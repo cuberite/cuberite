@@ -56,11 +56,11 @@ Commands
 Contributors
 ------------
 
-FakeTruth
-xoft
-tigerw
-bearbin
-tonibm19
+FakeTruth  
+xoft  
+tigerw  
+bearbin  
+tonibm19  
 
 (If you want your name here, please submit a PR after you've done your contributions.)
 

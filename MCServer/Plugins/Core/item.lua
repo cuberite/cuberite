@@ -5,7 +5,8 @@ function HandleItemCommand(Split, Player)
 		return true
 	end
 
-	itemSplit = StringSplit(Split[2], ":")
+	local itemSplit = StringSplit(Split[2], ":")
+	local newSplit = {}
 
 	newSplit[1] = "/give"
 	newSplit[2] = Player:GetName()
@@ -21,4 +22,5 @@ function HandleItemCommand(Split, Player)
 
 	HandleGiveCommand(newSplit, Player)
 	return true
+	
 end

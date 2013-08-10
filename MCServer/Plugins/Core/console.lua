@@ -9,6 +9,7 @@ function InitConsoleCommands()
 	PluginMgr:BindConsoleCommand("banlist",              HandleConsoleBanList,              " - Lists all players banned by name");
 	PluginMgr:BindConsoleCommand("getversion",           HandleConsoleVersion,              " - Gets server version reported to 1.4+ clients");
 	PluginMgr:BindConsoleCommand("help",                 HandleConsoleHelp,                 " - Lists all commands");
+	PluginMgr:BindConsoleCommand("give",                 HandleConsoleGive,                 " - Gives items to the specified player.")
 	PluginMgr:BindConsoleCommand("list",                 HandleConsoleList,                 " - Lists all players in a machine-readable format");
 	PluginMgr:BindConsoleCommand("listgroups",           HandleConsoleListGroups,           " - Shows a list of all the groups");
 	PluginMgr:BindConsoleCommand("numchunks",            HandleConsoleNumChunks,            " - Shows number of chunks currently loaded");
@@ -21,6 +22,66 @@ function InitConsoleCommands()
 	PluginMgr:BindConsoleCommand("unban",                HandleConsoleUnban,                " ~ Unbans a player by name");
 	PluginMgr:BindConsoleCommand("unload",               HandleConsoleUnload,               " - Unloads all unused chunks");
 	
+end
+
+function HandleConsoleGive(Split)
+
+	-- Make sure there are a correct number of arguments.
+	if #Split ~= 3 and #Split ~= 4 and #Split ~= 5 then
+		return true, "Usage: give <player> <item> [amount] [meta]"
+	end
+
+	-- Get the item from the arguments and check it's valid.
+	local Item = cItem()
+	if #Split == 5 then
+		local FoundItem = StringToItem(Split[3] .. ":" .. Split[5], Item)
+	else
+		local FoundItem = StringToItem(Split[3], Item)
+	end	
+	if not IsValidItem(Item.m_ItemType) then  -- StringToItem does not check if item is valid
+		FoundItem = false
+	end
+
+	if not FoundItem  then
+		return true, "Invalid item id or name!"
+	end
+
+	-- Work out how many items the user wants.
+	local ItemAmount = 1
+	if #Split > 3 then
+		ItemAmount = tonumber(Split[4])
+		if ItemAmount == nil or ItemAmount < 1 or ItemAmount > 512 then
+			return true, "Invalid amount!"
+		end
+	end
+
+	Item.m_ItemCount = ItemAmount
+
+	-- Get the playername from the split.
+	local playerName = Split[2]
+
+	local function giveItems(newPlayer)
+		local ItemsGiven = newPlayer:GetInventory():AddItem(Item)
+		if ItemsGiven == ItemAmount then
+			newPlayer:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "There you go!" )
+			LOG("Gave " .. newPlayer:GetName() .. " " .. Item.m_ItemCount .. " times " .. Item.m_ItemType .. ":" .. Item.m_ItemDamage)
+		else
+			Player:SendMessage( cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Not enough space in inventory, only gave " .. ItemsGiven)
+			return true, "Only " .. Item.m_ItemCount .. " out of " .. ItemsGiven .. "items could be delivered.")
+		end
+	end
+
+	-- Finally give the items to the player.
+	itemStatus = cRoot:Get():FindAndDoWithPlayer(playerName, giveItems)
+
+	-- Check to make sure that giving items was successful.
+	if not itemStatus then
+		return true, "There was no player that matched your query."
+	end
+
+	return true
+
+end
 end
 
 function HandleConsoleBan(Split)
@@ -50,7 +111,7 @@ end
 
 function HandleConsoleUnban(Split)
 	if( #Split < 2 ) then		
-		return true, "Usage: /unban [Player]"
+		return true, "Usage: unban [Player]"
 	end
 	
 	if( BannedPlayersIni:GetValueB("Banned", Split[2], false) == false ) then
