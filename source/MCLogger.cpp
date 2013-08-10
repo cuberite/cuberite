@@ -144,7 +144,7 @@ void cMCLogger::SetColor(eColorScheme a_Scheme)
 			default: ASSERT(!"Unhandled color scheme");
 		}
 		SetConsoleTextAttribute(g_Console, Attrib);
-	#elif defined(LINUX) && !defined(ANDROID_NDK)
+	#elif defined(__linux) && !defined(ANDROID_NDK)
 		switch (a_Scheme)
 		{
 			case csGrayOnBlack:   puts("\x1b[0m");    break;
