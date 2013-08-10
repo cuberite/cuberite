@@ -147,10 +147,10 @@ void cMCLogger::SetColor(eColorScheme a_Scheme)
 	#elif defined(__linux) && !defined(ANDROID_NDK)
 		switch (a_Scheme)
 		{
-			case csGrayOnBlack:   puts("\x1b[0m");    break;
-			case csYellowOnBlack: puts("\x1b[33;1m"); break;
-			case csRedOnBlack:    puts("\x1b[31;1m"); break;
-			case csBlackOnRed:    puts("\x1b[7;31;1m"); break;
+			case csGrayOnBlack:   printf("\x1b[0m");    break;
+			case csYellowOnBlack: printf("\x1b[33;1m"); break;
+			case csRedOnBlack:    printf("\x1b[31;1m"); break;
+			case csBlackOnRed:    printf("\x1b[7;31;1m"); break;
 			default: ASSERT(!"Unhandled color scheme");
 		}
 	#endif
