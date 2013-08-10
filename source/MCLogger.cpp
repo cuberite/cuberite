@@ -18,8 +18,6 @@ bool g_ShouldColorOutput = false;
 	WORD g_DefaultConsoleAttrib = 0x07;
 #elif defined (__linux) && !defined(ANDROID_NDK)
 	#include <unistd.h>  // Needed for isatty() on Linux
-	
-	bool g_ShouldColorOutput;
 #endif
 
 
@@ -40,7 +38,7 @@ cMCLogger::cMCLogger(void)
 	AString FileName;
 	Printf(FileName, "LOG_%d.txt", (int)time(NULL));
 	m_Log = new cLog(FileName);
-	m_Log->Log("--- Started Log ---");
+	m_Log->Log("--- Started Log ---\n");
 
 	s_MCLogger = this;
 
@@ -74,7 +72,7 @@ cMCLogger::cMCLogger(const AString & a_FileName)
 
 cMCLogger::~cMCLogger()
 {
-	m_Log->Log("--- Stopped Log ---");
+	m_Log->Log("--- Stopped Log ---\n");
 	delete m_Log;
 	if (this == s_MCLogger)
 		s_MCLogger = NULL;
@@ -116,6 +114,7 @@ void cMCLogger::Log(const char * a_Format, va_list a_ArgList)
 	SetColor(csRegular);
 	m_Log->Log(a_Format, a_ArgList);
 	ResetColor();
+	puts("");
 }
 
 
@@ -128,6 +127,7 @@ void cMCLogger::Info(const char * a_Format, va_list a_ArgList)
 	SetColor(csInfo);
 	m_Log->Log(a_Format, a_ArgList);
 	ResetColor();
+	puts("");
 }
 
 
@@ -140,6 +140,7 @@ void cMCLogger::Warn(const char * a_Format, va_list a_ArgList)
 	SetColor(csWarning);
 	m_Log->Log(a_Format, a_ArgList);
 	ResetColor();
+	puts("");
 }
 
 
@@ -152,6 +153,7 @@ void cMCLogger::Error(const char * a_Format, va_list a_ArgList)
 	SetColor(csError);
 	m_Log->Log(a_Format, a_ArgList);
 	ResetColor();
+	puts("");
 }
 
 
