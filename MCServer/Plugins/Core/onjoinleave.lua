@@ -19,4 +19,6 @@ end
 function OnDisconnect(Player, Reason)
 	local Server = cRoot:Get():GetServer()
 	Server:SendMessage(cChatColor.Yellow .. "[LEAVE] " .. cChatColor.White .. Player:GetName() .. " has left the game" )
+	LOG("Player " .. Player .. " has left the game."
+	return false
 end
