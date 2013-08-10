@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include <time.h>
-#include <io.h>
 #include "Log.h"
 
 
@@ -13,6 +12,8 @@ cMCLogger * cMCLogger::s_MCLogger = NULL;
 bool g_ShouldColorOutput = false;
 
 #ifdef _WIN32
+	#include <io.h>  // Needed for _isatty(), not available on Linux
+	
 	HANDLE g_Console = GetStdHandle(STD_OUTPUT_HANDLE);
 	WORD g_DefaultConsoleAttrib = 0x07;
 #elif defined (__linux) && !defined(ANDROID_NDK)
