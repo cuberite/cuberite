@@ -531,6 +531,27 @@ bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersi
 
 
 
+bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_ANIMATION);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerAnimation(a_Player, a_Animation))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_BREAKING_BLOCK);

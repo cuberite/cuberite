@@ -68,6 +68,7 @@ public:																	// tolua_export
 		HOOK_HANDSHAKE,
 		HOOK_KILLING,
 		HOOK_LOGIN,
+		HOOK_PLAYER_ANIMATION,
 		HOOK_PLAYER_BREAKING_BLOCK,
 		HOOK_PLAYER_BROKEN_BLOCK,
 		HOOK_PLAYER_EATING,
@@ -144,6 +145,7 @@ public:																	// tolua_export
 	bool CallHookHandshake                (cClientHandle * a_ClientHandle, const AString & a_Username);
 	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
+	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerEating             (cPlayer & a_Player);

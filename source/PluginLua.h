@@ -59,6 +59,7 @@ public:
 	virtual bool OnHandshake                (cClientHandle * a_Client, const AString & a_Username) override;
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer) override;
 	virtual bool OnLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) override;
+	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) override;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) override;

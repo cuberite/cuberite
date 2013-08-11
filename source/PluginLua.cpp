@@ -350,6 +350,18 @@ bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, co
 
 
 
+bool cPlugin_NewLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_ANIMATION), &a_Player, a_Animation, cLuaState::Return, res);
+	return res;
+}
+
+
+
+
+
 bool cPlugin_NewLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -842,6 +854,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";
 		case cPluginManager::HOOK_KILLING:                      return "OnKilling";
 		case cPluginManager::HOOK_LOGIN:                        return "OnLogin";
+		case cPluginManager::HOOK_PLAYER_ANIMATION:             return "OnPlayerAnimation";
 		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK:        return "OnPlayerBreakingBlock";
 		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:          return "OnPlayerBrokenBlock";
 		case cPluginManager::HOOK_PLAYER_EATING:                return "OnPlayerEating";

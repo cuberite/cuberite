@@ -997,6 +997,12 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 
 void cClientHandle::HandleAnimation(char a_Animation)
 {
+	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_Animation))
+	{
+		// Plugin disagrees, bail out
+		return;
+	}
+	
 	m_Player->GetWorld()->BroadcastPlayerAnimation(*m_Player, a_Animation, this);
 }
 
