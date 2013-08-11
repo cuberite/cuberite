@@ -128,6 +128,9 @@ protected:
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorldLightingProgress:
+
 /// A simple thread that displays the progress of world lighting in cWorld::InitializeSpawn()
 class cWorldLightingProgress :
 	public cIsThread
@@ -188,9 +191,45 @@ cWorld::cLock::cLock(cWorld & a_World) :
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTickThread:
+
+cWorld::cTickThread::cTickThread(cWorld & a_World) :
+	super(Printf("WorldTickThread: %s", a_World.GetName().c_str())),
+	m_World(a_World)
+{
+}
+
+
+
+
+
+void cWorld::cTickThread::Execute(void)
+{
+	const int ClocksPerTick = CLOCKS_PER_SEC / 20;
+	clock_t LastTime = clock();
+	while (!m_ShouldTerminate)
+	{
+		clock_t Start = clock();
+		m_World.Tick((float)(LastTime - Start) / CLOCKS_PER_SEC);
+		clock_t Now = clock();
+		if (Now - Start < ClocksPerTick)
+		{
+			cSleep::MilliSleep(1000 * (ClocksPerTick - (Now - Start)) / CLOCKS_PER_SEC);
+		}
+		LastTime = Start;
+	}
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
 cWorld::cWorld(const AString & a_WorldName) :
+	m_WorldName(a_WorldName),
+	m_IniFileName(m_WorldName + "/world.ini"),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
@@ -199,24 +238,26 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_LastSpawnMonster(0),
 	m_RSList(0),
 	m_Weather(eWeather_Sunny),
-	m_WeatherInterval(24000)  // Guaranteed 1 day of sunshine at server start :)
+	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(%s)", a_WorldName.c_str());
-	m_WorldName = a_WorldName;
-	m_IniFileName = m_WorldName + "/world.ini";
 
 	cMakeDir::MakeDir(m_WorldName.c_str());
 
-	MTRand r1;
-	m_SpawnX = (double)((r1.randInt() % 1000) - 500);
+	// TODO: Find a proper spawn location, based on the biomes (not in ocean)
+	m_SpawnX = (double)((m_TickRand.randInt() % 1000) - 500);
 	m_SpawnY = cChunkDef::Height;
-	m_SpawnZ = (double)((r1.randInt() % 1000) - 500);
+	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
 	m_GameMode = eGameMode_Creative;
 
 	AString StorageSchema("Default");
 
 	cIniFile IniFile(m_IniFileName);
-	IniFile.ReadFile();
+	if (!IniFile.ReadFile())
+	{
+		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
+	}
 	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
 	m_Dimension = StringToDimension(Dimension);
 	switch (m_Dimension)
@@ -268,9 +309,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true);
 		m_SpawnMonsterRate = (Int64)(IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10) * 20);  // Convert from secs to ticks
 		
-		// TODO: Move this into cServer instead:
-		SetMaxPlayers(IniFile2.GetValueI("Server", "MaxPlayers", 100));
-		m_Description = IniFile2.GetValue("Server", "Description", "MCServer! - In C++!").c_str();
 	}
 
 	m_ChunkMap = new cChunkMap(this);
@@ -1893,19 +1931,6 @@ void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
 
 
 
-void cWorld::SetMaxPlayers(int iMax)
-{
-	m_MaxPlayers = MAX_PLAYERS;
-	if (iMax > 0 && iMax < MAX_PLAYERS)
-	{
-		m_MaxPlayers = iMax;
-	}
-}
-
-
-
-
-
 void cWorld::AddPlayer(cPlayer * a_Player)
 {
 	cCSLock Lock(m_CSPlayers);
@@ -2299,11 +2324,13 @@ void cWorld::RemoveEntity(cEntity * a_Entity)
 
 
 
+/*
 unsigned int cWorld::GetNumPlayers(void)
 {
 	cCSLock Lock(m_CSPlayers);
 	return m_Players.size(); 
 }
+*/
 
 
 

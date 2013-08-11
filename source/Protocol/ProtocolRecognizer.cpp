@@ -14,6 +14,7 @@
 #include "Protocol16x.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
+#include "../Server.h"
 #include "../World.h"
 #include "../ChatColor.h"
 
@@ -729,11 +730,11 @@ void cProtocolRecognizer::HandleServerPing(void)
 		{
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
 			Printf(Reply, "%s%s%i%s%i", 
-				cRoot::Get()->GetDefaultWorld()->GetDescription().c_str(), 
-				cChatColor::Delimiter.c_str(), 
-				cRoot::Get()->GetDefaultWorld()->GetNumPlayers(),
-				cChatColor::Delimiter.c_str(), 
-				cRoot::Get()->GetDefaultWorld()->GetMaxPlayers()
+				cRoot::Get()->GetServer()->GetDescription().c_str(),
+				cChatColor::Delimiter.c_str(),
+				cRoot::Get()->GetServer()->GetNumPlayers(),
+				cChatColor::Delimiter.c_str(),
+				cRoot::Get()->GetServer()->GetMaxPlayers()
 			);
 			break;
 		}
@@ -759,9 +760,9 @@ void cProtocolRecognizer::HandleServerPing(void)
 			
 			// http://wiki.vg/wiki/index.php?title=Server_List_Ping&oldid=3100
 			AString NumPlayers;
-			Printf(NumPlayers, "%d", cRoot::Get()->GetDefaultWorld()->GetNumPlayers());
+			Printf(NumPlayers, "%d", cRoot::Get()->GetServer()->GetNumPlayers());
 			AString MaxPlayers;
-			Printf(MaxPlayers, "%d", cRoot::Get()->GetDefaultWorld()->GetMaxPlayers());
+			Printf(MaxPlayers, "%d", cRoot::Get()->GetServer()->GetMaxPlayers());
 			
 			AString ProtocolVersionNum;
 			Printf(ProtocolVersionNum, "%d", cRoot::Get()->m_PrimaryServerVersion);
@@ -775,7 +776,7 @@ void cProtocolRecognizer::HandleServerPing(void)
 			Reply.push_back(0);
 			Reply.append(ProtocolVersionTxt);
 			Reply.push_back(0);
-			Reply.append(cRoot::Get()->GetDefaultWorld()->GetDescription());
+			Reply.append(cRoot::Get()->GetServer()->GetDescription());
 			Reply.push_back(0);
 			Reply.append(NumPlayers);
 			Reply.push_back(0);

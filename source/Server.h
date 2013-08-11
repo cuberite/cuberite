@@ -37,7 +37,18 @@ class cServer										// tolua_export
 public:												// tolua_export
 	bool InitServer(cIniFile & a_SettingsIni);
 
-	bool IsConnected(void) const { return m_bIsConnected;} // returns connection status
+	// tolua_begin
+	
+	const AString & GetDescription(void) const {return m_Description; }
+
+	// Player counts:
+	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
+	int  GetNumPlayers(void) const { return m_NumPlayers; }
+	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
+	
+	// tolua_end
+
+	// bool IsConnected(void) const { return m_bIsConnected;} // returns connection status
 	
 	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export
 
@@ -130,6 +141,10 @@ private:
 	CryptoPP::RSA::PublicKey  m_PublicKey;
 	
 	cRCONServer m_RCONServer;
+	
+	AString m_Description;
+	int m_MaxPlayers;
+	int m_NumPlayers;
 	
 
 	cServer(void);

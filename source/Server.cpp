@@ -76,6 +76,38 @@ struct cServer::sServerState
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cServer:
+
+cServer::cServer(void) :
+	m_pState(new sServerState),
+	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client"),
+	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client"),
+	m_Millisecondsf(0),
+	m_Milliseconds(0),
+	m_bIsConnected(false),
+	m_bRestarting(false),
+	m_RCONServer(*this)
+{
+}
+
+
+
+
+
+cServer::~cServer()
+{
+	// TODO: Shut down the server gracefully
+	m_pState->bStopTickThread = true;
+	delete m_pState->pTickThread;	m_pState->pTickThread = NULL;
+
+	delete m_pState;
+}
+
+
+
+
+
 void cServer::ClientDestroying(const cClientHandle * a_Client)
 {
 	m_SocketThreads.StopReading(a_Client);
@@ -123,6 +155,9 @@ void cServer::RemoveClient(const cClientHandle * a_Client)
 
 bool cServer::InitServer(cIniFile & a_SettingsIni)
 {
+	m_Description = a_SettingsIni.GetValue ("Server", "Description", "MCServer! - In C++!").c_str();
+	m_MaxPlayers  = a_SettingsIni.GetValueI("Server", "MaxPlayers", 100);
+
 	if (m_bIsConnected)
 	{
 		LOGERROR("ERROR: Trying to initialize server while server is already running!");
@@ -195,35 +230,6 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	PrepareKeys();
 	
 	return true;
-}
-
-
-
-
-
-cServer::cServer(void)
-	: m_pState(new sServerState)
-	, m_ListenThreadIPv4(*this, cSocket::IPv4, "Client")
-	, m_ListenThreadIPv6(*this, cSocket::IPv6, "Client")
-	, m_Millisecondsf(0)
-	, m_Milliseconds(0)
-	, m_bIsConnected(false)
-	, m_bRestarting(false)
-	, m_RCONServer(*this)
-{
-}
-
-
-
-
-
-cServer::~cServer()
-{
-	// TODO: Shut down the server gracefully
-	m_pState->bStopTickThread = true;
-	delete m_pState->pTickThread;	m_pState->pTickThread = NULL;
-
-	delete m_pState;
 }
 
 

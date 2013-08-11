@@ -204,13 +204,6 @@ public:
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 
-	// MOTD
-	const AString & GetDescription(void) const {return m_Description; }	// FIXME: This should not be in cWorld
-
-	// Max Players
-	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }					// tolua_export
-	void SetMaxPlayers(int iMax);													// tolua_export
-
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
 
@@ -222,8 +215,6 @@ public:
 
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
-	
-	unsigned int GetNumPlayers();													// tolua_export
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit);
@@ -484,8 +475,6 @@ public:
 	inline int GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline int GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
 
-	void Tick(float a_Dt);
-
 	void InitializeSpawn(void);
 	
 	/// Stops threads that belong to this world (part of deinit)
@@ -540,7 +529,25 @@ public:
 private:
 
 	friend class cRoot;
+	
+	class cTickThread :
+		public cIsThread
+	{
+		typedef cIsThread super;
+	public:
+		cTickThread(cWorld & a_World);
+		
+	protected:
+		cWorld & m_World;
+		
+		// cIsThread overrides:
+		virtual void Execute(void) override;
+	} ;
+	
 
+	AString m_WorldName;
+	AString m_IniFileName;
+	
 	/// The dimension of the world, used by the client to provide correct lighting scheme
 	eDimension m_Dimension;
 	
@@ -583,8 +590,6 @@ private:
 
 	cWorldStorage     m_Storage;
 	
-	AString m_Description;
-	
 	unsigned int m_MaxPlayers;
 
 	cChunkMap * m_ChunkMap;
@@ -616,12 +621,13 @@ private:
 	
 	cChunkSender     m_ChunkSender;
 	cLightingThread  m_Lighting;
+	cTickThread      m_TickThread;
 
-	AString m_WorldName;
-	AString m_IniFileName;
-	
+
 	cWorld(const AString & a_WorldName);
 	~cWorld();
+
+	void Tick(float a_Dt);
 
 	void TickWeather(float a_Dt);  // Handles weather each tick
 	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick

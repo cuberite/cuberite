@@ -421,11 +421,11 @@ void cClientHandle::HandlePing(void)
 	// Somebody tries to retrieve information about the server
 	AString Reply;
 	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetDefaultWorld()->GetDescription().c_str(), 
-		cChatColor::Delimiter.c_str(), 
-		cRoot::Get()->GetDefaultWorld()->GetNumPlayers(),
-		cChatColor::Delimiter.c_str(), 
-		cRoot::Get()->GetDefaultWorld()->GetMaxPlayers()
+		cRoot::Get()->GetServer()->GetDescription().c_str(),
+		cChatColor::Delimiter.c_str(),
+		cRoot::Get()->GetServer()->GetNumPlayers(),
+		cChatColor::Delimiter.c_str(),
+		cRoot::Get()->GetServer()->GetMaxPlayers()
 	);
 	Kick(Reply.c_str());
 }
@@ -1176,7 +1176,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
 	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(this, a_Username))
 	{
-		if (cRoot::Get()->GetDefaultWorld()->GetNumPlayers() >= cRoot::Get()->GetDefaultWorld()->GetMaxPlayers())
+		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())
 		{
 			Kick("The server is currently full :(-- Try again later");
 			return false;
@@ -1191,7 +1191,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 {
-	if( a_EntityID != m_Player->GetUniqueID() )
+	if (a_EntityID != m_Player->GetUniqueID())
 	{
 		// We should only receive entity actions from the entity that is performing the action
 		return;
