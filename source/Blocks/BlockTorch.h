@@ -116,7 +116,7 @@ public:
 			//case E_BLOCK_NETHER_BRICK_FENCE:
 			//case E_BLOCK_PISTON:
 			//case E_BLOCK_IRON_BARS
-			if ( g_BlockIsSolid[a_BlockType] {
+			if ( g_BlockIsSolid[a_BlockType] ) {
 				return (a_Direction == 0x1);  // allow only direction "standing on floor"
 			}
 			else {
