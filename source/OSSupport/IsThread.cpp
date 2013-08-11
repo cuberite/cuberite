@@ -116,36 +116,38 @@ bool cIsThread::Start(void)
 
 
 
+void cIsThread::Stop(void)
+{
+	if (m_Handle == NULL)
+	{
+		return;
+	}
+	m_ShouldTerminate = true;
+	Wait();
+}
+
+
+
+
+
 bool cIsThread::Wait(void)
 {
-	#ifdef _WIN32
+	if (m_Handle == NULL)
+	{
+		return true;
+	}
+	LOGD("Waiting for thread %s to finish", m_ThreadName.c_str());
 	
-		if (m_Handle == NULL)
-		{
-			return true;
-		}
-		// Cannot log, logger may already be stopped:
-		// LOG("Waiting for thread \"%s\" to terminate.", m_ThreadName.c_str());
+	#ifdef _WIN32
 		int res = WaitForSingleObject(m_Handle, INFINITE);
 		m_Handle = NULL;
-		// Cannot log, logger may already be stopped:
-		// LOG("Thread \"%s\" %s terminated, GLE = %d", m_ThreadName.c_str(), (res == WAIT_OBJECT_0) ? "" : "not", GetLastError());
+		LOGD("Thread %s finished", m_ThreadName.c_str());
 		return (res == WAIT_OBJECT_0);
-		
 	#else  // _WIN32
-	
-		if (!m_HasStarted)
-		{
-			return true;
-		}
-		// Cannot log, logger may already be stopped:
-		// LOG("Waiting for thread \"%s\" to terminate.", m_ThreadName.c_str());
 		int res = pthread_join(m_Handle, NULL);
-		m_HasStarted = false;
-		// Cannot log, logger may already be stopped:
-		// LOG("Thread \"%s\" %s terminated, errno = %d", m_ThreadName.c_str(), (res == 0) ? "" : "not", errno);
+		m_Handle = NULL;
+		LOGD("Thread %s finished", m_ThreadName.c_str());
 		return (res == 0);
-		
 	#endif  // else _WIN32
 }
 

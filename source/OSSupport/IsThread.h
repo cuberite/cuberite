@@ -39,6 +39,9 @@ public:
 	/// Starts the thread; returns without waiting for the actual start
 	bool Start(void);
 	
+	/// Signals the thread to terminate and waits until it's finished
+	void Stop(void);
+	
 	/// Waits for the thread to finish. Doesn't signalize the ShouldTerminate flag
 	bool Wait(void);
 	
@@ -70,7 +73,6 @@ private:
 		}
 		
 	#endif  // else _WIN32
-	
 } ;
 
 
