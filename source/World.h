@@ -477,8 +477,12 @@ public:
 
 	void InitializeSpawn(void);
 	
+	/// Starts threads that belong to this world
+	void Start(void);
+	
 	/// Stops threads that belong to this world (part of deinit)
-	void StopThreads(void);
+	void Stop(void);
+	
 	void TickQueuedBlocks(float a_Dt);
 
 	struct BlockTickQueueItem
@@ -547,6 +551,9 @@ private:
 
 	AString m_WorldName;
 	AString m_IniFileName;
+	
+	/// Name of the storage schema used to load and save chunks
+	AString m_StorageSchema;
 	
 	/// The dimension of the world, used by the client to provide correct lighting scheme
 	eDimension m_Dimension;

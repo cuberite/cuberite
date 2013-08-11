@@ -230,6 +230,7 @@ void cWorld::cTickThread::Execute(void)
 cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
+	m_StorageSchema("Default"),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
@@ -244,102 +245,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	LOGD("cWorld::cWorld(%s)", a_WorldName.c_str());
 
 	cMakeDir::MakeDir(m_WorldName.c_str());
-
-	// TODO: Find a proper spawn location, based on the biomes (not in ocean)
-	m_SpawnX = (double)((m_TickRand.randInt() % 1000) - 500);
-	m_SpawnY = cChunkDef::Height;
-	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
-	m_GameMode = eGameMode_Creative;
-
-	AString StorageSchema("Default");
-
-	cIniFile IniFile(m_IniFileName);
-	if (!IniFile.ReadFile())
-	{
-		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
-	}
-	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
-	m_Dimension = StringToDimension(Dimension);
-	switch (m_Dimension)
-	{
-		case dimNether:
-		case dimOverworld:
-		case dimEnd:
-		{
-			break;
-		}
-		default:
-		{
-			LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", Dimension.c_str());
-			m_Dimension = dimOverworld;
-			break;
-		}
-	}  // switch (m_Dimension)
-	m_SpawnX                    = IniFile.GetValueSetF("SpawnPosition", "X",                         m_SpawnX);
-	m_SpawnY                    = IniFile.GetValueSetF("SpawnPosition", "Y",                         m_SpawnY);
-	m_SpawnZ                    = IniFile.GetValueSetF("SpawnPosition", "Z",                         m_SpawnZ);
-	StorageSchema               = IniFile.GetValueSet ("Storage",       "Schema",                    StorageSchema);
-	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
-	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
-	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
-	m_IsCarrotsBonemealable     = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",     true);
-	m_IsCropsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",       true);
-	m_IsGrassBonemealable       = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",       true);
-	m_IsMelonStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",   true);
-	m_IsMelonBonemealable       = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",       false);
-	m_IsPotatoesBonemealable    = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",    true);
-	m_IsPumpkinStemBonemealable = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable", true);
-	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
-	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
-	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
-	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
-	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
-
-	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
-
-	m_Lighting.Start(this);
-	m_Storage.Start(this, StorageSchema);
-	m_Generator.Start(this, IniFile);
-
-	m_bAnimals = true;
-	m_SpawnMonsterRate = 200;  // 1 mob each 10 seconds
-	cIniFile IniFile2("settings.ini");
-	if (IniFile2.ReadFile())
-	{
-		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true);
-		m_SpawnMonsterRate = (Int64)(IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10) * 20);  // Convert from secs to ticks
-		
-	}
-
-	m_ChunkMap = new cChunkMap(this);
-	
-	m_ChunkSender.Start(this);
-
-	m_LastSave = 0;
-	m_LastUnload = 0;
-
-	// preallocate some memory for ticking blocks so we don�t need to allocate that often
-	m_BlockTickQueue.reserve(1000);
-	m_BlockTickQueueCopy.reserve(1000);
-
-	// Simulators:
-	m_SimulatorManager  = new cSimulatorManager(*this);
-	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
-	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = new cSandSimulator(*this, IniFile);
-	m_FireSimulator     = new cFireSimulator(*this, IniFile);
-	m_RedstoneSimulator = new cRedstoneSimulator(*this);
-
-	// Water and Lava simulators get registered in InitializeFluidSimulator()
-	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
-
-	// Save any changes that the defaults may have done to the ini file:
-	if (!IniFile.WriteFile())
-	{
-		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
-	}
 }
 
 
@@ -542,10 +447,115 @@ void cWorld::InitializeSpawn(void)
 
 
 
-void cWorld::StopThreads(void)
+void cWorld::Start(void)
 {
+	// TODO: Find a proper spawn location, based on the biomes (not in ocean)
+	m_SpawnX = (double)((m_TickRand.randInt() % 1000) - 500);
+	m_SpawnY = cChunkDef::Height;
+	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
+	m_GameMode = eGameMode_Creative;
+
+	cIniFile IniFile(m_IniFileName);
+	if (!IniFile.ReadFile())
+	{
+		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
+	}
+	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
+	m_Dimension = StringToDimension(Dimension);
+	switch (m_Dimension)
+	{
+		case dimNether:
+		case dimOverworld:
+		case dimEnd:
+		{
+			break;
+		}
+		default:
+		{
+			LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", Dimension.c_str());
+			m_Dimension = dimOverworld;
+			break;
+		}
+	}  // switch (m_Dimension)
+	m_SpawnX                    = IniFile.GetValueSetF("SpawnPosition", "X",                         m_SpawnX);
+	m_SpawnY                    = IniFile.GetValueSetF("SpawnPosition", "Y",                         m_SpawnY);
+	m_SpawnZ                    = IniFile.GetValueSetF("SpawnPosition", "Z",                         m_SpawnZ);
+	m_StorageSchema             = IniFile.GetValueSet ("Storage",       "Schema",                    m_StorageSchema);
+	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
+	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
+	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
+	m_IsCarrotsBonemealable     = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",     true);
+	m_IsCropsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",       true);
+	m_IsGrassBonemealable       = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",       true);
+	m_IsMelonStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",   true);
+	m_IsMelonBonemealable       = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",       false);
+	m_IsPotatoesBonemealable    = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",    true);
+	m_IsPumpkinStemBonemealable = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable", true);
+	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
+	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
+	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
+	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
+	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
+
+	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
+
+	m_bAnimals = true;
+	m_SpawnMonsterRate = 200;  // 1 mob each 10 seconds
+	cIniFile IniFile2("settings.ini");
+	if (IniFile2.ReadFile())
+	{
+		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true);
+		m_SpawnMonsterRate = (Int64)(IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10) * 20);  // Convert from secs to ticks
+		
+	}
+
+	m_ChunkMap = new cChunkMap(this);
+	
+	m_LastSave = 0;
+	m_LastUnload = 0;
+
+	// preallocate some memory for ticking blocks so we don�t need to allocate that often
+	m_BlockTickQueue.reserve(1000);
+	m_BlockTickQueueCopy.reserve(1000);
+
+	// Simulators:
+	m_SimulatorManager  = new cSimulatorManager(*this);
+	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
+	m_SandSimulator     = new cSandSimulator(*this, IniFile);
+	m_FireSimulator     = new cFireSimulator(*this, IniFile);
+	m_RedstoneSimulator = new cRedstoneSimulator(*this);
+
+	// Water and Lava simulators get registered in InitializeFluidSimulator()
+	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
+	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
+	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
+
+	m_Lighting.Start(this);
+	m_Storage.Start(this, m_StorageSchema);
+	m_Generator.Start(this, IniFile);
+	m_ChunkSender.Start(this);
+	m_TickThread.Start();
+
+	// Save any changes that the defaults may have done to the ini file:
+	if (!IniFile.WriteFile())
+	{
+		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
+	}
+
+}
+
+
+
+
+
+void cWorld::Stop(void)
+{
+	m_TickThread.Stop();
+	m_Lighting.Stop();
 	m_Generator.Stop();
 	m_ChunkSender.Stop();
+	m_Storage.Stop();
 }
 
 

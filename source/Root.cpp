@@ -270,8 +270,9 @@ void cRoot::LoadWorlds(void)
 
 void cRoot::StartWorlds(void)
 {
-	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
+		itr->second->Start();
 		itr->second->InitializeSpawn();
 	}
 }
@@ -282,9 +283,9 @@ void cRoot::StartWorlds(void)
 
 void cRoot::StopWorlds(void)
 {
-	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
-		itr->second->StopThreads();
+		itr->second->Stop();
 	}
 }
 
@@ -344,7 +345,7 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 
 
 
-void cRoot::TickWorlds(float a_Dt)
+void cRoot::TickCommands(void)
 {
 	// Execute any pending commands:
 	cCommandQueue PendingCommands;
@@ -355,12 +356,6 @@ void cRoot::TickWorlds(float a_Dt)
 	for (cCommandQueue::iterator itr = PendingCommands.begin(), end = PendingCommands.end(); itr != end; ++itr)
 	{
 		ExecuteConsoleCommand(itr->m_Command, *(itr->m_Output));
-	}
-	
-	// Tick the worlds:
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
-	{
-		itr->second->Tick(a_Dt);
 	}
 }
 

@@ -317,7 +317,7 @@ void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_E
 
 bool cServer::Tick(float a_Dt)
 {
-	cRoot::Get()->TickWorlds(a_Dt);
+	cRoot::Get()->TickCommands();
 	
 	cClientHandleList RemoveClients;
 	{

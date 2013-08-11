@@ -62,7 +62,7 @@ public:												// tolua_export
 	/// Binds the built-in console commands with the plugin manager
 	static void BindBuiltInConsoleCommands(void);
 	
-	void Shutdown();
+	void Shutdown(void);
 
 	void SendMessage(const AString & a_Message, cPlayer * a_Player = NULL, bool a_bExclude = false );  // tolua_export
 	
