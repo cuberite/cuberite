@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockID.h"
@@ -242,7 +243,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
 	m_TickThread(*this)
 {
-	LOGD("cWorld::cWorld(%s)", a_WorldName.c_str());
+	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
 	cMakeDir::MakeDir(m_WorldName.c_str());
 }
@@ -587,6 +588,7 @@ void cWorld::Tick(float a_Dt)
 	m_ChunkMap->Tick(a_Dt);
 
 	TickQueuedBlocks(a_Dt);
+	TickQueuedTasks();
 	
 	GetSimulatorManager()->Simulate(a_Dt);
 
@@ -775,6 +777,27 @@ void cWorld::TickSpawnMobs(float a_Dt)
 		// A proper mob type was selected, now spawn the mob:
 		SpawnMob(SpawnPos.x, SpawnPos.y, SpawnPos.z, MobType);
 	}
+}
+
+
+
+
+
+void cWorld::TickQueuedTasks(void)
+{
+	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
+	cTasks Tasks;
+	{
+		cCSLock Lock(m_CSTasks);
+		std::swap(Tasks, m_Tasks);
+	}
+
+	// Execute and delete each task:
+	for (cTasks::iterator itr = m_Tasks.begin(), end = m_Tasks.end(); itr != end; ++itr)
+	{
+		(*itr)->Run(*this);
+		delete *itr;
+	}  // for itr - m_Tasks[]
 }
 
 
@@ -2307,6 +2330,25 @@ void cWorld::SaveAllChunks(void)
 
 
 
+void cWorld::QueueSaveAllChunks(void)
+{
+	QueueTask(new cWorld::cTaskSaveAllChunks);
+}
+
+
+
+
+
+void cWorld::QueueTask(cTask * a_Task)
+{
+	cCSLock Lock(m_CSTasks);
+	m_Tasks.push_back(a_Task);
+}
+
+
+
+
+
 void cWorld::AddEntity(cEntity * a_Entity)
 {
 	m_ChunkMap->AddEntity(a_Entity);
@@ -2549,6 +2591,18 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 	return res;
 }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTaskSaveAllChunks:
+
+void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
+{
+	a_World.SaveAllChunks();
+}
+
 
 
 

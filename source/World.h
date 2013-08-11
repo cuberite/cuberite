@@ -69,6 +69,24 @@ public:
 	public:
 		cLock(cWorld & a_World);
 	} ;
+	
+	/// A common ancestor for all tasks queued onto the tick thread
+	class cTask
+	{
+	public:
+		virtual void Run(cWorld & a_World) = 0;
+	} ;
+	
+	typedef std::vector<cTask *> cTasks;
+	
+	class cTaskSaveAllChunks :
+		public cTask
+	{
+	protected:
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
+	} ;
+	
 
 	// tolua_begin
 
@@ -461,10 +479,17 @@ public:
 		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
 	}
 
-	void SaveAllChunks(void);			// tolua_export
+	/// Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead
+	void SaveAllChunks(void);  // tolua_export
+	
+	/// Queues a task to save all chunks onto the tick thread. The prefferred way of saving chunks from external sources
+	void QueueSaveAllChunks(void);  // tolua_export
+	
+	/// Queues a task onto the tick thread. The task object will be deleted once the task is finished
+	void QueueTask(cTask * a_Task);
 
 	/// Returns the number of chunks loaded	
-	int GetNumChunks() const;		// tolua_export
+	int GetNumChunks() const;  // tolua_export
 
 	/// Returns the number of chunks loaded and dirty, and in the lighting queue
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
@@ -629,6 +654,12 @@ private:
 	cChunkSender     m_ChunkSender;
 	cLightingThread  m_Lighting;
 	cTickThread      m_TickThread;
+	
+	/// Guards the m_Tasks
+	cCriticalSection m_CSTasks;
+	
+	/// Tasks that have been queued onto the tick thread; guarded by m_CSTasks
+	cTasks m_Tasks;
 
 
 	cWorld(const AString & a_WorldName);
@@ -638,6 +669,9 @@ private:
 
 	void TickWeather(float a_Dt);  // Handles weather each tick
 	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
+	
+	/// Executes all tasks queued onto the tick thread
+	void TickQueuedTasks(void);
 	
 	/// Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section)
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
