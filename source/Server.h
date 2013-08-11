@@ -52,8 +52,6 @@ public:												// tolua_export
 	
 	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export
 
-	bool Tick(float a_Dt);
-
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
@@ -71,7 +69,7 @@ public:												// tolua_export
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
 
-	const AString & GetServerID(void) const; // tolua_export
+	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 	
 	void ClientDestroying(const cClientHandle * a_Client);  // Called by cClientHandle::Destroy(); stop m_SocketThreads from calling back into a_Client
 	
@@ -114,8 +112,22 @@ private:
 		void NotifyClientWrite(const cClientHandle * a_Client);
 	} ;
 	
-	struct sServerState;
-	sServerState * m_pState;
+	/// The server tick thread takes care of the players who aren't yet spawned in a world
+	class cTickThread :
+		public cIsThread
+	{
+		typedef cIsThread super;
+		
+	public:
+		cTickThread(cServer & a_Server);
+		
+	protected:
+		cServer & m_Server;
+		
+		// cIsThread overrides:
+		virtual void Execute(void) override;
+	} ;
+	
 	
 	cNotifyWriteThread m_NotifyWriteThread;
 	
@@ -128,10 +140,6 @@ private:
 	cSocketThreads m_SocketThreads;
 	
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
-
-	// Time since server was started
-	float m_Millisecondsf;
-	unsigned int m_Milliseconds;
 
 	bool m_bIsConnected; // true - connected false - not connected
 
@@ -146,13 +154,20 @@ private:
 	int m_MaxPlayers;
 	int m_NumPlayers;
 	
+	cTickThread m_TickThread;
+	cEvent m_RestartEvent;
+	
+	/// The server ID used for client authentication
+	AString m_ServerID;
+	
 
 	cServer(void);
-	~cServer();
 
 	/// Loads, or generates, if missing, RSA keys for protocol encryption
 	void PrepareKeys(void);
 	
+	bool Tick(float a_Dt);
+
 	// cListenThread::cCallback overrides:
 	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
 }; // tolua_export

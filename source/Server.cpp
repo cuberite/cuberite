@@ -59,18 +59,42 @@ typedef std::list< cClientHandle* > ClientList;
 
 
 
-struct cServer::sServerState
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cServer::cTickThread:
+
+cServer::cTickThread::cTickThread(cServer & a_Server) :
+	super("ServerTickThread"),
+	m_Server(a_Server)
 {
-	sServerState()
-		: pTickThread(NULL)
-		, bStopTickThread(false)
-	{}
+}
 
-	cThread* pTickThread;	bool bStopTickThread;
 
-	cEvent RestartEvent;
-	std::string ServerID;
-};
+
+
+
+void cServer::cTickThread::Execute(void)
+{
+	cTimer Timer;
+
+	long long msPerTick = 50;	// TODO - Put this in server config file
+	long long LastTime = Timer.GetNowTime();
+
+	while (!m_ShouldTerminate)
+	{
+		long long NowTime = Timer.GetNowTime();
+		float DeltaTime = (float)(NowTime-LastTime);
+		m_ShouldTerminate = !m_Server.Tick(DeltaTime);
+		long long TickTime = Timer.GetNowTime() - NowTime;
+		
+		if (TickTime < msPerTick)
+		{
+			// Stretch tick time until it's at least msPerTick
+			cSleep::MilliSleep((unsigned int)(msPerTick - TickTime));
+		}
+
+		LastTime = NowTime;
+	}
+}
 
 
 
@@ -80,28 +104,13 @@ struct cServer::sServerState
 // cServer:
 
 cServer::cServer(void) :
-	m_pState(new sServerState),
 	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client"),
 	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client"),
-	m_Millisecondsf(0),
-	m_Milliseconds(0),
 	m_bIsConnected(false),
 	m_bRestarting(false),
-	m_RCONServer(*this)
+	m_RCONServer(*this),
+	m_TickThread(*this)
 {
-}
-
-
-
-
-
-cServer::~cServer()
-{
-	// TODO: Shut down the server gracefully
-	m_pState->bStopTickThread = true;
-	delete m_pState->pTickThread;	m_pState->pTickThread = NULL;
-
-	delete m_pState;
 }
 
 
@@ -199,18 +208,17 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 	m_bIsConnected = true;
 
-	m_pState->ServerID = "-";
+	m_ServerID = "-";
 	if (a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true))
 	{
 		MTRand mtrand1;
-		unsigned int r1 = (mtrand1.randInt()%1147483647) + 1000000000;
-		unsigned int r2 = (mtrand1.randInt()%1147483647) + 1000000000;
+		unsigned int r1 = (mtrand1.randInt() % 1147483647) + 1000000000;
+		unsigned int r2 = (mtrand1.randInt() % 1147483647) + 1000000000;
 		std::ostringstream sid;
 		sid << std::hex << r1;
 		sid << std::hex << r2;
-		std::string ServerID = sid.str();
-		ServerID.resize(16, '0');
-		m_pState->ServerID = ServerID;
+		m_ServerID = sid.str();
+		m_ServerID.resize(16, '0');
 	}
 	
 	m_ClientViewDistance = a_SettingsIni.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
@@ -309,15 +317,8 @@ void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_E
 
 bool cServer::Tick(float a_Dt)
 {
-	m_Millisecondsf += a_Dt;
-	if (m_Millisecondsf > 1.f)
-	{
-		m_Milliseconds += (int)m_Millisecondsf;
-		m_Millisecondsf = m_Millisecondsf - (int)m_Millisecondsf;
-	}
-
-	cRoot::Get()->TickWorlds(a_Dt); // TODO - Maybe give all worlds their own thread?
-
+	cRoot::Get()->TickWorlds(a_Dt);
+	
 	cClientHandleList RemoveClients;
 	{
 		cCSLock Lock(m_CSClients);
@@ -338,8 +339,6 @@ bool cServer::Tick(float a_Dt)
 		delete *itr;
 	} // for itr - RemoveClients[]
 
-	cRoot::Get()->GetPluginManager()->Tick(a_Dt);
-
 	if (!m_bRestarting)
 	{
 		return true;
@@ -347,42 +346,9 @@ bool cServer::Tick(float a_Dt)
 	else
 	{
 		m_bRestarting = false;
-		m_pState->RestartEvent.Set();
+		m_RestartEvent.Set();
 		return false;
 	}
-}
-
-
-
-
-
-void ServerTickThread( void * a_Param )
-{
-	LOG("ServerTickThread");
-	cServer *CServerObj = (cServer*)a_Param;
-
-	cTimer Timer;
-
-	long long msPerTick = 50;	// TODO - Put this in server config file
-	long long LastTime = Timer.GetNowTime();
-
-	bool bKeepGoing = true;
-	while( bKeepGoing )
-	{
-		long long NowTime = Timer.GetNowTime();
-		float DeltaTime = (float)(NowTime-LastTime);
-		bKeepGoing = CServerObj->Tick( DeltaTime );
-		long long TickTime = Timer.GetNowTime() - NowTime;
-		
-		if( TickTime < msPerTick )	// Stretch tick time until it's at least msPerTick
-		{
-			cSleep::MilliSleep( (unsigned int)( msPerTick - TickTime ) );
-		}
-
-		LastTime = NowTime;
-	}
-
-	LOG("TICK THREAD STOPPED");
 }
 
 
@@ -391,7 +357,6 @@ void ServerTickThread( void * a_Param )
 
 bool cServer::Start(void)
 {
-	m_pState->pTickThread = new cThread( ServerTickThread, this, "cServer::ServerTickThread" );
 	if (!m_ListenThreadIPv4.Start())
 	{
 		return false;
@@ -400,7 +365,10 @@ bool cServer::Start(void)
 	{
 		return false;
 	}
-	m_pState->pTickThread->Start( true );
+	if (!m_TickThread.Start())
+	{
+		return false;
+	}
 	return true;
 }
 
@@ -503,13 +471,13 @@ void cServer::SendMessage(const AString & a_Message, cPlayer * a_Player /* = NUL
 
 
 
-void cServer::Shutdown()
+void cServer::Shutdown(void)
 {
 	m_ListenThreadIPv4.Stop();
 	m_ListenThreadIPv6.Stop();
 	
 	m_bRestarting = true;
-	m_pState->RestartEvent.Wait();
+	m_RestartEvent.Wait();
 
 	cRoot::Get()->SaveAllChunks();
 
@@ -520,15 +488,6 @@ void cServer::Shutdown()
 		delete *itr;
 	}
 	m_Clients.clear();
-}
-
-
-
-
-
-const AString & cServer::GetServerID(void) const
-{
-	return m_pState->ServerID;
 }
 
 
@@ -568,7 +527,7 @@ void cServer::AuthenticateUser(int a_ClientID)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cServer::cClientPacketThread:
+// cServer::cNotifyWriteThread:
 
 cServer::cNotifyWriteThread::cNotifyWriteThread(void) :
 	super("ClientPacketThread"),
