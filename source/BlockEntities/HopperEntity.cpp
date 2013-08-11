@@ -7,6 +7,7 @@
 #include "HopperEntity.h"
 #include "../Chunk.h"
 #include "../Player.h"
+#include "../PluginManager.h"
 #include "ChestEntity.h"
 #include "DropSpenserEntity.h"
 #include "FurnaceEntity.h"
@@ -162,12 +163,26 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 	bool res = false;
 	switch (a_Chunk.GetBlock(m_RelX, m_PosY + 1, m_RelZ))
 	{
-		case E_BLOCK_CHEST:       res = MoveItemsFromChest(a_Chunk); break;
-		case E_BLOCK_FURNACE:     res = MoveItemsFromFurnace(a_Chunk); break;
+		case E_BLOCK_CHEST:
+		{
+			// Chests have special handling because of double-chests
+			res = MoveItemsFromChest(a_Chunk);
+			break;
+		}
+		case E_BLOCK_LIT_FURNACE:
+		case E_BLOCK_FURNACE:
+		{
+			// Furnaces have special handling because only the output and leftover fuel buckets shall be moved
+			res = MoveItemsFromFurnace(a_Chunk);
+			break;
+		}
 		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:     res = MoveItemsFromGrid(((cDropSpenserEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ))->GetContents()); break;
-		case E_BLOCK_HOPPER:      res = MoveItemsFromGrid(((cHopperEntity *)     a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ))->GetContents()); break;
-		case E_BLOCK_LIT_FURNACE: res = MoveItemsFromFurnace(a_Chunk); break;
+		case E_BLOCK_DROPPER:
+		case E_BLOCK_HOPPER:
+		{
+			res = MoveItemsFromGrid(*(cBlockEntityWithItems *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ));
+			break;
+		}
 	}
 	
 	// If the item has been moved, reset the last tick:
@@ -230,12 +245,26 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 	bool res = false;
 	switch (DestChunk->GetBlock(rx, by, rz))
 	{
-		case E_BLOCK_CHEST:       res = MoveItemsToChest(*DestChunk, bx, by, bz); break;
-		case E_BLOCK_FURNACE:     res = MoveItemsToFurnace(*DestChunk, bx, by, bz, Meta); break;
+		case E_BLOCK_CHEST:
+		{
+			// Chests have special handling because of double-chests
+			res = MoveItemsToChest(*DestChunk, bx, by, bz);
+			break;
+		}
+		case E_BLOCK_LIT_FURNACE:
+		case E_BLOCK_FURNACE:
+		{
+			// Furnaces have special handling because of the direction-to-slot relation
+			res = MoveItemsToFurnace(*DestChunk, bx, by, bz, Meta);
+			break;
+		}
 		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:     res = MoveItemsToGrid(((cDropSpenserEntity *)DestChunk->GetBlockEntity(bx, by, bz))->GetContents()); break;
-		case E_BLOCK_HOPPER:      res = MoveItemsToGrid(((cHopperEntity *)     DestChunk->GetBlockEntity(bx, by, bz))->GetContents()); break;
-		case E_BLOCK_LIT_FURNACE: res = MoveItemsToFurnace(*DestChunk, bx, by, bz, Meta); break;
+		case E_BLOCK_DROPPER:
+		case E_BLOCK_HOPPER:
+		{
+			res = MoveItemsToGrid(*(cBlockEntityWithItems *)DestChunk->GetBlockEntity(bx, by, bz));
+			break;
+		}
 	}
 	
 	// If the item has been moved, reset the last tick:
@@ -254,7 +283,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 /// Moves items from a chest (dblchest) above the hopper into this hopper. Returns true if contents have changed.
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
-	if (MoveItemsFromGrid(((cChestEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ))->GetContents()))
+	if (MoveItemsFromGrid(*(cChestEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ)))
 	{
 		// Moved the item from the chest directly above the hopper
 		return true;
@@ -284,7 +313,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		{
 			continue;
 		}
-		if (MoveItemsFromGrid(((cChestEntity *)Neighbor->GetBlockEntity(x, m_PosY, z))->GetContents()))
+		if (MoveItemsFromGrid(*(cChestEntity *)Neighbor->GetBlockEntity(x, m_PosY, z)))
 		{
 			return true;
 		}
@@ -306,7 +335,7 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 	ASSERT(Furnace != NULL);
 	
 	// Try move from the output slot:
-	if (MoveItemsFromSlot(Furnace->GetOutputSlot(), true))
+	if (MoveItemsFromSlot(*Furnace, cFurnaceEntity::fsOutput, true))
 	{
 		cItem NewOutput(Furnace->GetOutputSlot());
 		Furnace->SetOutputSlot(NewOutput.AddCount(-1));
@@ -316,7 +345,7 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 	// No output moved, check if we can move an empty bucket out of the fuel slot:
 	if (Furnace->GetFuelSlot().m_ItemType == E_ITEM_BUCKET)
 	{
-		if (MoveItemsFromSlot(Furnace->GetFuelSlot(), true))
+		if (MoveItemsFromSlot(*Furnace, cFurnaceEntity::fsFuel, true))
 		{
 			Furnace->SetFuelSlot(cItem());
 			return true;
@@ -331,21 +360,21 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 
 
 
-/// Moves items from the specified ItemGrid into this hopper. Returns true if contents have changed.
-bool cHopperEntity::MoveItemsFromGrid(cItemGrid & a_Grid)
+bool cHopperEntity::MoveItemsFromGrid(cBlockEntityWithItems & a_Entity)
 {
-	int NumSlots = a_Grid.GetNumSlots();
+	cItemGrid & Grid = a_Entity.GetContents();
+	int NumSlots = Grid.GetNumSlots();
 	
 	// First try adding items of types already in the hopper:
 	for (int i = 0; i < NumSlots; i++)
 	{
-		if (a_Grid.IsSlotEmpty(i))
+		if (Grid.IsSlotEmpty(i))
 		{
 			continue;
 		}
-		if (MoveItemsFromSlot(a_Grid.GetSlot(i), false))
+		if (MoveItemsFromSlot(a_Entity, i, false))
 		{
-			a_Grid.ChangeSlotCount(i, -1);
+			Grid.ChangeSlotCount(i, -1);
 			return true;
 		}
 	}
@@ -353,13 +382,13 @@ bool cHopperEntity::MoveItemsFromGrid(cItemGrid & a_Grid)
 	// No already existing stack can be topped up, try again with allowing new stacks:
 	for (int i = 0; i < NumSlots; i++)
 	{
-		if (a_Grid.IsSlotEmpty(i))
+		if (Grid.IsSlotEmpty(i))
 		{
 			continue;
 		}
-		if (MoveItemsFromSlot(a_Grid.GetSlot(i), true))
+		if (MoveItemsFromSlot(a_Entity, i, true))
 		{
-			a_Grid.ChangeSlotCount(i, -1);
+			Grid.ChangeSlotCount(i, -1);
 			return true;
 		}
 	}
@@ -370,13 +399,36 @@ bool cHopperEntity::MoveItemsFromGrid(cItemGrid & a_Grid)
 
 
 
-/// Moves one of the specified itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
-bool cHopperEntity::MoveItemsFromSlot(const cItem & a_ItemStack, bool a_AllowNewStacks)
+/// Moves one piece of the specified a_Entity's slot itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
+bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SlotNum, bool a_AllowNewStacks)
 {
-	cItem One(a_ItemStack.CopyOne());
-	if (m_Contents.AddItem(One, a_AllowNewStacks) > 0)
+	cItem One(a_Entity.GetSlot(a_SlotNum).CopyOne());
+	for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
 	{
-		return true;
+		if (m_Contents.IsSlotEmpty(i))
+		{
+			if (a_AllowNewStacks)
+			{
+				if (cPluginManager::Get()->CallHookHopperPullingItem(*m_World, *this, i, a_Entity, a_SlotNum))
+				{
+					// Plugin disagrees with the move
+					continue;
+				}
+			}
+			m_Contents.SetSlot(i, One);
+			return true;
+		}
+		else if (m_Contents.GetSlot(i).IsStackableWith(One))
+		{
+			if (cPluginManager::Get()->CallHookHopperPullingItem(*m_World, *this, i, a_Entity, a_SlotNum))
+			{
+				// Plugin disagrees with the move
+				continue;
+			}
+			
+			m_Contents.ChangeSlotCount(i, 1);
+			return true;
+		}
 	}
 	return false;
 }
@@ -389,7 +441,7 @@ bool cHopperEntity::MoveItemsFromSlot(const cItem & a_ItemStack, bool a_AllowNew
 bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Try the chest directly connected to the hopper:
-	if (MoveItemsToGrid(((cChestEntity *)a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ))->GetContents()))
+	if (MoveItemsToGrid(*(cChestEntity *)a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ)))
 	{
 		return true;
 	}
@@ -418,7 +470,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		{
 			continue;
 		}
-		if (MoveItemsToGrid(((cChestEntity *)Neighbor->GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ))->GetContents()))
+		if (MoveItemsToGrid(*(cChestEntity *)Neighbor->GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			return true;
 		}
@@ -440,12 +492,12 @@ bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, int a_BlockX, int a_Blo
 	if (a_HopperMeta == E_META_HOPPER_FACING_YM)
 	{
 		// Feed the input slot of the furnace
-		return MoveItemsToSlot(Furnace->GetContents(), cFurnaceEntity::fsInput);
+		return MoveItemsToSlot(*Furnace, cFurnaceEntity::fsInput);
 	}
 	else
 	{
 		// Feed the fuel slot of the furnace
-		return MoveItemsToSlot(Furnace->GetContents(), cFurnaceEntity::fsFuel);
+		return MoveItemsToSlot(*Furnace, cFurnaceEntity::fsFuel);
 	}
 	return false;
 }
@@ -454,22 +506,14 @@ bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, int a_BlockX, int a_Blo
 
 
 
-/// Moves items to the specified ItemGrid. Returns true if contents have changed
-bool cHopperEntity::MoveItemsToGrid(cItemGrid & a_ItemGrid)
+bool cHopperEntity::MoveItemsToGrid(cBlockEntityWithItems & a_Entity)
 {
 	// Iterate through our slots, try to move from each one:
-	for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+	int NumSlots = a_Entity.GetContents().GetNumSlots();
+	for (int i = 0; i < NumSlots; i++)
 	{
-		const cItem & SrcItem = m_Contents.GetSlot(i);
-		if (SrcItem.IsEmpty())
+		if (MoveItemsToSlot(a_Entity, i))
 		{
-			continue;
-		}
-		
-		cItem ToAdd = SrcItem.CopyOne();
-		if (a_ItemGrid.AddItem(ToAdd) > 0)
-		{
-			m_Contents.ChangeSlotCount(i, -1);
 			return true;
 		}
 	}
@@ -480,17 +524,22 @@ bool cHopperEntity::MoveItemsToGrid(cItemGrid & a_ItemGrid)
 
 
 
-/// Moves one piece to the specified ItemGrid's slot. Returns true if contents have changed.
-bool cHopperEntity::MoveItemsToSlot(cItemGrid & a_ItemGrid, int a_DestSlotNum)
+bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstSlotNum)
 {
-	if (a_ItemGrid.IsSlotEmpty(a_DestSlotNum))
+	cItemGrid & Grid = a_Entity.GetContents();
+	if (Grid.IsSlotEmpty(a_DstSlotNum))
 	{
 		// The slot is empty, move the first non-empty slot from our contents:
 		for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
 		{
 			if (!m_Contents.IsSlotEmpty(i))
 			{
-				a_ItemGrid.SetSlot(a_DestSlotNum, m_Contents.GetSlot(i).CopyOne());
+				if (cPluginManager::Get()->CallHookHopperPushingItem(*m_World, *this, i, a_Entity, a_DstSlotNum))
+				{
+					// A plugin disagrees with the move
+					continue;
+				}
+				Grid.SetSlot(a_DstSlotNum, m_Contents.GetSlot(i).CopyOne());
 				m_Contents.ChangeSlotCount(i, -1);
 				return true;
 			}
@@ -500,7 +549,7 @@ bool cHopperEntity::MoveItemsToSlot(cItemGrid & a_ItemGrid, int a_DestSlotNum)
 	else
 	{
 		// The slot is taken, try to top it up:
-		const cItem & DestSlot = a_ItemGrid.GetSlot(a_DestSlotNum);
+		const cItem & DestSlot = Grid.GetSlot(a_DstSlotNum);
 		if (DestSlot.IsFullStack())
 		{
 			return false;
@@ -509,7 +558,12 @@ bool cHopperEntity::MoveItemsToSlot(cItemGrid & a_ItemGrid, int a_DestSlotNum)
 		{
 			if (m_Contents.GetSlot(i).IsStackableWith(DestSlot))
 			{
-				a_ItemGrid.ChangeSlotCount(a_DestSlotNum, 1);
+				if (cPluginManager::Get()->CallHookHopperPushingItem(*m_World, *this, i, a_Entity, a_DstSlotNum))
+				{
+					// A plugin disagrees with the move
+					continue;
+				}
+				Grid.ChangeSlotCount(a_DstSlotNum, 1);
 				m_Contents.ChangeSlotCount(i, -1);
 				return true;
 			}

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/09/13 14:50:49.
+** Generated automatically by tolua++-1.0.92 on 08/11/13 14:53:45.
 */
 
 #ifndef __cplusplus
@@ -16909,7 +16909,8 @@ static int tolua_AllToLua_cItemGrid_HowManyCanFit00(lua_State* tolua_S)
  if (
      !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16917,11 +16918,12 @@ static int tolua_AllToLua_cItemGrid_HowManyCanFit00(lua_State* tolua_S)
  {
   cItemGrid* self = (cItemGrid*)  tolua_tousertype(tolua_S,1,0);
   const cItem* a_ItemStack = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
+  bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,true));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'HowManyCanFit'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->HowManyCanFit(*a_ItemStack);
+   int tolua_ret = (int)  self->HowManyCanFit(*a_ItemStack,a_AllowNewStacks);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -29331,8 +29333,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"esBed",esBed);
   tolua_constant(tolua_S,"esEnderCrystal",esEnderCrystal);
   tolua_constant(tolua_S,"esGhastFireball",esGhastFireball);
-  tolua_constant(tolua_S,"esWitherSkullBlue",esWitherSkullBlue);
   tolua_constant(tolua_S,"esWitherSkullBlack",esWitherSkullBlack);
+  tolua_constant(tolua_S,"esWitherSkullBlue",esWitherSkullBlue);
   tolua_constant(tolua_S,"esWitherBirth",esWitherBirth);
   tolua_constant(tolua_S,"esPlugin",esPlugin);
   tolua_function(tolua_S,"BlockStringToType",tolua_AllToLua_BlockStringToType00);
@@ -29718,8 +29720,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_EXPLODED",cPluginManager::HOOK_EXPLODED);
    tolua_constant(tolua_S,"HOOK_EXPLODING",cPluginManager::HOOK_EXPLODING);
    tolua_constant(tolua_S,"HOOK_HANDSHAKE",cPluginManager::HOOK_HANDSHAKE);
+   tolua_constant(tolua_S,"HOOK_HOPPER_PULLING_ITEM",cPluginManager::HOOK_HOPPER_PULLING_ITEM);
+   tolua_constant(tolua_S,"HOOK_HOPPER_PUSHING_ITEM",cPluginManager::HOOK_HOPPER_PUSHING_ITEM);
    tolua_constant(tolua_S,"HOOK_KILLING",cPluginManager::HOOK_KILLING);
    tolua_constant(tolua_S,"HOOK_LOGIN",cPluginManager::HOOK_LOGIN);
+   tolua_constant(tolua_S,"HOOK_PLAYER_ANIMATION",cPluginManager::HOOK_PLAYER_ANIMATION);
    tolua_constant(tolua_S,"HOOK_PLAYER_BREAKING_BLOCK",cPluginManager::HOOK_PLAYER_BREAKING_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_BROKEN_BLOCK",cPluginManager::HOOK_PLAYER_BROKEN_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_EATING",cPluginManager::HOOK_PLAYER_EATING);

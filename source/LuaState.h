@@ -53,6 +53,8 @@ struct HTTPTemplateRequest;
 class cTNTEntity;
 class cCreeper;
 class Vector3i;
+class cHopperEntity;
+class cBlockEntity;
 
 
 
@@ -178,6 +180,8 @@ public:
 	void Push(cCreeper * a_Creeper);
 	void Push(Vector3i * a_Vector);
 	void Push(void * a_Ptr);
+	void Push(cHopperEntity * a_Hopper);
+	void Push(cBlockEntity * a_BlockEntity);
 	
 	/// Call any 0-param 0-return Lua function in a single line:
 	template <typename FnT>

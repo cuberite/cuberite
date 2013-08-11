@@ -326,6 +326,30 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 
 
 
+bool cPlugin_NewLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_HOPPER_PULLING_ITEM), &a_World, &a_Hopper, a_DstSlotNum, &a_SrcEntity, a_SrcSlotNum, cLuaState::Return, res);
+	return res;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_HOPPER_PUSHING_ITEM), &a_World, &a_Hopper, a_SrcSlotNum, &a_DstEntity, a_DstSlotNum, cLuaState::Return, res);
+	return res;
+}
+
+
+
+
+
 bool cPlugin_NewLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 {
 	cCSLock Lock(m_CriticalSection);

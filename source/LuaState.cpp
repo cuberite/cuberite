@@ -677,6 +677,32 @@ void cLuaState::Push(void * a_Ptr)
 
 
 
+void cLuaState::Push(cHopperEntity * a_Hopper)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Hopper, "cHopperEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cBlockEntity * a_BlockEntity)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_BlockEntity, "cBlockEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::GetReturn(int a_StackPos, bool & a_ReturnedVal)
 {
 	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);

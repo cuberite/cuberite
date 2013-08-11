@@ -38,6 +38,12 @@ class cPawn;
 // fwd: CommandOutput.h
 class cCommandOutputCallback;
 
+// fwd: BlockEntities/HopperEntity.h
+class cHopperEntity;
+
+// fwd: BlockEntities/BlockEntityWithItems.h
+class cBlockEntityWithItems;
+
 
 
 
@@ -66,6 +72,8 @@ public:																	// tolua_export
 		HOOK_EXPLODED,
 		HOOK_EXPLODING,
 		HOOK_HANDSHAKE,
+		HOOK_HOPPER_PULLING_ITEM,
+		HOOK_HOPPER_PUSHING_ITEM,
 		HOOK_KILLING,
 		HOOK_LOGIN,
 		HOOK_PLAYER_ANIMATION,
@@ -143,6 +151,8 @@ public:																	// tolua_export
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookHandshake                (cClientHandle * a_ClientHandle, const AString & a_Username);
+	bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum);
+	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
 	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);

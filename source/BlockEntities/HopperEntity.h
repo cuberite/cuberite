@@ -78,11 +78,11 @@ protected:
 	/// Moves items from a furnace above the hopper into this hopper. Returns true if contents have changed.
 	bool MoveItemsFromFurnace(cChunk & a_Chunk);
 	
-	/// Moves items from the specified ItemGrid into this hopper. Returns true if contents have changed.
-	bool MoveItemsFromGrid(cItemGrid & a_Grid);
+	/// Moves items from the specified a_Entity's Contents into this hopper. Returns true if contents have changed.
+	bool MoveItemsFromGrid(cBlockEntityWithItems & a_Entity);
 	
 	/// Moves one piece from the specified itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
-	bool MoveItemsFromSlot(const cItem & a_ItemStack, bool a_AllowNewStacks);
+	bool MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SrcSlotNum, bool a_AllowNewStacks);
 	
 	/// Moves items to the chest at the specified coords. Returns true if contents have changed
 	bool MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -91,10 +91,10 @@ protected:
 	bool MoveItemsToFurnace(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_HopperMeta);
 	
 	/// Moves items to the specified ItemGrid. Returns true if contents have changed
-	bool MoveItemsToGrid(cItemGrid & a_ItemGrid);
+	bool MoveItemsToGrid(cBlockEntityWithItems & a_Entity);
 
-	/// Moves one piece to the specified ItemGrid's slot. Returns true if contents have changed.
-	bool MoveItemsToSlot(cItemGrid & a_ItemGrid, int a_DestSlotNum);
+	/// Moves one piece to the specified entity's contents' slot. Returns true if contents have changed.
+	bool MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstSlotNum);
 } ;
 
 
