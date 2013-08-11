@@ -57,7 +57,9 @@ private:
 		
 		static DWORD_PTR __stdcall thrExecute(LPVOID a_Param)
 		{
+			HWND IdentificationWnd = CreateWindow("STATIC", ((cIsThread *)a_Param)->m_ThreadName.c_str(), 0, 0, 0, 0, WS_OVERLAPPED, NULL, NULL, NULL, NULL);
 			((cIsThread *)a_Param)->Execute();
+			DestroyWindow(IdentificationWnd);
 			return 0;
 		}
 		
