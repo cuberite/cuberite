@@ -111,17 +111,17 @@ public:
 	{
 		switch (a_BlockType)
 		{
-			case E_BLOCK_GLASS:
-			case E_BLOCK_FENCE:
-			case E_BLOCK_NETHER_BRICK_FENCE:
-			case E_BLOCK_PISTON:
-			case E_BLOCK_WORKBENCH:
-			{
+			//case E_BLOCK_GLASS:
+			//case E_BLOCK_FENCE:
+			//case E_BLOCK_NETHER_BRICK_FENCE:
+			//case E_BLOCK_PISTON:
+			//case E_BLOCK_IRON_BARS
+			if ( g_BlockIsSolid[a_BlockType] {
 				return (a_Direction == 0x1);  // allow only direction "standing on floor"
 			}
-			
-			default:
-			{
+			else {
+			//default:
+			//{
 				return g_BlockIsSolid[a_BlockType];
 			}
 		}

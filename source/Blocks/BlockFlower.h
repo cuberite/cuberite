@@ -32,7 +32,7 @@ public:
 
 	virtual bool DoesAllowBlockOnTop(void) override
 	{
-		return false;
+		return true;
 	}
 	
 	
