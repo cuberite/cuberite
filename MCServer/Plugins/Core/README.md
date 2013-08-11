@@ -8,6 +8,7 @@ Commands
 
  * /back
  * /ban
+ * /clear
  * /downfall
  * /give
  * /gm
@@ -15,6 +16,7 @@ Commands
  * /help
  * /i
  * /item
+ * /kill
  * /kick
  * /locate
  * /me
