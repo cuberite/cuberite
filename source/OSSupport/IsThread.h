@@ -26,18 +26,24 @@ In the descending class' constructor call the Start() method to start the thread
 class cIsThread
 {
 protected:
-	virtual void Execute(void) = 0;  // This function is called in the new thread's context
+	/// This is the main thread entrypoint
+	virtual void Execute(void) = 0;
 
-	volatile bool m_ShouldTerminate;  // The overriden Execute() method should check this periodically and terminate if this is true
+	/// The overriden Execute() method should check this value periodically and terminate if this is true
+	volatile bool m_ShouldTerminate;
 	
 public:
 	cIsThread(const AString & iThreadName);
 	~cIsThread();
 	
-	bool Start(void);  // Starts the thread
-	bool Wait(void);   // Waits for the thread to finish
+	/// Starts the thread; returns without waiting for the actual start
+	bool Start(void);
 	
-	static unsigned long GetCurrentID(void);  // Returns the OS-dependent thread ID for the caller's thread
+	/// Waits for the thread to finish. Doesn't signalize the ShouldTerminate flag
+	bool Wait(void);
+	
+	/// Returns the OS-dependent thread ID for the caller's thread
+	static unsigned long GetCurrentID(void);
 
 private:
 	AString m_ThreadName;
