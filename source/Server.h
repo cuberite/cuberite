@@ -46,11 +46,9 @@ public:												// tolua_export
 	int  GetNumPlayers(void) const { return m_NumPlayers; }
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
-	// tolua_end
+	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
 
-	// bool IsConnected(void) const { return m_bIsConnected;} // returns connection status
-	
-	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export
+	// tolua_end
 
 	bool Start(void);
 
