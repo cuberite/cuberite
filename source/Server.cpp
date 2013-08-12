@@ -162,6 +162,16 @@ void cServer::RemoveClient(const cClientHandle * a_Client)
 
 
 
+void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
+{
+	cCSLock Lock(m_CSClients);
+	m_Clients.remove(const_cast<cClientHandle *>(a_Client));
+}
+
+
+
+
+
 bool cServer::InitServer(cIniFile & a_SettingsIni)
 {
 	m_Description = a_SettingsIni.GetValue ("Server", "Description", "MCServer! - In C++!").c_str();
@@ -292,23 +302,6 @@ void cServer::OnConnectionAccepted(cSocket & a_Socket)
 	
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
-}
-
-
-
-
-
-void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSClients);
-	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
-	{
-		if ((*itr == a_Exclude) || !(*itr)->IsLoggedIn())
-		{
-			continue;
-		}
-		(*itr)->SendChat(a_Message);
-	}
 }
 
 
@@ -446,25 +439,6 @@ void cServer::BindBuiltInConsoleCommands(void)
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	PlgMgr->BindConsoleCommand("dumpmem", NULL, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
 	#endif	
-}
-
-
-
-
-
-void cServer::SendMessage(const AString & a_Message, cPlayer * a_Player /* = NULL */, bool a_bExclude /* = false */ )
-{
-	if ((a_Player != NULL) && !a_bExclude)
-	{
-		cClientHandle * Client = a_Player->GetClientHandle();
-		if (Client != NULL)
-		{
-			Client->SendChat(a_Message);
-		}
-		return;
-	}
-
-	BroadcastChat(a_Message, (a_Player != NULL) ? a_Player->GetClientHandle() : NULL);
 }
 
 

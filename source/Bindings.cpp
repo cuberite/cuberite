@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/11/13 20:59:51.
+** Generated automatically by tolua++-1.0.92 on 08/12/13 08:16:46.
 */
 
 #ifndef __cplusplus
@@ -11430,80 +11430,6 @@ static int tolua_AllToLua_cServer_SetMaxPlayers00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetMaxPlayers'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: BroadcastChat of class  cServer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cServer_BroadcastChat00
-static int tolua_AllToLua_cServer_BroadcastChat00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cServer",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"const cClientHandle",1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cServer* self = (cServer*)  tolua_tousertype(tolua_S,1,0);
-  const AString a_Message = ((const AString)  tolua_tocppstring(tolua_S,2,0));
-  const cClientHandle* a_Exclude = ((const cClientHandle*)  tolua_tousertype(tolua_S,3,NULL));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'BroadcastChat'", NULL);
-#endif
-  {
-   self->BroadcastChat(a_Message,a_Exclude);
-   tolua_pushcppstring(tolua_S,(const char*)a_Message);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'BroadcastChat'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: SendMessage of class  cServer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cServer_SendMessage00
-static int tolua_AllToLua_cServer_SendMessage00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cServer",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPlayer",1,&tolua_err) ||
-     !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cServer* self = (cServer*)  tolua_tousertype(tolua_S,1,0);
-  const AString a_Message = ((const AString)  tolua_tocppstring(tolua_S,2,0));
-  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,NULL));
-  bool a_bExclude = ((bool)  tolua_toboolean(tolua_S,4,false));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SendMessage'", NULL);
-#endif
-  {
-   self->SendMessage(a_Message,a_Player,a_bExclude);
-   tolua_pushcppstring(tolua_S,(const char*)a_Message);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SendMessage'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29850,8 +29776,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetMaxPlayers",tolua_AllToLua_cServer_GetMaxPlayers00);
    tolua_function(tolua_S,"GetNumPlayers",tolua_AllToLua_cServer_GetNumPlayers00);
    tolua_function(tolua_S,"SetMaxPlayers",tolua_AllToLua_cServer_SetMaxPlayers00);
-   tolua_function(tolua_S,"BroadcastChat",tolua_AllToLua_cServer_BroadcastChat00);
-   tolua_function(tolua_S,"SendMessage",tolua_AllToLua_cServer_SendMessage00);
    tolua_function(tolua_S,"GetServerID",tolua_AllToLua_cServer_GetServerID00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWorld","cWorld","",NULL);

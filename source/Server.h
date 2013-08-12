@@ -46,8 +46,6 @@ public:												// tolua_export
 	int  GetNumPlayers(void) const { return m_NumPlayers; }
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
-	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
-
 	// tolua_end
 
 	bool Start(void);
@@ -62,8 +60,6 @@ public:												// tolua_export
 	
 	void Shutdown(void);
 
-	void SendMessage(const AString & a_Message, cPlayer * a_Player = NULL, bool a_bExclude = false );  // tolua_export
-	
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
 
@@ -78,6 +74,9 @@ public:												// tolua_export
 	void QueueClientClose(const cClientHandle * a_Client);  // Queues the clienthandle to close when all its outgoing data is sent
 	
 	void RemoveClient(const cClientHandle * a_Client);  // Removes the clienthandle from m_SocketThreads
+	
+	/// Don't tick a_Client anymore, it will be ticked from its cPlayer instead
+	void ClientMovedToWorld(const cClientHandle * a_Client);
 	
 	CryptoPP::RSA::PrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	CryptoPP::RSA::PublicKey  & GetPublicKey (void) { return m_PublicKey; }
@@ -132,8 +131,8 @@ private:
 	cListenThread m_ListenThreadIPv4;
 	cListenThread m_ListenThreadIPv6;
 	
-	cCriticalSection  m_CSClients;  // Locks client list
-	cClientHandleList m_Clients;    // Clients that are connected to the server
+	cCriticalSection  m_CSClients;  ///< Locks client list
+	cClientHandleList m_Clients;    ///< Clients that are connected to the server and not yet assigned to a cWorld
 	
 	cSocketThreads m_SocketThreads;
 	

@@ -129,6 +129,12 @@ bool cPlayer::Initialize(cWorld * a_World)
 {
 	if (super::Initialize(a_World))
 	{
+		// Remove the client handle from the server, it will be ticked from this object from now on
+		if (m_ClientHandle != NULL)
+		{
+			cRoot::Get()->GetServer()->ClientMovedToWorld(m_ClientHandle);
+		}
+		
 		GetWorld()->AddPlayer(this);
 		return true;
 	}
@@ -175,18 +181,22 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	if (!m_ClientHandle->IsPlaying())
+	if (m_ClientHandle != NULL)
 	{
-		// We're not yet in the game, ignore everything
-		return;
+		if (!m_ClientHandle->IsPlaying())
+		{
+			// We're not yet in the game, ignore everything
+			return;
+		}
+		m_ClientHandle->Tick(a_Dt);
 	}
 	
 	super::Tick(a_Dt, a_Chunk);
 	
-	// set player swimming state
-	SetSwimState( a_Chunk);
+	// Set player swimming state
+	SetSwimState(a_Chunk);
 
-	// handle air drowning stuff
+	// Handle air drowning stuff
 	HandleAir();
 
 	if (m_bDirtyPosition)

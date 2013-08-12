@@ -1355,12 +1355,14 @@ void cClientHandle::Tick(float a_Dt)
 		m_ShouldCheckDownloaded = false;
 	}
 	
+	if (m_Player == NULL)
+	{
+		return;
+	}
+	
 	// Send a ping packet:
 	cTimer t1;
-	if (
-		(m_Player != NULL) &&  // Is logged in?
-		(m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime())
-	)
+	if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
 	{
 		m_PingID++;
 		m_PingStartTime = t1.GetNowTime();
@@ -1369,7 +1371,7 @@ void cClientHandle::Tick(float a_Dt)
 	}
 
 	// Handle block break animation:
-	if ((m_Player != NULL) && (m_BlockDigAnimStage > -1))
+	if (m_BlockDigAnimStage > -1)
 	{
 		int lastAnimVal = m_BlockDigAnimStage;
 		m_BlockDigAnimStage += (int)(m_BlockDigAnimSpeed * a_Dt);
@@ -1955,7 +1957,7 @@ void cClientHandle::SendConfirmPosition(void)
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
 		// Broadcast that this player has joined the game! Yay~
-		cRoot::Get()->GetServer()->BroadcastChat(m_Username + " joined the game!", this);
+		m_Player->GetWorld()->BroadcastChat(m_Username + " joined the game!", this);
 	}
 
 	SendPlayerMoveLook();
