@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/11/13 14:53:45.
+** Generated automatically by tolua++-1.0.92 on 08/12/13 11:15:33.
 */
 
 #ifndef __cplusplus
@@ -28949,6 +28949,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_NETHER_QUARTZ_ORE",E_BLOCK_NETHER_QUARTZ_ORE);
   tolua_constant(tolua_S,"E_BLOCK_HOPPER",E_BLOCK_HOPPER);
   tolua_constant(tolua_S,"E_BLOCK_QUARTZ_BLOCK",E_BLOCK_QUARTZ_BLOCK);
+  tolua_constant(tolua_S,"E_BLOCK_QUARTZ_STAIR",E_BLOCK_QUARTZ_STAIR);
   tolua_constant(tolua_S,"E_BLOCK_ACTIVATOR_RAIL",E_BLOCK_ACTIVATOR_RAIL);
   tolua_constant(tolua_S,"E_BLOCK_DROPPER",E_BLOCK_DROPPER);
   tolua_constant(tolua_S,"E_BLOCK_CARPET",E_BLOCK_CARPET);
