@@ -138,7 +138,7 @@ void cLog::Log(const char * a_Format, va_list argList)
 
 	#if defined (_WIN32) && defined(_DEBUG)
 	// In a Windows Debug build, output the log to debug console as well:
-	OutputDebugStringA(Line.c_str());
+	OutputDebugStringA((Line + "\n").c_str());
 	#endif  // _WIN32
 }
 
