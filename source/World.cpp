@@ -744,6 +744,13 @@ void cWorld::TickSpawnMobs(float a_Dt)
 				case 6: MobType = E_ENTITY_TYPE_ZOMBIE_PIGMAN; break;
 			}
 		}
+		else if (GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z) == biSky) 
+		{
+			switch (nightRand)
+			{
+				case 5: MobType = E_ENTITY_TYPE_ENDERMAN;         break;
+			}
+		}
 		else
 		{
 			switch (nightRand)
