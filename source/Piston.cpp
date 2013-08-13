@@ -12,7 +12,11 @@
 #include "Server.h"
 #include "Blocks/BlockHandler.h"
 
-
+#ifdef _WIN32
+#include <windows.h> 
+#else
+#include <unistd.h>
+#endif
 
 
 
@@ -122,12 +126,10 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 
 	AddDir(extx, exty, extz, pistonMeta & 7, 1)
 
-	#ifdef _WIN32 // Pause for 0.1 seconds to allow client animation to run
-		#include <windows.h>
-	    Sleep(100);
+	#ifdef __WIN32__
+	Sleep(100);
 	#else
-		#include <unistd.h>
-		sleep(0.1);
+	usleep(static_cast<useconds_t>(100)*1000); //or use nanosleep on platforms where it's needed
 	#endif
 
 	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta & 7);
@@ -174,12 +176,10 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 			// These cannot be moved by the sticky piston, bail out
 			return;
 		}
-		#ifdef _WIN32
-			#include <windows.h>
-			Sleep(100);
+		#ifdef __WIN32__
+		Sleep(100);
 		#else
-			#include <unistd.h>
-			sleep(0.1);
+		usleep(static_cast<useconds_t>(100)*1000); //or use nanosleep on platforms where it's needed
 		#endif
 
 		m_World->SetBlock(pistx, pisty, pistz, tempblock, tempmeta);
@@ -187,12 +187,10 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	}
 	else
 	{
-		#ifdef _WIN32
-			#include <windows.h>
-			Sleep(100);
+		#ifdef __WIN32__
+		Sleep(100);
 		#else
-			#include <unistd.h>
-			sleep(0.1);
+		usleep(static_cast<useconds_t>(100)*1000); //or use nanosleep on platforms where it's needed
 		#endif
 
 		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
