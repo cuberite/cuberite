@@ -72,29 +72,3 @@ function HandleTPAcceptCommand( Split, Player )
 	return true
 
 end
-
--- Teleports a_SrcPlayer to a player named a_DstPlayerName; if a_TellDst is true, will send a notice to the destination player
-function TeleportToPlayer( a_SrcPlayer, a_DstPlayerName, a_TellDst )
-
-	local teleport = function(OtherPlayer)
-
-		if OtherPlayer == a_SrcPlayer then
-			-- Asked to teleport to self?
-			SendMessageFailure( a_SrcPlayer, "Y' can't teleport to yerself!" )
-		else
-			SetBackCoordinates( a_SrcPlayer )
-			a_SrcPlayer:TeleportToEntity( OtherPlayer )
-			SendMessageSuccess( a_SrcPlayer, "You teleported to " .. OtherPlayer:GetName() .. "!" )
-			if (a_TellDst) then
-				SendMessage( OtherPlayer, Player:GetName().." teleported to you!" )
-			end
-		end
-
-	end
-
-	local World = a_SrcPlayer:GetWorld()
-	if not World:DoWithPlayer(a_DstPlayerName, teleport) then
-		SendMessageFailure( a_SrcPlayer, "Can't find player " .. a_DstPlayerName)
-	end
-
-end
