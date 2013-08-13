@@ -1347,10 +1347,13 @@ void cPlayer::SetSwimState(cChunk & a_Chunk)
 
 	m_IsSwimming = IsBlockWater(BlockIn);
 
-	// now we check if the player is submerged
-
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY+1, RelZ, BlockIn));
-
+	
+        //lazy fix for y>255 server crash
+        if ((BlockY <= cChunkDef::Height) && (BlockY > 0)){
+                // now we check if the player is submerged
+                VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY+1, RelZ, BlockIn));
+        }      
+        
 	m_IsSubmerged = IsBlockWater(BlockIn);
 }
 
