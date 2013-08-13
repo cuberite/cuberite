@@ -127,7 +127,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 	    Sleep(100);
 	#else
 		#include <unistd.h>
-		usleep(100 * 1000); // takes microseconds
+		usleep(0.1);
 	#endif
 
 	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta & 7);
@@ -179,7 +179,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 			Sleep(100);
 		#else
 			#include <unistd.h>
-			usleep(100 * 1000); // takes microseconds
+			usleep(0.1);
 		#endif
 
 		m_World->SetBlock(pistx, pisty, pistz, tempblock, tempmeta);
@@ -192,7 +192,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 			Sleep(100);
 		#else
 			#include <unistd.h>
-			usleep(100 * 1000); // takes microseconds
+			usleep(0.1);
 		#endif
 
 		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
