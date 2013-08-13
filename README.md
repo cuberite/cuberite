@@ -3,7 +3,7 @@ TransAPI
 
 A plugin translation API for MCServer.
 
-TransAPI is designed to be used with the provided client library, however there is also a stable API available for use.
+TransAPI is designed to be used with the [client library](https://github.com/bearbin/transapi-client), however there is also a stable API available for use.
 
 API
 ---
