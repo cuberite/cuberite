@@ -128,7 +128,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 
 	AddDir(extx, exty, extz, pistonMeta & 7, 1)
 
-	#ifdef __WIN32__
+	#ifdef _WIN32
 	Sleep(100);
 	#else
 	usleep(static_cast<useconds_t>(100)*1000);
@@ -178,7 +178,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 			// These cannot be moved by the sticky piston, bail out
 			return;
 		}
-		#ifdef __WIN32__
+		#ifdef _WIN32
 		Sleep(100);
 		#else
 		usleep(static_cast<useconds_t>(100)*1000);
@@ -189,7 +189,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	}
 	else
 	{
-		#ifdef __WIN32__
+		#ifdef _WIN32
 		Sleep(100);
 		#else
 		usleep(static_cast<useconds_t>(100)*1000);
