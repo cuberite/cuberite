@@ -54,9 +54,9 @@ cIsThread::cIsThread(const AString & iThreadName) :
 	m_ThreadName(iThreadName),
 	m_ShouldTerminate(false),
 	#ifdef _WIN32
-	m_Handle(NULL)
+		m_Handle(NULL)
 	#else  // _WIN32
-	m_HasStarted(false)
+		m_HasStarted(false)
 	#endif  // else _WIN32
 {
 }

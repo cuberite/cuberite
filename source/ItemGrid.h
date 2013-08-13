@@ -72,7 +72,7 @@ public:
 	void Clear(void);
 	
 	/// Returns number of items out of a_ItemStack that can fit in the storage
-	int HowManyCanFit(const cItem & a_ItemStack);
+	int HowManyCanFit(const cItem & a_ItemStack, bool a_AllowNewStacks = true);
 	
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;

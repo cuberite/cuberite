@@ -152,6 +152,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      ();
 		case E_BLOCK_PLANKS:                return new cBlockWoodHandler            (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_QUARTZ_STAIR:          return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_POTATOES:              return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);

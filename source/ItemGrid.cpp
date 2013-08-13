@@ -213,7 +213,7 @@ void cItemGrid::Clear(void)
 
 
 
-int cItemGrid::HowManyCanFit(const cItem & a_ItemStack)
+int cItemGrid::HowManyCanFit(const cItem & a_ItemStack, bool a_AllowNewStacks)
 {
 	char NumLeft = a_ItemStack.m_ItemCount;
 	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
@@ -221,7 +221,10 @@ int cItemGrid::HowManyCanFit(const cItem & a_ItemStack)
 	{
 		if (m_Slots[i].IsEmpty())
 		{
-			NumLeft -= MaxStack;
+			if (a_AllowNewStacks)
+			{
+				NumLeft -= MaxStack;
+			}
 		}
 		else if (m_Slots[i].IsStackableWith(a_ItemStack))
 		{

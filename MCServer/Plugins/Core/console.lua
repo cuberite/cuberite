@@ -2,7 +2,7 @@
 
 function InitConsoleCommands()
 	local PluginMgr = cPluginManager:Get();
-	
+
 	-- Please keep the list alpha-sorted
 	PluginMgr:BindConsoleCommand("ban",                  HandleConsoleBan,                  " ~ Bans a player by name");
 	PluginMgr:BindConsoleCommand("banlist ips",          HandleConsoleBanList,              " - Lists all players banned by IP");
@@ -21,7 +21,7 @@ function InitConsoleCommands()
 	PluginMgr:BindConsoleCommand("setversion",           HandleConsoleVersion,              " ~ Sets server version reported to 1.4+ clients");
 	PluginMgr:BindConsoleCommand("unban",                HandleConsoleUnban,                " ~ Unbans a player by name");
 	PluginMgr:BindConsoleCommand("unload",               HandleConsoleUnload,               " - Unloads all unused chunks");
-	
+
 end
 
 function HandleConsoleGive(Split)
@@ -37,7 +37,7 @@ function HandleConsoleGive(Split)
 		local FoundItem = StringToItem(Split[3] .. ":" .. Split[5], Item)
 	else
 		local FoundItem = StringToItem(Split[3], Item)
-	end	
+	end
 	if not IsValidItem(Item.m_ItemType) then  -- StringToItem does not check if item is valid
 		FoundItem = false
 	end
@@ -63,10 +63,10 @@ function HandleConsoleGive(Split)
 	local function giveItems(newPlayer)
 		local ItemsGiven = newPlayer:GetInventory():AddItem(Item)
 		if ItemsGiven == ItemAmount then
-			newPlayer:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "There you go!" )
+			SendMessageSuccess( newPlayer, "There you go!" )
 			LOG("Gave " .. newPlayer:GetName() .. " " .. Item.m_ItemCount .. " times " .. Item.m_ItemType .. ":" .. Item.m_ItemDamage)
 		else
-			Player:SendMessage( cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Not enough space in inventory, only gave " .. ItemsGiven)
+			SendMessageFailure( Player, "Not enough space in inventory, only gave " .. ItemsGiven)
 			return true, "Only " .. Item.m_ItemCount .. " out of " .. ItemsGiven .. "items could be delivered."
 		end
 	end
@@ -86,13 +86,13 @@ end
 function HandleConsoleBan(Split)
 	if (#Split < 2) then
 		return true, "Usage: ban [Player] <Reason>";
-	end	
-	
+	end
+
 	local Reason = cChatColor.Red .. "You have been banned." .. cChatColor.White .. " Did you do something illegal?"
 	if( #Split > 2 ) then
 		Reason = table.concat(Split, " ", 3)
 	end
-	
+
 	if KickPlayer(Split[2], Reason) == false then
 		BannedPlayersIni:DeleteValue("Banned", Split[2])
 		BannedPlayersIni:SetValueB("Banned", Split[2], true)
@@ -109,30 +109,32 @@ function HandleConsoleBan(Split)
 end
 
 function HandleConsoleUnban(Split)
-	if( #Split < 2 ) then		
-		return true, "Usage: unban [Player]"
+
+	if #Split < 2 then
+		return true, "Usage: /unban [Player]"
 	end
-	
+
 	if( BannedPlayersIni:GetValueB("Banned", Split[2], false) == false ) then
 		return true, Split[2] .. " is not banned!"
 	end
-	
+
 	BannedPlayersIni:SetValueB("Banned", Split[2], false, false)
 	BannedPlayersIni:WriteFile()
 
 	local Server = cRoot:Get():GetServer()
 	return true, "Unbanned " .. Split[2]
+
 end
 
 function HandleConsoleBanList(Split)
 	if (#Split == 1) then
 		return true, BanListByName();
 	end
-	
+
 	if (string.lower(Split[2]) == "ips") then
 		return true, BanListByIPs();
 	end
-	
+
 	return true, "Unknown banlist subcommand";
 end
 
@@ -146,15 +148,15 @@ function HandleConsoleHelp(Split)
 			MaxLength = CmdLen;
 		end
 	end
-	
+
 	cPluginManager:Get():ForEachConsoleCommand(AddToTable);
-	
+
 	-- Sort the table:
 	local CompareCommands = function(a, b)
 		return a[1] < b[1];  -- compare command strings
 	end
 	table.sort(Commands, CompareCommands);
-	
+
 	local Out = "";
 	Out = "'-' denotes no prefix, '~' denotes that a value is required.\n"
 	for i, Command in ipairs(Commands) do
@@ -185,14 +187,14 @@ function HandleConsoleListGroups(Split)
 	if (not(GroupsIni:ReadFile())) then
 		return true, "No groups found";
 	end
-	
+
 	-- Read the groups:
 	Number = GroupsIni:NumKeys();
 	Groups = {};
 	for i = 0, Number do
 		table.insert(Groups, GroupsIni:KeyName(i))
 	end
-	
+
 	-- Output the groups, concatenated to a string:
 	local Out = "Groups:\n"
 	Out = Out .. table.concat(Groups, ", ");
@@ -204,9 +206,9 @@ function HandleConsoleNumChunks(Split)
 	local AddNumChunks = function(World)
 		Output[World:GetName()] = World:GetNumChunks();
 	end;
-	
+
 	cRoot:Get():ForEachWorld(AddNumChunks);
-	
+
 	local Total = 0;
 	local Out = "";
 	for name, num in pairs(Output) do
@@ -214,7 +216,7 @@ function HandleConsoleNumChunks(Split)
 		Total = Total + num;
 	end
 	Out = Out .. "Total: " .. Total .. " chunks\n";
-	
+
 	return true, Out;
 end
 
@@ -227,9 +229,9 @@ function HandleConsolePlayers(Split)
 		end
 		table.insert(PlayersInWorlds[WorldName], Player:GetName() .. " @ " ..  Player:GetIP());
 	end
-	
+
 	cRoot:Get():ForEachPlayer(AddToTable);
-	
+
 	local Out = "";
 	for WorldName, Players in pairs(PlayersInWorlds) do
 		Out = Out .. "World " .. WorldName .. ":\n";
@@ -237,7 +239,7 @@ function HandleConsolePlayers(Split)
 			Out = Out .. "  " .. PlayerName .. "\n";
 		end
 	end
-	
+
 	return true, Out;
 end
 
@@ -247,7 +249,7 @@ function HandleConsoleVersion(Split)
 		local Version = cRoot:Get():GetPrimaryServerVersion();
 		return true, "Primary server version: #" .. Version .. ", " .. cRoot:GetProtocolVersionTextFromInt(Version);
 	end
-	
+
 	-- Set new value as the version:
 	cRoot:Get():SetPrimaryServerVersion(tonumber(Split[2]));
 	local Version = cRoot:Get():GetPrimaryServerVersion();
@@ -259,36 +261,36 @@ function HandleConsoleRank(Split)
 		return true, "Usage: /rank [Player] [Group]";
 	end
 	local Out = "";
-	
+
 	-- Read the groups.ini file:
 	local GroupsIni = cIniFile("groups.ini")
 	if (not(GroupsIni:ReadFile())) then
 		Out = "Could not read groups.ini, creating anew!\n"
 	end
-	
+
 	-- Find the group:
 	if (GroupsIni:FindKey(Split[3]) == -1) then
 		return true, Out .. "Group does not exist";
 	end
-	
+
 	-- Read the users.ini file:
 	local UsersIni = cIniFile("users.ini");
 	if (not(UsersIni:ReadFile())) then
 		Out = Out .. "Could not read users.ini, creating anew!\n";
 	end
-	
+
 	-- Write the new group value to users.ini:
 	UsersIni:DeleteKey(Split[2]);
 	UsersIni:GetValueSet(Split[2], "Groups", Split[3]);
 	UsersIni:WriteFile();
-	
+
 	-- Reload the player's permissions:
 	cRoot:Get():ForEachWorld(
 		function (World)
 			World:ForEachPlayer(
 				function (Player)
 					if (Player:GetName() == Split[2]) then
-						Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "You were moved to group " .. Split[3]);
+						SendMessage( Player, "You were moved to group " .. Split[3] )
 						Player:LoadPermissionsFromDisk();
 					end
 				end
@@ -328,7 +330,7 @@ function HandleConsoleUnload(Split)
 	local UnloadChunks = function(World)
 		World:UnloadUnusedChunks();
 	end
-	
+
 	local Out = "Num loaded chunks before: " .. cRoot:Get():GetTotalChunkCount() .. "\n";
 	cRoot:Get():ForEachWorld(UnloadChunks);
 	Out = Out .. "Num loaded chunks after: " .. cRoot:Get():GetTotalChunkCount();

@@ -1,9 +1,10 @@
 function HandleBackCommand( Split, Player )
 	if BackCoords[Player:GetName()] == nil then
-		Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "No known last position")
+		SendMessageFailure(Player, "No known last position")
+		return true
 	else
 		Player:TeleportToCoords(BackCoords[Player:GetName()].x, BackCoords[Player:GetName()].y, BackCoords[Player:GetName()].z)
-		Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "Teleported back to your last known position")
+		SendMessageSuccess(Player, "Teleported back to your last known position")
 	end
 	return true
 end

@@ -10,15 +10,15 @@ local function ShowUsersTable()
 	local Content = "<h4>Users</h4>"
 
 	local NumUsers = UsersIni:GetNumKeys()
-	
+
 	Content = Content .. "<table>"
-	
+
 	if( NumUsers > 0 ) then
 		Content = Content .. "<tr><th></th><th>User</th><th>Groups</th></tr>"
-	
+
 		for i=0, NumUsers-1 do
 			local UserName = UsersIni:GetKeyName( i )
-		
+
 			Content = Content .. "<tr>"
 			Content = Content .. "<td style='width: 10px;'>" .. i .. ".</td>"
 			Content = Content .. "<td>" .. UserName .. "</td>"
@@ -31,23 +31,23 @@ local function ShowUsersTable()
 		Content = Content .. "<tr><td>None</td></tr>"
 	end
 	Content = Content .. "</table>"
-	
-	
+
+
 	return Content
 end
 
 local function ShowGroupsTable()
 	local Content = "<h4>Groups</h4>"
-	
+
 	local NumGroups = GroupsIni:GetNumKeys()
-	
+
 	Content = Content .. "<table>"
 	if( NumGroups > 0 ) then
 		Content = Content .. "<tr><th></th><th>Name</th><th>Permissions</th><th>Color</th></tr>"
-		
+
 		for i=0, NumGroups-1 do
 			local GroupName = GroupsIni:GetKeyName( i )
-		
+
 			Content = Content .. "<tr>"
 			Content = Content .. "<td style='width: 10px;'>" .. i .. ".</td>"
 			Content = Content .. "<td>" .. GroupName .. "</td>"
@@ -63,14 +63,14 @@ local function ShowGroupsTable()
 		Content = Content .. "<tr><td>None</td></tr>"
 	end
 	Content = Content .. "</table>"
-	
+
 	return Content
 end
 
 local function HTML_Select_Group( name, defaultValue )
 	Groups = ""
 	for I=0, GroupsIni:GetNumKeys() - 1 do
-		Groups = Groups .. 
+		Groups = Groups ..
 		HTML_Option(GroupsIni:KeyName(I), GroupsIni:KeyName(I),  defaultValue == GroupsIni:KeyName(I) )
 	end
 	return [[<select name="]] .. name .. [[">]] .. Groups .. [[</select>]]
@@ -90,7 +90,7 @@ local function AddPlayers( Request )
 				UsersIni:WriteFile()
 				local loopPlayers = function( Player )
 					if Player:GetName() == Request.PostParams["AddPlayer"] then
-						Player:SendMessage( cChatColor.Green .. "You were moved to group " .. Request.PostParams["AddGroup"] )
+						SendMessageSuccess( Player, "You were moved to group " .. Request.PostParams["AddGroup"] )
 						Player:LoadPermissionsFromDisk()
 					end
 				end
@@ -110,7 +110,7 @@ local function AddPlayers( Request )
 	<td>]] .. HTML_Select_Group("AddGroup", GroupsIni:KeyName(0) ) .. [[</td></tr>
 	</table>
 	<input type="submit" value="Add Player" name="AddPlayerToGroup">]]
-	
+
 	return Content
 end
 
@@ -123,12 +123,12 @@ function HandleRequest_Permissions( Request )
 	if( UsersIni:ReadFile() == false ) then
 		return "Could not read users.ini!"
 	end
-	
+
 	local Content = ""
-	
+
 	Content = Content .. AddPlayers( Request )
 	Content = Content .. ShowGroupsTable()
 	Content = Content .. ShowUsersTable()
-	
+
 	return Content
 end

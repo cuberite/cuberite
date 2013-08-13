@@ -1,7 +1,7 @@
-function HandleItemCommand(Split, Player)
+function HandleItemCommand( Split, Player )
 
 	if ((#Split ~= 2) and (#Split ~=3)) then
-		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /i <item>[:meta] [amount]" )
+		SendMessage( Player, "Usage: /i <item>[:meta] [amount]" )
 		return true
 	end
 
@@ -20,7 +20,7 @@ function HandleItemCommand(Split, Player)
 		newSplit[5] = itemSplit[2]
 	end
 
-	HandleGiveCommand(newSplit, Player)
+	HandleGiveCommand( newSplit, Player )
 	return true
-	
+
 end

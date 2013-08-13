@@ -37,8 +37,6 @@ all: MCServer/MCServer
 #   -- according to http://stackoverflow.com/questions/6183899/undefined-reference-to-dlopen, libs must come after all sources
 # BUILDDIR    ... folder where the intermediate object files are built
 
-LNK_LIBS = -lstdc++ -ldl
-
 ifeq ($(release),1)
 ################
 # release build - fastest run-time, no gdb support
@@ -80,6 +78,23 @@ BUILDDIR = build/debug/
 endif
 endif
 endif
+
+
+
+###################################################
+# Set the link libraries based on the OS
+# Linux uses libdl
+# FreeBSD uses libltdl
+# TODO: other OSs?
+
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Linux)
+	LNK_LIBS = -lstdc++ -ldl
+else
+	LNK_LIBS = -lstdc++ -lltdl
+endif
+
+
 
 
 
