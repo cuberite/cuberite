@@ -2449,7 +2449,15 @@
 				Name="Core"
 				>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\ban.lua"
+					RelativePath="..\MCServer\Plugins\Core\back.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\ban-unban.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\clear.lua"
 					>
 				</File>
 				<File
@@ -2457,15 +2465,19 @@
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\coords.lua"
+					RelativePath="..\MCServer\Plugins\Core\do.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\gamemode.lua"
+					RelativePath="..\MCServer\Plugins\Core\functions.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\gotoworld.lua"
+					RelativePath="..\MCServer\Plugins\Core\give.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\gm.lua"
 					>
 				</File>
 				<File
@@ -2477,7 +2489,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\MCServer\Plugins\Core\itemrepair.lua"
+					>
+				</File>
+				<File
 					RelativePath="..\MCServer\Plugins\Core\kick.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\kill.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\locate.lua"
 					>
 				</File>
 				<File
@@ -2485,23 +2509,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\MCServer\Plugins\Core\me.lua"
+					>
+				</File>
+				<File
 					RelativePath="..\MCServer\Plugins\Core\motd.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\onblockdig.lua"
+					RelativePath="..\MCServer\Plugins\Core\onbreakplaceblock.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\onblockplace.lua"
+					RelativePath="..\MCServer\Plugins\Core\ondeath.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\oncraftingnorecipe.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\MCServer\Plugins\Core\onkilled.lua"
+					RelativePath="..\MCServer\Plugins\Core\onjoinleave.lua"
 					>
 				</File>
 				<File
@@ -2509,23 +2533,23 @@
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\onplayerjoin.lua"
+					RelativePath="..\MCServer\Plugins\Core\plugins.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\playerlist.lua"
+					RelativePath="..\MCServer\Plugins\Core\portal-worlds.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\pluginlist.lua"
+					RelativePath="..\MCServer\Plugins\Core\rank-groups.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\regeneratechunk.lua"
+					RelativePath="..\MCServer\Plugins\Core\regen.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\reload.lua"
+					RelativePath="..\MCServer\Plugins\Core\save-reload-stop.lua"
 					>
 				</File>
 				<File
@@ -2533,11 +2557,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\stop.lua"
+					RelativePath="..\MCServer\Plugins\Core\teleport.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\teleport.lua"
+					RelativePath="..\MCServer\Plugins\Core\tell.lua"
 					>
 				</File>
 				<File
@@ -2549,11 +2573,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\unban.lua"
+					RelativePath="..\MCServer\Plugins\Core\viewdistance.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\MCServer\Plugins\Core\viewdistance.lua"
+					RelativePath="..\MCServer\Plugins\Core\weather.lua"
 					>
 				</File>
 				<File
@@ -2562,6 +2586,10 @@
 				</File>
 				<File
 					RelativePath="..\MCServer\Plugins\Core\web_manageplugins.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\web_manageserver.lua"
 					>
 				</File>
 				<File
@@ -2578,6 +2606,10 @@
 				</File>
 				<File
 					RelativePath="..\MCServer\Plugins\Core\web_whitelist.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\worldlimiter.lua"
 					>
 				</File>
 			</Filter>
