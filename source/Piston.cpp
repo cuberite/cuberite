@@ -19,6 +19,8 @@
 #endif
 
 
+//Athar from http://www.cplusplus.com/forum/unices/60161/ helped with the sleep code.
+
 
 extern bool g_BlockPistonBreakable[];
 
@@ -129,7 +131,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 	#ifdef __WIN32__
 	Sleep(100);
 	#else
-	usleep(static_cast<useconds_t>(100)*1000); //or use nanosleep on platforms where it's needed
+	usleep(static_cast<useconds_t>(100)*1000);
 	#endif
 
 	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta & 7);
@@ -179,7 +181,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		#ifdef __WIN32__
 		Sleep(100);
 		#else
-		usleep(static_cast<useconds_t>(100)*1000); //or use nanosleep on platforms where it's needed
+		usleep(static_cast<useconds_t>(100)*1000);
 		#endif
 
 		m_World->SetBlock(pistx, pisty, pistz, tempblock, tempmeta);
@@ -190,7 +192,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		#ifdef __WIN32__
 		Sleep(100);
 		#else
-		usleep(static_cast<useconds_t>(100)*1000); //or use nanosleep on platforms where it's needed
+		usleep(static_cast<useconds_t>(100)*1000);
 		#endif
 
 		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
