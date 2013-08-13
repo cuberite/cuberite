@@ -1,8 +1,8 @@
 -- This plugin copyright Alexander Harkness 2013, licensed under the MIT license.
 
 -- Configuration
-g_ServerLang    = "english"
-g_ConsoleLang   = "english"
+g_ServerLang    = "en"
+g_ConsoleLang   = "en"
 
 -- Global Variables
 g_Plugin        = nil
@@ -23,7 +23,7 @@ function Initialize( Plugin )
 	Plugin:SetVersion( 1 )
 
 	-- This is the place for commands!
-	g_PluginManager:BindCommand("/language", "transapi.setlang", HandleLanguageCommand, " - Set your preferred language.")
+	g_PluginManager:BindCommand("/language", "transapi.setlang", HandleLanguageCommand, " - Set your preferred language (use ISO 639-1)")
 
 	-- Load the userdata file.
 	g_UserData = cIniFile( g_PluginDir .. "/userdata.ini" )
