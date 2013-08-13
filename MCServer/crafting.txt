@@ -72,6 +72,8 @@ Wool             = String,    1:1, 1:2, 2:1, 2:2
 TNT              = Gunpowder, 1:1, 3:1, 2:2, 1:3, 3:3 | Sand, 2:1, 1:2, 3:2, 2:3
 PillarQuartzBlock = QuartzSlab, 1:1, 1:2
 ChiseledQuartzBlock, 2 = QuartzBlock, 1:1, 1:2
+CoalBlock        = Coal, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+HayBale          = Wheat, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 
 # Slabs:
 StoneSlab,       6  = Stone,             1:1, 2:1, 3:1
@@ -105,7 +107,8 @@ SmoothSandstone, 4 = Sandstone, 1:1, 1:2, 2:1, 2:2
 OrnamentSandstone  = SandstoneSlab, 1:1, 1:2
 JackOLantern       = Pumpkin, 1:1 | Torch, 1:2
 
-
+# Other
+Carpet             = Wool, 1:3, 2:3
 
 
 
@@ -157,6 +160,7 @@ FishingRod     = Stick, 3:3, 2:2, 1:1          | String, 1:2, 1:3
 Shears         = IronIngot, 1:1, 2:2
 Shears         = IronIngot, 2:1, 1:2
 FireCharge     = BlazePowder, *   | Coal, *    | Gunpowder, *
+Lead           = String, 1:1, 1:2, 2:1, 3:3    | Slimeball, 2:2
 
 
 
@@ -271,12 +275,13 @@ Bread                = Wheat, 1:1, 2:1, 3:1
 Sugar                = Sugarcane, *
 Cake                 = MilkBucket, 1:1, 2:1, 3:1 | Sugar, 1:2, 3:2 | Egg, 2:2 | Wheat, 1:3, 2:3, 3:3
 Cookie               = Wheat, *, * | CocoaBeans, *
-GoldenApple          = RedApple, 2:2 | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
+GoldenApple          = RedApple, 2:2 | GoldIngot, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 EnchantedGoldenApple = RedApple, 2:2 | GoldBlock, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 Melon                = MelonSlice, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 MelonSeeds           = MelonSlice, *
 PumpkinSeeds, 4      = Pumpkin, *
 PumpkinPie           = Pumpkin, * | Sugar, * | egg, *
+Wheat, 9             = Haybale, *
 
 
 
@@ -293,6 +298,8 @@ Diamond, 9      = DiamondBlock, *
 LapisLazuli, 9  = LapisBlock, *
 Emerald, 9      = EmeraldBlock, *
 RedstoneDust, 9 = RedstoneBlock, *
+Coal, 9         = CoalBlock, *
+Clay, 4         = ClayBlock, *
 
 Painting            = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3   | Wool, 2:2
 ItemFrame           = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3   | Leather, 2:2
@@ -382,7 +389,7 @@ BrewingStand       = Cobblestone, 1:2, 2:2, 3:2   | BlazeRod, 2:1
 BlazePowder, 2     = BlazeRod, *
 MagmaCream         = SlimeBall, *    | BlazePowder, *
 FermentedSpiderEye = SpiderEye, *   | Sugar, *    | BrownMushroom, *
-GlisteringMelon    = MelonSlice, *  | GoldNugget, *
+GlisteringMelon    = MelonSlice, 2:2  | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 GoldNugget, 9      = GoldIngot, *
 EnchantmentTable   = Obsidian, 1:3, 2:3, 3:3, 2:2 | Diamond, 1:2, 3:2 | Book, 2:1
 
