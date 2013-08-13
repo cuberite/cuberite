@@ -587,6 +587,7 @@ void cWorld::Tick(float a_Dt)
 
 	m_ChunkMap->Tick(a_Dt);
 
+	TickClients(a_Dt);
 	TickQueuedBlocks(a_Dt);
 	TickQueuedTasks();
 	
@@ -805,6 +806,37 @@ void cWorld::TickQueuedTasks(void)
 		(*itr)->Run(*this);
 		delete *itr;
 	}  // for itr - m_Tasks[]
+}
+
+
+
+
+
+void cWorld::TickClients(float a_Dt)
+{
+	cClientHandleList RemoveClients;
+	{
+		cCSLock Lock(m_CSClients);
+		// Tick the clients, take out those that have been destroyed into RemoveClients
+		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
+		{
+			if ((*itr)->IsDestroyed())
+			{
+				// Remove the client later, when CS is not held, to avoid deadlock
+				RemoveClients.push_back(*itr);
+				itr = m_Clients.erase(itr);
+				continue;
+			}
+			(*itr)->Tick(a_Dt);
+			++itr;
+		}  // for itr - m_Clients[]
+	}
+	
+	// Delete the clients that have been destroyed
+	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
+	{
+		delete *itr;
+	} // for itr - RemoveClients[]
 }
 
 
@@ -1973,13 +2005,22 @@ void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
 
 void cWorld::AddPlayer(cPlayer * a_Player)
 {
-	cCSLock Lock(m_CSPlayers);
+	{
+		cCSLock Lock(m_CSPlayers);
+		
+		ASSERT(std::find(m_Players.begin(), m_Players.end(), a_Player) == m_Players.end());  // Is it already in the list? HOW?
+		
+		m_Players.remove(a_Player);  // Make sure the player is registered only once
+		m_Players.push_back(a_Player);
+	}
 	
-	ASSERT(std::find(m_Players.begin(), m_Players.end(), a_Player) == m_Players.end());  // Is it already in the list? HOW?
-	
-	m_Players.remove(a_Player);  // Make sure the player is registered only once
-	m_Players.push_back(a_Player);
-	
+	// Add the player's client to the list of clients to be ticked:
+	if (a_Player->GetClientHandle() != NULL)
+	{
+		cCSLock Lock(m_CSClients);
+		m_Clients.push_back(a_Player->GetClientHandle());
+	}
+
 	// The player has already been added to the chunkmap as the entity, do NOT add again!
 }
 
@@ -1990,8 +2031,17 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 void cWorld::RemovePlayer(cPlayer * a_Player)
 {
 	m_ChunkMap->RemoveEntity(a_Player);
-	cCSLock Lock(m_CSPlayers);
-	m_Players.remove(a_Player);
+	{
+		cCSLock Lock(m_CSPlayers);
+		m_Players.remove(a_Player);
+	}
+	
+	// Remove the player's client from the list of clients to be ticked:
+	if (a_Player->GetClientHandle() != NULL)
+	{
+		cCSLock Lock(m_CSClients);
+		m_Clients.remove(a_Player->GetClientHandle());
+	}
 }
 
 

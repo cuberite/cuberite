@@ -127,6 +127,8 @@ cPlayer::~cPlayer(void)
 
 bool cPlayer::Initialize(cWorld * a_World)
 {
+	ASSERT(a_World != NULL);
+	
 	if (super::Initialize(a_World))
 	{
 		// Remove the client handle from the server, it will be ticked from this object from now on
@@ -148,6 +150,7 @@ bool cPlayer::Initialize(cWorld * a_World)
 void cPlayer::Destroyed()
 {
 	CloseWindow(false);
+	
 	m_ClientHandle = NULL;
 }
 
@@ -157,22 +160,17 @@ void cPlayer::Destroyed()
 
 void cPlayer::SpawnOn(cClientHandle & a_Client)
 {
-	/*
-	LOGD("cPlayer::SpawnOn(%s) for \"%s\" at pos {%.2f, %.2f, %.2f}",
-		a_Client.GetUsername().c_str(), m_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
-	);
-	*/
-
-	if (m_bVisible && (m_ClientHandle != (&a_Client)))
+	if (!m_bVisible || (m_ClientHandle == (&a_Client)))
 	{
-		a_Client.SendPlayerSpawn(*this);
-		a_Client.SendEntityHeadLook(*this);
-		a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
-		a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots() );
-		a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings() );
-		a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate() );
-		a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet() );
+		return;
 	}
+	a_Client.SendPlayerSpawn(*this);
+	a_Client.SendEntityHeadLook(*this);
+	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
+	a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots() );
+	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings() );
+	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate() );
+	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet() );
 }
 
 
@@ -183,12 +181,18 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	if (m_ClientHandle != NULL)
 	{
+		if (m_ClientHandle->IsDestroyed())
+		{
+			// This should not happen, because destroying a client will remove it from the world, but just in case
+			m_ClientHandle = NULL;
+			return;
+		}
+		
 		if (!m_ClientHandle->IsPlaying())
 		{
 			// We're not yet in the game, ignore everything
 			return;
 		}
-		m_ClientHandle->Tick(a_Dt);
 	}
 	
 	super::Tick(a_Dt, a_Chunk);

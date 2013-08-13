@@ -212,11 +212,12 @@ private:
 
 	cProtocol * m_Protocol;
 	
+	cCriticalSection m_CSIncomingData;
+	AString          m_IncomingData;
+	
 	cCriticalSection m_CSOutgoingData;
 	cByteBuffer      m_OutgoingData;
-	AString          m_OutgoingDataOverflow;  //< For data that didn't fit into the m_OutgoingData ringbuffer temporarily
-
-	cCriticalSection m_CriticalSection;
+	AString          m_OutgoingDataOverflow;  ///< For data that didn't fit into the m_OutgoingData ringbuffer temporarily
 
 	Vector3d m_ConfirmPosition;
 
@@ -252,18 +253,22 @@ private:
 
 	enum eState
 	{
-		csConnected,         // The client has just connected, waiting for their handshake / login
-		csAuthenticating,    // The client has logged in, waiting for external authentication
-		csDownloadingWorld,  // The client is waiting for chunks, we're waiting for the loader to provide and send them
- 		csConfirmingPos,     // The client has been sent the position packet, waiting for them to repeat the position back
-		csPlaying,           // Normal gameplay
-		csDestroying,        // The client is being destroyed, don't queue any more packets / don't add to chunks
-		csDestroyed,         // The client has been destroyed, the destructor is to be called from the owner thread
+		csConnected,         ///< The client has just connected, waiting for their handshake / login
+		csAuthenticating,    ///< The client has logged in, waiting for external authentication
+		csAuthenticated,     ///< The client has been authenticated, will start streaming chunks in the next tick
+		csDownloadingWorld,  ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
+ 		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
+		csPlaying,           ///< Normal gameplay
+		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
+		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
 		
 		// TODO: Add Kicking here as well
 	} ;
 	
 	eState m_State;
+	
+	/// m_State needs to be locked in the Destroy() function so that the destruction code doesn't run twice on two different threads
+	cCriticalSection m_CSDestroyingState;
 
 	bool m_bKeepThreadGoing;
 	

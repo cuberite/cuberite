@@ -131,8 +131,9 @@ private:
 	cListenThread m_ListenThreadIPv4;
 	cListenThread m_ListenThreadIPv6;
 	
-	cCriticalSection  m_CSClients;  ///< Locks client list
-	cClientHandleList m_Clients;    ///< Clients that are connected to the server and not yet assigned to a cWorld
+	cCriticalSection  m_CSClients;        ///< Locks client lists
+	cClientHandleList m_Clients;          ///< Clients that are connected to the server and not yet assigned to a cWorld
+	cClientHandleList m_ClientsToRemove;  ///< Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick()
 	
 	cSocketThreads m_SocketThreads;
 	
@@ -164,6 +165,9 @@ private:
 	void PrepareKeys(void);
 	
 	bool Tick(float a_Dt);
+	
+	/// Ticks the clients in m_Clients, manages the list in respect to removing clients
+	void TickClients(float a_Dt);
 
 	// cListenThread::cCallback overrides:
 	virtual void OnConnectionAccepted(cSocket & a_Socket) override;

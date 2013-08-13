@@ -170,13 +170,21 @@ cClientHandle::~cClientHandle()
 
 
 
-void cClientHandle::Destroy()
+void cClientHandle::Destroy(void)
 {
-	// Setting m_bDestroyed was moved to the bottom of Destroy(), 
-	// otherwise the destructor may be called within another thread before the client is removed from chunks
-	// http://forum.mc-server.org/showthread.php?tid=366
+	{
+		cCSLock Lock(m_CSDestroyingState);
+		if (m_State >= csDestroying)
+		{
+			// Already called
+			return;
+		}
+		m_State = csDestroying;
+	}
 	
-	m_State = csDestroying;
+	// DEBUG:
+	LOGD("%s: client %p, \"%s\"", __FUNCTION__, this, m_Username.c_str());
+	
 	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
 	{
 		RemoveFromAllChunks();
@@ -253,9 +261,8 @@ void cClientHandle::Authenticate(void)
 	SendGameMode(m_Player->GetGameMode());
 	
 	m_Player->Initialize(World);
-	StreamChunks();
-	m_State = csDownloadingWorld;
-	
+	m_State = csAuthenticated;
+
 	// Broadcast this player's spawning to all other players in the same chunk
 	m_Player->GetWorld()->BroadcastSpawnEntity(*m_Player, this);
 
@@ -1342,6 +1349,20 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 void cClientHandle::Tick(float a_Dt)
 {
+	// Process received network data:
+	AString IncomingData;
+	{
+		cCSLock Lock(m_CSIncomingData);
+		std::swap(IncomingData, m_IncomingData);
+	}
+	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	
+	if (m_State == csAuthenticated)
+	{
+		StreamChunks();
+		m_State = csDownloadingWorld;
+	}
+	
 	m_TimeSinceLastPacket += a_Dt;
 	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
 	{
@@ -2118,30 +2139,10 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 
 void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 {
-	// Data is received from the client, hand it off to the protocol:
-	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
-	{
-		/*
-		_X: Lock the world, so that plugins reacting to protocol events have already the chunkmap locked.
-		There was a possibility of a deadlock between SocketThreads and TickThreads, resulting from each
-		holding one CS an requesting the other one (ChunkMap CS vs Plugin CS) (FS #375). To break this, it's 
-		sufficient to break any of the four Coffman conditions for a deadlock. We'll solve this by requiring
-		the ChunkMap CS for all SocketThreads operations before they lock the PluginCS - thus creating a kind
-		of a lock hierarchy. However, this incurs a performance penalty, we're de facto locking the chunkmap
-		for each incoming packet. A better, but more involved solutin would be to lock the chunkmap only when
-		the incoming packet really has a plugin CS lock request.
-		Also, it is still possible for a packet to slip through - when a player still doesn't have their world
-		assigned and several packets arrive at once.
-		*/
-		cWorld::cLock(*m_Player->GetWorld());
-		
-		m_Protocol->DataReceived(a_Data, a_Size);
-	}
-	else
-	{
-		m_Protocol->DataReceived(a_Data, a_Size);
-	}
+	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
 	m_TimeSinceLastPacket = 0;
+	cCSLock Lock(m_CSIncomingData);
+	m_IncomingData.append(a_Data, a_Size);
 }
 
 

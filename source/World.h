@@ -660,6 +660,12 @@ private:
 	
 	/// Tasks that have been queued onto the tick thread; guarded by m_CSTasks
 	cTasks m_Tasks;
+	
+	/// Guards m_Clients
+	cCriticalSection  m_CSClients;
+	
+	/// List of clients in this world, these will be ticked by this world
+	cClientHandleList m_Clients;
 
 
 	cWorld(const AString & a_WorldName);
@@ -667,11 +673,17 @@ private:
 
 	void Tick(float a_Dt);
 
-	void TickWeather(float a_Dt);  // Handles weather each tick
-	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
+	/// Handles the weather in each tick
+	void TickWeather(float a_Dt);
+	
+	/// Handles the mob spawning each tick
+	void TickSpawnMobs(float a_Dt);
 	
 	/// Executes all tasks queued onto the tick thread
 	void TickQueuedTasks(void);
+	
+	/// Ticks all clients that are in this world
+	void TickClients(float a_Dt);
 	
 	/// Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section)
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);

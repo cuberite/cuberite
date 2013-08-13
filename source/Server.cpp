@@ -165,7 +165,7 @@ void cServer::RemoveClient(const cClientHandle * a_Client)
 void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
 {
 	cCSLock Lock(m_CSClients);
-	m_Clients.remove(const_cast<cClientHandle *>(a_Client));
+	m_ClientsToRemove.push_back(const_cast<cClientHandle *>(a_Client));
 }
 
 
@@ -312,25 +312,7 @@ bool cServer::Tick(float a_Dt)
 {
 	cRoot::Get()->TickCommands();
 	
-	cClientHandleList RemoveClients;
-	{
-		cCSLock Lock(m_CSClients);
-		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
-		{
-			if ((*itr)->IsDestroyed())
-			{
-				RemoveClients.push_back(*itr);  // Remove the client later, when CS is not held, to avoid deadlock ( http://forum.mc-server.org/showthread.php?tid=374 )
-				itr = m_Clients.erase(itr);
-				continue;
-			}
-			(*itr)->Tick(a_Dt);
-			++itr;
-		}  // for itr - m_Clients[]
-	}
-	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
-	{
-		delete *itr;
-	} // for itr - RemoveClients[]
+	TickClients(a_Dt);
 
 	if (!m_bRestarting)
 	{
@@ -342,6 +324,45 @@ bool cServer::Tick(float a_Dt)
 		m_RestartEvent.Set();
 		return false;
 	}
+}
+
+
+
+
+
+void cServer::TickClients(float a_Dt)
+{
+	cClientHandleList RemoveClients;
+	{
+		cCSLock Lock(m_CSClients);
+		
+		// Remove clients that have moved to a world (the world will be ticking them from now on)
+		for (cClientHandleList::const_iterator itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
+		{
+			m_Clients.remove(*itr);
+		}  // for itr - m_ClientsToRemove[]
+		m_ClientsToRemove.clear();
+		
+		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
+		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
+		{
+			if ((*itr)->IsDestroyed())
+			{
+				// Remove the client later, when CS is not held, to avoid deadlock ( http://forum.mc-server.org/showthread.php?tid=374 )
+				RemoveClients.push_back(*itr);
+				itr = m_Clients.erase(itr);
+				continue;
+			}
+			(*itr)->Tick(a_Dt);
+			++itr;
+		}  // for itr - m_Clients[]
+	}
+	
+	// Delete the clients that have been destroyed
+	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
+	{
+		delete *itr;
+	} // for itr - RemoveClients[]
 }
 
 
@@ -492,6 +513,7 @@ void cServer::AuthenticateUser(int a_ClientID)
 		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
 			(*itr)->Authenticate();
+			return;
 		}
 	}  // for itr - m_Clients[]
 }

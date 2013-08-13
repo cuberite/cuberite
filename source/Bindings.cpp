@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/12/13 08:16:46.
+** Generated automatically by tolua++-1.0.92 on 08/12/13 21:48:05.
 */
 
 #ifndef __cplusplus
@@ -8237,40 +8237,6 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsRclking00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: Initialize of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_Initialize00
-static int tolua_AllToLua_cPlayer_Initialize00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Initialize'", NULL);
-#endif
-  {
-   bool tolua_ret = (bool)  self->Initialize(a_World);
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Initialize'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetEyeHeight of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetEyeHeight00
 static int tolua_AllToLua_cPlayer_GetEyeHeight00(lua_State* tolua_S)
@@ -10186,17 +10152,6 @@ static int tolua_AllToLua_cPlayer_IsSubmerged00(lua_State* tolua_S)
 
  class Lua__cPlayer : public cPlayer, public ToluaBase {
 public:
-	 bool  Initialize( cWorld* a_World) {
-		if (push_method("Initialize",  tolua_AllToLua_cPlayer_Initialize00)) {
-			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
-			ToluaBase::dbcall(lua_state, 2, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPlayer:: Initialize(a_World);
-		};
-	};
 	 void  MoveTo( const Vector3d& a_NewPos) {
 		if (push_method("MoveTo",  tolua_AllToLua_cPlayer_MoveTo00)) {
 			tolua_pushusertype(lua_state, (void*)&a_NewPos, "const Vector3d");
@@ -10418,9 +10373,6 @@ public:
 		};
 	};
 
-	 bool cPlayer__Initialize( cWorld* a_World) {
-		return ( bool )cPlayer::Initialize(a_World);
-	};
 	 void cPlayer__MoveTo( const Vector3d& a_NewPos) {
 		return ( void )cPlayer::MoveTo(a_NewPos);
 	};
@@ -10517,40 +10469,6 @@ static int tolua_AllToLua_Lua__cPlayer_tolua__set_instance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'tolua__set_instance'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPlayer__Initialize of class  Lua__cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlayer_cPlayer__Initialize00
-static int tolua_AllToLua_Lua__cPlayer_cPlayer__Initialize00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPlayer* self = (Lua__cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlayer__Initialize'", NULL);
-#endif
-  {
-   bool tolua_ret = (bool)  self->cPlayer__Initialize(a_World);
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPlayer__Initialize'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29625,7 +29543,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"EATING_TICKS",cPlayer::EATING_TICKS);
    tolua_constant(tolua_S,"MAX_AIR_LEVEL",cPlayer::MAX_AIR_LEVEL);
    tolua_constant(tolua_S,"DROWNING_TICKS",cPlayer::DROWNING_TICKS);
-   tolua_function(tolua_S,"Initialize",tolua_AllToLua_cPlayer_Initialize00);
    tolua_function(tolua_S,"GetEyeHeight",tolua_AllToLua_cPlayer_GetEyeHeight00);
    tolua_function(tolua_S,"GetEyePosition",tolua_AllToLua_cPlayer_GetEyePosition00);
    tolua_function(tolua_S,"IsOnGround",tolua_AllToLua_cPlayer_IsOnGround00);
@@ -29688,7 +29605,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"Lua__cPlayer","Lua__cPlayer","cPlayer",NULL);
   tolua_beginmodule(tolua_S,"Lua__cPlayer");
    tolua_function(tolua_S,"tolua__set_instance",tolua_AllToLua_Lua__cPlayer_tolua__set_instance00);
-   tolua_function(tolua_S,"cPlayer__Initialize",tolua_AllToLua_Lua__cPlayer_cPlayer__Initialize00);
    tolua_function(tolua_S,"cPlayer__MoveTo",tolua_AllToLua_Lua__cPlayer_cPlayer__MoveTo00);
    tolua_function(tolua_S,"cPlayer__IsSwimming",tolua_AllToLua_Lua__cPlayer_cPlayer__IsSwimming00);
    tolua_function(tolua_S,"cPlayer__IsSubmerged",tolua_AllToLua_Lua__cPlayer_cPlayer__IsSubmerged00);
