@@ -34,6 +34,7 @@
 #include "rsa.h"
 #include "rw.h"
 #include "sha.h"
+#include "skipjack.h"
 #include "trdlocal.h"
 
 #ifdef CRYPTOPP_IMPORTS

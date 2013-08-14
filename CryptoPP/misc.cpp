@@ -112,14 +112,13 @@ bool VerifyBufsEqual(const byte *buf, const byte *mask, size_t count)
 	return acc8 == 0;
 }
 
-#if !(defined(_MSC_VER) && (_MSC_VER < 1300)) && !defined(ANDROID_NDK)
+#if !(defined(_MSC_VER) && (_MSC_VER < 1300))
 using std::new_handler;
 using std::set_new_handler;
 #endif
 
 void CallNewHandler()
 {
-#if !defined(ANDROID_NDK)
 	new_handler newHandler = set_new_handler(NULL);
 	if (newHandler)
 		set_new_handler(newHandler);
@@ -128,7 +127,6 @@ void CallNewHandler()
 		newHandler();
 	else
 		throw std::bad_alloc();
-#endif
 }
 
 #if CRYPTOPP_BOOL_ALIGN16_ENABLED

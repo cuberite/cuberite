@@ -16,17 +16,12 @@
 
 // define this if you want to disable all OS-dependent features,
 // such as sockets and OS-provided random number generators
-#define NO_OS_DEPENDENCE
+// #define NO_OS_DEPENDENCE
 
 // Define this to use features provided by Microsoft's CryptoAPI.
 // Currently the only feature used is random number generation.
 // This macro will be ignored if NO_OS_DEPENDENCE is defined.
-// #define USE_MS_CRYPTOAPI
-
-// Define this to 1 to enforce the requirement in FIPS 186-2 Change Notice 1 that only 1024 bit moduli be used
-#ifndef DSA_1024_BIT_MODULUS_ONLY
-#	define DSA_1024_BIT_MODULUS_ONLY 1
-#endif
+#define USE_MS_CRYPTOAPI
 
 // ***************** Less Important Settings ***************
 
@@ -243,7 +238,7 @@ NAMESPACE_END
 #	pragma warn -8037
 #endif
 
-#if (defined(_MSC_VER) && _MSC_VER <= 1300) || defined(__MWERKS__) || defined(_STLPORT_VERSION) || defined(ANDROID_NDK)
+#if (defined(_MSC_VER) && _MSC_VER <= 1300) || defined(__MWERKS__) || defined(_STLPORT_VERSION)
 #define CRYPTOPP_DISABLE_UNCAUGHT_EXCEPTION
 #endif
 
@@ -348,7 +343,7 @@ NAMESPACE_END
 	#define CRYPTOPP_ALLOW_UNALIGNED_DATA_ACCESS
 #endif
 
-#define CRYPTOPP_VERSION 561
+#define CRYPTOPP_VERSION 562
 
 // ***************** determine availability of OS features ********************
 
