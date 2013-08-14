@@ -336,27 +336,3 @@ function HandleConsoleUnload(Split)
 	Out = Out .. "Num loaded chunks after: " .. cRoot:Get():GetTotalChunkCount();
 	return true, Out;
 end
-
-
--- Helper functions:
-
---- Returns the list of players banned by name, separated by ", "
-function BanListByName()
-	local NumValues = BannedPlayersIni:NumValues("Banned");
-	local Banned = {};
-	local KeyID = BannedPlayersIni:FindKey("Banned");
-	for i = 1, NumValues do
-		local PlayerName = BannedPlayersIni:ValueName(KeyID, i - 1);
-		if (BannedPlayersIni:GetValueB("Banned", PlayerName)) then
-			-- Player listed AND banned
-			table.insert(Banned, PlayerName);
-		end
-	end
-	return table.concat(Banned, ", ");
-end
-
---- Returns the list of players banned by IP, separated by ", "
-function BanListByIPs()
-	-- TODO: No IP ban implemented yet
-	return "";
-end

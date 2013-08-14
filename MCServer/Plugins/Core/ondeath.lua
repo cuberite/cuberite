@@ -44,7 +44,7 @@ function OnKilling(Victim, Killer)
 				elseif Killer:IsA("cMagmacube") then
 					Server:SendMessage( cChatColor.Red .. "[FATALITY] " .. cChatColor.White .. Victim:GetName() .. " was incinerated by a magmacube")
 				elseif Killer:IsA("cWolf") then
-					Server:SendMessage( cChatColor.Red .. "[FATALITY] " .. cChatColor.White .. Victim:GetName() .. " was savaged by a wolf")					
+					Server:SendMessage( cChatColor.Red .. "[FATALITY] " .. cChatColor.White .. Victim:GetName() .. " was savaged by a wolf")
 				end
 				CheckHardcore(Victim)
 				return false
@@ -52,14 +52,5 @@ function OnKilling(Victim, Killer)
 		end
 		Server:SendMessage( cChatColor.Red .. "[FATALITY] " .. cChatColor.White .. Victim:GetName() .. " died of mysterious circumstances")
 		CheckHardcore(Victim)
-	end
-end
-
-function CheckHardcore(Victim)
-	if HardCore == "true" then
-		if Victim:IsPlayer() == true then
-			local KilledPlayer = tolua.cast(Victim, "cPlayer")
-			BanPlayer(KilledPlayer:GetName(), "You died, haha. Good game, bro.")
-		end
 	end
 end

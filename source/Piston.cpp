@@ -21,10 +21,13 @@
 */
 
 
-//Athar from http://www.cplusplus.com/forum/unices/60161/ helped with the sleep code.
 
 
 extern bool g_BlockPistonBreakable[];
+
+
+
+
 
 #define AddDir( x, y, z, dir, amount ) \
 	switch (dir) \
@@ -132,6 +135,9 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 
 	/*
 	#ifdef _WIN32
+	// Sleeping here will play the piston animation on the client; however, it will block the entire server
+	// for the 100 ms, effectively dropping 2 game ticks per piston. This is very bad
+		// This needs to be handled using delayed scheduled tasks instead
 	Sleep(100);
 	#else
 	usleep(static_cast<useconds_t>(100)*1000);
@@ -184,6 +190,10 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		}
 		/*
 		#ifdef _WIN32
+		// TODO: This code needs replacing
+		// Sleeping here will play the piston animation on the client; however, it will block the entire server
+		// for the 100 ms, effectively dropping 2 game ticks per piston. This is very bad
+		// This needs to be handled using delayed scheduled tasks instead
 		Sleep(100);
 		#else
 		usleep(static_cast<useconds_t>(100)*1000);
@@ -197,6 +207,9 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	{
 		/*
 		#ifdef _WIN32
+		// Sleeping here will play the piston animation on the client; however, it will block the entire server
+		// for the 100 ms, effectively dropping 2 game ticks per piston. This is very bad
+		// This needs to be handled using delayed scheduled tasks instead
 		Sleep(100);
 		#else
 		usleep(static_cast<useconds_t>(100)*1000);
