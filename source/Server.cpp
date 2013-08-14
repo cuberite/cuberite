@@ -172,10 +172,34 @@ void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
 
 
 
+void cServer::PlayerCreated(const cPlayer * a_Player)
+{
+	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
+	cCSLock Lock(m_CSPlayerCountDiff);
+	m_PlayerCountDiff += 1;
+}
+
+
+
+
+
+void cServer::PlayerDestroyed(const cPlayer * a_Player)
+{
+	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
+	cCSLock Lock(m_CSPlayerCountDiff);
+	m_PlayerCountDiff -= 1;
+}
+
+
+
+
+
 bool cServer::InitServer(cIniFile & a_SettingsIni)
 {
 	m_Description = a_SettingsIni.GetValue ("Server", "Description", "MCServer! - In C++!").c_str();
 	m_MaxPlayers  = a_SettingsIni.GetValueI("Server", "MaxPlayers", 100);
+	m_PlayerCount = 0;
+	m_PlayerCountDiff = 0;
 
 	if (m_bIsConnected)
 	{
@@ -254,6 +278,16 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 
 
+int cServer::GetNumPlayers(void)
+{
+	cCSLock Lock(m_CSPlayerCount);
+	return m_PlayerCount;
+}
+
+
+
+
+
 void cServer::PrepareKeys(void)
 {
 	// TODO: Save and load key for persistence across sessions
@@ -310,6 +344,17 @@ void cServer::OnConnectionAccepted(cSocket & a_Socket)
 
 bool cServer::Tick(float a_Dt)
 {
+	// Apply the queued playercount adjustments (postponed to avoid deadlocks)
+	int PlayerCountDiff = 0;
+	{
+		cCSLock Lock(m_CSPlayerCountDiff);
+		std::swap(PlayerCountDiff, m_PlayerCountDiff);
+	}
+	{
+		cCSLock Lock(m_CSPlayerCount);
+		m_PlayerCount += PlayerCountDiff;
+	}
+	
 	cRoot::Get()->TickCommands();
 	
 	TickClients(a_Dt);

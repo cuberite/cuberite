@@ -100,6 +100,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_LastJumpHeight = (float)(GetPosY());
 	m_LastGroundHeight = (float)(GetPosY());
 	m_Stance = GetPosY() + 1.62;
+	
+	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
 
 
@@ -1120,20 +1122,15 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 	m_ClientHandle->RemoveFromAllChunks();
 	m_World->RemoveEntity(this);
 
+	// If the dimension is different, we can send the respawn packet
+	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
+	m_ClientHandle->MoveToWorld(*World, (OldDimension != World->GetDimension()));
+
 	// Add player to all the necessary parts of the new world
 	SetWorld(World);
 	World->AddEntity(this);
 	World->AddPlayer(this);
 
-	// If the dimension is different, we can send the respawn packet
-	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
-	if (OldDimension != World->GetDimension())
-	{
-		m_ClientHandle->SendRespawn();
-	}
-	
-	// Stream the new chunks:
-	m_ClientHandle->StreamChunks();
 	return true;
 }
 

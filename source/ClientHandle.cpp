@@ -275,7 +275,7 @@ void cClientHandle::Authenticate(void)
 
 void cClientHandle::StreamChunks(void)
 {
-	if ((m_State < csAuthenticating) || (m_State >= csDestroying))
+	if ((m_State < csAuthenticated) || (m_State >= csDestroying))
 	{
 		return;
 	}
@@ -1308,6 +1308,42 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 	
 	// Notify SocketThreads that we have something to write:
 	cRoot::Get()->GetServer()->NotifyClientWrite(this);
+}
+
+
+
+
+
+void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
+{
+	ASSERT(m_Player != NULL);
+	
+	if (a_SendRespawnPacket)
+	{
+		SendRespawn();
+	}
+
+	cWorld * World = m_Player->GetWorld();
+		
+	// Remove all associated chunks:
+	cChunkCoordsList Chunks;
+	{
+		cCSLock Lock(m_CSChunkLists);
+		std::swap(Chunks, m_LoadedChunks);
+		m_ChunksToSend.clear();
+	}
+	for (cChunkCoordsList::iterator itr = Chunks.begin(), end = Chunks.end(); itr != end; ++itr)
+	{
+		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
+		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
+	}  // for itr - Chunks[]
+	
+	// Do NOT stream new chunks, the new world runs its own tick thread and may deadlock
+	// Instead, the chunks will be streamed when the client is moved to the new world's Tick list,
+	// by setting state to csAuthenticated
+	m_State = csAuthenticated;
+	m_LastStreamedChunkX = 0x7fffffff;
+	m_LastStreamedChunkZ = 0x7fffffff;
 }
 
 

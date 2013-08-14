@@ -32,6 +32,7 @@ class cRedstone;
 class cWindow;
 class cFallingBlock;
 class cItemHandler;
+class cWorld;
 
 
 
@@ -193,6 +194,9 @@ public:
 	bool HandleLogin(int a_ProtocolVersion, const AString & a_Username);
 	
 	void SendData(const char * a_Data, int a_Size);
+	
+	/// Called when the player moves into a different world; queues sreaming the new chunks
+	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
 private:
 

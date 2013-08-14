@@ -43,7 +43,7 @@ public:												// tolua_export
 
 	// Player counts:
 	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
-	int  GetNumPlayers(void) const { return m_NumPlayers; }
+	int  GetNumPlayers(void);
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
 	// tolua_end
@@ -77,6 +77,12 @@ public:												// tolua_export
 	
 	/// Don't tick a_Client anymore, it will be ticked from its cPlayer instead
 	void ClientMovedToWorld(const cClientHandle * a_Client);
+	
+	/// Notifies the server that a player was created; the server uses this to adjust the number of players
+	void PlayerCreated(const cPlayer * a_Player);
+	
+	/// Notifies the server that a player was destroyed; the server uses this to adjust the number of players
+	void PlayerDestroyed(const cPlayer * a_Player);
 	
 	CryptoPP::RSA::PrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	CryptoPP::RSA::PublicKey  & GetPublicKey (void) { return m_PublicKey; }
@@ -135,6 +141,11 @@ private:
 	cClientHandleList m_Clients;          ///< Clients that are connected to the server and not yet assigned to a cWorld
 	cClientHandleList m_ClientsToRemove;  ///< Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick()
 	
+	cCriticalSection m_CSPlayerCount;      ///< Locks the m_PlayerCount
+	int              m_PlayerCount;        ///< Number of players currently playing in the server
+	cCriticalSection m_CSPlayerCountDiff;  ///< Locks the m_PlayerCountDiff
+	int              m_PlayerCountDiff;    ///< Adjustment to m_PlayerCount to be applied in the Tick thread
+	
 	cSocketThreads m_SocketThreads;
 	
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
@@ -150,7 +161,6 @@ private:
 	
 	AString m_Description;
 	int m_MaxPlayers;
-	int m_NumPlayers;
 	
 	cTickThread m_TickThread;
 	cEvent m_RestartEvent;

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/13/13 23:07:52.
+** Generated automatically by tolua++-1.0.92 on 08/14/13 08:14:03.
 */
 
 #ifndef __cplusplus
@@ -11295,14 +11295,14 @@ static int tolua_AllToLua_cServer_GetNumPlayers00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"const cServer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"cServer",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const cServer* self = (const cServer*)  tolua_tousertype(tolua_S,1,0);
+  cServer* self = (cServer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetNumPlayers'", NULL);
 #endif
