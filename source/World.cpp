@@ -211,7 +211,7 @@ void cWorld::cTickThread::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		clock_t Start = clock();
-		m_World.Tick((float)(LastTime - Start) / CLOCKS_PER_SEC);
+		m_World.Tick((float)(1000 * (Start - LastTime)) / CLOCKS_PER_SEC);
 		clock_t Now = clock();
 		if (Now - Start < ClocksPerTick)
 		{
