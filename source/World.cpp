@@ -552,6 +552,17 @@ void cWorld::Start(void)
 
 void cWorld::Stop(void)
 {
+	// Delete the clients that have been in this world:
+	{
+		cCSLock Lock(m_CSClients);
+		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+		{
+			(*itr)->Destroy();
+			delete *itr;
+		}  // for itr - m_Clients[]
+		m_Clients.clear();
+	}
+	
 	m_TickThread.Stop();
 	m_Lighting.Stop();
 	m_Generator.Stop();
