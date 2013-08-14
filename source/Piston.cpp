@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Piston.h"
@@ -12,13 +11,6 @@
 #include "Server.h"
 #include "Blocks/BlockHandler.h"
 
-/*
-#ifdef _WIN32
-#include <windows.h> 
-#else
-#include <unistd.h>
-#endif
-*/
 
 
 
@@ -133,16 +125,11 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 
 	AddDir(extx, exty, extz, pistonMeta & 7, 1)
 
-	/*
-	#ifdef _WIN32
+	// TODO: This code needs replacing
 	// Sleeping here will play the piston animation on the client; however, it will block the entire server
 	// for the 100 ms, effectively dropping 2 game ticks per piston. This is very bad
 		// This needs to be handled using delayed scheduled tasks instead
-	Sleep(100);
-	#else
-	usleep(static_cast<useconds_t>(100)*1000);
-	#endif
-	*/
+	cSleep::MilliSleep(100);
 
 	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta & 7);
 }
@@ -188,33 +175,23 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 			// These cannot be moved by the sticky piston, bail out
 			return;
 		}
-		/*
-		#ifdef _WIN32
+		
 		// TODO: This code needs replacing
 		// Sleeping here will play the piston animation on the client; however, it will block the entire server
 		// for the 100 ms, effectively dropping 2 game ticks per piston. This is very bad
 		// This needs to be handled using delayed scheduled tasks instead
-		Sleep(100);
-		#else
-		usleep(static_cast<useconds_t>(100)*1000);
-		#endif
-		*/
+		cSleep::MilliSleep(100);
 
 		m_World->SetBlock(pistx, pisty, pistz, tempblock, tempmeta);
 		m_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
 	}
 	else
 	{
-		/*
-		#ifdef _WIN32
+		// TODO: This code needs replacing
 		// Sleeping here will play the piston animation on the client; however, it will block the entire server
 		// for the 100 ms, effectively dropping 2 game ticks per piston. This is very bad
 		// This needs to be handled using delayed scheduled tasks instead
-		Sleep(100);
-		#else
-		usleep(static_cast<useconds_t>(100)*1000);
-		#endif
-		*/
+		cSleep::MilliSleep(100);
 
 		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 	}
