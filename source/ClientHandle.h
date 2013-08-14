@@ -288,12 +288,6 @@ private:
 	/// Running sum of m_NumExplosionsPerTick[]
 	int m_RunningSumExplosions;
 	
-	/// Lock for the m_PendingMessages buffer
-	cCriticalSection m_CSMessages;
-	
-	/// Buffer for received messages to be processed in the Tick thread
-	AStringList m_PendingMessages;
-
 	static int s_ClientCount;
 	int m_UniqueID;
 	
@@ -319,9 +313,6 @@ private:
 
 	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
 	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
-	
-	/// Processes the messages in m_PendingMessages; called from the Tick thread
-	void ProcessPendingMessages(void);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client
