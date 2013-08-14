@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/14/13 08:14:03.
+** Generated automatically by tolua++-1.0.92 on 08/14/13 19:48:00.
 */
 
 #ifndef __cplusplus
@@ -29138,14 +29138,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_TORCH_XP",E_META_TORCH_XP);
   tolua_constant(tolua_S,"E_META_TORCH_ZM",E_META_TORCH_ZM);
   tolua_constant(tolua_S,"E_META_TORCH_ZP",E_META_TORCH_ZP);
-  tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOUBLE_STEP_APPLE",E_BLOCK_WOODEN_DOUBLE_STEP_APPLE);
-  tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOUBLE_STEP_CONIFER",E_BLOCK_WOODEN_DOUBLE_STEP_CONIFER);
-  tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOUBLE_STEP_BIRCH",E_BLOCK_WOODEN_DOUBLE_STEP_BIRCH);
-  tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOUBLE_STEP_JUNGLE",E_BLOCK_WOODEN_DOUBLE_STEP_JUNGLE);
-  tolua_constant(tolua_S,"E_BLOCK_WOODEN_STEP_APPLE",E_BLOCK_WOODEN_STEP_APPLE);
-  tolua_constant(tolua_S,"E_BLOCK_WOODEN_STEP_CONIFER",E_BLOCK_WOODEN_STEP_CONIFER);
-  tolua_constant(tolua_S,"E_BLOCK_WOODEN_STEP_BIRCH",E_BLOCK_WOODEN_STEP_BIRCH);
-  tolua_constant(tolua_S,"E_BLOCK_WOODEN_STEP_JUNGLE",E_BLOCK_WOODEN_STEP_JUNGLE);
+  tolua_constant(tolua_S,"E_META_WOODEN_DOUBLE_STEP_APPLE",E_META_WOODEN_DOUBLE_STEP_APPLE);
+  tolua_constant(tolua_S,"E_META_WOODEN_DOUBLE_STEP_CONIFER",E_META_WOODEN_DOUBLE_STEP_CONIFER);
+  tolua_constant(tolua_S,"E_META_WOODEN_DOUBLE_STEP_BIRCH",E_META_WOODEN_DOUBLE_STEP_BIRCH);
+  tolua_constant(tolua_S,"E_META_WOODEN_DOUBLE_STEP_JUNGLE",E_META_WOODEN_DOUBLE_STEP_JUNGLE);
+  tolua_constant(tolua_S,"E_META_WOODEN_STEP_APPLE",E_META_WOODEN_STEP_APPLE);
+  tolua_constant(tolua_S,"E_META_WOODEN_STEP_CONIFER",E_META_WOODEN_STEP_CONIFER);
+  tolua_constant(tolua_S,"E_META_WOODEN_STEP_BIRCH",E_META_WOODEN_STEP_BIRCH);
+  tolua_constant(tolua_S,"E_META_WOODEN_STEP_JUNGLE",E_META_WOODEN_STEP_JUNGLE);
   tolua_constant(tolua_S,"E_META_WOOL_WHITE",E_META_WOOL_WHITE);
   tolua_constant(tolua_S,"E_META_WOOL_ORANGE",E_META_WOOL_ORANGE);
   tolua_constant(tolua_S,"E_META_WOOL_MAGENTA",E_META_WOOL_MAGENTA);
