@@ -147,7 +147,7 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 
 void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 {
-	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
+	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "MultiStepMap");
 	if (BiomeGenName.empty())
 	{
 		LOGWARN("[Generator]::BiomeGen value not found in world.ini, using \"MultiStepMap\".");
@@ -220,7 +220,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 
 void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 {
-	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
+	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "Biomal");
 	if (HeightGenName.empty())
 	{
 		LOGWARN("[Generator]::HeightGen value not found in world.ini, using \"Biomal\".");
@@ -306,7 +306,7 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 
 void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 {
-	AString CompoGenName = a_IniFile.GetValueSet("Generator", "CompositionGen", "");
+	AString CompoGenName = a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
 	if (CompoGenName.empty())
 	{
 		LOGWARN("[Generator]::CompositionGen value not found in world.ini, using \"Biomal\".");

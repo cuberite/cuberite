@@ -12,11 +12,13 @@
 #include "Server.h"
 #include "Blocks/BlockHandler.h"
 
+/*
 #ifdef _WIN32
 #include <windows.h> 
 #else
 #include <unistd.h>
 #endif
+*/
 
 
 //Athar from http://www.cplusplus.com/forum/unices/60161/ helped with the sleep code.
@@ -128,11 +130,13 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 
 	AddDir(extx, exty, extz, pistonMeta & 7, 1)
 
+	/*
 	#ifdef _WIN32
 	Sleep(100);
 	#else
 	usleep(static_cast<useconds_t>(100)*1000);
 	#endif
+	*/
 
 	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta & 7);
 }
@@ -178,22 +182,26 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 			// These cannot be moved by the sticky piston, bail out
 			return;
 		}
+		/*
 		#ifdef _WIN32
 		Sleep(100);
 		#else
 		usleep(static_cast<useconds_t>(100)*1000);
 		#endif
+		*/
 
 		m_World->SetBlock(pistx, pisty, pistz, tempblock, tempmeta);
 		m_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
 	}
 	else
 	{
+		/*
 		#ifdef _WIN32
 		Sleep(100);
 		#else
 		usleep(static_cast<useconds_t>(100)*1000);
 		#endif
+		*/
 
 		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 	}

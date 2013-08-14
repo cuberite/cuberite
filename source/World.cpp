@@ -2476,7 +2476,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
 	AString SimulatorSectionName;
 	Printf(SimulatorSectionName, "%sSimulator", a_FluidName);
-	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "");
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "Floody");
 	if (SimulatorName.empty())
 	{
 		LOGWARNING("%s [Physics]:%s not present or empty, using the default of \"Floody\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
