@@ -41,8 +41,8 @@ ifeq ($(release),1)
 ################
 # release build - fastest run-time, no gdb support
 ################
-CC_OPTIONS = -s -g -O3 -DNDEBUG
-CXX_OPTIONS = -s -g -O3 -DNDEBUG
+CC_OPTIONS = -s -g -O3 -DNDEBUG -Wno-tautological-compare
+CXX_OPTIONS = -s -g -O3 -DNDEBUG -Wno-tautological-compare
 LNK_OPTIONS = -pthread -O3
 BUILDDIR = build/release/
 
@@ -72,7 +72,7 @@ else
 # Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
 ################
 CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
-CXX_OPTIONS = -s -ggdb -g -D_DEBUG
+CXX_OPTIONS = -s -ggdb -g -D_DEBUG -Wno-tautological-compare
 LNK_OPTIONS = -pthread -g -ggdb
 BUILDDIR = build/debug/
 endif
