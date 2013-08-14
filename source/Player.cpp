@@ -112,6 +112,9 @@ cPlayer::~cPlayer(void)
 {
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
 	
+	// Notify the server that the player is being destroyed
+	cRoot::Get()->GetServer()->PlayerDestroying(this);
+
 	SaveToDisk();
 
 	m_World->RemovePlayer( this );

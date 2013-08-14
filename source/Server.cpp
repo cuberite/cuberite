@@ -183,7 +183,7 @@ void cServer::PlayerCreated(const cPlayer * a_Player)
 
 
 
-void cServer::PlayerDestroyed(const cPlayer * a_Player)
+void cServer::PlayerDestroying(const cPlayer * a_Player)
 {
 	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
 	cCSLock Lock(m_CSPlayerCountDiff);
