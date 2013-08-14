@@ -103,7 +103,6 @@ public:
 	virtual bool DoesAllowBlockOnTop(void) override
 	{
 		return true;
-		//was false
 	}
 
 
