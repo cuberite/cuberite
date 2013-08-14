@@ -666,6 +666,12 @@ private:
 	
 	/// List of clients in this world, these will be ticked by this world
 	cClientHandleList m_Clients;
+	
+	/// Clients that are scheduled for removal (ticked in another world), waiting for TickClients() to remove them
+	cClientHandleList m_ClientsToRemove;
+	
+	/// Clients that are scheduled for adding, waiting for TickClients to add them
+	cClientHandleList m_ClientsToAdd;
 
 
 	cWorld(const AString & a_WorldName);

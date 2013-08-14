@@ -817,6 +817,26 @@ void cWorld::TickClients(float a_Dt)
 	cClientHandleList RemoveClients;
 	{
 		cCSLock Lock(m_CSClients);
+		
+		// Remove clients scheduled for removal:
+		for (cClientHandleList::iterator itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
+		{
+			m_Clients.remove(*itr);
+		}  // for itr - m_ClientsToRemove[]
+		m_ClientsToRemove.clear();
+		
+		// Add clients scheduled for adding:
+		for (cClientHandleList::iterator itr = m_ClientsToAdd.begin(), end = m_ClientsToAdd.end(); itr != end; ++itr)
+		{
+			if (std::find(m_Clients.begin(), m_Clients.end(), *itr) != m_Clients.end())
+			{
+				ASSERT(!"Adding a client that is already in the clientlist");
+				continue;
+			}
+			m_Clients.push_back(*itr);
+		}  // for itr - m_ClientsToRemove[]
+		m_ClientsToAdd.clear();
+		
 		// Tick the clients, take out those that have been destroyed into RemoveClients
 		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
@@ -2018,7 +2038,7 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 	if (a_Player->GetClientHandle() != NULL)
 	{
 		cCSLock Lock(m_CSClients);
-		m_Clients.push_back(a_Player->GetClientHandle());
+		m_ClientsToAdd.push_back(a_Player->GetClientHandle());
 	}
 
 	// The player has already been added to the chunkmap as the entity, do NOT add again!
@@ -2040,7 +2060,7 @@ void cWorld::RemovePlayer(cPlayer * a_Player)
 	if (a_Player->GetClientHandle() != NULL)
 	{
 		cCSLock Lock(m_CSClients);
-		m_Clients.remove(a_Player->GetClientHandle());
+		m_ClientsToRemove.push_back(a_Player->GetClientHandle());
 	}
 }
 
