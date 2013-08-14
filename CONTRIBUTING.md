@@ -9,4 +9,4 @@ Copyright
 
 Your work should be licensed under the apache license, and you should add yourself to the CONTRIBUTORS file.
 
-If your work is not licensed under the apache license, then it must be compatible and marked as such.s
+If your work is not licensed under the apache license, then it must be compatible and marked as such.
