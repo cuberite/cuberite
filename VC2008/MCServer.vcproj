@@ -391,6 +391,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\DeadlockDetect.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\DeadlockDetect.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\Defines.h"
 				>
 			</File>

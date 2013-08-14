@@ -16,6 +16,7 @@
 #include "Chunk.h"
 #include "Protocol/ProtocolRecognizer.h"  // for protocol version constants
 #include "CommandOutput.h"
+#include "DeadlockDetect.h"
 
 #include "../iniFile/iniFile.h"
 
@@ -90,6 +91,7 @@ void cRoot::InputThread(void * a_Params)
 
 void cRoot::Start(void)
 {
+	cDeadlockDetect dd;
 	delete m_Log;
 	m_Log = new cMCLogger();
 
@@ -162,6 +164,9 @@ void cRoot::Start(void)
 		LOG("Starting worlds...");
 		StartWorlds();
 		
+		LOG("Starting deadlock detector...");
+		dd.Start();
+		
 		LOG("Starting server...");
 		m_Server->Start();
 
@@ -183,17 +188,21 @@ void cRoot::Start(void)
 
 		// Deallocate stuffs
 		LOG("Shutting down server...");
-		m_Server->Shutdown();  // This waits for threads to stop and d/c clients
+		m_Server->Shutdown();
+		
+		LOG("Shutting down deadlock detector...");
+		dd.Stop();
+		
 		LOG("Stopping world threads...");
 		StopWorlds();
+		
 		LOG("Stopping authenticator...");
 		m_Authenticator.Stop();
-		
 
 		LOG("Freeing MonsterConfig...");
-		delete m_MonsterConfig; m_MonsterConfig = 0;
+		delete m_MonsterConfig; m_MonsterConfig = NULL;
 		LOG("Stopping WebAdmin...");
-		delete m_WebAdmin; m_WebAdmin = 0;
+		delete m_WebAdmin; m_WebAdmin = NULL;
 		LOG("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
 		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
