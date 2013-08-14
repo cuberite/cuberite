@@ -1322,7 +1322,7 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 
 
-void cPlayer::UseEquippedItem()
+void cPlayer::UseEquippedItem(void)
 {
 	if (GetGameMode() == gmCreative)  // No damage in creative
 	{
@@ -1332,29 +1332,39 @@ void cPlayer::UseEquippedItem()
 	GetInventory().DamageEquippedItem();
 }
 
+
+
+
+
 void cPlayer::SetSwimState(cChunk & a_Chunk)
 {
-
+	int RelY = (int)floor(m_LastPosY + 0.1);
+	if ((RelY < 0) || (RelY >= cChunkDef::Height))
+	{
+		m_IsSwimming = false;
+		m_IsSubmerged = false;
+		return;
+	}
+	
 	BLOCKTYPE BlockIn;
 	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelY = (int)floor(m_LastPosY + 0.1);
 	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
 	
-	// first we check if the player is swimming
-
+	// Check if the player is swimming:
 	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
 	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
-
 	m_IsSwimming = IsBlockWater(BlockIn);
 
-	// now we check if the player is submerged
-
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY+1, RelZ, BlockIn));
-
+	// Check if the player is submerged:
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
 	m_IsSubmerged = IsBlockWater(BlockIn);
 }
 
-void cPlayer::HandleAir()
+
+
+
+
+void cPlayer::HandleAir(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
 	// see if the player is /submerged/ water (block above is water)
@@ -1363,27 +1373,36 @@ void cPlayer::HandleAir()
 	if (IsSubmerged())
 	{
 		// either reduce air level or damage player
-		if(m_AirLevel < 1)
+		if (m_AirLevel < 1)
 		{
-			if(m_AirTickTimer < 1)
+			if (m_AirTickTimer < 1)
 			{
 				// damage player 
 				TakeDamage(dtDrowning, NULL, 1, 1, 0);
 				// reset timer
 				m_AirTickTimer = DROWNING_TICKS;
-			}else{
+			}
+			else
+			{
 				m_AirTickTimer -= 1;
 			}
-		}else{
+		}
+		else
+		{
 			// reduce air supply
 			m_AirLevel -= 1;
 		}
-	}else{
+	}
+	else
+	{
 		// set the air back to maximum
 		m_AirLevel = MAX_AIR_LEVEL;
 		m_AirTickTimer = DROWNING_TICKS;
 	}
 }
+
+
+
 
 
 void cPlayer::HandleFood(void)
