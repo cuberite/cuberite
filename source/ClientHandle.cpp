@@ -170,13 +170,21 @@ cClientHandle::~cClientHandle()
 
 
 
-void cClientHandle::Destroy()
+void cClientHandle::Destroy(void)
 {
-	// Setting m_bDestroyed was moved to the bottom of Destroy(), 
-	// otherwise the destructor may be called within another thread before the client is removed from chunks
-	// http://forum.mc-server.org/showthread.php?tid=366
+	{
+		cCSLock Lock(m_CSDestroyingState);
+		if (m_State >= csDestroying)
+		{
+			// Already called
+			return;
+		}
+		m_State = csDestroying;
+	}
 	
-	m_State = csDestroying;
+	// DEBUG:
+	LOGD("%s: client %p, \"%s\"", __FUNCTION__, this, m_Username.c_str());
+	
 	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
 	{
 		RemoveFromAllChunks();
@@ -253,9 +261,8 @@ void cClientHandle::Authenticate(void)
 	SendGameMode(m_Player->GetGameMode());
 	
 	m_Player->Initialize(World);
-	StreamChunks();
-	m_State = csDownloadingWorld;
-	
+	m_State = csAuthenticated;
+
 	// Broadcast this player's spawning to all other players in the same chunk
 	m_Player->GetWorld()->BroadcastSpawnEntity(*m_Player, this);
 
@@ -268,7 +275,7 @@ void cClientHandle::Authenticate(void)
 
 void cClientHandle::StreamChunks(void)
 {
-	if ((m_State < csAuthenticating) || (m_State >= csDestroying))
+	if ((m_State < csAuthenticated) || (m_State >= csDestroying))
 	{
 		return;
 	}
@@ -421,11 +428,11 @@ void cClientHandle::HandlePing(void)
 	// Somebody tries to retrieve information about the server
 	AString Reply;
 	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetDefaultWorld()->GetDescription().c_str(), 
-		cChatColor::Delimiter.c_str(), 
-		cRoot::Get()->GetDefaultWorld()->GetNumPlayers(),
-		cChatColor::Delimiter.c_str(), 
-		cRoot::Get()->GetDefaultWorld()->GetMaxPlayers()
+		cRoot::Get()->GetServer()->GetDescription().c_str(),
+		cChatColor::Delimiter.c_str(),
+		cRoot::Get()->GetServer()->GetNumPlayers(),
+		cChatColor::Delimiter.c_str(),
+		cRoot::Get()->GetServer()->GetMaxPlayers()
 	);
 	Kick(Reply.c_str());
 }
@@ -914,11 +921,24 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 void cClientHandle::HandleChat(const AString & a_Message)
 {
-	// We need to process messages in the Tick thread, to avoid deadlocks resulting from player-commands being processed
-	// in the SocketThread and waiting for acquiring the ChunkMap CS with Plugin CS locked
+	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
 	
-	cCSLock Lock(m_CSMessages);
-	m_PendingMessages.push_back(a_Message);
+	// If a command, perform it:
+	AString Message(a_Message);
+	if (cRoot::Get()->GetServer()->Command(*this, Message))
+	{
+		return;
+	}
+	
+	// Not a command, broadcast as a simple message:
+	AString Msg;
+	Printf(Msg, "<%s%s%s> %s",
+		m_Player->GetColor().c_str(),
+		m_Player->GetName().c_str(),
+		cChatColor::White.c_str(),
+		Message.c_str()
+	);
+	m_Player->GetWorld()->BroadcastChat(Msg);
 }
 
 
@@ -1176,7 +1196,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
 	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(this, a_Username))
 	{
-		if (cRoot::Get()->GetDefaultWorld()->GetNumPlayers() >= cRoot::Get()->GetDefaultWorld()->GetMaxPlayers())
+		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())
 		{
 			Kick("The server is currently full :(-- Try again later");
 			return false;
@@ -1191,7 +1211,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 {
-	if( a_EntityID != m_Player->GetUniqueID() )
+	if (a_EntityID != m_Player->GetUniqueID())
 	{
 		// We should only receive entity actions from the entity that is performing the action
 		return;
@@ -1307,6 +1327,42 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 
 
 
+void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
+{
+	ASSERT(m_Player != NULL);
+	
+	if (a_SendRespawnPacket)
+	{
+		SendRespawn();
+	}
+
+	cWorld * World = m_Player->GetWorld();
+		
+	// Remove all associated chunks:
+	cChunkCoordsList Chunks;
+	{
+		cCSLock Lock(m_CSChunkLists);
+		std::swap(Chunks, m_LoadedChunks);
+		m_ChunksToSend.clear();
+	}
+	for (cChunkCoordsList::iterator itr = Chunks.begin(), end = Chunks.end(); itr != end; ++itr)
+	{
+		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
+		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
+	}  // for itr - Chunks[]
+	
+	// Do NOT stream new chunks, the new world runs its own tick thread and may deadlock
+	// Instead, the chunks will be streamed when the client is moved to the new world's Tick list,
+	// by setting state to csAuthenticated
+	m_State = csAuthenticated;
+	m_LastStreamedChunkX = 0x7fffffff;
+	m_LastStreamedChunkZ = 0x7fffffff;
+}
+
+
+
+
+
 bool cClientHandle::CheckBlockInteractionsRate(void)
 {
 	ASSERT(m_Player != NULL);
@@ -1342,6 +1398,20 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 void cClientHandle::Tick(float a_Dt)
 {
+	// Process received network data:
+	AString IncomingData;
+	{
+		cCSLock Lock(m_CSIncomingData);
+		std::swap(IncomingData, m_IncomingData);
+	}
+	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	
+	if (m_State == csAuthenticated)
+	{
+		StreamChunks();
+		m_State = csDownloadingWorld;
+	}
+	
 	m_TimeSinceLastPacket += a_Dt;
 	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
 	{
@@ -1355,12 +1425,14 @@ void cClientHandle::Tick(float a_Dt)
 		m_ShouldCheckDownloaded = false;
 	}
 	
+	if (m_Player == NULL)
+	{
+		return;
+	}
+	
 	// Send a ping packet:
 	cTimer t1;
-	if (
-		(m_Player != NULL) &&  // Is logged in?
-		(m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime())
-	)
+	if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
 	{
 		m_PingID++;
 		m_PingStartTime = t1.GetNowTime();
@@ -1369,7 +1441,7 @@ void cClientHandle::Tick(float a_Dt)
 	}
 
 	// Handle block break animation:
-	if ((m_Player != NULL) && (m_BlockDigAnimStage > -1))
+	if (m_BlockDigAnimStage > -1)
 	{
 		int lastAnimVal = m_BlockDigAnimStage;
 		m_BlockDigAnimStage += (int)(m_BlockDigAnimSpeed * a_Dt);
@@ -1387,9 +1459,6 @@ void cClientHandle::Tick(float a_Dt)
 	m_CurrentExplosionTick = (m_CurrentExplosionTick + 1) % ARRAYCOUNT(m_NumExplosionsPerTick);
 	m_RunningSumExplosions -= m_NumExplosionsPerTick[m_CurrentExplosionTick];
 	m_NumExplosionsPerTick[m_CurrentExplosionTick] = 0;
-	
-	// Process the queued messages:
-	ProcessPendingMessages();
 }
 
 
@@ -1955,7 +2024,7 @@ void cClientHandle::SendConfirmPosition(void)
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
 		// Broadcast that this player has joined the game! Yay~
-		cRoot::Get()->GetServer()->BroadcastChat(m_Username + " joined the game!", this);
+		m_Player->GetWorld()->BroadcastChat(m_Username + " joined the game!", this);
 	}
 
 	SendPlayerMoveLook();
@@ -2037,46 +2106,6 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cClientHandle::ProcessPendingMessages(void)
-{
-	while (true)
-	{
-		AString Message;
-		
-		// Extract one message from the PendingMessages buffer:
-		{
-			cCSLock Lock(m_CSMessages);
-			if (m_PendingMessages.empty())
-			{
-				// No more messages in the buffer, bail out
-				return;
-			}
-			Message = m_PendingMessages.front();
-			m_PendingMessages.pop_front();
-		}  // Lock(m_CSMessages)
-		
-		// If a command, perform it:
-		if (cRoot::Get()->GetServer()->Command(*this, Message))
-		{
-			continue;
-		}
-		
-		// Not a command, broadcast as a simple message:
-		AString Msg;
-		Printf(Msg, "<%s%s%s> %s",
-			m_Player->GetColor().c_str(),
-			m_Player->GetName().c_str(),
-			cChatColor::White.c_str(),
-			Message.c_str()
-		);
-		m_Player->GetWorld()->BroadcastChat(Msg);
-	}  // while (true)
-}
-
-
-
-
-
 void cClientHandle::PacketBufferFull(void)
 {
 	// Too much data in the incoming queue, the server is probably too busy, kick the client:
@@ -2116,30 +2145,10 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 
 void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 {
-	// Data is received from the client, hand it off to the protocol:
-	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
-	{
-		/*
-		_X: Lock the world, so that plugins reacting to protocol events have already the chunkmap locked.
-		There was a possibility of a deadlock between SocketThreads and TickThreads, resulting from each
-		holding one CS an requesting the other one (ChunkMap CS vs Plugin CS) (FS #375). To break this, it's 
-		sufficient to break any of the four Coffman conditions for a deadlock. We'll solve this by requiring
-		the ChunkMap CS for all SocketThreads operations before they lock the PluginCS - thus creating a kind
-		of a lock hierarchy. However, this incurs a performance penalty, we're de facto locking the chunkmap
-		for each incoming packet. A better, but more involved solutin would be to lock the chunkmap only when
-		the incoming packet really has a plugin CS lock request.
-		Also, it is still possible for a packet to slip through - when a player still doesn't have their world
-		assigned and several packets arrive at once.
-		*/
-		cWorld::cLock(*m_Player->GetWorld());
-		
-		m_Protocol->DataReceived(a_Data, a_Size);
-	}
-	else
-	{
-		m_Protocol->DataReceived(a_Data, a_Size);
-	}
+	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
 	m_TimeSinceLastPacket = 0;
+	cCSLock Lock(m_CSIncomingData);
+	m_IncomingData.append(a_Data, a_Size);
 }
 
 

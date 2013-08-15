@@ -32,6 +32,7 @@ class cRedstone;
 class cWindow;
 class cFallingBlock;
 class cItemHandler;
+class cWorld;
 
 
 
@@ -194,6 +195,9 @@ public:
 	
 	void SendData(const char * a_Data, int a_Size);
 	
+	/// Called when the player moves into a different world; queues sreaming the new chunks
+	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
+	
 private:
 
 	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
@@ -212,11 +216,12 @@ private:
 
 	cProtocol * m_Protocol;
 	
+	cCriticalSection m_CSIncomingData;
+	AString          m_IncomingData;
+	
 	cCriticalSection m_CSOutgoingData;
 	cByteBuffer      m_OutgoingData;
-	AString          m_OutgoingDataOverflow;  //< For data that didn't fit into the m_OutgoingData ringbuffer temporarily
-
-	cCriticalSection m_CriticalSection;
+	AString          m_OutgoingDataOverflow;  ///< For data that didn't fit into the m_OutgoingData ringbuffer temporarily
 
 	Vector3d m_ConfirmPosition;
 
@@ -252,18 +257,22 @@ private:
 
 	enum eState
 	{
-		csConnected,         // The client has just connected, waiting for their handshake / login
-		csAuthenticating,    // The client has logged in, waiting for external authentication
-		csDownloadingWorld,  // The client is waiting for chunks, we're waiting for the loader to provide and send them
- 		csConfirmingPos,     // The client has been sent the position packet, waiting for them to repeat the position back
-		csPlaying,           // Normal gameplay
-		csDestroying,        // The client is being destroyed, don't queue any more packets / don't add to chunks
-		csDestroyed,         // The client has been destroyed, the destructor is to be called from the owner thread
+		csConnected,         ///< The client has just connected, waiting for their handshake / login
+		csAuthenticating,    ///< The client has logged in, waiting for external authentication
+		csAuthenticated,     ///< The client has been authenticated, will start streaming chunks in the next tick
+		csDownloadingWorld,  ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
+ 		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
+		csPlaying,           ///< Normal gameplay
+		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
+		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
 		
 		// TODO: Add Kicking here as well
 	} ;
 	
 	eState m_State;
+	
+	/// m_State needs to be locked in the Destroy() function so that the destruction code doesn't run twice on two different threads
+	cCriticalSection m_CSDestroyingState;
 
 	bool m_bKeepThreadGoing;
 	
@@ -279,12 +288,6 @@ private:
 	/// Running sum of m_NumExplosionsPerTick[]
 	int m_RunningSumExplosions;
 	
-	/// Lock for the m_PendingMessages buffer
-	cCriticalSection m_CSMessages;
-	
-	/// Buffer for received messages to be processed in the Tick thread
-	AStringList m_PendingMessages;
-
 	static int s_ClientCount;
 	int m_UniqueID;
 	
@@ -310,9 +313,6 @@ private:
 
 	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
 	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
-	
-	/// Processes the messages in m_PendingMessages; called from the Tick thread
-	void ProcessPendingMessages(void);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client

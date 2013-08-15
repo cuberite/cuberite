@@ -100,6 +100,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_LastJumpHeight = (float)(GetPosY());
 	m_LastGroundHeight = (float)(GetPosY());
 	m_Stance = GetPosY() + 1.62;
+	
+	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
 
 
@@ -110,6 +112,9 @@ cPlayer::~cPlayer(void)
 {
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
 	
+	// Notify the server that the player is being destroyed
+	cRoot::Get()->GetServer()->PlayerDestroying(this);
+
 	SaveToDisk();
 
 	m_World->RemovePlayer( this );
@@ -127,8 +132,16 @@ cPlayer::~cPlayer(void)
 
 bool cPlayer::Initialize(cWorld * a_World)
 {
+	ASSERT(a_World != NULL);
+	
 	if (super::Initialize(a_World))
 	{
+		// Remove the client handle from the server, it will be ticked from this object from now on
+		if (m_ClientHandle != NULL)
+		{
+			cRoot::Get()->GetServer()->ClientMovedToWorld(m_ClientHandle);
+		}
+		
 		GetWorld()->AddPlayer(this);
 		return true;
 	}
@@ -142,6 +155,7 @@ bool cPlayer::Initialize(cWorld * a_World)
 void cPlayer::Destroyed()
 {
 	CloseWindow(false);
+	
 	m_ClientHandle = NULL;
 }
 
@@ -151,22 +165,17 @@ void cPlayer::Destroyed()
 
 void cPlayer::SpawnOn(cClientHandle & a_Client)
 {
-	/*
-	LOGD("cPlayer::SpawnOn(%s) for \"%s\" at pos {%.2f, %.2f, %.2f}",
-		a_Client.GetUsername().c_str(), m_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
-	);
-	*/
-
-	if (m_bVisible && (m_ClientHandle != (&a_Client)))
+	if (!m_bVisible || (m_ClientHandle == (&a_Client)))
 	{
-		a_Client.SendPlayerSpawn(*this);
-		a_Client.SendEntityHeadLook(*this);
-		a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
-		a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots() );
-		a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings() );
-		a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate() );
-		a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet() );
+		return;
 	}
+	a_Client.SendPlayerSpawn(*this);
+	a_Client.SendEntityHeadLook(*this);
+	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
+	a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots() );
+	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings() );
+	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate() );
+	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet() );
 }
 
 
@@ -175,18 +184,28 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	if (!m_ClientHandle->IsPlaying())
+	if (m_ClientHandle != NULL)
 	{
-		// We're not yet in the game, ignore everything
-		return;
+		if (m_ClientHandle->IsDestroyed())
+		{
+			// This should not happen, because destroying a client will remove it from the world, but just in case
+			m_ClientHandle = NULL;
+			return;
+		}
+		
+		if (!m_ClientHandle->IsPlaying())
+		{
+			// We're not yet in the game, ignore everything
+			return;
+		}
 	}
 	
 	super::Tick(a_Dt, a_Chunk);
 	
-	// set player swimming state
-	SetSwimState( a_Chunk);
+	// Set player swimming state
+	SetSwimState(a_Chunk);
 
-	// handle air drowning stuff
+	// Handle air drowning stuff
 	HandleAir();
 
 	if (m_bDirtyPosition)
@@ -1106,20 +1125,15 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 	m_ClientHandle->RemoveFromAllChunks();
 	m_World->RemoveEntity(this);
 
+	// If the dimension is different, we can send the respawn packet
+	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
+	m_ClientHandle->MoveToWorld(*World, (OldDimension != World->GetDimension()));
+
 	// Add player to all the necessary parts of the new world
 	SetWorld(World);
 	World->AddEntity(this);
 	World->AddPlayer(this);
 
-	// If the dimension is different, we can send the respawn packet
-	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
-	if (OldDimension != World->GetDimension())
-	{
-		m_ClientHandle->SendRespawn();
-	}
-	
-	// Stream the new chunks:
-	m_ClientHandle->StreamChunks();
 	return true;
 }
 

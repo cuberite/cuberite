@@ -8,8 +8,10 @@
 
 
 :: If there was a Git conflict, resolve it by resetting to HEAD; we're regenerating the files from scratch anyway
-git checkout -- Bindings.cpp
-git checkout -- Bindings.h
+git checkout --ours Bindings.cpp
+git add -u Bindings.cpp
+git checkout --ours Bindings.h
+git add -u Bindings.h
 
 
 
