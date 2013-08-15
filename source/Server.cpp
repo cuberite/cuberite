@@ -59,18 +59,59 @@ typedef std::list< cClientHandle* > ClientList;
 
 
 
-struct cServer::sServerState
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cServer::cTickThread:
+
+cServer::cTickThread::cTickThread(cServer & a_Server) :
+	super("ServerTickThread"),
+	m_Server(a_Server)
 {
-	sServerState()
-		: pTickThread(NULL)
-		, bStopTickThread(false)
-	{}
+}
 
-	cThread* pTickThread;	bool bStopTickThread;
 
-	cEvent RestartEvent;
-	std::string ServerID;
-};
+
+
+
+void cServer::cTickThread::Execute(void)
+{
+	cTimer Timer;
+
+	long long msPerTick = 50;	// TODO - Put this in server config file
+	long long LastTime = Timer.GetNowTime();
+
+	while (!m_ShouldTerminate)
+	{
+		long long NowTime = Timer.GetNowTime();
+		float DeltaTime = (float)(NowTime-LastTime);
+		m_ShouldTerminate = !m_Server.Tick(DeltaTime);
+		long long TickTime = Timer.GetNowTime() - NowTime;
+		
+		if (TickTime < msPerTick)
+		{
+			// Stretch tick time until it's at least msPerTick
+			cSleep::MilliSleep((unsigned int)(msPerTick - TickTime));
+		}
+
+		LastTime = NowTime;
+	}
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cServer:
+
+cServer::cServer(void) :
+	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client"),
+	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client"),
+	m_bIsConnected(false),
+	m_bRestarting(false),
+	m_RCONServer(*this),
+	m_TickThread(*this)
+{
+}
 
 
 
@@ -121,8 +162,45 @@ void cServer::RemoveClient(const cClientHandle * a_Client)
 
 
 
+void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
+{
+	cCSLock Lock(m_CSClients);
+	m_ClientsToRemove.push_back(const_cast<cClientHandle *>(a_Client));
+}
+
+
+
+
+
+void cServer::PlayerCreated(const cPlayer * a_Player)
+{
+	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
+	cCSLock Lock(m_CSPlayerCountDiff);
+	m_PlayerCountDiff += 1;
+}
+
+
+
+
+
+void cServer::PlayerDestroying(const cPlayer * a_Player)
+{
+	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
+	cCSLock Lock(m_CSPlayerCountDiff);
+	m_PlayerCountDiff -= 1;
+}
+
+
+
+
+
 bool cServer::InitServer(cIniFile & a_SettingsIni)
 {
+	m_Description = a_SettingsIni.GetValue ("Server", "Description", "MCServer! - In C++!").c_str();
+	m_MaxPlayers  = a_SettingsIni.GetValueI("Server", "MaxPlayers", 100);
+	m_PlayerCount = 0;
+	m_PlayerCountDiff = 0;
+
 	if (m_bIsConnected)
 	{
 		LOGERROR("ERROR: Trying to initialize server while server is already running!");
@@ -164,18 +242,17 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 	m_bIsConnected = true;
 
-	m_pState->ServerID = "-";
+	m_ServerID = "-";
 	if (a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true))
 	{
 		MTRand mtrand1;
-		unsigned int r1 = (mtrand1.randInt()%1147483647) + 1000000000;
-		unsigned int r2 = (mtrand1.randInt()%1147483647) + 1000000000;
+		unsigned int r1 = (mtrand1.randInt() % 1147483647) + 1000000000;
+		unsigned int r2 = (mtrand1.randInt() % 1147483647) + 1000000000;
 		std::ostringstream sid;
 		sid << std::hex << r1;
 		sid << std::hex << r2;
-		std::string ServerID = sid.str();
-		ServerID.resize(16, '0');
-		m_pState->ServerID = ServerID;
+		m_ServerID = sid.str();
+		m_ServerID.resize(16, '0');
 	}
 	
 	m_ClientViewDistance = a_SettingsIni.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
@@ -201,29 +278,10 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 
 
-cServer::cServer(void)
-	: m_pState(new sServerState)
-	, m_ListenThreadIPv4(*this, cSocket::IPv4, "Client")
-	, m_ListenThreadIPv6(*this, cSocket::IPv6, "Client")
-	, m_Millisecondsf(0)
-	, m_Milliseconds(0)
-	, m_bIsConnected(false)
-	, m_bRestarting(false)
-	, m_RCONServer(*this)
+int cServer::GetNumPlayers(void)
 {
-}
-
-
-
-
-
-cServer::~cServer()
-{
-	// TODO: Shut down the server gracefully
-	m_pState->bStopTickThread = true;
-	delete m_pState->pTickThread;	m_pState->pTickThread = NULL;
-
-	delete m_pState;
+	cCSLock Lock(m_CSPlayerCount);
+	return m_PlayerCount;
 }
 
 
@@ -284,55 +342,22 @@ void cServer::OnConnectionAccepted(cSocket & a_Socket)
 
 
 
-void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSClients);
-	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
-	{
-		if ((*itr == a_Exclude) || !(*itr)->IsLoggedIn())
-		{
-			continue;
-		}
-		(*itr)->SendChat(a_Message);
-	}
-}
-
-
-
-
-
 bool cServer::Tick(float a_Dt)
 {
-	m_Millisecondsf += a_Dt;
-	if (m_Millisecondsf > 1.f)
+	// Apply the queued playercount adjustments (postponed to avoid deadlocks)
+	int PlayerCountDiff = 0;
 	{
-		m_Milliseconds += (int)m_Millisecondsf;
-		m_Millisecondsf = m_Millisecondsf - (int)m_Millisecondsf;
+		cCSLock Lock(m_CSPlayerCountDiff);
+		std::swap(PlayerCountDiff, m_PlayerCountDiff);
 	}
-
-	cRoot::Get()->TickWorlds(a_Dt); // TODO - Maybe give all worlds their own thread?
-
-	cClientHandleList RemoveClients;
 	{
-		cCSLock Lock(m_CSClients);
-		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
-		{
-			if ((*itr)->IsDestroyed())
-			{
-				RemoveClients.push_back(*itr);  // Remove the client later, when CS is not held, to avoid deadlock ( http://forum.mc-server.org/showthread.php?tid=374 )
-				itr = m_Clients.erase(itr);
-				continue;
-			}
-			(*itr)->Tick(a_Dt);
-			++itr;
-		}  // for itr - m_Clients[]
+		cCSLock Lock(m_CSPlayerCount);
+		m_PlayerCount += PlayerCountDiff;
 	}
-	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
-	{
-		delete *itr;
-	} // for itr - RemoveClients[]
-
-	cRoot::Get()->GetPluginManager()->Tick(a_Dt);
+	
+	cRoot::Get()->TickCommands();
+	
+	TickClients(a_Dt);
 
 	if (!m_bRestarting)
 	{
@@ -341,7 +366,7 @@ bool cServer::Tick(float a_Dt)
 	else
 	{
 		m_bRestarting = false;
-		m_pState->RestartEvent.Set();
+		m_RestartEvent.Set();
 		return false;
 	}
 }
@@ -350,33 +375,39 @@ bool cServer::Tick(float a_Dt)
 
 
 
-void ServerTickThread( void * a_Param )
+void cServer::TickClients(float a_Dt)
 {
-	LOG("ServerTickThread");
-	cServer *CServerObj = (cServer*)a_Param;
-
-	cTimer Timer;
-
-	long long msPerTick = 50;	// TODO - Put this in server config file
-	long long LastTime = Timer.GetNowTime();
-
-	bool bKeepGoing = true;
-	while( bKeepGoing )
+	cClientHandleList RemoveClients;
 	{
-		long long NowTime = Timer.GetNowTime();
-		float DeltaTime = (float)(NowTime-LastTime);
-		bKeepGoing = CServerObj->Tick( DeltaTime );
-		long long TickTime = Timer.GetNowTime() - NowTime;
+		cCSLock Lock(m_CSClients);
 		
-		if( TickTime < msPerTick )	// Stretch tick time until it's at least msPerTick
+		// Remove clients that have moved to a world (the world will be ticking them from now on)
+		for (cClientHandleList::const_iterator itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
 		{
-			cSleep::MilliSleep( (unsigned int)( msPerTick - TickTime ) );
-		}
-
-		LastTime = NowTime;
+			m_Clients.remove(*itr);
+		}  // for itr - m_ClientsToRemove[]
+		m_ClientsToRemove.clear();
+		
+		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
+		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
+		{
+			if ((*itr)->IsDestroyed())
+			{
+				// Remove the client later, when CS is not held, to avoid deadlock ( http://forum.mc-server.org/showthread.php?tid=374 )
+				RemoveClients.push_back(*itr);
+				itr = m_Clients.erase(itr);
+				continue;
+			}
+			(*itr)->Tick(a_Dt);
+			++itr;
+		}  // for itr - m_Clients[]
 	}
-
-	LOG("TICK THREAD STOPPED");
+	
+	// Delete the clients that have been destroyed
+	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
+	{
+		delete *itr;
+	} // for itr - RemoveClients[]
 }
 
 
@@ -385,7 +416,6 @@ void ServerTickThread( void * a_Param )
 
 bool cServer::Start(void)
 {
-	m_pState->pTickThread = new cThread( ServerTickThread, this, "cServer::ServerTickThread" );
 	if (!m_ListenThreadIPv4.Start())
 	{
 		return false;
@@ -394,7 +424,10 @@ bool cServer::Start(void)
 	{
 		return false;
 	}
-	m_pState->pTickThread->Start( true );
+	if (!m_TickThread.Start())
+	{
+		return false;
+	}
 	return true;
 }
 
@@ -478,32 +511,13 @@ void cServer::BindBuiltInConsoleCommands(void)
 
 
 
-void cServer::SendMessage(const AString & a_Message, cPlayer * a_Player /* = NULL */, bool a_bExclude /* = false */ )
-{
-	if ((a_Player != NULL) && !a_bExclude)
-	{
-		cClientHandle * Client = a_Player->GetClientHandle();
-		if (Client != NULL)
-		{
-			Client->SendChat(a_Message);
-		}
-		return;
-	}
-
-	BroadcastChat(a_Message, (a_Player != NULL) ? a_Player->GetClientHandle() : NULL);
-}
-
-
-
-
-
-void cServer::Shutdown()
+void cServer::Shutdown(void)
 {
 	m_ListenThreadIPv4.Stop();
 	m_ListenThreadIPv6.Stop();
 	
 	m_bRestarting = true;
-	m_pState->RestartEvent.Wait();
+	m_RestartEvent.Wait();
 
 	cRoot::Get()->SaveAllChunks();
 
@@ -514,15 +528,6 @@ void cServer::Shutdown()
 		delete *itr;
 	}
 	m_Clients.clear();
-}
-
-
-
-
-
-const AString & cServer::GetServerID(void) const
-{
-	return m_pState->ServerID;
 }
 
 
@@ -553,6 +558,7 @@ void cServer::AuthenticateUser(int a_ClientID)
 		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
 			(*itr)->Authenticate();
+			return;
 		}
 	}  // for itr - m_Clients[]
 }
@@ -562,7 +568,7 @@ void cServer::AuthenticateUser(int a_ClientID)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cServer::cClientPacketThread:
+// cServer::cNotifyWriteThread:
 
 cServer::cNotifyWriteThread::cNotifyWriteThread(void) :
 	super("ClientPacketThread"),
