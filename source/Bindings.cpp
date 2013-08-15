@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/14/13 19:48:00.
+** Generated automatically by tolua++-1.0.92 on 08/15/13 22:11:03.
 */
 
 #ifndef __cplusplus
@@ -12890,6 +12890,51 @@ static int tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'WakeUpSimulatorsInArea'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: DoExplosiontAt of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_DoExplosiontAt00
+static int tolua_AllToLua_cWorld_DoExplosiontAt00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isuserdata(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  double a_ExplosionSize = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_BlockX = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_BlockY = ((double)  tolua_tonumber(tolua_S,4,0));
+  double a_BlockZ = ((double)  tolua_tonumber(tolua_S,5,0));
+  bool a_CanCauseFire = ((bool)  tolua_toboolean(tolua_S,6,0));
+  eExplosionSource a_Source = ((eExplosionSource) (int)  tolua_tonumber(tolua_S,7,0));
+  void* a_SourceData = ((void*)  tolua_touserdata(tolua_S,8,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoExplosiontAt'", NULL);
+#endif
+  {
+   self->DoExplosiontAt(a_ExplosionSize,a_BlockX,a_BlockY,a_BlockZ,a_CanCauseFire,a_Source,a_SourceData);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DoExplosiontAt'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29776,6 +29821,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpawnZ",tolua_AllToLua_cWorld_GetSpawnZ00);
    tolua_function(tolua_S,"WakeUpSimulators",tolua_AllToLua_cWorld_WakeUpSimulators00);
    tolua_function(tolua_S,"WakeUpSimulatorsInArea",tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00);
+   tolua_function(tolua_S,"DoExplosiontAt",tolua_AllToLua_cWorld_DoExplosiontAt00);
    tolua_function(tolua_S,"GetSignLines",tolua_AllToLua_cWorld_GetSignLines00);
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
