@@ -32,7 +32,7 @@ extern "C"
 
 
 
-const cLuaState::cRet cLuaState::Return;
+const cLuaState::cRet cLuaState::Return = {};
 
 
 
