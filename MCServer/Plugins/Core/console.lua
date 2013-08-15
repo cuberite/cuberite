@@ -21,8 +21,11 @@ function InitConsoleCommands()
 	PluginMgr:BindConsoleCommand("setversion",           HandleConsoleVersion,              " ~ Sets server version reported to 1.4+ clients");
 	PluginMgr:BindConsoleCommand("unban",                HandleConsoleUnban,                " ~ Unbans a player by name");
 	PluginMgr:BindConsoleCommand("unload",               HandleConsoleUnload,               " - Unloads all unused chunks");
-
 end
+
+
+
+
 
 function HandleConsoleGive(Split)
 
@@ -80,8 +83,11 @@ function HandleConsoleGive(Split)
 	end
 
 	return true
-
 end
+
+
+
+
 
 function HandleConsoleBan(Split)
 	if (#Split < 2) then
@@ -108,6 +114,10 @@ function HandleConsoleBan(Split)
 	return true
 end
 
+
+
+
+
 function HandleConsoleUnban(Split)
 
 	if #Split < 2 then
@@ -123,8 +133,11 @@ function HandleConsoleUnban(Split)
 
 	local Server = cRoot:Get():GetServer()
 	return true, "Unbanned " .. Split[2]
-
 end
+
+
+
+
 
 function HandleConsoleBanList(Split)
 	if (#Split == 1) then
@@ -137,6 +150,10 @@ function HandleConsoleBanList(Split)
 
 	return true, "Unknown banlist subcommand";
 end
+
+
+
+
 
 function HandleConsoleHelp(Split)
 	local Commands = {};   -- {index => {"Command", "HelpString"} }
@@ -166,6 +183,10 @@ function HandleConsoleHelp(Split)
 	return true, Out;
 end
 
+
+
+
+
 function HandleConsoleList(Split)
 	-- Get a list of all players, one playername per line
 	local Out = "";
@@ -180,6 +201,10 @@ function HandleConsoleList(Split)
 	);
 	return true, Out;
 end
+
+
+
+
 
 function HandleConsoleListGroups(Split)
 	-- Read the groups.ini file:
@@ -201,6 +226,10 @@ function HandleConsoleListGroups(Split)
 	return true, Out;
 end
 
+
+
+
+
 function HandleConsoleNumChunks(Split)
 	local Output = {};
 	local AddNumChunks = function(World)
@@ -219,6 +248,10 @@ function HandleConsoleNumChunks(Split)
 
 	return true, Out;
 end
+
+
+
+
 
 function HandleConsolePlayers(Split)
 	local PlayersInWorlds = {};    -- "WorldName" => [players array]
@@ -243,6 +276,10 @@ function HandleConsolePlayers(Split)
 	return true, Out;
 end
 
+
+
+
+
 function HandleConsoleVersion(Split)
 	if (#Split == 1) then
 		-- Display current version:
@@ -255,6 +292,10 @@ function HandleConsoleVersion(Split)
 	local Version = cRoot:Get():GetPrimaryServerVersion();
 	return true, "Primary server version is now #" .. Version .. ", " .. cRoot:GetProtocolVersionTextFromInt(Version);
 end
+
+
+
+
 
 function HandleConsoleRank(Split)
 	if (Split[2] == nil) or (Split[3] == nil) then
@@ -301,19 +342,37 @@ function HandleConsoleRank(Split)
 	return true, Out .. "Player " .. Split[2] .. " was moved to " .. Split[3];
 end
 
+
+
+
+
 function HandleConsoleReload(Split)
-	Server = cRoot:Get():GetServer();
-	Server:SendMessage(cChatColor.Rose .. "[WARNING] " .. cChatColor.White .. "Reloading all plugins!");
+	cRoot:Get():ForEachWorld(
+		function (a_World)
+			a_World:BroadcastChat(cChatColor.Rose .. "[WARNING] " .. cChatColor.White .. "Reloading all plugins!");
+		end
+	)
 	cPluginManager:Get():ReloadPlugins();
 	return true;
 end
 
+
+
+
+
 function HandleConsoleSaveAll(Split)
-	Server = cRoot:Get():GetServer();
-	Server:SendMessage(cChatColor.Rose .. "[WARNING] " .. cChatColor.White .. "Saving all chunks!");
+	cRoot:Get():ForEachWorld(
+		function (a_World)
+			a_World:BroadcastChat(cChatColor.Rose .. "[WARNING] " .. cChatColor.White .. "Saving all chunks!");
+		end
+	)
 	cRoot:Get():SaveAllChunks();
 	return true;
 end
+
+
+
+
 
 function HandleConsoleSay(Split)
 	table.remove(Split, 1);
@@ -326,6 +385,10 @@ function HandleConsoleSay(Split)
 	return true;
 end
 
+
+
+
+
 function HandleConsoleUnload(Split)
 	local UnloadChunks = function(World)
 		World:UnloadUnusedChunks();
@@ -336,3 +399,7 @@ function HandleConsoleUnload(Split)
 	Out = Out .. "Num loaded chunks after: " .. cRoot:Get():GetTotalChunkCount();
 	return true, Out;
 end
+
+
+
+
