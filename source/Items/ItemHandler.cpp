@@ -162,6 +162,8 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_MINECART:
 		case E_ITEM_CHEST_MINECART:
 		case E_ITEM_FURNACE_MINECART:
+		case E_ITEM_MINECART_WITH_TNT:
+		case E_ITEM_MINECART_WITH_HOPPER:
 		{
 			return new cItemMinecartHandler(a_ItemType);
 		}
