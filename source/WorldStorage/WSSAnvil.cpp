@@ -944,6 +944,14 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadMinecartFFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "MinecartTNT", a_IDTagLength) == 0)
+	{
+		LoadMinecartTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "MinecartHopper", a_IDTagLength) == 0)
+	{
+		LoadMinecartHFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	if (strncmp(a_IDTag, "Item", a_IDTagLength) == 0)
 	{
 		LoadPickupFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1020,6 +1028,40 @@ void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	
 	// TODO: Load the Push and Fuel tags
 	
+	a_Entities.push_back(Minecart.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cMinecartWithTNT> Minecart(new cMinecartWithTNT(0, 0, 0));
+	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	//TODO: Everything to do with TNT carts
+
+	a_Entities.push_back(Minecart.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cMinecartWithHopper> Minecart(new cMinecartWithHopper(0, 0, 0));
+	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	//TODO: Everything to do with hopper carts
+
 	a_Entities.push_back(Minecart.release());
 }
 

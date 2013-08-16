@@ -39,13 +39,13 @@ bool cMinecart::Initialize(cWorld * a_World)
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	char Type = 0;
-	switch (m_Payload)
+	switch (m_Payload) //Wiki.vg is outdated on this!!
 	{
-		case mpNone:    Type = 10; break;
-		case mpChest:   Type = 11; break;
-		case mpFurnace: Type = 12; break;
-		case mpTNT:  Type = 13; break;
-		case mpHopper:     Type = 14; break;
+		case mpNone:    Type = 15; break; //?
+		case mpChest:   Type = 10; break;
+		case mpFurnace: Type = 11; break; //?
+		case mpTNT:     Type = 12; break; //?
+		case mpHopper:  Type = 14; break; //?
 		default:
 		{
 			ASSERT(!"Unknown payload, cannot spawn on client");

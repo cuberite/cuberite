@@ -61,9 +61,11 @@ public:
 		cMinecart * Minecart = NULL;
 		switch (m_ItemType)
 		{
-			case E_ITEM_MINECART:         Minecart = new cEmptyMinecart      (x, y, z); break;
-			case E_ITEM_CHEST_MINECART:   Minecart = new cMinecartWithChest  (x, y, z); break;
-			case E_ITEM_FURNACE_MINECART: Minecart = new cMinecartWithFurnace(x, y, z); break;
+			case E_ITEM_MINECART:             Minecart = new cEmptyMinecart        (x, y, z); break;
+			case E_ITEM_CHEST_MINECART:       Minecart = new cMinecartWithChest    (x, y, z); break;
+			case E_ITEM_FURNACE_MINECART:     Minecart = new cMinecartWithFurnace  (x, y, z); break;
+			case E_ITEM_MINECART_WITH_TNT:    Minecart = new cMinecartWithTNT      (x, y, z); break;
+			case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (x, y, z); break;
 			default:
 			{
 				ASSERT(!"Unhandled minecart item");
