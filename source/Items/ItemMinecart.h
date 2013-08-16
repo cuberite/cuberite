@@ -43,6 +43,7 @@ public:
 			case E_BLOCK_MINECART_TRACKS:
 			case E_BLOCK_POWERED_RAIL:
 			case E_BLOCK_DETECTOR_RAIL:
+			case E_BLOCK_ACTIVATOR_RAIL:
 			{
 				// These are allowed
 				break;

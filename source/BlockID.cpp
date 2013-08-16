@@ -661,6 +661,8 @@ public:
 		g_BlockPistonBreakable[E_BLOCK_MELON_STEM]            = true;
 		g_BlockPistonBreakable[E_BLOCK_PUMPKIN]               = true;
 		g_BlockPistonBreakable[E_BLOCK_PUMPKIN_STEM]          = true;
+		g_BlockPistonBreakable[E_BLOCK_REDSTONE_REPEATER_OFF] = true;
+		g_BlockPistonBreakable[E_BLOCK_REDSTONE_REPEATER_ON]  = true;
 		g_BlockPistonBreakable[E_BLOCK_REDSTONE_TORCH_OFF]    = true;
 		g_BlockPistonBreakable[E_BLOCK_REDSTONE_TORCH_ON]     = true;
 		g_BlockPistonBreakable[E_BLOCK_REDSTONE_WIRE]         = true;

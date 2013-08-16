@@ -29,7 +29,9 @@ public:
 		mpNone,     // Empty minecart, ridable by player or mobs
 		mpChest,    // Minecart-with-chest, can store a grid of 3*8 items
 		mpFurnace,  // Minecart-with-furnace, can be powered
-		// TODO: Other 1.5 features: hopper, tnt, dispenser, spawner
+		mpTNT,      // Minecart-with-TNT, can be blown up with activator rail
+		mpHopper,   // Minecart-with-hopper, can be hopper
+		// TODO: Spawner minecarts, (and possibly any block in a minecart with NBT editing)
 	} ;
 	
 	// cEntity overrides:
@@ -115,3 +117,32 @@ public:
 
 
 
+
+class cMinecartWithTNT :
+	public cMinecart
+{
+	typedef cMinecart super;
+	
+public:
+	CLASS_PROTODEF(cMinecartWithTNT);
+	
+	cMinecartWithTNT(double a_X, double a_Y, double a_Z);
+} ;
+
+
+
+
+
+class cMinecartWithHopper :
+	public cMinecart
+{
+	typedef cMinecart super;
+	
+public:
+	CLASS_PROTODEF(cMinecartWithHopper);
+	
+	cMinecartWithHopper(double a_X, double a_Y, double a_Z);
+	
+	// cEntity overrides:
+	virtual void OnRightClicked(cPlayer & a_Player) override;
+} ;
