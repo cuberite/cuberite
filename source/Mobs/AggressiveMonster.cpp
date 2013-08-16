@@ -3,6 +3,7 @@
 
 #include "AggressiveMonster.h"
 
+#include "../World.h"
 #include "../Vector3f.h"
 #include "../Player.h"
 #include "../MersenneTwister.h"

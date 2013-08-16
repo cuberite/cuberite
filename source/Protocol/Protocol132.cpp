@@ -7,6 +7,7 @@
 #include "Protocol132.h"
 #include "../Root.h"
 #include "../Server.h"
+#include "../World.h"
 #include "../ClientHandle.h"
 #include "../../CryptoPP/randpool.h"
 #include "../Item.h"

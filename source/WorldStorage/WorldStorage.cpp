@@ -84,6 +84,15 @@ bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName)
 
 
 
+void cWorldStorage::Stop(void)
+{
+	WaitForFinish();
+}
+
+
+
+
+
 void cWorldStorage::WaitForFinish(void)
 {
 	LOG("Waiting for the world storage to finish saving");

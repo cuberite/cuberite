@@ -3,6 +3,7 @@
 
 #include "PassiveMonster.h"
 #include "../MersenneTwister.h"
+#include "../World.h"
 
 
 

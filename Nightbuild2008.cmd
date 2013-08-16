@@ -53,6 +53,15 @@ if errorlevel 1 goto haderror
 
 
 
+:: Update the external plugins to the latest revision:
+cd MCServer\Plugins\Core
+git pull
+if errorlevel 1 goto haderror
+cd ..\ProtectionAreas
+git pull
+if errorlevel 1 goto haderror
+cd ..\..\..
+
 :: Get the Git commit ID into an environment var
 For /f "tokens=1 delims=/. " %%a in ('git log -1 --oneline --no-abbrev-commit') do (set COMMITID=%%a)
 if errorlevel 1 goto haderror
@@ -100,7 +109,7 @@ set FILESUFFIX=%MYYEAR%_%MYMONTH%_%MYDAY%_%MYTIME%_%COMMITID%
 echo FILESUFFIX=%FILESUFFIX%
 copy MCServer\MCServer.exe Install\MCServer.exe
 cd Install
-%zip% a -mx9 -y MCServer_Win_%FILESUFFIX%.7z -scsWIN @Zip2008.list
+%zip% a -mx9 -y MCServer_Win_%FILESUFFIX%.7z -scsWIN -i@Zip2008.list -xr!*.git*
 if errorlevel 1 goto haderror
 cd ..
 

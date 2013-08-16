@@ -33,7 +33,7 @@ public:
 			a_BlockY--;
 		}
 
-		if (a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, a_Item.m_ItemDamage) >= 0)
+		if (a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, (cMonster::eType)(a_Item.m_ItemDamage)) >= 0)
 		{
 			if (a_Player->GetGameMode() != 1)
 			{

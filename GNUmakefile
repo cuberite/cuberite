@@ -12,6 +12,8 @@
 # Usage:
 # To make a release build, call "make release=1"
 # To make a debug build, call "make"
+# To make a 32-bit build on 64-bit OS, pass the addm32=1 flag
+# To build with clang, you need to add disableasm=1 flag
 #
 ###################################################
 
@@ -98,15 +100,29 @@ endif
 
 
 
-################
+###################################################
 # 32-bit build override in 64-bit build environments
-#   - so that BearBin doesn't need to modify his makefile after each makefile change :)
-################
+
 ifeq ($(addm32),1)
 CC_OPTIONS += -m32
 CXX_OPTIONS += -m32
 LNK_OPTIONS += -m32
 endif
+
+
+
+
+
+
+###################################################
+# Clang doesn't seem to support CryptoPP's assembly mode, disable  it for now (CryptoPP 5.6.2)
+
+ifeq ($(disableasm),1)
+	CC_OPTIONS += -DCRYPTOPP_DISABLE_ASM
+	CXX_OPTIONS += -DCRYPTOPP_DISABLE_ASM
+endif
+
+
 
 
 

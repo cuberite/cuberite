@@ -15,7 +15,7 @@
 cEvent::cEvent(void)
 {
 #ifdef _WIN32
-	m_Event = CreateEvent( 0, FALSE, FALSE, 0 );
+	m_Event = CreateEvent(NULL, FALSE, FALSE, NULL);
 	if (m_Event == NULL)
 	{
 		LOGERROR("cEvent: cannot create event, GLE = %d. Aborting server.", GetLastError());
@@ -78,19 +78,19 @@ cEvent::~cEvent()
 
 void cEvent::Wait(void)
 {
-#ifdef _WIN32
-	DWORD res = WaitForSingleObject(m_Event, INFINITE);
-	if (res != WAIT_OBJECT_0)
-	{
-		LOGWARN("cEvent: waiting for the event failed: %d, GLE = %d. Continuing, but server may be unstable.", res, GetLastError());
-	}
-#else
-	int res = sem_wait(m_Event);
-	if (res != 0 )
-	{
-		LOGWARN("cEvent: waiting for the event failed: %i, errno = %i. Continuing, but server may be unstable.", res, errno);
-	}
-#endif
+	#ifdef _WIN32
+		DWORD res = WaitForSingleObject(m_Event, INFINITE);
+		if (res != WAIT_OBJECT_0)
+		{
+			LOGWARN("cEvent: waiting for the event failed: %d, GLE = %d. Continuing, but server may be unstable.", res, GetLastError());
+		}
+	#else
+		int res = sem_wait(m_Event);
+		if (res != 0 )
+		{
+			LOGWARN("cEvent: waiting for the event failed: %i, errno = %i. Continuing, but server may be unstable.", res, errno);
+		}
+	#endif
 }
 
 
@@ -99,18 +99,70 @@ void cEvent::Wait(void)
 
 void cEvent::Set(void)
 {
-#ifdef _WIN32
-	if (!SetEvent(m_Event))
-	{
-		LOGWARN("cEvent: Could not set cEvent: GLE = %d", GetLastError());
-	}
-#else
-	int res = sem_post(m_Event);
-	if (res != 0)
-	{
-		LOGWARN("cEvent: Could not set cEvent: %i, errno = %d", res, errno);
-	}
-#endif
+	#ifdef _WIN32
+		if (!SetEvent(m_Event))
+		{
+			LOGWARN("cEvent: Could not set cEvent: GLE = %d", GetLastError());
+		}
+	#else
+		int res = sem_post(m_Event);
+		if (res != 0)
+		{
+			LOGWARN("cEvent: Could not set cEvent: %i, errno = %d", res, errno);
+		}
+	#endif
+}
+
+
+
+
+
+cEvent::eWaitResult cEvent::Wait(int a_TimeoutMilliSec)
+{
+	#ifdef _WIN32
+		DWORD res = WaitForSingleObject(m_Event, (DWORD)a_TimeoutMilliSec);
+		switch (res)
+		{
+			case WAIT_OBJECT_0:
+			{
+				// The semaphore was signalled
+				return wrSignalled;
+			}
+			case WAIT_TIMEOUT:
+			{
+				// The timeout was hit
+				return wrTimeout;
+			}
+			default:
+			{
+				LOGWARNING("cEvent: timed-waiting for the event failed: %d, GLE = %d. Continuing, but server may be unstable.", res, GetLastError());
+				return wrError;
+			}
+		}
+	#else
+		timespec timeout;
+		timeout.tv_sec = a_TimeoutMilliSec / 1000;
+		timeout.tv_nsec = (a_TimeoutMilliSec % 1000) * 1000000;
+		int res = sem_timedwait(m_Event, &timeout);
+		switch (res)
+		{
+			case 0:
+			{
+				// The semaphore was signalled
+				return wrSignalled;
+			}
+			case ETIMEDOUT:
+			{
+				// The timeout was hit
+				return wrTimeout;
+			}
+			default:
+			{
+				LOGWARNING("cEvent: timed-waiting for the event failed: %i, errno = %i. Continuing, but server may be unstable.", res, errno);
+				return wrError;
+			}
+		}
+	#endif
 }
 
 

@@ -85,9 +85,10 @@ public:
 	
 	/// Called by cAuthenticator to auth the specified user
 	void AuthenticateUser(int a_ClientID);
-
-	void TickWorlds(float a_Dt);
 	
+	/// Executes commands queued in the command queue
+	void TickCommands(void);
+
 	/// Returns the number of chunks loaded
 	int GetTotalChunkCount(void);  // tolua_export
 	

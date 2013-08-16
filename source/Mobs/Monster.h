@@ -3,7 +3,6 @@
 
 #include "../Pawn.h"
 #include "../Defines.h"
-#include "../World.h"
 #include "../BlockID.h"
 #include "../Item.h"
 
@@ -13,6 +12,7 @@
 
 class Vector3f;
 class cClientHandle;
+class cWorld;
 
 
 
@@ -23,7 +23,41 @@ class cMonster :
 {
 	typedef cPawn super;
 public:
+	/// This identifies individual monster type, as well as their network type-ID
+	enum eType
+	{
+		mtCreeper      = E_META_SPAWN_EGG_CREEPER,
+		mtSkeleton     = E_META_SPAWN_EGG_SKELETON,
+		mtSpider       = E_META_SPAWN_EGG_SPIDER,
+		mtGiant        = E_META_SPAWN_EGG_GIANT,
+		mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
+		mtSlime        = E_META_SPAWN_EGG_SLIME,
+		mtGhast        = E_META_SPAWN_EGG_GHAST,
+		mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
+		mtEnderman     = E_META_SPAWN_EGG_ENDERMAN,
+		mtCaveSpider   = E_META_SPAWN_EGG_CAVE_SPIDER,
+		mtSilverfish   = E_META_SPAWN_EGG_SILVERFISH,
+		mtBlaze        = E_META_SPAWN_EGG_BLAZE,
+		mtMagmaCube    = E_META_SPAWN_EGG_MAGMA_CUBE,
+		mtEnderDragon  = E_META_SPAWN_EGG_ENDER_DRAGON,
+		mtWither       = E_META_SPAWN_EGG_WITHER,
+		mtBat          = E_META_SPAWN_EGG_BAT,
+		mtWitch        = E_META_SPAWN_EGG_WITCH,
+		mtPig          = E_META_SPAWN_EGG_PIG,
+		mtSheep        = E_META_SPAWN_EGG_SHEEP,
+		mtCow          = E_META_SPAWN_EGG_COW,
+		mtChicken      = E_META_SPAWN_EGG_CHICKEN,
+		mtSquid        = E_META_SPAWN_EGG_SQUID,
+		mtWolf         = E_META_SPAWN_EGG_WOLF,
+		mtMooshroom    = E_META_SPAWN_EGG_MOOSHROOM,
+		mtSnowGolem    = E_META_SPAWN_EGG_SNOW_GOLEM,
+		mtOcelot       = E_META_SPAWN_EGG_OCELOT,
+		mtIronGolem    = E_META_SPAWN_EGG_IRON_GOLEM,
+		mtVillager     = E_META_SPAWN_EGG_VILLAGER,
+	} ;
+	
 	// tolua_end
+	
 	float m_SightDistance;
 	
 	/** Creates the mob object.

@@ -20,6 +20,7 @@
 #include "Defines.h"
 #include "LightingThread.h"
 #include "Item.h"
+#include "Mobs/Monster.h"
 
 
 
@@ -69,6 +70,24 @@ public:
 	public:
 		cLock(cWorld & a_World);
 	} ;
+	
+	/// A common ancestor for all tasks queued onto the tick thread
+	class cTask
+	{
+	public:
+		virtual void Run(cWorld & a_World) = 0;
+	} ;
+	
+	typedef std::vector<cTask *> cTasks;
+	
+	class cTaskSaveAllChunks :
+		public cTask
+	{
+	protected:
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
+	} ;
+	
 
 	// tolua_begin
 
@@ -136,8 +155,8 @@ public:
 	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
-	void BroadcastBlockEntity    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
-	void BroadcastChat               (const AString & a_Message, const cClientHandle * a_Exclude = NULL);
+	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
+	void BroadcastChat               (const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastChunkData          (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity      (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
@@ -204,13 +223,6 @@ public:
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 
-	// MOTD
-	const AString & GetDescription(void) const {return m_Description; }	// FIXME: This should not be in cWorld
-
-	// Max Players
-	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }					// tolua_export
-	void SetMaxPlayers(int iMax);													// tolua_export
-
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
 
@@ -222,8 +234,6 @@ public:
 
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
-	
-	unsigned int GetNumPlayers();													// tolua_export
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit);
@@ -394,7 +404,7 @@ public:
 	| esWitherBirth | TBD |
 	| esPlugin | void * |
 	*/
-	void DoExplosiontAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData);
+	void DoExplosiontAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData);  // tolua_export
 
 	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
 	bool DoWithChestAt  (int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp
@@ -470,10 +480,17 @@ public:
 		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
 	}
 
-	void SaveAllChunks(void);			// tolua_export
+	/// Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead
+	void SaveAllChunks(void);  // tolua_export
+	
+	/// Queues a task to save all chunks onto the tick thread. The prefferred way of saving chunks from external sources
+	void QueueSaveAllChunks(void);  // tolua_export
+	
+	/// Queues a task onto the tick thread. The task object will be deleted once the task is finished
+	void QueueTask(cTask * a_Task);
 
 	/// Returns the number of chunks loaded	
-	int GetNumChunks() const;		// tolua_export
+	int GetNumChunks() const;  // tolua_export
 
 	/// Returns the number of chunks loaded and dirty, and in the lighting queue
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
@@ -484,12 +501,14 @@ public:
 	inline int GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline int GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
 
-	void Tick(float a_Dt);
-
 	void InitializeSpawn(void);
 	
+	/// Starts threads that belong to this world
+	void Start(void);
+	
 	/// Stops threads that belong to this world (part of deinit)
-	void StopThreads(void);
+	void Stop(void);
+	
 	void TickQueuedBlocks(float a_Dt);
 
 	struct BlockTickQueueItem
@@ -528,8 +547,8 @@ public:
 
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
-	/// Spawns a mob of the specified entity type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
-	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityType);  // tolua_export
+	/// Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
+	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
 	
 	/// Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread!
 	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
@@ -540,7 +559,28 @@ public:
 private:
 
 	friend class cRoot;
+	
+	class cTickThread :
+		public cIsThread
+	{
+		typedef cIsThread super;
+	public:
+		cTickThread(cWorld & a_World);
+		
+	protected:
+		cWorld & m_World;
+		
+		// cIsThread overrides:
+		virtual void Execute(void) override;
+	} ;
+	
 
+	AString m_WorldName;
+	AString m_IniFileName;
+	
+	/// Name of the storage schema used to load and save chunks
+	AString m_StorageSchema;
+	
 	/// The dimension of the world, used by the client to provide correct lighting scheme
 	eDimension m_Dimension;
 	
@@ -583,8 +623,6 @@ private:
 
 	cWorldStorage     m_Storage;
 	
-	AString m_Description;
-	
 	unsigned int m_MaxPlayers;
 
 	cChunkMap * m_ChunkMap;
@@ -616,15 +654,43 @@ private:
 	
 	cChunkSender     m_ChunkSender;
 	cLightingThread  m_Lighting;
-
-	AString m_WorldName;
-	AString m_IniFileName;
+	cTickThread      m_TickThread;
 	
+	/// Guards the m_Tasks
+	cCriticalSection m_CSTasks;
+	
+	/// Tasks that have been queued onto the tick thread; guarded by m_CSTasks
+	cTasks m_Tasks;
+	
+	/// Guards m_Clients
+	cCriticalSection  m_CSClients;
+	
+	/// List of clients in this world, these will be ticked by this world
+	cClientHandleList m_Clients;
+	
+	/// Clients that are scheduled for removal (ticked in another world), waiting for TickClients() to remove them
+	cClientHandleList m_ClientsToRemove;
+	
+	/// Clients that are scheduled for adding, waiting for TickClients to add them
+	cClientHandleList m_ClientsToAdd;
+
+
 	cWorld(const AString & a_WorldName);
 	~cWorld();
 
-	void TickWeather(float a_Dt);  // Handles weather each tick
-	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
+	void Tick(float a_Dt);
+
+	/// Handles the weather in each tick
+	void TickWeather(float a_Dt);
+	
+	/// Handles the mob spawning each tick
+	void TickSpawnMobs(float a_Dt);
+	
+	/// Executes all tasks queued onto the tick thread
+	void TickQueuedTasks(void);
+	
+	/// Ticks all clients that are in this world
+	void TickClients(float a_Dt);
 	
 	/// Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section)
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);

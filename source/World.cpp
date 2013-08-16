@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockID.h"
@@ -128,6 +129,9 @@ protected:
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorldLightingProgress:
+
 /// A simple thread that displays the progress of world lighting in cWorld::InitializeSpawn()
 class cWorldLightingProgress :
 	public cIsThread
@@ -188,9 +192,46 @@ cWorld::cLock::cLock(cWorld & a_World) :
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTickThread:
+
+cWorld::cTickThread::cTickThread(cWorld & a_World) :
+	super(Printf("WorldTickThread: %s", a_World.GetName().c_str())),
+	m_World(a_World)
+{
+}
+
+
+
+
+
+void cWorld::cTickThread::Execute(void)
+{
+	const int ClocksPerTick = CLOCKS_PER_SEC / 20;
+	clock_t LastTime = clock();
+	while (!m_ShouldTerminate)
+	{
+		clock_t Start = clock();
+		m_World.Tick((float)(1000 * (Start - LastTime)) / CLOCKS_PER_SEC);
+		clock_t Now = clock();
+		if (Now - Start < ClocksPerTick)
+		{
+			cSleep::MilliSleep(1000 * (ClocksPerTick - (Now - Start)) / CLOCKS_PER_SEC);
+		}
+		LastTime = Start;
+	}
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
 cWorld::cWorld(const AString & a_WorldName) :
+	m_WorldName(a_WorldName),
+	m_IniFileName(m_WorldName + "/world.ini"),
+	m_StorageSchema("Default"),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
@@ -199,109 +240,12 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_LastSpawnMonster(0),
 	m_RSList(0),
 	m_Weather(eWeather_Sunny),
-	m_WeatherInterval(24000)  // Guaranteed 1 day of sunshine at server start :)
+	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_TickThread(*this)
 {
-	LOGD("cWorld::cWorld(%s)", a_WorldName.c_str());
-	m_WorldName = a_WorldName;
-	m_IniFileName = m_WorldName + "/world.ini";
+	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
 	cMakeDir::MakeDir(m_WorldName.c_str());
-
-	MTRand r1;
-	m_SpawnX = (double)((r1.randInt() % 1000) - 500);
-	m_SpawnY = cChunkDef::Height;
-	m_SpawnZ = (double)((r1.randInt() % 1000) - 500);
-	m_GameMode = eGameMode_Creative;
-
-	AString StorageSchema("Default");
-
-	cIniFile IniFile(m_IniFileName);
-	IniFile.ReadFile();
-	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
-	m_Dimension = StringToDimension(Dimension);
-	switch (m_Dimension)
-	{
-		case dimNether:
-		case dimOverworld:
-		case dimEnd:
-		{
-			break;
-		}
-		default:
-		{
-			LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", Dimension.c_str());
-			m_Dimension = dimOverworld;
-			break;
-		}
-	}  // switch (m_Dimension)
-	m_SpawnX                    = IniFile.GetValueSetF("SpawnPosition", "X",                         m_SpawnX);
-	m_SpawnY                    = IniFile.GetValueSetF("SpawnPosition", "Y",                         m_SpawnY);
-	m_SpawnZ                    = IniFile.GetValueSetF("SpawnPosition", "Z",                         m_SpawnZ);
-	StorageSchema               = IniFile.GetValueSet ("Storage",       "Schema",                    StorageSchema);
-	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
-	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
-	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
-	m_IsCarrotsBonemealable     = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",     true);
-	m_IsCropsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",       true);
-	m_IsGrassBonemealable       = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",       true);
-	m_IsMelonStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",   true);
-	m_IsMelonBonemealable       = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",       false);
-	m_IsPotatoesBonemealable    = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",    true);
-	m_IsPumpkinStemBonemealable = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable", true);
-	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
-	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
-	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
-	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
-	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
-
-	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
-
-	m_Lighting.Start(this);
-	m_Storage.Start(this, StorageSchema);
-	m_Generator.Start(this, IniFile);
-
-	m_bAnimals = true;
-	m_SpawnMonsterRate = 200;  // 1 mob each 10 seconds
-	cIniFile IniFile2("settings.ini");
-	if (IniFile2.ReadFile())
-	{
-		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true);
-		m_SpawnMonsterRate = (Int64)(IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10) * 20);  // Convert from secs to ticks
-		
-		// TODO: Move this into cServer instead:
-		SetMaxPlayers(IniFile2.GetValueI("Server", "MaxPlayers", 100));
-		m_Description = IniFile2.GetValue("Server", "Description", "MCServer! - In C++!").c_str();
-	}
-
-	m_ChunkMap = new cChunkMap(this);
-	
-	m_ChunkSender.Start(this);
-
-	m_LastSave = 0;
-	m_LastUnload = 0;
-
-	// preallocate some memory for ticking blocks so we don�t need to allocate that often
-	m_BlockTickQueue.reserve(1000);
-	m_BlockTickQueueCopy.reserve(1000);
-
-	// Simulators:
-	m_SimulatorManager  = new cSimulatorManager(*this);
-	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
-	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = new cSandSimulator(*this, IniFile);
-	m_FireSimulator     = new cFireSimulator(*this, IniFile);
-	m_RedstoneSimulator = new cRedstoneSimulator(*this);
-
-	// Water and Lava simulators get registered in InitializeFluidSimulator()
-	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
-
-	// Save any changes that the defaults may have done to the ini file:
-	if (!IniFile.WriteFile())
-	{
-		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
-	}
 }
 
 
@@ -504,10 +448,126 @@ void cWorld::InitializeSpawn(void)
 
 
 
-void cWorld::StopThreads(void)
+void cWorld::Start(void)
 {
+	// TODO: Find a proper spawn location, based on the biomes (not in ocean)
+	m_SpawnX = (double)((m_TickRand.randInt() % 1000) - 500);
+	m_SpawnY = cChunkDef::Height;
+	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
+	m_GameMode = eGameMode_Creative;
+
+	cIniFile IniFile(m_IniFileName);
+	if (!IniFile.ReadFile())
+	{
+		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
+	}
+	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
+	m_Dimension = StringToDimension(Dimension);
+	switch (m_Dimension)
+	{
+		case dimNether:
+		case dimOverworld:
+		case dimEnd:
+		{
+			break;
+		}
+		default:
+		{
+			LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", Dimension.c_str());
+			m_Dimension = dimOverworld;
+			break;
+		}
+	}  // switch (m_Dimension)
+	m_SpawnX                    = IniFile.GetValueSetF("SpawnPosition", "X",                         m_SpawnX);
+	m_SpawnY                    = IniFile.GetValueSetF("SpawnPosition", "Y",                         m_SpawnY);
+	m_SpawnZ                    = IniFile.GetValueSetF("SpawnPosition", "Z",                         m_SpawnZ);
+	m_StorageSchema             = IniFile.GetValueSet ("Storage",       "Schema",                    m_StorageSchema);
+	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
+	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
+	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
+	m_IsCarrotsBonemealable     = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",     true);
+	m_IsCropsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",       true);
+	m_IsGrassBonemealable       = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",       true);
+	m_IsMelonStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",   true);
+	m_IsMelonBonemealable       = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",       false);
+	m_IsPotatoesBonemealable    = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",    true);
+	m_IsPumpkinStemBonemealable = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable", true);
+	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
+	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
+	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
+	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
+	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
+
+	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
+
+	m_bAnimals = true;
+	m_SpawnMonsterRate = 200;  // 1 mob each 10 seconds
+	cIniFile IniFile2("settings.ini");
+	if (IniFile2.ReadFile())
+	{
+		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true);
+		m_SpawnMonsterRate = (Int64)(IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10) * 20);  // Convert from secs to ticks
+		
+	}
+
+	m_ChunkMap = new cChunkMap(this);
+	
+	m_LastSave = 0;
+	m_LastUnload = 0;
+
+	// preallocate some memory for ticking blocks so we don�t need to allocate that often
+	m_BlockTickQueue.reserve(1000);
+	m_BlockTickQueueCopy.reserve(1000);
+
+	// Simulators:
+	m_SimulatorManager  = new cSimulatorManager(*this);
+	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
+	m_SandSimulator     = new cSandSimulator(*this, IniFile);
+	m_FireSimulator     = new cFireSimulator(*this, IniFile);
+	m_RedstoneSimulator = new cRedstoneSimulator(*this);
+
+	// Water and Lava simulators get registered in InitializeFluidSimulator()
+	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
+	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
+	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
+
+	m_Lighting.Start(this);
+	m_Storage.Start(this, m_StorageSchema);
+	m_Generator.Start(this, IniFile);
+	m_ChunkSender.Start(this);
+	m_TickThread.Start();
+
+	// Save any changes that the defaults may have done to the ini file:
+	if (!IniFile.WriteFile())
+	{
+		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
+	}
+
+}
+
+
+
+
+
+void cWorld::Stop(void)
+{
+	// Delete the clients that have been in this world:
+	{
+		cCSLock Lock(m_CSClients);
+		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+		{
+			(*itr)->Destroy();
+			delete *itr;
+		}  // for itr - m_Clients[]
+		m_Clients.clear();
+	}
+	
+	m_TickThread.Stop();
+	m_Lighting.Stop();
 	m_Generator.Stop();
 	m_ChunkSender.Stop();
+	m_Storage.Stop();
 }
 
 
@@ -529,7 +589,7 @@ void cWorld::Tick(float a_Dt)
 	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
 	m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
 
-	// Broadcase time update every 40 ticks (2 seconds)
+	// Broadcast time update every 40 ticks (2 seconds)
 	if (m_LastTimeUpdate < m_WorldAge - 40)
 	{
 		BroadcastTimeUpdate();
@@ -538,7 +598,9 @@ void cWorld::Tick(float a_Dt)
 
 	m_ChunkMap->Tick(a_Dt);
 
+	TickClients(a_Dt);
 	TickQueuedBlocks(a_Dt);
+	TickQueuedTasks();
 	
 	GetSimulatorManager()->Simulate(a_Dt);
 
@@ -684,56 +746,146 @@ void cWorld::TickSpawnMobs(float a_Dt)
 	int Height = GetHeight((int)SpawnPos.x, (int)SpawnPos.z);
 
 	int MobType = -1;
-	if (m_TimeOfDay >= 12000 + 1000)
+	int Biome = GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z);
+	switch (Biome)
 	{
-		if (GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z) == biHell) // Spawn nether mobs
+		case biNether:
 		{
+			// Spawn nether mobs
 			switch (nightRand)
 			{
-				case 5: MobType = E_ENTITY_TYPE_GHAST;         break;
-				case 6: MobType = E_ENTITY_TYPE_ZOMBIE_PIGMAN; break;
+				case 5: MobType = cMonster::mtGhast;        break;
+				case 6: MobType = cMonster::mtZombiePigman; break;
 			}
+			break;
 		}
-		else if (GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z) == biSky) 
+		
+		case biEnd:
 		{
-			switch (nightRand)
+			// Only endermen spawn in the End
+			MobType = cMonster::mtEnderman;
+			break;
+		}
+		
+		case biMushroomIsland:
+		case biMushroomShore:
+		{
+			// Mushroom land gets only mooshrooms
+			MobType = cMonster::mtMooshroom;
+			break;
+		}
+		
+		default:
+		{
+			// Overworld biomes depend on whether it's night or day:
+			if (m_TimeOfDay >= 12000 + 1000)
 			{
-				case 5: MobType = E_ENTITY_TYPE_ENDERMAN;         break;
-			}
-		}
-		else
-		{
-			switch (nightRand)
-			{			
-				case 0: MobType = E_ENTITY_TYPE_SPIDER;      break;
-				case 1: MobType = E_ENTITY_TYPE_ZOMBIE;      break;				
-				case 2: MobType = E_ENTITY_TYPE_ENDERMAN;    break;
-				case 3: MobType = E_ENTITY_TYPE_CREEPER;     break;
-				case 4: MobType = E_ENTITY_TYPE_CAVE_SPIDER; break;
-				case 7: MobType = E_ENTITY_TYPE_SLIME;       break;
-				case 8: MobType = E_ENTITY_TYPE_SILVERFISH;  break;
-				case 9: MobType = E_ENTITY_TYPE_SKELETON;    break;
-			}
-		}
-	}
-	else
-	{
-		switch (dayRand)
-		{
-			case 0: MobType = E_ENTITY_TYPE_CHICKEN; break;
-			case 1: MobType = E_ENTITY_TYPE_COW;     break;
-			case 2: MobType = E_ENTITY_TYPE_PIG;     break;
-			case 3: MobType = E_ENTITY_TYPE_SHEEP;   break;
-			case 4: MobType = E_ENTITY_TYPE_SQUID;   break;
-			case 5: MobType = E_ENTITY_TYPE_WOLF;    break;
-		}
-	}
+				// Night mobs:
+				switch (nightRand)
+				{			
+					case 0: MobType = cMonster::mtSpider;     break;
+					case 1: MobType = cMonster::mtZombie;     break;				
+					case 2: MobType = cMonster::mtEnderman;   break;
+					case 3: MobType = cMonster::mtCreeper;    break;
+					case 4: MobType = cMonster::mtCaveSpider; break;
+					case 7: MobType = cMonster::mtSlime;      break;
+					case 8: MobType = cMonster::mtSilverfish; break;
+					case 9: MobType = cMonster::mtSkeleton;   break;
+				}
+			}  // if (night)
+			else
+			{
+				// During the day:
+				switch (dayRand)
+				{
+					case 0: MobType = cMonster::mtChicken; break;
+					case 1: MobType = cMonster::mtCow;     break;
+					case 2: MobType = cMonster::mtPig;     break;
+					case 3: MobType = cMonster::mtSheep;   break;
+					case 4: MobType = cMonster::mtSquid;   break;
+					case 5: MobType = cMonster::mtWolf;    break;
+				}
+			}  // else (night)
+		}  // case overworld biomes
+	}  // switch (biome)
 
 	if (MobType >= 0)
 	{
 		// A proper mob type was selected, now spawn the mob:
-		SpawnMob(SpawnPos.x, SpawnPos.y, SpawnPos.z, MobType);
+		SpawnMob(SpawnPos.x, SpawnPos.y, SpawnPos.z, (cMonster::eType)MobType);
 	}
+}
+
+
+
+
+
+void cWorld::TickQueuedTasks(void)
+{
+	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
+	cTasks Tasks;
+	{
+		cCSLock Lock(m_CSTasks);
+		std::swap(Tasks, m_Tasks);
+	}
+
+	// Execute and delete each task:
+	for (cTasks::iterator itr = m_Tasks.begin(), end = m_Tasks.end(); itr != end; ++itr)
+	{
+		(*itr)->Run(*this);
+		delete *itr;
+	}  // for itr - m_Tasks[]
+}
+
+
+
+
+
+void cWorld::TickClients(float a_Dt)
+{
+	cClientHandleList RemoveClients;
+	{
+		cCSLock Lock(m_CSClients);
+		
+		// Remove clients scheduled for removal:
+		for (cClientHandleList::iterator itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
+		{
+			m_Clients.remove(*itr);
+		}  // for itr - m_ClientsToRemove[]
+		m_ClientsToRemove.clear();
+		
+		// Add clients scheduled for adding:
+		for (cClientHandleList::iterator itr = m_ClientsToAdd.begin(), end = m_ClientsToAdd.end(); itr != end; ++itr)
+		{
+			if (std::find(m_Clients.begin(), m_Clients.end(), *itr) != m_Clients.end())
+			{
+				ASSERT(!"Adding a client that is already in the clientlist");
+				continue;
+			}
+			m_Clients.push_back(*itr);
+		}  // for itr - m_ClientsToRemove[]
+		m_ClientsToAdd.clear();
+		
+		// Tick the clients, take out those that have been destroyed into RemoveClients
+		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
+		{
+			if ((*itr)->IsDestroyed())
+			{
+				// Remove the client later, when CS is not held, to avoid deadlock
+				RemoveClients.push_back(*itr);
+				itr = m_Clients.erase(itr);
+				continue;
+			}
+			(*itr)->Tick(a_Dt);
+			++itr;
+		}  // for itr - m_Clients[]
+	}
+	
+	// Delete the clients that have been destroyed
+	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
+	{
+		delete *itr;
+	} // for itr - RemoveClients[]
 }
 
 
@@ -1900,28 +2052,24 @@ void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
 
 
 
-void cWorld::SetMaxPlayers(int iMax)
-{
-	m_MaxPlayers = MAX_PLAYERS;
-	if (iMax > 0 && iMax < MAX_PLAYERS)
-	{
-		m_MaxPlayers = iMax;
-	}
-}
-
-
-
-
-
 void cWorld::AddPlayer(cPlayer * a_Player)
 {
-	cCSLock Lock(m_CSPlayers);
+	{
+		cCSLock Lock(m_CSPlayers);
+		
+		ASSERT(std::find(m_Players.begin(), m_Players.end(), a_Player) == m_Players.end());  // Is it already in the list? HOW?
+		
+		m_Players.remove(a_Player);  // Make sure the player is registered only once
+		m_Players.push_back(a_Player);
+	}
 	
-	ASSERT(std::find(m_Players.begin(), m_Players.end(), a_Player) == m_Players.end());  // Is it already in the list? HOW?
-	
-	m_Players.remove(a_Player);  // Make sure the player is registered only once
-	m_Players.push_back(a_Player);
-	
+	// Add the player's client to the list of clients to be ticked:
+	if (a_Player->GetClientHandle() != NULL)
+	{
+		cCSLock Lock(m_CSClients);
+		m_ClientsToAdd.push_back(a_Player->GetClientHandle());
+	}
+
 	// The player has already been added to the chunkmap as the entity, do NOT add again!
 }
 
@@ -1932,8 +2080,17 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 void cWorld::RemovePlayer(cPlayer * a_Player)
 {
 	m_ChunkMap->RemoveEntity(a_Player);
-	cCSLock Lock(m_CSPlayers);
-	m_Players.remove(a_Player);
+	{
+		cCSLock Lock(m_CSPlayers);
+		m_Players.remove(a_Player);
+	}
+	
+	// Remove the player's client from the list of clients to be ticked:
+	if (a_Player->GetClientHandle() != NULL)
+	{
+		cCSLock Lock(m_CSClients);
+		m_ClientsToRemove.push_back(a_Player->GetClientHandle());
+	}
 }
 
 
@@ -2279,6 +2436,25 @@ void cWorld::SaveAllChunks(void)
 
 
 
+void cWorld::QueueSaveAllChunks(void)
+{
+	QueueTask(new cWorld::cTaskSaveAllChunks);
+}
+
+
+
+
+
+void cWorld::QueueTask(cTask * a_Task)
+{
+	cCSLock Lock(m_CSTasks);
+	m_Tasks.push_back(a_Task);
+}
+
+
+
+
+
 void cWorld::AddEntity(cEntity * a_Entity)
 {
 	m_ChunkMap->AddEntity(a_Entity);
@@ -2306,11 +2482,13 @@ void cWorld::RemoveEntity(cEntity * a_Entity)
 
 
 
+/*
 unsigned int cWorld::GetNumPlayers(void)
 {
 	cCSLock Lock(m_CSPlayers);
 	return m_Players.size(); 
 }
+*/
 
 
 
@@ -2393,41 +2571,41 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityType)
+int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType)
 {
 	cMonster * Monster = NULL;
 
 	int Size = GetTickRandomNumber(2) + 1;  // 1 .. 3
 	
-	switch (a_EntityType)
+	switch (a_MonsterType)
 	{
-		case E_ENTITY_TYPE_BAT:           Monster = new cBat();           break;
-		case E_ENTITY_TYPE_BLAZE:         Monster = new cBlaze();         break;
-		case E_ENTITY_TYPE_CAVE_SPIDER:   Monster = new cCavespider();    break;
-		case E_ENTITY_TYPE_CHICKEN:       Monster = new cChicken();       break;
-		case E_ENTITY_TYPE_COW:           Monster = new cCow();           break;
-		case E_ENTITY_TYPE_CREEPER:       Monster = new cCreeper();       break;
-		case E_ENTITY_TYPE_ENDERMAN:      Monster = new cEnderman();      break;
-		case E_ENTITY_TYPE_GHAST:         Monster = new cGhast();         break;
-		case E_ENTITY_TYPE_MAGMA_CUBE:    Monster = new cMagmacube(Size); break;
-		case E_ENTITY_TYPE_MOOSHROOM:     Monster = new cMooshroom();     break;
-		case E_ENTITY_TYPE_OCELOT:        Monster = new cOcelot();        break;
-		case E_ENTITY_TYPE_PIG:           Monster = new cPig();           break;
-		case E_ENTITY_TYPE_SHEEP:         Monster = new cSheep();         break;
-		case E_ENTITY_TYPE_SILVERFISH:    Monster = new cSilverfish();    break;
-		case E_ENTITY_TYPE_SKELETON:      Monster = new cSkeleton();      break;
-		case E_ENTITY_TYPE_SLIME:         Monster = new cSlime(Size);     break;
-		case E_ENTITY_TYPE_SPIDER:        Monster = new cSpider();        break;
-		case E_ENTITY_TYPE_SQUID:         Monster = new cSquid();         break;
-		case E_ENTITY_TYPE_VILLAGER:      Monster = new cVillager();      break;
-		case E_ENTITY_TYPE_WITCH:         Monster = new cWitch();         break;
-		case E_ENTITY_TYPE_WOLF:          Monster = new cWolf();          break;
-		case E_ENTITY_TYPE_ZOMBIE:        Monster = new cZombie();        break;
-		case E_ENTITY_TYPE_ZOMBIE_PIGMAN: Monster = new cZombiepigman();  break;
+		case cMonster::mtBat:          Monster = new cBat();           break;
+		case cMonster::mtBlaze:        Monster = new cBlaze();         break;
+		case cMonster::mtCaveSpider:   Monster = new cCavespider();    break;
+		case cMonster::mtChicken:      Monster = new cChicken();       break;
+		case cMonster::mtCow:          Monster = new cCow();           break;
+		case cMonster::mtCreeper:      Monster = new cCreeper();       break;
+		case cMonster::mtEnderman:     Monster = new cEnderman();      break;
+		case cMonster::mtGhast:        Monster = new cGhast();         break;
+		case cMonster::mtMagmaCube:    Monster = new cMagmacube(Size); break;
+		case cMonster::mtMooshroom:    Monster = new cMooshroom();     break;
+		case cMonster::mtOcelot:       Monster = new cOcelot();        break;
+		case cMonster::mtPig:          Monster = new cPig();           break;
+		case cMonster::mtSheep:        Monster = new cSheep();         break;
+		case cMonster::mtSilverfish:   Monster = new cSilverfish();    break;
+		case cMonster::mtSkeleton:     Monster = new cSkeleton();      break;
+		case cMonster::mtSlime:        Monster = new cSlime(Size);     break;
+		case cMonster::mtSpider:       Monster = new cSpider();        break;
+		case cMonster::mtSquid:        Monster = new cSquid();         break;
+		case cMonster::mtVillager:     Monster = new cVillager();      break;
+		case cMonster::mtWitch:        Monster = new cWitch();         break;
+		case cMonster::mtWolf:         Monster = new cWolf();          break;
+		case cMonster::mtZombie:       Monster = new cZombie();        break;
+		case cMonster::mtZombiePigman: Monster = new cZombiepigman();  break;
 		
 		default:
 		{
-			LOGWARNING("%s: Unhandled entity type: %d. Not spawning.", __FUNCTION__, a_EntityType);
+			LOGWARNING("%s: Unhandled monster type: %d. Not spawning.", __FUNCTION__, a_MonsterType);
 			return -1;
 		}
 	}
@@ -2519,6 +2697,18 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 	return res;
 }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTaskSaveAllChunks:
+
+void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
+{
+	a_World.SaveAllChunks();
+}
+
 
 
 

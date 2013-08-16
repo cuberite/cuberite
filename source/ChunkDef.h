@@ -76,7 +76,8 @@ enum EMCSBiome
 	biRiver            = 7,
 	biHell             = 8,  // same as Nether
 	biNether           = 8,
-	biSky              = 9,
+	biSky              = 9,  // same as biEnd
+	biEnd              = 9,
 	biFrozenOcean      = 10,
 	biFrozenRiver      = 11,
 	biIcePlains        = 12,
