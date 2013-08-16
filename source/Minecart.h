@@ -142,7 +142,4 @@ public:
 	CLASS_PROTODEF(cMinecartWithHopper);
 	
 	cMinecartWithHopper(double a_X, double a_Y, double a_Z);
-	
-	// cEntity overrides:
-	virtual void OnRightClicked(cPlayer & a_Player) override;
 } ;
