@@ -746,55 +746,73 @@ void cWorld::TickSpawnMobs(float a_Dt)
 	int Height = GetHeight((int)SpawnPos.x, (int)SpawnPos.z);
 
 	int MobType = -1;
-	if (m_TimeOfDay >= 12000 + 1000)
+	int Biome = GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z);
+	switch (Biome)
 	{
-		if (GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z) == biHell) // Spawn nether mobs
+		case biNether:
 		{
+			// Spawn nether mobs
 			switch (nightRand)
 			{
-				case 5: MobType = E_ENTITY_TYPE_GHAST;         break;
-				case 6: MobType = E_ENTITY_TYPE_ZOMBIE_PIGMAN; break;
+				case 5: MobType = cMonster::mtGhast;        break;
+				case 6: MobType = cMonster::mtZombiePigman; break;
 			}
+			break;
 		}
-		else if (GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z) == biSky) 
+		
+		case biEnd:
 		{
-			switch (nightRand)
+			// Only endermen spawn in the End
+			MobType = cMonster::mtEnderman;
+			break;
+		}
+		
+		case biMushroomIsland:
+		case biMushroomShore:
+		{
+			// Mushroom land gets only mooshrooms
+			MobType = cMonster::mtMooshroom;
+			break;
+		}
+		
+		default:
+		{
+			// Overworld biomes depend on whether it's night or day:
+			if (m_TimeOfDay >= 12000 + 1000)
 			{
-				case 5: MobType = E_ENTITY_TYPE_ENDERMAN;         break;
-			}
-		}
-		else
-		{
-			switch (nightRand)
-			{			
-				case 0: MobType = E_ENTITY_TYPE_SPIDER;      break;
-				case 1: MobType = E_ENTITY_TYPE_ZOMBIE;      break;				
-				case 2: MobType = E_ENTITY_TYPE_ENDERMAN;    break;
-				case 3: MobType = E_ENTITY_TYPE_CREEPER;     break;
-				case 4: MobType = E_ENTITY_TYPE_CAVE_SPIDER; break;
-				case 7: MobType = E_ENTITY_TYPE_SLIME;       break;
-				case 8: MobType = E_ENTITY_TYPE_SILVERFISH;  break;
-				case 9: MobType = E_ENTITY_TYPE_SKELETON;    break;
-			}
-		}
-	}
-	else
-	{
-		switch (dayRand)
-		{
-			case 0: MobType = E_ENTITY_TYPE_CHICKEN; break;
-			case 1: MobType = E_ENTITY_TYPE_COW;     break;
-			case 2: MobType = E_ENTITY_TYPE_PIG;     break;
-			case 3: MobType = E_ENTITY_TYPE_SHEEP;   break;
-			case 4: MobType = E_ENTITY_TYPE_SQUID;   break;
-			case 5: MobType = E_ENTITY_TYPE_WOLF;    break;
-		}
-	}
+				// Night mobs:
+				switch (nightRand)
+				{			
+					case 0: MobType = cMonster::mtSpider;     break;
+					case 1: MobType = cMonster::mtZombie;     break;				
+					case 2: MobType = cMonster::mtEnderman;   break;
+					case 3: MobType = cMonster::mtCreeper;    break;
+					case 4: MobType = cMonster::mtCaveSpider; break;
+					case 7: MobType = cMonster::mtSlime;      break;
+					case 8: MobType = cMonster::mtSilverfish; break;
+					case 9: MobType = cMonster::mtSkeleton;   break;
+				}
+			}  // if (night)
+			else
+			{
+				// During the day:
+				switch (dayRand)
+				{
+					case 0: MobType = cMonster::mtChicken; break;
+					case 1: MobType = cMonster::mtCow;     break;
+					case 2: MobType = cMonster::mtPig;     break;
+					case 3: MobType = cMonster::mtSheep;   break;
+					case 4: MobType = cMonster::mtSquid;   break;
+					case 5: MobType = cMonster::mtWolf;    break;
+				}
+			}  // else (night)
+		}  // case overworld biomes
+	}  // switch (biome)
 
 	if (MobType >= 0)
 	{
 		// A proper mob type was selected, now spawn the mob:
-		SpawnMob(SpawnPos.x, SpawnPos.y, SpawnPos.z, MobType);
+		SpawnMob(SpawnPos.x, SpawnPos.y, SpawnPos.z, (cMonster::eType)MobType);
 	}
 }
 
@@ -2553,41 +2571,41 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityType)
+int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType)
 {
 	cMonster * Monster = NULL;
 
 	int Size = GetTickRandomNumber(2) + 1;  // 1 .. 3
 	
-	switch (a_EntityType)
+	switch (a_MonsterType)
 	{
-		case E_ENTITY_TYPE_BAT:           Monster = new cBat();           break;
-		case E_ENTITY_TYPE_BLAZE:         Monster = new cBlaze();         break;
-		case E_ENTITY_TYPE_CAVE_SPIDER:   Monster = new cCavespider();    break;
-		case E_ENTITY_TYPE_CHICKEN:       Monster = new cChicken();       break;
-		case E_ENTITY_TYPE_COW:           Monster = new cCow();           break;
-		case E_ENTITY_TYPE_CREEPER:       Monster = new cCreeper();       break;
-		case E_ENTITY_TYPE_ENDERMAN:      Monster = new cEnderman();      break;
-		case E_ENTITY_TYPE_GHAST:         Monster = new cGhast();         break;
-		case E_ENTITY_TYPE_MAGMA_CUBE:    Monster = new cMagmacube(Size); break;
-		case E_ENTITY_TYPE_MOOSHROOM:     Monster = new cMooshroom();     break;
-		case E_ENTITY_TYPE_OCELOT:        Monster = new cOcelot();        break;
-		case E_ENTITY_TYPE_PIG:           Monster = new cPig();           break;
-		case E_ENTITY_TYPE_SHEEP:         Monster = new cSheep();         break;
-		case E_ENTITY_TYPE_SILVERFISH:    Monster = new cSilverfish();    break;
-		case E_ENTITY_TYPE_SKELETON:      Monster = new cSkeleton();      break;
-		case E_ENTITY_TYPE_SLIME:         Monster = new cSlime(Size);     break;
-		case E_ENTITY_TYPE_SPIDER:        Monster = new cSpider();        break;
-		case E_ENTITY_TYPE_SQUID:         Monster = new cSquid();         break;
-		case E_ENTITY_TYPE_VILLAGER:      Monster = new cVillager();      break;
-		case E_ENTITY_TYPE_WITCH:         Monster = new cWitch();         break;
-		case E_ENTITY_TYPE_WOLF:          Monster = new cWolf();          break;
-		case E_ENTITY_TYPE_ZOMBIE:        Monster = new cZombie();        break;
-		case E_ENTITY_TYPE_ZOMBIE_PIGMAN: Monster = new cZombiepigman();  break;
+		case cMonster::mtBat:          Monster = new cBat();           break;
+		case cMonster::mtBlaze:        Monster = new cBlaze();         break;
+		case cMonster::mtCaveSpider:   Monster = new cCavespider();    break;
+		case cMonster::mtChicken:      Monster = new cChicken();       break;
+		case cMonster::mtCow:          Monster = new cCow();           break;
+		case cMonster::mtCreeper:      Monster = new cCreeper();       break;
+		case cMonster::mtEnderman:     Monster = new cEnderman();      break;
+		case cMonster::mtGhast:        Monster = new cGhast();         break;
+		case cMonster::mtMagmaCube:    Monster = new cMagmacube(Size); break;
+		case cMonster::mtMooshroom:    Monster = new cMooshroom();     break;
+		case cMonster::mtOcelot:       Monster = new cOcelot();        break;
+		case cMonster::mtPig:          Monster = new cPig();           break;
+		case cMonster::mtSheep:        Monster = new cSheep();         break;
+		case cMonster::mtSilverfish:   Monster = new cSilverfish();    break;
+		case cMonster::mtSkeleton:     Monster = new cSkeleton();      break;
+		case cMonster::mtSlime:        Monster = new cSlime(Size);     break;
+		case cMonster::mtSpider:       Monster = new cSpider();        break;
+		case cMonster::mtSquid:        Monster = new cSquid();         break;
+		case cMonster::mtVillager:     Monster = new cVillager();      break;
+		case cMonster::mtWitch:        Monster = new cWitch();         break;
+		case cMonster::mtWolf:         Monster = new cWolf();          break;
+		case cMonster::mtZombie:       Monster = new cZombie();        break;
+		case cMonster::mtZombiePigman: Monster = new cZombiepigman();  break;
 		
 		default:
 		{
-			LOGWARNING("%s: Unhandled entity type: %d. Not spawning.", __FUNCTION__, a_EntityType);
+			LOGWARNING("%s: Unhandled monster type: %d. Not spawning.", __FUNCTION__, a_MonsterType);
 			return -1;
 		}
 	}

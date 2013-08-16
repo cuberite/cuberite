@@ -112,7 +112,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		{
 			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-			if (m_World->SpawnMob(MobX, DispY, MobZ, m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
+			if (m_World->SpawnMob(MobX, DispY, MobZ, (cMonster::eType)m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}

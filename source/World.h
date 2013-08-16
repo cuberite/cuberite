@@ -20,6 +20,7 @@
 #include "Defines.h"
 #include "LightingThread.h"
 #include "Item.h"
+#include "Mobs/Monster.h"
 
 
 
@@ -546,8 +547,8 @@ public:
 
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
-	/// Spawns a mob of the specified entity type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
-	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityType);  // tolua_export
+	/// Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
+	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
 	
 	/// Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread!
 	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }

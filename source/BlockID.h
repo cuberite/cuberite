@@ -541,8 +541,8 @@ enum
 	E_META_TRACKS_X = 1,
 	E_META_TRACKS_Z = 0,
 		
-	// E_ITEM_SPAWN_EGG spawn EntityIDs:
-	// See also E_ENTITY_TYPE_XXX, since entity type and spawn egg meta are the same
+	// E_ITEM_SPAWN_EGG metas:
+	// See also cMonster::eType, since monster type and spawn egg meta are the same
 	E_META_SPAWN_EGG_CREEPER       = 50,
 	E_META_SPAWN_EGG_SKELETON      = 51,
 	E_META_SPAWN_EGG_SPIDER        = 52,
@@ -557,6 +557,9 @@ enum
 	E_META_SPAWN_EGG_BLAZE         = 61,
 	E_META_SPAWN_EGG_MAGMA_CUBE    = 62,
 	E_META_SPAWN_EGG_ENDER_DRAGON  = 63,
+	E_META_SPAWN_EGG_WITHER        = 64,
+	E_META_SPAWN_EGG_BAT           = 65,
+	E_META_SPAWN_EGG_WITCH         = 66,
 	E_META_SPAWN_EGG_PIG           = 90,
 	E_META_SPAWN_EGG_SHEEP         = 91,
 	E_META_SPAWN_EGG_COW           = 92,
@@ -567,48 +570,15 @@ enum
 	E_META_SPAWN_EGG_SNOW_GOLEM    = 97,
 	E_META_SPAWN_EGG_OCELOT        = 98,
 	E_META_SPAWN_EGG_IRON_GOLEM    = 99,
+	E_META_SPAWN_EGG_HORSE         = 100,
 	E_META_SPAWN_EGG_VILLAGER      = 120,
 } ;
 
 
 
 
-enum
-{
-	// See also E_META_SPAWN_EGG_XXX, since entity type and spawn egg meta are the same
-	E_ENTITY_TYPE_CREEPER       = 50,
-	E_ENTITY_TYPE_SKELETON      = 51,
-	E_ENTITY_TYPE_SPIDER        = 52,
-	E_ENTITY_TYPE_GIANT         = 53,
-	E_ENTITY_TYPE_ZOMBIE        = 54,
-	E_ENTITY_TYPE_SLIME         = 55,
-	E_ENTITY_TYPE_GHAST         = 56,
-	E_ENTITY_TYPE_ZOMBIE_PIGMAN = 57,
-	E_ENTITY_TYPE_ENDERMAN      = 58,
-	E_ENTITY_TYPE_CAVE_SPIDER   = 59,
-	E_ENTITY_TYPE_SILVERFISH    = 60,
-	E_ENTITY_TYPE_BLAZE         = 61,
-	E_ENTITY_TYPE_MAGMA_CUBE    = 62,
-	E_ENTITY_TYPE_ENDER_DRAGON  = 63,
-	E_ENTITY_TYPE_WITHER        = 64,
-	E_ENTITY_TYPE_BAT           = 65,
-	E_ENTITY_TYPE_WITCH         = 66,
-	E_ENTITY_TYPE_PIG           = 90,
-	E_ENTITY_TYPE_SHEEP         = 91,
-	E_ENTITY_TYPE_COW           = 92,
-	E_ENTITY_TYPE_CHICKEN       = 93,
-	E_ENTITY_TYPE_SQUID         = 94,
-	E_ENTITY_TYPE_WOLF          = 95,
-	E_ENTITY_TYPE_MOOSHROOM     = 96,
-	E_ENTITY_TYPE_SNOW_GOLEM    = 97,
-	E_ENTITY_TYPE_OCELOT        = 98,
-	E_ENTITY_TYPE_IRON_GOLEM    = 99,
-	E_ENTITY_TYPE_VILLAGER      = 120,
-} ;
 
-
-
-
+/// Dimension of a world
 enum eDimension
 {
 	dimNether    = -1,

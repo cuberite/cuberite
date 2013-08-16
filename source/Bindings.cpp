@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/15/13 22:11:03.
+** Generated automatically by tolua++-1.0.92 on 08/16/13 10:46:12.
 */
 
 #ifndef __cplusplus
@@ -13883,12 +13883,12 @@ static int tolua_AllToLua_cWorld_SpawnMob00(lua_State* tolua_S)
   double a_PosX = ((double)  tolua_tonumber(tolua_S,2,0));
   double a_PosY = ((double)  tolua_tonumber(tolua_S,3,0));
   double a_PosZ = ((double)  tolua_tonumber(tolua_S,4,0));
-  int a_EntityType = ((int)  tolua_tonumber(tolua_S,5,0));
+  cMonster::eType a_MonsterType = ((cMonster::eType) (int)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SpawnMob'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->SpawnMob(a_PosX,a_PosY,a_PosZ,a_EntityType);
+   int tolua_ret = (int)  self->SpawnMob(a_PosX,a_PosY,a_PosZ,a_MonsterType);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -28687,6 +28687,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"biHell",biHell);
   tolua_constant(tolua_S,"biNether",biNether);
   tolua_constant(tolua_S,"biSky",biSky);
+  tolua_constant(tolua_S,"biEnd",biEnd);
   tolua_constant(tolua_S,"biFrozenOcean",biFrozenOcean);
   tolua_constant(tolua_S,"biFrozenRiver",biFrozenRiver);
   tolua_constant(tolua_S,"biIcePlains",biIcePlains);
@@ -29243,6 +29244,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_BLAZE",E_META_SPAWN_EGG_BLAZE);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_MAGMA_CUBE",E_META_SPAWN_EGG_MAGMA_CUBE);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_ENDER_DRAGON",E_META_SPAWN_EGG_ENDER_DRAGON);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_WITHER",E_META_SPAWN_EGG_WITHER);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_BAT",E_META_SPAWN_EGG_BAT);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_WITCH",E_META_SPAWN_EGG_WITCH);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_PIG",E_META_SPAWN_EGG_PIG);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_SHEEP",E_META_SPAWN_EGG_SHEEP);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_COW",E_META_SPAWN_EGG_COW);
@@ -29253,35 +29257,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_SNOW_GOLEM",E_META_SPAWN_EGG_SNOW_GOLEM);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_OCELOT",E_META_SPAWN_EGG_OCELOT);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_IRON_GOLEM",E_META_SPAWN_EGG_IRON_GOLEM);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_HORSE",E_META_SPAWN_EGG_HORSE);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_VILLAGER",E_META_SPAWN_EGG_VILLAGER);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_CREEPER",E_ENTITY_TYPE_CREEPER);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_SKELETON",E_ENTITY_TYPE_SKELETON);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_SPIDER",E_ENTITY_TYPE_SPIDER);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_GIANT",E_ENTITY_TYPE_GIANT);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_ZOMBIE",E_ENTITY_TYPE_ZOMBIE);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_SLIME",E_ENTITY_TYPE_SLIME);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_GHAST",E_ENTITY_TYPE_GHAST);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_ZOMBIE_PIGMAN",E_ENTITY_TYPE_ZOMBIE_PIGMAN);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_ENDERMAN",E_ENTITY_TYPE_ENDERMAN);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_CAVE_SPIDER",E_ENTITY_TYPE_CAVE_SPIDER);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_SILVERFISH",E_ENTITY_TYPE_SILVERFISH);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_BLAZE",E_ENTITY_TYPE_BLAZE);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_MAGMA_CUBE",E_ENTITY_TYPE_MAGMA_CUBE);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_ENDER_DRAGON",E_ENTITY_TYPE_ENDER_DRAGON);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_WITHER",E_ENTITY_TYPE_WITHER);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_BAT",E_ENTITY_TYPE_BAT);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_WITCH",E_ENTITY_TYPE_WITCH);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_PIG",E_ENTITY_TYPE_PIG);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_SHEEP",E_ENTITY_TYPE_SHEEP);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_COW",E_ENTITY_TYPE_COW);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_CHICKEN",E_ENTITY_TYPE_CHICKEN);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_SQUID",E_ENTITY_TYPE_SQUID);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_WOLF",E_ENTITY_TYPE_WOLF);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_MOOSHROOM",E_ENTITY_TYPE_MOOSHROOM);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_SNOW_GOLEM",E_ENTITY_TYPE_SNOW_GOLEM);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_OCELOT",E_ENTITY_TYPE_OCELOT);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_IRON_GOLEM",E_ENTITY_TYPE_IRON_GOLEM);
-  tolua_constant(tolua_S,"E_ENTITY_TYPE_VILLAGER",E_ENTITY_TYPE_VILLAGER);
   tolua_constant(tolua_S,"dimNether",dimNether);
   tolua_constant(tolua_S,"dimOverworld",dimOverworld);
   tolua_constant(tolua_S,"dimEnd",dimEnd);
@@ -30553,6 +30530,34 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cMonster","cMonster","cPawn",NULL);
   tolua_beginmodule(tolua_S,"cMonster");
+   tolua_constant(tolua_S,"mtCreeper",cMonster::mtCreeper);
+   tolua_constant(tolua_S,"mtSkeleton",cMonster::mtSkeleton);
+   tolua_constant(tolua_S,"mtSpider",cMonster::mtSpider);
+   tolua_constant(tolua_S,"mtGiant",cMonster::mtGiant);
+   tolua_constant(tolua_S,"mtZombie",cMonster::mtZombie);
+   tolua_constant(tolua_S,"mtSlime",cMonster::mtSlime);
+   tolua_constant(tolua_S,"mtGhast",cMonster::mtGhast);
+   tolua_constant(tolua_S,"mtZombiePigman",cMonster::mtZombiePigman);
+   tolua_constant(tolua_S,"mtEnderman",cMonster::mtEnderman);
+   tolua_constant(tolua_S,"mtCaveSpider",cMonster::mtCaveSpider);
+   tolua_constant(tolua_S,"mtSilverfish",cMonster::mtSilverfish);
+   tolua_constant(tolua_S,"mtBlaze",cMonster::mtBlaze);
+   tolua_constant(tolua_S,"mtMagmaCube",cMonster::mtMagmaCube);
+   tolua_constant(tolua_S,"mtEnderDragon",cMonster::mtEnderDragon);
+   tolua_constant(tolua_S,"mtWither",cMonster::mtWither);
+   tolua_constant(tolua_S,"mtBat",cMonster::mtBat);
+   tolua_constant(tolua_S,"mtWitch",cMonster::mtWitch);
+   tolua_constant(tolua_S,"mtPig",cMonster::mtPig);
+   tolua_constant(tolua_S,"mtSheep",cMonster::mtSheep);
+   tolua_constant(tolua_S,"mtCow",cMonster::mtCow);
+   tolua_constant(tolua_S,"mtChicken",cMonster::mtChicken);
+   tolua_constant(tolua_S,"mtSquid",cMonster::mtSquid);
+   tolua_constant(tolua_S,"mtWolf",cMonster::mtWolf);
+   tolua_constant(tolua_S,"mtMooshroom",cMonster::mtMooshroom);
+   tolua_constant(tolua_S,"mtSnowGolem",cMonster::mtSnowGolem);
+   tolua_constant(tolua_S,"mtOcelot",cMonster::mtOcelot);
+   tolua_constant(tolua_S,"mtIronGolem",cMonster::mtIronGolem);
+   tolua_constant(tolua_S,"mtVillager",cMonster::mtVillager);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLineBlockTracer","cLineBlockTracer","",NULL);
   tolua_beginmodule(tolua_S,"cLineBlockTracer");
