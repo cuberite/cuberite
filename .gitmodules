@@ -1,0 +1,6 @@
+[submodule "MCServer/Plugins/Core"]
+	path = MCServer/Plugins/Core
+	url = git@github.com:mc-server/Core.git
+[submodule "MCServer/Plugins/ProtectionAreas"]
+	path = MCServer/Plugins/ProtectionAreas
+	url = git@github.com:mc-server/ProtectionAreas.git
