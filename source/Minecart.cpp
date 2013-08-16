@@ -39,11 +39,13 @@ bool cMinecart::Initialize(cWorld * a_World)
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	char Type = 0;
-	switch (m_Payload)
+	switch (m_Payload) //Wiki.vg is outdated on this!!
 	{
-		case mpNone:    Type = 10; break;
-		case mpChest:   Type = 11; break;
-		case mpFurnace: Type = 12; break;
+		case mpNone:    Type =  9; break; //?
+		case mpChest:   Type = 10; break;
+		case mpFurnace: Type = 11; break; //?
+		case mpTNT:     Type = 12; break; //?
+		case mpHopper:  Type = 13; break; //?
 		default:
 		{
 			ASSERT(!"Unknown payload, cannot spawn on client");
@@ -162,3 +164,27 @@ void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cMinecartWithTNT:
+
+cMinecartWithTNT::cMinecartWithTNT(double a_X, double a_Y, double a_Z) :
+	super(mpTNT, a_X, a_Y, a_Z)
+{
+}
+
+// TODO: Make it activate when passing over activator rail
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cMinecartWithHopper:
+
+cMinecartWithHopper::cMinecartWithHopper(double a_X, double a_Y, double a_Z) :
+	super(mpHopper, a_X, a_Y, a_Z)
+{
+}
+
+// TODO: Make it suck up blocks and travel further than any other cart and physics and put and take blocks
+// AND AVARYTHING!!

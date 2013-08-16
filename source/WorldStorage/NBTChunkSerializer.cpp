@@ -274,6 +274,8 @@ void cNBTChunkSerializer::AddMinecartEntity(cMinecart * a_Minecart)
 		case cMinecart::mpNone:    EntityClass = "MinecartRideable"; break;
 		case cMinecart::mpChest:   EntityClass = "MinecartChest";    break;
 		case cMinecart::mpFurnace: EntityClass = "MinecartFurnace";  break;
+		case cMinecart::mpTNT:     EntityClass = "MinecartTNT";      break;
+		case cMinecart::mpHopper:  EntityClass = "MinecartHopper";   break;
 		default:
 		{
 			ASSERT(!"Unhandled minecart payload type");

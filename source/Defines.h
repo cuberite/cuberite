@@ -189,9 +189,7 @@ inline bool IsValidBlock(int a_BlockType)
 {
 	if (
 		(a_BlockType > -1) &&
-		(a_BlockType <= E_BLOCK_MAX_TYPE_ID) &&
-		(a_BlockType != 34) &&  // Piston extension
-		(a_BlockType != 36)     // Piston moved block
+		(a_BlockType <= E_BLOCK_MAX_TYPE_ID)
 	)
 	{
 		return true;

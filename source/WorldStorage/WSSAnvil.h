@@ -142,6 +142,8 @@ protected:
 	void LoadMinecartRFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartCFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartFFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartTFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartHFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPickupFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads entity common data from the NBT compound; returns true if successful
