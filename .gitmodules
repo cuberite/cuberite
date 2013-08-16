@@ -4,3 +4,6 @@
 [submodule "MCServer/Plugins/ProtectionAreas"]
 	path = MCServer/Plugins/ProtectionAreas
 	url = git@github.com:mc-server/ProtectionAreas.git
+[submodule "MCServer/Plugins/TransAPI"]
+	path = MCServer/Plugins/TransAPI
+	url = git@github.com:bearbin/transapi.git
