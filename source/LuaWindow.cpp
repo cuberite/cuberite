@@ -48,6 +48,16 @@ cLuaWindow::cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_Slo
 
 cLuaWindow::~cLuaWindow()
 {
+	m_Contents.RemoveListener(*this);
+
+	// Must delete slot areas now, because they are referencing this->m_Contents and would try to access it in cWindow's
+	// destructor, when the member is already gone.
+	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		delete *itr;
+	}
+	m_SlotAreas.clear();
+
 	ASSERT(m_OpenedBy.empty());
 }
 
