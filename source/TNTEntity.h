@@ -16,8 +16,8 @@ class cTNTEntity :
 public:
 	CLASS_PROTODEF(cTNTEntity);
 
-	cTNTEntity(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec);
-	cTNTEntity(const Vector3d & a_Pos, float a_FuseTimeInSec);
+	cTNTEntity(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec);
+	cTNTEntity(const Vector3d & a_Pos, double a_FuseTimeInSec);
 	
 	// cEntity overrides:
 	virtual bool Initialize(cWorld * a_World) override;
@@ -25,8 +25,8 @@ public:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	
 protected:
-	float m_Counter;      ///< How much time has elapsed since the object was created, in seconds
-	float m_MaxFuseTime;  ///< How long the fuse is, in seconds
+	double m_Counter;      ///< How much time has elapsed since the object was created, in seconds
+	double m_MaxFuseTime;  ///< How long the fuse is, in seconds
 };
 
 

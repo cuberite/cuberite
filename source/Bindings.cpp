@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/16/13 10:46:12.
+** Generated automatically by tolua++-1.0.92 on 08/17/13 23:54:30.
 */
 
 #ifndef __cplusplus
@@ -20372,6 +20372,40 @@ static int tolua_AllToLua_cRoot_SaveAllChunks00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: BroadcastChat of class  cRoot */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_BroadcastChat00
+static int tolua_AllToLua_cRoot_BroadcastChat00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cRoot* self = (cRoot*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_Message = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'BroadcastChat'", NULL);
+#endif
+  {
+   self->BroadcastChat(a_Message);
+   tolua_pushcppstring(tolua_S,(const char*)a_Message);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'BroadcastChat'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetProtocolVersionTextFromInt of class  cRoot */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00
 static int tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00(lua_State* tolua_S)
@@ -30174,6 +30208,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"QueueExecuteConsoleCommand",tolua_AllToLua_cRoot_QueueExecuteConsoleCommand00);
    tolua_function(tolua_S,"GetTotalChunkCount",tolua_AllToLua_cRoot_GetTotalChunkCount00);
    tolua_function(tolua_S,"SaveAllChunks",tolua_AllToLua_cRoot_SaveAllChunks00);
+   tolua_function(tolua_S,"BroadcastChat",tolua_AllToLua_cRoot_BroadcastChat00);
    tolua_function(tolua_S,"GetProtocolVersionTextFromInt",tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus

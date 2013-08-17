@@ -8,7 +8,7 @@
 
 
 
-cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec) :
+cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec) :
 	super(etTNT, a_X, a_Y, a_Z, 0.98, 0.98),
 	m_Counter(0),
 	m_MaxFuseTime(a_FuseTimeInSec)
@@ -19,7 +19,7 @@ cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec
 
 
 
-cTNTEntity::cTNTEntity(const Vector3d & a_Pos, float a_FuseTimeInSec) :
+cTNTEntity::cTNTEntity(const Vector3d & a_Pos, double a_FuseTimeInSec) :
 	super(etTNT, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98),
 	m_Counter(0),
 	m_MaxFuseTime(a_FuseTimeInSec)

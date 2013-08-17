@@ -478,6 +478,18 @@ void cRoot::SaveAllChunks(void)
 
 
 
+void cRoot::BroadcastChat(const AString & a_Message)
+{
+	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	{
+		itr->second->BroadcastChat(a_Message);
+	}  // for itr - m_WorldsByName[]
+}
+
+
+
+
+
 bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)

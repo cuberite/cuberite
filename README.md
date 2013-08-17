@@ -10,6 +10,8 @@ Installation
 
 To install MCServer, you can either download the repository and compile it, or download a pre-compiled version.
 
+If you are cloning the repository, you are required to recursively download the submodules also with `git clone -r`. When pulling, you should use `git pull --recurse-submodules`. You might want to set the base forms as aliases to these.
+
 Compilation instructions are available in the COMPILING file.
 
 Linux builds can be downloaded from [the Berboe CI server](http://ci.berboe.co.uk) and windows from xoft's [nightly build service](http://mc-server.xoft.cz).

@@ -355,8 +355,13 @@ bool cServer::Tick(float a_Dt)
 		m_PlayerCount += PlayerCountDiff;
 	}
 	
+	// Send the tick to the plugins, as well as let the plugin manager reload, if asked to (issue #102):
+	cPluginManager::Get()->Tick(a_Dt);
+	
+	// Let the Root process all the queued commands:
 	cRoot::Get()->TickCommands();
 	
+	// Tick all clients not yet assigned to a world:
 	TickClients(a_Dt);
 
 	if (!m_bRestarting)
