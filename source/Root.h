@@ -95,6 +95,9 @@ public:
 	/// Saves all chunks in all worlds
 	void SaveAllChunks(void);  // tolua_export
 	
+	/// Sends a chat message to all connected clients (in all worlds)
+	void BroadcastChat(const AString & a_Message);  // tolua_export
+	
 	/// Calls the callback for each player in all worlds
 	bool ForEachPlayer(cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 
