@@ -173,6 +173,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		)
 		{
 			// These cannot be moved by the sticky piston, bail out
+			m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 			return;
 		}
 

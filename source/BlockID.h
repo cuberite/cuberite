@@ -169,8 +169,11 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_ACTIVATOR_RAIL = 157,
 	
 	E_BLOCK_DROPPER = 158,
-	
-	E_BLOCK_CARPET = 171,
+	E_BLOCK_STAINED_CLAY = 159,
+	E_BLOCK_HAY_BALE = 170
+	E_BLOCK_CARPET = 171,	
+	E_BLOCK_HARDENED_CLAY = 172,
+	E_BLOCK_BLOCK_OF_COAL = 173,
 	
 	// Keep these two as the last values, without a number - they will get their correct number assigned automagically by C++
 	// IsValidBlock() depends on this
@@ -507,7 +510,42 @@ enum
 	E_META_WOOL_RED        = 14,
 	E_META_WOOL_BLACK      = 15,
 	
-
+	// E_BLOCK_CARPET metas:
+	E_META_CARPET_WHITE      = 0,
+	E_META_CARPET_ORANGE     = 1,
+	E_META_CARPET_MAGENTA    = 2,
+	E_META_CARPET_LIGHTBLUE  = 3,
+	E_META_CARPET_YELLOW     = 4,
+	E_META_CARPET_LIGHTGREEN = 5,
+	E_META_CARPET_PINK       = 6,
+	E_META_CARPET_GRAY       = 7,
+	E_META_CARPET_LIGHTGRAY  = 8,
+	E_META_CARPET_CYAN       = 9,
+	E_META_CARPET_PURPLE     = 10,
+	E_META_CARPET_BLUE       = 11,
+	E_META_CARPET_BROWN      = 12,
+	E_META_CARPET_GREEN      = 13,
+	E_META_CARPET_RED        = 14,
+	E_META_CARPET_BLACK      = 15,
+	
+	// E_BLOCK_STAINED_CLAY metas
+	E_META_STAINED_CLAY_WHITE      = 0,
+	E_META_STAINED_CLAY_ORANGE     = 1,
+	E_META_STAINED_CLAY_MAGENTA    = 2,
+	E_META_STAINED_CLAY_LIGHTBLUE  = 3,
+	E_META_STAINED_CLAY_YELLOW     = 4,
+	E_META_STAINED_CLAY_LIGHTGREEN = 5,
+	E_META_STAINED_CLAY_PINK       = 6,
+	E_META_STAINED_CLAY_GRAY       = 7,
+	E_META_STAINED_CLAY_LIGHTGRAY  = 8,
+	E_META_STAINED_CLAY_CYAN       = 9,
+	E_META_STAINED_CLAY_PURPLE     = 10,
+	E_META_STAINED_CLAY_BLUE       = 11,
+	E_META_STAINED_CLAY_BROWN      = 12,
+	E_META_STAINED_CLAY_GREEN      = 13,
+	E_META_STAINED_CLAY_RED        = 14,
+	E_META_STAINED_CLAY_BLACK      = 15,
+	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Item metas:
 	

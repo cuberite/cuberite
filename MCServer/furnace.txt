@@ -48,6 +48,7 @@
 363:1 @ 200 = 364:1    # 1 Raw Beef     -> 1 Cooked Beef (steak)
 365:1 @ 200 = 366:1    # 1 Raw Chicken  -> 1 Cooked Chicken
 337:1 @ 200 = 336:1    # 1 Clay         -> 1 Clay Brick
+82:1  @ 200 = 172:1    # 1 Clay Block   -> 1 Hardened Clay
 87:1  @ 200 = 405:1    # 1 NetherRack   -> 1 NetherBrick
 349:1 @ 200 = 350:1    # 1 Raw Fish     -> 1 Cooked Fish
 17:1  @ 200 = 263:1:1  # 1 Log          -> 1 Charcoal
@@ -60,7 +61,8 @@
 #--------------------------
 # Fuels
 
-! 263:1    = 1600   # 1 Charcoal       -> 80 sec
+! 263:1    = 1600   # 1 Coal           -> 80 sec
+! 263:1:1  = 1600   # 1 Charcoal       -> 80 sec
 ! 42:126:1 = 150    # 1 Halfslab       -> 7.5 seconds
 ! 5:1      = 300    # 1 Planks         -> 15 sec
 ! 280:1    = 100    # 1 Stick          -> 5 sec
@@ -73,3 +75,4 @@
 ! 327:1    = 200000 # 1 Lava Bucket    -> 1000 sec
 ! 17:1     = 300    # 1 Wood           -> 15 sec
 ! 6:1      = 100    # 1 Sapling        -> 5 sec
+! 173:1    = 7400   # 1 Coal Block     -> 370 sec, based on https://github.com/minetest/common/commit/e0f5a6fd6936052756e27a05a2bfdd6aa86b38e1 which is a clone of MC

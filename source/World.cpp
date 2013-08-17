@@ -2635,12 +2635,19 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
-		if (NoCaseCompare((*itr)->GetName().substr(0, a_Text.length()), a_Text) != 0)
+		for (unsigned int selected = 0; selected < a_Text.length(); selected++ )
 		{
-			// Player name doesn't match
-			continue;
+			std::string playername ((*itr)->GetName());
+			std::string cut (a_Text.substr(selected, a_Text.length()));
+			std::size_t found = playername.find(cut);
+			if (found!=0)
+			{
+				//Player name doesn't match
+				continue;
+			}
+			a_Results.push_back((*itr)->GetName());
+			break;
 		}
-		a_Results.push_back((*itr)->GetName());
 	}
 }
 
