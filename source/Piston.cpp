@@ -119,7 +119,8 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	{
 		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_PISTON);
 	}
-
+	
+	char isSticky = (char)(pistonBlock == E_BLOCK_STICKY_PISTON) * 8;
 	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
 	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
 	m_World->SetServerBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta);
