@@ -99,7 +99,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	{
 		AddDir(pistx, pisty, pistz, pistonMeta, -1);
 		m_World->GetBlockTypeMeta(pistx, pisty, pistz, currBlock, currBlockMeta);
-		m_World->SetServerBlock( oldx, oldy, oldz, currBlock, currBlockMeta);
+		m_World->SetBlock( oldx, oldy, oldz, currBlock, currBlockMeta);
 		oldx = pistx;
 		oldy = pisty;
 		oldz = pistz;
@@ -114,7 +114,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
 	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
-	m_World->SetServerBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
+	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
 }
 
 
@@ -134,7 +134,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	
 	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	m_World->SetServerBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
+	m_World->SetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
 
 
 	// Check the extension:
@@ -156,18 +156,18 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		if (CanPull(tempBlock, tempMeta))
 		{
 			// Pull the block
-			m_World->SetServerBlock(pistx, pisty, pistz, tempBlock, tempMeta);
-			m_World->SetServerBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
+			m_World->SetBlock(pistx, pisty, pistz, tempBlock, tempMeta);
+			m_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
 		}
 		else
 		{
 			// Retract without pulling
-			m_World->SetServerBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+			m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 		}
 	}
 	else
 	{
-		m_World->SetServerBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 	}
 }
 

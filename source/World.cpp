@@ -1385,21 +1385,6 @@ void cWorld::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBB
 
 
 
-void cWorld::SetServerBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	if (a_BlockType == E_BLOCK_AIR)
-	{
-		BlockHandler(GetBlock(a_X, a_Y, a_Z))->OnDestroyed(this, a_X, a_Y, a_Z);
-	}
-	m_ChunkMap->SetServerBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta);
-
-	BlockHandler(a_BlockType)->OnPlaced(this, a_X, a_Y, a_Z, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
 BLOCKTYPE cWorld::GetBlock(int a_X, int a_Y, int a_Z)
 {
 	// First check if it isn't queued in the m_FastSetBlockQueue:

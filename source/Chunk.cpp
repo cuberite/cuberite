@@ -1607,61 +1607,6 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 
 
-void cChunk::SetServerBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
-{
-	ASSERT(!((a_RelX < 0) || (a_RelX >= Width) || (a_RelY < 0) || (a_RelY >= Height) || (a_RelZ < 0) || (a_RelZ >= Width)));
-
-	ASSERT(IsValid());
-	
-	const int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	const BLOCKTYPE OldBlockType = cChunkDef::GetBlock(m_BlockTypes, index);
-	const BLOCKTYPE OldBlockMeta = GetNibble(m_BlockMeta, index);
-	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
-	{
-		return;
-	}
-
-	MarkDirty();
-	
-	m_BlockTypes[index] = a_BlockType;
-
-	SetNibble(m_BlockMeta, index, a_BlockMeta);
-
-	// ONLY recalculate lighting if it's necessary!
-	if(
-		(g_BlockLightValue[OldBlockType ]        != g_BlockLightValue[a_BlockType]) ||
-		(g_BlockSpreadLightFalloff[OldBlockType] != g_BlockSpreadLightFalloff[a_BlockType]) ||
-		(g_BlockTransparent[OldBlockType]        != g_BlockTransparent[a_BlockType])
-	)
-	{
-		m_IsLightValid = false;
-	}
-
-	// Update heightmap, if needed:
-	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * Width])
-	{
-		if (a_BlockType != E_BLOCK_AIR)
-		{
-			m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)a_RelY;
-		}
-		else
-		{
-			for (int y = a_RelY - 1; y > 0; --y)
-			{
-				if (m_BlockTypes[MakeIndexNoCheck(a_RelX, y, a_RelZ)] != E_BLOCK_AIR)
-				{
-					m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)y;
-					break;
-				}
-			}  // for y - column in m_BlockData
-		}
-	}
-}
-
-
-
-
-
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
 	// The coords must be valid, because the upper level already does chunk lookup. No need to check them again.
