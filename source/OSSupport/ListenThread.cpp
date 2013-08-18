@@ -25,7 +25,7 @@ cListenThread::cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family, 
 
 cListenThread::~cListenThread()
 {
-	// TODO
+	Stop();
 }
 
 
@@ -79,7 +79,11 @@ void cListenThread::Stop(void)
 	// Wait for the thread to finish
 	super::Wait();
 	
-	// Clean up all sockets
+	// Close all the listening sockets:
+	for (cSockets::iterator itr = m_Sockets.begin(), end = m_Sockets.end(); itr != end; ++itr)
+	{
+		itr->CloseSocket();
+	}  // for itr - m_Sockets[]
 	m_Sockets.clear();
 }
 
