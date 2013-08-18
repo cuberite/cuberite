@@ -1,5 +1,5 @@
 -- flags
-local disable_virtual_hooks = false
+local disable_virtual_hooks = true
 local enable_pure_virtual = true
 local default_private_access = false
 
