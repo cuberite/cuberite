@@ -57,12 +57,36 @@ public:
 
 	void ExtendPiston( int, int, int );
 	void RetractPiston( int, int, int );
+	
+	/// Returns true if the piston (specified by blocktype) is a sticky piston
+	static bool IsSticky(BLOCKTYPE a_BlockType);
+	
+	/// Returns true if the piston (with the specified meta) is extended
+	static bool IsExtended(NIBBLETYPE a_PistonMeta);
 
+	/// Returns true if the extension (with the specified meta) is sticky
+	static bool IsStickyExtension(NIBBLETYPE a_ExtMeta);
+	
+	/// Returns true if the specified block can be pushed by a piston (and left intact)
+	static bool CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/// Returns true if the specified block can be pushed by a piston and broken / replaced
+	static bool CanBreakPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/// Returns true if the specified block can be pulled by a sticky piston
+	static bool CanPull(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/// Updates the coords by the specified amount in the direction a piston of the specified meta is facing
+	static void AddDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_PistonMeta, int a_Amount);
+	
+	
 	cWorld * m_World;
 
 private:
 	void ChainMove( int, int, int, char, unsigned short * );
-	unsigned short FirstPassthroughBlock( int, int, int, char );
+	
+	/// Returns how many blocks the piston has to push (where the first free space is); <0 when unpushable
+	int FirstPassthroughBlock(int a_PistonX, int a_PistonY, int a_PistonZ, NIBBLETYPE a_PistonMeta);
 } ;
 
 

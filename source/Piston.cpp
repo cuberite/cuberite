@@ -20,21 +20,6 @@ extern bool g_BlockPistonBreakable[];
 
 
 
-//Replace AddDir (...) with the switch cases that, sets coords in direction of piston face
-#define AddDir( x, y, z, dir, amount ) \
-	switch (dir) \
-	{ \
-		case 0: (y)-=(amount); break; \
-		case 1: (y)+=(amount); break; \
-		case 2: (z)-=(amount); break; \
-		case 3: (z)+=(amount); break; \
-		case 4: (x)-=(amount); break; \
-		case 5: (x)+=(amount); break; \
-	}
-
-
-
-
 
 cPiston::cPiston(cWorld * a_World)
 	: m_World(a_World)
@@ -46,55 +31,55 @@ cPiston::cPiston(cWorld * a_World)
 
 
 
-unsigned short cPiston::FirstPassthroughBlock(int pistonX, int pistonY, int pistonZ, char pistonmeta)
+int cPiston::FirstPassthroughBlock(int pistonX, int pistonY, int pistonZ, NIBBLETYPE pistonmeta)
 {
-	unsigned short ret;
-	pistonmeta &= 7;
-	if (pistonmeta >= 6)
+	// Examine each of the 12 blocks ahead of the piston:
+	for (int ret = 0; ret < 12; ret++)
 	{
-		// Just in case, it shouldn't happen but if it would, it'd cause inf loop
-		LOGD("cPiston::FirstPassthroughBlock - piston has invalid meta data!\n");
-		return 9001;
-	}
-	BLOCKTYPE currBlock;
-	NIBBLETYPE currMeta;
-	for (ret = 0; ret < 24; ret++)  //Push up to 24 blocks
-	{
-		AddDir( pistonX, pistonY, pistonZ, pistonmeta, 1) //Set the coords one further from the piston direction
+		BLOCKTYPE currBlock;
+		NIBBLETYPE currMeta;
+		AddDir(pistonX, pistonY, pistonZ, pistonmeta, 1);
 		m_World->GetBlockTypeMeta(pistonX, pistonY, pistonZ, currBlock, currMeta);
-		if ((currBlock == E_BLOCK_BEDROCK) || (currBlock == E_BLOCK_OBSIDIAN) || (currBlock == E_BLOCK_PISTON_EXTENSION) || ( (currMeta & 0x8) != 0x0 ))
+		if (CanBreakPush(currBlock, currMeta))
 		{
-			return 9001;
-		}
-		if (g_BlockPistonBreakable[currBlock]) //If it's a breakable block (air, torch, etc.) then the line of blocks can be pushed
-		{
+			// This block breaks when pushed, extend up to here
 			return ret;
 		}
+		if (!CanPush(currBlock, currMeta))
+		{
+			// This block cannot be pushed at all, the piston can't extend
+			return -1;
+		}
 	}
-	return 9001; //There is no space for the blocks to move within 24 spaces, piston can't push
+	// There is no space for the blocks to move, piston can't extend
+	return -1;
 }
 
 
 
 
 
-void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
+void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 {
 	BLOCKTYPE pistonBlock;
 	NIBBLETYPE pistonMeta;
 	m_World->GetBlockTypeMeta(pistx, pisty, pistz, pistonBlock, pistonMeta);
 	
-	char isSticky = (char)(pistonBlock == E_BLOCK_STICKY_PISTON) * 8;
-	if ( (pistonMeta & 0x8) != 0x0 )
+	if (IsExtended(pistonMeta))
 	{
-		// Piston already extended, bail out
+		// Already extended, bail out
 		return;
 	}
 	
-	unsigned short dist = FirstPassthroughBlock(pistx, pisty, pistz, pistonMeta);
-	if (dist > 9000) return; // FirstPassthroughBlock says piston can't push anything, bail out
+	int dist = FirstPassthroughBlock(pistx, pisty, pistz, pistonMeta);
+	if (dist < 0)
+	{
+		// FirstPassthroughBlock says piston can't push anything, bail out
+		return;
+	}
 
-	AddDir(pistx, pisty, pistz, pistonMeta & 7, dist + 1) //Get the coords of the air / breakable block in the line, dist+1 because of coords
+	// Drop the breakable block in the line, if appropriate:
+	AddDir(pistx, pisty, pistz, pistonMeta, dist + 1);  // "pist" now at the breakable / empty block
 	BLOCKTYPE currBlock;
 	NIBBLETYPE currMeta;
 	m_World->GetBlockTypeMeta(pistx, pisty, pistz, currBlock, currMeta);
@@ -106,30 +91,30 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 			Handler->DropBlock(m_World, NULL, pistx, pisty, pistz); //If block is breakable, drop it
 		}
 	}
-	int oldx = pistx, oldy = pisty, oldz = pistz; //Make a second set of coord vars along with the originals
+	
+	// Push blocks, from the furthest to the nearest:
+	int oldx = pistx, oldy = pisty, oldz = pistz;
 	NIBBLETYPE currBlockMeta;
-	if (dist != 0) //Check for single block being pushed - for loop doesn't catch it in time and breaks stuffz
+	for (int i = dist + 1; i > 1; i--)
 	{
-		for (int i = dist + 1; i > 1; i--) //Decrement from the dropped breakable block to two further than the piston (one further will be future extension)
-		{
-			AddDir(pistx, pisty, pistz, pistonMeta & 7, -1) //Move one set of coords one back from breakable dropped block
-			m_World->GetBlockTypeMeta(pistx, pisty, pistz, currBlock, currBlockMeta); //Get the block
-			m_World->SetBlock( oldx, oldy, oldz, currBlock, currBlockMeta); //Set the block at the location of the original coords
-			oldx = pistx; //Shift the selectors down a block and repeat
-			oldy = pisty;
-			oldz = pistz;
-		}
+		AddDir(pistx, pisty, pistz, pistonMeta, -1);
+		m_World->GetBlockTypeMeta(pistx, pisty, pistz, currBlock, currBlockMeta);
+		m_World->SetBlock( oldx, oldy, oldz, currBlock, currBlockMeta);
+		oldx = pistx;
+		oldy = pisty;
+		oldz = pistz;
 	}
 
 	int extx = pistx;
 	int exty = pisty;
 	int extz = pistz;
-
-	AddDir(pistx, pisty, pistz, pistonMeta & 7, -1) //Move back one block to the piston base
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_PISTON); //Set the base
+	AddDir(pistx, pisty, pistz, pistonMeta, -1);
+	// "pist" now at piston body, "ext" at future extension
+	
+	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
-	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta); //Set the arm
+	m_World->FastSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8);
+	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
 }
 
 
@@ -141,48 +126,161 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	BLOCKTYPE pistonBlock;
 	NIBBLETYPE pistonMeta;
 	m_World->GetBlockTypeMeta(pistx, pisty, pistz, pistonBlock, pistonMeta);
-	if (pistonMeta <= 6)
+	if (!IsExtended(pistonMeta))
 	{
 		// Already retracted, bail out
 		return;
 	}
+	
 	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_PISTON);
 	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
 	m_World->FastSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8)); //Set the base
 
-	AddDir(pistx, pisty, pistz, pistonMeta & 7, 1) //Move forwards to the extension coord
+	// Check the extension:
+	AddDir(pistx, pisty, pistz, pistonMeta, 1);
 	if (m_World->GetBlock(pistx, pisty, pistz) != E_BLOCK_PISTON_EXTENSION)
 	{
 		LOGD("%s: Piston without an extension?", __FUNCTION__);
 		return;
 	}
 	
-	if (pistonBlock == E_BLOCK_STICKY_PISTON)
+	// Retract the extension, pull block if appropriate
+	if (IsSticky(pistonBlock))
 	{
 		int tempx = pistx, tempy = pisty, tempz = pistz;
-		AddDir( tempx, tempy, tempz, pistonMeta & 7, 1 ) //Move forward to the block being pulled
-		BLOCKTYPE tempblock;
-		NIBBLETYPE tempmeta;
-		m_World->GetBlockTypeMeta(tempx, tempy, tempz, tempblock, tempmeta); //Check for pullable-ness
-		if (
-			(tempblock == E_BLOCK_OBSIDIAN) || 
-			(tempblock == E_BLOCK_BEDROCK) || 
-			(tempblock == E_BLOCK_PISTON_EXTENSION) ||
-			(g_BlockPistonBreakable[tempblock]) ||
-			((tempmeta & 0x8) != 0x0 )
-		)
+		AddDir( tempx, tempy, tempz, pistonMeta, 1);
+		BLOCKTYPE tempBlock;
+		NIBBLETYPE tempMeta;
+		m_World->GetBlockTypeMeta(tempx, tempy, tempz, tempBlock, tempMeta);
+		if (CanPull(tempBlock, tempMeta))
 		{
-			// These cannot be moved by the sticky piston, bail out
-			return;
+			m_World->SetBlock(pistx, pisty, pistz, tempBlock, tempMeta);
+			m_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
 		}
-
-		m_World->SetBlock(pistx, pisty, pistz, tempblock, tempmeta);
-		m_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
+		else
+		{
+			m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+		}
 	}
 	else
 	{
-
 		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+	}
+}
+
+
+
+
+
+bool cPiston::IsExtended(NIBBLETYPE a_PistonMeta)
+{
+	return ((a_PistonMeta & 0x8) != 0x0);
+}
+
+
+
+
+
+bool cPiston::IsSticky(BLOCKTYPE a_BlockType)
+{
+	return (a_BlockType == E_BLOCK_STICKY_PISTON);
+}
+
+
+
+
+
+bool cPiston::IsStickyExtension(NIBBLETYPE a_ExtMeta)
+{
+	return ((a_ExtMeta & 0x08) != 0);
+}
+
+
+
+
+
+bool cPiston::CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ANVIL:
+		case E_BLOCK_BED:
+		case E_BLOCK_BEDROCK:
+		case E_BLOCK_BREWING_STAND:
+		case E_BLOCK_CHEST:
+		case E_BLOCK_COMMAND_BLOCK:
+		case E_BLOCK_DISPENSER:
+		case E_BLOCK_DROPPER:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_END_PORTAL:
+		case E_BLOCK_END_PORTAL_FRAME:
+		case E_BLOCK_FURNACE:
+		case E_BLOCK_HOPPER:
+		case E_BLOCK_JUKEBOX:
+		case E_BLOCK_MOB_SPAWNER:
+		case E_BLOCK_NETHER_PORTAL:
+		case E_BLOCK_NOTE_BLOCK:
+		case E_BLOCK_OBSIDIAN:
+		case E_BLOCK_PISTON_EXTENSION:
+		{
+			return false;
+		}
+		case E_BLOCK_PISTON:
+		{
+			// A piston can only be pushed if retracted:
+			return !IsExtended(a_BlockMeta);
+		}
+	}
+	return true;
+}
+
+
+
+
+
+bool cPiston::CanBreakPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	return g_BlockPistonBreakable[a_BlockType];
+}
+
+
+
+
+
+bool cPiston::CanPull(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_LAVA:
+		case E_BLOCK_STATIONARY_LAVA:
+		case E_BLOCK_STATIONARY_WATER:
+		case E_BLOCK_WATER:
+		{
+			return false;
+		}
+	}
+	return CanPush(a_BlockType, a_BlockMeta) || CanBreakPush(a_BlockType, a_BlockMeta);
+}
+
+
+
+
+
+void cPiston::AddDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_PistonMeta, int a_Amount)
+{
+	switch (a_PistonMeta & 0x07)
+	{
+		case 0: a_BlockY -= a_Amount; break;
+		case 1: a_BlockY += a_Amount; break;
+		case 2: a_BlockZ -= a_Amount; break;
+		case 3: a_BlockZ += a_Amount; break;
+		case 4: a_BlockX -= a_Amount; break;
+		case 5: a_BlockX += a_Amount; break;
+		default:
+		{
+			LOGWARNING("%s: invalid direction %d, ignoring", __FUNCTION__, a_PistonMeta & 0x07);
+			break;
+		}
 	}
 }
 
