@@ -114,7 +114,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 		{
 			AddDir(pistx, pisty, pistz, pistonMeta & 7, -1) //Move one set of coords one back from breakable dropped block
 			m_World->GetBlockTypeMeta(pistx, pisty, pistz, currBlock, currBlockMeta); //Get the block
-			m_World->SetBlock( oldx, oldy, oldz, currBlock, currBlockMeta); //Set the block at the location of the original coords
+			m_World->SetServerBlock( oldx, oldy, oldz, currBlock, currBlockMeta); //Set the block at the location of the original coords
 			oldx = pistx; //Shift the selectors down a block and repeat
 			oldy = pisty;
 			oldz = pistz;
@@ -126,10 +126,19 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 	int extz = pistz;
 
 	AddDir(pistx, pisty, pistz, pistonMeta & 7, -1) //Move back one block to the piston base
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_PISTON); //Set the base
+
+	if (pistonBlock == E_BLOCK_STICKY_PISTON)
+	{
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_STICKY_PISTON);
+	}
+	else
+	{
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_PISTON);
+	}
+
 	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
-	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta); //Set the arm
+	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 ); //Set the base
+	m_World->SetServerBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta); //Set the arm
 }
 
 
@@ -146,9 +155,18 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		// Already retracted, bail out
 		return;
 	}
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_PISTON);
+	
+	if (pistonBlock == E_BLOCK_STICKY_PISTON)
+	{
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_STICKY_PISTON);
+	}
+	else
+	{
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_PISTON);
+	}
+
 	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	m_World->FastSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8)); //Set the base
+	m_World->SetServerBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8)); //Set the base
 
 	AddDir(pistx, pisty, pistz, pistonMeta & 7, 1) //Move forwards to the extension coord
 	if (m_World->GetBlock(pistx, pisty, pistz) != E_BLOCK_PISTON_EXTENSION)
@@ -173,17 +191,16 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		)
 		{
 			// These cannot be moved by the sticky piston, bail out
-			m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+			m_World->SetServerBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 			return;
 		}
 
-		m_World->SetBlock(pistx, pisty, pistz, tempblock, tempmeta);
-		m_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
+		m_World->SetServerBlock(pistx, pisty, pistz, tempblock, tempmeta);
+		m_World->SetServerBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
 	}
 	else
 	{
-
-		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+		m_World->SetServerBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 	}
 }
 
