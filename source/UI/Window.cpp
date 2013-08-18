@@ -664,13 +664,35 @@ void cWindow::BroadcastWholeWindow(void)
 
 
 
-void cWindow::BroadcastInventoryProgress(short a_Progressbar, short a_Value)
+void cWindow::BroadcastProgress(int a_Progressbar, int a_Value)
 {
 	cCSLock Lock(m_CS);
 	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
 	{
-		(*itr)->GetClientHandle()->SendInventoryProgress(m_WindowID, a_Progressbar, a_Value);
+		(*itr)->GetClientHandle()->SendWindowProperty(*this, a_Progressbar, a_Value);
 	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
+void cWindow::SetProperty(int a_Property, int a_Value)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
+	{
+		(*itr)->GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
+	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
+void cWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
+{
+	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
 }
 
 

@@ -82,7 +82,7 @@ enum
 	PACKET_WINDOW_CLICK              = 0x66,
 	PACKET_INVENTORY_SLOT            = 0x67,
 	PACKET_INVENTORY_WHOLE           = 0x68,
-	PACKET_INVENTORY_PROGRESS        = 0x69,
+	PACKET_WINDOW_PROPERTY           = 0x69,
 	PACKET_CREATIVE_INVENTORY_ACTION = 0x6B,
 	PACKET_UPDATE_SIGN               = 0x82,
 	PACKET_PLAYER_LIST_ITEM          = 0xC9,
@@ -484,20 +484,6 @@ void cProtocol125::SendHealth(void)
 	WriteShort((short)m_Client->GetPlayer()->GetHealth());
 	WriteShort(m_Client->GetPlayer()->GetFoodLevel());
 	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
-	Flush();
-}
-
-
-
-
-
-void cProtocol125::SendInventoryProgress(char a_WindowID, short a_ProgressBar, short a_Value)
-{
-	cCSLock Lock(m_CSPacket);
-	WriteByte (PACKET_INVENTORY_PROGRESS);
-	WriteByte (a_WindowID);
-	WriteShort(a_ProgressBar);
-	WriteShort(a_Value);
 	Flush();
 }
 
@@ -968,6 +954,20 @@ void cProtocol125::SendWindowOpen(char a_WindowID, char a_WindowType, const AStr
 	WriteByte  (a_WindowType);
 	WriteString(a_WindowTitle);
 	WriteByte  (a_NumSlots);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte (PACKET_WINDOW_PROPERTY);
+	WriteByte (a_Window.GetWindowID());
+	WriteShort(a_Property);
+	WriteShort(a_Value);
 	Flush();
 }
 

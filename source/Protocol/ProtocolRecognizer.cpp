@@ -332,10 +332,10 @@ void cProtocolRecognizer::SendHealth(void)
 
 
 
-void cProtocolRecognizer::SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value)
+void cProtocolRecognizer::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendInventoryProgress(a_WindowID, a_Progressbar, a_Value);
+	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }
 
 

@@ -35,6 +35,7 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/starve",  "debuggers", HandleStarveCmd,       "- Sets the food level to zero");
 	PluginManager:BindCommand("/fl",      "debuggers", HandleFoodLevelCmd,    "- Sets the food level to the given value");
 	PluginManager:BindCommand("/spidey",  "debuggers", HandleSpideyCmd,       "- Shoots a line of web blocks until it hits non-air");
+	PluginManager:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -739,3 +740,11 @@ end
 
 
 
+
+function HandleEnchCmd(a_Split, a_Player)
+	local Wnd = cLuaWindow(cWindow.Enchantment, 1, 1, "Ench")
+	a_Player:OpenWindow(Wnd)
+	Wnd:SetProperty(0, 10)
+	Wnd:SetProperty(1, 15)
+	Wnd:SetProperty(2, 25)
+end

@@ -220,7 +220,7 @@ void cFurnaceEntity::BroadcastProgress(int a_ProgressbarID, short a_Value)
 	cWindow * Window = GetWindow();
 	if (Window != NULL)
 	{
-		Window->BroadcastInventoryProgress(a_ProgressbarID, a_Value);
+		Window->BroadcastProgress(a_ProgressbarID, a_Value);
 	}
 }
 

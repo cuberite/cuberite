@@ -111,7 +111,6 @@ public:
 	void SendExplosion           (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
 	void SendGameMode            (eGameMode a_GameMode);
 	void SendHealth              (void);
-	void SendInventoryProgress   (char a_WindowID, short a_Progressbar, short a_Value);
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendPlayerAnimation     (const cPlayer & a_Player, char a_Animation);
@@ -139,6 +138,7 @@ public:
 	void SendWholeInventory      (const cWindow    & a_Window);
 	void SendWindowClose         (const cWindow    & a_Window);
 	void SendWindowOpen          (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
+	void SendWindowProperty      (const cWindow & a_Window, int a_Property, int a_Value);
 
 	const AString & GetUsername(void) const;		// tolua_export
 	void SetUsername( const AString & a_Username );	// tolua_export

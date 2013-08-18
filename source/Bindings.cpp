@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/18/13 10:47:30.
+** Generated automatically by tolua++-1.0.92 on 08/18/13 13:15:34.
 */
 
 #ifndef __cplusplus
@@ -26657,6 +26657,73 @@ static int tolua_AllToLua_cWindow_SetWindowTitle00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SetProperty of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_SetProperty00
+static int tolua_AllToLua_cWindow_SetProperty00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWindow* self = (cWindow*)  tolua_tousertype(tolua_S,1,0);
+  int a_Property = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Value = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetProperty'", NULL);
+#endif
+  {
+   self->SetProperty(a_Property,a_Value);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetProperty'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetProperty of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_SetProperty01
+static int tolua_AllToLua_cWindow_SetProperty01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"cPlayer",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cWindow* self = (cWindow*)  tolua_tousertype(tolua_S,1,0);
+  int a_Property = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Value = ((int)  tolua_tonumber(tolua_S,3,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetProperty'", NULL);
+#endif
+  {
+   self->SetProperty(a_Property,a_Value,*a_Player);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cWindow_SetProperty00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cLuaWindow */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaWindow_new00
 static int tolua_AllToLua_cLuaWindow_new00(lua_State* tolua_S)
@@ -28610,6 +28677,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsSlotInPlayerInventory",tolua_AllToLua_cWindow_IsSlotInPlayerInventory00);
    tolua_function(tolua_S,"GetWindowTitle",tolua_AllToLua_cWindow_GetWindowTitle00);
    tolua_function(tolua_S,"SetWindowTitle",tolua_AllToLua_cWindow_SetWindowTitle00);
+   tolua_function(tolua_S,"SetProperty",tolua_AllToLua_cWindow_SetProperty00);
+   tolua_function(tolua_S,"SetProperty",tolua_AllToLua_cWindow_SetProperty01);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cLuaWindow","cLuaWindow","cWindow",tolua_collect_cLuaWindow);

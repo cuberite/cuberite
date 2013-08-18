@@ -120,13 +120,19 @@ public:
 	/// Sends the contents of the whole window to all clients of this window.
 	void BroadcastWholeWindow(void);
 	
-	/// Sends the progressbar to all clients of this window
-	void BroadcastInventoryProgress(short a_Progressbar, short a_Value);
+	/// Sends the progressbar to all clients of this window (same as SetProperty)
+	void BroadcastProgress(int a_Progressbar, int a_Value);
 
 	// tolua_begin
 	
 	const AString & GetWindowTitle() const { return m_WindowTitle; }
 	void SetWindowTitle(const AString & a_WindowTitle ) { m_WindowTitle = a_WindowTitle; }
+	
+	/// Sends the UpdateWindowProperty (0x69) packet to all clients of the window
+	void SetProperty(int a_Property, int a_Value);
+	
+	/// Sends the UpdateWindowPropert(0x69) packet to the specified player
+	void SetProperty(int a_Property, int a_Value, cPlayer & a_Player);
 	
 	// tolua_end
 

@@ -1718,15 +1718,6 @@ void cClientHandle::SendHealth(void)
 
 
 
-void cClientHandle::SendInventoryProgress(char a_WindowID, short a_ProgressBar, short a_Value)
-{
-	m_Protocol->SendInventoryProgress(a_WindowID, a_ProgressBar, a_Value);
-}
-
-
-
-
-
 void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
 	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
@@ -1954,6 +1945,24 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 
 
 
+void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
+{
+	m_Protocol->SendWholeInventory(a_Inventory);
+}
+
+
+
+
+
+void cClientHandle::SendWholeInventory(const cWindow & a_Window)
+{
+	m_Protocol->SendWholeInventory(a_Window);
+}
+
+
+
+
+
 void cClientHandle::SendWindowClose(const cWindow & a_Window)
 {
 	m_Protocol->SendWindowClose(a_Window);
@@ -1972,18 +1981,9 @@ void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const ASt
 
 
 
-void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
+void cClientHandle::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
 {
-	m_Protocol->SendWholeInventory(a_Inventory);
-}
-
-
-
-
-
-void cClientHandle::SendWholeInventory(const cWindow & a_Window)
-{
-	m_Protocol->SendWholeInventory(a_Window);
+	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }
 
 
