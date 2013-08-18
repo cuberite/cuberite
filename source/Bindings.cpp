@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/18/13 13:15:34.
+** Generated automatically by tolua++-1.0.92 on 08/18/13 22:18:01.
 */
 
 #ifndef __cplusplus
@@ -10721,6 +10721,49 @@ static int tolua_AllToLua_cWorld_FastSetBlock00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'FastSetBlock'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: QueueSetBlock of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_QueueSetBlock00
+static int tolua_AllToLua_cWorld_QueueSetBlock00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BLockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
+  int a_TickDelay = ((int)  tolua_tonumber(tolua_S,7,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'QueueSetBlock'", NULL);
+#endif
+  {
+   self->QueueSetBlock(a_BlockX,a_BLockY,a_BlockZ,a_BlockType,a_BlockMeta,a_TickDelay);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'QueueSetBlock'.",&tolua_err);
  return 0;
 #endif
 }
@@ -27149,7 +27192,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_QUARTZ_STAIR",E_BLOCK_QUARTZ_STAIR);
   tolua_constant(tolua_S,"E_BLOCK_ACTIVATOR_RAIL",E_BLOCK_ACTIVATOR_RAIL);
   tolua_constant(tolua_S,"E_BLOCK_DROPPER",E_BLOCK_DROPPER);
+  tolua_constant(tolua_S,"E_BLOCK_STAINED_CLAY",E_BLOCK_STAINED_CLAY);
+  tolua_constant(tolua_S,"E_BLOCK_HAY_BALE",E_BLOCK_HAY_BALE);
   tolua_constant(tolua_S,"E_BLOCK_CARPET",E_BLOCK_CARPET);
+  tolua_constant(tolua_S,"E_BLOCK_HARDENED_CLAY",E_BLOCK_HARDENED_CLAY);
+  tolua_constant(tolua_S,"E_BLOCK_BLOCK_OF_COAL",E_BLOCK_BLOCK_OF_COAL);
   tolua_constant(tolua_S,"E_BLOCK_NUMBER_OF_TYPES",E_BLOCK_NUMBER_OF_TYPES);
   tolua_constant(tolua_S,"E_BLOCK_MAX_TYPE_ID",E_BLOCK_MAX_TYPE_ID);
   tolua_constant(tolua_S,"E_ITEM_EMPTY",E_ITEM_EMPTY);
@@ -27416,6 +27463,38 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_WOOL_GREEN",E_META_WOOL_GREEN);
   tolua_constant(tolua_S,"E_META_WOOL_RED",E_META_WOOL_RED);
   tolua_constant(tolua_S,"E_META_WOOL_BLACK",E_META_WOOL_BLACK);
+  tolua_constant(tolua_S,"E_META_CARPET_WHITE",E_META_CARPET_WHITE);
+  tolua_constant(tolua_S,"E_META_CARPET_ORANGE",E_META_CARPET_ORANGE);
+  tolua_constant(tolua_S,"E_META_CARPET_MAGENTA",E_META_CARPET_MAGENTA);
+  tolua_constant(tolua_S,"E_META_CARPET_LIGHTBLUE",E_META_CARPET_LIGHTBLUE);
+  tolua_constant(tolua_S,"E_META_CARPET_YELLOW",E_META_CARPET_YELLOW);
+  tolua_constant(tolua_S,"E_META_CARPET_LIGHTGREEN",E_META_CARPET_LIGHTGREEN);
+  tolua_constant(tolua_S,"E_META_CARPET_PINK",E_META_CARPET_PINK);
+  tolua_constant(tolua_S,"E_META_CARPET_GRAY",E_META_CARPET_GRAY);
+  tolua_constant(tolua_S,"E_META_CARPET_LIGHTGRAY",E_META_CARPET_LIGHTGRAY);
+  tolua_constant(tolua_S,"E_META_CARPET_CYAN",E_META_CARPET_CYAN);
+  tolua_constant(tolua_S,"E_META_CARPET_PURPLE",E_META_CARPET_PURPLE);
+  tolua_constant(tolua_S,"E_META_CARPET_BLUE",E_META_CARPET_BLUE);
+  tolua_constant(tolua_S,"E_META_CARPET_BROWN",E_META_CARPET_BROWN);
+  tolua_constant(tolua_S,"E_META_CARPET_GREEN",E_META_CARPET_GREEN);
+  tolua_constant(tolua_S,"E_META_CARPET_RED",E_META_CARPET_RED);
+  tolua_constant(tolua_S,"E_META_CARPET_BLACK",E_META_CARPET_BLACK);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_WHITE",E_META_STAINED_CLAY_WHITE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_ORANGE",E_META_STAINED_CLAY_ORANGE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_MAGENTA",E_META_STAINED_CLAY_MAGENTA);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTBLUE",E_META_STAINED_CLAY_LIGHTBLUE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_YELLOW",E_META_STAINED_CLAY_YELLOW);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTGREEN",E_META_STAINED_CLAY_LIGHTGREEN);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_PINK",E_META_STAINED_CLAY_PINK);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_GRAY",E_META_STAINED_CLAY_GRAY);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTGRAY",E_META_STAINED_CLAY_LIGHTGRAY);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_CYAN",E_META_STAINED_CLAY_CYAN);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_PURPLE",E_META_STAINED_CLAY_PURPLE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BLUE",E_META_STAINED_CLAY_BLUE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BROWN",E_META_STAINED_CLAY_BROWN);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_GREEN",E_META_STAINED_CLAY_GREEN);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_RED",E_META_STAINED_CLAY_RED);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BLACK",E_META_STAINED_CLAY_BLACK);
   tolua_constant(tolua_S,"E_META_COAL_NORMAL",E_META_COAL_NORMAL);
   tolua_constant(tolua_S,"E_META_COAL_CHARCOAL",E_META_COAL_CHARCOAL);
   tolua_constant(tolua_S,"E_META_DYE_BLACK",E_META_DYE_BLACK);
@@ -27955,6 +28034,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GenerateChunk",tolua_AllToLua_cWorld_GenerateChunk00);
    tolua_function(tolua_S,"SetBlock",tolua_AllToLua_cWorld_SetBlock00);
    tolua_function(tolua_S,"FastSetBlock",tolua_AllToLua_cWorld_FastSetBlock00);
+   tolua_function(tolua_S,"QueueSetBlock",tolua_AllToLua_cWorld_QueueSetBlock00);
    tolua_function(tolua_S,"GetBlock",tolua_AllToLua_cWorld_GetBlock00);
    tolua_function(tolua_S,"GetBlockMeta",tolua_AllToLua_cWorld_GetBlockMeta00);
    tolua_function(tolua_S,"SetBlockMeta",tolua_AllToLua_cWorld_SetBlockMeta00);

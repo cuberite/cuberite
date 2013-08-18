@@ -311,8 +311,23 @@ public:
 	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
 
 	// tolua_begin
-	void       SetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	void       FastSetBlock      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/** Sets the block at the specified coords to the specified value.
+	Full processing, incl. updating neighbors, is performed.
+	*/
+	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/** Sets the block at the specified coords to the specified value.
+	The replacement doesn't trigger block updates.
+	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block)
+	*/
+	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/** Queues a SetBlock() with the specified parameters after the specified number of ticks.
+	Calls SetBlock(), so performs full processing of the replaced block.
+	*/
+	void QueueSetBlock(int a_BlockX, int a_BLockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay);
+	
 	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData);

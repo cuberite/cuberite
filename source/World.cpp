@@ -1385,6 +1385,15 @@ void cWorld::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBB
 
 
 
+void cWorld::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay)
+{
+	m_ChunkMap->QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, GetWorldAge() + a_TickDelay);
+}
+
+
+
+
+
 BLOCKTYPE cWorld::GetBlock(int a_X, int a_Y, int a_Z)
 {
 	// First check if it isn't queued in the m_FastSetBlockQueue:

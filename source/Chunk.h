@@ -136,6 +136,9 @@ public:
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta ); }
 	
+	/// Queues a block change till the specified world tick
+	void QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick);
+	
 	/// Queues block for ticking (m_ToTickQueue)
 	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
 	
@@ -319,6 +322,22 @@ private:
 
 	friend class cChunkMap;
 	
+	struct sSetBlockQueueItem
+	{
+		int m_RelX, m_RelY, m_RelZ;
+		BLOCKTYPE m_BlockType;
+		NIBBLETYPE m_BlockMeta;
+		Int64 m_Tick;
+		
+		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick) :
+			m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ)
+		{
+		}
+	} ;
+
+	typedef std::vector<sSetBlockQueueItem> sSetBlockQueueVector;
+	
+
 	bool m_IsValid;        // True if the chunk is loaded / generated
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
@@ -328,6 +347,8 @@ private:
 	cCriticalSection          m_CSBlockLists;
 	std::vector<unsigned int> m_ToTickBlocks;
 	sSetBlockVector           m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
+	
+	sSetBlockQueueVector m_SetBlockQueue;  ///< Block changes that are queued to a specific tick
 	
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	cClientHandleList  m_LoadedByClient;
@@ -405,6 +426,9 @@ private:
 
 	/// Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients
 	void MoveEntityToNewChunk(cEntity * a_Entity);
+	
+	/// Processes all blocks that have been scheduled for replacement by the QueueSetBlock() function
+	void ProcessQueuedSetBlocks(void);
 };
 
 typedef cChunk * cChunkPtr;

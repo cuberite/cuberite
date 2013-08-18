@@ -440,6 +440,9 @@ void cChunk::Tick(float a_Dt)
 		(*itr)->SendUnloadChunk(m_PosX, m_PosZ);
 	}
 	m_UnloadQuery.clear();
+	
+	// Set all blocks that have been queued for setting later:
+	ProcessQueuedSetBlocks();
 
 	CheckBlocks();
 	
@@ -538,6 +541,30 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	} Mover(a_Entity);
 	
 	m_ChunkMap->CompareChunkClients(this, Neighbor, Mover);
+}
+
+
+
+
+
+void cChunk::ProcessQueuedSetBlocks(void)
+{
+	Int64 CurrTick = m_World->GetWorldAge();
+	for (sSetBlockQueueVector::iterator itr = m_SetBlockQueue.begin(); itr != m_SetBlockQueue.end();)
+	{
+		if (itr->m_Tick < CurrTick)
+		{
+			// Not yet
+			++itr;
+			continue;
+		}
+		else
+		{
+			// Now is the time to set the block
+			SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
+			itr = m_SetBlockQueue.erase(itr);
+		}
+	}  // for itr - m_SetBlockQueue[]
 }
 
 
@@ -1486,6 +1513,15 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 			break;
 		}
 	}  // switch (a_BlockType)
+}
+
+
+
+
+
+void cChunk::QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick)
+{
+	m_SetBlockQueue.push_back(sSetBlockQueueItem(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta, a_Tick));
 }
 
 
