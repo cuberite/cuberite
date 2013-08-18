@@ -88,7 +88,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 		cBlockHandler * Handler = BlockHandler(currBlock);
 		if (Handler->DoesDropOnUnsuitable())
 		{
-			Handler->DropBlock(m_World, NULL, pistx, pisty, pistz); //If block is breakable, drop it
+			Handler->DropBlock(m_World, NULL, pistx, pisty, pistz);
 		}
 	}
 	
@@ -111,20 +111,10 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	AddDir(pistx, pisty, pistz, pistonMeta, -1);
 	// "pist" now at piston body, "ext" at future extension
 	
-	if (pistonBlock == E_BLOCK_STICKY_PISTON)
-	{
-		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_STICKY_PISTON);
-	}
-	else
-	{
-		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_PISTON);
-	}
-	
-	char isSticky = (char)(pistonBlock == E_BLOCK_STICKY_PISTON) * 8;
+	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
 	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
-	m_World->SetServerBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta);
-
+	m_World->SetServerBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
 }
 
 
@@ -142,15 +132,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		return;
 	}
 	
-	if (pistonBlock == E_BLOCK_STICKY_PISTON)
-	{
-		m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_STICKY_PISTON);
-	}
-	else
-	{
-		m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_PISTON);
-	}
-
+	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
 	m_World->SetServerBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
 
@@ -173,11 +155,13 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		m_World->GetBlockTypeMeta(tempx, tempy, tempz, tempBlock, tempMeta);
 		if (CanPull(tempBlock, tempMeta))
 		{
+			// Pull the block
 			m_World->SetServerBlock(pistx, pisty, pistz, tempBlock, tempMeta);
 			m_World->SetServerBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
 		}
 		else
 		{
+			// Retract without pulling
 			m_World->SetServerBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 		}
 	}
