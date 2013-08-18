@@ -62,7 +62,18 @@ unsigned short cPiston::FirstPassthroughBlock(int pistonX, int pistonY, int pist
 	{
 		AddDir( pistonX, pistonY, pistonZ, pistonmeta, 1) //Set the coords one further from the piston direction
 		m_World->GetBlockTypeMeta(pistonX, pistonY, pistonZ, currBlock, currMeta);
-		if ((currBlock == E_BLOCK_BEDROCK) || (currBlock == E_BLOCK_OBSIDIAN) || (currBlock == E_BLOCK_PISTON_EXTENSION) || ( (currMeta & 0x8) != 0x0 ))
+		if ((currBlock == E_BLOCK_BEDROCK) ||
+			(currBlock == E_BLOCK_OBSIDIAN) ||
+			(currBlock == E_BLOCK_PISTON_EXTENSION) ||
+			( (currMeta & 0x8) != 0x0 ) || //Seems to include signs as well
+			(currBlock == E_BLOCK_CHEST) ||
+			(currBlock == E_BLOCK_DISPENSER) ||
+			(currBlock == E_BLOCK_DROPPER) ||
+			(currBlock == E_BLOCK_FURNACE) ||
+			(currBlock == E_BLOCK_LIT_FURNACE) ||
+			(currBlock == E_BLOCK_HOPPER) ||
+			(currBlock == E_BLOCK_JUKEBOX) ||
+			(currBlock == E_BLOCK_NOTE_BLOCK))
 		{
 			return 9001;
 		}
@@ -187,7 +198,15 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 			(tempblock == E_BLOCK_BEDROCK) || 
 			(tempblock == E_BLOCK_PISTON_EXTENSION) ||
 			(g_BlockPistonBreakable[tempblock]) ||
-			((tempmeta & 0x8) != 0x0 )
+			( (tempmeta & 0x8) != 0x0 ) || //Seems to include signs as well
+			(tempblock == E_BLOCK_CHEST) ||
+			(tempblock == E_BLOCK_DISPENSER) ||
+			(tempblock == E_BLOCK_DROPPER) ||
+			(tempblock == E_BLOCK_FURNACE) ||
+			(tempblock == E_BLOCK_LIT_FURNACE) ||
+			(tempblock == E_BLOCK_HOPPER) ||
+			(tempblock == E_BLOCK_JUKEBOX) ||
+			(tempblock == E_BLOCK_NOTE_BLOCK)
 		)
 		{
 			// These cannot be moved by the sticky piston, bail out
