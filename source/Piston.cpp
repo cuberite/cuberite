@@ -99,7 +99,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	{
 		AddDir(pistx, pisty, pistz, pistonMeta, -1);
 		m_World->GetBlockTypeMeta(pistx, pisty, pistz, currBlock, currBlockMeta);
-		m_World->SetBlock( oldx, oldy, oldz, currBlock, currBlockMeta);
+		m_World->SetServerBlock( oldx, oldy, oldz, currBlock, currBlockMeta);
 		oldx = pistx;
 		oldy = pisty;
 		oldz = pistz;
@@ -111,10 +111,19 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	AddDir(pistx, pisty, pistz, pistonMeta, -1);
 	// "pist" now at piston body, "ext" at future extension
 	
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
+	if (pistonBlock == E_BLOCK_STICKY_PISTON)
+	{
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_STICKY_PISTON);
+	}
+	else
+	{
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_PISTON);
+	}
+
 	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	m_World->FastSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8);
-	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
+	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
+	m_World->SetServerBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta);
+
 }
 
 
@@ -132,9 +141,18 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		return;
 	}
 	
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_PISTON);
+	if (pistonBlock == E_BLOCK_STICKY_PISTON)
+	{
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_STICKY_PISTON);
+	}
+	else
+	{
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_PISTON);
+	}
+
 	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	m_World->FastSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8)); //Set the base
+	m_World->SetServerBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
+
 
 	// Check the extension:
 	AddDir(pistx, pisty, pistz, pistonMeta, 1);
@@ -154,17 +172,17 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		m_World->GetBlockTypeMeta(tempx, tempy, tempz, tempBlock, tempMeta);
 		if (CanPull(tempBlock, tempMeta))
 		{
-			m_World->SetBlock(pistx, pisty, pistz, tempBlock, tempMeta);
-			m_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
+			m_World->SetServerBlock(pistx, pisty, pistz, tempBlock, tempMeta);
+			m_World->SetServerBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
 		}
 		else
 		{
-			m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+			m_World->SetServerBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 		}
 	}
 	else
 	{
-		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+		m_World->SetServerBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
 	}
 }
 
@@ -215,6 +233,7 @@ bool cPiston::CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 		case E_BLOCK_END_PORTAL:
 		case E_BLOCK_END_PORTAL_FRAME:
 		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_HOPPER:
 		case E_BLOCK_JUKEBOX:
 		case E_BLOCK_MOB_SPAWNER:

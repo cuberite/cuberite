@@ -1385,6 +1385,21 @@ void cWorld::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBB
 
 
 
+void cWorld::SetServerBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	if (a_BlockType == E_BLOCK_AIR)
+	{
+		BlockHandler(GetBlock(a_X, a_Y, a_Z))->OnDestroyed(this, a_X, a_Y, a_Z);
+	}
+	m_ChunkMap->SetServerBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta);
+
+	BlockHandler(a_BlockType)->OnPlaced(this, a_X, a_Y, a_Z, a_BlockType, a_BlockMeta);
+}
+
+
+
+
+
 BLOCKTYPE cWorld::GetBlock(int a_X, int a_Y, int a_Z)
 {
 	// First check if it isn't queued in the m_FastSetBlockQueue:
@@ -2635,12 +2650,18 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
-		if (NoCaseCompare((*itr)->GetName().substr(0, a_Text.length()), a_Text) != 0)
+		size_t LastSpace = a_Text.find_last_of(" "); //Find the position of the last space
+		
+		std::string LastWord = a_Text.substr(LastSpace + 1, a_Text.length()); //Find the last word
+		std::string PlayerName ((*itr)->GetName());
+		std::size_t Found = PlayerName.find(LastWord); //Try to find last word in playername
+		
+		if (Found!=0)
 		{
-			// Player name doesn't match
-			continue;
+			continue; //No match
 		}
-		a_Results.push_back((*itr)->GetName());
+		
+		a_Results.push_back((*itr)->GetName()); //Match!
 	}
 }
 
