@@ -13,10 +13,10 @@
 
 
 /// Number of milliseconds per cycle
-const int CYCLE_MILLISECONDS = 500;
+const int CYCLE_MILLISECONDS = 100;
 
 /// When the number of cycles for the same world age hits this value, it is considered a deadlock
-const int NUM_CYCLES_LIMIT = 40;  // 40 = twenty seconds
+const int NUM_CYCLES_LIMIT = 200;  // 200 = twenty seconds
 
 
 
@@ -60,20 +60,10 @@ bool cDeadlockDetect::Start(void)
 
 
 
-void cDeadlockDetect::Stop(void)
-{
-	m_EvtTerminate.Set();
-	super::Stop();
-}
-
-
-
-
-
 void cDeadlockDetect::Execute(void)
 {
 	// Loop until the event is signalled
-	while (m_EvtTerminate.Wait(CYCLE_MILLISECONDS) == cEvent::wrTimeout)
+	while (!m_ShouldTerminate)
 	{
 		// Check the world ages:
 		class cChecker :
@@ -95,6 +85,8 @@ void cDeadlockDetect::Execute(void)
 			}
 		} Checker(this);
 		cRoot::Get()->ForEachWorld(Checker);
+		
+		cSleep::MilliSleep(CYCLE_MILLISECONDS);
 	}  // while (should run)
 }
 

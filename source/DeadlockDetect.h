@@ -31,9 +31,6 @@ public:
 	/// Starts the detection. Hides cIsThread's Start, because we need some initialization
 	bool Start(void);
 	
-	/// Stops the detection. Hides cIsThread's Stop, because we need to signal m_EvtTerminate
-	void Stop(void);
-	
 protected:
 	struct sWorldAge
 	{
@@ -48,8 +45,6 @@ protected:
 	typedef std::map<AString, sWorldAge> WorldAges;
 	
 	WorldAges m_WorldAges;
-	
-	cEvent m_EvtTerminate;
 	
 	
 	// cIsThread overrides:
