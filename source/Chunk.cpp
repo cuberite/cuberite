@@ -1377,76 +1377,17 @@ void cChunk::CalculateHeightmap()
 
 
 
-void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )
+void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if (a_RelX < 0 || a_RelX >= Width || a_RelY < 0 || a_RelY >= Height || a_RelZ < 0 || a_RelZ >= Width)
-	{
-		return;  // Clip
-	}
+	FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 
-	ASSERT(IsValid());  // Is this chunk loaded / generated?
+	const int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 	
-	int index = MakeIndexNoCheck( a_RelX, a_RelY, a_RelZ );
-	BLOCKTYPE OldBlockMeta = GetNibble( m_BlockMeta, index );
-	BLOCKTYPE OldBlockType = m_BlockTypes[index];
-	m_BlockTypes[index] = a_BlockType;
-
-	SetNibble( m_BlockMeta, index, a_BlockMeta );
-
-	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
-	{
-		return;
-	}
-
-	MarkDirty();
-	
-	// The client doesn't need to distinguish between stationary and nonstationary fluids:
-	if (
-		(OldBlockMeta != a_BlockMeta) ||  // Different meta always gets updated
-		!(
-			((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
-			((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
-			((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
-			((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
-		)
-	)
-	{
-		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
-	}
-
-	// ONLY recalculate lighting if it's necessary!
-	if(
-		(g_BlockLightValue[ OldBlockType ] != g_BlockLightValue[ a_BlockType ]) ||
-		(g_BlockSpreadLightFalloff[ OldBlockType ] != g_BlockSpreadLightFalloff[ a_BlockType ]) ||
-		(g_BlockTransparent[ OldBlockType ] != g_BlockTransparent[ a_BlockType ] )
-	)
-	{
-		m_IsLightValid = false;
-	}
-
-	// Update heightmap, if needed:
-	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * Width])
-	{
-		if (a_BlockType != E_BLOCK_AIR)
-		{
-			SetHeight(m_HeightMap, a_RelX, a_RelZ, a_RelY);
-		}
-		else
-		{
-			for (int y = a_RelY - 1; y > 0; --y)
-			{
-				if (cChunkDef::GetBlock(m_BlockTypes, a_RelX, y, a_RelZ) != E_BLOCK_AIR)
-				{
-					SetHeight(m_HeightMap, a_RelX, a_RelZ, y);
-					break;
-				}
-			}  // for y - column in m_BlockData
-		}
-	}
-
+	// Tick this block and its neighbors:
 	m_ToTickBlocks.push_back(index);
 	QueueTickBlockNeighbors(a_RelX, a_RelY, a_RelZ);
 
+	// If there was a block entity, remove it:
 	Vector3i WorldPos = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
 	cBlockEntity * BlockEntity = GetBlockEntity(WorldPos);
 	if (BlockEntity != NULL)
@@ -1456,32 +1397,33 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 		delete BlockEntity;
 	}
 	
+	// If the new block is a block entity, create the entity object:
 	switch (a_BlockType)
 	{
 		case E_BLOCK_CHEST:
 		{
-			AddBlockEntity(new cChestEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			AddBlockEntity(new cChestEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_DISPENSER:
 		{
-			AddBlockEntity(new cDispenserEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			AddBlockEntity(new cDispenserEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_DROPPER:
 		{
-			AddBlockEntity(new cDropperEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			AddBlockEntity(new cDropperEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
 		{
-			AddBlockEntity(new cFurnaceEntity( WorldPos.x, WorldPos.y, WorldPos.z, a_BlockType, a_BlockMeta, m_World));
+			AddBlockEntity(new cFurnaceEntity(WorldPos.x, WorldPos.y, WorldPos.z, a_BlockType, a_BlockMeta, m_World));
 			break;
 		}
 		case E_BLOCK_HOPPER:
 		{
-			AddBlockEntity(new cHopperEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			AddBlockEntity(new cHopperEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_SIGN_POST:
