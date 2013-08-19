@@ -515,7 +515,13 @@ function HandleListEntitiesCmd(Split, Player)
 			-- The entity has already been destroyed, don't list it
 			return false;
 		end;
-		Player:SendMessage("  " .. Entity:GetUniqueID() .. ": " .. Entity:GetClass() .. "   {" .. round(Entity:GetPosX(), 2) .. ", " .. round(Entity:GetPosY(), 2) .. ", " .. round(Entity:GetPosZ(), 2) .."}");
+		local cls = Entity:GetClass();
+		Player:SendMessage("  " .. Entity:GetUniqueID() .. ": " .. cls .. "   {" .. round(Entity:GetPosX(), 2) .. ", " .. round(Entity:GetPosY(), 2) .. ", " .. round(Entity:GetPosZ(), 2) .."}");
+		if (cls == "cPickup") then
+			local Pickup = Entity;
+			tolua.cast(Pickup, "cPickup");
+			Player:SendMessage("    Age: " .. Pickup:GetAge() .. ", IsCollected: " .. tostring(Pickup:IsCollected()));
+		end
 		NumEntities = NumEntities + 1;
 	end
 	
