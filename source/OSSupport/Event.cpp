@@ -141,7 +141,7 @@ cEvent::eWaitResult cEvent::Wait(int a_TimeoutMilliSec)
 		}
 	#else
 		timespec timeout;
-		timeout.tv_sec = a_TimeoutMilliSec / 1000;
+		timeout.tv_sec = time(NULL) + a_TimeoutMilliSec / 1000;
 		timeout.tv_nsec = (a_TimeoutMilliSec % 1000) * 1000000;
 		int res = sem_timedwait(m_Event, &timeout);
 		if (res == 0)
