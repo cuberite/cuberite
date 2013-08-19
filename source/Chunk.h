@@ -330,7 +330,7 @@ private:
 		Int64 m_Tick;
 		
 		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick) :
-			m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ)
+			m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta)
 		{
 		}
 	} ;
