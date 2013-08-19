@@ -573,20 +573,11 @@ void cChunk::ProcessQueuedSetBlocks(void)
 
 void cChunk::BroadcastPendingBlockChanges(void)
 {
-	sSetBlockVector Changes;
-	{
-		cCSLock Lock(m_CSBlockLists);
-		if (m_PendingSendBlocks.empty())
-		{
-			return;
-		}
-		std::swap(Changes, m_PendingSendBlocks);
-	}
-	
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
 	{
-		(*itr)->SendBlockChanges(m_PosX, m_PosZ, Changes);
+		(*itr)->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
 	}
+	m_PendingSendBlocks.clear();
 }
 
 
@@ -595,14 +586,12 @@ void cChunk::BroadcastPendingBlockChanges(void)
 
 void cChunk::CheckBlocks(void)
 {
-	cCSLock Lock2(m_CSBlockLists);
 	if (m_ToTickBlocks.size() == 0)
 	{
 		return;
 	}
 	std::vector<unsigned int> ToTickBlocks;
 	std::swap(m_ToTickBlocks, ToTickBlocks);
-	Lock2.Unlock();
 	
 	for (std::vector<unsigned int>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
 	{
@@ -1422,7 +1411,6 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 		)
 	)
 	{
-		cCSLock Lock(m_CSBlockLists);
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 
@@ -1602,7 +1590,6 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		)
 	)
 	{
-		cCSLock Lock(m_CSBlockLists);
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 	
@@ -1675,8 +1662,8 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 
 void cChunk::AddBlockEntity(cBlockEntity * a_BlockEntity)
 {
-	cCSLock Lock(m_CSBlockLists);
-	m_BlockEntities.push_back( a_BlockEntity );
+	MarkDirty();
+	m_BlockEntities.push_back(a_BlockEntity);
 }
 
 
@@ -1788,9 +1775,8 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 
 void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
 {
-	cCSLock Lock(m_CSBlockLists);
 	MarkDirty();
-	m_BlockEntities.remove( a_BlockEntity );
+	m_BlockEntities.remove(a_BlockEntity);
 }
 
 
