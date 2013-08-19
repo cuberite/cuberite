@@ -12,6 +12,7 @@
 #include "Root.h"
 #include "../iniFile/iniFile.h"
 #include "ChunkMap.h"
+#include "OSSupport/Timer.h"
 
 // Simulators:
 #include "Simulator/SimulatorManager.h"
@@ -206,18 +207,25 @@ cWorld::cTickThread::cTickThread(cWorld & a_World) :
 
 void cWorld::cTickThread::Execute(void)
 {
-	const int ClocksPerTick = CLOCKS_PER_SEC / 20;
-	clock_t LastTime = clock();
+	cTimer Timer;
+
+	long long msPerTick = 50;
+	long long LastTime = Timer.GetNowTime();
+
 	while (!m_ShouldTerminate)
 	{
-		clock_t Start = clock();
-		m_World.Tick((float)(1000 * (Start - LastTime)) / CLOCKS_PER_SEC);
-		clock_t Now = clock();
-		if (Now - Start < ClocksPerTick)
+		long long NowTime = Timer.GetNowTime();
+		float DeltaTime = (float)(NowTime - LastTime);
+		m_World.Tick(DeltaTime);
+		long long TickTime = Timer.GetNowTime() - NowTime;
+		
+		if (TickTime < msPerTick)
 		{
-			cSleep::MilliSleep(1000 * (ClocksPerTick - (Now - Start)) / CLOCKS_PER_SEC);
+			// Stretch tick time until it's at least msPerTick
+			cSleep::MilliSleep((unsigned int)(msPerTick - TickTime));
 		}
-		LastTime = Start;
+
+		LastTime = NowTime;
 	}
 }
 

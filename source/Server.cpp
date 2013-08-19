@@ -75,7 +75,7 @@ void cServer::cTickThread::Execute(void)
 {
 	cTimer Timer;
 
-	long long msPerTick = 50;	// TODO - Put this in server config file
+	long long msPerTick = 50;
 	long long LastTime = Timer.GetNowTime();
 
 	while (!m_ShouldTerminate)
