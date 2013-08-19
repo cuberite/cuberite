@@ -9,7 +9,7 @@
 #include "Plugin.h"
 #include "PluginLua.h"
 #include "PluginManager.h"
-#include "Player.h"
+#include "Entities/Player.h"
 #include "WebAdmin.h"
 #include "StringMap.h"
 #include "ClientHandle.h"

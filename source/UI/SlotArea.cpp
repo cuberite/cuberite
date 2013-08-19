@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "SlotArea.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"

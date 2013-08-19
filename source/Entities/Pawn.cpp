@@ -2,14 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Pawn.h"
-#include "Root.h"
-#include "Server.h"
-#include "World.h"
-#include "Player.h"
-#include "PluginManager.h"
-#include "Vector3d.h"
-#include "BlockID.h"
-#include "Defines.h"
 
 
 

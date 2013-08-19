@@ -12,7 +12,7 @@
 
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
-#include "Player.h"
+#include "Entities/Player.h"
 
 
 

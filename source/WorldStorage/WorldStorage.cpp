@@ -11,7 +11,7 @@
 #include "WSSAnvil.h"
 #include "../World.h"
 #include "../Generating/ChunkGenerator.h"
-#include "../Entity.h"
+#include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 
 

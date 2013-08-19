@@ -20,13 +20,13 @@
 #include "../Item.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
-#include "../Entity.h"
+#include "../Entities/Entity.h"
 #include "../OSSupport/MakeDir.h"
 #include "FastNBT.h"
-#include "../FallingBlock.h"
-#include "../Minecart.h"
+#include "../Entities/FallingBlock.h"
+#include "../Entities/Minecart.h"
 #include "../Mobs/Monster.h"
-#include "../Pickup.h"
+#include "../Entities/Pickup.h"
 
 
 

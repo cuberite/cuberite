@@ -3,7 +3,7 @@
 
 #include "FurnaceEntity.h"
 #include "../UI/Window.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../Root.h"
 #include "../Chunk.h"
 #include <json/json.h>

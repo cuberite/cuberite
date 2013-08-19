@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Entity.h"
+#include "Entities/Entity.h"
 #include "ChunkDef.h"
 
 #include "Simulator/FireSimulator.h"

@@ -3,9 +3,14 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 
-class cItemSwordHandler : public cItemHandler
+
+
+
+
+class cItemSwordHandler :
+	public cItemHandler
 {
 public:
 	cItemSwordHandler(int a_ItemType)
@@ -18,4 +23,8 @@ public:
 	{
 		return (a_BlockType == E_BLOCK_COBWEB);
 	}
-};
+} ;
+
+
+
+

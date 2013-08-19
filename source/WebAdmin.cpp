@@ -10,7 +10,7 @@
 #include "Plugin.h"
 
 #include "World.h"
-#include "Player.h"
+#include "Entities/Player.h"
 #include "Server.h"
 #include "Root.h"
 

@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "DispenserEntity.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Chunk.h"
 

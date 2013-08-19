@@ -16,15 +16,15 @@ Documentation:
 #include "../ClientHandle.h"
 #include "../World.h"
 #include "ChunkDataSerializer.h"
-#include "../Entity.h"
+#include "../Entities/Entity.h"
 #include "../Mobs/Monster.h"
-#include "../Pickup.h"
-#include "../Player.h"
+#include "../Entities/Pickup.h"
+#include "../Entities/Player.h"
 #include "../ChatColor.h"
 #include "../UI/Window.h"
 #include "../Root.h"
 #include "../Server.h"
-#include "../FallingBlock.h"
+#include "../Entities/FallingBlock.h"
 
 
 

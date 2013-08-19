@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Plugin.h"
-#include "Player.h"
+#include "Entities/Player.h"
 #include "World.h"
 #include "CommandOutput.h"
 #include "Mobs/Monster.h"

@@ -3,9 +3,14 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 
-class cItemHoeHandler : public cItemHandler
+
+
+
+
+class cItemHoeHandler :
+	public cItemHandler
 {
 public:
 	cItemHoeHandler(int a_ItemType)
@@ -28,4 +33,8 @@ public:
 		}
 		return false;
 	}
-};
+} ;
+
+
+
+

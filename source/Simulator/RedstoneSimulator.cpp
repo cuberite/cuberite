@@ -8,7 +8,7 @@
 #include "../World.h"
 #include "../BlockID.h"
 #include "../Chunk.h"
-#include "../TNTEntity.h"
+#include "../Entities/TNTEntity.h"
 
 
 

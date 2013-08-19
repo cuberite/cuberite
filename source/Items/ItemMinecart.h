@@ -9,8 +9,7 @@
 
 #pragma once
 
-// Not needed, we're being included only from ItemHandler.cpp which already has this file: #include "ItemHandler.h"
-#include "../Minecart.h"
+#include "../Entities/Minecart.h"
 
 
 

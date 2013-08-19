@@ -2,12 +2,11 @@
 
 #include "Piston.h"
 #include "ChunkDef.h"
-#include "Pickup.h"
+#include "Entities/Pickup.h"
 #include "Item.h"
 #include "Root.h"
 #include "ClientHandle.h"
 #include "World.h"
-#include "BlockID.h"
 #include "Server.h"
 #include "Blocks/BlockHandler.h"
 

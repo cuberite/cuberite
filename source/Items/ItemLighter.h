@@ -3,8 +3,8 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
-#include "../Player.h"
-#include "../TNTEntity.h"
+#include "../Entities/Player.h"
+#include "../Entities/TNTEntity.h"
 
 
 

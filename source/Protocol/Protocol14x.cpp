@@ -19,11 +19,11 @@ Implements the 1.4.x protocol classes representing these protocols:
 #include "../../CryptoPP/randpool.h"
 #include "../Item.h"
 #include "ChunkDataSerializer.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../Mobs/Monster.h"
 #include "../UI/Window.h"
-#include "../Pickup.h"
-#include "../FallingBlock.h"
+#include "../Entities/Pickup.h"
+#include "../Entities/FallingBlock.h"
 
 
 

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../Pawn.h"
+#include "../Entities/Pawn.h"
 #include "../Defines.h"
 #include "../BlockID.h"
 #include "../Item.h"

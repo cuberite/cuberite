@@ -5,8 +5,8 @@
 
 #include "Globals.h"
 #include "Minecart.h"
-#include "World.h"
-#include "ClientHandle.h"
+#include "../World.h"
+#include "../ClientHandle.h"
 #include "Player.h"
 
 

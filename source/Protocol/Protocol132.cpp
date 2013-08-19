@@ -12,10 +12,10 @@
 #include "../../CryptoPP/randpool.h"
 #include "../Item.h"
 #include "ChunkDataSerializer.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../Mobs/Monster.h"
 #include "../UI/Window.h"
-#include "../Pickup.h"
+#include "../Entities/Pickup.h"
 #include "../WorldStorage/FastNBT.h"
 #include "../StringCompression.h"
 

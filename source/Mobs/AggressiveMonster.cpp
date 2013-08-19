@@ -5,7 +5,7 @@
 
 #include "../World.h"
 #include "../Vector3f.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../MersenneTwister.h"
 
 

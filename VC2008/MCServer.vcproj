@@ -403,6 +403,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\Doors.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\Enchantments.cpp"
 				>
 			</File>
@@ -500,6 +504,10 @@
 			</File>
 			<File
 				RelativePath="..\source\ItemGrid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Ladder.h"
 				>
 			</File>
 			<File
@@ -676,6 +684,10 @@
 			</File>
 			<File
 				RelativePath="..\source\Server.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Sign.h"
 				>
 			</File>
 			<File
@@ -985,71 +997,59 @@
 				Name="Entities"
 				>
 				<File
-					RelativePath="..\source\Doors.h"
+					RelativePath="..\source\Entities\Entity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entity.cpp"
+					RelativePath="..\source\Entities\Entity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entity.h"
+					RelativePath="..\source\Entities\FallingBlock.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FallingBlock.cpp"
+					RelativePath="..\source\Entities\FallingBlock.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FallingBlock.h"
+					RelativePath="..\source\Entities\Minecart.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Ladder.h"
+					RelativePath="..\source\Entities\Minecart.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Minecart.cpp"
+					RelativePath="..\source\Entities\Pawn.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Minecart.h"
+					RelativePath="..\source\Entities\Pawn.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Pawn.cpp"
+					RelativePath="..\source\Entities\Pickup.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Pawn.h"
+					RelativePath="..\source\Entities\Pickup.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Pickup.cpp"
+					RelativePath="..\source\Entities\Player.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Pickup.h"
+					RelativePath="..\source\Entities\Player.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Player.cpp"
+					RelativePath="..\source\Entities\TNTEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Player.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Sign.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\TNTEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\TNTEntity.h"
+					RelativePath="..\source\Entities\TNTEntity.h"
 					>
 				</File>
 			</Filter>

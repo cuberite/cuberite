@@ -10,7 +10,7 @@
 #include "CraftingRecipes.h"
 #include "PluginManager.h"
 #include "MonsterConfig.h"
-#include "Player.h"
+#include "Entities/Player.h"
 #include "Blocks/BlockHandler.h"
 #include "Items/ItemHandler.h"
 #include "Chunk.h"

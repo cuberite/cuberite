@@ -1,8 +1,8 @@
 #include "Globals.h"
 
 #include "TNTEntity.h"
-#include "World.h"
-#include "ClientHandle.h"
+#include "../World.h"
+#include "../ClientHandle.h"
 
 
 

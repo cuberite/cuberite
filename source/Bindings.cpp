@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/19/13 09:36:55.
+** Generated automatically by tolua++-1.0.92 on 08/19/13 10:28:26.
 */
 
 #ifndef __cplusplus
@@ -24,9 +24,9 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "StringMap.h"
 #include "ChatColor.h"
 #include "ClientHandle.h"
-#include "Entity.h"
-#include "Pawn.h"
-#include "Player.h"
+#include "Entities/Entity.h"
+#include "Entities/Pawn.h"
+#include "Entities/Player.h"
 #include "PluginManager.h"
 #include "Plugin.h"
 #include "PluginLua.h"
@@ -45,7 +45,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "BlockEntities/FurnaceEntity.h"
 #include "WebAdmin.h"
 #include "WebPlugin.h"
-#include "Pickup.h"
+#include "Entities/Pickup.h"
 #include "Root.h"
 #include "Vector3f.h"
 #include "Vector3d.h"

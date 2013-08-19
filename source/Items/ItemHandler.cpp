@@ -3,7 +3,7 @@
 #include "ItemHandler.h"
 #include "../Item.h"
 #include "../World.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../FastRandom.h"
 
 // Handlers:

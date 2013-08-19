@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Inventory.h"
-#include "Player.h"
+#include "Entities/Player.h"
 #include "ClientHandle.h"
 #include "UI/Window.h"
 #include "Item.h"

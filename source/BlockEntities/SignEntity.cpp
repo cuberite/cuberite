@@ -3,7 +3,7 @@
 
 #include "SignEntity.h"
 
-#include "../Player.h"
+#include "../Entities/Player.h"
 // #include "ClientHandle.h"
 // #include "World.h"
 // #include "Root.h"

@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "HopperEntity.h"
 #include "../Chunk.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../PluginManager.h"
 #include "ChestEntity.h"
 #include "DropSpenserEntity.h"

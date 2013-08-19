@@ -4,7 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Doors.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 
 
 

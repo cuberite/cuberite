@@ -8,10 +8,7 @@
 #include "Vector3i.h"
 #include "Vector3d.h"
 
-#include "BlockID.h"
-#include "Entity.h"
-
-#include "Defines.h"
+#include "Entities/Entity.h"
 
 #ifndef _WIN32
 	#include <stdlib.h> // abs()

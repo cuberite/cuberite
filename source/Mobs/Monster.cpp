@@ -6,7 +6,7 @@
 #include "../Server.h"
 #include "../ClientHandle.h"
 #include "../World.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../Defines.h"
 #include "../MonsterConfig.h"
 #include "../MersenneTwister.h"

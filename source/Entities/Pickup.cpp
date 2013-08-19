@@ -6,20 +6,19 @@
 #endif
 
 #include "Pickup.h"
-#include "ClientHandle.h"
-#include "Inventory.h"
-#include "World.h"
-#include "Simulator/FluidSimulator.h"
-#include "Server.h"
+#include "../ClientHandle.h"
+#include "../Inventory.h"
+#include "../World.h"
+#include "../Simulator/FluidSimulator.h"
+#include "../Server.h"
 #include "Player.h"
-#include "PluginManager.h"
-#include "Item.h"
-#include "Root.h"
-#include "Tracer.h"
-#include "Chunk.h"
+#include "../PluginManager.h"
+#include "../Item.h"
+#include "../Root.h"
+#include "../Chunk.h"
 
-#include "Vector3d.h"
-#include "Vector3f.h"
+#include "../Vector3d.h"
+#include "../Vector3f.h"
 
 
 

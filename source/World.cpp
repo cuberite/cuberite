@@ -5,8 +5,8 @@
 #include "World.h"
 #include "ChunkDef.h"
 #include "ClientHandle.h"
-#include "Pickup.h"
-#include "Player.h"
+#include "Entities/Pickup.h"
+#include "Entities/Player.h"
 #include "Server.h"
 #include "Item.h"
 #include "Root.h"
@@ -50,13 +50,13 @@
 
 #include "OSSupport/MakeDir.h"
 #include "MersenneTwister.h"
-#include "Tracer.h"
 #include "Generating/Trees.h"
 #include "PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Vector3d.h"
-#include "TNTEntity.h"
+#include "Entities/TNTEntity.h"
 
+#include "Tracer.h"
 #include "tolua++.h"
 
 // DEBUG: Test out the cLineBlockTracer class by tracing a few lines:

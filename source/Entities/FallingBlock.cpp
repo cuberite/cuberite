@@ -1,10 +1,10 @@
 #include "Globals.h"
 
 #include "FallingBlock.h"
-#include "World.h"
-#include "ClientHandle.h"
-#include "Simulator/SandSimulator.h"
-#include "Chunk.h"
+#include "../World.h"
+#include "../ClientHandle.h"
+#include "../Simulator/SandSimulator.h"
+#include "../Chunk.h"
 
 
 

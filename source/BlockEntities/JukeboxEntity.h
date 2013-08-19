@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 
 
 

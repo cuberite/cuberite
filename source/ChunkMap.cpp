@@ -4,15 +4,14 @@
 #include "ChunkMap.h"
 #include "World.h"
 #include "Root.h"
-#include "Player.h"
-#include "BlockID.h"
+#include "Entities/Player.h"
 #include "Item.h"
-#include "Pickup.h"
+#include "Entities/Pickup.h"
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
 #include "PluginManager.h"
-#include "TNTEntity.h"
+#include "Entities/TNTEntity.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs

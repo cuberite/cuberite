@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "Item.h"
-#include "Vector3d.h"
-#include "Vector3f.h"
+#include "../Item.h"
+#include "../Vector3d.h"
+#include "../Vector3f.h"
 
 
 

@@ -3,9 +3,9 @@
 #include "ClientHandle.h"
 #include "Server.h"
 #include "World.h"
-#include "Pickup.h"
+#include "Entities/Pickup.h"
 #include "PluginManager.h"
-#include "Player.h"
+#include "Entities/Player.h"
 #include "Inventory.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/SignEntity.h"
@@ -20,7 +20,6 @@
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
 
-#include "Tracer.h"
 #include "Vector3f.h"
 #include "Vector3d.h"
 

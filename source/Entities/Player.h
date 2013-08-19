@@ -2,8 +2,8 @@
 #pragma once
 
 #include "Pawn.h"
-#include "Inventory.h"
-#include "Defines.h"
+#include "../Inventory.h"
+#include "../Defines.h"
 
 
 

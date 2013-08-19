@@ -2,17 +2,17 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Entity.h"
-#include "World.h"
-#include "Server.h"
-#include "Root.h"
-#include "Vector3d.h"
-#include "Matrix4f.h"
-#include "ReferenceManager.h"
-#include "ClientHandle.h"
-#include "Tracer.h"
-#include "Chunk.h"
-#include "Simulator/FluidSimulator.h"
-#include "PluginManager.h"
+#include "../World.h"
+#include "../Server.h"
+#include "../Root.h"
+#include "../Vector3d.h"
+#include "../Matrix4f.h"
+#include "../ReferenceManager.h"
+#include "../ClientHandle.h"
+#include "../Chunk.h"
+#include "../Simulator/FluidSimulator.h"
+#include "../PluginManager.h"
+#include "../Tracer.h"
 
 
 

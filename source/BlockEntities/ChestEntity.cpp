@@ -3,9 +3,8 @@
 
 #include "ChestEntity.h"
 #include "../Item.h"
-#include "../Player.h"
+#include "../Entities/Player.h"
 #include "../UI/Window.h"
-#include "../Noise.h"
 #include <json/json.h>
 
 

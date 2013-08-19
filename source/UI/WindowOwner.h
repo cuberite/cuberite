@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../BlockEntities/BlockEntity.h"
-#include "../Entity.h"
+#include "../Entities/Entity.h"
 #include "Window.h"
 
 /*

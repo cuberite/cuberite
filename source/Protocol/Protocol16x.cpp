@@ -13,8 +13,8 @@ Implements the 1.6.x protocol classes:
 #include "Globals.h"
 #include "Protocol16x.h"
 #include "../ClientHandle.h"
-#include "../Entity.h"
-#include "../Player.h"
+#include "../Entities/Entity.h"
+#include "../Entities/Player.h"
 
 
 
