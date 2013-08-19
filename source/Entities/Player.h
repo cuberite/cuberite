@@ -171,14 +171,17 @@ public:
 	void SetFoodLevel                 (int a_FoodLevel);
 	void SetFoodSaturationLevel       (double a_FoodSaturationLevel);
 	void SetFoodTickTimer             (int a_FoodTickTimer);
-	void SetFoodExhaustionLevel       (double a_FoodSaturationLevel);
+	void SetFoodExhaustionLevel       (double a_FoodExhaustionLevel);
 	void SetFoodPoisonedTicksRemaining(int a_FoodPoisonedTicksRemaining);
 
 	/// Adds to FoodLevel and FoodSaturationLevel, returns true if any food has been consumed, false if player "full"
 	bool Feed(int a_Food, double a_Saturation);
 
 	/// Adds the specified exhaustion to m_FoodExhaustion. Expects only positive values.
-	void AddFoodExhaustion(double a_Exhaustion) { m_FoodExhaustionLevel += a_Exhaustion; }
+	void AddFoodExhaustion(double a_Exhaustion)
+	{
+		m_FoodExhaustionLevel += a_Exhaustion;
+	}
 	
 	/// Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two
 	void FoodPoison(int a_NumTicks);

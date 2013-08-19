@@ -3,6 +3,7 @@ PLUGIN = {};	-- Reference to own plugin object
 
 g_DropSpensersToActivate = {};  -- A list of dispensers and droppers (as {World, X, Y Z} quadruplets) that are to be activated every tick
 g_HungerReportTick = 10;
+g_ShowFoodStats = false;  -- When true, each player's food stats are sent to them every 10 ticks
 
 
 
@@ -22,6 +23,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_WORLD_TICK);
 
 	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
@@ -36,6 +38,7 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/fl",      "debuggers", HandleFoodLevelCmd,    "- Sets the food level to the given value");
 	PluginManager:BindCommand("/spidey",  "debuggers", HandleSpideyCmd,       "- Shoots a line of web blocks until it hits non-air");
 	PluginManager:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
+	PluginManager:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -444,20 +447,28 @@ function OnTick()
 		GCOnTick = GCOnTick - 1;
 	end
 	
-	--[[
-	if (g_HungerReportTick > 0) then
-		g_HungerReportTick = g_HungerReportTick - 1;
-	else
-		g_HungerReportTick = 10;
-		cRoot:Get():GetDefaultWorld():ForEachPlayer(
-			function(a_Player)
-				a_Player:SendMessage("FoodStat: " .. a_Player:GetFoodLevel() .. " / " .. a_Player:GetFoodExhaustionLevel());
-			end
-		);
-	end
-	]]
-	
 	return false;
+end
+
+
+
+
+
+function OnWorldTick(a_World, a_Dt)
+	local Tick = a_World:GetWorldAge();
+	if (not(g_ShowFoodStats) or (math.mod(Tick, 10) ~= 0)) then
+		return false;
+	end
+	a_World:ForEachPlayer(
+		function(a_Player)
+			a_Player:SendMessage(
+				tostring(Tick / 10) .. 
+				" > FS: fl " .. a_Player:GetFoodLevel() .. 
+				"; sat " .. a_Player:GetFoodSaturationLevel() ..
+				"; exh " .. a_Player:GetFoodExhaustionLevel()
+			);
+		end
+	);
 end
 
 
@@ -708,7 +719,13 @@ function HandleFoodLevelCmd(a_Split, a_Player)
 	end
 	
 	a_Player:SetFoodLevel(tonumber(a_Split[2]));
-	a_Player:SendMessage("Food level set to " .. a_Player:GetFoodLevel());
+	a_Player:SetFoodSaturationLevel(5);
+	a_Player:SetFoodExhaustionLevel(0);
+	a_Player:SendMessage(
+		"Food level set to " .. a_Player:GetFoodLevel() .. 
+		", saturation reset to " .. a_Player:GetFoodSaturationLevel() ..
+		" and exhaustion reset to " .. a_Player:GetFoodExhaustionLevel()
+	);
 	return true;
 end
 
@@ -748,9 +765,21 @@ end
 
 
 function HandleEnchCmd(a_Split, a_Player)
-	local Wnd = cLuaWindow(cWindow.Enchantment, 1, 1, "Ench")
-	a_Player:OpenWindow(Wnd)
-	Wnd:SetProperty(0, 10)
-	Wnd:SetProperty(1, 15)
-	Wnd:SetProperty(2, 25)
+	local Wnd = cLuaWindow(cWindow.Enchantment, 1, 1, "Ench");
+	a_Player:OpenWindow(Wnd);
+	Wnd:SetProperty(0, 10);
+	Wnd:SetProperty(1, 15);
+	Wnd:SetProperty(2, 25);
 end
+
+
+
+
+
+function HandleFoodStatsCmd(a_Split, a_Player)
+	g_ShowFoodStats = not(g_ShowFoodStats);
+end
+
+
+
+

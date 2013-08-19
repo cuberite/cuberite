@@ -340,9 +340,9 @@ void cPlayer::SetFoodTickTimer(int a_FoodTickTimer)
 
 
 
-void cPlayer::SetFoodExhaustionLevel(double a_FoodSaturationLevel)
+void cPlayer::SetFoodExhaustionLevel(double a_FoodExhaustionLevel)
 {
-	m_FoodExhaustionLevel = std::max(0.0, std::min(a_FoodSaturationLevel, 4.0));
+	m_FoodExhaustionLevel = std::max(0.0, std::min(a_FoodExhaustionLevel, 4.0));
 }
 
 
