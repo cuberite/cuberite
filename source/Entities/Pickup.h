@@ -40,6 +40,9 @@ public:
 	/// Returns the number of ticks that this entity has existed
 	int GetAge(void) const { return (int)(m_Timer / 50); }  // tolua_export
 	
+	/// Returns true if the pickup has already been collected
+	bool IsCollected(void) const { return m_bCollected; }  // tolua_export
+	
 private:
 	Vector3d   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
 
