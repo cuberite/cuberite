@@ -144,24 +144,19 @@ cEvent::eWaitResult cEvent::Wait(int a_TimeoutMilliSec)
 		timeout.tv_sec = a_TimeoutMilliSec / 1000;
 		timeout.tv_nsec = (a_TimeoutMilliSec % 1000) * 1000000;
 		int res = sem_timedwait(m_Event, &timeout);
-		switch (res)
+		if (res == 0)
 		{
-			case 0:
-			{
-				// The semaphore was signalled
-				return wrSignalled;
-			}
-			case ETIMEDOUT:
-			{
-				// The timeout was hit
-				return wrTimeout;
-			}
-			default:
-			{
-				LOGWARNING("cEvent: timed-waiting for the event failed: %i, errno = %i. Continuing, but server may be unstable.", res, errno);
-				return wrError;
-			}
+			// The semaphore was signalled
+			return wrSignalled;
 		}
+		int err = errno;
+		if (err == ETIMEDOUT)
+		{
+			// The timeout was hit
+			return wrTimeout;
+		}
+		LOGWARNING("cEvent: timed-waiting for the event failed: %i, errno = %i. Continuing, but server may be unstable.", res, err);
+		return wrError;
 	#endif
 }
 
