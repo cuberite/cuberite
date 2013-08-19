@@ -37,16 +37,15 @@ public:
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	
-	short GetHealth(void) const { return m_Health; }
-	
 	/// Returns the number of ticks that this entity has existed
-	short GetAge(void) const { return (short)(m_Timer / 50); }
+	int GetAge(void) const { return (int)(m_Timer / 50); }  // tolua_export
 	
 private:
 	Vector3d   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
 
 	Vector3d   m_WaterSpeed;
 
+	/// The number of ticks that the entity has existed / timer between collect and destroy; in msec
 	float m_Timer;
 
 	cItem m_Item;

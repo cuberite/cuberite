@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/19/13 10:28:26.
+** Generated automatically by tolua++-1.0.92 on 08/19/13 11:43:38.
 */
 
 #ifndef __cplusplus
@@ -18043,6 +18043,38 @@ static int tolua_AllToLua_cPickup_CollectedBy00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetAge of class  cPickup */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_GetAge00
+static int tolua_AllToLua_cPickup_GetAge00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPickup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPickup* self = (const cPickup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetAge'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetAge();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetAge'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: m_PrimaryServerVersion of class  cRoot */
 #ifndef TOLUA_DISABLE_tolua_get_cRoot_m_PrimaryServerVersion
 static int tolua_get_cRoot_m_PrimaryServerVersion(lua_State* tolua_S)
@@ -28399,6 +28431,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,".call",tolua_AllToLua_cPickup_new00_local);
    tolua_function(tolua_S,"GetItem",tolua_AllToLua_cPickup_GetItem00);
    tolua_function(tolua_S,"CollectedBy",tolua_AllToLua_cPickup_CollectedBy00);
+   tolua_function(tolua_S,"GetAge",tolua_AllToLua_cPickup_GetAge00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cRoot","cRoot","",NULL);
   tolua_beginmodule(tolua_S,"cRoot");
