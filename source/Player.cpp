@@ -1353,7 +1353,7 @@ void cPlayer::UseEquippedItem(void)
 void cPlayer::SetSwimState(cChunk & a_Chunk)
 {
 	int RelY = (int)floor(m_LastPosY + 0.1);
-	if ((RelY < 0) || (RelY >= cChunkDef::Height))
+	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
 	{
 		m_IsSwimming = false;
 		m_IsSubmerged = false;
