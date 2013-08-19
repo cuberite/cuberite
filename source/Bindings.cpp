@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/18/13 22:18:01.
+** Generated automatically by tolua++-1.0.92 on 08/19/13 09:36:55.
 */
 
 #ifndef __cplusplus
@@ -210,7 +210,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cEnchantments");
  tolua_usertype(tolua_S,"cLuaWindow");
- tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"cDropperEntity");
  tolua_usertype(tolua_S,"std::vector<cIniFile::key>");
@@ -227,7 +227,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cPlugin_NewLua");
+ tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"cCraftingRecipes");
@@ -255,7 +255,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
  tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
- tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cPluginLua");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"Vector3d");
 }
@@ -9818,11 +9818,11 @@ static int tolua_AllToLua_cPlugin_GetLocalDirectory00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: __cWebPlugin__ of class  cPlugin_NewLua */
-#ifndef TOLUA_DISABLE_tolua_get_cPlugin_NewLua___cWebPlugin__
-static int tolua_get_cPlugin_NewLua___cWebPlugin__(lua_State* tolua_S)
+/* get function: __cWebPlugin__ of class  cPluginLua */
+#ifndef TOLUA_DISABLE_tolua_get_cPluginLua___cWebPlugin__
+static int tolua_get_cPluginLua___cWebPlugin__(lua_State* tolua_S)
 {
-  cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPluginLua* self = (cPluginLua*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cWebPlugin__'",NULL);
 #endif
@@ -27975,6 +27975,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_UPDATING_SIGN",cPluginManager::HOOK_UPDATING_SIGN);
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGED",cPluginManager::HOOK_WEATHER_CHANGED);
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGING",cPluginManager::HOOK_WEATHER_CHANGING);
+   tolua_constant(tolua_S,"HOOK_WORLD_TICK",cPluginManager::HOOK_WORLD_TICK);
    tolua_function(tolua_S,"Get",tolua_AllToLua_cPluginManager_Get00);
    tolua_function(tolua_S,"GetPlugin",tolua_AllToLua_cPluginManager_GetPlugin00);
    tolua_function(tolua_S,"FindPlugins",tolua_AllToLua_cPluginManager_FindPlugins00);
@@ -27998,9 +27999,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetDirectory",tolua_AllToLua_cPlugin_GetDirectory00);
    tolua_function(tolua_S,"GetLocalDirectory",tolua_AllToLua_cPlugin_GetLocalDirectory00);
   tolua_endmodule(tolua_S);
-  tolua_cclass(tolua_S,"cPlugin_NewLua","cPlugin_NewLua","cPlugin",NULL);
-  tolua_beginmodule(tolua_S,"cPlugin_NewLua");
-   tolua_variable(tolua_S,"__cWebPlugin__",tolua_get_cPlugin_NewLua___cWebPlugin__,NULL);
+  tolua_cclass(tolua_S,"cPluginLua","cPluginLua","cPlugin",NULL);
+  tolua_beginmodule(tolua_S,"cPluginLua");
+   tolua_variable(tolua_S,"__cWebPlugin__",tolua_get_cPluginLua___cWebPlugin__,NULL);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cServer","cServer","",NULL);
   tolua_beginmodule(tolua_S,"cServer");

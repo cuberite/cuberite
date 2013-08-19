@@ -21,9 +21,9 @@ extern "C"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cPlugin_NewLua:
+// cPluginLua:
 
-cPlugin_NewLua::cPlugin_NewLua(const AString & a_PluginDirectory) :
+cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
 	cPlugin(a_PluginDirectory),
 	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str()))
 {
@@ -33,7 +33,7 @@ cPlugin_NewLua::cPlugin_NewLua(const AString & a_PluginDirectory) :
 
 
 
-cPlugin_NewLua::~cPlugin_NewLua()
+cPluginLua::~cPluginLua()
 {
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.Close();
@@ -43,7 +43,7 @@ cPlugin_NewLua::~cPlugin_NewLua()
 
 
 
-bool cPlugin_NewLua::Initialize(void)
+bool cPluginLua::Initialize(void)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -98,7 +98,7 @@ bool cPlugin_NewLua::Initialize(void)
 
 
 
-void cPlugin_NewLua::OnDisable(void)
+void cPluginLua::OnDisable(void)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.HasFunction("OnDisable"))
@@ -112,7 +112,7 @@ void cPlugin_NewLua::OnDisable(void)
 
 
 
-void cPlugin_NewLua::Tick(float a_Dt)
+void cPluginLua::Tick(float a_Dt)
 {
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_TICK), a_Dt);
@@ -122,7 +122,7 @@ void cPlugin_NewLua::Tick(float a_Dt)
 
 
 
-bool cPlugin_NewLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
+bool cPluginLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -134,7 +134,7 @@ bool cPlugin_NewLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int 
 
 
 
-bool cPlugin_NewLua::OnChat(cPlayer * a_Player, AString & a_Message)
+bool cPluginLua::OnChat(cPlayer * a_Player, AString & a_Message)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -146,7 +146,7 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, AString & a_Message)
 
 
 
-bool cPlugin_NewLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -158,7 +158,7 @@ bool cPlugin_NewLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_Chun
 
 
 
-bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+bool cPluginLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -170,7 +170,7 @@ bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 
 
 
-bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+bool cPluginLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -182,7 +182,7 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 
 
 
-bool cPlugin_NewLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -194,7 +194,7 @@ bool cPlugin_NewLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_Chunk
 
 
 
-bool cPlugin_NewLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -206,7 +206,7 @@ bool cPlugin_NewLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_Chun
 
 
 
-bool cPlugin_NewLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
+bool cPluginLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -218,7 +218,7 @@ bool cPlugin_NewLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 
 
 
-bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -230,7 +230,7 @@ bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftin
 
 
 
-bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
+bool cPluginLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -242,7 +242,7 @@ bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 
 
 
-bool cPlugin_NewLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -254,7 +254,7 @@ bool cPlugin_NewLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & 
 
 
 
-bool cPlugin_NewLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
+bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -284,7 +284,7 @@ bool cPlugin_NewLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a
 
 
 
-bool cPlugin_NewLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
+bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -314,7 +314,7 @@ bool cPlugin_NewLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, boo
 
 
 
-bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
+bool cPluginLua::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -326,7 +326,7 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 
 
 
-bool cPlugin_NewLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
+bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -338,7 +338,7 @@ bool cPlugin_NewLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hop
 
 
 
-bool cPlugin_NewLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
+bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -350,7 +350,7 @@ bool cPlugin_NewLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hop
 
 
 
-bool cPlugin_NewLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
+bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -362,7 +362,7 @@ bool cPlugin_NewLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 
 
 
-bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
+bool cPluginLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -374,7 +374,7 @@ bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, co
 
 
 
-bool cPlugin_NewLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
+bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -386,7 +386,7 @@ bool cPlugin_NewLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 
 
 
-bool cPlugin_NewLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -398,7 +398,7 @@ bool cPlugin_NewLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int
 
 
 
-bool cPlugin_NewLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -410,7 +410,7 @@ bool cPlugin_NewLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a
 
 
 
-bool cPlugin_NewLua::OnPlayerEating(cPlayer & a_Player)
+bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -422,7 +422,7 @@ bool cPlugin_NewLua::OnPlayerEating(cPlayer & a_Player)
 
 
 
-bool cPlugin_NewLua::OnPlayerJoined(cPlayer & a_Player)
+bool cPluginLua::OnPlayerJoined(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -434,7 +434,7 @@ bool cPlugin_NewLua::OnPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPlugin_NewLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -446,7 +446,7 @@ bool cPlugin_NewLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_B
 
 
 
-bool cPlugin_NewLua::OnPlayerMoved(cPlayer & a_Player)
+bool cPluginLua::OnPlayerMoved(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -458,7 +458,7 @@ bool cPlugin_NewLua::OnPlayerMoved(cPlayer & a_Player)
 
 
 
-bool cPlugin_NewLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -470,7 +470,7 @@ bool cPlugin_NewLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a
 
 
 
-bool cPlugin_NewLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -482,7 +482,7 @@ bool cPlugin_NewLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int 
 
 
 
-bool cPlugin_NewLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -494,7 +494,7 @@ bool cPlugin_NewLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_
 
 
 
-bool cPlugin_NewLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity)
+bool cPluginLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -506,7 +506,7 @@ bool cPlugin_NewLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a
 
 
 
-bool cPlugin_NewLua::OnPlayerShooting(cPlayer & a_Player)
+bool cPluginLua::OnPlayerShooting(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -518,7 +518,7 @@ bool cPlugin_NewLua::OnPlayerShooting(cPlayer & a_Player)
 
 
 
-bool cPlugin_NewLua::OnPlayerSpawned(cPlayer & a_Player)
+bool cPluginLua::OnPlayerSpawned(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -530,7 +530,7 @@ bool cPlugin_NewLua::OnPlayerSpawned(cPlayer & a_Player)
 
 
 
-bool cPlugin_NewLua::OnPlayerTossingItem(cPlayer & a_Player)
+bool cPluginLua::OnPlayerTossingItem(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -542,7 +542,7 @@ bool cPlugin_NewLua::OnPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPlugin_NewLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -554,7 +554,7 @@ bool cPlugin_NewLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_B
 
 
 
-bool cPlugin_NewLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) 
+bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) 
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -566,7 +566,7 @@ bool cPlugin_NewLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_Bl
 
 
 
-bool cPlugin_NewLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -578,7 +578,7 @@ bool cPlugin_NewLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_
 
 
 
-bool cPlugin_NewLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -590,7 +590,7 @@ bool cPlugin_NewLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_B
 
 
 
-bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -602,7 +602,7 @@ bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGri
 
 
 
-bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -614,7 +614,7 @@ bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid
 
 
 
-bool cPlugin_NewLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
+bool cPluginLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -626,7 +626,7 @@ bool cPlugin_NewLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 
 
 
-bool cPlugin_NewLua::OnSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
+bool cPluginLua::OnSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -638,7 +638,7 @@ bool cPlugin_NewLua::OnSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
 
 
 
-bool cPlugin_NewLua::OnSpawningEntity(cWorld & a_World, cEntity & a_Entity)
+bool cPluginLua::OnSpawningEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -650,7 +650,7 @@ bool cPlugin_NewLua::OnSpawningEntity(cWorld & a_World, cEntity & a_Entity)
 
 
 
-bool cPlugin_NewLua::OnSpawningMonster(cWorld & a_World, cMonster & a_Monster)
+bool cPluginLua::OnSpawningMonster(cWorld & a_World, cMonster & a_Monster)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -662,7 +662,7 @@ bool cPlugin_NewLua::OnSpawningMonster(cWorld & a_World, cMonster & a_Monster)
 
 
 
-bool cPlugin_NewLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
+bool cPluginLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -674,7 +674,7 @@ bool cPlugin_NewLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 
 
 
-bool cPlugin_NewLua::OnUpdatedSign(
+bool cPluginLua::OnUpdatedSign(
 	cWorld * a_World, 
 	int a_BlockX, int a_BlockY, int a_BlockZ, 
 	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
@@ -691,7 +691,7 @@ bool cPlugin_NewLua::OnUpdatedSign(
 
 
 
-bool cPlugin_NewLua::OnUpdatingSign(
+bool cPluginLua::OnUpdatingSign(
 	cWorld * a_World, 
 	int a_BlockX, int a_BlockY, int a_BlockZ, 
 	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4,
@@ -708,7 +708,7 @@ bool cPlugin_NewLua::OnUpdatingSign(
 
 
 
-bool cPlugin_NewLua::OnWeatherChanged(cWorld & a_World)
+bool cPluginLua::OnWeatherChanged(cWorld & a_World)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -720,7 +720,7 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld & a_World)
 
 
 
-bool cPlugin_NewLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
+bool cPluginLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -734,7 +734,7 @@ bool cPlugin_NewLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather
 
 
 
-bool cPlugin_NewLua::OnWorldTick(cWorld & a_World, float a_Dt)
+bool cPluginLua::OnWorldTick(cWorld & a_World, float a_Dt)
 {
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_WORLD_TICK), &a_World, a_Dt);
@@ -745,7 +745,7 @@ bool cPlugin_NewLua::OnWorldTick(cWorld & a_World, float a_Dt)
 
 
 
-bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player)
+bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player)
 {
 	ASSERT(!a_Split.empty());
 	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
@@ -765,7 +765,7 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 
 
 
-bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
+bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
 {
 	ASSERT(!a_Split.empty());
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
@@ -792,7 +792,7 @@ bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split, cComman
 
 
 
-void cPlugin_NewLua::ClearCommands(void)
+void cPluginLua::ClearCommands(void)
 {
 	cCSLock Lock(m_CriticalSection);
 
@@ -811,7 +811,7 @@ void cPlugin_NewLua::ClearCommands(void)
 
 
 
-void cPlugin_NewLua::ClearConsoleCommands(void)
+void cPluginLua::ClearConsoleCommands(void)
 {
 	cCSLock Lock(m_CriticalSection);
 
@@ -830,7 +830,7 @@ void cPlugin_NewLua::ClearConsoleCommands(void)
 
 
 
-bool cPlugin_NewLua::CanAddHook(cPluginManager::PluginHook a_Hook)
+bool cPluginLua::CanAddHook(cPluginManager::PluginHook a_Hook)
 {
 	const char * FnName = GetHookFnName(a_Hook);
 	if (FnName == NULL)
@@ -871,7 +871,7 @@ bool cPlugin_NewLua::CanAddHook(cPluginManager::PluginHook a_Hook)
 
 
 
-const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
+const char * cPluginLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 {
 	switch (a_Hook)
 	{
@@ -928,7 +928,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 
 
 
-AString cPlugin_NewLua::HandleWebRequest(const HTTPRequest * a_Request )
+AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request )
 {
 	cCSLock Lock(m_CriticalSection);
 	std::string RetVal = "";
@@ -968,7 +968,7 @@ AString cPlugin_NewLua::HandleWebRequest(const HTTPRequest * a_Request )
 
 
 
-bool cPlugin_NewLua::AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference)
+bool cPluginLua::AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (a_LuaState != m_LuaState)
@@ -990,7 +990,7 @@ bool cPlugin_NewLua::AddWebTab(const AString & a_Title, lua_State * a_LuaState, 
 
 
 
-void cPlugin_NewLua::BindCommand(const AString & a_Command, int a_FnRef)
+void cPluginLua::BindCommand(const AString & a_Command, int a_FnRef)
 {
 	ASSERT(m_Commands.find(a_Command) == m_Commands.end());
 	m_Commands[a_Command] = a_FnRef;
@@ -1000,7 +1000,7 @@ void cPlugin_NewLua::BindCommand(const AString & a_Command, int a_FnRef)
 
 
 
-void cPlugin_NewLua::BindConsoleCommand(const AString & a_Command, int a_FnRef)
+void cPluginLua::BindConsoleCommand(const AString & a_Command, int a_FnRef)
 {
 	ASSERT(m_ConsoleCommands.find(a_Command) == m_ConsoleCommands.end());
 	m_ConsoleCommands[a_Command] = a_FnRef;
@@ -1010,7 +1010,7 @@ void cPlugin_NewLua::BindConsoleCommand(const AString & a_Command, int a_FnRef)
 
 
 
-void cPlugin_NewLua::Unreference(int a_LuaRef)
+void cPluginLua::Unreference(int a_LuaRef)
 {
 	cCSLock Lock(m_CriticalSection);
 	luaL_unref(m_LuaState, LUA_REGISTRYINDEX, a_LuaRef);
@@ -1020,7 +1020,7 @@ void cPlugin_NewLua::Unreference(int a_LuaRef)
 
 
 
-bool cPlugin_NewLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse)
+bool cPluginLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse)
 {
 	ASSERT(a_FnRef != LUA_REFNIL);
 	
@@ -1034,7 +1034,7 @@ bool cPlugin_NewLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPla
 
 
 
-void cPlugin_NewLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum)
+void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum)
 {
 	ASSERT(a_FnRef != LUA_REFNIL);
 	

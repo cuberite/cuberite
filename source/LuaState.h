@@ -46,7 +46,7 @@ class cCraftingGrid;
 class cCraftingRecipe;
 struct TakeDamageInfo;
 class cWindow;
-class cPlugin_NewLua;
+class cPluginLua;
 struct HTTPRequest;
 class cWebAdmin;
 struct HTTPTemplateRequest;
@@ -172,7 +172,7 @@ public:
 	void Push(const cCraftingRecipe * a_Recipe);
 	void Push(TakeDamageInfo * a_TDI);
 	void Push(cWindow * a_Window);
-	void Push(cPlugin_NewLua * a_Plugin);
+	void Push(cPluginLua * a_Plugin);
 	void Push(const HTTPRequest * a_Request);
 	void Push(cWebAdmin * a_WebAdmin);
 	void Push(const HTTPTemplateRequest * a_Request);

@@ -1310,7 +1310,7 @@ bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 
 bool cPluginManager::LoadPlugin(const AString & a_PluginName)
 {
-	return AddPlugin(new cPlugin_NewLua(a_PluginName.c_str()));
+	return AddPlugin(new cPluginLua(a_PluginName.c_str()));
 }
 
 

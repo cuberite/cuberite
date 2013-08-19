@@ -28,15 +28,15 @@ class cWindow;
 
 
 // tolua_begin
-class cPlugin_NewLua :
+class cPluginLua :
 	public cPlugin,
 	public cWebPlugin
 {
 public:
 	// tolua_end
 	
-	cPlugin_NewLua( const AString & a_PluginDirectory );
-	~cPlugin_NewLua();
+	cPluginLua( const AString & a_PluginDirectory );
+	~cPluginLua();
 
 	virtual void OnDisable(void) override;
 	virtual bool Initialize(void) override;

@@ -16,8 +16,8 @@
 
 
 
-// fwd: Plugin_NewLua.h
-class cPlugin_NewLua;
+// fwd: PluginLua.h
+class cPluginLua;
 
 
 
@@ -55,23 +55,23 @@ public:
 	/** Sets the plugin reference and the internal Lua object reference index
 	used for preventing Lua's GC to collect this class while the window is open
 	*/
-	void SetLuaRef(cPlugin_NewLua * a_Plugin, int a_LuaRef);
+	void SetLuaRef(cPluginLua * a_Plugin, int a_LuaRef);
 	
 	/// Returns true if SetLuaRef() has been called
 	bool IsLuaReferenced(void) const;
 	
 	/// Sets the callback function (Lua reference) to call when the window is about to close
-	void SetOnClosing(cPlugin_NewLua * a_Plugin, int a_FnRef);
+	void SetOnClosing(cPluginLua * a_Plugin, int a_FnRef);
 	
 	/// Sets the callback function (Lua reference) to call when a slot is changed
-	void SetOnSlotChanged(cPlugin_NewLua * a_Plugin, int a_FnRef);
+	void SetOnSlotChanged(cPluginLua * a_Plugin, int a_FnRef);
 	
 protected:
 	/// Contents of the non-inventory part
 	cItemGrid m_Contents;
 	
 	/// The plugin that has opened the window and owns the m_LuaRef
-	cPlugin_NewLua * m_Plugin;
+	cPluginLua * m_Plugin;
 	
 	/// The Lua object reference, used for keeping the object alive as long as any player has the window open
 	int m_LuaRef;

@@ -552,11 +552,11 @@ void cLuaState::Push(cWindow * a_Window)
 
 
 
-void cLuaState::Push(cPlugin_NewLua * a_Plugin)
+void cLuaState::Push(cPluginLua * a_Plugin)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Plugin, "cPlugin_NewLua");
+	tolua_pushusertype(m_LuaState, a_Plugin, "cPluginLua");
 	m_NumCurrentFunctionArgs += 1;
 }
 

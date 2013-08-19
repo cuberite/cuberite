@@ -136,7 +136,7 @@ static int tolua_LOGERROR(lua_State* tolua_S)
 
 
 
-cPlugin_NewLua * GetLuaPlugin(lua_State * L)
+cPluginLua * GetLuaPlugin(lua_State * L)
 {
 	// Get the plugin identification out of LuaState:
 	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
@@ -146,7 +146,7 @@ cPlugin_NewLua * GetLuaPlugin(lua_State * L)
 		lua_pop(L, 1);
 		return NULL;
 	}
-	cPlugin_NewLua * Plugin = (cPlugin_NewLua *)lua_topointer(L, -1);
+	cPluginLua * Plugin = (cPluginLua *)lua_topointer(L, -1);
 	lua_pop(L, 1);
 	
 	return Plugin;
@@ -907,7 +907,7 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 static int tolua_cPluginManager_BindCommand(lua_State * L)
 {
 	// Function signature: cPluginManager:BindCommand(Command, Permission, Function, HelpString)
-	cPlugin_NewLua * Plugin = GetLuaPlugin(L);
+	cPluginLua * Plugin = GetLuaPlugin(L);
 	if (Plugin == NULL)
 	{
 		return 0;
@@ -969,7 +969,7 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	{
 		LOGERROR("cPluginManager:BindConsoleCommand() cannot get plugin instance, what have you done to my Lua state? Command-binding aborted.");
 	}
-	cPlugin_NewLua * Plugin = (cPlugin_NewLua *)lua_topointer(L, -1);
+	cPluginLua * Plugin = (cPluginLua *)lua_topointer(L, -1);
 	lua_pop(L, 1);
 	
 	// Read the arguments to this API call:
@@ -1071,7 +1071,7 @@ static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
 	// Function signature: cPlayer:OpenWindow(Window)
 
 	// Retrieve the plugin instance from the Lua state
-	cPlugin_NewLua * Plugin = GetLuaPlugin(tolua_S);
+	cPluginLua * Plugin = GetLuaPlugin(tolua_S);
 	if (Plugin == NULL)
 	{
 		return 0;
@@ -1117,14 +1117,14 @@ static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
 
 template <
 	class OBJTYPE,
-	void (OBJTYPE::*SetCallback)(cPlugin_NewLua * a_Plugin, int a_FnRef)
+	void (OBJTYPE::*SetCallback)(cPluginLua * a_Plugin, int a_FnRef)
 >
 static int tolua_SetObjectCallback(lua_State * tolua_S)
 {
 	// Function signature: OBJTYPE:SetWhateverCallback(CallbackFunction)
 
 	// Retrieve the plugin instance from the Lua state
-	cPlugin_NewLua * Plugin = GetLuaPlugin(tolua_S);
+	cPluginLua * Plugin = GetLuaPlugin(tolua_S);
 	if (Plugin == NULL)
 	{
 		// Warning message has already been printed by GetLuaPlugin(), bail out silently
@@ -1154,9 +1154,9 @@ static int tolua_SetObjectCallback(lua_State * tolua_S)
 
 
 
-static int tolua_cPlugin_NewLua_AddWebTab(lua_State * tolua_S)
+static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 {
-	cPlugin_NewLua * self = (cPlugin_NewLua*)tolua_tousertype(tolua_S,1,0);
+	cPluginLua * self = (cPluginLua *)tolua_tousertype(tolua_S,1,0);
 
 	tolua_Error tolua_err;
 	tolua_err.array = 0;
@@ -1186,7 +1186,7 @@ static int tolua_cPlugin_NewLua_AddWebTab(lua_State * tolua_S)
 	}
 	else
 	{
-		LOGERROR("ERROR: cPlugin_NewLua:AddWebTab invalid function reference in 2nd argument (Title: \"%s\")", Title.c_str() );
+		LOGERROR("ERROR: cPluginLua:AddWebTab invalid function reference in 2nd argument (Title: \"%s\")", Title.c_str() );
 	}
 
 	return 0;
@@ -1196,13 +1196,13 @@ static int tolua_cPlugin_NewLua_AddWebTab(lua_State * tolua_S)
 
 
 
-static int tolua_cPlugin_NewLua_AddTab(lua_State* tolua_S)
+static int tolua_cPluginLua_AddTab(lua_State* tolua_S)
 {
-	cPlugin_NewLua * self = (cPlugin_NewLua *) tolua_tousertype(tolua_S, 1, 0);
+	cPluginLua * self = (cPluginLua *) tolua_tousertype(tolua_S, 1, 0);
 	LOGWARN("WARNING: Using deprecated function AddTab()! Use AddWebTab() instead. (plugin \"%s\" in folder \"%s\")",
 		self->GetName().c_str(), self->GetDirectory().c_str()
 	);
-	return tolua_cPlugin_NewLua_AddWebTab( tolua_S );
+	return tolua_cPluginLua_AddWebTab( tolua_S );
 }
 
 
@@ -1271,7 +1271,7 @@ static int copy_lua_values(lua_State * a_Source, lua_State * a_Destination, int 
 
 static int tolua_cPlugin_Call(lua_State* tolua_S)
 {
-	cPlugin_NewLua * self = (cPlugin_NewLua *) tolua_tousertype(tolua_S, 1, 0);
+	cPluginLua * self = (cPluginLua *) tolua_tousertype(tolua_S, 1, 0);
 	lua_State* targetState = self->GetLuaState();
 	int targetTop = lua_gettop(targetState);
 
@@ -1712,9 +1712,9 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "SetOnSlotChanged", tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnSlotChanged>);
 		tolua_endmodule(tolua_S);
 
-		tolua_beginmodule(tolua_S, "cPlugin_NewLua");
-			tolua_function(tolua_S, "AddTab", tolua_cPlugin_NewLua_AddTab);
-			tolua_function(tolua_S, "AddWebTab", tolua_cPlugin_NewLua_AddWebTab);
+		tolua_beginmodule(tolua_S, "cPluginLua");
+			tolua_function(tolua_S, "AddTab", tolua_cPluginLua_AddTab);
+			tolua_function(tolua_S, "AddWebTab", tolua_cPluginLua_AddWebTab);
 		tolua_endmodule(tolua_S);
 
 		tolua_cclass(tolua_S,"HTTPRequest","HTTPRequest","",NULL);

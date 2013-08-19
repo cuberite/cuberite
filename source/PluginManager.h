@@ -109,7 +109,7 @@ public:																	// tolua_export
 		HOOK_WORLD_TICK,
 		
 		// Note that if a hook type is added, it may need processing in cPlugin::CanAddHook() descendants,
-		//   and it definitely needs adding in cPlugin_NewLua::GetHookFnName() !
+		//   and it definitely needs adding in cPluginLua::GetHookFnName() !
 	} ;
 	// tolua_end
 

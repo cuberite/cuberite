@@ -65,7 +65,7 @@ cLuaWindow::~cLuaWindow()
 
 
 
-void cLuaWindow::SetLuaRef(cPlugin_NewLua * a_Plugin, int a_LuaRef)
+void cLuaWindow::SetLuaRef(cPluginLua * a_Plugin, int a_LuaRef)
 {
 	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
 	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
@@ -87,7 +87,7 @@ bool cLuaWindow::IsLuaReferenced(void) const
 
 
 
-void cLuaWindow::SetOnClosing(cPlugin_NewLua * a_Plugin, int a_FnRef)
+void cLuaWindow::SetOnClosing(cPluginLua * a_Plugin, int a_FnRef)
 {
 	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
 	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
@@ -107,7 +107,7 @@ void cLuaWindow::SetOnClosing(cPlugin_NewLua * a_Plugin, int a_FnRef)
 
 
 
-void cLuaWindow::SetOnSlotChanged(cPlugin_NewLua * a_Plugin, int a_FnRef)
+void cLuaWindow::SetOnSlotChanged(cPluginLua * a_Plugin, int a_FnRef)
 {
 	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
 	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
