@@ -98,7 +98,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	{
 		AddDir(pistx, pisty, pistz, pistonMeta, -1);
 		m_World->GetBlockTypeMeta(pistx, pisty, pistz, currBlock, currBlockMeta);
-		m_World->SetBlock( oldx, oldy, oldz, currBlock, currBlockMeta);
+		m_World->QueueSetBlock( oldx, oldy, oldz, currBlock, currBlockMeta, 320);
 		oldx = pistx;
 		oldy = pisty;
 		oldz = pistz;
@@ -113,7 +113,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
 	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
-	m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
+	m_World->QueueSetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0), 320);
 }
 
 
@@ -133,7 +133,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	
 	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	m_World->SetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
+	m_World->QueueSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8), 320);
 
 
 	// Check the extension:
@@ -155,18 +155,18 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		if (CanPull(tempBlock, tempMeta))
 		{
 			// Pull the block
-			m_World->SetBlock(pistx, pisty, pistz, tempBlock, tempMeta);
-			m_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
+			m_World->QueueSetBlock(pistx, pisty, pistz, tempBlock, tempMeta, 320);
+			m_World->QueueSetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0, 320);
 		}
 		else
 		{
 			// Retract without pulling
-			m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+			m_World->QueueSetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0, 320);
 		}
 	}
 	else
 	{
-		m_World->SetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0);
+		m_World->QueueSetBlock(pistx, pisty, pistz, E_BLOCK_AIR, 0, 320);
 	}
 }
 
