@@ -1,4 +1,5 @@
 Debug/
+Debug profiled/
 Release/
 *.user
 *.ncb
