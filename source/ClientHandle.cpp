@@ -1502,6 +1502,8 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
+	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
+	
 	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 }
 

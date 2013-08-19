@@ -573,6 +573,11 @@ void cChunk::ProcessQueuedSetBlocks(void)
 
 void cChunk::BroadcastPendingBlockChanges(void)
 {
+	if (m_PendingSendBlocks.empty())
+	{
+		return;
+	}
+	
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
 	{
 		(*itr)->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
