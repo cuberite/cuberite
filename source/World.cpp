@@ -576,6 +576,9 @@ void cWorld::Stop(void)
 
 void cWorld::Tick(float a_Dt)
 {
+	// Call the plugins
+	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt);
+	
 	// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
 	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
 	m_TimeOfDaySecs += (double)a_Dt / 1000.0;

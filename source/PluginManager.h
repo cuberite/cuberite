@@ -106,6 +106,7 @@ public:																	// tolua_export
 		HOOK_UPDATING_SIGN,
 		HOOK_WEATHER_CHANGED,
 		HOOK_WEATHER_CHANGING,
+		HOOK_WORLD_TICK,
 		
 		// Note that if a hook type is added, it may need processing in cPlugin::CanAddHook() descendants,
 		//   and it definitely needs adding in cPlugin_NewLua::GetHookFnName() !
@@ -184,6 +185,7 @@ public:																	// tolua_export
 	bool CallHookUpdatingSign             (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	bool CallHookWeatherChanged           (cWorld & a_World);
 	bool CallHookWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather);
+	bool CallHookWorldTick                (cWorld & a_World, float a_Dt);
 	
 	bool DisablePlugin(const AString & a_PluginName);  // tolua_export
 	bool LoadPlugin   (const AString & a_PluginName);  // tolua_export

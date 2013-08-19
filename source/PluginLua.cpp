@@ -734,6 +734,17 @@ bool cPlugin_NewLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather
 
 
 
+bool cPlugin_NewLua::OnWorldTick(cWorld & a_World, float a_Dt)
+{
+	cCSLock Lock(m_CriticalSection);
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_WORLD_TICK), &a_World, a_Dt);
+	return false;
+}
+
+
+
+
+
 bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player)
 {
 	ASSERT(!a_Split.empty());
@@ -908,6 +919,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_UPDATING_SIGN:                return "OnUpdatingSign";
 		case cPluginManager::HOOK_WEATHER_CHANGED:              return "OnWeatherChanged";
 		case cPluginManager::HOOK_WEATHER_CHANGING:             return "OnWeatherChanging";
+		case cPluginManager::HOOK_WORLD_TICK:                   return "OnWorldTick";
 		default: return NULL;
 	}  // switch (a_Hook)
 }

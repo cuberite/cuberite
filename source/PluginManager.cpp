@@ -1180,6 +1180,27 @@ bool cPluginManager::CallHookWeatherChanging(cWorld & a_World, eWeather & a_NewW
 
 
 
+bool cPluginManager::CallHookWorldTick(cWorld & a_World, float a_Dt)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_WORLD_TICK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnWorldTick(a_World, a_Dt))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
 	ASSERT(a_Player != NULL);

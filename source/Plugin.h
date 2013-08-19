@@ -94,6 +94,7 @@ public:
 	virtual bool OnUpdatingSign             (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player) = 0;
 	virtual bool OnWeatherChanged           (cWorld & a_World) = 0;
 	virtual bool OnWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather) = 0;
+	virtual bool OnWorldTick                (cWorld & a_World, float a_Dt) = 0;
 	
 	/** Handles the command split into a_Split, issued by player a_Player.
 	Command permissions have already been checked.
