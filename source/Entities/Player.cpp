@@ -200,6 +200,12 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 	
+	if (!a_Chunk.IsValid())
+	{
+		// This may happen if the cPlayer is created before the chunks have the chance of being loaded / generated (#83)
+		return;
+	}
+	
 	super::Tick(a_Dt, a_Chunk);
 	
 	// Set player swimming state
