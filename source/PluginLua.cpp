@@ -36,7 +36,10 @@ cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
 cPluginLua::~cPluginLua()
 {
 	cCSLock Lock(m_CriticalSection);
-	m_LuaState.Close();
+	if (m_LuaState.IsValid())
+	{
+		m_LuaState.Close();
+	}
 }
 
 
