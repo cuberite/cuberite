@@ -51,6 +51,9 @@ static const int MAX_EXPLOSIONS_PER_TICK = 100;
 /// How many explosions in the recent history are allowed
 static const int MAX_RUNNING_SUM_EXPLOSIONS = cClientHandle::NUM_CHECK_EXPLOSIONS_TICKS * MAX_EXPLOSIONS_PER_TICK / 8;
 
+/// How many ticks before the socket is closed after the client is destroyed (#31)
+static const int TICKS_BEFORE_CLOSE = 20;
+
 
 
 
@@ -84,6 +87,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	, m_bKeepThreadGoing(true)
 	, m_Ping(1000)
 	, m_PingID(1)
+	, m_TicksSinceDestruction(0)
 	, m_State(csConnected)
 	, m_LastStreamedChunkX(0x7fffffff)  // bogus chunk coords to force streaming upon login
 	, m_LastStreamedChunkZ(0x7fffffff)
@@ -111,7 +115,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 
 cClientHandle::~cClientHandle()
 {
-	ASSERT(m_State == csDestroyed);  // Has Destroy() been called?
+	ASSERT(m_State >= csDestroyedWaiting);  // Has Destroy() been called?
 	
 	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
 
@@ -189,7 +193,7 @@ void cClientHandle::Destroy(void)
 		RemoveFromAllChunks();
 		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
 	}
-	m_State = csDestroyed;
+	m_State = csDestroyedWaiting;
 }
 
 
@@ -1397,6 +1401,17 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 void cClientHandle::Tick(float a_Dt)
 {
+	// Handle clients that are waiting for final close while destroyed:
+	if (m_State == csDestroyedWaiting)
+	{
+		m_TicksSinceDestruction += 1;  // This field is misused for the timeout counting
+		if (m_TicksSinceDestruction > TICKS_BEFORE_CLOSE)
+		{
+			m_State = csDestroyed;
+		}
+		return;
+	}
+	
 	// Process received network data:
 	AString IncomingData;
 	{

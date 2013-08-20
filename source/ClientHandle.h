@@ -254,6 +254,9 @@ private:
 	int m_LastDigBlockX;
 	int m_LastDigBlockY;
 	int m_LastDigBlockZ;
+	
+	/// Used while csDestroyedWaiting for counting the ticks until the connection is closed
+	int m_TicksSinceDestruction;
 
 	enum eState
 	{
@@ -264,6 +267,7 @@ private:
  		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,           ///< Normal gameplay
 		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
+		csDestroyedWaiting,  ///< The client has been destroyed, but is still kept so that the Kick packet is delivered (#31)
 		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
 		
 		// TODO: Add Kicking here as well
