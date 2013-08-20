@@ -21,7 +21,7 @@ extern bool g_BlockPistonBreakable[];
 
 
 /// Number of ticks that the piston extending / retracting waits before setting the block
-const int PISTON_TICK_DELAY = 30;
+const int PISTON_TICK_DELAY = 10;
 
 
 
