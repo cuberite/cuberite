@@ -76,6 +76,9 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 		// Already extended, bail out
 		return;
 	}
+
+	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
+	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
 	
 	int dist = FirstPassthroughBlock(pistx, pisty, pistz, pistonMeta);
 	if (dist < 0)
@@ -117,9 +120,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	AddDir(pistx, pisty, pistz, pistonMeta, -1);
 	// "pist" now at piston body, "ext" at future extension
 	
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
-	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
+	m_World->QueueSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8, PISTON_TICK_DELAY);
 	m_World->QueueSetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0), PISTON_TICK_DELAY);
 }
 
@@ -139,9 +140,8 @@ void cPiston::RetractPiston(int pistx, int pisty, int pistz)
 	}
 	
 	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), pistonBlock);
-	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
+	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);			
 	m_World->QueueSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8), PISTON_TICK_DELAY);
-
 
 	// Check the extension:
 	AddDir(pistx, pisty, pistz, pistonMeta, 1);
