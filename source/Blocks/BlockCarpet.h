@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "BlockHandler.h"
+
 
 
 
@@ -16,7 +18,11 @@ class cBlockCarpetHandler :
 	public cBlockHandler
 {
 public:
-	cBlockCarpetHandler(BLOCKTYPE a_BlockType);
+	cBlockCarpetHandler(BLOCKTYPE a_BlockType)
+	: cBlockHandler(a_BlockType)
+	{
+	}
+
 
 	virtual const char * GetStepSound(void) override
 	{
@@ -39,13 +45,13 @@ public:
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_BLOCK_CARPET, a_BlockMeta));
+		a_Pickups.push_back(cItem(E_BLOCK_CARPET, 1, a_BlockMeta));
 	}
 
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
+		return (a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR);
 	}
 } ;
 
