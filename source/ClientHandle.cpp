@@ -1522,6 +1522,16 @@ void cClientHandle::SendChat(const AString & a_Message)
 
 void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
+	ASSERT(m_Player != NULL);
+	
+	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
+	{
+		if ((a_ChunkX == m_Player->GetChunkX()) && (a_ChunkZ == m_Player->GetChunkZ()))
+		{
+			m_Protocol->SendPlayerMoveLook();
+		}
+	}
+	
 	// Check chunks being sent, erase them from m_ChunksToSend:
 	bool Found = false;
 	{
