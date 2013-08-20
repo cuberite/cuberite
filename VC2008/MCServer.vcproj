@@ -1160,6 +1160,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Entities\ProjectileEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Entities\TNTEntity.cpp"
 					>
 				</File>
