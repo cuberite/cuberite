@@ -147,6 +147,7 @@ bool cIsThread::Wait(void)
 		int res = pthread_join(m_Handle, NULL);
 		m_Handle = NULL;
 		LOGD("Thread %s finished", m_ThreadName.c_str());
+		m_HasStarted = false;
 		return (res == 0);
 	#endif  // else _WIN32
 }
