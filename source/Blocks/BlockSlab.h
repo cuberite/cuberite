@@ -39,15 +39,15 @@ public:
 			{
 				if (a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_STONE_SLAB)
 				{
-					a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_DOUBLE_STONE_SLAB, Meta);
-					a_BlockType = E_BLOCK_AIR;
+					a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_DOUBLE_STONE_SLAB, Meta); //Set it to a slabby block
+					a_BlockType = E_BLOCK_AIR; //Stop the server trying to place another slab on top
 				}
 				else
 				{
-					a_BlockMeta = Meta & 0x7; break;  // Always bottom half of the slab when placing on top    of something
+					a_BlockMeta = Meta & 0x7; break;  //Bottom half if on top of non slab block
 				}
 			}
-			case BLOCK_FACE_BOTTOM: a_BlockMeta = Meta | 0x8; break;  // Always top    half of the slab when placing on bottom of something
+			case BLOCK_FACE_BOTTOM: a_BlockMeta = Meta | 0x8; break;  //Always top when placing on bottom of something
 			case BLOCK_FACE_EAST:
 			case BLOCK_FACE_NORTH:
 			case BLOCK_FACE_SOUTH:
