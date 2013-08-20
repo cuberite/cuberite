@@ -584,6 +584,7 @@ public:
 
 		// Transparent blocks
 		g_BlockTransparent[E_BLOCK_AIR]                   = true;
+		g_BlockTransparent[E_BLOCK_ACTIVATOR_RAIL]        = true;
 		g_BlockTransparent[E_BLOCK_BROWN_MUSHROOM]        = true;
 		g_BlockTransparent[E_BLOCK_CARROTS]               = true;
 		g_BlockTransparent[E_BLOCK_CHEST]                 = true;
@@ -603,6 +604,7 @@ public:
 		g_BlockTransparent[E_BLOCK_NETHER_BRICK_FENCE]    = true;
 		g_BlockTransparent[E_BLOCK_POTATOES]              = true;
 		g_BlockTransparent[E_BLOCK_POWERED_RAIL]          = true;
+		g_BlockTransparent[E_BLOCK_PISTON_EXTENSION]      = true;
 		g_BlockTransparent[E_BLOCK_PUMPKIN_STEM]          = true;
 		g_BlockTransparent[E_BLOCK_RAIL]                  = true;
 		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]          = true;
