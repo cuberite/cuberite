@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/19/13 11:57:26.
+** Generated automatically by tolua++-1.0.92 on 08/21/13 10:18:57.
 */
 
 #ifndef __cplusplus
@@ -8545,12 +8545,12 @@ static int tolua_AllToLua_cPlayer_SetFoodExhaustionLevel00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  double a_FoodSaturationLevel = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_FoodExhaustionLevel = ((double)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetFoodExhaustionLevel'", NULL);
 #endif
   {
-   self->SetFoodExhaustionLevel(a_FoodSaturationLevel);
+   self->SetFoodExhaustionLevel(a_FoodExhaustionLevel);
   }
  }
  return 0;
@@ -11977,6 +11977,38 @@ static int tolua_AllToLua_cWorld_GetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetName'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetIniFileName of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetIniFileName00
+static int tolua_AllToLua_cWorld_GetIniFileName00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetIniFileName'", NULL);
+#endif
+  {
+   const AString tolua_ret = (const AString)  self->GetIniFileName();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetIniFileName'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28132,6 +28164,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GrowSugarcane",tolua_AllToLua_cWorld_GrowSugarcane00);
    tolua_function(tolua_S,"GetBiomeAt",tolua_AllToLua_cWorld_GetBiomeAt00);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cWorld_GetName00);
+   tolua_function(tolua_S,"GetIniFileName",tolua_AllToLua_cWorld_GetIniFileName00);
    tolua_function(tolua_S,"SaveAllChunks",tolua_AllToLua_cWorld_SaveAllChunks00);
    tolua_function(tolua_S,"QueueSaveAllChunks",tolua_AllToLua_cWorld_QueueSaveAllChunks00);
    tolua_function(tolua_S,"GetNumChunks",tolua_AllToLua_cWorld_GetNumChunks00);
