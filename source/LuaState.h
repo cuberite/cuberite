@@ -782,6 +782,12 @@ public:
 	/// If the status is nonzero, prints the text on the top of Lua stack and returns true
 	static bool ReportErrors(lua_State * a_LuaState, int status);
 	
+	/// Logs all items in the current stack trace to the server console
+	void LogStackTrace(void);
+	
+	/// Returns the type of the item on the specified position in the stack
+	AString GetTypeText(int a_StackPos);
+	
 protected:
 	lua_State * m_LuaState;
 	
