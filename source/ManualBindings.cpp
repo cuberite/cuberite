@@ -893,6 +893,7 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 	{
 		// The next params are a cPlugin and a number, assume style 3 or 4
 		LOGINFO("cPluginManager.AddHook(): Deprecated format used, use cPluginManager.AddHook(HOOK_TYPE, CallbackFunction) instead. Fixing the call for you.");
+		S.LogStackTrace();
 		return tolua_cPluginManager_AddHook_DefFn(PlgMgr, S, ParamIdx);
 	}
 	
