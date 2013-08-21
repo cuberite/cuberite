@@ -118,7 +118,7 @@ public:
 	Returns true if the hook can be added (handler exists)
 	Descendants should also log the specific error message as a warning if they return false.
 	*/
-	virtual bool CanAddHook(cPluginManager::PluginHook a_Hook) = 0;
+	virtual bool CanAddHook(int a_Hook) = 0;
 	
 	// tolua_begin
 	const AString & GetName(void) const  { return m_Name; }

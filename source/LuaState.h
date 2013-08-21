@@ -77,7 +77,7 @@ public:
 		bool IsValid(void) const {return (m_Ref != LUA_REFNIL); }
 		
 		/// Allows to use this class wherever an int (i. e. ref) is to be used
-		operator int(void) { return m_Ref; }
+		operator int(void) const { return m_Ref; }
 		
 	protected:
 		cLuaState & m_LuaState;

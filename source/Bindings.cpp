@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/21/13 10:18:57.
+** Generated automatically by tolua++-1.0.92 on 08/21/13 19:38:47.
 */
 
 #ifndef __cplusplus
@@ -9302,41 +9302,6 @@ static int tolua_AllToLua_cPluginManager_ReloadPlugins00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ReloadPlugins'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: AddHook of class  cPluginManager */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_AddHook00
-static int tolua_AllToLua_cPluginManager_AddHook00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cPlugin",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
-  cPlugin* a_Plugin = ((cPlugin*)  tolua_tousertype(tolua_S,2,0));
-  cPluginManager::PluginHook a_Hook = ((cPluginManager::PluginHook) (int)  tolua_tonumber(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddHook'", NULL);
-#endif
-  {
-   self->AddHook(a_Plugin,a_Hook);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'AddHook'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28072,11 +28037,12 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGED",cPluginManager::HOOK_WEATHER_CHANGED);
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGING",cPluginManager::HOOK_WEATHER_CHANGING);
    tolua_constant(tolua_S,"HOOK_WORLD_TICK",cPluginManager::HOOK_WORLD_TICK);
+   tolua_constant(tolua_S,"HOOK_NUM_HOOKS",cPluginManager::HOOK_NUM_HOOKS);
+   tolua_constant(tolua_S,"HOOK_MAX",cPluginManager::HOOK_MAX);
    tolua_function(tolua_S,"Get",tolua_AllToLua_cPluginManager_Get00);
    tolua_function(tolua_S,"GetPlugin",tolua_AllToLua_cPluginManager_GetPlugin00);
    tolua_function(tolua_S,"FindPlugins",tolua_AllToLua_cPluginManager_FindPlugins00);
    tolua_function(tolua_S,"ReloadPlugins",tolua_AllToLua_cPluginManager_ReloadPlugins00);
-   tolua_function(tolua_S,"AddHook",tolua_AllToLua_cPluginManager_AddHook00);
    tolua_function(tolua_S,"GetNumPlugins",tolua_AllToLua_cPluginManager_GetNumPlugins00);
    tolua_function(tolua_S,"DisablePlugin",tolua_AllToLua_cPluginManager_DisablePlugin00);
    tolua_function(tolua_S,"LoadPlugin",tolua_AllToLua_cPluginManager_LoadPlugin00);

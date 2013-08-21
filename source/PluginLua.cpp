@@ -36,9 +36,32 @@ cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
 cPluginLua::~cPluginLua()
 {
 	cCSLock Lock(m_CriticalSection);
+	Close();
+}
+
+
+
+
+
+void cPluginLua::Close(void)
+{
 	if (m_LuaState.IsValid())
 	{
+		// Release all the references in the hook map:
+		for (cHookMap::iterator itrH = m_HookMap.begin(), endH = m_HookMap.end(); itrH != endH; ++itrH)
+		{
+			for (cLuaRefs::iterator itrR = itrH->second.begin(), endR = itrH->second.end(); itrR != endR; ++itrR)
+			{
+				delete *itrR;
+			}  // for itrR - itrH->second[]
+		}  // for itrH - m_HookMap[]
+		m_HookMap.clear();
+		
 		m_LuaState.Close();
+	}
+	else
+	{
+		ASSERT(m_HookMap.empty());
 	}
 }
 
@@ -73,7 +96,7 @@ bool cPluginLua::Initialize(void)
 		AString Path = PluginPath + *itr;
 		if (!m_LuaState.LoadFile(Path))
 		{
-			m_LuaState.Close();
+			Close();
 			return false;
 		}
 	}  // for itr - Files[]
@@ -83,14 +106,14 @@ bool cPluginLua::Initialize(void)
 	if (!m_LuaState.Call("Initialize", this, cLuaState::Return, res))
 	{
 		LOGWARNING("Error in plugin %s: Cannot call the Initialize() function. Plugin is temporarily disabled.", GetName().c_str());
-		m_LuaState.Close();
+		Close();
 		return false;
 	}
 
 	if (!res)
 	{
 		LOGINFO("Plugin %s: Initialize() call failed, plugin is temporarily disabled.", GetName().c_str());
-		m_LuaState.Close();
+		Close();
 		return false;
 	}
 
@@ -118,7 +141,11 @@ void cPluginLua::OnDisable(void)
 void cPluginLua::Tick(float a_Dt)
 {
 	cCSLock Lock(m_CriticalSection);
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_TICK), a_Dt);
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_TICK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Dt);
+	}
 }
 
 
@@ -129,8 +156,16 @@ bool cPluginLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_Bl
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_BLOCK_TO_PICKUPS), a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_BLOCK_TO_PICKUPS];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -141,8 +176,16 @@ bool cPluginLua::OnChat(cPlayer * a_Player, AString & a_Message)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHAT), a_Player, a_Message, cLuaState::Return, res, a_Message);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHAT];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Player, a_Message, cLuaState::Return, res, a_Message);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -153,8 +196,16 @@ bool cPluginLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_AVAILABLE), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_AVAILABLE];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -165,8 +216,16 @@ bool cPluginLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, 
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATED), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_GENERATED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -177,8 +236,16 @@ bool cPluginLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ,
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATING), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_GENERATING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -189,8 +256,16 @@ bool cPluginLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADED), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_UNLOADED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -201,8 +276,16 @@ bool cPluginLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADING), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_UNLOADING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -213,8 +296,16 @@ bool cPluginLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_COLLECTING_PICKUP), a_Player, a_Pickup, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_COLLECTING_PICKUP];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Player, a_Pickup, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -225,8 +316,16 @@ bool cPluginLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGri
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CRAFTING_NO_RECIPE), (cPlayer *)a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CRAFTING_NO_RECIPE];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), (cPlayer *)a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -237,8 +336,16 @@ bool cPluginLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_DISCONNECT), a_Player, a_Reason, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_DISCONNECT];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Player, a_Reason, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -249,8 +356,16 @@ bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Sp
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_EXECUTE_COMMAND), a_Player, a_Split, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_EXECUTE_COMMAND];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Player, a_Split, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -261,26 +376,33 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_EXPLODED);
-	switch (a_Source)
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_EXPLODED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		case esOther:            m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res); break;
-		case esPrimedTNT:        m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cTNTEntity *)a_SourceData, cLuaState::Return, res); break;
-		case esCreeper:          m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cCreeper *)a_SourceData,   cLuaState::Return, res); break;
-		case esBed:              m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res); break;
-		case esEnderCrystal:     m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res); break;
-		case esGhastFireball:    m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res); break;
-		case esWitherSkullBlack:
-		case esWitherSkullBlue:  m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
-		case esWitherBirth:      m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
-		case esPlugin:           m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
-		default:
+		switch (a_Source)
 		{
-			ASSERT(!"Unhandled ExplosionSource");
-			return false;
+			case esOther:            m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res); break;
+			case esPrimedTNT:        m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cTNTEntity *)a_SourceData, cLuaState::Return, res); break;
+			case esCreeper:          m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cCreeper *)a_SourceData,   cLuaState::Return, res); break;
+			case esBed:              m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res); break;
+			case esEnderCrystal:     m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res); break;
+			case esGhastFireball:    m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res); break;
+			case esWitherSkullBlack:
+			case esWitherSkullBlue:  m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
+			case esWitherBirth:      m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
+			case esPlugin:           m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
+			default:
+			{
+				ASSERT(!"Unhandled ExplosionSource");
+				return false;
+			}
+		}
+		if (res)
+		{
+			return true;
 		}
 	}
-	return res;
+	return false;
 }
 
 
@@ -291,26 +413,33 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_EXPLODING);
-	switch (a_Source)
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_EXPLODING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		case esOther:            m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		case esPrimedTNT:        m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cTNTEntity *)a_SourceData, cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		case esCreeper:          m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cCreeper *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		case esBed:              m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		case esEnderCrystal:     m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		case esGhastFireball:    m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		case esWitherSkullBlack:
-		case esWitherSkullBlue:  m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		case esWitherBirth:      m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		case esPlugin:           m_LuaState.Call(FnName, &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-		default:
+		switch (a_Source)
 		{
-			ASSERT(!"Unhandled ExplosionSource");
-			return false;
+			case esOther:            m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esPrimedTNT:        m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cTNTEntity *)a_SourceData, cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esCreeper:          m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cCreeper *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esBed:              m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esEnderCrystal:     m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esGhastFireball:    m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esWitherSkullBlack:
+			case esWitherSkullBlue:  m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esWitherBirth:      m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esPlugin:           m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			default:
+			{
+				ASSERT(!"Unhandled ExplosionSource");
+				return false;
+			}
+		}
+		if (res)
+		{
+			return true;
 		}
 	}
-	return res;
+	return false;
 }
 
 
@@ -321,8 +450,16 @@ bool cPluginLua::OnHandshake(cClientHandle * a_Client, const AString & a_Usernam
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_HANDSHAKE), a_Client, a_Username, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_HANDSHAKE];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Client, a_Username, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -333,8 +470,17 @@ bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_HOPPER_PULLING_ITEM), &a_World, &a_Hopper, a_DstSlotNum, &a_SrcEntity, a_SrcSlotNum, cLuaState::Return, res);
-	return res;
+
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_HOPPER_PULLING_ITEM];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, &a_Hopper, a_DstSlotNum, &a_SrcEntity, a_SrcSlotNum, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -345,8 +491,16 @@ bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_HOPPER_PUSHING_ITEM), &a_World, &a_Hopper, a_SrcSlotNum, &a_DstEntity, a_DstSlotNum, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_HOPPER_PUSHING_ITEM];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, &a_Hopper, a_SrcSlotNum, &a_DstEntity, a_DstSlotNum, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -357,8 +511,16 @@ bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_KILLING), &a_Victim, a_Killer, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_KILLING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Victim, a_Killer, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -369,8 +531,16 @@ bool cPluginLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const 
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_LOGIN), a_Client, a_ProtocolVersion, a_Username, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_LOGIN];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Client, a_ProtocolVersion, a_Username, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -381,8 +551,16 @@ bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_ANIMATION), &a_Player, a_Animation, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_ANIMATION];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_Animation, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -393,8 +571,16 @@ bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_B
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_BREAKING_BLOCK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -405,8 +591,16 @@ bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_Blo
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_BROKEN_BLOCK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -417,8 +611,16 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_EATING), &a_Player, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_EATING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -429,8 +631,16 @@ bool cPluginLua::OnPlayerJoined(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_JOINED), &a_Player, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_JOINED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -441,8 +651,16 @@ bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_Block
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_LEFT_CLICK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_LEFT_CLICK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -453,8 +671,16 @@ bool cPluginLua::OnPlayerMoved(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_MOVING), &a_Player, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_MOVING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -465,8 +691,16 @@ bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_Blo
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_PLACED_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_PLACED_BLOCK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -477,8 +711,16 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_Bl
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_PLACING_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_PLACING_BLOCK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -489,8 +731,16 @@ bool cPluginLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_Bloc
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHT_CLICK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_RIGHT_CLICK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -501,8 +751,16 @@ bool cPluginLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Ent
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY), &a_Player, &a_Entity, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, &a_Entity, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -513,8 +771,16 @@ bool cPluginLua::OnPlayerShooting(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_SHOOTING), &a_Player, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_SHOOTING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -525,8 +791,16 @@ bool cPluginLua::OnPlayerSpawned(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_SPAWNED), &a_Player, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_SPAWNED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -537,8 +811,16 @@ bool cPluginLua::OnPlayerTossingItem(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_TOSSING_ITEM), &a_Player, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_TOSSING_ITEM];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -549,8 +831,16 @@ bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_Block
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_USED_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_USED_BLOCK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -561,8 +851,16 @@ bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_USED_ITEM), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_USED_ITEM];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -573,8 +871,16 @@ bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_Bloc
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_USING_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_USING_BLOCK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -585,8 +891,16 @@ bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_Block
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_USING_ITEM), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_USING_ITEM];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -597,8 +911,16 @@ bool cPluginLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * 
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_POST_CRAFTING), a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_POST_CRAFTING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -609,8 +931,16 @@ bool cPluginLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PRE_CRAFTING), a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PRE_CRAFTING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -621,8 +951,16 @@ bool cPluginLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_SPAWNED_ENTITY), &a_World, &a_Entity, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_SPAWNED_ENTITY];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, &a_Entity, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -633,8 +971,16 @@ bool cPluginLua::OnSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_SPAWNED_MONSTER), &a_World, &a_Monster, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_SPAWNED_MONSTER];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, &a_Monster, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -645,8 +991,16 @@ bool cPluginLua::OnSpawningEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_SPAWNING_ENTITY), &a_World, &a_Entity, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_SPAWNING_ENTITY];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, &a_Entity, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -657,8 +1011,16 @@ bool cPluginLua::OnSpawningMonster(cWorld & a_World, cMonster & a_Monster)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_SPAWNING_MONSTER), &a_World, &a_Monster, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_SPAWNING_MONSTER];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, &a_Monster, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -669,8 +1031,16 @@ bool cPluginLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_TAKE_DAMAGE), &a_Receiver, &a_TDI, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_TAKE_DAMAGE];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Receiver, &a_TDI, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -686,8 +1056,16 @@ bool cPluginLua::OnUpdatedSign(
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_UPDATED_SIGN), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_UPDATED_SIGN];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -703,8 +1081,16 @@ bool cPluginLua::OnUpdatingSign(
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_UPDATING_SIGN), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res, a_Line1, a_Line2, a_Line3, a_Line4);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_UPDATING_SIGN];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res, a_Line1, a_Line2, a_Line3, a_Line4);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -715,8 +1101,16 @@ bool cPluginLua::OnWeatherChanged(cWorld & a_World)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGED), &a_World, cLuaState::Return, res);
-	return res;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_WEATHER_CHANGED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -728,9 +1122,18 @@ bool cPluginLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	int NewWeather = a_NewWeather;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGING), &a_World, a_NewWeather, cLuaState::Return, res, NewWeather);
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_WEATHER_CHANGING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, NewWeather, cLuaState::Return, res, NewWeather);
+		if (res)
+		{
+			a_NewWeather = (eWeather)NewWeather;
+			return true;
+		}
+	}
 	a_NewWeather = (eWeather)NewWeather;
-	return res;
+	return false;
 }
 
 
@@ -740,7 +1143,11 @@ bool cPluginLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 bool cPluginLua::OnWorldTick(cWorld & a_World, float a_Dt)
 {
 	cCSLock Lock(m_CriticalSection);
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_WORLD_TICK), &a_World, a_Dt);
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_WORLD_TICK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World, a_Dt);
+	}
 	return false;
 }
 
@@ -833,7 +1240,7 @@ void cPluginLua::ClearConsoleCommands(void)
 
 
 
-bool cPluginLua::CanAddHook(cPluginManager::PluginHook a_Hook)
+bool cPluginLua::CanAddHook(int a_Hook)
 {
 	const char * FnName = GetHookFnName(a_Hook);
 	if (FnName == NULL)
@@ -854,18 +1261,7 @@ bool cPluginLua::CanAddHook(cPluginManager::PluginHook a_Hook)
 	);
 	
 	// Lua stacktrace:
-	LOGWARNING("Stack trace:");
-	lua_Debug entry;
-	int depth = 0; 
-	while (lua_getstack(m_LuaState, depth, &entry))
-	{
-		int status = lua_getinfo(m_LuaState, "Sln", &entry);
-		assert(status);
-
-		LOGWARNING("  %s(%d): %s", entry.short_src, entry.currentline, entry.name ? entry.name : "?");
-		depth++;
-	}
-	LOGWARNING("Stack trace end");
+	m_LuaState.LogStackTrace();
 
 	return false;
 }
@@ -874,7 +1270,7 @@ bool cPluginLua::CanAddHook(cPluginManager::PluginHook a_Hook)
 
 
 
-const char * cPluginLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
+const char * cPluginLua::GetHookFnName(int a_Hook)
 {
 	switch (a_Hook)
 	{
@@ -925,6 +1321,18 @@ const char * cPluginLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_WORLD_TICK:                   return "OnWorldTick";
 		default: return NULL;
 	}  // switch (a_Hook)
+}
+
+
+
+
+
+bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
+{
+	ASSERT(m_CriticalSection.IsLockedByCurrentThread());  // It probably has to be, how else would we have a LuaState?
+	
+	m_HookMap[a_HookType].push_back(new cLuaState::cRef(m_LuaState, a_FnRefIdx));
+	return true;
 }
 
 

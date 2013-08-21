@@ -100,7 +100,7 @@ public:
 	
 	virtual void ClearConsoleCommands(void) override;
 
-	virtual bool CanAddHook(cPluginManager::PluginHook a_Hook) override;
+	virtual bool CanAddHook(int a_Hook) override;
 	
 	// cWebPlugin override
 	virtual const AString GetWebTitle(void) const {return GetName(); }
@@ -128,18 +128,35 @@ public:
 	/// Calls the plugin-specified "cLuaWindow slot changed" callback.
 	void CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum);
 	
-protected:
-	cCriticalSection m_CriticalSection;
-	cLuaState m_LuaState;
+	/// Returns the name of Lua function that should handle the specified hook type in the older (#121) API
+	static const char * GetHookFnName(int a_HookType);
 	
+	/** Adds a Lua function to be called for the specified hook.
+	The function has to be on the Lua stack at the specified index a_FnRefIdx
+	Returns true if the hook was added successfully.
+	*/
+	bool AddHookRef(int a_HookType, int a_FnRefIdx);
+
+protected:
 	/// Maps command name into Lua function reference
 	typedef std::map<AString, int> CommandMap;
 	
+	/// Provides an array of Lua function references
+	typedef std::vector<cLuaState::cRef *> cLuaRefs;
+	
+	/// Maps hook types into arrays of Lua function references to call for each hook type
+	typedef std::map<int, cLuaRefs> cHookMap;
+	
+	cCriticalSection m_CriticalSection;
+	cLuaState m_LuaState;
+	
 	CommandMap m_Commands;
 	CommandMap m_ConsoleCommands;
-
-	/// Returns the name of Lua function that should handle the specified hook
-	const char * GetHookFnName(cPluginManager::PluginHook a_Hook);
+	
+	cHookMap m_HookMap;
+	
+	/// Releases all Lua references and closes the LuaState
+	void Close(void);
 } ;  // tolua_export
 
 
