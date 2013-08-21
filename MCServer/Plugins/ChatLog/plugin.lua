@@ -13,8 +13,7 @@ function Initialize(Plugin)
 	Plugin:SetName("ChatLog")
 	Plugin:SetVersion(3)
 
-	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT)
+	cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChat)
 
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	return true

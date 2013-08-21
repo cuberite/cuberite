@@ -9,7 +9,6 @@
 
 
 -- Global variables
-PLUGIN = {}	-- Reference to own plugin object
 MOVER_SIZE_X = 4;
 MOVER_SIZE_Y = 4;
 MOVER_SIZE_Z = 4;
@@ -19,13 +18,10 @@ MOVER_SIZE_Z = 4;
 
 
 function Initialize(Plugin)
-	PLUGIN = Plugin;
-	
 	Plugin:SetName("DiamondMover");
 	Plugin:SetVersion(1);
 	
-	PluginManager = cRoot:Get():GetPluginManager();
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USED_ITEM);
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USED_ITEM, OnPlayerUsedItem);
 	return true;
 end
 
@@ -81,3 +77,7 @@ function OnPlayerUsedItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 		return false;
 	end
 end
+
+
+
+
