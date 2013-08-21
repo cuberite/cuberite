@@ -16,15 +16,21 @@ function Initialize(Plugin)
 	Plugin:SetName("Debuggers")
 	Plugin:SetVersion(1)
 	
-	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_BLOCK);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_WORLD_TICK);
+	--[[
+	-- Test multiple hook handlers:
+	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick1);
+	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
+	--]]
+	
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
+	cPluginManager.AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
+	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick);
+	cPluginManager.AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
+	cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
 
+	PluginManager = cRoot:Get():GetPluginManager();
 	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PluginManager:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -409,6 +415,24 @@ function OnTakeDamage(Receiver, TDI)
 
 	LOG(Receiver:GetClass() .. " was dealt " .. DamageTypeToString(TDI.DamageType) .. " damage: Raw " .. TDI.RawDamage .. ", Final " .. TDI.FinalDamage .. " (" .. (TDI.RawDamage - TDI.FinalDamage) .. " covered by armor)");
 	return false;
+end
+
+
+
+
+
+function OnTick1()
+	-- For testing multiple hook handlers per plugin
+	LOGINFO("Tick1");
+end
+
+
+
+
+
+function OnTick2()
+	-- For testing multiple hook handlers per plugin
+	LOGINFO("Tick2");
 end
 
 
