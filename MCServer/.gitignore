@@ -10,7 +10,7 @@ schematics
 *.schematic
 *.ilk
 *.pdb
-memdump.xml
+memdump*
 *.grab
 ProtectionAreas.sqlite
 helgrind.log
