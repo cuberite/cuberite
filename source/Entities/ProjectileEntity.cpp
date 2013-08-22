@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "ProjectileEntity.h"
+#include "../ClientHandle.h"
 
 
 
@@ -71,7 +72,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 
 void cArrowEntity::SpawnOn(cClientHandle & a_Client)
 {
-	// TODO
+	a_Client.SendSpawnObject(*this, pkArrow, 0, 0, 0);
 }
 
 
