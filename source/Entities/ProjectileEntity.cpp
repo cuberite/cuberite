@@ -16,6 +16,7 @@
 
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height) :
 	super(etProjectile, a_X, a_Y, a_Z, a_Width, a_Height),
+	m_ProjectileKind(a_Kind),
 	m_Creator(a_Creator)
 {
 }
@@ -26,6 +27,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height) :
 	super(etProjectile, a_Pos.x, a_Pos.y, a_Pos.z, a_Width, a_Height),
+	m_ProjectileKind(a_Kind),
 	m_Creator(a_Creator)
 {
 	SetSpeed(a_Speed);
@@ -57,13 +59,39 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 
 
 
+AString cProjectileEntity::GetMCAClassName(void) const
+{
+	switch (m_ProjectileKind)
+	{
+		case pkArrow:         return "Arrow";
+		case pkSnowball:      return "Snowball";
+		case pkEgg:           return "Egg";
+		case pkGhastFireball: return "Fireball";
+		case pkFireCharge:    return "SmallFireball";
+		case pkEnderPearl:    return "ThrownEnderPearl";
+		case pkExpBottle:     return "ThrownExpBottle";
+		case pkSplashPotion:  return "ThrownPotion";
+		case pkWitherSkull:   return "WitherSkull";
+		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
+	}
+	ASSERT(!"Unhandled projectile entity kind!");
+	return "";
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cArrowEntity:
 
 cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d a_Speed) :
-	super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5)
+	super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5),
+	m_PickupState(psNoPickup),
+	m_DamageCoeff(2)
 {
 	SetSpeed(a_Speed);
+	SetMass(0.1);
 }
 
 

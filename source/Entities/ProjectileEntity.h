@@ -29,8 +29,8 @@ public:
 		pkArrow         = 60,
 		pkSnowball      = 61,
 		pkEgg           = 62,
-		pkGhastFireball = 63,  // TODO: Unverified TypeID, check this in ProtoProxy
-		pkFireCharge    = 64,  // TODO: Unverified TypeID, check this in ProtoProxy
+		pkGhastFireball = 63,
+		pkFireCharge    = 64,
 		pkEnderPearl    = 65,
 		pkExpBottle     = 75,
 		pkSplashPotion  = 73,
@@ -50,14 +50,26 @@ public:
 	
 	// tolua_begin
 
+	/// Returns the kind of the projectile (fast class identification)
+	eKind GetProjectileKind(void) const { return m_ProjectileKind; }
+	
 	/// Returns the entity who created this projectile; may be NULL
 	cEntity * GetCreator(void) { return m_Creator; }
 	
+	/// Returns the string that is used as the entity type (class name) in MCA files
+	AString GetMCAClassName(void) const;
+	
+	/// Returns true if the projectile has hit the ground and is stuck there
+	bool IsInGround(void) const { return m_IsInGround; }
+	
 protected:
-	eKind m_Kind;
+	eKind m_ProjectileKind;
 	
 	/// The entity who has created this projectile; may be NULL (e. g. for dispensers)
 	cEntity * m_Creator;
+	
+	/// True if the projectile has hit the ground and is stuck there
+	bool m_IsInGround;
 } ;
 
 
@@ -70,12 +82,41 @@ class cArrowEntity :
 	typedef cProjectileEntity super;
 	
 public:
+	/// Determines when the arrow can be picked up (depending on player gamemode). Corresponds to the MCA file "pickup" field
+	enum ePickupState
+	{
+		psNoPickup             = 0,
+		psInSurvivalOrCreative = 1,
+		psInCreative           = 2,
+	} ;
 
 	// tolua_end
 	
+	/// Creates a new arrow with psNoPickup state and default damage modifier coeff
 	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d a_Speed);
 	
+	/// Returns whether the arrow can be picked up by players
+	ePickupState GetPickupState(void) const { return m_PickupState; }
+	
+	/// Sets a new pickup state
+	void SetPickupState(ePickupState a_PickupState) { m_PickupState = a_PickupState; }
+	
+	/// Returns the damage modifier coeff.
+	double GetDamageCoeff(void) const { return m_DamageCoeff; }
+	
+	/// Sets the damage modifier coeff
+	void SetDamageCoeff(double a_DamageCoeff) { m_DamageCoeff = a_DamageCoeff; }
+	
+	/// Returns true if the specified player can pick the arrow up
+	bool CanPickup(const cPlayer & a_Player) const;
+	
 protected:
+
+	/// Determines when the arrow can be picked up by players
+	ePickupState m_PickupState;
+	
+	/// The coefficient applied to the damage that the arrow will deal, based on the bow enchantment. 2.0 for normal arrow
+	double m_DamageCoeff;
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_Client) override;
