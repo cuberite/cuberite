@@ -1287,6 +1287,12 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 void cClientHandle::SendData(const char * a_Data, int a_Size)
 {
+	if (m_HasSentDC)
+	{
+		// This could crash the client, because they've already unloaded the world etc., and suddenly a wild packet appears (#31)
+		return;
+	}
+	
 	{
 		cCSLock Lock(m_CSOutgoingData);
 		
