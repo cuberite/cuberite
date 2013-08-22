@@ -21,6 +21,7 @@
 #include "LightingThread.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
+#include "Entities/ProjectileEntity.h"
 
 
 
@@ -572,6 +573,9 @@ public:
 	
 	/// Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
 	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
+	
+	/// Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
+	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const Vector3d * a_Speed = NULL);  // tolua_export
 	
 	/// Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread!
 	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }

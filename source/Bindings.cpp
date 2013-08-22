@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/21/13 19:38:47.
+** Generated automatically by tolua++-1.0.92 on 08/22/13 08:53:27.
 */
 
 #ifndef __cplusplus
@@ -27,6 +27,8 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Entities/Entity.h"
 #include "Entities/Pawn.h"
 #include "Entities/Player.h"
+#include "Entities/Pickup.h"
+#include "Entities/ProjectileEntity.h"
 #include "PluginManager.h"
 #include "Plugin.h"
 #include "PluginLua.h"
@@ -45,7 +47,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "BlockEntities/FurnaceEntity.h"
 #include "WebAdmin.h"
 #include "WebPlugin.h"
-#include "Entities/Pickup.h"
 #include "Root.h"
 #include "Vector3f.h"
 #include "Vector3d.h"
@@ -203,47 +204,49 @@ static int tolua_collect_Vector3d (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"TakeDamageInfo");
+ tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin");
+ tolua_usertype(tolua_S,"cMonster");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cEnchantments");
  tolua_usertype(tolua_S,"cLuaWindow");
- tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
- tolua_usertype(tolua_S,"cDropperEntity");
+ tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"std::vector<cIniFile::key>");
- tolua_usertype(tolua_S,"cMonster");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"std::vector<std::string>");
- tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cChatColor");
  tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cEntity");
+ tolua_usertype(tolua_S,"cCraftingRecipes");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
- tolua_usertype(tolua_S,"cCraftingRecipes");
+ tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
- tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"cWebAdmin");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cDispenserEntity");
- tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"cBlockEntity");
- tolua_usertype(tolua_S,"cCriticalSection");
- tolua_usertype(tolua_S,"HTTPTemplateRequest");
  tolua_usertype(tolua_S,"sWebAdminPage");
+ tolua_usertype(tolua_S,"cBlockEntity");
+ tolua_usertype(tolua_S,"cItemGrid::cListener");
+ tolua_usertype(tolua_S,"HTTPTemplateRequest");
  tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cFurnaceEntity");
+ tolua_usertype(tolua_S,"cDropperEntity");
  tolua_usertype(tolua_S,"cLineBlockTracer");
  tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cIniFile");
@@ -253,8 +256,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
- tolua_usertype(tolua_S,"cEntity");
- tolua_usertype(tolua_S,"cItemGrid::cListener");
+ tolua_usertype(tolua_S,"cCriticalSection");
+ tolua_usertype(tolua_S,"cProjectileEntity");
  tolua_usertype(tolua_S,"cPluginLua");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"Vector3d");
@@ -9182,6 +9185,253 @@ static int tolua_AllToLua_cPlayer_IsSubmerged00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  cPickup */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_new00
+static int tolua_AllToLua_cPickup_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cPickup",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const cItem",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  int a_MicroPosX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_MicroPosY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_MicroPosZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,5,0));
+  float a_SpeedX = ((float)  tolua_tonumber(tolua_S,6,0.f));
+  float a_SpeedY = ((float)  tolua_tonumber(tolua_S,7,0.f));
+  float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
+  {
+   cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cPickup */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_new00_local
+static int tolua_AllToLua_cPickup_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cPickup",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const cItem",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  int a_MicroPosX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_MicroPosY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_MicroPosZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,5,0));
+  float a_SpeedX = ((float)  tolua_tonumber(tolua_S,6,0.f));
+  float a_SpeedY = ((float)  tolua_tonumber(tolua_S,7,0.f));
+  float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
+  {
+   cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetItem of class  cPickup */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_GetItem00
+static int tolua_AllToLua_cPickup_GetItem00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPickup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPickup* self = (cPickup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetItem'", NULL);
+#endif
+  {
+   cItem& tolua_ret = (cItem&)  self->GetItem();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetItem'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CollectedBy of class  cPickup */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_CollectedBy00
+static int tolua_AllToLua_cPickup_CollectedBy00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPickup",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPickup* self = (cPickup*)  tolua_tousertype(tolua_S,1,0);
+  cPlayer* a_Dest = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CollectedBy'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->CollectedBy(a_Dest);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CollectedBy'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetAge of class  cPickup */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_GetAge00
+static int tolua_AllToLua_cPickup_GetAge00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPickup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPickup* self = (const cPickup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetAge'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetAge();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetAge'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsCollected of class  cPickup */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_IsCollected00
+static int tolua_AllToLua_cPickup_IsCollected00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPickup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPickup* self = (const cPickup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsCollected'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsCollected();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsCollected'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetCreator of class  cProjectileEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cProjectileEntity_GetCreator00
+static int tolua_AllToLua_cProjectileEntity_GetCreator00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cProjectileEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cProjectileEntity* self = (cProjectileEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetCreator'", NULL);
+#endif
+  {
+   cEntity* tolua_ret = (cEntity*)  self->GetCreator();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEntity");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetCreator'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Get of class  cPluginManager */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_Get00
 static int tolua_AllToLua_cPluginManager_Get00(lua_State* tolua_S)
@@ -12547,6 +12797,50 @@ static int tolua_AllToLua_cWorld_SpawnMob00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SpawnMob'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CreateProjectile of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_CreateProjectile00
+static int tolua_AllToLua_cWorld_CreateProjectile00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,6,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,7,"const Vector3d",1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  double a_PosX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_PosY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_PosZ = ((double)  tolua_tonumber(tolua_S,4,0));
+  cProjectileEntity::eKind a_Kind = ((cProjectileEntity::eKind) (int)  tolua_tonumber(tolua_S,5,0));
+  cEntity* a_Creator = ((cEntity*)  tolua_tousertype(tolua_S,6,0));
+  const Vector3d* a_Speed = ((const Vector3d*)  tolua_tousertype(tolua_S,7,NULL));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CreateProjectile'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->CreateProjectile(a_PosX,a_PosY,a_PosZ,a_Kind,a_Creator,a_Speed);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CreateProjectile'.",&tolua_err);
  return 0;
 #endif
 }
@@ -17884,221 +18178,6 @@ static int tolua_AllToLua_cWebPlugin_SafeString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SafeString'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new of class  cPickup */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_new00
-static int tolua_AllToLua_cPickup_new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cPickup",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const cItem",0,&tolua_err)) ||
-     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,9,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  int a_MicroPosX = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_MicroPosY = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_MicroPosZ = ((int)  tolua_tonumber(tolua_S,4,0));
-  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,5,0));
-  float a_SpeedX = ((float)  tolua_tonumber(tolua_S,6,0.f));
-  float a_SpeedY = ((float)  tolua_tonumber(tolua_S,7,0.f));
-  float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
-  {
-   cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  cPickup */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_new00_local
-static int tolua_AllToLua_cPickup_new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cPickup",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const cItem",0,&tolua_err)) ||
-     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,9,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  int a_MicroPosX = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_MicroPosY = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_MicroPosZ = ((int)  tolua_tonumber(tolua_S,4,0));
-  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,5,0));
-  float a_SpeedX = ((float)  tolua_tonumber(tolua_S,6,0.f));
-  float a_SpeedY = ((float)  tolua_tonumber(tolua_S,7,0.f));
-  float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
-  {
-   cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetItem of class  cPickup */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_GetItem00
-static int tolua_AllToLua_cPickup_GetItem00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPickup",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPickup* self = (cPickup*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetItem'", NULL);
-#endif
-  {
-   cItem& tolua_ret = (cItem&)  self->GetItem();
-    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetItem'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: CollectedBy of class  cPickup */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_CollectedBy00
-static int tolua_AllToLua_cPickup_CollectedBy00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPickup",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPickup* self = (cPickup*)  tolua_tousertype(tolua_S,1,0);
-  cPlayer* a_Dest = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CollectedBy'", NULL);
-#endif
-  {
-   bool tolua_ret = (bool)  self->CollectedBy(a_Dest);
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'CollectedBy'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetAge of class  cPickup */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_GetAge00
-static int tolua_AllToLua_cPickup_GetAge00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cPickup",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPickup* self = (const cPickup*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetAge'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->GetAge();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetAge'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: IsCollected of class  cPickup */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_IsCollected00
-static int tolua_AllToLua_cPickup_IsCollected00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cPickup",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPickup* self = (const cPickup*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsCollected'", NULL);
-#endif
-  {
-   bool tolua_ret = (bool)  self->IsCollected();
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'IsCollected'.",&tolua_err);
  return 0;
 #endif
 }
@@ -27821,10 +27900,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"etPlayer",cEntity::etPlayer);
    tolua_constant(tolua_S,"etPickup",cEntity::etPickup);
    tolua_constant(tolua_S,"etMonster",cEntity::etMonster);
-   tolua_constant(tolua_S,"etMob",cEntity::etMob);
    tolua_constant(tolua_S,"etFallingBlock",cEntity::etFallingBlock);
    tolua_constant(tolua_S,"etMinecart",cEntity::etMinecart);
    tolua_constant(tolua_S,"etTNT",cEntity::etTNT);
+   tolua_constant(tolua_S,"etProjectile",cEntity::etProjectile);
+   tolua_constant(tolua_S,"etMob",cEntity::etMob);
    tolua_constant(tolua_S,"eEntityType_Entity",cEntity::eEntityType_Entity);
    tolua_constant(tolua_S,"eEntityType_Player",cEntity::eEntityType_Player);
    tolua_constant(tolua_S,"eEntityType_Pickup",cEntity::eEntityType_Pickup);
@@ -27985,6 +28065,37 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetSprint",tolua_AllToLua_cPlayer_SetSprint00);
    tolua_function(tolua_S,"IsSwimming",tolua_AllToLua_cPlayer_IsSwimming00);
    tolua_function(tolua_S,"IsSubmerged",tolua_AllToLua_cPlayer_IsSubmerged00);
+  tolua_endmodule(tolua_S);
+  #ifdef __cplusplus
+  tolua_cclass(tolua_S,"cPickup","cPickup","cEntity",tolua_collect_cPickup);
+  #else
+  tolua_cclass(tolua_S,"cPickup","cPickup","cEntity",NULL);
+  #endif
+  tolua_beginmodule(tolua_S,"cPickup");
+   tolua_function(tolua_S,"new",tolua_AllToLua_cPickup_new00);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cPickup_new00_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cPickup_new00_local);
+   tolua_function(tolua_S,"GetItem",tolua_AllToLua_cPickup_GetItem00);
+   tolua_function(tolua_S,"CollectedBy",tolua_AllToLua_cPickup_CollectedBy00);
+   tolua_function(tolua_S,"GetAge",tolua_AllToLua_cPickup_GetAge00);
+   tolua_function(tolua_S,"IsCollected",tolua_AllToLua_cPickup_IsCollected00);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cProjectileEntity","cProjectileEntity","cEntity",NULL);
+  tolua_beginmodule(tolua_S,"cProjectileEntity");
+   tolua_constant(tolua_S,"pkArrow",cProjectileEntity::pkArrow);
+   tolua_constant(tolua_S,"pkSnowball",cProjectileEntity::pkSnowball);
+   tolua_constant(tolua_S,"pkEgg",cProjectileEntity::pkEgg);
+   tolua_constant(tolua_S,"pkGhastFireball",cProjectileEntity::pkGhastFireball);
+   tolua_constant(tolua_S,"pkFireCharge",cProjectileEntity::pkFireCharge);
+   tolua_constant(tolua_S,"pkEnderPearl",cProjectileEntity::pkEnderPearl);
+   tolua_constant(tolua_S,"pkExpBottle",cProjectileEntity::pkExpBottle);
+   tolua_constant(tolua_S,"pkSplashPotion",cProjectileEntity::pkSplashPotion);
+   tolua_constant(tolua_S,"pkWitherSkull",cProjectileEntity::pkWitherSkull);
+   tolua_constant(tolua_S,"pkFishingFloat",cProjectileEntity::pkFishingFloat);
+   tolua_function(tolua_S,"GetCreator",tolua_AllToLua_cProjectileEntity_GetCreator00);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cArrowEntity","cArrowEntity","cProjectileEntity",NULL);
+  tolua_beginmodule(tolua_S,"cArrowEntity");
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPluginManager","cPluginManager","",NULL);
   tolua_beginmodule(tolua_S,"cPluginManager");
@@ -28148,6 +28259,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetMaxCactusHeight",tolua_AllToLua_cWorld_GetMaxCactusHeight00);
    tolua_function(tolua_S,"IsBlockDirectlyWatered",tolua_AllToLua_cWorld_IsBlockDirectlyWatered00);
    tolua_function(tolua_S,"SpawnMob",tolua_AllToLua_cWorld_SpawnMob00);
+   tolua_function(tolua_S,"CreateProjectile",tolua_AllToLua_cWorld_CreateProjectile00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cInventory","cInventory","cItemGrid::cListener",NULL);
   tolua_beginmodule(tolua_S,"cInventory");
@@ -28450,20 +28562,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetWebTitle",tolua_AllToLua_cWebPlugin_GetWebTitle00);
    tolua_function(tolua_S,"HandleWebRequest",tolua_AllToLua_cWebPlugin_HandleWebRequest00);
    tolua_function(tolua_S,"SafeString",tolua_AllToLua_cWebPlugin_SafeString00);
-  tolua_endmodule(tolua_S);
-  #ifdef __cplusplus
-  tolua_cclass(tolua_S,"cPickup","cPickup","cEntity",tolua_collect_cPickup);
-  #else
-  tolua_cclass(tolua_S,"cPickup","cPickup","cEntity",NULL);
-  #endif
-  tolua_beginmodule(tolua_S,"cPickup");
-   tolua_function(tolua_S,"new",tolua_AllToLua_cPickup_new00);
-   tolua_function(tolua_S,"new_local",tolua_AllToLua_cPickup_new00_local);
-   tolua_function(tolua_S,".call",tolua_AllToLua_cPickup_new00_local);
-   tolua_function(tolua_S,"GetItem",tolua_AllToLua_cPickup_GetItem00);
-   tolua_function(tolua_S,"CollectedBy",tolua_AllToLua_cPickup_CollectedBy00);
-   tolua_function(tolua_S,"GetAge",tolua_AllToLua_cPickup_GetAge00);
-   tolua_function(tolua_S,"IsCollected",tolua_AllToLua_cPickup_IsCollected00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cRoot","cRoot","",NULL);
   tolua_beginmodule(tolua_S,"cRoot");

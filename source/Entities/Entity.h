@@ -90,12 +90,13 @@ public:
 		etPlayer,
 		etPickup,
 		etMonster,
-		etMob = etMonster,  // DEPRECATED, use etMonster instead!
 		etFallingBlock,
 		etMinecart,
 		etTNT,
+		etProjectile,
 		
 		// DEPRECATED older constants, left over for compatibility reasons (plugins)
+		etMob = etMonster,  // DEPRECATED, use etMonster instead!
 		eEntityType_Entity = etEntity,
 		eEntityType_Player = etPlayer,
 		eEntityType_Pickup = etPickup,
@@ -276,9 +277,8 @@ public:
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
-	Needs to have a default implementation due to Lua bindings.
 	*/
-	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }
+	virtual void SpawnOn(cClientHandle & a_Client) = 0;
 
 	// tolua_begin
 	

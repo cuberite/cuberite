@@ -5,14 +5,17 @@
 #include "World.h"
 #include "ChunkDef.h"
 #include "ClientHandle.h"
-#include "Entities/Pickup.h"
-#include "Entities/Player.h"
 #include "Server.h"
 #include "Item.h"
 #include "Root.h"
 #include "../iniFile/iniFile.h"
 #include "ChunkMap.h"
 #include "OSSupport/Timer.h"
+
+// Entities (except mobs):
+#include "Entities/Pickup.h"
+#include "Entities/Player.h"
+#include "Entities/TNTEntity.h"
 
 // Simulators:
 #include "Simulator/SimulatorManager.h"
@@ -55,7 +58,6 @@
 #include "PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Vector3d.h"
-#include "Entities/TNTEntity.h"
 
 #include "Tracer.h"
 #include "tolua++.h"
@@ -2644,6 +2646,26 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	BroadcastSpawnEntity(*Monster);
 	cPluginManager::Get()->CallHookSpawnedMonster(*this, *Monster);
 	return Monster->GetUniqueID();
+}
+
+
+
+
+
+int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const Vector3d * a_Speed)
+{
+	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Speed);
+	if (Projectile == NULL)
+	{
+		return -1;
+	}
+	if (!Projectile->Initialize(this))
+	{
+		delete Projectile;
+		return -1;
+	}
+	BroadcastSpawnEntity(*Projectile);
+	return Projectile->GetUniqueID();
 }
 
 

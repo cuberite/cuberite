@@ -1,7 +1,7 @@
 
 // ProjectileEntity.h
 
-// Declares the cProjectileEntity class representing the common base class for projectiles
+// Declares the cProjectileEntity class representing the common base class for projectiles, as well as individual projectile types
 
 
 
@@ -38,11 +38,20 @@ public:
 		pkFishingFloat  = 90,
 	} ;
 	
+	// tolua_end
+	
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);
 	
+	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d * a_Speed = NULL);
+	
 	/// Called by the physics blocktracer when the entity hits a solid block, the coords and the face hit is given
 	virtual void OnHitSolidBlock(double a_BlockX, double a_BlockY, double a_BlockZ, char a_BlockFace) {};
+	
+	// tolua_begin
+
+	/// Returns the entity who created this projectile; may be NULL
+	cEntity * GetCreator(void) { return m_Creator; }
 	
 protected:
 	eKind m_Kind;
@@ -58,9 +67,20 @@ protected:
 class cArrowEntity :
 	public cProjectileEntity
 {
+	typedef cProjectileEntity super;
+	
 public:
-	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
-	cArrowEntity(cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);
+
+	// tolua_end
+	
+	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d a_Speed);
+	
+protected:
+
+	// cEntity overrides:
+	virtual void SpawnOn(cClientHandle & a_Client) override;
+	
+	// tolua_begin
 } ;
 
 // tolua_end
