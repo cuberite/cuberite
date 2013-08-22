@@ -100,7 +100,8 @@ public:
 	
 	virtual void ClearConsoleCommands(void) override;
 
-	virtual bool CanAddHook(int a_Hook) override;
+	/// Returns true if the plugin contains the function for the specified hook type, using the old-style registration (#121)
+	bool CanAddOldStyleHook(int a_HookType);
 	
 	// cWebPlugin override
 	virtual const AString GetWebTitle(void) const {return GetName(); }
