@@ -40,10 +40,13 @@ public:
 			}
 			default:
 			{
-				// Light a fire next to the block:
+				// Light a fire next to/on top of the block if air:
 				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);
-				break;
+				if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+				{
+					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);
+					break;
+				}
 			}
 		}
 
