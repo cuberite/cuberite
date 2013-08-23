@@ -846,33 +846,62 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	}
 	
 	cWorld * World = m_Player->GetWorld();
-	
-	// Check if the block ignores build collision (water, grass etc.):
-	BLOCKTYPE ClickedBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
-	if (Handler->DoesIgnoreBuildCollision())
+
+	BLOCKTYPE ClickedBlock;
+	NIBBLETYPE ClickedBlockMeta;
+	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
+	NIBBLETYPE EquippedBlockDamage = (NIBBLETYPE)(m_Player->GetEquippedItem().m_ItemDamage);
+
+	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+
+	//Special slab handler coding
+	if (
+		((a_BlockFace == BLOCK_FACE_TOP) || (a_BlockFace == BLOCK_FACE_BOTTOM)) &&
+		((ClickedBlock == E_BLOCK_STONE_SLAB) || (ClickedBlock == E_BLOCK_WOODEN_SLAB)) && //Is clicked a slab?
+		((EquippedBlock == E_BLOCK_STONE_SLAB) || (EquippedBlock == E_BLOCK_WOODEN_SLAB)) && //Is equipped a slab?		
+		((ClickedBlockMeta & 0x07) == (EquippedBlockDamage & 0x07)) //Is clicked same type of slab as item in hand?
+		)
 	{
-		Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-		// World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+		//Don't move the coordinates
 	}
 	else
 	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		// Check for Blocks not allowing placement on top
-		if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
+		//Check if the block ignores build collision (water, grass etc.):
+		cBlockHandler * Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
+		if (Handler->DoesIgnoreBuildCollision())
 		{
-			// Resend the old block
-			// Some times the client still places the block O.o
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			return;
+			Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+			//World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 		}
-
-
-		BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
+		else
 		{
-			// Tried to place a block *into* another?
-			return;  // Happens when you place a block aiming at side of block like torch or stem
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			//On side of block, make sure that placement won't be cancelled if there is a slab there
+			//No need to combinability checks, client will do that
+			if ((World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_STONE_SLAB) || (World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_SLAB))
+			{
+				//Is a slab, don't do checks and proceed to double-slabbing
+			}
+			else
+			{
+				// Check for Blocks not allowing placement on top
+				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
+				{
+					// Resend the old block
+					// Some times the client still places the block O.o
+					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+					return;
+				}
+	
+	
+				BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+				if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
+				{
+					// Tried to place a block *into* another?
+					// Happens when you place a block aiming at side of block like torch or stem
+					return;
+				}
+			}
 		}
 	}
 
