@@ -2202,15 +2202,12 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit)
 		Vector3f Pos = (*itr)->GetPosition();
 		float Distance = (Pos - a_Pos).Length();
 
-		if (Distance <= a_SightLimit)
+		if (Distance < ClosestDistance)
 		{
 			if (!LineOfSight.Trace(a_Pos,(Pos - a_Pos),(int)(Pos - a_Pos).Length()))
 			{
-				if (Distance < ClosestDistance)
-				{
-					ClosestDistance = Distance;
-					ClosestPlayer = *itr;
-				}
+				ClosestDistance = Distance;
+				ClosestPlayer = *itr;
 			}
 		}
 	}
