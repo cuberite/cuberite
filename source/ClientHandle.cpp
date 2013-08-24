@@ -871,7 +871,12 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			return;
 		}
 
-
+		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+		{
+			// The block is being placed outside the world, ignore this packet altogether (#128)
+			return;
+		}
+		
 		BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
 		{
