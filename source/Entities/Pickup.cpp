@@ -73,18 +73,19 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 	if (!m_bCollected)
 	{
 		int BlockY = (int) floor(GetPosY());
-		if (BlockY < cChunkDef::Height)  // Don't do anything except for falling when above the world
+		if ((BlockY >= 0) && (BlockY < cChunkDef::Height))  // Don't do anything except for falling when outside the world
 		{
 			int BlockX = (int) floor(GetPosX());
 			int BlockZ = (int) floor(GetPosZ());
-			//Position might have changed due to physics. So we have to make sure we have the correct chunk.
+			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
 			cChunk * CurrentChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
 			if (CurrentChunk != NULL)  // Make sure the chunk is loaded
 			{
 				int RelBlockX = BlockX - (CurrentChunk->GetPosX() * cChunkDef::Width);
 				int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
 				
-				BLOCKTYPE BlockBelow = CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ);
+				// If the pickup is on the bottommost block position, make it think the void is made of air: (#131)
+				BLOCKTYPE BlockBelow = (BlockY > 0) ? CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 				BLOCKTYPE BlockIn = CurrentChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
 
 				if (
