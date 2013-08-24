@@ -350,6 +350,33 @@ AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8)
 // UTF-8 conversion code adapted from:
 //  http://stackoverflow.com/questions/2867123/convert-utf-16-to-utf-8-under-windows-and-linux-in-c
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin of Unicode, Inc.'s code / information
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Notice from the original file:
+* Copyright 2001-2004 Unicode, Inc.
+* 
+* Disclaimer
+* 
+* This source code is provided as is by Unicode, Inc. No claims are
+* made as to fitness for any particular purpose. No warranties of any
+* kind are expressed or implied. The recipient agrees to determine
+* applicability of information provided. If this file has been
+* purchased on magnetic or optical media from Unicode, Inc., the
+* sole remedy for any claim will be exchange of defective media
+* within 90 days of receipt.
+* 
+* Limitations on Rights to Redistribute This Code
+* 
+* Unicode, Inc. hereby grants the right to freely use the information
+* supplied in this file in the creation of products supporting the
+* Unicode Standard, and to make copies of this file in any form
+* for internal or external distribution as long as this notice
+* remains attached.
+*/
+
 #define UNI_MAX_BMP         0x0000FFFF
 #define UNI_MAX_UTF16       0x0010FFFF
 #define UNI_MAX_UTF32       0x7FFFFFFF
@@ -505,18 +532,24 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
         } while (tmpBytesToRead > 0);
     }
 
-   --------------------------------------------------------------------- */
-   
+   ---------------------------------------------------------------------
+*/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// End of Unicode, Inc.'s code / information
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 
-/*
+
+
+#define HEX(x) ((x) > 9 ? (x) + 'A' - 10 : (x) + '0')
+
+/**
 format binary data this way:
 00001234: 31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66    1234567890abcdef
 */
-#define HEX(x) ((x) > 9 ? (x) + 'A' - 10 : (x) + '0')
-
 AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_LineLength)
 {
 	ASSERT(a_LineLength <= 120);  // Due to using a fixed size line buffer; increase line[]'s size to lift this max
