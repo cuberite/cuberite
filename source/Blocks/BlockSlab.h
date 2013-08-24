@@ -18,8 +18,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		char Count = ((m_BlockType == E_BLOCK_STONE_SLAB) || (m_BlockType == E_BLOCK_WOODEN_SLAB)) ? 1 : 1;
-		a_Pickups.push_back(cItem(m_BlockType, Count, a_BlockMeta));
+		a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta));
 	}
 
 
@@ -37,39 +36,54 @@ public:
 		int DoubleType;
 		if (Type == E_BLOCK_STONE_SLAB)
 		{
-			DoubleType = 43; //Make it a double slab (with old type wood)
+			DoubleType = 43; // Make it a double slab (with old type wood)
 		}
 		else
 		{
-			 DoubleType = 125; //Make it a wooden double slab (new type)
+			 DoubleType = 125; // Make it a wooden double slab (new type)
 		}
+		// HandlePlaceBlock wants a cItemHandler pointer thing, so let's give it one
 		cItemHandler * ItemHandler = cItemHandler::GetItemHandler(DoubleType);
 
-		switch (a_BlockFace)
+		// Check if the block at the coordinates is a slab. Eligibility for combining etc. were processed in ClientHandle
+		BLOCKTYPE IsSlab;
+		IsSlab = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		if ((IsSlab == E_BLOCK_STONE_SLAB) || (IsSlab == E_BLOCK_WOODEN_SLAB))
 		{
-			case BLOCK_FACE_TOP:
+			// Special handling for non top/bottom clicks
+			if ((a_BlockFace == BLOCK_FACE_TOP) || (a_BlockFace == BLOCK_FACE_BOTTOM))
 			{
-				if ((a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_STONE_SLAB) || (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_SLAB))
+				// As with previous, call the function in ClientHandle that places a block when the client sends the packet
+				// This effectively simulates a client placing a double slab, so it goes through plugins etc. so the slabbing can be cancelled
+				a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
+			}
+			else
+			{
+				// If player cursor is at top half of block
+				if (a_CursorY > 7)
 				{
-					a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-					return false;
+					// Edit the call to use BLOCK_FACE_BOTTOM, otherwise it places incorrectly
+					a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_TOP, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 				}
 				else
 				{
-					a_BlockMeta = Meta & 0x7; break;  //Bottom half if on top of non slab block
+					// Edit the call to use BLOCK_FACE_TOP, otherwise it places incorrectly
+					a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_BOTTOM, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 				}
+			}
+			return false; // Cancel the event because dblslabs were already placed, nothing else needed
+		}
+		
+		switch (a_BlockFace)
+		{
+			// Previous IF condition didn't cancel the event (not a slab at coords), so place slab with correct metas
+			case BLOCK_FACE_TOP:
+			{
+				a_BlockMeta = Meta & 0x7; break;  // Bottom half slab block
 			}
 			case BLOCK_FACE_BOTTOM:
 			{
-				if ((a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_STONE_SLAB) || (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_SLAB))
-				{
-					a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-					return false;
-				}
-				else
-				{
-					a_BlockMeta = Meta | 0x8; break;  //Bottom half if on top of non slab block
-				}
+				a_BlockMeta = Meta | 0x8; break;  // Top half slab block
 			}
 			case BLOCK_FACE_EAST:
 			case BLOCK_FACE_NORTH:
@@ -78,29 +92,13 @@ public:
 			{
 				if (a_CursorY > 7)
 				{
-					// Cursor at the top half of the face, place a top half of slab
-					if ((a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_STONE_SLAB) || (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_SLAB))
-					{
-						a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-						return false;
-					}
-					else
-					{
-						a_BlockMeta = Meta | 0x8; break;
-					}
+					// Cursor at top half of block, place top slab
+					a_BlockMeta = Meta | 0x8; break;
 				}
 				else
 				{
-					// Cursor at the bottom half of the face, place a bottom half of slab:
-					if ((a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_STONE_SLAB) || (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_SLAB))
-					{
-						a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-						return false;
-					}
-					else
-					{
-						a_BlockMeta = Meta & 0x7; break;
-					}
+					// Cursor at bottom half of block, place bottom slab
+					a_BlockMeta = Meta & 0x7; break;
 				}
 			}
 		}  // switch (a_BlockFace)
