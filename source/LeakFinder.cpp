@@ -942,10 +942,10 @@ static int MyAllocHook(int nAllocType, void *pvData,
 			g_CurrentMemUsage += nSize ;
 			g_pCRTTable->Insert(lRequest, c, nSize);
 			
-			if (g_CurrentMemUsage > 1073741824) //This is 1 gb = 1024 * 1024* 1024.
+			if (g_CurrentMemUsage > 1536 * 1024* 1024)
 			{
 				printf("******************************************\n");
-				printf("** Server reached 1 GiB memory usage,   **\n");
+				printf("** Server reached 1.5 GiB memory usage, **\n");
 				printf("** something is probably wrong.         **\n");
 				printf("** Writing memory dump into memdump.xml **\n");
 				printf("******************************************\n");
