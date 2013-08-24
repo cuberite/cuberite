@@ -856,7 +856,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 	//Special slab handler coding
 	if (
-		((a_BlockFace == BLOCK_FACE_TOP) || (a_BlockFace == BLOCK_FACE_BOTTOM)) &&
+		(((a_BlockFace == BLOCK_FACE_TOP) && (ClickedBlockMeta == (EquippedBlockDamage & 0x07))) || ((a_BlockFace == BLOCK_FACE_BOTTOM) && (ClickedBlockMeta == (EquippedBlockDamage | 0x08)))) &&
 		((ClickedBlock == E_BLOCK_STONE_SLAB) || (ClickedBlock == E_BLOCK_WOODEN_SLAB)) && //Is clicked a slab?
 		((EquippedBlock == E_BLOCK_STONE_SLAB) || (EquippedBlock == E_BLOCK_WOODEN_SLAB)) && //Is equipped a slab?		
 		((ClickedBlockMeta & 0x07) == (EquippedBlockDamage & 0x07)) //Is clicked same type of slab as item in hand?
