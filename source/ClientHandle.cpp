@@ -850,36 +850,77 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	}
 	
 	cWorld * World = m_Player->GetWorld();
-	
-	// Check if the block ignores build collision (water, grass etc.):
-	BLOCKTYPE ClickedBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
-	if (Handler->DoesIgnoreBuildCollision())
+
+	BLOCKTYPE ClickedBlock;
+	NIBBLETYPE ClickedBlockMeta;
+	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
+	NIBBLETYPE EquippedBlockDamage = (NIBBLETYPE)(m_Player->GetEquippedItem().m_ItemDamage);
+
+	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+
+	// Special slab handler coding
+	if (
+		// If clicked face top: is slab there in the "bottom" position?
+		// If clicked face bottom: is the slab there in the "top" position?
+		// This prevents a dblslab forming below if you click the top face of a "top" slab.
+		(((a_BlockFace == BLOCK_FACE_TOP) && (ClickedBlockMeta == (EquippedBlockDamage & 0x07))) || ((a_BlockFace == BLOCK_FACE_BOTTOM) && (ClickedBlockMeta == (EquippedBlockDamage | 0x08)))) &&
+		
+		// Is clicked a slab? This is a SLAB handler, not stone or something!
+		((ClickedBlock == E_BLOCK_STONE_SLAB) || (ClickedBlock == E_BLOCK_WOODEN_SLAB)) &&
+		
+		// Is equipped a some type of slab?
+		// This prevents a bug where, well, you get a dblslab by placing TNT or something not a slab.
+		((EquippedBlock == E_BLOCK_STONE_SLAB) || (EquippedBlock == E_BLOCK_WOODEN_SLAB)) &&
+		
+		// Is equipped slab type same as the slab in the world? After all, we can't combine different slabs!
+		((ClickedBlockMeta & 0x07) == (EquippedBlockDamage & 0x07))
+		)
 	{
-		Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-		// World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+		// Coordinates at CLICKED block, don't move them anywhere
 	}
 	else
 	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		// Check for Blocks not allowing placement on top
-		if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
+		// Check if the block ignores build collision (water, grass etc.):
+		cBlockHandler * Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
+		if (Handler->DoesIgnoreBuildCollision())
 		{
-			// Resend the old block
-			// Some times the client still places the block O.o
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			return;
+			Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+			//World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 		}
-
-
-		BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
+		else
 		{
-			// Tried to place a block *into* another?
-			return;  // Happens when you place a block aiming at side of block like torch or stem
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			
+			// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
+			// No need to do combinability (dblslab) checks, client will do that here.
+			if ((World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_STONE_SLAB) || (World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_SLAB))
+			{
+				//Is a slab, don't do checks and proceed to double-slabbing
+			}
+			else
+			{
+				// Check for Blocks not allowing placement on top
+				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
+				{
+					// Resend the old block
+					// Some times the client still places the block O.o
+					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+					return;
+				}
+	
+	
+				BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+				if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
+				{
+					// Tried to place a block *into* another?
+					// Happens when you place a block aiming at side of block like torch or stem
+					return;
+				}
+			}
 		}
 	}
-
+	// Special slab handler coding end
+	
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	if (!a_ItemHandler.GetPlacementBlockTypeMeta(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))

@@ -2020,6 +2020,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockDoubleSlab.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockDirt.h"
 					>
 				</File>
