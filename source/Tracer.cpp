@@ -133,9 +133,9 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)
 {
-	if (a_Start.y < 0)
+	if ((a_Start.y < 0) || (a_Start.y >= cChunkDef::Height))
 	{
-		LOGD("%s: Start is below the world", __FUNCTION__);
+		LOGD("%s: Start Y is outside the world (%d), not tracing.", __FUNCTION__, a_Start.y);
 		return 0;
 	}
 	
