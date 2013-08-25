@@ -20,13 +20,13 @@
 #include "../Item.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
-#include "../Entities/Entity.h"
 #include "../OSSupport/MakeDir.h"
 #include "FastNBT.h"
+#include "../Mobs/Monster.h"
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Minecart.h"
-#include "../Mobs/Monster.h"
 #include "../Entities/Pickup.h"
+#include "../Entities/ProjectileEntity.h"
 
 
 
@@ -956,6 +956,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadPickupFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	if (strncmp(a_IDTag, "Arrow", a_IDTagLength) == 0)
+	{
+		LoadArrowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	// TODO: other entities
 }
 
@@ -1043,7 +1047,7 @@ void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 	
-	//TODO: Everything to do with TNT carts
+	// TODO: Everything to do with TNT carts
 
 	a_Entities.push_back(Minecart.release());
 }
@@ -1060,7 +1064,7 @@ void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 	
-	//TODO: Everything to do with hopper carts
+	// TODO: Everything to do with hopper carts
 
 	a_Entities.push_back(Minecart.release());
 }
@@ -1087,6 +1091,45 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 	a_Entities.push_back(Pickup.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cArrowEntity> Arrow(new cArrowEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	if (!LoadEntityBaseFromNBT(*Arrow.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Load pickup state:
+	int PickupIdx = a_NBT.FindChildByName(a_TagIdx, "pickup");
+	if (PickupIdx > 0)
+	{
+		Arrow->SetPickupState((cArrowEntity::ePickupState)a_NBT.GetByte(PickupIdx));
+	}
+	else
+	{
+		// Try the older "player" tag:
+		int PlayerIdx = a_NBT.FindChildByName(a_TagIdx, "player");
+		if (PlayerIdx > 0)
+		{
+			Arrow->SetPickupState((a_NBT.GetByte(PlayerIdx) == 0) ? cArrowEntity::psNoPickup : cArrowEntity::psInSurvivalOrCreative);
+		}
+	}
+	
+	// Load damage:
+	int DamageIdx = a_NBT.FindChildByName(a_TagIdx, "damage");
+	if (DamageIdx > 0)
+	{
+		Arrow->SetDamageCoeff(a_NBT.GetDouble(DamageIdx));
+	}
+	
+	// Store the new arrow in the entities list:
+	a_Entities.push_back(Arrow.release());
 }
 
 
