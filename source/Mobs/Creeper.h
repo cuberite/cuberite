@@ -18,6 +18,7 @@ public:
 	CLASS_PROTODEF(cCreeper);
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void Attack(float a_Dt);
 } ;
 
 
