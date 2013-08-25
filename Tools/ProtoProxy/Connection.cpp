@@ -201,6 +201,9 @@ enum
 	PACKET_ENCRYPTION_KEY_REQUEST    = 0xfd,
 	PACKET_PING                      = 0xfe,
 	PACKET_KICK                      = 0xff,
+	
+	// Synonyms:
+	PACKET_DISCONNECT                = PACKET_KICK,
 } ;
 
 
@@ -568,6 +571,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			case PACKET_CHAT_MESSAGE:              HANDLE_CLIENT_READ(HandleClientChatMessage); break;
 			case PACKET_CLIENT_STATUSES:           HANDLE_CLIENT_READ(HandleClientClientStatuses); break;
 			case PACKET_CREATIVE_INVENTORY_ACTION: HANDLE_CLIENT_READ(HandleClientCreativeInventoryAction); break;
+			case PACKET_DISCONNECT:                HANDLE_CLIENT_READ(HandleClientDisconnect); break;
 			case PACKET_ENCRYPTION_KEY_RESPONSE:   HANDLE_CLIENT_READ(HandleClientEncryptionKeyResponse); break;
 			case PACKET_ENTITY_ACTION:             HANDLE_CLIENT_READ(HandleClientEntityAction); break;
 			case PACKET_HANDSHAKE:                 HANDLE_CLIENT_READ(HandleClientHandshake); break;
@@ -835,6 +839,19 @@ bool cConnection::HandleClientCreativeInventoryAction(void)
 	Log("Received a PACKET_CREATIVE_INVENTORY_ACTION from the client:");
 	Log("  SlotNum = %d", SlotNum);
 	Log("  Item = %s", Item.c_str());
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientDisconnect(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Reason);
+	Log("Received a PACKET_DISCONNECT from the client:");
+	Log("  Reason = \"%s\"", Reason.c_str());
 	COPY_TO_SERVER();
 	return true;
 }

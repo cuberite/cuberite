@@ -115,6 +115,7 @@ protected:
 	bool HandleClientChatMessage(void);
 	bool HandleClientClientStatuses(void);
 	bool HandleClientCreativeInventoryAction(void);
+	bool HandleClientDisconnect(void);
 	bool HandleClientEncryptionKeyResponse(void);
 	bool HandleClientEntityAction(void);
 	bool HandleClientHandshake(void);
