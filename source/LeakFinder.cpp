@@ -116,12 +116,15 @@
 /* _X: MSVC 2012 (MSC 1700) seems to use a different allocation scheme for STL containers,
 * allocating lots of small objects and running out of memory very soon
 * Thus for MSVC 2012 we cut the callstack buffer length in half
+*
+* _X 2013_08_25: The callstack tracking gets worse even for MSVC 2008, a single lua_state eats 50 MiB of RAM
+* Therefore I decided to further reduce the buffers from 0x2000 to 0x1000
 */
 // Controlling the callstack depth
 #if (_MSC_VER < 1700)
-	#define MAX_CALLSTACK_LEN_BUF 0x2000
-#else
 	#define MAX_CALLSTACK_LEN_BUF 0x1000
+#else
+	#define MAX_CALLSTACK_LEN_BUF 0x0800
 #endif
 
 
