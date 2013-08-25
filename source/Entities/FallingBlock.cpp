@@ -22,20 +22,6 @@ cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_Block
 
 
 
-bool cFallingBlock::Initialize(cWorld * a_World)
-{
-	if (super::Initialize(a_World))
-	{
-		a_World->BroadcastSpawnEntity(*this);
-		return true;
-	}
-	return false;
-}
-
-
-
-
-
 void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnFallingBlock(*this);

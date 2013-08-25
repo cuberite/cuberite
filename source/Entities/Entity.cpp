@@ -144,6 +144,10 @@ bool cEntity::Initialize(cWorld * a_World)
 	m_World->AddEntity(this);
 	
 	cPluginManager::Get()->CallHookSpawnedEntity(*a_World, *this);
+	
+	// Spawn the entity on the clients:
+	a_World->BroadcastSpawnEntity(*this);
+	
 	return true;
 }
 

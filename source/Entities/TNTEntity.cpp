@@ -29,20 +29,6 @@ cTNTEntity::cTNTEntity(const Vector3d & a_Pos, double a_FuseTimeInSec) :
 
 
 
-bool cTNTEntity::Initialize(cWorld * a_World)
-{
-	if (super::Initialize(a_World))
-	{
-		a_World->BroadcastSpawnEntity(*this);
-		return true;
-	}
-	return false;
-}
-
-
-
-
-
 void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnObject(*this, 50, 1, 0, 0);  // 50 means TNT
