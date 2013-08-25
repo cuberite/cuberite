@@ -40,6 +40,8 @@ public:
 	
 	// tolua_end
 	
+	CLASS_PROTODEF(cProjectileEntity);
+
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);
 	
@@ -92,8 +94,12 @@ public:
 
 	// tolua_end
 	
+	CLASS_PROTODEF(cArrowEntity);
+
 	/// Creates a new arrow with psNoPickup state and default damage modifier coeff
 	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d a_Speed);
+	
+	// tolua_begin
 	
 	/// Returns whether the arrow can be picked up by players
 	ePickupState GetPickupState(void) const { return m_PickupState; }
@@ -109,6 +115,8 @@ public:
 	
 	/// Returns true if the specified player can pick the arrow up
 	bool CanPickup(const cPlayer & a_Player) const;
+	
+	// tolua_end
 	
 protected:
 

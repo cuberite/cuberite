@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "ProjectileEntity.h"
 #include "../ClientHandle.h"
+#include "Player.h"
 
 
 
@@ -92,6 +93,22 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
+}
+
+
+
+
+
+bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
+{
+	switch (m_PickupState)
+	{
+		case psNoPickup:             return false;
+		case psInSurvivalOrCreative: return (a_Player.IsGameModeSurvival() || a_Player.IsGameModeCreative());
+		case psInCreative:           return a_Player.IsGameModeCreative();
+	}
+	ASSERT(!"Unhandled pickup state");
+	return false;
 }
 
 
