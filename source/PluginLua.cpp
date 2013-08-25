@@ -1240,13 +1240,16 @@ void cPluginLua::ClearConsoleCommands(void)
 
 
 
-bool cPluginLua::CanAddHook(int a_Hook)
+bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 {
-	const char * FnName = GetHookFnName(a_Hook);
+	const char * FnName = GetHookFnName(a_HookType);
 	if (FnName == NULL)
 	{
 		// Unknown hook ID
-		LOGWARNING("Plugin %s wants to add an unknown hook ID (%d). The plugin need not work properly.", GetName().c_str(), a_Hook);
+		LOGWARNING("Plugin %s wants to add an unknown hook ID (%d). The plugin need not work properly.",
+			GetName().c_str(), a_HookType
+		);
+		m_LuaState.LogStackTrace();
 		return false;
 	}
 	
@@ -1257,12 +1260,9 @@ bool cPluginLua::CanAddHook(int a_Hook)
 	}
 	
 	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.", 
-		GetName().c_str(), a_Hook, FnName
+		GetName().c_str(), a_HookType, FnName
 	);
-	
-	// Lua stacktrace:
 	m_LuaState.LogStackTrace();
-
 	return false;
 }
 
@@ -1270,9 +1270,9 @@ bool cPluginLua::CanAddHook(int a_Hook)
 
 
 
-const char * cPluginLua::GetHookFnName(int a_Hook)
+const char * cPluginLua::GetHookFnName(int a_HookType)
 {
-	switch (a_Hook)
+	switch (a_HookType)
 	{
 		case cPluginManager::HOOK_BLOCK_TO_PICKUPS:             return "OnBlockToPickups";
 		case cPluginManager::HOOK_CHAT:                         return "OnChat";
@@ -1331,7 +1331,17 @@ bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 {
 	ASSERT(m_CriticalSection.IsLockedByCurrentThread());  // It probably has to be, how else would we have a LuaState?
 	
-	m_HookMap[a_HookType].push_back(new cLuaState::cRef(m_LuaState, a_FnRefIdx));
+	// Check if the function reference is valid:
+	cLuaState::cRef * Ref = new cLuaState::cRef(m_LuaState, a_FnRefIdx);
+	if ((Ref == NULL) || !Ref->IsValid())
+	{
+		LOGWARNING("Plugin %s tried to add a hook %d with bad handler function.", GetName().c_str(), a_HookType);
+		m_LuaState.LogStackTrace();
+		delete Ref;
+		return false;
+	}
+	
+	m_HookMap[a_HookType].push_back(Ref);
 	return true;
 }
 

@@ -1619,10 +1619,6 @@ void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
 		LOGWARN("Called cPluginManager::AddHook() with a_Plugin == NULL");
 		return;
 	}
-	if (!a_Plugin->CanAddHook(a_Hook))
-	{
-		return;
-	}
 	PluginList & Plugins = m_Hooks[a_Hook];
 	Plugins.remove(a_Plugin);
 	Plugins.push_back(a_Plugin);

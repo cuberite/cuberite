@@ -53,6 +53,10 @@ void cRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk
 		}
 		switch (BlockType)
 		{
+			case E_BLOCK_PISTON:
+			case E_BLOCK_STICKY_PISTON:
+			case E_BLOCK_DISPENSER:
+			case E_BLOCK_DROPPER:
 			case E_BLOCK_REDSTONE_LAMP_OFF:
 			case E_BLOCK_REDSTONE_LAMP_ON:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
@@ -514,6 +518,20 @@ bool cRedstoneSimulator::PowerBlock(const Vector3i & a_BlockPos, const Vector3i 
 			break;
 		}
 		
+		case E_BLOCK_REDSTONE_LAMP_OFF:
+		{
+			m_World.FastSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_REDSTONE_LAMP_ON, 0);
+			break;
+		}
+
+		case E_BLOCK_TNT:
+		{
+			m_World.BroadcastSoundEffect("random.fuse", a_BlockPos.x * 8, a_BlockPos.y * 8, a_BlockPos.z * 8, 0.5f, 0.6f);
+			m_World.SpawnPrimedTNT(a_BlockPos.x + 0.5, a_BlockPos.y + 0.5, a_BlockPos.z + 0.5, 4);  // 4 seconds to boom
+			m_World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_AIR, 0);
+			break;
+		}
+
 		default:
 		{
 			if (
@@ -612,6 +630,12 @@ int cRedstoneSimulator::UnPowerBlock(const Vector3i & a_BlockPos, const Vector3i
 			{
 				SetRepeater(a_BlockPos, 10, false);
 			}
+			break;
+		}
+
+		case E_BLOCK_REDSTONE_LAMP_ON:
+		{
+			m_World.FastSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_REDSTONE_LAMP_OFF, 0);
 			break;
 		}
 		

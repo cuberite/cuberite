@@ -168,6 +168,13 @@ public:
 		return false;
 	}
 	
+	virtual void OnUpdate(cWorld * a_World, int X, int Y, int Z)
+	{
+		if (a_World->GetBlock(X, Y - 1, Z) == E_BLOCK_AIR)
+		{
+			a_World->SetBlock(X, Y - 1, Z, E_BLOCK_VINES, a_World->GetBlockMeta(X, Y, Z));
+		}
+	}
 	
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{

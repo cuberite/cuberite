@@ -19,6 +19,7 @@
 #include "OSSupport/Timer.h"
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
+#include "Blocks/BlockSlab.h"
 
 #include "Vector3f.h"
 #include "Vector3d.h"
@@ -850,36 +851,82 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	}
 	
 	cWorld * World = m_Player->GetWorld();
-	
-	// Check if the block ignores build collision (water, grass etc.):
-	BLOCKTYPE ClickedBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
-	if (Handler->DoesIgnoreBuildCollision())
+
+	BLOCKTYPE ClickedBlock;
+	NIBBLETYPE ClickedBlockMeta;
+	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
+	NIBBLETYPE EquippedBlockDamage = (NIBBLETYPE)(m_Player->GetEquippedItem().m_ItemDamage);
+
+	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 	{
-		Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-		// World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+		// The block is being placed outside the world, ignore this packet altogether (#128)
+		return;
+	}
+	
+	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+
+	// Special slab handling - placing a slab onto another slab produces a dblslab instead:
+	if (
+		cBlockSlabHandler::IsAnySlabType(ClickedBlock) &&               // Is there a slab already?
+		cBlockSlabHandler::IsAnySlabType(EquippedBlock) &&              // Is the player placing another slab?
+		((ClickedBlockMeta & 0x07) == (EquippedBlockDamage & 0x07)) &&  // Is it the same slab type?
+		(
+			(a_BlockFace == BLOCK_FACE_TOP) ||                            // Clicking the top of a bottom slab
+			(a_BlockFace == BLOCK_FACE_BOTTOM)                            // Clicking the bottom of a top slab
+		)
+	)
+	{
+		// Coordinates at CLICKED block, don't move them anywhere
 	}
 	else
 	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		// Check for Blocks not allowing placement on top
-		if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
+		// Check if the block ignores build collision (water, grass etc.):
+		cBlockHandler * Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
+		if (Handler->DoesIgnoreBuildCollision())
 		{
-			// Resend the old block
-			// Some times the client still places the block O.o
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			return;
+			Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 		}
-
 
 		BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
 		{
-			// Tried to place a block *into* another?
-			return;  // Happens when you place a block aiming at side of block like torch or stem
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			
+			if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+			{
+				// The block is being placed outside the world, ignore this packet altogether (#128)
+				return;
+			}
+			
+			BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+
+			// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
+			// No need to do combinability (dblslab) checks, client will do that here.
+			if (cBlockSlabHandler::IsAnySlabType(PlaceBlock))
+			{
+				// It's a slab, don't do checks and proceed to double-slabbing
+			}
+			else
+			{
+				// Check for Blocks not allowing placement on top
+				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
+				{
+					// Resend the old block
+					// Sometimes the client still places the block O.o
+					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+					return;
+				}
+
+				if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
+				{
+					// Tried to place a block *into* another?
+					// Happens when you place a block aiming at side of block like torch or stem
+					return;
+				}
+			}
 		}
 	}
-
+	
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	if (!a_ItemHandler.GetPlacementBlockTypeMeta(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
@@ -914,7 +961,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	NewBlock->OnPlacedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
 	// Step sound with 0.8f pitch is used as block placement sound
-	World->BroadcastSoundEffect(NewBlock->GetStepSound(),a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
+	World->BroadcastSoundEffect(NewBlock->GetStepSound(), a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 

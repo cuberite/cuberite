@@ -11,3 +11,4 @@ cloc.xsl
 *.user
 *.suo
 /EveryNight.cmd
+*.sublime-*
