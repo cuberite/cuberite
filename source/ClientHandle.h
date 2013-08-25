@@ -198,6 +198,9 @@ public:
 	/// Called when the player moves into a different world; queues sreaming the new chunks
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
+	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
+	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
+	
 private:
 
 	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
@@ -314,9 +317,6 @@ private:
 	
 	/// Handles the DIG_FINISHED dig packet:
 	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
-
-	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
-	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client

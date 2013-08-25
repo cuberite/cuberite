@@ -47,7 +47,10 @@ void cBlockDoorHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY
 
 void cBlockDoorHandler::OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
-	cDoors::ChangeDoor(a_World, a_BlockX, a_BlockY, a_BlockZ);
+	if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_DOOR)
+	{
+		cDoors::ChangeDoor(a_World, a_BlockX, a_BlockY, a_BlockZ);
+	}
 }
 
 
