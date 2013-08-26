@@ -127,6 +127,7 @@ protected:
 	double m_DamageCoeff;
 
 	// cEntity overrides:
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
 	// tolua_begin

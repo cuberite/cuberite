@@ -115,6 +115,18 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 
+void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	super::Tick(a_Dt, a_Chunk);
+	
+	// DEBUG:
+	LOGD("Arrow %d: {%.02f, %.02f, %.02f}", m_UniqueID, GetPosX(), GetPosY(), GetPosZ());
+}
+
+
+
+
+
 void cArrowEntity::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnObject(*this, pkArrow, 0, 0, 0);
