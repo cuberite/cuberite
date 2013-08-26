@@ -93,6 +93,9 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
+	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f}",
+		m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ()
+	);
 }
 
 
@@ -120,7 +123,11 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	super::Tick(a_Dt, a_Chunk);
 	
 	// DEBUG:
-	LOGD("Arrow %d: {%.02f, %.02f, %.02f}", m_UniqueID, GetPosX(), GetPosY(), GetPosZ());
+	LOGD("Arrow %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}",
+		m_UniqueID,
+		GetPosX(), GetPosY(), GetPosZ(),
+		GetSpeedX(), GetSpeedY(), GetSpeedZ()
+	);
 }
 
 
