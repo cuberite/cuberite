@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/25/13 15:54:49.
+** Generated automatically by tolua++-1.0.92 on 08/27/13 08:55:56.
 */
 
 #ifndef __cplusplus
@@ -3071,6 +3071,182 @@ static int tolua_set_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
   tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
   g_BlockOneHitDig[tolua_index] = ((bool)  tolua_toboolean(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: g_BlockPistonBreakable */
+#ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockPistonBreakable
+static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)g_BlockPistonBreakable[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: g_BlockPistonBreakable */
+#ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockPistonBreakable
+static int tolua_set_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  g_BlockPistonBreakable[tolua_index] = ((bool)  tolua_toboolean(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: g_BlockIsSnowable */
+#ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSnowable
+static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)g_BlockIsSnowable[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: g_BlockIsSnowable */
+#ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockIsSnowable
+static int tolua_set_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  g_BlockIsSnowable[tolua_index] = ((bool)  tolua_toboolean(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: g_BlockRequiresSpecialTool */
+#ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockRequiresSpecialTool
+static int tolua_get_AllToLua_g_BlockRequiresSpecialTool(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)g_BlockRequiresSpecialTool[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: g_BlockRequiresSpecialTool */
+#ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockRequiresSpecialTool
+static int tolua_set_AllToLua_g_BlockRequiresSpecialTool(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  g_BlockRequiresSpecialTool[tolua_index] = ((bool)  tolua_toboolean(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: g_BlockIsSolid */
+#ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSolid
+static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)g_BlockIsSolid[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: g_BlockIsSolid */
+#ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockIsSolid
+static int tolua_set_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  g_BlockIsSolid[tolua_index] = ((bool)  tolua_toboolean(tolua_S,3,0));
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -27678,6 +27854,10 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_array(tolua_S,"g_BlockSpreadLightFalloff",tolua_get_AllToLua_g_BlockSpreadLightFalloff,tolua_set_AllToLua_g_BlockSpreadLightFalloff);
   tolua_array(tolua_S,"g_BlockTransparent",tolua_get_AllToLua_g_BlockTransparent,tolua_set_AllToLua_g_BlockTransparent);
   tolua_array(tolua_S,"g_BlockOneHitDig",tolua_get_AllToLua_g_BlockOneHitDig,tolua_set_AllToLua_g_BlockOneHitDig);
+  tolua_array(tolua_S,"g_BlockPistonBreakable",tolua_get_AllToLua_g_BlockPistonBreakable,tolua_set_AllToLua_g_BlockPistonBreakable);
+  tolua_array(tolua_S,"g_BlockIsSnowable",tolua_get_AllToLua_g_BlockIsSnowable,tolua_set_AllToLua_g_BlockIsSnowable);
+  tolua_array(tolua_S,"g_BlockRequiresSpecialTool",tolua_get_AllToLua_g_BlockRequiresSpecialTool,tolua_set_AllToLua_g_BlockRequiresSpecialTool);
+  tolua_array(tolua_S,"g_BlockIsSolid",tolua_get_AllToLua_g_BlockIsSolid,tolua_set_AllToLua_g_BlockIsSolid);
   tolua_constant(tolua_S,"BLOCK_FACE_NONE",BLOCK_FACE_NONE);
   tolua_constant(tolua_S,"BLOCK_FACE_BOTTOM",BLOCK_FACE_BOTTOM);
   tolua_constant(tolua_S,"BLOCK_FACE_TOP",BLOCK_FACE_TOP);

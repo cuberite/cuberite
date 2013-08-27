@@ -29,6 +29,16 @@ extern bool g_BlockTransparent[];
 /// Is a block destroyed after a single hit?
 extern bool g_BlockOneHitDig[];
 
+/// Can a piston break this block?
+extern bool g_BlockPistonBreakable[256];
+
+/// Can this block hold snow atop?
+extern bool g_BlockIsSnowable[256];
+
+extern bool g_BlockRequiresSpecialTool[256];
+
+extern bool g_BlockIsSolid[256];
+
 
 
 
