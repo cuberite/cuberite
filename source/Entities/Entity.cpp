@@ -529,7 +529,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			float fallspeed;
 			if (IsBlockWater(BlockIn))
 			{
-				fallspeed = -3.0f * a_Dt;  // Fall slower in water.
+				fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
 			}
 			else if (BlockIn == E_BLOCK_COBWEB)
 			{

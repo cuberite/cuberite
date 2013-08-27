@@ -163,7 +163,7 @@ public:
 	void SetPosY    (double a_PosY);
 	void SetPosZ    (double a_PosZ);
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
-	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x,a_Pos.y,a_Pos.z);}
+	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
 	void SetRot     (const Vector3f & a_Rot);
 	void SetRotation(double a_Rotation);
 	void SetPitch   (double a_Pitch);
