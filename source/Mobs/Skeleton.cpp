@@ -21,12 +21,13 @@ void cSkeleton::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	cMonster::Tick(a_Dt, a_Chunk);
 
-	// TODO Outsource
-	// TODO should do SkyLight check, mobs in the dark don´t burn 
-	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsOnFire())
+	if ((GetWorld()->GetBlockSkyLight(GetPosX(), GetPosY(), GetPosZ()) == 15) && (GetWorld()->GetBlock(GetPosX(), GetPosY(), GetPosZ()) != E_BLOCK_SOULSAND))
 	{
-		// Burn for 10 ticks, then decide again
-		StartBurning(10);
+		if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsOnFire())
+		{
+			// Burn for 100 ticks, then decide again
+			StartBurning(100);
+		}
 	}
 }
 
