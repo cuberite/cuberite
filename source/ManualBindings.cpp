@@ -1649,7 +1649,7 @@ public:
 	{
 	}
 	
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
 		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNextBlock"))
 		{
@@ -1661,6 +1661,7 @@ public:
 		m_LuaState.Push(a_BlockZ);
 		m_LuaState.Push(a_BlockType);
 		m_LuaState.Push(a_BlockMeta);
+		m_LuaState.Push(a_EntryFace);
 		if (!m_LuaState.CallFunction(1))
 		{
 			return false;
@@ -1674,7 +1675,7 @@ public:
 		return res;
 	}
 	
-	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) override
 	{
 		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNextBlockNoData"))
 		{
@@ -1684,6 +1685,7 @@ public:
 		m_LuaState.Push(a_BlockX);
 		m_LuaState.Push(a_BlockY);
 		m_LuaState.Push(a_BlockZ);
+		m_LuaState.Push(a_EntryFace);
 		if (!m_LuaState.CallFunction(1))
 		{
 			return false;

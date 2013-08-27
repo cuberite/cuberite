@@ -47,8 +47,8 @@ public:
 	
 	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d * a_Speed = NULL);
 	
-	/// Called by the physics blocktracer when the entity hits a solid block, the coords and the face hit is given
-	virtual void OnHitSolidBlock(double a_BlockX, double a_BlockY, double a_BlockZ, char a_BlockFace) {};
+	/// Called by the physics blocktracer when the entity hits a solid block, the block's coords and the face hit is given
+	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
 	
 	// tolua_begin
 
@@ -72,6 +72,10 @@ protected:
 	
 	/// True if the projectile has hit the ground and is stuck there
 	bool m_IsInGround;
+	
+	// cEntity overrides:
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
 } ;
 
 
@@ -127,7 +131,6 @@ protected:
 	double m_DamageCoeff;
 
 	// cEntity overrides:
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
 	// tolua_begin
