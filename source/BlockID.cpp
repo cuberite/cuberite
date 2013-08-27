@@ -782,7 +782,7 @@ public:
 		g_BlockIsSolid[E_BLOCK_NETHER_PORTAL]         = false;
 		g_BlockIsSolid[E_BLOCK_PISTON]                = false;
 		g_BlockIsSolid[E_BLOCK_PISTON_EXTENSION]      = false;
-		g_BlockIsSolid[E_BLOCK_RAIL]                  = false;
+		g_BlockIsSolid[E_BLOCK_RAIL]                  = true;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_REPEATER_OFF] = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_REPEATER_ON]  = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_TORCH_OFF]    = false;

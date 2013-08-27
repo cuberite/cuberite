@@ -2,6 +2,7 @@
 // Minecart.cpp
 
 // Implements the cMinecart class representing a minecart in the world
+// Indiana Jones!
 
 #include "Globals.h"
 #include "Minecart.h"
@@ -17,6 +18,7 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 	super(etMinecart, a_X, a_Y, a_Z, 0.98, 0.7),
 	m_Payload(a_Payload)
 {
+	m_Mass = 20.f;
 }
 
 
@@ -59,9 +61,202 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
+enum ENUM_RAIL_DIRECTIONS
+{
+	E_RAIL_NORTH_SOUTH       = 0,
+	E_RAIL_EAST_WEST         = 1,
+	E_RAIL_ASCEND_EAST       = 2,
+	E_RAIL_ASCEND_WEST       = 3,
+	E_RAIL_ASCEND_NORTH      = 4,
+	E_RAIL_ASCEND_SOUTH      = 5,
+	E_RAIL_CURVED_SOUTH_EAST = 6,
+	E_RAIL_CURVED_SOUTH_WEST = 7,
+	E_RAIL_CURVED_NORTH_WEST = 8,
+	E_RAIL_CURVED_NORTH_EAST = 9,
+} ;
+
+
+
+
+
 void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	// TODO: the physics
+	/*
+	NOTE: Please bear in mind that taking away from negatives make them even more negative,
+	adding to negatives make them positive, etc. Also remember that - North is -Z, South +Z, West -X, and East +Z
+	*/
+	
+	super::Tick(a_Dt, a_Chunk);
+	
+	BLOCKTYPE BelowType;
+	NIBBLETYPE BelowMeta;
+	double SpeedX = GetSpeedX(), SpeedY = GetSpeedY(), SpeedZ = GetSpeedZ(); // Get current speed
+
+	// Get block type & meta below the cart
+	GetWorld()->GetBlockTypeMeta(floor(GetPosX()), floor(GetPosY() -1 ), floor(GetPosZ()), BelowType, BelowMeta);
+
+	if ((BelowType == E_BLOCK_RAIL) || (BelowType == E_BLOCK_DETECTOR_RAIL) || (BelowType == E_BLOCK_ACTIVATOR_RAIL))
+	{
+		switch (BelowMeta)
+		{
+
+			case E_RAIL_NORTH_SOUTH:
+			{
+				SpeedY = 0; // Don't move vertically as on ground
+				
+				// Set Y as current Y rounded up to bypass friction
+				// TODO: this causes positioning mismatches on the client, but Entity physics insists on friction!
+				SetPosY(ceil(GetPosY()) + 0.05);
+
+				if (SpeedZ != 0) // Don't do anything if cart is stationary
+				{
+					if (SpeedZ > 0)
+					{
+						// Going SOUTH, slow down
+						SpeedZ = SpeedZ - 0.05;
+					}
+					else
+					{
+						// Going NORTH, slow down
+						SpeedZ = SpeedZ + 0.05;
+					}
+				}
+				break;
+			}
+
+			case E_RAIL_EAST_WEST:
+			{
+				SpeedY = 0;
+				SetPosY(ceil(GetPosY()) + 0.05);
+
+				if (SpeedX != 0)
+				{
+					if (SpeedX > 0)
+					{
+						SpeedX = SpeedX - 0.05;
+					}
+					else
+					{
+						SpeedX = SpeedX + 0.05;
+					}
+				}
+				break;
+			}
+
+			case E_RAIL_ASCEND_NORTH:
+			{
+				if (SpeedZ >= 0)
+				{
+					// SpeedZ POSITIVE, going SOUTH
+					if (SpeedZ <= 6) // Speed limit of 6 SOUTH (m/s??)
+					{
+						SpeedZ = SpeedZ + 1; // Speed up
+						SpeedY = (0 - SpeedZ); // Downward movement is negative (0 minus positive numbers is negative)
+					}
+					else
+					{
+						SpeedZ = 6; // Enforce speed limit
+						SpeedY = (0 - SpeedZ);
+					}
+				}
+				else
+				{
+					// SpeedZ NEGATIVE, going NORTH
+					SpeedZ = SpeedZ + 0.1; // Slow down
+					SpeedY = (0 - SpeedZ); // Upward movement is positive (0 minus negative number is positive number)
+				}
+				break;
+			}
+
+			case E_RAIL_ASCEND_SOUTH:
+			{
+				if (SpeedX > 0)
+				{
+					// SpeedZ POSITIVE, going SOUTH
+					SpeedZ = SpeedZ - 0.1; // Slow down
+					SpeedY = SpeedZ; // Upward movement positive
+				}
+				else
+				{
+					if (SpeedZ >= -6) // Speed limit of 6 WEST (m/s??)
+					{
+						// SpeedZ NEGATIVE, going NORTH
+						SpeedZ = SpeedZ - 1; // Speed up
+						SpeedY = SpeedZ; // Downward movement negative
+					}
+					else
+					{
+						SpeedZ = 6; // Enforce speed limit
+						SpeedY = SpeedZ;
+					}
+				}
+				break;
+			}
+
+			case E_RAIL_ASCEND_WEST:
+			{
+				if (SpeedX >= 0)
+				{
+					if (SpeedX <= 6)
+					{
+						SpeedX = SpeedX + 1;
+						SpeedY = (0 - SpeedX);
+					}
+					else
+					{
+						SpeedX = 6;
+						SpeedY = (0 - SpeedX);
+					}
+				}
+				else
+				{
+					SpeedX = SpeedX + 0.1;
+					SpeedY = (0 - SpeedX);
+				}
+				break;
+			}
+
+			case E_RAIL_ASCEND_EAST:
+			{
+				if (SpeedX > 0)
+				{
+					SpeedX = SpeedX - 0.1;
+					SpeedY = SpeedX;
+				}
+				else
+				{
+					if (SpeedX >= -6)
+					{
+						SpeedX = SpeedX - 1;
+						SpeedY = SpeedX;
+					}
+					else
+					{
+						SpeedX = -6;
+						SpeedY = SpeedX;
+					}
+				}
+				break;
+			}
+
+			default:
+			{
+				ASSERT(!"Unhandled rail meta!");
+				break;
+			}
+
+		}
+	}
+	
+	// Set speed to speed variables
+	SetSpeedX(SpeedX);
+	SetSpeedY(SpeedY);
+	SetSpeedZ(SpeedZ);
+
+	// Pass to physics handlers in Entity.cpp and broadcast position to client
+	HandlePhysics(a_Dt, a_Chunk);
+	BroadcastMovementUpdate();
+
 }
 
 

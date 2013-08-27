@@ -351,6 +351,9 @@ protected:
 
 	bool     m_bOnGround;
 	float    m_Gravity;
+	
+	// Measured in Kilograms (Kg)
+	double m_Mass;
 
 	// Last Position.
 	double m_LastPosX, m_LastPosY, m_LastPosZ;
@@ -398,9 +401,6 @@ private:
 	
 	// Measured in meter / second
 	Vector3d m_WaterSpeed;
-	
-	// Measured in Kilograms (Kg)
-	double m_Mass;
 	
 	/// Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
 	double m_Width;
