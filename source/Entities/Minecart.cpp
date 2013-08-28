@@ -18,7 +18,8 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 	super(etMinecart, a_X, a_Y, a_Z, 0.98, 0.7),
 	m_Payload(a_Payload)
 {
-	m_Mass = 20.f;
+	SetMass(20.f);
+	SetMaxHealth(6);
 }
 
 
@@ -40,21 +41,21 @@ bool cMinecart::Initialize(cWorld * a_World)
 
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	char Type = 0;
-	switch (m_Payload) //Wiki.vg is outdated on this!!
+	char TypeType = 0;
+	switch (m_Payload)
 	{
-		case mpNone:    Type =  9; break; //?
-		case mpChest:   Type = 10; break;
-		case mpFurnace: Type = 11; break; //?
-		case mpTNT:     Type = 12; break; //?
-		case mpHopper:  Type = 13; break; //?
+		case mpNone:    TypeType = 0; break;
+		case mpChest:   TypeType = 1; break;
+		case mpFurnace: TypeType = 2; break;
+		case mpTNT:     TypeType = 3; break;
+		case mpHopper:  TypeType = 5; break;
 		default:
 		{
 			ASSERT(!"Unknown payload, cannot spawn on client");
 			return;
 		}
 	}
-	a_ClientHandle.SendSpawnVehicle(*this, Type);
+	a_ClientHandle.SendSpawnVehicle(*this, 10, TypeType); // 10 = Minecarts, TypeType = What type of Minecart
 }
 
 

@@ -747,7 +747,7 @@ void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 
 
 
-void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType)
+void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleTypeType)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_SPAWN_OBJECT);
@@ -758,10 +758,13 @@ void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	WriteInt  ((int)(a_Vehicle.GetPosZ() * 32));
 	WriteByte ((Byte)((a_Vehicle.GetPitch() / 360.f) * 256));
 	WriteByte ((Byte)((a_Vehicle.GetRotation() / 360.f) * 256));
-	WriteInt  (1);
-	WriteShort((short)(a_Vehicle.GetSpeedX() * 400));
-	WriteShort((short)(a_Vehicle.GetSpeedY() * 400));
-	WriteShort((short)(a_Vehicle.GetSpeedZ() * 400));
+	WriteInt  (a_VehicleTypeType);
+	if (a_VehicleTypeType != 0)
+	{
+		WriteShort((short)(a_Vehicle.GetSpeedX() * 400));
+		WriteShort((short)(a_Vehicle.GetSpeedY() * 400));
+		WriteShort((short)(a_Vehicle.GetSpeedZ() * 400));
+	}
 	Flush();
 }
 
