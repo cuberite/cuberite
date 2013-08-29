@@ -88,20 +88,19 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 				SpeedY = 0; // Don't move vertically as on ground
 				
 				// Set Y as current Y rounded up to bypass friction
-				// TODO: this causes positioning mismatches on the client, but Entity physics insists on friction!
-				SetPosY(ceil(GetPosY()) + 0.05);
+				SetPosY(floor(GetPosY()));
 
 				if (SpeedZ != 0) // Don't do anything if cart is stationary
 				{
 					if (SpeedZ > 0)
 					{
 						// Going SOUTH, slow down
-						SpeedZ = SpeedZ - 0.05;
+						SpeedZ = SpeedZ - 0.1;
 					}
 					else
 					{
 						// Going NORTH, slow down
-						SpeedZ = SpeedZ + 0.05;
+						SpeedZ = SpeedZ + 0.1;
 					}
 				}
 				break;
@@ -110,17 +109,17 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 			case E_RAIL_XM_XP:
 			{
 				SpeedY = 0;
-				SetPosY(ceil(GetPosY()) + 0.05);
+				SetPosY(floor(GetPosY()));
 
 				if (SpeedX != 0)
 				{
 					if (SpeedX > 0)
 					{
-						SpeedX = SpeedX - 0.05;
+						SpeedX = SpeedX - 0.1;
 					}
 					else
 					{
-						SpeedX = SpeedX + 0.05;
+						SpeedX = SpeedX + 0.1;
 					}
 				}
 				break;
@@ -131,21 +130,21 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 				if (SpeedZ >= 0)
 				{
 					// SpeedZ POSITIVE, going SOUTH
-					if (SpeedZ <= 6) // Speed limit of 6 SOUTH (m/s??)
+					if (SpeedZ <= 8) // Speed limit of 8 SOUTH (m/s??)
 					{
-						SpeedZ = SpeedZ + 1; // Speed up
+						SpeedZ = SpeedZ + 0.5; // Speed up
 						SpeedY = (0 - SpeedZ); // Downward movement is negative (0 minus positive numbers is negative)
 					}
 					else
 					{
-						SpeedZ = 6; // Enforce speed limit
+						SpeedZ = 8; // Enforce speed limit
 						SpeedY = (0 - SpeedZ);
 					}
 				}
 				else
 				{
 					// SpeedZ NEGATIVE, going NORTH
-					SpeedZ = SpeedZ + 0.1; // Slow down
+					SpeedZ = SpeedZ + 0.6; // Slow down
 					SpeedY = (0 - SpeedZ); // Upward movement is positive (0 minus negative number is positive number)
 				}
 				break;
@@ -156,20 +155,20 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 				if (SpeedX > 0)
 				{
 					// SpeedZ POSITIVE, going SOUTH
-					SpeedZ = SpeedZ - 0.1; // Slow down
+					SpeedZ = SpeedZ - 0.6; // Slow down
 					SpeedY = SpeedZ; // Upward movement positive
 				}
 				else
 				{
-					if (SpeedZ >= -6) // Speed limit of 6 WEST (m/s??)
+					if (SpeedZ >= -8) // Speed limit of 8 WEST (m/s??)
 					{
 						// SpeedZ NEGATIVE, going NORTH
-						SpeedZ = SpeedZ - 1; // Speed up
+						SpeedZ = SpeedZ - 0.5; // Speed up
 						SpeedY = SpeedZ; // Downward movement negative
 					}
 					else
 					{
-						SpeedZ = 6; // Enforce speed limit
+						SpeedZ = 8; // Enforce speed limit
 						SpeedY = SpeedZ;
 					}
 				}
@@ -180,20 +179,20 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 			{
 				if (SpeedX >= 0)
 				{
-					if (SpeedX <= 6)
+					if (SpeedX <= 8)
 					{
-						SpeedX = SpeedX + 1;
+						SpeedX = SpeedX + 0.5;
 						SpeedY = (0 - SpeedX);
 					}
 					else
 					{
-						SpeedX = 6;
+						SpeedX = 8;
 						SpeedY = (0 - SpeedX);
 					}
 				}
 				else
 				{
-					SpeedX = SpeedX + 0.1;
+					SpeedX = SpeedX + 0.6;
 					SpeedY = (0 - SpeedX);
 				}
 				break;
@@ -203,19 +202,19 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 			{
 				if (SpeedX > 0)
 				{
-					SpeedX = SpeedX - 0.1;
+					SpeedX = SpeedX - 0.6;
 					SpeedY = SpeedX;
 				}
 				else
 				{
-					if (SpeedX >= -6)
+					if (SpeedX >= -8)
 					{
-						SpeedX = SpeedX - 1;
+						SpeedX = SpeedX - 0.5;
 						SpeedY = SpeedX;
 					}
 					else
 					{
-						SpeedX = -6;
+						SpeedX = -8;
 						SpeedY = SpeedX;
 					}
 				}

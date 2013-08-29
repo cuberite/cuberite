@@ -499,6 +499,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 		int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
 		BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
+		BLOCKTYPE BlockBelow = NextChunk->GetBlock( RelBlockX, BlockY - 1, RelBlockZ );
 		if (!g_BlockIsSolid[BlockIn])  // Making sure we are not inside a solid block
 		{
 			if (m_bOnGround)  // check if it's still on the ground
@@ -540,13 +541,21 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			//Friction
-			if (NextSpeed.SqrLength() > 0.0004f)
+			if (
+				(BlockBelow != E_BLOCK_RAIL) && 
+				(BlockBelow != E_BLOCK_DETECTOR_RAIL) && 
+				(BlockBelow != E_BLOCK_POWERED_RAIL) && 
+				(BlockBelow != E_BLOCK_ACTIVATOR_RAIL)
+				)
 			{
-				NextSpeed.x *= 0.7f/(1+a_Dt);
-				if ( fabs(NextSpeed.x) < 0.05 ) NextSpeed.x = 0;
-				NextSpeed.z *= 0.7f/(1+a_Dt);
-				if ( fabs(NextSpeed.z) < 0.05 ) NextSpeed.z = 0;
+				//Friction
+				if (NextSpeed.SqrLength() > 0.0004f)
+				{
+					NextSpeed.x *= 0.7f/(1+a_Dt);
+					if ( fabs(NextSpeed.x) < 0.05 ) NextSpeed.x = 0;
+					NextSpeed.z *= 0.7f/(1+a_Dt);
+					if ( fabs(NextSpeed.z) < 0.05 ) NextSpeed.z = 0;
+				}
 			}
 		}
 
