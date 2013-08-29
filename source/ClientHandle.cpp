@@ -1901,9 +1901,9 @@ void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType,
 
 
 
-void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleTypeType) // VehicleTypeType is specific to Minecarts
+void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) // VehicleTypeType is specific to Minecarts
 {
-	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleTypeType);
+	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
 }
 
 

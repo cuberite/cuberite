@@ -502,10 +502,10 @@ void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_Objec
 
 
 
-void cProtocolRecognizer::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleTypeType)
+void cProtocolRecognizer::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleTypeType);
+	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
 }
 
 

@@ -125,7 +125,7 @@ public:
 	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob            (const cMonster & a_Mob);
 	void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);
-	void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleTypeType);
+	void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType);
 	void SendTabCompletionResults(const AStringVector & a_Results);
 	void SendTeleportEntity      (const cEntity & a_Entity);
 	void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ);

@@ -41,40 +41,22 @@ bool cMinecart::Initialize(cWorld * a_World)
 
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	char TypeType = 0;
+	char SubType = 0;
 	switch (m_Payload)
 	{
-		case mpNone:    TypeType = 0; break;
-		case mpChest:   TypeType = 1; break;
-		case mpFurnace: TypeType = 2; break;
-		case mpTNT:     TypeType = 3; break;
-		case mpHopper:  TypeType = 5; break;
+		case mpNone:    SubType = 0; break;
+		case mpChest:   SubType = 1; break;
+		case mpFurnace: SubType = 2; break;
+		case mpTNT:     SubType = 3; break;
+		case mpHopper:  SubType = 5; break;
 		default:
 		{
 			ASSERT(!"Unknown payload, cannot spawn on client");
 			return;
 		}
 	}
-	a_ClientHandle.SendSpawnVehicle(*this, 10, TypeType); // 10 = Minecarts, TypeType = What type of Minecart
+	a_ClientHandle.SendSpawnVehicle(*this, 10, SubType); // 10 = Minecarts, TypeType = What type of Minecart
 }
-
-
-
-
-
-enum ENUM_RAIL_DIRECTIONS
-{
-	E_RAIL_NORTH_SOUTH       = 0,
-	E_RAIL_EAST_WEST         = 1,
-	E_RAIL_ASCEND_EAST       = 2,
-	E_RAIL_ASCEND_WEST       = 3,
-	E_RAIL_ASCEND_NORTH      = 4,
-	E_RAIL_ASCEND_SOUTH      = 5,
-	E_RAIL_CURVED_SOUTH_EAST = 6,
-	E_RAIL_CURVED_SOUTH_WEST = 7,
-	E_RAIL_CURVED_NORTH_WEST = 8,
-	E_RAIL_CURVED_NORTH_EAST = 9,
-} ;
 
 
 
@@ -84,7 +66,7 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	/*
 	NOTE: Please bear in mind that taking away from negatives make them even more negative,
-	adding to negatives make them positive, etc. Also remember that - North is -Z, South +Z, West -X, and East +Z
+	adding to negatives make them positive, etc.
 	*/
 	
 	super::Tick(a_Dt, a_Chunk);
@@ -101,7 +83,7 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 		switch (BelowMeta)
 		{
 
-			case E_RAIL_NORTH_SOUTH:
+			case E_RAIL_ZM_ZP:
 			{
 				SpeedY = 0; // Don't move vertically as on ground
 				
@@ -125,7 +107,7 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 				break;
 			}
 
-			case E_RAIL_EAST_WEST:
+			case E_RAIL_XM_XP:
 			{
 				SpeedY = 0;
 				SetPosY(ceil(GetPosY()) + 0.05);
@@ -144,7 +126,7 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 				break;
 			}
 
-			case E_RAIL_ASCEND_NORTH:
+			case E_RAIL_ASCEND_ZM:
 			{
 				if (SpeedZ >= 0)
 				{
@@ -169,7 +151,7 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 				break;
 			}
 
-			case E_RAIL_ASCEND_SOUTH:
+			case E_RAIL_ASCEND_ZP:
 			{
 				if (SpeedX > 0)
 				{
@@ -194,7 +176,7 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 				break;
 			}
 
-			case E_RAIL_ASCEND_WEST:
+			case E_RAIL_ASCEND_XM:
 			{
 				if (SpeedX >= 0)
 				{
@@ -217,7 +199,7 @@ void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 				break;
 			}
 
-			case E_RAIL_ASCEND_EAST:
+			case E_RAIL_ASCEND_XP:
 			{
 				if (SpeedX > 0)
 				{
