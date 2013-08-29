@@ -55,7 +55,7 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 			return;
 		}
 	}
-	a_ClientHandle.SendSpawnVehicle(*this, 10, SubType); // 10 = Minecarts, TypeType = What type of Minecart
+	a_ClientHandle.SendSpawnVehicle(*this, 10, SubType); // 10 = Minecarts, SubType = What type of Minecart
 }
 
 
