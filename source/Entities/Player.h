@@ -73,7 +73,7 @@ public:
 	void CancelChargingBow(void);
 	
 	/// Returns true if the player is currently charging the bow
-	bool IsChargingBox(void) const { return m_IsChargingBow; }
+	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
 	void SetTouchGround( bool a_bTouchGround );
 	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
@@ -89,6 +89,12 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
 	// tolua_begin
+	
+	/// Returns the position where projectiles thrown by this player should start, player eye position + adjustment
+	Vector3d GetThrowStartPos(void) const;
+	
+	/// Returns the initial speed vector of a throw, with a 3D length of a_SpeedCoeff.
+	Vector3d GetThrowSpeed(double a_SpeedCoeff) const;
 	
 	/// Returns the current gamemode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable
 	eGameMode GetGameMode(void) const { return m_GameMode; }

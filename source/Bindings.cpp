@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/30/13 14:30:24.
+** Generated automatically by tolua++-1.0.92 on 08/30/13 17:24:30.
 */
 
 #ifndef __cplusplus
@@ -7650,6 +7650,92 @@ static int tolua_AllToLua_cPlayer_GetEquippedItem00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetThrowStartPos of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetThrowStartPos00
+static int tolua_AllToLua_cPlayer_GetThrowStartPos00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetThrowStartPos'", NULL);
+#endif
+  {
+   Vector3d tolua_ret = (Vector3d)  self->GetThrowStartPos();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetThrowStartPos'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetThrowSpeed of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetThrowSpeed00
+static int tolua_AllToLua_cPlayer_GetThrowSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  double a_SpeedCoeff = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetThrowSpeed'", NULL);
+#endif
+  {
+   Vector3d tolua_ret = (Vector3d)  self->GetThrowSpeed(a_SpeedCoeff);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetThrowSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetGameMode of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetGameMode00
 static int tolua_AllToLua_cPlayer_GetGameMode00(lua_State* tolua_S)
@@ -9699,88 +9785,6 @@ static int tolua_AllToLua_cProjectileEntity_IsInGround00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsInGround'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: PosFromPlayerPos of class  cArrowEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cArrowEntity_PosFromPlayerPos00
-static int tolua_AllToLua_cArrowEntity_PosFromPlayerPos00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cArrowEntity",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cPlayer",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,2,0));
-  {
-   Vector3d tolua_ret = (Vector3d)  cArrowEntity::PosFromPlayerPos(*a_Player);
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'PosFromPlayerPos'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: SpeedFromPlayerLook of class  cArrowEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cArrowEntity_SpeedFromPlayerLook00
-static int tolua_AllToLua_cArrowEntity_SpeedFromPlayerLook00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cArrowEntity",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cPlayer",0,&tolua_err)) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,2,0));
-  double a_Force = ((double)  tolua_tonumber(tolua_S,3,0));
-  {
-   Vector3d tolua_ret = (Vector3d)  cArrowEntity::SpeedFromPlayerLook(*a_Player,a_Force);
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SpeedFromPlayerLook'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28588,6 +28592,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetStance",tolua_AllToLua_cPlayer_GetStance00);
    tolua_function(tolua_S,"GetInventory",tolua_AllToLua_cPlayer_GetInventory00);
    tolua_function(tolua_S,"GetEquippedItem",tolua_AllToLua_cPlayer_GetEquippedItem00);
+   tolua_function(tolua_S,"GetThrowStartPos",tolua_AllToLua_cPlayer_GetThrowStartPos00);
+   tolua_function(tolua_S,"GetThrowSpeed",tolua_AllToLua_cPlayer_GetThrowSpeed00);
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cPlayer_GetGameMode00);
    tolua_function(tolua_S,"SetGameMode",tolua_AllToLua_cPlayer_SetGameMode00);
    tolua_function(tolua_S,"IsGameModeCreative",tolua_AllToLua_cPlayer_IsGameModeCreative00);
@@ -28677,8 +28683,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"psNoPickup",cArrowEntity::psNoPickup);
    tolua_constant(tolua_S,"psInSurvivalOrCreative",cArrowEntity::psInSurvivalOrCreative);
    tolua_constant(tolua_S,"psInCreative",cArrowEntity::psInCreative);
-   tolua_function(tolua_S,"PosFromPlayerPos",tolua_AllToLua_cArrowEntity_PosFromPlayerPos00);
-   tolua_function(tolua_S,"SpeedFromPlayerLook",tolua_AllToLua_cArrowEntity_SpeedFromPlayerLook00);
    tolua_function(tolua_S,"GetPickupState",tolua_AllToLua_cArrowEntity_GetPickupState00);
    tolua_function(tolua_S,"SetPickupState",tolua_AllToLua_cArrowEntity_SetPickupState00);
    tolua_function(tolua_S,"GetDamageCoeff",tolua_AllToLua_cArrowEntity_GetDamageCoeff00);

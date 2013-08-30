@@ -857,6 +857,36 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 
 
+Vector3d cPlayer::GetThrowStartPos(void) const
+{
+	Vector3d res = GetEyePosition();
+	
+	// Adjust the position to be just outside the player's bounding box:
+	res.x += 0.16 * cos(GetPitch());
+	res.y += -0.1;
+	res.z += 0.16 * sin(GetPitch());
+	
+	return res;
+}
+
+
+
+
+
+Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
+{
+	Vector3d res = GetLookVector();
+	res.Normalize();
+	
+	// TODO: Add a slight random change (+-0.0075 in each direction)
+	
+	return res * a_SpeedCoeff;
+}	
+
+
+
+
+
 void cPlayer::MoveTo( const Vector3d & a_NewPos )
 {
 	if ((a_NewPos.y < -990) && (GetPosY() > -100))

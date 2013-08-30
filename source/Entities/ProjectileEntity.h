@@ -112,12 +112,6 @@ public:
 	
 	// tolua_begin
 	
-	/// Returns the initial arrow position, as defined by the player eye position + adjustment.
-	static Vector3d PosFromPlayerPos(const cPlayer & a_Player);
-
-	/// Returns the initial arrow speed, as defined by the player look vector and the force coefficient
-	static Vector3d SpeedFromPlayerLook(const cPlayer & a_Player, double a_Force);
-	
 	/// Returns whether the arrow can be picked up by players
 	ePickupState GetPickupState(void) const { return m_PickupState; }
 	
