@@ -76,6 +76,12 @@ void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 		return;
 	}
 
+	if (m_Callback.OnNewRegion(RegionX, RegionZ))
+	{
+		// Callback doesn't want the region file processed
+		return;
+	}
+	
 	cFile f;
 	if (!f.Open(a_FileName, cFile::fmRead))
 	{
@@ -92,6 +98,8 @@ void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 	}
 	
 	ProcessFileData(FileContents.data(), FileContents.size(), RegionX * 32, RegionZ * 32);
+	
+	m_Callback.OnRegionFinished(RegionX, RegionZ);
 }
 
 

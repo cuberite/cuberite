@@ -22,17 +22,20 @@ class cParsedNBT;
 
 /** The base class for all chunk-processor callbacks, declares the interface.
 The processor calls each virtual function in the order they are declared here with the specified args.
-If the function returns true, the processor moves on to next chunk and starts calling the callbacks again from start with
-the new chunk data.
+If the function returns true, the processor doesn't process the data item, moves on to the next chunk
+and starts calling the callbacks again from start with the new chunk data.
 So if a statistics collector doesn't need data decompression at all, it can stop the processor from doing so early-enough
 and still get meaningful data.
-A callback is guaranteed to run in a single thread and always the same thread.
+A callback is guaranteed to run in a single thread and always the same thread for the same chunk.
 A callback is guaranteed to run on all chunks in a region and one region is guaranteed to be handled by only callback.
 */
 class cCallback abstract
 {
 public:
 	virtual ~cCallback() {}  // Force a virtual destructor in each descendant
+
+	/// Called when a new region file is about to be opened; by default allow the region
+	virtual bool OnNewRegion(int a_RegionX, int a_RegionZ) { return false; }
 	
 	/// Called to inform the stats module of the chunk coords for newly processing chunk
 	virtual bool OnNewChunk(int a_ChunkX, int a_ChunkZ) = 0;
@@ -118,6 +121,9 @@ public:
 		int a_TicksLeft,
 		int a_PosX, int a_PosY, int a_PosZ
 	) { return true; }
+	
+	/// Called after the entire region file has been processed. No more callbacks for this region will be called. No processing by default
+	virtual void OnRegionFinished(int a_RegionX, int a_RegionZ) {}
 } ;
 
 typedef std::vector<cCallback *> cCallbacks;

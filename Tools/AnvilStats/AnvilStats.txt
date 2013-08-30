@@ -15,6 +15,7 @@ Possible usage:
   - count the per-chunk density of specific blocks
   - count the per-chunk density of dungeons, by measuring the number of zombie/skeleton/regularspider spawners
   - count the per-chunk-per-biome density of trees, by measuring the number of dirt-log vertical transitions, correlating to biome data
+  - draw a vertical map of the world based on a specific measured value (biome, elevation, ...)
 
 This project is Windows-only, although it shouldn't be too difficult to make it portable.
 
