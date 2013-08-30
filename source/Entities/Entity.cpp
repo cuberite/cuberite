@@ -144,6 +144,10 @@ bool cEntity::Initialize(cWorld * a_World)
 	m_World->AddEntity(this);
 	
 	cPluginManager::Get()->CallHookSpawnedEntity(*a_World, *this);
+	
+	// Spawn the entity on the clients:
+	a_World->BroadcastSpawnEntity(*this);
+	
 	return true;
 }
 
@@ -477,7 +481,7 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 {
 	// TODO Add collision detection with entities.
-	a_Dt /= 1000;
+	a_Dt /= 1000;  // Convert from msec to sec
 	Vector3d NextPos = Vector3d(GetPosX(),GetPosY(),GetPosZ());
 	Vector3d NextSpeed = Vector3d(GetSpeedX(),GetSpeedY(),GetSpeedZ());
 	int BlockX = (int) floor(NextPos.x);
@@ -493,7 +497,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	}
 	
 	// Make sure we got the correct chunk and a valid one. No one ever knows...
-	cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX,BlockZ);
+	cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
 	if (NextChunk != NULL)
 	{
 		int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
@@ -512,11 +516,12 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			//Push out entity.
+			// Push out entity.
 			m_bOnGround = true;
 			NextPos.y += 0.2;
-			LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
-				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ);
+			LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
+				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ
+			);
 		}
 
 		if (!m_bOnGround)
@@ -524,34 +529,40 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			float fallspeed;
 			if (IsBlockWater(BlockIn))
 			{
-				fallspeed = -3.0f * a_Dt; //Fall slower in water.
+				fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
 			}
 			else if (BlockIn == E_BLOCK_COBWEB)
 			{
-				NextSpeed.y *= 0.05; //Reduce overall falling speed
-				fallspeed = 0; //No falling.
+				NextSpeed.y *= 0.05;  // Reduce overall falling speed
+				fallspeed = 0;  // No falling.
 			}
 			else
 			{
-				//Normal gravity
+				// Normal gravity
 				fallspeed = m_Gravity * a_Dt;
 			}
 			NextSpeed.y += fallspeed;
 		}
 		else
 		{
-			//Friction
+			// Friction
 			if (NextSpeed.SqrLength() > 0.0004f)
 			{
-				NextSpeed.x *= 0.7f/(1+a_Dt);
-				if ( fabs(NextSpeed.x) < 0.05 ) NextSpeed.x = 0;
-				NextSpeed.z *= 0.7f/(1+a_Dt);
-				if ( fabs(NextSpeed.z) < 0.05 ) NextSpeed.z = 0;
+				NextSpeed.x *= 0.7f / (1 + a_Dt);
+				if (fabs(NextSpeed.x) < 0.05)
+				{
+					NextSpeed.x = 0;
+				}
+				NextSpeed.z *= 0.7f / (1 + a_Dt);
+				if (fabs(NextSpeed.z) < 0.05)
+				{
+					NextSpeed.z = 0;
+				}
 			}
 		}
 
-		//Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
-		//might have different speed modifiers according to terrain.
+		// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
+		// might have different speed modifiers according to terrain.
 		if (BlockIn == E_BLOCK_COBWEB)
 		{
 			NextSpeed.x *= 0.25;
@@ -1028,9 +1039,9 @@ void cEntity::SetMass(double a_Mass)
 	}
 	else
 	{
-		//Make sure that mass is not zero. 1g is the default because we 
-		//have to choose a number. It's perfectly legal to have a mass 
-		//less than 1g as long as is NOT equal or less than zero.
+		// Make sure that mass is not zero. 1g is the default because we 
+		// have to choose a number. It's perfectly legal to have a mass 
+		// less than 1g as long as is NOT equal or less than zero.
 		m_Mass = 0.001;
 	}
 }

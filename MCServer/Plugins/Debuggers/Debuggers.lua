@@ -45,6 +45,7 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/spidey",  "debuggers", HandleSpideyCmd,       "- Shoots a line of web blocks until it hits non-air");
 	PluginManager:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
 	PluginManager:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
+	PluginManager:BindCommand("/arr",     "debuggers", HandleArrowCmd,        "- Creates an arrow going away from the player");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -794,6 +795,7 @@ function HandleEnchCmd(a_Split, a_Player)
 	Wnd:SetProperty(0, 10);
 	Wnd:SetProperty(1, 15);
 	Wnd:SetProperty(2, 25);
+	return true;
 end
 
 
@@ -802,6 +804,22 @@ end
 
 function HandleFoodStatsCmd(a_Split, a_Player)
 	g_ShowFoodStats = not(g_ShowFoodStats);
+	return true;
+end
+
+
+
+
+
+function HandleArrowCmd(a_Split, a_Player)
+	local World = a_Player:GetWorld();
+	local Pos = a_Player:GetEyePosition();
+	local Speed = a_Player:GetLookVector();
+	Speed:Normalize();
+	Pos = Pos + Speed;
+	
+	World:CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity.pkArrow, a_Player, Speed * 10);
+	return true;
 end
 
 

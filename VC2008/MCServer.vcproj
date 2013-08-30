@@ -1160,6 +1160,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Entities\ProjectileEntity.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Entities\ProjectileEntity.h"
 					>
 				</File>
@@ -2233,6 +2237,10 @@
 				>
 				<File
 					RelativePath="..\source\items\ItemBed.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Items\ItemBow.h"
 					>
 				</File>
 				<File

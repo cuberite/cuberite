@@ -40,20 +40,6 @@ cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem 
 
 
 
-bool cPickup::Initialize(cWorld * a_World)
-{
-	if (super::Initialize(a_World))
-	{
-		a_World->BroadcastSpawnEntity(*this);
-		return true;
-	}
-	return false;
-}
-
-
-
-
-
 void cPickup::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendPickupSpawn(*this);	

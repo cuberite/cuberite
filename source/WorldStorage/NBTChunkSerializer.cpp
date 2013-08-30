@@ -22,6 +22,8 @@
 #include "../Entities/Minecart.h"
 #include "../Mobs/Monster.h"
 #include "../Entities/Pickup.h"
+#include "../Entities/ProjectileEntity.h"
+
 
 
 
@@ -330,6 +332,62 @@ void cNBTChunkSerializer::AddPickupEntity(cPickup * a_Pickup)
 
 
 
+void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_Projectile, a_Projectile->GetMCAClassName());
+		Vector3d Pos = a_Projectile->GetPosition();
+		m_Writer.AddShort("xTile",  (Int16)floor(Pos.x));
+		m_Writer.AddShort("yTile",  (Int16)floor(Pos.y));
+		m_Writer.AddShort("zTile",  (Int16)floor(Pos.z));
+		m_Writer.AddShort("inTile", 0);  // TODO: Query the block type (is it needed?)
+		m_Writer.AddShort("shake",  0);  // TODO: Any shake?
+		m_Writer.AddByte ("inGround", a_Projectile->IsInGround() ? 1 : 0);
+		
+		switch (a_Projectile->GetProjectileKind())
+		{
+			case cProjectileEntity::pkArrow:
+			{
+				m_Writer.AddByte("inData",   0);  // TODO: Query the block meta (is it needed?)
+				m_Writer.AddByte("pickup",   ((cArrowEntity *)a_Projectile)->GetPickupState());
+				m_Writer.AddDouble("damage", ((cArrowEntity *)a_Projectile)->GetDamageCoeff());
+				break;
+			}
+			case cProjectileEntity::pkGhastFireball:
+			{
+				m_Writer.AddInt("ExplosionPower", 1);
+				// fall-through:
+			}
+			case cProjectileEntity::pkFireCharge:
+			case cProjectileEntity::pkWitherSkull:
+			{
+				m_Writer.BeginList("Motion", TAG_Double);
+					m_Writer.AddDouble("", a_Projectile->GetSpeedX());
+					m_Writer.AddDouble("", a_Projectile->GetSpeedY());
+					m_Writer.AddDouble("", a_Projectile->GetSpeedZ());
+				m_Writer.EndList();
+				break;
+			}
+			default:
+			{
+				ASSERT(!"Unsaved projectile entity!");
+			}
+		}  // switch (ProjectileKind)
+		cEntity * Creator = a_Projectile->GetCreator();
+		if (Creator != NULL)
+		{
+			if (Creator->GetEntityType() == cEntity::etPlayer)
+			{
+				m_Writer.AddString("ownerName", ((cPlayer *)Creator)->GetName());
+			}
+		}
+	m_Writer.EndCompound();
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Minecart)
 {
 	m_Writer.BeginList("Items", TAG_Compound);
@@ -403,10 +461,11 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 	
 	switch (a_Entity->GetEntityType())
 	{
-		case cEntity::etFallingBlock: AddFallingBlockEntity((cFallingBlock *)a_Entity); break;
-		case cEntity::etMinecart:     AddMinecartEntity    ((cMinecart *)    a_Entity); break;
-		case cEntity::etMonster:      AddMonsterEntity     ((cMonster *)     a_Entity); break;
-		case cEntity::etPickup:       AddPickupEntity      ((cPickup *)      a_Entity); break;
+		case cEntity::etFallingBlock: AddFallingBlockEntity((cFallingBlock *)    a_Entity); break;
+		case cEntity::etMinecart:     AddMinecartEntity    ((cMinecart *)        a_Entity); break;
+		case cEntity::etMonster:      AddMonsterEntity     ((cMonster *)         a_Entity); break;
+		case cEntity::etPickup:       AddPickupEntity      ((cPickup *)          a_Entity); break;
+		case cEntity::etProjectile:   AddProjectileEntity  ((cProjectileEntity *)a_Entity); break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world
 		default:
 		{

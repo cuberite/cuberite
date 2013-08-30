@@ -31,12 +31,12 @@ public:
 		/** Called on each block encountered along the path, including the first block (path start)
 		When this callback returns true, the tracing is aborted.
 		*/
-		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
+		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) = 0;
 		
 		/** Called on each block encountered along the path, including the first block (path start), if chunk data is not loaded
 		When this callback returns true, the tracing is aborted.
 		*/
-		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) { return false; }
+		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) { return false; }
 		
 		/** Called when the path goes out of world, either below (a_BlockY < 0) or above (a_BlockY >= cChunkDef::Height)
 		The coords specify the exact point at which the path exited the world.
