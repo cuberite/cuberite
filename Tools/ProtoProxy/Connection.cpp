@@ -1720,16 +1720,45 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	{
 		return false;
 	}
-	AString Meta;
-	if (!m_ServerBuffer.ReadString(Meta, ChunkCount * 12))
+	
+	// Read individual chunk metas.
+	// Need to read them first and only then start logging (in case we don't have the full packet yet)
+	struct sChunkMeta
 	{
-		return false;
+		int m_ChunkX, m_ChunkZ;
+		short m_PrimaryBitmap;
+		short m_AddBitmap;
+		sChunkMeta(int a_ChunkX, int a_ChunkZ, short a_PrimaryBitmap, short a_AddBitmap) :
+			m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_PrimaryBitmap(a_PrimaryBitmap), m_AddBitmap(a_AddBitmap)
+		{
+		}
+	} ;
+	typedef std::vector<sChunkMeta> sChunkMetas;
+	sChunkMetas ChunkMetas;
+	ChunkMetas.reserve(ChunkCount);
+	for (short i = 0; i < ChunkCount; i++)
+	{
+		HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkX);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkZ);
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, PrimaryBitmap);
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, AddBitmap);
+		ChunkMetas.push_back(sChunkMeta(ChunkX, ChunkZ, PrimaryBitmap, AddBitmap));
 	}
+	
 	Log("Received a PACKET_MAP_CHUNK_BULK from the server:");
 	Log("  ChunkCount = %d", ChunkCount);
 	Log("  Compressed size = %d (0x%x)", CompressedSize, CompressedSize);
 	Log("  IsSkyLightSent = %s", IsSkyLightSent ? "true" : "false");
 	
+	// Log individual chunk coords:
+	int idx = 0;
+	for (sChunkMetas::iterator itr = ChunkMetas.begin(), end = ChunkMetas.end(); itr != end; ++itr, ++idx)
+	{
+		Log("  [%d]: [%d, %d], primary bitmap 0x%02x, add bitmap 0x%02x",
+			idx, itr->m_ChunkX, itr->m_ChunkZ, itr->m_PrimaryBitmap, itr->m_AddBitmap
+		);
+	}  // for itr - ChunkMetas[]
+
 	// TODO: Save the compressed data into a file for later analysis
 	
 	COPY_TO_CLIENT();
