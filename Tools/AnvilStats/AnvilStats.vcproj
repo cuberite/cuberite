@@ -314,6 +314,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HeightBiomeMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HeightBiomeMap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\HeightMap.cpp"
 				>
 			</File>

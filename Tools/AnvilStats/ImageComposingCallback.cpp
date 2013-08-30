@@ -72,7 +72,7 @@ void cImageComposingCallback::OnRegionFinished(int a_RegionX, int a_RegionZ)
 
 AString cImageComposingCallback::GetFileName(int a_RegionX, int a_RegionZ)
 {
-	return Printf("%s.%d.%d", m_FileNamePrefix.c_str(), a_RegionX, a_RegionZ);
+	return Printf("%s.%d.%d.bmp", m_FileNamePrefix.c_str(), a_RegionX, a_RegionZ);
 }
 
 
@@ -148,7 +148,7 @@ int cImageComposingCallback::GetPixel(int a_RelU, int a_RelV)
 
 void cImageComposingCallback::SetPixelURow(int a_RelUStart, int a_RelV, int a_CountU, int * a_Pixels)
 {
-	ASSERT((a_RelUStart >= 0) && (a_RelUStart + a_CountU < IMAGE_WIDTH));
+	ASSERT((a_RelUStart >= 0) && (a_RelUStart + a_CountU <= IMAGE_WIDTH));
 	ASSERT((a_RelV >= 0) && (a_RelV < IMAGE_HEIGHT));
 	ASSERT(a_Pixels != NULL);
 
@@ -159,6 +159,36 @@ void cImageComposingCallback::SetPixelURow(int a_RelUStart, int a_RelV, int a_Co
 	}
 }
 
+
+
+
+
+int cImageComposingCallback::ShadeColor(int a_Color, int a_Shade)
+{
+	if (a_Shade < 64)
+	{
+		return MixColor(0, a_Color, a_Shade * 4);
+	}
+	return MixColor(a_Color, 0xffffff, (a_Shade - 64) * 4);
+}
+
+
+
+
+
+int cImageComposingCallback::MixColor(int a_Src, int a_Dest, int a_Amount)
+{
+	int r = a_Src & 0xff;
+	int g = (a_Src >> 8) & 0xff;
+	int b = (a_Src >> 16) & 0xff;
+	int rd = a_Dest & 0xff;
+	int gd = (a_Dest >> 8) & 0xff;
+	int bd = (a_Dest >> 16) & 0xff;
+	int nr = r + (rd - r) * a_Amount / 256;
+	int ng = g + (gd - g) * a_Amount / 256;
+	int nb = b + (bd - b) * a_Amount / 256;
+	return nr | (ng << 8) | (nb << 16);
+}
 
 
 

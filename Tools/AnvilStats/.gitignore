@@ -5,3 +5,5 @@ Debug/
 Release/
 Profiling
 *.png
+world/
+*.html
