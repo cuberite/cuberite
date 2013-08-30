@@ -143,6 +143,7 @@ typedef short     Int16;
 #include <stdio.h>
 #include <math.h>
 #include <stdarg.h>
+#include <time.h>
 
 
 

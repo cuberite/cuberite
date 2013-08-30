@@ -256,6 +256,14 @@
 				RelativePath="..\..\source\StringUtils.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\source\OSSupport\Timer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\source\OSSupport\Timer.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\ProtoProxy.txt"

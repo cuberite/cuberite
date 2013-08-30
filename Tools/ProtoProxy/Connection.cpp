@@ -241,7 +241,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_Server(a_Server),
 	m_ClientSocket(a_ClientSocket),
 	m_ServerSocket(-1),
-	m_BeginTick(clock()),
+	m_BeginTick(m_Timer.GetNowTime()),
 	m_ClientState(csUnencrypted),
 	m_ServerState(csUnencrypted),
 	m_Nonce(0),
@@ -478,8 +478,7 @@ bool cConnection::RelayFromClient(void)
 
 double cConnection::GetRelativeTime(void)
 {
-	return (double)(clock() - m_BeginTick) / CLOCKS_PER_SEC;
-	
+	return (double)(m_Timer.GetNowTime() - m_BeginTick) / 1000;
 }
 
 
