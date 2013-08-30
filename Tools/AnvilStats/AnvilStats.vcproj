@@ -322,6 +322,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ImageComposingCallback.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ImageComposingCallback.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Processor.cpp"
 				>
 			</File>
