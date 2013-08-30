@@ -22,6 +22,7 @@
 #include "ItemLighter.h"
 #include "ItemMinecart.h"
 #include "ItemPickaxe.h"
+#include "ItemThrowable.h"
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
 #include "ItemSapling.h"
@@ -88,12 +89,15 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
+		case E_ITEM_EGG:               return new cItemEggHandler();
+		case E_ITEM_ENDER_PEARL:       return new cItemEnderPearlHandler();
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
 		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);
 		case E_ITEM_SIGN:              return new cItemSignHandler(a_ItemType);
+		case E_ITEM_SNOWBALL:          return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:         return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemType);
 		
