@@ -659,6 +659,7 @@ enum eDamageType
 	dtFireContact,      // Standing inside a fire block
 	dtInVoid,           // Falling into the Void (Y < 0)
 	dtPotionOfHarming,
+	dtEnderPearl,       // Thrown an ender pearl, teleported by it
 	dtAdmin,            // Damage applied by an admin command
 	
 	// Some common synonyms:

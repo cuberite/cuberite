@@ -316,7 +316,13 @@ cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X
 
 void cThrownEnderPearlEntity::OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 {
-	// TODO: Teleport the creator here, make them take 5 damage
+	// Teleport the creator here, make them take 5 damage:
+	if (m_Creator != NULL)
+	{
+		// TODO: The coords might need some tweaking based on the block face
+		m_Creator->TeleportToCoords(a_BlockX + 0.5, a_BlockY + 1.7, a_BlockZ + 0.5);
+		m_Creator->TakeDamage(dtEnderPearl, this, 5, 0);
+	}
 	
 	Destroy();
 }
