@@ -576,8 +576,8 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 					// A plugin doesn't agree with the action. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 					return;
 				}
+				ItemHandler->OnItemShoot(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			}
-			LOGINFO("%s: Status SHOOT not implemented", __FUNCTION__);
 			return;
 		}
 		
@@ -790,16 +790,16 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(BlockType);
+	cBlockHandler * BlockHandler = cBlockHandler::GetBlockHandler(BlockType);
 	
-	if (Handler->IsUseable() && !m_Player->IsCrouched())
+	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 	{
 		if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 		{
 			// A plugin doesn't agree with using the block, abort
 			return;
 		}
-		Handler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+		BlockHandler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 		PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 		return;
 	}

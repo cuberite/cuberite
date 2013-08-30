@@ -62,6 +62,18 @@ public:
 	
 	/// Returns the currently equipped boots; empty item if none
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
+	
+	/// Starts charging the equipped bow
+	void StartChargingBow(void);
+	
+	/// Finishes charging the current bow. Returns the number of ticks for which the bow has been charged
+	int FinishChargingBow(void);
+	
+	/// Cancels the current bow charging
+	void CancelChargingBow(void);
+	
+	/// Returns true if the player is currently charging the bow
+	bool IsChargingBox(void) const { return m_IsChargingBow; }
 
 	void SetTouchGround( bool a_bTouchGround );
 	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
@@ -351,6 +363,9 @@ protected:
 
 	/// The world tick in which eating will be finished. -1 if not eating
 	Int64 m_EatingFinishTick;
+	
+	bool m_IsChargingBow;
+	int  m_BowCharge;
 
 	virtual void Destroyed(void);
 

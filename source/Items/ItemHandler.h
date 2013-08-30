@@ -21,8 +21,11 @@ class cItemHandler
 public:
 	cItemHandler(int a_ItemType);
 	
-	/// Called when the player tries to use the item. Return false to make the item unusable. DEFAULT: False
-	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);	//eg for fishing or hoes
+	/// Called when the player tries to use the item (right mouse button). Return false to make the item unusable. DEFAULT: False
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
+	
+	/// Called when the client sends the SHOOT status in the lclk packet
+	virtual void OnItemShoot(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) {}
 	
 	/// Called while the player diggs a block using this item
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
@@ -88,7 +91,7 @@ protected:
 	int m_ItemType;
 	static cItemHandler *CreateItemHandler(int m_ItemType);
 
-	static cItemHandler *m_ItemHandler[2268];
+	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
 	static bool m_HandlerInitialized;	//used to detect if the itemhandlers are initialized
 };
 

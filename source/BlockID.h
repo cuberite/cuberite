@@ -367,7 +367,9 @@ enum ENUM_ITEM_ID
 	// Keep these two as the last values of the disc list, without a number - they will get their correct number assigned automagically by C++
 	// IsValidItem() depends on this!
 	E_ITEM_LAST_DISC_PLUS_ONE,  ///< Useless, really, but needs to be present for the following value
-	E_ITEM_LAST_DISC = E_ITEM_LAST_DISC_PLUS_ONE - 1  ///< Maximum disc itemtype number used
+	E_ITEM_LAST_DISC = E_ITEM_LAST_DISC_PLUS_ONE - 1,  ///< Maximum disc itemtype number used
+	
+	E_ITEM_LAST = E_ITEM_LAST_DISC,  ///< Maximum valid ItemType
 };
 
 

@@ -229,6 +229,47 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 
 
 
+cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
+	super(pkArrow, &a_Player, PosFromPlayerPos(a_Player), SpeedFromPlayerLook(a_Player, a_Force), 0.5, 0.5),
+	m_PickupState(psInSurvivalOrCreative),
+	m_DamageCoeff(2)
+{
+}
+
+
+
+
+
+Vector3d cArrowEntity::PosFromPlayerPos(const cPlayer & a_Player)
+{
+	Vector3d res = a_Player.GetEyePosition();
+	
+	// Adjust the position to be just outside the player's bounding box:
+	res.x += 0.16 * cos(a_Player.GetPitch());
+	res.y += -0.1;
+	res.z += 0.16 * sin(a_Player.GetPitch());
+	
+	return res;
+}
+
+
+
+
+
+Vector3d cArrowEntity::SpeedFromPlayerLook(const cPlayer & a_Player, double a_Force)
+{
+	Vector3d res = a_Player.GetLookVector();
+	res.Normalize();
+	
+	// TODO: Add a slight random change (+-0.0075 in each direction)
+	
+	return res * a_Force * 1.5 * 20;
+}
+
+
+
+
+
 bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 {
 	switch (m_PickupState)
