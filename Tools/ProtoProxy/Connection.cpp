@@ -560,9 +560,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 	
 	while (m_ClientBuffer.CanReadBytes(1))
 	{
-		Log("Decoding client's packets, there are now %d bytes in the queue", m_ClientBuffer.GetReadableSpace());
 		unsigned char PacketType;
 		m_ClientBuffer.ReadByte(PacketType);
+		Log("Decoding client's packets, there are now %d bytes in the queue; next packet is 0x%02x", m_ClientBuffer.GetReadableSpace(), PacketType);
 		switch (PacketType)
 		{
 			case PACKET_BLOCK_DIG:                 HANDLE_CLIENT_READ(HandleClientBlockDig); break;
@@ -647,7 +647,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 	{
 		unsigned char PacketType;
 		m_ServerBuffer.ReadByte(PacketType);
-		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%x", m_ServerBuffer.GetReadableSpace(), PacketType);
+		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%02x", m_ServerBuffer.GetReadableSpace(), PacketType);
 		LogFlush();
 		switch (PacketType)
 		{
