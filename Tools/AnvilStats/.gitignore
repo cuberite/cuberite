@@ -1,5 +1,7 @@
 .xls
 Statistics.txt
 *.bmp
+Debug/
+Release/
 Profiling
 *.png

@@ -78,6 +78,7 @@ protected:
 	// cEntity overrides:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
 	// tolua_begin
 } ;
@@ -105,18 +106,12 @@ public:
 	CLASS_PROTODEF(cArrowEntity);
 
 	/// Creates a new arrow with psNoPickup state and default damage modifier coeff
-	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d a_Speed);
+	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
 	
 	/// Creates a new arrow as shot by a player, initializes it from the player object
 	cArrowEntity(cPlayer & a_Player, double a_Force);
 	
 	// tolua_begin
-	
-	/// Returns the initial arrow position, as defined by the player eye position + adjustment.
-	static Vector3d PosFromPlayerPos(const cPlayer & a_Player);
-
-	/// Returns the initial arrow speed, as defined by the player look vector and the force coefficient
-	static Vector3d SpeedFromPlayerLook(const cPlayer & a_Player, double a_Force);
 	
 	/// Returns whether the arrow can be picked up by players
 	ePickupState GetPickupState(void) const { return m_PickupState; }
@@ -143,11 +138,99 @@ protected:
 	/// The coefficient applied to the damage that the arrow will deal, based on the bow enchantment. 2.0 for normal arrow
 	double m_DamageCoeff;
 
-	// cEntity overrides:
+	// cProjectileEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
 	// tolua_begin
 } ;
+
+
+
+
+
+class cThrownEggEntity :
+	public cProjectileEntity
+{
+	typedef cProjectileEntity super;
+	
+public:
+
+	// tolua_end
+	
+	CLASS_PROTODEF(cThrownEggEntity);
+
+	cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	
+protected:
+
+	// tolua_end
+	
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+
+	// tolua_begin
+	
+} ;
+
+
+
+
+
+class cThrownEnderPearlEntity :
+	public cProjectileEntity
+{
+	typedef cProjectileEntity super;
+	
+public:
+
+	// tolua_end
+	
+	CLASS_PROTODEF(cThrownEnderPearlEntity);
+
+	cThrownEnderPearlEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	
+protected:
+
+	// tolua_end
+	
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+
+	// tolua_begin
+	
+} ;
+
+
+
+
+
+class cThrownSnowballEntity :
+	public cProjectileEntity
+{
+	typedef cProjectileEntity super;
+	
+public:
+
+	// tolua_end
+	
+	CLASS_PROTODEF(cThrownSnowballEntity);
+
+	cThrownSnowballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	
+protected:
+
+	// tolua_end
+	
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+
+	// tolua_begin
+	
+} ;
+
+
+
+
 
 // tolua_end
 

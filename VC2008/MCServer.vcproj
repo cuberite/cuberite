@@ -2348,6 +2348,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Items\ItemThrowable.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\items\ItemWood.h"
 					>
 				</File>

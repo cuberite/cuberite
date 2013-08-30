@@ -101,11 +101,14 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 
 	switch (a_Kind)
 	{
-		case pkArrow: return new cArrowEntity(a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkArrow:      return new cArrowEntity           (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkEgg:        return new cThrownEggEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkEnderPearl: return new cThrownEnderPearlEntity(a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkSnowball:   return new cThrownSnowballEntity  (a_Creator, a_X, a_Y, a_Z, Speed);
 		// TODO: the rest
 	}
 	
-	LOGWARNING("%s: Unknown kind: %d", __FUNCTION__, a_Kind);
+	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);
 	return NULL;
 }
 
@@ -210,10 +213,20 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 
 
+void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
+{
+	// Default spawning - use the projectile kind to spawn an object:
+	a_Client.SendSpawnObject(*this, m_ProjectileKind, 0, 0, 0);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cArrowEntity:
 
-cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d a_Speed) :
+cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
 	super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2)
@@ -230,40 +243,10 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 
 
 cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
-	super(pkArrow, &a_Player, PosFromPlayerPos(a_Player), SpeedFromPlayerLook(a_Player, a_Force), 0.5, 0.5),
+	super(pkArrow, &a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), 0.5, 0.5),
 	m_PickupState(psInSurvivalOrCreative),
 	m_DamageCoeff(2)
 {
-}
-
-
-
-
-
-Vector3d cArrowEntity::PosFromPlayerPos(const cPlayer & a_Player)
-{
-	Vector3d res = a_Player.GetEyePosition();
-	
-	// Adjust the position to be just outside the player's bounding box:
-	res.x += 0.16 * cos(a_Player.GetPitch());
-	res.y += -0.1;
-	res.z += 0.16 * sin(a_Player.GetPitch());
-	
-	return res;
-}
-
-
-
-
-
-Vector3d cArrowEntity::SpeedFromPlayerLook(const cPlayer & a_Player, double a_Force)
-{
-	Vector3d res = a_Player.GetLookVector();
-	res.Normalize();
-	
-	// TODO: Add a slight random change (+-0.0075 in each direction)
-	
-	return res * a_Force * 1.5 * 20;
 }
 
 
@@ -290,6 +273,78 @@ void cArrowEntity::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnObject(*this, pkArrow, 0, 0, 0);
 }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cThrownEggEntity:
+
+cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
+	super(pkEgg, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+{
+	SetSpeed(a_Speed);
+}
+
+
+
+
+
+void cThrownEggEntity::OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+{
+	// TODO: Random-spawn a chicken or four
+	
+	Destroy();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cThrownEnderPearlEntity :
+
+cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
+	super(pkEnderPearl, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+{
+	SetSpeed(a_Speed);
+}
+
+
+
+
+
+void cThrownEnderPearlEntity::OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+{
+	// TODO: Teleport the creator here, make them take 5 damage
+	
+	Destroy();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cThrownSnowballEntity :
+
+cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
+	super(pkSnowball, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+{
+	SetSpeed(a_Speed);
+}
+
+
+
+
+
+void cThrownSnowballEntity::OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+{
+	// TODO: Apply damage to certain mobs (blaze etc.) and anger all mobs
+	
+	Destroy();
+}
+
 
 
 
