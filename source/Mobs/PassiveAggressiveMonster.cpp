@@ -1,8 +1,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "PassiveMonster.h"
-#include "../MersenneTwister.h"
+#include "PassiveAggressiveMonster.h"
+
 #include "../World.h"
+#include "../Vector3f.h"
+#include "../Entities/Player.h"
+#include "../MersenneTwister.h"
 
 
 
