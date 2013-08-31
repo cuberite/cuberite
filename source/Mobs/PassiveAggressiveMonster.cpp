@@ -1,9 +1,8 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "PassiveAggressiveMonster.h"
-
-#include "../Entities/Player.h"
+#include "PassiveMonster.h"
+#include "../MersenneTwister.h"
+#include "../World.h"
 
 
 
@@ -19,13 +18,15 @@ cPassiveAggressiveMonster::cPassiveAggressiveMonster(const AString & a_ConfigNam
 
 
 
+
+
+
 void cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	super::DoTakeDamage(a_TDI);
-	
-	if ((m_Target != NULL) && (m_Target->IsPlayer()))
+	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
 	{
-		cPlayer * Player = (cPlayer *) m_Target;
+		cPlayer * Player = (cPlayer *) a_TDI.Attacker;
 		if (Player->GetGameMode() != 1)
 		{
 			m_EMState = CHASING;
