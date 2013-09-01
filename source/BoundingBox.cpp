@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "BoundingBox.h"
+#include "Defines.h"
 
 
 
@@ -123,11 +124,7 @@ cBoundingBox cBoundingBox::Union(const cBoundingBox & a_Other)
 
 bool cBoundingBox::IsInside(const Vector3d & a_Point)
 {
-	return (
-		((a_Point.x >= m_Min.x) && (a_Point.x < m_Max.x)) &&
-		((a_Point.y >= m_Min.y) && (a_Point.y < m_Max.y)) &&
-		((a_Point.z >= m_Min.z) && (a_Point.z < m_Max.z))
-	);
+	return IsInside(m_Min, m_Max, a_Point);
 }
 
 
@@ -136,11 +133,7 @@ bool cBoundingBox::IsInside(const Vector3d & a_Point)
 
 bool cBoundingBox::IsInside(double a_X, double a_Y,double a_Z)
 {
-	return (
-		((a_X >= m_Min.x) && (a_X < m_Max.x)) &&
-		((a_Y >= m_Min.y) && (a_Y < m_Max.y)) &&
-		((a_Z >= m_Min.z) && (a_Z < m_Max.z))
-	);
+	return IsInside(m_Min, m_Max, a_X, a_Y, a_Z);
 }
 
 
@@ -161,6 +154,107 @@ bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max)
 {
 	// If both coords are inside this, then the entire a_Other is inside
 	return (IsInside(a_Min) && IsInside(a_Max));
+}
+
+
+
+
+
+bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Point)
+{
+	return (
+		((a_Point.x >= a_Min.x) && (a_Point.x < a_Max.x)) &&
+		((a_Point.y >= a_Min.y) && (a_Point.y < a_Max.y)) &&
+		((a_Point.z >= a_Min.z) && (a_Point.z < a_Max.z))
+	);
+}
+
+
+
+
+
+bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max, double a_X, double a_Y, double a_Z)
+{
+	return (
+		((a_X >= a_Min.x) && (a_X < a_Max.x)) &&
+		((a_Y >= a_Min.y) && (a_Y < a_Max.y)) &&
+		((a_Z >= a_Min.z) && (a_Z < a_Max.z))
+	);
+}
+
+
+
+
+
+bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, char & a_Face)
+{
+	return CalcLineIntersection(m_Min, m_Max, a_Line1, a_Line2, a_LineCoeff, a_Face);
+}
+
+
+
+
+
+bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, char & a_Face)
+{
+	char Face = 0;
+	double Coeff = Vector3d::NO_INTERSECTION;
+	
+	// Check each individual bbox face for intersection with the line, remember the one with the lowest coeff
+	double c = a_Line1.LineCoeffToXYPlane(a_Line2, a_Min.z);
+	if (c < Coeff)
+	{
+		Face = (a_Line1.z > a_Line2.z) ? BLOCK_FACE_ZP : BLOCK_FACE_ZM;
+		Coeff = c;
+	}
+	c = a_Line1.LineCoeffToXYPlane(a_Line2, a_Max.z);
+	if (c < Coeff)
+	{
+		Face = (a_Line1.z > a_Line2.z) ? BLOCK_FACE_ZP : BLOCK_FACE_ZM;
+		Coeff = c;
+	}
+	c = a_Line1.LineCoeffToXZPlane(a_Line2, a_Min.y);
+	if (c < Coeff)
+	{
+		Face = (a_Line1.y > a_Line2.y) ? BLOCK_FACE_YP : BLOCK_FACE_YM;
+		Coeff = c;
+	}
+	c = a_Line1.LineCoeffToXZPlane(a_Line2, a_Max.y);
+	if (c < Coeff)
+	{
+		Face = (a_Line1.y > a_Line2.y) ? BLOCK_FACE_YP : BLOCK_FACE_YM;
+		Coeff = c;
+	}
+	c = a_Line1.LineCoeffToYZPlane(a_Line2, a_Min.x);
+	if (c < Coeff)
+	{
+		Face = (a_Line1.x > a_Line2.x) ? BLOCK_FACE_XP : BLOCK_FACE_XM;
+		Coeff = c;
+	}
+	c = a_Line1.LineCoeffToYZPlane(a_Line2, a_Max.x);
+	if (c < Coeff)
+	{
+		Face = (a_Line1.x > a_Line2.x) ? BLOCK_FACE_XP : BLOCK_FACE_XM;
+		Coeff = c;
+	}
+	
+	if (Coeff >= Vector3d::NO_INTERSECTION)
+	{
+		// There has been no intersection
+		return false;
+	}
+	
+	Vector3d Intersection = a_Line1 + (a_Line2 - a_Line1) * Coeff;
+	if (!IsInside(a_Min, a_Max, Intersection))
+	{
+		// The line intersects with the individual wall planes, but not within this bounding box
+		return false;
+	}
+	
+	// True intersection, return all the values:
+	a_LineCoeff = Coeff;
+	a_Face = Face;
+	return true;
 }
 
 

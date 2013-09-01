@@ -51,6 +51,22 @@ public:
 	/// Returns true if a boundingbox specified by a_Min and a_Max is inside this bounding box
 	bool IsInside(const Vector3d & a_Min, const Vector3d & a_Max);
 	
+	/// Returns true if the specified point is inside the bounding box specified by its min/max corners
+	static bool IsInside(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Point);
+	
+	/// Returns true if the specified point is inside the bounding box specified by its min/max corners
+	static bool IsInside(const Vector3d & a_Min, const Vector3d & a_Max, double a_X, double a_Y, double a_Z);
+	
+	/** Returns true if this bounding box is intersected by the line specified by its two points
+	Also calculates the distance along the line in which the intersection occurs (0 .. 1)
+	*/
+	bool CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, char & a_Face);
+	
+	/** Returns true if the specified bounding box is intersected by the line specified by its two points
+	Also calculates the distance along the line in which the intersection occurs (0 .. 1) and the face hit (BLOCK_FACE_ constants)
+	*/
+	static bool CalcLineIntersection(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, char & a_Face);
+	
 	// tolua_end
 	
 	/// Calculates the intersection of the two bounding boxes; returns true if nonempty
