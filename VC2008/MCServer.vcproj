@@ -387,6 +387,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\BoundingBox.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\BoundingBox.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\ByteBuffer.cpp"
 				>
 			</File>

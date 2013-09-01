@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/30/13 18:03:04.
+** Generated automatically by tolua++-1.0.92 on 09/01/13 12:24:41.
 */
 
 #ifndef __cplusplus
@@ -53,6 +53,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Vector3i.h"
 #include "Matrix4f.h"
 #include "Cuboid.h"
+#include "BoundingBox.h"
 #include "Tracer.h"
 #include "Group.h"
 #include "BlockArea.h"
@@ -163,6 +164,13 @@ static int tolua_collect_cTracer (lua_State* tolua_S)
 	return 0;
 }
 
+static int tolua_collect_cBoundingBox (lua_State* tolua_S)
+{
+ cBoundingBox* self = (cBoundingBox*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
 static int tolua_collect_Vector3f (lua_State* tolua_S)
 {
  Vector3f* self = (Vector3f*) tolua_tousertype(tolua_S,1,0);
@@ -204,13 +212,14 @@ static int tolua_collect_Vector3d (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"cThrownEnderPearlEntity");
- tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cPluginManager");
+ tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cMonster");
- tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin");
- tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cBlockArea");
@@ -218,12 +227,12 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cLuaWindow");
  tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cRoot");
- tolua_usertype(tolua_S,"cCuboid");
- tolua_usertype(tolua_S,"std::vector<cIniFile::key>");
  tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"std::vector<cIniFile::key>");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"std::vector<std::string>");
- tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
@@ -22316,6 +22325,559 @@ static int tolua_AllToLua_cCuboid_IsSorted00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new00
+static int tolua_AllToLua_cBoundingBox_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  double a_MinX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_MaxX = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_MinY = ((double)  tolua_tonumber(tolua_S,4,0));
+  double a_MaxY = ((double)  tolua_tonumber(tolua_S,5,0));
+  double a_MinZ = ((double)  tolua_tonumber(tolua_S,6,0));
+  double a_MaxZ = ((double)  tolua_tonumber(tolua_S,7,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(a_MinX,a_MaxX,a_MinY,a_MaxY,a_MinZ,a_MaxZ));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new00_local
+static int tolua_AllToLua_cBoundingBox_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  double a_MinX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_MaxX = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_MinY = ((double)  tolua_tonumber(tolua_S,4,0));
+  double a_MaxY = ((double)  tolua_tonumber(tolua_S,5,0));
+  double a_MinZ = ((double)  tolua_tonumber(tolua_S,6,0));
+  double a_MaxZ = ((double)  tolua_tonumber(tolua_S,7,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(a_MinX,a_MaxX,a_MinY,a_MaxY,a_MinZ,a_MaxZ));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new01
+static int tolua_AllToLua_cBoundingBox_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Min,*a_Max));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new01_local
+static int tolua_AllToLua_cBoundingBox_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Min,*a_Max));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new00_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new02
+static int tolua_AllToLua_cBoundingBox_new02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Pos = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  double a_Radius = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Height = ((double)  tolua_tonumber(tolua_S,4,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Pos,a_Radius,a_Height));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new02_local
+static int tolua_AllToLua_cBoundingBox_new02_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Pos = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  double a_Radius = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Height = ((double)  tolua_tonumber(tolua_S,4,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Pos,a_Radius,a_Height));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new01_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new03
+static int tolua_AllToLua_cBoundingBox_new03(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const cBoundingBox* a_Orig = ((const cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Orig));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new02(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new03_local
+static int tolua_AllToLua_cBoundingBox_new03_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const cBoundingBox* a_Orig = ((const cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Orig));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new02_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Move of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_Move00
+static int tolua_AllToLua_cBoundingBox_Move00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  double a_OffX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_OffY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_OffZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Move'", NULL);
+#endif
+  {
+   self->Move(a_OffX,a_OffY,a_OffZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Move'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Move of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_Move01
+static int tolua_AllToLua_cBoundingBox_Move01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_Off = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Move'", NULL);
+#endif
+  {
+   self->Move(*a_Off);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_Move00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Expand of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_Expand00
+static int tolua_AllToLua_cBoundingBox_Expand00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  double a_ExpandX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_ExpandY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_ExpandZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Expand'", NULL);
+#endif
+  {
+   self->Expand(a_ExpandX,a_ExpandY,a_ExpandZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Expand'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: DoesIntersect of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_DoesIntersect00
+static int tolua_AllToLua_cBoundingBox_DoesIntersect00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const cBoundingBox* a_Other = ((const cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoesIntersect'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->DoesIntersect(*a_Other);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DoesIntersect'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Union of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_Union00
+static int tolua_AllToLua_cBoundingBox_Union00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const cBoundingBox* a_Other = ((const cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Union'", NULL);
+#endif
+  {
+   cBoundingBox tolua_ret = (cBoundingBox)  self->Union(*a_Other);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cBoundingBox)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cBoundingBox));
+     tolua_pushusertype(tolua_S,tolua_obj,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Union'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside00
+static int tolua_AllToLua_cBoundingBox_IsInside00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_Point = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(*a_Point);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsInside'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside01
+static int tolua_AllToLua_cBoundingBox_IsInside01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  double a_X = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_Y = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Z = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(a_X,a_Y,a_Z);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_IsInside00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside02
+static int tolua_AllToLua_cBoundingBox_IsInside02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  cBoundingBox* a_Other = ((cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(*a_Other);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_IsInside01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside03
+static int tolua_AllToLua_cBoundingBox_IsInside03(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(*a_Min,*a_Max);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_IsInside02(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cTracer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cTracer_new00
 static int tolua_AllToLua_cTracer_new00(lua_State* tolua_S)
@@ -28280,6 +28842,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"dtFireContact",dtFireContact);
   tolua_constant(tolua_S,"dtInVoid",dtInVoid);
   tolua_constant(tolua_S,"dtPotionOfHarming",dtPotionOfHarming);
+  tolua_constant(tolua_S,"dtEnderPearl",dtEnderPearl);
   tolua_constant(tolua_S,"dtAdmin",dtAdmin);
   tolua_constant(tolua_S,"dtPawnAttack",dtPawnAttack);
   tolua_constant(tolua_S,"dtEntityAttack",dtEntityAttack);
@@ -29327,6 +29890,34 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsCompletelyInside",tolua_AllToLua_cCuboid_IsCompletelyInside00);
    tolua_function(tolua_S,"Move",tolua_AllToLua_cCuboid_Move00);
    tolua_function(tolua_S,"IsSorted",tolua_AllToLua_cCuboid_IsSorted00);
+  tolua_endmodule(tolua_S);
+  #ifdef __cplusplus
+  tolua_cclass(tolua_S,"cBoundingBox","cBoundingBox","",tolua_collect_cBoundingBox);
+  #else
+  tolua_cclass(tolua_S,"cBoundingBox","cBoundingBox","",NULL);
+  #endif
+  tolua_beginmodule(tolua_S,"cBoundingBox");
+   tolua_function(tolua_S,"new",tolua_AllToLua_cBoundingBox_new00);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cBoundingBox_new00_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cBoundingBox_new00_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cBoundingBox_new01);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cBoundingBox_new01_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cBoundingBox_new01_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cBoundingBox_new02);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cBoundingBox_new02_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cBoundingBox_new02_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cBoundingBox_new03);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cBoundingBox_new03_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cBoundingBox_new03_local);
+   tolua_function(tolua_S,"Move",tolua_AllToLua_cBoundingBox_Move00);
+   tolua_function(tolua_S,"Move",tolua_AllToLua_cBoundingBox_Move01);
+   tolua_function(tolua_S,"Expand",tolua_AllToLua_cBoundingBox_Expand00);
+   tolua_function(tolua_S,"DoesIntersect",tolua_AllToLua_cBoundingBox_DoesIntersect00);
+   tolua_function(tolua_S,"Union",tolua_AllToLua_cBoundingBox_Union00);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside00);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside01);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside02);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside03);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cTracer","cTracer","",tolua_collect_cTracer);
