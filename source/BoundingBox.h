@@ -16,6 +16,11 @@
 
 // tolua_begin
 
+/** Represents two sets of coords, minimum and maximum for each direction.
+All the coords within those limits (inclusive the edges) are considered "inside" the box.
+For intersection purposes, though, if the intersection is "sharp" in any coord (i. e. zero volume),
+the boxes are considered non-intersecting.
+*/
 class cBoundingBox
 {
 public:

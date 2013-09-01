@@ -11,6 +11,48 @@
 
 
 
+#if 0
+
+/// A simple self-test that is executed on program start, used to verify bbox functionality
+class SelfTest
+{
+public:
+	SelfTest(void)
+	{
+		Vector3d Min(1, 1, 1);
+		Vector3d Max(2, 2, 2);
+		Vector3d LineDefs[] =
+		{
+			Vector3d(1.5,   4, 1.5), Vector3d(1.5,   3, 1.5),  // Should intersect at 2, face 1 (YP)
+			Vector3d(1.5,   0, 1.5), Vector3d(1.5,   4, 1.5),  // Should intersect at 0.25, face 0 (YM)
+			Vector3d(0,     0,   0), Vector3d(2,     2,   2),  // Should intersect at 0.5,  face 0, 3 or 5 (anyM)
+			Vector3d(0.999, 0, 1.5), Vector3d(0.999, 4, 1.5),  // Should not intersect
+			Vector3d(1.999, 0, 1.5), Vector3d(1.999, 4, 1.5),  // Should intersect at 0.25, face 0 (YM)
+			Vector3d(2.001, 0, 1.5), Vector3d(2.001, 4, 1.5),  // Should not intersect
+		} ;
+		for (int i = 0; i < ARRAYCOUNT(LineDefs) / 2; i++)
+		{
+			double LineCoeff;
+			char Face;
+			Vector3d Line1 = LineDefs[2 * i];
+			Vector3d Line2 = LineDefs[2 * i + 1];
+			bool res = cBoundingBox::CalcLineIntersection(Min, Max, Line1, Line2, LineCoeff, Face);
+			printf("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
+				Line1.x, Line1.y, Line1.z,
+				Line2.x, Line2.y, Line2.z,
+				res ? 1 : 0, LineCoeff, Face
+			);
+		}  // for i - LineDefs[]
+		printf("BoundingBox selftest complete.");
+	}
+} Test;
+
+#endif
+
+
+
+
+
 cBoundingBox::cBoundingBox(double a_MinX, double a_MaxX, double a_MinY, double a_MaxY, double a_MinZ, double a_MaxZ) :
 	m_Min(a_MinX, a_MinY, a_MinZ),
 	m_Max(a_MaxX, a_MaxY, a_MaxZ)
@@ -96,9 +138,9 @@ void cBoundingBox::Expand(double a_ExpandX, double a_ExpandY, double a_ExpandZ)
 bool cBoundingBox::DoesIntersect(const cBoundingBox & a_Other)
 {
 	return (
-		((a_Other.m_Min.x < m_Max.x) && (a_Other.m_Max.x > m_Min.x)) &&  // X coords intersect
-		((a_Other.m_Min.y < m_Max.y) && (a_Other.m_Max.y > m_Min.y)) &&  // Y coords intersect
-		((a_Other.m_Min.z < m_Max.z) && (a_Other.m_Max.z > m_Min.z))     // Z coords intersect
+		((a_Other.m_Min.x <= m_Max.x) && (a_Other.m_Max.x >= m_Min.x)) &&  // X coords intersect
+		((a_Other.m_Min.y <= m_Max.y) && (a_Other.m_Max.y >= m_Min.y)) &&  // Y coords intersect
+		((a_Other.m_Min.z <= m_Max.z) && (a_Other.m_Max.z >= m_Min.z))     // Z coords intersect
 	);
 }
 
@@ -163,9 +205,9 @@ bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max)
 bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Point)
 {
 	return (
-		((a_Point.x >= a_Min.x) && (a_Point.x < a_Max.x)) &&
-		((a_Point.y >= a_Min.y) && (a_Point.y < a_Max.y)) &&
-		((a_Point.z >= a_Min.z) && (a_Point.z < a_Max.z))
+		((a_Point.x >= a_Min.x) && (a_Point.x <= a_Max.x)) &&
+		((a_Point.y >= a_Min.y) && (a_Point.y <= a_Max.y)) &&
+		((a_Point.z >= a_Min.z) && (a_Point.z <= a_Max.z))
 	);
 }
 
@@ -176,9 +218,9 @@ bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max, cons
 bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max, double a_X, double a_Y, double a_Z)
 {
 	return (
-		((a_X >= a_Min.x) && (a_X < a_Max.x)) &&
-		((a_Y >= a_Min.y) && (a_Y < a_Max.y)) &&
-		((a_Z >= a_Min.z) && (a_Z < a_Max.z))
+		((a_X >= a_Min.x) && (a_X <= a_Max.x)) &&
+		((a_Y >= a_Min.y) && (a_Y <= a_Max.y)) &&
+		((a_Z >= a_Min.z) && (a_Z <= a_Max.z))
 	);
 }
 
