@@ -171,8 +171,8 @@ public:
 	void BroadcastEntityVelocity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastPlayerAnimation    (const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	void BroadcastPlayerListItem     (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
-	void BroadcastSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // a_Src coords are Block * 8
-	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
+	void BroadcastSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export a_Src coords are Block * 8
+	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL); // tolua_export
 	void BroadcastSpawnEntity        (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTeleportEntity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/30/13 18:03:04.
+** Generated automatically by tolua++-1.0.92 on 09/01/13 14:42:04.
 */
 
 #ifndef __cplusplus
@@ -11278,6 +11278,95 @@ static int tolua_AllToLua_cWorld_BroadcastChat00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'BroadcastChat'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: BroadcastSoundEffect of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_BroadcastSoundEffect00
+static int tolua_AllToLua_cWorld_BroadcastSoundEffect00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,8,"const cClientHandle",1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_SoundName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  int a_SrcX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_SrcY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_SrcZ = ((int)  tolua_tonumber(tolua_S,5,0));
+  float a_Volume = ((float)  tolua_tonumber(tolua_S,6,0));
+  float a_Pitch = ((float)  tolua_tonumber(tolua_S,7,0));
+  const cClientHandle* a_Exclude = ((const cClientHandle*)  tolua_tousertype(tolua_S,8,NULL));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'BroadcastSoundEffect'", NULL);
+#endif
+  {
+   self->BroadcastSoundEffect(a_SoundName,a_SrcX,a_SrcY,a_SrcZ,a_Volume,a_Pitch,a_Exclude);
+   tolua_pushcppstring(tolua_S,(const char*)a_SoundName);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'BroadcastSoundEffect'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: BroadcastSoundParticleEffect of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_BroadcastSoundParticleEffect00
+static int tolua_AllToLua_cWorld_BroadcastSoundParticleEffect00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,7,"const cClientHandle",1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_EffectID = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_SrcX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_SrcY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_SrcZ = ((int)  tolua_tonumber(tolua_S,5,0));
+  int a_Data = ((int)  tolua_tonumber(tolua_S,6,0));
+  const cClientHandle* a_Exclude = ((const cClientHandle*)  tolua_tousertype(tolua_S,7,NULL));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'BroadcastSoundParticleEffect'", NULL);
+#endif
+  {
+   self->BroadcastSoundParticleEffect(a_EffectID,a_SrcX,a_SrcY,a_SrcZ,a_Data,a_Exclude);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'BroadcastSoundParticleEffect'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28807,6 +28896,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetDimension",tolua_AllToLua_cWorld_GetDimension00);
    tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cWorld_GetHeight00);
    tolua_function(tolua_S,"BroadcastChat",tolua_AllToLua_cWorld_BroadcastChat00);
+   tolua_function(tolua_S,"BroadcastSoundEffect",tolua_AllToLua_cWorld_BroadcastSoundEffect00);
+   tolua_function(tolua_S,"BroadcastSoundParticleEffect",tolua_AllToLua_cWorld_BroadcastSoundParticleEffect00);
    tolua_function(tolua_S,"UnloadUnusedChunks",tolua_AllToLua_cWorld_UnloadUnusedChunks00);
    tolua_function(tolua_S,"RegenerateChunk",tolua_AllToLua_cWorld_RegenerateChunk00);
    tolua_function(tolua_S,"GenerateChunk",tolua_AllToLua_cWorld_GenerateChunk00);
