@@ -8,6 +8,9 @@
 #include "../ClientHandle.h"
 #include "Player.h"
 #include "../LineBlockTracer.h"
+#include "../BoundingBox.h"
+#include "../ChunkMap.h"
+#include "../Chunk.h"
 
 
 
@@ -57,6 +60,82 @@ protected:
 		// Continue tracing
 		return false;
 	}
+} ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProjectileEntityCollisionCallback:
+
+class cProjectileEntityCollisionCallback :
+	public cEntityCallback
+{
+public:
+	cProjectileEntityCollisionCallback(cProjectileEntity * a_Projectile, const Vector3d & a_Pos, const Vector3d & a_NextPos) :
+		m_Projectile(a_Projectile),
+		m_Pos(a_Pos),
+		m_NextPos(a_NextPos),
+		m_MinCoeff(1),
+		m_HitEntity(NULL)
+	{
+	}
+	
+	
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		if (a_Entity == m_Projectile)
+		{
+			// Self-colision
+			return false;
+		}
+		
+		cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+		
+		// Instead of colliding the bounding box with another bounding box in motion, we collide an enlarged bounding box with a hairline.
+		// The results should be good enough for our purposes
+		double LineCoeff;
+		char Face;
+		EntBox.Expand(m_Projectile->GetWidth() / 2, m_Projectile->GetHeight() / 2, m_Projectile->GetWidth() / 2);
+		if (!EntBox.CalcLineIntersection(m_Pos, m_NextPos, LineCoeff, Face))
+		{
+			// No intersection whatsoever
+			return false;
+		}
+
+		// TODO: Some entities don't interact with the projectiles (pickups, falling blocks)
+		// TODO: Allow plugins to interfere about which entities can be hit
+		
+		if (LineCoeff < m_MinCoeff)
+		{
+			// The entity is closer than anything we've stored so far, replace it as the potential victim
+			m_MinCoeff = LineCoeff;
+			m_HitEntity = a_Entity;
+		}
+		
+		// Don't break the enumeration, we want all the entities
+		return false;
+	}
+	
+	/// Returns the nearest entity that was hit, after the enumeration has been completed
+	cEntity * GetHitEntity(void) const { return m_HitEntity; }
+	
+	/// Returns the line coeff where the hit was encountered, after the enumeration has been completed
+	double GetMinCoeff(void) const { return m_MinCoeff; }
+	
+	/// Returns true if the callback has encountered a true hit
+	bool HasHit(void) const { return (m_MinCoeff < 1); }
+	
+protected:
+	cProjectileEntity * m_Projectile;
+	const Vector3d & m_Pos;
+	const Vector3d & m_NextPos;
+	double m_MinCoeff;  // The coefficient of the nearest hit on the Pos line
+
+	// Although it's bad(tm) to store entity ptrs from a callback, we can afford it here, because the entire callback
+	// is processed inside the tick thread, so the entities won't be removed in between the calls and the final processing
+	cEntity * m_HitEntity;  // The nearest hit entity
 } ;
 
 
@@ -192,17 +271,39 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	// Trace the tick's worth of movement as a line:
 	Vector3d NextPos = Pos + PerTickSpeed;
 	cProjectileTracerCallback TracerCallback(this);
-	if (cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
+	if (!cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
 	{
-		// Nothing in the way, update the position
-		SetPosition(NextPos);
+		// Something has been hit, abort all other processing
+		return;
 	}
+	
+	// Test for entity collisions:
+	cProjectileEntityCollisionCallback EntityCollisionCallback(this, Pos, NextPos);
+	a_Chunk.ForEachEntity(EntityCollisionCallback);
+	if (EntityCollisionCallback.HasHit())
+	{
+		// An entity was hit:
+		// DEBUG:
+		Vector3d HitPos = Pos + (NextPos - Pos) * EntityCollisionCallback.GetMinCoeff();
+		LOGD("Projectile %d has hit an entity %d (%s) at {%.02f, %.02f, %.02f} (coeff %.03f)",
+			m_UniqueID,
+			EntityCollisionCallback.GetHitEntity()->GetUniqueID(),
+			EntityCollisionCallback.GetHitEntity()->GetClass(),
+			HitPos.x, HitPos.y, HitPos.z,
+			EntityCollisionCallback.GetMinCoeff()
+		);
+		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()));
+	}
+	// TODO: Test the entities in the neighboring chunks, too
+
+	// Update the position:
+	SetPosition(NextPos);
 	
 	// Add gravity effect to the vertical speed component:
 	SetSpeedY(GetSpeedY() + m_Gravity / 20);
 
 	// DEBUG:
-	LOGD("Arrow %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}",
+	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}",
 		m_UniqueID,
 		GetPosX(), GetPosY(), GetPosZ(),
 		GetSpeedX(), GetSpeedY(), GetSpeedZ()
@@ -273,6 +374,24 @@ void cArrowEntity::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnObject(*this, pkArrow, 0, 0, 0);
 }
+
+
+
+
+void cArrowEntity::OnHitEntity(cEntity & a_EntityHit)
+{
+	if (!a_EntityHit.IsMob() && !a_EntityHit.IsMinecart() && !a_EntityHit.IsPlayer())
+	{
+		// Not an entity that interacts with an arrow
+		return;
+	}
+	
+	// TODO: The damage dealt should be based on arrow speed in addition to the damage coeff
+	a_EntityHit.TakeDamage(dtRangedAttack, this, (int)(2.5 * m_DamageCoeff), 1);
+	
+	Destroy();
+}
+
 
 
 

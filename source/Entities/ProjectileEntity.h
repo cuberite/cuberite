@@ -50,6 +50,9 @@ public:
 	/// Called by the physics blocktracer when the entity hits a solid block, the block's coords and the face hit is given
 	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
 	
+	/// Called by the physics blocktracer when the entity hits another entity
+	virtual void OnHitEntity(cEntity & a_EntityHit) {}
+	
 	// tolua_begin
 
 	/// Returns the kind of the projectile (fast class identification)
@@ -140,6 +143,7 @@ protected:
 
 	// cProjectileEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void OnHitEntity(cEntity & a_EntityHit) override;
 	
 	// tolua_begin
 } ;
