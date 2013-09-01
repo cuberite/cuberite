@@ -202,37 +202,37 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 	
 	// Check each individual bbox face for intersection with the line, remember the one with the lowest coeff
 	double c = a_Line1.LineCoeffToXYPlane(a_Line2, a_Min.z);
-	if (c < Coeff)
+	if ((c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
 	{
 		Face = (a_Line1.z > a_Line2.z) ? BLOCK_FACE_ZP : BLOCK_FACE_ZM;
 		Coeff = c;
 	}
 	c = a_Line1.LineCoeffToXYPlane(a_Line2, a_Max.z);
-	if (c < Coeff)
+	if ((c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
 	{
 		Face = (a_Line1.z > a_Line2.z) ? BLOCK_FACE_ZP : BLOCK_FACE_ZM;
 		Coeff = c;
 	}
 	c = a_Line1.LineCoeffToXZPlane(a_Line2, a_Min.y);
-	if (c < Coeff)
+	if ((c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
 	{
 		Face = (a_Line1.y > a_Line2.y) ? BLOCK_FACE_YP : BLOCK_FACE_YM;
 		Coeff = c;
 	}
 	c = a_Line1.LineCoeffToXZPlane(a_Line2, a_Max.y);
-	if (c < Coeff)
+	if ((c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
 	{
 		Face = (a_Line1.y > a_Line2.y) ? BLOCK_FACE_YP : BLOCK_FACE_YM;
 		Coeff = c;
 	}
 	c = a_Line1.LineCoeffToYZPlane(a_Line2, a_Min.x);
-	if (c < Coeff)
+	if ((c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
 	{
 		Face = (a_Line1.x > a_Line2.x) ? BLOCK_FACE_XP : BLOCK_FACE_XM;
 		Coeff = c;
 	}
 	c = a_Line1.LineCoeffToYZPlane(a_Line2, a_Max.x);
-	if (c < Coeff)
+	if ((c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
 	{
 		Face = (a_Line1.x > a_Line2.x) ? BLOCK_FACE_XP : BLOCK_FACE_XM;
 		Coeff = c;
@@ -244,14 +244,6 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 		return false;
 	}
 	
-	Vector3d Intersection = a_Line1 + (a_Line2 - a_Line1) * Coeff;
-	if (!IsInside(a_Min, a_Max, Intersection))
-	{
-		// The line intersects with the individual wall planes, but not within this bounding box
-		return false;
-	}
-	
-	// True intersection, return all the values:
 	a_LineCoeff = Coeff;
 	a_Face = Face;
 	return true;

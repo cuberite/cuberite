@@ -11,9 +11,6 @@ class Vector3f;
 class Vector3d
 {
 public:
-	static const double EPS;              ///< The max difference between two coords for which the coords are assumed equal
-	static const double NO_INTERSECTION;  ///< Return value of LineCoeffToPlane() if the line is parallel to the plane
-	
 	// convert from float
 	Vector3d(const Vector3f & v);
 	Vector3d(const Vector3f * v);
@@ -33,18 +30,21 @@ public:
 	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified Z coord
 	The result satisfies the following equation:
 	(*this + Result * (a_OtherEnd - *this)).z = a_Z
+	If the line is too close to being parallel, this function returns NO_INTERSECTION
 	*/
 	double LineCoeffToXYPlane(const Vector3d & a_OtherEnd, double a_Z) const;
 
 	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified Y coord
 	The result satisfies the following equation:
 	(*this + Result * (a_OtherEnd - *this)).y = a_Y
+	If the line is too close to being parallel, this function returns NO_INTERSECTION
 	*/
 	double LineCoeffToXZPlane(const Vector3d & a_OtherEnd, double a_Y) const;
 
 	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified X coord
 	The result satisfies the following equation:
 	(*this + Result * (a_OtherEnd - *this)).x = a_X
+	If the line is too close to being parallel, this function returns NO_INTERSECTION
 	*/
 	double LineCoeffToYZPlane(const Vector3d & a_OtherEnd, double a_X) const;
 
@@ -69,6 +69,9 @@ public:
 	Vector3d operator / (const double f)      const { return Vector3d(x / f, y / f, z / f ); }
 
 	double x, y, z;
+
+	static const double EPS;              ///< The max difference between two coords for which the coords are assumed equal
+	static const double NO_INTERSECTION;  ///< Return value of LineCoeffToPlane() if the line is parallel to the plane
 } ;
 
 // tolua_end
