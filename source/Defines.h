@@ -43,16 +43,24 @@ extern bool g_BlockIsSolid[256];
 
 
 
-/// Block face constants, used in PlayerDigging and PlayerBlockPlacement packets
-enum
+/// Block face constants, used in PlayerDigging and PlayerBlockPlacement packets and bbox collision calc
+enum eBlockFace
 {
-	BLOCK_FACE_NONE   = -1,  // Interacting with no block face - swinging the item in the air
-	BLOCK_FACE_BOTTOM = 0,   // Interacting with the bottom   face of the block (YM)
-	BLOCK_FACE_TOP    = 1,   // Interacting with the top      face of the block (YP)
-	BLOCK_FACE_NORTH  = 2,   // Interacting with the northern face of the block (ZP)
-	BLOCK_FACE_SOUTH  = 3,   // Interacting with the southern face of the block (ZM)
-	BLOCK_FACE_WEST   = 4,   // Interacting with the western  face of the block (XP)
-	BLOCK_FACE_EAST   = 5,   // Interacting with the eastern  face of the block (XM)
+	BLOCK_FACE_NONE = -1,  // Interacting with no block face - swinging the item in the air
+	BLOCK_FACE_XM   = 5,   // Interacting with the X- face of the block
+	BLOCK_FACE_XP   = 4,   // Interacting with the X+ face of the block
+	BLOCK_FACE_YM   = 0,   // Interacting with the Y- face of the block
+	BLOCK_FACE_YP   = 1,   // Interacting with the Y+ face of the block
+	BLOCK_FACE_ZM   = 3,   // Interacting with the Z- face of the block
+	BLOCK_FACE_ZP   = 2,   // Interacting with the Z+ face of the block
+	
+	// Synonyms using the (deprecated) world directions:
+	BLOCK_FACE_BOTTOM = BLOCK_FACE_YM,  // Interacting with the bottom   face of the block
+	BLOCK_FACE_TOP    = BLOCK_FACE_YP,  // Interacting with the top      face of the block
+	BLOCK_FACE_NORTH  = BLOCK_FACE_ZP,  // Interacting with the northern face of the block
+	BLOCK_FACE_SOUTH  = BLOCK_FACE_ZM,  // Interacting with the southern face of the block
+	BLOCK_FACE_WEST   = BLOCK_FACE_XP,  // Interacting with the western  face of the block
+	BLOCK_FACE_EAST   = BLOCK_FACE_XM,  // Interacting with the eastern  face of the block
 } ;
 
 
