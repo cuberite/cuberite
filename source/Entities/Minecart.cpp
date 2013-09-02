@@ -20,6 +20,7 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 {
 	SetMass(20.f);
 	SetMaxHealth(6);
+	SetHealth(6);
 }
 
 
@@ -62,183 +63,308 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
+void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 {
+	if ((GetPosY() > 0) && (GetPosY() < cChunkDef::Height))
+	{
+		BLOCKTYPE BelowType = GetWorld()->GetBlock(floor(GetPosX()), floor(GetPosY() -1 ), floor(GetPosZ()));
+
+		if (
+			(BelowType == E_BLOCK_RAIL) ||
+			(BelowType == E_BLOCK_POWERED_RAIL) ||
+			(BelowType == E_BLOCK_DETECTOR_RAIL) ||
+			(BelowType == E_BLOCK_ACTIVATOR_RAIL)
+			)
+		{
+			HandleRailPhysics(a_Dt, a_Chunk);
+		}
+		else
+		{
+			super::HandlePhysics(a_Dt, a_Chunk);
+			BroadcastMovementUpdate();
+		}
+	}
+	else
+	{
+		super::HandlePhysics(a_Dt, a_Chunk);
+		BroadcastMovementUpdate();
+	}
+}
+
+
+
+
+
+static const double MAX_SPEED = 8;
+static const double MAX_SPEED_NEGATIVE = (0 - MAX_SPEED);
+void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
+{
+	
+	super::HandlePhysics(a_Dt, a_Chunk); // Main physics handling
+
 	/*
 	NOTE: Please bear in mind that taking away from negatives make them even more negative,
 	adding to negatives make them positive, etc.
 	*/
 	
-	super::Tick(a_Dt, a_Chunk);
-	
-	BLOCKTYPE BelowType;
-	NIBBLETYPE BelowMeta;
+	// Get block meta below the cart
+	NIBBLETYPE BelowMeta = GetWorld()->GetBlockMeta(floor(GetPosX()), floor(GetPosY() -1 ), floor(GetPosZ()));
 	double SpeedX = GetSpeedX(), SpeedY = GetSpeedY(), SpeedZ = GetSpeedZ(); // Get current speed
-
-	// Get block type & meta below the cart
-	GetWorld()->GetBlockTypeMeta(floor(GetPosX()), floor(GetPosY() -1 ), floor(GetPosZ()), BelowType, BelowMeta);
-
-	if ((BelowType == E_BLOCK_RAIL) || (BelowType == E_BLOCK_DETECTOR_RAIL) || (BelowType == E_BLOCK_ACTIVATOR_RAIL))
+	
+	switch (BelowMeta)
 	{
-		switch (BelowMeta)
+		case E_RAIL_ZM_ZP: // NORTHSOUTH
 		{
+			SetRotation(270);
+			SpeedY = 0; // Don't move vertically as on ground
+			SpeedX = 0; // Correct diagonal movement from curved rails
+			
+			// Set Y as current Y rounded up to bypass friction
+			SetPosY(floor(GetPosY()));
 
-			case E_RAIL_ZM_ZP:
+			if (SpeedZ != 0) // Don't do anything if cart is stationary
 			{
-				SpeedY = 0; // Don't move vertically as on ground
-				
-				// Set Y as current Y rounded up to bypass friction
-				SetPosY(floor(GetPosY()));
-
-				if (SpeedZ != 0) // Don't do anything if cart is stationary
+				if (SpeedZ > 0)
 				{
-					if (SpeedZ > 0)
-					{
-						// Going SOUTH, slow down
-						SpeedZ = SpeedZ - 0.1;
-					}
-					else
-					{
-						// Going NORTH, slow down
-						SpeedZ = SpeedZ + 0.1;
-					}
-				}
-				break;
-			}
-
-			case E_RAIL_XM_XP:
-			{
-				SpeedY = 0;
-				SetPosY(floor(GetPosY()));
-
-				if (SpeedX != 0)
-				{
-					if (SpeedX > 0)
-					{
-						SpeedX = SpeedX - 0.1;
-					}
-					else
-					{
-						SpeedX = SpeedX + 0.1;
-					}
-				}
-				break;
-			}
-
-			case E_RAIL_ASCEND_ZM:
-			{
-				if (SpeedZ >= 0)
-				{
-					// SpeedZ POSITIVE, going SOUTH
-					if (SpeedZ <= 8) // Speed limit of 8 SOUTH (m/s??)
-					{
-						SpeedZ = SpeedZ + 0.5; // Speed up
-						SpeedY = (0 - SpeedZ); // Downward movement is negative (0 minus positive numbers is negative)
-					}
-					else
-					{
-						SpeedZ = 8; // Enforce speed limit
-						SpeedY = (0 - SpeedZ);
-					}
+					// Going SOUTH, slow down
+					SpeedZ = SpeedZ - 0.1;
 				}
 				else
+				{
+					// Going NORTH, slow down
+					SpeedZ = SpeedZ + 0.1;
+				}
+			}
+			break;
+		}
+
+		case E_RAIL_XM_XP: // EASTWEST
+		{
+			SetRotation(180);
+			SpeedY = 0;
+			SpeedZ = 0;
+
+			SetPosY(floor(GetPosY()));
+
+			if (SpeedX != 0)
+			{
+				if (SpeedX > 0)
+				{
+					SpeedX = SpeedX - 0.1;
+				}
+				else
+				{
+					SpeedX = SpeedX + 0.1;
+				}
+			}
+			break;
+		}
+
+		case E_RAIL_ASCEND_ZM: // ASCEND NORTH
+		{
+			SetRotation(270);
+			SetPosY(floor(GetPosY()) + 0.2); // It seems it doesn't work without levitation :/
+			SpeedX = 0;
+
+			if (SpeedZ >= 0)
+			{
+				// SpeedZ POSITIVE, going SOUTH
+				if (SpeedZ <= MAX_SPEED) // Speed limit
+				{
+					SpeedZ = SpeedZ + 0.5; // Speed up
+					SpeedY = (0 - SpeedZ); // Downward movement is negative (0 minus positive numbers is negative)
+				}
+				else
+				{
+					SpeedZ = MAX_SPEED; // Enforce speed limit
+					SpeedY = (0 - SpeedZ);
+				}
+			}
+			else
+			{
+				// SpeedZ NEGATIVE, going NORTH
+				SpeedZ = SpeedZ + 0.4; // Slow down
+				SpeedY = (0 - SpeedZ); // Upward movement is positive (0 minus negative number is positive number)
+			}
+			break;
+		}
+
+		case E_RAIL_ASCEND_ZP: // ASCEND SOUTH
+		{
+			SetRotation(270);
+			SetPosY(floor(GetPosY()) + 0.2);
+			SpeedX = 0;
+
+			if (SpeedZ > 0)
+			{
+				// SpeedZ POSITIVE, going SOUTH
+				SpeedZ = SpeedZ - 0.4; // Slow down
+				SpeedY = SpeedZ; // Upward movement positive
+			}
+			else
+			{
+				if (SpeedZ >= MAX_SPEED_NEGATIVE) // Speed limit
 				{
 					// SpeedZ NEGATIVE, going NORTH
-					SpeedZ = SpeedZ + 0.6; // Slow down
-					SpeedY = (0 - SpeedZ); // Upward movement is positive (0 minus negative number is positive number)
-				}
-				break;
-			}
-
-			case E_RAIL_ASCEND_ZP:
-			{
-				if (SpeedX > 0)
-				{
-					// SpeedZ POSITIVE, going SOUTH
-					SpeedZ = SpeedZ - 0.6; // Slow down
-					SpeedY = SpeedZ; // Upward movement positive
+					SpeedZ = SpeedZ - 0.5; // Speed up
+					SpeedY = SpeedZ; // Downward movement negative
 				}
 				else
 				{
-					if (SpeedZ >= -8) // Speed limit of 8 WEST (m/s??)
-					{
-						// SpeedZ NEGATIVE, going NORTH
-						SpeedZ = SpeedZ - 0.5; // Speed up
-						SpeedY = SpeedZ; // Downward movement negative
-					}
-					else
-					{
-						SpeedZ = 8; // Enforce speed limit
-						SpeedY = SpeedZ;
-					}
+					SpeedZ = MAX_SPEED_NEGATIVE; // Enforce speed limit
+					SpeedY = SpeedZ;
 				}
-				break;
 			}
+			break;
+		}
 
-			case E_RAIL_ASCEND_XM:
+		case E_RAIL_ASCEND_XM: // ASCEND EAST
+		{
+			SetRotation(180);
+			SetPosY(floor(GetPosY()) + 0.2);
+			SpeedZ = 0;
+
+			if (SpeedX >= 0)
 			{
-				if (SpeedX >= 0)
+				if (SpeedX <= MAX_SPEED)
 				{
-					if (SpeedX <= 8)
-					{
-						SpeedX = SpeedX + 0.5;
-						SpeedY = (0 - SpeedX);
-					}
-					else
-					{
-						SpeedX = 8;
-						SpeedY = (0 - SpeedX);
-					}
-				}
-				else
-				{
-					SpeedX = SpeedX + 0.6;
+					SpeedX = SpeedX + 0.5;
 					SpeedY = (0 - SpeedX);
 				}
-				break;
-			}
-
-			case E_RAIL_ASCEND_XP:
-			{
-				if (SpeedX > 0)
+				else
 				{
-					SpeedX = SpeedX - 0.6;
+					SpeedX = MAX_SPEED;
+					SpeedY = (0 - SpeedX);
+				}
+			}
+			else
+			{
+				SpeedX = SpeedX + 0.4;
+				SpeedY = (0 - SpeedX);
+			}
+			break;
+		}
+
+		case E_RAIL_ASCEND_XP: // ASCEND WEST
+		{
+			SetRotation(180);
+			SetPosY(floor(GetPosY()) + 0.2);
+			SpeedZ = 0;
+
+			if (SpeedX > 0)
+			{
+				SpeedX = SpeedX - 0.4;
+				SpeedY = SpeedX;
+			}
+			else
+			{
+				if (SpeedX >= MAX_SPEED_NEGATIVE)
+				{
+					SpeedX = SpeedX - 0.5;
 					SpeedY = SpeedX;
 				}
 				else
 				{
-					if (SpeedX >= -8)
-					{
-						SpeedX = SpeedX - 0.5;
-						SpeedY = SpeedX;
-					}
-					else
-					{
-						SpeedX = -8;
-						SpeedY = SpeedX;
-					}
+					SpeedX = MAX_SPEED_NEGATIVE;
+					SpeedY = SpeedX;
 				}
-				break;
 			}
+			break;
+		}
 
-			default:
+		case E_RAIL_CURVED_ZM_XM: // Ends pointing NORTH and WEST
+		{
+			SetRotation(315); // Set correct rotation server side
+			SetPosY(floor(GetPosY()) + 0.2); // Levitate dat cart
+
+			if (SpeedZ > 0) // Cart moving south
 			{
-				ASSERT(!"Unhandled rail meta!");
-				break;
+				SpeedX = (0 - SpeedZ); // Diagonally move southwest (which will make cart hit a southwest rail)
 			}
+			else if (SpeedX > 0) // Cart moving east
+			{
+				SpeedZ = (0 - SpeedX); // Diagonally move northeast
+			}
+			break;
+		}
 
+		case E_RAIL_CURVED_ZM_XP: // Curved NORTH EAST
+		{
+			SetRotation(225);
+			SetPosY(floor(GetPosY()) + 0.2);
+
+			if (SpeedZ > 0)
+			{
+				SpeedX = SpeedZ;
+			}
+			else if (SpeedX < 0)
+			{
+				SpeedZ = SpeedX;
+			}
+			break;
+		}
+
+		case E_RAIL_CURVED_ZP_XM: // Curved SOUTH WEST
+		{
+			SetRotation(135);
+			SetPosY(floor(GetPosY()) + 0.2);
+
+			if (SpeedZ < 0)
+			{
+				SpeedX = SpeedZ;
+			}
+			else if (SpeedX > 0)
+			{
+				SpeedZ = SpeedX;
+			}
+			break;
+		}
+
+		case E_RAIL_CURVED_ZP_XP: // Curved SOUTH EAST
+		{
+			SetRotation(45);
+			SetPosY(floor(GetPosY()) + 0.2);
+
+			if (SpeedZ < 0)
+			{
+				SpeedX = (0 - SpeedZ);
+			}
+			else if (SpeedX < 0)
+			{
+				SpeedZ = (0 - SpeedX);
+			}
+			break;
+		}
+
+		default:
+		{
+			ASSERT(!"Unhandled rail meta!"); // Dun dun DUN!
+			break;
 		}
 	}
-	
+
 	// Set speed to speed variables
 	SetSpeedX(SpeedX);
 	SetSpeedY(SpeedY);
 	SetSpeedZ(SpeedZ);
 
-	// Pass to physics handlers in Entity.cpp and broadcast position to client
-	HandlePhysics(a_Dt, a_Chunk);
-	BroadcastMovementUpdate();
 
+	// Broadcast position to client
+	BroadcastMovementUpdate();
+}
+
+
+
+
+
+void cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
+{
+	super::DoTakeDamage(TDI);
+
+	if (GetHealth() == 0)
+	{
+		Destroy(true);
+	}
 }
 
 

@@ -37,7 +37,10 @@ public:
 	// cEntity overrides:
 	virtual bool Initialize(cWorld * a_World) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
+	void HandleRailPhysics(float a_Dt, cChunk & a_Chunk);
+	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
+
 	
 	ePayload GetPayload(void) const { return m_Payload; }
 	
