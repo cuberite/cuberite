@@ -85,9 +85,13 @@ public:
 	
 	virtual bool Item(cEntity * a_Entity) override
 	{
-		if (a_Entity == m_Projectile)
+		if (
+			(a_Entity == m_Projectile) ||          // Do not check collisions with self
+			(a_Entity == m_Projectile->GetCreator())  // Do not check whoever shot the projectile
+		)
 		{
-			// Self-colision
+			// TODO: Don't check creator only for the first 5 ticks
+			// so that arrows stuck in ground and dug up can hurt the player
 			return false;
 		}
 		
