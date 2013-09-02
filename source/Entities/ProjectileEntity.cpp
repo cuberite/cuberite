@@ -24,13 +24,18 @@ class cProjectileTracerCallback :
 {
 public:
 	cProjectileTracerCallback(cProjectileEntity * a_Projectile) :
-		m_Projectile(a_Projectile)
+		m_Projectile(a_Projectile),
+		m_SlowdownCoeff(0.99)  // Default slowdown when not in water
 	{
 	}
 	
+	double GetSlowdownCoeff(void) const { return m_SlowdownCoeff; }
+	
 protected:
 	cProjectileEntity * m_Projectile;
+	double m_SlowdownCoeff;
 	
+	// cCallbacks overrides:
 	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
 		if (g_BlockIsSolid[a_BlockType])
@@ -47,12 +52,14 @@ protected:
 			case E_BLOCK_STATIONARY_LAVA:
 			{
 				m_Projectile->StartBurning(30);
+				m_SlowdownCoeff = std::min(m_SlowdownCoeff, 0.9);  // Slow down to 0.9* the speed each tick when moving through lava
 				break;
 			}
 			case E_BLOCK_WATER:
 			case E_BLOCK_STATIONARY_WATER:
 			{
 				m_Projectile->StopBurning();
+				m_SlowdownCoeff = std::min(m_SlowdownCoeff, 0.8);  // Slow down to 0.8* the speed each tick when moving through water
 				break;
 			}
 		}  // switch (a_BlockType)
@@ -280,6 +287,7 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		// Something has been hit, abort all other processing
 		return;
 	}
+	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later
 	
 	// Test for entity collisions:
 	cProjectileEntityCollisionCallback EntityCollisionCallback(this, Pos, NextPos);
@@ -303,8 +311,11 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	// Update the position:
 	SetPosition(NextPos);
 	
-	// Add gravity effect to the vertical speed component:
-	SetSpeedY(GetSpeedY() + m_Gravity / 20);
+	// Add slowdown and gravity effect to the speed:
+	Vector3d NewSpeed(GetSpeed());
+	NewSpeed.y += m_Gravity / 20;
+	NewSpeed *= TracerCallback.GetSlowdownCoeff();
+	SetSpeed(NewSpeed);
 
 	// DEBUG:
 	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}",
