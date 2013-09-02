@@ -23,6 +23,8 @@ public:
 	
 	void Finish(void);
 	
+	static bool IsGround(BLOCKTYPE a_BlockType);
+
 protected:
 	int m_CurrentChunkX;  // Absolute chunk coords
 	int m_CurrentChunkZ;
@@ -55,8 +57,6 @@ protected:
 	virtual bool OnSectionsFinished(void) override;
 
 	void StartNewRegion(int a_RegionX, int a_RegionZ);
-	
-	static bool IsGround(BLOCKTYPE a_BlockType);
 } ;
 
 

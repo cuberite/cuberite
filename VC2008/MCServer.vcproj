@@ -1160,6 +1160,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Entities\ProjectileEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Entities\ProjectileEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Entities\TNTEntity.cpp"
 					>
 				</File>
@@ -2016,10 +2024,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockDoubleSlab.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\blocks\BlockDirt.h"
 					>
 				</File>
@@ -2236,6 +2240,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Items\ItemBow.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Items\ItemBrewingStand.h"
 					>
 				</File>
@@ -2337,6 +2345,10 @@
 				</File>
 				<File
 					RelativePath="..\source\items\ItemSword.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Items\ItemThrowable.h"
 					>
 				</File>
 				<File

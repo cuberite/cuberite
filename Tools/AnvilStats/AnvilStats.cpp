@@ -8,6 +8,7 @@
 #include "Statistics.h"
 #include "BiomeMap.h"
 #include "HeightMap.h"
+#include "HeightBiomeMap.h"
 #include "ChunkExtract.h"
 #include "SpringStats.h"
 
@@ -26,6 +27,7 @@ int main(int argc, char * argv[])
 		LOG("  2 - height map");
 		LOG("  3 - extract chunks");
 		LOG("  4 - count lava- and water- springs");
+		LOG("  5 - biome and height map");
 		LOG("\nNo method number present, aborting.");
 		return -1;
 	}
@@ -48,6 +50,7 @@ int main(int argc, char * argv[])
 		case 2: Factory = new cHeightMapFactory;                 break;
 		case 3: Factory = new cChunkExtractFactory(WorldFolder); break;
 		case 4: Factory = new cSpringStatsFactory;               break;
+		case 5: Factory = new cHeightBiomeMapFactory;            break;
 		default:
 		{
 			LOG("Unknown method \"%s\", aborting.", argv[1]);

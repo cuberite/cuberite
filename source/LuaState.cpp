@@ -884,6 +884,49 @@ bool cLuaState::ReportErrors(lua_State * a_LuaState, int a_Status)
 
 
 
+void cLuaState::LogStackTrace(void)
+{
+	LOGWARNING("Stack trace:");
+	lua_Debug entry;
+	int depth = 0;
+	while (lua_getstack(m_LuaState, depth, &entry))
+	{
+		int status = lua_getinfo(m_LuaState, "Sln", &entry);
+		assert(status);
+
+		LOGWARNING("  %s(%d): %s", entry.short_src, entry.currentline, entry.name ? entry.name : "?");
+		depth++;
+	}
+	LOGWARNING("Stack trace end");
+}
+
+
+
+
+
+AString cLuaState::GetTypeText(int a_StackPos)
+{
+	int Type = lua_type(m_LuaState, a_StackPos);
+	switch (Type)
+	{
+		case LUA_TNONE:          return "TNONE";
+		case LUA_TNIL:           return "TNIL";
+		case LUA_TBOOLEAN:       return "TBOOLEAN";
+		case LUA_TLIGHTUSERDATA: return "TLIGHTUSERDATA";
+		case LUA_TNUMBER:        return "TNUMBER";
+		case LUA_TSTRING:        return "TSTRING";
+		case LUA_TTABLE:         return "TTABLE";
+		case LUA_TFUNCTION:      return "TFUNCTION";
+		case LUA_TUSERDATA:      return "TUSERDATA";
+		case LUA_TTHREAD:        return "TTHREAD";
+	}
+	return Printf("Unknown (%d)", Type);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cRef:
 

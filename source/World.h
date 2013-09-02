@@ -21,6 +21,7 @@
 #include "LightingThread.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
+#include "Entities/ProjectileEntity.h"
 
 
 
@@ -170,8 +171,8 @@ public:
 	void BroadcastEntityVelocity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastPlayerAnimation    (const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	void BroadcastPlayerListItem     (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
-	void BroadcastSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // a_Src coords are Block * 8
-	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
+	void BroadcastSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export a_Src coords are Block * 8
+	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL); // tolua_export
 	void BroadcastSpawnEntity        (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTeleportEntity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
@@ -451,22 +452,30 @@ public:
 	
 	void GrowTreeImage(const sSetBlockVector & a_Blocks);
 	
+	// tolua_begin
+	
 	/// Grows the plant at the specified block to its ripe stage (bonemeal used); returns false if the block is not growable. If a_IsBonemeal is true, block is not grown if not allowed in world.ini
-	bool GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false);    // tolua_export
+	bool GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false);
 	
 	/// Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config
-	void GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);  // tolua_export
+	void GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 
 	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
-	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockType);    // tolua_export
+	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockType);
 
 	/// Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config
-	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);  // tolua_export
+	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
-	int  GetBiomeAt (int a_BlockX, int a_BlockZ);   // tolua_export
+	/// Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value
+	int GetBiomeAt(int a_BlockX, int a_BlockZ);
 
-	const AString & GetName(void) const { return m_WorldName; }									// tolua_export
+	/// Returns the name of the world
+	const AString & GetName(void) const { return m_WorldName; }
+	
+	/// Returns the name of the world.ini file used by this world
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
+	
+	// tolua_end
 
 	inline static void AbsoluteToRelative( int & a_X, int & a_Y, int & a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
@@ -564,6 +573,9 @@ public:
 	
 	/// Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
 	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
+	
+	/// Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
+	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const Vector3d * a_Speed = NULL);  // tolua_export
 	
 	/// Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread!
 	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }

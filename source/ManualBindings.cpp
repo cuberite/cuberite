@@ -755,6 +755,159 @@ static int tolua_cPluginManager_GetAllPlugins(lua_State * tolua_S)
 
 
 
+static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, cLuaState & S, int a_ParamIdx)
+{
+	// Helper function for cPluginmanager:AddHook() binding
+	// Takes care of the new case (#121): args are HOOK_TYPE and CallbackFunction
+	// The arg types have already been checked
+	
+	// Retrieve the cPlugin from the LuaState:
+	cPluginLua * Plugin = GetLuaPlugin(S);
+	if (Plugin == NULL)
+	{
+		// An error message has been already printed in GetLuaPlugin()
+		return 0;
+	}
+	
+	// Retrieve and check the hook type
+	int HookType = (int)tolua_tonumber(S, a_ParamIdx, -1);
+	if (!a_PluginManager->IsValidHookType(HookType))
+	{
+		LOGWARNING("cPluginManager.AddHook(): Invalid HOOK_TYPE parameter: %d", HookType);
+		S.LogStackTrace();
+		return 0;
+	}
+	
+	// Add the hook to the plugin
+	if (!Plugin->AddHookRef(HookType, a_ParamIdx + 1))
+	{
+		LOGWARNING("cPluginManager.AddHook(): Cannot add hook %d, unknown error.", HookType);
+		S.LogStackTrace();
+		return 0;
+	}
+	a_PluginManager->AddHook(Plugin, HookType);
+	
+	// Success
+	return 0;
+}
+
+
+
+
+
+static int tolua_cPluginManager_AddHook_DefFn(cPluginManager * a_PluginManager, cLuaState & S, int a_ParamIdx)
+{
+	// Helper function for cPluginmanager:AddHook() binding
+	// Takes care of the old case (#121): args are cPluginLua and HOOK_TYPE
+	// The arg types have already been checked
+	
+	// Retrieve and check the cPlugin parameter
+	cPluginLua * Plugin = (cPluginLua *)tolua_tousertype(S, a_ParamIdx, NULL);
+	if (Plugin == NULL)
+	{
+		LOGWARNING("cPluginManager.AddHook(): Invalid Plugin parameter, expected a valid cPlugin object. Hook not added");
+		S.LogStackTrace();
+		return 0;
+	}
+	if (Plugin != GetLuaPlugin(S))
+	{
+		// The plugin parameter passed to us is not our stored plugin. Disallow this!
+		LOGWARNING("cPluginManager.AddHook(): Invalid Plugin parameter, cannot add hook to foreign plugins. Hook not added.");
+		S.LogStackTrace();
+		return 0;
+	}
+	
+	// Retrieve and check the hook type
+	int HookType = (int)tolua_tonumber(S, a_ParamIdx + 1, -1);
+	if (!a_PluginManager->IsValidHookType(HookType))
+	{
+		LOGWARNING("cPluginManager.AddHook(): Invalid HOOK_TYPE parameter: %d", HookType);
+		S.LogStackTrace();
+		return 0;
+	}
+	
+	// Get the standard name for the callback function:
+	const char * FnName = cPluginLua::GetHookFnName(HookType);
+	if (FnName == NULL)
+	{
+		LOGWARNING("cPluginManager.AddHook(): Unknown hook type (%d). Hook not added.", HookType);
+		S.LogStackTrace();
+		return 0;
+	}
+
+	// Retrieve the function to call and add it to the plugin:
+	lua_pushstring(S, FnName);
+	bool res = Plugin->AddHookRef(HookType, 1);
+	lua_pop(S, 1);  // Pop the function off the stack
+	if (!res)
+	{
+		LOGWARNING("cPluginManager.AddHook(): Function %s not found. Hook not added.", FnName);
+		S.LogStackTrace();
+		return 0;
+	}
+	a_PluginManager->AddHook(Plugin, HookType);
+	
+	// Success
+	return 0;
+}
+
+
+
+
+
+static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
+{
+	/*
+	Function signatures:
+	cPluginManager.AddHook(HOOK_TYPE, CallbackFunction)        -- (1) recommended
+	cPluginManager:Get():AddHook(HOOK_TYPE, CallbackFunction)  -- (2) accepted silently
+	cPluginManager:Get():AddHook(Plugin, HOOK_TYPE)            -- (3) old style (#121), accepted but complained about
+	cPluginManager.AddHook(Plugin, HOOK_TYPE)                  -- (4) old style (#121) mangled, accepted but complained about
+	*/
+	
+	cLuaState S(tolua_S);
+	cPluginManager * PlgMgr = cPluginManager::Get();
+
+	// If the first param is a cPluginManager, use it instead of the global one:
+	int ParamIdx = 1;
+	tolua_Error err;
+	if (tolua_isusertype(S, 1, "cPluginManager", 0, &err))
+	{
+		// Style 2 or 3, retrieve the PlgMgr instance
+		PlgMgr = (cPluginManager *)tolua_tousertype(S, 1, NULL);
+		if (PlgMgr == NULL)
+		{
+			LOGWARNING("Malformed plugin, use cPluginManager.AddHook(HOOK_TYPE, CallbackFunction). Fixing the call for you.");
+			S.LogStackTrace();
+			PlgMgr = cPluginManager::Get();
+		}
+		ParamIdx += 1;
+	}
+	
+	if (lua_isnumber(S, ParamIdx) && lua_isfunction(S, ParamIdx + 1))
+	{
+		// The next params are a number and a function, assume style 1 or 2
+		return tolua_cPluginManager_AddHook_FnRef(PlgMgr, S, ParamIdx);
+	}
+	else if (tolua_isusertype(S, ParamIdx, "cPlugin", 0, &err) && lua_isnumber(S, ParamIdx + 1))
+	{
+		// The next params are a cPlugin and a number, assume style 3 or 4
+		LOGINFO("cPluginManager.AddHook(): Deprecated format used, use cPluginManager.AddHook(HOOK_TYPE, CallbackFunction) instead. Fixing the call for you.");
+		S.LogStackTrace();
+		return tolua_cPluginManager_AddHook_DefFn(PlgMgr, S, ParamIdx);
+	}
+	
+	AString ParamDesc;
+	Printf(ParamDesc, "%s, %s, %s", S.GetTypeText(1).c_str(), S.GetTypeText(2).c_str(), S.GetTypeText(3).c_str());
+	LOGWARNING("cPluginManager.AddHook(): bad parameters. Expected HOOK_TYPE and CallbackFunction, got %s. Hook not added.", ParamDesc.c_str());
+	S.LogStackTrace();
+	return 0;
+}
+
+
+
+
+
 static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
@@ -1496,7 +1649,7 @@ public:
 	{
 	}
 	
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
 		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNextBlock"))
 		{
@@ -1508,6 +1661,7 @@ public:
 		m_LuaState.Push(a_BlockZ);
 		m_LuaState.Push(a_BlockType);
 		m_LuaState.Push(a_BlockMeta);
+		m_LuaState.Push(a_EntryFace);
 		if (!m_LuaState.CallFunction(1))
 		{
 			return false;
@@ -1521,7 +1675,7 @@ public:
 		return res;
 	}
 	
-	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) override
 	{
 		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNextBlockNoData"))
 		{
@@ -1531,6 +1685,7 @@ public:
 		m_LuaState.Push(a_BlockX);
 		m_LuaState.Push(a_BlockY);
 		m_LuaState.Push(a_BlockZ);
+		m_LuaState.Push(a_EntryFace);
 		if (!m_LuaState.CallFunction(1))
 		{
 			return false;
@@ -1699,6 +1854,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachCommand",        tolua_cPluginManager_ForEachCommand);
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
+			tolua_function(tolua_S, "AddHook",               tolua_cPluginManager_AddHook);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");

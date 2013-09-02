@@ -77,7 +77,7 @@ public:
 		bool IsValid(void) const {return (m_Ref != LUA_REFNIL); }
 		
 		/// Allows to use this class wherever an int (i. e. ref) is to be used
-		operator int(void) { return m_Ref; }
+		operator int(void) const { return m_Ref; }
 		
 	protected:
 		cLuaState & m_LuaState;
@@ -781,6 +781,12 @@ public:
 	
 	/// If the status is nonzero, prints the text on the top of Lua stack and returns true
 	static bool ReportErrors(lua_State * a_LuaState, int status);
+	
+	/// Logs all items in the current stack trace to the server console
+	void LogStackTrace(void);
+	
+	/// Returns the type of the item on the specified position in the stack
+	AString GetTypeText(int a_StackPos);
 	
 protected:
 	lua_State * m_LuaState;

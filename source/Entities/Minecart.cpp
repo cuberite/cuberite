@@ -26,20 +26,6 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 
 
 
-bool cMinecart::Initialize(cWorld * a_World)
-{
-	if (super::Initialize(a_World))
-	{
-		a_World->BroadcastSpawnEntity(*this);
-		return true;
-	}
-	return false;
-}
-
-
-
-
-
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	char SubType = 0;

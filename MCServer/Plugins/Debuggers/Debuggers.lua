@@ -16,15 +16,21 @@ function Initialize(Plugin)
 	Plugin:SetName("Debuggers")
 	Plugin:SetVersion(1)
 	
-	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_BLOCK);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_WORLD_TICK);
+	--[[
+	-- Test multiple hook handlers:
+	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick1);
+	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
+	--]]
+	
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
+	cPluginManager.AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
+	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick);
+	cPluginManager.AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
+	cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
 
+	PluginManager = cRoot:Get():GetPluginManager();
 	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PluginManager:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -39,6 +45,7 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/spidey",  "debuggers", HandleSpideyCmd,       "- Shoots a line of web blocks until it hits non-air");
 	PluginManager:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
 	PluginManager:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
+	PluginManager:BindCommand("/arr",     "debuggers", HandleArrowCmd,        "- Creates an arrow going away from the player");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -415,6 +422,24 @@ end
 
 
 
+function OnTick1()
+	-- For testing multiple hook handlers per plugin
+	LOGINFO("Tick1");
+end
+
+
+
+
+
+function OnTick2()
+	-- For testing multiple hook handlers per plugin
+	LOGINFO("Tick2");
+end
+
+
+
+
+
 --- When set to a positive number, the following OnTick() will perform GC and decrease until 0 again
 GCOnTick = 0;
 
@@ -770,6 +795,7 @@ function HandleEnchCmd(a_Split, a_Player)
 	Wnd:SetProperty(0, 10);
 	Wnd:SetProperty(1, 15);
 	Wnd:SetProperty(2, 25);
+	return true;
 end
 
 
@@ -778,6 +804,22 @@ end
 
 function HandleFoodStatsCmd(a_Split, a_Player)
 	g_ShowFoodStats = not(g_ShowFoodStats);
+	return true;
+end
+
+
+
+
+
+function HandleArrowCmd(a_Split, a_Player)
+	local World = a_Player:GetWorld();
+	local Pos = a_Player:GetEyePosition();
+	local Speed = a_Player:GetLookVector();
+	Speed:Normalize();
+	Pos = Pos + Speed;
+	
+	World:CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity.pkArrow, a_Player, Speed * 10);
+	return true;
 end
 
 

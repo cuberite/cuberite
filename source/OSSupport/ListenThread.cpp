@@ -80,7 +80,7 @@ void cListenThread::Stop(void)
 	super::Wait();
 	
 	// Close all the listening sockets:
-	for (cSockets::iterator itr = m_Sockets.begin(), end = m_Sockets.end(); itr != end; ++itr)
+	for (cSockets::iterator itr = m_Sockets.begin() + 1, end = m_Sockets.end(); itr != end; ++itr)
 	{
 		itr->CloseSocket();
 	}  // for itr - m_Sockets[]

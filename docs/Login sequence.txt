@@ -1,0 +1,26 @@
+
+This is the connection sequence of the 1.6.2 client to a vanilla server, after the encryption has been established:
+
+S->C: 0xfc (encryption key response) empty payload (4 * 0x00)
+C->S: 0xcd (client statuses)
+S->C: 0x01 (login)
+S->C: 0xfa (plugin message) - "MC|Brand": "vanilla"
+S->C: 0x06 (compass)
+S->C: 0xca (player capabilities)
+S->C: 0x10 (slot select)
+S->C: 0x04 (time update)
+S->C: 0xc9 (player list item)
+S->C: 0x0d (player pos + look)
+S->C: 0x04 (time update)
+S->C: 0x68 (window contents)
+S->C: 0x67 (slot contents) - Window -1, slot -1
+S->C: 0x67 (slot contents) - Window 0, slot 9 .. 44, only occupied slots
+S->C: 0x38 (chunk bulk)
+S->C: 0x28 (entity metadata) player metadata
+S->C: 0x2c (entity properties) player properties
+S->C: 0x04 (time update)
+S->C: 0x38 (chunk bulk)
+C->S: 0xcc (client settings / locale and view)
+C->S: 0xfa (plugin message) - "MC|Brand": "vanilla"
+C->S: 0x0d (player pos + look)
+S->C: 0x38 (chunk bulk)

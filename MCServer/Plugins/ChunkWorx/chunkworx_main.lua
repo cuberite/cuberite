@@ -26,8 +26,7 @@ function Initialize(Plugin)
 	PLUGIN:SetName("ChunkWorx")
 	PLUGIN:SetVersion(6)
 	
-	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook(PLUGIN, cPluginManager.HOOK_TICK)
+	cPluginManager.AddHook(cPluginManager.HOOK_TICK, OnTick)
 	
 	Plugin:AddWebTab("(Re)Generation", HandleRequest_Generation)
 	

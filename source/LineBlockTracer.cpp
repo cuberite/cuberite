@@ -55,6 +55,7 @@ bool cLineBlockTracer::Trace(double a_StartX, double a_StartY, double a_StartZ, 
 	m_DirX = (m_StartX < m_EndX) ? 1 : -1;
 	m_DirY = (m_StartY < m_EndY) ? 1 : -1;
 	m_DirZ = (m_StartZ < m_EndZ) ? 1 : -1;
+	m_CurrentFace = BLOCK_FACE_NONE;
 	
 	// Check the start coords, adjust into the world:
 	if (m_StartY < 0)
@@ -178,9 +179,9 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	// Based on the wall hit, adjust the current coords
 	switch (Direction)
 	{
-		case dirX:    m_CurrentX += m_DirX; break;
-		case dirY:    m_CurrentY += m_DirY; break;
-		case dirZ:    m_CurrentZ += m_DirZ; break;
+		case dirX:    m_CurrentX += m_DirX; m_CurrentFace = (m_DirX > 0) ? BLOCK_FACE_EAST   : BLOCK_FACE_WEST;  break;
+		case dirY:    m_CurrentY += m_DirY; m_CurrentFace = (m_DirY > 0) ? BLOCK_FACE_BOTTOM : BLOCK_FACE_TOP;   break;
+		case dirZ:    m_CurrentZ += m_DirZ; m_CurrentFace = (m_DirZ > 0) ? BLOCK_FACE_SOUTH  : BLOCK_FACE_NORTH; break;
 		case dirNONE: return false;
 	}
 	return true;
@@ -211,7 +212,7 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 			int RelX = m_CurrentX - a_Chunk->GetPosX() * cChunkDef::Width;
 			int RelZ = m_CurrentZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 			a_Chunk->GetBlockTypeMeta(RelX, m_CurrentY, RelZ, BlockType, BlockMeta);
-			if (m_Callbacks->OnNextBlock(m_CurrentX, m_CurrentY, m_CurrentZ, BlockType, BlockMeta))
+			if (m_Callbacks->OnNextBlock(m_CurrentX, m_CurrentY, m_CurrentZ, BlockType, BlockMeta, m_CurrentFace))
 			{
 				// The callback terminated the trace
 				return false;
@@ -219,7 +220,7 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 		}
 		else
 		{
-			if (m_Callbacks->OnNextBlockNoData(m_CurrentX, m_CurrentY, m_CurrentZ))
+			if (m_Callbacks->OnNextBlockNoData(m_CurrentX, m_CurrentY, m_CurrentZ, m_CurrentFace))
 			{
 				// The callback terminated the trace
 				return false;

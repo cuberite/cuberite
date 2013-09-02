@@ -110,6 +110,10 @@ public:																	// tolua_export
 		
 		// Note that if a hook type is added, it may need processing in cPlugin::CanAddHook() descendants,
 		//   and it definitely needs adding in cPluginLua::GetHookFnName() !
+		
+		// Keep these two as the last items, they are used for validity checking and get their values automagically
+		HOOK_NUM_HOOKS,
+		HOOK_MAX = HOOK_NUM_HOOKS - 1,
 	} ;
 	// tolua_end
 
@@ -133,7 +137,9 @@ public:																	// tolua_export
 
 	void FindPlugins();													// tolua_export
 	void ReloadPlugins();												// tolua_export
-	void AddHook( cPlugin* a_Plugin, PluginHook a_Hook );				// tolua_export
+	
+	/// Adds the plugin to the list of plugins called for the specified hook type. Handles multiple adds as a single add
+	void AddHook(cPlugin * a_Plugin, int a_HookType);
 
 	unsigned int GetNumPlugins() const;  // tolua_export
 	
@@ -237,6 +243,9 @@ public:																	// tolua_export
 	*/
 	void TabCompleteCommand(const AString & a_Text, AStringVector & a_Results, cPlayer * a_Player);
 	
+	/// Returns true if the specified hook type is within the allowed range
+	static bool IsValidHookType(int a_HookType);
+	
 private:
 	friend class cRoot;
 	
@@ -248,7 +257,7 @@ private:
 		AString   m_HelpString;
 	} ;
 	
-	typedef std::map< cPluginManager::PluginHook, cPluginManager::PluginList > HookMap;
+	typedef std::map<int, cPluginManager::PluginList> HookMap;
 	typedef std::map<AString, cCommandReg> CommandMap;
 
 	PluginList m_DisablePluginList;

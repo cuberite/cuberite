@@ -7,9 +7,8 @@ function Initialize( Plugin )
 	Plugin:SetName( "MagicCarpet" )
 	Plugin:SetVersion( 1 )
 
-	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
+	cPluginManager.AddHook(cPluginManager.HOOK_DISCONNECT,    OnDisconnect)
 	
 	PluginManager:BindCommand("/mc", "magiccarpet", HandleCarpetCommand, " - Spawns a magical carpet");
 

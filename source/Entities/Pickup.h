@@ -26,8 +26,6 @@ public:
 
 	cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);	// tolua_export
 	
-	virtual bool Initialize(cWorld * a_World) override;
-
 	cItem &       GetItem(void)       {return m_Item; }								// tolua_export
 	const cItem & GetItem(void) const {return m_Item; }
 

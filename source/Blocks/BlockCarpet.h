@@ -18,8 +18,8 @@ class cBlockCarpetHandler :
 	public cBlockHandler
 {
 public:
-	cBlockCarpetHandler(BLOCKTYPE a_BlockType)
-	: cBlockHandler(a_BlockType)
+	cBlockCarpetHandler(BLOCKTYPE a_BlockType) :
+		cBlockHandler(a_BlockType)
 	{
 	}
 

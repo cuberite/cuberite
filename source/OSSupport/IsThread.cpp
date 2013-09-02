@@ -136,17 +136,29 @@ bool cIsThread::Wait(void)
 	{
 		return true;
 	}
-	LOGD("Waiting for thread %s to finish", m_ThreadName.c_str());
+	
+	#ifdef LOGD  // ProtoProxy doesn't have LOGD
+		LOGD("Waiting for thread %s to finish", m_ThreadName.c_str());
+	#endif  // LOGD
 	
 	#ifdef _WIN32
 		int res = WaitForSingleObject(m_Handle, INFINITE);
 		m_Handle = NULL;
-		LOGD("Thread %s finished", m_ThreadName.c_str());
+		
+		#ifdef LOGD  // ProtoProxy doesn't have LOGD
+			LOGD("Thread %s finished", m_ThreadName.c_str());
+		#endif  // LOGD
+		
 		return (res == WAIT_OBJECT_0);
 	#else  // _WIN32
 		int res = pthread_join(m_Handle, NULL);
 		m_Handle = NULL;
-		LOGD("Thread %s finished", m_ThreadName.c_str());
+		
+		#ifdef LOGD  // ProtoProxy doesn't have LOGD
+			LOGD("Thread %s finished", m_ThreadName.c_str());
+		#endif  // LOGD
+		
+		m_HasStarted = false;
 		return (res == 0);
 	#endif  // else _WIN32
 }

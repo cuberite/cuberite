@@ -64,6 +64,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_IsSwimming(false)
 	, m_IsSubmerged(false)
 	, m_EatingFinishTick(-1)
+	, m_IsChargingBow(false)
+	, m_BowCharge(0)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -200,6 +202,12 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 	
+	if (!a_Chunk.IsValid())
+	{
+		// This may happen if the cPlayer is created before the chunks have the chance of being loaded / generated (#83)
+		return;
+	}
+	
 	super::Tick(a_Dt, a_Chunk);
 	
 	// Set player swimming state
@@ -207,6 +215,13 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 	// Handle air drowning stuff
 	HandleAir();
+	
+	// Handle charging the bow:
+	if (m_IsChargingBow)
+	{
+		m_BowCharge += 1;
+		LOGD("Player \"%s\" charging bow: %d", m_PlayerName.c_str(), m_BowCharge);
+	}
 
 	if (m_bDirtyPosition)
 	{
@@ -241,6 +256,41 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		m_World->SendPlayerList(this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
+}
+
+
+
+
+
+void cPlayer::StartChargingBow(void)
+{
+	LOGD("Player \"%s\" started charging their bow", m_PlayerName.c_str());
+	m_IsChargingBow = true;
+	m_BowCharge = 0;
+}
+
+
+
+
+
+int cPlayer::FinishChargingBow(void)
+{
+	LOGD("Player \"%s\" finished charging their bow at a charge of %d", m_PlayerName.c_str(), m_BowCharge);
+	int res = m_BowCharge;
+	m_IsChargingBow = false;
+	m_BowCharge = 0;
+	return res;
+}
+
+
+
+
+
+void cPlayer::CancelChargingBow(void)
+{
+	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", m_PlayerName.c_str(), m_BowCharge);
+	m_IsChargingBow = false;
+	m_BowCharge = 0;
 }
 
 
@@ -802,6 +852,36 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
 	m_ClientHandle->SendPlayerMoveLook();
 }
+
+
+
+
+
+Vector3d cPlayer::GetThrowStartPos(void) const
+{
+	Vector3d res = GetEyePosition();
+	
+	// Adjust the position to be just outside the player's bounding box:
+	res.x += 0.16 * cos(GetPitch());
+	res.y += -0.1;
+	res.z += 0.16 * sin(GetPitch());
+	
+	return res;
+}
+
+
+
+
+
+Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
+{
+	Vector3d res = GetLookVector();
+	res.Normalize();
+	
+	// TODO: Add a slight random change (+-0.0075 in each direction)
+	
+	return res * a_SpeedCoeff;
+}	
 
 
 

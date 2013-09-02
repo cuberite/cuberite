@@ -8,6 +8,7 @@
 
 // Handlers:
 #include "ItemBed.h"
+#include "ItemBow.h"
 #include "ItemBrewingStand.h"
 #include "ItemBucket.h"
 #include "ItemCauldron.h"
@@ -21,6 +22,7 @@
 #include "ItemLighter.h"
 #include "ItemMinecart.h"
 #include "ItemPickaxe.h"
+#include "ItemThrowable.h"
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
 #include "ItemSapling.h"
@@ -47,18 +49,24 @@ cItemHandler * cItemHandler::m_ItemHandler[2268];
 
 
 
-cItemHandler *cItemHandler::GetItemHandler(int a_ItemType)
+cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 {
-	if(a_ItemType < 0) a_ItemType = 0;
+	if (a_ItemType < 0)
+	{
+		ASSERT(!"Bad item type");
+		a_ItemType = 0;
+	}
 
-	if(!m_HandlerInitialized)
-	{	//We have to initialize
+	if (!m_HandlerInitialized)
+	{
+		// We need to initialize
 		memset(m_ItemHandler, 0, sizeof(m_ItemHandler));
 		m_HandlerInitialized = true;
 	}
-	if(m_ItemHandler[a_ItemType])
-		return m_ItemHandler[a_ItemType];
-	m_ItemHandler[a_ItemType] = CreateItemHandler(a_ItemType);
+	if (m_ItemHandler[a_ItemType] == NULL)
+	{
+		m_ItemHandler[a_ItemType] = CreateItemHandler(a_ItemType);
+	}
 	return m_ItemHandler[a_ItemType];
 }
 
@@ -77,15 +85,19 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_SAPLING:          return new cItemSaplingHandler(a_ItemType);
 		case E_BLOCK_WOOL:             return new cItemClothHandler(a_ItemType);
 		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
+		case E_ITEM_BOW:               return new cItemBowHandler;
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
+		case E_ITEM_EGG:               return new cItemEggHandler();
+		case E_ITEM_ENDER_PEARL:       return new cItemEnderPearlHandler();
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
 		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);
 		case E_ITEM_SIGN:              return new cItemSignHandler(a_ItemType);
+		case E_ITEM_SNOWBALL:          return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:         return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemType);
 		

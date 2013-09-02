@@ -113,13 +113,6 @@ public:
 	/// All bound console commands are to be removed, do any language-dependent cleanup here
 	virtual void ClearConsoleCommands(void) {} ;
 	
-	/** Called from cPluginManager::AddHook() to check if the hook can be added.
-	Plugin API providers may check if the plugin is written correctly (has the hook handler function)
-	Returns true if the hook can be added (handler exists)
-	Descendants should also log the specific error message as a warning if they return false.
-	*/
-	virtual bool CanAddHook(cPluginManager::PluginHook a_Hook) = 0;
-	
 	// tolua_begin
 	const AString & GetName(void) const  { return m_Name; }
 	void SetName(const AString & a_Name) { m_Name = a_Name; }

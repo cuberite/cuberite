@@ -201,6 +201,9 @@ enum
 	PACKET_ENCRYPTION_KEY_REQUEST    = 0xfd,
 	PACKET_PING                      = 0xfe,
 	PACKET_KICK                      = 0xff,
+	
+	// Synonyms:
+	PACKET_DISCONNECT                = PACKET_KICK,
 } ;
 
 
@@ -238,7 +241,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_Server(a_Server),
 	m_ClientSocket(a_ClientSocket),
 	m_ServerSocket(-1),
-	m_BeginTick(clock()),
+	m_BeginTick(m_Timer.GetNowTime()),
 	m_ClientState(csUnencrypted),
 	m_ServerState(csUnencrypted),
 	m_Nonce(0),
@@ -475,8 +478,7 @@ bool cConnection::RelayFromClient(void)
 
 double cConnection::GetRelativeTime(void)
 {
-	return (double)(clock() - m_BeginTick) / CLOCKS_PER_SEC;
-	
+	return (double)(m_Timer.GetNowTime() - m_BeginTick) / 1000;
 }
 
 
@@ -558,9 +560,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 	
 	while (m_ClientBuffer.CanReadBytes(1))
 	{
-		Log("Decoding client's packets, there are now %d bytes in the queue", m_ClientBuffer.GetReadableSpace());
 		unsigned char PacketType;
 		m_ClientBuffer.ReadByte(PacketType);
+		Log("Decoding client's packets, there are now %d bytes in the queue; next packet is 0x%02x", m_ClientBuffer.GetReadableSpace(), PacketType);
 		switch (PacketType)
 		{
 			case PACKET_BLOCK_DIG:                 HANDLE_CLIENT_READ(HandleClientBlockDig); break;
@@ -568,6 +570,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			case PACKET_CHAT_MESSAGE:              HANDLE_CLIENT_READ(HandleClientChatMessage); break;
 			case PACKET_CLIENT_STATUSES:           HANDLE_CLIENT_READ(HandleClientClientStatuses); break;
 			case PACKET_CREATIVE_INVENTORY_ACTION: HANDLE_CLIENT_READ(HandleClientCreativeInventoryAction); break;
+			case PACKET_DISCONNECT:                HANDLE_CLIENT_READ(HandleClientDisconnect); break;
 			case PACKET_ENCRYPTION_KEY_RESPONSE:   HANDLE_CLIENT_READ(HandleClientEncryptionKeyResponse); break;
 			case PACKET_ENTITY_ACTION:             HANDLE_CLIENT_READ(HandleClientEntityAction); break;
 			case PACKET_HANDSHAKE:                 HANDLE_CLIENT_READ(HandleClientHandshake); break;
@@ -644,7 +647,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 	{
 		unsigned char PacketType;
 		m_ServerBuffer.ReadByte(PacketType);
-		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%x", m_ServerBuffer.GetReadableSpace(), PacketType);
+		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%02x", m_ServerBuffer.GetReadableSpace(), PacketType);
 		LogFlush();
 		switch (PacketType)
 		{
@@ -835,6 +838,19 @@ bool cConnection::HandleClientCreativeInventoryAction(void)
 	Log("Received a PACKET_CREATIVE_INVENTORY_ACTION from the client:");
 	Log("  SlotNum = %d", SlotNum);
 	Log("  Item = %s", Item.c_str());
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientDisconnect(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Reason);
+	Log("Received a PACKET_DISCONNECT from the client:");
+	Log("  Reason = \"%s\"", Reason.c_str());
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1704,16 +1720,45 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	{
 		return false;
 	}
-	AString Meta;
-	if (!m_ServerBuffer.ReadString(Meta, ChunkCount * 12))
+	
+	// Read individual chunk metas.
+	// Need to read them first and only then start logging (in case we don't have the full packet yet)
+	struct sChunkMeta
 	{
-		return false;
+		int m_ChunkX, m_ChunkZ;
+		short m_PrimaryBitmap;
+		short m_AddBitmap;
+		sChunkMeta(int a_ChunkX, int a_ChunkZ, short a_PrimaryBitmap, short a_AddBitmap) :
+			m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_PrimaryBitmap(a_PrimaryBitmap), m_AddBitmap(a_AddBitmap)
+		{
+		}
+	} ;
+	typedef std::vector<sChunkMeta> sChunkMetas;
+	sChunkMetas ChunkMetas;
+	ChunkMetas.reserve(ChunkCount);
+	for (short i = 0; i < ChunkCount; i++)
+	{
+		HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkX);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkZ);
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, PrimaryBitmap);
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, AddBitmap);
+		ChunkMetas.push_back(sChunkMeta(ChunkX, ChunkZ, PrimaryBitmap, AddBitmap));
 	}
+	
 	Log("Received a PACKET_MAP_CHUNK_BULK from the server:");
 	Log("  ChunkCount = %d", ChunkCount);
 	Log("  Compressed size = %d (0x%x)", CompressedSize, CompressedSize);
 	Log("  IsSkyLightSent = %s", IsSkyLightSent ? "true" : "false");
 	
+	// Log individual chunk coords:
+	int idx = 0;
+	for (sChunkMetas::iterator itr = ChunkMetas.begin(), end = ChunkMetas.end(); itr != end; ++itr, ++idx)
+	{
+		Log("  [%d]: [%d, %d], primary bitmap 0x%02x, add bitmap 0x%02x",
+			idx, itr->m_ChunkX, itr->m_ChunkZ, itr->m_PrimaryBitmap, itr->m_AddBitmap
+		);
+	}  // for itr - ChunkMetas[]
+
 	// TODO: Save the compressed data into a file for later analysis
 	
 	COPY_TO_CLIENT();

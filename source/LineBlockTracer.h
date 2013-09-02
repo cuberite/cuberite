@@ -60,6 +60,9 @@ protected:
 	
 	// The current block
 	int m_CurrentX, m_CurrentY, m_CurrentZ;
+	
+	// The face through which the current block has been entered
+	char m_CurrentFace;
 
 	
 	/// Adjusts the start point above the world to just at the world's top

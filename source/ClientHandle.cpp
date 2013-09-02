@@ -19,6 +19,7 @@
 #include "OSSupport/Timer.h"
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
+#include "Blocks/BlockSlab.h"
 
 #include "Vector3f.h"
 #include "Vector3d.h"
@@ -50,6 +51,9 @@ static const int MAX_EXPLOSIONS_PER_TICK = 100;
 
 /// How many explosions in the recent history are allowed
 static const int MAX_RUNNING_SUM_EXPLOSIONS = cClientHandle::NUM_CHECK_EXPLOSIONS_TICKS * MAX_EXPLOSIONS_PER_TICK / 8;
+
+/// How many ticks before the socket is closed after the client is destroyed (#31)
+static const int TICKS_BEFORE_CLOSE = 20;
 
 
 
@@ -84,6 +88,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	, m_bKeepThreadGoing(true)
 	, m_Ping(1000)
 	, m_PingID(1)
+	, m_TicksSinceDestruction(0)
 	, m_State(csConnected)
 	, m_LastStreamedChunkX(0x7fffffff)  // bogus chunk coords to force streaming upon login
 	, m_LastStreamedChunkZ(0x7fffffff)
@@ -111,7 +116,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 
 cClientHandle::~cClientHandle()
 {
-	ASSERT(m_State == csDestroyed);  // Has Destroy() been called?
+	ASSERT(m_State >= csDestroyedWaiting);  // Has Destroy() been called?
 	
 	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
 
@@ -189,7 +194,7 @@ void cClientHandle::Destroy(void)
 		RemoveFromAllChunks();
 		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
 	}
-	m_State = csDestroyed;
+	m_State = csDestroyedWaiting;
 }
 
 
@@ -571,8 +576,8 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 					// A plugin doesn't agree with the action. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 					return;
 				}
+				ItemHandler->OnItemShoot(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			}
-			LOGINFO("%s: Status SHOOT not implemented", __FUNCTION__);
 			return;
 		}
 		
@@ -785,16 +790,16 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(BlockType);
+	cBlockHandler * BlockHandler = cBlockHandler::GetBlockHandler(BlockType);
 	
-	if (Handler->IsUseable() && !m_Player->IsCrouched())
+	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 	{
 		if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 		{
 			// A plugin doesn't agree with using the block, abort
 			return;
 		}
-		Handler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+		BlockHandler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 		PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 		return;
 	}
@@ -852,25 +857,24 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
 	NIBBLETYPE EquippedBlockDamage = (NIBBLETYPE)(m_Player->GetEquippedItem().m_ItemDamage);
 
+	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+	{
+		// The block is being placed outside the world, ignore this packet altogether (#128)
+		return;
+	}
+	
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
 
-	// Special slab handler coding
+	// Special slab handling - placing a slab onto another slab produces a dblslab instead:
 	if (
-		// If clicked face top: is slab there in the "bottom" position?
-		// If clicked face bottom: is the slab there in the "top" position?
-		// This prevents a dblslab forming below if you click the top face of a "top" slab.
-		(((a_BlockFace == BLOCK_FACE_TOP) && (ClickedBlockMeta == (EquippedBlockDamage & 0x07))) || ((a_BlockFace == BLOCK_FACE_BOTTOM) && (ClickedBlockMeta == (EquippedBlockDamage | 0x08)))) &&
-		
-		// Is clicked a slab? This is a SLAB handler, not stone or something!
-		((ClickedBlock == E_BLOCK_STONE_SLAB) || (ClickedBlock == E_BLOCK_WOODEN_SLAB)) &&
-		
-		// Is equipped a some type of slab?
-		// This prevents a bug where, well, you get a dblslab by placing TNT or something not a slab.
-		((EquippedBlock == E_BLOCK_STONE_SLAB) || (EquippedBlock == E_BLOCK_WOODEN_SLAB)) &&
-		
-		// Is equipped slab type same as the slab in the world? After all, we can't combine different slabs!
-		((ClickedBlockMeta & 0x07) == (EquippedBlockDamage & 0x07))
+		cBlockSlabHandler::IsAnySlabType(ClickedBlock) &&               // Is there a slab already?
+		cBlockSlabHandler::IsAnySlabType(EquippedBlock) &&              // Is the player placing another slab?
+		((ClickedBlockMeta & 0x07) == (EquippedBlockDamage & 0x07)) &&  // Is it the same slab type?
+		(
+			(a_BlockFace == BLOCK_FACE_TOP) ||                            // Clicking the top of a bottom slab
+			(a_BlockFace == BLOCK_FACE_BOTTOM)                            // Clicking the bottom of a top slab
 		)
+	)
 	{
 		// Coordinates at CLICKED block, don't move them anywhere
 	}
@@ -881,17 +885,26 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		if (Handler->DoesIgnoreBuildCollision())
 		{
 			Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-			//World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 		}
-		else
+
+		BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			
+			if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+			{
+				// The block is being placed outside the world, ignore this packet altogether (#128)
+				return;
+			}
+			
+			BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+
 			// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 			// No need to do combinability (dblslab) checks, client will do that here.
-			if ((World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_STONE_SLAB) || (World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_SLAB))
+			if (cBlockSlabHandler::IsAnySlabType(PlaceBlock))
 			{
-				//Is a slab, don't do checks and proceed to double-slabbing
+				// It's a slab, don't do checks and proceed to double-slabbing
 			}
 			else
 			{
@@ -899,13 +912,11 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
 				{
 					// Resend the old block
-					// Some times the client still places the block O.o
+					// Sometimes the client still places the block O.o
 					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 					return;
 				}
-	
-	
-				BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+
 				if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
 				{
 					// Tried to place a block *into* another?
@@ -915,7 +926,6 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			}
 		}
 	}
-	// Special slab handler coding end
 	
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -951,7 +961,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	NewBlock->OnPlacedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
 	// Step sound with 0.8f pitch is used as block placement sound
-	World->BroadcastSoundEffect(NewBlock->GetStepSound(),a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
+	World->BroadcastSoundEffect(NewBlock->GetStepSound(), a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 
@@ -1324,6 +1334,12 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 void cClientHandle::SendData(const char * a_Data, int a_Size)
 {
+	if (m_HasSentDC)
+	{
+		// This could crash the client, because they've already unloaded the world etc., and suddenly a wild packet appears (#31)
+		return;
+	}
+	
 	{
 		cCSLock Lock(m_CSOutgoingData);
 		
@@ -1438,6 +1454,17 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 void cClientHandle::Tick(float a_Dt)
 {
+	// Handle clients that are waiting for final close while destroyed:
+	if (m_State == csDestroyedWaiting)
+	{
+		m_TicksSinceDestruction += 1;  // This field is misused for the timeout counting
+		if (m_TicksSinceDestruction > TICKS_BEFORE_CLOSE)
+		{
+			m_State = csDestroyed;
+		}
+		return;
+	}
+	
 	// Process received network data:
 	AString IncomingData;
 	{
@@ -1563,6 +1590,16 @@ void cClientHandle::SendChat(const AString & a_Message)
 
 void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
+	ASSERT(m_Player != NULL);
+	
+	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
+	{
+		if ((a_ChunkX == m_Player->GetChunkX()) && (a_ChunkZ == m_Player->GetChunkZ()))
+		{
+			m_Protocol->SendPlayerMoveLook();
+		}
+	}
+	
 	// Check chunks being sent, erase them from m_ChunksToSend:
 	bool Found = false;
 	{

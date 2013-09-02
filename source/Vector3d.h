@@ -30,12 +30,13 @@ public:			// tolua_export
 	void operator -= ( Vector3d* a_V ) { x -= a_V->x; y -= a_V->y; z -= a_V->z; }
 	void operator *= ( double a_f ) { x *= a_f; y *= a_f; z *= a_f; }
 
-	Vector3d operator + ( const Vector3d& v2 ) const { return Vector3d( x + v2.x, y + v2.y, z + v2.z ); }									// tolua_export
-	Vector3d operator + ( const Vector3d* v2 ) const { return Vector3d( x + v2->x, y + v2->y, z + v2->z ); }								// tolua_export
-	Vector3d operator - ( const Vector3d& v2 ) const { return Vector3d( x - v2.x, y - v2.y, z - v2.z ); }									// tolua_export
-	Vector3d operator - ( const Vector3d* v2 ) const { return Vector3d( x - v2->x, y - v2->y, z - v2->z ); }								// tolua_export
-	Vector3d operator * ( const double f ) const { return Vector3d( x * f, y * f, z * f ); }												// tolua_export
-	Vector3d operator * ( const Vector3d& v2 ) const { return Vector3d( x * v2.x, y * v2.y, z * v2.z ); }									// tolua_export
+	Vector3d operator + (const Vector3d & v2) const { return Vector3d(x + v2.x, y + v2.y, z + v2.z ); }     // tolua_export
+	Vector3d operator + (const Vector3d * v2) const { return Vector3d(x + v2->x, y + v2->y, z + v2->z ); }  // tolua_export
+	Vector3d operator - (const Vector3d & v2) const { return Vector3d(x - v2.x, y - v2.y, z - v2.z ); }     // tolua_export
+	Vector3d operator - (const Vector3d * v2) const { return Vector3d(x - v2->x, y - v2->y, z - v2->z ); }  // tolua_export
+	Vector3d operator * (const double f)      const { return Vector3d(x * f, y * f, z * f ); }              // tolua_export
+	Vector3d operator * (const Vector3d & v2) const { return Vector3d(x * v2.x, y * v2.y, z * v2.z ); }     // tolua_export
+	Vector3d operator / (const double f)      const { return Vector3d(x / f, y / f, z / f ); }              // tolua_export
 
 	double x, y, z;	// tolua_export
 

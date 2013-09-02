@@ -61,7 +61,7 @@ void cPluginManager::FindPlugins(void)
 	// First get a clean list of only the currently running plugins, we don't want to mess those up
 	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
 	{
-		if( itr->second == NULL )
+		if (itr->second == NULL)
 		{
 			PluginMap::iterator thiz = itr;
 			++thiz;
@@ -1585,6 +1585,15 @@ void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & 
 
 
 
+bool cPluginManager::IsValidHookType(int a_HookType)
+{
+	return ((a_HookType >= 0) && (a_HookType <= HOOK_MAX));
+}
+
+
+
+
+
 bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 {
 	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;
@@ -1603,15 +1612,11 @@ bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 
 
 
-void cPluginManager::AddHook(cPlugin * a_Plugin, PluginHook a_Hook)
+void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
 {
 	if (!a_Plugin)
 	{
 		LOGWARN("Called cPluginManager::AddHook() with a_Plugin == NULL");
-		return;
-	}
-	if (!a_Plugin->CanAddHook(a_Hook))
-	{
 		return;
 	}
 	PluginList & Plugins = m_Hooks[a_Hook];

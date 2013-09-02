@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <time.h>
 #include "ByteBuffer.h"
+#include "../../source/OSSupport/Timer.h"
 
 
 
@@ -35,7 +35,8 @@ class cConnection
 	SOCKET m_ClientSocket;
 	SOCKET m_ServerSocket;
 	
-	clock_t m_BeginTick;  // Tick when the relative time was first retrieved (used for GetRelativeTime())
+	cTimer m_Timer;
+	long long m_BeginTick;  // Tick when the relative time was first retrieved (used for GetRelativeTime())
 	
 	enum eConnectionState
 	{
@@ -115,6 +116,7 @@ protected:
 	bool HandleClientChatMessage(void);
 	bool HandleClientClientStatuses(void);
 	bool HandleClientCreativeInventoryAction(void);
+	bool HandleClientDisconnect(void);
 	bool HandleClientEncryptionKeyResponse(void);
 	bool HandleClientEntityAction(void);
 	bool HandleClientHandshake(void);
