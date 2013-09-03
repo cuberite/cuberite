@@ -41,8 +41,22 @@ protected:
 		if (g_BlockIsSolid[a_BlockType])
 		{
 			// The projectile hit a solid block
-			m_Projectile->OnHitSolidBlock(a_BlockX, a_BlockY, a_BlockZ, a_EntryFace);
-			return true;
+			// Calculate the exact hit coords:
+			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);
+			Vector3d Line1 = m_Projectile->GetPosition();
+			Vector3d Line2 = Line1 + m_Projectile->GetSpeed();
+			double LineCoeff = 0;
+			char Face;
+			if (bb.CalcLineIntersection(Line1, Line2, LineCoeff, Face))
+			{
+				Vector3d Intersection = Line1 + m_Projectile->GetSpeed() * LineCoeff;
+				m_Projectile->OnHitSolidBlock(Intersection, Face);
+				return true;
+			}
+			else
+			{
+				LOGD("WEIRD! block tracer reports a hit, but BBox tracer doesn't. Ignoring the hit.");
+			}
 		}
 		
 		// Convey some special effects from special blocks:
@@ -206,26 +220,17 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 
 
 
-void cProjectileEntity::OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
-	// TODO: Set proper position based on what face was hit
-	switch (a_BlockFace)
-	{
-		case BLOCK_FACE_TOP:    SetPosition(0.5 + a_BlockX, 1.0 + a_BlockY, 0.5 + a_BlockZ); break;
-		case BLOCK_FACE_BOTTOM: SetPosition(0.5 + a_BlockX,       a_BlockY, 0.5 + a_BlockZ); break;
-		case BLOCK_FACE_EAST:   SetPosition(      a_BlockX, 0.5 + a_BlockY, 0.5 + a_BlockZ); break;
-		case BLOCK_FACE_WEST:   SetPosition(1.0 + a_BlockX, 0.5 + a_BlockY, 0.5 + a_BlockZ); break;
-		case BLOCK_FACE_NORTH:  SetPosition(0.5 + a_BlockX, 0.5 + a_BlockY, 1.0 + a_BlockZ); break;
-		case BLOCK_FACE_SOUTH:  SetPosition(0.5 + a_BlockX, 0.5 + a_BlockY,       a_BlockZ); break;
-		case BLOCK_FACE_NONE:   SetPosition(0.5 + a_BlockX, 0.5 + a_BlockY, 0.5 + a_BlockZ); break;
-	}
+	// Set the position based on what face was hit:
+	SetPosition(a_HitPos);
 	SetSpeed(0, 0, 0);
 
 	// DEBUG:
 	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, hit solid block at face %d",
 		m_UniqueID,
-		GetPosX(), GetPosY(), GetPosZ(),
-		a_BlockFace
+		a_HitPos.x, a_HitPos.y, a_HitPos.z,
+		a_HitFace
 	);
 
 	m_IsInGround = true;
@@ -287,7 +292,7 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		// Something has been hit, abort all other processing
 		return;
 	}
-	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later
+	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later in its SlowdownCoeff
 	
 	// Test for entity collisions:
 	cProjectileEntityCollisionCallback EntityCollisionCallback(this, Pos, NextPos);
@@ -430,7 +435,7 @@ cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, 
 
 
 
-void cThrownEggEntity::OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
 	// TODO: Random-spawn a chicken or four
 	
@@ -454,13 +459,13 @@ cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X
 
 
 
-void cThrownEnderPearlEntity::OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
 	// Teleport the creator here, make them take 5 damage:
 	if (m_Creator != NULL)
 	{
 		// TODO: The coords might need some tweaking based on the block face
-		m_Creator->TeleportToCoords(a_BlockX + 0.5, a_BlockY + 1.7, a_BlockZ + 0.5);
+		m_Creator->TeleportToCoords(a_HitPos.x + 0.5, a_HitPos.y + 1.7, a_HitPos.z + 0.5);
 		m_Creator->TakeDamage(dtEnderPearl, this, 5, 0);
 	}
 	
@@ -484,7 +489,7 @@ cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, double a_X, do
 
 
 
-void cThrownSnowballEntity::OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
 	// TODO: Apply damage to certain mobs (blaze etc.) and anger all mobs
 	

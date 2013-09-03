@@ -47,8 +47,8 @@ public:
 	
 	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d * a_Speed = NULL);
 	
-	/// Called by the physics blocktracer when the entity hits a solid block, the block's coords and the face hit is given
-	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
+	/// Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace);
 	
 	/// Called by the physics blocktracer when the entity hits another entity
 	virtual void OnHitEntity(cEntity & a_EntityHit) {}
@@ -179,7 +179,7 @@ protected:
 	// tolua_end
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
 
 	// tolua_begin
 	
@@ -207,7 +207,7 @@ protected:
 	// tolua_end
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
 
 	// tolua_begin
 	
@@ -235,7 +235,7 @@ protected:
 	// tolua_end
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
 
 	// tolua_begin
 	
