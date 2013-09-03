@@ -99,7 +99,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 	
 	switch (BelowMeta)
 	{
-		case E_RAIL_ZM_ZP: // NORTHSOUTH
+		case E_META_RAIL_ZM_ZP: // NORTHSOUTH
 		{
 			SetRotation(270);
 			SpeedY = 0; // Don't move vertically as on ground
@@ -124,7 +124,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_XM_XP: // EASTWEST
+		case E_META_RAIL_XM_XP: // EASTWEST
 		{
 			SetRotation(180);
 			SpeedY = 0;
@@ -146,7 +146,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_ASCEND_ZM: // ASCEND NORTH
+		case E_META_RAIL_ASCEND_ZM: // ASCEND NORTH
 		{
 			SetRotation(270);
 			SetPosY(floor(GetPosY()) + 0.2); // It seems it doesn't work without levitation :/
@@ -175,7 +175,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_ASCEND_ZP: // ASCEND SOUTH
+		case E_META_RAIL_ASCEND_ZP: // ASCEND SOUTH
 		{
 			SetRotation(270);
 			SetPosY(floor(GetPosY()) + 0.2);
@@ -204,7 +204,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_ASCEND_XM: // ASCEND EAST
+		case E_META_RAIL_ASCEND_XM: // ASCEND EAST
 		{
 			SetRotation(180);
 			SetPosY(floor(GetPosY()) + 0.2);
@@ -231,7 +231,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_ASCEND_XP: // ASCEND WEST
+		case E_META_RAIL_ASCEND_XP: // ASCEND WEST
 		{
 			SetRotation(180);
 			SetPosY(floor(GetPosY()) + 0.2);
@@ -258,7 +258,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_CURVED_ZM_XM: // Ends pointing NORTH and WEST
+		case E_META_RAIL_CURVED_ZM_XM: // Ends pointing NORTH and WEST
 		{
 			SetRotation(315); // Set correct rotation server side
 			SetPosY(floor(GetPosY()) + 0.2); // Levitate dat cart
@@ -274,7 +274,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_CURVED_ZM_XP: // Curved NORTH EAST
+		case E_META_RAIL_CURVED_ZM_XP: // Curved NORTH EAST
 		{
 			SetRotation(225);
 			SetPosY(floor(GetPosY()) + 0.2);
@@ -290,7 +290,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_CURVED_ZP_XM: // Curved SOUTH WEST
+		case E_META_RAIL_CURVED_ZP_XM: // Curved SOUTH WEST
 		{
 			SetRotation(135);
 			SetPosY(floor(GetPosY()) + 0.2);
@@ -306,7 +306,7 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			break;
 		}
 
-		case E_RAIL_CURVED_ZP_XP: // Curved SOUTH EAST
+		case E_META_RAIL_CURVED_ZP_XP: // Curved SOUTH EAST
 		{
 			SetRotation(45);
 			SetPosY(floor(GetPosY()) + 0.2);

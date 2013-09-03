@@ -65,13 +65,13 @@ public:
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		switch (Meta)
 		{
-			case E_RAIL_ASCEND_XP:
-			case E_RAIL_ASCEND_XM:
-			case E_RAIL_ASCEND_ZM:
-			case E_RAIL_ASCEND_ZP:
+			case E_META_RAIL_ASCEND_XP:
+			case E_META_RAIL_ASCEND_XM:
+			case E_META_RAIL_ASCEND_ZM:
+			case E_META_RAIL_ASCEND_ZP:
 			{
 				// Mapping between the meta and the neighbors that need checking
-				Meta -= E_RAIL_ASCEND_XP;  // Base index at zero
+				Meta -= E_META_RAIL_ASCEND_XP;  // Base index at zero
 				static const struct
 				{
 					int x, z;
@@ -126,12 +126,12 @@ public:
 		}
 		if (RailsCnt == 1)
 		{
-			if (Neighbors[7]) return E_RAIL_ASCEND_ZP;
-			else if (Neighbors[6]) return E_RAIL_ASCEND_ZM;
-			else if (Neighbors[5]) return E_RAIL_ASCEND_XM;
-			else if (Neighbors[4]) return E_RAIL_ASCEND_XP;
-			else if (Neighbors[0] || Neighbors[1]) return E_RAIL_XM_XP;
-			else if (Neighbors[2] || Neighbors[3]) return E_RAIL_ZM_ZP;
+			if (Neighbors[7]) return E_META_RAIL_ASCEND_ZP;
+			else if (Neighbors[6]) return E_META_RAIL_ASCEND_ZM;
+			else if (Neighbors[5]) return E_META_RAIL_ASCEND_XM;
+			else if (Neighbors[4]) return E_META_RAIL_ASCEND_XP;
+			else if (Neighbors[0] || Neighbors[1]) return E_META_RAIL_XM_XP;
+			else if (Neighbors[2] || Neighbors[3]) return E_META_RAIL_ZM_ZP;
 			ASSERT(!"Weird neighbor count");
 			return Meta;
 		}
@@ -144,16 +144,16 @@ public:
 		}
 		if (RailsCnt > 1)
 		{
-			if      (Neighbors[3] && Neighbors[0]) return E_RAIL_CURVED_ZP_XP;
-			else if (Neighbors[3] && Neighbors[1]) return E_RAIL_CURVED_ZP_XM;
-			else if (Neighbors[2] && Neighbors[0]) return E_RAIL_CURVED_ZM_XP;
-			else if (Neighbors[2] && Neighbors[1]) return E_RAIL_CURVED_ZM_XM;
-			else if (Neighbors[7] && Neighbors[2]) return E_RAIL_ASCEND_ZP;
-			else if (Neighbors[3] && Neighbors[6]) return E_RAIL_ASCEND_ZM;
-			else if (Neighbors[5] && Neighbors[0]) return E_RAIL_ASCEND_XM;
-			else if (Neighbors[4] && Neighbors[1]) return E_RAIL_ASCEND_XP;
-			else if (Neighbors[0] && Neighbors[1]) return E_RAIL_XM_XP;
-			else if (Neighbors[2] && Neighbors[3]) return E_RAIL_ZM_ZP;
+			if      (Neighbors[3] && Neighbors[0]) return E_META_RAIL_CURVED_ZP_XP;
+			else if (Neighbors[3] && Neighbors[1]) return E_META_RAIL_CURVED_ZP_XM;
+			else if (Neighbors[2] && Neighbors[0]) return E_META_RAIL_CURVED_ZM_XP;
+			else if (Neighbors[2] && Neighbors[1]) return E_META_RAIL_CURVED_ZM_XM;
+			else if (Neighbors[7] && Neighbors[2]) return E_META_RAIL_ASCEND_ZP;
+			else if (Neighbors[3] && Neighbors[6]) return E_META_RAIL_ASCEND_ZM;
+			else if (Neighbors[5] && Neighbors[0]) return E_META_RAIL_ASCEND_XM;
+			else if (Neighbors[4] && Neighbors[1]) return E_META_RAIL_ASCEND_XP;
+			else if (Neighbors[0] && Neighbors[1]) return E_META_RAIL_XM_XP;
+			else if (Neighbors[2] && Neighbors[3]) return E_META_RAIL_ZM_ZP;
 			ASSERT(!"Weird neighbor count");
 		}
 		return Meta;
@@ -169,7 +169,7 @@ public:
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		switch (Meta)
 		{
-			case E_RAIL_ZM_ZP:
+			case E_META_RAIL_ZM_ZP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH, E_PURE_DOWN) || 
@@ -181,7 +181,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_XM_XP:
+			case E_META_RAIL_XM_XP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST, E_PURE_DOWN) || 
@@ -193,7 +193,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_ASCEND_XP:
+			case E_META_RAIL_ASCEND_XP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_EAST) || 
@@ -205,7 +205,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_ASCEND_XM:
+			case E_META_RAIL_ASCEND_XM:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST) || 
@@ -217,7 +217,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_ASCEND_ZM:
+			case E_META_RAIL_ASCEND_ZM:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NORTH) || 
@@ -229,7 +229,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_ASCEND_ZP:
+			case E_META_RAIL_ASCEND_ZP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
@@ -241,7 +241,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_CURVED_ZP_XP:
+			case E_META_RAIL_CURVED_ZP_XP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
@@ -253,7 +253,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_CURVED_ZP_XM:
+			case E_META_RAIL_CURVED_ZP_XM:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
@@ -265,7 +265,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_CURVED_ZM_XM:
+			case E_META_RAIL_CURVED_ZM_XM:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
@@ -277,7 +277,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_CURVED_ZM_XP:
+			case E_META_RAIL_CURVED_ZM_XP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
@@ -325,11 +325,11 @@ public:
 			case BLOCK_FACE_NORTH:
 			{
 				if (
-					(Meta == E_RAIL_ZM_ZP) ||
-					(Meta == E_RAIL_ASCEND_ZM) ||
-					(Meta == E_RAIL_ASCEND_ZP) ||
-					(Meta == E_RAIL_CURVED_ZP_XP) ||
-					(Meta == E_RAIL_CURVED_ZP_XM)
+					(Meta == E_META_RAIL_ZM_ZP) ||
+					(Meta == E_META_RAIL_ASCEND_ZM) ||
+					(Meta == E_META_RAIL_ASCEND_ZP) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XP) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XM)
 				)
 				{
 					return false;
@@ -340,11 +340,11 @@ public:
 			case BLOCK_FACE_SOUTH:
 			{
 				if (
-					(Meta == E_RAIL_ZM_ZP) ||
-					(Meta == E_RAIL_ASCEND_ZM) ||
-					(Meta == E_RAIL_ASCEND_ZP) ||
-					(Meta == E_RAIL_CURVED_ZM_XP) ||
-					(Meta == E_RAIL_CURVED_ZM_XM)
+					(Meta == E_META_RAIL_ZM_ZP) ||
+					(Meta == E_META_RAIL_ASCEND_ZM) ||
+					(Meta == E_META_RAIL_ASCEND_ZP) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XP) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XM)
 				)
 				{
 					return false;
@@ -355,11 +355,11 @@ public:
 			case BLOCK_FACE_EAST:
 			{
 				if (
-					(Meta == E_RAIL_XM_XP) ||
-					(Meta == E_RAIL_ASCEND_XP) ||
-					(Meta == E_RAIL_ASCEND_XM) ||
-					(Meta == E_RAIL_CURVED_ZP_XM) ||
-					(Meta == E_RAIL_CURVED_ZM_XM)
+					(Meta == E_META_RAIL_XM_XP) ||
+					(Meta == E_META_RAIL_ASCEND_XP) ||
+					(Meta == E_META_RAIL_ASCEND_XM) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XM) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XM)
 				)
 				{
 					return false;
@@ -369,11 +369,11 @@ public:
 			case BLOCK_FACE_WEST:
 			{
 				if (
-					(Meta == E_RAIL_XM_XP) ||
-					(Meta == E_RAIL_ASCEND_XP) ||
-					(Meta == E_RAIL_ASCEND_XM) ||
-					(Meta == E_RAIL_CURVED_ZP_XP) ||
-					(Meta == E_RAIL_CURVED_ZM_XP)
+					(Meta == E_META_RAIL_XM_XP) ||
+					(Meta == E_META_RAIL_ASCEND_XP) ||
+					(Meta == E_META_RAIL_ASCEND_XM) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XP) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XP)
 				)
 				{
 					return false;

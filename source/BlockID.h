@@ -561,16 +561,16 @@ enum
 	E_META_SNOW_LAYER_EIGHT        = 7,
 
 	// E_BLOCK_RAIL metas
-	E_RAIL_ZM_ZP                   = 0,
-	E_RAIL_XM_XP                   = 1,
-	E_RAIL_ASCEND_XP               = 2,
-	E_RAIL_ASCEND_XM               = 3,
-	E_RAIL_ASCEND_ZM               = 4,
-	E_RAIL_ASCEND_ZP               = 5,
-	E_RAIL_CURVED_ZP_XP            = 6,
-	E_RAIL_CURVED_ZP_XM            = 7,
-	E_RAIL_CURVED_ZM_XM            = 8,
-	E_RAIL_CURVED_ZM_XP            = 9,
+	E_META_RAIL_ZM_ZP              = 0,
+	E_META_RAIL_XM_XP              = 1,
+	E_META_RAIL_ASCEND_XP          = 2,
+	E_META_RAIL_ASCEND_XM          = 3,
+	E_META_RAIL_ASCEND_ZM          = 4,
+	E_META_RAIL_ASCEND_ZP          = 5,
+	E_META_RAIL_CURVED_ZP_XP       = 6,
+	E_META_RAIL_CURVED_ZP_XM       = 7,
+	E_META_RAIL_CURVED_ZM_XM       = 8,
+	E_META_RAIL_CURVED_ZM_XP       = 9,
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Item metas:
