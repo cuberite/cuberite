@@ -345,7 +345,8 @@ void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
 	super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5),
 	m_PickupState(psNoPickup),
-	m_DamageCoeff(2)
+	m_DamageCoeff(2),
+	m_IsCritical(false)
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
@@ -361,7 +362,8 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	super(pkArrow, &a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), 0.5, 0.5),
 	m_PickupState(psInSurvivalOrCreative),
-	m_DamageCoeff(2)
+	m_DamageCoeff(2),
+	m_IsCritical((a_Force >= 1))
 {
 }
 
@@ -401,8 +403,12 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit)
 		return;
 	}
 	
-	// TODO: The damage dealt should be based on arrow speed in addition to the damage coeff
-	a_EntityHit.TakeDamage(dtRangedAttack, this, (int)(2.5 * m_DamageCoeff), 1);
+	int Damage = (int)(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
+	if (m_IsCritical)
+	{
+		Damage += m_World->GetTickRandomNumber(Damage / 2 + 2);
+	}
+	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
 	
 	Destroy();
 }

@@ -140,6 +140,9 @@ protected:
 	
 	/// The coefficient applied to the damage that the arrow will deal, based on the bow enchantment. 2.0 for normal arrow
 	double m_DamageCoeff;
+	
+	/// If true, the arrow deals more damage
+	bool m_IsCritical;
 
 	// cProjectileEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_Client) override;
