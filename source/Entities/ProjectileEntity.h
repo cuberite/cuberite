@@ -131,6 +131,12 @@ public:
 	/// Returns true if the specified player can pick the arrow up
 	bool CanPickup(const cPlayer & a_Player) const;
 	
+	/// Returns true if the arrow is set as critical
+	bool IsCritical(void) const { return m_IsCritical; }
+	
+	/// Sets the IsCritical flag
+	void SetIsCritical(bool a_IsCritical) { m_IsCritical = a_IsCritical; }
+	
 	// tolua_end
 	
 protected:

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/01/13 19:03:24.
+** Generated automatically by tolua++-1.0.92 on 09/03/13 08:38:38.
 */
 
 #ifndef __cplusplus
@@ -9961,6 +9961,71 @@ static int tolua_AllToLua_cArrowEntity_CanPickup00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'CanPickup'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsCritical of class  cArrowEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cArrowEntity_IsCritical00
+static int tolua_AllToLua_cArrowEntity_IsCritical00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cArrowEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cArrowEntity* self = (const cArrowEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsCritical'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsCritical();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsCritical'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetIsCritical of class  cArrowEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cArrowEntity_SetIsCritical00
+static int tolua_AllToLua_cArrowEntity_SetIsCritical00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cArrowEntity",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cArrowEntity* self = (cArrowEntity*)  tolua_tousertype(tolua_S,1,0);
+  bool a_IsCritical = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetIsCritical'", NULL);
+#endif
+  {
+   self->SetIsCritical(a_IsCritical);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetIsCritical'.",&tolua_err);
  return 0;
 #endif
 }
@@ -20233,24 +20298,6 @@ static int tolua_set_Vector3f_z(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: EPS of class  Vector3d */
-#ifndef TOLUA_DISABLE_tolua_get_Vector3d_EPS
-static int tolua_get_Vector3d_EPS(lua_State* tolua_S)
-{
-  tolua_pushnumber(tolua_S,(lua_Number)Vector3d::EPS);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: NO_INTERSECTION of class  Vector3d */
-#ifndef TOLUA_DISABLE_tolua_get_Vector3d_NO_INTERSECTION
-static int tolua_get_Vector3d_NO_INTERSECTION(lua_State* tolua_S)
-{
-  tolua_pushnumber(tolua_S,(lua_Number)Vector3d::NO_INTERSECTION);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: new of class  Vector3d */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3d_new00
 static int tolua_AllToLua_Vector3d_new00(lua_State* tolua_S)
@@ -21271,6 +21318,24 @@ static int tolua_set_Vector3d_z(lua_State* tolua_S)
   self->z = ((double)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: EPS of class  Vector3d */
+#ifndef TOLUA_DISABLE_tolua_get_Vector3d_EPS
+static int tolua_get_Vector3d_EPS(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)Vector3d::EPS);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: NO_INTERSECTION of class  Vector3d */
+#ifndef TOLUA_DISABLE_tolua_get_Vector3d_NO_INTERSECTION
+static int tolua_get_Vector3d_NO_INTERSECTION(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)Vector3d::NO_INTERSECTION);
+ return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -29097,6 +29162,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"dimOverworld",dimOverworld);
   tolua_constant(tolua_S,"dimEnd",dimEnd);
   tolua_constant(tolua_S,"dtAttack",dtAttack);
+  tolua_constant(tolua_S,"dtRangedAttack",dtRangedAttack);
   tolua_constant(tolua_S,"dtLightning",dtLightning);
   tolua_constant(tolua_S,"dtFalling",dtFalling);
   tolua_constant(tolua_S,"dtDrowning",dtDrowning);
@@ -29115,6 +29181,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"dtEntityAttack",dtEntityAttack);
   tolua_constant(tolua_S,"dtMob",dtMob);
   tolua_constant(tolua_S,"dtMobAttack",dtMobAttack);
+  tolua_constant(tolua_S,"dtArrowAttack",dtArrowAttack);
+  tolua_constant(tolua_S,"dtArrow",dtArrow);
+  tolua_constant(tolua_S,"dtProjectile",dtProjectile);
   tolua_constant(tolua_S,"dtFall",dtFall);
   tolua_constant(tolua_S,"dtDrown",dtDrown);
   tolua_constant(tolua_S,"dtSuffocation",dtSuffocation);
@@ -29527,6 +29596,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetDamageCoeff",tolua_AllToLua_cArrowEntity_GetDamageCoeff00);
    tolua_function(tolua_S,"SetDamageCoeff",tolua_AllToLua_cArrowEntity_SetDamageCoeff00);
    tolua_function(tolua_S,"CanPickup",tolua_AllToLua_cArrowEntity_CanPickup00);
+   tolua_function(tolua_S,"IsCritical",tolua_AllToLua_cArrowEntity_IsCritical00);
+   tolua_function(tolua_S,"SetIsCritical",tolua_AllToLua_cArrowEntity_SetIsCritical00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cThrownEggEntity","cThrownEggEntity","cProjectileEntity",NULL);
   tolua_beginmodule(tolua_S,"cThrownEggEntity");
@@ -30072,8 +30143,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"Vector3d","Vector3d","",NULL);
   #endif
   tolua_beginmodule(tolua_S,"Vector3d");
-   tolua_variable(tolua_S,"EPS",tolua_get_Vector3d_EPS,NULL);
-   tolua_variable(tolua_S,"NO_INTERSECTION",tolua_get_Vector3d_NO_INTERSECTION,NULL);
    tolua_function(tolua_S,"new",tolua_AllToLua_Vector3d_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_Vector3d_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_Vector3d_new00_local);
@@ -30108,6 +30177,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"x",tolua_get_Vector3d_x,tolua_set_Vector3d_x);
    tolua_variable(tolua_S,"y",tolua_get_Vector3d_y,tolua_set_Vector3d_y);
    tolua_variable(tolua_S,"z",tolua_get_Vector3d_z,tolua_set_Vector3d_z);
+   tolua_variable(tolua_S,"EPS",tolua_get_Vector3d_EPS,NULL);
+   tolua_variable(tolua_S,"NO_INTERSECTION",tolua_get_Vector3d_NO_INTERSECTION,NULL);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"Vector3i","Vector3i","",tolua_collect_Vector3i);
