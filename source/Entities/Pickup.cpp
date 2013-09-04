@@ -25,7 +25,7 @@
 
 
 cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
-	:	cEntity(etPickup, ((double)(a_MicroPosX)) / 32, ((double)(a_MicroPosY)) / 32, ((double)(a_MicroPosZ)) / 32, 0.2, 0.2)
+	:	cEntity(etPickup, (((double)(a_MicroPosX)) / 32) + 0.1 /*Accomodate player vomiting*/, ((double)(a_MicroPosY)) / 32, ((double)(a_MicroPosZ)) / 32, 0.2, 0.2)
 	, m_Timer( 0.f )
 	, m_Item(a_Item)
 	, m_bCollected( false )
@@ -33,7 +33,7 @@ cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem 
 	m_MaxHealth = 5;
 	m_Health = 5;
 	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
-	m_Gravity = -3.0;
+	m_Gravity = -10.0;
 }
 
 
