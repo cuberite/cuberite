@@ -517,7 +517,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			//Push out entity.
+			// Push out entity.
 
 			if (NextChunk->GetBlock( RelBlockX + 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += 0.2; }
 			else if (NextChunk->GetBlock( RelBlockX - 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += -0.2; }

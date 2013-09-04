@@ -1514,22 +1514,13 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
 		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
-		float SpeedY = (float)(a_FlyAwaySpeed *  r1.randInt(1000));
+		float SpeedY = 1;
 		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
-		
-		// Add random offset to the spawn position:
-		int MicroX = (int)(a_BlockX * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
-		int MicroY = (int)(a_BlockY * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
-		int MicroZ = (int)(a_BlockZ * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
 
-		// TODO 2013_05_12 _X: Because spawning pickups with nonzero speed causes them to bug (FS #338),
-		// I decided to temporarily reset the speed to zero to fix it, until we have proper pickup physics
-		SpeedX = SpeedY = SpeedZ = 0;
-		
-		// TODO 2013_05_12 _X: It seems that pickups bug out even with zero speed, trying mid-block position:
-		MicroX = (int)(floor(a_BlockX) * 32) + 16;
-		MicroY = (int)(floor(a_BlockY) * 32) + 16;
-		MicroZ = (int)(floor(a_BlockZ) * 32) + 16;
+		// (FS #338 Fixed with mid block position spawn, previous TODOs/comments removed)
+		int MicroX = (int)(floor(a_BlockX) * 32) + 16;
+		int MicroY = (int)(floor(a_BlockY) * 32) + 16;
+		int MicroZ = (int)(floor(a_BlockZ) * 32) + 16;
 		
 		cPickup * Pickup = new cPickup(
 			MicroX, MicroY, MicroZ,
@@ -1545,23 +1536,14 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
-	// TODO 2013_05_12 _X: Because spawning pickups with nonzero speed causes them to bug (FS #338),
-	// I decided to temporarily reset the speed to zero to fix it, until we have proper pickup physics
-	a_SpeedX = a_SpeedY = a_SpeedZ = 0;
-		
 	MTRand r1;
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
-		// Add random offset to the spawn position:
-		int MicroX = (int)(a_BlockX * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
-		int MicroY = (int)(a_BlockY * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
-		int MicroZ = (int)(a_BlockZ * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
-
-		// TODO 2013_05_12 _X: It seems that pickups bug out even with zero speed, trying mid-block position:
-		MicroX = (int)(floor(a_BlockX) * 32) + 16;
-		MicroY = (int)(floor(a_BlockY) * 32) + 16;
-		MicroZ = (int)(floor(a_BlockZ) * 32) + 16;
-		
+		// (FS #338 Fixed with mid block position spawn, previous TODOs/comments removed)
+		int MicroX = (int)(floor(a_BlockX) * 32) + 16;
+		int MicroY = (int)(floor(a_BlockY) * 32) + 16;
+		int MicroZ = (int)(floor(a_BlockZ) * 32) + 16;
+				
 		cPickup * Pickup = new cPickup(
 			MicroX, MicroY, MicroZ,
 			*itr, (float)a_SpeedX, (float)a_SpeedY, (float)a_SpeedZ
