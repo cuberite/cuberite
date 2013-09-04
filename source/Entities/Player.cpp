@@ -1182,7 +1182,7 @@ void cPlayer::TossItem(
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetRotation(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 2, vY * 2, vZ * 2);
+	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 3, vY * 3, vZ * 3);
 }
 
 
