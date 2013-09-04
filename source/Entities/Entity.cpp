@@ -517,7 +517,14 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			// Push out entity.
+			//Push out entity.
+
+			if (NextChunk->GetBlock( RelBlockX + 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += 0.2; }
+			else if (NextChunk->GetBlock( RelBlockX - 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += -0.2; }
+			else if (NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ + 1 ) == E_BLOCK_AIR) { NextPos.z += 0.2; }
+			else if (NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ - 1 ) == E_BLOCK_AIR) { NextPos.z += -0.2; }
+			else { NextPos.y += 0.2; }
+			
 			m_bOnGround = true;
 			NextPos.y += 0.2;
 			LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
