@@ -185,6 +185,8 @@ public:
 	void AddSpeedX  (double a_AddSpeedX);
 	void AddSpeedY  (double a_AddSpeedY);
 	void AddSpeedZ  (double a_AddSpeedZ);
+	
+	void SteerVehicle(float a_Forward, float a_Sideways);
 
 	inline int  GetUniqueID(void) const { return m_UniqueID; }
 	inline bool IsDestroyed(void) const { return !m_IsInitialized; }

@@ -177,6 +177,7 @@ public:
 	void HandleRespawn          (void);
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
 	void HandleSlotSelected     (short a_SlotNum);
+	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (
 		int a_BlockX, int a_BlockY, int a_BlockZ, 
