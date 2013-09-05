@@ -89,7 +89,7 @@ public:
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) = 0;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) = 0;
 	virtual void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) = 0;
-	virtual void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType) = 0;
+	virtual void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) = 0;
 	virtual void SendTabCompletionResults(const AStringVector & a_Results) = 0;
 	virtual void SendTeleportEntity      (const cEntity & a_Entity) = 0;
 	virtual void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;

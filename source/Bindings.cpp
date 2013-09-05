@@ -28302,6 +28302,16 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_SNOW_LAYER_SIX",E_META_SNOW_LAYER_SIX);
   tolua_constant(tolua_S,"E_META_SNOW_LAYER_SEVEN",E_META_SNOW_LAYER_SEVEN);
   tolua_constant(tolua_S,"E_META_SNOW_LAYER_EIGHT",E_META_SNOW_LAYER_EIGHT);
+  tolua_constant(tolua_S,"E_META_RAIL_ZM_ZP",E_META_RAIL_ZM_ZP);
+  tolua_constant(tolua_S,"E_META_RAIL_XM_XP",E_META_RAIL_XM_XP);
+  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_XP",E_META_RAIL_ASCEND_XP);
+  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_XM",E_META_RAIL_ASCEND_XM);
+  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_ZM",E_META_RAIL_ASCEND_ZM);
+  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_ZP",E_META_RAIL_ASCEND_ZP);
+  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZP_XP",E_META_RAIL_CURVED_ZP_XP);
+  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZP_XM",E_META_RAIL_CURVED_ZP_XM);
+  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZM_XM",E_META_RAIL_CURVED_ZM_XM);
+  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZM_XP",E_META_RAIL_CURVED_ZM_XP);
   tolua_constant(tolua_S,"E_META_COAL_NORMAL",E_META_COAL_NORMAL);
   tolua_constant(tolua_S,"E_META_COAL_CHARCOAL",E_META_COAL_CHARCOAL);
   tolua_constant(tolua_S,"E_META_DYE_BLACK",E_META_DYE_BLACK);

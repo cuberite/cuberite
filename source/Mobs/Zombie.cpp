@@ -3,10 +3,12 @@
 
 #include "Zombie.h"
 #include "../World.h"
+#include "../LineBlockTracer.h"
 
 
 
 
+// They're eating your brains!
 
 cZombie::cZombie(void) :
 	super("Zombie", 54, "mob.zombie.hurt", "mob.zombie.death", 0.6, 1.8)
@@ -20,12 +22,13 @@ cZombie::cZombie(void) :
 void cZombie::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-
-	// TODO Same as in cSkeleton :D
-	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsOnFire())
+	if ((GetWorld()->GetBlockSkyLight(GetPosX(), GetPosY(), GetPosZ()) == 15) && (GetWorld()->GetBlock(GetPosX(), GetPosY(), GetPosZ()) != E_BLOCK_SOULSAND))
 	{
-		// Burn for 10 ticks, then decide again
-		StartBurning(10);
+		if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsOnFire())
+		{
+			// Burn for 100 ticks, then decide again
+			StartBurning(100);
+		}
 	}
 }
 

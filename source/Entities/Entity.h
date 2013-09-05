@@ -351,7 +351,7 @@ protected:
 
 	bool     m_bOnGround;
 	float    m_Gravity;
-
+	
 	// Last Position.
 	double m_LastPosX, m_LastPosY, m_LastPosZ;
 

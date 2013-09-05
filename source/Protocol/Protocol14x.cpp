@@ -229,21 +229,24 @@ void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 
 
 
-void cProtocol146::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType)
+void cProtocol146::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
 {
 	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_SPAWN_OBJECT);
-	WriteInt (a_Vehicle.GetUniqueID());
-	WriteByte(a_VehicleType);
-	WriteInt ((int)(a_Vehicle.GetPosX() * 32));
-	WriteInt ((int)(a_Vehicle.GetPosY() * 32));
-	WriteInt ((int)(a_Vehicle.GetPosZ() * 32));
+	WriteByte (PACKET_SPAWN_OBJECT);
+	WriteInt  (a_Vehicle.GetUniqueID());
+	WriteByte (a_VehicleType);
+	WriteInt  ((int)(a_Vehicle.GetPosX() * 32));
+	WriteInt  ((int)(a_Vehicle.GetPosY() * 32));
+	WriteInt  ((int)(a_Vehicle.GetPosZ() * 32));
 	WriteByte ((Byte)((a_Vehicle.GetPitch() / 360.f) * 256));
 	WriteByte ((Byte)((a_Vehicle.GetRotation() / 360.f) * 256));
-	WriteInt (1);
-	WriteShort((short)(a_Vehicle.GetSpeedX() * 400));
-	WriteShort((short)(a_Vehicle.GetSpeedY() * 400));
-	WriteShort((short)(a_Vehicle.GetSpeedZ() * 400));
+	WriteInt  (a_VehicleSubType);
+	if (a_VehicleSubType != 0)
+	{
+		WriteShort((short)(a_Vehicle.GetSpeedX() * 400));
+		WriteShort((short)(a_Vehicle.GetSpeedY() * 400));
+		WriteShort((short)(a_Vehicle.GetSpeedZ() * 400));
+	}
 	Flush();
 }
 

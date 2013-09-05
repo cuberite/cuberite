@@ -8,37 +8,6 @@
 
 
 
-/// Meta values for the rail
-enum ENUM_RAIL_DIRECTIONS
-{
-	E_RAIL_NORTH_SOUTH       = 0,
-	E_RAIL_EAST_WEST         = 1,
-	E_RAIL_ASCEND_EAST       = 2,
-	E_RAIL_ASCEND_WEST       = 3,
-	E_RAIL_ASCEND_NORTH      = 4,
-	E_RAIL_ASCEND_SOUTH      = 5,
-	E_RAIL_CURVED_SOUTH_EAST = 6,
-	E_RAIL_CURVED_SOUTH_WEST = 7,
-	E_RAIL_CURVED_NORTH_WEST = 8,
-	E_RAIL_CURVED_NORTH_EAST = 9,
-
-	// Some useful synonyms:
-	E_RAIL_DIR_X       = E_RAIL_EAST_WEST,
-	E_RAIL_DIR_Z       = E_RAIL_NORTH_SOUTH,
-	E_RAIL_ASCEND_XP   = E_RAIL_ASCEND_EAST,
-	E_RAIL_ASCEND_XM   = E_RAIL_ASCEND_WEST,
-	E_RAIL_ASCEND_ZM   = E_RAIL_ASCEND_NORTH,
-	E_RAIL_ASCEND_ZP   = E_RAIL_ASCEND_SOUTH,
-	E_RAIL_CURVED_XPZP = E_RAIL_CURVED_SOUTH_EAST,
-	E_RAIL_CURVED_XMZP = E_RAIL_CURVED_SOUTH_WEST,
-	E_RAIL_CURVED_XMZM = E_RAIL_CURVED_NORTH_WEST,
-	E_RAIL_CURVED_XPZM = E_RAIL_CURVED_NORTH_EAST,
-} ;
-
-
-
-
-
 enum ENUM_PURE
 {
 	E_PURE_UPDOWN = 0,
@@ -96,13 +65,13 @@ public:
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		switch (Meta)
 		{
-			case E_RAIL_ASCEND_EAST:
-			case E_RAIL_ASCEND_WEST:
-			case E_RAIL_ASCEND_NORTH:
-			case E_RAIL_ASCEND_SOUTH:
+			case E_META_RAIL_ASCEND_XP:
+			case E_META_RAIL_ASCEND_XM:
+			case E_META_RAIL_ASCEND_ZM:
+			case E_META_RAIL_ASCEND_ZP:
 			{
 				// Mapping between the meta and the neighbors that need checking
-				Meta -= E_RAIL_ASCEND_EAST;  // Base index at zero
+				Meta -= E_META_RAIL_ASCEND_XP;  // Base index at zero
 				static const struct
 				{
 					int x, z;
@@ -157,12 +126,12 @@ public:
 		}
 		if (RailsCnt == 1)
 		{
-			if (Neighbors[7]) return E_RAIL_ASCEND_SOUTH;
-			else if (Neighbors[6]) return E_RAIL_ASCEND_NORTH;
-			else if (Neighbors[5]) return E_RAIL_ASCEND_WEST;
-			else if (Neighbors[4]) return E_RAIL_ASCEND_EAST;
-			else if (Neighbors[0] || Neighbors[1]) return E_RAIL_EAST_WEST;
-			else if (Neighbors[2] || Neighbors[3]) return E_RAIL_NORTH_SOUTH;
+			if (Neighbors[7]) return E_META_RAIL_ASCEND_ZP;
+			else if (Neighbors[6]) return E_META_RAIL_ASCEND_ZM;
+			else if (Neighbors[5]) return E_META_RAIL_ASCEND_XM;
+			else if (Neighbors[4]) return E_META_RAIL_ASCEND_XP;
+			else if (Neighbors[0] || Neighbors[1]) return E_META_RAIL_XM_XP;
+			else if (Neighbors[2] || Neighbors[3]) return E_META_RAIL_ZM_ZP;
 			ASSERT(!"Weird neighbor count");
 			return Meta;
 		}
@@ -175,16 +144,16 @@ public:
 		}
 		if (RailsCnt > 1)
 		{
-			if      (Neighbors[3] && Neighbors[0]) return E_RAIL_CURVED_SOUTH_EAST;
-			else if (Neighbors[3] && Neighbors[1]) return E_RAIL_CURVED_SOUTH_WEST;
-			else if (Neighbors[2] && Neighbors[0]) return E_RAIL_CURVED_NORTH_EAST;
-			else if (Neighbors[2] && Neighbors[1]) return E_RAIL_CURVED_NORTH_WEST;
-			else if (Neighbors[7] && Neighbors[2]) return E_RAIL_ASCEND_SOUTH;
-			else if (Neighbors[3] && Neighbors[6]) return E_RAIL_ASCEND_NORTH;
-			else if (Neighbors[5] && Neighbors[0]) return E_RAIL_ASCEND_WEST;
-			else if (Neighbors[4] && Neighbors[1]) return E_RAIL_ASCEND_EAST;
-			else if (Neighbors[0] && Neighbors[1]) return E_RAIL_EAST_WEST;
-			else if (Neighbors[2] && Neighbors[3]) return E_RAIL_NORTH_SOUTH;
+			if      (Neighbors[3] && Neighbors[0]) return E_META_RAIL_CURVED_ZP_XP;
+			else if (Neighbors[3] && Neighbors[1]) return E_META_RAIL_CURVED_ZP_XM;
+			else if (Neighbors[2] && Neighbors[0]) return E_META_RAIL_CURVED_ZM_XP;
+			else if (Neighbors[2] && Neighbors[1]) return E_META_RAIL_CURVED_ZM_XM;
+			else if (Neighbors[7] && Neighbors[2]) return E_META_RAIL_ASCEND_ZP;
+			else if (Neighbors[3] && Neighbors[6]) return E_META_RAIL_ASCEND_ZM;
+			else if (Neighbors[5] && Neighbors[0]) return E_META_RAIL_ASCEND_XM;
+			else if (Neighbors[4] && Neighbors[1]) return E_META_RAIL_ASCEND_XP;
+			else if (Neighbors[0] && Neighbors[1]) return E_META_RAIL_XM_XP;
+			else if (Neighbors[2] && Neighbors[3]) return E_META_RAIL_ZM_ZP;
 			ASSERT(!"Weird neighbor count");
 		}
 		return Meta;
@@ -200,7 +169,7 @@ public:
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		switch (Meta)
 		{
-			case E_RAIL_NORTH_SOUTH:
+			case E_META_RAIL_ZM_ZP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH, E_PURE_DOWN) || 
@@ -212,7 +181,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_EAST_WEST:
+			case E_META_RAIL_XM_XP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST, E_PURE_DOWN) || 
@@ -224,7 +193,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_ASCEND_EAST:
+			case E_META_RAIL_ASCEND_XP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_EAST) || 
@@ -236,7 +205,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_ASCEND_WEST:
+			case E_META_RAIL_ASCEND_XM:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST) || 
@@ -248,7 +217,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_ASCEND_NORTH:
+			case E_META_RAIL_ASCEND_ZM:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NORTH) || 
@@ -260,7 +229,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_ASCEND_SOUTH:
+			case E_META_RAIL_ASCEND_ZP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
@@ -272,7 +241,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_CURVED_SOUTH_EAST:
+			case E_META_RAIL_CURVED_ZP_XP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
@@ -284,7 +253,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_CURVED_SOUTH_WEST:
+			case E_META_RAIL_CURVED_ZP_XM:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
@@ -296,7 +265,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_CURVED_NORTH_WEST:
+			case E_META_RAIL_CURVED_ZM_XM:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
@@ -308,7 +277,7 @@ public:
 				break;
 			}
 			
-			case E_RAIL_CURVED_NORTH_EAST:
+			case E_META_RAIL_CURVED_ZM_XP:
 			{
 				if (
 					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
@@ -356,11 +325,11 @@ public:
 			case BLOCK_FACE_NORTH:
 			{
 				if (
-					(Meta == E_RAIL_NORTH_SOUTH) ||
-					(Meta == E_RAIL_ASCEND_NORTH) ||
-					(Meta == E_RAIL_ASCEND_SOUTH) ||
-					(Meta == E_RAIL_CURVED_SOUTH_EAST) ||
-					(Meta == E_RAIL_CURVED_SOUTH_WEST)
+					(Meta == E_META_RAIL_ZM_ZP) ||
+					(Meta == E_META_RAIL_ASCEND_ZM) ||
+					(Meta == E_META_RAIL_ASCEND_ZP) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XP) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XM)
 				)
 				{
 					return false;
@@ -371,11 +340,11 @@ public:
 			case BLOCK_FACE_SOUTH:
 			{
 				if (
-					(Meta == E_RAIL_NORTH_SOUTH) ||
-					(Meta == E_RAIL_ASCEND_NORTH) ||
-					(Meta == E_RAIL_ASCEND_SOUTH) ||
-					(Meta == E_RAIL_CURVED_NORTH_EAST) ||
-					(Meta == E_RAIL_CURVED_NORTH_WEST)
+					(Meta == E_META_RAIL_ZM_ZP) ||
+					(Meta == E_META_RAIL_ASCEND_ZM) ||
+					(Meta == E_META_RAIL_ASCEND_ZP) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XP) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XM)
 				)
 				{
 					return false;
@@ -386,11 +355,11 @@ public:
 			case BLOCK_FACE_EAST:
 			{
 				if (
-					(Meta == E_RAIL_EAST_WEST) ||
-					(Meta == E_RAIL_ASCEND_EAST) ||
-					(Meta == E_RAIL_ASCEND_WEST) ||
-					(Meta == E_RAIL_CURVED_SOUTH_WEST) ||
-					(Meta == E_RAIL_CURVED_NORTH_WEST)
+					(Meta == E_META_RAIL_XM_XP) ||
+					(Meta == E_META_RAIL_ASCEND_XP) ||
+					(Meta == E_META_RAIL_ASCEND_XM) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XM) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XM)
 				)
 				{
 					return false;
@@ -400,11 +369,11 @@ public:
 			case BLOCK_FACE_WEST:
 			{
 				if (
-					(Meta == E_RAIL_EAST_WEST) ||
-					(Meta == E_RAIL_ASCEND_EAST) ||
-					(Meta == E_RAIL_ASCEND_WEST) ||
-					(Meta == E_RAIL_CURVED_SOUTH_EAST) ||
-					(Meta == E_RAIL_CURVED_NORTH_EAST)
+					(Meta == E_META_RAIL_XM_XP) ||
+					(Meta == E_META_RAIL_ASCEND_XP) ||
+					(Meta == E_META_RAIL_ASCEND_XM) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XP) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XP)
 				)
 				{
 					return false;
