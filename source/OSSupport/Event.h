@@ -19,21 +19,11 @@
 class cEvent
 {
 public:
-	enum eWaitResult
-	{
-		wrSignalled,
-		wrTimeout,
-		wrError,
-	} ;
-	
 	cEvent(void);
 	~cEvent();
 
 	void Wait(void);
 	void Set (void);
-	
-	/// Waits for the semaphore with a timeout
-	eWaitResult Wait(int a_TimeoutMilliSec);
 	
 private:
 
