@@ -1090,6 +1090,15 @@ void cClientHandle::HandleSlotSelected(short a_SlotNum)
 
 
 
+void cClientHandle::HandleSteerVehicle(float a_Forward, float a_Sideways)
+{
+	m_Player->SteerVehicle(a_Forward, a_Sideways);
+}
+
+
+
+
+
 void cClientHandle::HandleWindowClose(char a_WindowID)
 {
 	m_Player->CloseWindowIfID(a_WindowID);

@@ -213,6 +213,10 @@ int cProtocol161::ParseSteerVehicle(void)
 	{
 		m_Client->HandleUnmount();
 	}
+	else
+	{
+		m_Client->HandleSteerVehicle(Forward, Sideways);
+	}
 	return PARSE_OK;
 }
 

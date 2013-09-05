@@ -546,22 +546,24 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
+			// TODO: This condition belongs to minecarts, without it, they derails too much.
+			// But it shouldn't be here for other entities. We need a complete minecart physics overhaul.
 			if (
-				(BlockBelow != E_BLOCK_RAIL) && 
-				(BlockBelow != E_BLOCK_DETECTOR_RAIL) && 
-				(BlockBelow != E_BLOCK_POWERED_RAIL) && 
+				(BlockBelow != E_BLOCK_RAIL) &&
+				(BlockBelow != E_BLOCK_DETECTOR_RAIL) &&
+				(BlockBelow != E_BLOCK_POWERED_RAIL) &&
 				(BlockBelow != E_BLOCK_ACTIVATOR_RAIL)
-				)
+			)
 			{
 				// Friction
 				if (NextSpeed.SqrLength() > 0.0004f)
 				{
-					NextSpeed.x *= 0.7f / (1 + a_Dt);
+					NextSpeed.x *= 0.6666;
 					if (fabs(NextSpeed.x) < 0.05)
 					{
 						NextSpeed.x = 0;
 					}
-					NextSpeed.z *= 0.7f / (1 + a_Dt);
+					NextSpeed.z *= 0.6666;
 					if (fabs(NextSpeed.z) < 0.05)
 					{
 						NextSpeed.z = 0;
@@ -1219,6 +1221,25 @@ void cEntity::AddSpeedZ(double a_AddSpeedZ)
 	m_Speed.z += a_AddSpeedZ;
 	m_bDirtySpeed = true;
 	WrapSpeed();
+}
+
+
+
+
+
+void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
+{
+	if (m_AttachedTo == NULL)
+	{
+		return;
+	}
+	if ((a_Forward != 0) || (a_Sideways != 0))
+	{
+		Vector3d LookVector = GetLookVector();
+		double AddSpeedX = LookVector.x * a_Forward + LookVector.z * a_Sideways;
+		double AddSpeedZ = LookVector.z * a_Forward - LookVector.x * a_Sideways;
+		m_AttachedTo->AddSpeed(AddSpeedX, 0, AddSpeedZ);
+	}
 }
 
 
