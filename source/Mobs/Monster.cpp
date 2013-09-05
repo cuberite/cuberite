@@ -15,6 +15,7 @@
 #include "../Vector3i.h"
 #include "../Vector3d.h"
 #include "../Tracer.h"
+#include "../Chunk.h"
 
 // #include "../../iniFile/iniFile.h"
 
@@ -100,6 +101,9 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	// Burning in daylight
+	HandleDaylightBurning(a_Chunk);
+	
 	HandlePhysics(a_Dt,a_Chunk);
 	BroadcastMovementUpdate();
 
@@ -467,6 +471,38 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 	if (Count > 0)
 	{
 		a_Drops.push_back(cItem(a_Item, Count, a_ItemHealth));
+	}
+}
+
+
+
+
+
+void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
+{
+	if (!m_BurnsInDaylight)
+	{
+		return;
+	}
+	
+	int RelY = (int)floor(GetPosY());
+	if ((RelY < 0) || (RelY >= cChunkDef::Height))
+	{
+		// Outside the world
+		return;
+	}
+	
+	int RelX = (int)floor(GetPosX()) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = (int)floor(GetPosZ()) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	if (
+		(a_Chunk.GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
+		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
+		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
+		!IsOnFire()                                                  // Not already burning
+	)
+	{
+		// Burn for 100 ticks, then decide again
+		StartBurning(100);
 	}
 }
 
