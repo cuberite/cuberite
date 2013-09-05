@@ -11,24 +11,7 @@
 cSkeleton::cSkeleton(void) :
 	super("Skeleton", 51, "mob.skeleton.hurt", "mob.skeleton.death", 0.6, 1.8)
 {
-}
-
-
-
-
-
-void cSkeleton::Tick(float a_Dt, cChunk & a_Chunk)
-{
-	cMonster::Tick(a_Dt, a_Chunk);
-
-	if ((GetWorld()->GetBlockSkyLight(GetPosX(), GetPosY(), GetPosZ()) == 15) && (GetWorld()->GetBlock(GetPosX(), GetPosY(), GetPosZ()) != E_BLOCK_SOULSAND))
-	{
-		if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsOnFire())
-		{
-			// Burn for 100 ticks, then decide again
-			StartBurning(100);
-		}
-	}
+	SetBurnsInDaylight(true);
 }
 
 
