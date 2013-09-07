@@ -138,6 +138,7 @@ protected:
 	
 	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength);
 	
+	void LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIndx);
 	void LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartRFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartCFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);

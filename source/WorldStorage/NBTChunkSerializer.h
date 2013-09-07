@@ -19,6 +19,7 @@
 class cFastNBTWriter;
 class cEntity;
 class cBlockEntity;
+class cBoat;
 class cChestEntity;
 class cDispenserEntity;
 class cDropperEntity;
@@ -94,6 +95,7 @@ protected:
 	
 	// Entities:
 	void AddBasicEntity       (cEntity * a_Entity, const AString & a_ClassName);
+	void AddBoatEntity        (cBoat * a_Boat);
 	void AddFallingBlockEntity(cFallingBlock * a_FallingBlock);
 	void AddMinecartEntity    (cMinecart * a_Minecart);
 	void AddMonsterEntity     (cMonster * a_Monster);

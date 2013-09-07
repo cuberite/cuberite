@@ -19,6 +19,7 @@
 #include "../OSSupport/MakeDir.h"
 #include "FastNBT.h"
 #include "../Entities/FallingBlock.h"
+#include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
 #include "../Mobs/Monster.h"
 #include "../Entities/Pickup.h"
@@ -252,6 +253,20 @@ void cNBTChunkSerializer::AddBasicEntity(cEntity * a_Entity, const AString & a_C
 
 
 
+void cNBTChunkSerializer::AddBoatEntity(cBoat * a_Boat)
+{
+	const char * EntityClass = NULL;
+	EntityClass = "Boat";
+
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_Boat, EntityClass);
+	m_Writer.EndCompound();
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddFallingBlockEntity(cFallingBlock * a_FallingBlock)
 {
 	m_Writer.BeginCompound("");
@@ -461,6 +476,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 	
 	switch (a_Entity->GetEntityType())
 	{
+		case cEntity::etBoat:         AddBoatEntity        ((cBoat *)            a_Entity); break;
 		case cEntity::etFallingBlock: AddFallingBlockEntity((cFallingBlock *)    a_Entity); break;
 		case cEntity::etMinecart:     AddMinecartEntity    ((cMinecart *)        a_Entity); break;
 		case cEntity::etMonster:      AddMonsterEntity     ((cMonster *)         a_Entity); break;

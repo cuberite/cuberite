@@ -8,6 +8,7 @@
 
 // Handlers:
 #include "ItemBed.h"
+#include "ItemBoat.h"
 #include "ItemBow.h"
 #include "ItemBrewingStand.h"
 #include "ItemBucket.h"
@@ -180,6 +181,11 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 			return new cItemMinecartHandler(a_ItemType);
 		}
 		
+		case E_ITEM_BOAT:
+		{
+			return new cItemBoatHandler(a_ItemType);
+		}
+
 		// Food:
 		case E_ITEM_BREAD:
 		case E_ITEM_COOKIE:
