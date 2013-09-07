@@ -49,6 +49,7 @@ class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
 class cFluidSimulatorData;
+class cMobCensus;
 
 typedef std::list<cClientHandle *>      cClientHandleList;
 typedef cItemCallback<cEntity>          cEntityCallback;
@@ -124,6 +125,9 @@ public:
 	/// Sets or resets the internal flag that prevents chunk from being unloaded
 	void Stay(bool a_Stay = true);
 	
+	/// Recence all mobs proximities to players in order to know what to do with them
+	void CollectMobCensus(cMobCensus& toFill);
+
 	void Tick(float a_Dt);
 
 	int GetPosX(void) const { return m_PosX; }

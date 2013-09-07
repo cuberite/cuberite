@@ -42,6 +42,7 @@ class cChunkGenerator;  // The thread responsible for generating chunks
 class cChestEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
+class cMobCensus;
 
 typedef std::list< cPlayer * > cPlayerList;
 

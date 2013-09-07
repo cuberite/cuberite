@@ -29,6 +29,7 @@
 
 // Mobs:
 #include "Mobs/IncludeAllMonsters.h"
+#include "MobCensus.h"
 
 #include "OSSupport/MakeDir.h"
 #include "MersenneTwister.h"
@@ -712,6 +713,10 @@ void cWorld::TickSpawnMobs(float a_Dt)
 	{
 		return;
 	}
+
+	cMobCensus MobCensus;
+	m_ChunkMap->CollectMobCensus(MobCensus);
+	MobCensus.logd();
 	
 	m_LastSpawnMonster = m_WorldAge;
 	Vector3d SpawnPos;

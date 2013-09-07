@@ -12,6 +12,7 @@
 #include "BlockArea.h"
 #include "PluginManager.h"
 #include "Entities/TNTEntity.h"
+#include "MobCensus.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -2152,6 +2153,19 @@ void cChunkMap::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cChunkMap::CollectMobCensus(cMobCensus& a_ToFill)
+{
+	cCSLock Lock(m_CSLayers);
+	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	{
+		(*itr)->CollectMobCensus(a_ToFill);
+	}  // for itr - m_Layers
+}
+
+
+
+
+
 
 void cChunkMap::Tick(float a_Dt)
 {
@@ -2306,6 +2320,24 @@ cChunk * cChunkMap::cChunkLayer::FindChunk(int a_ChunkX, int a_ChunkZ)
 	int Index = LocalX + LocalZ * LAYER_SIZE;
 	return m_Chunks[Index];
 }
+
+
+
+
+void cChunkMap::cChunkLayer::CollectMobCensus(cMobCensus& a_ToFill)
+{
+	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	{
+		// We do count every Mobs in the world. But we are assuming that every chunk not loaded by any client
+		// doesn't affect us. Normally they should not have mobs because every "too far" mobs despawn
+		// If they have (f.i. when player disconnect) we assume we don't have to make them live or despawn
+		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->HasAnyClients())
+		{
+			m_Chunks[i]->CollectMobCensus(a_ToFill);
+		}
+	}  // for i - m_Chunks[]
+}
+
 
 
 

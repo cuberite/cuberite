@@ -26,6 +26,7 @@ class cPawn;
 class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
+class cMobCensus;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cChunk * cChunkPtr;
@@ -266,6 +267,9 @@ public:
 		/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 
+	/// Make a Mob census, of all mobs, their family, their chunk and theyr distance to closest player
+	void CollectMobCensus(cMobCensus& a_ToFill);
+
 	void Tick(float a_Dt);
 
 	void UnloadUnusedChunks(void);
@@ -309,6 +313,10 @@ private:
 		void Save(void);
 		void UnloadUnusedChunks(void);
 		
+		/// Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player
+		void CollectMobCensus(cMobCensus& a_ToFill);
+
+
 		void Tick(float a_Dt);
 		
 		void RemoveClient(cClientHandle * a_Client);

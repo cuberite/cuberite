@@ -30,6 +30,8 @@
 #include "PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Simulator/FluidSimulator.h"
+#include "MobCensus.h"
+
 
 #include <json/json.h>
 
@@ -424,6 +426,43 @@ void cChunk::Stay(bool a_Stay)
 {
 	m_StayCount += (a_Stay ? 1 : -1);
 	ASSERT(m_StayCount >= 0);
+}
+
+
+
+
+void cChunk::CollectMobCensus(cMobCensus& toFill)
+{
+	toFill.CollectSpawnableChunck(*this);
+	std::list<const Vector3d*> playerPositions;
+	cPlayer* currentPlayer;
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+	{
+		currentPlayer = (*itr)->GetPlayer();
+		playerPositions.push_back(&(currentPlayer->GetPosition()));
+	} 
+
+	Vector3d currentPosition;
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	{
+		//LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+		if ((*itr)->IsMob())
+		{
+			try
+			{		
+				cMonster& Monster = (cMonster&)(**itr);
+				currentPosition = Monster.GetPosition();
+				for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); itr2 ++)
+				{
+					toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
+				}
+			}
+			catch (std::bad_cast& e)
+			{
+				LOGD("Something wrong happend I'm collecting an entity that respond 'true' to IsMob() but are not castable in cMonster - No Action");
+			}
+		}
+	}  // for itr - m_Entitites[]
 }
 
 
