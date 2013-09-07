@@ -12428,9 +12428,9 @@ static int tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: DoExplosiontAt of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_DoExplosiontAt00
-static int tolua_AllToLua_cWorld_DoExplosiontAt00(lua_State* tolua_S)
+/* method: DoExplosionAt of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_DoExplosionAt00
+static int tolua_AllToLua_cWorld_DoExplosionAt00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -12458,16 +12458,16 @@ static int tolua_AllToLua_cWorld_DoExplosiontAt00(lua_State* tolua_S)
   eExplosionSource a_Source = ((eExplosionSource) (int)  tolua_tonumber(tolua_S,7,0));
   void* a_SourceData = ((void*)  tolua_touserdata(tolua_S,8,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoExplosiontAt'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoExplosionAt'", NULL);
 #endif
   {
-   self->DoExplosiontAt(a_ExplosionSize,a_BlockX,a_BlockY,a_BlockZ,a_CanCauseFire,a_Source,a_SourceData);
+   self->DoExplosionAt(a_ExplosionSize,a_BlockX,a_BlockY,a_BlockZ,a_CanCauseFire,a_Source,a_SourceData);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'DoExplosiontAt'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'DoExplosionAt'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29808,7 +29808,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpawnZ",tolua_AllToLua_cWorld_GetSpawnZ00);
    tolua_function(tolua_S,"WakeUpSimulators",tolua_AllToLua_cWorld_WakeUpSimulators00);
    tolua_function(tolua_S,"WakeUpSimulatorsInArea",tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00);
-   tolua_function(tolua_S,"DoExplosiontAt",tolua_AllToLua_cWorld_DoExplosiontAt00);
+   tolua_function(tolua_S,"DoExplosionAt",tolua_AllToLua_cWorld_DoExplosionAt00);
    tolua_function(tolua_S,"GetSignLines",tolua_AllToLua_cWorld_GetSignLines00);
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
