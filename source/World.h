@@ -414,13 +414,13 @@ public:
 	| esCreeper | cCreeper * |
 	| esBed | cVector3i * |
 	| esEnderCrystal | Vector3i * |
-	| esGhastFireball | TBD |
+	| esGhastFireball | cGhastFireball * |
 	| esWitherSkullBlack | TBD |
 	| esWitherSkullBlue | TBD |
 	| esWitherBirth | TBD |
 	| esPlugin | void * |
 	*/
-	void DoExplosiontAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData);  // tolua_export
+	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData);  // tolua_export
 
 	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
 	bool DoWithChestAt  (int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp

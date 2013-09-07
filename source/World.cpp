@@ -969,7 +969,7 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 
 
 
-void cWorld::DoExplosiontAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
+void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
 {
 	if (cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) || (a_ExplosionSize <= 0))
 	{
@@ -979,7 +979,7 @@ void cWorld::DoExplosiontAt(double a_ExplosionSize, double a_BlockX, double a_Bl
 	// TODO: Add damage to entities, add support for pickups, and implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
-	m_ChunkMap->DoExplosiontAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
+	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
 	BroadcastSoundEffect("random.explode", (int)floor(a_BlockX * 8), (int)floor(a_BlockY * 8), (int)floor(a_BlockZ * 8), 1.0f, 0.6f);
 	{
 		cCSLock Lock(m_CSPlayers);

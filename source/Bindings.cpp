@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/01/13 14:42:04.
+** Generated automatically by tolua++-1.0.92 on 09/07/13 22:05:18.
 */
 
 #ifndef __cplusplus
@@ -53,6 +53,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Vector3i.h"
 #include "Matrix4f.h"
 #include "Cuboid.h"
+#include "BoundingBox.h"
 #include "Tracer.h"
 #include "Group.h"
 #include "BlockArea.h"
@@ -163,6 +164,13 @@ static int tolua_collect_cTracer (lua_State* tolua_S)
 	return 0;
 }
 
+static int tolua_collect_cBoundingBox (lua_State* tolua_S)
+{
+ cBoundingBox* self = (cBoundingBox*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
 static int tolua_collect_Vector3f (lua_State* tolua_S)
 {
  Vector3f* self = (Vector3f*) tolua_tousertype(tolua_S,1,0);
@@ -204,66 +212,69 @@ static int tolua_collect_Vector3d (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"cThrownEnderPearlEntity");
- tolua_usertype(tolua_S,"TakeDamageInfo");
- tolua_usertype(tolua_S,"cPluginManager");
- tolua_usertype(tolua_S,"cMonster");
- tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cCraftingRecipe");
- tolua_usertype(tolua_S,"cPlugin");
- tolua_usertype(tolua_S,"cWindow");
- tolua_usertype(tolua_S,"cStringMap");
- tolua_usertype(tolua_S,"cItemGrid");
- tolua_usertype(tolua_S,"cBlockArea");
- tolua_usertype(tolua_S,"cEnchantments");
- tolua_usertype(tolua_S,"cLuaWindow");
- tolua_usertype(tolua_S,"cServer");
- tolua_usertype(tolua_S,"cRoot");
+ tolua_usertype(tolua_S,"cFurnaceEntity");
+ tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"cEnchantments");
+ tolua_usertype(tolua_S,"cMonster");
+ tolua_usertype(tolua_S,"cPluginLua");
+ tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"std::vector<cIniFile::key>");
- tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cPickup");
- tolua_usertype(tolua_S,"std::vector<std::string>");
- tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cClientHandle");
+ tolua_usertype(tolua_S,"cItems");
+ tolua_usertype(tolua_S,"cFireChargeEntity");
+ tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"cThrownSnowballEntity");
- tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"cCraftingRecipes");
- tolua_usertype(tolua_S,"cItems");
- tolua_usertype(tolua_S,"cWebPlugin");
- tolua_usertype(tolua_S,"cItem");
+ tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"Vector3f");
- tolua_usertype(tolua_S,"cArrowEntity");
- tolua_usertype(tolua_S,"cDropSpenserEntity");
- tolua_usertype(tolua_S,"sWebAdminPage");
- tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cCraftingRecipes");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cDispenserEntity");
- tolua_usertype(tolua_S,"HTTPRequest");
- tolua_usertype(tolua_S,"cBlockEntity");
- tolua_usertype(tolua_S,"cItemGrid::cListener");
- tolua_usertype(tolua_S,"HTTPTemplateRequest");
- tolua_usertype(tolua_S,"cFurnaceEntity");
- tolua_usertype(tolua_S,"cDropperEntity");
- tolua_usertype(tolua_S,"cPluginLua");
- tolua_usertype(tolua_S,"cBlockEntityWithItems");
+ tolua_usertype(tolua_S,"cGhastFireballEntity");
  tolua_usertype(tolua_S,"cLineBlockTracer");
- tolua_usertype(tolua_S,"cCriticalSection");
- tolua_usertype(tolua_S,"cIniFile");
- tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cListeners");
+ tolua_usertype(tolua_S,"cThrownSnowballEntity");
+ tolua_usertype(tolua_S,"Vector3d");
+ tolua_usertype(tolua_S,"TakeDamageInfo");
+ tolua_usertype(tolua_S,"cCraftingRecipe");
+ tolua_usertype(tolua_S,"cPlugin");
+ tolua_usertype(tolua_S,"cItemGrid");
+ tolua_usertype(tolua_S,"cBlockArea");
+ tolua_usertype(tolua_S,"cLuaWindow");
+ tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"cBoundingBox");
+ tolua_usertype(tolua_S,"cBlockEntityWithItems");
+ tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cArrowEntity");
+ tolua_usertype(tolua_S,"cDropSpenserEntity");
+ tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cStringMap");
+ tolua_usertype(tolua_S,"cBlockEntity");
+ tolua_usertype(tolua_S,"cCriticalSection");
+ tolua_usertype(tolua_S,"HTTPTemplateRequest");
+ tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"std::vector<std::string>");
+ tolua_usertype(tolua_S,"cClientHandle");
+ tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"sWebAdminPage");
+ tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"cIniFile");
+ tolua_usertype(tolua_S,"cWebAdmin");
+ tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"cPawn");
- tolua_usertype(tolua_S,"cThrownEggEntity");
+ tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
- tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"cProjectileEntity");
- tolua_usertype(tolua_S,"cWorld");
- tolua_usertype(tolua_S,"cPlayer");
- tolua_usertype(tolua_S,"Vector3d");
+ tolua_usertype(tolua_S,"cItemGrid::cListener");
+ tolua_usertype(tolua_S,"cDropperEntity");
+ tolua_usertype(tolua_S,"cThrownEggEntity");
 }
 
 /* method: new of class  cIniFile */
@@ -6445,6 +6456,41 @@ static int tolua_AllToLua_cEntity_AddSpeedZ00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SteerVehicle of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SteerVehicle00
+static int tolua_AllToLua_cEntity_SteerVehicle00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  float a_Forward = ((float)  tolua_tonumber(tolua_S,2,0));
+  float a_Sideways = ((float)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SteerVehicle'", NULL);
+#endif
+  {
+   self->SteerVehicle(a_Forward,a_Sideways);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SteerVehicle'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetUniqueID of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetUniqueID00
 static int tolua_AllToLua_cEntity_GetUniqueID00(lua_State* tolua_S)
@@ -6642,6 +6688,133 @@ static int tolua_AllToLua_cEntity_TakeDamage02(lua_State* tolua_S)
  return 0;
 tolua_lerror:
  return tolua_AllToLua_cEntity_TakeDamage01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetGravity of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetGravity00
+static int tolua_AllToLua_cEntity_GetGravity00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetGravity'", NULL);
+#endif
+  {
+   float tolua_ret = (float)  self->GetGravity();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetGravity'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetGravity of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetGravity00
+static int tolua_AllToLua_cEntity_SetGravity00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  float a_Gravity = ((float)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetGravity'", NULL);
+#endif
+  {
+   self->SetGravity(a_Gravity);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetGravity'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetRotationFromSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetRotationFromSpeed00
+static int tolua_AllToLua_cEntity_SetRotationFromSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRotationFromSpeed'", NULL);
+#endif
+  {
+   self->SetRotationFromSpeed();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetRotationFromSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetPitchFromSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetPitchFromSpeed00
+static int tolua_AllToLua_cEntity_SetPitchFromSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetPitchFromSpeed'", NULL);
+#endif
+  {
+   self->SetPitchFromSpeed();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetPitchFromSpeed'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -9957,6 +10130,71 @@ static int tolua_AllToLua_cArrowEntity_CanPickup00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsCritical of class  cArrowEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cArrowEntity_IsCritical00
+static int tolua_AllToLua_cArrowEntity_IsCritical00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cArrowEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cArrowEntity* self = (const cArrowEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsCritical'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsCritical();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsCritical'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetIsCritical of class  cArrowEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cArrowEntity_SetIsCritical00
+static int tolua_AllToLua_cArrowEntity_SetIsCritical00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cArrowEntity",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cArrowEntity* self = (cArrowEntity*)  tolua_tousertype(tolua_S,1,0);
+  bool a_IsCritical = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetIsCritical'", NULL);
+#endif
+  {
+   self->SetIsCritical(a_IsCritical);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetIsCritical'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Get of class  cPluginManager */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_Get00
 static int tolua_AllToLua_cPluginManager_Get00(lua_State* tolua_S)
@@ -12378,9 +12616,9 @@ static int tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: DoExplosiontAt of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_DoExplosiontAt00
-static int tolua_AllToLua_cWorld_DoExplosiontAt00(lua_State* tolua_S)
+/* method: DoExplosionAt of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_DoExplosionAt00
+static int tolua_AllToLua_cWorld_DoExplosionAt00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -12408,16 +12646,16 @@ static int tolua_AllToLua_cWorld_DoExplosiontAt00(lua_State* tolua_S)
   eExplosionSource a_Source = ((eExplosionSource) (int)  tolua_tonumber(tolua_S,7,0));
   void* a_SourceData = ((void*)  tolua_touserdata(tolua_S,8,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoExplosiontAt'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoExplosionAt'", NULL);
 #endif
   {
-   self->DoExplosiontAt(a_ExplosionSize,a_BlockX,a_BlockY,a_BlockZ,a_CanCauseFire,a_Source,a_SourceData);
+   self->DoExplosionAt(a_ExplosionSize,a_BlockX,a_BlockY,a_BlockZ,a_CanCauseFire,a_Source,a_SourceData);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'DoExplosiontAt'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'DoExplosionAt'.",&tolua_err);
  return 0;
 #endif
 }
@@ -20811,6 +21049,114 @@ static int tolua_AllToLua_Vector3d_Cross00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: LineCoeffToXYPlane of class  Vector3d */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3d_LineCoeffToXYPlane00
+static int tolua_AllToLua_Vector3d_LineCoeffToXYPlane00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Vector3d* self = (const Vector3d*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_OtherEnd = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  double a_Z = ((double)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'LineCoeffToXYPlane'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->LineCoeffToXYPlane(*a_OtherEnd,a_Z);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'LineCoeffToXYPlane'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: LineCoeffToXZPlane of class  Vector3d */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3d_LineCoeffToXZPlane00
+static int tolua_AllToLua_Vector3d_LineCoeffToXZPlane00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Vector3d* self = (const Vector3d*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_OtherEnd = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  double a_Y = ((double)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'LineCoeffToXZPlane'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->LineCoeffToXZPlane(*a_OtherEnd,a_Y);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'LineCoeffToXZPlane'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: LineCoeffToYZPlane of class  Vector3d */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3d_LineCoeffToYZPlane00
+static int tolua_AllToLua_Vector3d_LineCoeffToYZPlane00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Vector3d* self = (const Vector3d*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_OtherEnd = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  double a_X = ((double)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'LineCoeffToYZPlane'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->LineCoeffToYZPlane(*a_OtherEnd,a_X);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'LineCoeffToYZPlane'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Equals of class  Vector3d */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3d_Equals00
 static int tolua_AllToLua_Vector3d_Equals00(lua_State* tolua_S)
@@ -21225,6 +21571,24 @@ static int tolua_set_Vector3d_z(lua_State* tolua_S)
   self->z = ((double)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: EPS of class  Vector3d */
+#ifndef TOLUA_DISABLE_tolua_get_Vector3d_EPS
+static int tolua_get_Vector3d_EPS(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)Vector3d::EPS);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: NO_INTERSECTION of class  Vector3d */
+#ifndef TOLUA_DISABLE_tolua_get_Vector3d_NO_INTERSECTION
+static int tolua_get_Vector3d_NO_INTERSECTION(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)Vector3d::NO_INTERSECTION);
+ return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -22402,6 +22766,700 @@ static int tolua_AllToLua_cCuboid_IsSorted00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'IsSorted'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new00
+static int tolua_AllToLua_cBoundingBox_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  double a_MinX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_MaxX = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_MinY = ((double)  tolua_tonumber(tolua_S,4,0));
+  double a_MaxY = ((double)  tolua_tonumber(tolua_S,5,0));
+  double a_MinZ = ((double)  tolua_tonumber(tolua_S,6,0));
+  double a_MaxZ = ((double)  tolua_tonumber(tolua_S,7,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(a_MinX,a_MaxX,a_MinY,a_MaxY,a_MinZ,a_MaxZ));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new00_local
+static int tolua_AllToLua_cBoundingBox_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  double a_MinX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_MaxX = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_MinY = ((double)  tolua_tonumber(tolua_S,4,0));
+  double a_MaxY = ((double)  tolua_tonumber(tolua_S,5,0));
+  double a_MinZ = ((double)  tolua_tonumber(tolua_S,6,0));
+  double a_MaxZ = ((double)  tolua_tonumber(tolua_S,7,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(a_MinX,a_MaxX,a_MinY,a_MaxY,a_MinZ,a_MaxZ));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new01
+static int tolua_AllToLua_cBoundingBox_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Min,*a_Max));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new01_local
+static int tolua_AllToLua_cBoundingBox_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Min,*a_Max));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new00_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new02
+static int tolua_AllToLua_cBoundingBox_new02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Pos = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  double a_Radius = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Height = ((double)  tolua_tonumber(tolua_S,4,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Pos,a_Radius,a_Height));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new02_local
+static int tolua_AllToLua_cBoundingBox_new02_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Pos = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  double a_Radius = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Height = ((double)  tolua_tonumber(tolua_S,4,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Pos,a_Radius,a_Height));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new01_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new03
+static int tolua_AllToLua_cBoundingBox_new03(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const cBoundingBox* a_Orig = ((const cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Orig));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new02(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_new03_local
+static int tolua_AllToLua_cBoundingBox_new03_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const cBoundingBox* a_Orig = ((const cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+  {
+   cBoundingBox* tolua_ret = (cBoundingBox*)  Mtolua_new((cBoundingBox)(*a_Orig));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_new02_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Move of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_Move00
+static int tolua_AllToLua_cBoundingBox_Move00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  double a_OffX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_OffY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_OffZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Move'", NULL);
+#endif
+  {
+   self->Move(a_OffX,a_OffY,a_OffZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Move'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Move of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_Move01
+static int tolua_AllToLua_cBoundingBox_Move01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_Off = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Move'", NULL);
+#endif
+  {
+   self->Move(*a_Off);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_Move00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Expand of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_Expand00
+static int tolua_AllToLua_cBoundingBox_Expand00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  double a_ExpandX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_ExpandY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_ExpandZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Expand'", NULL);
+#endif
+  {
+   self->Expand(a_ExpandX,a_ExpandY,a_ExpandZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Expand'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: DoesIntersect of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_DoesIntersect00
+static int tolua_AllToLua_cBoundingBox_DoesIntersect00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const cBoundingBox* a_Other = ((const cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoesIntersect'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->DoesIntersect(*a_Other);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DoesIntersect'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Union of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_Union00
+static int tolua_AllToLua_cBoundingBox_Union00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const cBoundingBox* a_Other = ((const cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Union'", NULL);
+#endif
+  {
+   cBoundingBox tolua_ret = (cBoundingBox)  self->Union(*a_Other);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cBoundingBox)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cBoundingBox));
+     tolua_pushusertype(tolua_S,tolua_obj,"cBoundingBox");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Union'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside00
+static int tolua_AllToLua_cBoundingBox_IsInside00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_Point = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(*a_Point);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsInside'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside01
+static int tolua_AllToLua_cBoundingBox_IsInside01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  double a_X = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_Y = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Z = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(a_X,a_Y,a_Z);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_IsInside00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside02
+static int tolua_AllToLua_cBoundingBox_IsInside02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cBoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  cBoundingBox* a_Other = ((cBoundingBox*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(*a_Other);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_IsInside01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside03
+static int tolua_AllToLua_cBoundingBox_IsInside03(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(*a_Min,*a_Max);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_IsInside02(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside04
+static int tolua_AllToLua_cBoundingBox_IsInside04(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+  const Vector3d* a_Point = ((const Vector3d*)  tolua_tousertype(tolua_S,4,0));
+  {
+   bool tolua_ret = (bool)  cBoundingBox::IsInside(*a_Min,*a_Max,*a_Point);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_IsInside03(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_IsInside05
+static int tolua_AllToLua_cBoundingBox_IsInside05(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+  double a_X = ((double)  tolua_tonumber(tolua_S,4,0));
+  double a_Y = ((double)  tolua_tonumber(tolua_S,5,0));
+  double a_Z = ((double)  tolua_tonumber(tolua_S,6,0));
+  {
+   bool tolua_ret = (bool)  cBoundingBox::IsInside(*a_Min,*a_Max,a_X,a_Y,a_Z);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_IsInside04(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CalcLineIntersection of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_CalcLineIntersection00
+static int tolua_AllToLua_cBoundingBox_CalcLineIntersection00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBoundingBox* self = (cBoundingBox*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_Line1 = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Line2 = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+  double a_LineCoeff = ((double)  tolua_tonumber(tolua_S,4,0));
+  char a_Face = ((char)  tolua_tonumber(tolua_S,5,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CalcLineIntersection'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->CalcLineIntersection(*a_Line1,*a_Line2,a_LineCoeff,a_Face);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushnumber(tolua_S,(lua_Number)a_LineCoeff);
+   tolua_pushnumber(tolua_S,(lua_Number)a_Face);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CalcLineIntersection'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CalcLineIntersection of class  cBoundingBox */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBoundingBox_CalcLineIntersection01
+static int tolua_AllToLua_cBoundingBox_CalcLineIntersection01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cBoundingBox",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const Vector3d",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3d* a_Min = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3d* a_Max = ((const Vector3d*)  tolua_tousertype(tolua_S,3,0));
+  const Vector3d* a_Line1 = ((const Vector3d*)  tolua_tousertype(tolua_S,4,0));
+  const Vector3d* a_Line2 = ((const Vector3d*)  tolua_tousertype(tolua_S,5,0));
+  double a_LineCoeff = ((double)  tolua_tonumber(tolua_S,6,0));
+  char a_Face = ((char)  tolua_tonumber(tolua_S,7,0));
+  {
+   bool tolua_ret = (bool)  cBoundingBox::CalcLineIntersection(*a_Min,*a_Max,*a_Line1,*a_Line2,a_LineCoeff,a_Face);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushnumber(tolua_S,(lua_Number)a_LineCoeff);
+   tolua_pushnumber(tolua_S,(lua_Number)a_Face);
+  }
+ }
+ return 3;
+tolua_lerror:
+ return tolua_AllToLua_cBoundingBox_CalcLineIntersection00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -28367,6 +29425,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"dimOverworld",dimOverworld);
   tolua_constant(tolua_S,"dimEnd",dimEnd);
   tolua_constant(tolua_S,"dtAttack",dtAttack);
+  tolua_constant(tolua_S,"dtRangedAttack",dtRangedAttack);
   tolua_constant(tolua_S,"dtLightning",dtLightning);
   tolua_constant(tolua_S,"dtFalling",dtFalling);
   tolua_constant(tolua_S,"dtDrowning",dtDrowning);
@@ -28379,11 +29438,15 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"dtFireContact",dtFireContact);
   tolua_constant(tolua_S,"dtInVoid",dtInVoid);
   tolua_constant(tolua_S,"dtPotionOfHarming",dtPotionOfHarming);
+  tolua_constant(tolua_S,"dtEnderPearl",dtEnderPearl);
   tolua_constant(tolua_S,"dtAdmin",dtAdmin);
   tolua_constant(tolua_S,"dtPawnAttack",dtPawnAttack);
   tolua_constant(tolua_S,"dtEntityAttack",dtEntityAttack);
   tolua_constant(tolua_S,"dtMob",dtMob);
   tolua_constant(tolua_S,"dtMobAttack",dtMobAttack);
+  tolua_constant(tolua_S,"dtArrowAttack",dtArrowAttack);
+  tolua_constant(tolua_S,"dtArrow",dtArrow);
+  tolua_constant(tolua_S,"dtProjectile",dtProjectile);
   tolua_constant(tolua_S,"dtFall",dtFall);
   tolua_constant(tolua_S,"dtDrown",dtDrown);
   tolua_constant(tolua_S,"dtSuffocation",dtSuffocation);
@@ -28431,6 +29494,12 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_array(tolua_S,"g_BlockRequiresSpecialTool",tolua_get_AllToLua_g_BlockRequiresSpecialTool,tolua_set_AllToLua_g_BlockRequiresSpecialTool);
   tolua_array(tolua_S,"g_BlockIsSolid",tolua_get_AllToLua_g_BlockIsSolid,tolua_set_AllToLua_g_BlockIsSolid);
   tolua_constant(tolua_S,"BLOCK_FACE_NONE",BLOCK_FACE_NONE);
+  tolua_constant(tolua_S,"BLOCK_FACE_XM",BLOCK_FACE_XM);
+  tolua_constant(tolua_S,"BLOCK_FACE_XP",BLOCK_FACE_XP);
+  tolua_constant(tolua_S,"BLOCK_FACE_YM",BLOCK_FACE_YM);
+  tolua_constant(tolua_S,"BLOCK_FACE_YP",BLOCK_FACE_YP);
+  tolua_constant(tolua_S,"BLOCK_FACE_ZM",BLOCK_FACE_ZM);
+  tolua_constant(tolua_S,"BLOCK_FACE_ZP",BLOCK_FACE_ZP);
   tolua_constant(tolua_S,"BLOCK_FACE_BOTTOM",BLOCK_FACE_BOTTOM);
   tolua_constant(tolua_S,"BLOCK_FACE_TOP",BLOCK_FACE_TOP);
   tolua_constant(tolua_S,"BLOCK_FACE_NORTH",BLOCK_FACE_NORTH);
@@ -28648,12 +29717,17 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddSpeedX",tolua_AllToLua_cEntity_AddSpeedX00);
    tolua_function(tolua_S,"AddSpeedY",tolua_AllToLua_cEntity_AddSpeedY00);
    tolua_function(tolua_S,"AddSpeedZ",tolua_AllToLua_cEntity_AddSpeedZ00);
+   tolua_function(tolua_S,"SteerVehicle",tolua_AllToLua_cEntity_SteerVehicle00);
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cEntity_GetUniqueID00);
    tolua_function(tolua_S,"IsDestroyed",tolua_AllToLua_cEntity_IsDestroyed00);
    tolua_function(tolua_S,"Destroy",tolua_AllToLua_cEntity_Destroy00);
    tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cEntity_TakeDamage00);
    tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cEntity_TakeDamage01);
    tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cEntity_TakeDamage02);
+   tolua_function(tolua_S,"GetGravity",tolua_AllToLua_cEntity_GetGravity00);
+   tolua_function(tolua_S,"SetGravity",tolua_AllToLua_cEntity_SetGravity00);
+   tolua_function(tolua_S,"SetRotationFromSpeed",tolua_AllToLua_cEntity_SetRotationFromSpeed00);
+   tolua_function(tolua_S,"SetPitchFromSpeed",tolua_AllToLua_cEntity_SetPitchFromSpeed00);
    tolua_function(tolua_S,"GetRawDamageAgainst",tolua_AllToLua_cEntity_GetRawDamageAgainst00);
    tolua_function(tolua_S,"GetArmorCoverAgainst",tolua_AllToLua_cEntity_GetArmorCoverAgainst00);
    tolua_function(tolua_S,"GetKnockbackAmountAgainst",tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00);
@@ -28790,6 +29864,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetDamageCoeff",tolua_AllToLua_cArrowEntity_GetDamageCoeff00);
    tolua_function(tolua_S,"SetDamageCoeff",tolua_AllToLua_cArrowEntity_SetDamageCoeff00);
    tolua_function(tolua_S,"CanPickup",tolua_AllToLua_cArrowEntity_CanPickup00);
+   tolua_function(tolua_S,"IsCritical",tolua_AllToLua_cArrowEntity_IsCritical00);
+   tolua_function(tolua_S,"SetIsCritical",tolua_AllToLua_cArrowEntity_SetIsCritical00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cThrownEggEntity","cThrownEggEntity","cProjectileEntity",NULL);
   tolua_beginmodule(tolua_S,"cThrownEggEntity");
@@ -28799,6 +29875,12 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cThrownSnowballEntity","cThrownSnowballEntity","cProjectileEntity",NULL);
   tolua_beginmodule(tolua_S,"cThrownSnowballEntity");
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cGhastFireballEntity","cGhastFireballEntity","cProjectileEntity",NULL);
+  tolua_beginmodule(tolua_S,"cGhastFireballEntity");
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cFireChargeEntity","cFireChargeEntity","cProjectileEntity",NULL);
+  tolua_beginmodule(tolua_S,"cFireChargeEntity");
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPluginManager","cPluginManager","",NULL);
   tolua_beginmodule(tolua_S,"cPluginManager");
@@ -28935,7 +30017,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpawnZ",tolua_AllToLua_cWorld_GetSpawnZ00);
    tolua_function(tolua_S,"WakeUpSimulators",tolua_AllToLua_cWorld_WakeUpSimulators00);
    tolua_function(tolua_S,"WakeUpSimulatorsInArea",tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00);
-   tolua_function(tolua_S,"DoExplosiontAt",tolua_AllToLua_cWorld_DoExplosiontAt00);
+   tolua_function(tolua_S,"DoExplosionAt",tolua_AllToLua_cWorld_DoExplosionAt00);
    tolua_function(tolua_S,"GetSignLines",tolua_AllToLua_cWorld_GetSignLines00);
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
@@ -29357,6 +30439,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SqrLength",tolua_AllToLua_Vector3d_SqrLength00);
    tolua_function(tolua_S,"Dot",tolua_AllToLua_Vector3d_Dot00);
    tolua_function(tolua_S,"Cross",tolua_AllToLua_Vector3d_Cross00);
+   tolua_function(tolua_S,"LineCoeffToXYPlane",tolua_AllToLua_Vector3d_LineCoeffToXYPlane00);
+   tolua_function(tolua_S,"LineCoeffToXZPlane",tolua_AllToLua_Vector3d_LineCoeffToXZPlane00);
+   tolua_function(tolua_S,"LineCoeffToYZPlane",tolua_AllToLua_Vector3d_LineCoeffToYZPlane00);
    tolua_function(tolua_S,"Equals",tolua_AllToLua_Vector3d_Equals00);
    tolua_function(tolua_S,".add",tolua_AllToLua_Vector3d__add00);
    tolua_function(tolua_S,".add",tolua_AllToLua_Vector3d__add01);
@@ -29368,6 +30453,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"x",tolua_get_Vector3d_x,tolua_set_Vector3d_x);
    tolua_variable(tolua_S,"y",tolua_get_Vector3d_y,tolua_set_Vector3d_y);
    tolua_variable(tolua_S,"z",tolua_get_Vector3d_z,tolua_set_Vector3d_z);
+   tolua_variable(tolua_S,"EPS",tolua_get_Vector3d_EPS,NULL);
+   tolua_variable(tolua_S,"NO_INTERSECTION",tolua_get_Vector3d_NO_INTERSECTION,NULL);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"Vector3i","Vector3i","",tolua_collect_Vector3i);
@@ -29428,6 +30515,38 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsCompletelyInside",tolua_AllToLua_cCuboid_IsCompletelyInside00);
    tolua_function(tolua_S,"Move",tolua_AllToLua_cCuboid_Move00);
    tolua_function(tolua_S,"IsSorted",tolua_AllToLua_cCuboid_IsSorted00);
+  tolua_endmodule(tolua_S);
+  #ifdef __cplusplus
+  tolua_cclass(tolua_S,"cBoundingBox","cBoundingBox","",tolua_collect_cBoundingBox);
+  #else
+  tolua_cclass(tolua_S,"cBoundingBox","cBoundingBox","",NULL);
+  #endif
+  tolua_beginmodule(tolua_S,"cBoundingBox");
+   tolua_function(tolua_S,"new",tolua_AllToLua_cBoundingBox_new00);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cBoundingBox_new00_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cBoundingBox_new00_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cBoundingBox_new01);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cBoundingBox_new01_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cBoundingBox_new01_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cBoundingBox_new02);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cBoundingBox_new02_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cBoundingBox_new02_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cBoundingBox_new03);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cBoundingBox_new03_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cBoundingBox_new03_local);
+   tolua_function(tolua_S,"Move",tolua_AllToLua_cBoundingBox_Move00);
+   tolua_function(tolua_S,"Move",tolua_AllToLua_cBoundingBox_Move01);
+   tolua_function(tolua_S,"Expand",tolua_AllToLua_cBoundingBox_Expand00);
+   tolua_function(tolua_S,"DoesIntersect",tolua_AllToLua_cBoundingBox_DoesIntersect00);
+   tolua_function(tolua_S,"Union",tolua_AllToLua_cBoundingBox_Union00);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside00);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside01);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside02);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside03);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside04);
+   tolua_function(tolua_S,"IsInside",tolua_AllToLua_cBoundingBox_IsInside05);
+   tolua_function(tolua_S,"CalcLineIntersection",tolua_AllToLua_cBoundingBox_CalcLineIntersection00);
+   tolua_function(tolua_S,"CalcLineIntersection",tolua_AllToLua_cBoundingBox_CalcLineIntersection01);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cTracer","cTracer","",tolua_collect_cTracer);

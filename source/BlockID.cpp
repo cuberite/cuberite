@@ -419,6 +419,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 	switch (a_DamageType)
 	{
 		case dtAttack:          return "dtAttack";
+		case dtRangedAttack:    return "dtRangedAttack";
 		case dtLightning:       return "dtLightning";
 		case dtFalling:         return "dtFalling";
 		case dtDrowning:        return "dtDrowning";
@@ -463,6 +464,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 	{
 		// Cannonical names:
 		{ dtAttack,          "dtAttack"},
+		{ dtRangedAttack,    "dtRangedAttack"},
 		{ dtLightning,       "dtLightning"},
 		{ dtFalling,         "dtFalling"},
 		{ dtDrowning,        "dtDrowning"},
@@ -478,23 +480,26 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtAdmin,           "dtAdmin"},
 
 		// Common synonyms:
-		{ dtPawnAttack,   "dtAttack"},
-		{ dtEntityAttack, "dtAttack"},
-		{ dtMob,          "dtAttack"},
-		{ dtMobAttack,    "dtAttack"},
-		{ dtFall,         "dtFalling"},
-		{ dtDrown,        "dtDrowning"},
-		{ dtSuffocation,  "dtSuffocating"},
-		{ dtStarvation,   "dtStarving"},
-		{ dtHunger,       "dtStarving"},
-		{ dtCactus,       "dtCactusContact"},
-		{ dtCactuses,     "dtCactusContact"},
-		{ dtCacti,        "dtCactusContact"},
-		{ dtLava,         "dtLavaContact"},
-		{ dtPoison,       "dtPoisoning"},
-		{ dtBurning,      "dtOnFire"},
-		{ dtInFire,       "dtFireContact"},
-		{ dtPlugin,       "dtAdmin"},
+		{ dtAttack,        "dtPawnAttack"},
+		{ dtAttack,        "dtEntityAttack"},
+		{ dtAttack,        "dtMob"},
+		{ dtAttack,        "dtMobAttack"},
+		{ dtRangedAttack,  "dtArrowAttack"},
+		{ dtRangedAttack,  "dtArrow"},
+		{ dtRangedAttack,  "dtProjectile"},
+		{ dtFalling,       "dtFall"},
+		{ dtDrowning,      "dtDrown"},
+		{ dtSuffocating,   "dtSuffocation"},
+		{ dtStarving,      "dtStarvation"},
+		{ dtStarving,      "dtHunger"},
+		{ dtCactusContact, "dtCactus"},
+		{ dtCactusContact, "dtCactuses"},
+		{ dtCactusContact, "dtCacti"},
+		{ dtLavaContact,   "dtLava"},
+		{ dtPoisoning,     "dtPoison"},
+		{ dtOnFire,        "dtBurning"},
+		{ dtFireContact,   "dtInFire"},
+		{ dtAdmin,         "dtPlugin"},
 	} ;
 	for (int i = 0; i < ARRAYCOUNT(DamageTypeMap); i++)
 	{

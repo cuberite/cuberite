@@ -47,8 +47,11 @@ public:
 	
 	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d * a_Speed = NULL);
 	
-	/// Called by the physics blocktracer when the entity hits a solid block, the block's coords and the face hit is given
-	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
+	/// Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace);
+	
+	/// Called by the physics blocktracer when the entity hits another entity
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) {}
 	
 	// tolua_begin
 
@@ -64,6 +67,11 @@ public:
 	/// Returns true if the projectile has hit the ground and is stuck there
 	bool IsInGround(void) const { return m_IsInGround; }
 	
+	// tolua_end
+	
+	/// Sets the internal InGround flag. To be used by MCA loader only!
+	void SetIsInGround(bool a_IsInGround) { m_IsInGround = a_IsInGround; }
+	
 protected:
 	eKind m_ProjectileKind;
 	
@@ -72,8 +80,6 @@ protected:
 	
 	/// True if the projectile has hit the ground and is stuck there
 	bool m_IsInGround;
-	
-	// tolua_end
 	
 	// cEntity overrides:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
@@ -128,6 +134,12 @@ public:
 	/// Returns true if the specified player can pick the arrow up
 	bool CanPickup(const cPlayer & a_Player) const;
 	
+	/// Returns true if the arrow is set as critical
+	bool IsCritical(void) const { return m_IsCritical; }
+	
+	/// Sets the IsCritical flag
+	void SetIsCritical(bool a_IsCritical) { m_IsCritical = a_IsCritical; }
+	
 	// tolua_end
 	
 protected:
@@ -137,9 +149,13 @@ protected:
 	
 	/// The coefficient applied to the damage that the arrow will deal, based on the bow enchantment. 2.0 for normal arrow
 	double m_DamageCoeff;
+	
+	/// If true, the arrow deals more damage
+	bool m_IsCritical;
 
 	// cProjectileEntity overrides:
-	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
 	
 	// tolua_begin
 } ;
@@ -166,7 +182,7 @@ protected:
 	// tolua_end
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
 
 	// tolua_begin
 	
@@ -194,7 +210,7 @@ protected:
 	// tolua_end
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
 
 	// tolua_begin
 	
@@ -218,16 +234,73 @@ public:
 	cThrownSnowballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
 	
 protected:
-
-	// tolua_end
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
 
 	// tolua_begin
 	
 } ;
 
+
+
+
+
+class cGhastFireballEntity :
+	public cProjectileEntity
+{
+	typedef cProjectileEntity super;
+
+public:
+
+	// tolua_end
+	
+	CLASS_PROTODEF(cGhastFireballEntity);
+	
+	cGhastFireballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	
+protected:
+
+	void Explode(int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+
+	// TODO: Deflecting the fireballs by arrow- or sword- hits
+	
+	// tolua_begin
+	
+} ;
+
+
+
+
+
+class cFireChargeEntity :
+	public cProjectileEntity
+{
+	typedef cProjectileEntity super;
+
+public:
+
+	// tolua_end
+	
+	CLASS_PROTODEF(cFireChargeEntity);
+	
+	cFireChargeEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	
+protected:
+
+	void Explode(int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+
+	// tolua_begin
+	
+} ;
 
 
 

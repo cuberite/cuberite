@@ -232,6 +232,18 @@ enum
 
 
 
+AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor = 32)
+{
+	return Printf("<%d, %d, %d> ~ {%.02f, %.02f, %.02f}",
+		a_X, a_Y, a_Z,
+		(double)a_X / a_Divisor, (double)a_Y / a_Divisor, (double)a_Z / a_Divisor
+	);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cConnection:
 
@@ -1481,7 +1493,7 @@ bool cConnection::HandleServerEntityRelativeMove(void)
 	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dz);
 	Log("Received a PACKET_ENTITY_RELATIVE_MOVE from the server:");
 	Log("  EntityID = %d", EntityID);
-	Log("  RelMove = <%d, %d, %d>", dx, dy, dz);
+	Log("  RelMove = %s", PrintableAbsIntTriplet(dx, dy, dz).c_str());
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1500,7 +1512,7 @@ bool cConnection::HandleServerEntityRelativeMoveLook(void)
 	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
 	Log("Received a PACKET_ENTITY_RELATIVE_MOVE_LOOK from the server:");
 	Log("  EntityID = %d", EntityID);
-	Log("  RelMove = <%d, %d, %d>", dx, dy, dz);
+	Log("  RelMove = %s", PrintableAbsIntTriplet(dx, dy, dz).c_str());
 	Log("  Yaw = %d", Yaw);
 	Log("  Pitch = %d", Pitch);
 	COPY_TO_CLIENT();
@@ -1529,14 +1541,14 @@ bool cConnection::HandleServerEntityStatus(void)
 bool cConnection::HandleServerEntityTeleport(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsZ);
 	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Yaw);
 	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
 	Log("Received a PACKET_ENTITY_TELEPORT from the server:");
 	Log("  EntityID = %d", EntityID);
-	Log("  Pos = {%d, %d, %d}", BlockX, BlockY, BlockZ);
+	Log("  Pos = (%d, %d, %d) ~ {%.02f, %.02f, %.02f}", AbsX, AbsY, AbsZ, (double)AbsX / 32, (double)AbsY / 32, (double)AbsZ / 32);
 	Log("  Yaw = %d", Yaw);
 	Log("  Pitch = %d", Pitch);
 	COPY_TO_CLIENT();
@@ -1555,7 +1567,7 @@ bool cConnection::HandleServerEntityVelocity(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityZ);
 	Log("Received a PACKET_ENTITY_VELOCITY from the server:");
 	Log("  EntityID = %d", EntityID);
-	Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
+	Log("  Velocity = %s", PrintableAbsIntTriplet(VelocityX, VelocityY, VelocityZ, 8000).c_str());
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1996,9 +2008,9 @@ bool cConnection::HandleServerSpawnMob(void)
 	Log("Received a PACKET_SPAWN_MOB from the server:");
 	Log("  EntityID = %d", EntityID);
 	Log("  MobType = %d", MobType);
-	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Angles = [%d, %d, %d]", Yaw, Pitch, HeadYaw);
-	Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
+	Log("  Velocity = %s", PrintableAbsIntTriplet(VelocityX, VelocityY, VelocityZ, 8000).c_str());
 	Log("  Metadata, length = %d (0x%x):\n%s", Metadata.length(), Metadata.length(), HexDump.c_str());
 	LogMetadata(Metadata, 4);
 	COPY_TO_CLIENT();
@@ -2029,7 +2041,7 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	Log("Received a PACKET_SPAWN_NAMED_ENTITY from the server:");
 	Log("  EntityID = %d (0x%x)", EntityID, EntityID);
 	Log("  Name = %s", EntityName.c_str());
-	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
 	Log("  CurrentItem = %d", CurrentItem);
 	Log("  Metadata, length = %d (0x%x):\n%s", Metadata.length(), Metadata.length(), HexDump.c_str());
@@ -2102,12 +2114,12 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	Log("Received a PACKET_SPAWN_OBJECT_VEHICLE from the server:");
 	Log("  EntityID = %d (0x%x)", EntityID, EntityID);
 	Log("  ObjType = %d (0x%x)", ObjType, ObjType);
-	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
 	Log("  DataIndicator = %d (0x%x)", DataIndicator, DataIndicator);
 	if (DataIndicator != 0)
 	{
-		Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
+		Log("  Velocity = %s", PrintableAbsIntTriplet(VelocityX, VelocityY, VelocityZ, 8000).c_str());
 		DataLog(ExtraData.data(), ExtraData.size(), "  ExtraData size = %d:", ExtraData.size());
 	}
 	COPY_TO_CLIENT();
@@ -2129,7 +2141,7 @@ bool cConnection::HandleServerSpawnPainting(void)
 	Log("Received a PACKET_SPAWN_PAINTING from the server:");
 	Log("  EntityID = %d", EntityID);
 	Log("  ImageName = \"%s\"", ImageName.c_str());
-	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Direction = %d", Direction);
 	COPY_TO_CLIENT();
 	return true;
@@ -2156,7 +2168,7 @@ bool cConnection::HandleServerSpawnPickup(void)
 	Log("Received a PACKET_SPAWN_PICKUP from the server:");
 	Log("  EntityID = %d", EntityID);
 	Log("  Item = %s", ItemDesc.c_str());
-	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Angles = [%d, %d, %d]", Rotation, Pitch, Roll);
 	COPY_TO_CLIENT();
 	return true;
