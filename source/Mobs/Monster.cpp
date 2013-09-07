@@ -26,6 +26,8 @@
 cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
 	: super(etMob, a_Width, a_Height)
 	, m_Target(NULL)
+	, m_AttackRate(3)
+	, idle_interval(0)
 	, m_bMovingToDestination(false)
 	, m_DestinationTime( 0 )
 	, m_DestroyTimer( 0 )
@@ -40,8 +42,7 @@ cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const A
 	, m_AttackDamage(1.0f)
 	, m_AttackRange(5.0f)
 	, m_AttackInterval(0)
-	, m_AttackRate(3)
-	, idle_interval(0)
+	, m_BurnsInDaylight(false)
 {
 	if (!a_ConfigName.empty())
 	{
