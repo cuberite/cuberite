@@ -45,6 +45,16 @@ protected:
 	// cCallbacks overrides:
 	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
+		/*
+		// DEBUG:
+		LOGD("Hit block %d:%d at {%d, %d, %d} face %d, %s (%s)",
+			a_BlockType, a_BlockMeta,
+			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
+			g_BlockIsSolid[a_BlockType] ? "solid" : "non-solid",
+			ItemToString(cItem(a_BlockType, 1, a_BlockMeta)).c_str()
+		);
+		*/
+		
 		if (g_BlockIsSolid[a_BlockType])
 		{
 			// The projectile hit a solid block
