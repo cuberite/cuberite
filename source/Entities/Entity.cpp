@@ -528,7 +528,8 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			m_bOnGround = true;
 
 			LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
-				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ);
+				m_UniqueID, GetClass(), BlockX, BlockY, 
+			);
 		}
 
 		if (!m_bOnGround)
