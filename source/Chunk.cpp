@@ -31,6 +31,7 @@
 #include "Blocks/BlockHandler.h"
 #include "Simulator/FluidSimulator.h"
 #include "MobCensus.h"
+#include "MobSpawner.h"
 
 
 #include <json/json.h>
@@ -463,6 +464,42 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 			}
 		}
 	}  // for itr - m_Entitites[]
+}
+
+
+
+
+void cChunk::getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ)
+{
+	assert(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
+	int Random = m_World->GetTickRandomNumber(0x00ffffff);
+	a_X =   Random % (a_MaxX * 2);
+	a_Y =  (Random / (a_MaxX * 2)) % (a_MaxY * 2);
+	a_Z = ((Random / (a_MaxX * 2)) / (a_MaxY * 2)) % (a_MaxZ * 2);
+	a_X /= 2;
+	a_Y /= 2;
+	a_Z /= 2;
+}
+
+
+
+
+
+void cChunk::getRandomBlock(int& a_X, int& a_Y, int& a_Z)
+{
+	// MG TODO : check if this kind of optimization (only one random call) is still needed
+	// MG TODO : if so propagate it
+
+	getThreeRandomNumber(a_X, a_Y, a_Z, Width, Height-2, Width);
+	a_Y++;
+}
+
+
+
+
+
+void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
+{
 }
 
 

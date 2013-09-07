@@ -27,6 +27,7 @@ class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
 class cMobCensus;
+class cMobSpawner;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cChunk * cChunkPtr;
@@ -264,11 +265,14 @@ public:
 	/// Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config
 	void GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
-		/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
+	/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/// Make a Mob census, of all mobs, their family, their chunk and theyr distance to closest player
 	void CollectMobCensus(cMobCensus& a_ToFill);
+
+	/// Try to Spawn Monsters inside all Chunks
+	void SpawnMobs(cMobSpawner& a_MobSpawner);
 
 	void Tick(float a_Dt);
 
@@ -314,8 +318,9 @@ private:
 		void UnloadUnusedChunks(void);
 		
 		/// Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player
-		void CollectMobCensus(cMobCensus& a_ToFill);
-
+		void CollectMobCensus(cMobCensus& a_ToFill);		
+		/// Try to Spawn Monsters inside all Chunks
+		void SpawnMobs(cMobSpawner& a_MobSpawner);
 
 		void Tick(float a_Dt);
 		

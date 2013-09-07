@@ -13,6 +13,7 @@
 #include "PluginManager.h"
 #include "Entities/TNTEntity.h"
 #include "MobCensus.h"
+#include "MobSpawner.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -2167,6 +2168,19 @@ void cChunkMap::CollectMobCensus(cMobCensus& a_ToFill)
 
 
 
+void cChunkMap::SpawnMobs(cMobSpawner& a_MobSpawner)
+{
+	cCSLock Lock(m_CSLayers);
+	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	{
+		(*itr)->SpawnMobs(a_MobSpawner);
+	}  // for itr - m_Layers
+}
+
+
+
+
+
 void cChunkMap::Tick(float a_Dt)
 {
 	cCSLock Lock(m_CSLayers);
@@ -2340,6 +2354,20 @@ void cChunkMap::cChunkLayer::CollectMobCensus(cMobCensus& a_ToFill)
 
 
 
+
+
+
+void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner& a_MobSpawner)
+{
+	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	{
+		// We only spawn close to players
+		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->HasAnyClients())
+		{
+			m_Chunks[i]->SpawnMobs(a_MobSpawner);
+		}
+	}  // for i - m_Chunks[]
+}
 
 
 
