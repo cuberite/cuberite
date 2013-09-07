@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/03/13 10:19:58.
+** Generated automatically by tolua++-1.0.92 on 09/07/13 21:26:23.
 */
 
 #ifndef __cplusplus
@@ -212,67 +212,69 @@ static int tolua_collect_Vector3d (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"cThrownEnderPearlEntity");
- tolua_usertype(tolua_S,"cPluginManager");
- tolua_usertype(tolua_S,"TakeDamageInfo");
- tolua_usertype(tolua_S,"cMonster");
+ tolua_usertype(tolua_S,"cFurnaceEntity");
+ tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cCuboid");
- tolua_usertype(tolua_S,"cWindow");
- tolua_usertype(tolua_S,"cCraftingRecipe");
- tolua_usertype(tolua_S,"cPlugin");
- tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cStringMap");
- tolua_usertype(tolua_S,"cItemGrid");
- tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cEnchantments");
- tolua_usertype(tolua_S,"cLuaWindow");
- tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cMonster");
+ tolua_usertype(tolua_S,"cPluginLua");
  tolua_usertype(tolua_S,"cRoot");
- tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"std::vector<cIniFile::key>");
- tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cPickup");
- tolua_usertype(tolua_S,"std::vector<std::string>");
- tolua_usertype(tolua_S,"cBoundingBox");
- tolua_usertype(tolua_S,"cClientHandle");
+ tolua_usertype(tolua_S,"cItems");
+ tolua_usertype(tolua_S,"cFireChargeEntity");
+ tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"cThrownSnowballEntity");
- tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"cCraftingRecipes");
- tolua_usertype(tolua_S,"cItems");
- tolua_usertype(tolua_S,"cWebPlugin");
- tolua_usertype(tolua_S,"cItem");
+ tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"Vector3f");
- tolua_usertype(tolua_S,"cArrowEntity");
- tolua_usertype(tolua_S,"cDropSpenserEntity");
- tolua_usertype(tolua_S,"sWebAdminPage");
- tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cCraftingRecipes");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cDispenserEntity");
- tolua_usertype(tolua_S,"HTTPRequest");
- tolua_usertype(tolua_S,"cBlockEntity");
- tolua_usertype(tolua_S,"cItemGrid::cListener");
- tolua_usertype(tolua_S,"HTTPTemplateRequest");
- tolua_usertype(tolua_S,"cFurnaceEntity");
- tolua_usertype(tolua_S,"cDropperEntity");
- tolua_usertype(tolua_S,"cPluginLua");
- tolua_usertype(tolua_S,"cBlockEntityWithItems");
+ tolua_usertype(tolua_S,"cGhastFireballEntity");
  tolua_usertype(tolua_S,"cLineBlockTracer");
- tolua_usertype(tolua_S,"cCriticalSection");
- tolua_usertype(tolua_S,"cIniFile");
- tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cListeners");
+ tolua_usertype(tolua_S,"cThrownSnowballEntity");
+ tolua_usertype(tolua_S,"Vector3d");
+ tolua_usertype(tolua_S,"TakeDamageInfo");
+ tolua_usertype(tolua_S,"cCraftingRecipe");
+ tolua_usertype(tolua_S,"cPlugin");
+ tolua_usertype(tolua_S,"cItemGrid");
+ tolua_usertype(tolua_S,"cBlockArea");
+ tolua_usertype(tolua_S,"cLuaWindow");
+ tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"cBoundingBox");
+ tolua_usertype(tolua_S,"cBlockEntityWithItems");
+ tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cArrowEntity");
+ tolua_usertype(tolua_S,"cDropSpenserEntity");
+ tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cStringMap");
+ tolua_usertype(tolua_S,"cBlockEntity");
+ tolua_usertype(tolua_S,"cCriticalSection");
+ tolua_usertype(tolua_S,"HTTPTemplateRequest");
+ tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"std::vector<std::string>");
+ tolua_usertype(tolua_S,"cClientHandle");
+ tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"sWebAdminPage");
+ tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"cIniFile");
+ tolua_usertype(tolua_S,"cWebAdmin");
+ tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"cPawn");
- tolua_usertype(tolua_S,"cThrownEggEntity");
+ tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
- tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"cProjectileEntity");
- tolua_usertype(tolua_S,"cWorld");
- tolua_usertype(tolua_S,"cPlayer");
- tolua_usertype(tolua_S,"Vector3d");
+ tolua_usertype(tolua_S,"cItemGrid::cListener");
+ tolua_usertype(tolua_S,"cDropperEntity");
+ tolua_usertype(tolua_S,"cThrownEggEntity");
 }
 
 /* method: new of class  cIniFile */
@@ -6714,6 +6716,68 @@ static int tolua_AllToLua_cEntity_SetGravity00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetGravity'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetRotationFromSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetRotationFromSpeed00
+static int tolua_AllToLua_cEntity_SetRotationFromSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRotationFromSpeed'", NULL);
+#endif
+  {
+   self->SetRotationFromSpeed();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetRotationFromSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetPitchFromSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetPitchFromSpeed00
+static int tolua_AllToLua_cEntity_SetPitchFromSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetPitchFromSpeed'", NULL);
+#endif
+  {
+   self->SetPitchFromSpeed();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetPitchFromSpeed'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29527,6 +29591,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cEntity_TakeDamage02);
    tolua_function(tolua_S,"GetGravity",tolua_AllToLua_cEntity_GetGravity00);
    tolua_function(tolua_S,"SetGravity",tolua_AllToLua_cEntity_SetGravity00);
+   tolua_function(tolua_S,"SetRotationFromSpeed",tolua_AllToLua_cEntity_SetRotationFromSpeed00);
+   tolua_function(tolua_S,"SetPitchFromSpeed",tolua_AllToLua_cEntity_SetPitchFromSpeed00);
    tolua_function(tolua_S,"GetRawDamageAgainst",tolua_AllToLua_cEntity_GetRawDamageAgainst00);
    tolua_function(tolua_S,"GetArmorCoverAgainst",tolua_AllToLua_cEntity_GetArmorCoverAgainst00);
    tolua_function(tolua_S,"GetKnockbackAmountAgainst",tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00);
@@ -29674,6 +29740,12 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cThrownSnowballEntity","cThrownSnowballEntity","cProjectileEntity",NULL);
   tolua_beginmodule(tolua_S,"cThrownSnowballEntity");
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cGhastFireballEntity","cGhastFireballEntity","cProjectileEntity",NULL);
+  tolua_beginmodule(tolua_S,"cGhastFireballEntity");
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cFireChargeEntity","cFireChargeEntity","cProjectileEntity",NULL);
+  tolua_beginmodule(tolua_S,"cFireChargeEntity");
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPluginManager","cPluginManager","",NULL);
   tolua_beginmodule(tolua_S,"cPluginManager");
