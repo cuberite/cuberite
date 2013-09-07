@@ -711,8 +711,8 @@ private:
 	/// Handles the weather in each tick
 	void TickWeather(float a_Dt);
 	
-	/// Handles the mob spawning each tick
-	void TickSpawnMobs(float a_Dt);
+	/// Handles the mob spawning/moving/destroying each tick
+	void TickMobs(float a_Dt);
 	
 	/// Executes all tasks queued onto the tick thread
 	void TickQueuedTasks(void);

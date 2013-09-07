@@ -533,10 +533,14 @@ void cChunk::Tick(float a_Dt)
 		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
 	}
 	
-	// Tick all entities in this chunk:
+	// Tick all entities in this chunk (except mobs):
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		(*itr)->Tick(a_Dt, *this);
+		// Mobs are tickes inside MobTick (as we don't have to tick them if they are far away from players)
+		if (!((*itr)->IsMob()))
+		{
+			(*itr)->Tick(a_Dt, *this);
+		}
 	}  // for itr - m_Entitites[]
 	
 	// Remove all entities that were scheduled for removal:

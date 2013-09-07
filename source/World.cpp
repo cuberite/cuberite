@@ -622,7 +622,7 @@ void cWorld::Tick(float a_Dt)
 		UnloadUnusedChunks();
 	}
 
-	TickSpawnMobs(a_Dt);
+	TickMobs(a_Dt);
 
 	std::vector<int> m_RSList_copy(m_RSList);
 	
@@ -707,13 +707,13 @@ void cWorld::TickWeather(float a_Dt)
 
 
 
-void cWorld::TickSpawnMobs(float a_Dt)
+void cWorld::TickMobs(float a_Dt)
 {
-	if (!m_bAnimals || (m_WorldAge - m_LastSpawnMonster <= m_SpawnMonsterRate))
+	if (!m_bAnimals)
 	{
 		return;
 	}
-
+/*
 	cMobCensus MobCensus;
 	m_ChunkMap->CollectMobCensus(MobCensus);
 	MobCensus.logd();
@@ -810,6 +810,7 @@ void cWorld::TickSpawnMobs(float a_Dt)
 		// A proper mob type was selected, now spawn the mob:
 		SpawnMob(SpawnPos.x, SpawnPos.y, SpawnPos.z, (cMonster::eType)MobType);
 	}
+*/
 }
 
 
