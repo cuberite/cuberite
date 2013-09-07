@@ -67,6 +67,11 @@ public:
 	/// Returns true if the projectile has hit the ground and is stuck there
 	bool IsInGround(void) const { return m_IsInGround; }
 	
+	// tolua_end
+	
+	/// Sets the internal InGround flag. To be used by MCA loader only!
+	void SetIsInGround(bool a_IsInGround) { m_IsInGround = a_IsInGround; }
+	
 protected:
 	eKind m_ProjectileKind;
 	
@@ -75,8 +80,6 @@ protected:
 	
 	/// True if the projectile has hit the ground and is stuck there
 	bool m_IsInGround;
-	
-	// tolua_end
 	
 	// cEntity overrides:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
