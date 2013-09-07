@@ -1,6 +1,5 @@
--- Global variables
-PLUGIN = {};	-- Reference to own plugin object
 
+-- Global variables
 g_DropSpensersToActivate = {};  -- A list of dispensers and droppers (as {World, X, Y Z} quadruplets) that are to be activated every tick
 g_HungerReportTick = 10;
 g_ShowFoodStats = false;  -- When true, each player's food stats are sent to them every 10 ticks
@@ -11,8 +10,6 @@ g_ShowFoodStats = false;  -- When true, each player's food stats are sent to the
 
 
 function Initialize(Plugin)
-	PLUGIN = Plugin
-	
 	Plugin:SetName("Debuggers")
 	Plugin:SetVersion(1)
 	
@@ -480,6 +477,7 @@ end
 
 
 function OnWorldTick(a_World, a_Dt)
+	-- Report food stats, if switched on:
 	local Tick = a_World:GetWorldAge();
 	if (not(g_ShowFoodStats) or (math.mod(Tick, 10) ~= 0)) then
 		return false;
