@@ -214,10 +214,12 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 
 	switch (a_Kind)
 	{
-		case pkArrow:      return new cArrowEntity           (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkEgg:        return new cThrownEggEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkEnderPearl: return new cThrownEnderPearlEntity(a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkSnowball:   return new cThrownSnowballEntity  (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkArrow:         return new cArrowEntity           (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkEgg:           return new cThrownEggEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkEnderPearl:    return new cThrownEnderPearlEntity(a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkSnowball:      return new cThrownSnowballEntity  (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
 		// TODO: the rest
 	}
 	
@@ -309,8 +311,9 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if (EntityCollisionCallback.HasHit())
 	{
 		// An entity was hit:
-		// DEBUG:
 		Vector3d HitPos = Pos + (NextPos - Pos) * EntityCollisionCallback.GetMinCoeff();
+
+		// DEBUG:
 		LOGD("Projectile %d has hit an entity %d (%s) at {%.02f, %.02f, %.02f} (coeff %.03f)",
 			m_UniqueID,
 			EntityCollisionCallback.GetHitEntity()->GetUniqueID(),
@@ -318,7 +321,8 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			HitPos.x, HitPos.y, HitPos.z,
 			EntityCollisionCallback.GetMinCoeff()
 		);
-		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()));
+		
+		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()), HitPos);
 	}
 	// TODO: Test the entities in the neighboring chunks, too
 
@@ -423,7 +427,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 
 
 
-void cArrowEntity::OnHitEntity(cEntity & a_EntityHit)
+void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
 	if (!a_EntityHit.IsMob() && !a_EntityHit.IsMinecart() && !a_EntityHit.IsPlayer())
 	{
@@ -519,6 +523,97 @@ void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_Hi
 	Destroy();
 }
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cGhastFireballEntity :
+
+cGhastFireballEntity::cGhastFireballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
+	super(pkGhastFireball, a_Creator, a_X, a_Y, a_Z, 1, 1)
+{
+	SetSpeed(a_Speed);
+	SetGravity(0);
+}
+
+
+
+
+
+void cGhastFireballEntity::Explode(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	m_World->DoExplosionAt(1, a_BlockX, a_BlockY, a_BlockZ, true, esGhastFireball, this);
+}
+
+
+
+
+
+void cGhastFireballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+{
+	Destroy();
+	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
+}
+
+
+
+
+
+void cGhastFireballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+{
+	Destroy();
+	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFireChargeEntity :
+
+cFireChargeEntity::cFireChargeEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
+	super(pkFireCharge, a_Creator, a_X, a_Y, a_Z, 0.3125, 0.3125)
+{
+	SetSpeed(a_Speed);
+	SetGravity(0);
+}
+
+
+
+
+
+void cFireChargeEntity::Explode(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	if (m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+	{
+		m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 1);
+	}
+}
+
+
+
+
+
+void cFireChargeEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+{
+	Destroy();
+	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
+}
+
+
+
+
+
+void cFireChargeEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+{
+	Destroy();
+	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
+	
+	// TODO: Some entities are immune to hits
+	a_EntityHit.StartBurning(5 * 20);  // 5 seconds of burning
+}
 
 
 

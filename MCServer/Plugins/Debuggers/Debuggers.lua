@@ -43,6 +43,7 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
 	PluginManager:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
 	PluginManager:BindCommand("/arr",     "debuggers", HandleArrowCmd,        "- Creates an arrow going away from the player");
+	PluginManager:BindCommand("/fb",      "debuggers", HandleFireballCmd,     "- Creates a ghast fireball as if shot by the player");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -817,6 +818,21 @@ function HandleArrowCmd(a_Split, a_Player)
 	Pos = Pos + Speed;
 	
 	World:CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity.pkArrow, a_Player, Speed * 10);
+	return true;
+end
+
+
+
+
+
+function HandleFireballCmd(a_Split, a_Player)
+	local World = a_Player:GetWorld();
+	local Pos = a_Player:GetEyePosition();
+	local Speed = a_Player:GetLookVector();
+	Speed:Normalize();
+	Pos = Pos + Speed * 2;
+	
+	World:CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity.pkGhastFireball, a_Player, Speed * 10);
 	return true;
 end
 
