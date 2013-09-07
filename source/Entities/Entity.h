@@ -205,6 +205,12 @@ public:
 	
 	void SetGravity(float a_Gravity) { m_Gravity = a_Gravity; }
 	
+	/// Sets the rotation to match the speed vector (entity goes "face-forward")
+	void SetRotationFromSpeed(void);
+	
+	/// Sets the pitch to match the speed vector (entity gies "face-forward")
+	void SetPitchFromSpeed(void);
+	
 	// tolua_end
 	
 	/// Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied

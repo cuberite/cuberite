@@ -151,7 +151,7 @@ protected:
 	bool m_IsCritical;
 
 	// cProjectileEntity overrides:
-	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
 	virtual void OnHitEntity(cEntity & a_EntityHit) override;
 	
 	// tolua_begin

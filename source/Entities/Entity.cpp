@@ -253,6 +253,39 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 
 
+void cEntity::SetRotationFromSpeed(void)
+{
+	const double EPS = 0.0000001;
+	if ((abs(m_Speed.x) < EPS) && (abs(m_Speed.z) < EPS))
+	{
+		// atan2() may overflow or is undefined, pick any number
+		SetRotation(0);
+		return;
+	}
+	SetRotation(atan2(m_Speed.x, m_Speed.z) * 180 / PI);
+}
+
+
+
+
+
+void cEntity::SetPitchFromSpeed(void)
+{
+	const double EPS = 0.0000001;
+	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z); // Speed XZ-plane component
+	if ((abs(xz) < EPS) && (abs(m_Speed.y) < EPS))
+	{
+		// atan2() may overflow or is undefined, pick any number
+		SetPitch(0);
+		return;
+	}
+	SetPitch(atan2(m_Speed.y, xz) * 180 / PI);
+}
+
+
+
+
+
 void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))

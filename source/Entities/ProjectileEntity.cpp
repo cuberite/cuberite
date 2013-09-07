@@ -16,6 +16,13 @@
 
 
 
+/// Converts an angle in radians into a byte representation used by the network protocol
+#define ANGLE_TO_PROTO(X) (Byte)(X * 255 / 360)
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cProjectileTracerCallback:
 
@@ -189,6 +196,8 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 	m_IsInGround(false)
 {
 	SetSpeed(a_Speed);
+	SetRotationFromSpeed();
+	SetPitchFromSpeed();
 }
 
 
@@ -321,12 +330,15 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	NewSpeed.y += m_Gravity / 20;
 	NewSpeed *= TracerCallback.GetSlowdownCoeff();
 	SetSpeed(NewSpeed);
+	SetRotationFromSpeed();
+	SetPitchFromSpeed();
 
 	// DEBUG:
-	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}",
+	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}, rot {%.02f, %.02f}",
 		m_UniqueID,
 		GetPosX(), GetPosY(), GetPosZ(),
-		GetSpeedX(), GetSpeedY(), GetSpeedZ()
+		GetSpeedX(), GetSpeedY(), GetSpeedZ(),
+		GetRotation(), GetPitch()
 	);
 }
 
@@ -337,7 +349,8 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 {
 	// Default spawning - use the projectile kind to spawn an object:
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, 0, 0, 0);
+	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetRotation()), ANGLE_TO_PROTO(GetPitch()));
+	a_Client.SendEntityMetadata(*this);
 }
 
 
@@ -355,8 +368,11 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
-	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f}",
-		m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ()
+	SetRotationFromSpeed();
+	SetPitchFromSpeed();
+	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",
+		m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ(),
+		GetRotation(), GetPitch()
 	);
 }
 
@@ -392,10 +408,17 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 
-void cArrowEntity::SpawnOn(cClientHandle & a_Client)
+void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
-	a_Client.SendSpawnObject(*this, pkArrow, 0, 0, 0);
+	super::OnHitSolidBlock(a_HitPos, a_HitFace);
+	
+	// Broadcast the position and speed packets before teleporting:
+	BroadcastMovementUpdate();
+	
+	// Teleport the entity to the exact hit coords:
+	m_World->BroadcastTeleportEntity(*this);
 }
+
 
 
 
