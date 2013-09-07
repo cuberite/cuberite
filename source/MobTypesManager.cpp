@@ -44,6 +44,43 @@ cMobTypesManager::tMobTypes2Names cMobTypesManager::MobTypes2NamesInitializerBef
 	return toReturn;
 }
 
+cMobTypesManager::tMobType2Family& cMobTypesManager::m_MobsType2Family()
+{
+	static std::map<cMonster::eType,cMonster::eFamily>* value = new std::map<cMonster::eType,cMonster::eFamily>(MobType2FamilyInitializerBeforeCx11());
+	return *value;
+}
+
+cMobTypesManager::tMobType2Family cMobTypesManager::MobType2FamilyInitializerBeforeCx11()
+{
+	std::map<cMonster::eType,cMonster::eFamily> toReturn;
+	typedef std::map<cMonster::eType,cMonster::eFamily>::value_type ValueType;
+	toReturn.insert(ValueType(cMonster::mtBat,cMonster::mfAmbient));
+	toReturn.insert(ValueType(cMonster::mtSquid,cMonster::mfWater));
+	toReturn.insert(ValueType(cMonster::mtCow,cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtPig,cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtSheep,cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtChicken,cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtVillager,cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtMagmaCube,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtSlime,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtBlaze,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtCaveSpider,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtCreeper,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtEnderman,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtGhast,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtMooshroom,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtOcelot,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtSilverfish,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtSkeleton,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtSpider,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtWitch,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtWolf,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtZombie,cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtZombiePigman,cMonster::mfHostile));	
+
+	return toReturn;
+}
+
 
 cFastRandom& cMobTypesManager::m_Random()
 {
@@ -126,5 +163,16 @@ cMonster::eType cMobTypesManager::fromStringToMobType(const std::string& a_Name)
 			return itr->first;			
 		}
 	}
-	throw new NotAMonsterException();
+	return cMonster::mtInvalidType;
+}
+
+cMonster::eFamily cMobTypesManager::getFamilyFromType(cMonster::eType a_Type)
+{
+	cMonster::eFamily toReturn = cMonster::mfMaxplusone;
+	std::map<cMonster::eType,cMonster::eFamily>::const_iterator itr = m_MobsType2Family().find(a_Type);
+	if (itr != m_MobsType2Family().end())
+	{
+		toReturn = itr->second;
+	}
+	return toReturn;
 }

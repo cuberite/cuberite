@@ -54,6 +54,8 @@ public:
 		mtOcelot       = E_META_SPAWN_EGG_OCELOT,
 		mtIronGolem    = E_META_SPAWN_EGG_IRON_GOLEM,
 		mtVillager     = E_META_SPAWN_EGG_VILLAGER,
+
+		mtInvalidType,  // MG TODO : be sure this is the way we do in this project. (needed inside cMobSpawner::ChooscMonster for instance if nothing can be spawned)
 	} ;
 
 	enum eFamily
@@ -62,7 +64,8 @@ public:
 		mfPassive  = 1, // Cows, Pigs
 		mfAmbient  = 2, // Bats
 		mfWater    = 3, // Squid
-		mfMaxplusone = 4, // Nothing
+
+		mfMaxplusone, // Nothing. Be sure this is the last and the others are in order
 	} ;
 	
 	// tolua_end

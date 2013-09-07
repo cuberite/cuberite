@@ -10,19 +10,22 @@ class cFastRandom;
 // functionnalities are (in the first version) :
 // - create a mob from its type (as enum) (in that way it is a compiler-proxy for mobs)
 // - can transform MobTypes from enums to string and reciprocal
+// - return mob family from providen type
 class cMobTypesManager
 {
 public:
 	static const std::string& fromMobTypeToString(cMonster::eType a_MobType);
-	static cMonster::eType fromStringToMobType(const std::string&);
-
-public:
-	class NotAMonsterException : public std::exception {}; //MG TODO : check if this is this project way to do it
+	static cMonster::eType fromStringToMobType(const std::string& a_MobTypeName);
+	static cMonster::eFamily getFamilyFromType(cMonster::eType a_MobType);
 
 protected : 
 	typedef const std::map<cMonster::eType,std::string> tMobTypes2Names;
 	static tMobTypes2Names& m_MobsTypes2Names();
 	static tMobTypes2Names MobTypes2NamesInitializerBeforeCx11();
+
+	typedef const std::map<cMonster::eType,cMonster::eFamily> tMobType2Family;  //MG TODO : this is redundancy with cMonster::getFamily() methods. But almost all the management of MobType is redundancy in this project. Maybe is it optimization, or just historical TODO : understand and do something about it.
+	static tMobType2Family& m_MobsType2Family();
+	static tMobType2Family MobType2FamilyInitializerBeforeCx11();
 
 	static cFastRandom& m_Random();
 	
