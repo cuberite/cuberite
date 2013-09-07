@@ -95,5 +95,12 @@ void cAggressiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 }
 
 
+cMonster::eFamily cAggressiveMonster::GetMobFamily() const
+{
+	return mfHostile;
+}
+
+
+
 
 

@@ -55,6 +55,15 @@ public:
 		mtIronGolem    = E_META_SPAWN_EGG_IRON_GOLEM,
 		mtVillager     = E_META_SPAWN_EGG_VILLAGER,
 	} ;
+
+	enum eFamily
+	{
+		mfHostile  = 0, // Spider, Zombies ...
+		mfPassive  = 1, // Cows, Pigs
+		mfAmbient  = 2, // Bats
+		mfWater    = 3, // Squid
+		mfMaxplusone = 4, // Nothing
+	} ;
 	
 	// tolua_end
 	
@@ -81,6 +90,7 @@ public:
 	virtual bool ReachedDestination(void);
 	
 	char GetMobType(void) const {return m_MobType; }
+	virtual eFamily GetMobFamily(void) const = 0;
 
 	const char * GetState();
 	void SetState(const AString & str);

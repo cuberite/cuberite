@@ -54,4 +54,7 @@ void cSquid::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-
+cMonster::eFamily cSquid::GetMobFamily() const
+{
+	return mfWater;
+}

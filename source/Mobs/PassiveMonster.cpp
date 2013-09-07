@@ -55,4 +55,11 @@ void cPassiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
+cMonster::eFamily cPassiveMonster::GetMobFamily() const 
+{
+	return mfPassive;
+}
+
+
+
 
