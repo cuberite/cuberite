@@ -220,7 +220,6 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	if (m_IsChargingBow)
 	{
 		m_BowCharge += 1;
-		LOGD("Player \"%s\" charging bow: %d", m_PlayerName.c_str(), m_BowCharge);
 	}
 
 	if (m_bDirtyPosition)
