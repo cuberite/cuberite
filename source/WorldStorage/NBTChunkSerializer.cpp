@@ -360,6 +360,7 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			}
 			case cProjectileEntity::pkFireCharge:
 			case cProjectileEntity::pkWitherSkull:
+			case cProjectileEntity::pkEnderPearl:
 			{
 				m_Writer.BeginList("Motion", TAG_Double);
 					m_Writer.AddDouble("", a_Projectile->GetSpeedX());
