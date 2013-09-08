@@ -485,7 +485,7 @@ void cChunk::getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a
 
 
 
-void cChunk::getRandomBlock(int& a_X, int& a_Y, int& a_Z)
+void cChunk::getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z)
 {
 	// MG TODO : check if this kind of optimization (only one random call) is still needed
 	// MG TODO : if so propagate it
@@ -501,7 +501,7 @@ void cChunk::getRandomBlock(int& a_X, int& a_Y, int& a_Z)
 void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 {
 	int Center_X,Center_Y,Center_Z;
-	getRandomBlock(Center_X,Center_Y,Center_Z);
+	getRandomBlockCoords(Center_X,Center_Y,Center_Z);
 
 	BLOCKTYPE PackCenterBlock = GetBlock(Center_X, Center_Y, Center_Z);
 	if (a_MobSpawner.CheckPackCenter(PackCenterBlock))

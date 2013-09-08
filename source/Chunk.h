@@ -394,7 +394,7 @@ private:
 
 
 	// pick up a random block of this chunk
-	void getRandomBlock(int& a_X, int& a_Y, int& a_Z);
+	void getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z);
 	void getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ);
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);

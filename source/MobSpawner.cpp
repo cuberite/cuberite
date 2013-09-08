@@ -6,8 +6,6 @@
 #include "Mobs/Monster.h"
 #include "Mobs/IncludeAllMonsters.h"
 
-#include <sstream>
-
 cMobSpawner::tMobTypes& cMobSpawner::m_MobTypes()
 {
 	static tMobTypes* value = new tMobTypes(initMobTypesBeforeCx11());
@@ -179,7 +177,6 @@ bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType,
 			{
 				if (a_MobType == cMonster::mtChicken || a_MobType == cMonster::mtPig || a_MobType == cMonster::mtCow || a_MobType == cMonster::mtSheep)
 				{
-					LOGD(oss.str().c_str());
 					toReturn = (
 						a_BlockType_below == E_BLOCK_GRASS /*&& // MG TODO
 						a_LightLevel >= 9 */
