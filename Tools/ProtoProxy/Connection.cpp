@@ -1636,7 +1636,8 @@ bool cConnection::HandleServerKick(void)
 		
 		// Split by NULL chars (StringSplit() won't work here):
 		size_t Last = 0;
-		for (size_t i = 0; i < Reason.size(); i++)
+		size_t Len = Reason.size();
+		for (size_t i = 0; i < Len; i++)
 		{
 			if (Reason[i] == 0)
 			{
@@ -1644,14 +1645,40 @@ bool cConnection::HandleServerKick(void)
 				Last = i + 1;
 			}
 		}
-		
-		if (Split.size() == 5)
+		if (Last < Len)
 		{
-			Log("  Protocol version: \"%s\"", Split[0].c_str());
-			Log("  Server version: \"%s\"", Split[1].c_str());
-			Log("  MOTD: \"%s\"", Split[2].c_str());
-			Log("  Cur players: \"%s\"", Split[3].c_str());
-			Log("  Max players: \"%s\"", Split[4].c_str());
+			Split.push_back(Reason.substr(Last));
+		}
+		
+		if (Split.size() == 6)
+		{
+			Log("  Preamble: \"%s\"", Split[0].c_str());
+			Log("  Protocol version: \"%s\"", Split[1].c_str());
+			Log("  Server version: \"%s\"", Split[2].c_str());
+			Log("  MOTD: \"%s\"", Split[3].c_str());
+			Log("  Cur players: \"%s\"", Split[4].c_str());
+			Log("  Max players: \"%s\"", Split[5].c_str());
+			
+			// Modify the MOTD to show that it's being ProtoProxied:
+			Reason.assign(Split[0]);
+			Reason.push_back(0);
+			Reason.append(Split[1]);
+			Reason.push_back(0);
+			Reason.append(Split[2]);
+			Reason.push_back(0);
+			Reason.append(Printf("ProtoProxy: %s", Split[3].c_str()));
+			Reason.push_back(0);
+			Reason.append(Split[4]);
+			Reason.push_back(0);
+			Reason.append(Split[5]);
+			AString ReasonBE16;
+			UTF8ToRawBEUTF16(Reason.data(), Reason.size(), ReasonBE16);
+			AString PacketStart("\xff");
+			PacketStart.push_back((ReasonBE16.size() / 2) / 256);
+			PacketStart.push_back((ReasonBE16.size() / 2) % 256);
+			CLIENTSEND(PacketStart.data(), PacketStart.size());
+			CLIENTSEND(ReasonBE16.data(), ReasonBE16.size());
+			return true;
 		}
 		else
 		{
