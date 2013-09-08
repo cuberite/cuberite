@@ -1,8 +1,8 @@
 
-// Minecart.cpp
+// Boat.cpp
 
-// Implements the cMinecart class representing a minecart in the world
-// Indiana Jones!
+// Implements the cBoat class representing a boat in the world
+// Pirates of the Carribean!
 
 #include "Globals.h"
 #include "Boat.h"

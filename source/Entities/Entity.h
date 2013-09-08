@@ -92,6 +92,7 @@ public:
 		etMonster,
 		etFallingBlock,
 		etMinecart,
+		etBoat,
 		etTNT,
 		etProjectile,
 		
@@ -119,6 +120,7 @@ public:
 	bool IsPickup  (void) const { return (m_EntityType == etPickup); }
 	bool IsMob     (void) const { return (m_EntityType == etMob); }
 	bool IsMinecart(void) const { return (m_EntityType == etMinecart); }
+	bool IsBoat    (void) const { return (m_EntityType == etBoat); }
 	bool IsTNT     (void) const { return (m_EntityType == etTNT); }
 	
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)

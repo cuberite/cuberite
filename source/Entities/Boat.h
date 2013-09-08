@@ -1,7 +1,7 @@
 
 // Boat.h
 
-// Declares the cBoat class representing a minecart in the world
+// Declares the cBoat class representing a boat in the world
 
 
 
