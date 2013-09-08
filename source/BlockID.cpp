@@ -1,4 +1,3 @@
-
 // BlockID.cpp
 
 // Implements the helper functions for converting Block ID string to int etc.
@@ -722,8 +721,10 @@ public:
 		g_BlockIsSnowable[E_BLOCK_WALLSIGN]              = false;
 		g_BlockIsSnowable[E_BLOCK_WATER]                 = false;
 		g_BlockIsSnowable[E_BLOCK_YELLOW_FLOWER]         = false;
+		g_BlockIsSnowable[E_BLOCK_LILY_PAD]              = false;
+		
 
-		// Blocks that don´t drop without a special tool
+		// Blocks that donï¿½t drop without a special tool
 		g_BlockRequiresSpecialTool[E_BLOCK_BRICK]                = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_CAULDRON]             = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_COAL_ORE]             = true;
