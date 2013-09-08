@@ -106,13 +106,23 @@ public:
 	}
 
 
-	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, char a_Direction)
+	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, char a_BlockFace)
 	{
-		if ( g_BlockIsSolid[a_BlockType] ) {
-			return (a_Direction == 0x1);  // allow only direction "standing on floor"
-		}
-		else {
-			return g_BlockIsSolid[a_BlockType];
+		switch (a_BlockType)
+		{
+			case E_BLOCK_GLASS:
+			case E_BLOCK_FENCE:
+			case E_BLOCK_NETHER_BRICK_FENCE:
+			case E_BLOCK_PISTON:
+			case E_BLOCK_WORKBENCH:
+			{
+				return (a_BlockFace == BLOCK_FACE_TOP);  // allow only direction "standing on floor" on these blocks
+			}
+			
+			default:
+			{
+				return g_BlockIsSolid[a_BlockType];  // Any placement on solid blocks
+			}
 		}
 	}
 	
@@ -121,7 +131,7 @@ public:
 	{
 		// TODO: If placing a torch from below, check all 4 XZ neighbors, place it on that neighbor instead
 		// How to propagate that change up?
-		// Simon: The easiest way is to calculate the position two times, shouldn�t cost much cpu power :)
+		// Simon: The easiest way is to calculate the position two times, shouldn't cost much cpu power :)
 
 		if (a_BlockFace == BLOCK_FACE_BOTTOM)
 		{
