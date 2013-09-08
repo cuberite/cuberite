@@ -14,12 +14,18 @@ void cMobProximityCounter::CollectMob(cEntity& a_Monster, cChunk& a_Chunk, doubl
 	{
 		sDistanceAndChunk newDistanceAndChunck(a_Distance,a_Chunk);
 		std::pair<tMonsterToDistance::iterator,bool> result = m_MonsterToDistance.insert(tMonsterToDistance::value_type(&a_Monster,newDistanceAndChunck));
-		assert(result.second);
+		if (!result.second)
+		{
+			ASSERT("A collected Monster was not found inside distance map using find(), but insert() said there already is a key for it");
+		}
 	}
 	else
 	{
-		it->second.m_Distance = a_Distance;
-		it->second.m_Chunk = a_Chunk;
+		if (a_Distance < it->second.m_Distance)
+		{
+			it->second.m_Distance = a_Distance;
+			it->second.m_Chunk = a_Chunk;
+		}
 	}
 
 	m_EligibleForSpawnChunks.insert(&a_Chunk);
