@@ -38,7 +38,7 @@ protected :
 	// this map is generated after collection phase, in order to access monster by distance to player
 	tDistanceToMonster m_DistanceToMonster;
 
-	// this are the collected chuncks. Used to determinate the number of elligible chunck for spawning.
+	// this are the collected chunks. Used to determinate the number of elligible chunk for spawning.
 	std::set<cChunk*> m_EligibleForSpawnChunks;
 
 protected : 
@@ -47,9 +47,9 @@ protected :
 	void convertMaps();
 
 public :
-	// count a mob on a specified chunck with specified distance to an unkown player
+	// count a mob on a specified chunk with specified distance to an unkown player
 	// if the distance is shortest than the one collected, this become the new closest
-	// distance and the chunck become the "hosting" chunk (that is the one that will perform the action)
+	// distance and the chunk become the "hosting" chunk (that is the one that will perform the action)
 	void CollectMob(cEntity& a_Monster, cChunk& a_Chunk, double a_Distance);
 
 	// return the mobs that are within the range of distance of the closest player they are

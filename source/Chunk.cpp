@@ -434,7 +434,7 @@ void cChunk::Stay(bool a_Stay)
 
 void cChunk::CollectMobCensus(cMobCensus& toFill)
 {
-	toFill.CollectSpawnableChunck(*this);
+	toFill.CollectSpawnableChunk(*this);
 	std::list<const Vector3d*> playerPositions;
 	cPlayer* currentPlayer;
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)

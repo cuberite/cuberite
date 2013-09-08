@@ -11,7 +11,7 @@ class cMonster;
 // it was first being designed in order to make mobs spawn / despawn / act
 // as the behaviour and even life of mobs depends on the distance to closest player
 //
-// as side effect : it also collect the chuncks that are elligible for spawning
+// as side effect : it also collect the chunks that are elligible for spawning
 // as side effect 2 : it also know the caps for mobs number and can compare census to this numbers
 class cMobCensus
 {
@@ -27,7 +27,7 @@ protected :
 
 	std::set<cChunk*> m_EligibleForSpawnChunks;
 
-	// count the chunks that are elligible to spawn (for now, the loaded valide not null chuncks)
+	// count the chunks that are elligible to spawn (for now, the loaded valide not null chunks)
 	int getChunkNb();
 
 public:
@@ -39,8 +39,8 @@ public:
 
 public :
 	// collect an elligible Chunk for Mob Spawning
-	// MG TODO : code the correct rule (not loaded chunck but short distant from players)
-	void CollectSpawnableChunck(cChunk& a_Chunk);
+	// MG TODO : code the correct rule (not loaded chunk but short distant from players)
+	void CollectSpawnableChunk(cChunk& a_Chunk);
 	
 	// collect a mob - it's distance to player, it's family ...
 	void CollectMob(cMonster& a_Monster, cChunk& a_Chunk, double a_Distance);

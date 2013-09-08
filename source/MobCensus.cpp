@@ -50,7 +50,7 @@ void cMobCensus::CollectMob(cMonster& a_Monster, cChunk& a_Chunk, double a_Dista
 bool cMobCensus::isCaped(cMonster::eFamily a_MobFamily)
 {
 	bool toReturn = true;
-	const int ratio = 319; // this should be 256 as we are only supposed to take account from chuncks that are in 17x17 from a player
+	const int ratio = 319; // this should be 256 as we are only supposed to take account from chunks that are in 17x17 from a player
 	// but for now, we use all chunks loaded by players. that means 19 x 19 chucks. That's why we use 256 * (19*19) / (17*17) = 319
 	// MG TODO : code the correct count	
 	tCapMultipliersMap::const_iterator capMultiplier = m_CapMultipliers().find(a_MobFamily);
@@ -64,7 +64,7 @@ bool cMobCensus::isCaped(cMonster::eFamily a_MobFamily)
 	return toReturn;
 }
 
-void cMobCensus::CollectSpawnableChunck(cChunk& a_Chunk)
+void cMobCensus::CollectSpawnableChunk(cChunk& a_Chunk)
 {
 	m_EligibleForSpawnChunks.insert(&a_Chunk);
 }
