@@ -574,6 +574,7 @@ public:
 	
 	/// Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
 	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
+	int SpawnMobFinalize(cMonster* a_Monster);
 	
 	/// Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
 	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const Vector3d * a_Speed = NULL);  // tolua_export
@@ -626,7 +627,7 @@ private:
 	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
 	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
 	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
-	Int64  m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned
+	std::map<cMonster::eFamily,Int64> m_LastSpawnMonster; // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster) // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
@@ -656,7 +657,7 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	bool m_bAnimals;
-	Int64 m_SpawnMonsterRate;
+	std::set<cMonster::eType> m_AllowedMobs;
 
 	eWeather m_Weather;
 	int m_WeatherInterval;

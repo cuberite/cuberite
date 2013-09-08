@@ -500,6 +500,67 @@ void cChunk::getRandomBlock(int& a_X, int& a_Y, int& a_Z)
 
 void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 {
+	int Center_X,Center_Y,Center_Z;
+	getRandomBlock(Center_X,Center_Y,Center_Z);
+
+	BLOCKTYPE PackCenterBlock = GetBlock(Center_X, Center_Y, Center_Z);
+	if (a_MobSpawner.CheckPackCenter(PackCenterBlock))
+	{
+		a_MobSpawner.NewPack();
+		int NumberOfTries = 0;
+		int NumberOfSuccess = 0;
+		int MaxNbOfSuccess = 4; // this can be changed during the process for Wolves and Ghass
+		while (NumberOfTries < 12 && NumberOfSuccess < MaxNbOfSuccess)
+		{
+			const int HorizontalRange = 20; // MG TODO : relocate
+			const int VerticalRange = 0; // MG TODO : relocate
+			int Try_X, Try_Y, Try_Z;
+			getThreeRandomNumber(Try_X, Try_Y, Try_Z, 2*HorizontalRange+1 , 2*VerticalRange+1 , 2*HorizontalRange+1);
+			Try_X -= HorizontalRange;
+			Try_Y -= VerticalRange;
+			Try_Z -= HorizontalRange;
+			Try_X += Center_X;
+			Try_Y += Center_Y;
+			Try_Z += Center_Z;
+
+			assert(Try_Y > 0);
+			assert(Try_Y < cChunkDef::Height-1);
+			
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+			BLOCKTYPE BlockType_below;
+			NIBBLETYPE BlockMeta_below;
+			BLOCKTYPE BlockType_above;
+			NIBBLETYPE BlockMeta_above;
+			if (UnboundedRelGetBlock(Try_X, Try_Y  , Try_Z, BlockType, BlockMeta) &&
+				UnboundedRelGetBlock(Try_X, Try_Y-1, Try_Z, BlockType_below, BlockMeta_below)&&
+				UnboundedRelGetBlock(Try_X, Try_Y+1, Try_Z, BlockType_above, BlockMeta_above)
+				)
+			{
+				EMCSBiome Biome = m_ChunkMap->GetBiomeAt (Try_X, Try_Z);
+				// MG TODO :
+				// Moon cycle (for slime)
+				// check player and playerspawn presence < 24 blocks
+				// check mobs presence on the block
+
+				// MG TODO: fix the "light" thing, I'm pretty sure that UnboundedRelGetBlock s not returning the right thing
+
+				// MG TODO : check that "Level" really means Y
+				cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, Biome, Try_Y, MaxNbOfSuccess);
+				if (newMob)
+				{
+					int WorldX, WorldY, WorldZ;
+					PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
+					newMob->SetPosition(WorldX, WorldY, WorldZ);
+					LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
+					NumberOfSuccess++;
+				}
+			}
+			
+			NumberOfTries++;
+		}
+	}
+
 }
 
 
