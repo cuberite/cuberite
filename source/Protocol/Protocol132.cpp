@@ -452,8 +452,17 @@ void cProtocol132::SendTabCompletionResults(const AStringVector & a_Results)
 
 void cProtocol132::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	// Not used in 1.3.2
-	// Does it unload chunks on its own?
+	// Unloading the chunk is done by sending a "map chunk" packet
+	// with IncludeInitialize set to true and primary bitmap set to 0:
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_CHUNK_DATA);
+	WriteInt (a_ChunkX);
+	WriteInt (a_ChunkZ);
+	WriteBool(true);      // IncludeInitialize
+	WriteShort(0);        // Primary bitmap
+	WriteShort(0);        // Add bitmap
+	WriteInt(0);
+	Flush();
 }
 
 
