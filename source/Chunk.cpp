@@ -451,7 +451,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 		{
 			try
 			{		
-				cMonster& Monster = (cMonster&)(**itr);
+				cMonster& Monster = dynamic_cast<cMonster&>(**itr);
 				currentPosition = Monster.GetPosition();
 				for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); itr2 ++)
 				{
