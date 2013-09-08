@@ -491,14 +491,19 @@ void cWorld::Start(void)
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
 
-	m_bAnimals = true;
- 
-	m_AllowedMobs.insert(cMonster::mtCow);  // MG TODO : temporary
-	m_AllowedMobs.insert(cMonster::mtZombie);
-	m_AllowedMobs.insert(cMonster::mtZombiePigman);
-	m_AllowedMobs.insert(cMonster::mtBat);
-	m_AllowedMobs.insert(cMonster::mtSpider);
-	m_AllowedMobs.insert(cMonster::mtGhast);
+	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", true);
+	AString sAllMonsters = IniFile.GetValue("Monsters", "Types");
+	AStringVector SplitList = StringSplit(sAllMonsters, ",");
+	for (unsigned int i = 0; i < SplitList.size(); ++i)
+	{
+		cMonster::eType ToAdd = cMobTypesManager::fromStringToMobType(SplitList[i]);
+		if (ToAdd != cMonster::mtInvalidType)
+		{
+			m_AllowedMobs.insert(ToAdd);
+			LOGD("Allowed mob: %s",cMobTypesManager::fromMobTypeToString(ToAdd).c_str()); // a bit reverse working, but very few ressources wasted
+		}
+	};
+
 
 	m_ChunkMap = new cChunkMap(this);
 	
