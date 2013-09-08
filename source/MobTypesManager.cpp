@@ -102,7 +102,11 @@ cMonster* cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a_
 			{
 				a_Size = m_Random().NextInt(2,a_MobType)+1;
 			}
-			assert(a_Size > 0 && a_Size < 4);
+			if (a_Size <= 0 || a_Size >= 4)
+			{
+				ASSERT(!"Random for size was supposed to pick in [1..3] and picked outside");
+				a_Size = 1;
+			}
 			break;
 		default : break;
 	}
@@ -135,7 +139,7 @@ cMonster* cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a_
 		case cMonster::mtZombiePigman:  toReturn  = new cZombiepigman();  break;
 		default:
 		{
-			assert(false);
+			ASSERT(!"Unhandled Mob type");
 		}
 	}
 	return toReturn;

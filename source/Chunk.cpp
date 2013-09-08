@@ -471,7 +471,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 
 void cChunk::getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ)
 {
-	assert(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
+	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
 	int Random = m_World->GetTickRandomNumber(0x00ffffff);
 	a_X =   Random % (a_MaxX * 2);
 	a_Y =  (Random / (a_MaxX * 2)) % (a_MaxY * 2);
@@ -523,8 +523,8 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 			Try_Y += Center_Y;
 			Try_Z += Center_Z;
 
-			assert(Try_Y > 0);
-			assert(Try_Y < cChunkDef::Height-1);
+			ASSERT(Try_Y > 0);
+			ASSERT(Try_Y < cChunkDef::Height-1);
 			
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
