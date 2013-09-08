@@ -299,16 +299,13 @@ private:
 	static int s_ClientCount;
 	int m_UniqueID;
 	
+	/// Set to true when the chunk where the player is is sent to the client. Used for spawning the player
+	bool m_HasSentPlayerChunk;
+	
 
 
 	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)
 	bool CheckBlockInteractionsRate(void);
-	
-	/// Checks whether all loaded chunks have been sent to the client; if so, sends the position to confirm
-	void CheckIfWorldDownloaded(void);
-	
-	/// Sends the PlayerMoveLook packet that the client needs to reply to for the game to start
-	void SendConfirmPosition(void);
 	
 	/// Adds a single chunk to be streamed to the client; used by StreamChunks()
 	void StreamChunk(int a_ChunkX, int a_ChunkZ);

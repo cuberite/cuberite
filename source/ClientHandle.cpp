@@ -98,6 +98,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	, m_HasStartedDigging(false)
 	, m_CurrentExplosionTick(0)
 	, m_RunningSumExplosions(0)
+	, m_HasSentPlayerChunk(false)
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -489,8 +490,14 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 
 void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
 {
+	if ((m_Player == NULL) || (m_State != csPlaying))
+	{
+		// The client hasn't been spawned yet and sends nonsense, we know better
+		return;
+	}
+
 	/*
-		// TODO: Invalid stance check
+	// TODO: Invalid stance check
 	if ((a_PosY >= a_Stance) || (a_Stance > a_PosY + 1.65))
 	{
 		LOGD("Invalid stance");
@@ -499,7 +506,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	}
 	*/
 	
-	// LOGD("recv player pos: {%0.2f %0.2f %0.2f}, ground: %d", a_PosX, a_PosY, a_PosZ, a_IsOnGround ? 1 : 0);
+	// If the player has moved too far, "repair" them:
 	Vector3d Pos(a_PosX, a_PosY, a_PosZ);
 	if ((m_Player->GetPosition() - Pos).SqrLength() > 100 * 100)
 	{
@@ -513,7 +520,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	{
 		// we only add this exhaustion if the player is not swimming - otherwise we end up with both jump + swim exhaustion
 
-		if(! m_Player->IsSwimming() )
+		if (!m_Player->IsSwimming())
 		{
 			m_Player->AddFoodExhaustion(m_Player->IsSprinting() ? 0.8 : 0.2);
 		}
@@ -997,11 +1004,15 @@ void cClientHandle::HandleChat(const AString & a_Message)
 
 void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
+	if ((m_Player == NULL) || (m_State != csPlaying))
+	{
+		return;
+	}
+	
 	m_Player->SetRotation   (a_Rotation);
 	m_Player->SetHeadYaw    (a_Rotation);
 	m_Player->SetPitch      (a_Pitch);
 	m_Player->SetTouchGround(a_IsOnGround);
-	m_Player->WrapRotation();
 }
 
 
@@ -1010,6 +1021,12 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
+	if ((m_Player == NULL) || (m_State != csPlaying))
+	{
+		// The client hasn't been spawned yet and sends nonsense, we know better
+		return;
+	}
+
 	/*
 	// TODO: Invalid stance check
 	if ((a_PosY >= a_Stance) || (a_Stance > a_PosY + 1.65))
@@ -1019,46 +1036,13 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 		return;
 	}
 	*/
-	switch (m_State)
-	{
-		case csPlaying:
-		{
-			m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
-			m_Player->SetStance     (a_Stance);
-			m_Player->SetTouchGround(a_IsOnGround);
-			m_Player->SetHeadYaw    (a_Rotation);
-			m_Player->SetRotation   (a_Rotation);
-			m_Player->SetPitch      (a_Pitch);
-			m_Player->WrapRotation();
-			break;
-		}
-		
-		case csDownloadingWorld:
-		{
-			Vector3d ReceivedPosition = Vector3d(a_PosX, a_PosY, a_PosZ);
-			// LOGD("Received MoveLook confirmation: {%0.2f %0.2f %0.2f}", a_PosX, a_PosY, a_PosZ);
-			
-			// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
-			double Dist = (ReceivedPosition - m_ConfirmPosition).SqrLength();
-			if (Dist < 1.0)
-			{
-				if (ReceivedPosition.Equals(m_ConfirmPosition))
-				{
-					LOGINFO("Exact position confirmed by client!");
-				}
-				m_State = csPlaying;
-			}
-			else
-			{
-				LOGWARNING("Player \"%s\" sent a weird position confirmation %.2f blocks away, retrying", m_Username.c_str(), sqrt(Dist));
-				LOGD("  Expected pos: {%0.2f, %0.2f, %0.2f}", m_ConfirmPosition.x, m_ConfirmPosition.y, m_ConfirmPosition.z);
-				LOGD("  Received pos: {%0.2f, %0.2f, %0.2f}", a_PosX, a_PosY, a_PosZ);
-				m_ConfirmPosition = m_Player->GetPosition();
-				SendPlayerMoveLook();
-			}
-			break;
-		}
-	}
+	
+	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
+	m_Player->SetStance     (a_Stance);
+	m_Player->SetTouchGround(a_IsOnGround);
+	m_Player->SetHeadYaw    (a_Rotation);
+	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetPitch      (a_Pitch);
 }
 
 
@@ -1208,7 +1192,7 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 
 void cClientHandle::HandleRespawn(void)
 {
-	if( m_Player == NULL )
+	if (m_Player == NULL)
 	{
 		Destroy();
 		return;
@@ -1422,6 +1406,7 @@ void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 	m_State = csAuthenticated;
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
+	m_HasSentPlayerChunk = false;
 }
 
 
@@ -1495,17 +1480,23 @@ void cClientHandle::Tick(float a_Dt)
 		Destroy();
 	}
 	
-	if ((m_State == csDownloadingWorld) && m_ShouldCheckDownloaded)
-	{
-		CheckIfWorldDownloaded();
-		m_ShouldCheckDownloaded = false;
-	}
-	
 	if (m_Player == NULL)
 	{
 		return;
 	}
 	
+	// If the chunk the player's in was just sent, spawn the player:
+	if (m_HasSentPlayerChunk && (m_State != csPlaying))
+	{
+		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
+		{
+			// Broadcast that this player has joined the game! Yay~
+			m_Player->GetWorld()->BroadcastChat(m_Username + " joined the game!", this);
+		}
+		m_Protocol->SendPlayerMoveLook();
+		m_State = csPlaying;
+	}
+
 	// Send a ping packet:
 	cTimer t1;
 	if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
@@ -1601,14 +1592,6 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 {
 	ASSERT(m_Player != NULL);
 	
-	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
-	{
-		if ((a_ChunkX == m_Player->GetChunkX()) && (a_ChunkZ == m_Player->GetChunkZ()))
-		{
-			m_Protocol->SendPlayerMoveLook();
-		}
-	}
-	
 	// Check chunks being sent, erase them from m_ChunksToSend:
 	bool Found = false;
 	{
@@ -1618,11 +1601,6 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
 			{
 				m_ChunksToSend.erase(itr);
-				
-				// Make the tick thread check if all the needed chunks have been downloaded
-				//   -- needed to offload this from here due to a deadlock possibility
-				m_ShouldCheckDownloaded = true;
-				
 				Found = true;
 				break;
 			}
@@ -1637,6 +1615,15 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	}
 	
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
+
+	// If it is the chunk the player's in, make them spawn (in the tick thread):
+	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
+	{
+		if ((a_ChunkX == m_Player->GetChunkX()) && (a_ChunkZ == m_Player->GetChunkZ()))
+		{
+			m_HasSentPlayerChunk = true;
+		}
+	}
 }
 
 
@@ -2072,50 +2059,6 @@ void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const ASt
 void cClientHandle::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
 {
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
-}
-
-
-
-
-
-void cClientHandle::CheckIfWorldDownloaded(void)
-{
-	if (m_State != csDownloadingWorld)
-	{
-		return;
-	}
-	
-	bool ShouldSendConfirm = false;
-	{
-		cCSLock Lock(m_CSChunkLists);
-		ShouldSendConfirm = m_ChunksToSend.empty();
-	}
-	
-	if (ShouldSendConfirm)
-	{
-		SendConfirmPosition();
-	}
-}
-
-
-
-
-
-void cClientHandle::SendConfirmPosition(void)
-{
-	LOG("Spawning player \"%s\" at {%.2f, %.2f, %.2f}",
-		m_Username.c_str(), m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ()
-	);
-	
-	m_State = csConfirmingPos;
-
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
-	{
-		// Broadcast that this player has joined the game! Yay~
-		m_Player->GetWorld()->BroadcastChat(m_Username + " joined the game!", this);
-	}
-
-	SendPlayerMoveLook();
 }
 
 
