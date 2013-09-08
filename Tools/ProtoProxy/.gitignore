@@ -1,4 +1,5 @@
 Debug
 Release
+Logs/
 *.log
 *.nbt

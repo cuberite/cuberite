@@ -8,6 +8,9 @@
 #include "Server.h"
 #include <iostream>
 
+#ifdef _WIN32
+	#include <direct.h>  // For _mkdir()
+#endif
 
 
 
@@ -261,7 +264,14 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_ServerBuffer(1024 KiB),
 	m_HasClientPinged(false)
 {
-	Printf(m_LogNameBase, "Log_%d", (int)time(NULL));
+	// Create the Logs subfolder, if not already created:
+	#if defined(_WIN32)
+		_mkdir("Logs");
+	#else
+		mkdir("Logs", 0777);
+	#endif
+
+	Printf(m_LogNameBase, "Logs/Log_%d", (int)time(NULL));
 	AString fnam(m_LogNameBase);
 	fnam.append(".log");
 	m_LogFile = fopen(fnam.c_str(), "w");
