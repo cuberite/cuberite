@@ -449,18 +449,11 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 		//LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if ((*itr)->IsMob())
 		{
-			try
-			{		
-				cMonster& Monster = dynamic_cast<cMonster&>(**itr);
-				currentPosition = Monster.GetPosition();
-				for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); itr2 ++)
-				{
-					toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
-				}
-			}
-			catch (std::bad_cast& e)
+			cMonster& Monster = (cMonster&)(**itr);
+			currentPosition = Monster.GetPosition();
+			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); itr2 ++)
 			{
-				LOGD("Something wrong happend I'm collecting an entity that respond 'true' to IsMob() but are not castable in cMonster - No Action");
+				toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
 			}
 		}
 	}  // for itr - m_Entitites[]
