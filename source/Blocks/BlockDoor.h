@@ -3,7 +3,6 @@
 
 #include "BlockHandler.h"
 #include "../World.h"
-#include "../Doors.h"
 #include "../Entities/Player.h"
 
 
@@ -43,7 +42,7 @@ public:
 		}
 		
 		a_BlockType = m_BlockType;
-		a_BlockMeta = cDoors::RotationToMetaData(a_Player->GetRotation());
+		a_BlockMeta = PlayerYawToMetaData(a_Player->GetRotation());
 		return true;
 	}
 
@@ -98,6 +97,83 @@ public:
 		}
 		return false;
 	}
+
+
+	/// Converts the player's yaw to placed door's blockmeta
+	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
+	{
+		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
+		
+		a_Yaw += 90 + 45;
+		if (a_Yaw > 360)
+		{
+			a_Yaw -= 360;
+		}
+		if ((a_Yaw >= 0) && (a_Yaw < 90))
+		{
+			return 0x0;
+		}
+		else if ((a_Yaw >= 180) && (a_Yaw < 270))
+		{
+			return 0x2;
+		}
+		else if ((a_Yaw >= 90) && (a_Yaw < 180))
+		{
+			return 0x1;
+		}
+		else
+		{
+			return 0x3;
+		}
+	}
+
+
+	/// Returns true if the specified blocktype is any kind of door
+	inline static bool IsDoor(BLOCKTYPE a_Block)
+	{
+		return (a_Block == E_BLOCK_WOODEN_DOOR) || (a_Block == E_BLOCK_IRON_DOOR);
+	}
+
+
+	/// Returns the metadata for the opposite door state (open vs closed)
+	static NIBBLETYPE ChangeStateMetaData(NIBBLETYPE a_MetaData)
+	{
+		return a_MetaData ^ 4;
+	}
+
+
+	/// Changes the door at the specified coords from open to close or vice versa
+	static void ChangeDoor(cWorld * a_World, int a_X, int a_Y, int a_Z)
+	{
+		NIBBLETYPE OldMetaData = a_World->GetBlockMeta(a_X, a_Y, a_Z);
+		
+		a_World->SetBlockMeta(a_X, a_Y, a_Z, ChangeStateMetaData(OldMetaData));
+		
+		if (OldMetaData & 8)
+		{
+			// Current block is top of the door
+			BLOCKTYPE  BottomBlock = a_World->GetBlock(a_X, a_Y - 1, a_Z);
+			NIBBLETYPE BottomMeta  = a_World->GetBlockMeta(a_X, a_Y - 1, a_Z);
+
+			if (IsDoor(BottomBlock) && !(BottomMeta & 8))
+			{
+				a_World->SetBlockMeta(a_X, a_Y - 1, a_Z, ChangeStateMetaData(BottomMeta));
+			}
+		}
+		else
+		{
+			// Current block is bottom of the door
+			BLOCKTYPE  TopBlock = a_World->GetBlock(a_X, a_Y + 1, a_Z);
+			NIBBLETYPE TopMeta = a_World->GetBlockMeta(a_X, a_Y + 1, a_Z);
+
+			if (IsDoor(TopBlock) && (TopMeta & 8))
+			{
+				a_World->SetBlockMeta(a_X, a_Y + 1, a_Z, ChangeStateMetaData(TopMeta));
+			}
+		}
+	}
+	
+	
 } ;
 
 

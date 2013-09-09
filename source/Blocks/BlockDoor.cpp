@@ -3,7 +3,6 @@
 #include "BlockDoor.h"
 #include "../Item.h"
 #include "../World.h"
-#include "../Doors.h"
 #include "../Entities/Player.h"
 
 
@@ -26,7 +25,7 @@ void cBlockDoorHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY
 	if (OldMeta & 8)
 	{
 		// Was upper part of door
-		if (cDoors::IsDoor(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
+		if (IsDoor(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
 		{
 			a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
 		}
@@ -34,7 +33,7 @@ void cBlockDoorHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY
 	else
 	{
 		// Was lower part
-		if (cDoors::IsDoor(a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)))
+		if (IsDoor(a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)))
 		{
 			a_World->FastSetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_AIR, 0);
 		}
@@ -49,7 +48,7 @@ void cBlockDoorHandler::OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX
 {
 	if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_DOOR)
 	{
-		cDoors::ChangeDoor(a_World, a_BlockX, a_BlockY, a_BlockZ);
+		ChangeDoor(a_World, a_BlockX, a_BlockY, a_BlockZ);
 	}
 }
 
