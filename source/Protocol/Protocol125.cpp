@@ -584,7 +584,7 @@ void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 	WriteByte  ((unsigned char)PACKET_PLAYER_LIST_ITEM);
 	WriteString(PlayerName);
 	WriteBool  (a_IsOnline);
-	WriteShort (a_Player.GetClientHandle()->GetPing());
+	WriteShort (a_IsOnline ? a_Player.GetClientHandle()->GetPing() : 0);
 	Flush();
 }
 
