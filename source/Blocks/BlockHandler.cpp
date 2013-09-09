@@ -351,6 +351,14 @@ void cBlockHandler::DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX
 	
 	if (!Pickups.empty())
 	{
+		// Add random offset to the spawn position:
+		// Commented out until bug with pickups not spawning properly is fixed, see World.cpp
+		/*
+		int MicroX = (int)(a_BlockX * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
+		int MicroY = (int)(a_BlockY * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
+		int MicroZ = (int)(a_BlockZ * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
+		*/
+
 		a_World->SpawnItemPickups(Pickups, a_BlockX, a_BlockY, a_BlockZ);
 	}
 }

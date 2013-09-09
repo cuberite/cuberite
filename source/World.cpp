@@ -1517,7 +1517,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		float SpeedY = 1;
 		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 
-		// (FS #338 Fixed with mid block position spawn, previous TODOs/comments removed)
+		// Pickup doesn't spawn on client without a mid block position. Perhaps the doubles are causing issues?
 		int MicroX = (int)(floor(a_BlockX) * 32) + 16;
 		int MicroY = (int)(floor(a_BlockY) * 32) + 16;
 		int MicroZ = (int)(floor(a_BlockZ) * 32) + 16;
@@ -1539,7 +1539,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	MTRand r1;
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
-		// (FS #338 Fixed with mid block position spawn, previous TODOs/comments removed)
+		// Pickup doesn't spawn on client without a mid block position. Perhaps the doubles are causing issues?
 		int MicroX = (int)(floor(a_BlockX) * 32) + 16;
 		int MicroY = (int)(floor(a_BlockY) * 32) + 16;
 		int MicroZ = (int)(floor(a_BlockZ) * 32) + 16;

@@ -38,7 +38,6 @@ public:
 			a_Player->UseEquippedItem();
 			return true;
 		}
-		// TODO: cobweb, vines
 		return false;
 	}
 
