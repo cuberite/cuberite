@@ -2876,6 +2876,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="APIDump"
+				>
+				<File
+					RelativePath="..\MCServer\Plugins\APIDump\main.lua"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

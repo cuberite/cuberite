@@ -5,6 +5,7 @@ logs
 players
 world*
 API.txt
+API_wiki.txt
 *.dat
 schematics
 *.schematic
@@ -15,3 +16,4 @@ memdump*
 ProtectionAreas.sqlite
 helgrind.log
 motd.txt
+*.deuser
