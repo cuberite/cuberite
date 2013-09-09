@@ -1116,6 +1116,14 @@
 				Name="Entities"
 				>
 				<File
+					RelativePath="..\source\Entities\Boat.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Entities\Boat.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Entities\Entity.cpp"
 					>
 				</File>
@@ -2241,6 +2249,10 @@
 				>
 				<File
 					RelativePath="..\source\items\ItemBed.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Items\ItemBoat.h"
 					>
 				</File>
 				<File
