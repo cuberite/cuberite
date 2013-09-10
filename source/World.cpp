@@ -525,7 +525,7 @@ void cWorld::Start(void)
 	m_LastSave = 0;
 	m_LastUnload = 0;
 
-	// preallocate some memory for ticking blocks so we don�t need to allocate that often
+	// preallocate some memory for ticking blocks so we don't need to allocate that often
 	m_BlockTickQueue.reserve(1000);
 	m_BlockTickQueueCopy.reserve(1000);
 
