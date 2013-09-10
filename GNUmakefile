@@ -86,12 +86,13 @@ endif
 
 
 ###################################################
-ifeq ($(CC),clang++)
+# Fix Crypto++ warnings in clang
+
+ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),0)
 CC_OPTIONS += -Wno-tautological-compare
+CXX_OPTIONS += -Wno-tautological-compare
 endif
-ifeq ($(CC),clang)
-CC_OPTIONS += -Wno-tautological-compare
-endif	
+
 
 ###################################################
 # Set the link libraries based on the OS
