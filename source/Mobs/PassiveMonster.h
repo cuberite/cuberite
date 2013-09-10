@@ -20,7 +20,6 @@ public:
 	/// When hit by someone, run away
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
-	virtual eFamily GetMobFamily(void) const  override;
 } ;
 
 

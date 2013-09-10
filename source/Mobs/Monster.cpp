@@ -9,6 +9,7 @@
 #include "../Entities/Player.h"
 #include "../Defines.h"
 #include "../MonsterConfig.h"
+#include "../MobTypesManager.h"
 #include "../MersenneTwister.h"
 
 #include "../Vector3f.h"
@@ -16,6 +17,7 @@
 #include "../Vector3d.h"
 #include "../Tracer.h"
 #include "../Chunk.h"
+
 
 // #include "../../iniFile/iniFile.h"
 
@@ -510,3 +512,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 
 
 
+cMonster::eFamily cMonster::GetMobFamily(void) const
+{
+	return cMobTypesManager::getFamilyFromType(GetMobTypeAsEnum());
+}

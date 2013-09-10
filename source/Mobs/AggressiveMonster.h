@@ -20,7 +20,6 @@ public:
 	
 	virtual void EventSeePlayer(cEntity *) override;
 
-	virtual eFamily GetMobFamily(void) const  override;
 	
 protected:
 	float m_ChaseTime;

@@ -17,7 +17,6 @@ public:
 
 	CLASS_PROTODEF(cBat);
 	
-	virtual eFamily GetMobFamily(void) const override;
 } ;
 
 

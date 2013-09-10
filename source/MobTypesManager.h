@@ -23,7 +23,7 @@ protected :
 	static tMobTypes2Names& m_MobsTypes2Names();
 	static tMobTypes2Names MobTypes2NamesInitializerBeforeCx11();
 
-	typedef const std::map<cMonster::eType,cMonster::eFamily> tMobType2Family;  //MG TODO : this is redundancy with cMonster::getFamily() methods. But almost all the management of MobType is redundancy in this project. Maybe is it optimization, or just historical TODO : understand and do something about it.
+	typedef const std::map<cMonster::eType,cMonster::eFamily> tMobType2Family;
 	static tMobType2Family& m_MobsType2Family();
 	static tMobType2Family MobType2FamilyInitializerBeforeCx11();
 

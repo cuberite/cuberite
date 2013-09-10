@@ -13,7 +13,3 @@ cBat::cBat(void) :
 }
 
 
-cMonster::eFamily cBat::GetMobFamily() const
-{
-	return mfAmbient;
-}
