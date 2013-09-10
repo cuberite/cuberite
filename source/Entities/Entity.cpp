@@ -491,8 +491,15 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
 		// Outside of the world
-		// TODO: Current speed should still be added to the entity position
-		// Otherwise TNT explosions in the void will still effect the bottommost layers of the world
+
+		cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX,BlockZ);
+		// See if we can commit our changes. If not, we will discard them.
+		if (NextChunk != NULL)
+		{
+			SetSpeed(NextSpeed);
+			NextPos += (NextSpeed * a_Dt);
+			SetPosition(NextPos);
+		}
 		return;
 	}
 	
