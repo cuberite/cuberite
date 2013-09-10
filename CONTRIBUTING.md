@@ -19,6 +19,7 @@ Code Stuff
   - This helps prevent mistakes such as "if (a & 1 == 0)"
  * White space is free, so use it freely
   - "freely" as in "plentifully", not "arbitrarily"
+ * Please leave the first line of all files blank, to get around an IDE bug.
 
 
 Copyright
