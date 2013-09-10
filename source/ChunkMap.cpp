@@ -12,6 +12,7 @@
 #include "BlockArea.h"
 #include "PluginManager.h"
 #include "Entities/TNTEntity.h"
+#include "BlockDataReader.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -200,7 +201,7 @@ cChunkPtr cChunkMap::GetChunkNoLoad( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 
 
 
-bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cChunkMap::LockedGetBlockData(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockDataReader& a_Reader)
 {
 	// We already have m_CSLayers locked since this can be called only from within the tick thread
 	ASSERT(m_CSLayers.IsLockedByCurrentThread());
@@ -214,10 +215,10 @@ bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 	}
 	
 	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockType = Chunk->GetBlock(Index);
-	a_BlockMeta = Chunk->GetMeta(Index);
+	a_Reader.read(*Chunk,Index);
 	return true;
 }
+
 
 
 
@@ -225,44 +226,67 @@ bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 
 bool cChunkMap::LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType)
 {
-	// We already have m_CSLayers locked since this can be called only from within the tick thread
-	ASSERT(m_CSLayers.IsLockedByCurrentThread());
-
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if (Chunk == NULL)
-	{
-		return false;
-	}
-	
-	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockType = Chunk->GetBlock(Index);
-	return true;
+	cBlockTypeReader TypeReader;
+	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, TypeReader);
+	a_BlockType = TypeReader.getValue();
+	return toReturn;
 }
-
-
-
-
 
 bool cChunkMap::LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta)
 {
-	// We already have m_CSLayers locked since this can be called only from within the tick thread
-	ASSERT(m_CSLayers.IsLockedByCurrentThread());
-	
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if (Chunk == NULL)
-	{
-		return false;
-	}
-	
-	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockMeta = Chunk->GetMeta(Index);
-	return true;
+	cBlockMetaReader MetaReader;
+	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, MetaReader);
+	a_BlockMeta = MetaReader.getValue();
+	return toReturn;
 }
 
+bool cChunkMap::LockedGetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockLight)
+{
+	cBlockLightReader LightReader;
+	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, LightReader);
+	a_BlockLight = LightReader.getValue();
+	return toReturn;
+}
+
+bool cChunkMap::LockedGetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockSkyLight)
+{
+	cBlockSkyLightReader SkyLightReader;
+	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, SkyLightReader);
+	a_BlockSkyLight = SkyLightReader.getValue();
+	return toReturn;
+}
+
+bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+{
+	cBlockMetaReader MetaReader;
+	cBlockTypeReader TypeReader;
+	cBlockMultipleReader MultipleReader;
+	MultipleReader.addReader(MetaReader);
+	MultipleReader.addReader(TypeReader);
+	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, MultipleReader);
+	a_BlockType = TypeReader.getValue();
+	a_BlockMeta = MetaReader.getValue();
+	return toReturn;
+}
+
+bool cChunkMap::LockedGetBlockFull(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_BlockSkyLight)
+{
+	cBlockMetaReader MetaReader;
+	cBlockTypeReader TypeReader;
+	cBlockLightReader LightReader;
+	cBlockSkyLightReader SkyLightReader;
+	cBlockMultipleReader MultipleReader;
+	MultipleReader.addReader(MetaReader);
+	MultipleReader.addReader(TypeReader);
+	MultipleReader.addReader(LightReader);
+	MultipleReader.addReader(SkyLightReader);
+	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, MultipleReader);
+	a_BlockType = TypeReader.getValue();
+	a_BlockMeta = MetaReader.getValue();
+	a_BlockLight = LightReader.getValue();
+	a_BlockSkyLight = SkyLightReader.getValue();
+	return toReturn;
+}
 
 
 

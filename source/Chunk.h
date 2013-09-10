@@ -49,6 +49,7 @@ class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
 class cFluidSimulatorData;
+class cBlockDataReader;
 
 typedef std::list<cClientHandle *>      cClientHandleList;
 typedef cItemCallback<cEntity>          cEntityCallback;
@@ -289,7 +290,9 @@ public:
 	inline void       SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta)                     {       cChunkDef::SetNibble(m_BlockMeta, a_BlockIdx, a_Meta); }
 
 	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetBlockLight(int a_BlockIdx) const {return cChunkDef::GetNibble(m_BlockLight, a_BlockIdx); }
 	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight  (int a_BlockIdx) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_BlockIdx); }
 	
 	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
@@ -299,6 +302,19 @@ public:
 	
 	/// Same as GetBlockMeta(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockMeta) const;
+
+	/// Same as GetBlockSkyLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockSkyLight) const;
+
+	/// Same as GetBlockLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelGetBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight) const;
+
+	/// Same as GetBlockType() + GetBlockMeta() + GetBlockLight() + GetBlockSkyLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelGetBlockFull(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_BlockSkyLight) const;
+
+	/// core method that sustain all UnboundRelGetBlockXXX TODO MG : same thing with set
+	bool UnboundedRelGetBlockData(int a_RelX, int a_RelY, int a_RelZ, cBlockDataReader& reader) const;
+
 	
 	/// Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
