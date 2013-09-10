@@ -255,6 +255,9 @@ public:
 	
 	/// Updates the state related to this entity being on fire
 	virtual void TickBurning(cChunk & a_Chunk);
+	
+	/// Handles when the entity is in the void
+	virtual void TickInVoid(cChunk & a_Chunk);
 
 	/// Called when the entity starts burning
 	virtual void OnStartedBurning(void);
@@ -377,6 +380,9 @@ protected:
 	
 	/// Time, in ticks, until the entity extinguishes its fire
 	int m_TicksLeftBurning;
+	
+	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
+	int m_TicksSinceLastVoidDamage;
 
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
