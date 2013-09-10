@@ -4,6 +4,7 @@ MCServer
 logs
 players
 world*
+API/
 API.txt
 API_wiki.txt
 *.dat
