@@ -611,10 +611,13 @@ void cPlayer::SetSprint(bool a_IsSprinting)
 
 void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (m_GameMode == eGameMode_Creative)
+	if (a_TDI.DamageType != dtInVoid)
 	{
-		// No damage / health in creative mode
-		return;
+		if (m_GameMode == eGameMode_Creative)
+		{
+			// No damage / health in creative mode
+			return;
+		}
 	}
 	
 	super::DoTakeDamage(a_TDI);
