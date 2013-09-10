@@ -85,6 +85,13 @@ endif
 endif
 
 
+###################################################
+ifeq ($(CC),clang++)
+CC_OPTIONS += -Wno-tautological-compare
+endif
+ifeq ($(CC),clang)
+CC_OPTIONS += -Wno-tautological-compare
+endif	
 
 ###################################################
 # Set the link libraries based on the OS
