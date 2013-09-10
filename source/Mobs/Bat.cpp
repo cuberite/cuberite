@@ -15,5 +15,5 @@ cBat::cBat(void) :
 
 cMonster::eFamily cBat::GetMobFamily() const
 {
-	return mfWater;
+	return mfAmbient;
 }
