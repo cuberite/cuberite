@@ -21,8 +21,11 @@
 # Macros
 #
 
+# allow user to override compiler
+# if no compiler is specified make specifies cc
+ifeq ($(CC),cc)
 CC = /usr/bin/g++
-
+endif
 
 all: MCServer/MCServer
 
