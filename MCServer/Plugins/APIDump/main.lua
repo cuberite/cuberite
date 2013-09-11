@@ -27,6 +27,9 @@ function Initialize(Plugin)
 	-- dump all available API functions and objects:
 	-- DumpAPITxt();
 	
+	-- DEBUG: Convert the wiki dump into APIDesc
+	ConvertWikiToDesc();
+	
 	-- Dump all available API object in HTML format into a subfolder:
 	DumpAPIHtml();
 	
@@ -185,12 +188,20 @@ function DumpAPIHtml()
 	-- Read in the descriptions:
 	ReadDescriptions(API);
 	
-	-- Create the output folder:
-	os.execute("mkdir API");
-	
 	-- Create a "class index" file, write each class as a link to that file,
 	-- then dump class contents into class-specific file
 	local f = io.open("API/index.html", "w");
+	if (f == nil) then
+		-- Create the output folder
+		os.execute("mkdir API");
+		local err;
+		f, err = io.open("API/index.html", "w");
+		if (f == nil) then
+			LOGINFO("Cannot output HTML API: " .. err);
+			return;
+		end
+	end
+	
 	f:write([[<html><head><title>MCServer API - class index</title>
 	<link rel="stylesheet" type="text/css" href="main.css" />
 	</head><body>
@@ -202,6 +213,8 @@ function DumpAPIHtml()
 	end
 	f:write("</ul></body></html>");
 	f:close();
+	
+	LOG("API subfolder written");
 end
 
 
@@ -321,6 +334,75 @@ function WriteHtmlClass(a_ClassAPI)
 	
 	cf:write("</body></html>");
 	cf:close();
+end
+
+
+
+
+
+-- This function converts the wiki dump, as provided by FakeTruth, into the APIDesc format.
+-- Dump available in forum: http://forum.mc-server.org/showthread.php?tid=1214&pid=9892#pid9892
+-- The dump is expected unpacked as "wikipages/api/*.txt", in the executable folder
+-- Only Windows-style paths are supported for now, since this is a one-time action
+function ConvertWikiToDesc()
+	local fout = io.open("APIDesc.wiki.lua", "w");
+	for filename in io.popen([[dir wikipages\\api\\*.txt /b]]):lines() do
+		-- Read file
+		local fin = io.open("wikipages\\api\\" .. filename, "r");
+		if (fin ~= nil) then
+			-- Read and parse the info from the file
+			local state = 0;
+			local Desc = "";
+			local Constants = {};
+			local Functions = {};
+			for line in fin:lines() do
+				if (line:find("======") ~= nil) then
+					state = 1;  -- The following is the class description
+				elseif (line:find("===== Constants") ~= nil) then
+					state = 2;  -- The following is the constants description
+				elseif (line:find("===== Functions") ~= nil) then
+					state = 3;  -- The following is the functions description
+				elseif (line:find("=====") ~= nil) then
+					state = 4;  -- The following is an unknown text, skip it entirely
+				elseif (state == 1) then
+					-- Class description:
+					if (line == "") then
+						line = "</p>\n<p>";  -- Replace empty lines with paragraph delimiters
+					end
+					Desc = Desc .. line .. "\n";
+				elseif (state == 2) then
+					-- Constants:
+					local Split = StringSplitAndTrim(line, "|");
+					if (#Split >= 3) then
+						-- Split[1] is always "", because the line starts with a "|"
+						table.insert(Constants, {Name = Split[2], Notes = Split[3]});
+					end
+				elseif (state == 3) then
+					-- Functions:
+					local Split = StringSplitAndTrim(line, "|");
+					if (#Split >= 5) then
+						-- Split[1] is always "", because the line starts with a "|"
+						table.insert(Functions, {Name = Split[2], Params = Split[3], Return = Split[4], Notes = Split[5]});
+					end
+				end
+			end  -- for line
+			fin:close();
+			
+			-- Write the info into the output file:
+			fout:write(filename:match("[^\.]*") .. " =\n{\tFunctions =\n\t{\n");
+			for i, func in ipairs(Functions) do
+				fout:write("\t\t{ " .. func.Name .. " = { Params = \"" .. func.Params .. "\", Return =\"" ..
+					func.Return .. "\", Desc = \"" .. func.Notes .. "\" },\n"
+				);
+			end
+			fout:write("\t},\n\tConstants =\n\t{\n");
+			for i, cons in ipairs(Constants) do
+				fout:write("\t\t{ " .. cons.Name .. " = { Notes = \"" .. cons.Notes .. "\" },\n");
+			end
+			fout:write("\t},\n},\n\n\n");
+		end  -- if fin ~= nil
+	end  -- for file
+	fout:close();
 end
 
 
