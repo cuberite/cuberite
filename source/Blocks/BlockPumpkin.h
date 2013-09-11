@@ -30,7 +30,7 @@ public:
 	{
 		
 		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
-		a_Yaw *= -1;
+		a_Yaw -= 180;
 		a_Yaw += 360 + 45;
 		if (a_Yaw > 360)
 		{
