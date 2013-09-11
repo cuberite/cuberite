@@ -48,6 +48,10 @@ g_APIDesc =
 				CopyTo   = { Params = "{{cBlockArea|BlockAreaDst}}", Notes = "Copies contents from self into BlockAreaDst"},
 				GetBlockLight = { Params = "BlockX, BlockY, BlockZ", Return = "NIBBLETYPE", Notes = "Returns the blocklight at the specified absolute coords"},
 			},
+			Constants =
+			{
+				baTypes = { Notes = "Operation should work on block types" },
+			},
 		},
 		
 		cBlockEntity =
