@@ -498,7 +498,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	{
 		// Outside of the world
 
-		cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX,BlockZ);
+		cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
 		// See if we can commit our changes. If not, we will discard them.
 		if (NextChunk != NULL)
 		{
