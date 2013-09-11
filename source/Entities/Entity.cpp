@@ -518,13 +518,30 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		else
 		{
 			// Push out entity.
+			BLOCKTYPE GotBlock;
 
-			if (NextChunk->GetBlock( RelBlockX + 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += 0.2; }
-			else if (NextChunk->GetBlock( RelBlockX - 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += -0.2; }
-			else if (NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ + 1 ) == E_BLOCK_AIR) { NextPos.z += 0.2; }
-			else if (NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ - 1 ) == E_BLOCK_AIR) { NextPos.z += -0.2; }
-			else { NextPos.y += 0.2; }
+			static const struct
+			{
+				int x, y, z;
+			} gCrossCoords[] =
+			{
+				{ 1, 0,  0},
+				{-1, 0,  0},
+				{ 0, 0,  1},
+				{ 0, 0, -1},
+			} ;
 
+			for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+			{
+				NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock);
+				if (GotBlock == E_BLOCK_AIR)
+				{
+					NextPos.x += gCrossCoords[i].x;
+					NextPos.z += gCrossCoords[i].z;
+				}
+				else { NextPos.y += 0.2; }
+			}  // for i - gCrossCoords[]
+			
 			m_bOnGround = true;
 
 			LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
