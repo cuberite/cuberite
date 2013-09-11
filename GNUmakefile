@@ -85,6 +85,15 @@ endif
 endif
 
 
+###################################################
+# Fix Crypto++ warnings in clang
+
+ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),0)
+CC_OPTIONS += -Wno-tautological-compare
+CXX_OPTIONS += -Wno-tautological-compare
+disableasm = 1
+endif
+
 
 ###################################################
 # Set the link libraries based on the OS
