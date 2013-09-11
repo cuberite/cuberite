@@ -22,16 +22,15 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		double a_Rotation = a_Player->GetRotation()
-		a_Rotation = -1 * a_Rotation;
-		a_BlockMeta = PlayerYawToMetaData(a_Rotation);
+		a_BlockMeta = PlayerYawToMetaData(a_Player->GetRotation());
 		return true;
 	}
 
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
-		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
 		
+		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
+		a_Yaw *= -1;
 		a_Yaw += 360 + 45;
 		if (a_Yaw > 360)
 		{
