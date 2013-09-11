@@ -519,11 +519,11 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		{
 			// Push out entity.
 
-			if (NextChunk->GetBlock( RelBlockX + 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += 0.2; NextPos.z, NextPos.y = 0; }
-			else if (NextChunk->GetBlock( RelBlockX - 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += -0.2; NextPos.z, NextPos.y = 0; }
-			else if (NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ + 1 ) == E_BLOCK_AIR) { NextPos.z += 0.2; NextPos.x, NextPos.y = 0; }
-			else if (NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ - 1 ) == E_BLOCK_AIR) { NextPos.z += -0.2; NextPos.x, NextPos.y = 0; }
-			else { NextPos.y += 0.2; NextPos.z, NextPos.x = 0;}
+			if (NextChunk->GetBlock( RelBlockX + 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += 0.2; }
+			else if (NextChunk->GetBlock( RelBlockX - 1, BlockY, RelBlockZ ) == E_BLOCK_AIR) { NextPos.x += -0.2; }
+			else if (NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ + 1 ) == E_BLOCK_AIR) { NextPos.z += 0.2; }
+			else if (NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ - 1 ) == E_BLOCK_AIR) { NextPos.z += -0.2; }
+			else { NextPos.y += 0.2; }
 
 			m_bOnGround = true;
 
@@ -648,7 +648,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 					}
 					NextPos.Set(Tracer.RealHit.x,Tracer.RealHit.y,Tracer.RealHit.z);
 					NextPos.x += Tracer.HitNormal.x * 0.3f;
-					NextPos.y += Tracer.HitNormal.y * 0.1f; // Any larger produces entity vibration-upon-the-spot
+					NextPos.y += Tracer.HitNormal.y * 0.05f; // Any larger produces entity vibration-upon-the-spot
 					NextPos.z += Tracer.HitNormal.z * 0.3f;
 				}
 				else
