@@ -92,6 +92,21 @@ static int tolua_StringSplit(lua_State * tolua_S)
 
 
 
+static int tolua_StringSplitAndTrim(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+	std::string str   = (std::string)tolua_tocppstring(LuaState, 1, 0);
+	std::string delim = (std::string)tolua_tocppstring(LuaState, 2, 0);
+
+	AStringVector Split = StringSplitAndTrim(str, delim);
+	LuaState.Push(Split);
+	return 1;
+}
+
+
+
+
+
 static int tolua_LOG(lua_State* tolua_S)
 {
 	const char* str = tolua_tocppstring(tolua_S,1,0);
@@ -1808,12 +1823,13 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 void ManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, NULL);
-		tolua_function(tolua_S, "StringSplit", tolua_StringSplit);
-		tolua_function(tolua_S, "LOG",         tolua_LOG);
-		tolua_function(tolua_S, "LOGINFO",     tolua_LOGINFO);
-		tolua_function(tolua_S, "LOGWARN",     tolua_LOGWARN);
-		tolua_function(tolua_S, "LOGWARNING",  tolua_LOGWARN);
-		tolua_function(tolua_S, "LOGERROR",    tolua_LOGERROR);
+		tolua_function(tolua_S, "StringSplit",        tolua_StringSplit);
+		tolua_function(tolua_S, "StringSplitAndTrim", tolua_StringSplitAndTrim);
+		tolua_function(tolua_S, "LOG",                tolua_LOG);
+		tolua_function(tolua_S, "LOGINFO",            tolua_LOGINFO);
+		tolua_function(tolua_S, "LOGWARN",            tolua_LOGWARN);
+		tolua_function(tolua_S, "LOGWARNING",         tolua_LOGWARN);
+		tolua_function(tolua_S, "LOGERROR",           tolua_LOGERROR);
 		
 		tolua_beginmodule(tolua_S, "cLineBlockTracer");
 			tolua_function(tolua_S, "Trace", tolua_cLineBlockTracer_Trace);
