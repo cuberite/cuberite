@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "BlockHandler.h"
@@ -23,8 +22,9 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		
-		a_BlockMeta = PlayerYawToMetaData(a_Player->GetRotation() - 180);
+		double a_Rotation = a_Player->GetRotation()
+		a_Rotation = -1 * a_Rotation;
+		a_BlockMeta = PlayerYawToMetaData(a_Rotation);
 		return true;
 	}
 
