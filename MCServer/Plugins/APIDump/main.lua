@@ -7,8 +7,17 @@
 
 
 
+-- Global variables:
+g_Plugin = nil;
+
+
+
+
+
 
 function Initialize(Plugin)
+	g_Plugin = Plugin;
+	
 	Plugin:SetName("APIDump")
 	Plugin:SetVersion(1)
 	
@@ -18,12 +27,9 @@ function Initialize(Plugin)
 	-- dump all available API functions and objects:
 	-- DumpAPITxt();
 	
-	-- Dump all available API objects in wiki-style tables:
-	-- DumpAPIWiki();
-	
 	-- Dump all available API object in HTML format into a subfolder:
 	DumpAPIHtml();
-
+	
 	return true
 end
 
@@ -69,69 +75,30 @@ end
 
 
 
-function DumpAPIWiki()
-	LOG("Dumping all available functions and constants to API_wiki.txt...");
-
-	local API, Globals = CreateAPITables();
-
-	-- Now dump the whole thing into a file, formatted as a wiki table:
-	local function WriteClass(a_File, a_ClassAPI)
-		if (#a_ClassAPI.Functions > 0) then
-			a_File:write("Functions:\n");
-			a_File:write("^ Function name ^ Parameters ^ Return value ^ Note ^\n");
-			for i, n in ipairs(a_ClassAPI.Functions) do
-				a_File:write("| " .. n[1] .. " | | | |\n");
-			end
-			a_File:write("\n\n");
-		end
-		
-		if (#a_ClassAPI.Constants > 0) then
-			a_File:write("Constants:\n");
-			a_File:write("^ Constant ^ Value ^ Note ^\n");
-			for i, n in ipairs(a_ClassAPI.Constants) do
-				a_File:write("| " .. n[1] .. " | " .. n[2] .. " | |\n");
-			end
-			a_File:write("\n\n");
-		end
-	end
-	
-	local f = io.open("API_wiki.txt", "w");
-	for i, n in ipairs(API) do
-		f:write("Class " .. n[1] .. "\n");
-		WriteClass(f, n[2]);
-		f:write("\n\n\n----------------\n");
-	end
-	f:write("globals:\n");
-	WriteClass(f, Globals);
-	f:close();
-	
-	LOG("API_wiki.txt file written");
-end
-
-
-
 
 function CreateAPITables()
 	--[[
 	We want an API table of the following shape:
 	local API = {
-		{"cCuboid", {
+		{
+			Name = "cCuboid",
 			Functions = {
-				{"Sort"},    -- The extra table will be used to later add params, return values and notes
-				{"IsInside"}
+				{Name = "Sort"},
+				{Name = "IsInside"}
 			},
 			Constants = {
 			}
 		}},
-		{"cBlockArea", {
+		{
+			Name = "cBlockArea",
 			Functions = {
-				"Clear",
-				"CopyFrom",
+				{Name = "Clear"},
+				{Name = "CopyFrom"},
 				...
 			}
 			Constants = {
-				{"baTypes", 0},
-				{"baMetas", 1},
+				{Name = "baTypes", Value = 0},
+				{Name = "baMetas", Value = 1},
 				...
 			}
 			...
@@ -152,9 +119,9 @@ function CreateAPITables()
 	
 	local function Add(a_APIContainer, a_ClassName, a_ClassObj)
 		if (type(a_ClassObj) == "function") then
-			table.insert(a_APIContainer.Functions, {a_ClassName});
+			table.insert(a_APIContainer.Functions, {Name = a_ClassName});
 		elseif (type(a_ClassObj) == "number") then
-			table.insert(a_APIContainer.Constants, {a_ClassName, a_ClassObj});
+			table.insert(a_APIContainer.Constants, {Name = a_ClassName, Value = a_ClassObj});
 		end
 	end
 	
@@ -162,18 +129,18 @@ function CreateAPITables()
 		-- Sort the function list and constant lists:
 		table.sort(a_ClassAPI.Functions,
 			function(f1, f2)
-				return (f1[1] < f2[1]);
+				return (f1.Name < f2.Name);
 			end
 		);
 		table.sort(a_ClassAPI.Constants,
 			function(c1, c2)
-				return (c1[1] < c2[1]);
+				return (c1.Name < c2.Name);
 			end
 		);
 	end;
 	
-	local function ParseClass(a_ClassObj)
-		local res = {Functions = {}, Constants = {}};
+	local function ParseClass(a_ClassName, a_ClassObj)
+		local res = {Name = a_ClassName, Functions = {}, Constants = {}};
 		for i, v in pairs(a_ClassObj) do
 			Add(res, i, v);
 		end
@@ -188,7 +155,7 @@ function CreateAPITables()
 			local StartLetter = GetChar(i, 0);
 			if (StartLetter == "c") then
 				-- Starts with a "c", handle it as a MCS API class
-				table.insert(API, {i, ParseClass(v)});
+				table.insert(API, ParseClass(i, v));
 			end
 		else
 			Add(Globals, i, v);
@@ -197,7 +164,7 @@ function CreateAPITables()
 	SortClass(Globals);
 	table.sort(API,
 		function(c1, c2)
-			return (c1[1] < c2[1]);
+			return (c1.Name < c2.Name);
 		end
 	);
 	
@@ -212,8 +179,13 @@ function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 
 	local API, Globals = CreateAPITables();
+	Globals.Name = "Globals";
+	table.insert(API, Globals);
 	
-	-- Create the folder:
+	-- Read in the descriptions:
+	ReadDescriptions(API);
+	
+	-- Create the output folder:
 	os.execute("mkdir API");
 	
 	-- Create a "class index" file, write each class as a link to that file,
@@ -224,9 +196,9 @@ function DumpAPIHtml()
 	</head><body>
 	<ul>
 	]]);
-	for i, n in ipairs(API) do
-		f:write("<li><a href=\"" .. n[1] .. ".html\">" .. n[1] .. "</a></li>\n");
-		WriteHtmlClass(n);
+	for i, cls in ipairs(API) do
+		f:write("<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>\n");
+		WriteHtmlClass(cls);
 	end
 	f:write("</ul></body></html>");
 	f:close();
@@ -235,19 +207,70 @@ end
 
 
 
+
+function ReadDescriptions(a_API)
+	local UnexportedDocumented = {};  -- List of API objects that are documented but not exported, simply a list of names
+	for i, cls in ipairs(a_API) do
+		local APIDesc = g_APIDesc.Classes[cls.Name];
+		if (APIDesc ~= nil) then
+			cls.Desc = APIDesc.Desc;
+			
+			if (APIDesc.Functions ~= nil) then
+				-- Assign function descriptions:
+				for j, func in ipairs(cls.Functions) do
+					-- func is {"FuncName"}, add Parameters, Return and Notes from g_APIDesc
+					local FnDesc = APIDesc.Functions[func.Name];
+					if (FnDesc ~= nil) then
+						func.Params = FnDesc.Params;
+						func.Return = FnDesc.Return;
+						func.Notes  = FnDesc.Notes;
+						FnDesc.IsExported = true;
+					end
+				end  -- for j, func
+				
+				-- Add all non-exported function descriptions to UnexportedDocumented:
+				for j, func in pairs(APIDesc.Functions) do
+					-- TODO
+				end
+			end  -- if (APIDesc.Functions ~= nil)
+			
+			if (APIDesc.Constants ~= nil) then
+				-- Assign constant descriptions:
+				for j, cons in ipairs(cls.Constants) do
+					local CnDesc = APIDesc.Constants[cons.Name];
+					if (CnDesc ~= nil) then
+						cons.Notes = CnDesc.Notes;
+						CnDesc.IsExported = true;
+					end
+				end  -- for j, cons
+
+				-- Add all non-exported constant descriptions to UnexportedDocumented:
+				for j, cons in pairs(APIDesc.Constants) do
+					-- TODO
+				end
+			end  -- if (APIDesc.Constants ~= nil)
+			
+		end
+	end  -- for i, class
+end
+
+
+
+
+
 function WriteHtmlClass(a_ClassAPI)
-	local cf, err = io.open("API/" .. a_ClassAPI[1] .. ".html", "w");
+	local cf, err = io.open("API/" .. a_ClassAPI.Name .. ".html", "w");
 	if (cf == nil) then
 		return;
 	end
 	
 	local function LinkifyString(a_String)
-		-- TODO: Make a link out of anything with the special linkifying syntax [[link|title]]
-		-- a_String:gsub("\[\[" .. "[
+		-- TODO: Make a link out of anything with the special linkifying syntax {{link|title}}
+		-- a_String:gsub("{{([^|]*)|[^}]*}}", "<a href=\"%1\">%2</a>");
 		return a_String;
 	end
 	
-	cf:write([[<html><head><title>MCServer API - ]] .. a_ClassAPI[1] .. [[</title>
+	cf:write([[<html><head><title>MCServer API - ]] .. a_ClassAPI.Name .. [[</title>
 	<link rel="stylesheet" type="text/css" href="main.css" />
 	</head><body>
 	<h1>Contents</h1>
@@ -255,43 +278,43 @@ function WriteHtmlClass(a_ClassAPI)
 	]]);
 	
 	-- Write the table of contents:
-	if (#a_ClassAPI[2].Constants > 0) then
+	if (#a_ClassAPI.Constants > 0) then
 		cf:write("<li><a href=\"#constants\">Constants</a></li>\n");
 	end
-	if (#a_ClassAPI[2].Functions > 0) then
+	if (#a_ClassAPI.Functions > 0) then
 		cf:write("<li><a href=\"#functions\">Functions</a></li>\n");
 	end
 	cf:write("</ul>");
 	
 	-- Write the class description:
-	cf:write("<a name=\"desc\"><h1>" .. a_ClassAPI[1] .. "</h1></a>\n");
-	if (a_ClassAPI.Description ~= nil) then
+	cf:write("<a name=\"desc\"><h1>" .. a_ClassAPI.Name .. "</h1></a>\n");
+	if (a_ClassAPI.Desc ~= nil) then
 		cf:write("<p>");
-		cf:write(n.Description);
+		cf:write(a_ClassAPI.Desc);
 		cf:write("</p>\n");
 	end;
 	
 	-- Write the constants:
-	if (#a_ClassAPI[2].Constants > 0) then
+	if (#a_ClassAPI.Constants > 0) then
 		cf:write("<a name=\"constants\"><h1>Constants</h1></a>\n");
 		cf:write("<table><tr><th>Name</th><th>Value</th><th>Notes</th></tr>\n");
-		for i, n in ipairs(a_ClassAPI[2].Constants) do
-			cf:write("<tr><td>" .. n[1] .. "</td>");
-			cf:write("<td>" .. n[2] .. "</td>");
-			cf:write("<td>" .. LinkifyString(n.Notes or "") .. "</td></tr>\n");
+		for i, cons in ipairs(a_ClassAPI.Constants) do
+			cf:write("<tr><td>" .. cons.Name .. "</td>");
+			cf:write("<td>" .. cons.Value .. "</td>");
+			cf:write("<td>" .. LinkifyString(cons.Notes or "") .. "</td></tr>\n");
 		end
 		cf:write("</table>\n");
 	end
 	
 	-- Write the functions:
-	if (#a_ClassAPI[2].Functions > 0) then
+	if (#a_ClassAPI.Functions > 0) then
 		cf:write("<a name=\"functions\"><h1>Functions</h1></a>\n");
 		cf:write("<table><tr><th>Name</th><th>Parameters</th><th>Return value</th><th>Notes</th></tr>\n");
-		for i, f in ipairs(a_ClassAPI[2].Functions) do
-			cf:write("<tr><td>" .. f[1] .. "</td>");
-			cf:write("<td>" .. LinkifyString(f.Params or "").. "</td>");
-			cf:write("<td>" .. LinkifyString(f.Return or "").. "</td>");
-			cf:write("<td>" .. LinkifyString(f.Notes or "") .. "</td></tr>\n");
+		for i, func in ipairs(a_ClassAPI.Functions) do
+			cf:write("<tr><td>" .. func.Name .. "</td>");
+			cf:write("<td>" .. LinkifyString(func.Params or "").. "</td>");
+			cf:write("<td>" .. LinkifyString(func.Return or "").. "</td>");
+			cf:write("<td>" .. LinkifyString(func.Notes or "") .. "</td></tr>\n");
 		end
 		cf:write("</table>\n");
 	end

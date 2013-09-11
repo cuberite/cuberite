@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
   <file>
+    <filename>APIDesc.lua</filename>
+  </file>
+  <file>
     <filename>main.lua</filename>
   </file>
 </project>
