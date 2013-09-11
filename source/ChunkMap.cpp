@@ -53,23 +53,23 @@ void cChunkMap::Bench()
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr chunk = GetChunk(7,41,11);
-	LOGD("=====>BENCHING<=====");
+	std::cout << "=====>BENCHING<====="<<std::endl;
 //	if (chunk->IsValid())
 	{
 		cTimer timer;
 		long long before = timer.GetNowTime();
 		NIBBLETYPE nt;
 		BLOCKTYPE bt;
-		for (int i = 0; i< 100000; i++)
+		for (int i = 0; i< 1000000; i++)
 		{
 			chunk->UnboundedRelGetBlock(0,0,0,bt,nt);
 		}
 		long long after = timer.GetNowTime();
 		std::ostringstream oss;
 		oss << after-before;
-		LOGD(oss.str().c_str());
+		std::cout << oss.str().c_str()<<std::endl;
 	}
-	LOGD("=====>BENCHING END<=====");
+	std::cout << "=====>BENCHING END<====="<<std::endl;
 }
 
 
