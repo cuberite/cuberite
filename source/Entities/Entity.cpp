@@ -55,6 +55,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_TicksSinceLastBurnDamage(0)
 	, m_TicksSinceLastLavaDamage(0)
 	, m_TicksSinceLastFireDamage(0)
+	, m_TicksSinceLastVoidDamage(0)
 	, m_TicksLeftBurning(0)
 	, m_WaterSpeed(0, 0, 0)
 	, m_Width(a_Width)
@@ -505,6 +506,11 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		TickBurning(a_Chunk);
 	}
+	if ((a_Chunk.IsValid())  && (GetPosY() < -46))
+	{
+		TickInVoid(a_Chunk);
+	}
+	else { m_TicksSinceLastVoidDamage = 0; }
 }
 
 
@@ -524,8 +530,15 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
 		// Outside of the world
-		// TODO: Current speed should still be added to the entity position
-		// Otherwise TNT explosions in the void will still effect the bottommost layers of the world
+
+		cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
+		// See if we can commit our changes. If not, we will discard them.
+		if (NextChunk != NULL)
+		{
+			SetSpeed(NextSpeed);
+			NextPos += (NextSpeed * a_Dt);
+			SetPosition(NextPos);
+		}
 		return;
 	}
 	
@@ -822,6 +835,23 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	else if ((m_TicksLeftBurning <= 0) && HasBeenBurning)
 	{
 		OnFinishedBurning();
+	}
+}
+
+
+
+
+
+void cEntity::TickInVoid(cChunk & a_Chunk)
+{
+	if (m_TicksSinceLastVoidDamage == 20)
+	{
+		TakeDamage(dtInVoid, NULL, 2, 0);
+		m_TicksSinceLastVoidDamage = 0;
+	}
+	else
+	{
+		m_TicksSinceLastVoidDamage++;
 	}
 }
 
