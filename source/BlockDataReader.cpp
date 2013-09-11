@@ -27,6 +27,28 @@ void cBlockSkyLightReader::read(const cChunk& a_Chunk, int a_BlockIdx)
 }
 
 
+cBlockMultipleReader::cBlockMultipleReader(cBlockDataReader& a_Reader1, cBlockDataReader& a_Reader2)
+{
+	addReader(a_Reader1);
+	addReader(a_Reader2);
+}
+
+cBlockMultipleReader::cBlockMultipleReader(cBlockDataReader& a_Reader1, cBlockDataReader& a_Reader2, cBlockDataReader& a_Reader3)
+{
+	addReader(a_Reader1);
+	addReader(a_Reader2);
+	addReader(a_Reader3);
+}
+
+cBlockMultipleReader::cBlockMultipleReader(cBlockDataReader& a_Reader1, cBlockDataReader& a_Reader2, cBlockDataReader& a_Reader3, cBlockDataReader& a_Reader4)
+{
+	addReader(a_Reader1);
+	addReader(a_Reader2);
+	addReader(a_Reader3);
+	addReader(a_Reader4);
+}
+	
+
 void cBlockMultipleReader::addReader(cBlockDataReader& toAdd)
 {
 	m_Readers.insert(&toAdd);	

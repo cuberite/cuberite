@@ -226,7 +226,7 @@ bool cChunkMap::LockedGetBlockData(int a_BlockX, int a_BlockY, int a_BlockZ, cBl
 
 bool cChunkMap::LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType)
 {
-	cBlockTypeReader TypeReader;
+	static cBlockTypeReader TypeReader;
 	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, TypeReader);
 	a_BlockType = TypeReader.getValue();
 	return toReturn;
@@ -234,7 +234,7 @@ bool cChunkMap::LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 
 bool cChunkMap::LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta)
 {
-	cBlockMetaReader MetaReader;
+	static cBlockMetaReader MetaReader;
 	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, MetaReader);
 	a_BlockMeta = MetaReader.getValue();
 	return toReturn;
@@ -242,7 +242,7 @@ bool cChunkMap::LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIB
 
 bool cChunkMap::LockedGetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockLight)
 {
-	cBlockLightReader LightReader;
+	static cBlockLightReader LightReader;
 	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, LightReader);
 	a_BlockLight = LightReader.getValue();
 	return toReturn;
@@ -250,7 +250,7 @@ bool cChunkMap::LockedGetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ, NI
 
 bool cChunkMap::LockedGetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockSkyLight)
 {
-	cBlockSkyLightReader SkyLightReader;
+	static cBlockSkyLightReader SkyLightReader;
 	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, SkyLightReader);
 	a_BlockSkyLight = SkyLightReader.getValue();
 	return toReturn;
@@ -258,11 +258,9 @@ bool cChunkMap::LockedGetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ,
 
 bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	cBlockMetaReader MetaReader;
-	cBlockTypeReader TypeReader;
-	cBlockMultipleReader MultipleReader;
-	MultipleReader.addReader(MetaReader);
-	MultipleReader.addReader(TypeReader);
+	static cBlockMetaReader MetaReader;
+	static cBlockTypeReader TypeReader;
+	static cBlockMultipleReader MultipleReader(MetaReader,TypeReader);
 	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, MultipleReader);
 	a_BlockType = TypeReader.getValue();
 	a_BlockMeta = MetaReader.getValue();
@@ -271,15 +269,11 @@ bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 
 bool cChunkMap::LockedGetBlockFull(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_BlockSkyLight)
 {
-	cBlockMetaReader MetaReader;
-	cBlockTypeReader TypeReader;
-	cBlockLightReader LightReader;
-	cBlockSkyLightReader SkyLightReader;
-	cBlockMultipleReader MultipleReader;
-	MultipleReader.addReader(MetaReader);
-	MultipleReader.addReader(TypeReader);
-	MultipleReader.addReader(LightReader);
-	MultipleReader.addReader(SkyLightReader);
+	static cBlockMetaReader MetaReader;
+	static cBlockTypeReader TypeReader;
+	static cBlockLightReader LightReader;
+	static cBlockSkyLightReader SkyLightReader;
+	static cBlockMultipleReader MultipleReader(MetaReader,TypeReader,LightReader,SkyLightReader);
 	bool toReturn = LockedGetBlockData(a_BlockX, a_BlockY, a_BlockZ, MultipleReader);
 	a_BlockType = TypeReader.getValue();
 	a_BlockMeta = MetaReader.getValue();

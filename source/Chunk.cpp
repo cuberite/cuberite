@@ -969,11 +969,9 @@ bool cChunk::UnboundedRelGetBlockData(int a_RelX, int a_RelY, int a_RelZ, cBlock
 
 bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
-	cBlockTypeReader TypeReader;
-	cBlockMetaReader MetaReader;
-	cBlockMultipleReader MultipleReader;
-	MultipleReader.addReader(TypeReader);
-	MultipleReader.addReader(MetaReader);
+	static cBlockTypeReader TypeReader;
+	static cBlockMetaReader MetaReader;
+	static cBlockMultipleReader MultipleReader(TypeReader,MetaReader);
 	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, MultipleReader);
 	a_BlockType = TypeReader.getValue();
 	a_BlockMeta = MetaReader.getValue();
@@ -986,7 +984,7 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType) const
 {
-	cBlockTypeReader TypeReader;
+	static cBlockTypeReader TypeReader;
 	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, TypeReader);
 	a_BlockType = TypeReader.getValue();
 	return toReturn;
@@ -998,7 +996,7 @@ bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 
 bool cChunk::UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockMeta) const
 {
-	cBlockMetaReader MetaReader;
+	static cBlockMetaReader MetaReader;
 	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, MetaReader);
 	a_BlockMeta = MetaReader.getValue();
 	return toReturn;
@@ -1010,7 +1008,7 @@ bool cChunk::UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLE
 
 bool cChunk::UnboundedRelGetBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight) const
 {
-	cBlockLightReader LightReader;
+	static cBlockLightReader LightReader;
 	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, LightReader);
 	a_BlockLight = LightReader.getValue();
 	return toReturn;
@@ -1022,7 +1020,7 @@ bool cChunk::UnboundedRelGetBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBL
 
 bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockSkyLight) const
 {
-	cBlockSkyLightReader SkyLightReader;
+	static cBlockSkyLightReader SkyLightReader;
 	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, SkyLightReader);
 	a_BlockSkyLight = SkyLightReader.getValue();
 	return toReturn;
@@ -1034,15 +1032,11 @@ bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NI
 
 bool cChunk::UnboundedRelGetBlockFull(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_BlockSkyLight) const
 {
-	cBlockTypeReader TypeReader;
-	cBlockMetaReader MetaReader;
-	cBlockLightReader LightReader;
-	cBlockSkyLightReader SkyLightReader;
-	cBlockMultipleReader MultipleReader;
-	MultipleReader.addReader(TypeReader);
-	MultipleReader.addReader(MetaReader);
-	MultipleReader.addReader(LightReader);
-	MultipleReader.addReader(SkyLightReader);
+	static cBlockTypeReader TypeReader;
+	static cBlockMetaReader MetaReader;
+	static cBlockLightReader LightReader;
+	static cBlockSkyLightReader SkyLightReader;
+	static cBlockMultipleReader MultipleReader(TypeReader,MetaReader,LightReader,SkyLightReader);
 	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, MultipleReader);
 	a_BlockType = TypeReader.getValue();
 	a_BlockMeta = MetaReader.getValue();

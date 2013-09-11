@@ -51,9 +51,12 @@ public :
 class cBlockMultipleReader : public cBlockDataReader
 {
 public : 
-	void addReader(cBlockDataReader& toAdd);
+	cBlockMultipleReader(cBlockDataReader&, cBlockDataReader&);
+	cBlockMultipleReader(cBlockDataReader&, cBlockDataReader&, cBlockDataReader&);
+	cBlockMultipleReader(cBlockDataReader&, cBlockDataReader&, cBlockDataReader&, cBlockDataReader&);
 	virtual void read(const cChunk&, int a_BlockIdx) override;
 protected :
+	void addReader(cBlockDataReader& toAdd);
 	std::set<cBlockDataReader*> m_Readers;
 };
 
