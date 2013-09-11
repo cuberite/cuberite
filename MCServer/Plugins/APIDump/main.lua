@@ -389,7 +389,7 @@ function ConvertWikiToDesc()
 			fin:close();
 			
 			-- Write the info into the output file:
-			fout:write(filename:match("[^\.]*") .. " =\n{\tFunctions =\n\t{\n");
+			fout:write(filename:match("[^\.]*") .. " =\n{\n\tFunctions =\n\t{\n");
 			for i, func in ipairs(Functions) do
 				fout:write("\t\t{ " .. func.Name .. " = { Params = \"" .. func.Params .. "\", Return =\"" ..
 					func.Return .. "\", Desc = \"" .. func.Notes .. "\" },\n"
