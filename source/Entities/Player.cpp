@@ -613,7 +613,7 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType != dtInVoid)
 	{
-		if (m_GameMode == eGameMode_Creative)
+		if (IsGameModeCreative())
 		{
 			// No damage / health in creative mode
 			return;
