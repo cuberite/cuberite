@@ -380,10 +380,12 @@ function ConvertWikiToDesc()
 					state = 2;  -- The following is the constants description
 				elseif (line:find("===== Functions") ~= nil) then
 					state = 3;  -- The following is the functions description
+				elseif (line:find("===== Class [Dd]efinition ==") ~= nil) then
+					state = 4;  -- The following contains both functions' and constants' descriptions
 				elseif (line:find("=====") ~= nil) then
-					state = 4;  -- The following is an unknown text, skip it entirely
+					state = 5;  -- The following is an unknown text, skip it entirely
+					
 				elseif (state == 1) then
-				
 					-- Class description:
 					if (line == "") then
 						AddNextTime = "</p>\n\t\t<p>";  -- Replace empty lines with paragraph delimiters; add only when there's a followup text on next line
@@ -391,8 +393,8 @@ function ConvertWikiToDesc()
 						Desc = Desc .. AddNextTime .. line .. "\n";
 						AddNextTime = "";
 					end
+					
 				elseif (state == 2) then
-				
 					-- Constants:
 					line = line:gsub("| ", "\n");
 					local Split = StringSplitAndTrim(line, "\n");
@@ -400,10 +402,14 @@ function ConvertWikiToDesc()
 						-- Split[1] is always "", because the line starts with a "|"
 						local notes = Split[3] or "";
 						notes = notes:sub(1, notes:len() - 2);  -- Remove the trailing " |"
-						table.insert(Constants, {Name = Split[2], Notes = notes});
+						local name = (Split[2] or "");
+						name = name:match("%a+");
+						if ((name ~= "") and (name ~= nil)) then
+							table.insert(Constants, {Name = name, Notes = notes});
+						end
 					end
+					
 				elseif (state == 3) then
-				
 					-- Functions:
 					line = string.gsub(line, "| ", "\n");
 					local Split = StringSplitAndTrim(line, "\n");
@@ -416,7 +422,38 @@ function ConvertWikiToDesc()
 							name = "constructor" .. ConstructorNumber;  -- Special name is used for the constructor in the wiki
 							ConstructorNumber = ConstructorNumber + 1;
 						end
- 						table.insert(Functions, {Name = name, Params = Split[3], Return = Split[4], Notes = notes});
+						name = name:match("%a+");
+						if ((name ~= "") and (name ~= nil)) then
+							table.insert(Functions, {Name = name, Params = Split[3], Return = Split[4], Notes = notes});
+						end
+					end
+					
+				elseif (state == 4) then
+					-- Constants and functions interspersed:
+					line = line:gsub("| ", "\n");
+					local Split = StringSplitAndTrim(line, "\n");
+					if (#Split >= 5) then
+						-- Split[1] is always "", because the line starts with a "|"
+						local notes = Split[5] or "";
+						notes = notes:sub(1, notes:len() - 2);  -- Remove the trailing " |"
+						local name = (Split[2] or "");
+						if ((name == "( )") or (name == "()")) then
+							name = "constructor" .. ConstructorNumber;  -- Special name is used for the constructor in the wiki
+							ConstructorNumber = ConstructorNumber + 1;
+						end
+						name = name:match("%a+");
+						if ((name ~= "") and (name ~= nil)) then
+							table.insert(Functions, {Name = name, Params = Split[3], Return = Split[4], Notes = notes});
+						end
+					elseif (#Split >= 3) then
+						-- Split[1] is always "", because the line starts with a "|"
+						local notes = Split[3] or "";
+						notes = notes:sub(1, notes:len() - 2);  -- Remove the trailing " |"
+						local name = (Split[2] or "");
+						name = name:match("%a+");
+						if ((name ~= "") and (name ~= nil)) then
+							table.insert(Constants, {Name = name, Notes = notes});
+						end
 					end
 				end
 			end  -- for line
@@ -425,6 +462,7 @@ function ConvertWikiToDesc()
 			-- Write the info into the output file:
 			fout:write("\t\t" .. ClassName .. " =\n\t\t{\n\t\t\tDesc = [[" .. Desc .. "]],\n\t\t\tFunctions =\n\t\t\t{\n");
 			for i, func in ipairs(Functions) do
+				LOG(ClassName .. "." .. func.Name);
 				fout:write(string.format("\t\t\t\t{ %s = { Params = %q, Return = %q, Notes = %q } },\n",
 					func.Name, func.Params, func.Return, func.Notes
 				));
