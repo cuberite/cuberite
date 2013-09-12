@@ -345,6 +345,7 @@ end
 -- Only Windows-style paths are supported for now, since this is a one-time action
 function ConvertWikiToDesc()
 	local fout = io.open("APIDesc.wiki.lua", "w");
+	fout:write("g_APIDesc =\n{\n\tClasses =\n\t{\n");
 	for filename in io.popen([[dir wikipages\\api\\*.txt /b]]):lines() do
 		-- Read file
 		local fin = io.open("wikipages\\api\\" .. filename, "r");
@@ -356,10 +357,16 @@ function ConvertWikiToDesc()
 			local Desc = "";
 			local Constants = {};
 			local Functions = {};
+			local ConstructorNumber = 1;
 			for line in fin:lines() do
 				-- Replace wiki-style markup:
 				line = line:gsub("%[%[.-:.-:(.-)|(.-)%]%]", "{{%1|%2}}");  -- Replaces [[API:Plugin:Hook|LinkText]]
+				line = line:gsub("%[%[.-:.-:(.-)%]%]", "{{%1|%1}}");       -- Replaces [[API:Plugin:Hook]]
 				line = line:gsub("%[%[.-:(.-)|(.-)%]%]", "{{%1|%2}}");     -- Replaces [[API:Class|LinkText]]
+				line = line:gsub("%[%[.-:(.-)%]%]", "{{%1|%1}}");          -- Replaces [[API:Class]]
+				line = line:gsub("%[%[(.-)|(.-)%]%]", "{{%1|%2}}");        -- Replaces [[Class|LinkText]]
+				line = line:gsub("%[%[(.-)%]%]", "{{%1|%1}}");             -- Replaces [[Class]]
+				
 				if (line:find("======") ~= nil) then
 					state = 1;  -- The following is the class description
 					ClassName = line:gsub("======", "");
@@ -378,10 +385,10 @@ function ConvertWikiToDesc()
 				elseif (state == 1) then
 				
 					-- Class description:
-					Desc = Desc .. AddNextTime .. line .. "\n";
 					if (line == "") then
-						AddNextTime = "</p>\n<p>";  -- Replace empty lines with paragraph delimiters; add only when there's a followup text on next line
+						AddNextTime = "</p>\n\t\t<p>";  -- Replace empty lines with paragraph delimiters; add only when there's a followup text on next line
 					else
+						Desc = Desc .. AddNextTime .. line .. "\n";
 						AddNextTime = "";
 					end
 				elseif (state == 2) then
@@ -406,7 +413,8 @@ function ConvertWikiToDesc()
 						notes = notes:sub(1, notes:len() - 2);  -- Remove the trailing " |"
 						local name = (Split[2] or "");
 						if ((name == "( )") or (name == "()")) then
-							name = "constructor";  -- Special name is used for the constructor in the wiki
+							name = "constructor" .. ConstructorNumber;  -- Special name is used for the constructor in the wiki
+							ConstructorNumber = ConstructorNumber + 1;
 						end
  						table.insert(Functions, {Name = name, Params = Split[3], Return = Split[4], Notes = notes});
 					end
@@ -415,19 +423,22 @@ function ConvertWikiToDesc()
 			fin:close();
 			
 			-- Write the info into the output file:
-			fout:write(ClassName .. " =\n{\n\tDesc = [[" .. Desc .. "]]\n\tFunctions =\n\t{\n");
+			fout:write("\t\t" .. ClassName .. " =\n\t\t{\n\t\t\tDesc = [[" .. Desc .. "]],\n\t\t\tFunctions =\n\t\t\t{\n");
 			for i, func in ipairs(Functions) do
-				fout:write("\t\t{ " .. func.Name .. " = { Params = \"" .. func.Params .. "\", Return =\"" ..
-					func.Return .. "\", Desc = \"" .. func.Notes .. "\" },\n"
-				);
+				fout:write(string.format("\t\t\t\t{ %s = { Params = %q, Return = %q, Notes = %q } },\n",
+					func.Name, func.Params, func.Return, func.Notes
+				));
 			end
-			fout:write("\t},\n\tConstants =\n\t{\n");
+			fout:write("\t\t\t},\n\t\t\tConstants =\n\t\t\t{\n");
 			for i, cons in ipairs(Constants) do
-				fout:write("\t\t{ " .. cons.Name .. " = { Notes = \"" .. cons.Notes .. "\" },\n");
+				fout:write(string.format("\t\t\t\t{ %s = { Notes = %q } },\n",
+					cons.Name, cons.Notes
+				));
 			end
-			fout:write("\t},\n},\n\n\n");
+			fout:write("\t\t\t},\n\t\t},\n\n");
 		end  -- if fin ~= nil
 	end  -- for file
+	fout:write("\t}\n}\n\n\n\n\n\n");
 	fout:close();
 end
 
