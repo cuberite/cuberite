@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Entity.h"
@@ -564,10 +563,32 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		else
 		{
 			// Push out entity.
+			BLOCKTYPE GotBlock;
+
+			static const Vector3i CrossCoords[] =
+			{
+			  Vector3i(1, 0, 0),
+			  Vector3i(-1, 0, 0),
+			  Vector3i(0, 0, 1),
+			  Vector3i(0, 0, -1),
+			} ;
+			Vector3i PushDirection(0, 1, 0);
+			
+			for (int i = 0; i < ARRAYCOUNT(CrossCoords); i++)
+			{
+			  NextChunk->UnboundedRelGetBlockType(RelBlockX + CrossCoords[i].x, BlockY, RelBlockZ + CrossCoords[i].z, GotBlock);
+			  if (!g_BlockIsSolid[GotBlock])
+			  {
+			    PushDirection = CrossCoords[i];
+			    break;
+			  }
+			}  // for i - CrossCoords[]
+			NextPos += Vector3d(PushDirection) * 0.2;
+			
 			m_bOnGround = true;
-			NextPos.y += 0.2;
-			LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
-				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ
+
+			LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
+				m_UniqueID, GetClass(), BlockX, BlockY, 
 			);
 		}
 
@@ -688,8 +709,9 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 						}
 					}
 					NextPos.Set(Tracer.RealHit.x,Tracer.RealHit.y,Tracer.RealHit.z);
-					NextPos.x += Tracer.HitNormal.x * 0.5f;
-					NextPos.z += Tracer.HitNormal.z * 0.5f;
+					NextPos.x += Tracer.HitNormal.x * 0.3f;
+					NextPos.y += Tracer.HitNormal.y * 0.05f; // Any larger produces entity vibration-upon-the-spot
+					NextPos.z += Tracer.HitNormal.z * 0.3f;
 				}
 				else
 					NextPos += (NextSpeed * a_Dt);
