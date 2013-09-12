@@ -607,19 +607,19 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		switch(WaterDir)
 		{
 			case X_PLUS:
-				m_WaterSpeed.x = 1.f;
+				m_WaterSpeed.x = 0.2f;
 				m_bOnGround = false;
 				break;
 			case X_MINUS:
-				m_WaterSpeed.x = -1.f;
+				m_WaterSpeed.x = -0.2f;
 				m_bOnGround = false;
 				break;
 			case Z_PLUS:
-				m_WaterSpeed.z = 1.f;
+				m_WaterSpeed.z = 0.2f;
 				m_bOnGround = false;
 				break;
 			case Z_MINUS:
-				m_WaterSpeed.z = -1.f;
+				m_WaterSpeed.z = -0.2f;
 				m_bOnGround = false;
 				break;
 			
@@ -650,7 +650,6 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				{
 					if( Ret == 1 )
 					{
-
 						if( Tracer.HitNormal.x != 0.f ) NextSpeed.x = 0.f;
 						if( Tracer.HitNormal.y != 0.f ) NextSpeed.y = 0.f;
 						if( Tracer.HitNormal.z != 0.f ) NextSpeed.z = 0.f;
@@ -666,7 +665,9 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 					NextPos.z += Tracer.HitNormal.z * 0.3f;
 				}
 				else
+				{
 					NextPos += (NextSpeed * a_Dt);
+				}
 			}
 			else
 			{
