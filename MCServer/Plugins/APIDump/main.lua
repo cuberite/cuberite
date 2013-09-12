@@ -466,14 +466,13 @@ function ConvertWikiToDesc()
 			-- Write the info into the output file:
 			fout:write("\t\t" .. ClassName .. " =\n\t\t{\n\t\t\tDesc = [[" .. Desc .. "]],\n\t\t\tFunctions =\n\t\t\t{\n");
 			for i, func in ipairs(Functions) do
-				LOG(ClassName .. "." .. func.Name);
-				fout:write(string.format("\t\t\t\t{ %s = { Params = %q, Return = %q, Notes = %q } },\n",
+				fout:write(string.format("\t\t\t\t%s = { Params = %q, Return = %q, Notes = %q },\n",
 					func.Name, func.Params, func.Return, func.Notes
 				));
 			end
 			fout:write("\t\t\t},\n\t\t\tConstants =\n\t\t\t{\n");
 			for i, cons in ipairs(Constants) do
-				fout:write(string.format("\t\t\t\t{ %s = { Notes = %q } },\n",
+				fout:write(string.format("\t\t\t\t%s = { Notes = %q },\n",
 					cons.Name, cons.Notes
 				));
 			end
