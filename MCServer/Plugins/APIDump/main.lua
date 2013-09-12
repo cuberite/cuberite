@@ -357,6 +357,9 @@ function ConvertWikiToDesc()
 			local Constants = {};
 			local Functions = {};
 			for line in fin:lines() do
+				-- Replace wiki-style markup:
+				line = line:gsub("%[%[.-:.-:(.-)|(.-)%]%]", "{{%1|%2}}");  -- Replaces [[API:Plugin:Hook|LinkText]]
+				line = line:gsub("%[%[.-:(.-)|(.-)%]%]", "{{%1|%2}}");     -- Replaces [[API:Class|LinkText]]
 				if (line:find("======") ~= nil) then
 					state = 1;  -- The following is the class description
 					ClassName = line:gsub("======", "");
