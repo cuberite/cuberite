@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Entity.h"
@@ -520,27 +519,25 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			// Push out entity.
 			BLOCKTYPE GotBlock;
 
-			static const struct
+			static const Vector3i CrossCoords[] =
 			{
-				int x, y, z;
-			} gCrossCoords[] =
-			{
-				{ 1, 0,  0},
-				{-1, 0,  0},
-				{ 0, 0,  1},
-				{ 0, 0, -1},
+			  Vector3i(1, 0, 0),
+			  Vector3i(-1, 0, 0),
+			  Vector3i(0, 0, 1),
+			  Vector3i(0, 0, -1),
 			} ;
-
-			for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+			Vector3i PushDirection(0, 1, 0);
+			
+			for (int i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 			{
-				NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock);
-				if (GotBlock == E_BLOCK_AIR)
-				{
-					NextPos.x += gCrossCoords[i].x;
-					NextPos.z += gCrossCoords[i].z;
-				}
-				else { NextPos.y += 0.2; }
-			}  // for i - gCrossCoords[]
+			  NextChunk->UnboundedRelGetBlockType(RelBlockX + CrossCoords[i].x, BlockY, RelBlockZ + CrossCoords[i].z, GotBlock);
+			  if (!g_BlockIsSolid[GotBlock])
+			  {
+			    PushDirection = CrossCoords[i];
+			    break;
+			  }
+			}  // for i - CrossCoords[]
+			NextPos += Vector3d(PushDirection) * 0.2;
 			
 			m_bOnGround = true;
 
