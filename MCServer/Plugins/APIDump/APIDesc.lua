@@ -113,19 +113,23 @@ g_APIDesc =
 
 		cBlockEntity =
 		{
-			Desc = [[Block entities are simply blocks in the world that have persistent data, such as the text for a sign or contents of a chest. All block entities are also saved in the chunk data of the chunk they reside in. The cBlockEntity class acts as a common ancestor for all the individual block entities.
-]],
+			Desc = [[
+				Block entities are simply blocks in the world that have persistent data, such as the text for a sign
+				or contents of a chest. All block entities are also saved in the chunk data of the chunk they reside in.
+				The cBlockEntity class acts as a common ancestor for all the individual block entities.
+			]],
+			
 			Functions =
 			{
 				GetBlockType = { Params = "", Return = "BLOCKTYPE", Notes = "Returns the blocktype which is represented by this blockentity. This is the primary means of type-identification" },
-				GetChunkX = { Params = "", Return = "number", Notes = "Returns the chunk X-coord of the block entity's chunk" },
-				GetChunkZ = { Params = "", Return = "number", Notes = "Returns the chunk Z-coord of the block entity's chunk" },
-				GetPosX = { Params = "", Return = "number", Notes = "Returns the block X-coord of the block entity's block" },
-				GetPosY = { Params = "", Return = "number", Notes = "Returns the block Y-coord of the block entity's block" },
-				GetPosZ = { Params = "", Return = "number", Notes = "Returns the block Z-coord of the block entity's block" },
-				GetRelX = { Params = "", Return = "number", Notes = "Returns the relative X coord of the block entity's block within the chunk" },
-				GetRelZ = { Params = "", Return = "number", Notes = "Returns the relative Z coord of the block entity's block within the chunk" },
-				GetWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world to which the block entity belongs" },
+				GetChunkX    = { Params = "", Return = "number", Notes = "Returns the chunk X-coord of the block entity's chunk" },
+				GetChunkZ    = { Params = "", Return = "number", Notes = "Returns the chunk Z-coord of the block entity's chunk" },
+				GetPosX      = { Params = "", Return = "number", Notes = "Returns the block X-coord of the block entity's block" },
+				GetPosY      = { Params = "", Return = "number", Notes = "Returns the block Y-coord of the block entity's block" },
+				GetPosZ      = { Params = "", Return = "number", Notes = "Returns the block Z-coord of the block entity's block" },
+				GetRelX      = { Params = "", Return = "number", Notes = "Returns the relative X coord of the block entity's block within the chunk" },
+				GetRelZ      = { Params = "", Return = "number", Notes = "Returns the relative Z coord of the block entity's block within the chunk" },
+				GetWorld     = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world to which the block entity belongs" },
 			},
 			Constants =
 			{
@@ -134,8 +138,16 @@ g_APIDesc =
 
 		cBlockEntityWithItems =
 		{
-			Desc = [[This class is a common ancestor for all {{cItemGrid|cItemGrid}} object for storing the items; this ItemGrid is accessible through the API. The storage is a grid of items, items in it can be addressed either by a slot number, or by XY coords within the grid. If a UI window is opened for this block entity, the item storage is monitored for changes and the changes are immediately sent to clients of the UI window.
-]],
+			Desc = [[
+				This class is a common ancestor for all {{cBlockEntity|block entities}} that provide item storage.
+				Internally, the object has a {{cItemGrid|cItemGrid}} object for storing the items; this ItemGrid is
+				accessible through the API. The storage is a grid of items, items in it can be addressed either by a slot
+				number, or by XY coords within the grid. If a UI window is opened for this block entity, the item storage
+				is monitored for changes and the changes are immediately sent to clients of the UI window.
+			]],
+			
+			Inherits = "cBlockEntity",
+			
 			Functions =
 			{
 				GetContents = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the cItemGrid object representing the items stored within this block entity" },
@@ -151,71 +163,33 @@ g_APIDesc =
 
 		cChatColor =
 		{
-			Desc = [[A cChatColor represents possible chat colors in form of constant strings.
-]],
+			Desc = [[
+				A wrapper class for constants representing colors or effects.
+			]],
+			
 			Functions =
 			{
+				MakeColor = { Params = "ColorCodeConstant", Return = "string", Notes = "Creates the complete color-code-sequence from the color or effect constant" },
 			},
 			Constants =
 			{
-				Color = { Notes = "|" },
-				Delimiter = { Notes = "|" },
-				Black = { Notes = "0" },
-				Navy = { Notes = "1" },
-				Green = { Notes = "2" },
-				Blue = { Notes = "3" },
-				Red = { Notes = "4" },
-				Purple = { Notes = "5" },
-				Gold = { Notes = "6" },
-				LightGray = { Notes = "7" },
-				Gray = { Notes = "8" },
-				DarkPurple = { Notes = "9" },
-				LightGreen = { Notes = "a" },
-				LightBlue = { Notes = "b" },
-				Rose = { Notes = "c" },
-				LightPurple = { Notes = "d" },
-				Yellow = { Notes = "e" },
-				White = { Notes = "f" },
-				Random = { Notes = "k" },
-				Bold = { Notes = "l" },
-				Strikethrough = { Notes = "m" },
-				Underlined = { Notes = "n" },
-				Italic = { Notes = "o" },
-				Plain = { Notes = "r" },
-				MakeColor = { Notes = "String" },
+				Color         = { Notes = "The first character of the color-code-sequence, §" },
+				Delimiter     = { Notes = "The first character of the color-code-sequence, §" },
+				Random        = { Notes = "Random letters and symbols animate instead of the text" },
+				Plain         = { Notes = "Resets all formatting to normal" },
 			},
 		},
 
-		Data =
+		cChestEntity =
 		{
-			Desc = [[<li>Inherits {{cBlockEntity|cBlockEntity}}</li>
-A chest entity represents a chest in the world, currently only single chests exist in MCServer
-Chest entities are saved and loaded from disk when the chunk they reside in is saved or loaded
-</p>
-		<p>Here's some raw C++ code showing how chest entities are saved
-<code cpp>
-void cChestEntity::WriteToFile(FILE* a_File)
-{
-	fwrite( &m_BlockType, sizeof( ENUM_BLOCK_ID ), 1, a_File );
-	fwrite( &m_PosX, sizeof( int ), 1, a_File );
-	fwrite( &m_PosY, sizeof( int ), 1, a_File );
-	fwrite( &m_PosZ, sizeof( int ), 1, a_File );
-</p>
-		<p>	unsigned int NumSlots = c_ChestHeight*c_ChestWidth;
-	fwrite( &NumSlots, sizeof(unsigned int), 1, a_File );
-	for(unsigned int i = 0; i < NumSlots; i++)
-	{
-		cItem* Item = GetSlot( i );
-		if( Item )
-		{
-			fwrite( &Item->m_ItemID, sizeof(Item->m_ItemID), 1, a_File );
-			fwrite( &Item->m_ItemCount, sizeof(Item->m_ItemCount), 1, a_File );
-			fwrite( &Item->m_ItemHealth, sizeof(Item->m_ItemHealth), 1, a_File );
-		}
-	}
-}
-</code>
-]],
+			Desc = [[
+				A chest entity is a {{cBlockEntityWithItems|cBlockEntityWithItems}} descendant that represents a chest
+				in the world. Note that doublechests consist of two separate cChestEntity objects, they do not collaborate
+				in any way.
+			]],
+			
+			Inherits = "cBlockEntityWithItems",
+			
 			Functions =
 			{
 			},
@@ -226,33 +200,38 @@ void cChestEntity::WriteToFile(FILE* a_File)
 
 		cChunkDesc =
 		{
-			Desc = [[The cChunkDesc class is a container for chunk data while the chunk is being generated. As such, it is only used as a parameter for the {{onchunkgenerating|OnChunkGenerating}} and {{OnChunkGenerated|OnChunkGenerated}} hooks and cannot be constructed on its own. Plugins can use this class in both those hooks to manipulate generated chunks.
-]],
+			Desc = [[
+				The cChunkDesc class is a container for chunk data while the chunk is being generated. As such, it is
+				only used as a parameter for the {{OnChunkGenerating|OnChunkGenerating}} and
+				{{OnChunkGenerated|OnChunkGenerated}} hooks and cannot be constructed on its own. Plugins can use this
+				class in both those hooks to manipulate generated chunks.
+			]],
+			
 			Functions =
 			{
-				FillBlocks = { Params = "BlockType, BlockMeta", Return = "", Notes = "Fills the entire chunk with the specified blocks" },
-				GetBiome = { Params = "RelX, RelZ", Return = "EMCSBiome", Notes = "Returns the biome at the specified relative coords" },
-				GetBlockMeta = { Params = "RelX, RelY, RelZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
-				GetBlockType = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified relative coords" },
-				GetBlockTypeMeta = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified relative coords" },
-				GetHeight = { Params = "RelX, RelZ", Return = "number", Notes = "Returns the height at the specified relative coords" },
-				IsUsingDefaultBiomes = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default biome generator" },
+				FillBlocks                = { Params = "BlockType, BlockMeta", Return = "", Notes = "Fills the entire chunk with the specified blocks" },
+				GetBiome                  = { Params = "RelX, RelZ", Return = "EMCSBiome", Notes = "Returns the biome at the specified relative coords" },
+				GetBlockMeta              = { Params = "RelX, RelY, RelZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
+				GetBlockType              = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified relative coords" },
+				GetBlockTypeMeta          = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified relative coords" },
+				GetHeight                 = { Params = "RelX, RelZ", Return = "number", Notes = "Returns the height at the specified relative coords" },
+				IsUsingDefaultBiomes      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default biome generator" },
 				IsUsingDefaultComposition = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default composition generator" },
-				IsUsingDefaultFinish = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default finishers" },
-				IsUsingDefaultHeight = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default height generator" },
-				IsUsingDefaultStructures = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default structures" },
-				ReadBlockArea = { Params = "BlockArea, MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ", Return = "", Notes = "Reads data from the chunk into the block area object" },
-				SetBiome = { Params = "RelX, RelZ, EMCSBiome", Return = "", Notes = "Sets the biome at the specified relative coords" },
-				SetBlockMeta = { Params = "RelX, RelY, RelZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified relative coords" },
-				SetBlockType = { Params = "RelX, RelY, RelZ, BlockType", Return = "", Notes = "Sets the block type at the specified relative coords" },
-				SetBlockTypeMeta = { Params = "RelX, RelY, RelZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified relative coords" },
-				SetHeight = { Params = "RelX, RelZ, Height", Return = "", Notes = "Sets the height at the specified relative coords" },
-				SetUseDefaultBiomes = { Params = "bool", Return = "", Notes = "Sets the chunk to use default biome generator or not" },
-				SetUseDefaultComposition = { Params = "bool", Return = "", Notes = "Sets the chunk to use default composition generator or not" },
-				SetUseDefaultFinish = { Params = "bool", Return = "", Notes = "Sets the chunk to use default finishers or not" },
-				SetUseDefaultHeight = { Params = "bool", Return = "", Notes = "Sets the chunk to use default height generator or not" },
-				SetUseDefaultStructures = { Params = "bool", Return = "", Notes = "Sets the chunk to use default structures or not" },
-				WriteBlockArea = { Params = "BlockArea, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
+				IsUsingDefaultFinish      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default finishers" },
+				IsUsingDefaultHeight      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default height generator" },
+				IsUsingDefaultStructures  = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default structures" },
+				ReadBlockArea             = { Params = "BlockArea, MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ", Return = "", Notes = "Reads data from the chunk into the block area object" },
+				SetBiome                  = { Params = "RelX, RelZ, EMCSBiome", Return = "", Notes = "Sets the biome at the specified relative coords" },
+				SetBlockMeta              = { Params = "RelX, RelY, RelZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified relative coords" },
+				SetBlockType              = { Params = "RelX, RelY, RelZ, BlockType", Return = "", Notes = "Sets the block type at the specified relative coords" },
+				SetBlockTypeMeta          = { Params = "RelX, RelY, RelZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified relative coords" },
+				SetHeight                 = { Params = "RelX, RelZ, Height", Return = "", Notes = "Sets the height at the specified relative coords" },
+				SetUseDefaultBiomes       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default biome generator or not" },
+				SetUseDefaultComposition  = { Params = "bool", Return = "", Notes = "Sets the chunk to use default composition generator or not" },
+				SetUseDefaultFinish       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default finishers or not" },
+				SetUseDefaultHeight       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default height generator or not" },
+				SetUseDefaultStructures   = { Params = "bool", Return = "", Notes = "Sets the chunk to use default structures or not" },
+				WriteBlockArea            = { Params = "BlockArea, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
 			},
 			Constants =
 			{
