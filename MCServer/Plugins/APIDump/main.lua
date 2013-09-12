@@ -18,10 +18,9 @@ g_Plugin = nil;
 function Initialize(Plugin)
 	g_Plugin = Plugin;
 	
-	Plugin:SetName("APIDump")
-	Plugin:SetVersion(1)
+	Plugin:SetName("APIDump");
+	Plugin:SetVersion(1);
 	
-	PluginManager = cRoot:Get():GetPluginManager()
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
 	-- dump all available API functions and objects:
@@ -349,6 +348,8 @@ function ConvertWikiToDesc()
 	for filename in io.popen([[dir wikipages\\api\\*.txt /b]]):lines() do
 		-- Read file
 		local fin = io.open("wikipages\\api\\" .. filename, "r");
+		local ClassName = filename:match("[^\.]*");
+		local AddNextTime = "";
 		if (fin ~= nil) then
 			-- Read and parse the info from the file
 			local state = 0;
@@ -358,6 +359,13 @@ function ConvertWikiToDesc()
 			for line in fin:lines() do
 				if (line:find("======") ~= nil) then
 					state = 1;  -- The following is the class description
+					ClassName = line:gsub("======", "");
+					ClassName = ClassName:match("%w+");
+					if (ClassName == nil) then
+						-- Reset to default
+						ClassName = filename:match("[^\.]*");
+					end
+					AddNextTime = "";
 				elseif (line:find("===== Constants") ~= nil) then
 					state = 2;  -- The following is the constants description
 				elseif (line:find("===== Functions") ~= nil) then
@@ -365,31 +373,46 @@ function ConvertWikiToDesc()
 				elseif (line:find("=====") ~= nil) then
 					state = 4;  -- The following is an unknown text, skip it entirely
 				elseif (state == 1) then
+				
 					-- Class description:
+					Desc = Desc .. AddNextTime .. line .. "\n";
 					if (line == "") then
-						line = "</p>\n<p>";  -- Replace empty lines with paragraph delimiters
+						AddNextTime = "</p>\n<p>";  -- Replace empty lines with paragraph delimiters; add only when there's a followup text on next line
+					else
+						AddNextTime = "";
 					end
-					Desc = Desc .. line .. "\n";
 				elseif (state == 2) then
+				
 					-- Constants:
-					local Split = StringSplitAndTrim(line, "|");
+					line = line:gsub("| ", "\n");
+					local Split = StringSplitAndTrim(line, "\n");
 					if (#Split >= 3) then
 						-- Split[1] is always "", because the line starts with a "|"
-						table.insert(Constants, {Name = Split[2], Notes = Split[3]});
+						local notes = Split[3] or "";
+						notes = notes:sub(1, notes:len() - 2);  -- Remove the trailing " |"
+						table.insert(Constants, {Name = Split[2], Notes = notes});
 					end
 				elseif (state == 3) then
+				
 					-- Functions:
-					local Split = StringSplitAndTrim(line, "|");
+					line = string.gsub(line, "| ", "\n");
+					local Split = StringSplitAndTrim(line, "\n");
 					if (#Split >= 5) then
 						-- Split[1] is always "", because the line starts with a "|"
-						table.insert(Functions, {Name = Split[2], Params = Split[3], Return = Split[4], Notes = Split[5]});
+						local notes = Split[5] or "";
+						notes = notes:sub(1, notes:len() - 2);  -- Remove the trailing " |"
+						local name = (Split[2] or "");
+						if ((name == "( )") or (name == "()")) then
+							name = "constructor";  -- Special name is used for the constructor in the wiki
+						end
+ 						table.insert(Functions, {Name = name, Params = Split[3], Return = Split[4], Notes = notes});
 					end
 				end
 			end  -- for line
 			fin:close();
 			
 			-- Write the info into the output file:
-			fout:write(filename:match("[^\.]*") .. " =\n{\n\tFunctions =\n\t{\n");
+			fout:write(ClassName .. " =\n{\n\tDesc = [[" .. Desc .. "]]\n\tFunctions =\n\t{\n");
 			for i, func in ipairs(Functions) do
 				fout:write("\t\t{ " .. func.Name .. " = { Params = \"" .. func.Params .. "\", Return =\"" ..
 					func.Return .. "\", Desc = \"" .. func.Notes .. "\" },\n"
