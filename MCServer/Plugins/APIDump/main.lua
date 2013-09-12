@@ -390,6 +390,10 @@ function ConvertWikiToDesc()
 					if (line == "") then
 						AddNextTime = "</p>\n\t\t<p>";  -- Replace empty lines with paragraph delimiters; add only when there's a followup text on next line
 					else
+						-- Replace wiki-style bullets with <li> tag:
+						if (line:find("^  +%*")) then
+							line = line:gsub("^  +%* *", "<li>") .. "</li>";
+						end
 						Desc = Desc .. AddNextTime .. line .. "\n";
 						AddNextTime = "";
 					end
