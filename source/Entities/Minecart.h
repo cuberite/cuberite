@@ -16,6 +16,20 @@
 
 
 
+inline bool IsBlockRail(BLOCKTYPE a_BlockType)
+	{
+		return (
+			(a_BlockType == E_BLOCK_RAIL) ||
+			(a_BlockType == E_BLOCK_ACTIVATOR_RAIL) ||
+			(a_BlockType == E_BLOCK_DETECTOR_RAIL) ||
+			(a_BlockType == E_BLOCK_POWERED_RAIL)
+			) ;
+	}
+
+
+
+
+
 class cMinecart :
 	public cEntity
 {

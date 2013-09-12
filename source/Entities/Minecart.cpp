@@ -54,20 +54,24 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if ((GetPosY() > 0) && (GetPosY() < cChunkDef::Height))
 	{
 		BLOCKTYPE BelowType = GetWorld()->GetBlock(floor(GetPosX()), floor(GetPosY() -1 ), floor(GetPosZ()));
+		BLOCKTYPE InsideType = GetWorld()->GetBlock(floor(GetPosX()), floor(GetPosY()), floor(GetPosZ()));
 
-		if (
-			(BelowType == E_BLOCK_RAIL) ||
-			(BelowType == E_BLOCK_POWERED_RAIL) ||
-			(BelowType == E_BLOCK_DETECTOR_RAIL) ||
-			(BelowType == E_BLOCK_ACTIVATOR_RAIL)
-			)
+		if (IsBlockRail(BelowType))
 		{
 			HandleRailPhysics(a_Dt, a_Chunk);
 		}
 		else
 		{
-			super::HandlePhysics(a_Dt, a_Chunk);
-			BroadcastMovementUpdate();
+			if (IsBlockRail(InsideType))
+			{
+				SetPosY(ceil(GetPosY()));
+				HandleRailPhysics(a_Dt, a_Chunk);
+			}
+			else
+			{
+				super::HandlePhysics(a_Dt, a_Chunk);
+				BroadcastMovementUpdate();
+			}
 		}
 	}
 	else
