@@ -63,12 +63,6 @@ public:
 
 		return true;
 	}
-
-	
-	virtual bool CanBePlacedOnSide(void) override
-	{
-		return false;
-	}
 	
 
 	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override

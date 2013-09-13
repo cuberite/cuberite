@@ -37,12 +37,6 @@ public:
 	}
 
 
-	virtual bool DoesAllowBlockOnTop() override
-	{
-		return false;
-	}
-
-
 	// Bed specific helper functions
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{

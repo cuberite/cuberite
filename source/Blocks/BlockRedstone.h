@@ -16,11 +16,6 @@ public:
 
 	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return false;
-	}
-
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
@@ -32,12 +27,6 @@ public:
 	{
 		// Reset meta to 0
 		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_DUST, 1));
-	}
-	
-	
-	virtual bool CanBePlacedOnSide(void) override
-	{
-		return false;
 	}
 } ;
 

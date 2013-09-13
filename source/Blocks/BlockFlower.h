@@ -30,18 +30,6 @@ public:
 	}
 
 
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return true;
-	}
-	
-	
-	virtual bool CanBePlacedOnSide(void) override
-	{
-		return false;
-	}
-
-
 	virtual const char * GetStepSound(void) override
 	{
 		return "step.grass";

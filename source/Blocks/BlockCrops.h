@@ -20,12 +20,6 @@ public:
 	}
 
 
-	virtual bool DoesAllowBlockOnTop() override
-	{
-		return false;
-	}
-
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
 	{
 		MTRand rand;
