@@ -87,6 +87,7 @@ function CreateAPITables()
 			},
 			Constants = {
 			}
+			Descendants = {},  -- Will be filled by ReadDescriptions(), array of class APIs (references to other member in the tree)
 		}},
 		{
 			Name = "cBlockArea",
@@ -113,25 +114,27 @@ function CreateAPITables()
 	};
 	--]]
 
-	local Globals = {Functions = {}, Constants = {}};
+	local Globals = {Functions = {}, Constants = {}, Descendants = {}};
 	local API = {};
 	
 	local function Add(a_APIContainer, a_ClassName, a_ClassObj)
 		if (type(a_ClassObj) == "function") then
 			table.insert(a_APIContainer.Functions, {Name = a_ClassName});
-		elseif (type(a_ClassObj) == "number") then
+		elseif (
+			(type(a_ClassObj) == "number") or
+			(type(a_ClassObj) == "string")
+		) then
 			table.insert(a_APIContainer.Constants, {Name = a_ClassName, Value = a_ClassObj});
 		end
 	end
 	
 	local function SortClass(a_ClassAPI)
-		-- Sort the function list and constant lists:
-		table.sort(a_ClassAPI.Functions,
+		table.sort(a_ClassAPI.Functions,  -- Sort function list
 			function(f1, f2)
 				return (f1.Name < f2.Name);
 			end
 		);
-		table.sort(a_ClassAPI.Constants,
+		table.sort(a_ClassAPI.Constants,  -- Sort constant list
 			function(c1, c2)
 				return (c1.Name < c2.Name);
 			end
@@ -139,7 +142,7 @@ function CreateAPITables()
 	end;
 	
 	local function ParseClass(a_ClassName, a_ClassObj)
-		local res = {Name = a_ClassName, Functions = {}, Constants = {}};
+		local res = {Name = a_ClassName, Functions = {}, Constants = {}, Descendants = {}};
 		for i, v in pairs(a_ClassObj) do
 			Add(res, i, v);
 		end
@@ -223,7 +226,16 @@ function ReadDescriptions(a_API)
 		local APIDesc = g_APIDesc.Classes[cls.Name];
 		if (APIDesc ~= nil) then
 			cls.Desc = APIDesc.Desc;
-			cls.Inherits = APIDesc.Inherits;
+			
+			-- Process inheritance:
+			if (APIDesc.Inherits ~= nil) then
+				for j, icls in ipairs(a_API) do
+					if (icls.Name == APIDesc.Inherits) then
+						table.insert(icls.Descendants, cls);
+						cls.Inherits = icls;
+					end
+				end
+			end
 			
 			if (APIDesc.Functions ~= nil) then
 				-- Assign function descriptions:
@@ -261,7 +273,16 @@ function ReadDescriptions(a_API)
 			end  -- if (APIDesc.Constants ~= nil)
 			
 		end
-	end  -- for i, class
+	end  -- for i, cls
+
+	-- Sort the descendants lists:
+	for i, cls in ipairs(a_API) do
+		table.sort(cls.Descendants,
+			function(c1, c2)
+				return (c1.Name < c2.Name);
+			end
+		);
+	end  -- for i, cls
 end
 
 
@@ -278,19 +299,6 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		-- TODO: Make a link out of anything with the special linkifying syntax {{link|title}}
 		-- a_String:gsub("{{([^|]*)|([^}])*}}", "<a href=\"%1\">%2</a>");
 		return a_String;
-	end
-	
-	-- Returns the ClassAPI for the inherited class, or nil if not found
-	local function FindInheritedClassAPI(a_AllAPI, a_InheritedClassName)
-		if (a_InheritedClassName == nil) then
-			return nil;
-		end
-		for i, cls in ipairs(a_AllAPI) do
-			if (cls.Name == a_InheritedClassName) then
-				return cls;
-			end
-		end
-		return nil;
 	end
 	
 	-- Writes a table containing all functions in the specified list, with an optional "inherited from" header when a_InheritedName is valid
@@ -310,13 +318,26 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 		cf:write("</table>\n");
 	end
+	
+	local function WriteDescendants(a_Descendants)
+		if (#a_Descendants == 0) then
+			return;
+		end
+		cf:write("<ul>");
+		for i, desc in ipairs(a_Descendants) do
+			cf:write("<li><a href=\"".. desc.Name .. ".html\">" .. desc.Name .. "</a>");
+			WriteDescendants(desc.Descendants);
+			cf:write("</li>\n");
+		end
+		cf:write("</ul>\n");
+	end
 
 	-- Build an array of inherited classes chain:
 	local InheritanceChain = {};
-	local CurrInheritance = FindInheritedClassAPI(a_AllAPI, a_ClassAPI.Inherits);
+	local CurrInheritance = a_ClassAPI.Inherits;
 	while (CurrInheritance ~= nil) do
 		table.insert(InheritanceChain, CurrInheritance);
-		CurrInheritance = FindInheritedClassAPI(a_AllAPI, CurrInheritance.Inherits);
+		CurrInheritance = CurrInheritance.Inherits;
 	end
 	
 	cf:write([[<html><head><title>MCServer API - ]] .. a_ClassAPI.Name .. [[</title>
@@ -326,8 +347,10 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	<ul>
 	]]);
 	
+	local HasInheritance = ((#a_ClassAPI.Descendants > 0) or (a_ClassAPI.Inherits ~= nil));
+	
 	-- Write the table of contents:
-	if (a_ClassAPI.Inherits ~= nil) then
+	if (HasInheritance) then
 		cf:write("<li><a href=\"#inherits\">Inheritance</a></li>\n");
 	end
 	cf:write("<li><a href=\"#constants\">Constants</a></li>\n");
@@ -343,10 +366,19 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	end;
 	
 	-- Write the inheritance, if available:
-	if (a_ClassAPI.Inherits ~= nil) then
+	if (HasInheritance) then
 		cf:write("<a name=\"inherits\"><h1>Inheritance</h1></a>\n");
-		for i, cls in ipairs(InheritanceChain) do
-			cf:write("<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>");
+		if (#InheritanceChain > 0) then
+			cf:write("<p>This class inherits from the following parent classes:<ul>\n");
+			for i, cls in ipairs(InheritanceChain) do
+				cf:write("<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>\n");
+			end
+			cf:write("</ul></p>\n");
+		end
+		if (#a_ClassAPI.Descendants > 0) then
+			cf:write("<p>This class has the following descendants:\n");
+			WriteDescendants(a_ClassAPI.Descendants);
+			cf:write("</p>\n");
 		end
 	end
 	
