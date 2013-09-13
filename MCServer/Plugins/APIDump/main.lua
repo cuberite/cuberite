@@ -205,7 +205,7 @@ function DumpAPIHtml()
 	]]);
 	for i, cls in ipairs(API) do
 		f:write("<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>\n");
-		WriteHtmlClass(cls);
+		WriteHtmlClass(cls, API);
 	end
 	f:write("</ul></body></html>");
 	f:close();
@@ -223,6 +223,7 @@ function ReadDescriptions(a_API)
 		local APIDesc = g_APIDesc.Classes[cls.Name];
 		if (APIDesc ~= nil) then
 			cls.Desc = APIDesc.Desc;
+			cls.Inherits = APIDesc.Inherits;
 			
 			if (APIDesc.Functions ~= nil) then
 				-- Assign function descriptions:
@@ -267,7 +268,7 @@ end
 
 
 
-function WriteHtmlClass(a_ClassAPI)
+function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	local cf, err = io.open("API/" .. a_ClassAPI.Name .. ".html", "w");
 	if (cf == nil) then
 		return;
@@ -275,8 +276,47 @@ function WriteHtmlClass(a_ClassAPI)
 	
 	local function LinkifyString(a_String)
 		-- TODO: Make a link out of anything with the special linkifying syntax {{link|title}}
-		-- a_String:gsub("{{([^|]*)|[^}]*}}", "<a href=\"%1\">%2</a>");
+		-- a_String:gsub("{{([^|]*)|([^}])*}}", "<a href=\"%1\">%2</a>");
 		return a_String;
+	end
+	
+	-- Returns the ClassAPI for the inherited class, or nil if not found
+	local function FindInheritedClassAPI(a_AllAPI, a_InheritedClassName)
+		if (a_InheritedClassName == nil) then
+			return nil;
+		end
+		for i, cls in ipairs(a_AllAPI) do
+			if (cls.Name == a_InheritedClassName) then
+				return cls;
+			end
+		end
+		return nil;
+	end
+	
+	-- Writes a table containing all functions in the specified list, with an optional "inherited from" header when a_InheritedName is valid
+	local function WriteFunctions(a_Functions, a_InheritedName)
+		if (#a_Functions == 0) then
+			return;
+		end
+		if (a_InheritedName ~= nil) then
+			cf:write("<h2>Functions inherited from " .. a_InheritedName .. "</h2>");
+		end
+		cf:write("<table><tr><th>Name</th><th>Parameters</th><th>Return value</th><th>Notes</th></tr>\n");
+		for i, func in ipairs(a_Functions) do
+			cf:write("<tr><td>" .. func.Name .. "</td>");
+			cf:write("<td>" .. LinkifyString(func.Params or "").. "</td>");
+			cf:write("<td>" .. LinkifyString(func.Return or "").. "</td>");
+			cf:write("<td>" .. LinkifyString(func.Notes or "") .. "</td></tr>\n");
+		end
+		cf:write("</table>\n");
+	end
+
+	-- Build an array of inherited classes chain:
+	local InheritanceChain = {};
+	local CurrInheritance = FindInheritedClassAPI(a_AllAPI, a_ClassAPI.Inherits);
+	while (CurrInheritance ~= nil) do
+		table.insert(InheritanceChain, CurrInheritance);
+		CurrInheritance = FindInheritedClassAPI(a_AllAPI, CurrInheritance.Inherits);
 	end
 	
 	cf:write([[<html><head><title>MCServer API - ]] .. a_ClassAPI.Name .. [[</title>
@@ -287,45 +327,44 @@ function WriteHtmlClass(a_ClassAPI)
 	]]);
 	
 	-- Write the table of contents:
-	if (#a_ClassAPI.Constants > 0) then
-		cf:write("<li><a href=\"#constants\">Constants</a></li>\n");
+	if (a_ClassAPI.Inherits ~= nil) then
+		cf:write("<li><a href=\"#inherits\">Inheritance</a></li>\n");
 	end
-	if (#a_ClassAPI.Functions > 0) then
-		cf:write("<li><a href=\"#functions\">Functions</a></li>\n");
-	end
+	cf:write("<li><a href=\"#constants\">Constants</a></li>\n");
+	cf:write("<li><a href=\"#functions\">Functions</a></li>\n");
 	cf:write("</ul>");
 	
 	-- Write the class description:
-	cf:write("<a name=\"desc\"><h1>" .. a_ClassAPI.Name .. "</h1></a>\n");
+	cf:write("<a name=\"desc\"><h1>" .. a_ClassAPI.Name .. " class</h1></a>\n");
 	if (a_ClassAPI.Desc ~= nil) then
 		cf:write("<p>");
 		cf:write(a_ClassAPI.Desc);
 		cf:write("</p>\n");
 	end;
 	
-	-- Write the constants:
-	if (#a_ClassAPI.Constants > 0) then
-		cf:write("<a name=\"constants\"><h1>Constants</h1></a>\n");
-		cf:write("<table><tr><th>Name</th><th>Value</th><th>Notes</th></tr>\n");
-		for i, cons in ipairs(a_ClassAPI.Constants) do
-			cf:write("<tr><td>" .. cons.Name .. "</td>");
-			cf:write("<td>" .. cons.Value .. "</td>");
-			cf:write("<td>" .. LinkifyString(cons.Notes or "") .. "</td></tr>\n");
+	-- Write the inheritance, if available:
+	if (a_ClassAPI.Inherits ~= nil) then
+		cf:write("<a name=\"inherits\"><h1>Inheritance</h1></a>\n");
+		for i, cls in ipairs(InheritanceChain) do
+			cf:write("<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>");
 		end
-		cf:write("</table>\n");
 	end
 	
-	-- Write the functions:
-	if (#a_ClassAPI.Functions > 0) then
-		cf:write("<a name=\"functions\"><h1>Functions</h1></a>\n");
-		cf:write("<table><tr><th>Name</th><th>Parameters</th><th>Return value</th><th>Notes</th></tr>\n");
-		for i, func in ipairs(a_ClassAPI.Functions) do
-			cf:write("<tr><td>" .. func.Name .. "</td>");
-			cf:write("<td>" .. LinkifyString(func.Params or "").. "</td>");
-			cf:write("<td>" .. LinkifyString(func.Return or "").. "</td>");
-			cf:write("<td>" .. LinkifyString(func.Notes or "") .. "</td></tr>\n");
-		end
-		cf:write("</table>\n");
+	-- Write the constants:
+	cf:write("<a name=\"constants\"><h1>Constants</h1></a>\n");
+	cf:write("<table><tr><th>Name</th><th>Value</th><th>Notes</th></tr>\n");
+	for i, cons in ipairs(a_ClassAPI.Constants) do
+		cf:write("<tr><td>" .. cons.Name .. "</td>");
+		cf:write("<td>" .. cons.Value .. "</td>");
+		cf:write("<td>" .. LinkifyString(cons.Notes or "") .. "</td></tr>\n");
+	end
+	cf:write("</table>\n");
+	
+	-- Write the functions, including the inherited ones:
+	cf:write("<a name=\"functions\"><h1>Functions</h1></a>\n");
+	WriteFunctions(a_ClassAPI.Functions, nil);
+	for i, cls in ipairs(InheritanceChain) do
+		WriteFunctions(cls.Functions, cls.Name);
 	end
 	
 	cf:write("</body></html>");
