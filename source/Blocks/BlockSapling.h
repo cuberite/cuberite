@@ -29,12 +29,6 @@ public:
 	{
 		return (a_RelY > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ));
 	}
-
-
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return false;
-	}
 	
 
 	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
@@ -49,12 +43,6 @@ public:
 		{
 			a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x08);
 		}
-	}
-	
-	
-	virtual bool CanBePlacedOnSide() override
-	{
-		return false;
 	}
 
 

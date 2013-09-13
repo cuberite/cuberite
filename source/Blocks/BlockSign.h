@@ -23,12 +23,6 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
 	}
-
-	
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return false;
-	}
 	
 
 	virtual const char * GetStepSound(void) override

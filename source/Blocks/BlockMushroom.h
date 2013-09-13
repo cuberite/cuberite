@@ -46,18 +46,6 @@ public:
 		}
 		return true;
 	}
-
-
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return false;
-	}
-
-	
-	virtual bool CanBePlacedOnSide(void) override
-	{
-		return false;
-	}
 	
 
 	virtual const char * GetStepSound(void) override

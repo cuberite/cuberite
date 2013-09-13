@@ -68,12 +68,6 @@ public:
 	}
 
 
-	virtual bool CanBePlacedOnSide(void) override
-	{
-		return false;
-	}
-
-
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));

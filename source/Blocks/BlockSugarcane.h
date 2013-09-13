@@ -77,12 +77,6 @@ public:
 	{
 		a_World->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 1);
 	}
-
-
-	virtual bool CanBePlacedOnSide() override
-	{
-		return false;
-	}
 	
 	
 	virtual const char * GetStepSound(void) override
