@@ -117,14 +117,14 @@ function CreateAPITables()
 	local Globals = {Functions = {}, Constants = {}, Descendants = {}};
 	local API = {};
 	
-	local function Add(a_APIContainer, a_ClassName, a_ClassObj)
-		if (type(a_ClassObj) == "function") then
-			table.insert(a_APIContainer.Functions, {Name = a_ClassName});
+	local function Add(a_APIContainer, a_ObjName, a_ObjValue)
+		if (type(a_ObjValue) == "function") then
+			table.insert(a_APIContainer.Functions, {Name = a_ObjName});
 		elseif (
-			(type(a_ClassObj) == "number") or
-			(type(a_ClassObj) == "string")
+			(type(a_ObjValue) == "number") or
+			(type(a_ObjValue) == "string")
 		) then
-			table.insert(a_APIContainer.Constants, {Name = a_ClassName, Value = a_ClassObj});
+			table.insert(a_APIContainer.Constants, {Name = a_ObjName, Value = a_ObjValue});
 		end
 	end
 	
@@ -153,12 +153,7 @@ function CreateAPITables()
 	
 	for i, v in pairs(_G) do
 		if (type(v) == "table") then
-			-- It is a table - probably a class
-			local StartLetter = GetChar(i, 0);
-			if (StartLetter == "c") then
-				-- Starts with a "c", handle it as a MCS API class
-				table.insert(API, ParseClass(i, v));
-			end
+			table.insert(API, ParseClass(i, v));
 		else
 			Add(Globals, i, v);
 		end
@@ -221,7 +216,18 @@ end
 
 
 function ReadDescriptions(a_API)
+	-- Returns true if the function (specified by its fully qualified name) is to be ignored
+	local function IsFunctionIgnored(a_FnName)
+		for i, name in ipairs(g_APIDesc.IgnoreFunctions) do
+			if (a_FnName:match(name)) then
+				return true;
+			end
+		end
+		return false;
+	end
+	
 	local UnexportedDocumented = {};  -- List of API objects that are documented but not exported, simply a list of names
+	
 	for i, cls in ipairs(a_API) do
 		local APIDesc = g_APIDesc.Classes[cls.Name];
 		if (APIDesc ~= nil) then
@@ -272,9 +278,18 @@ function ReadDescriptions(a_API)
 				end
 			end  -- if (APIDesc.Constants ~= nil)
 			
-		end
+			-- Remove ignored functions:
+			local NewFunctions = {};
+			for j, fn in ipairs(cls.Functions) do
+				if (not(IsFunctionIgnored(cls.Name .. "." .. fn.Name))) then
+					table.insert(NewFunctions, fn);
+				end
+			end  -- for j, fn
+			cls.Functions = NewFunctions;
+			
+		end  -- if (APIDesc ~= nil)
 	end  -- for i, cls
-
+	
 	-- Sort the descendants lists:
 	for i, cls in ipairs(a_API) do
 		table.sort(cls.Descendants,
