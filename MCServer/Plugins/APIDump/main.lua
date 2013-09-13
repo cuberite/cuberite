@@ -295,10 +295,9 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		return;
 	end
 	
+	-- Make a link out of anything with the special linkifying syntax {{link|title}}
 	local function LinkifyString(a_String)
-		-- TODO: Make a link out of anything with the special linkifying syntax {{link|title}}
-		-- a_String:gsub("{{([^|]*)|([^}])*}}", "<a href=\"%1\">%2</a>");
-		return a_String;
+		return (a_String:gsub("{{([^|]*)|([^}]*)}}", "<a href=\"%1.html\">%2</a>"));  -- The extra parenthesis remove the extra values returned by gsub()
 	end
 	
 	-- Writes a table containing all functions in the specified list, with an optional "inherited from" header when a_InheritedName is valid
@@ -361,7 +360,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	cf:write("<a name=\"desc\"><h1>" .. a_ClassAPI.Name .. " class</h1></a>\n");
 	if (a_ClassAPI.Desc ~= nil) then
 		cf:write("<p>");
-		cf:write(a_ClassAPI.Desc);
+		cf:write(LinkifyString(a_ClassAPI.Desc));
 		cf:write("</p>\n");
 	end;
 	
