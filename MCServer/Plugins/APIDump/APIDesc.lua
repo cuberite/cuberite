@@ -43,6 +43,7 @@ g_APIDesc =
 			]],
 			Functions =
 			{
+				constructor = { Params = "", Return = "cBlockArea", Notes = "Creates a new empty cBlockArea object" },
 				Clear = { Params = "", Return = "", Notes = "Clears the object, resets it to zero size" },
 				CopyFrom = { Params = "BlockAreaSrc", Return = "", Notes = "Copies contents from BlockAreaSrc into self" },
 				CopyTo = { Params = "BlockAreaDst", Return = "", Notes = "Copies contents from self into BlockAreaDst." },

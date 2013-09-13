@@ -246,8 +246,12 @@ function ReadDescriptions(a_API)
 			if (APIDesc.Functions ~= nil) then
 				-- Assign function descriptions:
 				for j, func in ipairs(cls.Functions) do
-					-- func is {"FuncName"}, add Parameters, Return and Notes from g_APIDesc
-					local FnDesc = APIDesc.Functions[func.Name];
+					local FnName = func.Name;
+					if (FnName == ".call") then
+						FnName = "constructor";
+						func.Name = "() <i>(constructor)</i>";
+					end
+					local FnDesc = APIDesc.Functions[FnName];
 					if (FnDesc ~= nil) then
 						func.Params = FnDesc.Params;
 						func.Return = FnDesc.Return;
