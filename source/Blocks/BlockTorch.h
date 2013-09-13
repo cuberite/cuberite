@@ -100,12 +100,6 @@ public:
 	}
 
 
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return true;
-	}
-
-
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, char a_Direction)
 	{
 		if ( g_BlockIsSolid[a_BlockType] ) {
