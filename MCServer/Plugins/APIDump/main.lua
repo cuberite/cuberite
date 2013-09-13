@@ -208,6 +208,18 @@ function DumpAPIHtml()
 	f:write("</ul></body></html>");
 	f:close();
 	
+	-- Copy the CSS file to the output folder (overwrite any existing):
+	cssf = io.open("API/main.css", "w");
+	if (cssf ~= nil) then
+		cssfi = io.open(g_Plugin:GetLocalDirectory() .. "/main.css", "r");
+		if (cssfi ~= nil) then
+			local CSS = cssfi:read("*all");
+			cssf:write(CSS);
+			cssfi:close();
+		end
+		cssf:close();
+	end
+	
 	LOG("API subfolder written");
 end
 

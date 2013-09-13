@@ -1,0 +1,23 @@
+table
+{
+	background-color: #fff;
+	border-spacing: 0px;
+	border-collapse: collapse;
+	border-color: gray;
+}
+
+tr
+{
+	display: table-row;
+	vertical-align: inherit;
+	border-color: inherit;
+}
+
+td, th
+{
+	display: table-cell;
+	vertical-align: inherit;
+	padding: 3px;
+	border: 1px solid #ccc;
+}
+
