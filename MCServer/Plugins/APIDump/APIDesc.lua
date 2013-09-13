@@ -14,7 +14,7 @@ g_APIDesc =
 		{
 			Desc = [[
 				This class is used when multiple adjacent blocks are to be manipulated. Because of chunking
-				and multithreading, manipulating single blocks using {{api:cWorld|cWorld:SetBlock}}() is a rather
+				and multithreading, manipulating single blocks using {{cWorld|cWorld:SetBlock}}() is a rather
 				time-consuming operation (locks for exclusive access need to be obtained, chunk lookup is done
 				for each block), so whenever you need to manipulate multiple adjacent blocks, it's better to wrap
 				the operation into a cBlockArea access. cBlockArea is capable of reading / writing across chunk
@@ -36,9 +36,9 @@ g_APIDesc =
 				<p>
 				Typical usage:<ul>
 					<li>Create cBlockArea object</li>
-					<li>Read an area from the world</li>
+					<li>Read an area from the world / load from file / create anew</li>
 					<li>Modify blocks inside cBlockArea</li>
-					<li>Write the area back to a world</li>
+					<li>Write the area back to a world / save to file</li>
 				</ul></p>
 			]],
 			Functions =
