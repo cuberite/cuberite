@@ -621,25 +621,30 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			},
 			Constants =
 			{
-				invArmorCount = { Notes = "4" },
-				invArmorOffset = { Notes = "0" },
-				invInventoryCount = { Notes = "" },
-				invInventoryOffset = { Notes = "4" },
-				invHotbarCount = { Notes = "9" },
-				invHotbarOffset = { Notes = "" },
-				invNumSlots = { Notes = "" },
+				invArmorCount      = { Notes = "Number of slots in the Armor part" },
+				invArmorOffset     = { Notes = "Starting slot number of the Armor part" },
+				invInventoryCount  = { Notes = "Number of slots in the main inventory part" },
+				invInventoryOffset = { Notes = "Starting slot number of the main inventory part" },
+				invHotbarCount     = { Notes = "Number of slots in the Hotbar part" },
+				invHotbarOffset    = { Notes = "Starting slot number of the Hotbar part" },
+				invNumSlots        = { Notes = "Total number of slots in a cInventory" },
 			},
 		},
 
 		cItem =
 		{
-			Desc = [[cItem is what defines an item or stack of items in the game, it contains the item ID, damage, quantity and enchantments. Each slot in a {{cEnchantments|cEnchantments}} class
-]],
+			Desc = [[
+				cItem is what defines an item or stack of items in the game, it contains the item ID, damage,
+				quantity and enchantments. Each slot in a {{cInventory|cInventory}} class or a
+				{{cItemGrid|cItemGrid}} class is a cItem and each cPickup contains a cItem. The enchantments
+				are contained in a {{cEnchantments|cEnchantments}} class
+			]],
+			
 			Functions =
 			{
-				constructor = { Params = "", Return = "cItem", Notes = "Creates a new empty cItem obje" },
-				constructor = { Params = "ItemType, Count, Damage, EnchantmentString", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default) and enchantments (non-enchanted by default)" },
-				constructor = { Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
+				constructor1 = { Params = "", Return = "cItem", Notes = "Creates a new empty cItem obje" },
+				constructor2 = { Params = "ItemType, Count, Damage, EnchantmentString", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default) and enchantments (non-enchanted by default)" },
+				constructor3 = { Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
 				Clear = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
 				CopyOne = { Params = "", Return = "cItem", Notes = "Creates a copy of this object, with its count set to 1" },
 				DamageItem = { Params = "[Amount]", Return = "bool", Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)" },
