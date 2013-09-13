@@ -520,31 +520,36 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			// Push out entity.
 			BLOCKTYPE GotBlock;
 
-			static const Vector3i CrossCoords[] =
+			static const struct
 			{
-			  Vector3i(1, 0, 0),
-			  Vector3i(-1, 0, 0),
-			  Vector3i(0, 0, 1),
-			  Vector3i(0, 0, -1),
+				int x, y, z;
+			} gCrossCoords[] =
+			{
+				{ 1, 0,  0},
+				{-1, 0,  0},
+				{ 0, 0,  1},
+				{ 0, 0, -1},
 			} ;
-			Vector3i PushDirection(0, 1, 0);
-			
-			for (int i = 0; i < ARRAYCOUNT(CrossCoords); i++)
+
+			bool IsNoAirSurrounding = true;
+			for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 			{
-			  NextChunk->UnboundedRelGetBlockType(RelBlockX + CrossCoords[i].x, BlockY, RelBlockZ + CrossCoords[i].z, GotBlock);
-			  if (!g_BlockIsSolid[GotBlock])
-			  {
-			    PushDirection = CrossCoords[i];
-			    break;
-			  }
-			}  // for i - CrossCoords[]
-			NextPos += Vector3d(PushDirection) * 0.2;
+				NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock);
+				if (!g_BlockIsSolid[GotBlock])
+				{
+					NextPos.x += gCrossCoords[i].x;
+					NextPos.z += gCrossCoords[i].z;
+					IsNoAirSurrounding = false;
+				}
+			}  // for i - gCrossCoords[]
 			
+			if (IsNoAirSurrounding)
+			{ NextPos.y += 0.5; }
+
 			m_bOnGround = true;
 
 			LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
-				m_UniqueID, GetClass(), BlockX, BlockY, 
-			);
+				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ);
 		}
 
 		if (!m_bOnGround)
