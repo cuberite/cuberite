@@ -1251,6 +1251,7 @@ A list of items regarding plugins that have been documented
 ]],
 			Functions =
 			{
+				operator_plus = {Params = "{{Vector3d}}", Return = "{{Vector3d}}", Notes = "Returns the sum of this vector with the specified vector" },
 			},
 			Constants =
 			{

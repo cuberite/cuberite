@@ -247,6 +247,26 @@ function ReadDescriptions(a_API)
 	local UnexportedDocumented = {};  -- List of API objects that are documented but not exported, simply a list of names
 	
 	for i, cls in ipairs(a_API) do
+		-- Rename special functions:
+		for j, fn in ipairs(cls.Functions) do
+			if (fn.Name == ".call") then
+				fn.DocID = "constructor";
+				fn.Name = "() <i>(constructor)</i>";
+			elseif (fn.Name == ".add") then
+				fn.DocID = "operator_plus";
+				fn.Name = "<i>operator +</i>";
+			elseif (fn.Name == ".div") then
+				fn.DocID = "operator_div";
+				fn.Name = "<i>operator /</i>";
+			elseif (fn.Name == ".mul") then
+				fn.DocID = "operator_mul";
+				fn.Name = "<i>operator *</i>";
+			elseif (fn.Name == ".sub") then
+				fn.DocID = "operator_sub";
+				fn.Name = "<i>operator -</i>";
+			end
+		end
+		
 		local APIDesc = g_APIDesc.Classes[cls.Name];
 		if (APIDesc ~= nil) then
 			cls.Desc = APIDesc.Desc;
@@ -264,11 +284,7 @@ function ReadDescriptions(a_API)
 			if (APIDesc.Functions ~= nil) then
 				-- Assign function descriptions:
 				for j, func in ipairs(cls.Functions) do
-					local FnName = func.Name;
-					if (FnName == ".call") then
-						FnName = "constructor";
-						func.Name = "() <i>(constructor)</i>";
-					end
+					local FnName = func.DocID or func.Name;
 					local FnDesc = APIDesc.Functions[FnName];
 					if (FnDesc ~= nil) then
 						func.Params = FnDesc.Params;
