@@ -56,7 +56,7 @@ public:
 	static const int DEFAULT_VIEW_DISTANCE = 9;
 #endif
 	static const int MAX_VIEW_DISTANCE = 10;
-	static const int MIN_VIEW_DISTANCE = 4;
+	static const int MIN_VIEW_DISTANCE = 3;
 	
 	/// How many ticks should be checked for a running average of explosions, for limiting purposes
 	static const int NUM_CHECK_EXPLOSIONS_TICKS = 20;
