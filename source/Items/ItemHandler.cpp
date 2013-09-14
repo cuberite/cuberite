@@ -54,7 +54,11 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 {
 	if (a_ItemType < 0)
 	{
-		ASSERT(!"Bad item type");
+		// Either nothing (-1), or bad value, both cases should return the air handler
+		if (a_ItemType < -1)
+		{
+			ASSERT(!"Bad item type");
+		}
 		a_ItemType = 0;
 	}
 
@@ -86,6 +90,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_SAPLING:          return new cItemSaplingHandler(a_ItemType);
 		case E_BLOCK_WOOL:             return new cItemClothHandler(a_ItemType);
 		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
+		case E_ITEM_BOAT:              return new cItemBoatHandler(a_ItemType);
 		case E_ITEM_BOW:               return new cItemBowHandler;
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
@@ -181,11 +186,6 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 			return new cItemMinecartHandler(a_ItemType);
 		}
 		
-		case E_ITEM_BOAT:
-		{
-			return new cItemBoatHandler(a_ItemType);
-		}
-
 		// Food:
 		case E_ITEM_BREAD:
 		case E_ITEM_COOKIE:
