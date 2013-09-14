@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/07/13 22:05:18.
+** Generated automatically by tolua++-1.0.92 on 09/15/13 00:13:18.
 */
 
 #ifndef __cplusplus
@@ -4723,6 +4723,38 @@ static int tolua_AllToLua_cEntity_IsMinecart00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsMinecart'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsBoat of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsBoat00
+static int tolua_AllToLua_cEntity_IsBoat00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsBoat'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsBoat();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsBoat'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29652,6 +29684,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"etMonster",cEntity::etMonster);
    tolua_constant(tolua_S,"etFallingBlock",cEntity::etFallingBlock);
    tolua_constant(tolua_S,"etMinecart",cEntity::etMinecart);
+   tolua_constant(tolua_S,"etBoat",cEntity::etBoat);
    tolua_constant(tolua_S,"etTNT",cEntity::etTNT);
    tolua_constant(tolua_S,"etProjectile",cEntity::etProjectile);
    tolua_constant(tolua_S,"etMob",cEntity::etMob);
@@ -29664,6 +29697,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsPickup",tolua_AllToLua_cEntity_IsPickup00);
    tolua_function(tolua_S,"IsMob",tolua_AllToLua_cEntity_IsMob00);
    tolua_function(tolua_S,"IsMinecart",tolua_AllToLua_cEntity_IsMinecart00);
+   tolua_function(tolua_S,"IsBoat",tolua_AllToLua_cEntity_IsBoat00);
    tolua_function(tolua_S,"IsTNT",tolua_AllToLua_cEntity_IsTNT00);
    tolua_function(tolua_S,"IsA",tolua_AllToLua_cEntity_IsA00);
    tolua_function(tolua_S,"GetClass",tolua_AllToLua_cEntity_GetClass00);
