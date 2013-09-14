@@ -42,8 +42,37 @@ g_APIDesc =
 					Contents = "Contents of the additional section 2",
 				}
 			},
+			
+			Inherits = "ParentClassName",  -- Only present if the class inherits from another API class
 		},
 		]]--
+		
+		cArrowEntity =
+		{
+			Desc = [[
+				Represents the arrow when it is shot from the bow. A subclass of the {{cProjectileEntity}}.
+			]],
+			
+			Functions =
+			{
+				CanPickup      = { Params = "{{cPlayer|Player}}", Return = "bool", Notes = "Returns true if the specified player can pick the arrow when it's on the ground" },
+				GetDamageCoeff = { Params = "", Return = "number", Notes = "Returns the damage coefficient stored within the arrow. The damage dealt by this arrow is multiplied by this coeff" },
+				GetPickupState = { Params = "", Return = "PickupState", Notes = "Returns the pickup state (one of the psXXX constants, above)" },
+				IsCritical     = { Params = "", Return = "bool", Notes = "Returns true if the arrow should deal critical damage. Based on the bow charge when the arrow was shot." },
+				SetDamageCoeff = { Params = "number", Return = "", Notes = "Sets the damage coefficient. The damage dealt by this arrow is multiplied by this coeff" },
+				SetIsCritical  = { Params = "bool", Return = "", Notes = "Sets the IsCritical flag on the arrow. Critical arrow deal additional damage" },
+				SetPickupState = { Params = "PickupState", Return = "", Notes = "Sets the pickup state (one of the psXXX constants, above)" },
+			},
+			
+			Constants =
+			{
+				psInCreative           = { Notes = "The arrow can be picked up only by players in creative gamemode" },
+				psInSurvivalOrCreative = { Notes = "The arrow can be picked up by players in survival or creative gamemode" },
+				psNoPickup             = { Notes = "The arrow cannot be picked up at all" },
+			},
+			
+			Inherits = "cProjectileEntity",
+		},
 		
 		cBlockArea =
 		{
