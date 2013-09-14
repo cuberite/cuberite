@@ -912,18 +912,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			},
 		},
 
-		cluachunk =
-		{
-			Desc = [[]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
-		Callbacks =
+		cLuaWindow =
 		{
 			Desc = [[This class is used by plugins wishing to display a custom window to the player, unrelated to block entities or entities near the player. The window can be of any type and have any contents that the plugin defines. Callbacks for when the player modifies the window contents and when the player closes the window can be set.
 </p>
@@ -934,21 +923,6 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 		<p>When creating a new cLuaWindow object, you need to specify both the window type and the contents' width and height. Note that MCServer accepts any combination of these, but opening a window for a player may crash their client if the contents' dimensions don't match the client's expectations.
 </p>
 		<p>To open the window for a player, call {{cPlayer|cPlayer}}:OpenWindow(). Multiple players can open window of the same cLuaWindow object. All players see the same items in the window's contents (like chest, unlike crafting table).
-The object calls the following functions at the appropriate time:
-==== OnClosing Callback ====
-This callback, settabel via the SetOnClosing() function, will be called when the player tries to close the window, or the window is closed for any other reason (such as a player disconnecting).
-<code lua>
-function OnWindowClosing(a_Window, a_Player, a_CanRefuse)
-</code>
-The a_Window parameter is the cLuaWindow object representing the window, a_Player is the player for whom the window is about to close. a_CanRefuse specifies whether the callback can refuse the closing. If the callback returns true and a_CanRefuse is true, the window is not closed (internally, the server sends a new OpenWindow packet to the client).
-==== OnSlotChanged Callback ====
-This callback, settable via the SetOnSlotChanged() function, will be called whenever the contents of any slot in the window's contents (i. e. NOT in the player inventory!) changes.
-<code lua>
-function OnWindowSlotChanged(a_Window, a_SlotNum)
-</code>
-The a_Window parameter is the cLuaWindow object representing the window, a_SlotNum is the slot number. There is no reference to a {{cWorld|cWorld}}:DoWithPlayer().
-</p>
-		<p>Any returned values are ignored.
 ]],
 			Functions =
 			{
@@ -960,7 +934,69 @@ The a_Window parameter is the cLuaWindow object representing the window, a_SlotN
 			Constants =
 			{
 			},
-		},
+			AdditionalInfo =
+			{
+				{
+					Header = "Callbacks",
+					Contents = [[
+						The object calls the following functions at the appropriate time:
+					]],
+				},
+				{
+					Header = "OnClosing Callback",
+					Contents = [[
+						This callback, settable via the SetOnClosing() function, will be called when the player tries to close the window, or the window is closed for any other reason (such as a player disconnecting).</p>
+<pre>
+function OnWindowClosing(a_Window, a_Player, a_CanRefuse)
+</pre>
+						<p>
+						The a_Window parameter is the cLuaWindow object representing the window, a_Player is the player for whom the window is about to close. a_CanRefuse specifies whether the callback can refuse the closing. If the callback returns true and a_CanRefuse is true, the window is not closed (internally, the server sends a new OpenWindow packet to the client).
+					]],
+				},
+				{
+					Header = "OnSlotChanged Callback",
+					Contents = [[
+						This callback, settable via the SetOnSlotChanged() function, will be called whenever the contents of any slot in the window's contents (i. e. NOT in the player inventory!) changes.</p>
+<pre>
+function OnWindowSlotChanged(a_Window, a_SlotNum)
+</pre>
+						<p>The a_Window parameter is the cLuaWindow object representing the window, a_SlotNum is the slot number. There is no reference to a {{cPlayer}}, because the slot change needn't originate from the player action. To get or set the slot, you'll need to retrieve a cPlayer object, for example by calling {{cWorld|cWorld}}:DoWithPlayer().
+						</p>
+						<p>Any returned values are ignored.
+					]],
+				},
+				{
+					Header = "Example",
+					Contents = [[
+						This example is taken from the Debuggers plugin, used to test the API functionality. It opens a window and refuse to close it 3 times. It also logs slot changes to the server console.
+<pre>
+-- Callback that refuses to close the window twice, then allows:
+local Attempt = 1;
+local OnClosing = function(Window, Player, CanRefuse)
+	Player:SendMessage("Window closing attempt #" .. Attempt .. "; CanRefuse = " .. tostring(CanRefuse));
+	Attempt = Attempt + 1;
+	return CanRefuse and (Attempt <= 3);  -- refuse twice, then allow, unless CanRefuse is set to true
+end
+
+-- Log the slot changes:
+local OnSlotChanged = function(Window, SlotNum)
+	LOG("Window \"" .. Window:GetWindowTitle() .. "\" slot " .. SlotNum .. " changed.");
+end
+
+-- Set window contents:
+-- a_Player is a cPlayer object received from the outside of this code fragment
+local Window = cLuaWindow(cWindow.Hopper, 3, 3, "TestWnd");
+Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
+Window:SetOnClosing(OnClosing);
+Window:SetOnSlotChanged(OnSlotChanged);
+
+-- Open the window:
+a_Player:OpenWindow(Window);
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cLuaWindow
 
 		cMCLogger =
 		{
@@ -1363,43 +1399,9 @@ unsigned int cChunk::MakeIndex(int x, int y, int z )
 			},
 		},
 
-		Documented =
-		{
-			Desc = [[</p>
-		<p>A plugin is a script written in Lua that can modify the game in multiple ways.
-A list of items regarding plugins that have been documented
-</p>
-		<p>{{indexmenu>:api:plugin#1}}
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
 		TakeDamageInfo =
 		{
 			Desc = [[The TakeDamageInfo is a struct that contains the amount of damage, and the entity that caused the damage. It is used in the {{OnTakeDamage|OnTakeDamage}}() hook and in the {{cEntity|cEntity}}'s TakeDamage() function.
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
-		Vector3 =
-		{
-			Desc = [[Vector3 is a family of classes that all represent a point in space
-<li>{{vector3f|vector3f}}</li>
-<li>Uses floating point values</li>
-<li>{{vector3d|vector3d}}</li>
-<li>Uses double precision floating point values</li>
-<li>{{vector3i|vector3i}}</li>
-<li>Uses fixed point (integer) values</li>
 ]],
 			Functions =
 			{
