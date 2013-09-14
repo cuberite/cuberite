@@ -308,6 +308,13 @@ g_APIDesc =
 			{
 			},
 		},
+		
+		cBoundingBox = 
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+		},
 
 		cChatColor =
 		{
@@ -631,6 +638,14 @@ g_APIDesc =
 			},
 		},
 
+		cFireChargeEntity = 
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+			Inherits = "cProjectileEntity",
+		} ,
+		
 		cFurnaceEntity =
 		{
 			Desc = [[This class represents a furnace block entity in the world. An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks)
@@ -657,8 +672,16 @@ g_APIDesc =
 				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid|cItemGrid}} representing the contents" },
 				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid|cItemGrid}} representing the contents" },
 			},
+			Inherits = "cBlockEntityWithItems"
 		},
 
+		cGhastFireballEntity =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+		} ,
+		
 		cGroup =
 		{
 			Desc = [[cGroup is a group {{cPlayer|cPlayer}}'s can be in. Groups define the permissions players have, and optionally the color of their name in the chat.
@@ -912,6 +935,13 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			},
 		},
 
+		cLineBlockTracer =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+		},
+		
 		cLuaWindow =
 		{
 			Desc = [[This class is used by plugins wishing to display a custom window to the player, unrelated to block entities or entities near the player. The window can be of any type and have any contents that the plugin defines. Callbacks for when the player modifies the window contents and when the player closes the window can be set.
@@ -998,6 +1028,14 @@ a_Player:OpenWindow(Window);
 			},  -- AdditionalInfo
 		},  -- cLuaWindow
 
+		cMonster =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+			Inherits = "cPawn",
+		},
+		
 		cPawn =
 		{
 			Desc = [[cPawn is a controllable pawn object, controlled by either AI or a player. cPawn inherits all functions and members of {{centity|centity}}
@@ -1098,6 +1136,14 @@ a_Player:OpenWindow(Window);
 			},
 		},
 
+		cPluginLua =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+			Inherits = "cPlugin",
+		},
+		
 		cPluginManager =
 		{
 			Desc = [[This class is used for generic plugin-related functionality. The plugin manager has a list of all plugins, can enable or disable plugins, manages hook and in-game console commands.
@@ -1131,6 +1177,14 @@ a_Player:OpenWindow(Window);
 			},
 		},
 
+		cProjectileEntity =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+			Inherits = "cEntity",
+		},
+		
 		cRoot =
 		{
 			Desc = [[There is always only one cRoot object in MCServer. cRoot manages all the important objects such as {{cServer|cServer}}
@@ -1182,7 +1236,31 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 			{
 			},
 		},
-
+		
+		cThrownEggEntity =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+			Inherits = "cProjectileEntity",
+		},
+		
+		cThrownEnderPearlEntity =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+			Inherits = "cProjectileEntity",
+		},
+		
+		cThrownSnowballEntity =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+			Inherits = "cProjectileEntity",
+		},
+		
 		cTracer =
 		{
 			Desc = [[A cTracer object is used to trace lines in the world. One thing you can use the cTracer for, is tracing what block a player is looking at, but you can do more with it if you want.
@@ -1197,6 +1275,20 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 			},
 		},
 
+		cWebAdmin =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+		},
+		
+		cWebPlugin =
+		{
+			Desc = "",
+			Functions = {},
+			Constants = {},
+		},
+		
 		cWindow =
 		{
 			Desc = [[This class is the common ancestor for all window classes used by MCServer. It is inherited by the {{cLuaWindow|cLuaWindow}} class that plugins use for opening custom windows. It is planned to be used for window-related hooks in the future. It implements the basic functionality of any window.
