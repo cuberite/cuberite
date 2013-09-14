@@ -128,26 +128,11 @@ function CreateAPITables()
 		end
 	end
 	
-	local function SortClass(a_ClassAPI)
-		table.sort(a_ClassAPI.Functions,  -- Sort function list
-			function(f1, f2)
-				return (f1.Name < f2.Name);
-			end
-		);
-		table.sort(a_ClassAPI.Constants,  -- Sort constant list
-			function(c1, c2)
-				return (c1.Name < c2.Name);
-			end
-		);
-	end;
-	
 	local function ParseClass(a_ClassName, a_ClassObj)
 		local res = {Name = a_ClassName, Functions = {}, Constants = {}, Descendants = {}};
 		for i, v in pairs(a_ClassObj) do
 			Add(res, i, v);
 		end
-		
-		SortClass(res);
 		return res;
 	end
 	
@@ -164,12 +149,6 @@ function CreateAPITables()
 			end
 		end
 	end
-	SortClass(Globals);
-	table.sort(API,
-		function(c1, c2)
-			return (c1.Name < c2.Name);
-		end
-	);
 	
 	return API, Globals;
 end
@@ -182,6 +161,15 @@ function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 
 	local API, Globals = CreateAPITables();
+	
+	-- Sort the classes by name:
+	table.sort(API,
+		function (c1, c2)
+			return (string.lower(c1.Name) < string.lower(c2.Name));
+		end
+	);
+	
+	-- Add Globals into the API:
 	Globals.Name = "Globals";
 	table.insert(API, Globals);
 	
@@ -325,6 +313,20 @@ function ReadDescriptions(a_API)
 			end
 		end  -- for j, fn
 		cls.Functions = NewFunctions;
+
+		-- Sort the functions (they may have been renamed):
+		table.sort(cls.Functions,
+			function(f1, f2)
+				return (f1.Name < f2.Name);
+			end
+		);
+		
+		-- Sort the constants:
+		table.sort(cls.Constants,
+			function(c1, c2)
+				return (c1.Name < c2.Name);
+			end
+		);
 	end  -- for i, cls
 	
 	-- Sort the descendants lists:
@@ -359,6 +361,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		if (#a_Functions == 0) then
 			return;
 		end
+
 		if (a_InheritedName ~= nil) then
 			cf:write("<h2>Functions inherited from " .. a_InheritedName .. "</h2>");
 		end

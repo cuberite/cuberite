@@ -1315,6 +1315,7 @@ A list of items regarding WebPlugins that have been documented
 		"%a+\.\.collector",  -- AnyClass..collector
 		"%a+\.new",          -- AnyClass.new
 		"%a+.new_local",     -- AnyClass.new_local
+		"%a+.delete",        -- AnyClass.delete
 	},
 } ;
 
