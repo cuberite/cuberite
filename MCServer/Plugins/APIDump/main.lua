@@ -193,14 +193,15 @@ function DumpAPIHtml()
 	
 	f:write([[<html><head><title>MCServer API - class index</title>
 	<link rel="stylesheet" type="text/css" href="main.css" />
-	</head><body>
+	</head><body><h1>MCServer API - class index</h1>
+	<p>The following classes are available in the MCServer Lua scripting language:
 	<ul>
 	]]);
 	for i, cls in ipairs(API) do
 		f:write("<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>\n");
 		WriteHtmlClass(cls, API);
 	end
-	f:write("</ul></body></html>");
+	f:write("</ul></p></body></html>");
 	f:close();
 	
 	-- Copy the CSS file to the output folder (overwrite any existing):
