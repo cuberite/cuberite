@@ -140,7 +140,8 @@ function CreateAPITables()
 		if (
 			(v ~= _G) and           -- don't want the global namespace
 			(v ~= _G.packages) and  -- don't want any packages
-			(v ~= _G[".get"])
+			(v ~= _G[".get"]) and
+			(v ~= g_APIDesc)
 		) then
 			if (type(v) == "table") then
 				table.insert(API, ParseClass(i, v));

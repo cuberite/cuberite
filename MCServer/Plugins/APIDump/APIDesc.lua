@@ -1308,14 +1308,22 @@ A list of items regarding WebPlugins that have been documented
 	
 	IgnoreFunctions =
 	{
-		"globals.assert",
-		"globals.collectgarbage",
-		"globals.xpcall",
+		"Globals.assert",
+		"Globals.collectgarbage",
+		"Globals.xpcall",
 		"%a+\.__%a+",        -- AnyClass.__Anything
 		"%a+\.\.collector",  -- AnyClass..collector
 		"%a+\.new",          -- AnyClass.new
 		"%a+.new_local",     -- AnyClass.new_local
 		"%a+.delete",        -- AnyClass.delete
+		
+		-- Functions global in the APIDump plugin:
+		"Initialize",
+		"DumpAPITxt",
+		"CreateAPITables",
+		"DumpAPIHtml",
+		"ReadDescriptions",
+		"WriteHtmlClass",
 	},
 } ;
 
