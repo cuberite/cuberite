@@ -269,19 +269,41 @@ function ReadDescriptions(a_API)
 					end
 				end
 			end
+
+			cls.Undocumented = {};  -- This will contain all the API objects that are not documented
+			
+			local DoxyFunctions = {};  -- This will contain all the API functions together with their documentation
+			
+			local function AddFunction(a_Name, a_Params, a_Return, a_Notes)
+				table.insert(DoxyFunctions, {Name = a_Name, Params = a_Params, Return = a_Return, Notes = a_Notes});
+			end
 			
 			if (APIDesc.Functions ~= nil) then
 				-- Assign function descriptions:
 				for j, func in ipairs(cls.Functions) do
 					local FnName = func.DocID or func.Name;
 					local FnDesc = APIDesc.Functions[FnName];
-					if (FnDesc ~= nil) then
-						func.Params = FnDesc.Params;
-						func.Return = FnDesc.Return;
-						func.Notes  = FnDesc.Notes;
+					if (FnDesc == nil) then
+						-- No description for this API function
+						AddFunction(func.Name);
+						table.insert(cls.Undocumented, func.Name);
+					else
+						-- Description is available
+						if (FnDesc[1] == nil) then
+							-- Single function definition
+							AddFunction(func.Name, FnDesc.Params, FnDesc.Return, FnDesc.Notes);
+						else
+							-- Multiple function overloads
+							for k, desc in ipairs(FnDesc) do
+								AddFunction(func.Name, desc.Params, desc.Return, desc.Notes);
+							end  -- for k, desc - FnDesc[]
+						end
 						FnDesc.IsExported = true;
 					end
 				end  -- for j, func
+				
+				-- Replace functions with their described and overload-expanded versions:
+				cls.Functions = DoxyFunctions;
 				
 				-- Add all non-exported function descriptions to UnexportedDocumented:
 				for j, func in pairs(APIDesc.Functions) do
@@ -293,7 +315,10 @@ function ReadDescriptions(a_API)
 				-- Assign constant descriptions:
 				for j, cons in ipairs(cls.Constants) do
 					local CnDesc = APIDesc.Constants[cons.Name];
-					if (CnDesc ~= nil) then
+					if (CnDesc == nil) then
+						-- Not documented
+						table.insert(cls.Undocumented, cons.Name);
+					else
 						cons.Notes = CnDesc.Notes;
 						CnDesc.IsExported = true;
 					end
@@ -318,6 +343,13 @@ function ReadDescriptions(a_API)
 		-- Sort the functions (they may have been renamed):
 		table.sort(cls.Functions,
 			function(f1, f2)
+				if (f1.Name == f2.Name) then
+					-- Same name, either comparing the same function to itself, or two overloads, in which case compare the params
+					if ((f1.Params == nil) or (f2.Params == nil)) then
+						return 0;
+					end
+					return (f1.Params < f2.Params);
+				end
 				return (f1.Name < f2.Name);
 			end
 		);

@@ -152,10 +152,16 @@ g_APIDesc =
 			Functions =
 			{
 				GetContents = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the cItemGrid object representing the items stored within this block entity" },
-				GetSlot = { Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot number. Returns nil for invalid slot numbers" },
-				GetSlot = { Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot coords. Returns nil for invalid slot coords" },
-				SetSlot = { Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot number. Ignored if invalid slot number" },
-				SetSlot = { Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords" },
+				GetSlot =
+				{
+					{ Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot number. Returns nil for invalid slot numbers" },
+					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot coords. Returns nil for invalid slot coords" },
+				},
+				SetSlot = 
+				{
+					{ Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot number. Ignored if invalid slot number" },
+					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords" },
+				},
 			},
 			Constants =
 			{
@@ -297,10 +303,16 @@ g_APIDesc =
 				GetIngredientsHeight = { Params = "", Return = "number", Notes = "Returns the height of the ingredients' grid" },
 				GetIngredientsWidth = { Params = "", Return = "number", Notes = "Returns the width of the ingredients' grid" },
 				GetResult = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the result of the recipe" },
-				SetIngredient = { Params = "x, y, {{cItem|cItem}}", Return = "", Notes = "Sets the ingredient at the specified coords" },
-				SetIngredient = { Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the ingredient at the specified coords" },
-				SetResult = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the result item" },
-				SetResult = { Params = "ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the result item" },
+				SetIngredient = 
+				{
+					{ Params = "x, y, {{cItem|cItem}}", Return = "", Notes = "Sets the ingredient at the specified coords" },
+					{ Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the ingredient at the specified coords" },
+				},
+				SetResult =
+				{
+					{ Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the result item" },
+					{ Params = "ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the result item" },
+				},
 			},
 			Constants =
 			{
