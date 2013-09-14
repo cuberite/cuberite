@@ -299,17 +299,16 @@ function ReadDescriptions(a_API)
 					-- TODO
 				end
 			end  -- if (APIDesc.Constants ~= nil)
-			
-			-- Remove ignored functions:
-			local NewFunctions = {};
-			for j, fn in ipairs(cls.Functions) do
-				if (not(IsFunctionIgnored(cls.Name .. "." .. fn.Name))) then
-					table.insert(NewFunctions, fn);
-				end
-			end  -- for j, fn
-			cls.Functions = NewFunctions;
-			
 		end  -- if (APIDesc ~= nil)
+		
+		-- Remove ignored functions:
+		local NewFunctions = {};
+		for j, fn in ipairs(cls.Functions) do
+			if (not(IsFunctionIgnored(cls.Name .. "." .. fn.Name))) then
+				table.insert(NewFunctions, fn);
+			end
+		end  -- for j, fn
+		cls.Functions = NewFunctions;
 	end  -- for i, cls
 	
 	-- Sort the descendants lists:
