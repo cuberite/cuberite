@@ -349,7 +349,9 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	-- Make a link out of anything with the special linkifying syntax {{link|title}}
 	local function LinkifyString(a_String)
-		return (a_String:gsub("{{([^|]*)|([^}]*)}}", "<a href=\"%1.html\">%2</a>"));  -- The extra parenthesis remove the extra values returned by gsub()
+		local txt = a_String:gsub("{{([^|]*)|([^}]*)}}", "<a href=\"%1.html\">%2</a>")  -- {{link|title}}
+		txt = txt:gsub("{{([^|]*)}}", "<a href=\"%1.html\">%1</a>")  -- {{LinkAndTitle}}
+		return txt;
 	end
 	
 	-- Writes a table containing all functions in the specified list, with an optional "inherited from" header when a_InheritedName is valid
