@@ -259,6 +259,7 @@ function ReadDescriptions(a_API)
 		local APIDesc = g_APIDesc.Classes[cls.Name];
 		if (APIDesc ~= nil) then
 			cls.Desc = APIDesc.Desc;
+			cls.AdditionalInfo = APIDesc.AdditionalInfo;
 			
 			-- Process inheritance:
 			if (APIDesc.Inherits ~= nil) then
@@ -444,6 +445,11 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	end
 	cf:write("<li><a href=\"#constants\">Constants</a></li>\n");
 	cf:write("<li><a href=\"#functions\">Functions</a></li>\n");
+	if (a_ClassAPI.AdditionalInfo ~= nil) then
+		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
+			cf:write("<li><a href=\"#additionalinfo_" .. i .. "\">" .. additional.Header .. "</a></li>\n");
+		end
+	end
 	cf:write("</ul>");
 	
 	-- Write the class description:
@@ -488,6 +494,14 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		WriteFunctions(cls.Functions, cls.Name);
 	end
 	
+	-- Write the additional infos:
+	if (a_ClassAPI.AdditionalInfo ~= nil) then
+		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
+			cf:write("<a name=\"additionalinfo_" .. i .. "\"><h1>" .. additional.Header .. "</h1></a>\n");
+			cf:write(additional.Contents);
+		end
+	end
+
 	cf:write("</body></html>");
 	cf:close();
 end

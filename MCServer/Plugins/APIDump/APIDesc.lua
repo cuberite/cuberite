@@ -110,7 +110,83 @@ g_APIDesc =
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
 			},
-		},
+			
+			AdditionalInfo = {
+				{
+					Header = "Merge strategies",
+					Contents =
+					[[
+						<p>The strategy parameter specifies how individual blocks are combined together, using the table below.
+						</p>
+						<table class="inline">
+						<tbody><tr>
+						<th colspan="2">area block</th><th colspan="3">result</th>
+						</tr>
+						<tr>
+						<th> this </th><th> Src </th><th> msOverwrite </th><th> msFillAir </th><th> msImprint </th>
+						</tr>
+						<tr>
+						<td> air </td><td> air </td><td> air </td><td> air </td><td> air </td>
+						</tr>
+						<tr>
+						<td> A </td><td> air </td><td> air </td><td> A </td><td> A </td>
+						</tr>
+						<tr>
+						<td> air </td><td> B </td><td> B </td><td> B </td><td> B </td>
+						</tr>
+						<tr>
+						<td> A </td><td> B </td><td> B </td><td> A </td><td> B </td>
+						</tr>
+						</tbody></table>
+
+						<p>
+						So to sum up:
+						<ol>
+						<li class="level1">msOverwrite completely overwrites all blocks with the Src's blocks</li>
+						<li class="level1">msFillAir overwrites only those blocks that were air</li>
+						<li class="level1">msImprint overwrites with only those blocks that are non-air</li>
+						</ol>
+						</p>
+
+						<p>
+						Special strategies:
+						</p>
+
+						<p>
+						<strong>msLake</strong> (evaluate top-down, first match wins):
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> sponge </td><td> A </td><td> Sponge is the NOP block </td>
+						</tr><tr>
+						<td> *        </td><td> air    </td><td> air    </td><td> Air always gets hollowed out, even under the oceans </td>
+						</tr><tr>
+						<td> water    </td><td> *      </td><td> water  </td><td> Water is never overwritten </td>
+						</tr><tr>
+						<td> lava     </td><td> *      </td><td> lava   </td><td> Lava is never overwritten </td>
+						</tr><tr>
+						<td> *        </td><td> water  </td><td> water  </td><td> Water always overwrites anything </td>
+						</tr><tr>
+						<td> *        </td><td> lava   </td><td> lava   </td><td> Lava always overwrites anything </td>
+						</tr><tr>
+						<td> dirt     </td><td> stone  </td><td> stone  </td><td> Stone overwrites dirt </td>
+						</tr><tr>
+						<td> grass    </td><td> stone  </td><td> stone  </td><td> ... and grass </td>
+						</tr><tr>
+						<td> mycelium </td><td> stone  </td><td> stone  </td><td> ... and mycelium </td>
+						</tr><tr>
+						<td> A        </td><td> stone  </td><td> A      </td><td> ... but nothing else </td>
+						</tr><tr>
+						<td> A        </td><td> *      </td><td> A      </td><td> Everything else is left as it is </td>
+						</tr>
+						</tbody></table>
+					]],
+				},  -- Merge strategies
+			},  -- AdditionalInfo
+		},  -- cBlockArea
 
 		cBlockEntity =
 		{
