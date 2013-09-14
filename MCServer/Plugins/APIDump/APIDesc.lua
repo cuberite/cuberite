@@ -10,6 +10,41 @@ g_APIDesc =
 {
 	Classes =
 	{
+		--[[
+		-- What the APIDump plugin understands / how to document stuff:
+		ExampleClassName =
+		{
+			Desc = "Description, exported as the first paragraph of the class page. Usually enclosed within double brackets."
+			
+			Functions =
+			{
+				FunctionName = { Params = "Parameter list", Return = "Return values list", Notes = "Notes" ),
+				OverloadedFunctionName =  -- When a function supports multiple parameter variants
+				{
+					{ Params = "Parameter list 1", Return = "Return values list 1", Notes = "Notes 1" },
+					{ Params = "Parameter list 2", Return = "Return values list 2", Notes = "Notes 2" },
+				}
+			} ,
+			
+			Constants =
+			{
+				ConstantName = { Notes = "Notes about the constant" },
+			} ,
+			
+			AdditionalInfo =  -- Paragraphs to be exported after the function definitions table
+			{
+				{
+					Header = "Header 1",
+					Contents = "Contents of the additional section 1",
+				},
+				{
+					Header = "Header 2",
+					Contents = "Contents of the additional section 2",
+				}
+			},
+		},
+		]]--
+		
 		cBlockArea =
 		{
 			Desc = [[
@@ -111,7 +146,8 @@ g_APIDesc =
 				msLake = { Notes = "Special mode for merging lake images" },
 			},
 			
-			AdditionalInfo = {
+			AdditionalInfo =
+			{
 				{
 					Header = "Merge strategies",
 					Contents =
@@ -323,8 +359,10 @@ g_APIDesc =
 
 		cClientHandle =
 		{
-			Desc = [[A cClientHandle represents technical aspect of connected player - it's game client.
-]],
+			Desc = [[
+				A cClientHandle represents technical aspect of a connected player - their game client connection.
+			]],
+			
 			Functions =
 			{
 				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
@@ -346,8 +384,13 @@ g_APIDesc =
 
 		cCraftingGrid =
 		{
-			Desc = [[cCraftingGrid represents the player's crafting grid. It is used only in {{OnCraftingNoRecipe|OnCraftingNoRecipe}}, {{OnPostCrafting|OnPostCrafting}} and {{OnPreCrafting|OnPreCrafting}} hooks. Plugins may use it to inspect the items the player placed on their crafting grid.
-]],
+			Desc = [[
+				cCraftingGrid represents the player's crafting grid. It is used only in
+				{{OnCraftingNoRecipe|OnCraftingNoRecipe}}, {{OnPostCrafting|OnPostCrafting}} and
+				{{OnPreCrafting|OnPreCrafting}} hooks. Plugins may use it to inspect the items the player placed
+				on their crafting grid.
+			]],
+			
 			Functions =
 			{
 				Clear = { Params = "", Return = "", Notes = "Clears the entire grid" },
@@ -356,8 +399,11 @@ g_APIDesc =
 				GetHeight = { Params = "", Return = "number", Notes = "Returns the height of the grid" },
 				GetItem = { Params = "x, y", Return = "{{cItem|cItem}}", Notes = "Returns the item at the specified coords" },
 				GetWidth = { Params = "", Return = "number", Notes = "Returns the width of the grid" },
-				SetItem = { Params = "x, y, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified coords" },
-				SetItem = { Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified coords" },
+				SetItem = 
+				{
+					{ Params = "x, y, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified coords" },
+					{ Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified coords" },
+				},
 			},
 			Constants =
 			{
@@ -366,7 +412,8 @@ g_APIDesc =
 
 		cCraftingRecipe =
 		{
-			Desc = [[This class is used to represent a crafting recipe, either a built-in one, or one created dynamically in a plugin. It is used only as a parameter for {{OnCraftingNoRecipe|OnCraftingNoRecipe}}, {{OnPostCrafting|OnPostCrafting}} and {{OnPreCrafting|OnPreCrafting}} hooks. Plugins may use it to inspect or modify a crafting recipe that a player views in their crafting window, either at a crafting table or the survival inventory screen.
+			Desc = [[
+				This class is used to represent a crafting recipe, either a built-in one, or one created dynamically in a plugin. It is used only as a parameter for {{OnCraftingNoRecipe|OnCraftingNoRecipe}}, {{OnPostCrafting|OnPostCrafting}} and {{OnPreCrafting|OnPreCrafting}} hooks. Plugins may use it to inspect or modify a crafting recipe that a player views in their crafting window, either at a crafting table or the survival inventory screen.
 </p>
 		<p>Internally, the class contains a {{cItem|cItem}} for the result.
 ]],
