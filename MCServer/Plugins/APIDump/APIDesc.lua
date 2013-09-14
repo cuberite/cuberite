@@ -473,18 +473,21 @@ g_APIDesc =
 
 		cCuboid =
 		{
-			Desc = [[cCuboid offers some native support for cuboids. A cuboid simply consists of two {{vector3i|vector3i}}'s. It offers some extra functions for sorting and checking if a point is inside the cuboid.
-]],
+			Desc = [[
+				cCuboid offers some native support for integral-boundary cuboids. A cuboid simply consists of two
+				{{vector3i}}-s. It offers some extra functions for sorting and checking if a point is inside the
+				cuboid.
+			]],
 			Functions =
 			{
-			},
-			Constants =
-			{
-				p = { Notes = "{{Vector3i|Vector3i}}" },
-				p = { Notes = "{{Vector3i|Vector3i}}" },
 				Sort = { Notes = "void" },
 				IsInside = { Notes = "bool" },
 				IsInside = { Notes = "bool" },
+			},
+			Variables =
+			{
+				p1 = { Notes = "{{Vector3i}} of one corner. Usually the lesser of the two coords in each set" },
+				p2 = { Notes = "{{Vector3i}} of the other corner. Usually the larger of the two coords in each set" },
 			},
 		},
 
@@ -501,6 +504,7 @@ g_APIDesc =
 			Constants =
 			{
 			},
+			Inherits = "cDropSpenserEntity",
 		},
 
 		cDropperEntity =
@@ -516,9 +520,10 @@ g_APIDesc =
 			Constants =
 			{
 			},
+			Inherits = "cDropSpenserEntity",
 		},
 
-		cDropSpenser =
+		cDropSpenserEntity =
 		{
 			Desc = [[This is a class that implements behavior common to both {{cDispenserEntity|dispensers}} and {{cDropperEntity|droppers}}.
 ]],
@@ -533,6 +538,8 @@ g_APIDesc =
 				ContentsWidth = { Notes = "Width (X) of the cItemGrid representing the contents" },
 				ContentsHeight = { Notes = "Height (Y) of the cItemGrid representing the contents" },
 			},
+			
+			Inherits = "cBlockEntity";
 		},
 
 		cEnchantments =
@@ -658,9 +665,6 @@ g_APIDesc =
 ]],
 			Functions =
 			{
-			},
-			Constants =
-			{
 				SetName = { Notes = "void" },
 				GetName = { Notes = "String" },
 				SetColor = { Notes = "void" },
@@ -670,6 +674,9 @@ g_APIDesc =
 				AddPermission = { Notes = "void" },
 				InheritFrom = { Notes = "void" },
 			},
+			Constants =
+			{
+			},
 		},
 
 		cIniFile =
@@ -678,10 +685,7 @@ g_APIDesc =
 ]],
 			Functions =
 			{
-			},
-			Constants =
-			{
-				cIniFile = { Notes = "{{cIniFile|cIniFile}}" },
+				constructor = { Return = "{{cIniFile|cIniFile}}" },
 				CaseSensitive = { Notes = "void" },
 				CaseInsensitive = { Notes = "void" },
 				Path = { Notes = "void" },
@@ -739,6 +743,9 @@ g_APIDesc =
 				DeleteKeyComment = { Notes = "bool" },
 				DeleteKeyComments = { Notes = "bool" },
 				DeleteKeyComments = { Notes = "bool" },
+			},
+			Constants =
+			{
 			},
 		},
 
@@ -807,9 +814,12 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			
 			Functions =
 			{
-				constructor1 = { Params = "", Return = "cItem", Notes = "Creates a new empty cItem obje" },
-				constructor2 = { Params = "ItemType, Count, Damage, EnchantmentString", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default) and enchantments (non-enchanted by default)" },
-				constructor3 = { Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
+				constructor =
+				{
+					{ Params = "", Return = "cItem", Notes = "Creates a new empty cItem obje" },
+					{ Params = "ItemType, Count, Damage, EnchantmentString", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default) and enchantments (non-enchanted by default)" },
+					{ Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
+				} ,
 				Clear = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
 				CopyOne = { Params = "", Return = "cItem", Notes = "Creates a copy of this object, with its count set to 1" },
 				DamageItem = { Params = "[Amount]", Return = "bool", Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)" },
@@ -878,9 +888,13 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			},
 		},
 
-		citems =
+		cItems =
 		{
-			Desc = [[]],
+			Desc = [[
+				This class represents a numbered collection (array) of {{cItem}} objects. The array indices start at
+				zero, each consecutive item gets a consecutive index. This class is used for spawning multiple
+				pickups or for mass manipulating an inventory.
+				]],
 			Functions =
 			{
 				constructor = { Params = "", Return = "cItems", Notes = "Creates a new cItems object" },
@@ -895,20 +909,6 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			},
 			Constants =
 			{
-			},
-		},
-
-		cLadder =
-		{
-			Desc = [[cLadder just represents ladders and their specific - rotation.
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-				DirectionToMetaData = { Notes = "char" },
-				MetaDataToDirection = { Notes = "char" },
 			},
 		},
 
@@ -998,83 +998,11 @@ a_Player:OpenWindow(Window);
 			},  -- AdditionalInfo
 		},  -- cLuaWindow
 
-		cMCLogger =
-		{
-			Desc = [[cMCLogger gives you a bit more complex way to log things.
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-				LogSimple = { Notes = "void" },
-			},
-		},
-
-		cPacket =
-		{
-			Desc = [[This packet is received by clients when they are digging blocks
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-				m = { Notes = "char" },
-				m = { Notes = "int" },
-				m = { Notes = "char" },
-				m = { Notes = "int" },
-				m = { Notes = "char" },
-			},
-		},
-
-		cPacket =
-		{
-			Desc = [[This packet is received by clients when they are placing blocks
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-				m = { Notes = "int" },
-				m = { Notes = "char" },
-				m = { Notes = "int" },
-				m = { Notes = "char" },
-				m = { Notes = "short int" },
-				m = { Notes = "char" },
-				m = { Notes = "short int" },
-			},
-		},
-
-		cPacket =
-		{
-			Desc = [[This packet is received when a client logs in
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-				m = { Notes = "int" },
-				m = { Notes = "String" },
-				m = { Notes = "String" },
-				m = { Notes = "int" },
-				m = { Notes = "int" },
-				m = { Notes = "char" },
-				m = { Notes = "char" },
-				m = { Notes = "char" },
-			},
-		},
-
 		cPawn =
 		{
 			Desc = [[cPawn is a controllable pawn object, controlled by either AI or a player. cPawn inherits all functions and members of {{centity|centity}}
 ]],
 			Functions =
-			{
-			},
-			Constants =
 			{
 				TeleportToEntity = { Notes = "void" },
 				TeleportTo = { Notes = "void" },
@@ -1083,6 +1011,10 @@ a_Player:OpenWindow(Window);
 				KilledBy = { Notes = "void" },
 				GetHealth = { Notes = "int" },
 			},
+			Constants =
+			{
+			},
+			Inherits = "cEntity",
 		},
 
 		cPickup =
@@ -1091,13 +1023,14 @@ a_Player:OpenWindow(Window);
 ]],
 			Functions =
 			{
-			},
-			Constants =
-			{
 				cPickup = { Notes = "[[cPickup}}" },
 				GetItem = { Notes = "{{cItem|cItem}}" },
 				CollectedBy = { Notes = "bool" },
 			},
+			Constants =
+			{
+			},
+			Inherits = "cEntity",
 		},
 
 		cPlayer =
@@ -1105,9 +1038,6 @@ a_Player:OpenWindow(Window);
 			Desc = [[cPlayer describes a human player in the server. cPlayer inherits all functions and members of {{cPawn|cPawn}}
 ]],
 			Functions =
-			{
-			},
-			Constants =
 			{
 				GetEyeHeight = { Notes = "double" },
 				GetEyePosition = { Notes = "{{Vector3d|Vector3d}}" },
@@ -1144,6 +1074,10 @@ a_Player:OpenWindow(Window);
 				GetGroups = { Notes = "list<{{cGroup|cGroup}}>" },
 				GetResolvedPermissions = { Notes = "String" },
 			},
+			Constants =
+			{
+			},
+			Inherits = "cPawn",
 		},
 
 		cPlugin =
@@ -1152,15 +1086,15 @@ a_Player:OpenWindow(Window);
 ]],
 			Functions =
 			{
-			},
-			Constants =
-			{
 				GetName = { Notes = "String" },
 				SetName = { Notes = "void" },
 				GetVersion = { Notes = "int" },
 				SetVersion = { Notes = "void" },
 				GetFileName = { Notes = "String" },
 				CreateWebPlugin = { Notes = "{{cWebPlugin|cWebPlugin}}" },
+			},
+			Constants =
+			{
 			},
 		},
 
@@ -1197,17 +1131,6 @@ a_Player:OpenWindow(Window);
 			},
 		},
 
-		cplugin_newlua =
-		{
-			Desc = [[]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
 		cRoot =
 		{
 			Desc = [[There is always only one cRoot object in MCServer. cRoot manages all the important objects such as {{cServer|cServer}}
@@ -1232,29 +1155,11 @@ a_Player:OpenWindow(Window);
 			},
 		},
 
-		Data =
+		cSignEntity =
 		{
-			Desc = [[<li>Inherits {{cBlockEntity|cBlockEntity}}</li>
+			Desc = [[
 A sign entity represents a sign in the world.
 Sign entities are saved and loaded from disk when the chunk they reside in is saved or loaded
-</p>
-		<p>Here's some raw C++ code showing how sign entities are saved
-<code cpp>
-void cSignEntity::WriteToFile(FILE* a_File)
-{
-	fwrite( &m_BlockType, sizeof( ENUM_BLOCK_ID ), 1, a_File );
-	fwrite( &m_PosX, sizeof( int ), 1, a_File );
-	fwrite( &m_PosY, sizeof( int ), 1, a_File );
-	fwrite( &m_PosZ, sizeof( int ), 1, a_File );
-</p>
-		<p>	for( int i = 0; i < 4; i++ )
-	{
-		short Size = m_Line[i].size();
-		fwrite( &Size, sizeof(short), 1, a_File );
-		fwrite( m_Line[i].c_str(), Size * sizeof(char), 1, a_File );
-	}
-}
-</code>
 ]],
 			Functions =
 			{
@@ -1262,23 +1167,13 @@ void cSignEntity::WriteToFile(FILE* a_File)
 			Constants =
 			{
 			},
+			
+			Inherits = "cBlockEntity";
 		},
 
 		cStringMap =
 		{
 			Desc = [[cStringMap is an object that maps strings with strings, it's also known as a dictionary
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
-		cTCPLink =
-		{
-			Desc = [[OBSOLETE, Do not use!
 ]],
 			Functions =
 			{
@@ -1347,58 +1242,6 @@ void cSignEntity::WriteToFile(FILE* a_File)
 			},
 		},
 
-		Coordinates =
-		{
-			Desc = [[The PAK format is highly compact format that has a slightly better compression ratio and saving / loading times than the {{dataformatanvil | Anvil}} format. 
-I use this function to convert block coordinates to indices which I use to access the arrays of blocks
-<code cpp>
-unsigned int cChunk::MakeIndex(int x, int y, int z )
-{
-	if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
-		return y + (z * 128) + (x * 128 * 16);
-	return 0;
-}
-</code>
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
-		eGameMode =
-		{
-			Desc = [[</p>
-		<p>{{eGameMode|eGameMode}} is an enum that defines what game mode a player is in. It can be one of these two values.
-</p>
-		<p>^ eGameMode ^
-| eGameMode_Survival |
-| eGameMode_Creative |
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
-		Initialize =
-		{
-			Desc = [[The Initialize() function is the main entrypoint to a plugin. Within this function the plugin is expected to register any hook callbacks, commands, read settings, add webadmin tabs etc. MCServer calls this function after all the files in the plugin directory have been read and the global values and commands have been executed by the Lua engine, so all the global variables and functions are accessible.
-</p>
-		<p>Typically, plugins will also store the Plugin parameter into a global variable so that it is accessible later.
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
 		TakeDamageInfo =
 		{
 			Desc = [[The TakeDamageInfo is a struct that contains the amount of damage, and the entity that caused the damage. It is used in the {{OnTakeDamage|OnTakeDamage}}() hook and in the {{cEntity|cEntity}}'s TakeDamage() function.
@@ -1447,28 +1290,6 @@ unsigned int cChunk::MakeIndex(int x, int y, int z )
 			{
 			},
 		},
-
-		Documented =
-		{
-			Desc = [[</p>
-		<p>WebPlugins provide an interface for the server through a webpage, to be able to use WebPlugins you need to enable WebAdmin in webadmin.ini{{ :api:webadmin.png?200| A WebPlugin in action}}
-<code ini>
-[WebAdmin]
-Enabled=1
-Port=8080
-</code>
-A list of items regarding WebPlugins that have been documented
-</p>
-		<p>{{indexmenu>:api:webplugin#1}}
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
-
 	},
 	
 	
