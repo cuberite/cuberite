@@ -1310,7 +1310,10 @@ A list of items regarding WebPlugins that have been documented
 		"globals.assert",
 		"globals.collectgarbage",
 		"globals.xpcall",
-		"%a+\.__%a+",  -- AnyClass.__Anything
+		"%a+\.__%a+",        -- AnyClass.__Anything
+		"%a+\.\.collector",  -- AnyClass..collector
+		"%a+\.new",          -- AnyClass.new
+		"%a+.new_local",     -- AnyClass.new_local
 	},
 } ;
 
