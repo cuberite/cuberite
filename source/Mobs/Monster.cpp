@@ -40,7 +40,7 @@ cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const A
 	, m_SeePlayerInterval (0)
 	, m_EMPersonality(AGGRESSIVE)
 	, m_AttackDamage(1.0f)
-	, m_AttackRange(5.0f)
+	, m_AttackRange(2.0f)
 	, m_AttackInterval(0)
 	, m_BurnsInDaylight(false)
 {
