@@ -265,16 +265,20 @@ function DumpAPIHtml()
 				-- The whole class is not exported
 				f:write("class\t" .. clsname .. "\n");
 			else
-				for fnname, fnapi in pairs(cls.Functions) do
-					if not(fnapi.IsExported) then
-						f:write("func\t" .. clsname .. "." .. fnname .. "\n");
-					end
-				end  -- for j, fn - cls.Functions[]
-				for cnname, cnapi in pairs(cls.Constants) do
-					if not(cnapi.IsExported) then
-						f:write("const\t" .. clsname .. "." .. cnname .. "\n");
-					end
-				end  -- for j, fn - cls.Functions[]
+				if (cls.Functions ~= nil) then
+					for fnname, fnapi in pairs(cls.Functions) do
+						if not(fnapi.IsExported) then
+							f:write("func\t" .. clsname .. "." .. fnname .. "\n");
+						end
+					end  -- for j, fn - cls.Functions[]
+				end
+				if (cls.Constants ~= nil) then
+					for cnname, cnapi in pairs(cls.Constants) do
+						if not(cnapi.IsExported) then
+							f:write("const\t" .. clsname .. "." .. cnname .. "\n");
+						end
+					end  -- for j, fn - cls.Functions[]
+				end
 			end
 		end  -- for i, cls - g_APIDesc.Classes[]
 		f:close();
