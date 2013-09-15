@@ -636,6 +636,114 @@ static int tolua_ForEach(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
+{
+	// Exported manually, because tolua would generate useless additional parameters (a_BlockType .. a_BlockSkyLight)
+	// Function signature: GetBlockInfo(BlockX, BlockY, BlockZ) -> BlockValid, [BlockType, BlockMeta, BlockSkyLight, BlockBlockLight]
+	#ifndef TOLUA_RELEASE
+	tolua_Error tolua_err;
+	if (
+		!tolua_isusertype (tolua_S, 1, "cWorld", 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 2, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 3, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 4, 0, &tolua_err) ||
+		!tolua_isnoobj    (tolua_S, 5, &tolua_err)
+		)
+		goto tolua_lerror;
+	else
+	#endif
+	{
+		cWorld * self       = (cWorld *) tolua_tousertype (tolua_S, 1, 0);
+		int BlockX          = (int)      tolua_tonumber   (tolua_S, 2, 0);
+		int BlockY          = (int)      tolua_tonumber   (tolua_S, 3, 0);
+		int BlockZ          = (int)      tolua_tonumber   (tolua_S, 4, 0);
+		#ifndef TOLUA_RELEASE
+		if (self == NULL)
+		{
+			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines' / 'UpdateSign'", NULL);
+		}
+		#endif
+		{
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta, BlockSkyLight, BlockBlockLight;
+			bool res = self->GetBlockInfo(BlockX, BlockY, BlockZ, BlockType, BlockMeta, BlockSkyLight, BlockBlockLight);
+			tolua_pushboolean(tolua_S, res ? 1 : 0);
+			if (res)
+			{
+				tolua_pushnumber(tolua_S, BlockType);
+				tolua_pushnumber(tolua_S, BlockMeta);
+				tolua_pushnumber(tolua_S, BlockSkyLight);
+				tolua_pushnumber(tolua_S, BlockBlockLight);
+				return 5;
+			}
+		}
+	}
+	return 1;
+	
+	#ifndef TOLUA_RELEASE
+tolua_lerror:
+	tolua_error(tolua_S, "#ferror in function 'GetBlockInfo'.", &tolua_err);
+	return 0;
+	#endif
+}
+
+
+
+
+
+static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
+{
+	// Exported manually, because tolua would generate useless additional parameters (a_BlockType, a_BlockMeta)
+	// Function signature: GetBlockTypeMeta(BlockX, BlockY, BlockZ) -> BlockValid, [BlockType, BlockMeta]
+	#ifndef TOLUA_RELEASE
+	tolua_Error tolua_err;
+	if (
+		!tolua_isusertype (tolua_S, 1, "cWorld", 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 2, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 3, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 4, 0, &tolua_err) ||
+		!tolua_isnoobj    (tolua_S, 5, &tolua_err)
+		)
+		goto tolua_lerror;
+	else
+	#endif
+	{
+		cWorld * self       = (cWorld *) tolua_tousertype (tolua_S, 1, 0);
+		int BlockX          = (int)      tolua_tonumber   (tolua_S, 2, 0);
+		int BlockY          = (int)      tolua_tonumber   (tolua_S, 3, 0);
+		int BlockZ          = (int)      tolua_tonumber   (tolua_S, 4, 0);
+		#ifndef TOLUA_RELEASE
+		if (self == NULL)
+		{
+			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines' / 'UpdateSign'", NULL);
+		}
+		#endif
+		{
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+			bool res = self->GetBlockTypeMeta(BlockX, BlockY, BlockZ, BlockType, BlockMeta);
+			tolua_pushboolean(tolua_S, res ? 1 : 0);
+			if (res)
+			{
+				tolua_pushnumber(tolua_S, BlockType);
+				tolua_pushnumber(tolua_S, BlockMeta);
+				return 3;
+			}
+		}
+	}
+	return 1;
+	
+	#ifndef TOLUA_RELEASE
+tolua_lerror:
+	tolua_error(tolua_S, "#ferror in function 'GetBlockTypeMeta'.", &tolua_err);
+	return 0;
+	#endif
+}
+
+
+
+
+
 static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 {
 	// Exported manually, because tolua would generate useless additional return values (a_Line1 .. a_Line4)
@@ -1855,6 +1963,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachEntityInChunk",  tolua_ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
 			tolua_function(tolua_S, "ForEachFurnaceInChunk", tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
 			tolua_function(tolua_S, "ForEachPlayer",         tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
+			tolua_function(tolua_S, "GetBlockInfo",          tolua_cWorld_GetBlockInfo);
+			tolua_function(tolua_S, "GetBlockTypeMeta",      tolua_cWorld_GetBlockTypeMeta);
 			tolua_function(tolua_S, "SetSignLines",          tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "TryGetHeight",          tolua_cWorld_TryGetHeight);
 			tolua_function(tolua_S, "UpdateSign",            tolua_cWorld_SetSignLines);

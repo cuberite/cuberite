@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/15/13 00:13:18.
+** Generated automatically by tolua++-1.0.92 on 09/15/13 20:27:51.
 */
 
 #ifndef __cplusplus
@@ -12054,100 +12054,6 @@ static int tolua_AllToLua_cWorld_GetBlockBlockLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetBlockBlockLight'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetBlockTypeMeta of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetBlockTypeMeta00
-static int tolua_AllToLua_cWorld_GetBlockTypeMeta00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,7,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
-  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
-  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockTypeMeta'", NULL);
-#endif
-  {
-   bool tolua_ret = (bool)  self->GetBlockTypeMeta(a_BlockX,a_BlockY,a_BlockZ,a_BlockType,a_BlockMeta);
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-   tolua_pushnumber(tolua_S,(lua_Number)a_BlockType);
-   tolua_pushnumber(tolua_S,(lua_Number)a_BlockMeta);
-  }
- }
- return 3;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetBlockTypeMeta'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetBlockInfo of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetBlockInfo00
-static int tolua_AllToLua_cWorld_GetBlockInfo00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,9,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
-  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
-  unsigned char a_Meta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
-  unsigned char a_SkyLight = (( unsigned char)  tolua_tonumber(tolua_S,7,0));
-  unsigned char a_BlockLight = (( unsigned char)  tolua_tonumber(tolua_S,8,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockInfo'", NULL);
-#endif
-  {
-   bool tolua_ret = (bool)  self->GetBlockInfo(a_BlockX,a_BlockY,a_BlockZ,a_BlockType,a_Meta,a_SkyLight,a_BlockLight);
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-   tolua_pushnumber(tolua_S,(lua_Number)a_BlockType);
-   tolua_pushnumber(tolua_S,(lua_Number)a_Meta);
-   tolua_pushnumber(tolua_S,(lua_Number)a_SkyLight);
-   tolua_pushnumber(tolua_S,(lua_Number)a_BlockLight);
-  }
- }
- return 5;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetBlockInfo'.",&tolua_err);
  return 0;
 #endif
 }
@@ -30035,8 +29941,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetBlockMeta",tolua_AllToLua_cWorld_SetBlockMeta00);
    tolua_function(tolua_S,"GetBlockSkyLight",tolua_AllToLua_cWorld_GetBlockSkyLight00);
    tolua_function(tolua_S,"GetBlockBlockLight",tolua_AllToLua_cWorld_GetBlockBlockLight00);
-   tolua_function(tolua_S,"GetBlockTypeMeta",tolua_AllToLua_cWorld_GetBlockTypeMeta00);
-   tolua_function(tolua_S,"GetBlockInfo",tolua_AllToLua_cWorld_GetBlockInfo00);
    tolua_function(tolua_S,"FastSetBlock",tolua_AllToLua_cWorld_FastSetBlock01);
    tolua_function(tolua_S,"GetBlock",tolua_AllToLua_cWorld_GetBlock01);
    tolua_function(tolua_S,"GetBlockMeta",tolua_AllToLua_cWorld_GetBlockMeta01);
