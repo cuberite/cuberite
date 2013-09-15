@@ -2160,6 +2160,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockPumpkin.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Blocks\BlockRail.h"
 					>
 				</File>

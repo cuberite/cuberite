@@ -42,12 +42,6 @@ public:
 		a_BlockMeta = cRedstoneSimulator::LeverDirectionToMetaData(a_BlockFace);
 		return true;
 	}
-	
-
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return false;
-	}
 
 
 	virtual const char * GetStepSound(void) override

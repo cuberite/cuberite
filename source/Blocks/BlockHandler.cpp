@@ -157,7 +157,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_PUMPKIN:               return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_JACK_O_LANTERN:        return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
-		case E_BLOCK_QUARTZ_STAIR:          return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_QUARTZ_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_POTATOES:              return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);
@@ -401,24 +401,6 @@ bool cBlockHandler::IsClickedThrough(void)
 bool cBlockHandler::DoesIgnoreBuildCollision(void)
 {
 	return (m_BlockType == E_BLOCK_AIR);
-}
-
-
-
-
-
-bool cBlockHandler::DoesAllowBlockOnTop(void)
-{
-	return true;
-}
-
-
-
-
-
-bool cBlockHandler::CanBePlacedOnSide(void)
-{
-	return true;
 }
 
 

@@ -24,16 +24,31 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		// Find proper placement. Use the player-supplied one as the default, but fix if not okay:
-		if (!TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+		// Find proper placement of torch
+
+		if ((a_BlockFace == BLOCK_FACE_TOP) || (a_BlockFace == BLOCK_FACE_BOTTOM))
 		{
-			a_BlockFace = FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ);
-			
-			if (a_BlockFace == BLOCK_FACE_BOTTOM)
+			a_BlockFace = FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ); // Top or bottom faces clicked, find a suitable face
+			if (a_BlockFace == BLOCK_FACE_NONE)
 			{
+				// Client wouldn't have sent anything anyway, but whatever
 				return false;
 			}
 		}
+		else
+		{
+			// Not top or bottom faces, try to preserve whatever face was clicked
+			if (!TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+			{
+				// Torch couldn't be placed on whatever face was clicked, last ditch resort - find another face
+				a_BlockFace = FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ);
+				if (a_BlockFace == BLOCK_FACE_NONE)
+				{
+					return false;
+				}
+			}
+		}
+
 		a_BlockType = m_BlockType;
 		a_BlockMeta = DirectionToMetaData(a_BlockFace);
 		return true;
@@ -100,61 +115,58 @@ public:
 	}
 
 
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return true;
-	}
-
-
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, char a_BlockFace)
 	{
-		switch (a_BlockType)
+		if ( !g_BlockIsTorchPlaceable[a_BlockType] )
 		{
-			case E_BLOCK_GLASS:
-			case E_BLOCK_FENCE:
-			case E_BLOCK_NETHER_BRICK_FENCE:
-			case E_BLOCK_PISTON:
-			case E_BLOCK_WORKBENCH:
-			{
-				return (a_BlockFace == BLOCK_FACE_TOP);  // allow only direction "standing on floor" on these blocks
-			}
-			
-			default:
-			{
-				return g_BlockIsSolid[a_BlockType];  // Any placement on solid blocks
-			}
+			return (a_BlockFace == BLOCK_FACE_TOP);  // Allow placement only when torch upright
+		}
+		else
+		{
+			return true;
 		}
 	}
 	
 	
 	static bool TorchCanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
-		// TODO: If placing a torch from below, check all 4 XZ neighbors, place it on that neighbor instead
-		// How to propagate that change up?
-		// Simon: The easiest way is to calculate the position two times, shouldn't cost much cpu power :)
-
-		if (a_BlockFace == BLOCK_FACE_BOTTOM)
-		{
-			return false;
-		}
-
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
-
 		return CanBePlacedOn(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace);
 	}
 	
 	
-	/// Finds a suitable Face for the Torch. Returns BLOCK_FACE_BOTTOM on failure
+	/// Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure
 	static char FindSuitableFace(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		for (int i = 1; i <= 5; i++)
+		// TODO: If placing a torch from below, check all 4 XZ neighbors, place it on that neighbor instead
+		// How to propagate that change up?
+		// Simon: The easiest way is to calculate the position two times, shouldn't cost much cpu power :)
+
+		for (int i = 0; i <= 5; i++)
 		{
-			if (TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, i))
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, true);
+			BLOCKTYPE BlockInQuestion = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+
+			if (
+				((BlockInQuestion == E_BLOCK_GLASS) ||
+				(BlockInQuestion == E_BLOCK_FENCE) ||
+				(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
+				(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL)) &&
+				(i = 1)
+				)
 			{
 				return i;
 			}
+			else if ( g_BlockIsTorchPlaceable[BlockInQuestion] )
+			{
+				return i;
+			}
+			else
+			{
+				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, false);
+			}
 		}
-		return BLOCK_FACE_BOTTOM;
+		return BLOCK_FACE_NONE;
 	}
 
 
@@ -173,11 +185,28 @@ public:
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		// TODO: Use AdjustCoordsByMeta(), then cChunk::UnboundedRelGetBlock() and finally some comparison
 		char Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-		return TorchCanBePlacedAt(a_Chunk.GetWorld(), BlockX, a_RelY, BlockZ, Face);
+
+		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
+		BLOCKTYPE BlockInQuestion;
+		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockInQuestion);
+
+		if ((BlockInQuestion == E_BLOCK_GLASS) || (BlockInQuestion == E_BLOCK_FENCE) || (BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE))
+		{
+			// Torches can be placed on tops of glass and fences, despite them being 'untorcheable'
+			// No need to check for upright orientation, it was done when the torch was placed
+			return true;
+		}
+		else if ( !g_BlockIsTorchPlaceable[BlockInQuestion] )
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 

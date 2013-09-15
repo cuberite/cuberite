@@ -270,7 +270,13 @@ bool cPiston::CanPull(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 			return false;
 		}
 	}
-	return CanPush(a_BlockType, a_BlockMeta) || CanBreakPush(a_BlockType, a_BlockMeta);
+
+	if (CanBreakPush(a_BlockType, a_BlockMeta))
+	{
+		return false; // CanBreakPush returns true, but we need false to prevent pulling
+	}
+
+	return CanPush(a_BlockType, a_BlockMeta);
 }
 
 
