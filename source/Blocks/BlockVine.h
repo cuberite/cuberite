@@ -151,12 +151,6 @@ public:
 	}
 	
 	
-	virtual bool DoesAllowBlockOnTop(void) override
-	{
-		return false;
-	}
-
-
 	virtual const char * GetStepSound(void) override
 	{
 		return "step.grass";
