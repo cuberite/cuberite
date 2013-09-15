@@ -165,7 +165,7 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_NETHER_QUARTZ_ORE = 153,
 	E_BLOCK_HOPPER = 154,
 	E_BLOCK_QUARTZ_BLOCK = 155,
-	E_BLOCK_QUARTZ_STAIR = 156,
+	E_BLOCK_QUARTZ_STAIRS = 156,
 	E_BLOCK_ACTIVATOR_RAIL = 157,
 	
 	E_BLOCK_DROPPER = 158,
@@ -770,7 +770,7 @@ extern bool       g_BlockPistonBreakable[256];
 extern bool       g_BlockIsSnowable[256];
 extern bool       g_BlockRequiresSpecialTool[256];
 extern bool       g_BlockIsSolid[256];
-
+extern bool       g_BlockIsTorchPlaceable[256];
 
 
 
