@@ -540,6 +540,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 					NextPos.x += gCrossCoords[i].x;
 					NextPos.z += gCrossCoords[i].z;
 					IsNoAirSurrounding = false;
+					break;
 				}
 			}  // for i - gCrossCoords[]
 			
