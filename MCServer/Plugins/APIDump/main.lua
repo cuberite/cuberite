@@ -478,8 +478,8 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	-- Make a link out of anything with the special linkifying syntax {{link|title}}
 	local function LinkifyString(a_String)
-		local txt = a_String:gsub("{{([^|]*)|([^}]*)}}", "<a href=\"%1.html\">%2</a>")  -- {{link|title}}
-		txt = txt:gsub("{{([^|]*)}}", "<a href=\"%1.html\">%1</a>")  -- {{LinkAndTitle}}
+		local txt = a_String:gsub("{{([^|}]*)|([^}]*)}}", "<a href=\"%1.html\">%2</a>")  -- {{link|title}}
+		txt = txt:gsub("{{([^|}]*)}}", "<a href=\"%1.html\">%1</a>")  -- {{LinkAndTitle}}
 		return txt;
 	end
 	
