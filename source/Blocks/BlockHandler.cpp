@@ -404,15 +404,6 @@ bool cBlockHandler::DoesIgnoreBuildCollision(void)
 
 
 
-bool cBlockHandler::CanBePlacedOnSide(void)
-{
-	return true;
-}
-
-
-
-
-
 bool cBlockHandler::DoesDropOnUnsuitable(void)
 {
 	return true;

@@ -96,9 +96,6 @@ public:
 	For example blocks placed "on" snow will be placed at the same position. So: Snow ignores Build collision
 	*/
 	virtual bool DoesIgnoreBuildCollision(void);
-	
-	/// Indicates this block can be placed on the side of other blocks. Default: true
-	virtual bool CanBePlacedOnSide(void);
 
 	/// Does this block drop if it gets destroyed by an unsuitable situation? Default: true
 	virtual bool DoesDropOnUnsuitable(void);
