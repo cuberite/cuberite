@@ -1093,7 +1093,7 @@ void cWorld::GrowTree(int a_X, int a_Y, int a_Z)
 
 
 
-void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, char a_SaplingMeta)
+void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_SaplingMeta)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
@@ -1345,7 +1345,7 @@ void cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlock
 
 
 
-void cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockType)
+void cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType)
 {
 	MTRand Rand;
 	m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, Rand);

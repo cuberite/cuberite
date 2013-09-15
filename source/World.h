@@ -438,13 +438,18 @@ public:
 	/// Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback
 	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
 
-	void GrowTree           (int a_BlockX, int a_BlockY, int a_BlockZ);                           // tolua_export
-	void GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, char a_SaplingMeta);       // tolua_export
-	void GrowTreeByBiome    (int a_BlockX, int a_BlockY, int a_BlockZ);                           // tolua_export
-	
 	void GrowTreeImage(const sSetBlockVector & a_Blocks);
 	
 	// tolua_begin
+
+	/// Grows a tree at the specified coords, either from a sapling there, or based on the biome
+	void GrowTree           (int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	/// Grows a tree at the specified coords, based on the sapling meta provided
+	void GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	
+	/// Grows a tree at the specified coords, based on the biome in the place
+	void GrowTreeByBiome    (int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Grows the plant at the specified block to its ripe stage (bonemeal used); returns false if the block is not growable. If a_IsBonemeal is true, block is not grown if not allowed in world.ini
 	bool GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false);
@@ -453,7 +458,7 @@ public:
 	void GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 
 	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
-	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockType);
+	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
 
 	/// Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config
 	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
