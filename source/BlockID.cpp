@@ -778,10 +778,11 @@ public:
 		g_BlockIsSolid[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE] = false;
 		g_BlockIsSolid[E_BLOCK_MELON_STEM]            = false;
 		g_BlockIsSolid[E_BLOCK_NETHER_PORTAL]         = false;
-		g_BlockIsSolid[E_BLOCK_PISTON_MOVED_BLOCK]    = false;
-		g_BlockIsSolid[E_BLOCK_POTATOES]              = false;
-		g_BlockIsSolid[E_BLOCK_PUMPKIN_STEM]          = false;
+		g_BlockIsSolid[E_BLOCK_PISTON]                = false;
+		g_BlockIsSolid[E_BLOCK_PISTON_EXTENSION]      = false;
 		g_BlockIsSolid[E_BLOCK_RAIL]                  = false;
+		g_BlockIsSolid[E_BLOCK_REDSTONE_REPEATER_OFF] = false;
+		g_BlockIsSolid[E_BLOCK_REDSTONE_REPEATER_ON]  = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_TORCH_OFF]    = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_TORCH_ON]     = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_WIRE]         = false;

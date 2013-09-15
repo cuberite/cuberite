@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Entity.h"
@@ -13,6 +12,7 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../PluginManager.h"
 #include "../Tracer.h"
+#include "Minecart.h"
 
 
 
@@ -564,8 +564,43 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		else
 		{
 			// Push out entity.
+			BLOCKTYPE GotBlock;
+
+			static const struct
+			{
+				int x, y, z;
+			} gCrossCoords[] =
+			{
+				{ 1, 0,  0},
+				{-1, 0,  0},
+				{ 0, 0,  1},
+				{ 0, 0, -1},
+			} ;
+
+			bool IsNoAirSurrounding = true;
+			for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+			{
+				if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
+				{
+					// The pickup is too close to an unloaded chunk, bail out of any physics handling
+					return;
+				}
+				if (!g_BlockIsSolid[GotBlock])
+				{
+					NextPos.x += gCrossCoords[i].x;
+					NextPos.z += gCrossCoords[i].z;
+					IsNoAirSurrounding = false;
+					break;
+				}
+			}  // for i - gCrossCoords[]
+			
+			if (IsNoAirSurrounding)
+			{
+				NextPos.y += 0.5;
+			}
+
 			m_bOnGround = true;
-			NextPos.y += 0.2;
+
 			LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
 				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ
 			);
@@ -577,6 +612,11 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			if (IsBlockWater(BlockIn))
 			{
 				fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
+			}
+			else if ((IsBlockRail(BlockBelow)) && (IsMinecart())) // Rails aren't solid, except for Minecarts
+			{
+				fallspeed = 0;
+				m_bOnGround = true;
 			}
 			else if (BlockIn == E_BLOCK_COBWEB)
 			{
@@ -592,27 +632,40 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			// TODO: This condition belongs to minecarts, without it, they derails too much.
-			// But it shouldn't be here for other entities. We need a complete minecart physics overhaul.
-			if (
-				(BlockBelow != E_BLOCK_RAIL) &&
-				(BlockBelow != E_BLOCK_DETECTOR_RAIL) &&
-				(BlockBelow != E_BLOCK_POWERED_RAIL) &&
-				(BlockBelow != E_BLOCK_ACTIVATOR_RAIL)
-			)
+			if (IsMinecart())
 			{
-				// Friction
-				if (NextSpeed.SqrLength() > 0.0004f)
+				if (!IsBlockRail(BlockBelow))
 				{
-					NextSpeed.x *= 0.6666;
-					if (fabs(NextSpeed.x) < 0.05)
+					// Friction if minecart is off track, otherwise, Minecart.cpp handles this
+					if (NextSpeed.SqrLength() > 0.0004f)
 					{
-						NextSpeed.x = 0;
+						NextSpeed.x *= 0.7f / (1 + a_Dt);
+						if (fabs(NextSpeed.x) < 0.05)
+						{
+							NextSpeed.x = 0;
+						}
+						NextSpeed.z *= 0.7f / (1 + a_Dt);
+						if (fabs(NextSpeed.z) < 0.05)
+						{
+							NextSpeed.z = 0;
+						}
 					}
-					NextSpeed.z *= 0.6666;
-					if (fabs(NextSpeed.z) < 0.05)
+				}
+				else
+				{
+					// Friction
+					if (NextSpeed.SqrLength() > 0.0004f)
 					{
-						NextSpeed.z = 0;
+						NextSpeed.x *= 0.7f / (1 + a_Dt);
+						if (fabs(NextSpeed.x) < 0.05)
+						{
+							NextSpeed.x = 0;
+						}
+						NextSpeed.z *= 0.7f / (1 + a_Dt);
+						if (fabs(NextSpeed.z) < 0.05)
+						{
+							NextSpeed.z = 0;
+						}
 					}
 				}
 			}
@@ -634,19 +687,19 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		switch(WaterDir)
 		{
 			case X_PLUS:
-				m_WaterSpeed.x = 1.f;
+				m_WaterSpeed.x = 0.2f;
 				m_bOnGround = false;
 				break;
 			case X_MINUS:
-				m_WaterSpeed.x = -1.f;
+				m_WaterSpeed.x = -0.2f;
 				m_bOnGround = false;
 				break;
 			case Z_PLUS:
-				m_WaterSpeed.z = 1.f;
+				m_WaterSpeed.z = 0.2f;
 				m_bOnGround = false;
 				break;
 			case Z_MINUS:
-				m_WaterSpeed.z = -1.f;
+				m_WaterSpeed.z = -0.2f;
 				m_bOnGround = false;
 				break;
 			
@@ -677,7 +730,6 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				{
 					if( Ret == 1 )
 					{
-
 						if( Tracer.HitNormal.x != 0.f ) NextSpeed.x = 0.f;
 						if( Tracer.HitNormal.y != 0.f ) NextSpeed.y = 0.f;
 						if( Tracer.HitNormal.z != 0.f ) NextSpeed.z = 0.f;
@@ -688,11 +740,14 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 						}
 					}
 					NextPos.Set(Tracer.RealHit.x,Tracer.RealHit.y,Tracer.RealHit.z);
-					NextPos.x += Tracer.HitNormal.x * 0.5f;
-					NextPos.z += Tracer.HitNormal.z * 0.5f;
+					NextPos.x += Tracer.HitNormal.x * 0.3f;
+					NextPos.y += Tracer.HitNormal.y * 0.05f; // Any larger produces entity vibration-upon-the-spot
+					NextPos.z += Tracer.HitNormal.z * 0.3f;
 				}
 				else
+				{
 					NextPos += (NextSpeed * a_Dt);
+				}
 			}
 			else
 			{

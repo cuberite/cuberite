@@ -54,20 +54,24 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if ((GetPosY() > 0) && (GetPosY() < cChunkDef::Height))
 	{
 		BLOCKTYPE BelowType = GetWorld()->GetBlock(floor(GetPosX()), floor(GetPosY() -1 ), floor(GetPosZ()));
+		BLOCKTYPE InsideType = GetWorld()->GetBlock(floor(GetPosX()), floor(GetPosY()), floor(GetPosZ()));
 
-		if (
-			(BelowType == E_BLOCK_RAIL) ||
-			(BelowType == E_BLOCK_POWERED_RAIL) ||
-			(BelowType == E_BLOCK_DETECTOR_RAIL) ||
-			(BelowType == E_BLOCK_ACTIVATOR_RAIL)
-			)
+		if (IsBlockRail(BelowType))
 		{
 			HandleRailPhysics(a_Dt, a_Chunk);
 		}
 		else
 		{
-			super::HandlePhysics(a_Dt, a_Chunk);
-			BroadcastMovementUpdate();
+			if (IsBlockRail(InsideType))
+			{
+				SetPosY(ceil(GetPosY()));
+				HandleRailPhysics(a_Dt, a_Chunk);
+			}
+			else
+			{
+				super::HandlePhysics(a_Dt, a_Chunk);
+				BroadcastMovementUpdate();
+			}
 		}
 	}
 	else
@@ -105,9 +109,6 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			SpeedY = 0; // Don't move vertically as on ground
 			SpeedX = 0; // Correct diagonal movement from curved rails
 			
-			// Set Y as current Y rounded up to bypass friction
-			SetPosY(floor(GetPosY()));
-
 			if (SpeedZ != 0) // Don't do anything if cart is stationary
 			{
 				if (SpeedZ > 0)
@@ -129,8 +130,6 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 			SetRotation(180);
 			SpeedY = 0;
 			SpeedZ = 0;
-
-			SetPosY(floor(GetPosY()));
 
 			if (SpeedX != 0)
 			{
@@ -347,7 +346,7 @@ void cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 {
 	super::DoTakeDamage(TDI);
 
-	if (GetHealth() == 0)
+	if (GetHealth() <= 0)
 	{
 		Destroy(true);
 	}
