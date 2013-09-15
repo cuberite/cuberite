@@ -660,7 +660,7 @@ static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 		#ifndef TOLUA_RELEASE
 		if (self == NULL)
 		{
-			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines' / 'UpdateSign'", NULL);
+			tolua_error(tolua_S, "invalid 'self' in function 'GetBlockInfo'", NULL);
 		}
 		#endif
 		{
@@ -715,7 +715,7 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 		#ifndef TOLUA_RELEASE
 		if (self == NULL)
 		{
-			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines' / 'UpdateSign'", NULL);
+			tolua_error(tolua_S, "invalid 'self' in function 'GetBlockTypeMeta'", NULL);
 		}
 		#endif
 		{
@@ -736,6 +736,59 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 	#ifndef TOLUA_RELEASE
 tolua_lerror:
 	tolua_error(tolua_S, "#ferror in function 'GetBlockTypeMeta'.", &tolua_err);
+	return 0;
+	#endif
+}
+
+
+
+
+
+static int tolua_cWorld_GetSignLines(lua_State * tolua_S)
+{
+	// Exported manually, because tolua would generate useless additional parameters (a_Line1 .. a_Line4)
+	#ifndef TOLUA_RELEASE
+	tolua_Error tolua_err;
+	if (
+		!tolua_isusertype (tolua_S, 1, "cWorld", 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 2, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 3, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 4, 0, &tolua_err) ||
+		!tolua_isnoobj    (tolua_S, 10, &tolua_err)
+		)
+		goto tolua_lerror;
+	else
+	#endif
+	{
+		cWorld * self       = (cWorld *) tolua_tousertype (tolua_S, 1, 0);
+		int BlockX          = (int)      tolua_tonumber   (tolua_S, 2, 0);
+		int BlockY          = (int)      tolua_tonumber   (tolua_S, 3, 0);
+		int BlockZ          = (int)      tolua_tonumber   (tolua_S, 4, 0);
+		#ifndef TOLUA_RELEASE
+		if (self == NULL)
+		{
+			tolua_error(tolua_S, "invalid 'self' in function 'GetSignLines'", NULL);
+		}
+		#endif
+		{
+			AString Line1, Line2, Line3, Line4;
+			bool res = self->GetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+			tolua_pushboolean(tolua_S, res ? 1 : 0);
+			if (res)
+			{
+				tolua_pushstring(tolua_S, Line1.c_str());
+				tolua_pushstring(tolua_S, Line2.c_str());
+				tolua_pushstring(tolua_S, Line3.c_str());
+				tolua_pushstring(tolua_S, Line4.c_str());
+				return 5;
+			}
+		}
+	}
+	return 1;
+	
+	#ifndef TOLUA_RELEASE
+tolua_lerror:
+	tolua_error(tolua_S, "#ferror in function 'GetSignLines'.", &tolua_err);
 	return 0;
 	#endif
 }

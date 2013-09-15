@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/15/13 20:52:09.
+** Generated automatically by tolua++-1.0.92 on 09/15/13 21:24:51.
 */
 
 #ifndef __cplusplus
@@ -12599,51 +12599,40 @@ static int tolua_AllToLua_cWorld_DoExplosionAt00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetSignLines of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetSignLines00
-static int tolua_AllToLua_cWorld_GetSignLines00(lua_State* tolua_S)
+/* method: UseBlockEntity of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_UseBlockEntity00
+static int tolua_AllToLua_cWorld_UseBlockEntity00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
-  AString a_Line1 = ((AString)  tolua_tocppstring(tolua_S,5,0));
-  AString a_Line2 = ((AString)  tolua_tocppstring(tolua_S,6,0));
-  AString a_Line3 = ((AString)  tolua_tocppstring(tolua_S,7,0));
-  AString a_Line4 = ((AString)  tolua_tocppstring(tolua_S,8,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSignLines'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'UseBlockEntity'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->GetSignLines(a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-   tolua_pushcppstring(tolua_S,(const char*)a_Line1);
-   tolua_pushcppstring(tolua_S,(const char*)a_Line2);
-   tolua_pushcppstring(tolua_S,(const char*)a_Line3);
-   tolua_pushcppstring(tolua_S,(const char*)a_Line4);
+   self->UseBlockEntity(a_Player,a_BlockX,a_BlockY,a_BlockZ);
   }
  }
- return 5;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetSignLines'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'UseBlockEntity'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29956,7 +29945,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"WakeUpSimulators",tolua_AllToLua_cWorld_WakeUpSimulators00);
    tolua_function(tolua_S,"WakeUpSimulatorsInArea",tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00);
    tolua_function(tolua_S,"DoExplosionAt",tolua_AllToLua_cWorld_DoExplosionAt00);
-   tolua_function(tolua_S,"GetSignLines",tolua_AllToLua_cWorld_GetSignLines00);
+   tolua_function(tolua_S,"UseBlockEntity",tolua_AllToLua_cWorld_UseBlockEntity00);
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
    tolua_function(tolua_S,"GrowTreeByBiome",tolua_AllToLua_cWorld_GrowTreeByBiome00);
