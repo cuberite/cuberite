@@ -90,20 +90,13 @@ public:
 	} ;
 	
 
-	// tolua_begin
-
-	static const char * GetClassStatic(void)
+	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
 		return "cWorld";
 	}
 	
-	/// Return time in seconds
-	inline static float GetTime(void)
-	{
-		LOGWARNING("cWorld:GetTime() is obsolete, use GetWorldAge() or GetTimeOfDay() for a specific world instead.");
-		return 0;
-	}
-	
+	// tolua_begin
+
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 	Int64 GetWorldAge(void)  const { return m_WorldAge; }
 	Int64 GetTimeOfDay(void) const { return m_TimeOfDay; }

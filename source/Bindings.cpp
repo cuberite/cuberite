@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/15/13 21:24:51.
+** Generated automatically by tolua++-1.0.92 on 09/15/13 21:52:06.
 */
 
 #ifndef __cplusplus
@@ -11001,62 +11001,6 @@ static int tolua_AllToLua_cServer_GetServerID00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetServerID'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetClassStatic of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetClassStatic00
-static int tolua_AllToLua_cWorld_GetClassStatic00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   const char* tolua_ret = (const char*)  cWorld::GetClassStatic();
-   tolua_pushstring(tolua_S,(const char*)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetClassStatic'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetTime of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetTime00
-static int tolua_AllToLua_cWorld_GetTime00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   float tolua_ret = (float)  cWorld::GetTime();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetTime'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29900,8 +29844,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWorld","cWorld","",NULL);
   tolua_beginmodule(tolua_S,"cWorld");
-   tolua_function(tolua_S,"GetClassStatic",tolua_AllToLua_cWorld_GetClassStatic00);
-   tolua_function(tolua_S,"GetTime",tolua_AllToLua_cWorld_GetTime00);
    tolua_function(tolua_S,"GetTicksUntilWeatherChange",tolua_AllToLua_cWorld_GetTicksUntilWeatherChange00);
    tolua_function(tolua_S,"GetWorldAge",tolua_AllToLua_cWorld_GetWorldAge00);
    tolua_function(tolua_S,"GetTimeOfDay",tolua_AllToLua_cWorld_GetTimeOfDay00);
