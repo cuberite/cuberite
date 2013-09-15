@@ -83,10 +83,7 @@ public:
 	NOTE: This call doesn't actually place the block
 	*/
 	// virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
-	
-	/// Called when the player tries to place a block on top of this block (Only if he aims directly on this block); return false to disallow
-	virtual bool DoesAllowBlockOnTop(void);
-	
+		
 	/// Called to check whether this block supports a rclk action. If it returns true, OnUse() is called
 	virtual bool IsUseable(void);
 	

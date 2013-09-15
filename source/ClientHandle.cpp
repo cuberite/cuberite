@@ -908,15 +908,6 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			}
 			else
 			{
-				// Check for Blocks not allowing placement on top
-				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
-				{
-					// Resend the old block
-					// Sometimes the client still places the block O.o
-					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-					return;
-				}
-
 				if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
 				{
 					// Tried to place a block *into* another?
