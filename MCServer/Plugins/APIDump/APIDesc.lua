@@ -1324,10 +1324,126 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 
 		cWorld =
 		{
-			Desc = [[cWorld is the game world, at the moment there can only be one world. The world manages all {{cChunk | Chunks}}, {{cPlayer | Players}} and the time.
-]],
+			Desc = [[
+				cWorld is the game world. It is the hub of all the information managed by individual classes,
+				providing convenient access to them. MCServer supports multiple worlds in any combination of
+				world types. You can have two overworlds, three nethers etc. To enumerate all world the server
+				provides, use the {{cRoot}}:ForEachWorld() function.</p>
+				<p>
+				The world data is held in individual chunks. Each chunk consists of 16 (x) * 16 (z) * 256 (y)
+				blocks, each block is specified by its block type (8-bit) and block metadata (4-bit).
+				Additionally, each block has two light values calculated - skylight (how much daylight it receives)
+				and blocklight (how much light from light-emissive blocks it receives), both 4-bit.</p>
+				<p>
+				Each world runs several separate threads used for various housekeeping purposes, the most important
+				of those is the Tick thread. This thread updates the game logic 20 times per second, and it is
+				the thread where all the gameplay actions are evaluated. Liquid physics, entity interactions,
+				player ovement etc., all are applied in this thread.</p>
+				<p>
+				Additional threads include the generation thread (generates new chunks as needed, storage thread
+				(saves and loads chunk from the disk), lighting thread (updates block light values) and the
+				chunksender thread (compresses chunks to send to the clients).</p>
+				<p>
+				The world provides access to all its {{cPlayer|players}}, {{cEntity|entities}} and {{cBlockEntity|block
+				entities}}. Because of multithreading issues, individual objects cannot be retrieved for indefinite
+				handling, but rather must be modified in callbacks, within which they are guaranteed to stay valid.</p>
+				<p>
+				Physics for individual blocks are handled by the simulators. These will fire in each tick for all
+				blocks that have been scheduled for simulator update ("simulator wakeup"). The simulators include
+				liquid physics, falling blocks, fire spreading and extinguishing and redstone.</p>
+				<p>
+				Game time is also handled by the world. It provides the time-of-day and the total world age.
+			]],
+			
 			Functions =
 			{
+				BroadcastChat = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the Message to all players in this world, except the optional ExceptClient" },
+				BroadcastSoundEffect = { Params = "SoundName, X, Y, Z, Volume, Pitch, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient" },
+				BroadcastSoundParticleEffect = { Params = "EffectID, X, Y, Z, EffectData, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified effect to all players in this world, except the optional ExceptClient" },
+				CastThunderbolt = { Params = "X, Y, Z", Return = "", Notes = "Creates a thunderbolt at the specified coords" },
+				ChangeWeather = { Params = "", Return = "", Notes = "Forces the weather to change in the next game tick. Weather is changed according to the normal rules: wSunny <-> wRain <-> wStorm" },
+				CreateProjectile = { Params = "X, Y, Z, {{cProjectile|ProjectileKind}}, {{cEntity|Creator}}, [{{Vector3d|Speed}}]", Return = "", Notes = "Creates a new projectile of the specified kind at the specified coords. The projectile's creator is set to Creator (may be nil). Optional speed indicates the initial speed for the projectile." },
+				DigBlock = { Params = "X, Y, Z", Return = "", Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors." },
+				DoExplosionAt = { Params = "Force, X, Y, Z, CanCauseFire, Source, SourceData", Return = "", Notes = "Creates an explosion of the specified relative force in the specified position. If CanCauseFire is set, the explosion will set blocks on fire, too. The Source parameter specifies the source of the explosion, one of the esXXX constants. The SourceData parameter is specific to each source type, usually it provides more info about the source." },
+				DoWithChestAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a chest at the specified coords, calls the CallbackFunction with the {{cChestEntity}} parameter representing the chest. The CallbackFunction has the following signature: <pre>function Callback({{cChestEntity|ChestEntity}}, [CallbackData])</pre> The function returns false if there is no chest, or if there is, it returns the bool value that the callback has returned." },
+				DoWithDispenserAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dispenser at the specified coords, calls the CallbackFunction with the {{cDispenserEntity}} parameter representing the dispenser. The CallbackFunction has the following signature: <pre>function Callback({{cDispenserEntity|DispenserEntity}}, [CallbackData])</pre> The function returns false if there is no dispenser, or if there is, it returns the bool value that the callback has returned." },
+				DoWithDropSpenserAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dropper or a dispenser at the specified coords, calls the CallbackFunction with the {{cDropSpenserEntity}} parameter representing the dropper or dispenser. The CallbackFunction has the following signature: <pre>function Callback({{cDropSpenserEntity|DropSpenserEntity}}, [CallbackData])</pre> Note that this can be used to access both dispensers and droppers in a similar way. The function returns false if there is neither dispenser nor dropper, or if there is, it returns the bool value that the callback has returned." },
+				DoWithDropperAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dropper at the specified coords, calls the CallbackFunction with the {{cDropperEntity}} parameter representing the dropper. The CallbackFunction has the following signature: <pre>function Callback({{cDropperEntity|DropperEntity}}, [CallbackData])</pre> The function returns false if there is no dropper, or if there is, it returns the bool value that the callback has returned." },
+				DoWithEntityByID = { Params = "EntityID, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If an entity with the specified ID exists, calls the callback with the {{cEntity}} parameter representing the entity. The CallbackFunction has the following signature: <pre>function Callback({{cEntity|Entity}}, [CallbackData])</pre> The function returns false if the entity was not found, and it returns the same bool value that the callback has returned if the entity was found." },
+				DoWithFurnaceAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a furnace at the specified coords, calls the CallbackFunction with the {{cFurnaceEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre>function Callback({{cFurnaceEntity|FurnaceEntity}}, [CallbackData])</pre> The function returns false if there is no furnace, or if there is, it returns the bool value that the callback has returned." },
+				DoWithPlayer = { Params = "PlayerName, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a player of the specified name (exact match), calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre>function Callback({{cPlayer|Player}}, [CallbackData])</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found." },
+				FastSetBlock = { Params = "X, Y, Z, BlockType, BlockMeta", Return = "", Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it!" },
+				FindAndDoWithPlayer = { Params = "PlayerNameHint, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a player of a name similar to the specified name (weighted-match), calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre>function Callback({{cPlayer|Player}}, [CallbackData])</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found. Note that the name matching is very loose, so it is a good idea to check the player name in the callback function." },
+				ForEachChestInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each chest in the chunk. Returns true if all chests in the chunk have been processed (including when there are zero chests), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre>function Callback({{cChestEntity|ChestEntity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next chest, or true to abort the enumeration." },
+				ForEachEntity = { Params = "CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each entity in the loaded world. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre>function Callback({{cEntity|Entity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
+				ForEachEntityInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each entity in the specified chunk. Returns true if all the entities have been processed (including when there are zero entities), or false if the chunk is not loaded or the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre>function Callback({{cEntity|Entity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
+				ForEachFurnaceInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each furnace in the chunk. Returns true if all furnaces in the chunk have been processed (including when there are zero furnaces), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre>function Callback({{cFurnaceEntity|FurnaceEntity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next furnace, or true to abort the enumeration." },
+				ForEachPlayer = { Params = "CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each player in the loaded world. Returns true if all the players have been processed (including when there are zero players), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre>function Callback({{cPlayer|Player}}, [CallbackData])</pre> The callback should return false or no value to continue with the next player, or true to abort the enumeration." },
+				GenerateChunk = { Params = "ChunkX, ChunkZ", Return = "", Notes = "Queues the specified chunk in the chunk generator. Ignored if the chunk is already generated (use RegenerateChunk() to force chunk re-generation)." },
+				GetBiomeAt = { Params = "BlockX, BlockZ", Return = "eBiome", Notes = "Returns the biome at the specified coords. Reads the biome from the chunk, if it is loaded, otherwise it uses the chunk generator to provide the biome value." },
+				GetBlock = { Params = "BlockX, BlockY, BlockZ", Return = "BLOCKTYPE", Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
+				GetBlockBlockLight = { Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the amount of block light at the specified coords, or 0 if the appropriate chunk is not loaded." },
+				GetBlockInfo = { Params = "BlockX, BlockY, BlockZ", Return = "BlockValid, BlockType, BlockMeta, BlockSkyLight, BlockBlockLight", Notes = "Returns the complete block info for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true." },
+				GetBlockMeta = { Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
+				GetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the block skylight of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
+				GetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ", Return = "BlockValid, BlockType, BlockMeta", Notes = "Returns the block type and metadata for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true." },
+				GetClassStatic = { Params = "", Return = "", Notes = "" },
+				GetDimension = { Params = "", Return = "", Notes = "" },
+				GetGameMode = { Params = "", Return = "", Notes = "" },
+				GetGeneratorQueueLength = { Params = "", Return = "", Notes = "" },
+				GetHeight = { Params = "", Return = "", Notes = "" },
+				GetIniFileName = { Params = "", Return = "", Notes = "" },
+				GetLightingQueueLength = { Params = "", Return = "", Notes = "" },
+				GetMaxCactusHeight = { Params = "", Return = "", Notes = "" },
+				GetMaxSugarcaneHeight = { Params = "", Return = "", Notes = "" },
+				GetName = { Params = "", Return = "", Notes = "" },
+				GetNumChunks = { Params = "", Return = "", Notes = "" },
+				GetSignLines = { Params = "", Return = "", Notes = "" },
+				GetSpawnX = { Params = "", Return = "", Notes = "" },
+				GetSpawnY = { Params = "", Return = "", Notes = "" },
+				GetSpawnZ = { Params = "", Return = "", Notes = "" },
+				GetStorageLoadQueueLength = { Params = "", Return = "", Notes = "" },
+				GetStorageSaveQueueLength = { Params = "", Return = "", Notes = "" },
+				GetTicksUntilWeatherChange = { Params = "", Return = "", Notes = "" },
+				GetTime = { Params = "", Return = "", Notes = "" },
+				GetTimeOfDay = { Params = "", Return = "", Notes = "" },
+				GetWeather = { Params = "", Return = "", Notes = "" },
+				GetWorldAge = { Params = "", Return = "", Notes = "" },
+				GrowCactus = { Params = "", Return = "", Notes = "" },
+				GrowMelonPumpkin = { Params = "", Return = "", Notes = "" },
+				GrowRipePlant = { Params = "", Return = "", Notes = "" },
+				GrowSugarcane = { Params = "", Return = "", Notes = "" },
+				GrowTree = { Params = "", Return = "", Notes = "" },
+				GrowTreeByBiome = { Params = "", Return = "", Notes = "" },
+				GrowTreeFromSapling = { Params = "", Return = "", Notes = "" },
+				IsBlockDirectlyWatered = { Params = "", Return = "", Notes = "" },
+				IsDeepSnowEnabled = { Params = "", Return = "", Notes = "" },
+				IsGameModeAdventure = { Params = "", Return = "", Notes = "" },
+				IsGameModeCreative = { Params = "", Return = "", Notes = "" },
+				IsGameModeSurvival = { Params = "", Return = "", Notes = "" },
+				IsPVPEnabled = { Params = "", Return = "", Notes = "" },
+				QueueBlockForTick = { Params = "", Return = "", Notes = "" },
+				QueueSaveAllChunks = { Params = "", Return = "", Notes = "" },
+				QueueSetBlock = { Params = "", Return = "", Notes = "" },
+				RegenerateChunk = { Params = "", Return = "", Notes = "" },
+				SaveAllChunks = { Params = "", Return = "", Notes = "" },
+				SendBlockTo = { Params = "", Return = "", Notes = "" },
+				SetBlock = { Params = "", Return = "", Notes = "" },
+				SetBlockMeta = { Params = "", Return = "", Notes = "" },
+				SetNextBlockTick = { Params = "", Return = "", Notes = "" },
+				SetSignLines = { Params = "", Return = "", Notes = "" },
+				SetTicksUntilWeatherChange = { Params = "", Return = "", Notes = "" },
+				SetTimeOfDay = { Params = "", Return = "", Notes = "" },
+				SetWeather = { Params = "", Return = "", Notes = "" },
+				SetWorldTime = { Params = "", Return = "", Notes = "" },
+				SpawnItemPickups = { Params = "", Return = "", Notes = "" },
+				SpawnMob = { Params = "", Return = "", Notes = "" },
+				SpawnPrimedTNT = { Params = "", Return = "", Notes = "" },
+				TryGetHeight = { Params = "", Return = "", Notes = "" },
+				UnloadUnusedChunks = { Params = "", Return = "", Notes = "" },
+				UpdateSign = { Params = "", Return = "", Notes = "" },
+				WakeUpSimulators = { Params = "", Return = "", Notes = "" },
+				WakeUpSimulatorsInArea = { Params = "", Return = "", Notes = "" },
 			},
 			Constants =
 			{
