@@ -772,7 +772,7 @@ static int tolua_cWorld_GetSignLines(lua_State * tolua_S)
 		#endif
 		{
 			AString Line1, Line2, Line3, Line4;
-			bool res = self->GetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+			bool res = self->GetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
 			tolua_pushboolean(tolua_S, res ? 1 : 0);
 			if (res)
 			{
