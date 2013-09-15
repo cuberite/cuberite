@@ -20,6 +20,11 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_DIRT, 1, 0));
 	}
+	
+	virtual const char * GetStepSound(void) override
+	{
+		return "step.gravel";
+	}
 } ;
 
 
