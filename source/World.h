@@ -113,12 +113,6 @@ public:
 		BroadcastTimeUpdate();
 	}
 	
-	void SetWorldTime(Int64 a_TimeOfDay)
-	{
-		LOGWARNING("cWorld:SetWorldTime() is obsolete, use SetTimeOfDay() instead");
-		SetTimeOfDay(a_TimeOfDay);
-	}
-	
 	/// Returns the current game mode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable
 	eGameMode GetGameMode(void) const { return m_GameMode; }
 
