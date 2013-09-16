@@ -1448,7 +1448,17 @@ void cPlayer::SetSwimState(cChunk & a_Chunk)
 	
 	// Check if the player is swimming:
 	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
+	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
+	{
+		// This sometimes happens on Linux machines
+		// Ref.: http://forum.mc-server.org/showthread.php?tid=1244
+		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, LastPos = {%.02f, %.02f}, Pos = %.02f, %.02f}",
+			RelX, RelY, m_LastPosX, m_LastPosZ, GetPosX(), GetPosZ()
+		);
+		m_IsSwimming = false;
+		m_IsSubmerged = false;
+		return;
+	}
 	m_IsSwimming = IsBlockWater(BlockIn);
 
 	// Check if the player is submerged:
