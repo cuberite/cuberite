@@ -591,7 +591,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
 			cf:write("<a name=\"additionalinfo_" .. i .. "\"><h1>" .. additional.Header .. "</h1></a>\n");
-			cf:write(additional.Contents);
+			cf:write(LinkifyString(additional.Contents));
 		end
 	end
 
