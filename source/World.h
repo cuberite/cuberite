@@ -502,7 +502,7 @@ public:
 	}
 
 	/// Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead
-	void SaveAllChunks(void);  // tolua_export
+	void SaveAllChunks(void);
 	
 	/// Queues a task to save all chunks onto the tick thread. The prefferred way of saving chunks from external sources
 	void QueueSaveAllChunks(void);  // tolua_export
