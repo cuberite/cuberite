@@ -530,17 +530,19 @@ public:
 	/// Stops threads that belong to this world (part of deinit)
 	void Stop(void);
 	
-	void TickQueuedBlocks(float a_Dt);
+	/// Processes the blocks queued for ticking with a delay (m_BlockTickQueue[])
+	void TickQueuedBlocks(void);
 
 	struct BlockTickQueueItem
 	{
 		int X;
 		int Y;
 		int Z;
-		float ToWait;
+		int TicksToWait;
 	};
 
-	void QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, float a_TimeToWait);  // tolua_export
+	/// Queues the block to be ticked after the specified number of game ticks
+	void QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, int a_TicksToWait);  // tolua_export
 
 	// tolua_begin
 	/// Casts a thunderbolt at the specified coords
@@ -633,7 +635,7 @@ private:
 	std::vector<int> m_RSList;
 	
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
-	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;	//Second is for safely removing the objects from the queue
+	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;	 // Second is for safely removing the objects from the queue
 
 	cSimulatorManager *  m_SimulatorManager;
 	cSandSimulator *     m_SandSimulator;

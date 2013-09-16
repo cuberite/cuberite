@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/15/13 22:09:07.
+** Generated automatically by tolua++-1.0.92 on 09/16/13 09:19:33.
 */
 
 #ifndef __cplusplus
@@ -13163,12 +13163,12 @@ static int tolua_AllToLua_cWorld_QueueBlockForTick00(lua_State* tolua_S)
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
-  float a_TimeToWait = ((float)  tolua_tonumber(tolua_S,5,0));
+  int a_TicksToWait = ((int)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'QueueBlockForTick'", NULL);
 #endif
   {
-   self->QueueBlockForTick(a_BlockX,a_BlockY,a_BlockZ,a_TimeToWait);
+   self->QueueBlockForTick(a_BlockX,a_BlockY,a_BlockZ,a_TicksToWait);
   }
  }
  return 0;

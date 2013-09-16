@@ -612,7 +612,7 @@ void cWorld::Tick(float a_Dt)
 	m_ChunkMap->Tick(a_Dt);
 
 	TickClients(a_Dt);
-	TickQueuedBlocks(a_Dt);
+	TickQueuedBlocks();
 	TickQueuedTasks();
 	
 	GetSimulatorManager()->Simulate(a_Dt);
@@ -2514,7 +2514,7 @@ void cWorld::GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLigh
 
 
 
-void cWorld::TickQueuedBlocks(float a_Dt)
+void cWorld::TickQueuedBlocks(void)
 {
 	if (m_BlockTickQueue.empty())
 	{
@@ -2526,15 +2526,16 @@ void cWorld::TickQueuedBlocks(float a_Dt)
 	for (std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); itr++)
 	{
 		BlockTickQueueItem *Block = (*itr);
-		Block->ToWait -= a_Dt;
-		if (Block->ToWait <= 0)
+		Block->TicksToWait -= 1;
+		if (Block->TicksToWait <= 0)
 		{
+			// TODO: Handle the case when the chunk is already unloaded
 			BlockHandler(GetBlock(Block->X, Block->Y, Block->Z))->OnUpdate(this, Block->X, Block->Y, Block->Z);
-			delete Block;	//We don't have to remove it from the vector, this will happen automatically on the next tick
+			delete Block;	 // We don't have to remove it from the vector, this will happen automatically on the next tick
 		}
 		else
 		{
-			m_BlockTickQueue.push_back(Block);	//Keep the block in the queue
+			m_BlockTickQueue.push_back(Block);	// Keep the block in the queue
 		}
 	}  // for itr - m_BlockTickQueueCopy[]
 }
@@ -2543,13 +2544,13 @@ void cWorld::TickQueuedBlocks(float a_Dt)
 
 
 
-void cWorld::QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, float a_TimeToWait)
+void cWorld::QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, int a_TicksToWait)
 {
 	BlockTickQueueItem * Block = new BlockTickQueueItem;
 	Block->X = a_BlockX;
 	Block->Y = a_BlockY;
 	Block->Z = a_BlockZ;
-	Block->ToWait = a_TimeToWait;
+	Block->TicksToWait = a_TicksToWait;
 	
 	m_BlockTickQueue.push_back(Block);
 }
