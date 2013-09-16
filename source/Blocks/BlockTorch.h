@@ -148,7 +148,7 @@ public:
 				(BlockInQuestion == E_BLOCK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL)) &&
-				(i = BLOCK_FACE_TOP)
+				(i == BLOCK_FACE_TOP)
 				)
 			{
 				return i;
