@@ -1466,6 +1466,66 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 			Constants =
 			{
 			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Using callbacks",
+					Contents = [[
+						To avoid problems with stale objects, the cWorld class will not let plugins get a direct pointer
+						to an {{cEntity|entity}}, {{cBlockEntity|block entity}} or a {{cPlayer|player}}. Such an object
+						could be modified or even destroyed by another thread while the plugin holds it, so it would be
+						rather unsafe.</p>
+						<p>
+						Instead, the cWorld provides access to these objects using callbacks. The plugin provides a
+						function that is called and receives the object as a parameter; cWorld guarantees that while
+						the callback is executing, the object will stay valid. If a plugin needs to "remember" the
+						object outside of the callback, it needs to store the entity ID, blockentity coords or player
+						name.</p>
+						<p>
+						The following code examples show how to use the callbacks</p>
+						<p>
+						This code teleports player Player to another player named ToName in the same world:
+<pre>
+-- Player is a cPlayer object
+-- ToName is a string
+-- World is a cWorld object
+World:ForEachPlayer(
+	function (a_OtherPlayer)
+	if (a_OtherPlayer:GetName() == ToName) then
+		Player:TeleportToEntity(a_OtherPlayer);
+	end
+);
+</pre></p>
+						<p>
+						This code fills each furnace in the chunk with 64 coals:
+<pre>
+-- Player is a cPlayer object
+-- World is a cWorld object
+World:ForEachFurnaceInChunk(Player:GetChunkX(), Player:GetChunkZ(),
+	function (a_Furnace)
+		a_Furnace:SetFuelSlot(cItem(E_ITEM_COAL, 64));
+	end
+);
+</pre></p>
+						<p>
+						This code teleports all spiders up by 100 blocks:
+<pre>
+-- World is a cWorld object
+World:ForEachEntity(
+	function (a_Entity)
+		if not(a_Entity:IsMob()) then
+			return;
+		end
+		local Monster = tolua.cast(a_Entity, "cMonster");  -- Get the cMonster out of cEntity, now that we know the entity represents one.
+		if (Monster:GetMobType() == cMonster.mtSpider) then
+			Monster:TeleportToCoords(Monster:GetPosX(), Monster:GetPosY() + 100, Monster:GetPosZ());
+		end
+	end
+);
+</pre></p>
+					]],
+				},
+			},  -- AdditionalInfo
 		},
 
 		TakeDamageInfo =
