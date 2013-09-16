@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/16/13 10:08:23.
+** Generated automatically by tolua++-1.0.92 on 09/16/13 11:41:45.
 */
 
 #ifndef __cplusplus
@@ -28583,6 +28583,38 @@ static int tolua_get_cLuaWindow___cItemGrid__cListener__(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetMobType of class  cMonster */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cMonster_GetMobType00
+static int tolua_AllToLua_cMonster_GetMobType00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cMonster",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cMonster* self = (cMonster*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMobType'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetMobType();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMobType'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
 {
@@ -30595,6 +30627,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"mtOcelot",cMonster::mtOcelot);
    tolua_constant(tolua_S,"mtIronGolem",cMonster::mtIronGolem);
    tolua_constant(tolua_S,"mtVillager",cMonster::mtVillager);
+   tolua_function(tolua_S,"GetMobType",tolua_AllToLua_cMonster_GetMobType00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLineBlockTracer","cLineBlockTracer","",NULL);
   tolua_beginmodule(tolua_S,"cLineBlockTracer");

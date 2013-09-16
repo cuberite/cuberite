@@ -100,7 +100,9 @@ public:
 	virtual void InStateEscaping(float a_Dt);
 	
 	virtual void Attack(float a_Dt);
-	int GetMobType() {return m_MobType;}
+	
+	int GetMobType() { return m_MobType; }  // tolua_export
+	
 	int GetAttackRate(){return (int)m_AttackRate;}
 	void SetAttackRate(int ar);
 	void SetAttackRange(float ar);
