@@ -1,4 +1,3 @@
-
 // cClientHandle.h
 
 // Interfaces to the cClientHandle class representing a client connected to this server. The client need not be a player yet
@@ -53,9 +52,9 @@ public:
 #if defined(ANDROID_NDK)
 	static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
 #else
-	static const int DEFAULT_VIEW_DISTANCE = 9;
+	static const int DEFAULT_VIEW_DISTANCE = 10;
 #endif
-	static const int MAX_VIEW_DISTANCE = 10;
+	static const int MAX_VIEW_DISTANCE = 15;
 	static const int MIN_VIEW_DISTANCE = 3;
 	
 	/// How many ticks should be checked for a running average of explosions, for limiting purposes
