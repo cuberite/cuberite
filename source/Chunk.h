@@ -3,6 +3,7 @@
 
 #include "Entities/Entity.h"
 #include "ChunkDef.h"
+#include "BlockDataReader.h"
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
@@ -444,6 +445,9 @@ private:
 	
 	/// Processes all blocks that have been scheduled for replacement by the QueueSetBlock() function
 	void ProcessQueuedSetBlocks(void);
+
+
+	cBlockTypeAndMetaReader m_BlockTypeAndMetaReader[4];
 };
 
 typedef cChunk * cChunkPtr;

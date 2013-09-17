@@ -11,6 +11,7 @@
 #pragma once
 
 #include "DelayedFluidSimulator.h"
+#include "BlockDataReader.h"
 
 
 
@@ -46,6 +47,8 @@ protected:
 	
 	/// Checks if there are enough neighbors to create a source at the coords specified; turns into source and returns true if so
 	bool CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+
+	cBlockTypeAndMetaReader m_BlockTypeAndMetaReader;
 } ;
 
 

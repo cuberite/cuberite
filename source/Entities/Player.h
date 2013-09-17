@@ -4,7 +4,7 @@
 #include "Pawn.h"
 #include "../Inventory.h"
 #include "../Defines.h"
-
+#include "BlockDataReader.h"
 
 
 
@@ -389,6 +389,8 @@ protected:
 
 	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
 	void ApplyFoodExhaustionFromMovement();
+
+	cBlockTypeReader m_BlockTypeReader;
 } ; // tolua_export
 
 

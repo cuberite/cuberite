@@ -13,6 +13,8 @@
 #include "PluginManager.h"
 #include "Entities/TNTEntity.h"
 #include "BlockDataReader.h"
+#include "OSSupport/Timer.h"
+#include <sstream>
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -47,6 +49,29 @@ cChunkMap::~cChunkMap()
 	}
 }
 
+
+void cChunkMap::Bench()
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr chunk = GetChunk(7,41,11);
+	std::cout << "=====>BENCHING<====="<<std::endl;
+//	if (chunk->IsValid())
+	{
+		cTimer timer;
+		long long before = timer.GetNowTime();
+		NIBBLETYPE nt;
+		BLOCKTYPE bt;
+		for (int i = 0; i< 1000000; i++)
+		{
+			chunk->UnboundedRelGetBlock(0,0,0,bt,nt);
+		}
+		long long after = timer.GetNowTime();
+		std::ostringstream oss;
+		oss << after-before;
+		std::cout << oss.str().c_str()<<std::endl;
+	}
+	std::cout << "=====>BENCHING END<====="<<std::endl;
+}
 
 
 

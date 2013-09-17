@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Simulator.h"
-
+#include "BlockDataReader.h"
 
 
 
@@ -76,6 +76,8 @@ private:
 	BlockList m_RefreshTorchesAround;
 	
 	void RefreshTorchesAround( const Vector3i & a_BlockPos );
+
+	cBlockTypeAndMetaReader m_BlockTypeAndMetaReader;
 
 	// TODO: The entire simulator is synchronized, no need to lock data structures; remove this
 	cCriticalSection m_CS;

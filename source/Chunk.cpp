@@ -688,15 +688,13 @@ void cChunk::ApplyWeatherToTop()
 			if (m_World->IsDeepSnowEnabled() && (TopBlock == E_BLOCK_SNOW))
 			{
 				int MaxSize = 7;
-				BLOCKTYPE  BlockType[4];
-				NIBBLETYPE BlockMeta[4];
-				UnboundedRelGetBlock(X - 1, Height, Z,     BlockType[0], BlockMeta[0]);
-				UnboundedRelGetBlock(X + 1, Height, Z,     BlockType[1], BlockMeta[1]);
-				UnboundedRelGetBlock(X,     Height, Z - 1, BlockType[2], BlockMeta[2]);
-				UnboundedRelGetBlock(X,     Height, Z + 1, BlockType[3], BlockMeta[3]);
+				UnboundedRelGetBlockData(X - 1, Height, Z,     m_BlockTypeAndMetaReader[0]);
+				UnboundedRelGetBlockData(X + 1, Height, Z,     m_BlockTypeAndMetaReader[1]);
+				UnboundedRelGetBlockData(X,     Height, Z - 1, m_BlockTypeAndMetaReader[2]);
+				UnboundedRelGetBlockData(X,     Height, Z + 1, m_BlockTypeAndMetaReader[3]);
 				for (int i = 0; i < 4; i++)
 				{
-					switch (BlockType[i])
+					switch (m_BlockTypeAndMetaReader[i].getType())
 					{
 						case E_BLOCK_AIR:
 						{
@@ -705,7 +703,7 @@ void cChunk::ApplyWeatherToTop()
 						}
 						case E_BLOCK_SNOW:
 						{
-							MaxSize = std::min(BlockMeta[i] + 1, MaxSize);
+							MaxSize = std::min(m_BlockTypeAndMetaReader[i].getMeta() + 1, MaxSize);
 							break;
 						}
 					}
@@ -767,18 +765,16 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 
 	// Check if there's another melon / pumpkin around that stem, if so, abort:
 	bool IsValid;
-	BLOCKTYPE BlockType[4];
-	NIBBLETYPE BlockMeta;  // unused
-	IsValid =            UnboundedRelGetBlock(a_RelX + 1, a_RelY, a_RelZ,     BlockType[0], BlockMeta);
-	IsValid = IsValid && UnboundedRelGetBlock(a_RelX - 1, a_RelY, a_RelZ,     BlockType[1], BlockMeta);
-	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ + 1, BlockType[2], BlockMeta);
-	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ - 1, BlockType[3], BlockMeta);
+	IsValid =            UnboundedRelGetBlockData(a_RelX + 1, a_RelY, a_RelZ,     m_BlockTypeAndMetaReader[0]);
+	IsValid = IsValid && UnboundedRelGetBlockData(a_RelX - 1, a_RelY, a_RelZ,     m_BlockTypeAndMetaReader[1]);
+	IsValid = IsValid && UnboundedRelGetBlockData(a_RelX,     a_RelY, a_RelZ + 1, m_BlockTypeAndMetaReader[2]);
+	IsValid = IsValid && UnboundedRelGetBlockData(a_RelX,     a_RelY, a_RelZ - 1, m_BlockTypeAndMetaReader[3]);
 	if (
 		!IsValid || 
-		(BlockType[0] == ProduceType) || 
-		(BlockType[1] == ProduceType) || 
-		(BlockType[2] == ProduceType) || 
-		(BlockType[3] == ProduceType)
+		(m_BlockTypeAndMetaReader[0].getType() == ProduceType) || 
+		(m_BlockTypeAndMetaReader[1].getType() == ProduceType) || 
+		(m_BlockTypeAndMetaReader[2].getType() == ProduceType) || 
+		(m_BlockTypeAndMetaReader[3].getType() == ProduceType)
 	)
 	{
 		// Neighbors not valid or already taken by the same produce
@@ -797,7 +793,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 	}
 	
 	// Check that the block in that direction is empty:
-	switch (BlockType[CheckType])
+	switch (m_BlockTypeAndMetaReader[CheckType].getType())
 	{
 		case E_BLOCK_AIR:
 		case E_BLOCK_SNOW:
@@ -810,9 +806,9 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 	}
 	
 	// Check if there's soil under the neighbor. We already know the neighbors are valid. Place produce if ok
-	BLOCKTYPE Soil;
-	UnboundedRelGetBlock(a_RelX + x, a_RelY - 1, a_RelZ + z, Soil, BlockMeta);
-	switch (Soil)
+	cBlockTypeAndMetaReader Soil;
+	UnboundedRelGetBlockData(a_RelX + x, a_RelY - 1, a_RelZ + z, Soil);
+	switch (Soil.getType())
 	{
 		case E_BLOCK_DIRT:
 		case E_BLOCK_GRASS:
@@ -820,8 +816,8 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		{
 			// DEBUG: This is here to catch FS #349 - melons growing over other crops.
 			LOG("Growing melon/pumpkin overwriting %s, growing on %s",
-				ItemTypeToString(BlockType[CheckType]).c_str(),
-				ItemTypeToString(Soil).c_str()
+				ItemTypeToString(m_BlockTypeAndMetaReader[CheckType].getType()).c_str(),
+				ItemTypeToString(Soil.getType()).c_str()
 			);
 			// Place a randomly-facing produce:
 			UnboundedRelFastSetBlock(a_RelX + x, a_RelY, a_RelZ + z, ProduceType, (NIBBLETYPE)(a_TickRandom.randInt(4) % 4));
@@ -858,9 +854,7 @@ void cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 	int ToGrow = std::min(a_NumBlocks, m_World->GetMaxSugarcaneHeight() + 1 - (Top - Bottom));
 	for (int i = 0; i < ToGrow; i++)
 	{
-		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (UnboundedRelGetBlock(a_RelX, Top + i, a_RelZ, BlockType, BlockMeta) && (BlockType == E_BLOCK_AIR))
+		if (UnboundedRelGetBlockData(a_RelX, Top + i, a_RelZ, m_BlockTypeAndMetaReader[0]) && (m_BlockTypeAndMetaReader[0].getType() == E_BLOCK_AIR))
 		{
 			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_SUGARCANE, 0);
 		}
@@ -899,9 +893,7 @@ void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 	int ToGrow = std::min(a_NumBlocks, m_World->GetMaxCactusHeight() + 1 - (Top - Bottom));
 	for (int i = 0; i < ToGrow; i++)
 	{
-		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (UnboundedRelGetBlock(a_RelX, Top + i, a_RelZ, BlockType, BlockMeta) && (BlockType == E_BLOCK_AIR))
+		if (UnboundedRelGetBlockData(a_RelX, Top + i, a_RelZ, m_BlockTypeAndMetaReader[0]) && (m_BlockTypeAndMetaReader[0].getType() == E_BLOCK_AIR))
 		{
 			// TODO: Check the surrounding blocks, if they aren't air, break the cactus block into pickups (and continue breaking blocks above in the next loop iterations)
 			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_CACTUS, 0);

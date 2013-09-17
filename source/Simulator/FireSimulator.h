@@ -3,6 +3,7 @@
 
 #include "Simulator.h"
 #include "../BlockEntities/BlockEntity.h"
+#include "BlockDataReader.h"
 
 
 
@@ -61,6 +62,8 @@ protected:
 	The coords are relative to a_NearChunk but not necessarily in it.
 	*/
 	bool CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ);
+
+	cBlockTypeAndMetaReader m_BlockTypeAndMetaReader;
 } ;
 
 

@@ -241,11 +241,9 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 	
 	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 	{
-		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (a_Chunk->UnboundedRelGetBlock(a_RelX + gCrossCoords[i].x, a_RelY, a_RelZ + gCrossCoords[i].z, BlockType, BlockMeta))
+		if (a_Chunk->UnboundedRelGetBlockData(a_RelX + gCrossCoords[i].x, a_RelY, a_RelZ + gCrossCoords[i].z, m_BlockTypeAndMetaReader))
 		{
-			if (IsFuel(BlockType))
+			if (IsFuel(m_BlockTypeAndMetaReader.getType()))
 			{
 				return m_BurnStepTimeFuel;
 			}
@@ -308,14 +306,12 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 {
 	for (int i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
-		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
+		if (!a_Chunk->UnboundedRelGetBlockData(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, m_BlockTypeAndMetaReader))
 		{
 			// Neighbor not accessible, ignore it
 			continue;
 		}
-		if (!IsFuel(BlockType))
+		if (!IsFuel(m_BlockTypeAndMetaReader.getType()))
 		{
 			continue;
 		}
@@ -333,15 +329,13 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 
 bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	BLOCKTYPE  BlockType;
-	NIBBLETYPE BlockMeta;
-	if (!a_NearChunk->UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta))
+	if (!a_NearChunk->UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, m_BlockTypeAndMetaReader))
 	{
 		// The chunk is not accessible
 		return false;
 	}
 	
-	if (BlockType != E_BLOCK_AIR)
+	if (m_BlockTypeAndMetaReader.getType() != E_BLOCK_AIR)
 	{
 		// Only an air block can be replaced by a fire block
 		return false;
@@ -349,12 +343,12 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 	
 	for (int i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
-		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
+		if (!a_NearChunk->UnboundedRelGetBlockData(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, m_BlockTypeAndMetaReader))
 		{
 			// Neighbor inaccessible, skip it while evaluating
 			continue;
 		}
-		if (IsFuel(BlockType))
+		if (IsFuel(m_BlockTypeAndMetaReader.getType()))
 		{
 			return true;
 		}

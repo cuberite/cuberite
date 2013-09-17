@@ -284,6 +284,8 @@ public:
 	/// Returns the CS for locking the chunkmap; only cWorld::cLock may use this function!
 	cCriticalSection & GetCS(void) { return m_CSLayers; }
 
+	void Bench();
+
 private:
 
 	friend class cChunk;  // The chunks can manipulate neighbors while in their Tick() method, using LockedGetBlock() and LockedSetBlock()

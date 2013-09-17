@@ -27,11 +27,17 @@ void cBlockSkyLightReader::read(const cChunk& a_Chunk, int a_BlockIdx)
 }
 
 
+cBlockMultipleReader::cBlockMultipleReader()
+{
+}
+
+
 cBlockMultipleReader::cBlockMultipleReader(cBlockDataReader& a_Reader1, cBlockDataReader& a_Reader2)
 {
 	addReader(a_Reader1);
 	addReader(a_Reader2);
 }
+
 
 cBlockMultipleReader::cBlockMultipleReader(cBlockDataReader& a_Reader1, cBlockDataReader& a_Reader2, cBlockDataReader& a_Reader3)
 {
@@ -39,6 +45,7 @@ cBlockMultipleReader::cBlockMultipleReader(cBlockDataReader& a_Reader1, cBlockDa
 	addReader(a_Reader2);
 	addReader(a_Reader3);
 }
+
 
 cBlockMultipleReader::cBlockMultipleReader(cBlockDataReader& a_Reader1, cBlockDataReader& a_Reader2, cBlockDataReader& a_Reader3, cBlockDataReader& a_Reader4)
 {
@@ -60,4 +67,21 @@ void cBlockMultipleReader::read(const cChunk& a_Chunk, int a_BlockIdx)
 	{
 		(*it)->read(a_Chunk,a_BlockIdx);
 	}
+}
+
+
+cBlockTypeAndMetaReader::cBlockTypeAndMetaReader()
+{
+	addReader(m_TypeReader);
+	addReader(m_MetaReader);
+}
+
+NIBBLETYPE& cBlockTypeAndMetaReader::getMeta()
+{
+	return m_MetaReader.getValue();
+}
+
+BLOCKTYPE& cBlockTypeAndMetaReader::getType()
+{
+	return m_TypeReader.getValue();
 }

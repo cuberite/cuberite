@@ -304,15 +304,15 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 		int x = a_RelX + NeighborCoords[i].x;
 		int y = a_RelY + NeighborCoords[i].y;
 		int z = a_RelZ + NeighborCoords[i].z;
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!a_Chunk->UnboundedRelGetBlock(x, y, z, BlockType, BlockMeta))
+
+
+		if (!a_Chunk->UnboundedRelGetBlockData(x, y, z, m_BlockTypeAndMetaReader))
 		{
 			// Neighbor not available, skip it
 			continue;
 		}
-		// FLOG("   Neighbor at {%d, %d, %d}: %s", x, y, z, ItemToFullString(cItem(BlockType, 1, BlockMeta)).c_str());
-		if ((BlockMeta == 0) && IsAnyFluidBlock(BlockType))
+		// FLOG("   Neighbor at {%d, %d, %d}: %s", x, y, z, ItemToFullString(cItem(m_BlockTypeAndMetaReader.getType(), 1, m_BlockTypeAndMetaReader.getMeta())).c_str());
+		if ((m_BlockTypeAndMetaReader.getMeta() == 0) && IsAnyFluidBlock(m_BlockTypeAndMetaReader.getType()))
 		{
 			NumNeeded--;
 			// FLOG("    Found a neighbor source at {%d, %d, %d}, NumNeeded := %d", x, y, z, NumNeeded);

@@ -1446,12 +1446,12 @@ void cPlayer::SetSwimState(cChunk & a_Chunk)
 	
 	// Check if the player is swimming:
 	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
-	m_IsSwimming = IsBlockWater(BlockIn);
+	VERIFY(a_Chunk.UnboundedRelGetBlockData(RelX, RelY, RelZ, m_BlockTypeReader));
+	m_IsSwimming = IsBlockWater(m_BlockTypeReader.getValue());
 
 	// Check if the player is submerged:
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
-	m_IsSubmerged = IsBlockWater(BlockIn);
+	VERIFY(a_Chunk.UnboundedRelGetBlockData(RelX, RelY + 1, RelZ, m_BlockTypeReader));
+	m_IsSubmerged = IsBlockWater(m_BlockTypeReader.getValue());
 }
 
 

@@ -452,6 +452,8 @@ void cWorld::InitializeSpawn(void)
 	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 15, m_SpawnY - 5, m_SpawnZ + 7.5, m_SpawnX + 13, m_SpawnY - 10, m_SpawnZ + 8.5);
 	LOGD("Tracing tests done");
 	#endif  // TEST_LINEBLOCKTRACER
+
+	m_ChunkMap->Bench();
 }
 
 

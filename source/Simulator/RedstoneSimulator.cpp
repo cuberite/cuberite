@@ -47,7 +47,7 @@ void cRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk
 	{
 		BLOCKTYPE  BlockType;
 		NIBBLETYPE BlockMeta;
-		if (!a_Chunk->UnboundedRelGetBlock(RelX + x, a_BlockY + y, RelZ + z, BlockType, BlockMeta))
+		if (!a_Chunk->UnboundedRelGetBlockData(RelX + x, a_BlockY + y, RelZ + z, m_BlockTypeAndMetaReader))
 		{
 			continue;
 		}
