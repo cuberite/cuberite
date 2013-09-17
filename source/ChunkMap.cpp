@@ -59,11 +59,10 @@ void cChunkMap::Bench()
 	{
 		cTimer timer;
 		long long before = timer.GetNowTime();
-		NIBBLETYPE nt;
-		BLOCKTYPE bt;
+		cBlockTypeAndMetaReader reader;
 		for (int i = 0; i< 1000000; i++)
 		{
-			chunk->UnboundedRelGetBlock(0,0,0,bt,nt);
+			chunk->UnboundedRelGetBlockData(0,0,0,reader);
 		}
 		long long after = timer.GetNowTime();
 		std::ostringstream oss;
