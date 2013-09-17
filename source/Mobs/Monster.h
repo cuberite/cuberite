@@ -110,7 +110,7 @@ public:
 	void SetSightDistance(float sd);
 	
 	/// Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick
-	void SetBurnsInDaylight(bool a_BurnsInDaylight) { a_BurnsInDaylight = a_BurnsInDaylight; }
+	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
 	
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
 	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
