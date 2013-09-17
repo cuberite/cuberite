@@ -651,21 +651,21 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 						}
 					}
 				}
-				else
+			}
+			else
+			{
+				// Friction for non-minecarts
+				if (NextSpeed.SqrLength() > 0.0004f)
 				{
-					// Friction
-					if (NextSpeed.SqrLength() > 0.0004f)
+					NextSpeed.x *= 0.7f / (1 + a_Dt);
+					if (fabs(NextSpeed.x) < 0.05)
 					{
-						NextSpeed.x *= 0.7f / (1 + a_Dt);
-						if (fabs(NextSpeed.x) < 0.05)
-						{
-							NextSpeed.x = 0;
-						}
-						NextSpeed.z *= 0.7f / (1 + a_Dt);
-						if (fabs(NextSpeed.z) < 0.05)
-						{
-							NextSpeed.z = 0;
-						}
+						NextSpeed.x = 0;
+					}
+					NextSpeed.z *= 0.7f / (1 + a_Dt);
+					if (fabs(NextSpeed.z) < 0.05)
+					{
+						NextSpeed.z = 0;
 					}
 				}
 			}

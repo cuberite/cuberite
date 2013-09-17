@@ -138,10 +138,6 @@ public:
 	/// Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure
 	static char FindSuitableFace(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		// TODO: If placing a torch from below, check all 4 XZ neighbors, place it on that neighbor instead
-		// How to propagate that change up?
-		// Simon: The easiest way is to calculate the position two times, shouldn't cost much cpu power :)
-
 		for (int i = 0; i <= 5; i++)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, true);
@@ -152,12 +148,12 @@ public:
 				(BlockInQuestion == E_BLOCK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL)) &&
-				(i = 1)
+				(i == BLOCK_FACE_TOP)
 				)
 			{
 				return i;
 			}
-			else if ( g_BlockIsTorchPlaceable[BlockInQuestion] )
+			else if ((g_BlockIsTorchPlaceable[BlockInQuestion]) && (i != BLOCK_FACE_BOTTOM))
 			{
 				return i;
 			}
@@ -193,7 +189,12 @@ public:
 		BLOCKTYPE BlockInQuestion;
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockInQuestion);
 
-		if ((BlockInQuestion == E_BLOCK_GLASS) || (BlockInQuestion == E_BLOCK_FENCE) || (BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE))
+		if (
+			(BlockInQuestion == E_BLOCK_GLASS) ||
+			(BlockInQuestion == E_BLOCK_FENCE) ||
+			(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
+			(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL)
+			)
 		{
 			// Torches can be placed on tops of glass and fences, despite them being 'untorcheable'
 			// No need to check for upright orientation, it was done when the torch was placed
