@@ -1191,6 +1191,25 @@ a_Player:OpenWindow(Window);
 ]],
 			Functions =
 			{
+				Get = { Params = "", Return = "Root object", Notes = "This function returns the cRoot object " },
+				BroadcastChat = { Params = "Message", Return = "", Notes = "Broadcasts a message to every player in the server" },
+				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for the given player" },
+				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player" },
+				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world" },
+				GetCraftingRecipes = { Params = "", Return = "{{cCraftingRecipe|cCraftingRecipe}}", Notes = "Returns the CraftingRecipes object" },
+				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world" },
+				GetFurnaceRecipe = { Params = "", Return = "{{cFurnaceRecipe|cFurnaceRecipe}}", Notes = "Returns the cFurnaceRecipes object" },
+				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object" },
+				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object" },
+				GetPrimaryServerVersion = { Params = "", Return = "Int", Notes = "Returns the servers primary server version" },
+				GetProtocolVersionTextFromInt = { Params = "Protocol Version", Return = "string", Notes = "Returns the Minecraft version from the given Protocol" },
+				GetServer = { Params = "", Return = "{{cServer|cServer}}", Notes = "Returns the cServer object" },
+				GetTotalChunkCount = { Params = "", Return = "Int", Notes = "Returns the amount of loaded chunks" },
+				GetWebAdmin = { Params = "", Return = "{{cWebAdmin|cWebAdmin}}", Notes = "Returns the cWebAdmin object" },
+				GetWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Returns the cWorld object of the given world" },
+				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread The command's output will be sent to console " .. '"stop" and "restart" commands have special handling.' },
+				SaveAllChunks = { Params = "", Return = "", Notes = "Saves all the chunks in all the worlds" },
+				SetPrimaryServerVersion = { Params = "Protocol Version", Return = "", Notes = "Sets the servers PrimaryServerVersion to the given protocol Int" }
 			},
 			Constants =
 			{
