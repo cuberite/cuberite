@@ -2160,6 +2160,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\blocks\BlockPlanks.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Blocks\BlockPumpkin.h"
 					>
 				</File>
@@ -2352,10 +2356,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemSlab.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\Items\ItemSpawnEgg.h"
 					>
 				</File>
@@ -2369,10 +2369,6 @@
 				</File>
 				<File
 					RelativePath="..\source\Items\ItemThrowable.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\items\ItemWood.h"
 					>
 				</File>
 			</Filter>
