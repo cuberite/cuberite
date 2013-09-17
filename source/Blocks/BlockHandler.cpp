@@ -41,6 +41,7 @@
 #include "BlockNote.h"
 #include "BlockOre.h"
 #include "BlockPiston.h"
+#include "BlockPlanks.h"
 #include "BlockPumpkin.h"
 #include "BlockRail.h"
 #include "BlockRedstone.h"
@@ -153,7 +154,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      ();
-		case E_BLOCK_PLANKS:                return new cBlockWoodHandler            (a_BlockType);
+		case E_BLOCK_PLANKS:                return new cBlockPlanksHandler          (a_BlockType);
 		case E_BLOCK_PUMPKIN:               return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_JACK_O_LANTERN:        return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
