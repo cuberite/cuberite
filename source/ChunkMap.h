@@ -26,6 +26,7 @@ class cPawn;
 class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
+class cBlockDataReader;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cChunk * cChunkPtr;
@@ -357,6 +358,8 @@ private:
 	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
 	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Doesn't load, doesn't generate
 	
+
+	
 	/// Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
 	bool LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	
@@ -365,6 +368,19 @@ private:
 	
 	/// Gets a block meta in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
 	bool LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta);
+
+	/// Gets a block Light in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	bool LockedGetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta);
+
+	/// Gets a block SkyLight in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	bool LockedGetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta);
+
+	/// Gets a block Type + Meta + Light + SkyLight in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	bool LockedGetBlockFull(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_BlockSkyLight);
+
+	/// The method, all LockedGetBlockXXXXX rely on 
+	bool LockedGetBlockData(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockDataReader& a_Reader);
+
 	
 	/// Sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
 	bool LockedSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);

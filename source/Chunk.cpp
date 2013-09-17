@@ -30,6 +30,7 @@
 #include "PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Simulator/FluidSimulator.h"
+#include "BlockDataReader.h"
 
 #include <json/json.h>
 
@@ -915,8 +916,7 @@ void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 
 
 
-
-bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+bool cChunk::UnboundedRelGetBlockData(int a_RelX, int a_RelY, int a_RelZ, cBlockDataReader& a_Reader) const
 {
 	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
 	{
@@ -932,36 +932,50 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 			return false;
 		}
 		int BlockIdx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-		a_BlockType = GetBlock(BlockIdx);
-		a_BlockMeta = GetMeta(BlockIdx);
+		a_Reader.read(*this,BlockIdx);
 		return true;
 	}
 
 	// Not in this chunk, try walking the neighbors first:
 	if ((a_RelX < 0) && (m_NeighborXM != NULL))
 	{
-		return m_NeighborXM->UnboundedRelGetBlock(a_RelX + cChunkDef::Width, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+		return m_NeighborXM->UnboundedRelGetBlockData(a_RelX + cChunkDef::Width, a_RelY, a_RelZ, a_Reader);
 	}
 	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
 	{
-		return m_NeighborXP->UnboundedRelGetBlock(a_RelX - cChunkDef::Width, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+		return m_NeighborXP->UnboundedRelGetBlockData(a_RelX - cChunkDef::Width, a_RelY, a_RelZ, a_Reader);
 	}
 	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
 	{
-		return m_NeighborZM->UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ + cChunkDef::Width, a_BlockType, a_BlockMeta);
+		return m_NeighborZM->UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ + cChunkDef::Width, a_Reader);
 	}
 	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
 	{
-		return m_NeighborZP->UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ - cChunkDef::Width, a_BlockType, a_BlockMeta);
+		return m_NeighborZP->UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ - cChunkDef::Width, a_Reader);
 	}
 
 	// Neighbors not available, use the chunkmap to locate the chunk:
-	return m_ChunkMap->LockedGetBlock(
+	return m_ChunkMap->LockedGetBlockData(
 		m_PosX * cChunkDef::Width + a_RelX,
 		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
 		m_PosZ * cChunkDef::Width + a_RelZ,
-		a_BlockType, a_BlockMeta
+		a_Reader
 	);
+}
+
+
+
+
+
+bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+{
+	static cBlockTypeReader TypeReader;
+	static cBlockMetaReader MetaReader;
+	static cBlockMultipleReader MultipleReader(TypeReader,MetaReader);
+	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, MultipleReader);
+	a_BlockType = TypeReader.getValue();
+	a_BlockMeta = MetaReader.getValue();
+	return toReturn;
 }
 
 
@@ -970,49 +984,10 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType) const
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
-	{
-		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
-		return false;
-	}
-	
-	// Is it in this chunk?
-	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
-	{
-		if (!IsValid())
-		{
-			return false;
-		}
-		int BlockIdx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-		a_BlockType = GetBlock(BlockIdx);
-		return true;
-	}
-
-	// Not in this chunk, try walking the neighbors first:
-	if ((a_RelX < 0) && (m_NeighborXM != NULL))
-	{
-		return m_NeighborXM->UnboundedRelGetBlockType(a_RelX + cChunkDef::Width, a_RelY, a_RelZ, a_BlockType);
-	}
-	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
-	{
-		return m_NeighborXP->UnboundedRelGetBlockType(a_RelX - cChunkDef::Width, a_RelY, a_RelZ, a_BlockType);
-	}
-	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
-	{
-		return m_NeighborZM->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ + cChunkDef::Width, a_BlockType);
-	}
-	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
-	{
-		return m_NeighborZP->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ - cChunkDef::Width, a_BlockType);
-	}
-
-	// Neighbors not available, use the chunkmap to locate the chunk:
-	return m_ChunkMap->LockedGetBlockType(
-		m_PosX * cChunkDef::Width + a_RelX,
-		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
-		m_PosZ * cChunkDef::Width + a_RelZ,
-		a_BlockType
-	);
+	static cBlockTypeReader TypeReader;
+	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, TypeReader);
+	a_BlockType = TypeReader.getValue();
+	return toReturn;
 }
 
 
@@ -1021,50 +996,55 @@ bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 
 bool cChunk::UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockMeta) const
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
-	{
-		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
-		return false;
-	}
-	
-	// Is it in this chunk?
-	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
-	{
-		if (!IsValid())
-		{
-			return false;
-		}
-		int BlockIdx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-		a_BlockMeta = GetMeta(BlockIdx);
-		return true;
-	}
-
-	// Not in this chunk, try walking the neighbors first:
-	if ((a_RelX < 0) && (m_NeighborXM != NULL))
-	{
-		return m_NeighborXM->UnboundedRelGetBlockMeta(a_RelX + cChunkDef::Width, a_RelY, a_RelZ, a_BlockMeta);
-	}
-	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
-	{
-		return m_NeighborXP->UnboundedRelGetBlockMeta(a_RelX - cChunkDef::Width, a_RelY, a_RelZ, a_BlockMeta);
-	}
-	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
-	{
-		return m_NeighborZM->UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ + cChunkDef::Width, a_BlockMeta);
-	}
-	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
-	{
-		return m_NeighborZP->UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ - cChunkDef::Width, a_BlockMeta);
-	}
-
-	// Neighbors not available, use the chunkmap to locate the chunk:
-	return m_ChunkMap->LockedGetBlockMeta(
-		m_PosX * cChunkDef::Width + a_RelX,
-		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
-		m_PosZ * cChunkDef::Width + a_RelZ,
-		a_BlockMeta
-	);
+	static cBlockMetaReader MetaReader;
+	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, MetaReader);
+	a_BlockMeta = MetaReader.getValue();
+	return toReturn;
 }
+
+
+
+
+
+bool cChunk::UnboundedRelGetBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight) const
+{
+	static cBlockLightReader LightReader;
+	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, LightReader);
+	a_BlockLight = LightReader.getValue();
+	return toReturn;
+}
+
+
+
+
+
+bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockSkyLight) const
+{
+	static cBlockSkyLightReader SkyLightReader;
+	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, SkyLightReader);
+	a_BlockSkyLight = SkyLightReader.getValue();
+	return toReturn;
+}
+
+
+
+
+
+bool cChunk::UnboundedRelGetBlockFull(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_BlockSkyLight) const
+{
+	static cBlockTypeReader TypeReader;
+	static cBlockMetaReader MetaReader;
+	static cBlockLightReader LightReader;
+	static cBlockSkyLightReader SkyLightReader;
+	static cBlockMultipleReader MultipleReader(TypeReader,MetaReader,LightReader,SkyLightReader);
+	bool toReturn = UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, MultipleReader);
+	a_BlockType = TypeReader.getValue();
+	a_BlockMeta = MetaReader.getValue();
+	a_BlockLight = LightReader.getValue();
+	a_BlockSkyLight = SkyLightReader.getValue();
+	return toReturn;
+}
+
 
 
 
