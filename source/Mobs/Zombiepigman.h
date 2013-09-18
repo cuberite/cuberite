@@ -7,17 +7,16 @@
 
 
 
-class cZombiepigman :
+class cZombiePigman :
 	public cPassiveAggressiveMonster
 {
 	typedef cPassiveAggressiveMonster super;
 	
 public:
-	cZombiepigman(void);
+	cZombiePigman(void);
 
-	CLASS_PROTODEF(cZombiepigman);
+	CLASS_PROTODEF(cZombiePigman);
 
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void KilledBy(cEntity * a_Killer) override;
 } ;

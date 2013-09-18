@@ -35,8 +35,12 @@
 #include "Mobs/Cow.h"
 #include "Mobs/Creeper.h"
 #include "Mobs/Enderman.h"
+#include "Mobs/EnderDragon.h"
 #include "Mobs/Ghast.h"
-#include "Mobs/Magmacube.h"
+#include "Mobs/Giant.h"
+#include "Mobs/Horse.h"
+#include "Mobs/IronGolem.h"
+#include "Mobs/MagmaCube.h"
 #include "Mobs/Mooshroom.h"
 #include "Mobs/Ocelot.h"
 #include "Mobs/Pig.h"
@@ -44,13 +48,15 @@
 #include "Mobs/Silverfish.h"
 #include "Mobs/Skeleton.h"
 #include "Mobs/Slime.h"
+#include "Mobs/SnowGolem.h"
 #include "Mobs/Spider.h"
 #include "Mobs/Squid.h"
 #include "Mobs/Villager.h"
 #include "Mobs/Witch.h"
+#include "Mobs/Wither.h"
 #include "Mobs/Wolf.h"
 #include "Mobs/Zombie.h"
-#include "Mobs/Zombiepigman.h"
+#include "Mobs/ZombiePigman.h"
 
 #include "OSSupport/MakeDir.h"
 #include "MersenneTwister.h"
@@ -2588,8 +2594,12 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 		case cMonster::mtCow:          Monster = new cCow();           break;
 		case cMonster::mtCreeper:      Monster = new cCreeper();       break;
 		case cMonster::mtEnderman:     Monster = new cEnderman();      break;
+		case cMonster::mtEnderDragon:  Monster = new cEnderDragon();   break;
 		case cMonster::mtGhast:        Monster = new cGhast();         break;
-		case cMonster::mtMagmaCube:    Monster = new cMagmacube(Size); break;
+		case cMonster::mtGiant:        Monster = new cGiant();         break;
+		case cMonster::mtHorse:        Monster = new cHorse();         break;
+		case cMonster::mtIronGolem:    Monster = new cIronGolem();     break;
+		case cMonster::mtMagmaCube:    Monster = new cMagmaCube(Size); break;
 		case cMonster::mtMooshroom:    Monster = new cMooshroom();     break;
 		case cMonster::mtOcelot:       Monster = new cOcelot();        break;
 		case cMonster::mtPig:          Monster = new cPig();           break;
@@ -2597,13 +2607,15 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 		case cMonster::mtSilverfish:   Monster = new cSilverfish();    break;
 		case cMonster::mtSkeleton:     Monster = new cSkeleton();      break;
 		case cMonster::mtSlime:        Monster = new cSlime(Size);     break;
+		case cMonster::mtSnowGolem:    Monster = new cSnowGolem();     break;
 		case cMonster::mtSpider:       Monster = new cSpider();        break;
 		case cMonster::mtSquid:        Monster = new cSquid();         break;
 		case cMonster::mtVillager:     Monster = new cVillager();      break;
 		case cMonster::mtWitch:        Monster = new cWitch();         break;
+		case cMonster::mtWither:       Monster = new cWither();        break;
 		case cMonster::mtWolf:         Monster = new cWolf();          break;
 		case cMonster::mtZombie:       Monster = new cZombie();        break;
-		case cMonster::mtZombiePigman: Monster = new cZombiepigman();  break;
+		case cMonster::mtZombiePigman: Monster = new cZombiePigman();  break;
 		
 		default:
 		{
