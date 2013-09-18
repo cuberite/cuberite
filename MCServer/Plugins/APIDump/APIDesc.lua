@@ -1146,34 +1146,106 @@ a_Player:OpenWindow(Window);
 		
 		cPluginManager =
 		{
-			Desc = [[This class is used for generic plugin-related functionality. The plugin manager has a list of all plugins, can enable or disable plugins, manages hook and in-game console commands.
-</p>
-		<p>There is one instance of cPluginManager in MCServer, to get it, call either {{GetPluginManager|GetPluginManager}}() or cPluginManager:Get() function.
+			Desc = [[
+				This class is used for generic plugin-related functionality. The plugin manager has a list of all
+				plugins, can enable or disable plugins, manages hooks and in-game console commands.</p>
+				<p>
+				There is one instance of cPluginManager in MCServer, to get it, call either
+				{{cRoot|cRoot}}:Get():GetPluginManager() or cPluginManager:Get() function.</p>
+				<p>
+				Note that some functions are "static", that means that they are called using a dot operator instead
+				of the colon operator. For example:
+<pre>
+cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
+</pre></p>
 ]],
 			Functions =
 			{
-				AddHook = { Params = "{{cPlugin|Plugin}}, HookType", Return = "", Notes = "Adds processing of the specified hook" },
-				BindCommand = { Params = "Command, Permission, Callback, HelpString", Return = "", Notes = "Binds an in-game command with the specified callback function, permission and help string" },
-				BindConsoleCommand = { Params = "Command, Callback, HelpString", Return = "", Notes = "Binds a console command with the specified callback function and help string" },
-				DisablePlugin = { Params = "PluginName", Return = "", Notes = "Disables a plugin specified by its name" },
-				ExecuteCommand = { Params = "Player, Command", Return = "bool", Notes = "Executes the command as if given by the specified Player. Checks permissions. Returns true if executed" },
-				ExecuteConsoleCommand = { Params = "Command", Return = "bool", Notes = "Executes the command as if given on the server console. Returns true if executed." },
+				AddHook =
+				{
+					{ Params = "HookType, [HookFunction]", Return = "", Notes = "(STATIC) Informs the plugin manager that it should call the specified function when the specified hook event occurs. If a function is not specified, a default function name is looked up, based on the hook type" },
+					{ Params = "{{cPlugin|Plugin}}, HookType, [HookFunction]", Return = "", Notes = "(STATIC, <b>DEPRECATED</b>) Informs the plugin manager that it should call the specified function when the specified hook event occurs. If a function is not specified, a default function name is looked up, based on the hook type. NOTE: This format is deprecated and the server outputs a warning if it is used!" },
+				},
+				BindCommand =
+				{
+					{ Params = "Command, Permission, Callback, HelpString", Return = "", Notes = "(STATIC) Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display." },
+					{ Params = "Command, Permission, Callback, HelpString", Return = "", Notes = "Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display." },
+				},
+				BindConsoleCommand =
+				{
+					{ Params = "Command, Callback, HelpString", Return = "", Notes = "(STATIC) Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command." },
+					{ Params = "Command, Callback, HelpString", Return = "", Notes = "Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command." },
+				},
+				DisablePlugin = { Params = "PluginName", Return = "bool", Notes = "Disables a plugin specified by its name. Returns true if the plugin was disabled, false if it wasn't found or wasn't active." },
+				ExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Executes the command as if given by the specified Player. Checks permissions. Returns true if executed." },
+				ExecuteConsoleCommand = { Params = "CommandStr", Return = "bool", Notes = "Executes the command as if given on the server console. Returns true if executed." },
 				FindPlugins = { Params = "", Return = "", Notes = "Refreshes the list of plugins to include all folders inside the Plugins folder (potentially new disabled plugins)" },
-				ForceExecuteCommand = { Params = "Player, Command", Return = "bool", Notes = "Same as ExecuteCommand, but doesn't check permissions" },
-				ForEachCommand = { Params = "Callback", Return = "", Notes = "Calls the Callback function for each command that has been bound using BindCommand()" },
-				ForEachConsoleCommand = { Params = "Callback", Return = "", Notes = "Calls the Callback function for each command that has been bound using BindConsoleCommand()" },
+				ForceExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Same as ExecuteCommand, but doesn't check permissions" },
+				ForEachCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindCommand(). The CallbackFn has the following signature: <pre>function(Command, Permission, HelpString)</pre>. If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
+				ForEachConsoleCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindConsoleCommand(). The CallbackFn has the following signature: <pre>function (Command, HelpString)</pre>. If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
 				Get = { Params = "", Return = "cPluginManager", Notes = "Returns the single instance of the plugin manager" },
-				GetAllPlugins = { Params = "", Return = "PluginTable", Notes = "Returns a table of all plugins, [name => cPlugin] pairs" },
+				GetAllPlugins = { Params = "", Return = "table", Notes = "Returns a table (dictionary) of all plugins, [name => {{cPlugin}}] pairing." },
 				GetCommandPermission = { Params = "Command", Return = "Permission", Notes = "Returns the permission needed for executing the specified command" },
 				GetNumPlugins = { Params = "", Return = "number", Notes = "Returns the number of plugins, including the disabled ones" },
 				GetPlugin = { Params = "PluginName", Return = "{{cPlugin|cPlugin}}", Notes = "Returns a plugin handle of the specified plugin" },
-				IsCommandBound = { Params = "Command", Return = "boolean", Notes = "Returns true if in-game Command is already bound (by any plugin)" },
-				IsConsoleCommandBound = { Params = "Command", Return = "boolean", Notes = "Returns true if console Command is already bound (by any plugin)" },
-				LoadPlugin = { Params = "PluginFolder", Return = "", Notes = "Loads a plugin from the specified folder" },
+				IsCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if in-game Command is already bound (by any plugin)" },
+				IsConsoleCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if console Command is already bound (by any plugin)" },
+				LoadPlugin = { Params = "PluginFolder", Return = "", Notes = "(<b>DEPRECATED</b>) Loads a plugin from the specified folder. NOTE: Loading plugins may be an unsafe operation and may result in a deadlock or a crash. This API is deprecated and might be removed." },
 				ReloadPlugins = { Params = "", Return = "", Notes = "Reloads all active plugins" },
 			},
 			Constants =
 			{
+				HOOK_BLOCK_TO_PICKUPS = { Notes = "Called when a block has been dug and is being converted to pickups. The server has provided the default pickups and the plugins may modify them." },
+				HOOK_CHAT = { Notes = "Called when a client sends a chat message that is not a command. The plugin may modify the chat message" },
+				HOOK_CHUNK_AVAILABLE = { Notes = "Called when a chunk is loaded or generated and becomes available in the {{cWorld|world}}." },
+				HOOK_CHUNK_GENERATED = { Notes = "Called after a chunk is generated. A plugin may do last modifications on the generated chunk before it is handed of to the {{cWorld|world}}." },
+				HOOK_CHUNK_GENERATING = { Notes = "Called before a chunk is generated. A plugin may override some parts of the generation algorithm." },
+				HOOK_CHUNK_UNLOADED = { Notes = "Called after a chunk has been unloaded from a {{cWorld|world}}." },
+				HOOK_CHUNK_UNLOADING = { Notes = "Called before a chunk is unloaded from a {{cWorld|world}}. The chunk has already been saved." },
+				HOOK_COLLECTING_PICKUP = { Notes = "Called when a player is about to collect a pickup." },
+				HOOK_CRAFTING_NO_RECIPE = { Notes = "Called when a player has items in the crafting slots and the server cannot locate any recipe. Plugin may provide a recipe." },
+				HOOK_DISCONNECT = { Notes = "Called after the player has disconnected." },
+				HOOK_EXECUTE_COMMAND = { Notes = "Called when a client sends a chat message that is recognized as a command, before handing that command to the regular command handler. A plugin may stop the command from being handled. This hook is called even when the player doesn't have permissions for the command." },
+				HOOK_EXPLODED = { Notes = "Called after an explosion has been processed in a {{cWorld|world}}." },
+				HOOK_EXPLODING = { Notes = "Called before an explosion is processed in a {{cWorld|world}}. A plugin may alter the explosion parameters or cancel the explosion altogether." },
+				HOOK_HANDSHAKE = { Notes = "Called when a Handshake packet is received from a client." },
+				HOOK_HOPPER_PULLING_ITEM = { Notes = "Called when a hopper is pulling an item from the container above it." },
+				HOOK_HOPPER_PUSHING_ITEM = { Notes = "Called when a hopper is pushing an item into the container it is aimed at." },
+				HOOK_KILLING = { Notes = "Called when an entity has just been killed. A plugin may resurrect the entity by setting its health to above zero." },
+				HOOK_LOGIN = { Notes = "Called when a Login packet is sent to the client, before the client is queued for authentication." },
+				HOOK_MAX = { Notes = "The maximum TypeID of a hook. Used internally by MCS to check hook type for validity." },
+				HOOK_NUM_HOOKS = { Notes = "Total number of hook types MCS supports. Used internally by MCS to check hook type for validity." },
+				HOOK_PLAYER_ANIMATION = { Notes = "Called when a client send the Animation packet." },
+				HOOK_PLAYER_BREAKING_BLOCK = { Notes = "Called when a player is about to break a block. A plugin may cancel the event." },
+				HOOK_PLAYER_BROKEN_BLOCK = { Notes = "Called after a player has broken a block." },
+				HOOK_PLAYER_EATING = { Notes = "Called when the player starts eating a held item. Plugins may abort the eating." },
+				HOOK_PLAYER_JOINED = { Notes = "Called when the player entity has been created. It has not yet been fully initialized." },
+				HOOK_PLAYER_LEFT_CLICK = { Notes = "Called when the client sends the LeftClick packet." },
+				HOOK_PLAYER_MOVING = { Notes = "Called when the player has moved and the movement is now being applied." },
+				HOOK_PLAYER_PLACED_BLOCK = { Notes = "Called when the player has just placed a block" },
+				HOOK_PLAYER_PLACING_BLOCK = { Notes = "Called when the player is about to place a block. A plugin may cancel the event." },
+				HOOK_PLAYER_RIGHT_CLICK = { Notes = "Called when the client sends the RightClick packet." },
+				HOOK_PLAYER_RIGHT_CLICKING_ENTITY = { Notes = "Called when the client sends the UseEntity packet." },
+				HOOK_PLAYER_SHOOTING = { Notes = "Called when the player releases the mouse button to fire their bow." },
+				HOOK_PLAYER_SPAWNED = { Notes = "Called after the player entity has been created. The entity is fully initialized and is spawning in the {{cWorld|world}}." },
+				HOOK_PLAYER_TOSSING_ITEM = { Notes = "Called when the player is tossing the held item (keypress Q)" },
+				HOOK_PLAYER_USED_BLOCK = { Notes = "Called after the player has right-clicked a block" },
+				HOOK_PLAYER_USED_ITEM = { Notes = "Called after the player has right-clicked with a usable item in their hand." },
+				HOOK_PLAYER_USING_BLOCK = { Notes = "Called when the player is about to use (right-click) a block" },
+				HOOK_PLAYER_USING_ITEM = { Notes = "Called when the player is about to right-click with a usable item in their hand." },
+				HOOK_POST_CRAFTING = { Notes = "Called after a valid recipe has been chosen for the current contents of the crafting grid. Plugins may modify the recipe." },
+				HOOK_PRE_CRAFTING = { Notes = "Called before a recipe is searched for the current contents of the crafting grid. Plugins may provide a recipe and cancel the built-in search." },
+				HOOK_SPAWNED_ENTITY = { Notes = "Called after an entity is spawned in a {{cWorld|world}}. The entity is already part of the world." },
+				HOOK_SPAWNED_MONSTER = { Notes = "Called after a mob is spawned in a {{cWorld|world}}. The mob is already part of the world." },
+				HOOK_SPAWNING_ENTITY = { Notes = "Called just before an entity is spawned in a {{cWorld|world}}." },
+				HOOK_SPAWNING_MONSTER = { Notes = "Called just before a mob is spawned in a {{cWorld|world}}." },
+				HOOK_TAKE_DAMAGE = { Notes = "Called when an entity is taking any kind of damage. Plugins may modify the damage value, effects, source or cancel the damage." },
+				HOOK_TICK = { Notes = "Called when the main server thread ticks - 20 times a second." },
+				HOOK_UPDATED_SIGN = { Notes = "Called after a {{cSignEntity|sign}} text has been updated, either by a player or by any external means." },
+				HOOK_UPDATING_SIGN = { Notes = "Called before a {{cSignEntity|sign}} text is updated, either by a player or by any external means." },
+				HOOK_WEATHER_CHANGED = { Notes = "Called after the weather has changed." },
+				HOOK_WEATHER_CHANGING = { Notes = "Called just before the weather changes" },
+				HOOK_WORLD_TICK = { Notes = "Called in each world's tick thread when the game logic is about to tick (20 times a second)." },
 			},
 		},
 
