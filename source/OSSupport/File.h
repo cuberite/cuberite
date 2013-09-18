@@ -99,6 +99,9 @@ public:
 	/// Renames a file, returns true if successful. May fail if dest already exists (libc-dependant)!
 	static bool Rename(const AString & a_OrigFileName, const AString & a_NewFileName);
 	
+	/// Returns true if the specified path is a folder
+	static bool IsFolder(const AString & a_Path);
+	
 	int Printf(const char * a_Fmt, ...);
 	
 private:
