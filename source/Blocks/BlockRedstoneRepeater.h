@@ -36,6 +36,15 @@ public:
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
 	}
+	
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override;
+
 
 	virtual const char * GetStepSound(void) override
 	{

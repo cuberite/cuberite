@@ -31,11 +31,9 @@
 #include "ItemShears.h"
 #include "ItemShovel.h"
 #include "ItemSign.h"
-#include "ItemSlab.h"
 #include "ItemSpawnEgg.h"
 #include "ItemSugarcane.h"
 #include "ItemSword.h"
-#include "ItemWood.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -141,18 +139,6 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_DIAMOND_SWORD:
 		{
 			return new cItemSwordHandler(a_ItemType);
-		}
-		
-		case E_BLOCK_STONE_SLAB:
-		case E_BLOCK_WOODEN_SLAB:
-		{
-			return new cItemSlabHandler(a_ItemType);
-		}
-		
-		case E_BLOCK_LOG:
-		case E_BLOCK_PLANKS:
-		{
-			return new cItemWoodHandler(a_ItemType);
 		}
 		
 		case E_ITEM_BUCKET:
