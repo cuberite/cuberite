@@ -81,6 +81,9 @@ bool cPluginLua::Initialize(void)
 		lua_setglobal(m_LuaState, LUA_PLUGIN_INSTANCE_VAR_NAME);
 		lua_pushstring(m_LuaState, GetName().c_str());
 		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
+		
+		tolua_pushusertype(m_LuaState, this, "cPluginLua");
+		lua_setglobal(m_LuaState, "g_Plugin");
 	}
 
 	std::string PluginPath = FILE_IO_PREFIX + GetLocalDirectory() + "/";
