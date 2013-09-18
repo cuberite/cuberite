@@ -2028,6 +2028,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockComparator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Blocks\BlockComparator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockCrops.h"
 					>
 				</File>
@@ -2281,6 +2289,10 @@
 				</File>
 				<File
 					RelativePath="..\source\items\ItemCloth.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Items\ItemComparator.h"
 					>
 				</File>
 				<File
