@@ -121,7 +121,8 @@ public:
 	void SetVersion(int a_Version) { m_Version = a_Version; }
 
 	const AString & GetDirectory(void) const {return m_Directory; }
-	AString GetLocalDirectory(void) const;
+	AString GetLocalDirectory(void) const {return GetLocalFolder(); }  // OBSOLETE, use GetLocalFolder() instead
+	AString GetLocalFolder(void) const;
 	// tolua_end
 	
 

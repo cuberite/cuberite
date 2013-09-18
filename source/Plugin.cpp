@@ -2,10 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Plugin.h"
-#include "Entities/Player.h"
-#include "World.h"
-#include "CommandOutput.h"
-#include "Mobs/Monster.h"
 
 
 
@@ -32,7 +28,11 @@ cPlugin::~cPlugin()
 
 
 
-AString cPlugin::GetLocalDirectory(void) const
+AString cPlugin::GetLocalFolder(void) const
 {
 	return std::string("Plugins/") + m_Directory;
 }
+
+
+
+

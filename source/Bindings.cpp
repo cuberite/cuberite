@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/16/13 11:41:45.
+** Generated automatically by tolua++-1.0.92 on 09/18/13 22:13:21.
 */
 
 #ifndef __cplusplus
@@ -10823,6 +10823,38 @@ static int tolua_AllToLua_cPlugin_GetLocalDirectory00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetLocalDirectory'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetLocalFolder of class  cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_GetLocalFolder00
+static int tolua_AllToLua_cPlugin_GetLocalFolder00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlugin* self = (const cPlugin*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetLocalFolder'", NULL);
+#endif
+  {
+   AString tolua_ret = (AString)  self->GetLocalFolder();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetLocalFolder'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29797,6 +29829,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetVersion",tolua_AllToLua_cPlugin_SetVersion00);
    tolua_function(tolua_S,"GetDirectory",tolua_AllToLua_cPlugin_GetDirectory00);
    tolua_function(tolua_S,"GetLocalDirectory",tolua_AllToLua_cPlugin_GetLocalDirectory00);
+   tolua_function(tolua_S,"GetLocalFolder",tolua_AllToLua_cPlugin_GetLocalFolder00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPluginLua","cPluginLua","cPlugin",NULL);
   tolua_beginmodule(tolua_S,"cPluginLua");
