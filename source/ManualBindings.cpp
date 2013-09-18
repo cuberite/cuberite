@@ -1501,14 +1501,16 @@ static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 
 	tolua_Error tolua_err;
 	tolua_err.array = 0;
-	tolua_err.index = 0;
-	tolua_err.type = 0;
+	tolua_err.index = 3;
+	tolua_err.type = "function";
 
 	std::string Title = "";
 	int Reference = LUA_REFNIL;
 
-	if( tolua_isstring( tolua_S, 2, 0, &tolua_err ) &&
-		lua_isfunction( tolua_S, 3 ) )
+	if (
+		tolua_isstring(tolua_S, 2, 0, &tolua_err ) &&
+		lua_isfunction(tolua_S, 3 )
+	)
 	{
 		Reference = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
 		Title = ((std::string)  tolua_tocppstring(tolua_S,2,0));
