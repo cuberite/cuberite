@@ -1237,7 +1237,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 {
 	/* Function signatures:
 		cPluginManager:BindCommand(Command, Permission, Function, HelpString)
-		cPluginManager.BindCommand(Command, Permission, Function, HelpString)
+		cPluginManager.BindCommand(Command, Permission, Function, HelpString)  -- without the "self" param
 	*/
 	cPluginLua * Plugin = GetLuaPlugin(L);
 	if (Plugin == NULL)
@@ -1297,37 +1297,42 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 
 static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 {
-	// Function signature: cPluginManager:BindConsoleCommand(Command, Function, HelpString)
+	/* Function signatures:
+		cPluginManager:BindConsoleCommand(Command, Function, HelpString)
+		cPluginManager.BindConsoleCommand(Command, Function, HelpString)  -- without the "self" param
+	*/
 	
 	// Get the plugin identification out of LuaState:
-	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
-	if (!lua_islightuserdata(L, -1))
+	cPluginLua * Plugin = GetLuaPlugin(L);
+	if (Plugin == NULL)
 	{
-		LOGERROR("cPluginManager:BindConsoleCommand() cannot get plugin instance, what have you done to my Lua state? Command-binding aborted.");
+		return 0;
 	}
-	cPluginLua * Plugin = (cPluginLua *)lua_topointer(L, -1);
-	lua_pop(L, 1);
 	
 	// Read the arguments to this API call:
 	tolua_Error tolua_err;
+	int idx = 1;
+	if (tolua_isusertype(L, 1, "cPluginManager", 0, &tolua_err))
+	{
+		idx++;
+	}
 	if (
-		!tolua_isusertype (L, 1, "cPluginManager", 0, &tolua_err) ||  // self
-		!tolua_iscppstring(L, 2, 0, &tolua_err) ||  // Command
-		!tolua_iscppstring(L, 4, 0, &tolua_err) ||  // HelpString
-		!tolua_isnoobj    (L, 5, &tolua_err)
+		!tolua_iscppstring(L, idx,     0, &tolua_err) ||  // Command
+		!tolua_iscppstring(L, idx + 2, 0, &tolua_err) ||  // HelpString
+		!tolua_isnoobj    (L, idx + 3, &tolua_err)
 	)
 	{
 		tolua_error(L, "#ferror in function 'BindConsoleCommand'.", &tolua_err);
 		return 0;
 	}
-	if (!lua_isfunction(L, 3))
+	if (!lua_isfunction(L, idx + 1))
 	{
 		luaL_error(L, "\"BindConsoleCommand\" function expects a function as its 2nd parameter. Command-binding aborted.");
 		return 0;
 	}
-	cPluginManager * self = (cPluginManager *)tolua_tousertype(L, 1, 0);
-	AString Command   (tolua_tocppstring(L, 2, ""));
-	AString HelpString(tolua_tocppstring(L, 4, ""));
+	cPluginManager * self = cPluginManager::Get();
+	AString Command   (tolua_tocppstring(L, idx,     ""));
+	AString HelpString(tolua_tocppstring(L, idx + 2, ""));
 	
 	// Store the function reference:
 	lua_pop(L, 1);  // Pop the help string off the stack
