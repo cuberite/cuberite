@@ -1235,7 +1235,10 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 
 static int tolua_cPluginManager_BindCommand(lua_State * L)
 {
-	// Function signature: cPluginManager:BindCommand(Command, Permission, Function, HelpString)
+	/* Function signatures:
+		cPluginManager:BindCommand(Command, Permission, Function, HelpString)
+		cPluginManager.BindCommand(Command, Permission, Function, HelpString)
+	*/
 	cPluginLua * Plugin = GetLuaPlugin(L);
 	if (Plugin == NULL)
 	{
@@ -1244,26 +1247,30 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 	
 	// Read the arguments to this API call:
 	tolua_Error tolua_err;
+	int idx = 1;
+	if (tolua_isusertype(L, 1, "cPluginManager", 0, &tolua_err))
+	{
+		idx++;
+	}
 	if (
-		!tolua_isusertype (L, 1, "cPluginManager", 0, &tolua_err) ||
-		!tolua_iscppstring(L, 2, 0, &tolua_err) ||
-		!tolua_iscppstring(L, 3, 0, &tolua_err) ||
-		!tolua_iscppstring(L, 5, 0, &tolua_err) ||
-		!tolua_isnoobj    (L, 6, &tolua_err)
+		!tolua_iscppstring(L, idx,     0, &tolua_err) ||
+		!tolua_iscppstring(L, idx + 1, 0, &tolua_err) ||
+		!tolua_iscppstring(L, idx + 3, 0, &tolua_err) ||
+		!tolua_isnoobj    (L, idx + 4, &tolua_err)
 	)
 	{
 		tolua_error(L, "#ferror in function 'BindCommand'.", &tolua_err);
 		return 0;
 	}
-	if (!lua_isfunction(L, 4))
+	if (!lua_isfunction(L, idx + 2))
 	{
 		luaL_error(L, "\"BindCommand\" function expects a function as its 3rd parameter. Command-binding aborted.");
 		return 0;
 	}
-	cPluginManager * self = (cPluginManager *)tolua_tousertype(L, 1, 0);
-	AString Command   (tolua_tocppstring(L, 2, ""));
-	AString Permission(tolua_tocppstring(L, 3, ""));
-	AString HelpString(tolua_tocppstring(L, 5, ""));
+	cPluginManager * self = cPluginManager::Get();
+	AString Command   (tolua_tocppstring(L, idx,     ""));
+	AString Permission(tolua_tocppstring(L, idx + 1, ""));
+	AString HelpString(tolua_tocppstring(L, idx + 3, ""));
 	
 	// Store the function reference:
 	lua_pop(L, 1);  // Pop the help string off the stack
@@ -2028,12 +2035,12 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPluginManager");
+			tolua_function(tolua_S, "AddHook",               tolua_cPluginManager_AddHook);
 			tolua_function(tolua_S, "BindCommand",           tolua_cPluginManager_BindCommand);
 			tolua_function(tolua_S, "BindConsoleCommand",    tolua_cPluginManager_BindConsoleCommand);
 			tolua_function(tolua_S, "ForEachCommand",        tolua_cPluginManager_ForEachCommand);
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
-			tolua_function(tolua_S, "AddHook",               tolua_cPluginManager_AddHook);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");
