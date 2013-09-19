@@ -189,6 +189,7 @@ enum
 	PACKET_BLOCK_CHANGE              = 0x35,
 	PACKET_BLOCK_ACTION              = 0x36,
 	PACKET_MAP_CHUNK_BULK            = 0x38,
+	PACKET_EXPLOSION                 = 0x3c,
 	PACKET_SOUND_EFFECT              = 0x3d,
 	PACKET_NAMED_SOUND_EFFECT        = 0x3e,
 	PACKET_CHANGE_GAME_STATE         = 0x46,
@@ -701,6 +702,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_ENTITY_STATUS:             HANDLE_SERVER_READ(HandleServerEntityStatus); break;
 			case PACKET_ENTITY_TELEPORT:           HANDLE_SERVER_READ(HandleServerEntityTeleport); break;
 			case PACKET_ENTITY_VELOCITY:           HANDLE_SERVER_READ(HandleServerEntityVelocity); break;
+			case PACKET_EXPLOSION:                 HANDLE_SERVER_READ(HandleServerExplosion); break;
 			case PACKET_INCREMENT_STATISTIC:       HANDLE_SERVER_READ(HandleServerIncrementStatistic); break;
 			case PACKET_KEEPALIVE:                 HANDLE_SERVER_READ(HandleServerKeepAlive); break;
 			case PACKET_KICK:                      HANDLE_SERVER_READ(HandleServerKick); break;
@@ -1585,6 +1587,49 @@ bool cConnection::HandleServerEntityVelocity(void)
 	Log("Received a PACKET_ENTITY_VELOCITY from the server:");
 	Log("  EntityID = %d", EntityID);
 	Log("  Velocity = %s", PrintableAbsIntTriplet(VelocityX, VelocityY, VelocityZ, 8000).c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerExplosion(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Force);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,    int,    NumRecords);
+	struct sCoords
+	{
+		int x, y, z;
+		
+		sCoords(int a_X, int a_Y, int a_Z) : x(a_X), y(a_Y), z(a_Z) {}
+	} ;
+	std::vector<sCoords> Records;
+	Records.reserve(NumRecords);
+	int PosXI = (int)PosX, PosYI = (int)PosY, PosZI = (int)PosZ;
+	for (int i = 0; i < NumRecords; i++)
+	{
+		HANDLE_SERVER_PACKET_READ(ReadChar, char, rx);
+		HANDLE_SERVER_PACKET_READ(ReadChar, char, ry);
+		HANDLE_SERVER_PACKET_READ(ReadChar, char, rz);
+		Records.push_back(sCoords(PosXI + rx, PosYI + ry, PosZI + rz));
+	}
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PlayerMotionX);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PlayerMotionY);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PlayerMotionZ);
+	Log("Received a PACKET_EXPLOSION from the server:");
+	Log("  Pos = {%.02f, %.02f, %.02f}", PosX, PosY, PosZ);
+	Log("  Force = %.02f", Force);
+	Log("  NumRecords = %d", NumRecords);
+	for (int i = 0; i < NumRecords; i++)
+	{
+		Log("    Records[%d] = {%d, %d, %d}", i, Records[i].x, Records[i].y, Records[i].z);
+	}
+	Log("  Player motion = <%.02f, %.02f, %.02f>", PlayerMotionX, PlayerMotionY, PlayerMotionZ);
 	COPY_TO_CLIENT();
 	return true;
 }

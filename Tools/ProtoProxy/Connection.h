@@ -158,6 +158,7 @@ protected:
 	bool HandleServerEntityStatus(void);
 	bool HandleServerEntityTeleport(void);
 	bool HandleServerEntityVelocity(void);
+	bool HandleServerExplosion(void);
 	bool HandleServerIncrementStatistic(void);
 	bool HandleServerKeepAlive(void);
 	bool HandleServerKick(void);
