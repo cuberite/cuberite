@@ -7,6 +7,8 @@ Implements the 1.6.x protocol classes:
 		- release 1.6.1 protocol (#73)
 	- cProtocol162
 		- release 1.6.2 protocol (#74)
+		- release 1.6.3 protocol (#77) - no relevant changes
+		- release 1.6.4 protocol (#78) - no relevant changes
 (others may be added later in the future for the 1.6 release series)
 */
 
