@@ -8,9 +8,9 @@
 
 
 class cHorse :
-	public cAggressiveMonster
+	public cPassiveMonster
 {
-	typedef cAggressiveMonster super;
+	typedef cPassiveMonster super;
 	
 public:
 	cHorse(void);

@@ -8,9 +8,9 @@
 
 
 class cIronGolem :
-	public cAggressiveMonster
+	public cPassiveAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	typedef cPassiveAggressiveMonster super;
 	
 public:
 	cIronGolem(void);
