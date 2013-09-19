@@ -49,6 +49,8 @@ class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
 class cFluidSimulatorData;
+class cMobCensus;
+class cMobSpawner;
 
 typedef std::list<cClientHandle *>      cClientHandleList;
 typedef cItemCallback<cEntity>          cEntityCallback;
@@ -124,6 +126,12 @@ public:
 	/// Sets or resets the internal flag that prevents chunk from being unloaded
 	void Stay(bool a_Stay = true);
 	
+	/// Recence all mobs proximities to players in order to know what to do with them
+	void CollectMobCensus(cMobCensus& toFill);
+
+	/// Try to Spawn Monsters inside chunk
+	void SpawnMobs(cMobSpawner& a_MobSpawner);
+
 	void Tick(float a_Dt);
 
 	int GetPosX(void) const { return m_PosX; }
@@ -384,6 +392,10 @@ private:
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
 
+
+	// pick up a random block of this chunk
+	void getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z);
+	void getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ);
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (cBlockEntity * a_BlockEntity);
