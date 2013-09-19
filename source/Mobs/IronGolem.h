@@ -1,24 +1,23 @@
 
 #pragma once
 
-#include "PassiveAggressiveMonster.h"
+#include "AggressiveMonster.h"
 
 
 
 
 
-class cZombiePigman :
+class cIronGolem :
 	public cPassiveAggressiveMonster
 {
 	typedef cPassiveAggressiveMonster super;
 	
 public:
-	cZombiePigman(void);
+	cIronGolem(void);
 
-	CLASS_PROTODEF(cZombiePigman);
-
+	CLASS_PROTODEF(cIronGolem);
+	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
-	virtual void KilledBy(cEntity * a_Killer) override;
 } ;
 
 

@@ -964,6 +964,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Mobs\EnderDragon.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\EnderDragon.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Mobs\Enderman.cpp"
 					>
 				</File>
@@ -980,11 +988,35 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Magmacube.cpp"
+					RelativePath="..\source\Mobs\Giant.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Magmacube.h"
+					RelativePath="..\source\Mobs\Giant.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Horse.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Horse.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\IronGolem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\IronGolem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\MagmaCube.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\MagmaCube.h"
 					>
 				</File>
 				<File
@@ -1060,6 +1092,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Mobs\SnowGolem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\SnowGolem.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Mobs\Spider.cpp"
 					>
 				</File>
@@ -1092,6 +1132,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Mobs\Wither.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Wither.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Mobs\Wolf.h"
 					>
 				</File>
@@ -1104,11 +1152,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Zombiepigman.cpp"
+					RelativePath="..\source\Mobs\ZombiePigman.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Zombiepigman.h"
+					RelativePath="..\source\Mobs\ZombiePigman.h"
 					>
 				</File>
 			</Filter>
@@ -2028,6 +2076,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockComparator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Blocks\BlockComparator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockCrops.h"
 					>
 				</File>
@@ -2281,6 +2337,10 @@
 				</File>
 				<File
 					RelativePath="..\source\items\ItemCloth.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Items\ItemComparator.h"
 					>
 				</File>
 				<File

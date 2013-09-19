@@ -13,6 +13,7 @@
 #include "BlockChest.h"
 #include "BlockCloth.h"
 #include "BlockCobWeb.h"
+#include "BlockComparator.h"
 #include "BlockCrops.h"
 #include "BlockDeadBush.h"
 #include "BlockDirt.h"
@@ -110,6 +111,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_CAULDRON:              return new cBlockCauldronHandler        (a_BlockType);
 		case E_BLOCK_CHEST:                 return new cBlockChestHandler           (a_BlockType);
 		case E_BLOCK_COAL_ORE:              return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_ACTIVE_COMPARATOR:     return new cBlockComparatorHandler      (a_BlockType);
 		case E_BLOCK_COBBLESTONE:           return new cBlockStoneHandler           (a_BlockType);
 		case E_BLOCK_COBBLESTONE_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_COBWEB:                return new cBlockCobWebHandler          (a_BlockType);
@@ -124,7 +126,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DROPPER:               return new cBlockDropSpenserHandler     (a_BlockType);
 		case E_BLOCK_EMERALD_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_ENDER_CHEST:           return new cBlockEnderchestHandler      (a_BlockType);
-		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler;
+		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler        (           );
 		case E_BLOCK_FENCE_GATE:            return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_FIRE:                  return new cBlockFireHandler            (a_BlockType);
 		case E_BLOCK_FLOWER_POT:            return new cBlockFlowerPotHandler       (a_BlockType);
@@ -136,6 +138,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
 		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);
 		case E_BLOCK_ICE:                   return new cBlockIceHandler             (a_BlockType);
+		case E_BLOCK_INACTIVE_COMPARATOR:   return new cBlockComparatorHandler      (a_BlockType);
 		case E_BLOCK_IRON_DOOR:             return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_IRON_ORE:              return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_JUKEBOX:               return new cBlockEntityHandler          (a_BlockType);
@@ -153,7 +156,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NETHER_BRICK_STAIRS:   return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
-		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      ();
+		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      (           );
 		case E_BLOCK_PLANKS:                return new cBlockPlanksHandler          (a_BlockType);
 		case E_BLOCK_PUMPKIN:               return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_JACK_O_LANTERN:        return new cBlockPumpkinHandler         (a_BlockType);
@@ -355,15 +358,20 @@ void cBlockHandler::DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX
 	
 	if (!Pickups.empty())
 	{
-		// Add random offset to the spawn position:
-		// Commented out until bug with pickups not spawning properly is fixed, see World.cpp
-		/*
-		int MicroX = (int)(a_BlockX * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
-		int MicroY = (int)(a_BlockY * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
-		int MicroZ = (int)(a_BlockZ * 32) + (r1.randInt(16) + r1.randInt(16) - 16);
-		*/
+		MTRand r1;
 
-		a_World->SpawnItemPickups(Pickups, a_BlockX, a_BlockY, a_BlockZ);
+		// Mid-block position first
+		double MicroX, MicroY, MicroZ;
+		MicroX = a_BlockX + 0.5;
+		MicroY = a_BlockY + 0.5;
+		MicroZ = a_BlockZ + 0.5;
+
+		// Add random offset second (this causes pickups to spawn inside blocks most times, it's a little buggy)
+		//MicroX += (int)(r1.randInt(16) + r1.randInt(16) - 16);
+		//MicroY += (int)(r1.randInt(16) + r1.randInt(16) - 16);
+		//MicroZ += (int)(r1.randInt(16) + r1.randInt(16) - 16);
+
+		a_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}
 }
 
