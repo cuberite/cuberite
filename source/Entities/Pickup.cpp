@@ -24,8 +24,8 @@
 
 
 
-cPickup::cPickup(double a_MicroPosX, double a_MicroPosY, double a_MicroPosZ, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
-	:	cEntity(etPickup, (double)(a_MicroPosX), (double)(a_MicroPosY), (double)(a_MicroPosZ), 0.2, 0.2)
+cPickup::cPickup(double a_X, double a_Y, double a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
+	:	cEntity(etPickup, a_X, a_Y, a_Z, 0.2, 0.2)
 	, m_Timer( 0.f )
 	, m_Item(a_Item)
 	, m_bCollected( false )
