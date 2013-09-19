@@ -436,15 +436,18 @@ void cProtocol125::SendExplosion(double a_BlockX, double a_BlockY, double a_Bloc
 	WriteDouble (a_BlockZ);
 	WriteFloat  (a_Radius);
 	WriteInt    (a_BlocksAffected.size());
+	int BlockX = (int)a_BlockX;
+	int BlockY = (int)a_BlockY;
+	int BlockZ = (int)a_BlockZ;
 	for (cVector3iArray::const_iterator itr = a_BlocksAffected.begin(); itr != a_BlocksAffected.end(); ++itr)
 	{
-		WriteByte   ((Byte)(itr->x - a_BlockX));
-		WriteByte   ((Byte)(itr->y - a_BlockY));
-		WriteByte   ((Byte)(itr->z - a_BlockZ));
+		WriteByte((Byte)(itr->x - BlockX));
+		WriteByte((Byte)(itr->y - BlockY));
+		WriteByte((Byte)(itr->z - BlockZ));
 	}
-	WriteFloat  ((float)a_PlayerMotion.x);
-	WriteFloat  ((float)a_PlayerMotion.y);
-	WriteFloat  ((float)a_PlayerMotion.z);
+	WriteFloat((float)a_PlayerMotion.x);
+	WriteFloat((float)a_PlayerMotion.y);
+	WriteFloat((float)a_PlayerMotion.z);
 	Flush();
 }
 
