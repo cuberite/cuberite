@@ -549,12 +549,11 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 		int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
 		BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
-		BLOCKTYPE BlockBelow = NextChunk->GetBlock( RelBlockX, BlockY - 1, RelBlockZ );
+		BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 		if (!g_BlockIsSolid[BlockIn])  // Making sure we are not inside a solid block
 		{
 			if (m_bOnGround)  // check if it's still on the ground
 			{
-				BLOCKTYPE BlockBelow = NextChunk->GetBlock( RelBlockX, BlockY - 1, RelBlockZ );
 				if (!g_BlockIsSolid[BlockBelow])  // Check if block below is air or water.
 				{
 					m_bOnGround = false;
@@ -613,7 +612,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			{
 				fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
 			}
-			else if ((IsBlockRail(BlockBelow)) && (IsMinecart())) // Rails aren't solid, except for Minecarts
+			else if (IsBlockRail(BlockBelow) && IsMinecart())  // Rails aren't solid, except for Minecarts
 			{
 				fallspeed = 0;
 				m_bOnGround = true;
