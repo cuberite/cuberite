@@ -15,7 +15,14 @@
 
 
 
-#ifdef _DEBUG
+/// When defined, the following macro causes a sleep after each parsed packet (DEBUG-mode only)
+// #define SLEEP_AFTER_PACKET
+
+
+
+
+
+#if defined(_DEBUG) && defined(SLEEP_AFTER_PACKET)
 	#define DebugSleep Sleep
 #else
 	#define DebugSleep(X)
@@ -299,7 +306,7 @@ void cConnection::Run(void)
 		Log("Cannot connect to server; aborting");
 		return;
 	}
-	
+
 	while (true)
 	{
 		fd_set ReadFDs;
