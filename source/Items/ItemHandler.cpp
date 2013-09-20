@@ -14,6 +14,7 @@
 #include "ItemBucket.h"
 #include "ItemCauldron.h"
 #include "ItemCloth.h"
+#include "ItemComparator.h"
 #include "ItemDoor.h"
 #include "ItemDye.h"
 #include "ItemFlowerPot.h"
@@ -92,6 +93,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BOW:               return new cItemBowHandler;
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
+		case E_ITEM_COMPARATOR:        return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:               return new cItemEggHandler();
 		case E_ITEM_ENDER_PEARL:       return new cItemEnderPearlHandler();

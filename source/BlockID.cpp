@@ -630,11 +630,13 @@ public:
 		// TODO: Any other transparent blocks?
 
 		// One hit break blocks
+		g_BlockOneHitDig[E_BLOCK_ACTIVE_COMPARATOR]     = true;
 		g_BlockOneHitDig[E_BLOCK_BROWN_MUSHROOM]        = true;
 		g_BlockOneHitDig[E_BLOCK_CARROTS]               = true;
 		g_BlockOneHitDig[E_BLOCK_CROPS]                 = true;
 		g_BlockOneHitDig[E_BLOCK_FIRE]                  = true;
 		g_BlockOneHitDig[E_BLOCK_FLOWER_POT]            = true;
+		g_BlockOneHitDig[E_BLOCK_INACTIVE_COMPARATOR]   = true;
 		g_BlockOneHitDig[E_BLOCK_LOCKED_CHEST]          = true;
 		g_BlockOneHitDig[E_BLOCK_MELON_STEM]            = true;
 		g_BlockOneHitDig[E_BLOCK_POTATOES]              = true;
@@ -655,6 +657,7 @@ public:
 		g_BlockOneHitDig[E_BLOCK_YELLOW_FLOWER]         = true;
 
 		// Blocks that breaks when pushed by piston
+		g_BlockPistonBreakable[E_BLOCK_ACTIVE_COMPARATOR]     = true;
 		g_BlockPistonBreakable[E_BLOCK_AIR]                   = true;
 		g_BlockPistonBreakable[E_BLOCK_BED]                   = true;
 		g_BlockPistonBreakable[E_BLOCK_BROWN_MUSHROOM]        = true;
@@ -662,6 +665,7 @@ public:
 		g_BlockPistonBreakable[E_BLOCK_CROPS]                 = true;
 		g_BlockPistonBreakable[E_BLOCK_DEAD_BUSH]             = true;
 		g_BlockPistonBreakable[E_BLOCK_FIRE]                  = true;
+		g_BlockPistonBreakable[E_BLOCK_INACTIVE_COMPARATOR]   = true;
 		g_BlockPistonBreakable[E_BLOCK_IRON_DOOR]             = true;
 		g_BlockPistonBreakable[E_BLOCK_JACK_O_LANTERN]        = true;
 		g_BlockPistonBreakable[E_BLOCK_LADDER]                = true;
@@ -694,6 +698,7 @@ public:
 
 
 		// Blocks that can be snowed over:
+		g_BlockIsSnowable[E_BLOCK_ACTIVE_COMPARATOR]     = false;
 		g_BlockIsSnowable[E_BLOCK_AIR]                   = false;
 		g_BlockIsSnowable[E_BLOCK_BROWN_MUSHROOM]        = false;
 		g_BlockIsSnowable[E_BLOCK_CACTUS]                = false;
@@ -702,6 +707,7 @@ public:
 		g_BlockIsSnowable[E_BLOCK_FIRE]                  = false;
 		g_BlockIsSnowable[E_BLOCK_GLASS]                 = false;
 		g_BlockIsSnowable[E_BLOCK_ICE]                   = false;
+		g_BlockIsSnowable[E_BLOCK_INACTIVE_COMPARATOR]   = false;
 		g_BlockIsSnowable[E_BLOCK_LAVA]                  = false;
 		g_BlockIsSnowable[E_BLOCK_LILY_PAD]              = false;
 		g_BlockIsSnowable[E_BLOCK_LOCKED_CHEST]          = false;
