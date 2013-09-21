@@ -75,7 +75,7 @@ void cPluginManager::FindPlugins(void)
 	AStringList Files = GetDirectoryContents(PluginsPath.c_str());
 	for (AStringList::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
 	{
-		if (!cFile::IsFolder(*itr))
+		if (!cFile::IsFolder(PluginsPath + *itr))
 		{
 			// We only want folders
 			continue;
@@ -84,7 +84,7 @@ void cPluginManager::FindPlugins(void)
 		// Add plugin name/directory to the list
 		if (m_Plugins.find(*itr) == m_Plugins.end())
 		{
-			m_Plugins[ *itr ] = NULL;
+			m_Plugins[*itr] = NULL;
 		}
 	}
 }

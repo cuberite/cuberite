@@ -290,7 +290,8 @@ bool cFile::Rename(const AString & a_OrigFileName, const AString & a_NewFileName
 bool cFile::IsFolder(const AString & a_Path)
 {
 	#ifdef _WIN32
-	return ((GetFileAttributes(a_Path.c_str()) & FILE_ATTRIBUTE_DIRECTORY) != 0);
+	DWORD FileAttrib = GetFileAttributes(a_Path.c_str());
+	return ((FileAttrib != INVALID_FILE_ATTRIBUTES) && ((FileAttrib & FILE_ATTRIBUTE_DIRECTORY) != 0));
 	#else
 	struct stat st;
 	return ((stat(a_Path.c_str(), &st) == 0) && S_ISDIR(st.st_mode));
