@@ -247,7 +247,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 	BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(Block);
 
-	if (a_Player->GetGameMode() == gmSurvival)
+	if (a_Player->IsGameModeSurvival())
 	{
 		if (!BlockRequiresSpecialTool(Block) || CanHarvestBlock(Block))
 		{

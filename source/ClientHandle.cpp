@@ -735,6 +735,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	
 	cWorld * World = m_Player->GetWorld();
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
+	// The ItemHandler is also responsible for spawning the pickups
 	
 	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	World->BroadcastSoundParticleEffect(2001, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, a_OldBlock, this);
