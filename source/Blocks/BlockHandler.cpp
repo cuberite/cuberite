@@ -299,7 +299,7 @@ void cBlockHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int
 	// If the block generates item drops, add them to the world
 	Vector3i position(a_BlockX, a_BlockY, a_BlockZ);
 	cItems drops;
-	ConvertToPickups(cItems &a_Pickups, a_World->GetBlockMeta(position));
+	ConvertToPickups(drops, a_World->GetBlockMeta(position));
 	if (drops.Size())
 	{
 		a_World->SpawnItemPickups(drops, a_BlockX, a_BlockY, a_BlockZ);
