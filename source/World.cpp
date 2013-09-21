@@ -40,7 +40,7 @@
 #include "Mobs/Giant.h"
 #include "Mobs/Horse.h"
 #include "Mobs/IronGolem.h"
-#include "Mobs/MagmaCube.h"
+#include "Mobs/Magmacube.h"
 #include "Mobs/Mooshroom.h"
 #include "Mobs/Ocelot.h"
 #include "Mobs/Pig.h"
@@ -56,7 +56,7 @@
 #include "Mobs/Wither.h"
 #include "Mobs/Wolf.h"
 #include "Mobs/Zombie.h"
-#include "Mobs/ZombiePigman.h"
+#include "Mobs/Zombiepigman.h"
 
 #include "OSSupport/MakeDir.h"
 #include "MersenneTwister.h"
