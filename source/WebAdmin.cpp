@@ -20,6 +20,8 @@
 	#include <psapi.h>
 #elif defined(__linux__)
 	#include <fstream>
+#elif defined(__APPLE__)
+	// Apple-specific includes go here
 #endif
 
 
@@ -448,8 +450,14 @@ int cWebAdmin::GetMemoryUsage(void)
 			}
 		}
 		return -1;
+	#elif defined (__APPLE__)
+		// TODO: Apple-specific
 	#else
 		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
 		return -1;
 	#endif
 }
+
+
+
+
