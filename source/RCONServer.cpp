@@ -78,8 +78,8 @@ protected:
 
 cRCONServer::cRCONServer(cServer & a_Server) :
 	m_Server(a_Server),
-	m_ListenThread4(*this, cSocket::IPv4, "RCON"),
-	m_ListenThread6(*this, cSocket::IPv6, "RCON")
+	m_ListenThread4(*this, cSocket::IPv4, "RCON IPv4"),
+	m_ListenThread6(*this, cSocket::IPv6, "RCON IPv6")
 {
 }
 

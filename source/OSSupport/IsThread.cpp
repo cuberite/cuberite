@@ -53,11 +53,7 @@ static void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
 cIsThread::cIsThread(const AString & iThreadName) :
 	m_ThreadName(iThreadName),
 	m_ShouldTerminate(false),
-	#ifdef _WIN32
-		m_Handle(NULL)
-	#else  // _WIN32
-		m_HasStarted(false)
-	#endif  // else _WIN32
+	m_Handle(NULL)
 {
 }
 
@@ -77,9 +73,9 @@ cIsThread::~cIsThread()
 
 bool cIsThread::Start(void)
 {
+	ASSERT(m_Handle == NULL);  // Has already started one thread?
+	
 	#ifdef _WIN32
-		ASSERT(m_Handle == NULL);  // Has already started one thread?
-		
 		// Create the thread suspended, so that the mHandle variable is valid in the thread procedure
 		DWORD ThreadID = 0;
 		m_Handle = CreateThread(NULL, 0, thrExecute, this, CREATE_SUSPENDED, &ThreadID);
@@ -99,14 +95,11 @@ bool cIsThread::Start(void)
 		#endif  // _DEBUG and _MSC_VER
 		
 	#else  // _WIN32
-		ASSERT(!m_HasStarted);
-		
 		if (pthread_create(&m_Handle, NULL, thrExecute, this))
 		{
 			LOGERROR("ERROR: Could not create thread \"%s\", !", m_ThreadName.c_str());
 			return false;
 		}
-		m_HasStarted = true;
 	#endif  // else _WIN32
 
 	return true;
@@ -158,7 +151,6 @@ bool cIsThread::Wait(void)
 			LOGD("Thread %s finished", m_ThreadName.c_str());
 		#endif  // LOGD
 		
-		m_HasStarted = false;
 		return (res == 0);
 	#endif  // else _WIN32
 }

@@ -48,7 +48,7 @@ public:
 	/// Returns the OS-dependent thread ID for the caller's thread
 	static unsigned long GetCurrentID(void);
 
-private:
+protected:
 	AString m_ThreadName;
 	
 	#ifdef _WIN32
@@ -66,7 +66,6 @@ private:
 	#else  // _WIN32
 	
 		pthread_t m_Handle;
-		bool      m_HasStarted;
 		
 		static void * thrExecute(void * a_Param)
 		{
