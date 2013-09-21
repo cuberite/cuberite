@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/18/13 22:13:21.
+** Generated automatically by tolua++-1.0.92 on 09/21/13 17:37:22.
 */
 
 #ifndef __cplusplus
@@ -9676,15 +9676,15 @@ static int tolua_AllToLua_cPickup_new00(lua_State* tolua_S)
  else
 #endif
  {
-  int a_MicroPosX = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_MicroPosY = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_MicroPosZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  double a_X = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_Y = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Z = ((double)  tolua_tonumber(tolua_S,4,0));
   const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,5,0));
   float a_SpeedX = ((float)  tolua_tonumber(tolua_S,6,0.f));
   float a_SpeedY = ((float)  tolua_tonumber(tolua_S,7,0.f));
   float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
   {
-   cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
+   cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_X,a_Y,a_Z,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
   }
  }
@@ -9718,15 +9718,15 @@ static int tolua_AllToLua_cPickup_new00_local(lua_State* tolua_S)
  else
 #endif
  {
-  int a_MicroPosX = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_MicroPosY = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_MicroPosZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  double a_X = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_Y = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Z = ((double)  tolua_tonumber(tolua_S,4,0));
   const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,5,0));
   float a_SpeedX = ((float)  tolua_tonumber(tolua_S,6,0.f));
   float a_SpeedY = ((float)  tolua_tonumber(tolua_S,7,0.f));
   float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
   {
-   cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
+   cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_X,a_Y,a_Z,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
@@ -18653,8 +18653,8 @@ static int tolua_AllToLua_cWebAdmin_GetMemoryUsage00(lua_State* tolua_S)
 #endif
  {
   {
-   AString tolua_ret = (AString)  cWebAdmin::GetMemoryUsage();
-   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   int tolua_ret = (int)  cWebAdmin::GetMemoryUsage();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
@@ -29062,14 +29062,17 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_BOOK_AND_QUILL",E_ITEM_BOOK_AND_QUILL);
   tolua_constant(tolua_S,"E_ITEM_WRITTEN_BOOK",E_ITEM_WRITTEN_BOOK);
   tolua_constant(tolua_S,"E_ITEM_EMERALD",E_ITEM_EMERALD);
+  tolua_constant(tolua_S,"E_ITEM_ITEM_FRAME",E_ITEM_ITEM_FRAME);
   tolua_constant(tolua_S,"E_ITEM_FLOWER_POT",E_ITEM_FLOWER_POT);
   tolua_constant(tolua_S,"E_ITEM_CARROT",E_ITEM_CARROT);
   tolua_constant(tolua_S,"E_ITEM_POTATO",E_ITEM_POTATO);
   tolua_constant(tolua_S,"E_ITEM_BAKED_POTATO",E_ITEM_BAKED_POTATO);
   tolua_constant(tolua_S,"E_ITEM_POISONOUS_POTATO",E_ITEM_POISONOUS_POTATO);
+  tolua_constant(tolua_S,"E_ITEM_EMPTY_MAP",E_ITEM_EMPTY_MAP);
   tolua_constant(tolua_S,"E_ITEM_GOLDEN_CARROT",E_ITEM_GOLDEN_CARROT);
   tolua_constant(tolua_S,"E_ITEM_HEAD",E_ITEM_HEAD);
   tolua_constant(tolua_S,"E_ITEM_CARROT_ON_STICK",E_ITEM_CARROT_ON_STICK);
+  tolua_constant(tolua_S,"E_ITEM_NETHER_STAR",E_ITEM_NETHER_STAR);
   tolua_constant(tolua_S,"E_ITEM_PUMPKIN_PIE",E_ITEM_PUMPKIN_PIE);
   tolua_constant(tolua_S,"E_ITEM_FIREWORK_ROCKET",E_ITEM_FIREWORK_ROCKET);
   tolua_constant(tolua_S,"E_ITEM_FIREWORK_STAR",E_ITEM_FIREWORK_STAR);
@@ -29263,11 +29266,35 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_GOLDEN_APPLE_ENCHANTED",E_META_GOLDEN_APPLE_ENCHANTED);
   tolua_constant(tolua_S,"E_META_TRACKS_X",E_META_TRACKS_X);
   tolua_constant(tolua_S,"E_META_TRACKS_Z",E_META_TRACKS_Z);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_PICKUP",E_META_SPAWN_EGG_PICKUP);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_EXPERIENCE_ORB",E_META_SPAWN_EGG_EXPERIENCE_ORB);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_LEASH_KNOT",E_META_SPAWN_EGG_LEASH_KNOT);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_PAINTING",E_META_SPAWN_EGG_PAINTING);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ARROW",E_META_SPAWN_EGG_ARROW);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SNOWBALL",E_META_SPAWN_EGG_SNOWBALL);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_FIREBALL",E_META_SPAWN_EGG_FIREBALL);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SMALL_FIREBALL",E_META_SPAWN_EGG_SMALL_FIREBALL);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ENDER_PEARL",E_META_SPAWN_EGG_ENDER_PEARL);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_EYE_OF_ENDER",E_META_SPAWN_EGG_EYE_OF_ENDER);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SPLASH_POTION",E_META_SPAWN_EGG_SPLASH_POTION);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_EXP_BOTTLE",E_META_SPAWN_EGG_EXP_BOTTLE);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ITEM_FRAME",E_META_SPAWN_EGG_ITEM_FRAME);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_WITHER_SKULL",E_META_SPAWN_EGG_WITHER_SKULL);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_PRIMED_TNT",E_META_SPAWN_EGG_PRIMED_TNT);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_FALLING_BLOCK",E_META_SPAWN_EGG_FALLING_BLOCK);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_FIREWORK",E_META_SPAWN_EGG_FIREWORK);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_BOAT",E_META_SPAWN_EGG_BOAT);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_MINECART",E_META_SPAWN_EGG_MINECART);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_MINECART_CHEST",E_META_SPAWN_EGG_MINECART_CHEST);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_MINECART_FURNACE",E_META_SPAWN_EGG_MINECART_FURNACE);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_MINECART_TNT",E_META_SPAWN_EGG_MINECART_TNT);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_MINECART_HOPPER",E_META_SPAWN_EGG_MINECART_HOPPER);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_MINECART_SPAWNER",E_META_SPAWN_EGG_MINECART_SPAWNER);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_CREEPER",E_META_SPAWN_EGG_CREEPER);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_SKELETON",E_META_SPAWN_EGG_SKELETON);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_SPIDER",E_META_SPAWN_EGG_SPIDER);
-  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ZOMBIE",E_META_SPAWN_EGG_ZOMBIE);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_GIANT",E_META_SPAWN_EGG_GIANT);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ZOMBIE",E_META_SPAWN_EGG_ZOMBIE);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_SLIME",E_META_SPAWN_EGG_SLIME);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_GHAST",E_META_SPAWN_EGG_GHAST);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_ZOMBIE_PIGMAN",E_META_SPAWN_EGG_ZOMBIE_PIGMAN);
@@ -29292,6 +29319,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_IRON_GOLEM",E_META_SPAWN_EGG_IRON_GOLEM);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_HORSE",E_META_SPAWN_EGG_HORSE);
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_VILLAGER",E_META_SPAWN_EGG_VILLAGER);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ENDER_CRYSTAL",E_META_SPAWN_EGG_ENDER_CRYSTAL);
   tolua_constant(tolua_S,"dimNether",dimNether);
   tolua_constant(tolua_S,"dimOverworld",dimOverworld);
   tolua_constant(tolua_S,"dimEnd",dimEnd);
@@ -30632,34 +30660,35 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cMonster","cMonster","cPawn",NULL);
   tolua_beginmodule(tolua_S,"cMonster");
-   tolua_constant(tolua_S,"mtCreeper",cMonster::mtCreeper);
-   tolua_constant(tolua_S,"mtSkeleton",cMonster::mtSkeleton);
-   tolua_constant(tolua_S,"mtSpider",cMonster::mtSpider);
-   tolua_constant(tolua_S,"mtGiant",cMonster::mtGiant);
-   tolua_constant(tolua_S,"mtZombie",cMonster::mtZombie);
-   tolua_constant(tolua_S,"mtSlime",cMonster::mtSlime);
-   tolua_constant(tolua_S,"mtGhast",cMonster::mtGhast);
-   tolua_constant(tolua_S,"mtZombiePigman",cMonster::mtZombiePigman);
-   tolua_constant(tolua_S,"mtEnderman",cMonster::mtEnderman);
-   tolua_constant(tolua_S,"mtCaveSpider",cMonster::mtCaveSpider);
-   tolua_constant(tolua_S,"mtSilverfish",cMonster::mtSilverfish);
-   tolua_constant(tolua_S,"mtBlaze",cMonster::mtBlaze);
-   tolua_constant(tolua_S,"mtMagmaCube",cMonster::mtMagmaCube);
-   tolua_constant(tolua_S,"mtEnderDragon",cMonster::mtEnderDragon);
-   tolua_constant(tolua_S,"mtWither",cMonster::mtWither);
    tolua_constant(tolua_S,"mtBat",cMonster::mtBat);
-   tolua_constant(tolua_S,"mtWitch",cMonster::mtWitch);
+   tolua_constant(tolua_S,"mtBlaze",cMonster::mtBlaze);
+   tolua_constant(tolua_S,"mtCaveSpider",cMonster::mtCaveSpider);
+   tolua_constant(tolua_S,"mtChicken",cMonster::mtChicken);
+   tolua_constant(tolua_S,"mtCow",cMonster::mtCow);
+   tolua_constant(tolua_S,"mtCreeper",cMonster::mtCreeper);
+   tolua_constant(tolua_S,"mtEnderDragon",cMonster::mtEnderDragon);
+   tolua_constant(tolua_S,"mtEnderman",cMonster::mtEnderman);
+   tolua_constant(tolua_S,"mtGhast",cMonster::mtGhast);
+   tolua_constant(tolua_S,"mtGiant",cMonster::mtGiant);
+   tolua_constant(tolua_S,"mtHorse",cMonster::mtHorse);
+   tolua_constant(tolua_S,"mtIronGolem",cMonster::mtIronGolem);
+   tolua_constant(tolua_S,"mtMagmaCube",cMonster::mtMagmaCube);
+   tolua_constant(tolua_S,"mtMooshroom",cMonster::mtMooshroom);
+   tolua_constant(tolua_S,"mtOcelot",cMonster::mtOcelot);
    tolua_constant(tolua_S,"mtPig",cMonster::mtPig);
    tolua_constant(tolua_S,"mtSheep",cMonster::mtSheep);
-   tolua_constant(tolua_S,"mtCow",cMonster::mtCow);
-   tolua_constant(tolua_S,"mtChicken",cMonster::mtChicken);
-   tolua_constant(tolua_S,"mtSquid",cMonster::mtSquid);
-   tolua_constant(tolua_S,"mtWolf",cMonster::mtWolf);
-   tolua_constant(tolua_S,"mtMooshroom",cMonster::mtMooshroom);
+   tolua_constant(tolua_S,"mtSilverfish",cMonster::mtSilverfish);
+   tolua_constant(tolua_S,"mtSkeleton",cMonster::mtSkeleton);
+   tolua_constant(tolua_S,"mtSlime",cMonster::mtSlime);
    tolua_constant(tolua_S,"mtSnowGolem",cMonster::mtSnowGolem);
-   tolua_constant(tolua_S,"mtOcelot",cMonster::mtOcelot);
-   tolua_constant(tolua_S,"mtIronGolem",cMonster::mtIronGolem);
+   tolua_constant(tolua_S,"mtSpider",cMonster::mtSpider);
+   tolua_constant(tolua_S,"mtSquid",cMonster::mtSquid);
    tolua_constant(tolua_S,"mtVillager",cMonster::mtVillager);
+   tolua_constant(tolua_S,"mtWitch",cMonster::mtWitch);
+   tolua_constant(tolua_S,"mtWither",cMonster::mtWither);
+   tolua_constant(tolua_S,"mtWolf",cMonster::mtWolf);
+   tolua_constant(tolua_S,"mtZombie",cMonster::mtZombie);
+   tolua_constant(tolua_S,"mtZombiePigman",cMonster::mtZombiePigman);
    tolua_function(tolua_S,"GetMobType",tolua_AllToLua_cMonster_GetMobType00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLineBlockTracer","cLineBlockTracer","",NULL);

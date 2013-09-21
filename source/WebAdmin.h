@@ -95,7 +95,9 @@ public:
 	static void         Request_Handler(webserver::http_request* r);
 
 	// tolua_begin
-	static AString      GetMemoryUsage(void);
+	
+	/// Returns the amount of currently used memory, in KiB, or -1 if it cannot be queried
+	static int GetMemoryUsage(void);
 
 	int                 GetPort() { return m_Port; }
 

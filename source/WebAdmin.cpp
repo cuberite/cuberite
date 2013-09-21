@@ -18,8 +18,8 @@
 
 #ifdef _WIN32
 	#include <psapi.h>
-#else
-	#include <sys/resource.h>
+#elif defined(__linux__)
+	#include <fstream>
 #endif
 
 
@@ -241,8 +241,17 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
 			}
 
-			AString MemUsage = GetMemoryUsage();
-			ReplaceString(Template, "{MEM}",         MemUsage);
+			int MemUsageKiB = GetMemoryUsage();
+			if (MemUsageKiB > 0)
+			{
+				ReplaceString(Template, "{MEM}",       Printf("%.02f", (double)MemUsageKiB / 1024));
+				ReplaceString(Template, "{MEMKIB}",    Printf("%d", MemUsageKiB));
+			}
+			else
+			{
+				ReplaceString(Template, "{MEM}",       "unknown");
+				ReplaceString(Template, "{MEMKIB}",    "unknown");
+			}
 			ReplaceString(Template, "{USERNAME}",    r->username_);
 			ReplaceString(Template, "{MENU}",        Menu);
 			ReplaceString(Template, "{PLUGIN_NAME}", FoundPlugin);
@@ -412,26 +421,35 @@ AString cWebAdmin::GetBaseURL( const AStringVector& a_URLSplit )
 
 
 
-AString cWebAdmin::GetMemoryUsage(void)
+int cWebAdmin::GetMemoryUsage(void)
 {
-	AString MemUsage;
-#ifndef _WIN32
-	rusage resource_usage;
-	if (getrusage(RUSAGE_SELF, &resource_usage) != 0)
-	{
-		MemUsage = "Error :(";
-	}
-	else
-	{
-		Printf(MemUsage, "%0.2f", ((double)resource_usage.ru_maxrss / 1024 / 1024) );
-	}
-#else
-	HANDLE hProcess = GetCurrentProcess();
-	PROCESS_MEMORY_COUNTERS pmc;
-	if( GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc) ) )
-	{
-		Printf(MemUsage, "%0.2f", (pmc.WorkingSetSize / 1024.f / 1024.f) );
-	}
-#endif
-	return MemUsage;
+	#ifdef _WIN32
+		PROCESS_MEMORY_COUNTERS pmc;
+		if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
+		{
+			return (int)(pmc.WorkingSetSize / 1024);
+		}
+		return -1;
+	#elif defined(__linux__)
+		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		std::ifstream StatFile("/proc/self/status");
+		if (!StatFile.good())
+		{
+			return -1;
+		}
+		while (StatFile.good())
+		{
+			AString Line;
+			std::getline(StatFile, Line);
+			if (strncmp(Line.c_str(), "VmSize:", 7) == 0)
+			{
+				int res = atoi(Line.c_str() + 8);
+				return (res == 0) ? -1 : res;  // If parsing failed, return -1
+			}
+		}
+		return -1;
+	#else
+		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
+		return -1;
+	#endif
 }

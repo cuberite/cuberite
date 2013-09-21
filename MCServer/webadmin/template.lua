@@ -58,7 +58,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	SiteContent = {}
 	local BaseURL = WebAdmin:GetBaseURL(TemplateRequest.Request.Path)
 	local Title = "MCServer"
-	local MemoryUsage = cWebAdmin:GetMemoryUsage()
+	local MemoryUsageKiB = cWebAdmin:GetMemoryUsage()
 	local NumChunks = cRoot:Get():GetTotalChunkCount()
 	local PluginPage = WebAdmin:GetPage(TemplateRequest.Request)
 	local PageContent = PluginPage.Content
@@ -456,7 +456,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 		</div>	
 		<!-- // #containerHolder -->
 	    
-		<p id="footer">MCServer is using: ]] .. MemoryUsage .. [[MB of memory; Current chunk count: ]] .. NumChunks .. [[ </p>
+		<p id="footer">MCServer is using: ]] .. MemoryUsageKiB / 1024 .. [[ MiB of memory; Current chunk count: ]] .. NumChunks .. [[ </p>
 	</div>
 	<!-- // #wrapper -->
 </body>
