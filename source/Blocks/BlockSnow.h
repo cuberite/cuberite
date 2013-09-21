@@ -48,6 +48,32 @@ public:
 		a_Pickups.push_back(cItem(E_ITEM_SNOWBALL, 1, 0));
 	}
 
+	virtual void OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	{
+		const cItem * equipped_item = &a_Player->GetEquippedItem();
+		if (!equipped_item->IsEmpty())
+		{
+			switch (equipped_item->m_ItemType)
+			{
+				case E_ITEM_DIAMOND_HOE:
+				case E_ITEM_GOLD_HOE:
+				case E_ITEM_IRON_HOE:
+				case E_ITEM_STONE_HOE:
+				case E_ITEM_WOODEN_HOE:
+					cItems drops;
+					Vector3i pos(a_BlockX, a_BlockY, a_BlockZ);
+					ConvertToPickups(drops, a_World->GetBlockMeta(pos));
+					a_World->SpawnItemPickups(drops, a_BlockX, a_BlockY, a_BlockZ);
+			}
+		}
+	}
+
+
+	virtual void OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+
+	}
+
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
