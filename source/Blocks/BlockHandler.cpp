@@ -295,6 +295,15 @@ void cBlockHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int
 	NeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ);
 	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ - 1);
 	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ + 1);
+
+	// If the block generates item drops, add them to the world
+	Vector3i position(a_BlockX, a_BlockY, a_BlockZ);
+	cItems drops;
+	ConvertToPickups(cItems &a_Pickups, a_World->GetBlockMeta(position));
+	if (drops.Size())
+	{
+		a_World->SpawnItemPickups(drops, a_BlockX, a_BlockY, a_BlockZ);
+	}
 }
 
 
