@@ -7,6 +7,7 @@
 #include "../PluginManager.h"
 #include "BlockBed.h"
 #include "BlockBrewingStand.h"
+#include "BlockButton.h"
 #include "BlockCactus.h"
 #include "BlockCarpet.h"
 #include "BlockCauldron.h"
@@ -185,6 +186,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STICKY_PISTON:         return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_STONE:                 return new cBlockStoneHandler           (a_BlockType);
 		case E_BLOCK_STONE_BRICK_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_STONE_BUTTON:          return new cBlockButtonHandler          (a_BlockType);
 		case E_BLOCK_STONE_SLAB:            return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_SUGARCANE:             return new cBlockSugarcaneHandler       (a_BlockType);
 		case E_BLOCK_TALL_GRASS:            return new cBlockTallGrassHandler       (a_BlockType);
@@ -192,6 +194,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);
+		case E_BLOCK_WOODEN_BUTTON:         return new cBlockButtonHandler          (a_BlockType);
 		case E_BLOCK_WOODEN_DOOR:           return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_WOODEN_SLAB:           return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_WOODEN_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
