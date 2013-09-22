@@ -21,7 +21,7 @@
 #elif defined(__linux__)
 	#include <fstream>
 #elif defined(__APPLE__)
-	// Apple-specific includes go here
+	#include <mach/mach.h>
 #endif
 
 
@@ -451,7 +451,16 @@ int cWebAdmin::GetMemoryUsage(void)
 		}
 		return -1;
 	#elif defined (__APPLE__)
-		// TODO: Apple-specific
+		struct task_basic_info t_info;
+		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+
+		if (KERN_SUCCESS == task_info(mach_task_self(),
+		                              TASK_BASIC_INFO, (task_info_t)&t_info, 
+		                              &t_info_count))
+		{
+		    return (int)(t_info.resident_size/1024);
+		}
+		return -1;
 	#else
 		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
 		return -1;
