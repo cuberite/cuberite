@@ -16,5 +16,6 @@ memdump*
 *.grab
 ProtectionAreas.sqlite
 helgrind.log
+valgrind.log
 motd.txt
 *.deuser
