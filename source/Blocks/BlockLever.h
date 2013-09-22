@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../World.h"
 #include "../Simulator/RedstoneSimulator.h"
 
 

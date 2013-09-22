@@ -1,8 +1,6 @@
 
 #include "Globals.h"
 #include "BlockRedstoneRepeater.h"
-#include "../Item.h"
-#include "../World.h"
 #include "../Simulator/RedstoneSimulator.h"
 #include "../Entities/Player.h"
 
