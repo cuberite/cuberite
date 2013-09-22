@@ -53,7 +53,6 @@ public:
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
 		a_Rotation += 90 + 45; // So its not aligned with axis
-		NIBBLETYPE result = 0x0;
 		if (a_Rotation > 360)
 		{
 			a_Rotation -= 360;

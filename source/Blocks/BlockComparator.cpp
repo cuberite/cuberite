@@ -1,8 +1,6 @@
 
 #include "Globals.h"
 #include "BlockComparator.h"
-#include "../Item.h"
-#include "../World.h"
 #include "../Simulator/RedstoneSimulator.h"
 #include "../Entities/Player.h"
 
@@ -32,16 +30,7 @@ void cBlockComparatorHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_Bl
 {
 	NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 	Meta ^= 0x04; // Toggle 3rd (addition/subtraction) bit with XOR
-	a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta);
-}
-
-
-
-
-
-void cBlockComparatorHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	OnUse(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NONE, 8, 8, 8);
+	a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
 }
 
 

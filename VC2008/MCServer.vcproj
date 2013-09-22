@@ -2052,6 +2052,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockButton.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Blocks\BlockButton.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockCactus.h"
 					>
 				</File>
