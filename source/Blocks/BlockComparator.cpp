@@ -32,7 +32,7 @@ void cBlockComparatorHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_Bl
 {
 	NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 	Meta ^= 0x04; // Toggle 3rd (addition/subtraction) bit with XOR
-	a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta);
+	a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
 }
 
 
