@@ -1662,6 +1662,43 @@ World:ForEachEntity(
 			{
 			},
 		},
+		Globals =
+		{
+			Desc = [[These functions are available directly, without a class instance. Any plugin cal call them at any time.]],
+			Functions =
+			{
+				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, Inverse", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified face"},
+				BlockStringToType = {Params = "BlockTypeString", Return = "BLOCKTYPE", Notes = "Returns the block type parsed from the given string"},
+				ClickActionToString = {Params = "ClickAction", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
+				DamageTypeToString = {Params = "{{TakeDamageInfo|eDamageType}}", Return = "string", Notes = "Converts a damage type enumerated value to a string representation "},
+				EscapeString = {Params = "string", Return = "string", Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash"},
+				GetChar = {Params = "String, Pos", Return = "string", Notes = "Returns one character from the string, specified by position "},
+				GetTime = {Return = "number", Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)"},
+				IsValidBlock = {Params = "BlockType", Return = "bool", Notes = "Returns true if BlockType is a known block type"},
+				IsValidItem = {Params = "ItemType", Return = "bool", Notes = "Returns true if ItemType is a known item type"},
+				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format “ItemTypeText:ItemDamage * Count”"},
+				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
+				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
+				LOG = {Params = "string", Notes = "Logs a text into the server console using “normal” severity (gray text) "},
+				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using “error” severity (black text on red background)"},
+				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using “info” severity (yellow text)"},
+				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using “warning” severity (red text); OBSOLETE"},
+				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using “warning” severity (red text)"},
+				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
+				ReplaceString = {Params = "full-string, to-be-replaced-string, to-replace-string", Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string"},
+				StringSplit = {Params = "string, Seperator", Return = "list", Notes = "Seperates string into multiple by splitting every time Seperator is encountered."},
+				StringToBiome = {Params = "string", Return = "EMCSBiome", Notes = "Converts a string representation to a biome enumerated value"},
+				StringToDamageType = {Params = "string", Return = "{{TakeDamageInfo|eDamageType}}", Notes = "Converts a string representation to an {{TakeDamageInfo|eDamageType}} enumerated value "},
+				StringToDimension = {Params = "string", Return = "eDimension", Notes = "Converts a string representation to an eDimension enumerated value"},
+				StringToItem = {Params = "string, {{cItem|cItem}}", Return = "bool", Notes = "Parses the given string and sets the item; returns true if successful"},
+				StringToMobType = {Params = "string", Return = "number", Notes = "Converts a string representation to a mob enumerated value"},
+				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
+				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
+			},
+			Constants =
+			{
+			},
+		},
 	},
 	
 	
