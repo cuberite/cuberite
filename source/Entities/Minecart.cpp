@@ -8,6 +8,7 @@
 #include "Minecart.h"
 #include "../World.h"
 #include "../ClientHandle.h"
+#include "../Chunk.h"
 #include "Player.h"
 
 
@@ -51,33 +52,42 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 {
-	if ((GetPosY() > 0) && (GetPosY() < cChunkDef::Height))
+	int PosY = (int)floor(GetPosY());
+	if ((PosY <= 0) || (PosY >= cChunkDef::Height))
 	{
-		BLOCKTYPE BelowType = GetWorld()->GetBlock(floor(GetPosX()), floor(GetPosY() -1 ), floor(GetPosZ()));
-		BLOCKTYPE InsideType = GetWorld()->GetBlock(floor(GetPosX()), floor(GetPosY()), floor(GetPosZ()));
+		// Outside the world, just process normal falling physics
+		super::HandlePhysics(a_Dt, a_Chunk);
+		BroadcastMovementUpdate();
+		return;
+	}
+	
+	int RelPosX = (int)floor(GetPosX()) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelPosZ = (int)floor(GetPosZ()) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
+	if (Chunk == NULL)
+	{
+		// Inside an unloaded chunk, bail out all processing
+		return;
+	}
+	BLOCKTYPE BelowType = Chunk->GetBlock(RelPosX, PosY - 1, RelPosZ);
+	BLOCKTYPE InsideType = Chunk->GetBlock(RelPosX, PosY, RelPosZ);
 
-		if (IsBlockRail(BelowType))
-		{
-			HandleRailPhysics(a_Dt, a_Chunk);
-		}
-		else
-		{
-			if (IsBlockRail(InsideType))
-			{
-				SetPosY(ceil(GetPosY()));
-				HandleRailPhysics(a_Dt, a_Chunk);
-			}
-			else
-			{
-				super::HandlePhysics(a_Dt, a_Chunk);
-				BroadcastMovementUpdate();
-			}
-		}
+	if (IsBlockRail(BelowType))
+	{
+		HandleRailPhysics(a_Dt, *Chunk);
 	}
 	else
 	{
-		super::HandlePhysics(a_Dt, a_Chunk);
-		BroadcastMovementUpdate();
+		if (IsBlockRail(InsideType))
+		{
+			SetPosY(PosY + 1);
+			HandleRailPhysics(a_Dt, *Chunk);
+		}
+		else
+		{
+			super::HandlePhysics(a_Dt, *Chunk);
+			BroadcastMovementUpdate();
+		}
 	}
 }
 
@@ -87,6 +97,7 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 static const double MAX_SPEED = 8;
 static const double MAX_SPEED_NEGATIVE = (0 - MAX_SPEED);
+
 void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 {
 	
@@ -98,7 +109,9 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 	*/
 	
 	// Get block meta below the cart
-	NIBBLETYPE BelowMeta = GetWorld()->GetBlockMeta(floor(GetPosX()), floor(GetPosY() -1 ), floor(GetPosZ()));
+	int RelPosX = (int)floor(GetPosX()) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelPosZ = (int)floor(GetPosZ()) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	NIBBLETYPE BelowMeta = a_Chunk.GetMeta(RelPosX, (int)floor(GetPosY() - 1), RelPosZ);
 	double SpeedX = GetSpeedX(), SpeedY = GetSpeedY(), SpeedZ = GetSpeedZ(); // Get current speed
 	
 	switch (BelowMeta)
