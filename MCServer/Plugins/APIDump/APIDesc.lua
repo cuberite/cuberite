@@ -1693,6 +1693,7 @@ World:ForEachEntity(
 				StringToItem = {Params = "string, {{cItem|cItem}}", Return = "bool", Notes = "Parses the given string and sets the item; returns true if successful"},
 				StringToMobType = {Params = "string", Return = "number", Notes = "Converts a string representation to a mob enumerated value"},
 				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
+				TrimString = {Params = "string", Return = "string", Notes = "Trime whitespace at both ends of the string"},
 				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
 			},
 			Constants =
