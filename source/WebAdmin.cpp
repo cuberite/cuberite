@@ -451,14 +451,18 @@ int cWebAdmin::GetMemoryUsage(void)
 		}
 		return -1;
 	#elif defined (__APPLE__)
+		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
 		struct task_basic_info t_info;
 		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 
-		if (KERN_SUCCESS == task_info(mach_task_self(),
-		                              TASK_BASIC_INFO, (task_info_t)&t_info, 
-		                              &t_info_count))
+		if (KERN_SUCCESS == task_info(
+			mach_task_self(),
+			TASK_BASIC_INFO,
+			(task_info_t)&t_info,
+			&t_info_count
+		))
 		{
-		    return (int)(t_info.resident_size/1024);
+		    return (int)(t_info.resident_size / 1024);
 		}
 		return -1;
 	#else
