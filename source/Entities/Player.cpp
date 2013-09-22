@@ -21,6 +21,7 @@
 #include "../MersenneTwister.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
+#include "../BlockDataReader.h"
 
 #include "../Vector3d.h"
 #include "../Vector3f.h"
@@ -1444,14 +1445,15 @@ void cPlayer::SetSwimState(cChunk & a_Chunk)
 	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
 	
+	cBlockTypeReader BlockTypeReader;
 	// Check if the player is swimming:
 	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
-	VERIFY(a_Chunk.UnboundedRelGetBlockData(RelX, RelY, RelZ, m_BlockTypeReader));
-	m_IsSwimming = IsBlockWater(m_BlockTypeReader.getValue());
+	VERIFY(a_Chunk.UnboundedRelGetBlockData(RelX, RelY, RelZ, BlockTypeReader));
+	m_IsSwimming = IsBlockWater(BlockTypeReader.getValue());
 
 	// Check if the player is submerged:
-	VERIFY(a_Chunk.UnboundedRelGetBlockData(RelX, RelY + 1, RelZ, m_BlockTypeReader));
-	m_IsSubmerged = IsBlockWater(m_BlockTypeReader.getValue());
+	VERIFY(a_Chunk.UnboundedRelGetBlockData(RelX, RelY + 1, RelZ, BlockTypeReader));
+	m_IsSubmerged = IsBlockWater(BlockTypeReader.getValue());
 }
 
 

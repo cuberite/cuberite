@@ -11,7 +11,7 @@
 #include "../Chunk.h"
 #include "../BlockArea.h"
 #include "../Blocks/BlockHandler.h"
-
+#include "../BlockDataReader.h"
 
 
 
@@ -141,20 +141,21 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 			Vector3i( 0, 0,  1),
 			Vector3i( 0, 0, -1),
 		} ;
+		cBlockTypeAndMetaReader BlockTypeAndMetaReader;
 		for (int i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
-			if (!a_Chunk->UnboundedRelGetBlockData(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, m_BlockTypeAndMetaReader))
+			if (!a_Chunk->UnboundedRelGetBlockData(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockTypeAndMetaReader))
 			{
 				continue;
 			}
-			if (IsAllowedBlock(m_BlockTypeAndMetaReader.getType()) && IsHigherMeta(m_BlockTypeAndMetaReader.getMeta(), a_MyMeta))
+			if (IsAllowedBlock(BlockTypeAndMetaReader.getType()) && IsHigherMeta(BlockTypeAndMetaReader.getMeta(), a_MyMeta))
 			{
 				// This block is fed, no more processing needed
 				FLOG("  Fed from {%d, %d, %d}, type %d, meta %d",
 					a_Chunk->GetPosX() * cChunkDef::Width + a_RelX + Coords[i].x,
 					a_RelY,
 					a_Chunk->GetPosZ() * cChunkDef::Width + a_RelZ + Coords[i].z,
-					 m_BlockTypeAndMetaReader.getType(), m_BlockTypeAndMetaReader.getMeta()
+					 BlockTypeAndMetaReader.getType(), BlockTypeAndMetaReader.getMeta()
 				);
 				return false;
 			}
@@ -193,15 +194,16 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	ASSERT(a_NewMeta <= 8);  // Invalid meta values
 	ASSERT(a_NewMeta > 0);  // Source blocks aren't spread
 	
-	if (!a_NearChunk->UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, m_BlockTypeAndMetaReader))
+	cBlockTypeAndMetaReader BlockTypeAndMetaReader;
+	if (!a_NearChunk->UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, BlockTypeAndMetaReader))
 	{
 		// Chunk not available
 		return;
 	}
 	
-	if (IsAllowedBlock(m_BlockTypeAndMetaReader.getType()))
+	if (IsAllowedBlock(BlockTypeAndMetaReader.getType()))
 	{
-		if ((m_BlockTypeAndMetaReader.getMeta() == a_NewMeta) || IsHigherMeta(m_BlockTypeAndMetaReader.getMeta(), a_NewMeta))
+		if ((BlockTypeAndMetaReader.getMeta() == a_NewMeta) || IsHigherMeta(BlockTypeAndMetaReader.getMeta(), a_NewMeta))
 		{
 			// Don't spread there, there's already a higher or same level there
 			return;
@@ -211,7 +213,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	// Check water - lava interaction:
 	if (m_FluidBlock == E_BLOCK_LAVA)
 	{
-		if (IsBlockWater(m_BlockTypeAndMetaReader.getType()))
+		if (IsBlockWater(BlockTypeAndMetaReader.getType()))
 		{
 			// Lava flowing into water, change to stone / cobblestone based on direction:
 			BLOCKTYPE NewBlock = (a_NewMeta == 8) ? E_BLOCK_STONE : E_BLOCK_COBBLESTONE;
@@ -228,10 +230,10 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	}
 	else if (m_FluidBlock == E_BLOCK_WATER)
 	{
-		if (IsBlockLava(m_BlockTypeAndMetaReader.getType()))
+		if (IsBlockLava(BlockTypeAndMetaReader.getType()))
 		{
 			// Water flowing into lava, change to cobblestone / obsidian based on dest block:
-			BLOCKTYPE NewBlock = (m_BlockTypeAndMetaReader.getMeta() == 0) ? E_BLOCK_OBSIDIAN : E_BLOCK_COBBLESTONE;
+			BLOCKTYPE NewBlock = (BlockTypeAndMetaReader.getMeta() == 0) ? E_BLOCK_OBSIDIAN : E_BLOCK_COBBLESTONE;
 			FLOG("  Water flowing into lava, turning lava at rel {%d, %d, %d} into %s", 
 				a_RelX, a_RelY, a_RelZ, ItemTypeToString(NewBlock).c_str()
 			);
@@ -247,16 +249,16 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		ASSERT(!"Unknown fluid!");
 	}
 	
-	if (!IsPassableForFluid(m_BlockTypeAndMetaReader.getType()))
+	if (!IsPassableForFluid(BlockTypeAndMetaReader.getType()))
 	{
 		// Can't spread there
 		return;
 	}
 	
 	// Wash away the block there, if possible:
-	if (CanWashAway(m_BlockTypeAndMetaReader.getType()))
+	if (CanWashAway(BlockTypeAndMetaReader.getType()))
 	{
-		cBlockHandler * Handler = BlockHandler(m_BlockTypeAndMetaReader.getType());
+		cBlockHandler * Handler = BlockHandler(BlockTypeAndMetaReader.getType());
 		if (Handler->DoesDropOnUnsuitable())
 		{
 			Handler->DropBlock(
@@ -295,6 +297,7 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 	} ;
 	
 	int NumNeeded = m_NumNeighborsForSource;
+	cBlockTypeAndMetaReader BlockTypeAndMetaReader;
 	for (int i = 0; i < ARRAYCOUNT(NeighborCoords); i++)
 	{
 		int x = a_RelX + NeighborCoords[i].x;
@@ -302,13 +305,13 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 		int z = a_RelZ + NeighborCoords[i].z;
 
 
-		if (!a_Chunk->UnboundedRelGetBlockData(x, y, z, m_BlockTypeAndMetaReader))
+		if (!a_Chunk->UnboundedRelGetBlockData(x, y, z, BlockTypeAndMetaReader))
 		{
 			// Neighbor not available, skip it
 			continue;
 		}
-		// FLOG("   Neighbor at {%d, %d, %d}: %s", x, y, z, ItemToFullString(cItem(m_BlockTypeAndMetaReader.getType(), 1, m_BlockTypeAndMetaReader.getMeta())).c_str());
-		if ((m_BlockTypeAndMetaReader.getMeta() == 0) && IsAnyFluidBlock(m_BlockTypeAndMetaReader.getType()))
+		// FLOG("   Neighbor at {%d, %d, %d}: %s", x, y, z, ItemToFullString(cItem(BlockTypeAndMetaReader.getType(), 1, BlockTypeAndMetaReader.getMeta())).c_str());
+		if ((BlockTypeAndMetaReader.getMeta() == 0) && IsAnyFluidBlock(BlockTypeAndMetaReader.getType()))
 		{
 			NumNeeded--;
 			// FLOG("    Found a neighbor source at {%d, %d, %d}, NumNeeded := %d", x, y, z, NumNeeded);

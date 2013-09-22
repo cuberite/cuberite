@@ -9,7 +9,7 @@
 #include "../BlockID.h"
 #include "../Chunk.h"
 #include "../Entities/TNTEntity.h"
-
+#include "BlockDataReader.h"
 
 
 
@@ -43,11 +43,12 @@ void cRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk
 	// Check if any close neighbor is redstone-related:
 	int MinY = (a_BlockY > 0) ? -1 : 0;
 	int MaxY = (a_BlockY < cChunkDef::Height - 1) ? 1 : 0;
+	cBlockTypeAndMetaReader BlockTypeAndMetaReader;
 	for (int y = MinY; y <= MaxY; y++) for (int x = -1; x < 2; x++) for (int z = -1; z < 2; z++)
 	{
 		BLOCKTYPE  BlockType;
 		NIBBLETYPE BlockMeta;
-		if (!a_Chunk->UnboundedRelGetBlockData(RelX + x, a_BlockY + y, RelZ + z, m_BlockTypeAndMetaReader))
+		if (!a_Chunk->UnboundedRelGetBlockData(RelX + x, a_BlockY + y, RelZ + z, BlockTypeAndMetaReader))
 		{
 			continue;
 		}

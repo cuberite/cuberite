@@ -3,7 +3,6 @@
 
 #include "Simulator.h"
 #include "../BlockEntities/BlockEntity.h"
-#include "BlockDataReader.h"
 
 
 
@@ -63,7 +62,6 @@ protected:
 	*/
 	bool CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ);
 
-	cBlockTypeAndMetaReader m_BlockTypeAndMetaReader;
 } ;
 
 

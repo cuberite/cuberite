@@ -6,6 +6,7 @@
 #include "../BlockID.h"
 #include "../Defines.h"
 #include "../Chunk.h"
+#include "BlockDataReader.h"
 
 
 
@@ -238,12 +239,13 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 	{
 		return m_BurnStepTimeFuel;
 	}
-	
+
+	cBlockTypeAndMetaReader BlockTypeAndMetaReader;	
 	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 	{
-		if (a_Chunk->UnboundedRelGetBlockData(a_RelX + gCrossCoords[i].x, a_RelY, a_RelZ + gCrossCoords[i].z, m_BlockTypeAndMetaReader))
+		if (a_Chunk->UnboundedRelGetBlockData(a_RelX + gCrossCoords[i].x, a_RelY, a_RelZ + gCrossCoords[i].z, BlockTypeAndMetaReader))
 		{
-			if (IsFuel(m_BlockTypeAndMetaReader.getType()))
+			if (IsFuel(BlockTypeAndMetaReader.getType()))
 			{
 				return m_BurnStepTimeFuel;
 			}
@@ -304,14 +306,15 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
+	cBlockTypeAndMetaReader BlockTypeAndMetaReader;
 	for (int i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
-		if (!a_Chunk->UnboundedRelGetBlockData(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, m_BlockTypeAndMetaReader))
+		if (!a_Chunk->UnboundedRelGetBlockData(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockTypeAndMetaReader))
 		{
 			// Neighbor not accessible, ignore it
 			continue;
 		}
-		if (!IsFuel(m_BlockTypeAndMetaReader.getType()))
+		if (!IsFuel(BlockTypeAndMetaReader.getType()))
 		{
 			continue;
 		}
@@ -329,13 +332,14 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 
 bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	if (!a_NearChunk->UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, m_BlockTypeAndMetaReader))
+	cBlockTypeAndMetaReader BlockTypeAndMetaReader;
+	if (!a_NearChunk->UnboundedRelGetBlockData(a_RelX, a_RelY, a_RelZ, BlockTypeAndMetaReader))
 	{
 		// The chunk is not accessible
 		return false;
 	}
 	
-	if (m_BlockTypeAndMetaReader.getType() != E_BLOCK_AIR)
+	if (BlockTypeAndMetaReader.getType() != E_BLOCK_AIR)
 	{
 		// Only an air block can be replaced by a fire block
 		return false;
@@ -343,12 +347,12 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 	
 	for (int i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
-		if (!a_NearChunk->UnboundedRelGetBlockData(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, m_BlockTypeAndMetaReader))
+		if (!a_NearChunk->UnboundedRelGetBlockData(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockTypeAndMetaReader))
 		{
 			// Neighbor inaccessible, skip it while evaluating
 			continue;
 		}
-		if (IsFuel(m_BlockTypeAndMetaReader.getType()))
+		if (IsFuel(BlockTypeAndMetaReader.getType()))
 		{
 			return true;
 		}
