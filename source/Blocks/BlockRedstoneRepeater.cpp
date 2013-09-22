@@ -36,15 +36,6 @@ void cBlockRedstoneRepeaterHandler::OnUse(cWorld *a_World, cPlayer *a_Player, in
 
 
 
-
-void cBlockRedstoneRepeaterHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	OnUse(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NONE, 8, 8, 8);
-}
-
-
-
-
 bool cBlockRedstoneRepeaterHandler::GetPlacementBlockTypeMeta(
 	cWorld * a_World, cPlayer * a_Player,
 	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
