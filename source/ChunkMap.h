@@ -186,7 +186,7 @@ public:
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Lua-accessible
 
 	/// Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates
-	void DoExplosiontAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlockAffected);
+	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlockAffected);
 	
 	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false.
 	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Lua-accessible

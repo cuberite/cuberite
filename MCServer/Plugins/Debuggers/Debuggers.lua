@@ -1,6 +1,5 @@
--- Global variables
-PLUGIN = {};	-- Reference to own plugin object
 
+-- Global variables
 g_DropSpensersToActivate = {};  -- A list of dispensers and droppers (as {World, X, Y Z} quadruplets) that are to be activated every tick
 g_HungerReportTick = 10;
 g_ShowFoodStats = false;  -- When true, each player's food stats are sent to them every 10 ticks
@@ -11,8 +10,6 @@ g_ShowFoodStats = false;  -- When true, each player's food stats are sent to the
 
 
 function Initialize(Plugin)
-	PLUGIN = Plugin
-	
 	Plugin:SetName("Debuggers")
 	Plugin:SetVersion(1)
 	
@@ -46,6 +43,7 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
 	PluginManager:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
 	PluginManager:BindCommand("/arr",     "debuggers", HandleArrowCmd,        "- Creates an arrow going away from the player");
+	PluginManager:BindCommand("/fb",      "debuggers", HandleFireballCmd,     "- Creates a ghast fireball as if shot by the player");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -480,6 +478,7 @@ end
 
 
 function OnWorldTick(a_World, a_Dt)
+	-- Report food stats, if switched on:
 	local Tick = a_World:GetWorldAge();
 	if (not(g_ShowFoodStats) or (math.mod(Tick, 10) ~= 0)) then
 		return false;
@@ -819,6 +818,21 @@ function HandleArrowCmd(a_Split, a_Player)
 	Pos = Pos + Speed;
 	
 	World:CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity.pkArrow, a_Player, Speed * 10);
+	return true;
+end
+
+
+
+
+
+function HandleFireballCmd(a_Split, a_Player)
+	local World = a_Player:GetWorld();
+	local Pos = a_Player:GetEyePosition();
+	local Speed = a_Player:GetLookVector();
+	Speed:Normalize();
+	Pos = Pos + Speed * 2;
+	
+	World:CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity.pkGhastFireball, a_Player, Speed * 10);
 	return true;
 end
 

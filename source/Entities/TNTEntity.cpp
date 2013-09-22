@@ -52,7 +52,7 @@ void cTNTEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		Destroy(true);
 		LOGD("BOOM at {%f,%f,%f}", GetPosX(), GetPosY(), GetPosZ());
-		m_World->DoExplosiontAt(4.0, GetPosX() + 0.49, GetPosY() + 0.49, GetPosZ() + 0.49, true, esPrimedTNT, this);
+		m_World->DoExplosionAt(4.0, GetPosX() + 0.49, GetPosY() + 0.49, GetPosZ() + 0.49, true, esPrimedTNT, this);
 		return;
 	}
 }

@@ -18,6 +18,8 @@
 // fwd: ItemGrid.h
 class cItemGrid;
 
+class cProjectileEntity;
+
 
 
 
@@ -138,17 +140,25 @@ protected:
 	
 	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength);
 	
-	void LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadMinecartRFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadMinecartCFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadMinecartFFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadMinecartTFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadMinecartHFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadPickupFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadArrowFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadFallingBlockFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartRFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartCFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartFFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartTFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartHFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPickupFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadArrowFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSnowballFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadEggFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadFireballFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadFireChargeFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads entity common data from the NBT compound; returns true if successful
 	bool LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx);
+	
+	/// Loads projectile common data from the NBT compound; returns true if successful
+	bool LoadProjectileBaseFromNBT(cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIx);
 	
 	/// Loads an array of doubles of the specified length from the specified NBT list tag a_TagIdx; returns true if successful
 	bool LoadDoublesListFromNBT(double * a_Doubles, int a_NumDoubles, const cParsedNBT & a_NBT, int a_TagIdx);

@@ -203,6 +203,16 @@ public:
 	/// Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage()
 	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount);
 	
+	float GetGravity(void) const { return m_Gravity; }
+	
+	void SetGravity(float a_Gravity) { m_Gravity = a_Gravity; }
+	
+	/// Sets the rotation to match the speed vector (entity goes "face-forward")
+	void SetRotationFromSpeed(void);
+	
+	/// Sets the pitch to match the speed vector (entity gies "face-forward")
+	void SetPitchFromSpeed(void);
+	
 	// tolua_end
 	
 	/// Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied

@@ -340,7 +340,7 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 		m_Writer.AddShort("xTile",  (Int16)floor(Pos.x));
 		m_Writer.AddShort("yTile",  (Int16)floor(Pos.y));
 		m_Writer.AddShort("zTile",  (Int16)floor(Pos.z));
-		m_Writer.AddShort("inTile", 0);  // TODO: Query the block type (is it needed?)
+		m_Writer.AddShort("inTile", 0);  // TODO: Query the block type
 		m_Writer.AddShort("shake",  0);  // TODO: Any shake?
 		m_Writer.AddByte ("inGround", a_Projectile->IsInGround() ? 1 : 0);
 		

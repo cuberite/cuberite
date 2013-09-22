@@ -952,13 +952,33 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadMinecartHFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
-	if (strncmp(a_IDTag, "Item", a_IDTagLength) == 0)
+	else if (strncmp(a_IDTag, "Item", a_IDTagLength) == 0)
 	{
 		LoadPickupFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
-	if (strncmp(a_IDTag, "Arrow", a_IDTagLength) == 0)
+	else if (strncmp(a_IDTag, "Arrow", a_IDTagLength) == 0)
 	{
 		LoadArrowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Snowball", a_IDTagLength) == 0)
+	{
+		LoadSnowballFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Egg", a_IDTagLength) == 0)
+	{
+		LoadEggFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Fireball", a_IDTagLength) == 0)
+	{
+		LoadFireballFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "SmallFireball", a_IDTagLength) == 0)
+	{
+		LoadFireChargeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "ThrownEnderpearl", a_IDTagLength) == 0)
+	{
+		LoadThrownEnderpearlFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 	// TODO: other entities
 }
@@ -1100,7 +1120,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::auto_ptr<cArrowEntity> Arrow(new cArrowEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
-	if (!LoadEntityBaseFromNBT(*Arrow.get(), a_NBT, a_TagIdx))
+	if (!LoadProjectileBaseFromNBT(*Arrow.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
@@ -1136,6 +1156,86 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 
 
+void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cThrownSnowballEntity> Snowball(new cThrownSnowballEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	if (!LoadProjectileBaseFromNBT(*Snowball.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Store the new snowball in the entities list:
+	a_Entities.push_back(Snowball.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cThrownEggEntity> Egg(new cThrownEggEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	if (!LoadProjectileBaseFromNBT(*Egg.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Store the new egg in the entities list:
+	a_Entities.push_back(Egg.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cGhastFireballEntity> Fireball(new cGhastFireballEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	if (!LoadProjectileBaseFromNBT(*Fireball.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Store the new fireball in the entities list:
+	a_Entities.push_back(Fireball.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cFireChargeEntity> FireCharge(new cFireChargeEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	if (!LoadProjectileBaseFromNBT(*FireCharge.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Store the new FireCharge in the entities list:
+	a_Entities.push_back(FireCharge.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cThrownEnderPearlEntity> Enderpearl(new cThrownEnderPearlEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	if (!LoadProjectileBaseFromNBT(*Enderpearl.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Store the new enderpearl in the entities list:
+	a_Entities.push_back(Enderpearl.release());
+}
+
+
+
+
+
 bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	double Pos[3];
@@ -1159,6 +1259,30 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 	}
 	a_Entity.SetRotation(Rotation[0]);
 	a_Entity.SetRoll    (Rotation[1]);
+	
+	return true;
+}
+
+
+
+
+
+bool cWSSAnvil::LoadProjectileBaseFromNBT(cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	if (!LoadEntityBaseFromNBT(a_Entity, a_NBT, a_TagIdx))
+	{
+		return false;
+	}
+	
+	bool IsInGround = false;
+	int InGroundIdx = a_NBT.FindChildByName(a_TagIdx, "inGround");
+	if (InGroundIdx > 0)
+	{
+		IsInGround = (a_NBT.GetByte(InGroundIdx) != 0);
+	}
+	a_Entity.SetIsInGround(IsInGround);
+	
+	// TODO: Load inTile, TileCoords
 	
 	return true;
 }

@@ -56,7 +56,7 @@ void cBlockBedHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, i
 	if (a_World->GetDimension() != dimOverworld)
 	{
 		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
-		a_World->DoExplosiontAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
+		a_World->DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
 	}
 	else
 	{

@@ -659,6 +659,7 @@ enum eDamageType
 {
 	// Canonical names for the types (as documented in the plugin wiki):
 	dtAttack,           // Being attacked by a mob
+	dtRangedAttack,     // Being attacked by a projectile, possibly from a mob
 	dtLightning,        // Hit by a lightning strike
 	dtFalling,          // Falling down; dealt when hitting the ground
 	dtDrowning,         // Drowning in water / lava
@@ -671,6 +672,7 @@ enum eDamageType
 	dtFireContact,      // Standing inside a fire block
 	dtInVoid,           // Falling into the Void (Y < 0)
 	dtPotionOfHarming,
+	dtEnderPearl,       // Thrown an ender pearl, teleported by it
 	dtAdmin,            // Damage applied by an admin command
 	
 	// Some common synonyms:
@@ -678,6 +680,9 @@ enum eDamageType
 	dtEntityAttack = dtAttack,
 	dtMob          = dtAttack,
 	dtMobAttack    = dtAttack,
+	dtArrowAttack  = dtRangedAttack,
+	dtArrow        = dtRangedAttack,
+	dtProjectile   = dtRangedAttack,
 	dtFall         = dtFalling,
 	dtDrown        = dtDrowning,
 	dtSuffocation  = dtSuffocating,
