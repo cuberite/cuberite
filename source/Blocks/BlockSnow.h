@@ -15,8 +15,28 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
-	
+
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
+	{
+		a_BlockType = m_BlockType;
+		NIBBLETYPE Meta = a_World->GetBlockMeta(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+
+		if ((Meta < 7) && (Meta != 0)) // Is height at maximum (7) or at mininum (0)? Don't do anything if so
+		{
+			Meta++;
+		}
+		
+		a_BlockMeta = Meta;
+		return true;
+	}
+
+
 	virtual bool DoesIgnoreBuildCollision(void) override
 	{
 		return true;

@@ -7,22 +7,22 @@
 
 
 
-class cMagmacube :
+class cMagmaCube :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
 	
 public:
-	/// Creates a magmacube of the specified size; size is 1 .. 3, with 1 being the smallest
-	cMagmacube(int a_Size);
+	/// Creates a MagmaCube of the specified size; size is 1 .. 3, with 1 being the smallest
+	cMagmaCube(int a_Size);
 
-	CLASS_PROTODEF(cMagmacube);
+	CLASS_PROTODEF(cMagmaCube);
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	
 protected:
 
-	/// Size of the magmacube, 1 .. 3, with 1 being the smallest
+	/// Size of the MagmaCube, 1 .. 3, with 1 being the smallest
 	int m_Size;
 } ;
 
