@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Authenticator.h"
+#include "WebServer.h"
 
 
 
@@ -141,6 +142,7 @@ private:
 	cWebAdmin *        m_WebAdmin;
 	cPluginManager *   m_PluginManager;
 	cAuthenticator     m_Authenticator;
+	cWebServer         m_WebServer;
 
 	cMCLogger *      m_Log;
 

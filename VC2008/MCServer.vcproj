@@ -901,6 +901,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\WebServer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\WebServer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\World.cpp"
 				>
 			</File>

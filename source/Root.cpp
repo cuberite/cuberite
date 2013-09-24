@@ -135,11 +135,9 @@ void cRoot::Start(void)
 		{
 			LOGWARNING("webadmin.ini inaccessible, wabadmin is disabled");
 		}
-
-		if (WebIniFile.GetValueB("WebAdmin", "Enabled", false))
+		else
 		{
-			LOG("Creating WebAdmin...");
-			m_WebAdmin = new cWebAdmin(8080);
+			m_WebServer.Initialize(WebIniFile);
 		}
 
 		LOG("Loading settings...");
