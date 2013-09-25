@@ -429,25 +429,27 @@ g_APIDesc =
 		cClientHandle =
 		{
 			Desc = [[
-				A cClientHandle represents technical aspect of a connected player - their game client connection.
+				A cClientHandle represents the technical aspect of a connected player - their game client
+				connection. Internally, it handles all the incoming and outgoing packets, the chunks that are to be
+				sent to the client, ping times etc.
 			]],
 			
 			Functions =
 			{
 				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
-				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client" },
+				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client. Note that this may be nil, for example if the player object is not yet spawned." },
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the UniqueID of the client used to identify the client in the server" },
 				GetUsername = { Params = "", Return = "string", Notes = "Returns the username that the client has provided" },
 				GetViewDistance = { Params = "", Return = "number", Notes = "Returns the viewdistance (number of chunks loaded for the player in each direction)" },
 				Kick = { Params = "Reason", Return = "", Notes = "Kicks the user with the specified reason" },
 				SetUsername = { Params = "Name", Return = "", Notes = "Sets the username" },
 				SetViewDistance = { Params = "ViewDistance", Return = "", Notes = "Sets the viewdistance (number of chunks loaded for the player in each direction)" },
-				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a block to the client. This can be used to create fake blocks." },
+				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player." },
 			},
 			Constants =
 			{
-				MAX = { Notes = "10" },
-				MIN = { Notes = "4" },
+				MAX_VIEW_DISTANCE = { Notes = "The maximum value of the view distance" },
+				MIN_VIEW_DISTANCE = { Notes = "The minimum value of the view distance" },
 			},
 		},
 
