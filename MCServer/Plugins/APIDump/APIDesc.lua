@@ -376,17 +376,46 @@ g_APIDesc =
 			Desc = [[
 				A chest entity is a {{cBlockEntityWithItems|cBlockEntityWithItems}} descendant that represents a chest
 				in the world. Note that doublechests consist of two separate cChestEntity objects, they do not collaborate
-				in any way.
+				in any way.</p>
+				<p>
+				The chest entity can be created by the plugins only in the {{OnChunkGenerating}} and
+				{{OnChunkGenerated}} hooks, as part of the new chunk being generated. Plugins may generate chests
+				with contents in this way.</p>
+				<p>
+				To manipulate a chest already in the game, you need to use {{cWorld}}'s callback mechanism with
+				either DoWithChestAt() or ForEachChestInChunk() function. See the code example below
 			]],
 			
 			Inherits = "cBlockEntityWithItems",
 			
 			Functions =
 			{
+				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cChestEntity", Notes = "Creates a new cChestEntity object. To be used only in the chunk generating hooks {{OnChunkGenerating}} and {{OnChunkGenerated}}." },
 			},
 			Constants =
 			{
+				ContentsHeight = { Notes = "Height of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}" },
+				ContentsWidth = { Notes = "Width of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}" },
 			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Code example",
+					Contents = [[
+						The following example code sets the top-left item of each chest in the same chunk as Player to
+						64 * diamond:
+<pre>
+-- Player is a {{cPlayer}} object instance
+local World = Player:GetWorld();
+World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
+	function (ChestEntity)
+		ChestEntity:SetSlot(0, 0, cItem(E_ITEM_DIAMOND, 64));
+	end
+);
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
 		},
 
 		cChunkDesc =
