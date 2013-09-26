@@ -511,16 +511,21 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		cCraftingGrid =
 		{
 			Desc = [[
-				cCraftingGrid represents the player's crafting grid. It is used only in
+				cCraftingGrid represents the player's crafting grid. It is used in
 				{{OnCraftingNoRecipe|OnCraftingNoRecipe}}, {{OnPostCrafting|OnPostCrafting}} and
 				{{OnPreCrafting|OnPreCrafting}} hooks. Plugins may use it to inspect the items the player placed
-				on their crafting grid.
+				on their crafting grid.</p>
+				<p>
+				Also, an object of this type is used in {{cCraftingRecipe}}'s ConsumeIngredients() function for
+				specifying the exact number of ingredients to consume in that recipe; plugins may use this to
+				apply the crafting recipe.</p>
 			]],
 			
 			Functions =
 			{
+				constructor = { Params = "Width, Height", Return = "cCraftingGrid", Notes = "Creates a new CraftingGrid object. This new crafting grid is not related to any player, but may be needed for {{cCraftingRecipe}}'s ConsumeIngredients function." },
 				Clear = { Params = "", Return = "", Notes = "Clears the entire grid" },
-				ConsumeGrid = { Params = "{{cCraftingGrid|CraftingGrid}}", Return = "", Notes = "Consumes items specified in CraftingGrid from the current contents" },
+				ConsumeGrid = { Params = "{{cCraftingGrid|CraftingGrid}}", Return = "", Notes = "Consumes items specified in CraftingGrid from the current contents. Used internally by {{cCraftingRecipe}}'s ConsumeIngredients() function, but available to plugins, too." },
 				Dump = { Params = "", Return = "", Notes = "DEBUG build: Dumps the contents of the grid to the log. RELEASE build: no action" },
 				GetHeight = { Params = "", Return = "number", Notes = "Returns the height of the grid" },
 				GetItem = { Params = "x, y", Return = "{{cItem|cItem}}", Notes = "Returns the item at the specified coords" },
