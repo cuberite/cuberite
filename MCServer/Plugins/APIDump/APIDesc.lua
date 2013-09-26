@@ -576,15 +576,37 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		cCuboid =
 		{
 			Desc = [[
-				cCuboid offers some native support for integral-boundary cuboids. A cuboid simply consists of two
-				{{vector3i}}-s. It offers some extra functions for sorting and checking if a point is inside the
-				cuboid.
+				cCuboid offers some native support for integral-boundary cuboids. A cuboid internally consists of
+				two {{Vector3i}}s. By default the cuboid doesn't make any assumptions about the defining points,
+				but for most of the operations in the cCuboid class, the p1 member variable is expected to be the
+				minima and the p2 variable the maxima. The Sort() function guarantees this condition.</p>
+				<p>
+				The Cuboid considers both its edges inclusive.</p>
 			]],
 			Functions =
 			{
-				Sort = { Return = "" },
-				IsInside = { Return = "bool" },
-				IsInside = { Return = "bool" },
+				constructor =
+				{
+					{ Params = "OtheCuboid", Return = "cCuboid", Notes = "Creates a new Cuboid object as a copy of OtherCuboid" },
+					{ Params = "{{Vector3i|Point1}}, {{Vector3i|Point2}}", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified points as its corners." },
+					{ Params = "X, Y, Z", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified point as both its corners (the cuboid has a size of 1 in each direction)." },
+					{ Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified points as its corners." },
+				},
+				Assign = { Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "", Notes = "Assigns all the coords stored in the cuboid. Sort-state is ignored." },
+				DifX = { Params = "", Return = "number", Notes = "Returns the difference between the two X coords (X-size minus 1). Assumes sorted." },
+				DifY = { Params = "", Return = "number", Notes = "Returns the difference between the two Y coords (Y-size minus 1). Assumes sorted." },
+				DifZ = { Params = "", Return = "number", Notes = "Returns the difference between the two Z coords (Z-size minus 1). Assumes sorted." },
+				DoesIntersect = { Params = "OtherCuboid", Return = "bool", Notes = "Returns true if this cuboid has at least one voxel in common with OtherCuboid. Note that edges are considered inclusive. Assumes both sorted." },
+				IsCompletelyInside = { Params = "OuterCuboid", Return = "bool", Notes = "Returns true if this cuboid is completely inside (in all directions) in OuterCuboid. Assumes both sorted." },
+				IsInside =
+				{
+					{ Params = "X, Y, Z", Return = "bool", Notes = "Returns true if the specified point (integral coords) is inside this cuboid. Assumes sorted." },
+					{ Params = "{{Vector3i|Point}}", Return = "bool", Notes = "Returns true if the specified point (integral coords) is inside this cuboid. Assumes sorted." },
+					{ Params = "{{Vector3d|Point}}", Return = "bool", Notes = "Returns true if the specified point (floating-point coords) is inside this cuboid. Assumes sorted." },
+				},
+				IsSorted = { Params = "", Return = "bool", Notes = "Returns true if this cuboid is sorted" },
+				Move = { Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Adds the specified offsets to each respective coord, effectively moving the Cuboid. Sort-state is ignored." },
+				Sort = { Params = "", Return = "" , Notes = "Sorts the internal representation so that p1 contains the lesser coords and p2 contains the greater coords." },
 			},
 			Variables =
 			{
