@@ -137,7 +137,7 @@ void cRoot::Start(void)
 		}
 		else
 		{
-			m_WebServer.Initialize(WebIniFile);
+			m_HTTPServer.Initialize(WebIniFile);
 		}
 
 		LOG("Loading settings...");

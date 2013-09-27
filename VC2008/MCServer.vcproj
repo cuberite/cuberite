@@ -901,14 +901,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\WebServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\WebServer.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\World.cpp"
 				>
 			</File>
@@ -2721,6 +2713,26 @@
 				</File>
 				<File
 					RelativePath="..\source\BlockEntities\SignEntity.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="HTTPServer"
+				>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPMessage.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPMessage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPServer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPServer.h"
 					>
 				</File>
 			</Filter>
