@@ -52,8 +52,11 @@ public:
 	/// Sends the data as the response (may be called multiple times)
 	void Send(const AString & a_Data) { Send(a_Data.data(), a_Data.size()); }
 	
-	/// Finishes sending current response, gets ready for receiving another request (HTTP 1.1 keepalive)
+	/// Indicates that the current response is finished, gets ready for receiving another request (HTTP 1.1 keepalive)
 	void FinishResponse(void);
+	
+	/// Resets the connection for a new request. Depending on the state, this will send an "InternalServerError" status or a "ResponseEnd"
+	void AwaitNextRequest(void);
 	
 protected:
 	typedef std::map<AString, AString> cNameValueMap;

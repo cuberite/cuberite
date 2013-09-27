@@ -34,9 +34,30 @@ class cHTTPServer :
 	public cListenThread::cCallback
 {
 public:
+	class cCallbacks
+	{
+	public:
+		/** Called when a new request arrives over a connection and its headers have been parsed.
+		The request body needn't have arrived yet.
+		*/
+		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) = 0;
+		
+		/// Called when another part of request body has arrived.
+		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size) = 0;
+		
+		/// Called when the request body has been fully received in previous calls to OnRequestBody()
+		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) = 0;
+	} ;
+	
 	cHTTPServer(void);
 	
 	bool Initialize(cIniFile & a_IniFile);
+	
+	/// Starts the server and assigns the callbacks to use for incoming requests
+	bool Start(cCallbacks & a_Callbacks);
+	
+	/// Stops the server, drops all current connections
+	void Stop(void);
 	
 protected:
 	friend class cHTTPConnection;
@@ -48,6 +69,10 @@ protected:
 
 	cCriticalSection m_CSConnections;
 	cHTTPConnections m_Connections;    ///< All the connections that are currently being serviced
+	
+	/// The callbacks to call for various events
+	cCallbacks * m_Callbacks;
+	
 
 	// cListenThread::cCallback overrides:
 	virtual void OnConnectionAccepted(cSocket & a_Socket) override;

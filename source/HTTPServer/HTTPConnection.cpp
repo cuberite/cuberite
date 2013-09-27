@@ -69,6 +69,39 @@ void cHTTPConnection::FinishResponse(void)
 
 
 
+void cHTTPConnection::AwaitNextRequest(void)
+{
+	switch (m_State)
+	{
+		case wcsRecvIdle:
+		{
+			// The client is waiting for a response, send an "Internal server error":
+			m_OutgoingData.append("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+			m_HTTPServer.NotifyConnectionWrite(*this);
+			m_State = wcsRecvHeaders;
+			break;
+		}
+		
+		case wcsSendingResp:
+		{
+			// The response headers have been sent, we need to terminate the response body:
+			m_OutgoingData.append("0\r\n\r\n");
+			m_State = wcsRecvHeaders;
+			break;
+		}
+		
+		default:
+		{
+			ASSERT(!"Unhandled state recovery");
+			break;
+		}
+	}
+}
+
+
+
+
+
 void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 {
 	switch (m_State)
@@ -128,10 +161,10 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 			}
 			if (m_CurrentRequestBodyRemaining == 0)
 			{
+				m_State = wcsRecvIdle;
 				m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
 				delete m_CurrentRequest;
 				m_CurrentRequest = NULL;
-				m_State = wcsRecvIdle;
 			}
 			break;
 		}

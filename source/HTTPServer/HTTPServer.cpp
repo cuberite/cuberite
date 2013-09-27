@@ -22,10 +22,43 @@
 
 
 
+class cDebugCallbacks :
+	public cHTTPServer::cCallbacks
+{
+		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
+		{
+			// Nothing needed
+		}
+		
+		
+		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size) override
+		{
+			// TODO
+		}
+		
+		
+		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
+		{
+			cHTTPResponse Resp;
+			Resp.SetContentType("text/plain");
+			a_Connection.Send(Resp);
+			a_Connection.Send("Hello, world");
+		}
+		
+		
+} g_DebugCallbacks;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cHTTPServer:
+
 cHTTPServer::cHTTPServer(void) :
 	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer IPv4"),
 	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer IPv6"),
-	m_SocketThreads()
+	m_Callbacks(NULL)
 {
 }
 
@@ -48,6 +81,20 @@ bool cHTTPServer::Initialize(cIniFile & a_IniFile)
 		LOG("WebAdmin is disabled");
 		return false;
 	}
+	
+	// DEBUG:
+	return Start(g_DebugCallbacks);
+	
+	return true;
+}
+
+
+
+
+
+bool cHTTPServer::Start(cCallbacks & a_Callbacks)
+{
+	m_Callbacks = &a_Callbacks;
 	if (!m_ListenThreadIPv4.Start())
 	{
 		return false;
@@ -58,6 +105,23 @@ bool cHTTPServer::Initialize(cIniFile & a_IniFile)
 		return false;
 	}
 	return true;
+}
+
+
+
+
+
+void cHTTPServer::Stop(void)
+{
+	m_ListenThreadIPv4.Stop();
+	m_ListenThreadIPv6.Stop();
+	
+	// Drop all current connections:
+	cCSLock Lock(m_CSConnections);
+	for (cHTTPConnections::iterator itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
+	{
+		m_SocketThreads.RemoveClient(*itr);
+	}  // for itr - m_Connections[]
 }
 
 
@@ -105,7 +169,7 @@ void cHTTPServer::NotifyConnectionWrite(cHTTPConnection & a_Connection)
 
 void cHTTPServer::NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
-	// TODO
+	m_Callbacks->OnRequestBegun(a_Connection, a_Request);
 }
 
 
@@ -114,7 +178,7 @@ void cHTTPServer::NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Re
 
 void cHTTPServer::RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size)
 {
-	// TODO
+	m_Callbacks->OnRequestBody(a_Connection, a_Request, a_Data, a_Size);
 }
 
 
@@ -123,14 +187,8 @@ void cHTTPServer::RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_R
 
 void cHTTPServer::RequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
-	// TODO
-	
-	// DEBUG: Send a debug response:
-	cHTTPResponse Resp;
-	Resp.SetContentType("text/plain");
-	a_Connection.Send(Resp);
-	a_Connection.Send("Hello");
-	a_Connection.FinishResponse();
+	m_Callbacks->OnRequestFinished(a_Connection, a_Request);
+	a_Connection.AwaitNextRequest();
 }
 
 
