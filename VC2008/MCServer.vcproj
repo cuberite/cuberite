@@ -2720,6 +2720,14 @@
 				Name="HTTPServer"
 				>
 				<File
+					RelativePath="..\source\HTTPServer\HTTPConnection.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPConnection.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\HTTPServer\HTTPMessage.cpp"
 					>
 				</File>
