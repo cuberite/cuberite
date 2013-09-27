@@ -55,7 +55,8 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 // cHTTPRequest:
 
 cHTTPRequest::cHTTPRequest(void) :
-	super(mkRequest)
+	super(mkRequest),
+	m_UserData(NULL)
 {
 }
 

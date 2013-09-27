@@ -71,12 +71,22 @@ public:
 	/// Returns true if the request did contain a Content-Length header
 	bool HasReceivedContentLength(void) const { return (m_ContentLength >= 0); }
 	
+	/// Sets the UserData pointer that is stored within this request. The request doesn't touch this data (doesn't delete it)!
+	void SetUserData(void * a_UserData) { m_UserData = a_UserData; }
+	
+	/// Retrieves the UserData pointer that has been stored within this request.
+	void * GetUserData(void) const { return m_UserData; }
+	
 protected:
 	/// Method of the request (GET / PUT / POST / ...)
 	AString m_Method;
 	
 	/// Full URL of the request
 	AString m_URL;
+	
+	/// Data that the HTTPServer callbacks are allowed to store.
+	void * m_UserData;
+	
 	
 	/** Parses the RequestLine out of a_Data, up to index a_IdxEnd
 	Returns the index to the next line, or npos if invalid request
