@@ -78,9 +78,6 @@ protected:
 	/// Full URL of the request
 	AString m_URL;
 	
-	/// Number of bytes that remain to read for the complete body of the message to be received
-	int m_BodyRemaining;
-
 	/** Parses the RequestLine out of a_Data, up to index a_IdxEnd
 	Returns the index to the next line, or npos if invalid request
 	*/

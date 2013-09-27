@@ -88,7 +88,11 @@ bool cHTTPRequest::ParseHeaders(const char * a_IncomingData, size_t a_IdxEnd)
 		End -= Next;
 	}
 	
-	return HasReceivedContentLength();
+	if (!HasReceivedContentLength())
+	{
+		SetContentLength(0);
+	}
+	return true;
 }
 
 
@@ -125,12 +129,12 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_IdxEnd)
 				{
 					case 0:
 					{
-						m_Method.assign(a_Data, Last, i - Last - 1);
+						m_Method.assign(a_Data, Last, i - Last);
 						break;
 					}
 					case 1:
 					{
-						m_URL.assign(a_Data, Last, i - Last - 1);
+						m_URL.assign(a_Data, Last, i - Last);
 						break;
 					}
 					default:
@@ -145,7 +149,7 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_IdxEnd)
 			}
 			case '\n':
 			{
-				if ((i == 0) || (a_Data[i] != '\r') || (NumSpaces != 2) || (i < Last + 7))
+				if ((i == 0) || (a_Data[i - 1] != '\r') || (NumSpaces != 2) || (i < Last + 7))
 				{
 					// LF too early, without a CR, without two preceeding spaces or too soon after the second space
 					return AString::npos;
@@ -155,7 +159,7 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_IdxEnd)
 				{
 					return AString::npos;
 				}
-				return i;
+				return i + 1;
 			}
 		}  // switch (a_Data[i])
 	}  // for i - a_Data[]
@@ -263,7 +267,7 @@ cHTTPResponse::cHTTPResponse(void) :
 
 void cHTTPResponse::AppendToData(AString & a_DataStream) const
 {
-	a_DataStream.append("200 OK\r\nTransfer-Encoding: chunked\r\nContent-Type: ");
+	a_DataStream.append("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nContent-Type: ");
 	a_DataStream.append(m_ContentType);
 	a_DataStream.append("\r\n");
 	for (cNameValueMap::const_iterator itr = m_Headers.begin(), end = m_Headers.end(); itr != end; ++itr)

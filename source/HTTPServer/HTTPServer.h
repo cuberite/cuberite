@@ -55,11 +55,14 @@ protected:
 	/// Called by cHTTPConnection to close the connection (presumably due to an error)
 	void CloseConnection(cHTTPConnection & a_Connection);
 	
+	/// Called by cHTTPConnection to notify SocketThreads that there's data to be sent for the connection
+	void NotifyConnectionWrite(cHTTPConnection & a_Connection);
+	
 	/// Called by cHTTPConnection when it finishes parsing the request header
 	void NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
 	
 	/// Called by cHTTPConenction when it receives more data for the request body
-	void RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	void RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size);
 	
 	/// Called by cHTTPConnection when it detects that the request has finished (all of its body has been received)
 	void RequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);

@@ -94,6 +94,15 @@ void cHTTPServer::CloseConnection(cHTTPConnection & a_Connection)
 
 
 
+void cHTTPServer::NotifyConnectionWrite(cHTTPConnection & a_Connection)
+{
+	m_SocketThreads.NotifyWrite(&a_Connection);
+}
+
+
+
+
+
 void cHTTPServer::NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	// TODO
@@ -103,7 +112,7 @@ void cHTTPServer::NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Re
 
 
 
-void cHTTPServer::RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cHTTPServer::RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size)
 {
 	// TODO
 }

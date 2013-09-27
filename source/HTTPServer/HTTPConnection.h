@@ -72,6 +72,9 @@ protected:
 	
 	/// The request being currently received (valid only between having parsed the headers and finishing receiving the body)
 	cHTTPRequest * m_CurrentRequest;
+
+	/// Number of bytes that remain to read for the complete body of the message to be received. Valid only in wcsRecvBody
+	int m_CurrentRequestBodyRemaining;
 	
 	
 	// cSocketThreads::cCallback overrides:
