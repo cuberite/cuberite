@@ -129,6 +129,8 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 			if (m_CurrentRequestBodyRemaining == 0)
 			{
 				m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
+				delete m_CurrentRequest;
+				m_CurrentRequest = NULL;
 				m_State = wcsRecvIdle;
 			}
 			break;
