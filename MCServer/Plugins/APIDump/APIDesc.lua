@@ -1402,10 +1402,15 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 
 		cServer =
 		{
-			Desc = [[cServer is typically only used by plugins to broadcast a chat message to all players in the server. Natively however, cServer accepts connections from clients and adds those clients to the game.
+			Desc = [[cServer is typically only used by plugins to broadcast a chat message(Now replaced by the {{cRoot|cRoot}} BroadcastChat function) to all players in the server. Natively however, cServer accepts connections from clients and adds those clients to the game.
 ]],
 			Functions =
 			{
+				GetDescription = { Return = "string", Notes = "Returns the server description set in the settings.ini." },
+				GetMaxPlayers = { Return = "number", Notes = "Returns the max amount of players who can join the server." },
+				SetMaxPlayers = { Params = "number", Notes = "Sets the max amount of players who can join." },
+				GetNumPlayers = { Return = "number", Notes = "Returns the amount of players online." },
+				GetServerID = { Return = "string", Notes = "Returns the ID of the server?" },
 			},
 			Constants =
 			{
