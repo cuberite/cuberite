@@ -294,7 +294,7 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 			);
 			CacheSize = 4;
 		}
-		LOGINFO("Using a cache for Heightgen of size %d.", CacheSize);
+		LOGD("Using a cache for Heightgen of size %d.", CacheSize);
 		m_UnderlyingHeightGen = m_HeightGen;
 		m_HeightGen = new cHeiGenCache(m_UnderlyingHeightGen, CacheSize);
 	}

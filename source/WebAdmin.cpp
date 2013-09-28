@@ -286,7 +286,7 @@ bool cWebAdmin::Init(int a_Port)
 	}
 
 
-	LOG("Starting WebAdmin on port %i", m_Port);
+	LOGD("Starting WebAdmin on port %i", m_Port);
 
 #ifdef _WIN32
 	HANDLE hThread = CreateThread(
