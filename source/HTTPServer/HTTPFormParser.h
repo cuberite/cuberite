@@ -50,6 +50,10 @@ protected:
 	AString m_IncomingData;
 	
 	bool m_IsValid;
+	
+	/// Simple static objects to hold the various strings for comparison with request's content-type
+	static AString m_FormURLEncoded;
+	static AString m_MultipartFormData;
 		
 	
 	/// Parses m_IncomingData as form-urlencoded data (fpkURL or fpkFormUrlEncoded kinds)

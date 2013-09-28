@@ -11,6 +11,13 @@
 
 
 
+AString cHTTPFormParser::m_FormURLEncoded("application/x-www-form-urlencoded");
+AString cHTTPFormParser::m_MultipartFormData("multipart/form-data");
+
+
+
+
+
 cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request) :
 	m_IsValid(true)
 {
@@ -29,12 +36,12 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request) :
 	}
 	if ((a_Request.GetMethod() == "POST") || (a_Request.GetMethod() == "PUT"))
 	{
-		if (a_Request.GetContentType() == "application/x-www-form-urlencoded")
+		if (a_Request.GetContentType() == m_FormURLEncoded)
 		{
 			m_Kind = fpkFormUrlEncoded;
 			return;
 		}
-		if (strncmp(a_Request.GetContentType().c_str(), "multipart/form-data", 19) == 0)
+		if (a_Request.GetContentType().substr(0, m_MultipartFormData.length()) == m_MultipartFormData)
 		{
 			m_Kind = fpkMultipart;
 			return;
@@ -96,9 +103,10 @@ bool cHTTPFormParser::Finish(void)
 
 bool cHTTPFormParser::HasFormData(const cHTTPRequest & a_Request)
 {
+	const AString & ContentType = a_Request.GetContentType();
 	return (
-		(a_Request.GetContentType() == "application/x-www-form-urlencoded") ||
-		(strncmp(a_Request.GetContentType().c_str(), "multipart/form-data", 19) == 0) ||
+		(ContentType == m_FormURLEncoded) ||
+		(ContentType.substr(0, m_MultipartFormData.length()) == m_MultipartFormData) ||
 		(
 			(a_Request.GetMethod() == "GET") &&
 			(a_Request.GetURL().find('?') != AString::npos)
@@ -142,59 +150,6 @@ void cHTTPFormParser::ParseFormUrlEncoded(void)
 		}
 	}  // for itr - Lines[]
 	m_IncomingData.clear();
-	
-	/*
-	size_t len = m_IncomingData.size();
-	if (len == 0)
-	{
-		// No values in the form, consider this valid, too.
-		return;
-	}
-	size_t len1 = len - 1;
-
-	for (size_t i = 0; i < len; )
-	{
-		char ch = m_IncomingData[i];
-		AString Name;
-		AString Value;
-		while ((i < len1) && (ch != '=') && (ch != '&'))
-		{
-			if (ch == '+')
-			{
-				ch = ' ';
-			}
-			Name.push_back(ch);
-			ch = m_IncomingData[++i];
-		}
-		if (i == len1)
-		{
-			Value.push_back(ch);
-		}
-		
-		if (ch == '=')
-		{
-			ch = m_IncomingData[++i];
-			while ((i < len1) && (ch != '&'))
-			{
-				if (ch == '+')
-				{
-					ch = ' ';
-				}
-				Value.push_back(ch);
-				ch = m_IncomingData[++i];
-			}
-			if (i == len1)
-			{
-				Value.push_back(ch);
-			}
-		}
-		(*this)[URLDecode(Name)] = URLDecode(Value);
-		if (ch == '&')
-		{
-			++i;
-		}
-	}  // for i - m_IncomingData[]
-	*/
 }
 
 
