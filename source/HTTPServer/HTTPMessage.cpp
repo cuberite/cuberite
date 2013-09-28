@@ -99,6 +99,7 @@ bool cHTTPRequest::ParseHeaders(const char * a_IncomingData, size_t a_IdxEnd)
 
 
 
+
 size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_IdxEnd)
 {	
 	// Ignore the initial CRLFs (HTTP spec's "should")

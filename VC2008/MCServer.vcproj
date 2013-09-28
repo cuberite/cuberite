@@ -2728,6 +2728,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\HTTPServer\HTTPFormParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPFormParser.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\HTTPServer\HTTPMessage.cpp"
 					>
 				</File>

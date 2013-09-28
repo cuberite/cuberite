@@ -7,6 +7,7 @@
 #include "HTTPServer.h"
 #include "HTTPMessage.h"
 #include "HTTPConnection.h"
+#include "HTTPFormParser.h"
 
 
 
@@ -27,18 +28,49 @@ class cDebugCallbacks :
 {
 		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
-			// Nothing needed
+			if (cHTTPFormParser::HasFormData(a_Request))
+			{
+				a_Request.SetUserData(new cHTTPFormParser(a_Request));
+			}
 		}
 		
 		
 		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size) override
 		{
-			// TODO
+			cHTTPFormParser * FormParser = (cHTTPFormParser *)(a_Request.GetUserData());
+			if (FormParser != NULL)
+			{
+				FormParser->Parse(a_Data, a_Size);
+			}
 		}
 		
 		
 		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
+			cHTTPFormParser * FormParser = (cHTTPFormParser *)(a_Request.GetUserData());
+			if (FormParser != NULL)
+			{
+				if (FormParser->Finish())
+				{
+					cHTTPResponse Resp;
+					Resp.SetContentType("text/html");
+					a_Connection.Send(Resp);
+					a_Connection.Send("<html><body><table border=1 cellspacing=0><tr><th>Name</th><th>Value</th></tr>\r\n");
+					for (cHTTPFormParser::iterator itr = FormParser->begin(), end = FormParser->end(); itr != end; ++itr)
+					{
+						a_Connection.Send(Printf("<tr><td valign=\"top\"><pre>%s</pre></td><td valign=\"top\"><pre>%s</pre></td></tr>\r\n", itr->first.c_str(), itr->second.c_str()));
+					}  // for itr - FormParser[]
+					a_Connection.Send("</table></body></html>");
+					return;
+				}
+				
+				// Parsing failed:
+				cHTTPResponse Resp;
+				Resp.SetContentType("text/plain");
+				a_Connection.Send(Resp);
+				a_Connection.Send("Form parsing failed");
+			}
+			
 			cHTTPResponse Resp;
 			Resp.SetContentType("text/plain");
 			a_Connection.Send(Resp);

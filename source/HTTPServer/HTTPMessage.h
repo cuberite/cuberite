@@ -71,6 +71,12 @@ public:
 	/// Returns true if the request did contain a Content-Length header
 	bool HasReceivedContentLength(void) const { return (m_ContentLength >= 0); }
 	
+	/// Returns the method used in the request
+	const AString & GetMethod(void) const { return m_Method; }
+	
+	/// Returns the URL used in the request
+	const AString & GetURL(void) const { return m_URL; }
+	
 	/// Sets the UserData pointer that is stored within this request. The request doesn't touch this data (doesn't delete it)!
 	void SetUserData(void * a_UserData) { m_UserData = a_UserData; }
 	
