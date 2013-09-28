@@ -710,7 +710,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				despawn / remove that entity in between the calls. If you need to refer to an entity later, use its
 				UniqueID and {{cWorld|cWorld}}'s entity manipulation functions DoWithEntityByID(), ForEachEntity()
 				or ForEachEntityInChunk() to access the entity again.</p>
-]],
+			]],
 			Functions =
 			{
 				AddPosition =
@@ -1906,6 +1906,18 @@ World:ForEachEntity(
 		},
 	},
 	
+
+	IgnoreClasses =
+	{
+		"coroutine",
+		"debug",
+		"io",
+		"math",
+		"package",
+		"os",
+		"string",
+		"table",
+	},
 	
 	IgnoreFunctions =
 	{
