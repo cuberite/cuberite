@@ -72,6 +72,12 @@ extern AString EscapeString(const AString & a_Message);  // tolua_export
 /// Removes all control codes used by MC for colors and styles
 extern AString StripColorCodes(const AString & a_Message);  // tolua_export
 
+/// URL-Decodes the given string, replacing all "%HH" into the correct characters. Invalid % sequences are left intact
+extern AString URLDecode(const AString & a_String);  // Cannot export to Lua automatically - would generated an extra return value
+
+/// Replaces all occurrences of char a_From inside a_String with char a_To.
+extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
+
 // If you have any other string helper functions, declare them here
 
 

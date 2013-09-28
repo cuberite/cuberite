@@ -658,3 +658,73 @@ AString StripColorCodes(const AString & a_Message)
 
 
 
+
+AString URLDecode(const AString & a_String)
+{
+	AString res;
+	size_t len = a_String.length();
+	res.reserve(len);
+	for (size_t i = 0; i < len; i++)
+	{
+		char ch = a_String[i];
+		if ((ch != '%') || (i > len - 3))
+		{
+			res.push_back(ch);
+			continue;
+		}
+		// Decode the hex value:
+		char hi = a_String[i + 1], lo = a_String[i + 2];
+		if ((hi >= '0') && (hi <= '9'))
+		{
+			hi = hi - '0';
+		}
+		else if ((hi >= 'a') && (hi <= 'f'))
+		{
+			hi = hi - 'a' + 10;
+		}
+		else if ((hi >= 'A') && (hi <= 'F'))
+		{
+			hi = hi - 'F' + 10;
+		}
+		else
+		{
+			res.push_back(ch);
+			continue;
+		}
+		if ((lo >= '0') && (lo <= '9'))
+		{
+			lo = lo - '0';
+		}
+		else if ((lo >= 'a') && (lo <= 'f'))
+		{
+			lo = lo - 'a' + 10;
+		}
+		else if ((lo >= 'A') && (lo <= 'F'))
+		{
+			lo = lo - 'A' + 10;
+		}
+		else
+		{
+			res.push_back(ch);
+			continue;
+		}
+		res.push_back((hi << 4) | lo);
+		i += 2;
+	}  // for i - a_String[]
+	return res;
+}
+
+
+
+
+
+AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To)
+{
+	AString res(a_String);
+	std::replace(res.begin(), res.end(), a_From, a_To);
+	return res;
+}
+
+
+
+
