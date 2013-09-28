@@ -69,6 +69,7 @@ class cDebugCallbacks :
 				Resp.SetContentType("text/plain");
 				a_Connection.Send(Resp);
 				a_Connection.Send("Form parsing failed");
+				return;
 			}
 			
 			cHTTPResponse Resp;

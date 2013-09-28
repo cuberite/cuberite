@@ -34,7 +34,7 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request) :
 			m_Kind = fpkFormUrlEncoded;
 			return;
 		}
-		if (a_Request.GetContentType() == "multipart/form-data")
+		if (strncmp(a_Request.GetContentType().c_str(), "multipart/form-data", 19) == 0)
 		{
 			m_Kind = fpkMultipart;
 			return;
@@ -98,7 +98,7 @@ bool cHTTPFormParser::HasFormData(const cHTTPRequest & a_Request)
 {
 	return (
 		(a_Request.GetContentType() == "application/x-www-form-urlencoded") ||
-		(a_Request.GetContentType() == "multipart/form-data") ||
+		(strncmp(a_Request.GetContentType().c_str(), "multipart/form-data", 19) == 0) ||
 		(
 			(a_Request.GetMethod() == "GET") &&
 			(a_Request.GetURL().find('?') != AString::npos)
