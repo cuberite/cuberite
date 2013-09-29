@@ -17,11 +17,11 @@
 #include "Protocol/ProtocolRecognizer.h"  // for protocol version constants
 #include "CommandOutput.h"
 #include "DeadlockDetect.h"
+#include "OSSupport/Timer.h"
 
 #include "../iniFile/iniFile.h"
 
 #include <iostream>
-#include <time.h>
 
 
 
@@ -92,16 +92,9 @@ void cRoot::InputThread(void * a_Params)
 
 void cRoot::Start(void)
 {
-	time_t timer;
-	struct tm y2k;
-	double seconds;
-	double finishseconds;
+	cTimer Time;
 
-	y2k.tm_hour = 0;   y2k.tm_min = 0; y2k.tm_sec = 0;
-	y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
-
-	time(&timer);
-	seconds = difftime(timer,mktime(&y2k));
+	long long mseconds = Time.GetNowTime();
 
 	cDeadlockDetect dd;
 	delete m_Log;
@@ -188,12 +181,11 @@ void cRoot::Start(void)
 		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
 		#endif
 
-		time(&timer);
-		finishseconds = difftime(timer,mktime(&y2k));
-		finishseconds -= seconds;
+		long long finishmseconds = Time.GetNowTime();
+		finishmseconds -= mseconds;
 
-		if ((finishseconds > 1) || (finishseconds == 0)) { LOG("Startup complete, took %.f seconds!", finishseconds); }
-		else { LOG("Startup complete, took 1 second!"); }
+		if ((finishmseconds > 1) || (finishmseconds == 0)) { LOG("Startup complete, took %i miliseconds!", finishmseconds); } // Milisecs, why not :P
+		else { LOG("Startup complete, took 1 milisecond!"); }
 
 		while (!m_bStop && !m_bRestart)  // These are modified by external threads
 		{

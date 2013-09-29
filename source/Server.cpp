@@ -206,8 +206,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		return false;
 	}
 
-	LOGD("Compatible clients: %s", MCS_CLIENT_VERSIONS);
-	LOGD("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
+	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
+	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
 	if (cSocket::WSAStartup() != 0) // Only does anything on Windows, but whatever
 	{
