@@ -659,8 +659,8 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			},
 			Constants =
 			{
-				ContentsWidth = { Notes = "Width (X) of the cItemGrid representing the contents" },
-				ContentsHeight = { Notes = "Height (Y) of the cItemGrid representing the contents" },
+				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid}} representing the contents" },
+				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid}} representing the contents" },
 			},
 			
 			Inherits = "cBlockEntity";
