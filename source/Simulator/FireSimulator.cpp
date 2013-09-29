@@ -221,7 +221,7 @@ void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk *
 
 int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	if (a_RelY > 0)
+	if ((a_RelY > 0) && (a_RelY < cChunkDef::Height - 1))
 	{
 		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 		if (IsForever(BlockBelow))
@@ -233,10 +233,6 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		{
 			return m_BurnStepTimeFuel;
 		}
-	}
-	if ((a_RelY < cChunkDef::Height - 1) && IsFuel(a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ)))
-	{
-		return m_BurnStepTimeFuel;
 	}
 	
 	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
@@ -251,7 +247,23 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 			}
 		}
 	}  // for i - gCrossCoords[]
-	return m_BurnStepTimeNonfuel;
+
+	if ((a_RelY > 0) && (a_RelY < cChunkDef::Height - 1))
+	{
+		// Checked through everything, nothing was flammable
+		// If block below isn't solid, we can't have fire, otherwise, we have non-fueled fire
+		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		if (g_BlockIsSolid[BlockBelow])
+		{
+			return m_BurnStepTimeNonfuel;
+		}
+		else
+		{
+			// SetBlock just to make sure fire doesn't spawn
+			a_Chunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+			return 0;
+		}
+	}
 }
 
 
