@@ -879,6 +879,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			Desc = "",
 			Functions = {},
 			Constants = {},
+			Inherits = "cProjectileEntity",
 		} ,
 		
 		cGroup =
@@ -1063,10 +1064,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			Desc = [[This class represents a 2D array of items. It is used as the underlying storage and API for all cases that use a grid of items:
 <li>Chest contents</li>
 <li>(TODO) Chest minecart contents</li>
-<li>Dispenser contents</li>
-<li>Dropper contents</li>
-<li>(TODO) Furnace contents (?)</li>
-<li>(TODO) Hopper contents</li>
+<li>{{cDispenserEntity|Dispenser|| contents</li>
+<li>{{cDropperEntity|Dropper}} contents</li>
+<li>{{cFurnaceEntity|Furnace}} contents (?)</li>
+<li>{{cHopperEntity|Hopper}} contents</li>
 <li>(TODO) Hopper minecart contents</li>
 <li>Player Inventory areas</li>
 <li>(TODO) Trapped chest contents</li>
@@ -1225,6 +1226,7 @@ a_Player:OpenWindow(Window);
 					]],
 				},
 			},  -- AdditionalInfo
+			Inherits = "cWindow",
 		},  -- cLuaWindow
 
 		cMonster =
