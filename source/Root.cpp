@@ -184,8 +184,7 @@ void cRoot::Start(void)
 		long long finishmseconds = Time.GetNowTime();
 		finishmseconds -= mseconds;
 
-		if ((finishmseconds > 1) || (finishmseconds == 0)) { LOG("Startup complete, took %i miliseconds!", finishmseconds); } // Milisecs, why not :P
-		else { LOG("Startup complete, took 1 milisecond!"); }
+		LOG("Startup complete, took %i ms!", finishmseconds);
 
 		while (!m_bStop && !m_bRestart)  // These are modified by external threads
 		{
