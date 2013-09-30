@@ -362,6 +362,9 @@ function ReadDescriptions(a_API)
 			elseif (fn.Name == ".sub") then
 				fn.DocID = "operator_sub";
 				fn.Name = "<i>operator -</i>";
+			elseif (fn.Name == ".eq") then
+				fn.DocID = "operator_sub";
+				fn.Name = "<i>operator ==</i>";
 			end
 		end
 		
