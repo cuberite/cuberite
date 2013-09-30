@@ -196,6 +196,23 @@ AString & StrToUpper(AString & s)
 
 
 
+AString & StrToLower(AString & s)
+{
+	AString::iterator i = s.begin();
+	AString::iterator end = s.end();
+
+	while (i != end)
+	{
+		*i = (char)tolower(*i);
+		++i;
+	}
+	return s;
+}
+
+
+
+
+
 int NoCaseCompare(const AString & s1, const AString & s2)
 {
 	#ifdef _MSC_VER

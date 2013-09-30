@@ -45,6 +45,9 @@ extern AString TrimString(const AString & str);  // tolua_export
 /// In-place string conversion to uppercase; returns the same string
 extern AString & StrToUpper(AString & s);
 
+/// In-place string conversion to lowercase; returns the same string
+extern AString & StrToLower(AString & s);
+
 /// Case-insensitive string comparison; returns 0 if the strings are the same
 extern int NoCaseCompare(const AString & s1, const AString & s2);  // tolua_export
 
