@@ -221,7 +221,7 @@ void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk *
 
 int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	if ((a_RelY > 0) && (a_RelY < cChunkDef::Height - 1))
+	if (a_RelY > 0)
 	{
 		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 		if (IsForever(BlockBelow))
@@ -260,7 +260,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		else
 		{
 			// SetBlock just to make sure fire doesn't spawn
-			a_Chunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
 			return 0;
 		}
 	}
