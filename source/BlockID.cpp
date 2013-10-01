@@ -603,6 +603,7 @@ public:
 		g_BlockTransparent[E_BLOCK_FIRE]                  = true;
 		g_BlockTransparent[E_BLOCK_FLOWER_POT]            = true;
 		g_BlockTransparent[E_BLOCK_GLASS]                 = true;
+		g_BlockTransparent[E_BLOCK_GLASS_PANE]            = true;
 		g_BlockTransparent[E_BLOCK_ICE]                   = true;
 		g_BlockTransparent[E_BLOCK_IRON_DOOR]             = true;
 		g_BlockTransparent[E_BLOCK_LEAVES]                = true;
@@ -645,7 +646,6 @@ public:
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_REPEATER_ON]  = true;
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_TORCH_OFF]    = true;
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_TORCH_ON]     = true;
-		g_BlockOneHitDig[E_BLOCK_REDSTONE_WIRE]         = true;
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_WIRE]         = true;
 		g_BlockOneHitDig[E_BLOCK_RED_MUSHROOM]          = true;
 		g_BlockOneHitDig[E_BLOCK_RED_ROSE]              = true;
