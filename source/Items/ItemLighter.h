@@ -26,7 +26,7 @@ public:
 			return false;
 		}
 		
-		a_Player->UseEquippedItem();		
+		a_Player->UseEquippedItem();
 
 		switch (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))
 		{
