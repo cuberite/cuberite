@@ -234,16 +234,16 @@ public:
 	/// Returns the curently equipped weapon; empty item if none
 	virtual cItem GetEquippedWeapon(void) const { return cItem(); }
 	
-	/// Returns the currently equipped helmet; empty item if nonte
+	/// Returns the currently equipped helmet; empty item if none
 	virtual cItem GetEquippedHelmet(void) const { return cItem(); }
 	
-	/// Returns the currently equipped chestplate; empty item if nonte
+	/// Returns the currently equipped chestplate; empty item if none
 	virtual cItem GetEquippedChestplate(void) const { return cItem(); }
 
-	/// Returns the currently equipped leggings; empty item if nonte
+	/// Returns the currently equipped leggings; empty item if none
 	virtual cItem GetEquippedLeggings(void) const { return cItem(); }
 	
-	/// Returns the currently equipped boots; empty item if nonte
+	/// Returns the currently equipped boots; empty item if none
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
 
 	/// Called when the health drops below zero. a_Killer may be NULL (environmental damage)

@@ -51,7 +51,7 @@ cFurnaceRecipe::~cFurnaceRecipe()
 void cFurnaceRecipe::ReloadRecipes(void)
 {
 	ClearRecipes();
-	LOG("-- Loading furnace recipes --");
+	LOGD("Loading furnace recipes...");
 
 	std::ifstream f;
 	char a_File[] = "furnace.txt";
@@ -175,7 +175,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	{
 		LOGERROR("ERROR: FurnaceRecipe, syntax error" );
 	}
-	LOG("Got %u furnace recipes, and %u fuels.", m_pState->Recipes.size(), m_pState->Fuel.size());
+	LOG("Loaded %u furnace recipes and %u fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
 }
 
 

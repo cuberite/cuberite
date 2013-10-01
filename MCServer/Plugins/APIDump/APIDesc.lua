@@ -659,8 +659,8 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			},
 			Constants =
 			{
-				ContentsWidth = { Notes = "Width (X) of the cItemGrid representing the contents" },
-				ContentsHeight = { Notes = "Height (Y) of the cItemGrid representing the contents" },
+				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid}} representing the contents" },
+				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid}} representing the contents" },
 			},
 			
 			Inherits = "cBlockEntity";
@@ -691,67 +691,149 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 
 		cEntity =
 		{
-			Desc = [[A cEntity object represents an object in the world, it has a position and orientation. cEntity is an abstract class, and can not be instantiated directly, instead, all entities are implemented as subclasses. The cEntity class works as the common interface for the operations that all (most) entities support.
-</p>
-		<p>All cEntity objects have an Entity Type so it can be determined what kind of entity it is efficiently. Entities also have a class inheritance awareness, they know their class name, their parent class' name and can decide if there is a class within their inheritance chain. Since these functions operate on strings, they are slightly slower than checking the entity type directly, on the other hand, they are more specific (compare etMob vs "cSpider" class name).
-</p>
-		<p>Note that you should not store a cEntity object between two hooks' calls, because MCServer may remove that entity in between the calls. If you need to refer to an entity later, use its UniqueID and {{cWorld|cWorld}}'s entity manipulation functions to access the entity.
-]],
+			Desc = [[
+				A cEntity object represents an object in the world, it has a position and orientation. cEntity is an
+				abstract class, and can not be instantiated directly, instead, all entities are implemented as
+				subclasses. The cEntity class works as the common interface for the operations that all (most)
+				entities support.</p>
+				<p>
+				All cEntity objects have an Entity Type so it can be determined what kind of entity it is
+				efficiently. Entities also have a class inheritance awareness, they know their class name,
+				their parent class' name and can decide if there is a class within their inheritance chain.
+				Since these functions operate on strings, they are slightly slower than checking the entity type
+				directly, on the other hand, they are more specific directly. To check if the entity is a spider,
+				you need to call IsMob(), then cast the object to {{cMonster}} and finally compare
+				{{cMonster}}:GetMonsterType() to mtSpider. GetClass(), on the other hand, returns "cSpider"
+				directly.</p>
+				<p>
+				Note that you should not store a cEntity object between two hooks' calls, because MCServer may
+				despawn / remove that entity in between the calls. If you need to refer to an entity later, use its
+				UniqueID and {{cWorld|cWorld}}'s entity manipulation functions DoWithEntityByID(), ForEachEntity()
+				or ForEachEntityInChunk() to access the entity again.</p>
+			]],
 			Functions =
 			{
+				AddPosition =
+				{
+					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Moves the entity by the specified amount in each axis direction" },
+					{ Params = "{{Vector3d|Offset}}", Return = "", Notes = "Moves the entity by the specified amount in each direction" },
+				},
+				AddPosX = { Params = "OffsetX", Return = "", Notes = "Moves the entity by the specified amount in the X axis direction" },
+				AddPosY = { Params = "OffsetY", Return = "", Notes = "Moves the entity by the specified amount in the Y axis direction" },
+				AddPosZ = { Params = "OffsetZ", Return = "", Notes = "Moves the entity by the specified amount in the Z axis direction" },
+				AddSpeed =
+				{
+					{ Params = "AddX, AddY, AddZ", Return = "", Notes = "Adds the specified amount of speed in each axis direction." },
+					{ Params = "{{Vector3d|Add}}", Return = "", Notes = "Adds the specified amount of speed in each axis direction." },
+				},
+				AddSpeedX = { Params = "AddX", Return = "", Notes = "Adds the specified amount of speed in the X axis direction." },
+				AddSpeedY = { Params = "AddY", Return = "", Notes = "Adds the specified amount of speed in the Y axis direction." },
+				AddSpeedZ = { Params = "AddZ", Return = "", Notes = "Adds the specified amount of speed in the Z axis direction." },
 				Destroy = { Params = "", Return = "", Notes = "Schedules the entity to be destroyed" },
+				GetArmorCoverAgainst = { Params = "AttackerEntity, DamageType, RawDamage", Return = "number", Notes = "Returns the number of hitpoints out of RawDamage that the currently equipped armor would cover. See {{TakeDamageInfo}} for more information on attack damage." },
 				GetChunkX = { Params = "", Return = "number", Notes = "Returns the X-coord of the chunk in which the entity is placed" },
-				GetChunkY = { Params = "", Return = "number", Notes = "Returns the Y-coord of the chunk in which the entity is placed" },
 				GetChunkZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the chunk in which the entity is placed" },
-				GetClass = { Params = "", Return = "string", Notes = "Returns the classname of the entity, such as \"spider\" or \"pickup\"" },
+				GetClass = { Params = "", Return = "string", Notes = "Returns the classname of the entity, such as \"cSpider\" or \"cPickup\"" },
 				GetClassStatic = { Params = "", Return = "string", Notes = "Returns the entity classname that this class implements. Each descendant overrides this function. Is static" },
-				GetEntityType = { Params = "", Return = "cEntity.eEntityType", Notes = "Returns the type of the entity, one of the etXXX constants" },
+				GetEntityType = { Params = "", Return = "eEntityType", Notes = "Returns the type of the entity, one of the etXXX constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call." },
+				GetEquippedBoots = { Params = "", Return = "{{cItem}}", Notes = "Returns the boots that the entity has equipped. Returns an empty cItem if no boots equipped or not applicable." },
+				GetEquippedChestplate = { Params = "", Return = "{{cItem}}", Notes = "Returns the chestplate that the entity has equipped. Returns an empty cItem if no chestplate equipped or not applicable." },
+				GetEquippedHelmet = { Params = "", Return = "{{cItem}}", Notes = "Returns the helmet that the entity has equipped. Returns an empty cItem if no helmet equipped or not applicable." },
+				GetEquippedLeggings = { Params = "", Return = "{{cItem}}", Notes = "Returns the leggings that the entity has equipped. Returns an empty cItem if no leggings equipped or not applicable." },
+				GetEquippedWeapon = { Params = "", Return = "{{cItem}}", Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable." },
+				GetGravity = { Params = "", Return = "number", Notes = "Returns the number that is used as the gravity for physics simulation. 1G (9.78) by default." },
+				GetHeadYaw = { Params = "", Return = "number", Notes = "Returns the pitch of the entity's head (FIXME: Rename to GetHeadPitch() )." },
+				GetHealth = { Params = "", Return = "number", Notes = "Returns the current health of the entity." },
+				GetHeight = { Params = "", Return = "number", Notes = "Returns the height (Y size) of the entity" },
+				GetKnockbackAmountAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the amount of knockback that the currently equipped items would cause when attacking the ReceiverEntity." },
 				GetLookVector = { Params = "", Return = "Vector3f", Notes = "Returns the vector that defines the direction in which the entity is looking" },
+				GetMass = { Params = "", Return = "number", Notes = "Returns the mass of the entity. Currently unused." },
+				GetMaxHealth = { Params = "", Return = "number", Notes = "Returns the maximum number of hitpoints this entity is allowed to have." },
 				GetParentClass = { Params = "", Return = "string", Notes = "Returns the name of the direct parent class for this entity" },
 				GetPitch = { Params = "", Return = "number", Notes = "Returns the pitch (nose-down rotation) of the entity" },
+				GetPosition = { Params = "", Return = "Vector3d", Notes = "Returns the entity's pivot position as a 3D vector" },
 				GetPosX = { Params = "", Return = "number", Notes = "Returns the X-coord of the entity's pivot" },
 				GetPosY = { Params = "", Return = "number", Notes = "Returns the Y-coord of the entity's pivot" },
 				GetPosZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the entity's pivot" },
-				GetPosition = { Params = "", Return = "Vector3d", Notes = "Returns the entity's pivot position as a 3D vector" },
-				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity" },
-				GetRot = { Params = "", Return = "Vector3f", Notes = "Returns the entire rotation vector (Rotation, Pitch, Roll)" },
-				GetRotation = { Params = "", Return = "number", Notes = "Returns the rotation (direction) of the entity" },
+				GetRawDamageAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the raw damage that this entity's equipment would cause when attacking the ReceiverEntity. This includes this entity's weapon {{cEnchantments|enchantments}}, but excludes the receiver's armor or potion effects. See {{TakeDamageInfo}} for more information on attack damage." },
+				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity. Currently unused." },
+				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the entire rotation vector (Yaw, Pitch, Roll)" },
+				GetRotation = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. FIXME: Rename to GetYaw()." },
 				GetSpeed = { Params = "", Return = "Vector3d", Notes = "Returns the complete speed vector of the entity" },
 				GetSpeedX = { Params = "", Return = "number", Notes = "Returns the X-part of the speed vector" },
 				GetSpeedY = { Params = "", Return = "number", Notes = "Returns the Y-part of the speed vector" },
 				GetSpeedZ = { Params = "", Return = "number", Notes = "Returns the Z-part of the speed vector" },
-				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity" },
+				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity within the running server. Note that this ID is not persisted to the data files." },
+				GetWidth = { Params = "", Return = "number", Notes = "Returns the width (X and Z size) of the entity." },
 				GetWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world where the entity resides" },
+				Heal = { Params = "Hitpoints", Return = "", Notes = "Heals the specified number of hitpoints. Hitpoints is expected to be a positive number." },
 				IsA = { Params = "ClassName", Return = "bool", Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself" },
-				IsCrouched = { Params = "", Return = "bool", Notes = "Returns true if the entity is crouched. False for entities that don't support crouching" },
-				IsDestroyed = { Params = "", Return = "bool", Notes = "Returns true if the entity has been destroyed and is awaiting removal from the internal structures" },
-				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a minecart" },
-				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any mob" },
+				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
+				IsCrouched = { Params = "", Return = "bool", Notes = "Returns true if the entity is crouched. Always false for entities that don't support crouching." },
+				IsDestroyed = { Params = "", Return = "bool", Notes = "Returns true if the entity has been destroyed and is awaiting removal from the internal structures." },
+				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cMinecart|minecart}}" },
+				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any {{cMonster|mob}}." },
 				IsOnFire = { Params = "", Return = "bool", Notes = "Returns true if the entity is on fire" },
-				IsPickup = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a pickup" },
-				IsPlayer = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a player" },
-				IsTNT = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a TNT entity" },
+				IsPickup = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPickup|pickup}}." },
+				IsPlayer = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPlayer|player}}" },
 				IsRclking = { Params = "", Return = "bool", Notes = "Currently unimplemented" },
-				IsSprinting = { Params = "", Return = "bool", Notes = "Returns true if the entity is sprinting. ENtities that cannot sprint return always false" },
+				IsRiding = { Params = "", Return = "bool", Notes = "Returns true if the entity is attached to (riding) another entity." },
+				IsSprinting = { Params = "", Return = "bool", Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false" },
+				IsTNT = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cTNTEntity|TNT entity}}" },
+				KilledBy = { Notes = "FIXME: Remove this from API" },
+				SetGravity = { Params = "Gravity", Return = "", Notes = "Sets the number that is used as the gravity for physics simulation. 1G (9.78) by default." },
+				SetHeadYaw = { Params = "HeadPitch", Return = "", Notes = "Sets the head pitch (FIXME: Rename to SetHeadPitch() )." },
+				SetHealth = { Params = "Hitpoints", Return = "", Notes = "Sets the entity's health to the specified amount of hitpoints. Doesn't broadcast any hurt animation. Doesn't kill the entity if health drops below zero. Use the TakeDamage() function instead for taking damage." },
+				SetHeight = { Params = "", Return = "", Notes = "FIXME: Remove this from API" },
+				SetMass = { Params = "Mass", Return = "", Notes = "Sets the mass of the entity. Currently unused." },
+				SetMaxHealth = { Params = "MaxHitpoints", Return = "", Notes = "Sets the maximum hitpoints of the entity. If current health is above MaxHitpoints, it is capped to MaxHitpoints." },
 				SetPitch = { Params = "number", Return = "", Notes = "Sets the pitch (nose-down rotation) of the entity" },
+				SetPitchFromSpeed = { Params = "", Return = "", Notes = "Sets the entity pitch to match its speed (entity looking forwards as it moves)" },
+				SetPosition =
+				{
+					{ Params = "PosX, PosY, PosZ", Return = "", Notes = "Sets all three coords of the entity's pivot" },
+					{ Params = "{{Vector3d|Vector3d}}", Return = "", Notes = "Sets all three coords of the entity's pivot" },
+				},
 				SetPosX = { Params = "number", Return = "", Notes = "Sets the X-coord of the entity's pivot" },
 				SetPosY = { Params = "number", Return = "", Notes = "Sets the Y-coord of the entity's pivot" },
 				SetPosZ = { Params = "number", Return = "", Notes = "Sets the Z-coord of the entity's pivot" },
-				SetPosition = { Params = "X, Y, Z", Return = "", Notes = "Sets all three coords of the entity's pivot" },
-				SetPosition = { Params = "{{Vector3d|Vector3d}}", Return = "", Notes = ":::" },
-				SetRoll = { Params = "number", Return = "", Notes = "Sets the roll (sideways rotation) of the entity" },
-				SetRot = { Params = "{{Vector3f|Vector3f}}", Return = "", Notes = "Sets the entire rotation vector (Rotation, Pitch, Roll)" },
-				SetRotation = { Params = "number", Return = "", Notes = "Sets the rotation (direction) of the entity" },
+				SetRoll = { Params = "number", Return = "", Notes = "Sets the roll (sideways rotation) of the entity. Currently unused." },
+				SetRot = { Params = "{{Vector3f|Rotation}}", Return = "", Notes = "Sets the entire rotation vector (Yaw, Pitch, Roll)" },
+				SetRotation = { Params = "number", Return = "", Notes = "Sets the yaw (direction) of the entity. FIXME: Rename to SetYaw()." },
+				SetRotationFromSpeed = { Params = "", Return = "", Notes = "Sets the entity's yaw to match its current speed (entity looking forwards as it moves). (FIXME: Rename to SetYawFromSpeed)" },
+				SetSpeed =
+				{
+					{ Params = "SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Sets the current speed of the entity" },
+					{ Params = "{{Vector3d|Speed}}", Return = "", Notes = "Sets the current speed of the entity" },
+				},
+				SetSpeedX = { Params = "SpeedX", Return = "", Notes = "Sets the X component of the entity speed" },
+				SetSpeedY = { Params = "SpeedY", Return = "", Notes = "Sets the Y component of the entity speed" },
+				SetSpeedZ = { Params = "SpeedZ", Return = "", Notes = "Sets the Z component of the entity speed" },
+				SetWidth = { Params = "", Return = "", Notes = "FIXME: Remove this from API" },
+				StartBurning = { Params = "NumTicks", Return = "", Notes = "Sets the entity on fire for the specified number of ticks. If entity is on fire already, makes it burn for either NumTicks or the number of ticks left from the previous fire, whichever is larger." },
+				SteerVehicle = { Params = "ForwardAmount, SidewaysAmount", Return = "", Notes = "Applies the specified steering to the vehicle this entity is attached to. Ignored if not attached to any entity." },
+				StopBurning = { Params = "", Return = "", Notes = "Extinguishes the entity fire, cancels all fire timers." },
+				TakeDamage =
+				{
+					{ Params = "AttackerEntity", Return = "", Notes = "Causes this entity to take damage that AttackerEntity would inflict. Includes their weapon and this entity's armor." },
+					{ Params = "DamageType, AttackerEntity, RawDamage, KnockbackAmount", Return = "", Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The final damage is calculated from RawDamage using the currently equipped armor." },
+					{ Params = "DamageType, ArrackerEntity, RawDamage, FinalDamage, KnockbackAmount", Return = "", Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The values are wrapped into a {{TakeDamageInfo}} structure and applied directly." },
+				},
+				TeleportToCoords = { Params = "PosX, PosY, PosZ", Return = "", Notes = "Teleports the entity to the specified coords." },
+				TeleportToEntity = { Params = "DestEntity", Return = "", Notes = "Teleports this entity to the specified destination entity." },
 			},
 			Constants =
 			{
-				etEntity = { Notes = "N" },
-				etPlayer = { Notes = "{{cPlayer|cPlayer" },
-				etPickup = { Notes = "{{cPickup|cPickup" },
-				etMob = { Notes = "{{cMonster|cMonster}} and descendan" },
-				etFallingBlock = { Notes = "{{cFallingBlock|cFallingBlock" },
-				etMinecart = { Notes = "{{cMinecart|cMinecart" },
-				etTNT = { Notes = "{{cTNTEntity|cTNTEntity" },
+				etBoat = { Notes = "The entity is a {{cBoat}}" },
+				etEntity = { Notes = "No further specialization available" },
+				etFallingBlock = { Notes = "The entity is a {{cFallingBlock}}" },
+				etMob = { Notes = "The entity is a {{cMonster}} descendant" },
+				etMonster = { Notes = "The entity is a {{cMonster}} descendant" },
+				etMinecart = { Notes = "The entity is a {{cMinecart}} descendant" },
+				etPlayer = { Notes = "The entity is a {{cPlayer}}" },
+				etPickup = { Notes = "The entity is a {{cPickup}}" },
+				etProjectile = { Notes = "The entity is a {{cProjectile}} descendant" },
+				etTNT = { Notes = "The entity is a {{cTNTEntity}}" },
 			},
 		},
 
@@ -797,6 +879,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			Desc = "",
 			Functions = {},
 			Constants = {},
+			Inherits = "cProjectileEntity",
 		} ,
 		
 		cGroup =
@@ -981,10 +1064,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			Desc = [[This class represents a 2D array of items. It is used as the underlying storage and API for all cases that use a grid of items:
 <li>Chest contents</li>
 <li>(TODO) Chest minecart contents</li>
-<li>Dispenser contents</li>
-<li>Dropper contents</li>
-<li>(TODO) Furnace contents (?)</li>
-<li>(TODO) Hopper contents</li>
+<li>{{cDispenserEntity|Dispenser|| contents</li>
+<li>{{cDropperEntity|Dropper}} contents</li>
+<li>{{cFurnaceEntity|Furnace}} contents (?)</li>
+<li>{{cHopperEntity|Hopper}} contents</li>
 <li>(TODO) Hopper minecart contents</li>
 <li>Player Inventory areas</li>
 <li>(TODO) Trapped chest contents</li>
@@ -995,33 +1078,54 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			{
 				AddItem = { Params = "{{cItem|cItem}}, [AllowNewStacks]", Return = "number", Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Returns the number of items added" },
 				AddItems = { Params = "{{cItems|cItems}}, [AllowNewStacks]", Return = "number", Notes = "Same as AddItem, but for several items at once" },
-				ChangeSlotCount = { Params = "SlotNum, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid SlotNum" },
-				ChangeSlotCount = { Params = "X, Y, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid slot coords" },
+				ChangeSlotCount =
+				{
+					{ Params = "SlotNum, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid SlotNum" },
+					{ Params = "X, Y, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid slot coords" },
+				},
 				Clear = { Params = "", Return = "", Notes = "Empties all slots" },
 				CopyToItems = { Params = "{{cItems|cItems}}", Return = "", Notes = "Copies all non-empty slots into the cItems object provided; original cItems contents are preserved" },
-				DamageItem = { Params = "SlotNum, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
-				DamageItem = { Params = "X, Y, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
-				EmptySlot = { Params = "SlotNum", Return = "", Notes = "Destroys the item in the specified slot" },
-				EmptySlot = { Params = "X, Y", Return = "", Notes = "Destroys the item in the specified slot" },
+				DamageItem =
+				{
+					{ Params = "SlotNum, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
+					{ Params = "X, Y, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
+				},
+				EmptySlot =
+				{
+					{ Params = "SlotNum", Return = "", Notes = "Destroys the item in the specified slot" },
+					{ Params = "X, Y", Return = "", Notes = "Destroys the item in the specified slot" },
+				},
 				GetFirstEmptySlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the first empty slot, -1 if all slots are full" },
 				GetHeight = { Params = "", Return = "number", Notes = "Returns the Y dimension of the grid" },
 				GetLastEmptySlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the last empty slot, -1 if all slots are full" },
 				GetNextEmptySlot = { Params = "StartFrom", Return = "number", Notes = "Returns the SlotNumber of the first empty slot following StartFrom, -1 if all the following slots are full" },
 				GetNumSlots = { Params = "", Return = "number", Notes = "Returns the total number of slots in the grid (Width * Height)" },
-				GetSlot = { Params = "SlotNumber", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
-				GetSlot = { Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
+				GetSlot =
+				{
+					{ Params = "SlotNumber", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
+					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
+				},
 				GetSlotCoords = { Params = "SlotNum", Return = "number, number", Notes = "Returns the X and Y coords for the specified SlotNumber. Returns \"-1, -1\" on invalid SlotNumber" },
 				GetSlotNum = { Params = "X, Y", Return = "number", Notes = "Returns the SlotNumber for the specified slot coords. Returns -1 on invalid coords" },
 				GetWidth = { Params = "", Return = "number", Notes = "Returns the X dimension of the grid" },
 				HasItems = { Params = "{{cItem|cItem}}", Return = "bool", Notes = "Returns true if there are at least as many items of the specified type as in the parameter" },
 				HowManyCanFit = { Params = "{{cItem|cItem}}", Return = "number", Notes = "Returns the number of the specified items that can fit in the storage, including empty slots" },
 				HowManyItems = { Params = "{{cItem|cItem}}", Return = "number", Notes = "Returns the number of the specified items that are currently stored" },
-				IsSlotEmpty = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
-				IsSlotEmpty = { Params = "X, Y", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
-				RemoveOneItem = { Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
-				RemoveOneItem = { Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
-				SetSlot = { Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
-				SetSlot = { Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
+				IsSlotEmpty =
+				{
+					{ Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
+					{ Params = "X, Y", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
+				},
+				RemoveOneItem =
+				{
+					{ Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
+					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
+				},
+				SetSlot =
+				{
+					{ Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
+					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
+				},
 			},
 			Constants =
 			{
@@ -1038,13 +1142,19 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			Functions =
 			{
 				constructor = { Params = "", Return = "cItems", Notes = "Creates a new cItems object" },
-				Add = { Params = "Index, {{cItem|cItem}}", Return = "", Notes = "Adds a new item to the end of the collection" },
-				Add = { Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Adds a new item to the end of the collection" },
+				Add =
+				{
+					{ Params = "{{cItem|cItem}}", Return = "", Notes = "Adds a new item to the end of the collection" },
+					{ Params = "ItemType, ItemCount, ItemDamage", Return = "", Notes = "Adds a new item to the end of the collection" },
+				},
 				Clear = { Params = "", Return = "", Notes = "Removes all items from the collection" },
 				Delete = { Params = "Index", Return = "", Notes = "Deletes item at the specified index" },
 				Get = { Params = "Index", Return = "{{cItem|cItem}}", Notes = "Returns the item at the specified index" },
-				Set = { Params = "Index, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified index to the specified item" },
-				Set = { Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified index to the specified item" },
+				Set =
+				{
+					{ Params = "Index, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified index to the specified item" },
+					{ Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified index to the specified item" },
+				},
 				Size = { Params = "", Return = "number", Notes = "Returns the number of items in the collection" },
 			},
 			Constants =
@@ -1143,6 +1253,7 @@ a_Player:OpenWindow(Window);
 					]],
 				},
 			},  -- AdditionalInfo
+			Inherits = "cWindow",
 		},  -- cLuaWindow
 
 		cMonster =
@@ -1824,6 +1935,18 @@ World:ForEachEntity(
 		},
 	},
 	
+
+	IgnoreClasses =
+	{
+		"coroutine",
+		"debug",
+		"io",
+		"math",
+		"package",
+		"os",
+		"string",
+		"table",
+	},
 	
 	IgnoreFunctions =
 	{
