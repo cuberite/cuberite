@@ -43,7 +43,7 @@ cGroupManager::~cGroupManager()
 cGroupManager::cGroupManager()
 	: m_pState( new sGroupManagerState )
 {
-	LOG("-- Loading Groups --");
+	LOGD("-- Loading Groups --");
 	cIniFile IniFile("groups.ini");
 	if (!IniFile.ReadFile())
 	{
@@ -57,7 +57,7 @@ cGroupManager::cGroupManager()
 		std::string KeyName = IniFile.GetKeyName( i );
 		cGroup* Group = GetGroup( KeyName.c_str() );
 
-		LOG("Loading group: %s", KeyName.c_str() );
+		LOGD("Loading group: %s", KeyName.c_str() );
 
 		Group->SetName( KeyName );
 		char Color = IniFile.GetValue( KeyName, "Color", "-" )[0];
@@ -73,7 +73,6 @@ cGroupManager::cGroupManager()
 			for( unsigned int i = 0; i < Split.size(); i++)
 			{
 				Group->AddCommand( Split[i] );
-				//LOG("%s", Split[i].c_str() );
 			}
 		}
 
@@ -84,7 +83,6 @@ cGroupManager::cGroupManager()
 			for( unsigned int i = 0; i < Split.size(); i++)
 			{
 				Group->AddPermission( Split[i] );
-				//LOGINFO("Permission: %s", Split[i].c_str() );
 			}
 		}
 
@@ -98,7 +96,7 @@ cGroupManager::cGroupManager()
 			}
 		}
 	}
-	LOG("-- Groups Successfully Loaded --");
+	LOGD("-- Groups Successfully Loaded --");
 }
 
 
