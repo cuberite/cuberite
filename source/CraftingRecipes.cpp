@@ -310,7 +310,7 @@ void cCraftingRecipes::GetRecipe(const cPlayer * a_Player, const cCraftingGrid &
 
 void cCraftingRecipes::LoadRecipes(void)
 {
-	LOG("-- Loading crafting recipes from crafting.txt --");
+	LOGD("Loading crafting recipes from crafting.txt...");
 	ClearRecipes();
 	
 	// Load the crafting.txt file:
@@ -338,7 +338,7 @@ void cCraftingRecipes::LoadRecipes(void)
 		}
 		AddRecipeLine(LineNum, Recipe);
 	}  // for itr - Split[]
-	LOG("-- %d crafting recipes loaded from crafting.txt --", m_Recipes.size());
+	LOG("Loaded %d crafting recipes", m_Recipes.size());
 }
 
 
