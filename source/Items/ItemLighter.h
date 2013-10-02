@@ -67,6 +67,11 @@ public:
 
 	inline static bool HandeNetherPortal(int X, int Y, int Z, int Face, cWorld * a_World)
 	{
+		if (Face != BLOCK_FACE_YP)
+		{
+			return false;
+		}
+
 		static const struct
 		{
 			int x, y, z;
@@ -235,7 +240,9 @@ public:
 				}
 				for (int i = 0; i < ARRAYCOUNT(Portal1Block1Set); i++)
 				{
-					a_World->SetBlock(X + Portal1Block1Set[i].x, Y + Portal1Block1Set[i].y, Z + Portal1Block1Set[i].z, E_BLOCK_NETHER_PORTAL, 0); // Meta is calculated on client
+					// Meta doesn't do anything on client, but tells server what direction portal block is
+					// This is to allow the server to check for invalid positionings
+					a_World->SetBlock(X + Portal1Block1Set[i].x, Y + Portal1Block1Set[i].y, Z + Portal1Block1Set[i].z, E_BLOCK_NETHER_PORTAL, 1);
 				}
 			}
 			else if (a_PortalBlock == 2)
@@ -262,7 +269,7 @@ public:
 				}
 				for (int i = 0; i < ARRAYCOUNT(Portal1Block2Set); i++)
 				{
-					a_World->SetBlock(X + Portal1Block2Set[i].x, Y + Portal1Block2Set[i].y, Z + Portal1Block2Set[i].z, E_BLOCK_NETHER_PORTAL, 0);
+					a_World->SetBlock(X + Portal1Block2Set[i].x, Y + Portal1Block2Set[i].y, Z + Portal1Block2Set[i].z, E_BLOCK_NETHER_PORTAL, 1);
 				}
 			}
 			else { ASSERT(!"Bad nether portal bottom clicked block!"); return false; }
@@ -293,7 +300,7 @@ public:
 				}
 				for (int i = 0; i < ARRAYCOUNT(Portal2Block1Set); i++)
 				{
-					a_World->SetBlock(X + Portal2Block1Set[i].x, Y + Portal2Block1Set[i].y, Z + Portal2Block1Set[i].z, E_BLOCK_NETHER_PORTAL, 0);
+					a_World->SetBlock(X + Portal2Block1Set[i].x, Y + Portal2Block1Set[i].y, Z + Portal2Block1Set[i].z, E_BLOCK_NETHER_PORTAL, 2);
 				}
 			}
 			else if (a_PortalBlock == 2)
@@ -320,7 +327,7 @@ public:
 				}
 				for (int i = 0; i < ARRAYCOUNT(Portal2Block2Set); i++)
 				{
-					a_World->SetBlock(X + Portal2Block2Set[i].x, Y + Portal2Block2Set[i].y, Z + Portal2Block2Set[i].z, E_BLOCK_NETHER_PORTAL, 0);
+					a_World->SetBlock(X + Portal2Block2Set[i].x, Y + Portal2Block2Set[i].y, Z + Portal2Block2Set[i].z, E_BLOCK_NETHER_PORTAL, 2);
 				}
 			}
 			else { ASSERT(!"Bad nether portal bottom clicked block!"); return false; }
