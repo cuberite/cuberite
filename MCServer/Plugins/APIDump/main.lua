@@ -335,8 +335,6 @@ function ReadDescriptions(a_API)
 	for i, cls in ipairs(a_API) do
 		if not(IsClassIgnored(cls.Name)) then
 			table.insert(APICopy, cls);
-		else
-			LOG("Ignoring class " .. cls.Name);
 		end
 	end
 	for i = 1, #a_API do
