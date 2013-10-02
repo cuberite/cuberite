@@ -363,7 +363,7 @@ function ReadDescriptions(a_API)
 				fn.DocID = "operator_sub";
 				fn.Name = "<i>operator -</i>";
 			elseif (fn.Name == ".eq") then
-				fn.DocID = "operator_sub";
+				fn.DocID = "operator_eq";
 				fn.Name = "<i>operator ==</i>";
 			end
 		end

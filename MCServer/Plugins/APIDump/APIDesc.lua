@@ -674,8 +674,12 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 ]],
 			Functions =
 			{
-				constructor = { Params = "", Return = "cEnchantments", Notes = "Creates a new empty cEnchantments object" },
-				constructor = { Params = "StringSpec", Return = "cEnchantments", Notes = "Creates a new cEnchantments object filled with enchantments based on the string description" },
+				constructor =
+				{
+					{ Params = "", Return = "cEnchantments", Notes = "Creates a new empty cEnchantments object" },
+					{ Params = "StringSpec", Return = "cEnchantments", Notes = "Creates a new cEnchantments object filled with enchantments based on the string description" },
+				},
+				operator_eq = { Params = "OtherEnchantments", Return = "bool", Notes = "Returns true if this enchantments object has the same enchantments as OtherEnchantments." },
 				AddFromString = { Params = "StringSpec", Return = "", Notes = "Adds the enchantments in the string description into the object. If a specified enchantment already existed, it is overwritten." },
 				Clear = { Params = "", Return = "", Notes = "Removes all enchantments" },
 				GetLevel = { Params = "EnchantmentNumID", Return = "number", Notes = "Returns the level of the specified enchantment stored in this object; 0 if not stored" },
