@@ -43,7 +43,7 @@ function HandleCarpetCommand( Split, Player )
 	else
 		Carpet:remove()
 		Carpets[ Player ] = nil
-		Core:Call("SendMessage", Player, "The carpet vanished!")
+		Core:Call("SendMessageSuccess", Player, "The carpet vanished!")
 	end
 
 	return true
