@@ -43,7 +43,8 @@ public:
 		}
 		bool Found = false;
 
-		if (a_World->GetWeather() != eWeather_Rain || a_World->GetBiomeAt(a_BlockX, a_BlockZ) == 1)
+		int Biome = a_World->GetBiomeAt(a_BlockX, a_BlockZ);
+		if (a_World->GetWeather() != eWeather_Rain || Biome == biDesert || Biome == biDesertHills)
 		{
 		int NumBlocks = Area.GetBlockCount();
 		BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
