@@ -42,6 +42,9 @@ public:
 			return;
 		}
 		bool Found = false;
+
+		if (a_World->GetWeather() != eWeather_Rain || a_World->GetBiomeAt(a_BlockX, a_BlockZ) == 1)
+		{
 		int NumBlocks = Area.GetBlockCount();
 		BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
 		for (int i = 0; i < NumBlocks; i++)
@@ -54,6 +57,11 @@ public:
 				Found = true;
 				break;
 			}
+		}
+		}
+		else
+		{
+			Found = true;
 		}
 		
 		NIBBLETYPE BlockMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
