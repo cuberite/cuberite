@@ -41,52 +41,57 @@ public:
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		if (a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ) == 0x1)
+		switch (a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ))
 		{
-			static const struct
+			case 0x1:
 			{
-				int x, y, z;
-			} PortalCheck[] =
-			{
-				{ 0, 1,  0},
-				{ 0,-1,  0},
-				{ 1, 0,  0},
-				{-1, 0,  0},
-			} ;
-
-			for (int i = 0; i < ARRAYCOUNT(PortalCheck); i++)
-			{
-				BLOCKTYPE Block;
-				a_Chunk.UnboundedRelGetBlockType(a_RelX + PortalCheck[i].x, a_RelY + PortalCheck[i].y, a_RelZ + PortalCheck[i].z, Block);
-
-				if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
+				static const struct
 				{
-					return false;
+					int x, y, z;
+				} PortalCheck[] =
+				{
+					{ 0, 1,  0},
+					{ 0,-1,  0},
+					{ 1, 0,  0},
+					{-1, 0,  0},
+				} ;
+
+				for (int i = 0; i < ARRAYCOUNT(PortalCheck); i++)
+				{
+					BLOCKTYPE Block;
+					a_Chunk.UnboundedRelGetBlockType(a_RelX + PortalCheck[i].x, a_RelY + PortalCheck[i].y, a_RelZ + PortalCheck[i].z, Block);
+
+					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
+					{
+						return false;
+					}
 				}
+				break;
 			}
-		}
-		else if (a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ) == 0x2)
-		{
-			static const struct
+			case 0x2:
 			{
-				int x, y, z;
-			} PortalCheck[] =
-			{
-				{ 0, 1,  0},
-				{ 0,-1,  0},
-				{ 0, 0, -1},
-				{ 0, 0,  1},
-			} ;
-
-			for (int i = 0; i < ARRAYCOUNT(PortalCheck); i++)
-			{
-				BLOCKTYPE Block;
-				a_Chunk.UnboundedRelGetBlockType(a_RelX + PortalCheck[i].x, a_RelY + PortalCheck[i].y, a_RelZ + PortalCheck[i].z, Block);
-
-				if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
+				static const struct
 				{
-					return false;
+					int x, y, z;
+				} PortalCheck[] =
+				{
+					{ 0, 1,  0},
+					{ 0,-1,  0},
+					{ 0, 0, -1},
+					{ 0, 0,  1},
+				} ;
+
+				for (int i = 0; i < ARRAYCOUNT(PortalCheck); i++)
+				{
+					BLOCKTYPE Block;
+					a_Chunk.UnboundedRelGetBlockType(a_RelX + PortalCheck[i].x, a_RelY + PortalCheck[i].y, a_RelZ + PortalCheck[i].z, Block);
+
+					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
+					{
+						return false;
+					}
 				}
+				break;
 			}
 		}
 		return true;
