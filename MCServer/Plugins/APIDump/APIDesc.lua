@@ -1347,14 +1347,18 @@ a_Player:OpenWindow(Window);
 
 		cPlugin =
 		{
-			Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions.
+			Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions. Each plugin has its own Plugin object.
 ]],
 			Functions =
 			{
-				GetName = { Return = "string" },
-				SetName = { Return = "" },
-				GetVersion = { Notes = "int" },
-				SetVersion = { Return = "" },
+				Call = { Params = "Function name, [All the parameters divided with commas]", Notes = "This function allows you to call a function from another plugin. It can only use pass: integers, booleans, strings and usertypes (cPlayer, cEntity, cCuboid, etc.)." },
+				GetDirectory = { Return = "string", Notes = "Returns the name of the folder where the plugin's files are. (APIDump)" },
+				GetLocalDirectory = { Notes = "OBSOLETE use GetLocalFolder instead." },
+				GetLocalFolder = { Return = "string", Notes = "Returns the path where the plugin's files are. (Plugins/APIDump)" },
+				GetName = { Return = "string", Notes = "Returns the name of the plugin." },
+				SetName = { Params = "string", Notes = "Sets the name of the Plugin." },
+				GetVersion = { Return = "number", Notes = "Returns the version of the plugin." },
+				SetVersion = { Params = "number", Notes = "Sets the version of the plugin." },
 				GetFileName = { Return = "string" },
 				CreateWebPlugin = { Notes = "{{cWebPlugin|cWebPlugin}}" },
 			},
