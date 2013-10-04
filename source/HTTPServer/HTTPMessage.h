@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "EnvelopeParser.h"
+
 
 
 
@@ -58,15 +60,18 @@ protected:
 
 
 class cHTTPRequest :
-	public cHTTPMessage
+	public cHTTPMessage,
+	protected cEnvelopeParser::cCallbacks
 {
 	typedef cHTTPMessage super;
 	
 public:
 	cHTTPRequest(void);
 	
-	/// Parses the headers information from the received data in the specified string of incoming data. Returns true if successful.
-	bool ParseHeaders(const char * a_IncomingData, size_t a_idxEnd);
+	/** Parses the request line and then headers from the received data.
+	Returns the number of bytes consumed or a negative number for error
+	*/
+	int ParseHeaders(const char * a_Data, int a_Size);
 	
 	/// Returns true if the request did contain a Content-Length header
 	bool HasReceivedContentLength(void) const { return (m_ContentLength >= 0); }
@@ -83,7 +88,19 @@ public:
 	/// Retrieves the UserData pointer that has been stored within this request.
 	void * GetUserData(void) const { return m_UserData; }
 	
+	/// Returns true if more data is expected for the request headers
+	bool IsInHeaders(void) const { return m_EnvelopeParser.IsInHeaders(); }
+	
 protected:
+	/// Parser for the envelope data
+	cEnvelopeParser m_EnvelopeParser;
+	
+	/// True if the data received so far is parsed successfully. When false, all further parsing is skipped
+	bool m_IsValid;
+	
+	/// Bufferred incoming data, while parsing for the request line
+	AString m_IncomingHeaderData;
+	
 	/// Method of the request (GET / PUT / POST / ...)
 	AString m_Method;
 	
@@ -94,21 +111,13 @@ protected:
 	void * m_UserData;
 	
 	
-	/** Parses the RequestLine out of a_Data, up to index a_IdxEnd
-	Returns the index to the next line, or npos if invalid request
+	/** Parses the incoming data for the first line (RequestLine)
+	Returns the number of bytes consumed, or -1 for an error
 	*/
-	size_t ParseRequestLine(const char * a_Data, size_t a_IdxEnd);
+	int ParseRequestLine(const char * a_Data, int a_Size);
 	
-	/** Parses one header field out of a_Data, up to offset a_IdxEnd.
-	Returns the index to the next line (relative to a_Data), or npos if invalid request.
-	a_Key is set to the key that was parsed (used for multi-line headers)
-	*/
-	size_t ParseHeaderField(const char * a_Data, size_t a_IdxEnd, AString & a_Key);
-	
-	/** Parses one header field that is known to be a continuation of previous header.
-	Returns the index to the next line, or npos if invalid request.
-	*/
-	size_t ParseHeaderFieldContinuation(const char * a_Data, size_t a_IdxEnd, AString & a_Key);
+	// cEnvelopeParser::cCallbacks overrides:
+	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) override;
 } ;
 
 

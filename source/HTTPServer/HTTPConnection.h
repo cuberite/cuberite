@@ -31,7 +31,7 @@ public:
 	
 	enum eState
 	{
-		wcsRecvHeaders,  ///< Receiving request headers (m_CurrentRequest == NULL)
+		wcsRecvHeaders,  ///< Receiving request headers (m_CurrentRequest is created if NULL)
 		wcsRecvBody,     ///< Receiving request body    (m_CurrentRequest is valid)
 		wcsRecvIdle,     ///< Has received the entire body, waiting to send the response (m_CurrentRequest == NULL)
 		wcsSendingResp,  ///< Sending response body     (m_CurrentRequest == NULL)

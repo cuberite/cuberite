@@ -108,22 +108,13 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 	{
 		case wcsRecvHeaders:
 		{
-			ASSERT(m_CurrentRequest == NULL);
-
-			// Start searching 3 chars from the end of the already received data, if available:
-			size_t SearchStart = m_IncomingHeaderData.size();
-			SearchStart = (SearchStart > 3) ? SearchStart - 3 : 0;
-			
-			m_IncomingHeaderData.append(a_Data, a_Size);
-			
-			// Parse the header, if it is complete:
-			size_t idxEnd = m_IncomingHeaderData.find("\r\n\r\n", SearchStart);
-			if (idxEnd == AString::npos)
+			if (m_CurrentRequest == NULL)
 			{
-				return;
+				m_CurrentRequest = new cHTTPRequest;
 			}
-			m_CurrentRequest = new cHTTPRequest;
-			if (!m_CurrentRequest->ParseHeaders(m_IncomingHeaderData.c_str(), idxEnd + 2))
+
+			int BytesConsumed = m_CurrentRequest->ParseHeaders(a_Data, a_Size);
+			if (BytesConsumed < 0)
 			{
 				delete m_CurrentRequest;
 				m_CurrentRequest = NULL;
@@ -131,20 +122,29 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 				m_HTTPServer.CloseConnection(*this);
 				return;
 			}
+			if (m_CurrentRequest->IsInHeaders())
+			{
+				// The request headers are not yet complete
+				return;
+			}
+			
+			// The request has finished parsing its headers successfully, notify of it:
 			m_State = wcsRecvBody;
 			m_HTTPServer.NewRequest(*this, *m_CurrentRequest);
 			m_CurrentRequestBodyRemaining = m_CurrentRequest->GetContentLength();
+			if (m_CurrentRequestBodyRemaining < 0)
+			{
+				// The body length was not specified in the request, assume zero
+				m_CurrentRequestBodyRemaining = 0;
+			}
 			
 			// Process the rest of the incoming data into the request body:
-			if (m_IncomingHeaderData.size() > idxEnd + 4)
+			if (a_Size > BytesConsumed)
 			{
-				m_IncomingHeaderData.erase(0, idxEnd + 4);
-				DataReceived(m_IncomingHeaderData.c_str(), m_IncomingHeaderData.size());
-				m_IncomingHeaderData.clear();
+				DataReceived(a_Data + BytesConsumed, a_Size - BytesConsumed);
 			}
 			else
 			{
-				m_IncomingHeaderData.clear();
 				DataReceived("", 0);  // If the request has zero body length, let it be processed right-away
 			}
 			break;

@@ -24,13 +24,14 @@
 
 
 class cDebugCallbacks :
-	public cHTTPServer::cCallbacks
+	public cHTTPServer::cCallbacks,
+	protected cHTTPFormParser::cCallbacks
 {
 		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
 			if (cHTTPFormParser::HasFormData(a_Request))
 			{
-				a_Request.SetUserData(new cHTTPFormParser(a_Request));
+				a_Request.SetUserData(new cHTTPFormParser(a_Request, *this));
 			}
 		}
 		
@@ -78,6 +79,23 @@ class cDebugCallbacks :
 			a_Connection.Send("Hello, world");
 		}
 		
+		
+		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) override
+		{
+			// TODO
+		}
+		
+		
+		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, int a_Size) override
+		{
+			// TODO
+		}
+		
+
+		virtual void OnFileEnd(cHTTPFormParser & a_Parser) override
+		{
+			// TODO
+		}
 		
 } g_DebugCallbacks;
 

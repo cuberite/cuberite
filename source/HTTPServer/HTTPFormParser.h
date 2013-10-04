@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "MultipartParser.h"
+
 
 
 
@@ -20,10 +22,25 @@ class cHTTPRequest;
 
 
 class cHTTPFormParser :
-	public std::map<AString, AString>
+	public std::map<AString, AString>,
+	public cMultipartParser::cCallbacks
 {
 public:
-	cHTTPFormParser(cHTTPRequest & a_Request);
+	class cCallbacks
+	{
+	public:
+		/// Called when a new file part is encountered in the form data
+		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) = 0;
+		
+		/// Called when more file data has come for the current file in the form data
+		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, int a_Size) = 0;
+		
+		/// Called when the current file part has ended in the form data
+		virtual void OnFileEnd(cHTTPFormParser & a_Parser) = 0;
+	} ;
+	
+	
+	cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callbacks);
 	
 	/// Adds more data into the parser, as the request body is received
 	void Parse(const char * a_Data, int a_Size);
@@ -41,26 +58,48 @@ protected:
 	{
 		fpkURL,             ///< The form has been transmitted as parameters to a GET request
 		fpkFormUrlEncoded,  ///< The form has been POSTed or PUT, with Content-Type of "application/x-www-form-urlencoded"
-		fpkMultipart,       ///< The form has been POSTed or PUT, with Content-Type of "multipart/*". Currently unsupported
+		fpkMultipart,       ///< The form has been POSTed or PUT, with Content-Type of "multipart/form-data"
 	};
+	
+	/// The callbacks to call for incoming file data
+	cCallbacks & m_Callbacks;
 
 	/// The kind of the parser (decided in the constructor, used in Parse()
 	eKind m_Kind;
-	
+
+	/// Buffer for the incoming data until it's parsed
 	AString m_IncomingData;
 	
+	/// True if the information received so far is a valid form; set to false on first problem. Further parsing is skipped when false.
 	bool m_IsValid;
 	
-	/// Simple static objects to hold the various strings for comparison with request's content-type
-	static AString m_FormURLEncoded;
-	static AString m_MultipartFormData;
-		
+	/// The parser for the multipart data, if used
+	std::auto_ptr<cMultipartParser> m_MultipartParser;
+	
+	/// Name of the currently parsed part in multipart data
+	AString m_CurrentPartName;
+	
+	/// True if the currently parsed part in multipart data is a file
+	bool m_IsCurrentPartFile;
+	
+	/// Filename of the current parsed part in multipart data (for file uploads)
+	AString m_CurrentPartFileName;
+	
+	/// Set to true after m_Callbacks.OnFileStart() has been called, reset to false on PartEnd
+	bool m_FileHasBeenAnnounced;
+	
+	
+	/// Sets up the object for parsing a fpkMultipart request
+	void BeginMultipart(const cHTTPRequest & a_Request);
 	
 	/// Parses m_IncomingData as form-urlencoded data (fpkURL or fpkFormUrlEncoded kinds)
 	void ParseFormUrlEncoded(void);
 	
-	/// Parses m_IncomingData as multipart data (fpkMultipart kind)
-	void ParseMultipart(void);
+	// cMultipartParser::cCallbacks overrides:
+	virtual void OnPartStart (void) override;
+	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) override;
+	virtual void OnPartData  (const char * a_Data, int a_Size) override;
+	virtual void OnPartEnd   (void) override;
 } ;
 
 

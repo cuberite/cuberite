@@ -6,19 +6,15 @@
 #include "Globals.h"
 #include "HTTPFormParser.h"
 #include "HTTPMessage.h"
+#include "MultipartParser.h"
+#include "NameValueParser.h"
 
 
 
 
 
-AString cHTTPFormParser::m_FormURLEncoded("application/x-www-form-urlencoded");
-AString cHTTPFormParser::m_MultipartFormData("multipart/form-data");
-
-
-
-
-
-cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request) :
+cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callbacks) :
+	m_Callbacks(a_Callbacks),
 	m_IsValid(true)
 {
 	if (a_Request.GetMethod() == "GET")
@@ -36,14 +32,15 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request) :
 	}
 	if ((a_Request.GetMethod() == "POST") || (a_Request.GetMethod() == "PUT"))
 	{
-		if (a_Request.GetContentType() == m_FormURLEncoded)
+		if (a_Request.GetContentType() == "application/x-www-form-urlencoded")
 		{
 			m_Kind = fpkFormUrlEncoded;
 			return;
 		}
-		if (a_Request.GetContentType().substr(0, m_MultipartFormData.length()) == m_MultipartFormData)
+		if (strncmp(a_Request.GetContentType().c_str(), "multipart/form-data", 19) == 0)
 		{
 			m_Kind = fpkMultipart;
+			BeginMultipart(a_Request);
 			return;
 		}
 	}
@@ -56,18 +53,24 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request) :
 
 void cHTTPFormParser::Parse(const char * a_Data, int a_Size)
 {
-	m_IncomingData.append(a_Data, a_Size);
+	if (!m_IsValid)
+	{
+		return;
+	}
+	
 	switch (m_Kind)
 	{
 		case fpkURL:
 		case fpkFormUrlEncoded:
 		{
 			// This format is used for smaller forms (not file uploads), so we can delay parsing it until Finish()
+			m_IncomingData.append(a_Data, a_Size);
 			break;
 		}
 		case fpkMultipart:
 		{
-			ParseMultipart();
+			ASSERT(m_MultipartParser.get() != NULL);
+			m_MultipartParser->Parse(a_Data, a_Size);
 			break;
 		}
 		default:
@@ -105,14 +108,24 @@ bool cHTTPFormParser::HasFormData(const cHTTPRequest & a_Request)
 {
 	const AString & ContentType = a_Request.GetContentType();
 	return (
-		(ContentType == m_FormURLEncoded) ||
-		(ContentType.substr(0, m_MultipartFormData.length()) == m_MultipartFormData) ||
+		(ContentType == "application/x-www-form-urlencoded") ||
+		(strncmp(ContentType.c_str(), "multipart/form-data", 19) == 0) ||
 		(
 			(a_Request.GetMethod() == "GET") &&
 			(a_Request.GetURL().find('?') != AString::npos)
 		)
 	);
 	return false;
+}
+
+
+
+
+
+void cHTTPFormParser::BeginMultipart(const cHTTPRequest & a_Request)
+{
+	ASSERT(m_MultipartParser.get() == NULL);
+	m_MultipartParser.reset(new cMultipartParser(a_Request.GetContentType(), *this));
 }
 
 
@@ -156,9 +169,107 @@ void cHTTPFormParser::ParseFormUrlEncoded(void)
 
 
 
-void cHTTPFormParser::ParseMultipart(void)
+void cHTTPFormParser::OnPartStart(void)
 {
-	// TODO
+	m_CurrentPartFileName.clear();
+	m_CurrentPartName.clear();
+	m_IsCurrentPartFile = false;
+	m_FileHasBeenAnnounced = false;
+}
+
+
+
+
+
+void cHTTPFormParser::OnPartHeader(const AString & a_Key, const AString & a_Value)
+{
+	if (NoCaseCompare(a_Key, "Content-Disposition") == 0)
+	{
+		size_t len = a_Value.size();
+		size_t ParamsStart = AString::npos;
+		for (size_t i = 0; i < len; ++i)
+		{
+			if (a_Value[i] > ' ')
+			{
+				if (strncmp(a_Value.c_str() + i, "form-data", 9) != 0)
+				{
+					// Content disposition is not "form-data", mark the whole form invalid
+					m_IsValid = false;
+					return;
+				}
+				ParamsStart = a_Value.find(';', i + 9);
+				break;
+			}
+		}
+		if (ParamsStart == AString::npos)
+		{
+			// There is data missing in the Content-Disposition field, mark the whole form invalid:
+			m_IsValid = false;
+			return;
+		}
+		
+		// Parse the field name and optional filename from this header:
+		cNameValueParser Parser(a_Value.data() + ParamsStart, a_Value.size() - ParamsStart);
+		Parser.Finish();
+		m_CurrentPartName = Parser["name"];
+		if (!Parser.IsValid() || m_CurrentPartName.empty())
+		{
+			// The required parameter "name" is missing, mark the whole form invalid:
+			m_IsValid = false;
+			return;
+		}
+		m_CurrentPartFileName = Parser["filename"];
+	}
+}
+
+
+
+
+
+void cHTTPFormParser::OnPartData(const char * a_Data, int a_Size)
+{
+	if (m_CurrentPartName.empty())
+	{
+		// Prologue, epilogue or invalid part
+		return;
+	}
+	if (m_CurrentPartFileName.empty())
+	{
+		// This is a variable, store it in the map
+		iterator itr = find(m_CurrentPartName);
+		if (itr == end())
+		{
+			(*this)[m_CurrentPartName] = AString(a_Data, a_Size);
+		}
+		else
+		{
+			itr->second.append(a_Data, a_Size);
+		}
+	}
+	else
+	{
+		// This is a file, pass it on through the callbacks
+		if (!m_FileHasBeenAnnounced)
+		{
+			m_Callbacks.OnFileStart(*this, m_CurrentPartFileName);
+			m_FileHasBeenAnnounced = true;
+		}
+		m_Callbacks.OnFileData(*this, a_Data, a_Size);
+	}
+}
+
+
+
+
+
+void cHTTPFormParser::OnPartEnd(void)
+{
+	if (m_FileHasBeenAnnounced)
+	{
+		m_Callbacks.OnFileEnd(*this);
+	}
+	m_CurrentPartName.clear();
+	m_CurrentPartFileName.clear();
 }
 
 

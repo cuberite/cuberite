@@ -10,11 +10,22 @@
 
 
 
+// Disable MSVC warnings:
+#if defined(_MSC_VER)
+	#pragma warning(push)
+	#pragma warning(disable:4355)  // 'this' : used in base member initializer list
+#endif
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cHTTPMessage:
 
 cHTTPMessage::cHTTPMessage(eKind a_Kind) :
-	m_Kind(a_Kind)
+	m_Kind(a_Kind),
+	m_ContentLength(-1)
 {
 }
 
@@ -24,10 +35,12 @@ cHTTPMessage::cHTTPMessage(eKind a_Kind) :
 
 void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 {
-	cNameValueMap::iterator itr = m_Headers.find(a_Key);
+	AString Key = a_Key;
+	StrToLower(Key);
+	cNameValueMap::iterator itr = m_Headers.find(Key);
 	if (itr == m_Headers.end())
 	{
-		m_Headers[a_Key] = a_Value;
+		m_Headers[Key] = a_Value;
 	}
 	else
 	{
@@ -37,13 +50,13 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 	}
 	
 	// Special processing for well-known headers:
-	if (a_Key == "Content-Type")
+	if (Key == "content-type")
 	{
-		m_ContentType = m_Headers["Content-Type"];
+		m_ContentType = m_Headers[Key];
 	}
-	else if (a_Key == "Content-Length")
+	else if (Key == "content-length")
 	{
-		m_ContentLength = atoi(m_Headers["Content-Length"].c_str());
+		m_ContentLength = atoi(m_Headers[Key].c_str());
 	}
 }
 
@@ -56,6 +69,8 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 
 cHTTPRequest::cHTTPRequest(void) :
 	super(mkRequest),
+	m_EnvelopeParser(*this),
+	m_IsValid(true),
 	m_UserData(NULL)
 {
 }
@@ -64,66 +79,75 @@ cHTTPRequest::cHTTPRequest(void) :
 
 
 
-bool cHTTPRequest::ParseHeaders(const char * a_IncomingData, size_t a_IdxEnd)
+int cHTTPRequest::ParseHeaders(const char * a_Data, int a_Size)
 {
-	// The first line contains the method and the URL:
-	size_t Next = ParseRequestLine(a_IncomingData, a_IdxEnd);
-	if (Next == AString::npos)
+	if (!m_IsValid)
 	{
-		return false;
+		return -1;
 	}
 	
-	// The following lines contain headers:
-	AString Key;
-	const char * Data = a_IncomingData + Next;
-	size_t End = a_IdxEnd - Next;
-	while (End > 0)
+	if (m_Method.empty())
 	{
-		Next = ParseHeaderField(Data, End, Key);
-		if (Next == AString::npos)
+		// The first line hasn't been processed yet
+		int res = ParseRequestLine(a_Data, a_Size);
+		if ((res < 0) || (res == a_Size))
 		{
-			return false;
+			return res;
 		}
-		ASSERT(End >= Next);
-		Data += Next;
-		End -= Next;
+		int res2 = m_EnvelopeParser.Parse(a_Data + res, a_Size - res);
+		if (res2 < 0)
+		{
+			m_IsValid = false;
+			return res2;
+		}
+		return res2 + res;
 	}
 	
-	if (!HasReceivedContentLength())
+	if (m_EnvelopeParser.IsInHeaders())
 	{
-		SetContentLength(0);
+		int res = m_EnvelopeParser.Parse(a_Data, a_Size);
+		if (res < 0)
+		{
+			m_IsValid = false;
+		}
+		return res;
 	}
-	return true;
+	return 0;
 }
 
 
 
 
 
-size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_IdxEnd)
+int cHTTPRequest::ParseRequestLine(const char * a_Data, int a_Size)
 {	
+	m_IncomingHeaderData.append(a_Data, a_Size);
+	size_t IdxEnd = m_IncomingHeaderData.size();
+
 	// Ignore the initial CRLFs (HTTP spec's "should")
 	size_t LineStart = 0;
 	while (
-		(LineStart < a_IdxEnd) &&
+		(LineStart < IdxEnd) &&
 		(
-			(a_Data[LineStart] == '\r') ||
-			(a_Data[LineStart] == '\n')
+			(m_IncomingHeaderData[LineStart] == '\r') ||
+			(m_IncomingHeaderData[LineStart] == '\n')
 		)
 	)
 	{
 		LineStart++;
 	}
-	if (LineStart >= a_IdxEnd)
+	if (LineStart >= IdxEnd)
 	{
-		return AString::npos;
+		m_IsValid = false;
+		return -1;
 	}
 	
-	size_t Last = LineStart;
 	int NumSpaces = 0;
-	for (size_t i = LineStart; i < a_IdxEnd; i++)
+	size_t MethodEnd = 0;
+	size_t URLEnd = 0;
+	for (size_t i = LineStart; i < IdxEnd; i++)
 	{
-		switch (a_Data[i])
+		switch (m_IncomingHeaderData[i])
 		{
 			case ' ':
 			{
@@ -131,124 +155,56 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_IdxEnd)
 				{
 					case 0:
 					{
-						m_Method.assign(a_Data, Last, i - Last);
+						MethodEnd = i;
 						break;
 					}
 					case 1:
 					{
-						m_URL.assign(a_Data, Last, i - Last);
+						URLEnd = i;
 						break;
 					}
 					default:
 					{
 						// Too many spaces in the request
-						return AString::npos;
+						m_IsValid = false;
+						return -1;
 					}
 				}
-				Last = i + 1;
 				NumSpaces += 1;
 				break;
 			}
 			case '\n':
 			{
-				if ((i == 0) || (a_Data[i - 1] != '\r') || (NumSpaces != 2) || (i < Last + 7))
+				if ((i == 0) || (m_IncomingHeaderData[i - 1] != '\r') || (NumSpaces != 2) || (i < URLEnd + 7))
 				{
 					// LF too early, without a CR, without two preceeding spaces or too soon after the second space
-					return AString::npos;
+					m_IsValid = false;
+					return -1;
 				}
 				// Check that there's HTTP/version at the end
-				if (strncmp(a_Data + Last, "HTTP/1.", 7) != 0)
+				if (strncmp(a_Data + URLEnd + 1, "HTTP/1.", 7) != 0)
 				{
-					return AString::npos;
+					m_IsValid = false;
+					return -1;
 				}
+				m_Method = m_IncomingHeaderData.substr(LineStart, MethodEnd - LineStart);
+				m_URL = m_IncomingHeaderData.substr(MethodEnd + 1, URLEnd - MethodEnd - 1);
 				return i + 1;
 			}
-		}  // switch (a_Data[i])
-	}  // for i - a_Data[]
-	return AString::npos;
-}
-
-
-
-
-
-size_t cHTTPRequest::ParseHeaderField(const char * a_Data, size_t a_IdxEnd, AString & a_Key)
-{
-	if (*a_Data <= ' ')
-	{
-		size_t res = ParseHeaderFieldContinuation(a_Data + 1, a_IdxEnd - 1, a_Key);
-		return (res == AString::npos) ? res : (res + 1);
-	}
-	size_t ValueIdx = 0;
-	AString Key;
-	for (size_t i = 0; i < a_IdxEnd; i++)
-	{
-		switch (a_Data[i])
-		{
-			case '\n':
-			{
-				if ((ValueIdx == 0) || (i < ValueIdx - 2) || (i == 0) || (a_Data[i - 1] != '\r'))
-				{
-					// Invalid header field - no colon or no CR before LF
-					return AString::npos;
-				}
-				AString Value(a_Data, ValueIdx + 1, i - ValueIdx - 2);
-				AddHeader(Key, Value);
-				a_Key = Key;
-				return i + 1;
-			}
-			case ':':
-			{
-				if (ValueIdx == 0)
-				{
-					Key.assign(a_Data, 0, i);
-					ValueIdx = i;
-				}
-				break;
-			}
-			case ' ':
-			case '\t':
-			{
-				if (ValueIdx == i - 1)
-				{
-					// Value has started in this char, but it is whitespace, so move the start one char further
-					ValueIdx = i;
-				}
-			}
-		}  // switch (char)
+		}  // switch (m_IncomingHeaderData[i])
 	}  // for i - m_IncomingHeaderData[]
-	// No header found, return the end-of-data index:
-	return a_IdxEnd;
+	
+	// CRLF hasn't been encountered yet, consider all data consumed
+	return a_Size;
 }
 
 
 
 
 
-size_t cHTTPRequest::ParseHeaderFieldContinuation(const char * a_Data, size_t a_IdxEnd, AString & a_Key)
+void cHTTPRequest::OnHeaderLine(const AString & a_Key, const AString & a_Value)
 {
-	size_t Start = 0;
-	for (size_t i = 0; i < a_IdxEnd; i++)
-	{
-		if ((a_Data[i] > ' ') && (Start == 0))
-		{
-			Start = i;
-		}
-		else if (a_Data[i] == '\n')
-		{
-			if ((i == 0) || (a_Data[i - 1] != '\r'))
-			{
-				// There wasn't a CR before this LF
-				return AString::npos;
-			}
-			AString Value(a_Data, 0, i - Start - 1);
-			AddHeader(a_Key, Value);
-			return i + 1;
-		}
-	}
-	// LF not found, how? We found it at the header end (CRLFCRLF)
-	ASSERT(!"LF not found, wtf?");
-	return AString::npos;
+	AddHeader(a_Key, a_Value);
 }
 
 

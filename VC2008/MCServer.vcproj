@@ -2720,6 +2720,14 @@
 				Name="HTTPServer"
 				>
 				<File
+					RelativePath="..\source\HTTPServer\EnvelopeParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\EnvelopeParser.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\HTTPServer\HTTPConnection.cpp"
 					>
 				</File>
@@ -2749,6 +2757,22 @@
 				</File>
 				<File
 					RelativePath="..\source\HTTPServer\HTTPServer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\MultipartParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\MultipartParser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\NameValueParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\NameValueParser.h"
 					>
 				</File>
 			</Filter>
