@@ -321,7 +321,7 @@ void cServer::OnConnectionAccepted(cSocket & a_Socket)
 		return;
 	}
 
-	LOG("Client \"%s\" connected!", ClientIP.c_str());
+	LOGD("Client \"%s\" connected!", ClientIP.c_str());
 
 	cClientHandle * NewHandle = new cClientHandle(&a_Socket, m_ClientViewDistance);
 	if (!m_SocketThreads.AddClient(a_Socket, NewHandle))

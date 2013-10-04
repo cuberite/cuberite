@@ -33,17 +33,15 @@ end
 
 function HandleCarpetCommand( Split, Player )
 	Carpet = Carpets[ Player ]
-	PluginManager = cPluginManager:Get()
-	local Core = PluginManager:GetPlugin("Core")
-	
+		
 	if( Carpet == nil ) then
 		Carpets[ Player ] = cCarpet:new()
-		Core:Call("SendMessageSuccess", Player, "You're on a magic carpet!")
-		Core:Call("SendMessage", Player, "Look straight down to descend. Jump to ascend.")
+		SendMessageSuccess(Player, "You're on a magic carpet!")
+		SendMessage(Player, "Look straight down to descend. Jump to ascend.")
 	else
 		Carpet:remove()
 		Carpets[ Player ] = nil
-		Core:Call("SendMessageSuccess", Player, "The carpet vanished!")
+		SendMessageSuccess(Player, "The carpet vanished!")
 	end
 
 	return true
