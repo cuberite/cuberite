@@ -81,6 +81,9 @@ extern AString URLDecode(const AString & a_String);  // Cannot export to Lua aut
 /// Replaces all occurrences of char a_From inside a_String with char a_To.
 extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
 
+/// Decodes a Base64-encoded string into the raw data
+extern AString Base64Decode(const AString & a_Base64String);
+
 // If you have any other string helper functions, declare them here
 
 

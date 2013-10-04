@@ -73,6 +73,16 @@ class cDebugCallbacks :
 				return;
 			}
 			
+			// Test the auth failure and success:
+			if (a_Request.GetURL() == "/auth")
+			{
+				if (!a_Request.HasAuth() || (a_Request.GetAuthUsername() != "a") || (a_Request.GetAuthPassword() != "b"))
+				{
+					a_Connection.SendNeedAuth("MCServer WebAdmin");
+					return;
+				}
+			}
+			
 			cHTTPResponse Resp;
 			Resp.SetContentType("text/plain");
 			a_Connection.Send(Resp);

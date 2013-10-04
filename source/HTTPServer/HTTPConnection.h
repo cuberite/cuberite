@@ -43,6 +43,9 @@ public:
 	/// Sends HTTP status code together with a_Reason (used for HTTP errors)
 	void SendStatusAndReason(int a_StatusCode, const AString & a_Reason);
 	
+	/// Sends the "401 unauthorized" reply together with instructions on authorizing, using the specified realm
+	void SendNeedAuth(const AString & a_Realm);
+	
 	/// Sends the headers contained in a_Response
 	void Send(const cHTTPResponse & a_Response);
 	

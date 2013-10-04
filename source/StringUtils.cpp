@@ -745,3 +745,71 @@ AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_
 
 
 
+
+/// Converts one Hex character in a Base64 encoding into the data value
+static inline int UnBase64(char c)
+{
+	if (c >='A' && c <= 'Z')
+	{
+		return c - 'A';
+	}
+	if (c >='a' && c <= 'z')
+	{
+		return c - 'a' + 26;
+	}
+	if (c >= '0' && c <= '9')
+	{
+		return c - '0' + 52;
+	}
+	if (c == '+')
+	{
+		return 62;
+	}
+	if (c == '/')
+	{
+		return 63;
+	}
+	if (c == '=')
+	{
+		return -1;
+	}
+	return -2;
+}
+
+
+
+
+
+AString Base64Decode(const AString & a_Base64String)
+{
+	AString res;
+	size_t i, len = a_Base64String.size();
+	int o, c;
+	res.resize((len * 4) / 3 + 5, 0);  // Approximate the upper bound on the result length
+	for (o = 0, i = 0; i < len; i++)
+	{
+		c = UnBase64(a_Base64String[i]);
+		if (c >= 0)
+		{
+			switch (o & 7)
+			{
+				case 0:	res[o >> 3] |= (c << 2); break;
+				case 6: res[o >> 3] |= (c >> 4); res[(o >> 3) + 1] |= (c << 4); break;
+				case 4: res[o >> 3] |= (c >> 2); res[(o >> 3) + 1] |= (c << 6); break;
+				case 2: res[o >> 3] |= c; break;
+			}
+			o += 6;
+		}
+		if (c == -1)
+		{
+			// Error while decoding, invalid input. Return as much as we've decoded:
+			res.resize(o >> 3);
+			return ERROR_SUCCESS;
+		}
+	}
+	res.resize(o >> 3);
+	return res;}
+
+
+
+

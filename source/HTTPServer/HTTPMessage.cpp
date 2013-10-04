@@ -71,7 +71,8 @@ cHTTPRequest::cHTTPRequest(void) :
 	super(mkRequest),
 	m_EnvelopeParser(*this),
 	m_IsValid(true),
-	m_UserData(NULL)
+	m_UserData(NULL),
+	m_HasAuth(false)
 {
 }
 
@@ -204,6 +205,20 @@ int cHTTPRequest::ParseRequestLine(const char * a_Data, int a_Size)
 
 void cHTTPRequest::OnHeaderLine(const AString & a_Key, const AString & a_Value)
 {
+	if (
+		(NoCaseCompare(a_Key, "Authorization") == 0) &&
+		(strncmp(a_Value.c_str(), "Basic ", 6) == 0)
+	)
+	{
+		AString UserPass = Base64Decode(a_Value.substr(6));
+		size_t idxCol = UserPass.find(':');
+		if (idxCol != AString::npos)
+		{
+			m_AuthUsername = UserPass.substr(0, idxCol);
+			m_AuthPassword = UserPass.substr(idxCol + 1);
+			m_HasAuth = true;
+		}
+	}
 	AddHeader(a_Key, a_Value);
 }
 

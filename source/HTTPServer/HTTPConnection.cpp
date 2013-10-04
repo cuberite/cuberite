@@ -26,6 +26,18 @@ void cHTTPConnection::SendStatusAndReason(int a_StatusCode, const AString & a_Re
 {
 	AppendPrintf(m_OutgoingData, "%d %s\r\n\r\n", a_StatusCode, a_Response.c_str());
 	m_HTTPServer.NotifyConnectionWrite(*this);
+	m_State = wcsRecvHeaders;
+}
+
+
+
+
+
+void cHTTPConnection::SendNeedAuth(const AString & a_Realm)
+{
+	AppendPrintf(m_OutgoingData, "HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"%s\"\r\n\r\n", a_Realm.c_str());
+	m_HTTPServer.NotifyConnectionWrite(*this);
+	m_State = wcsRecvHeaders;
 }
 
 
@@ -73,6 +85,12 @@ void cHTTPConnection::AwaitNextRequest(void)
 {
 	switch (m_State)
 	{
+		case wcsRecvHeaders:
+		{
+			// Nothing has been received yet, or a special response was given (SendStatusAndReason() or SendNeedAuth() )
+			break;
+		}
+		
 		case wcsRecvIdle:
 		{
 			// The client is waiting for a response, send an "Internal server error":

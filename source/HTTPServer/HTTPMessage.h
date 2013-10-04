@@ -91,6 +91,15 @@ public:
 	/// Returns true if more data is expected for the request headers
 	bool IsInHeaders(void) const { return m_EnvelopeParser.IsInHeaders(); }
 	
+	/// Returns true if the request did present auth data that was understood by the parser
+	bool HasAuth(void) const { return m_HasAuth; }
+	
+	/// Returns the username that the request presented. Only valid if HasAuth() is true
+	const AString & GetAuthUsername(void) const { return m_AuthUsername; }
+	
+	/// Returns the password that the request presented. Only valid if HasAuth() is true
+	const AString & GetAuthPassword(void) const { return m_AuthPassword; }
+	
 protected:
 	/// Parser for the envelope data
 	cEnvelopeParser m_EnvelopeParser;
@@ -109,6 +118,15 @@ protected:
 	
 	/// Data that the HTTPServer callbacks are allowed to store.
 	void * m_UserData;
+	
+	/// Set to true if the request contains auth data that was understood by the parser
+	bool m_HasAuth;
+	
+	/// The username used for auth
+	AString m_AuthUsername;
+	
+	/// The password used for auth
+	AString m_AuthPassword;
 	
 	
 	/** Parses the incoming data for the first line (RequestLine)
