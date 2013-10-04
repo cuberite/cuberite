@@ -20,7 +20,7 @@ public:
 	/// Creates an empty parser
 	cNameValueParser(bool a_AllowsKeyOnly = true);
 	
-	/// Creates an empty parser, then parses the data given
+	/// Creates an empty parser, then parses the data given. Doesn't call Finish(), so more data can be parsed later
 	cNameValueParser(const char * a_Data, int a_Size, bool a_AllowsKeyOnly = true);
 	
 	/// Parses the data given

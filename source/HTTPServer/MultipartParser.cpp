@@ -116,6 +116,7 @@ cMultipartParser::cMultipartParser(const AString & a_ContentType, cCallbacks & a
 	// Find the multipart boundary:
 	ContentType.erase(0, idxSC + 1);
 	cNameValueParser CTParser(ContentType.c_str(), ContentType.size());
+	CTParser.Finish();
 	if (!CTParser.IsValid())
 	{
 		m_IsValid = false;
