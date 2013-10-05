@@ -804,7 +804,7 @@ AString Base64Decode(const AString & a_Base64String)
 		{
 			// Error while decoding, invalid input. Return as much as we've decoded:
 			res.resize(o >> 3);
-			return ERROR_SUCCESS;
+			return res;
 		}
 	}
 	res.resize(o >> 3);
