@@ -1034,27 +1034,29 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 		{
 			Desc = [[
 				cItem is what defines an item or stack of items in the game, it contains the item ID, damage,
-				quantity and enchantments. Each slot in a {{cInventory|cInventory}} class or a
-				{{cItemGrid|cItemGrid}} class is a cItem and each cPickup contains a cItem. The enchantments
-				are contained in a {{cEnchantments|cEnchantments}} class
+				quantity and enchantments. Each slot in a {{cInventory}} class or a {{cItemGrid}} class is a cItem
+				and each {{cPickup}} contains a cItem. The enchantments are contained in a separate
+				{{cEnchantments}} class and are accessible through the m_Enchantments variable.
 			]],
 			
 			Functions =
 			{
 				constructor =
 				{
-					{ Params = "", Return = "cItem", Notes = "Creates a new empty cItem obje" },
+					{ Params = "", Return = "cItem", Notes = "Creates a new empty cItem object" },
 					{ Params = "ItemType, Count, Damage, EnchantmentString", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default) and enchantments (non-enchanted by default)" },
 					{ Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
 				} ,
+				AddCount = { Params = "AmountToAdd", Return = "cItem", Notes = "Adds the specified amount to the item count. Returns self (useful for chaining)." },
 				Clear = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
 				CopyOne = { Params = "", Return = "cItem", Notes = "Creates a copy of this object, with its count set to 1" },
 				DamageItem = { Params = "[Amount]", Return = "bool", Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)" },
 				Empty = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
 				GetMaxDamage = { Params = "", Return = "number", Notes = "Returns the maximum value for damage that this item can get before breaking; zero if damage is not accounted for for this item type" },
 				IsDamageable = { Params = "", Return = "bool", Notes = "Returns true if this item does account for its damage" },
-				IsEnchantable = { Params = "ItemType", Return = "bool", Notes = "(static) Returns true if the specified ItemType is an enchantable item, as defined by the 1.2.5 network protocol (deprecated)" },
+				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
 				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage and enchantments)" },
+				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
 				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object" },
 				IsStackableWith = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is stackable with the one stored in the object" },
 			},
