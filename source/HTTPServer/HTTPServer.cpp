@@ -127,24 +127,15 @@ cHTTPServer::cHTTPServer(void) :
 
 
 
-bool cHTTPServer::Initialize(cIniFile & a_IniFile)
+bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_PortsIPv6)
 {
-	if (!a_IniFile.GetValueSetB("WebAdmin", "Enabled", false))
-	{
-		// The WebAdmin is disabled
-		return true;
-	}
 	bool HasAnyPort;
-	HasAnyPort = m_ListenThreadIPv4.Initialize(a_IniFile.GetValueSet("WebAdmin", "Port", "8081"));
-	HasAnyPort = m_ListenThreadIPv6.Initialize(a_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "8082, 3300")) || HasAnyPort;
+	HasAnyPort = m_ListenThreadIPv4.Initialize(a_PortsIPv4);
+	HasAnyPort = m_ListenThreadIPv6.Initialize(a_PortsIPv6) || HasAnyPort;
 	if (!HasAnyPort)
 	{
-		LOG("WebAdmin is disabled");
 		return false;
 	}
-	
-	// DEBUG:
-	return Start(g_DebugCallbacks);
 	
 	return true;
 }

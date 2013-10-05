@@ -130,15 +130,9 @@ void cRoot::Start(void)
 		}
 		IniFile.WriteFile();
 
-		cIniFile WebIniFile("webadmin.ini");
-		if (!WebIniFile.ReadFile())
-		{
-			LOGWARNING("webadmin.ini inaccessible, wabadmin is disabled");
-		}
-		else
-		{
-			m_HTTPServer.Initialize(WebIniFile);
-		}
+		LOG("Initialising WebAdmin...");
+		m_WebAdmin = new cWebAdmin();
+		m_WebAdmin->Init();
 
 		LOG("Loading settings...");
 		m_GroupManager    = new cGroupManager();
@@ -167,6 +161,9 @@ void cRoot::Start(void)
 		
 		LOG("Starting server...");
 		m_Server->Start();
+		
+		LOG("Starting WebAdmin...");
+		m_WebAdmin->Start();
 
 		#if !defined(ANDROID_NDK)
 		LOG("Starting InputThread...");

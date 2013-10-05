@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/21/13 17:37:22.
+** Generated automatically by tolua++-1.0.92 on 10/05/13 18:34:12.
 */
 
 #ifndef __cplusplus
@@ -240,18 +240,19 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin");
  tolua_usertype(tolua_S,"cItemGrid");
- tolua_usertype(tolua_S,"cBlockArea");
+ tolua_usertype(tolua_S,"cHTTPServer::cCallbacks");
  tolua_usertype(tolua_S,"cLuaWindow");
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
- tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
- tolua_usertype(tolua_S,"cWindow");
- tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cBlockEntity");
@@ -18666,38 +18667,6 @@ static int tolua_AllToLua_cWebAdmin_GetMemoryUsage00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetPort of class  cWebAdmin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWebAdmin_GetPort00
-static int tolua_AllToLua_cWebAdmin_GetPort00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWebAdmin* self = (cWebAdmin*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPort'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->GetPort();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetPort'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetPage of class  cWebAdmin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWebAdmin_GetPage00
 static int tolua_AllToLua_cWebAdmin_GetPage00(lua_State* tolua_S)
@@ -30233,10 +30202,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"PluginName",tolua_get_sWebAdminPage_PluginName,tolua_set_sWebAdminPage_PluginName);
    tolua_variable(tolua_S,"TabName",tolua_get_sWebAdminPage_TabName,tolua_set_sWebAdminPage_TabName);
   tolua_endmodule(tolua_S);
-  tolua_cclass(tolua_S,"cWebAdmin","cWebAdmin","",NULL);
+  tolua_cclass(tolua_S,"cWebAdmin","cWebAdmin","cHTTPServer::cCallbacks",NULL);
   tolua_beginmodule(tolua_S,"cWebAdmin");
    tolua_function(tolua_S,"GetMemoryUsage",tolua_AllToLua_cWebAdmin_GetMemoryUsage00);
-   tolua_function(tolua_S,"GetPort",tolua_AllToLua_cWebAdmin_GetPort00);
    tolua_function(tolua_S,"GetPage",tolua_AllToLua_cWebAdmin_GetPage00);
    tolua_function(tolua_S,"GetBaseURL",tolua_AllToLua_cWebAdmin_GetBaseURL00);
   tolua_endmodule(tolua_S);

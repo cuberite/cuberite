@@ -82,6 +82,9 @@ public:
 	/// Returns the URL used in the request
 	const AString & GetURL(void) const { return m_URL; }
 	
+	/// Returns the URL used in the request, without any parameters
+	AString GetBareURL(void) const;
+	
 	/// Sets the UserData pointer that is stored within this request. The request doesn't touch this data (doesn't delete it)!
 	void SetUserData(void * a_UserData) { m_UserData = a_UserData; }
 	

@@ -120,6 +120,23 @@ int cHTTPRequest::ParseHeaders(const char * a_Data, int a_Size)
 
 
 
+AString cHTTPRequest::GetBareURL(void) const
+{
+	size_t idxQM = m_URL.find('?');
+	if (idxQM != AString::npos)
+	{
+		return m_URL.substr(0, idxQM);
+	}
+	else
+	{
+		return m_URL;
+	}
+}
+
+
+
+
+
 int cHTTPRequest::ParseRequestLine(const char * a_Data, int a_Size)
 {	
 	m_IncomingHeaderData.append(a_Data, a_Size);

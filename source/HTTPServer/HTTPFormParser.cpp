@@ -32,7 +32,7 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callba
 	}
 	if ((a_Request.GetMethod() == "POST") || (a_Request.GetMethod() == "PUT"))
 	{
-		if (a_Request.GetContentType() == "application/x-www-form-urlencoded")
+		if (strncmp(a_Request.GetContentType().c_str(), "application/x-www-form-urlencoded", 33) == 0)
 		{
 			m_Kind = fpkFormUrlEncoded;
 			return;
@@ -44,7 +44,8 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callba
 			return;
 		}
 	}
-	ASSERT(!"Unhandled request method");
+	// Invalid method / content type combination, this is not a HTTP form
+	m_IsValid = false;
 }
 
 
