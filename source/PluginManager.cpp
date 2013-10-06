@@ -75,9 +75,9 @@ void cPluginManager::FindPlugins(void)
 	AStringList Files = GetDirectoryContents(PluginsPath.c_str());
 	for (AStringList::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
 	{
-		if (!cFile::IsFolder(PluginsPath + *itr))
+		if ((*itr == ".") || (*itr == "..") || (!cFile::IsFolder(PluginsPath + *itr)))
 		{
-			// We only want folders
+			// We only want folders, and don't want "." or ".."
 			continue;
 		}
 
