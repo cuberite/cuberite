@@ -39,6 +39,7 @@ public:
 	} ;
 	
 	cHTTPConnection(cHTTPServer & a_HTTPServer);
+	~cHTTPConnection();
 	
 	/// Sends HTTP status code together with a_Reason (used for HTTP errors)
 	void SendStatusAndReason(int a_StatusCode, const AString & a_Reason);
@@ -60,6 +61,9 @@ public:
 	
 	/// Resets the connection for a new request. Depending on the state, this will send an "InternalServerError" status or a "ResponseEnd"
 	void AwaitNextRequest(void);
+	
+	/// Terminates the connection; finishes any request being currently processed
+	void Terminate(void);
 	
 protected:
 	typedef std::map<AString, AString> cNameValueMap;

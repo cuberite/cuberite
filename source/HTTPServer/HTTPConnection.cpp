@@ -17,7 +17,18 @@ cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
 	m_State(wcsRecvHeaders),
 	m_CurrentRequest(NULL)
 {
+	// LOGD("HTTP: New connection at %p", this);
 }
+
+
+
+
+
+cHTTPConnection::~cHTTPConnection()
+{
+	// LOGD("HTTP: Del connection at %p", this);
+}
+
 
 
 
@@ -120,6 +131,19 @@ void cHTTPConnection::AwaitNextRequest(void)
 
 
 
+void cHTTPConnection::Terminate(void)
+{
+	if (m_CurrentRequest != NULL)
+	{
+		m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
+	}
+	m_HTTPServer.CloseConnection(*this);
+}
+
+
+
+
+
 void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 {
 	switch (m_State)
@@ -214,6 +238,7 @@ void cHTTPConnection::SocketClosed(void)
 	{
 		m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
 	}
+	m_HTTPServer.CloseConnection(*this);
 }
 
 

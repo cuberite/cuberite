@@ -134,6 +134,8 @@ protected:
 	class cRequestData
 	{
 	public:
+		virtual ~cRequestData() {}  // Force a virtual destructor in all descendants
+		
 		/// Called when a new chunk of body data is received
 		virtual void OnBody(const char * a_Data, int a_Size) = 0;
 	} ;

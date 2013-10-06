@@ -179,9 +179,9 @@ void cHTTPServer::Stop(void)
 	
 	// Drop all current connections:
 	cCSLock Lock(m_CSConnections);
-	for (cHTTPConnections::iterator itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
+	while (!m_Connections.empty())
 	{
-		m_SocketThreads.RemoveClient(*itr);
+		m_Connections.front()->Terminate();
 	}  // for itr - m_Connections[]
 }
 
@@ -213,6 +213,7 @@ void cHTTPServer::CloseConnection(cHTTPConnection & a_Connection)
 			break;
 		}
 	}
+	delete &a_Connection;
 }
 
 

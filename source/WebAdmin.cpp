@@ -488,15 +488,20 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	)
 	{
 		HandleWebadminRequest(a_Connection, a_Request);
-		return;
 	}
-	if (URL == "/")
+	else if (URL == "/")
 	{
 		// The root needs no body handler and is fully handled in the OnRequestFinished() call
 		HandleRootRequest(a_Connection, a_Request);
-		return;
 	}
-	// TODO: Handle other requests
+	else
+	{
+		// TODO: Handle other requests
+	}
+	
+	// Delete any request data assigned to the request:
+	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
+	delete Data;
 }
 
 
