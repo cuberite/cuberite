@@ -554,8 +554,16 @@ public:
 	/// Forces a weather change in the next game tick
 	void ChangeWeather  (void);
 	
-	/// Returns the current weather
+	/// Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible
 	eWeather GetWeather     (void) const { return m_Weather; };
+	
+	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
+	bool IsWeatherRain (void) const { return (m_Weather == wRain); }
+	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
+	
+	/// Returns true if the current weather has any precipitation - rain or storm
+	bool IsWeatherWet  (void) const { return (m_Weather != wSunny); }
+	
 	// tolua_end
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }

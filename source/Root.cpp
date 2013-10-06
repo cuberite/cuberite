@@ -17,6 +17,7 @@
 #include "Protocol/ProtocolRecognizer.h"  // for protocol version constants
 #include "CommandOutput.h"
 #include "DeadlockDetect.h"
+#include "OSSupport/Timer.h"
 
 #include "../iniFile/iniFile.h"
 
@@ -91,6 +92,10 @@ void cRoot::InputThread(void * a_Params)
 
 void cRoot::Start(void)
 {
+	cTimer Time;
+
+	long long mseconds = Time.GetNowTime();
+
 	cDeadlockDetect dd;
 	delete m_Log;
 	m_Log = new cMCLogger();
@@ -125,7 +130,7 @@ void cRoot::Start(void)
 		LOG("Starting server...");
 		if (!m_Server->InitServer(IniFile))
 		{
-			LOGERROR("Failed to start server, shutting down.");
+			LOGERROR("Failure starting server, aborting...");
 			return;
 		}
 		IniFile.WriteFile();
@@ -134,44 +139,48 @@ void cRoot::Start(void)
 		m_WebAdmin = new cWebAdmin();
 		m_WebAdmin->Init();
 
-		LOG("Loading settings...");
+		LOGD("Loading settings...");
 		m_GroupManager    = new cGroupManager();
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
-		LOG("Loading worlds...");
+		LOGD("Loading worlds...");
 		LoadWorlds();
 
-		LOG("Loading plugin manager...");
+		LOGD("Loading plugin manager...");
 		m_PluginManager = new cPluginManager();
 		m_PluginManager->ReloadPluginsNow();
 		
-		LOG("Loading MonsterConfig...");
+		LOGD("Loading MonsterConfig...");
 		m_MonsterConfig = new cMonsterConfig;
 
 		// This sets stuff in motion
-		LOG("Starting Authenticator...");
+		LOGD("Starting Authenticator...");
 		m_Authenticator.Start();
 		
-		LOG("Starting worlds...");
+		LOGD("Starting worlds...");
 		StartWorlds();
 		
-		LOG("Starting deadlock detector...");
+		LOGD("Starting deadlock detector...");
 		dd.Start();
 		
-		LOG("Starting server...");
+		LOGD("Finalising startup...");
 		m_Server->Start();
 		
 		LOG("Starting WebAdmin...");
 		m_WebAdmin->Start();
 
 		#if !defined(ANDROID_NDK)
-		LOG("Starting InputThread...");
+		LOGD("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
 		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
 		#endif
 
-		LOG("Initialization done, server running now.");
+		long long finishmseconds = Time.GetNowTime();
+		finishmseconds -= mseconds;
+
+		LOG("Startup complete, took %i ms!", finishmseconds);
+
 		while (!m_bStop && !m_bRestart)  // These are modified by external threads
 		{
 			cSleep::MilliSleep(1000);
@@ -185,37 +194,37 @@ void cRoot::Start(void)
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
 		
-		LOG("Shutting down deadlock detector...");
+		LOGD("Shutting down deadlock detector...");
 		dd.Stop();
 		
-		LOG("Stopping world threads...");
+		LOGD("Stopping world threads...");
 		StopWorlds();
 		
-		LOG("Stopping authenticator...");
+		LOGD("Stopping authenticator...");
 		m_Authenticator.Stop();
 
-		LOG("Freeing MonsterConfig...");
+		LOGD("Freeing MonsterConfig...");
 		delete m_MonsterConfig; m_MonsterConfig = NULL;
-		LOG("Stopping WebAdmin...");
+		LOGD("Stopping WebAdmin...");
 		delete m_WebAdmin; m_WebAdmin = NULL;
-		LOG("Unloading recipes...");
+		LOGD("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
 		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
-		LOG("Forgetting groups...");
+		LOGD("Forgetting groups...");
 		delete m_GroupManager; m_GroupManager = 0;
-		LOG("Unloading worlds...");
+		LOGD("Unloading worlds...");
 		UnloadWorlds();
 		
-		LOG("Stopping plugin manager...");
+		LOGD("Stopping plugin manager...");
 		delete m_PluginManager; m_PluginManager = NULL;
 
 		cItemHandler::Deinit();
 		cBlockHandler::Deinit();
 
-		LOG("Destroying server...");
+		LOG("Cleaning up...");
 		//delete HeartBeat; HeartBeat = 0;
 		delete m_Server; m_Server = 0;
-		LOG("Shutdown done.");
+		LOG("Shutdown successful!");
 	}
 
 	delete m_Log; m_Log = 0;

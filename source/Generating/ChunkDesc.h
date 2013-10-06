@@ -36,12 +36,12 @@ public:
 	cChunkDesc(int a_ChunkX, int a_ChunkZ);
 	~cChunkDesc();
 
+	void SetChunkCoords(int a_ChunkX, int a_ChunkZ);
+	
 	// tolua_begin
 
 	int GetChunkX(void) const { return m_ChunkX; }
 	int GetChunkZ(void) const { return m_ChunkZ; }
-	
-	void SetChunkCoords(int a_ChunkX, int a_ChunkZ);
 	
 	void       FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	void       SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -74,7 +74,7 @@ public:
 	/// Writes the block area into the chunk, with its origin set at the specified relative coords. Area's data overwrite everything in the chunk.
 	void WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ, cBlockArea::eMergeStrategy a_MergeStrategy = cBlockArea::msOverwrite);
 
-	/// Reads an area from the chunk into a cBlockArea
+	/// Reads an area from the chunk into a cBlockArea, blocktypes and blockmetas
 	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);
 
 	/// Returns the maximum height value in the heightmap

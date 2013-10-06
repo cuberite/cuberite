@@ -206,7 +206,6 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		return false;
 	}
 
-	LOG("Starting up server.");
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
 	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
@@ -292,7 +291,7 @@ void cServer::PrepareKeys(void)
 	// TODO: Save and load key for persistence across sessions
 	// But generating the key takes only a moment, do we even need that?
 	
-	LOG("Generating protocol encryption keypair...");
+	LOGD("Generating protocol encryption keypair...");
 	
 	time_t CurTime = time(NULL);
 	CryptoPP::RandomPool rng;

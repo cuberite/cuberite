@@ -95,7 +95,7 @@ void cPluginManager::FindPlugins(void)
 
 void cPluginManager::ReloadPluginsNow(void)
 {
-	LOG("Loading plugins");
+	LOG("-- Loading Plugins --");
 	m_bReloadPlugins = false;
 	UnloadPluginsNow();
 
@@ -135,11 +135,15 @@ void cPluginManager::ReloadPluginsNow(void)
 
 	if (GetNumPlugins() == 0)
 	{
-		LOG("No plugins loaded");
+		LOG("-- No Plugins Loaded --");
+	}
+	else if ((GetNumPlugins() > 1) || (GetNumPlugins() == 0))
+	{
+		LOG("-- Loaded %i Plugins --", GetNumPlugins());
 	}
 	else
 	{
-		LOG("Loaded %i plugin(s)", GetNumPlugins());
+		LOG("-- Loaded 1 Plugin --");
 	}
 }
 

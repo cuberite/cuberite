@@ -30,30 +30,38 @@ public:
 
 	virtual void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		// TODO: Rain hydrates farmland, too. Check world weather, don't search for water if raining.
-		// NOTE: The desert biomes do not get precipitation, so another check needs to be made.
-		
-		// Search for water in a close proximity:
-		// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
-		cBlockArea Area;
-		if (!Area.Read(a_World, a_BlockX - 4, a_BlockX + 4, a_BlockY, a_BlockY + 1, a_BlockZ - 4, a_BlockZ + 4))
-		{
-			// Too close to the world edge, cannot check surroudnings; don't tick at all
-			return;
-		}
 		bool Found = false;
-		int NumBlocks = Area.GetBlockCount();
-		BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
-		for (int i = 0; i < NumBlocks; i++)
+		
+		int Biome = a_World->GetBiomeAt(a_BlockX, a_BlockZ);
+		if (a_World->IsWeatherWet() && (Biome != biDesert) && (Biome != biDesertHills))
 		{
-			if (
-				(BlockTypes[i] == E_BLOCK_WATER) ||
-				(BlockTypes[i] == E_BLOCK_STATIONARY_WATER)
-			)
+			// Rain hydrates farmland, too, except in Desert biomes.
+			Found = true;
+		}
+		else
+		{
+			// Search for water in a close proximity:
+			// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
+			cBlockArea Area;
+			if (!Area.Read(a_World, a_BlockX - 4, a_BlockX + 4, a_BlockY, a_BlockY + 1, a_BlockZ - 4, a_BlockZ + 4))
 			{
-				Found = true;
-				break;
+				// Too close to the world edge, cannot check surroudnings; don't tick at all
+				return;
 			}
+
+			int NumBlocks = Area.GetBlockCount();
+			BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
+			for (int i = 0; i < NumBlocks; i++)
+			{
+				if (
+					(BlockTypes[i] == E_BLOCK_WATER) ||
+					(BlockTypes[i] == E_BLOCK_STATIONARY_WATER)
+				)
+				{
+					Found = true;
+					break;
+				}
+			}  // for i - BlockTypes[]
 		}
 		
 		NIBBLETYPE BlockMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);

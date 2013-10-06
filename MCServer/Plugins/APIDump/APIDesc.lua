@@ -157,10 +157,13 @@ g_APIDesc =
 				SetBlockMeta = { Params = "BlockX, BlockY, BlockZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified absolute coords" },
 				SetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ, SkyLight", Return = "", Notes = "Sets the skylight at the specified absolute coords" },
 				SetBlockType = { Params = "BlockX, BlockY, BlockZ, BlockType", Return = "", Notes = "Sets the block type at the specified absolute coords" },
+				SetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified absolute coords" },
+				SetOrigin = { Params = "OriginX, OriginY, OriginZ", Return = "", Notes = "Resets the origin for the absolute coords. Only affects how absolute coords are translated into relative coords." },
 				SetRelBlockLight = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockLight", Return = "", Notes = "Sets the blocklight at the specified relative coords" },
 				SetRelBlockMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified relative coords" },
 				SetRelBlockSkyLight = { Params = "RelBlockX, RelBlockY, RelBlockZ, SkyLight", Return = "", Notes = "Sets the skylight at the specified relative coords" },
 				SetRelBlockType = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockType", Return = "", Notes = "Sets the block type at the specified relative coords" },
+				SetRelBlockTypeMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified relative coords" },
 				Write = { Params = "World, MinX, MinY, MinZ, DataTypes", Return = "bool", Notes = "Writes the area into World at the specified coords, returns true if successful" },
 			},
 			Constants =
@@ -311,8 +314,41 @@ g_APIDesc =
 		
 		cBoundingBox = 
 		{
-			Desc = "",
-			Functions = {},
+			Desc = [[
+			Represents two sets of coordinates, minimum and maximum for each direction; thus defining an
+			axis-aligned cuboid with floating-point boundaries. It supports operations changing the size and
+			position of the box, as well as querying whether a point or another BoundingBox is inside the box.</p>
+			<p>
+			All the points within the coordinate limits (inclusive the edges) are considered "inside" the box.
+			However, for intersection purposes, if the intersection is "sharp" in any coord (min1 == max2, i. e.
+			zero volume), the boxes are considered non-intersecting.</p>
+			]],
+			Functions =
+			{
+				constructor =
+				{
+					{ Params = "MinX, MaxX, MinY, MaxY, MinZ, MaxZ", Return = "cBoundingBox", Notes = "Creates a new bounding box with the specified edges" },
+					{ Params = "{{Vector3d|Min}}, {{Vector3d|Max}}", Return = "cBoundingBox", Notes = "Creates a new bounding box with the coords specified as two vectors" },
+					{ Params = "{{Vector3d|Pos}}, Radius, Height", Return = "cBoundingBox", Notes = "Creates a new bounding box from the position given and radius (X/Z) and height. Radius is added from X/Z to calculate the maximum coords and subtracted from X/Z to get the minimum; minimum Y is set to Pos.y and maxumim Y to Pos.y plus Height. This corresponds with how {{cEntity|entities}} are represented in Minecraft." },
+					{ Params = "OtherBoundingBox", Return = "cBoundingBox", Notes = "Creates a new copy of the given bounding box. Same result can be achieved by using a simple assignment." },
+				},
+				CalcLineIntersection = { Params = "{{Vector3d|LineStart}}, {{Vector3d|LinePt2}}", Return = "DoesIntersect, LineCoeff, Face", Notes = "Calculates the intersection of a ray (half-line), given by two of its points, with the bounding box. Returns false if the line doesn't intersect the bounding box, or true, together with coefficient of the intersection (how much of the difference between the two ray points is needed to reach the intersection), and the face of the box which is intersected.<br /><b>TODO</b>: Lua binding for this function is wrong atm." },
+				DoesIntersect = { Params = "OtherBoundingBox", Return = "bool", Notes = "Returns true if the two bounding boxes have an intersection of nonzero volume." },
+				Expand = { Params = "ExpandX, ExpandY, ExpandZ", Return = "", Notes = "Expands this bounding box by the specified amount in each direction (so the box becomes larger by 2 * Expand in each axis)." },
+				IsInside =
+				{
+					{ Params = "{{Vector3d|Point}}", Return = "bool", Notes = "Returns true if the specified point is inside (including on the edge) of the box." },
+					{ Params = "PointX, PointY, PointZ", Return = "bool", Notes = "Returns true if the specified point is inside (including on the edge) of the box." },
+					{ Params = "OtherBoundingBox", Return = "bool", Notes = "Returns true if OtherBoundingBox is inside of this box." },
+					{ Params = "{{Vector3d|OtherBoxMin}}, {{Vector3d|OtherBoxMax}}", Return = "bool", Notes = "Returns true if the other bounding box, specified by its 2 corners, is inside of this box." },
+				},
+				Move =
+				{
+					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Moves the bounding box by the specified offset in each axis" },
+					{ Params = "{{Vector3d|Offset}}", Return = "", Notes = "Moves the bounding box by the specified offset in each axis" },
+				},
+				Union = { Params = "OtherBoundingBox", Return = "cBoundingBox", Notes = "Returns the smallest bounding box that contains both OtherBoundingBox and this bounding box. Note that unlike the strict geometrical meaning of \"union\", this operation actually returns a cBoundingBox." },
+			},
 			Constants = {},
 		},
 
@@ -340,17 +376,46 @@ g_APIDesc =
 			Desc = [[
 				A chest entity is a {{cBlockEntityWithItems|cBlockEntityWithItems}} descendant that represents a chest
 				in the world. Note that doublechests consist of two separate cChestEntity objects, they do not collaborate
-				in any way.
+				in any way.</p>
+				<p>
+				The chest entity can be created by the plugins only in the {{OnChunkGenerating}} and
+				{{OnChunkGenerated}} hooks, as part of the new chunk being generated. Plugins may generate chests
+				with contents in this way.</p>
+				<p>
+				To manipulate a chest already in the game, you need to use {{cWorld}}'s callback mechanism with
+				either DoWithChestAt() or ForEachChestInChunk() function. See the code example below
 			]],
 			
 			Inherits = "cBlockEntityWithItems",
 			
 			Functions =
 			{
+				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cChestEntity", Notes = "Creates a new cChestEntity object. To be used only in the chunk generating hooks {{OnChunkGenerating}} and {{OnChunkGenerated}}." },
 			},
 			Constants =
 			{
+				ContentsHeight = { Notes = "Height of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}" },
+				ContentsWidth = { Notes = "Width of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}" },
 			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Code example",
+					Contents = [[
+						The following example code sets the top-left item of each chest in the same chunk as Player to
+						64 * diamond:
+<pre>
+-- Player is a {{cPlayer}} object instance
+local World = Player:GetWorld();
+World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
+	function (ChestEntity)
+		ChestEntity:SetSlot(0, 0, cItem(E_ITEM_DIAMOND, 64));
+	end
+);
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
 		},
 
 		cChunkDesc =
@@ -365,17 +430,40 @@ g_APIDesc =
 			Functions =
 			{
 				FillBlocks                = { Params = "BlockType, BlockMeta", Return = "", Notes = "Fills the entire chunk with the specified blocks" },
+				FillRelCuboid =
+				{
+					{ Params = "{{cCuboid|RelCuboid}}, BlockType, BlockMeta", Return = "", Notes = "Fills the cuboid, specified in relative coords, by the specified block type and block meta. The cuboid may reach outside of the chunk, only the part intersecting with this chunk is filled." },
+					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, BlockType, BlockMeta", Return = "", Notes = "Fills the cuboid, specified in relative coords, by the specified block type and block meta. The cuboid may reach outside of the chunk, only the part intersecting with this chunk is filled." },
+				},
+				FloorRelCuboid =
+				{
+					{ Params = "{{cCuboid|RelCuboid}}, BlockType, BlockMeta", Return = "", Notes = "Fills those blocks of the cuboid (specified in relative coords) that are considered non-floor (air, water) with the specified block type and meta. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, BlockType, BlockMeta", Return = "", Notes = "Fills those blocks of the cuboid (specified in relative coords) that are considered non-floor (air, water) with the specified block type and meta. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+				},
 				GetBiome                  = { Params = "RelX, RelZ", Return = "EMCSBiome", Notes = "Returns the biome at the specified relative coords" },
 				GetBlockMeta              = { Params = "RelX, RelY, RelZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
 				GetBlockType              = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified relative coords" },
 				GetBlockTypeMeta          = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified relative coords" },
+				GetChunkX                 = { Params = "", Return = "number", Notes = "Returns the X coord of the chunk contained." },
+				GetChunkZ                 = { Params = "", Return = "number", Notes = "Returns the Z coord of the chunk contained." },
 				GetHeight                 = { Params = "RelX, RelZ", Return = "number", Notes = "Returns the height at the specified relative coords" },
+				GetMaxHeight              = { Params = "", Return = "number", Notes = "Returns the maximum height contained in the heightmap." },
 				IsUsingDefaultBiomes      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default biome generator" },
 				IsUsingDefaultComposition = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default composition generator" },
 				IsUsingDefaultFinish      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default finishers" },
 				IsUsingDefaultHeight      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default height generator" },
 				IsUsingDefaultStructures  = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default structures" },
-				ReadBlockArea             = { Params = "BlockArea, MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ", Return = "", Notes = "Reads data from the chunk into the block area object" },
+				RandomFillRelCuboid =
+				{
+					{ Params = "{{cCuboid|RelCuboid}}, BlockType, BlockMeta, RandomSeed, ChanceOutOf10k", Return = "", Notes = "Fills the specified relative cuboid with block type and meta in random locations. RandomSeed is used for the random number genertion (same seed produces same results); ChanceOutOf10k specifies the density (how many out of every 10000 blocks should be filled). Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, BlockType, BlockMeta, RandomSeed, ChanceOutOf10k", Return = "", Notes = "Fills the specified relative cuboid with block type and meta in random locations. RandomSeed is used for the random number genertion (same seed produces same results); ChanceOutOf10k specifies the density (how many out of every 10000 blocks should be filled). Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+				},
+				ReadBlockArea             = { Params = "{{cBlockArea|BlockArea}}, MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ", Return = "", Notes = "Reads data from the chunk into the block area object. Block types and metas are processed." },
+				ReplaceRelCuboid =
+				{
+					{ Params = "{{cCuboid|RelCuboid}}, SrcType, SrcMeta, DstType, DstMeta", Return = "", Notes = "Replaces all SrcType+SrcMeta blocks in the cuboid (specified in relative coords) with DstType+DstMeta blocks. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, SrcType, SrcMeta, DstType, DstMeta", Return = "", Notes = "Replaces all SrcType+SrcMeta blocks in the cuboid (specified in relative coords) with DstType+DstMeta blocks. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+				},
 				SetBiome                  = { Params = "RelX, RelZ, EMCSBiome", Return = "", Notes = "Sets the biome at the specified relative coords" },
 				SetBlockMeta              = { Params = "RelX, RelY, RelZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified relative coords" },
 				SetBlockType              = { Params = "RelX, RelY, RelZ, BlockType", Return = "", Notes = "Sets the block type at the specified relative coords" },
@@ -386,7 +474,7 @@ g_APIDesc =
 				SetUseDefaultFinish       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default finishers or not" },
 				SetUseDefaultHeight       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default height generator or not" },
 				SetUseDefaultStructures   = { Params = "bool", Return = "", Notes = "Sets the chunk to use default structures or not" },
-				WriteBlockArea            = { Params = "BlockArea, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
+				WriteBlockArea            = { Params = "{{cBlockArea|BlockArea}}, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
 			},
 			Constants =
 			{
@@ -396,41 +484,48 @@ g_APIDesc =
 		cClientHandle =
 		{
 			Desc = [[
-				A cClientHandle represents technical aspect of a connected player - their game client connection.
+				A cClientHandle represents the technical aspect of a connected player - their game client
+				connection. Internally, it handles all the incoming and outgoing packets, the chunks that are to be
+				sent to the client, ping times etc.
 			]],
 			
 			Functions =
 			{
 				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
-				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client" },
+				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client. Note that this may be nil, for example if the player object is not yet spawned." },
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the UniqueID of the client used to identify the client in the server" },
 				GetUsername = { Params = "", Return = "string", Notes = "Returns the username that the client has provided" },
 				GetViewDistance = { Params = "", Return = "number", Notes = "Returns the viewdistance (number of chunks loaded for the player in each direction)" },
 				Kick = { Params = "Reason", Return = "", Notes = "Kicks the user with the specified reason" },
 				SetUsername = { Params = "Name", Return = "", Notes = "Sets the username" },
 				SetViewDistance = { Params = "ViewDistance", Return = "", Notes = "Sets the viewdistance (number of chunks loaded for the player in each direction)" },
-				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a block to the client. This can be used to create fake blocks." },
+				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player." },
 			},
 			Constants =
 			{
-				MAX = { Notes = "10" },
-				MIN = { Notes = "4" },
+				MAX_VIEW_DISTANCE = { Notes = "The maximum value of the view distance" },
+				MIN_VIEW_DISTANCE = { Notes = "The minimum value of the view distance" },
 			},
 		},
 
 		cCraftingGrid =
 		{
 			Desc = [[
-				cCraftingGrid represents the player's crafting grid. It is used only in
+				cCraftingGrid represents the player's crafting grid. It is used in
 				{{OnCraftingNoRecipe|OnCraftingNoRecipe}}, {{OnPostCrafting|OnPostCrafting}} and
 				{{OnPreCrafting|OnPreCrafting}} hooks. Plugins may use it to inspect the items the player placed
-				on their crafting grid.
+				on their crafting grid.</p>
+				<p>
+				Also, an object of this type is used in {{cCraftingRecipe}}'s ConsumeIngredients() function for
+				specifying the exact number of ingredients to consume in that recipe; plugins may use this to
+				apply the crafting recipe.</p>
 			]],
 			
 			Functions =
 			{
+				constructor = { Params = "Width, Height", Return = "cCraftingGrid", Notes = "Creates a new CraftingGrid object. This new crafting grid is not related to any player, but may be needed for {{cCraftingRecipe}}'s ConsumeIngredients function." },
 				Clear = { Params = "", Return = "", Notes = "Clears the entire grid" },
-				ConsumeGrid = { Params = "{{cCraftingGrid|CraftingGrid}}", Return = "", Notes = "Consumes items specified in CraftingGrid from the current contents" },
+				ConsumeGrid = { Params = "{{cCraftingGrid|CraftingGrid}}", Return = "", Notes = "Consumes items specified in CraftingGrid from the current contents. Used internally by {{cCraftingRecipe}}'s ConsumeIngredients() function, but available to plugins, too." },
 				Dump = { Params = "", Return = "", Notes = "DEBUG build: Dumps the contents of the grid to the log. RELEASE build: no action" },
 				GetHeight = { Params = "", Return = "number", Notes = "Returns the height of the grid" },
 				GetItem = { Params = "x, y", Return = "{{cItem|cItem}}", Notes = "Returns the item at the specified coords" },
@@ -481,15 +576,37 @@ g_APIDesc =
 		cCuboid =
 		{
 			Desc = [[
-				cCuboid offers some native support for integral-boundary cuboids. A cuboid simply consists of two
-				{{vector3i}}-s. It offers some extra functions for sorting and checking if a point is inside the
-				cuboid.
+				cCuboid offers some native support for integral-boundary cuboids. A cuboid internally consists of
+				two {{Vector3i}}s. By default the cuboid doesn't make any assumptions about the defining points,
+				but for most of the operations in the cCuboid class, the p1 member variable is expected to be the
+				minima and the p2 variable the maxima. The Sort() function guarantees this condition.</p>
+				<p>
+				The Cuboid considers both its edges inclusive.</p>
 			]],
 			Functions =
 			{
-				Sort = { Return = "" },
-				IsInside = { Return = "bool" },
-				IsInside = { Return = "bool" },
+				constructor =
+				{
+					{ Params = "OtheCuboid", Return = "cCuboid", Notes = "Creates a new Cuboid object as a copy of OtherCuboid" },
+					{ Params = "{{Vector3i|Point1}}, {{Vector3i|Point2}}", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified points as its corners." },
+					{ Params = "X, Y, Z", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified point as both its corners (the cuboid has a size of 1 in each direction)." },
+					{ Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified points as its corners." },
+				},
+				Assign = { Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "", Notes = "Assigns all the coords stored in the cuboid. Sort-state is ignored." },
+				DifX = { Params = "", Return = "number", Notes = "Returns the difference between the two X coords (X-size minus 1). Assumes sorted." },
+				DifY = { Params = "", Return = "number", Notes = "Returns the difference between the two Y coords (Y-size minus 1). Assumes sorted." },
+				DifZ = { Params = "", Return = "number", Notes = "Returns the difference between the two Z coords (Z-size minus 1). Assumes sorted." },
+				DoesIntersect = { Params = "OtherCuboid", Return = "bool", Notes = "Returns true if this cuboid has at least one voxel in common with OtherCuboid. Note that edges are considered inclusive. Assumes both sorted." },
+				IsCompletelyInside = { Params = "OuterCuboid", Return = "bool", Notes = "Returns true if this cuboid is completely inside (in all directions) in OuterCuboid. Assumes both sorted." },
+				IsInside =
+				{
+					{ Params = "X, Y, Z", Return = "bool", Notes = "Returns true if the specified point (integral coords) is inside this cuboid. Assumes sorted." },
+					{ Params = "{{Vector3i|Point}}", Return = "bool", Notes = "Returns true if the specified point (integral coords) is inside this cuboid. Assumes sorted." },
+					{ Params = "{{Vector3d|Point}}", Return = "bool", Notes = "Returns true if the specified point (floating-point coords) is inside this cuboid. Assumes sorted." },
+				},
+				IsSorted = { Params = "", Return = "bool", Notes = "Returns true if this cuboid is sorted" },
+				Move = { Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Adds the specified offsets to each respective coord, effectively moving the Cuboid. Sort-state is ignored." },
+				Sort = { Params = "", Return = "" , Notes = "Sorts the internal representation so that p1 contains the lesser coords and p2 contains the greater coords." },
 			},
 			Variables =
 			{
@@ -542,8 +659,8 @@ g_APIDesc =
 			},
 			Constants =
 			{
-				ContentsWidth = { Notes = "Width (X) of the cItemGrid representing the contents" },
-				ContentsHeight = { Notes = "Height (Y) of the cItemGrid representing the contents" },
+				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid}} representing the contents" },
+				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid}} representing the contents" },
 			},
 			
 			Inherits = "cBlockEntity";
@@ -557,8 +674,12 @@ g_APIDesc =
 ]],
 			Functions =
 			{
-				constructor = { Params = "", Return = "cEnchantments", Notes = "Creates a new empty cEnchantments object" },
-				constructor = { Params = "StringSpec", Return = "cEnchantments", Notes = "Creates a new cEnchantments object filled with enchantments based on the string description" },
+				constructor =
+				{
+					{ Params = "", Return = "cEnchantments", Notes = "Creates a new empty cEnchantments object" },
+					{ Params = "StringSpec", Return = "cEnchantments", Notes = "Creates a new cEnchantments object filled with enchantments based on the string description" },
+				},
+				operator_eq = { Params = "OtherEnchantments", Return = "bool", Notes = "Returns true if this enchantments object has the same enchantments as OtherEnchantments." },
 				AddFromString = { Params = "StringSpec", Return = "", Notes = "Adds the enchantments in the string description into the object. If a specified enchantment already existed, it is overwritten." },
 				Clear = { Params = "", Return = "", Notes = "Removes all enchantments" },
 				GetLevel = { Params = "EnchantmentNumID", Return = "number", Notes = "Returns the level of the specified enchantment stored in this object; 0 if not stored" },
@@ -574,67 +695,149 @@ g_APIDesc =
 
 		cEntity =
 		{
-			Desc = [[A cEntity object represents an object in the world, it has a position and orientation. cEntity is an abstract class, and can not be instantiated directly, instead, all entities are implemented as subclasses. The cEntity class works as the common interface for the operations that all (most) entities support.
-</p>
-		<p>All cEntity objects have an Entity Type so it can be determined what kind of entity it is efficiently. Entities also have a class inheritance awareness, they know their class name, their parent class' name and can decide if there is a class within their inheritance chain. Since these functions operate on strings, they are slightly slower than checking the entity type directly, on the other hand, they are more specific (compare etMob vs "cSpider" class name).
-</p>
-		<p>Note that you should not store a cEntity object between two hooks' calls, because MCServer may remove that entity in between the calls. If you need to refer to an entity later, use its UniqueID and {{cWorld|cWorld}}'s entity manipulation functions to access the entity.
-]],
+			Desc = [[
+				A cEntity object represents an object in the world, it has a position and orientation. cEntity is an
+				abstract class, and can not be instantiated directly, instead, all entities are implemented as
+				subclasses. The cEntity class works as the common interface for the operations that all (most)
+				entities support.</p>
+				<p>
+				All cEntity objects have an Entity Type so it can be determined what kind of entity it is
+				efficiently. Entities also have a class inheritance awareness, they know their class name,
+				their parent class' name and can decide if there is a class within their inheritance chain.
+				Since these functions operate on strings, they are slightly slower than checking the entity type
+				directly, on the other hand, they are more specific directly. To check if the entity is a spider,
+				you need to call IsMob(), then cast the object to {{cMonster}} and finally compare
+				{{cMonster}}:GetMonsterType() to mtSpider. GetClass(), on the other hand, returns "cSpider"
+				directly.</p>
+				<p>
+				Note that you should not store a cEntity object between two hooks' calls, because MCServer may
+				despawn / remove that entity in between the calls. If you need to refer to an entity later, use its
+				UniqueID and {{cWorld|cWorld}}'s entity manipulation functions DoWithEntityByID(), ForEachEntity()
+				or ForEachEntityInChunk() to access the entity again.</p>
+			]],
 			Functions =
 			{
+				AddPosition =
+				{
+					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Moves the entity by the specified amount in each axis direction" },
+					{ Params = "{{Vector3d|Offset}}", Return = "", Notes = "Moves the entity by the specified amount in each direction" },
+				},
+				AddPosX = { Params = "OffsetX", Return = "", Notes = "Moves the entity by the specified amount in the X axis direction" },
+				AddPosY = { Params = "OffsetY", Return = "", Notes = "Moves the entity by the specified amount in the Y axis direction" },
+				AddPosZ = { Params = "OffsetZ", Return = "", Notes = "Moves the entity by the specified amount in the Z axis direction" },
+				AddSpeed =
+				{
+					{ Params = "AddX, AddY, AddZ", Return = "", Notes = "Adds the specified amount of speed in each axis direction." },
+					{ Params = "{{Vector3d|Add}}", Return = "", Notes = "Adds the specified amount of speed in each axis direction." },
+				},
+				AddSpeedX = { Params = "AddX", Return = "", Notes = "Adds the specified amount of speed in the X axis direction." },
+				AddSpeedY = { Params = "AddY", Return = "", Notes = "Adds the specified amount of speed in the Y axis direction." },
+				AddSpeedZ = { Params = "AddZ", Return = "", Notes = "Adds the specified amount of speed in the Z axis direction." },
 				Destroy = { Params = "", Return = "", Notes = "Schedules the entity to be destroyed" },
+				GetArmorCoverAgainst = { Params = "AttackerEntity, DamageType, RawDamage", Return = "number", Notes = "Returns the number of hitpoints out of RawDamage that the currently equipped armor would cover. See {{TakeDamageInfo}} for more information on attack damage." },
 				GetChunkX = { Params = "", Return = "number", Notes = "Returns the X-coord of the chunk in which the entity is placed" },
-				GetChunkY = { Params = "", Return = "number", Notes = "Returns the Y-coord of the chunk in which the entity is placed" },
 				GetChunkZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the chunk in which the entity is placed" },
-				GetClass = { Params = "", Return = "string", Notes = "Returns the classname of the entity, such as \"spider\" or \"pickup\"" },
+				GetClass = { Params = "", Return = "string", Notes = "Returns the classname of the entity, such as \"cSpider\" or \"cPickup\"" },
 				GetClassStatic = { Params = "", Return = "string", Notes = "Returns the entity classname that this class implements. Each descendant overrides this function. Is static" },
-				GetEntityType = { Params = "", Return = "cEntity.eEntityType", Notes = "Returns the type of the entity, one of the etXXX constants" },
+				GetEntityType = { Params = "", Return = "eEntityType", Notes = "Returns the type of the entity, one of the etXXX constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call." },
+				GetEquippedBoots = { Params = "", Return = "{{cItem}}", Notes = "Returns the boots that the entity has equipped. Returns an empty cItem if no boots equipped or not applicable." },
+				GetEquippedChestplate = { Params = "", Return = "{{cItem}}", Notes = "Returns the chestplate that the entity has equipped. Returns an empty cItem if no chestplate equipped or not applicable." },
+				GetEquippedHelmet = { Params = "", Return = "{{cItem}}", Notes = "Returns the helmet that the entity has equipped. Returns an empty cItem if no helmet equipped or not applicable." },
+				GetEquippedLeggings = { Params = "", Return = "{{cItem}}", Notes = "Returns the leggings that the entity has equipped. Returns an empty cItem if no leggings equipped or not applicable." },
+				GetEquippedWeapon = { Params = "", Return = "{{cItem}}", Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable." },
+				GetGravity = { Params = "", Return = "number", Notes = "Returns the number that is used as the gravity for physics simulation. 1G (9.78) by default." },
+				GetHeadYaw = { Params = "", Return = "number", Notes = "Returns the pitch of the entity's head (FIXME: Rename to GetHeadPitch() )." },
+				GetHealth = { Params = "", Return = "number", Notes = "Returns the current health of the entity." },
+				GetHeight = { Params = "", Return = "number", Notes = "Returns the height (Y size) of the entity" },
+				GetKnockbackAmountAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the amount of knockback that the currently equipped items would cause when attacking the ReceiverEntity." },
 				GetLookVector = { Params = "", Return = "Vector3f", Notes = "Returns the vector that defines the direction in which the entity is looking" },
+				GetMass = { Params = "", Return = "number", Notes = "Returns the mass of the entity. Currently unused." },
+				GetMaxHealth = { Params = "", Return = "number", Notes = "Returns the maximum number of hitpoints this entity is allowed to have." },
 				GetParentClass = { Params = "", Return = "string", Notes = "Returns the name of the direct parent class for this entity" },
 				GetPitch = { Params = "", Return = "number", Notes = "Returns the pitch (nose-down rotation) of the entity" },
+				GetPosition = { Params = "", Return = "Vector3d", Notes = "Returns the entity's pivot position as a 3D vector" },
 				GetPosX = { Params = "", Return = "number", Notes = "Returns the X-coord of the entity's pivot" },
 				GetPosY = { Params = "", Return = "number", Notes = "Returns the Y-coord of the entity's pivot" },
 				GetPosZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the entity's pivot" },
-				GetPosition = { Params = "", Return = "Vector3d", Notes = "Returns the entity's pivot position as a 3D vector" },
-				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity" },
-				GetRot = { Params = "", Return = "Vector3f", Notes = "Returns the entire rotation vector (Rotation, Pitch, Roll)" },
-				GetRotation = { Params = "", Return = "number", Notes = "Returns the rotation (direction) of the entity" },
+				GetRawDamageAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the raw damage that this entity's equipment would cause when attacking the ReceiverEntity. This includes this entity's weapon {{cEnchantments|enchantments}}, but excludes the receiver's armor or potion effects. See {{TakeDamageInfo}} for more information on attack damage." },
+				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity. Currently unused." },
+				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the entire rotation vector (Yaw, Pitch, Roll)" },
+				GetRotation = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. FIXME: Rename to GetYaw()." },
 				GetSpeed = { Params = "", Return = "Vector3d", Notes = "Returns the complete speed vector of the entity" },
 				GetSpeedX = { Params = "", Return = "number", Notes = "Returns the X-part of the speed vector" },
 				GetSpeedY = { Params = "", Return = "number", Notes = "Returns the Y-part of the speed vector" },
 				GetSpeedZ = { Params = "", Return = "number", Notes = "Returns the Z-part of the speed vector" },
-				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity" },
+				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity within the running server. Note that this ID is not persisted to the data files." },
+				GetWidth = { Params = "", Return = "number", Notes = "Returns the width (X and Z size) of the entity." },
 				GetWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world where the entity resides" },
+				Heal = { Params = "Hitpoints", Return = "", Notes = "Heals the specified number of hitpoints. Hitpoints is expected to be a positive number." },
 				IsA = { Params = "ClassName", Return = "bool", Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself" },
-				IsCrouched = { Params = "", Return = "bool", Notes = "Returns true if the entity is crouched. False for entities that don't support crouching" },
-				IsDestroyed = { Params = "", Return = "bool", Notes = "Returns true if the entity has been destroyed and is awaiting removal from the internal structures" },
-				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a minecart" },
-				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any mob" },
+				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
+				IsCrouched = { Params = "", Return = "bool", Notes = "Returns true if the entity is crouched. Always false for entities that don't support crouching." },
+				IsDestroyed = { Params = "", Return = "bool", Notes = "Returns true if the entity has been destroyed and is awaiting removal from the internal structures." },
+				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cMinecart|minecart}}" },
+				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any {{cMonster|mob}}." },
 				IsOnFire = { Params = "", Return = "bool", Notes = "Returns true if the entity is on fire" },
-				IsPickup = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a pickup" },
-				IsPlayer = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a player" },
-				IsTNT = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a TNT entity" },
+				IsPickup = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPickup|pickup}}." },
+				IsPlayer = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPlayer|player}}" },
 				IsRclking = { Params = "", Return = "bool", Notes = "Currently unimplemented" },
-				IsSprinting = { Params = "", Return = "bool", Notes = "Returns true if the entity is sprinting. ENtities that cannot sprint return always false" },
+				IsRiding = { Params = "", Return = "bool", Notes = "Returns true if the entity is attached to (riding) another entity." },
+				IsSprinting = { Params = "", Return = "bool", Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false" },
+				IsTNT = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cTNTEntity|TNT entity}}" },
+				KilledBy = { Notes = "FIXME: Remove this from API" },
+				SetGravity = { Params = "Gravity", Return = "", Notes = "Sets the number that is used as the gravity for physics simulation. 1G (9.78) by default." },
+				SetHeadYaw = { Params = "HeadPitch", Return = "", Notes = "Sets the head pitch (FIXME: Rename to SetHeadPitch() )." },
+				SetHealth = { Params = "Hitpoints", Return = "", Notes = "Sets the entity's health to the specified amount of hitpoints. Doesn't broadcast any hurt animation. Doesn't kill the entity if health drops below zero. Use the TakeDamage() function instead for taking damage." },
+				SetHeight = { Params = "", Return = "", Notes = "FIXME: Remove this from API" },
+				SetMass = { Params = "Mass", Return = "", Notes = "Sets the mass of the entity. Currently unused." },
+				SetMaxHealth = { Params = "MaxHitpoints", Return = "", Notes = "Sets the maximum hitpoints of the entity. If current health is above MaxHitpoints, it is capped to MaxHitpoints." },
 				SetPitch = { Params = "number", Return = "", Notes = "Sets the pitch (nose-down rotation) of the entity" },
+				SetPitchFromSpeed = { Params = "", Return = "", Notes = "Sets the entity pitch to match its speed (entity looking forwards as it moves)" },
+				SetPosition =
+				{
+					{ Params = "PosX, PosY, PosZ", Return = "", Notes = "Sets all three coords of the entity's pivot" },
+					{ Params = "{{Vector3d|Vector3d}}", Return = "", Notes = "Sets all three coords of the entity's pivot" },
+				},
 				SetPosX = { Params = "number", Return = "", Notes = "Sets the X-coord of the entity's pivot" },
 				SetPosY = { Params = "number", Return = "", Notes = "Sets the Y-coord of the entity's pivot" },
 				SetPosZ = { Params = "number", Return = "", Notes = "Sets the Z-coord of the entity's pivot" },
-				SetPosition = { Params = "X, Y, Z", Return = "", Notes = "Sets all three coords of the entity's pivot" },
-				SetPosition = { Params = "{{Vector3d|Vector3d}}", Return = "", Notes = ":::" },
-				SetRoll = { Params = "number", Return = "", Notes = "Sets the roll (sideways rotation) of the entity" },
-				SetRot = { Params = "{{Vector3f|Vector3f}}", Return = "", Notes = "Sets the entire rotation vector (Rotation, Pitch, Roll)" },
-				SetRotation = { Params = "number", Return = "", Notes = "Sets the rotation (direction) of the entity" },
+				SetRoll = { Params = "number", Return = "", Notes = "Sets the roll (sideways rotation) of the entity. Currently unused." },
+				SetRot = { Params = "{{Vector3f|Rotation}}", Return = "", Notes = "Sets the entire rotation vector (Yaw, Pitch, Roll)" },
+				SetRotation = { Params = "number", Return = "", Notes = "Sets the yaw (direction) of the entity. FIXME: Rename to SetYaw()." },
+				SetRotationFromSpeed = { Params = "", Return = "", Notes = "Sets the entity's yaw to match its current speed (entity looking forwards as it moves). (FIXME: Rename to SetYawFromSpeed)" },
+				SetSpeed =
+				{
+					{ Params = "SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Sets the current speed of the entity" },
+					{ Params = "{{Vector3d|Speed}}", Return = "", Notes = "Sets the current speed of the entity" },
+				},
+				SetSpeedX = { Params = "SpeedX", Return = "", Notes = "Sets the X component of the entity speed" },
+				SetSpeedY = { Params = "SpeedY", Return = "", Notes = "Sets the Y component of the entity speed" },
+				SetSpeedZ = { Params = "SpeedZ", Return = "", Notes = "Sets the Z component of the entity speed" },
+				SetWidth = { Params = "", Return = "", Notes = "FIXME: Remove this from API" },
+				StartBurning = { Params = "NumTicks", Return = "", Notes = "Sets the entity on fire for the specified number of ticks. If entity is on fire already, makes it burn for either NumTicks or the number of ticks left from the previous fire, whichever is larger." },
+				SteerVehicle = { Params = "ForwardAmount, SidewaysAmount", Return = "", Notes = "Applies the specified steering to the vehicle this entity is attached to. Ignored if not attached to any entity." },
+				StopBurning = { Params = "", Return = "", Notes = "Extinguishes the entity fire, cancels all fire timers." },
+				TakeDamage =
+				{
+					{ Params = "AttackerEntity", Return = "", Notes = "Causes this entity to take damage that AttackerEntity would inflict. Includes their weapon and this entity's armor." },
+					{ Params = "DamageType, AttackerEntity, RawDamage, KnockbackAmount", Return = "", Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The final damage is calculated from RawDamage using the currently equipped armor." },
+					{ Params = "DamageType, ArrackerEntity, RawDamage, FinalDamage, KnockbackAmount", Return = "", Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The values are wrapped into a {{TakeDamageInfo}} structure and applied directly." },
+				},
+				TeleportToCoords = { Params = "PosX, PosY, PosZ", Return = "", Notes = "Teleports the entity to the specified coords." },
+				TeleportToEntity = { Params = "DestEntity", Return = "", Notes = "Teleports this entity to the specified destination entity." },
 			},
 			Constants =
 			{
-				etEntity = { Notes = "N" },
-				etPlayer = { Notes = "{{cPlayer|cPlayer" },
-				etPickup = { Notes = "{{cPickup|cPickup" },
-				etMob = { Notes = "{{cMonster|cMonster}} and descendan" },
-				etFallingBlock = { Notes = "{{cFallingBlock|cFallingBlock" },
-				etMinecart = { Notes = "{{cMinecart|cMinecart" },
-				etTNT = { Notes = "{{cTNTEntity|cTNTEntity" },
+				etBoat = { Notes = "The entity is a {{cBoat}}" },
+				etEntity = { Notes = "No further specialization available" },
+				etFallingBlock = { Notes = "The entity is a {{cFallingBlock}}" },
+				etMob = { Notes = "The entity is a {{cMonster}} descendant" },
+				etMonster = { Notes = "The entity is a {{cMonster}} descendant" },
+				etMinecart = { Notes = "The entity is a {{cMinecart}} descendant" },
+				etPlayer = { Notes = "The entity is a {{cPlayer}}" },
+				etPickup = { Notes = "The entity is a {{cPickup}}" },
+				etProjectile = { Notes = "The entity is a {{cProjectile}} descendant" },
+				etTNT = { Notes = "The entity is a {{cTNTEntity}}" },
 			},
 		},
 
@@ -680,6 +883,7 @@ g_APIDesc =
 			Desc = "",
 			Functions = {},
 			Constants = {},
+			Inherits = "cProjectileEntity",
 		} ,
 		
 		cGroup =
@@ -830,27 +1034,29 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 		{
 			Desc = [[
 				cItem is what defines an item or stack of items in the game, it contains the item ID, damage,
-				quantity and enchantments. Each slot in a {{cInventory|cInventory}} class or a
-				{{cItemGrid|cItemGrid}} class is a cItem and each cPickup contains a cItem. The enchantments
-				are contained in a {{cEnchantments|cEnchantments}} class
+				quantity and enchantments. Each slot in a {{cInventory}} class or a {{cItemGrid}} class is a cItem
+				and each {{cPickup}} contains a cItem. The enchantments are contained in a separate
+				{{cEnchantments}} class and are accessible through the m_Enchantments variable.
 			]],
 			
 			Functions =
 			{
 				constructor =
 				{
-					{ Params = "", Return = "cItem", Notes = "Creates a new empty cItem obje" },
+					{ Params = "", Return = "cItem", Notes = "Creates a new empty cItem object" },
 					{ Params = "ItemType, Count, Damage, EnchantmentString", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default) and enchantments (non-enchanted by default)" },
 					{ Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
 				} ,
+				AddCount = { Params = "AmountToAdd", Return = "cItem", Notes = "Adds the specified amount to the item count. Returns self (useful for chaining)." },
 				Clear = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
 				CopyOne = { Params = "", Return = "cItem", Notes = "Creates a copy of this object, with its count set to 1" },
 				DamageItem = { Params = "[Amount]", Return = "bool", Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)" },
 				Empty = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
 				GetMaxDamage = { Params = "", Return = "number", Notes = "Returns the maximum value for damage that this item can get before breaking; zero if damage is not accounted for for this item type" },
 				IsDamageable = { Params = "", Return = "bool", Notes = "Returns true if this item does account for its damage" },
-				IsEnchantable = { Params = "ItemType", Return = "bool", Notes = "(static) Returns true if the specified ItemType is an enchantable item, as defined by the 1.2.5 network protocol (deprecated)" },
+				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
 				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage and enchantments)" },
+				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
 				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object" },
 				IsStackableWith = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is stackable with the one stored in the object" },
 			},
@@ -864,10 +1070,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			Desc = [[This class represents a 2D array of items. It is used as the underlying storage and API for all cases that use a grid of items:
 <li>Chest contents</li>
 <li>(TODO) Chest minecart contents</li>
-<li>Dispenser contents</li>
-<li>Dropper contents</li>
-<li>(TODO) Furnace contents (?)</li>
-<li>(TODO) Hopper contents</li>
+<li>{{cDispenserEntity|Dispenser|| contents</li>
+<li>{{cDropperEntity|Dropper}} contents</li>
+<li>{{cFurnaceEntity|Furnace}} contents (?)</li>
+<li>{{cHopperEntity|Hopper}} contents</li>
 <li>(TODO) Hopper minecart contents</li>
 <li>Player Inventory areas</li>
 <li>(TODO) Trapped chest contents</li>
@@ -878,33 +1084,54 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			{
 				AddItem = { Params = "{{cItem|cItem}}, [AllowNewStacks]", Return = "number", Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Returns the number of items added" },
 				AddItems = { Params = "{{cItems|cItems}}, [AllowNewStacks]", Return = "number", Notes = "Same as AddItem, but for several items at once" },
-				ChangeSlotCount = { Params = "SlotNum, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid SlotNum" },
-				ChangeSlotCount = { Params = "X, Y, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid slot coords" },
+				ChangeSlotCount =
+				{
+					{ Params = "SlotNum, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid SlotNum" },
+					{ Params = "X, Y, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid slot coords" },
+				},
 				Clear = { Params = "", Return = "", Notes = "Empties all slots" },
 				CopyToItems = { Params = "{{cItems|cItems}}", Return = "", Notes = "Copies all non-empty slots into the cItems object provided; original cItems contents are preserved" },
-				DamageItem = { Params = "SlotNum, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
-				DamageItem = { Params = "X, Y, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
-				EmptySlot = { Params = "SlotNum", Return = "", Notes = "Destroys the item in the specified slot" },
-				EmptySlot = { Params = "X, Y", Return = "", Notes = "Destroys the item in the specified slot" },
+				DamageItem =
+				{
+					{ Params = "SlotNum, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
+					{ Params = "X, Y, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
+				},
+				EmptySlot =
+				{
+					{ Params = "SlotNum", Return = "", Notes = "Destroys the item in the specified slot" },
+					{ Params = "X, Y", Return = "", Notes = "Destroys the item in the specified slot" },
+				},
 				GetFirstEmptySlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the first empty slot, -1 if all slots are full" },
 				GetHeight = { Params = "", Return = "number", Notes = "Returns the Y dimension of the grid" },
 				GetLastEmptySlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the last empty slot, -1 if all slots are full" },
 				GetNextEmptySlot = { Params = "StartFrom", Return = "number", Notes = "Returns the SlotNumber of the first empty slot following StartFrom, -1 if all the following slots are full" },
 				GetNumSlots = { Params = "", Return = "number", Notes = "Returns the total number of slots in the grid (Width * Height)" },
-				GetSlot = { Params = "SlotNumber", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
-				GetSlot = { Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
+				GetSlot =
+				{
+					{ Params = "SlotNumber", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
+					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
+				},
 				GetSlotCoords = { Params = "SlotNum", Return = "number, number", Notes = "Returns the X and Y coords for the specified SlotNumber. Returns \"-1, -1\" on invalid SlotNumber" },
 				GetSlotNum = { Params = "X, Y", Return = "number", Notes = "Returns the SlotNumber for the specified slot coords. Returns -1 on invalid coords" },
 				GetWidth = { Params = "", Return = "number", Notes = "Returns the X dimension of the grid" },
 				HasItems = { Params = "{{cItem|cItem}}", Return = "bool", Notes = "Returns true if there are at least as many items of the specified type as in the parameter" },
 				HowManyCanFit = { Params = "{{cItem|cItem}}", Return = "number", Notes = "Returns the number of the specified items that can fit in the storage, including empty slots" },
 				HowManyItems = { Params = "{{cItem|cItem}}", Return = "number", Notes = "Returns the number of the specified items that are currently stored" },
-				IsSlotEmpty = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
-				IsSlotEmpty = { Params = "X, Y", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
-				RemoveOneItem = { Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
-				RemoveOneItem = { Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
-				SetSlot = { Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
-				SetSlot = { Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
+				IsSlotEmpty =
+				{
+					{ Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
+					{ Params = "X, Y", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
+				},
+				RemoveOneItem =
+				{
+					{ Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
+					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
+				},
+				SetSlot =
+				{
+					{ Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
+					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
+				},
 			},
 			Constants =
 			{
@@ -921,13 +1148,19 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			Functions =
 			{
 				constructor = { Params = "", Return = "cItems", Notes = "Creates a new cItems object" },
-				Add = { Params = "Index, {{cItem|cItem}}", Return = "", Notes = "Adds a new item to the end of the collection" },
-				Add = { Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Adds a new item to the end of the collection" },
+				Add =
+				{
+					{ Params = "{{cItem|cItem}}", Return = "", Notes = "Adds a new item to the end of the collection" },
+					{ Params = "ItemType, ItemCount, ItemDamage", Return = "", Notes = "Adds a new item to the end of the collection" },
+				},
 				Clear = { Params = "", Return = "", Notes = "Removes all items from the collection" },
 				Delete = { Params = "Index", Return = "", Notes = "Deletes item at the specified index" },
 				Get = { Params = "Index", Return = "{{cItem|cItem}}", Notes = "Returns the item at the specified index" },
-				Set = { Params = "Index, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified index to the specified item" },
-				Set = { Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified index to the specified item" },
+				Set =
+				{
+					{ Params = "Index, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified index to the specified item" },
+					{ Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified index to the specified item" },
+				},
 				Size = { Params = "", Return = "number", Notes = "Returns the number of items in the collection" },
 			},
 			Constants =
@@ -937,10 +1170,92 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 
 		cLineBlockTracer =
 		{
-			Desc = "",
-			Functions = {},
-			Constants = {},
-		},
+			Desc = [[Objects of this class provide an easy-to-use interface to tracing lines through individual
+blocks in the world. It will call the provided callbacks according to what events it encounters along the
+way.</p>
+<p>
+For the Lua API, there's only one function exported that takes all the parameters necessary to do the
+tracing. The Callbacks parameter is a table containing all the functions that will be called upon the
+various events. See below for further information.
+			]],
+			Functions =
+			{
+				Trace = { Params = "{{cWorld}}, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ", Return = "bool", Notes = "(STATIC) Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)" },
+			},
+			
+			AdditionalInfo =
+			{
+				{
+					Header = "Callbacks",
+					Contents = [[
+The Callbacks in the Trace() function is a table that contains named functions. MCServer will call
+individual functions from that table for the events that occur on the line - hitting a block, going out of
+valid world data etc. The following table lists all the available callbacks. If the callback function is
+not defined, MCServer skips it. Each function can return a bool value, if it returns true, the tracing is
+aborted and Trace() returns false.</p>
+<p>
+<table><tr><th>Name</th><th>Parameters</th><th>Notes</th></tr>
+<tr><td>OnNextBlock</td><td>BlockX, BlockY, BlockZ, BlockType, BlockMeta, EntryFace</td>
+	<td>Called when the ray hits a new valid block. The block type and meta is given. EntryFace is one of the
+	BLOCK_FACE_ constants indicating which "side" of the block got hit by the ray.</td></tr>
+<tr><td>OnNextBlockNoData</td><td>BlockX, BlockY, BlockZ, EntryFace</td>
+	<td>Called when the ray hits a new block, but the block is in an unloaded chunk - no valid data is
+	available. Only the coords and the entry face are given.</td></tr>
+<tr><td>OnOutOfWorld</td><td>X, Y, Z</td>
+	<td>Called when the ray goes outside of the world (Y-wise); the coords specify the exact exit point. Note
+	that for other paths than lines (considered for future implementations) the path may leave the world and
+	go back in again later, in such a case this callback is followed by OnIntoWorld() and further
+	OnNextBlock() calls.</td></tr>
+<tr><td>OnIntoWorld</td><td>X, Y, Z</td>
+	<td>Called when the ray enters the world (Y-wise); the coords specify the exact entry point.</td></tr>
+<tr><td>OnNoMoreHits</td><td>&nbsp;</td>
+	<td>Called when the path is sure not to hit any more blocks. This is the final callback, no more
+	callbacks are called after this function. Unlike the other callbacks, this function doesn't have a return
+	value.</td></tr>
+<tr><td>OnNoChunk</td><td>&nbsp;</td>
+	<td>Called when the ray enters a chunk that is not loaded. This usually means that the tracing is aborted.
+	Unlike the other callbacks, this function doesn't have a return value.</td></tr>
+</table>
+					]],
+				},
+				{
+					Header = "Example",
+					Contents = [[
+<p>The following example is taken from the Debuggers plugin. It is a command handler function for the
+"/spidey" command that creates a line of cobweb blocks from the player's eyes up to 50 blocks away in
+the direction they're looking, but only through the air.
+<pre>
+function HandleSpideyCmd(a_Split, a_Player)
+	local World = a_Player:GetWorld();
+
+	local Callbacks = {
+		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+			if (a_BlockType ~= E_BLOCK_AIR) then
+				-- abort the trace
+				return true;
+			end
+			World:SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COBWEB, 0);
+		end
+	};
+	
+	local EyePos = a_Player:GetEyePosition();
+	local LookVector = a_Player:GetLookVector();
+	LookVector:Normalize();  -- Make the vector 1 m long
+	
+	-- Start cca 2 blocks away from the eyes
+	local Start = EyePos + LookVector + LookVector;
+	local End = EyePos + LookVector * 50;
+	
+	cLineBlockTracer.Trace(World, Callbacks, Start.x, Start.y, Start.z, End.x, End.y, End.z);
+	
+	return true;
+end
+</pre>
+</p>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cLineBlockTracer
 		
 		cLuaWindow =
 		{
@@ -1026,6 +1341,7 @@ a_Player:OpenWindow(Window);
 					]],
 				},
 			},  -- AdditionalInfo
+			Inherits = "cWindow",
 		},  -- cLuaWindow
 
 		cMonster =
@@ -1115,14 +1431,18 @@ a_Player:OpenWindow(Window);
 
 		cPlugin =
 		{
-			Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions.
+			Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions. Each plugin has its own Plugin object.
 ]],
 			Functions =
 			{
-				GetName = { Return = "string" },
-				SetName = { Return = "" },
-				GetVersion = { Notes = "int" },
-				SetVersion = { Return = "" },
+				Call = { Params = "Function name, [All the parameters divided with commas]", Notes = "This function allows you to call a function from another plugin. It can only use pass: integers, booleans, strings and usertypes (cPlayer, cEntity, cCuboid, etc.)." },
+				GetDirectory = { Return = "string", Notes = "Returns the name of the folder where the plugin's files are. (APIDump)" },
+				GetLocalDirectory = { Notes = "OBSOLETE use GetLocalFolder instead." },
+				GetLocalFolder = { Return = "string", Notes = "Returns the path where the plugin's files are. (Plugins/APIDump)" },
+				GetName = { Return = "string", Notes = "Returns the name of the plugin." },
+				SetName = { Params = "string", Notes = "Sets the name of the Plugin." },
+				GetVersion = { Return = "number", Notes = "Returns the version of the plugin." },
+				SetVersion = { Params = "number", Notes = "Sets the version of the plugin." },
 				GetFileName = { Return = "string" },
 				CreateWebPlugin = { Notes = "{{cWebPlugin|cWebPlugin}}" },
 			},
@@ -1285,10 +1605,15 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 
 		cServer =
 		{
-			Desc = [[cServer is typically only used by plugins to broadcast a chat message to all players in the server. Natively however, cServer accepts connections from clients and adds those clients to the game.
+			Desc = [[cServer is typically only used by plugins to broadcast a chat message(Now replaced by the {{cRoot|cRoot}} BroadcastChat function) to all players in the server. Natively however, cServer accepts connections from clients and adds those clients to the game.
 ]],
 			Functions =
 			{
+				GetDescription = { Return = "string", Notes = "Returns the server description set in the settings.ini." },
+				GetMaxPlayers = { Return = "number", Notes = "Returns the max amount of players who can join the server." },
+				SetMaxPlayers = { Params = "number", Notes = "Sets the max amount of players who can join." },
+				GetNumPlayers = { Return = "number", Notes = "Returns the amount of players online." },
+				GetServerID = { Return = "string", Notes = "Returns the ID of the server?" },
 			},
 			Constants =
 			{
@@ -1504,7 +1829,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 				GetStorageSaveQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks queued up for saving" },
 				GetTicksUntilWeatherChange = { Params = "", Return = "number", Notes = "Returns the number of ticks that will pass before the weather is changed" },
 				GetTimeOfDay = { Params = "", Return = "number", Notes = "Returns the number of ticks that have passed from the sunrise, 0 .. 24000." },
-				GetWeather = { Params = "", Return = "eWeather", Notes = "Returns the current weather in the world (wSunny, wRain, wStorm)." },
+				GetWeather = { Params = "", Return = "eWeather", Notes = "Returns the current weather in the world (wSunny, wRain, wStorm). To check for weather, use IsWeatherXXX() functions instead." },
 				GetWorldAge = { Params = "", Return = "number", Notes = "Returns the total age of the world, in ticks. The age always grows, cannot be set by plugins and is unrelated to TimeOfDay." },
 				GrowCactus = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "", Notes = "Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight())." },
 				GrowMelonPumpkin = { Params = "BlockX, BlockY, BlockZ, StemType", Return = "", Notes = "Grows a melon or pumpkin, based on the stem type specified (assumed to be in the coords provided). Checks for normal melon / pumpkin growth conditions - stem not having another produce next to it and suitable ground below." },
@@ -1519,6 +1844,10 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmCreative." },
 				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmSurvival." },
 				IsPVPEnabled = { Params = "", Return = "bool", Notes = "Returns whether PVP is enabled in the world settings." },
+				IsWeatherRain = { Params = "", Return = "bool", Notes = "Returns true if the current weather is rain." },
+				IsWeatherStorm = { Params = "", Return = "bool", Notes = "Returns true if the current weather is a storm." },
+				IsWeatherSunny = { Params = "", Return = "bool", Notes = "Returns true if the current weather is sunny." },
+				IsWeatherWet = { Params = "", Return = "bool", Notes = "Returns true if the current weather has any precipitation (rain or storm)." },
 				QueueBlockForTick = { Params = "BlockX, BlockY, BlockZ, TicksToWait", Return = "", Notes = "Queues the specified block to be ticked after the specified number of gameticks." },
 				QueueSaveAllChunks = { Params = "", Return = "", Notes = "Queues all chunks to be saved in the world storage thread" },
 				QueueSetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta, TickDelay", Return = "", Notes = "Queues the block to be set to the specified blocktype and meta after the specified amount of game ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are handled correctly." },
@@ -1702,6 +2031,18 @@ World:ForEachEntity(
 		},
 	},
 	
+
+	IgnoreClasses =
+	{
+		"coroutine",
+		"debug",
+		"io",
+		"math",
+		"package",
+		"os",
+		"string",
+		"table",
+	},
 	
 	IgnoreFunctions =
 	{

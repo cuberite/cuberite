@@ -291,6 +291,19 @@ end
 
 
 function ReadDescriptions(a_API)
+	-- Returns true if the class of the specified name is to be ignored
+	local function IsClassIgnored(a_ClsName)
+		if (g_APIDesc.IgnoreClasses == nil) then
+			return false;
+		end
+		for i, name in ipairs(g_APIDesc.IgnoreClasses) do
+			if (a_ClsName:match(name)) then
+				return true;
+			end
+		end
+		return false;
+	end
+	
 	-- Returns true if the function (specified by its fully qualified name) is to be ignored
 	local function IsFunctionIgnored(a_FnName)
 		if (g_APIDesc.IgnoreFunctions == nil) then
@@ -317,6 +330,18 @@ function ReadDescriptions(a_API)
 		return false;
 	end
 	
+	-- Remove ignored classes from a_API:
+	local APICopy = {};
+	for i, cls in ipairs(a_API) do
+		if not(IsClassIgnored(cls.Name)) then
+			table.insert(APICopy, cls);
+		end
+	end
+	for i = 1, #a_API do
+		a_API[i] = APICopy[i];
+	end;
+
+	-- Process the documentation for each class:
 	for i, cls in ipairs(a_API) do
 		-- Rename special functions:
 		for j, fn in ipairs(cls.Functions) do
@@ -335,6 +360,9 @@ function ReadDescriptions(a_API)
 			elseif (fn.Name == ".sub") then
 				fn.DocID = "operator_sub";
 				fn.Name = "<i>operator -</i>";
+			elseif (fn.Name == ".eq") then
+				fn.DocID = "operator_eq";
+				fn.Name = "<i>operator ==</i>";
 			end
 		end
 		

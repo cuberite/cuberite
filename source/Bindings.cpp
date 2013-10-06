@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/05/13 18:34:12.
+** Generated automatically by tolua++-1.0.92 on 10/06/13 15:12:14.
 */
 
 #ifndef __cplusplus
@@ -13315,6 +13315,134 @@ static int tolua_AllToLua_cWorld_GetWeather00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsWeatherSunny of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsWeatherSunny00
+static int tolua_AllToLua_cWorld_IsWeatherSunny00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsWeatherSunny'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsWeatherSunny();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsWeatherSunny'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsWeatherRain of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsWeatherRain00
+static int tolua_AllToLua_cWorld_IsWeatherRain00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsWeatherRain'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsWeatherRain();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsWeatherRain'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsWeatherStorm of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsWeatherStorm00
+static int tolua_AllToLua_cWorld_IsWeatherStorm00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsWeatherStorm'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsWeatherStorm();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsWeatherStorm'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsWeatherWet of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsWeatherWet00
+static int tolua_AllToLua_cWorld_IsWeatherWet00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsWeatherWet'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsWeatherWet();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsWeatherWet'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetNextBlockTick of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetNextBlockTick00
 static int tolua_AllToLua_cWorld_SetNextBlockTick00(lua_State* tolua_S)
@@ -18706,6 +18834,38 @@ static int tolua_AllToLua_cWebAdmin_GetPage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetPage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetDefaultPage of class  cWebAdmin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWebAdmin_GetDefaultPage00
+static int tolua_AllToLua_cWebAdmin_GetDefaultPage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWebAdmin* self = (cWebAdmin*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetDefaultPage'", NULL);
+#endif
+  {
+   AString tolua_ret = (AString)  self->GetDefaultPage();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetDefaultPage'.",&tolua_err);
  return 0;
 #endif
 }
@@ -26132,41 +26292,6 @@ static int tolua_AllToLua_cChunkDesc_GetChunkZ00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetChunkCoords of class  cChunkDesc */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_SetChunkCoords00
-static int tolua_AllToLua_cChunkDesc_SetChunkCoords00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cChunkDesc* self = (cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
-  int a_ChunkX = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_ChunkZ = ((int)  tolua_tonumber(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetChunkCoords'", NULL);
-#endif
-  {
-   self->SetChunkCoords(a_ChunkX,a_ChunkZ);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetChunkCoords'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: FillBlocks of class  cChunkDesc */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_FillBlocks00
 static int tolua_AllToLua_cChunkDesc_FillBlocks00(lua_State* tolua_S)
@@ -29906,6 +30031,10 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetWeather",tolua_AllToLua_cWorld_SetWeather00);
    tolua_function(tolua_S,"ChangeWeather",tolua_AllToLua_cWorld_ChangeWeather00);
    tolua_function(tolua_S,"GetWeather",tolua_AllToLua_cWorld_GetWeather00);
+   tolua_function(tolua_S,"IsWeatherSunny",tolua_AllToLua_cWorld_IsWeatherSunny00);
+   tolua_function(tolua_S,"IsWeatherRain",tolua_AllToLua_cWorld_IsWeatherRain00);
+   tolua_function(tolua_S,"IsWeatherStorm",tolua_AllToLua_cWorld_IsWeatherStorm00);
+   tolua_function(tolua_S,"IsWeatherWet",tolua_AllToLua_cWorld_IsWeatherWet00);
    tolua_function(tolua_S,"SetNextBlockTick",tolua_AllToLua_cWorld_SetNextBlockTick00);
    tolua_function(tolua_S,"GetMaxSugarcaneHeight",tolua_AllToLua_cWorld_GetMaxSugarcaneHeight00);
    tolua_function(tolua_S,"GetMaxCactusHeight",tolua_AllToLua_cWorld_GetMaxCactusHeight00);
@@ -30206,6 +30335,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cWebAdmin");
    tolua_function(tolua_S,"GetMemoryUsage",tolua_AllToLua_cWebAdmin_GetMemoryUsage00);
    tolua_function(tolua_S,"GetPage",tolua_AllToLua_cWebAdmin_GetPage00);
+   tolua_function(tolua_S,"GetDefaultPage",tolua_AllToLua_cWebAdmin_GetDefaultPage00);
    tolua_function(tolua_S,"GetBaseURL",tolua_AllToLua_cWebAdmin_GetBaseURL00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWebPlugin","cWebPlugin","",NULL);
@@ -30522,7 +30652,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cChunkDesc");
    tolua_function(tolua_S,"GetChunkX",tolua_AllToLua_cChunkDesc_GetChunkX00);
    tolua_function(tolua_S,"GetChunkZ",tolua_AllToLua_cChunkDesc_GetChunkZ00);
-   tolua_function(tolua_S,"SetChunkCoords",tolua_AllToLua_cChunkDesc_SetChunkCoords00);
    tolua_function(tolua_S,"FillBlocks",tolua_AllToLua_cChunkDesc_FillBlocks00);
    tolua_function(tolua_S,"SetBlockTypeMeta",tolua_AllToLua_cChunkDesc_SetBlockTypeMeta00);
    tolua_function(tolua_S,"GetBlockTypeMeta",tolua_AllToLua_cChunkDesc_GetBlockTypeMeta00);
