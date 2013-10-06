@@ -50,6 +50,7 @@ public:
 	} ;
 	
 	cHTTPServer(void);
+	~cHTTPServer();
 	
 	/// Initializes the server on the specified ports
 	bool Initialize(const AString & a_PortsIPv4, const AString & a_PortsIPv6);

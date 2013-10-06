@@ -127,6 +127,15 @@ cHTTPServer::cHTTPServer(void) :
 
 
 
+cHTTPServer::~cHTTPServer()
+{
+	Stop();
+}
+
+
+
+
+
 bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_PortsIPv6)
 {
 	bool HasAnyPort;
