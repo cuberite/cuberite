@@ -100,7 +100,6 @@ public:
 
 
 	cWebAdmin(void);
-	~cWebAdmin();
 
 	/// Initializes the object. Returns true if successfully initialized and ready to start
 	bool Init(void);
@@ -171,20 +170,12 @@ protected:
 	
 	PluginList m_Plugins;
 
-	cEvent * m_Event;
-
 	/// The Lua template script to provide templates:
 	cLuaState m_TemplateScript;
 	
 	/// The HTTP server which provides the underlying HTTP parsing, serialization and events
 	cHTTPServer m_HTTPServer;
 
-
-	#ifdef _WIN32
-		static DWORD WINAPI ListenThread(LPVOID lpParam);
-	#else
-		static void *       ListenThread(void * lpParam);
-	#endif
 
 	AString GetTemplate(void);
 	

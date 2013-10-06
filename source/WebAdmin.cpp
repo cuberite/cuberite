@@ -50,32 +50,11 @@ public:
 
 
 
-cWebAdmin * WebAdmin = NULL;
-
-
-
-
-
 cWebAdmin::cWebAdmin(void) :
 	m_IsInitialized(false),
 	m_TemplateScript("<webadmin_template>"),
 	m_IniFile("webadmin.ini")
 {
-	WebAdmin = this;
-	m_Event = new cEvent();
-}
-
-
-
-
-
-cWebAdmin::~cWebAdmin()
-{
-
-	WebAdmin = 0;
-
-	m_Event->Wait();
-	delete m_Event;
 }
 
 
@@ -221,7 +200,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	// Try to get the template from the Lua template script
 	if (ShouldWrapInTemplate)
 	{
-		if (WebAdmin->m_TemplateScript.Call("ShowPage", WebAdmin, &TemplateRequest, cLuaState::Return, Template))
+		if (m_TemplateScript.Call("ShowPage", this, &TemplateRequest, cLuaState::Return, Template))
 		{
 			cHTTPResponse Resp;
 			Resp.SetContentType("text/html");
@@ -326,7 +305,7 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 	AString FoundPlugin;
 	if (Split.size() > 1)
 	{
-		for (PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr)
+		for (PluginList::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 		{
 			if ((*itr)->GetWebTitle() == Split[1])
 			{
