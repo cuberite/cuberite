@@ -196,6 +196,23 @@ AString & StrToUpper(AString & s)
 
 
 
+AString & StrToLower(AString & s)
+{
+	AString::iterator i = s.begin();
+	AString::iterator end = s.end();
+
+	while (i != end)
+	{
+		*i = (char)tolower(*i);
+		++i;
+	}
+	return s;
+}
+
+
+
+
+
 int NoCaseCompare(const AString & s1, const AString & s2)
 {
 	#ifdef _MSC_VER
@@ -654,6 +671,144 @@ AString StripColorCodes(const AString & a_Message)
 		res.erase(idx, 3);
 	}
 }
+
+
+
+
+
+AString URLDecode(const AString & a_String)
+{
+	AString res;
+	size_t len = a_String.length();
+	res.reserve(len);
+	for (size_t i = 0; i < len; i++)
+	{
+		char ch = a_String[i];
+		if ((ch != '%') || (i > len - 3))
+		{
+			res.push_back(ch);
+			continue;
+		}
+		// Decode the hex value:
+		char hi = a_String[i + 1], lo = a_String[i + 2];
+		if ((hi >= '0') && (hi <= '9'))
+		{
+			hi = hi - '0';
+		}
+		else if ((hi >= 'a') && (hi <= 'f'))
+		{
+			hi = hi - 'a' + 10;
+		}
+		else if ((hi >= 'A') && (hi <= 'F'))
+		{
+			hi = hi - 'F' + 10;
+		}
+		else
+		{
+			res.push_back(ch);
+			continue;
+		}
+		if ((lo >= '0') && (lo <= '9'))
+		{
+			lo = lo - '0';
+		}
+		else if ((lo >= 'a') && (lo <= 'f'))
+		{
+			lo = lo - 'a' + 10;
+		}
+		else if ((lo >= 'A') && (lo <= 'F'))
+		{
+			lo = lo - 'A' + 10;
+		}
+		else
+		{
+			res.push_back(ch);
+			continue;
+		}
+		res.push_back((hi << 4) | lo);
+		i += 2;
+	}  // for i - a_String[]
+	return res;
+}
+
+
+
+
+
+AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To)
+{
+	AString res(a_String);
+	std::replace(res.begin(), res.end(), a_From, a_To);
+	return res;
+}
+
+
+
+
+
+/// Converts one Hex character in a Base64 encoding into the data value
+static inline int UnBase64(char c)
+{
+	if (c >='A' && c <= 'Z')
+	{
+		return c - 'A';
+	}
+	if (c >='a' && c <= 'z')
+	{
+		return c - 'a' + 26;
+	}
+	if (c >= '0' && c <= '9')
+	{
+		return c - '0' + 52;
+	}
+	if (c == '+')
+	{
+		return 62;
+	}
+	if (c == '/')
+	{
+		return 63;
+	}
+	if (c == '=')
+	{
+		return -1;
+	}
+	return -2;
+}
+
+
+
+
+
+AString Base64Decode(const AString & a_Base64String)
+{
+	AString res;
+	size_t i, len = a_Base64String.size();
+	int o, c;
+	res.resize((len * 4) / 3 + 5, 0);  // Approximate the upper bound on the result length
+	for (o = 0, i = 0; i < len; i++)
+	{
+		c = UnBase64(a_Base64String[i]);
+		if (c >= 0)
+		{
+			switch (o & 7)
+			{
+				case 0:	res[o >> 3] |= (c << 2); break;
+				case 6: res[o >> 3] |= (c >> 4); res[(o >> 3) + 1] |= (c << 4); break;
+				case 4: res[o >> 3] |= (c >> 2); res[(o >> 3) + 1] |= (c << 6); break;
+				case 2: res[o >> 3] |= c; break;
+			}
+			o += 6;
+		}
+		if (c == -1)
+		{
+			// Error while decoding, invalid input. Return as much as we've decoded:
+			res.resize(o >> 3);
+			return res;
+		}
+	}
+	res.resize(o >> 3);
+	return res;}
 
 
 

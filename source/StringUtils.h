@@ -45,6 +45,9 @@ extern AString TrimString(const AString & str);  // tolua_export
 /// In-place string conversion to uppercase; returns the same string
 extern AString & StrToUpper(AString & s);
 
+/// In-place string conversion to lowercase; returns the same string
+extern AString & StrToLower(AString & s);
+
 /// Case-insensitive string comparison; returns 0 if the strings are the same
 extern int NoCaseCompare(const AString & s1, const AString & s2);  // tolua_export
 
@@ -71,6 +74,15 @@ extern AString EscapeString(const AString & a_Message);  // tolua_export
 
 /// Removes all control codes used by MC for colors and styles
 extern AString StripColorCodes(const AString & a_Message);  // tolua_export
+
+/// URL-Decodes the given string, replacing all "%HH" into the correct characters. Invalid % sequences are left intact
+extern AString URLDecode(const AString & a_String);  // Cannot export to Lua automatically - would generated an extra return value
+
+/// Replaces all occurrences of char a_From inside a_String with char a_To.
+extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
+
+/// Decodes a Base64-encoded string into the raw data
+extern AString Base64Decode(const AString & a_Base64String);
 
 // If you have any other string helper functions, declare them here
 
