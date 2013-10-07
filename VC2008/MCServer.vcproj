@@ -2716,6 +2716,66 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="HTTPServer"
+				>
+				<File
+					RelativePath="..\source\HTTPServer\EnvelopeParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\EnvelopeParser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPConnection.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPConnection.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPFormParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPFormParser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPMessage.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPMessage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPServer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\HTTPServer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\MultipartParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\MultipartParser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\NameValueParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\HTTPServer\NameValueParser.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Config files"

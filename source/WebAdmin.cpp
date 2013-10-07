@@ -14,7 +14,8 @@
 #include "Server.h"
 #include "Root.h"
 
-#include "../iniFile/iniFile.h"
+#include "HTTPServer/HTTPMessage.h"
+#include "HTTPServer/HTTPConnection.h"
 
 #ifdef _WIN32
 	#include <psapi.h>
@@ -49,37 +50,11 @@ public:
 
 
 
-cWebAdmin * WebAdmin = NULL;
-
-
-
-
-
-cWebAdmin::cWebAdmin( int a_Port /* = 8080 */ ) :
-	m_Port(a_Port),
-	m_bConnected(false),
-	m_TemplateScript("<webadmin_template>")
+cWebAdmin::cWebAdmin(void) :
+	m_IsInitialized(false),
+	m_TemplateScript("<webadmin_template>"),
+	m_IniFile("webadmin.ini")
 {
-	WebAdmin = this;
-	m_Event = new cEvent();
-	Init( m_Port );
-}
-
-
-
-
-
-cWebAdmin::~cWebAdmin()
-{
-
-	WebAdmin = 0;
-	m_WebServer->Stop();
-
-	delete m_WebServer;
-	delete m_IniFile;
-
-	m_Event->Wait();
-	delete m_Event;
 }
 
 
@@ -105,189 +80,36 @@ void cWebAdmin::RemovePlugin( cWebPlugin * a_Plugin )
 
 
 
-void cWebAdmin::Request_Handler(webserver::http_request* r)
+bool cWebAdmin::Init(void)
 {
-	if( WebAdmin == 0 ) return;
-	LOG("Path: %s", r->path_.c_str() );
-
-	if (r->path_ == "/")
+	if (!m_IniFile.ReadFile())
 	{
-		r->answer_ += "<h1>MCServer WebAdmin</h1>";
-		r->answer_ += "<center>";
-		r->answer_ += "<form method='get' action='webadmin/'>";
-		r->answer_ += "<input type='submit' value='Log in'>";
-		r->answer_ += "</form>";
-		r->answer_ += "</center>";
-		return;
-	}
-
-	if (r->path_.empty() || r->path_[0] != '/')
-	{
-		r->answer_ += "<h1>Bad request</h1>";
-		r->answer_ += "<p>";
-		r->answer_ = r->path_;  // TODO: Shouldn't we sanitize this? Possible security issue.
-		r->answer_ += "</p>";
-		return;
+		return false;
 	}
 	
-	AStringVector Split = StringSplit(r->path_.substr(1), "/");
-
-	if (Split.empty() || (Split[0] != "webadmin" && Split[0] != "~webadmin"))
-	{
-		r->answer_ += "<h1>Bad request</h1>";
-		return;
-	}
+	AString PortsIPv4 = m_IniFile.GetValue("WebAdmin", "Port", "8080");
+	AString PortsIPv6 = m_IniFile.GetValue("WebAdmin", "PortsIPv6", "");
 	
-	if (!r->authentication_given_)
+	if (!m_HTTPServer.Initialize(PortsIPv4, PortsIPv6))
 	{
-		r->answer_ += "no auth";
-		r->auth_realm_ = "MCServer WebAdmin";
+		return false;
 	}
-
-	bool bDontShowTemplate = false;
-	if (Split[0] == "~webadmin")
-	{
-		bDontShowTemplate = true;
-	}
-	
-	AString UserPassword = WebAdmin->m_IniFile->GetValue( "User:"+r->username_, "Password", "");
-	if ((UserPassword != "") && (r->password_ == UserPassword))
-	{
-		AString Template;
-
-		HTTPTemplateRequest TemplateRequest;
-		TemplateRequest.Request.Username = r->username_;
-		TemplateRequest.Request.Method = r->method_;
-		TemplateRequest.Request.Params = r->params_;
-		TemplateRequest.Request.PostParams = r->params_post_;
-		TemplateRequest.Request.Path = r->path_.substr(1);
-
-		for( unsigned int i = 0; i < r->multipart_formdata_.size(); ++i )
-		{
-			webserver::formdata& fd = r->multipart_formdata_[i];
-
-			HTTPFormData HTTPfd;//( fd.value_ );
-			HTTPfd.Value = fd.value_;
-			HTTPfd.Type = fd.content_type_;
-			HTTPfd.Name = fd.name_;
-			LOGINFO("Form data name: %s", fd.name_.c_str() );
-			TemplateRequest.Request.FormData[ fd.name_ ] = HTTPfd;
-		}
-
-		// Try to get the template from the Lua template script
-		bool bLuaTemplateSuccessful = false;
-		if (!bDontShowTemplate)
-		{
-			bLuaTemplateSuccessful = WebAdmin->m_TemplateScript.Call("ShowPage", WebAdmin, &TemplateRequest, cLuaState::Return, Template);
-		}
-		
-		if (!bLuaTemplateSuccessful)
-		{
-			AString BaseURL = WebAdmin->GetBaseURL(Split);
-			AString Menu;
-			Template = bDontShowTemplate ? "{CONTENT}" : WebAdmin->GetTemplate();
-			AString FoundPlugin;
-
-			for (PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr)
-			{
-				cWebPlugin* WebPlugin = *itr;
-				std::list< std::pair<AString, AString> > NameList = WebPlugin->GetTabNames();
-				for( std::list< std::pair<AString, AString> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names )
-				{
-					Menu += "<li><a href='" + BaseURL + WebPlugin->GetWebTitle().c_str() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
-				}
-			}
-
-			sWebAdminPage Page = WebAdmin->GetPage(TemplateRequest.Request);
-			AString Content = Page.Content;
-			FoundPlugin = Page.PluginName;
-			if (!Page.TabName.empty())
-				FoundPlugin += " - " + Page.TabName;
-
-			if( FoundPlugin.empty() )	// Default page
-			{
-				Content.clear();
-				FoundPlugin = "Current Game";
-				Content += "<h4>Server Name:</h4>";
-				Content += "<p>" + AString( cRoot::Get()->GetServer()->GetServerID() ) + "</p>";
-
-				Content += "<h4>Plugins:</h4><ul>";
-				cPluginManager* PM = cRoot::Get()->GetPluginManager();
-				if( PM )
-				{
-					const cPluginManager::PluginMap & List = PM->GetAllPlugins();
-					for( cPluginManager::PluginMap::const_iterator itr = List.begin(); itr != List.end(); ++itr )
-					{
-						if( itr->second == NULL ) continue;
-						AString VersionNum;
-						AppendPrintf(Content, "<li>%s V.%i</li>", itr->second->GetName().c_str(), itr->second->GetVersion());
-					}
-				}
-				Content += "</ul>";
-				Content += "<h4>Players:</h4><ul>";
-
-				cPlayerAccum PlayerAccum;
-				cWorld * World = cRoot::Get()->GetDefaultWorld(); // TODO - Create a list of worlds and players
-				if( World != NULL )
-				{
-					World->ForEachPlayer(PlayerAccum);
-					Content.append(PlayerAccum.m_Contents);
-				}
-				Content += "</ul><br>";
-			}
-
-			
-
-			if (!bDontShowTemplate && (Split.size() > 1))
-			{
-				Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
-			}
-
-			int MemUsageKiB = GetMemoryUsage();
-			if (MemUsageKiB > 0)
-			{
-				ReplaceString(Template, "{MEM}",       Printf("%.02f", (double)MemUsageKiB / 1024));
-				ReplaceString(Template, "{MEMKIB}",    Printf("%d", MemUsageKiB));
-			}
-			else
-			{
-				ReplaceString(Template, "{MEM}",       "unknown");
-				ReplaceString(Template, "{MEMKIB}",    "unknown");
-			}
-			ReplaceString(Template, "{USERNAME}",    r->username_);
-			ReplaceString(Template, "{MENU}",        Menu);
-			ReplaceString(Template, "{PLUGIN_NAME}", FoundPlugin);
-			ReplaceString(Template, "{CONTENT}",     Content);
-			ReplaceString(Template, "{TITLE}",       "MCServer");
-
-			AString NumChunks;
-			Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
-			ReplaceString(Template, "{NUMCHUNKS}", NumChunks);
-		}
-
-		r->answer_ = Template;
-	}
-	else
-	{
-		r->answer_ += "Wrong username/password";
-		r->auth_realm_ = "MCServer WebAdmin";
-	}
+	m_IsInitialized = true;
+	return true;
 }
 
 
 
 
 
-bool cWebAdmin::Init(int a_Port)
+bool cWebAdmin::Start(void)
 {
-	m_Port = a_Port;
-
-	m_IniFile = new cIniFile("webadmin.ini");
-	if (m_IniFile->ReadFile())
+	if (!m_IsInitialized)
 	{
-		m_Port = m_IniFile->GetValueI("WebAdmin", "Port", 8080);
+		// Not initialized
+		return false;
 	}
-
+	
 	// Initialize the WebAdmin template script and load the file
 	m_TemplateScript.Create();
 	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
@@ -296,46 +118,7 @@ bool cWebAdmin::Init(int a_Port)
 		m_TemplateScript.Close();
 	}
 
-
-	LOGINFO("Starting WebAdmin on port %i", m_Port);
-
-#ifdef _WIN32
-	HANDLE hThread = CreateThread(
-		NULL,              // default security
-		0,                 // default stack size
-		ListenThread,   // name of the thread function
-		this,	                // thread parameters
-		0,                 // default startup flags
-		NULL);
-	CloseHandle( hThread ); // Just close the handle immediately
-#else
-	pthread_t LstnThread;
-	pthread_create( &LstnThread, 0, ListenThread, this);
-#endif
-
-	return true;
-}
-
-
-
-
-
-#ifdef _WIN32
-DWORD WINAPI cWebAdmin::ListenThread(LPVOID lpParam)
-#else
-void *cWebAdmin::ListenThread( void *lpParam )
-#endif
-{
-	cWebAdmin* self = (cWebAdmin*)lpParam;
-
-	self->m_WebServer = new webserver(self->m_Port, Request_Handler );
-	if (!self->m_WebServer->Begin())
-	{
-		LOGWARN("WebServer failed to start! WebAdmin is disabled");
-	}
-
-	self->m_Event->Set();
-	return 0;
+	return m_HTTPServer.Start(*this);
 }
 
 
@@ -364,7 +147,156 @@ AString cWebAdmin::GetTemplate()
 
 
 
-sWebAdminPage cWebAdmin::GetPage(const HTTPRequest& a_Request)
+void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+{
+	if (!a_Request.HasAuth())
+	{
+		a_Connection.SendNeedAuth("MCServer WebAdmin");
+		return;
+	}
+
+	// Check auth:
+	AString UserPassword = m_IniFile.GetValue("User:" + a_Request.GetAuthUsername(), "Password", "");
+	if ((UserPassword == "") || (a_Request.GetAuthPassword() != UserPassword))
+	{
+		a_Connection.SendNeedAuth("MCServer WebAdmin - bad username or password");
+		return;
+	}
+	
+	// Check if the contents should be wrapped in the template:
+	AString URL = a_Request.GetBareURL();
+	ASSERT(URL.length() > 0);
+	bool ShouldWrapInTemplate = ((URL.length() > 1) && (URL[1] != '~'));
+	
+	// Retrieve the request data:
+	cWebadminRequestData * Data = (cWebadminRequestData *)(a_Request.GetUserData());
+	if (Data == NULL)
+	{
+		a_Connection.SendStatusAndReason(500, "Bad UserData");
+		return;
+	}
+	
+	// Wrap it all up for the Lua call:
+	AString Template;
+	HTTPTemplateRequest TemplateRequest;
+	TemplateRequest.Request.Username = a_Request.GetAuthUsername();
+	TemplateRequest.Request.Method = a_Request.GetMethod();
+	TemplateRequest.Request.Path = URL.substr(1);
+	
+	if (Data->m_Form.Finish())
+	{
+		for (cHTTPFormParser::const_iterator itr = Data->m_Form.begin(), end = Data->m_Form.end(); itr != end; ++itr)
+		{
+			HTTPFormData HTTPfd;
+			HTTPfd.Value = itr->second;
+			HTTPfd.Type = "";
+			HTTPfd.Name = itr->first;
+			TemplateRequest.Request.FormData[itr->first] = HTTPfd;
+			TemplateRequest.Request.PostParams[itr->first] = itr->second;
+			TemplateRequest.Request.Params[itr->first] = itr->second;
+		}  // for itr - Data->m_Form[]
+	}
+	
+	// Try to get the template from the Lua template script
+	if (ShouldWrapInTemplate)
+	{
+		if (m_TemplateScript.Call("ShowPage", this, &TemplateRequest, cLuaState::Return, Template))
+		{
+			cHTTPResponse Resp;
+			Resp.SetContentType("text/html");
+			a_Connection.Send(Resp);
+			a_Connection.Send(Template.c_str(), Template.length());
+			return;
+		}
+		a_Connection.SendStatusAndReason(500, "m_TemplateScript failed");
+		return;
+	}
+	
+	AString BaseURL = GetBaseURL(URL);
+	AString Menu;
+	Template = "{CONTENT}";
+	AString FoundPlugin;
+
+	for (PluginList::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
+	{
+		cWebPlugin * WebPlugin = *itr;
+		std::list< std::pair<AString, AString> > NameList = WebPlugin->GetTabNames();
+		for (std::list< std::pair<AString, AString> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names)
+		{
+			Menu += "<li><a href='" + BaseURL + WebPlugin->GetWebTitle().c_str() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
+		}
+	}
+
+	sWebAdminPage Page = GetPage(TemplateRequest.Request);
+	AString Content = Page.Content;
+	FoundPlugin = Page.PluginName;
+	if (!Page.TabName.empty())
+	{
+		FoundPlugin += " - " + Page.TabName;
+	}
+
+	if (FoundPlugin.empty())  // Default page
+	{
+		Content = GetDefaultPage();
+	}
+
+	if (ShouldWrapInTemplate && (URL.size() > 1))
+	{
+		Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
+	}
+
+	int MemUsageKiB = GetMemoryUsage();
+	if (MemUsageKiB > 0)
+	{
+		ReplaceString(Template, "{MEM}",       Printf("%.02f", (double)MemUsageKiB / 1024));
+		ReplaceString(Template, "{MEMKIB}",    Printf("%d", MemUsageKiB));
+	}
+	else
+	{
+		ReplaceString(Template, "{MEM}",       "unknown");
+		ReplaceString(Template, "{MEMKIB}",    "unknown");
+	}
+	ReplaceString(Template, "{USERNAME}",    a_Request.GetAuthUsername());
+	ReplaceString(Template, "{MENU}",        Menu);
+	ReplaceString(Template, "{PLUGIN_NAME}", FoundPlugin);
+	ReplaceString(Template, "{CONTENT}",     Content);
+	ReplaceString(Template, "{TITLE}",       "MCServer");
+
+	AString NumChunks;
+	Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
+	ReplaceString(Template, "{NUMCHUNKS}", NumChunks);
+
+	cHTTPResponse Resp;
+	Resp.SetContentType("text/html");
+	a_Connection.Send(Resp);
+	a_Connection.Send(Template.c_str(), Template.length());
+}
+
+
+
+
+
+void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+{
+	static const char LoginForm[] = \
+	"<h1>MCServer WebAdmin</h1>" \
+	"<center>" \
+	"<form method='get' action='webadmin/'>" \
+	"<input type='submit' value='Log in'>" \
+	"</form>" \
+	"</center>";
+	cHTTPResponse Resp;
+	Resp.SetContentType("text/html");
+	a_Connection.Send(Resp);
+	a_Connection.Send(LoginForm, sizeof(LoginForm) - 1);
+	a_Connection.FinishResponse();
+}
+
+
+
+
+
+sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 {
 	sWebAdminPage Page;
 	AStringVector Split = StringSplit(a_Request.Path, "/");
@@ -373,7 +305,7 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest& a_Request)
 	AString FoundPlugin;
 	if (Split.size() > 1)
 	{
-		for (PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr)
+		for (PluginList::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 		{
 			if ((*itr)->GetWebTitle() == Split[1])
 			{
@@ -392,6 +324,41 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest& a_Request)
 	return Page;
 }
 
+
+
+
+
+AString cWebAdmin::GetDefaultPage(void)
+{
+	AString Content;
+	Content += "<h4>Server Name:</h4>";
+	Content += "<p>" + AString( cRoot::Get()->GetServer()->GetServerID() ) + "</p>";
+
+	Content += "<h4>Plugins:</h4><ul>";
+	cPluginManager * PM = cPluginManager::Get();
+	const cPluginManager::PluginMap & List = PM->GetAllPlugins();
+	for (cPluginManager::PluginMap::const_iterator itr = List.begin(); itr != List.end(); ++itr)
+	{
+		if (itr->second == NULL)
+		{
+			continue;
+		}
+		AString VersionNum;
+		AppendPrintf(Content, "<li>%s V.%i</li>", itr->second->GetName().c_str(), itr->second->GetVersion());
+	}
+	Content += "</ul>";
+	Content += "<h4>Players:</h4><ul>";
+
+	cPlayerAccum PlayerAccum;
+	cWorld * World = cRoot::Get()->GetDefaultWorld(); // TODO - Create a list of worlds and players
+	if( World != NULL )
+	{
+		World->ForEachPlayer(PlayerAccum);
+		Content.append(PlayerAccum.m_Contents);
+	}
+	Content += "</ul><br>";
+	return Content;
+}
 
 
 
@@ -469,6 +436,84 @@ int cWebAdmin::GetMemoryUsage(void)
 		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
 		return -1;
 	#endif
+}
+
+
+
+
+
+void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+{
+	const AString & URL = a_Request.GetURL();
+	if (
+		(strncmp(URL.c_str(), "/webadmin", 9) == 0) ||
+		(strncmp(URL.c_str(), "/~webadmin", 10) == 0)
+	)
+	{
+		a_Request.SetUserData(new cWebadminRequestData(a_Request));
+		return;
+	}
+	if (URL == "/")
+	{
+		// The root needs no body handler and is fully handled in the OnRequestFinished() call
+		return;
+	}
+	// TODO: Handle other requests
+}
+
+
+
+
+
+void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size)
+{
+	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
+	if (Data == NULL)
+	{
+		return;
+	}
+	Data->OnBody(a_Data, a_Size);
+}
+
+
+
+
+
+void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+{
+	const AString & URL = a_Request.GetURL();
+	if (
+		(strncmp(URL.c_str(), "/webadmin", 9) == 0) ||
+		(strncmp(URL.c_str(), "/~webadmin", 10) == 0)
+	)
+	{
+		HandleWebadminRequest(a_Connection, a_Request);
+	}
+	else if (URL == "/")
+	{
+		// The root needs no body handler and is fully handled in the OnRequestFinished() call
+		HandleRootRequest(a_Connection, a_Request);
+	}
+	else
+	{
+		// TODO: Handle other requests
+	}
+	
+	// Delete any request data assigned to the request:
+	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
+	delete Data;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWebAdmin::cWebadminRequestData
+
+void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, int a_Size)
+{
+	m_Form.Parse(a_Data, a_Size);
 }
 
 
