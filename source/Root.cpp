@@ -92,10 +92,6 @@ void cRoot::InputThread(void * a_Params)
 
 void cRoot::Start(void)
 {
-	cTimer Time;
-
-	long long mseconds = Time.GetNowTime();
-
 	cDeadlockDetect dd;
 	delete m_Log;
 	m_Log = new cMCLogger();
@@ -103,6 +99,9 @@ void cRoot::Start(void)
 	m_bStop = false;
 	while (!m_bStop)
 	{
+		cTimer Time;
+		long long mseconds = Time.GetNowTime();
+		
 		m_bRestart = false;
 
 		LoadGlobalSettings();
