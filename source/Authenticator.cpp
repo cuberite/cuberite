@@ -100,6 +100,16 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 
 
 
+void cAuthenticator::Start(void)
+{
+	m_ShouldTerminate = false;
+	super::Start();
+}
+
+
+
+
+
 void cAuthenticator::Stop(void)
 {
 	m_ShouldTerminate = true;

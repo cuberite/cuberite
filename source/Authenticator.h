@@ -42,7 +42,10 @@ public:
 	/// Queues a request for authenticating a user. If the auth fails, the user is kicked
 	void Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash);
 
-	// Stops the authenticator thread
+	/// Starts the authenticator thread. The thread may be started and stopped repeatedly
+	void Start(void);
+	
+	/// Stops the authenticator thread. The thread may be started and stopped repeatedly
 	void Stop(void);
 	
 private:
