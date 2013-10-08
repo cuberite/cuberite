@@ -13,9 +13,17 @@ class cVillager :
 	typedef cPassiveMonster super;
 	
 public:
-	cVillager();
+	cVillager(int Type);
 
 	CLASS_PROTODEF(cVillager);
+
+	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	int GetVilType(void) const { return m_Type; }
+
+private:
+
+	int m_Type;
+
 } ;
 
 

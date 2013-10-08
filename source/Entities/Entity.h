@@ -71,6 +71,13 @@ public:
 		ENTITY_STATUS_WOLF_SHAKING    = 8,
 		ENTITY_STATUS_EATING_ACCEPTED = 9,
 		ENTITY_STATUS_SHEEP_EATING    = 10,
+		ENTITY_STATUS_GOLEM_ROSING    = 11,
+		ENTITY_STATUS_VILLAGER_HEARTS = 12,
+		ENTITY_STATUS_VILLAGER_ANGRY  = 13,
+		ENTITY_STATUS_VILLAGER_HAPPY  = 14,
+		ENTITY_STATUS_WITCH_MAGICKING = 15,
+		// It seems 16 (zombie conversion) is now done with metadata
+		ENTITY_STATUS_FIREWORK_EXPLODE= 17,
 	} ;
 	
 	enum
@@ -333,6 +340,62 @@ public:
 	virtual bool IsRiding   (void) const {return false; }
 	virtual bool IsSprinting(void) const {return false; }
 	virtual bool IsRclking  (void) const {return false; }
+	virtual bool IsInvisible(void) const {return false; }
+
+	// Ageables + Tameables
+	virtual bool IsBabby    (void) const {return false; }
+	virtual bool IsSitting  (void) const {return false; }
+	virtual bool IsTame     (void) const {return false; }
+
+	// Creepers
+	virtual bool IsCharged  (void) const {return false; }
+	virtual bool IsBlowing  (void) const {return false; }
+
+	// Furnace Minecarts & Minecarts
+	virtual int LastDamage  (void) const {return 0; }
+	virtual bool IsFueled   (void) const {return false; }
+
+	// Bat
+	virtual bool IsHanging (void)  const {return false; }
+
+	// Pig
+	virtual bool IsSaddled (void)  const {return false; }
+
+	// TESTIFICATE
+	virtual int  GetVilType(void)  const {return 0;     }
+
+	// Zombie
+	virtual bool IsVillager(void)  const {return false; }
+	virtual bool IsConvert (void)  const {return false; }
+
+	// Ghast
+	virtual bool IsCharging(void)  const {return false; }
+
+	// Arrow
+	virtual bool IsCritical(void)  const {return false; }
+
+	// Wolf
+	virtual bool IsAngry   (void)  const {return false; }
+	virtual bool IsBegging (void)  const {return false; }
+	virtual int GetCollar  (void)  const {return 0; }
+
+	// Sheep
+	virtual int GetFurColor(void)  const {return 0; }
+	virtual bool IsSheared (void)  const {return false; }
+
+	// Enderman
+	virtual BLOCKTYPE CarriedBlock (void) const {return E_BLOCK_AIR; }
+	virtual NIBBLETYPE CarriedMeta (void) const {return 0; }
+	virtual bool IsScream  (void)  const {return false; }
+
+	// Skeleton || Wither Skeleton
+	virtual bool IsWither (void)  const  {return false; }
+
+	// Witch
+	virtual bool IsNosey  (void)  const  {return false; }
+
+	// Slimes and Magma cubes
+	virtual int GetSize   (void)  const  {return 1; }
 	
 	// tolua_end
 	

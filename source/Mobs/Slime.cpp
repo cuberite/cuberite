@@ -3,8 +3,6 @@
 
 #include "Slime.h"
 
-// TODO: Implement sized slimes
-
 
 
 

@@ -13,11 +13,28 @@ class cHorse :
 	typedef cPassiveMonster super;
 	
 public:
-	cHorse(void);
+	cHorse(int Type, int Color, int Style, int TameTimes);
 
 	CLASS_PROTODEF(cHorse);
 	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void OnRightClicked(cPlayer & a_Player) override;
+	bool IsChested  (void) const  {return m_bIsChested; }
+	bool IsEating   (void) const  {return m_bIsEating; }
+	bool IsRearing  (void) const  {return m_bIsRearing; }
+	bool IsMthOpen  (void) const  {return m_bIsMouthOpen; }
+	bool IsTame     (void) const  {return m_bIsTame; }
+	int  GetHType   (void) const  {return m_Type; }
+	int  GetHColor  (void) const  {return m_Color; }
+	int  GetHStyle  (void) const  {return m_Style; }
+	int  GetHArmour (void) const  {return m_Armour;}
+
+private:
+
+	bool m_bIsChested, m_bIsEating, m_bIsRearing, m_bIsMouthOpen, m_bIsTame;
+	int m_Type, m_Color, m_Style, m_Armour, m_TimesToTame, m_TameAttemptTimes;
+
 } ;
 
 

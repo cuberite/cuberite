@@ -16,7 +16,8 @@
 
 cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 	super(etMinecart, a_X, a_Y, a_Z, 0.98, 0.7),
-	m_Payload(a_Payload)
+	m_Payload(a_Payload),
+	m_LastDamage(0)
 {
 	SetMass(20.f);
 	SetMaxHealth(6);
@@ -344,11 +345,51 @@ void cMinecart::HandleRailPhysics(float a_Dt, cChunk & a_Chunk)
 
 void cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 {
+	m_LastDamage = TDI.FinalDamage;
 	super::DoTakeDamage(TDI);
+
+	m_World->BroadcastEntityMetadata(*this);
 
 	if (GetHealth() <= 0)
 	{
 		Destroy(true);
+		
+		cItems Drops;
+		switch (m_Payload)
+		{
+			case mpNone:
+			{
+				Drops.push_back(cItem(E_ITEM_MINECART, 1, 0));
+				break;
+			}
+			case mpChest:
+			{
+				Drops.push_back(cItem(E_ITEM_CHEST_MINECART, 1, 0));
+				break;
+			}
+			case mpFurnace:
+			{
+				Drops.push_back(cItem(E_ITEM_FURNACE_MINECART, 1, 0));
+				break;
+			}
+			case mpTNT:
+			{
+				Drops.push_back(cItem(0, 1, 0));
+				break;
+			}
+			case mpHopper:
+			{
+				Drops.push_back(cItem(0, 1, 0));
+				break;
+			}
+			default:
+			{
+				ASSERT(!"Unhandled minecart type when spawning pickup!");
+				return;
+			}
+		}
+		
+		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
 }
 
@@ -434,7 +475,8 @@ void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 // cMinecartWithFurnace:
 
 cMinecartWithFurnace::cMinecartWithFurnace(double a_X, double a_Y, double a_Z) :
-	super(mpFurnace, a_X, a_Y, a_Z)
+	super(mpFurnace, a_X, a_Y, a_Z),
+	m_IsFueled(false)
 {
 }
 
@@ -444,8 +486,16 @@ cMinecartWithFurnace::cMinecartWithFurnace(double a_X, double a_Y, double a_Z) :
 
 void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 {
-	// Try to power the furnace with whatever the player is holding
-	// TODO
+	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_COAL)
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+
+		m_IsFueled = true;
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 

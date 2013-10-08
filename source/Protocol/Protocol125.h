@@ -142,11 +142,8 @@ protected:
 	/// Parses one item, "slot" as the protocol wiki calls it, from m_ReceivedData; returns the usual ParsePacket() codes
 	virtual int  ParseItem(cItem & a_Item);
 	
-	/// Returns the entity metadata representation
-	AString GetEntityMetaData(const cEntity & a_Entity);
-	
-	/// Returns the entity common metadata, index 0 (generic flags)
-	char GetEntityMetadataFlags(const cEntity & a_Entity);
+	/// Writes the entity metadata
+	void WriteMetadata(const cEntity & a_Entity);
 } ;
 
 

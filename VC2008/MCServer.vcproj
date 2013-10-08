@@ -1140,6 +1140,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Mobs\Wolf.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Mobs\Wolf.h"
 					>
 				</File>
