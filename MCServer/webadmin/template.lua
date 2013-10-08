@@ -58,7 +58,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	SiteContent = {}
 	local BaseURL = WebAdmin:GetBaseURL(TemplateRequest.Request.Path)
 	local Title = "MCServer"
-	local MemoryUsageKiB = cWebAdmin:GetMemoryUsage()
+	local MemoryUsageKiB = cRoot:GetPhysicalRAMUsage()
 	local NumChunks = cRoot:Get():GetTotalChunkCount()
 	local PluginPage = WebAdmin:GetPage(TemplateRequest.Request)
 	local PageContent = PluginPage.Content
