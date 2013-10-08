@@ -1,18 +1,16 @@
-local PLUGIN = {}
 local Carpets = {}
 
 function Initialize( Plugin )
-	PLUGIN = Plugin
-
 	Plugin:SetName( "MagicCarpet" )
-	Plugin:SetVersion( 1 )
+	Plugin:SetVersion( 2 )
 
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
 	cPluginManager.AddHook(cPluginManager.HOOK_DISCONNECT,    OnDisconnect)
 	
+	local PluginManager = cPluginManager:Get()
 	PluginManager:BindCommand("/mc", "magiccarpet", HandleCarpetCommand, " - Spawns a magical carpet");
 
-	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
+	LOG( "Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true
 end
 
@@ -33,14 +31,15 @@ end
 
 function HandleCarpetCommand( Split, Player )
 	Carpet = Carpets[ Player ]
+		
 	if( Carpet == nil ) then
 		Carpets[ Player ] = cCarpet:new()
-		Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "You're on a magic carpet!" )
-		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Look straight down to descend. Jump to ascend!" )
+		SendMessageSuccess(Player, "You're on a magic carpet!")
+		SendMessage(Player, "Look straight down to descend. Jump to ascend.")
 	else
 		Carpet:remove()
 		Carpets[ Player ] = nil
-		Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "The carpet vanished!" )
+		SendMessageSuccess(Player, "The carpet vanished!")
 	end
 
 	return true
