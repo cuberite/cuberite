@@ -1638,11 +1638,11 @@ void cProtocol125::WriteMetadata(const cEntity & a_Entity)
 	}
 	if (a_Entity.IsRclking())
 	{
-		CommonMetadata |= 0x16;
+		CommonMetadata |= 0x10;
 	}
 	if (a_Entity.IsInvisible())
 	{
-		CommonMetadata |= 0x32;
+		CommonMetadata |= 0x20;
 	}
 
 	WriteByte(0x0);
@@ -1691,7 +1691,7 @@ void cProtocol125::WriteMetadata(const cEntity & a_Entity)
 	else if (a_Entity.IsA("cZombie"))
 	{
 		WriteByte(0xC);
-		WriteByte(a_Entity.IsBabby() ? 1 : 0); // Babby zombie?
+		WriteByte(a_Entity.IsBaby() ? 1 : 0); // Babby zombie?
 		WriteByte(0xD);
 		WriteByte(a_Entity.IsVillZomb() ? 1 : 0); // Converted zombie?
 		WriteByte(0xE);
@@ -1784,7 +1784,7 @@ void cProtocol125::WriteMetadata(const cEntity & a_Entity)
 		{
 			Flags |= 0x8;
 		}
-		if (a_Entity.IsBabby())
+		if (a_Entity.IsBaby())
 		{
 			Flags |= 0x10; // IsBred flag, according to wiki.vg - don't think it does anything in multiplayer
 		}
