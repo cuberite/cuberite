@@ -1,8 +1,6 @@
 local Carpets = {}
 
 function Initialize( Plugin )
-	PLUGIN = Plugin
-
 	Plugin:SetName( "MagicCarpet" )
 	Plugin:SetVersion( 2 )
 
