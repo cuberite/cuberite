@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/06/13 15:12:14.
+** Generated automatically by tolua++-1.0.92 on 10/08/13 19:32:59.
 */
 
 #ifndef __cplusplus
@@ -29625,20 +29625,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cEntity","cEntity","",NULL);
   tolua_beginmodule(tolua_S,"cEntity");
-   tolua_constant(tolua_S,"ENTITY_STATUS_HURT",cEntity::ENTITY_STATUS_HURT);
-   tolua_constant(tolua_S,"ENTITY_STATUS_DEAD",cEntity::ENTITY_STATUS_DEAD);
-   tolua_constant(tolua_S,"ENTITY_STATUS_WOLF_TAMING",cEntity::ENTITY_STATUS_WOLF_TAMING);
-   tolua_constant(tolua_S,"ENTITY_STATUS_WOLF_TAMED",cEntity::ENTITY_STATUS_WOLF_TAMED);
-   tolua_constant(tolua_S,"ENTITY_STATUS_WOLF_SHAKING",cEntity::ENTITY_STATUS_WOLF_SHAKING);
-   tolua_constant(tolua_S,"ENTITY_STATUS_EATING_ACCEPTED",cEntity::ENTITY_STATUS_EATING_ACCEPTED);
-   tolua_constant(tolua_S,"ENTITY_STATUS_SHEEP_EATING",cEntity::ENTITY_STATUS_SHEEP_EATING);
-   tolua_constant(tolua_S,"FIRE_TICKS_PER_DAMAGE",cEntity::FIRE_TICKS_PER_DAMAGE);
-   tolua_constant(tolua_S,"FIRE_DAMAGE",cEntity::FIRE_DAMAGE);
-   tolua_constant(tolua_S,"LAVA_TICKS_PER_DAMAGE",cEntity::LAVA_TICKS_PER_DAMAGE);
-   tolua_constant(tolua_S,"LAVA_DAMAGE",cEntity::LAVA_DAMAGE);
-   tolua_constant(tolua_S,"BURN_TICKS_PER_DAMAGE",cEntity::BURN_TICKS_PER_DAMAGE);
-   tolua_constant(tolua_S,"BURN_DAMAGE",cEntity::BURN_DAMAGE);
-   tolua_constant(tolua_S,"BURN_TICKS",cEntity::BURN_TICKS);
    tolua_constant(tolua_S,"etEntity",cEntity::etEntity);
    tolua_constant(tolua_S,"etPlayer",cEntity::etPlayer);
    tolua_constant(tolua_S,"etPickup",cEntity::etPickup);
@@ -29649,10 +29635,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"etTNT",cEntity::etTNT);
    tolua_constant(tolua_S,"etProjectile",cEntity::etProjectile);
    tolua_constant(tolua_S,"etMob",cEntity::etMob);
-   tolua_constant(tolua_S,"eEntityType_Entity",cEntity::eEntityType_Entity);
-   tolua_constant(tolua_S,"eEntityType_Player",cEntity::eEntityType_Player);
-   tolua_constant(tolua_S,"eEntityType_Pickup",cEntity::eEntityType_Pickup);
-   tolua_constant(tolua_S,"eEntityType_Mob",cEntity::eEntityType_Mob);
    tolua_function(tolua_S,"GetEntityType",tolua_AllToLua_cEntity_GetEntityType00);
    tolua_function(tolua_S,"IsPlayer",tolua_AllToLua_cEntity_IsPlayer00);
    tolua_function(tolua_S,"IsPickup",tolua_AllToLua_cEntity_IsPickup00);

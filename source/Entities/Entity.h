@@ -61,7 +61,26 @@ struct TakeDamageInfo
 // tolua_begin
 class cEntity
 {
-public:			
+public:
+
+	enum eEntityType
+	{
+		etEntity,  // For all other types
+		etPlayer,
+		etPickup,
+		etMonster,
+		etFallingBlock,
+		etMinecart,
+		etBoat,
+		etTNT,
+		etProjectile,
+		
+		// Common variations
+		etMob = etMonster,  // DEPRECATED, use etMonster instead!
+	} ;
+	
+	// tolua_end
+
 	enum
 	{
 		ENTITY_STATUS_HURT            = 2,
@@ -84,28 +103,6 @@ public:
 		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
 	} ;
 	
-	enum eEntityType
-	{
-		etEntity,  // For all other types
-		etPlayer,
-		etPickup,
-		etMonster,
-		etFallingBlock,
-		etMinecart,
-		etBoat,
-		etTNT,
-		etProjectile,
-		
-		// DEPRECATED older constants, left over for compatibility reasons (plugins)
-		etMob = etMonster,  // DEPRECATED, use etMonster instead!
-		eEntityType_Entity = etEntity,
-		eEntityType_Player = etPlayer,
-		eEntityType_Pickup = etPickup,
-		eEntityType_Mob    = etMob,
-	} ;
-	
-	// tolua_end
-
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	virtual ~cEntity();
 
