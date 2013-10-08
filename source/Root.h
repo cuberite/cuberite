@@ -105,8 +105,18 @@ public:
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 	
+	// tolua_begin
+	
 	/// Returns the textual description of the protocol version: 49 -> "1.4.4". Provided specifically for Lua API
-	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);  // tolua_export
+	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);
+	
+	/// Returns the amount of virtual RAM used, in KiB. Returns a negative number on error
+	static int GetVirtualRAMUsage(void);
+	
+	/// Returns the amount of virtual RAM used, in KiB. Returns a negative number on error
+	static int GetPhysicalRAMUsage(void);
+	
+	// tolua_end
 	
 private:
 	class cCommand

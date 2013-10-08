@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/08/13 19:32:59.
+** Generated automatically by tolua++-1.0.92 on 10/08/13 20:07:51.
 */
 
 #ifndef __cplusplus
@@ -19546,6 +19546,62 @@ static int tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00(lua_State* tolua
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetVirtualRAMUsage of class  cRoot */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetVirtualRAMUsage00
+static int tolua_AllToLua_cRoot_GetVirtualRAMUsage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   int tolua_ret = (int)  cRoot::GetVirtualRAMUsage();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetVirtualRAMUsage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetPhysicalRAMUsage of class  cRoot */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetPhysicalRAMUsage00
+static int tolua_AllToLua_cRoot_GetPhysicalRAMUsage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   int tolua_ret = (int)  cRoot::GetPhysicalRAMUsage();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetPhysicalRAMUsage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  Vector3f */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3f_new00
 static int tolua_AllToLua_Vector3f_new00(lua_State* tolua_S)
@@ -30345,6 +30401,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SaveAllChunks",tolua_AllToLua_cRoot_SaveAllChunks00);
    tolua_function(tolua_S,"BroadcastChat",tolua_AllToLua_cRoot_BroadcastChat00);
    tolua_function(tolua_S,"GetProtocolVersionTextFromInt",tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00);
+   tolua_function(tolua_S,"GetVirtualRAMUsage",tolua_AllToLua_cRoot_GetVirtualRAMUsage00);
+   tolua_function(tolua_S,"GetPhysicalRAMUsage",tolua_AllToLua_cRoot_GetPhysicalRAMUsage00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"Vector3f","Vector3f","",tolua_collect_Vector3f);

@@ -21,13 +21,19 @@
 
 #include "../iniFile/iniFile.h"
 
-#include <iostream>
+#ifdef _WIN32
+	#include <psapi.h>
+#elif defined(__linux__)
+	#include <fstream>
+#elif defined(__APPLE__)
+	#include <mach/mach.h>
+#endif
 
 
 
 
 
-cRoot* cRoot::s_Root = 0;
+cRoot* cRoot::s_Root = NULL;
 
 
 
@@ -565,6 +571,110 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 AString cRoot::GetProtocolVersionTextFromInt(int a_ProtocolVersion)
 {
 	return cProtocolRecognizer::GetVersionTextFromInt(a_ProtocolVersion);
+}
+
+
+
+
+
+int cRoot::GetVirtualRAMUsage(void)
+{
+	#ifdef _WIN32
+		PROCESS_MEMORY_COUNTERS_EX pmc;
+		if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)))
+		{
+			return (int)(pmc.PrivateUsage / 1024);
+		}
+		return -1;
+	#elif defined(__linux__)
+		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		std::ifstream StatFile("/proc/self/status");
+		if (!StatFile.good())
+		{
+			return -1;
+		}
+		while (StatFile.good())
+		{
+			AString Line;
+			std::getline(StatFile, Line);
+			if (strncmp(Line.c_str(), "VmSize:", 7) == 0)
+			{
+				int res = atoi(Line.c_str() + 8);
+				return (res == 0) ? -1 : res;  // If parsing failed, return -1
+			}
+		}
+		return -1;
+	#elif defined (__APPLE__)
+		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		struct task_basic_info t_info;
+		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+
+		if (KERN_SUCCESS == task_info(
+			mach_task_self(),
+			TASK_BASIC_INFO,
+			(task_info_t)&t_info,
+			&t_info_count
+		))
+		{
+		    return (int)(t_info.virtual_size / 1024);
+		}
+		return -1;
+	#else
+		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
+		return -1;
+	#endif
+}
+
+
+
+
+
+int cRoot::GetPhysicalRAMUsage(void)
+{
+	#ifdef _WIN32
+		PROCESS_MEMORY_COUNTERS pmc;
+		if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
+		{
+			return (int)(pmc.WorkingSetSize / 1024);
+		}
+		return -1;
+	#elif defined(__linux__)
+		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		std::ifstream StatFile("/proc/self/status");
+		if (!StatFile.good())
+		{
+			return -1;
+		}
+		while (StatFile.good())
+		{
+			AString Line;
+			std::getline(StatFile, Line);
+			if (strncmp(Line.c_str(), "VmRSS:", 7) == 0)
+			{
+				int res = atoi(Line.c_str() + 8);
+				return (res == 0) ? -1 : res;  // If parsing failed, return -1
+			}
+		}
+		return -1;
+	#elif defined (__APPLE__)
+		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		struct task_basic_info t_info;
+		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+
+		if (KERN_SUCCESS == task_info(
+			mach_task_self(),
+			TASK_BASIC_INFO,
+			(task_info_t)&t_info,
+			&t_info_count
+		))
+		{
+		    return (int)(t_info.resident_size / 1024);
+		}
+		return -1;
+	#else
+		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
+		return -1;
+	#endif
 }
 
 
