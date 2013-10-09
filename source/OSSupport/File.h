@@ -103,8 +103,8 @@ public:
 	/// Deletes a file, returns true if successful
 	static bool Delete(const AString & a_FileName);
 	
-	/// Renames a file, returns true if successful. May fail if dest already exists (libc-dependant)!
-	static bool Rename(const AString & a_OrigFileName, const AString & a_NewFileName);
+	/// Renames a file or folder, returns true if successful. May fail if dest already exists (libc-dependant)!
+	static bool Rename(const AString & a_OrigPath, const AString & a_NewPath);
 	
 	/// Copies a file, returns true if successful.
 	static bool Copy(const AString & a_SrcFileName, const AString & a_DstFileName);

@@ -841,6 +841,30 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			},
 		},
 
+		cFile =
+		{
+			Desc = [[
+				Provides helper functions for manipulating and querying the filesystem. Most functions are called
+				directly on the cFile class itself:
+<pre>
+cFile:Delete("/usr/bin/virus.exe");
+</pre></p>
+			]],
+			
+			Functions =
+			{
+				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
+				CreateFolder = { Params = "FolderName", Return = "bool", Notes = "Creates a new folder. Returns true if successful." },
+				Delete = { Params = "FileName", Return = "bool", Notes = "Deletes the specified file. Returns true if successful." },
+				Exists = { Params = "FileName", Return = "bool", Notes = "Returns true if the specified file exists." },
+				GetSize = { Params = "FileName", Return = "number", Notes = "Returns the size of the file, or -1 on failure." },
+				IsFile = { Params = "Path", Return = "bool", Notes = "Returns true if the specified path points to an existing file." },
+				IsFolder = { Params = "Path", Return = "bool", Notes = "Returns true if the specified path points to an existing folder." },
+				Rename = { Params = "OrigPath, NewPath", Return = "bool", Notes = "Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists." },
+			},
+
+		},
+
 		cFireChargeEntity = 
 		{
 			Desc = "",
