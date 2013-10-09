@@ -164,6 +164,8 @@ function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 
 	local API, Globals = CreateAPITables();
+	local Hooks = {};
+	local UndocumentedHooks = {};
 	
 	-- Sort the classes by name:
 	table.sort(API,
@@ -176,8 +178,21 @@ function DumpAPIHtml()
 	Globals.Name = "Globals";
 	table.insert(API, Globals);
 	
+	-- Extract hook constants:
+	for name, obj in pairs(cPluginManager) do
+		if (type(obj) == "number") and (name:match("HOOK_.*")) then
+			table.insert(Hooks, { Name = name });
+		end
+	end
+	table.sort(Hooks,
+		function(Hook1, Hook2)
+			return (Hook1.Name < Hook2.Name);
+		end
+	);
+	
 	-- Read in the descriptions:
 	ReadDescriptions(API);
+	ReadHooks(Hooks);
 	
 	-- Create the output folder
 	if not(cFile:IsFolder("API")) then
@@ -220,7 +235,16 @@ function DumpAPIHtml()
 	for the event). See each hook's details to see the exact behavior.</p>
 	<table><tr><th>Hook name</th><th>Called when</th></tr>
 	]]);
-	-- TODO: Write out the hooks into a table
+	for i, hook in ipairs(Hooks) do
+		if (hook.DefaultFnName == nil) then
+			-- The hook is not documented yet
+			f:write("<tr><td>" .. hook.Name .. "</td><td><i>(No documentation yet)</i></td></tr>\n");
+			table.insert(UndocumentedHooks, hook.Name);
+		else
+			f:write("<tr><td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td><td>" .. hook.CalledWhen .. "</td></tr>\n");
+			WriteHtmlHook(hook);
+		end
+	end
 	f:write([[</table>
 	<a name="extra"><h2>Extra pages</h2></a>
 	<p>The following pages provide various extra information</p>
@@ -286,6 +310,24 @@ function DumpAPIHtml()
 				f:write("\t\t},\n\n");
 			end
 		end  -- for i, cls - API[]
+		f:write("\t},\n");
+		
+		if (#UndocumentedHooks > 0) then
+			f:write("\n\tHooks =\n\t{\n");
+			for i, hook in ipairs(UndocumentedHooks) do
+				if (i > 1) then
+					f:write("\n");
+				end
+				f:write("\t\t" .. hook .. " =\n\t\t{\n");
+				f:write("\t\t\tCalledWhen = \"\",\n");
+				f:write("\t\t\tDefaultFnName = \"On\",  -- also used as pagename\n");
+				f:write("\t\t\tDesc = [[]],\n");
+				f:write("\t\t\tParams =\n\t\t\t{\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
+				f:write("\t\t\tReturns = [[]],\n");
+				f:write("\t\t},  -- " .. hook .. "\n");
+			end
+		end
 		f:close();
 	end
 	
@@ -531,17 +573,44 @@ end
 
 
 
+function ReadHooks(a_Hooks)
+	--[[
+	a_Hooks = {
+		{ Name = "HOOK_1"},
+		{ Name = "HOOK_2"},
+		...
+	};
+	We want to add hook descriptions to each hook in this array
+	--]]
+	for i, hook in ipairs(a_Hooks) do
+		local HookDesc = g_APIDesc.Hooks[hook.Name];
+		if (HookDesc ~= nil) then
+			for key, val in pairs(HookDesc) do
+				hook[key] = val;
+			end
+		end
+	end  -- for i, hook - a_Hooks[]
+end
+
+
+
+
+
+-- Make a link out of anything with the special linkifying syntax {{link|title}}
+function LinkifyString(a_String)
+	local txt = a_String:gsub("{{([^|}]*)|([^}]*)}}", "<a href=\"%1.html\">%2</a>")  -- {{link|title}}
+	txt = txt:gsub("{{([^|}]*)}}", "<a href=\"%1.html\">%1</a>")  -- {{LinkAndTitle}}
+	return txt;
+end
+
+
+
+
+
 function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	local cf, err = io.open("API/" .. a_ClassAPI.Name .. ".html", "w");
 	if (cf == nil) then
 		return;
-	end
-	
-	-- Make a link out of anything with the special linkifying syntax {{link|title}}
-	local function LinkifyString(a_String)
-		local txt = a_String:gsub("{{([^|}]*)|([^}]*)}}", "<a href=\"%1.html\">%2</a>")  -- {{link|title}}
-		txt = txt:gsub("{{([^|}]*)}}", "<a href=\"%1.html\">%1</a>")  -- {{LinkAndTitle}}
-		return txt;
 	end
 	
 	-- Writes a table containing all functions in the specified list, with an optional "inherited from" header when a_InheritedName is valid
@@ -584,7 +653,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		CurrInheritance = CurrInheritance.Inherits;
 	end
 	
-	cf:write([[<html><head><title>MCServer API - ]] .. a_ClassAPI.Name .. [[</title>
+	cf:write([[<html><head><title>MCServer API - ]] .. a_ClassAPI.Name .. [[ class</title>
 	<link rel="stylesheet" type="text/css" href="main.css" />
 	</head><body>
 	<h1>Contents</h1>
@@ -660,6 +729,48 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	cf:close();
 end
 
+
+
+
+
+function WriteHtmlHook(a_Hook)
+	local fnam = "API/" .. a_Hook.DefaultFnName .. ".html";
+	local f, error = io.open(fnam, "w");
+	if (f == nil) then
+		LOG("Cannot write \"" .. fnam .. "\": \"" .. error .. "\".");
+		return;
+	end
+	f:write([[<html><head><title>MCServer API - ]] .. a_Hook.DefaultFnName .. [[ hook</title>
+	<link rel="stylesheet" type="text/css" href="main.css" />
+	</head><body>
+	<h1>]] .. a_Hook.Name .. [[ hook</h1>
+	<p>
+	]]);
+	f:write(LinkifyString(a_Hook.Desc));
+	f:write("</p><h1>Callback function</h1><pre>function " .. a_Hook.DefaultFnName .. "(");
+	if (a_Hook.Params == nil) then
+		a_Hook.Params = {};
+	end
+	for i, param in ipairs(a_Hook.Params) do
+		if (i > 1) then
+			f:write(", ");
+		end
+		f:write(param.Name);
+	end
+	f:write(")</pre><p>Parameters:\n<table><tr><th>Name</th><th>Type</th><th>Notes</th></tr>\n");
+	for i, param in ipairs(a_Hook.Params) do
+		f:write("<tr><td>" .. param.Name .. "</td><td>" .. LinkifyString(param.Type) .. "</td><td>" .. LinkifyString(param.Notes) .. "</td></tr>\n");
+	end
+	f:write("</table></p>\n<p>" .. (a_Hook.Returns or "") .. "</p>\n");
+	f:write([[<h1>Code examples</h1>
+	<h2>Registering the callback</h2>
+<pre>
+cPluginManager.AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);
+</pre>
+	]]);
+	-- TODO: Other code examples
+	f:close();
+end
 
 
 
