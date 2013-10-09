@@ -9,6 +9,7 @@
 
 -- Global variables:
 g_Plugin = nil;
+g_PluginFolder = "";
 
 
 
@@ -22,6 +23,8 @@ function Initialize(Plugin)
 	Plugin:SetVersion(1);
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	
+	g_PluginFolder = Plugin:GetLocalFolder();
 
 	-- dump all available API functions and objects:
 	-- DumpAPITxt();
@@ -189,9 +192,15 @@ function DumpAPIHtml()
 		return;
 	end
 	
-	f:write([[<html><head><title>MCServer API - class index</title>
+	f:write([[<html><head><title>MCServer API - index</title>
 	<link rel="stylesheet" type="text/css" href="main.css" />
-	</head><body><h1>MCServer API - class index</h1>
+	</head><body><h1>MCServer API - index</h1>
+	<p>The API reference is divided into the following sections:<ul>
+		<li><a href="#classes">Class index</a></li>
+		<li><a href="#hooks">Hooks</a></li>
+		<li><a href="#extra">Extra pages</a></li>
+	</ul></p>
+	<a name="classes"><h2>Class index</h2></a>
 	<p>The following classes are available in the MCServer Lua scripting language:
 	<ul>
 	]]);
@@ -199,7 +208,33 @@ function DumpAPIHtml()
 		f:write("<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>\n");
 		WriteHtmlClass(cls, API);
 	end
-	f:write("</ul></p></body></html>");
+	f:write([[</ul></p>
+	<a name="hooks"><h2>Hooks</h2></a>
+	<p>A plugin can register to be called whenever an “interesting event” occurs. It does so by calling
+	<a href="cPluginManager.html">cPluginManager</a>'s AddHook() function and implementing a callback
+	function to handle the event.</p>
+	<p>A plugin can decide whether it will let the event pass through to the rest of the plugins, or hide it
+	from them. This is determined by the return value from the hook callback function. If the function returns
+	false or no value, the event is propagated further. If the function returns true, the processing is
+	stopped, no other plugin receives the notification (and possibly MCServer disables the default behavior
+	for the event). See each hook's details to see the exact behavior.</p>
+	<table><tr><th>Hook name</th><th>Called when</th></tr>
+	]]);
+	-- TODO: Write out the hooks into a table
+	f:write([[</table>
+	<a name="extra"><h2>Extra pages</h2></a>
+	<p>The following pages provide various extra information</p>
+	<ul>]]);
+	for i, extra in ipairs(g_APIDesc.ExtraPages) do
+		if (cFile:Copy(g_PluginFolder .. "/" .. extra.FileName, "API/" .. extra.FileName)) then
+			f:write("<li><a href=\"" .. extra.FileName .. "\">" .. extra.Title .. "</a></li>\n");
+		else
+			f:write("<li>" .. extra.Title .. " <i>(file is missing)</i></li>\n");
+		end
+	end
+	f:write([[</ul>
+	</body></html>
+	]]);
 	f:close();
 	
 	-- Copy the CSS file to the output folder (overwrite any existing):

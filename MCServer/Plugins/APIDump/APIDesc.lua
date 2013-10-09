@@ -2063,6 +2063,12 @@ World:ForEachEntity(
 		"ReadDescriptions",
 		"WriteHtmlClass",
 	},
+	
+	ExtraPages =
+	{
+		-- No sorting is provided for these, they will be output in the same order as defined here
+		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
+	}
 } ;
 
 
