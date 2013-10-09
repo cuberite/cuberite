@@ -6,13 +6,12 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "File.h"
+#include <fstream>
 
 
 
 
 
-
-/// Simple constructor - creates an unopened file object, use Open() to open / create a real file
 cFile::cFile(void) :
 	#ifdef USE_STDIO_FILE
 	m_File(NULL)
@@ -27,7 +26,6 @@ cFile::cFile(void) :
 
 
 
-/// Constructs and opens / creates the file specified, use IsOpen() to check for success
 cFile::cFile(const AString & iFileName, eMode iMode) :
 	#ifdef USE_STDIO_FILE
 	m_File(NULL)
@@ -42,7 +40,6 @@ cFile::cFile(const AString & iFileName, eMode iMode) :
 
 
 
-/// Auto-closes the file, if open
 cFile::~cFile()
 {
 	if (IsOpen())
@@ -134,7 +131,6 @@ bool cFile::IsEOF(void) const
 
 
 
-/// Reads  up to iNumBytes bytes into iBuffer, returns the number of bytes actually read,    or -1 on failure; asserts if not open
 int cFile::Read (void * iBuffer, int iNumBytes)
 {
 	ASSERT(IsOpen());
@@ -289,8 +285,8 @@ bool cFile::Copy(const AString & a_SrcFileName, const AString & a_DstFileName)
 		return (CopyFile(a_SrcFileName.c_str(), a_DstFileName.c_str(), true) != 0);
 	#else
 		// Other OSs don't have a direct CopyFile equivalent, do it the harder way:
-		ifstream src(a_SrcFileName, ios::binary);
-		ofstream dst(a_DstFileName, ios::binary);
+		std::ifstream src(a_SrcFileName.c_str(), std::ios::binary);
+		std::ofstream dst(a_DstFileName.c_str(), std::ios::binary);
 		if (dst.good())
 		{
 			dst << src.rdbuf();
