@@ -2616,7 +2616,7 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 		case cMonster::mtWitch:        Monster = new cWitch();           break;
 		case cMonster::mtWither:       Monster = new cWither();          break;
 		case cMonster::mtWolf:         Monster = new cWolf();            break;
-		case cMonster::mtZombie:       Monster = new cZombie();          break;
+		case cMonster::mtZombie:       Monster = new cZombie(false);     break; // TODO: Villager infection
 		case cMonster::mtZombiePigman: Monster = new cZombiePigman();    break;
 		
 		default:

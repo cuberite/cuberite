@@ -334,78 +334,13 @@ public:
 	
 	// tolua_begin
 	
-	// Metadata flags; descendants may override the defaults:
+	// COMMON metadata flags; descendants may override the defaults:
 	virtual bool IsOnFire   (void) const {return (m_TicksLeftBurning > 0); }
 	virtual bool IsCrouched (void) const {return false; }
 	virtual bool IsRiding   (void) const {return false; }
 	virtual bool IsSprinting(void) const {return false; }
 	virtual bool IsRclking  (void) const {return false; }
 	virtual bool IsInvisible(void) const {return false; }
-
-	// Ageables + Tameables
-	virtual bool IsBaby     (void) const {return false; }
-	virtual bool IsSitting  (void) const {return false; }
-	virtual bool IsTame     (void) const {return false; }
-
-	// Creepers
-	virtual bool IsCharged  (void) const {return false; }
-	virtual bool IsBlowing  (void) const {return false; }
-
-	// Furnace Minecarts & Minecarts
-	virtual int LastDamage  (void) const {return 0; }
-	virtual bool IsFueled   (void) const {return false; }
-
-	// Bat
-	virtual bool IsHanging  (void) const {return false; }
-
-	// Pig
-	virtual bool IsSaddled  (void) const {return false; }
-
-	// TESTIFICATE
-	virtual int  GetVilType (void) const {return 0;     }
-
-	// Zombie
-	virtual bool IsVillZomb (void) const {return false; }
-	virtual bool IsConvert  (void) const {return false; }
-
-	// Ghast
-	virtual bool IsCharging (void) const {return false; }
-
-	// Arrow
-	virtual bool IsCritical (void) const {return false; }
-
-	// Wolf
-	virtual bool IsAngry    (void) const {return false; }
-	virtual bool IsBegging  (void) const {return false; }
-	virtual int  GetCollar  (void) const {return 0; }
-
-	// Sheep
-	virtual int GetFurColor (void) const {return 0; }
-	virtual bool IsSheared  (void) const {return false; }
-
-	// Enderman
-	virtual BLOCKTYPE CarriedBlock (void) const {return E_BLOCK_AIR; }
-	virtual NIBBLETYPE CarriedMeta (void) const {return 0; }
-	virtual bool IsScream   (void) const {return false; }
-
-	// Skeleton || Wither Skeleton
-	virtual bool IsWither   (void) const  {return false; }
-
-	// Witch
-	virtual bool IsNosey    (void) const  {return false; }
-
-	// Slimes and Magma cubes
-	virtual int  GetSize    (void) const  {return 1; }
-
-	// Horsheys
-	virtual bool IsChested  (void) const  {return false; }
-	virtual bool IsEating   (void) const  {return false; }
-	virtual bool IsRearing  (void) const  {return false; }
-	virtual bool IsMthOpen  (void) const  {return false; }
-	virtual int  GetHType   (void) const  {return 0; }
-	virtual int  GetHColor  (void) const  {return 0; }
-	virtual int  GetHStyle  (void) const  {return 0; }
-	virtual int  GetHArmour (void) const  {return 0; }
 	
 	// tolua_end
 	

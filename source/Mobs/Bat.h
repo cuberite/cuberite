@@ -20,6 +20,8 @@ public:
 	}
 
 	CLASS_PROTODEF(cBat);
+
+	bool IsHanging(void) const {return false; }
 } ;
 
 

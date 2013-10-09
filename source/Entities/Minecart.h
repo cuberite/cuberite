@@ -51,8 +51,8 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
-	int LastDamage(void) const { return m_LastDamage; }
 	
+	int LastDamage(void) const { return m_LastDamage; }
 	void HandleRailPhysics(float a_Dt, cChunk & a_Chunk);
 	ePayload GetPayload(void) const { return m_Payload; }
 	

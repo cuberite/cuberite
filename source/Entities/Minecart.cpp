@@ -374,12 +374,12 @@ void cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 			}
 			case mpTNT:
 			{
-				Drops.push_back(cItem(0, 1, 0));
+				Drops.push_back(cItem(E_ITEM_MINECART_WITH_TNT, 1, 0));
 				break;
 			}
 			case mpHopper:
 			{
-				Drops.push_back(cItem(0, 1, 0));
+				Drops.push_back(cItem(E_ITEM_MINECART_WITH_HOPPER, 1, 0));
 				break;
 			}
 			default:

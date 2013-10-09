@@ -16,6 +16,7 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_bIsRearing(false),
 	m_bIsMouthOpen(false),
 	m_bIsTame(false),
+	m_bIsSaddled(false),
 	m_Type(Type),
 	m_Color(Color),
 	m_Style(Style),

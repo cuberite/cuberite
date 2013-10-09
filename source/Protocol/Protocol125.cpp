@@ -24,7 +24,26 @@ Documentation:
 #include "../UI/Window.h"
 #include "../Root.h"
 #include "../Server.h"
+
+#include "../Entities/ProjectileEntity.h"
+#include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
+
+#include "../Mobs/Monster.h"
+#include "../Mobs/Creeper.h"
+#include "../Mobs/Bat.h"
+#include "../Mobs/Pig.h"
+#include "../Mobs/Villager.h"
+#include "../Mobs/Zombie.h"
+#include "../Mobs/Ghast.h"
+#include "../Mobs/Wolf.h"
+#include "../Mobs/Sheep.h"
+#include "../Mobs/Enderman.h"
+#include "../Mobs/Skeleton.h"
+#include "../Mobs/Witch.h"
+#include "../Mobs/Slime.h"
+#include "../Mobs/Magmacube.h"
+#include "../Mobs/Horse.h"
 
 
 
@@ -1655,70 +1674,70 @@ void cProtocol125::WriteMetadata(const cEntity & a_Entity)
 	{
 		WriteByte(0x51);
 		// No idea how Mojang makes their carts shakey shakey, so here is a complicated one-liner expression that does something similar
-		WriteInt( (((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * a_Entity.LastDamage()) * 4 );
+		WriteInt( (((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * ((cMinecart &)a_Entity).LastDamage()) * 4 );
 		WriteByte(0x52);
 		WriteInt(1); // Shaking direction, doesn't seem to affect anything
 		WriteByte(0x73);
-		WriteFloat((float)(a_Entity.LastDamage() + 10)); // Damage taken / shake effect multiplyer
+		WriteFloat((float)(((cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
 	}
 	else if (a_Entity.IsA("cCreeper"))
 	{
 		WriteByte(0x10);
-		WriteByte(a_Entity.IsBlowing() ? 1 : -1); // Blowing up?
+		WriteByte(((cCreeper &)a_Entity).IsBlowing() ? 1 : -1); // Blowing up?
 		WriteByte(0x11);
-		WriteByte(a_Entity.IsCharged() ? 1 : 0); // Lightning-charged?
+		WriteByte(((cCreeper &)a_Entity).IsCharged() ? 1 : 0); // Lightning-charged?
 	}
 	else if (a_Entity.IsA("cMinecartWithFurnace"))
 	{
 		WriteByte(0x10);
-		WriteByte(a_Entity.IsFueled() ? 1 : 0); // Fueled?
+		WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0); // Fueled?
 	}
 	else if (a_Entity.IsA("cBat"))
 	{
 		WriteByte(0x10);
-		WriteByte(a_Entity.IsHanging() ? 1 : 0); // Upside down?
+		WriteByte(((const cBat &)a_Entity).IsHanging() ? 1 : 0); // Upside down?
 	}
 	else if (a_Entity.IsA("cPig"))
 	{
 		WriteByte(0x10);
-		WriteByte(a_Entity.IsSaddled() ? 1 : 0); // Saddled?
+		WriteByte(((const cPig &)a_Entity).IsSaddled() ? 1 : 0); // Saddled?
 	}
 	else if (a_Entity.IsA("cVillager"))
 	{
 		WriteByte(0x50);
-		WriteInt(a_Entity.GetVilType()); // What sort of TESTIFICATE?
+		WriteInt(((const cVillager &)a_Entity).GetVilType()); // What sort of TESTIFICATE?
 	}
 	else if (a_Entity.IsA("cZombie"))
 	{
 		WriteByte(0xC);
-		WriteByte(a_Entity.IsBaby() ? 1 : 0); // Babby zombie?
+		WriteByte(((const cZombie &)a_Entity).IsBaby() ? 1 : 0); // Babby zombie?
 		WriteByte(0xD);
-		WriteByte(a_Entity.IsVillZomb() ? 1 : 0); // Converted zombie?
+		WriteByte(((const cZombie &)a_Entity).IsVillagerZombie() ? 1 : 0); // Converted zombie?
 		WriteByte(0xE);
-		WriteByte(a_Entity.IsConvert() ? 1 : 0); // Converted-but-converting-back zombllager?
+		WriteByte(((const cZombie &)a_Entity).IsConverting() ? 1 : 0); // Converted-but-converting-back zombllager?
 	}
 	else if (a_Entity.IsA("cGhast"))
 	{
 		WriteByte(0x10);
-		WriteByte(a_Entity.IsCharging()); // About to eject un flamé-bol? :P
+		WriteByte(((const cGhast &)a_Entity).IsCharging()); // About to eject un flamé-bol? :P
 	}
 	else if (a_Entity.IsA("cArrowEntity"))
 	{
 		WriteByte(0x10);
-		WriteByte(a_Entity.IsCritical() ? 1 : 0); // Critical hitting arrow?
+		WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0); // Critical hitting arrow?
 	}
 	else if (a_Entity.IsA("cWolf"))
 	{
 		Byte WolfStatus = 0;
-		if (a_Entity.IsSitting())
+		if (((const cWolf &)a_Entity).IsSitting())
 		{
 			WolfStatus |= 0x1;
 		}
-		if (a_Entity.IsAngry())
+		if (((const cWolf &)a_Entity).IsAngry())
 		{
 			WolfStatus |= 0x2;
 		}
-		if (a_Entity.IsTame())
+		if (((const cWolf &)a_Entity).IsTame())
 		{
 			WolfStatus |= 0x4;
 		}
@@ -1728,7 +1747,7 @@ void cProtocol125::WriteMetadata(const cEntity & a_Entity)
 		WriteByte(0x72);
 		WriteFloat((float)(a_Entity.GetHealth())); // Tail health-o-meter (only shown when tamed, by the way)
 		WriteByte(0x13);
-		WriteByte(a_Entity.IsBegging() ? 1 : 0); // Ultra cute mode?
+		WriteByte(((const cWolf &)a_Entity).IsBegging() ? 1 : 0); // Ultra cute mode?
 	}
 	else if (a_Entity.IsA("cSheep"))
 	{
@@ -1737,9 +1756,9 @@ void cProtocol125::WriteMetadata(const cEntity & a_Entity)
 
 		WriteByte(0x10);
 		Byte SheepMetadata = 0;
-		SheepMetadata = a_Entity.GetFurColor(); // Fur colour
+		SheepMetadata = ((const cSheep &)a_Entity).GetFurColor(); // Fur colour
 
-		if (a_Entity.IsSheared()) // Is sheared?
+		if (((const cSheep &)a_Entity).IsSheared()) // Is sheared?
 		{
 			SheepMetadata |= 0x16;
 		}
@@ -1748,55 +1767,62 @@ void cProtocol125::WriteMetadata(const cEntity & a_Entity)
 	else if (a_Entity.IsA("cEnderman"))
 	{
 		WriteByte(0x10);
-		WriteByte(a_Entity.CarriedBlock()); // Stolen block
+		WriteByte((Byte)(((cEnderman &)a_Entity).GetCarriedBlock())); // Block that he stole from your house
 		WriteByte(0x11);
-		WriteByte(a_Entity.CarriedMeta()); // Stolen metea
+		WriteByte((Byte)(((cEnderman &)a_Entity).GetCarriedMeta())); // Meta of block that he stole from your house
 		WriteByte(0x12);
-		WriteByte(a_Entity.IsScream() ? 1 : 0); // I HATE YER FACE, I SCWEAM AT YER FACE
+		WriteByte(((cEnderman &)a_Entity).IsScreaming() ? 1 : 0); // Screaming at your face?
 	}
 	else if (a_Entity.IsA("cSkeleton"))
 	{
 		WriteByte(0xD);
-		WriteByte(a_Entity.IsWither() ? 1 : 0); // It's a skeleton, but it's not
+		WriteByte(((const cSkeleton &)a_Entity).IsWither() ? 1 : 0); // It's a skeleton, but it's not
 	}
 	else if (a_Entity.IsA("cWitch"))
 	{
 		WriteByte(0x15);
-		WriteByte(a_Entity.IsNosey() ? 1 : 0); // Drinking-nose: like Squidward
+		WriteByte(((cWitch &)a_Entity).IsAngry() ? 1 : 0); // Aggravated? Doesn't seem to do anything
 	}
 	else if ((a_Entity.IsA("cSlime")) || (a_Entity.IsA("cMagmaCube")))
 	{
 		WriteByte(0x10);
-		WriteByte(a_Entity.GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+		if (a_Entity.IsA("cSlime"))
+		{
+			WriteByte(((const cSlime &)a_Entity).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+		}
+		else
+		{
+			WriteByte(((const cMagmaCube &)a_Entity).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+		}
 	}
 	else if (a_Entity.IsA("cHorse"))
 	{
 		int Flags = 0;
-		if (a_Entity.IsTame())
+		if (((const cHorse &)a_Entity).IsTame())
 		{
 			Flags |= 0x2;
 		}
-		if (a_Entity.IsSaddled())
+		if (((const cHorse &)a_Entity).IsSaddled())
 		{
 			Flags |= 0x4;
 		}
-		if (a_Entity.IsChested())
+		if (((const cHorse &)a_Entity).IsChested())
 		{
 			Flags |= 0x8;
 		}
-		if (a_Entity.IsBaby())
+		if (((const cHorse &)a_Entity).IsBaby())
 		{
 			Flags |= 0x10; // IsBred flag, according to wiki.vg - don't think it does anything in multiplayer
 		}
-		if (a_Entity.IsEating())
+		if (((const cHorse &)a_Entity).IsEating())
 		{
 			Flags |= 0x20;
 		}
-		if (a_Entity.IsRearing())
+		if (((const cHorse &)a_Entity).IsRearing())
 		{
 			Flags |= 0x40;
 		}
-		if (a_Entity.IsMthOpen())
+		if (((const cHorse &)a_Entity).IsMthOpen())
 		{
 			Flags |= 0x80;
 		}
@@ -1804,16 +1830,16 @@ void cProtocol125::WriteMetadata(const cEntity & a_Entity)
 		WriteInt(Flags);
 
 		WriteByte(0x13);
-		WriteByte(a_Entity.GetHType()); // Type of horse (donkey, chestnut, etc.)
+		WriteByte(((const cHorse &)a_Entity).GetHType()); // Type of horse (donkey, chestnut, etc.)
 
 		WriteByte(0x54);
 		int Appearance = 0;
-		Appearance = a_Entity.GetHColor(); // Mask FF
-		Appearance |= a_Entity.GetHStyle() * 256; // Mask FF00, so multiply by 256
+		Appearance = ((const cHorse &)a_Entity).GetHColor(); // Mask FF
+		Appearance |= ((const cHorse &)a_Entity).GetHStyle() * 256; // Mask FF00, so multiply by 256
 		WriteInt(Appearance);	
 
 		WriteByte(0x56);
-		WriteInt(a_Entity.GetHArmour()); // Horshey armour
+		WriteInt(((const cHorse &)a_Entity).GetHArmour()); // Horshey armour
 	}
 
 	// End Specific Metadata
