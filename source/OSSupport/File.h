@@ -41,9 +41,14 @@ Usage:
 
 
 
+// tolua_begin
+
 class cFile
 {
 public:
+
+	// tolua_end
+	
 	#ifdef _WIN32
 	static const char PathSeparator = '\\';
 	#else
@@ -90,6 +95,8 @@ public:
 	/// Reads the file from current position till EOF into an AString; returns the number of bytes read or -1 for error
 	int ReadRestOfFile(AString & a_Contents);
 	
+	// tolua_begin
+	
 	/// Returns true if the file specified exists
 	static bool Exists(const AString & a_FileName);
 	
@@ -99,8 +106,19 @@ public:
 	/// Renames a file, returns true if successful. May fail if dest already exists (libc-dependant)!
 	static bool Rename(const AString & a_OrigFileName, const AString & a_NewFileName);
 	
+	/// Copies a file, returns true if successful.
+	static bool Copy(const AString & a_SrcFileName, const AString & a_DstFileName);
+	
 	/// Returns true if the specified path is a folder
 	static bool IsFolder(const AString & a_Path);
+	
+	/// Returns true if the specified path is a regular file
+	static bool IsFile(const AString & a_Path);
+	
+	/// Returns the size of the file, or a negative number on error
+	static int GetSize(const AString & a_FileName);
+	
+	// tolua_end
 	
 	int Printf(const char * a_Fmt, ...);
 	
@@ -110,7 +128,7 @@ private:
 	#else
 	HANDLE m_File;
 	#endif
-} ;
+} ;  // tolua_export
 
 
 

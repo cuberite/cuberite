@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/08/13 20:07:51.
+** Generated automatically by tolua++-1.0.92 on 10/09/13 09:38:09.
 */
 
 #ifndef __cplusplus
@@ -17,6 +17,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "tolua_base.h"
 #include "ChunkDef.h"
 #include "../iniFile/iniFile.h"
+#include "OSSupport/File.h"
 #include "BlockID.h"
 #include "StringUtils.h"
 #include "Defines.h"
@@ -245,27 +246,28 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
- tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
  tolua_usertype(tolua_S,"cBlockArea");
- tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cStringMap");
+ tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
- tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cFile");
  tolua_usertype(tolua_S,"std::vector<std::string>");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"sWebAdminPage");
  tolua_usertype(tolua_S,"cWebPlugin");
- tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cWebAdmin");
+ tolua_usertype(tolua_S,"cIniFile");
+ tolua_usertype(tolua_S,"sWebAdminPage");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cPlayer");
@@ -2458,6 +2460,229 @@ static int tolua_AllToLua_cIniFile_DeleteKeyComments01(lua_State* tolua_S)
  return 2;
 tolua_lerror:
  return tolua_AllToLua_cIniFile_DeleteKeyComments00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Exists of class  cFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cFile_Exists00
+static int tolua_AllToLua_cFile_Exists00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_FileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   bool tolua_ret = (bool)  cFile::Exists(a_FileName);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_FileName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Exists'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Delete of class  cFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cFile_Delete00
+static int tolua_AllToLua_cFile_Delete00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_FileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   bool tolua_ret = (bool)  cFile::Delete(a_FileName);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_FileName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Delete'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Rename of class  cFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cFile_Rename00
+static int tolua_AllToLua_cFile_Rename00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_OrigFileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString a_NewFileName = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  {
+   bool tolua_ret = (bool)  cFile::Rename(a_OrigFileName,a_NewFileName);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_OrigFileName);
+   tolua_pushcppstring(tolua_S,(const char*)a_NewFileName);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Rename'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Copy of class  cFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cFile_Copy00
+static int tolua_AllToLua_cFile_Copy00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_SrcFileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString a_DstFileName = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  {
+   bool tolua_ret = (bool)  cFile::Copy(a_SrcFileName,a_DstFileName);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_SrcFileName);
+   tolua_pushcppstring(tolua_S,(const char*)a_DstFileName);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Copy'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsFolder of class  cFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cFile_IsFolder00
+static int tolua_AllToLua_cFile_IsFolder00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_Path = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   bool tolua_ret = (bool)  cFile::IsFolder(a_Path);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Path);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsFolder'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsFile of class  cFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cFile_IsFile00
+static int tolua_AllToLua_cFile_IsFile00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_Path = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   bool tolua_ret = (bool)  cFile::IsFile(a_Path);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Path);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsFile'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetSize of class  cFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cFile_GetSize00
+static int tolua_AllToLua_cFile_GetSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_FileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   int tolua_ret = (int)  cFile::GetSize(a_FileName);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_FileName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetSize'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -28905,6 +29130,16 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"DeleteKeyComment",tolua_AllToLua_cIniFile_DeleteKeyComment01);
    tolua_function(tolua_S,"DeleteKeyComments",tolua_AllToLua_cIniFile_DeleteKeyComments00);
    tolua_function(tolua_S,"DeleteKeyComments",tolua_AllToLua_cIniFile_DeleteKeyComments01);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cFile","cFile","",NULL);
+  tolua_beginmodule(tolua_S,"cFile");
+   tolua_function(tolua_S,"Exists",tolua_AllToLua_cFile_Exists00);
+   tolua_function(tolua_S,"Delete",tolua_AllToLua_cFile_Delete00);
+   tolua_function(tolua_S,"Rename",tolua_AllToLua_cFile_Rename00);
+   tolua_function(tolua_S,"Copy",tolua_AllToLua_cFile_Copy00);
+   tolua_function(tolua_S,"IsFolder",tolua_AllToLua_cFile_IsFolder00);
+   tolua_function(tolua_S,"IsFile",tolua_AllToLua_cFile_IsFile00);
+   tolua_function(tolua_S,"GetSize",tolua_AllToLua_cFile_GetSize00);
   tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"E_BLOCK_AIR",E_BLOCK_AIR);
   tolua_constant(tolua_S,"E_BLOCK_STONE",E_BLOCK_STONE);

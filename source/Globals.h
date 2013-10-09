@@ -109,7 +109,6 @@ typedef unsigned short     UInt16;
 	#endif  // GetFreeSpace
 #else
 	#include <sys/types.h>
-	#include <sys/stat.h>   // for mkdir
 	#include <sys/time.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>
@@ -142,6 +141,7 @@ typedef unsigned short     UInt16;
 
 
 // CRT stuff:
+#include <sys/stat.h>
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>

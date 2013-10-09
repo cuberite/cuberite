@@ -151,7 +151,6 @@ int cFile::Read (void * iBuffer, int iNumBytes)
 
 
 
-/// Writes up to iNumBytes bytes from iBuffer, returns the number of bytes actually written, or -1 on failure; asserts if not open
 int cFile::Write(const void * iBuffer, int iNumBytes)
 {
 	ASSERT(IsOpen());
@@ -169,7 +168,6 @@ int cFile::Write(const void * iBuffer, int iNumBytes)
 
 
 
-/// Seeks to iPosition bytes from file start, returns old position or -1 for failure
 int cFile::Seek (int iPosition)
 {
 	ASSERT(IsOpen());
@@ -191,7 +189,6 @@ int cFile::Seek (int iPosition)
 
 
 
-/// Returns the current position (bytes from file start)
 int cFile::Tell (void) const
 {
 	ASSERT(IsOpen());
@@ -208,7 +205,6 @@ int cFile::Tell (void) const
 
 
 
-/// Returns the size of file, in bytes, or -1 for failure; asserts if not open
 int cFile::GetSize(void) const
 {
 	ASSERT(IsOpen());
@@ -287,6 +283,30 @@ bool cFile::Rename(const AString & a_OrigFileName, const AString & a_NewFileName
 
 
 
+bool cFile::Copy(const AString & a_SrcFileName, const AString & a_DstFileName)
+{
+	#ifdef _WIN32
+		return (CopyFile(a_SrcFileName.c_str(), a_DstFileName.c_str(), true) != 0);
+	#else
+		// Other OSs don't have a direct CopyFile equivalent, do it the harder way:
+		ifstream src(a_SrcFileName, ios::binary);
+		ofstream dst(a_DstFileName, ios::binary);
+		if (dst.good())
+		{
+			dst << src.rdbuf();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	#endif
+}
+
+
+
+
+
 bool cFile::IsFolder(const AString & a_Path)
 {
 	#ifdef _WIN32
@@ -296,6 +316,35 @@ bool cFile::IsFolder(const AString & a_Path)
 	struct stat st;
 	return ((stat(a_Path.c_str(), &st) == 0) && S_ISDIR(st.st_mode));
 	#endif
+}
+
+
+
+
+
+bool cFile::IsFile(const AString & a_Path)
+{
+	#ifdef _WIN32
+	DWORD FileAttrib = GetFileAttributes(a_Path.c_str());
+	return ((FileAttrib != INVALID_FILE_ATTRIBUTES) && ((FileAttrib & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DEVICE)) == 0));
+	#else
+	struct stat st;
+	return ((stat(a_Path.c_str(), &st) == 0) && S_ISREG(st.st_mode));
+	#endif
+}
+
+
+
+
+
+int cFile::GetSize(const AString & a_FileName)
+{
+	struct stat st;
+	if (stat(a_FileName.c_str(), &st) == 0)
+	{
+		return st.st_size;
+	}
+	return -1;
 }
 
 

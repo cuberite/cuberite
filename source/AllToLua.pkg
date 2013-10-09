@@ -17,6 +17,8 @@ $cfile "ChunkDef.h"
 
 $cfile "../iniFile/iniFile.h"
 
+$cfile "OSSupport/File.h"
+
 $cfile "BlockID.h"
 $cfile "StringUtils.h"
 $cfile "Defines.h"
