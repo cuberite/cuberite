@@ -20,7 +20,6 @@
 #include "../Item.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
-#include "../OSSupport/MakeDir.h"
 #include "FastNBT.h"
 #include "../Mobs/Monster.h"
 #include "../Entities/Boat.h"
@@ -200,7 +199,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	// Load it anew:
 	AString FileName;
 	Printf(FileName, "%s/region", m_World->GetName().c_str());
-	cMakeDir::MakeDir(FileName);
+	cFile::CreateFolder(FILE_IO_PREFIX + FileName);
 	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
 	cMCAFile * f = new cMCAFile(FileName, RegionX, RegionZ);
 	if (f == NULL)

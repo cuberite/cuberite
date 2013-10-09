@@ -5,7 +5,6 @@
 
 #include <fstream>
 #include <ctime>
-#include "OSSupport/MakeDir.h"
 #include "OSSupport/IsThread.h"
 
 #if defined(ANDROID_NDK)
@@ -24,9 +23,9 @@ cLog::cLog(const AString & a_FileName )
 	s_Log = this;
 
 	// create logs directory
-	cMakeDir::MakeDir("logs");
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
 
-	OpenLog( (FILE_IO_PREFIX + std::string("logs/") + a_FileName).c_str() );
+	OpenLog((FILE_IO_PREFIX + AString("logs/") + a_FileName).c_str() );
 }
 
 
@@ -45,8 +44,10 @@ cLog::~cLog()
 
 cLog* cLog::GetInstance()
 {
-	if(s_Log)
+	if (s_Log != NULL)
+	{
 		return s_Log;
+	}
 
 	new cLog("log.txt");
 	return s_Log;

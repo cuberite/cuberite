@@ -58,7 +58,6 @@
 #include "Mobs/Zombie.h"
 #include "Mobs/Zombiepigman.h"
 
-#include "OSSupport/MakeDir.h"
 #include "MersenneTwister.h"
 #include "Generating/Trees.h"
 #include "PluginManager.h"
@@ -261,7 +260,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
-	cMakeDir::MakeDir(m_WorldName.c_str());
+	cFile::CreateFolder(FILE_IO_PREFIX + m_WorldName);
 }
 
 

@@ -118,6 +118,9 @@ public:
 	/// Returns the size of the file, or a negative number on error
 	static int GetSize(const AString & a_FileName);
 	
+	/// Creates a new folder with the specified name. Returns true if successful. Path may be relative or absolute
+	static bool CreateFolder(const AString & a_FolderPath);
+	
 	// tolua_end
 	
 	int Printf(const char * a_Fmt, ...);

@@ -310,11 +310,11 @@ bool cFile::Copy(const AString & a_SrcFileName, const AString & a_DstFileName)
 bool cFile::IsFolder(const AString & a_Path)
 {
 	#ifdef _WIN32
-	DWORD FileAttrib = GetFileAttributes(a_Path.c_str());
-	return ((FileAttrib != INVALID_FILE_ATTRIBUTES) && ((FileAttrib & FILE_ATTRIBUTE_DIRECTORY) != 0));
+		DWORD FileAttrib = GetFileAttributes(a_Path.c_str());
+		return ((FileAttrib != INVALID_FILE_ATTRIBUTES) && ((FileAttrib & FILE_ATTRIBUTE_DIRECTORY) != 0));
 	#else
-	struct stat st;
-	return ((stat(a_Path.c_str(), &st) == 0) && S_ISDIR(st.st_mode));
+		struct stat st;
+		return ((stat(a_Path.c_str(), &st) == 0) && S_ISDIR(st.st_mode));
 	#endif
 }
 
@@ -325,11 +325,11 @@ bool cFile::IsFolder(const AString & a_Path)
 bool cFile::IsFile(const AString & a_Path)
 {
 	#ifdef _WIN32
-	DWORD FileAttrib = GetFileAttributes(a_Path.c_str());
-	return ((FileAttrib != INVALID_FILE_ATTRIBUTES) && ((FileAttrib & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DEVICE)) == 0));
+		DWORD FileAttrib = GetFileAttributes(a_Path.c_str());
+		return ((FileAttrib != INVALID_FILE_ATTRIBUTES) && ((FileAttrib & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DEVICE)) == 0));
 	#else
-	struct stat st;
-	return ((stat(a_Path.c_str(), &st) == 0) && S_ISREG(st.st_mode));
+		struct stat st;
+		return ((stat(a_Path.c_str(), &st) == 0) && S_ISREG(st.st_mode));
 	#endif
 }
 
@@ -345,6 +345,19 @@ int cFile::GetSize(const AString & a_FileName)
 		return st.st_size;
 	}
 	return -1;
+}
+
+
+
+
+
+bool cFile::CreateFolder(const AString & a_FolderPath)
+{
+	#ifdef _WIN32
+		return (CreateDirectory(a_FolderPath.c_str(), NULL) != 0);
+	#else
+		return (mkdir(a_FolderPath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == 0);
+	#endif
 }
 
 

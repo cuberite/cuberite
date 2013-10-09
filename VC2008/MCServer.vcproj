@@ -1400,14 +1400,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\MakeDir.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\OSSupport\MakeDir.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\OSSupport\Semaphore.cpp"
 					>
 				</File>

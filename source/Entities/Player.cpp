@@ -16,7 +16,6 @@
 #include "../Item.h"
 #include "../Tracer.h"
 #include "../Root.h"
-#include "../OSSupport/MakeDir.h"
 #include "../OSSupport/Timer.h"
 #include "../MersenneTwister.h"
 #include "../Chunk.h"
@@ -1340,7 +1339,7 @@ bool cPlayer::LoadFromDisk()
 
 bool cPlayer::SaveToDisk()
 {
-	cMakeDir::MakeDir("players");
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("players"));
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
