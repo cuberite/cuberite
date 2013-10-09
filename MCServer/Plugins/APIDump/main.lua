@@ -36,7 +36,6 @@ end
 
 
 
-
 function DumpAPITxt()
 	LOG("Dumping all available functions to API.txt...");
 	function dump (prefix, a, Output)
@@ -177,18 +176,17 @@ function DumpAPIHtml()
 	-- Read in the descriptions:
 	ReadDescriptions(API);
 	
+	-- Create the output folder
+	if not(cFile:IsFolder("API")) then
+		cFile:CreateFolder("API");
+	end
+
 	-- Create a "class index" file, write each class as a link to that file,
 	-- then dump class contents into class-specific file
 	local f = io.open("API/index.html", "w");
 	if (f == nil) then
-		-- Create the output folder
-		os.execute("mkdir API");
-		local err;
-		f, err = io.open("API/index.html", "w");
-		if (f == nil) then
-			LOGINFO("Cannot output HTML API: " .. err);
-			return;
-		end
+		LOGINFO("Cannot output HTML API: " .. err);
+		return;
 	end
 	
 	f:write([[<html><head><title>MCServer API - class index</title>
