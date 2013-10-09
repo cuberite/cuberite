@@ -250,7 +250,13 @@ function DumpAPIHtml()
 	<p>The following pages provide various extra information</p>
 	<ul>]]);
 	for i, extra in ipairs(g_APIDesc.ExtraPages) do
-		if (cFile:Copy(g_PluginFolder .. "/" .. extra.FileName, "API/" .. extra.FileName)) then
+		local SrcFileName = g_PluginFolder .. "/" .. extra.FileName;
+		if (cFile:Exists(SrcFileName)) then
+			local DstFileName = "API/" .. extra.FileName;
+			if (cFile:Exists(DstFileName)) then
+				cFile:Delete(DstFileName);
+			end
+			cFile:Copy(SrcFileName, DstFileName);
 			f:write("<li><a href=\"" .. extra.FileName .. "\">" .. extra.Title .. "</a></li>\n");
 		else
 			f:write("<li>" .. extra.Title .. " <i>(file is missing)</i></li>\n");
