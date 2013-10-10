@@ -1596,7 +1596,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	{
 		for (int y = -ExplosionSizeInt; y < ExplosionSizeInt; y++)
 		{
-			if ((by + y >= cChunkDef::Height) || (by + y < 0))
+			if ((by + y >= cChunkDef::Height) || (by + y <= 0))
 			{
 				// Outside of the world
 				continue;

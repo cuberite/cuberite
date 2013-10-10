@@ -980,7 +980,10 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	{
 		return;
 	}
-	
+	if (a_BlockY <= 0.5){
+		BroadcastSoundEffect("random.explode", (int)floor(a_BlockX * 8), (int)floor(a_BlockY * 8), (int)floor(a_BlockZ * 8), 1.0f, 0.6f);
+		return;
+	}
 	// TODO: Add damage to entities, add support for pickups, and implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
