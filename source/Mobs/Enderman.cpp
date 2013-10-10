@@ -8,8 +8,7 @@
 
 
 cEnderman::cEnderman(void) :
-	// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
-	super("Enderman", 58, "mob.endermen.hit", "mob.endermen.death", 0.5, 2.5),
+	super("Enderman", 58, "mob.endermen.hit", "mob.endermen.death", 0.5, 2.9),
 	m_bIsScreaming(false),
 	CarriedBlock(E_BLOCK_AIR),
 	CarriedMeta(0)

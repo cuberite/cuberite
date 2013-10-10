@@ -142,8 +142,14 @@ protected:
 	/// Parses one item, "slot" as the protocol wiki calls it, from m_ReceivedData; returns the usual ParsePacket() codes
 	virtual int  ParseItem(cItem & a_Item);
 	
-	/// Writes the entity metadata
-	void WriteMetadata(const cEntity & a_Entity);
+	/// Writes the COMMON entity metadata
+	void WriteCommonMetadata(const cEntity & a_Entity);
+
+	/// Writes normal entity metadata
+	void WriteEntityMetadata(const cEntity & a_Entity);
+
+	/// Writes mobile entity metadata
+	void WriteMobMetadata(const cMonster & a_Mob);
 } ;
 
 
