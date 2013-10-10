@@ -33,7 +33,7 @@ protected:
 
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Initialize(cIniFile & a_IniFile) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -72,7 +72,7 @@ protected:
 	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
 	
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Initialize(cIniFile & a_IniFile) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -109,7 +109,7 @@ protected:
 	
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Initialize(cIniFile & a_IniFile) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -134,7 +134,7 @@ protected:
 
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Initialize(cIniFile & a_IniFile) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 	
 	EMCSBiome VoronoiBiome(int a_BlockX, int a_BlockZ);
 } ;
@@ -156,7 +156,7 @@ public:
 protected:
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Initialize(cIniFile & a_IniFile) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 	
 	/// Distorts the coords using a Perlin-like noise
 	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ);
@@ -195,7 +195,7 @@ protected:
 		
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Initialize(cIniFile & a_IniFile) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 	
 	/** Step 1: Decides between ocean, land and mushroom, using a DistVoronoi with special conditions and post-processing for mushroom islands
 	Sets biomes to biOcean, -1 (i.e. land), biMushroomIsland or biMushroomShore

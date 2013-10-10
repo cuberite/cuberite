@@ -211,7 +211,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		m_UnderlyingBiomeGen = m_BiomeGen;
 		m_BiomeGen = new cBioGenCache(m_UnderlyingBiomeGen, CacheSize);
 	}
-	m_BiomeGen->Initialize(a_IniFile);
+	m_BiomeGen->InitializeBiomeGen(a_IniFile);
 }
 
 
