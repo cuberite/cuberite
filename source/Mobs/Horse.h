@@ -21,16 +21,16 @@ public:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
-	bool IsSaddled  (void) const  {return m_bIsSaddled; }
-	bool IsChested  (void) const  {return m_bHasChest; }
-	bool IsEating   (void) const  {return m_bIsEating; }
-	bool IsRearing  (void) const  {return m_bIsRearing; }
-	bool IsMthOpen  (void) const  {return m_bIsMouthOpen; }
-	bool IsTame     (void) const  {return m_bIsTame; }
-	int  GetHType   (void) const  {return m_Type; }
-	int  GetHColor  (void) const  {return m_Color; }
-	int  GetHStyle  (void) const  {return m_Style; }
-	int  GetHArmour (void) const  {return m_Armour;}
+	bool IsSaddled      (void) const  {return m_bIsSaddled; }
+	bool IsChested      (void) const  {return m_bHasChest; }
+	bool IsEating       (void) const  {return m_bIsEating; }
+	bool IsRearing      (void) const  {return m_bIsRearing; }
+	bool IsMthOpen      (void) const  {return m_bIsMouthOpen; }
+	bool IsTame         (void) const  {return m_bIsTame; }
+	int  GetHorseType   (void) const  {return m_Type; }
+	int  GetHorseColor  (void) const  {return m_Color; }
+	int  GetHorseStyle  (void) const  {return m_Style; }
+	int  GetHorseArmour (void) const  {return m_Armour;}
 
 private:
 
