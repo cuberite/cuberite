@@ -518,6 +518,21 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 
 
 
+cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const char * a_Key, const char * a_Default)
+{
+	AString ItemStr = a_IniFile.GetValueSet(a_Section, a_Key, a_Default);
+	cItem res;
+	if (!StringToItem(ItemStr, res))
+	{
+		res.Empty();
+	}
+	return res;
+}
+
+
+
+
+
 // This is actually just some code that needs to run at program startup, so it is wrapped into a global var's constructor:
 class cBlockPropertiesInitializer
 {

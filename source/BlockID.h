@@ -746,8 +746,9 @@ enum eExplosionSource
 
 
 
-// fwd: cItem.h:
+// fwd:
 class cItem;
+class cIniFile;
 
 
 
@@ -784,6 +785,9 @@ extern AString DamageTypeToString(eDamageType a_DamageType);
 
 /// Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in). Returns -1 on failure
 extern eDamageType StringToDamageType(const AString & a_DamageString);
+
+/// Returns a cItem representing the item described in an IniFile's value; if the value doesn't exist, creates it with the provided default.
+extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const char * a_Key, const char * a_Default);
 
 // tolua_end
 

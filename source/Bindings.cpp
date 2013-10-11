@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/09/13 09:54:54.
+** Generated automatically by tolua++-1.0.92 on 10/11/13 10:08:32.
 */
 
 #ifndef __cplusplus
@@ -2541,13 +2541,13 @@ static int tolua_AllToLua_cFile_Rename00(lua_State* tolua_S)
  else
 #endif
  {
-  const AString a_OrigFileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
-  const AString a_NewFileName = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  const AString a_OrigPath = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString a_NewPath = ((const AString)  tolua_tocppstring(tolua_S,3,0));
   {
-   bool tolua_ret = (bool)  cFile::Rename(a_OrigFileName,a_NewFileName);
+   bool tolua_ret = (bool)  cFile::Rename(a_OrigPath,a_NewPath);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
-   tolua_pushcppstring(tolua_S,(const char*)a_OrigFileName);
-   tolua_pushcppstring(tolua_S,(const char*)a_NewFileName);
+   tolua_pushcppstring(tolua_S,(const char*)a_OrigPath);
+   tolua_pushcppstring(tolua_S,(const char*)a_NewPath);
   }
  }
  return 3;
@@ -3010,6 +3010,51 @@ static int tolua_AllToLua_StringToDamageType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StringToDamageType'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: GetIniItemSet */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_GetIniItemSet00
+static int tolua_AllToLua_GetIniItemSet00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     (tolua_isvaluenil(tolua_S,1,&tolua_err) || !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err)) ||
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isstring(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cIniFile* a_IniFile = ((cIniFile*)  tolua_tousertype(tolua_S,1,0));
+  const char* a_Section = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const char* a_Key = ((const char*)  tolua_tostring(tolua_S,3,0));
+  const char* a_Default = ((const char*)  tolua_tostring(tolua_S,4,0));
+  {
+   cItem tolua_ret = (cItem)  GetIniItemSet(*a_IniFile,a_Section,a_Key,a_Default);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetIniItemSet'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29796,6 +29841,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_function(tolua_S,"StringToDimension",tolua_AllToLua_StringToDimension00);
   tolua_function(tolua_S,"DamageTypeToString",tolua_AllToLua_DamageTypeToString00);
   tolua_function(tolua_S,"StringToDamageType",tolua_AllToLua_StringToDamageType00);
+  tolua_function(tolua_S,"GetIniItemSet",tolua_AllToLua_GetIniItemSet00);
   tolua_function(tolua_S,"TrimString",tolua_AllToLua_TrimString00);
   tolua_function(tolua_S,"NoCaseCompare",tolua_AllToLua_NoCaseCompare00);
   tolua_function(tolua_S,"ReplaceString",tolua_AllToLua_ReplaceString00);
