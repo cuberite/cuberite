@@ -8,9 +8,9 @@
 
 
 
-cVillager::cVillager(int Type) :
+cVillager::cVillager(eVillagerType VillagerType) :
 	super("Villager", 120, "", "", 0.6, 1.8),
-	m_Type(Type)
+	m_Type(VillagerType)
 {
 }
 

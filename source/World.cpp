@@ -2575,13 +2575,14 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	int SlSize = GetTickRandomNumber(2) + 1;  // 1 .. 3 - Slime
 	int ShColor = GetTickRandomNumber(15); // 0 .. 15 - Sheep
 	bool SkType = GetDimension() == biNether; // Skeleton
-	int VilType = GetTickRandomNumber(5); // 0 .. 5 - Villager
+
+	int VilType = GetTickRandomNumber(6); // 0 .. 5 - Villager
+	if (VilType == 6) { VilType = 0; } // Give farmers a better chance of spawning
 
 	int HseType = GetTickRandomNumber(7); // 0 .. 7 - Horse Type (donkey, zombie, etc.)
 	int HseColor = GetTickRandomNumber(6); // 0 .. 6 - Horse
 	int HseStyle = GetTickRandomNumber(4); // 0 .. 4 - Horse
 	int HseTameTimes = GetTickRandomNumber(6) + 1; // 1 .. 7 - Horse tame amount
-
 	if ((HseType == 5) || (HseType == 6) || (HseType == 7)) { HseType = 0; } // 5,6,7 = 0 because little chance of getting 0 with TickRand
 	
 	switch (a_MonsterType)
@@ -2612,7 +2613,10 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 		case cMonster::mtSnowGolem:    Monster = new cSnowGolem();       break;
 		case cMonster::mtSpider:       Monster = new cSpider();          break;
 		case cMonster::mtSquid:        Monster = new cSquid();           break;
-		case cMonster::mtVillager:     Monster = new cVillager(VilType); break;
+		case cMonster::mtVillager:
+		{
+			Monster = new cVillager((cVillager::eVillagerType)VilType);  break;
+		}
 		case cMonster::mtWitch:        Monster = new cWitch();           break;
 		case cMonster::mtWither:       Monster = new cWither();          break;
 		case cMonster::mtWolf:         Monster = new cWolf();            break;
