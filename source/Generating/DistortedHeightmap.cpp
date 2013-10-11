@@ -60,7 +60,7 @@ cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
 	m_OceanFloorSelect(a_Seed + 3000),
 	m_BiomeGen(a_BiomeGen),
 	m_UnderlyingHeiGen(a_Seed, a_BiomeGen),
-	m_HeightGen(&m_UnderlyingHeiGen, 64)
+	m_HeightGen(m_UnderlyingHeiGen, 64)
 {
 	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)1,    (NOISE_DATATYPE)0.5);
 	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)0.5,  (NOISE_DATATYPE)1);
@@ -77,11 +77,18 @@ cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
 
 void cDistortedHeightmap::Initialize(cIniFile & a_IniFile)
 {
+	if (m_IsInitialized)
+	{
+		return;
+	}
+	
 	// Read the params from the INI file:
 	m_SeaLevel   =                 a_IniFile.GetValueSetI("Generator", "DistortedHeightmapSeaLevel",   62);
 	m_FrequencyX = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyX", 10);
 	m_FrequencyY = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyY", 10);
 	m_FrequencyZ = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyZ", 10);
+
+	m_IsInitialized = true;
 }
 
 
@@ -178,6 +185,15 @@ void cDistortedHeightmap::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::He
 			}  // for y
 		}  // for x
 	}  // for z
+}
+
+
+
+
+
+void cDistortedHeightmap::InitializeHeightGen(cIniFile & a_IniFile)
+{
+	Initialize(a_IniFile);
 }
 
 
@@ -305,6 +321,15 @@ void cDistortedHeightmap::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
+}
+
+
+
+
+
+void cDistortedHeightmap::InitializeCompoGen(cIniFile & a_IniFile)
+{
+	Initialize(a_IniFile);
 }
 
 

@@ -6,6 +6,8 @@
 #include "Globals.h"
 #include "HeiGen.h"
 #include "../LinearUpscale.h"
+#include "../../iniFile/iniFile.h"
+
 
 
 
@@ -26,10 +28,19 @@ void cHeiGenFlat::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap 
 
 
 
+void cHeiGenFlat::InitializeHeightGen(cIniFile & a_IniFile)
+{
+	m_Height = a_IniFile.GetValueSetI("Generator", "FlatHeight", m_Height);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cHeiGenCache:
 
-cHeiGenCache::cHeiGenCache(cTerrainHeightGen * a_HeiGenToCache, int a_CacheSize) :
+cHeiGenCache::cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, int a_CacheSize) :
 	m_HeiGenToCache(a_HeiGenToCache),
 	m_CacheSize(a_CacheSize),
 	m_CacheOrder(new int[a_CacheSize]),
@@ -99,7 +110,7 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 	
 	// Not in the cache:
 	m_NumMisses++;
-	m_HeiGenToCache->GenHeightMap(a_ChunkX, a_ChunkZ, a_HeightMap);
+	m_HeiGenToCache.GenHeightMap(a_ChunkX, a_ChunkZ, a_HeightMap);
 	
 	// Insert it as the first item in the MRU order:
 	int Idx = m_CacheOrder[m_CacheSize - 1];
@@ -111,6 +122,15 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 	memcpy(m_CacheData[Idx].m_HeightMap, a_HeightMap, sizeof(a_HeightMap));
 	m_CacheData[Idx].m_ChunkX = a_ChunkX;
 	m_CacheData[Idx].m_ChunkZ = a_ChunkZ;
+}
+
+
+
+
+
+void cHeiGenCache::InitializeHeightGen(cIniFile & a_IniFile)
+{
+	m_HeiGenToCache.InitializeHeightGen(a_IniFile);
 }
 
 
@@ -137,17 +157,10 @@ bool cHeiGenCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_Rel
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cHeiGenClassic:
 
-cHeiGenClassic::cHeiGenClassic(int a_Seed, float a_HeightFreq1, float a_HeightAmp1, float a_HeightFreq2, float a_HeightAmp2, float a_HeightFreq3, float a_HeightAmp3) :
+cHeiGenClassic::cHeiGenClassic(int a_Seed) :
 	m_Seed(a_Seed),
-	m_Noise(a_Seed),
-	m_HeightFreq1(a_HeightFreq1),
-	m_HeightAmp1 (a_HeightAmp1),
-	m_HeightFreq2(a_HeightFreq2),
-	m_HeightAmp2 (a_HeightAmp2),
-	m_HeightFreq3(a_HeightFreq3),
-	m_HeightAmp3 (a_HeightAmp3)
+	m_Noise(a_Seed)
 {
-	// Nothing needed yet
 }
 
 
@@ -193,6 +206,20 @@ void cHeiGenClassic::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightM
 			cChunkDef::SetHeight(a_HeightMap, x , z, hei);
 		}  // for x
 	}  // for z
+}
+
+
+
+
+
+void cHeiGenClassic::InitializeHeightGen(cIniFile & a_IniFile)
+{
+	m_HeightFreq1 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq1", 0.1);
+	m_HeightFreq2 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq2", 1.0);
+	m_HeightFreq3 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq3", 2.0);
+	m_HeightAmp1  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp1",  1.0);
+	m_HeightAmp2  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp2",  0.5);
+	m_HeightAmp3  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp3",  0.5);
 }
 
 
@@ -288,6 +315,15 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 		}  // for x
 	}
 	//*/
+}
+
+
+
+
+
+void cHeiGenBiomal::InitializeHeightGen(cIniFile & a_IniFile)
+{
+	// No user-settable params
 }
 
 

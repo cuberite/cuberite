@@ -25,14 +25,15 @@ class cHeiGenFlat :
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenFlat(int a_Height) : m_Height(a_Height) {}
+	cHeiGenFlat(void) : m_Height(5) {}
 	
 protected:
 
 	int m_Height;
 
-	// cTerrainHeightGen override:
+	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -44,18 +45,19 @@ class cHeiGenCache :
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenCache(cTerrainHeightGen * a_HeiGenToCache, int a_CacheSize);  // Doesn't take ownership of a_HeiGenToCache
+	cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, int a_CacheSize);  // Doesn't take ownership of a_HeiGenToCache
 	~cHeiGenCache();
 	
-	// cTerrainHeightGen override:
+	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 	
 	/// Retrieves height at the specified point in the cache, returns true if found, false if not found
 	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
 	
 protected:
 
-	cTerrainHeightGen * m_HeiGenToCache;
+	cTerrainHeightGen & m_HeiGenToCache;
 	
 	struct sCacheData
 	{
@@ -83,7 +85,7 @@ class cHeiGenClassic :
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenClassic(int a_Seed, float a_HeightFreq1, float a_HeightAmp1, float a_HeightFreq2, float a_HeightAmp2, float a_HeightFreq3, float a_HeightAmp3);
+	cHeiGenClassic(int a_Seed);
 	
 protected:
 
@@ -95,8 +97,9 @@ protected:
 	
 	float GetNoise(float x, float y);
 
-	// cTerrainHeightGen override:
+	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -130,8 +133,9 @@ protected:
 	} ;
 	static const sGenParam m_GenParam[biNumBiomes];
 	
-	// cTerrainHeightGen override:
+	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 	
 	NOISE_DATATYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors);
 } ;

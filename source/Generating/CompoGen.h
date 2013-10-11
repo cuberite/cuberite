@@ -27,9 +27,9 @@ class cCompoGenSameBlock :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenSameBlock(BLOCKTYPE a_BlockType, bool a_IsBedrocked) :
-		m_BlockType(a_BlockType),
-		m_IsBedrocked(a_IsBedrocked)
+	cCompoGenSameBlock(void) :
+		m_BlockType(E_BLOCK_STONE),
+		m_IsBedrocked(true)
 	{}
 	
 protected:
@@ -39,6 +39,7 @@ protected:
 	
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -65,11 +66,7 @@ class cCompoGenClassic :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenClassic(
-		int a_SeaLevel, int a_BeachHeight, int a_BeachDepth,
-		BLOCKTYPE a_BlockTop, BLOCKTYPE a_BlockMiddle, BLOCKTYPE a_BlockBottom,
-		BLOCKTYPE a_BlockBeach, BLOCKTYPE a_BlockBeachBottom, BLOCKTYPE a_BlockSea
-	);
+	cCompoGenClassic(void);
 	
 protected:
 
@@ -85,6 +82,7 @@ protected:
 	
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -95,9 +93,9 @@ class cCompoGenBiomal :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenBiomal(int a_Seed, int a_SeaLevel) :
+	cCompoGenBiomal(int a_Seed) :
 		m_Noise(a_Seed + 1000),
-		m_SeaLevel(a_SeaLevel - 1)  // we do an adjustment later in filling the terrain with water
+		m_SeaLevel(62)
 	{
 	}
 	
@@ -108,6 +106,7 @@ protected:
 	
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 	
 	void FillColumnGrass    (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
 	void FillColumnSand     (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
@@ -136,6 +135,7 @@ protected:
 	
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -147,15 +147,16 @@ class cCompoGenCache :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenCache(cTerrainCompositionGen * a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
+	cCompoGenCache(cTerrainCompositionGen & a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
 	~cCompoGenCache();
 	
 	// cTerrainCompositionGen override:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 	
 protected:
 
-	cTerrainCompositionGen * m_Underlying;
+	cTerrainCompositionGen & m_Underlying;
 	
 	struct sCacheData
 	{

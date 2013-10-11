@@ -231,35 +231,24 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 	bool CacheOffByDefault = false;
 	if (NoCaseCompare(HeightGenName, "flat") == 0)
 	{
-		int Height = a_IniFile.GetValueSetI("Generator", "FlatHeight", 5);
-		m_HeightGen = new cHeiGenFlat(Height);
+		m_HeightGen = new cHeiGenFlat;
 		CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
 	}
 	else if (NoCaseCompare(HeightGenName, "classic") == 0)
 	{
-		// These used to be in terrain.ini, but now they are in world.ini (so that multiple worlds can have different values):
-		float HeightFreq1 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq1", 0.1);
-		float HeightFreq2 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq2", 1.0);
-		float HeightFreq3 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq3", 2.0);
-		float HeightAmp1  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp1",  1.0);
-		float HeightAmp2  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp2",  0.5);
-		float HeightAmp3  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp3",  0.5);
-		m_HeightGen = new cHeiGenClassic(Seed, HeightFreq1, HeightAmp1, HeightFreq2, HeightAmp2, HeightFreq3, HeightAmp3);
+		m_HeightGen = new cHeiGenClassic(Seed);
 	}
 	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
 	{
 		m_HeightGen = new cDistortedHeightmap(Seed, *m_BiomeGen);
-		((cDistortedHeightmap *)m_HeightGen)->Initialize(a_IniFile);
 	}
 	else if (NoCaseCompare(HeightGenName, "End") == 0)
 	{
 		m_HeightGen = new cEndGen(Seed);
-		((cEndGen *)m_HeightGen)->Initialize(a_IniFile);
 	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
 		m_HeightGen = new cNoise3DComposable(Seed);
-		((cNoise3DComposable *)m_HeightGen)->Initialize(a_IniFile);
 	}
 	else  // "biomal" or <not found>
 	{
@@ -283,6 +272,9 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 		//*/
 	}
 	
+	// Read the settings:
+	m_HeightGen->InitializeHeightGen(a_IniFile);
+	
 	// Add a cache, if requested:
 	int CacheSize = a_IniFile.GetValueSetI("Generator", "HeightGenCacheSize", CacheOffByDefault ? 0 : 64);
 	if (CacheSize > 0)
@@ -296,7 +288,7 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 		}
 		LOGD("Using a cache for Heightgen of size %d.", CacheSize);
 		m_UnderlyingHeightGen = m_HeightGen;
-		m_HeightGen = new cHeiGenCache(m_UnderlyingHeightGen, CacheSize);
+		m_HeightGen = new cHeiGenCache(*m_UnderlyingHeightGen, CacheSize);
 	}
 }
 
@@ -306,6 +298,7 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 
 void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 {
+	int Seed = m_ChunkGenerator.GetSeed();
 	AString CompoGenName = a_IniFile.GetValueSet("Generator", "CompositionGen", "");
 	if (CompoGenName.empty())
 	{
@@ -314,9 +307,7 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	}
 	if (NoCaseCompare(CompoGenName, "sameblock") == 0)
 	{
-		int Block = m_ChunkGenerator.GetIniBlock(a_IniFile, "Generator", "SameBlockType", "stone");
-		bool Bedrocked = (a_IniFile.GetValueSetI("Generator", "SameBlockBedrocked", 1) != 0);
-		m_CompositionGen = new cCompoGenSameBlock((BLOCKTYPE)Block, Bedrocked);
+		m_CompositionGen = new cCompoGenSameBlock;
 	}
 	else if (NoCaseCompare(CompoGenName, "debugbiomes") == 0)
 	{
@@ -324,38 +315,23 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	}
 	else if (NoCaseCompare(CompoGenName, "classic") == 0)
 	{
-		int SeaLevel    = a_IniFile.GetValueSetI("Generator", "ClassicSeaLevel", 60);
-		int BeachHeight = a_IniFile.GetValueSetI("Generator", "ClassicBeachHeight", 2);
-		int BeachDepth  = a_IniFile.GetValueSetI("Generator", "ClassicBeachDepth", 4);
-		BLOCKTYPE BlockTop         = m_ChunkGenerator.GetIniBlock(a_IniFile, "Generator", "ClassicBlockTop",         "grass");
-		BLOCKTYPE BlockMiddle      = m_ChunkGenerator.GetIniBlock(a_IniFile, "Generator", "ClassicBlockMiddle",      "dirt");
-		BLOCKTYPE BlockBottom      = m_ChunkGenerator.GetIniBlock(a_IniFile, "Generator", "ClassicBlockBottom",      "stone");
-		BLOCKTYPE BlockBeach       = m_ChunkGenerator.GetIniBlock(a_IniFile, "Generator", "ClassicBlockBeach",       "sand");
-		BLOCKTYPE BlockBeachBottom = m_ChunkGenerator.GetIniBlock(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone");
-		BLOCKTYPE BlockSea         = m_ChunkGenerator.GetIniBlock(a_IniFile, "Generator", "ClassicBlockSea",         "stationarywater");
-		m_CompositionGen = new cCompoGenClassic(
-			SeaLevel, BeachHeight, BeachDepth, BlockTop, BlockMiddle, BlockBottom, BlockBeach,
-			BlockBeachBottom, BlockSea
-		);
+		m_CompositionGen = new cCompoGenClassic;
 	}
 	else if (NoCaseCompare(CompoGenName, "DistortedHeightmap") == 0)
 	{
-		m_CompositionGen = new cDistortedHeightmap(m_ChunkGenerator.GetSeed(), *m_BiomeGen);
-		((cDistortedHeightmap *)m_CompositionGen)->Initialize(a_IniFile);
+		m_CompositionGen = new cDistortedHeightmap(Seed, *m_BiomeGen);
 	}
 	else if (NoCaseCompare(CompoGenName, "end") == 0)
 	{
-		m_CompositionGen = new cEndGen(m_ChunkGenerator.GetSeed());
-		((cEndGen *)m_CompositionGen)->Initialize(a_IniFile);
+		m_CompositionGen = new cEndGen(Seed);
 	}
 	else if (NoCaseCompare(CompoGenName, "nether") == 0)
 	{
-		m_CompositionGen = new cCompoGenNether(m_ChunkGenerator.GetSeed());
+		m_CompositionGen = new cCompoGenNether(Seed);
 	}
 	else if (NoCaseCompare(CompoGenName, "Noise3D") == 0)
 	{
 		m_CompositionGen = new cNoise3DComposable(m_ChunkGenerator.GetSeed());
-		((cNoise3DComposable *)m_CompositionGen)->Initialize(a_IniFile);
 	}
 	else
 	{
@@ -363,9 +339,7 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 		{
 			LOGWARN("Unknown CompositionGen \"%s\", using \"biomal\" instead.", CompoGenName.c_str());
 		}
-		int SeaLevel = a_IniFile.GetValueSetI("Generator", "BiomalSeaLevel", 62);
-		int Seed = m_ChunkGenerator.GetSeed();
-		m_CompositionGen = new cCompoGenBiomal(Seed, SeaLevel);
+		m_CompositionGen = new cCompoGenBiomal(Seed);
 
 		/*
 		// Performance-testing:
@@ -383,11 +357,14 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 		//*/
 	}
 	
+	// Read the settings from the ini file:
+	m_CompositionGen->InitializeCompoGen(a_IniFile);
+	
 	int CompoGenCacheSize = a_IniFile.GetValueSetI("Generator", "CompositionGenCacheSize", 64);
 	if (CompoGenCacheSize > 1)
 	{
 		m_UnderlyingCompositionGen = m_CompositionGen;
-		m_CompositionGen = new cCompoGenCache(m_UnderlyingCompositionGen, 32);
+		m_CompositionGen = new cCompoGenCache(*m_UnderlyingCompositionGen, 32);
 	}
 }
 

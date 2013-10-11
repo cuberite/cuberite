@@ -30,8 +30,6 @@ class cDistortedHeightmap :
 public:
 	cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen);
 	
-	void Initialize(cIniFile & a_IniFile);
-	
 protected:
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
 
@@ -77,6 +75,9 @@ protected:
 	NOISE_DATATYPE m_DistortAmpX[DIM_X * DIM_Z];
 	NOISE_DATATYPE m_DistortAmpZ[DIM_X * DIM_Z];
 	
+	/// True if Initialize() has been called. Used to initialize-once even with multiple init entrypoints (HeiGen / CompoGen)
+	bool m_IsInitialized;
+	
 
 	/// Unless the LastChunk coords are equal to coords given, prepares the internal state (noise arrays, heightmap)
 	void PrepareState(int a_ChunkX, int a_ChunkZ);
@@ -93,10 +94,15 @@ protected:
 	/// Calculates the X and Z distortion amplitudes based on the neighbors' biomes
 	void GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ);
 	
+	/// Reads the settings from the ini file. Skips reading if already initialized
+	void Initialize(cIniFile & a_IniFile);
+	
 	
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;

@@ -67,6 +67,9 @@ public:
 	
 	/// Generates heightmap for the given chunk
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) = 0;
+	
+	/// Reads parameters from the ini file, prepares generator for use.
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) {}
 } ;
 
 
@@ -84,6 +87,9 @@ public:
 	virtual ~cTerrainCompositionGen() {}  // Force a virtual destructor in descendants
 	
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) = 0;
+	
+	/// Reads parameters from the ini file, prepares generator for use.
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) {}
 } ;
 
 

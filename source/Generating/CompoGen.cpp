@@ -10,7 +10,9 @@
 #include "Globals.h"
 #include "CompoGen.h"
 #include "../BlockID.h"
+#include "../Item.h"
 #include "../LinearUpscale.h"
+#include "../../iniFile/iniFile.h"
 
 
 
@@ -42,6 +44,16 @@ void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			}  // for y
 		}  // for z
 	}  // for x
+}
+
+
+
+
+
+void cCompoGenSameBlock::InitializeCompoGen(cIniFile & a_IniFile)
+{
+	m_BlockType = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "SameBlockType", "stone").m_ItemType);
+	m_IsBedrocked = (a_IniFile.GetValueSetI("Generator", "SameBlockBedrocked", 1) != 0);
 }
 
 
@@ -102,20 +114,16 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCompoGenClassic:
 
-cCompoGenClassic::cCompoGenClassic(
-	int a_SeaLevel, int a_BeachHeight, int a_BeachDepth,
-	BLOCKTYPE a_BlockTop, BLOCKTYPE a_BlockMiddle, BLOCKTYPE a_BlockBottom,
-	BLOCKTYPE a_BlockBeach, BLOCKTYPE a_BlockBeachBottom, BLOCKTYPE a_BlockSea
-) :
-	m_SeaLevel(a_SeaLevel),
-	m_BeachHeight(a_BeachHeight),
-	m_BeachDepth(a_BeachDepth),
-	m_BlockTop(a_BlockTop),
-	m_BlockMiddle(a_BlockMiddle),
-	m_BlockBottom(a_BlockBottom),
-	m_BlockBeach(a_BlockBeach),
-	m_BlockBeachBottom(a_BlockBeachBottom),
-	m_BlockSea(a_BlockSea)
+cCompoGenClassic::cCompoGenClassic(void) :
+	m_SeaLevel(60),
+	m_BeachHeight(2),
+	m_BeachDepth(4),
+	m_BlockTop(E_BLOCK_GRASS),
+	m_BlockMiddle(E_BLOCK_DIRT),
+	m_BlockBottom(E_BLOCK_STONE),
+	m_BlockBeach(E_BLOCK_SAND),
+	m_BlockBeachBottom(E_BLOCK_SANDSTONE),
+	m_BlockSea(E_BLOCK_STATIONARY_WATER)
 {
 }
 
@@ -178,6 +186,23 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
+}
+
+
+
+
+
+void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
+{
+	m_SeaLevel         = a_IniFile.GetValueSetI("Generator", "ClassicSeaLevel",    m_SeaLevel);
+	m_BeachHeight      = a_IniFile.GetValueSetI("Generator", "ClassicBeachHeight", m_BeachHeight);
+	m_BeachDepth       = a_IniFile.GetValueSetI("Generator", "ClassicBeachDepth",  m_BeachDepth);
+	m_BlockTop         = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockTop",         "grass").m_ItemType);
+	m_BlockMiddle      = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockMiddle",      "dirt").m_ItemType);
+	m_BlockBottom      = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBottom",      "stone").m_ItemType);
+	m_BlockBeach       = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeach",       "sand").m_ItemType);
+	m_BlockBeachBottom = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone").m_ItemType);
+	m_BlockSea         = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockSea",         "stationarywater").m_ItemType);
 }
 
 
@@ -280,6 +305,15 @@ void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
+}
+
+
+
+
+
+void cCompoGenBiomal::InitializeCompoGen(cIniFile & a_IniFile)
+{
+	m_SeaLevel = a_IniFile.GetValueSetI("Generator", "BiomalSeaLevel", m_SeaLevel) - 1;
 }
 
 
@@ -485,10 +519,19 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 
 
+void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
+{
+	m_Threshold = a_IniFile.GetValueSetI("Generator", "NetherThreshold", m_Threshold);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCompoGenCache:
 
-cCompoGenCache::cCompoGenCache(cTerrainCompositionGen * a_Underlying, int a_CacheSize) :
+cCompoGenCache::cCompoGenCache(cTerrainCompositionGen & a_Underlying, int a_CacheSize) :
 	m_Underlying(a_Underlying),
 	m_CacheSize(a_CacheSize),
 	m_CacheOrder(new int[a_CacheSize]),
@@ -521,13 +564,13 @@ cCompoGenCache::~cCompoGenCache()
 
 void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
-	//*
+	#ifdef _DEBUG
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
 		LOGD("CompoGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
 		LOGD("CompoGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
 	}
-	//*/
+	#endif  // _DEBUG
 	
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -562,7 +605,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	
 	// Not in the cache:
 	m_NumMisses++;
-	m_Underlying->ComposeTerrain(a_ChunkDesc);
+	m_Underlying.ComposeTerrain(a_ChunkDesc);
 	
 	// Insert it as the first item in the MRU order:
 	int Idx = m_CacheOrder[m_CacheSize - 1];
@@ -575,6 +618,15 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	memcpy(m_CacheData[Idx].m_BlockMetas, a_ChunkDesc.GetBlockMetasUncompressed(), sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
 	m_CacheData[Idx].m_ChunkX = ChunkX;
 	m_CacheData[Idx].m_ChunkZ = ChunkZ;
+}
+
+
+
+
+
+void cCompoGenCache::InitializeCompoGen(cIniFile & a_IniFile)
+{
+	m_Underlying.InitializeCompoGen(a_IniFile);
 }
 
 
