@@ -22,7 +22,8 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_Style(Style),
 	m_Armour(0),
 	m_TimesToTame(TameTimes),
-	m_TameAttemptTimes(0)
+	m_TameAttemptTimes(0),
+	m_RearTickCount(0)
 {
 }
 
@@ -70,9 +71,13 @@ void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 	
-	if ((m_bIsRearing) && (m_World->GetTickRandomNumber(15) == 6))
+	if (m_bIsRearing)
 	{
-		m_bIsRearing = false;
+		if (m_RearTickCount == 20)
+		{
+			m_bIsRearing = false;
+		}
+		else { m_RearTickCount++;}
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
