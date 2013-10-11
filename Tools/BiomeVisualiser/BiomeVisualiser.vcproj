@@ -332,6 +332,22 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\source\Enchantments.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\source\Enchantments.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\source\WorldStorage\FastNBT.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\source\WorldStorage\FastNBT.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\source\Globals.cpp"
 					>
 					<FileConfiguration
@@ -361,6 +377,10 @@
 				</File>
 				<File
 					RelativePath="..\..\source\Globals.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\source\Item.h"
 					>
 				</File>
 				<File
@@ -432,14 +452,6 @@
 					</File>
 					<File
 						RelativePath="..\..\source\OSSupport\IsThread.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\source\OSSupport\MakeDir.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\source\OSSupport\MakeDir.h"
 						>
 					</File>
 					<File
