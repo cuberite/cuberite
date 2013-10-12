@@ -1701,6 +1701,12 @@ void cProtocol125::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0); // Fueled?
 		}
 	}
+	else if (a_Entity.IsA("cArrowEntity"));
+	{
+		WriteByte(0x10);
+		WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0); // Critical hitting arrow?
+	}
+
 }
 
 
@@ -1711,7 +1717,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 {
 	switch (a_Mob.GetMobType())
 	{
-		case E_META_SPAWN_EGG_CREEPER:
+		case cMonster::mtCreeper:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1); // Blowing up?
@@ -1719,25 +1725,25 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0); // Lightning-charged?
 			break;
 		}
-		case E_META_SPAWN_EGG_BAT:
+		case cMonster::mtBat:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0); // Upside down?
 			break;
 		}
-		case E_META_SPAWN_EGG_PIG:
+		case cMonster::mtPig:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0); // Saddled?
 			break;
 		}
-		case E_META_SPAWN_EGG_VILLAGER:
+		case cMonster::mtVillager:
 		{
 			WriteByte(0x50);
 			WriteInt(((const cVillager &)a_Mob).GetVilType()); // What sort of TESTIFICATE?
 			break;
 		}
-		case E_META_SPAWN_EGG_ZOMBIE:
+		case cMonster::mtZombie:
 		{
 			WriteByte(0xC);
 			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0); // Babby zombie?
@@ -1747,19 +1753,13 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cZombie &)a_Mob).IsConverting() ? 1 : 0); // Converted-but-converting-back zombllager?
 			break;
 		}
-		case E_META_SPAWN_EGG_GHAST:
+		case cMonster::mtGhast:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cGhast &)a_Mob).IsCharging()); // About to eject un flamé-bol? :P
 			break;
 		}
-		case E_META_SPAWN_EGG_ARROW:
-		{
-			WriteByte(0x10);
-			WriteByte(((const cArrowEntity &)a_Mob).IsCritical() ? 1 : 0); // Critical hitting arrow?
-			break;
-		}
-		case E_META_SPAWN_EGG_WOLF:
+		case cMonster::mtWolf:
 		{
 			Byte WolfStatus = 0;
 			if (((const cWolf &)a_Mob).IsSitting())
@@ -1783,7 +1783,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cWolf &)a_Mob).IsBegging() ? 1 : 0); // Ultra cute mode?
 			break;
 		}
-		case E_META_SPAWN_EGG_SHEEP:
+		case cMonster::mtSheep:
 		{
 			// [1](1111)
 			// [] = Is sheared? () = Color, from 0 to 15
@@ -1799,7 +1799,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(SheepMetadata);
 			break;
 		}
-		case E_META_SPAWN_EGG_ENDERMAN:
+		case cMonster::mtEnderman:
 		{
 			WriteByte(0x10);
 			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock())); // Block that he stole from your house
@@ -1809,23 +1809,23 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0); // Screaming at your face?
 			break;
 		}
-		case E_META_SPAWN_EGG_SKELETON:
+		case cMonster::mtSkeleton:
 		{
 			WriteByte(0xD);
 			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0); // It's a skeleton, but it's not
 			break;
 		}
-		case E_META_SPAWN_EGG_WITCH:
+		case cMonster::mtWitch:
 		{
 			WriteByte(0x15);
 			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0); // Aggravated? Doesn't seem to do anything
 			break;
 		}
-		case E_META_SPAWN_EGG_SLIME:
-		case E_META_SPAWN_EGG_MAGMA_CUBE:
+		case cMonster::mtSlime:
+		case cMonster::mtMagmaCube:
 		{
 			WriteByte(0x10);
-			if (a_Mob.GetMobType() == E_META_SPAWN_EGG_SLIME)
+			if (a_Mob.GetMobType() == cMonster::mtSlime)
 			{
 				WriteByte(((const cSlime &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
 			}
@@ -1835,7 +1835,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			}
 			break;
 		}
-		case E_META_SPAWN_EGG_HORSE:
+		case cMonster::mtHorse:
 		{
 			int Flags = 0;
 			if (((const cHorse &)a_Mob).IsTame())
