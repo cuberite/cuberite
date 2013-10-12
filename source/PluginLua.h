@@ -169,7 +169,7 @@ public:
 	}
 
 	/// Call a Lua function with 4 args
-	template <typename FnT, typename ArgT0, typename ArgT1, typename ArgT2, typename ArgT3> bool Call(FnT a_Fn, ArgT0 a_Arg0, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_ArgT3)
+	template <typename FnT, typename ArgT0, typename ArgT1, typename ArgT2, typename ArgT3> bool Call(FnT a_Fn, ArgT0 a_Arg0, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3)
 	{
 		cCSLock Lock(m_CriticalSection);
 		return m_LuaState.Call(a_Fn, a_Arg0, a_Arg1, a_Arg2, a_Arg3);
