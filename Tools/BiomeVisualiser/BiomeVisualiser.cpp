@@ -21,8 +21,8 @@ int WINAPI WinMain(HINSTANCE a_Instance, HINSTANCE a_PrevInstance, LPSTR a_CmdLi
 
 
 
-cBiomeVisualiser::cBiomeVisualiser(void)
-	// : m_Logger(Printf("BiomeVisualiser_%08x", time(NULL)))
+cBiomeVisualiser::cBiomeVisualiser(void) :
+	m_Logger(new cMCLogger(Printf("BiomeVisualiser_%08x.log", time(NULL))))
 {
 }
 

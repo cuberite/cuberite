@@ -23,7 +23,7 @@ public:
 protected:
 	cBiomeViewWnd m_MainWnd;
 	
-	cMCLogger m_Logger;
+	cMCLogger * m_Logger;
 } ;
 
 
