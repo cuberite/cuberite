@@ -2086,6 +2086,32 @@ World:ForEachEntity(
 				Either way, the server will then spawn pickups specified in the Pickups parameter, so to disable
 				pickups, you need to Clear the object first, then return true.
 			]],
+			CodeExamples =
+			{
+				{
+					Title = "Modify pickups",
+					Desc = "This example callback function makes tall grass drop diamonds when digged by natural causes (washed away by water).",
+					Code = [[
+function OnBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_Pickups)
+	if (a_Digger ~= nil) then
+		-- Not a natural cause
+		return false;
+	end
+	if (a_BlockType ~= E_BLOCK_TALL_GRASS) then
+		-- Not a tall grass being washed away
+		return false;
+	end
+	
+	-- Remove all pickups suggested by MCServer:
+	a_Pickups:Clear();
+	
+	-- Drop a diamond:
+	a_Pickups:Add(cItem(E_ITEM_DIAMOND));
+	return true;
+end;
+					]],
+				},
+			} ,  -- CodeExamples
 		},  -- HOOK_BLOCK_TO_PICKUPS
 
 		HOOK_CHAT =
