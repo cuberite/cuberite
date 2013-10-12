@@ -13,14 +13,20 @@ class cSheep :
 	typedef cPassiveMonster super;
 	
 public:
-	cSheep(void);
+	cSheep(int a_Color);
 	
-	bool       m_IsSheared;
-	NIBBLETYPE m_WoolColor;  // Uses E_META_WOOL_ constants for colors
-
 	CLASS_PROTODEF(cSheep);
-
+	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void OnRightClicked(cPlayer & a_Player) override;
+	bool IsSheared(void) const { return m_IsSheared; }
+	int GetFurColor(void) const { return m_WoolColor; }
+
+private:
+	
+	bool m_IsSheared;
+	int m_WoolColor;
+
 } ;
 
 

@@ -8,8 +8,10 @@
 
 
 
-cZombie::cZombie(void) :
-	super("Zombie", 54, "mob.zombie.hurt", "mob.zombie.death", 0.6, 1.8)
+cZombie::cZombie(bool IsVillagerZombie) :
+	super("Zombie", 54, "mob.zombie.hurt", "mob.zombie.death", 0.6, 1.8),
+	m_bIsConverting(false),
+	m_bIsVillagerZombie(IsVillagerZombie)
 {
 	SetBurnsInDaylight(true);
 }

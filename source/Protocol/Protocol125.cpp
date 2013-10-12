@@ -24,7 +24,26 @@ Documentation:
 #include "../UI/Window.h"
 #include "../Root.h"
 #include "../Server.h"
+
+#include "../Entities/ProjectileEntity.h"
+#include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
+
+#include "../Mobs/Monster.h"
+#include "../Mobs/Creeper.h"
+#include "../Mobs/Bat.h"
+#include "../Mobs/Pig.h"
+#include "../Mobs/Villager.h"
+#include "../Mobs/Zombie.h"
+#include "../Mobs/Ghast.h"
+#include "../Mobs/Wolf.h"
+#include "../Mobs/Sheep.h"
+#include "../Mobs/Enderman.h"
+#include "../Mobs/Skeleton.h"
+#include "../Mobs/Witch.h"
+#include "../Mobs/Slime.h"
+#include "../Mobs/Magmacube.h"
+#include "../Mobs/Horse.h"
 
 
 
@@ -343,8 +362,18 @@ void cProtocol125::SendEntityMetadata(const cEntity & a_Entity)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_METADATA);
 	WriteInt (a_Entity.GetUniqueID());
-	AString MetaData = GetEntityMetaData(a_Entity);
-	SendData(MetaData.data(), MetaData.size());
+	
+	WriteCommonMetadata(a_Entity);
+	if (a_Entity.IsMob())
+	{
+		WriteMobMetadata(((const cMonster &)a_Entity));
+	}
+	else
+	{
+		WriteEntityMetadata(a_Entity);
+	}	
+	WriteByte(0x7f);
+
 	Flush();
 }
 
@@ -713,8 +742,11 @@ void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 	WriteByte   (0);
 	WriteByte   (0);
 	WriteByte   (0);
-	AString MetaData = GetEntityMetaData(a_Mob);
-	SendData (MetaData.data(), MetaData.size());
+
+	WriteCommonMetadata(a_Mob);
+	WriteMobMetadata(a_Mob);
+	WriteByte(0x7f);
+
 	Flush();
 }
 
@@ -1617,48 +1649,243 @@ int cProtocol125::ParseItem(cItem & a_Item)
 
 
 
-AString cProtocol125::GetEntityMetaData(const cEntity & a_Entity)
+void cProtocol125::WriteCommonMetadata(const cEntity & a_Entity)
 {
-	// We should send all the metadata here
-	AString MetaData;
-	// Common metadata (index 0, byte):
-	MetaData.push_back(0);
-	MetaData.push_back(GetEntityMetadataFlags(a_Entity));
-	
-	// TODO: Add more entity-specific metadata
-	
-	MetaData.push_back(0x7f);  // End metadata
-	return MetaData;
+	Byte CommonMetadata = 0;
+
+	if (a_Entity.IsOnFire())
+	{
+		CommonMetadata |= 0x1;
+	}
+	if (a_Entity.IsCrouched())
+	{
+		CommonMetadata |= 0x2;
+	}
+	if (a_Entity.IsRiding())
+	{
+		CommonMetadata |= 0x4;
+	}
+	if (a_Entity.IsSprinting())
+	{
+		CommonMetadata |= 0x8;
+	}
+	if (a_Entity.IsRclking())
+	{
+		CommonMetadata |= 0x10;
+	}
+	if (a_Entity.IsInvisible())
+	{
+		CommonMetadata |= 0x20;
+	}
+
+	WriteByte(0x0);
+	WriteByte(CommonMetadata);
 }
 
 
 
 
 
-char cProtocol125::GetEntityMetadataFlags(const cEntity & a_Entity)
+void cProtocol125::WriteEntityMetadata(const cEntity & a_Entity)
 {
-	char Flags = 0;
-	if (a_Entity.IsOnFire())
+	if (a_Entity.IsMinecart())
 	{
-		Flags |= 1;
+		WriteByte(0x51);
+		// No idea how Mojang makes their carts shakey shakey, so here is a complicated one-liner expression that does something similar
+		WriteInt( (((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * ((const cMinecart &)a_Entity).LastDamage()) * 4 );
+		WriteByte(0x52);
+		WriteInt(1); // Shaking direction, doesn't seem to affect anything
+		WriteByte(0x73);
+		WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
+		
+		if (a_Entity.IsA("cMinecartWithFurnace"))
+		{
+			WriteByte(0x10);
+			WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0); // Fueled?
+		}
 	}
-	if (a_Entity.IsCrouched())
+	else if (a_Entity.IsA("cArrowEntity"));
 	{
-		Flags |= 2;
+		WriteByte(0x10);
+		WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0); // Critical hitting arrow?
 	}
-	if (a_Entity.IsRiding())
+
+}
+
+
+
+
+
+void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
+{
+	switch (a_Mob.GetMobType())
 	{
-		Flags |= 4;
+		case cMonster::mtCreeper:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1); // Blowing up?
+			WriteByte(0x11);
+			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0); // Lightning-charged?
+			break;
+		}
+		case cMonster::mtBat:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0); // Upside down?
+			break;
+		}
+		case cMonster::mtPig:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0); // Saddled?
+			break;
+		}
+		case cMonster::mtVillager:
+		{
+			WriteByte(0x50);
+			WriteInt(((const cVillager &)a_Mob).GetVilType()); // What sort of TESTIFICATE?
+			break;
+		}
+		case cMonster::mtZombie:
+		{
+			WriteByte(0xC);
+			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0); // Babby zombie?
+			WriteByte(0xD);
+			WriteByte(((const cZombie &)a_Mob).IsVillagerZombie() ? 1 : 0); // Converted zombie?
+			WriteByte(0xE);
+			WriteByte(((const cZombie &)a_Mob).IsConverting() ? 1 : 0); // Converted-but-converting-back zombllager?
+			break;
+		}
+		case cMonster::mtGhast:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cGhast &)a_Mob).IsCharging()); // About to eject un flamé-bol? :P
+			break;
+		}
+		case cMonster::mtWolf:
+		{
+			Byte WolfStatus = 0;
+			if (((const cWolf &)a_Mob).IsSitting())
+			{
+				WolfStatus |= 0x1;
+			}
+			if (((const cWolf &)a_Mob).IsAngry())
+			{
+				WolfStatus |= 0x2;
+			}
+			if (((const cWolf &)a_Mob).IsTame())
+			{
+				WolfStatus |= 0x4;
+			}
+			WriteByte(0x10);
+			WriteByte(WolfStatus);
+
+			WriteByte(0x72);
+			WriteFloat((float)(a_Mob.GetHealth())); // Tail health-o-meter (only shown when tamed, by the way)
+			WriteByte(0x13);
+			WriteByte(((const cWolf &)a_Mob).IsBegging() ? 1 : 0); // Ultra cute mode?
+			break;
+		}
+		case cMonster::mtSheep:
+		{
+			// [1](1111)
+			// [] = Is sheared? () = Color, from 0 to 15
+
+			WriteByte(0x10);
+			Byte SheepMetadata = 0;
+			SheepMetadata = ((const cSheep &)a_Mob).GetFurColor(); // Fur colour
+
+			if (((const cSheep &)a_Mob).IsSheared()) // Is sheared?
+			{
+				SheepMetadata |= 0x16;
+			}
+			WriteByte(SheepMetadata);
+			break;
+		}
+		case cMonster::mtEnderman:
+		{
+			WriteByte(0x10);
+			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock())); // Block that he stole from your house
+			WriteByte(0x11);
+			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedMeta())); // Meta of block that he stole from your house
+			WriteByte(0x12);
+			WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0); // Screaming at your face?
+			break;
+		}
+		case cMonster::mtSkeleton:
+		{
+			WriteByte(0xD);
+			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0); // It's a skeleton, but it's not
+			break;
+		}
+		case cMonster::mtWitch:
+		{
+			WriteByte(0x15);
+			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0); // Aggravated? Doesn't seem to do anything
+			break;
+		}
+		case cMonster::mtSlime:
+		case cMonster::mtMagmaCube:
+		{
+			WriteByte(0x10);
+			if (a_Mob.GetMobType() == cMonster::mtSlime)
+			{
+				WriteByte(((const cSlime &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+			}
+			else
+			{
+				WriteByte(((const cMagmaCube &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+			}
+			break;
+		}
+		case cMonster::mtHorse:
+		{
+			int Flags = 0;
+			if (((const cHorse &)a_Mob).IsTame())
+			{
+				Flags |= 0x2;
+			}
+			if (((const cHorse &)a_Mob).IsSaddled())
+			{
+				Flags |= 0x4;
+			}
+			if (((const cHorse &)a_Mob).IsChested())
+			{
+				Flags |= 0x8;
+			}
+			if (((const cHorse &)a_Mob).IsBaby())
+			{
+				Flags |= 0x10; // IsBred flag, according to wiki.vg - don't think it does anything in multiplayer
+			}
+			if (((const cHorse &)a_Mob).IsEating())
+			{
+				Flags |= 0x20;
+			}
+			if (((const cHorse &)a_Mob).IsRearing())
+			{
+				Flags |= 0x40;
+			}
+			if (((const cHorse &)a_Mob).IsMthOpen())
+			{
+				Flags |= 0x80;
+			}
+			WriteByte(0x50);
+			WriteInt(Flags);
+
+			WriteByte(0x13);
+			WriteByte(((const cHorse &)a_Mob).GetHorseType()); // Type of horse (donkey, chestnut, etc.)
+
+			WriteByte(0x54);
+			int Appearance = 0;
+			Appearance = ((const cHorse &)a_Mob).GetHorseColor(); // Mask FF
+			Appearance |= ((const cHorse &)a_Mob).GetHorseStyle() * 256; // Mask FF00, so multiply by 256
+			WriteInt(Appearance);	
+
+			WriteByte(0x56);
+			WriteInt(((const cHorse &)a_Mob).GetHorseArmour()); // Horshey armour
+			break;
+		}
 	}
-	if (a_Entity.IsSprinting())
-	{
-		Flags |= 8;
-	}
-	if (a_Entity.IsRclking())
-	{
-		Flags |= 16;
-	}
-	return Flags;
 }
 
 
