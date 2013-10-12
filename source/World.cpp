@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockID.h"
@@ -772,16 +771,36 @@ void cWorld::TickSpawnMobs(float a_Dt)
 			// Spawn nether mobs
 			switch (nightRand)
 			{
-				case 5: MobType = cMonster::mtGhast;        break;
+				case 0: MobType = cMonster::mtGhast;        break;
+				case 1: MobType = cMonster::mtBlaze;        break;
+				case 2: MobType = cMonster::mtZombiePigman; break;
+				case 3: MobType = cMonster::mtZombiePigman; break;
+				case 4: MobType = cMonster::mtZombiePigman; break;
+				case 5: MobType = cMonster::mtZombiePigman; break;
 				case 6: MobType = cMonster::mtZombiePigman; break;
+				case 7: MobType = cMonster::mtZombiePigman; break;
+				case 8: MobType = cMonster::mtZombiePigman; break;
+				case 9: MobType = cMonster::mtZombiePigman; break;
 			}
 			break;
 		}
 		
 		case biEnd:
 		{
-			// Only endermen spawn in the End
-			MobType = cMonster::mtEnderman;
+			// Spawn only The End mobs
+			switch (nightRand)
+			{
+				case 0: MobType = cMonster::mtEnderDragon;  break;
+				case 1: MobType = cMonster::mtEnderman;     break;
+				case 2: MobType = cMonster::mtEnderman;     break;
+				case 3: MobType = cMonster::mtEnderman;     break;
+				case 4: MobType = cMonster::mtEnderman;     break;
+				case 5: MobType = cMonster::mtEnderman;     break;
+				case 6: MobType = cMonster::mtEnderman;     break;
+				case 7: MobType = cMonster::mtEnderman;     break;
+				case 8: MobType = cMonster::mtEnderman;     break;
+				case 9: MobType = cMonster::mtEnderman;     break;
+			}
 			break;
 		}
 		
@@ -822,6 +841,7 @@ void cWorld::TickSpawnMobs(float a_Dt)
 					case 3: MobType = cMonster::mtSheep;   break;
 					case 4: MobType = cMonster::mtSquid;   break;
 					case 5: MobType = cMonster::mtWolf;    break;
+					case 6: MobType = cMonster::mtHorse;   break;
 				}
 			}  // else (night)
 		}  // case overworld biomes
