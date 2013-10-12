@@ -753,7 +753,8 @@ function WriteHtmlHook(a_Hook)
 	<p>
 	]]);
 	f:write(LinkifyString(a_Hook.Desc));
-	f:write("</p><h1>Callback function</h1><pre>function " .. a_Hook.DefaultFnName .. "(");
+	f:write("</p><h1>Callback function</h1><p>The default name for the callback function is ");
+	f:write(a_Hook.DefaultFnName .. ". It has the following signature:<pre>function " .. a_Hook.DefaultFnName .. "(");
 	if (a_Hook.Params == nil) then
 		a_Hook.Params = {};
 	end
@@ -774,7 +775,12 @@ function WriteHtmlHook(a_Hook)
 cPluginManager.AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);
 </pre>
 	]]);
-	-- TODO: Other code examples
+	local Examples = a_Hook.CodeExamples or {};
+	for i, example in ipairs(Examples) do
+		f:write("<h2>" .. example.Title .. "</h2>\n");
+		f:write("<p>" .. example.Desc .. "</p>\n");
+		f:write("<pre>" .. example.Code .. "</pre>\n");
+	end
 	f:close();
 end
 
