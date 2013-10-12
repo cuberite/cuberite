@@ -772,10 +772,10 @@ void cWorld::TickSpawnMobs(float a_Dt)
 			// Spawn nether mobs
 			switch (nightRand)
 			{
-				case 0: MobType = cMonster::mtGhast;        break;
-				case 1: MobType = cMonster::mtBlaze;        break;
-				case 2: MobType = cMonster::mtZombiePigman; break;
-				case 3: MobType = cMonster::mtZombiePigman; break;
+				case 0: MobType = cMonster::mtBlaze;        break;
+				case 1: MobType = cMonster::mtGhast;        break;
+				case 2: MobType = cMonster::mtGhast;        break;
+				case 3: MobType = cMonster::mtGhast;        break;
 				case 4: MobType = cMonster::mtZombiePigman; break;
 				case 5: MobType = cMonster::mtZombiePigman; break;
 				case 6: MobType = cMonster::mtZombiePigman; break;
