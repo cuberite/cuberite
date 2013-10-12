@@ -37,7 +37,39 @@ cMCLogger::cMCLogger(void)
 {
 	AString FileName;
 	Printf(FileName, "LOG_%d.txt", (int)time(NULL));
-	m_Log = new cLog(FileName);
+	InitLog(FileName);
+}
+
+
+
+
+
+cMCLogger::cMCLogger(const AString & a_FileName)
+{
+	InitLog(a_FileName);
+}
+
+
+
+
+
+cMCLogger::~cMCLogger()
+{
+	m_Log->Log("--- Stopped Log ---\n");
+	delete m_Log;
+	if (this == s_MCLogger)
+	{
+		s_MCLogger = NULL;
+	}
+}
+
+
+
+
+
+void cMCLogger::InitLog(const AString & a_FileName)
+{
+	m_Log = new cLog(a_FileName);
 	m_Log->Log("--- Started Log ---\n");
 
 	s_MCLogger = this;
@@ -55,29 +87,6 @@ cMCLogger::cMCLogger(void)
 		g_ShouldColorOutput = isatty(fileno(stdout));
 		// TODO: Check if the terminal supports colors, somehow?
 	#endif
-}
-
-
-
-
-
-cMCLogger::cMCLogger(const AString & a_FileName)
-{
-	m_Log = new cLog(a_FileName);
-}
-
-
-
-
-
-cMCLogger::~cMCLogger()
-{
-	m_Log->Log("--- Stopped Log ---\n");
-	delete m_Log;
-	if (this == s_MCLogger)
-	{
-		s_MCLogger = NULL;
-	}
 }
 
 

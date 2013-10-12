@@ -13,8 +13,12 @@ class cLog;
 class cMCLogger														// tolua_export
 {																	// tolua_export
 public:																// tolua_export
+	/// Creates a logger with the default filename, "logs/LOG_<timestamp>.log"
 	cMCLogger(void);
+	
+	/// Creates a logger with the specified filename inside "logs" folder
 	cMCLogger(const AString & a_FileName);  // tolua_export
+	
 	~cMCLogger();													// tolua_export
 
 	void Log(const char* a_Format, va_list a_ArgList);
@@ -34,16 +38,24 @@ private:
 		csError,
 	} ;
 	
+	cCriticalSection m_CriticalSection;
+	cLog * m_Log;
+	static cMCLogger * s_MCLogger;
+
+
 	/// Sets the specified color scheme in the terminal (TODO: if coloring available)
 	void SetColor(eColorScheme a_Scheme);
 	
 	/// Resets the color back to whatever is the default in the terminal
 	void ResetColor(void);
 	
-	cCriticalSection m_CriticalSection;
-	cLog * m_Log;
-	static cMCLogger * s_MCLogger;
+	/// Common initialization for all constructors, creates a logfile with the specified name and assigns s_MCLogger to this
+	void InitLog(const AString & a_FileName);
 };																	// tolua_export
+
+
+
+
 
 extern void LOG(const char* a_Format, ...);
 extern void LOGINFO(const char* a_Format, ...);
