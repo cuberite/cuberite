@@ -78,9 +78,16 @@ public:
 	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		if (Meta < 7)
+		NIBBLETYPE Water = a_World->GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
+		NIBBLETYPE Light = a_World->GetBlockBlockLight(a_BlockX, a_BlockY, a_BlockZ);
+		
+		if ((Meta < 7) && (Water > 0) && (Light > 8))
 		{
 			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_CROPS, ++Meta);
+		}
+		else if ((!Water) ||  (Light < 9))
+		{
+			a_World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 
