@@ -661,6 +661,8 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	cf:write([[<html><head><title>MCServer API - ]] .. a_ClassAPI.Name .. [[ class</title>
 	<link rel="stylesheet" type="text/css" href="main.css" />
+	<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+	<script src="http://google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
 	</head><body>
 	<h1>Contents</h1>
 	<ul>
@@ -748,13 +750,16 @@ function WriteHtmlHook(a_Hook)
 	end
 	f:write([[<html><head><title>MCServer API - ]] .. a_Hook.DefaultFnName .. [[ hook</title>
 	<link rel="stylesheet" type="text/css" href="main.css" />
+	<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+	<script src="http://google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
 	</head><body>
 	<h1>]] .. a_Hook.Name .. [[ hook</h1>
 	<p>
 	]]);
 	f:write(LinkifyString(a_Hook.Desc));
 	f:write("</p><h1>Callback function</h1><p>The default name for the callback function is ");
-	f:write(a_Hook.DefaultFnName .. ". It has the following signature:<pre>function " .. a_Hook.DefaultFnName .. "(");
+	f:write(a_Hook.DefaultFnName .. ". It has the following signature:");
+	f:write("<pre class=\"prettyprint lang-lua\">function " .. a_Hook.DefaultFnName .. "(");
 	if (a_Hook.Params == nil) then
 		a_Hook.Params = {};
 	end
@@ -771,7 +776,7 @@ function WriteHtmlHook(a_Hook)
 	f:write("</table></p>\n<p>" .. (a_Hook.Returns or "") .. "</p>\n");
 	f:write([[<h1>Code examples</h1>
 	<h2>Registering the callback</h2>
-<pre>
+<pre class=\"prettyprint lang-lua\">
 cPluginManager.AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);
 </pre>
 	]]);
@@ -779,7 +784,7 @@ cPluginManager.AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.Defa
 	for i, example in ipairs(Examples) do
 		f:write("<h2>" .. example.Title .. "</h2>\n");
 		f:write("<p>" .. example.Desc .. "</p>\n");
-		f:write("<pre>" .. example.Code .. "</pre>\n");
+		f:write("<pre class=\"prettyprint lang-lua\">" .. example.Code .. "</pre>\n");
 	end
 	f:close();
 end
