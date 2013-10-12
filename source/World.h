@@ -508,7 +508,7 @@ public:
 	void QueueSaveAllChunks(void);  // tolua_export
 	
 	/// Queues a task onto the tick thread. The task object will be deleted once the task is finished
-	void QueueTask(cTask * a_Task);
+	void QueueTask(cTask * a_Task);  // Exported in ManualBindings.cpp
 
 	/// Returns the number of chunks loaded	
 	int GetNumChunks() const;  // tolua_export
@@ -589,7 +589,7 @@ public:
 	
 	/// Appends all usernames starting with a_Text (case-insensitive) into Results
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
-	
+
 private:
 
 	friend class cRoot;

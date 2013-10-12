@@ -896,6 +896,70 @@ tolua_lerror:
 
 
 
+class cLuaWorldTask :
+	public cWorld::cTask
+{
+public:
+	cLuaWorldTask(cPluginLua & a_Plugin, int a_FnRef) :
+		m_Plugin(a_Plugin),
+		m_FnRef(a_FnRef)
+	{
+	}
+
+protected:
+	cPluginLua & m_Plugin;
+	int m_FnRef;
+	
+	// cWorld::cTask overrides:
+	virtual void Run(cWorld & a_World) override
+	{
+		m_Plugin.Call(m_FnRef, &a_World);
+	}
+} ;
+
+
+
+
+
+static int tolua_cWorld_QueueTask(lua_State * tolua_S)
+{
+	// Binding for cWorld::QueueTask
+	// Params: function
+	
+	// Retrieve the cPlugin from the LuaState:
+	cPluginLua * Plugin = GetLuaPlugin(tolua_S);
+	if (Plugin == NULL)
+	{
+		// An error message has been already printed in GetLuaPlugin()
+		return 0;
+	}
+
+	// Retrieve the args:
+	cWorld * self = (cWorld *)tolua_tousertype(tolua_S, 1, 0);
+	if (self == NULL)
+	{
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
+	}
+	if (!lua_isfunction(tolua_S, 2))
+	{
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a function for parameter #1");
+	}
+
+	// Create a reference to the function:
+	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+	if (FnRef == LUA_REFNIL)
+	{
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
+	}
+
+	self->QueueTask(new cLuaWorldTask(*Plugin, FnRef));
+	return 0;
+}
+
+
+
+
+
 static int tolua_cPluginManager_GetAllPlugins(lua_State * tolua_S)
 {
 	cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
@@ -2032,6 +2096,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachPlayer",         tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
 			tolua_function(tolua_S, "GetBlockInfo",          tolua_cWorld_GetBlockInfo);
 			tolua_function(tolua_S, "GetBlockTypeMeta",      tolua_cWorld_GetBlockTypeMeta);
+			tolua_function(tolua_S, "QueueTask",             tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "SetSignLines",          tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "TryGetHeight",          tolua_cWorld_TryGetHeight);
 			tolua_function(tolua_S, "UpdateSign",            tolua_cWorld_SetSignLines);

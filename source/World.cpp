@@ -848,7 +848,7 @@ void cWorld::TickQueuedTasks(void)
 	}
 
 	// Execute and delete each task:
-	for (cTasks::iterator itr = m_Tasks.begin(), end = m_Tasks.end(); itr != end; ++itr)
+	for (cTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
 	{
 		(*itr)->Run(*this);
 		delete *itr;
