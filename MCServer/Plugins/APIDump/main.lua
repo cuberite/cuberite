@@ -241,7 +241,7 @@ function DumpAPIHtml()
 			f:write("<tr><td>" .. hook.Name .. "</td><td><i>(No documentation yet)</i></td></tr>\n");
 			table.insert(UndocumentedHooks, hook.Name);
 		else
-			f:write("<tr><td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td><td>" .. hook.CalledWhen .. "</td></tr>\n");
+			f:write("<tr><td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td><td>" .. LinkifyString(hook.CalledWhen) .. "</td></tr>\n");
 			WriteHtmlHook(hook);
 		end
 	end
