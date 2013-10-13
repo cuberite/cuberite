@@ -56,8 +56,14 @@ struct HTTPRequest
 	AString Path;
 	AString Username;
 	// tolua_end
+	
+	/// Parameters given in the URL, after the questionmark
 	StringStringMap Params;     // >> EXPORTED IN MANUALBINDINGS <<
+	
+	/// Parameters posted as a part of a form - either in the URL (GET method) or in the body (POST method)
 	StringStringMap PostParams; // >> EXPORTED IN MANUALBINDINGS <<
+	
+	/// Same as PostParams
 	FormDataMap FormData;       // >> EXPORTED IN MANUALBINDINGS <<
 } ; // tolua_export
 

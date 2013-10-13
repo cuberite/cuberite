@@ -185,8 +185,19 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 			HTTPfd.Name = itr->first;
 			TemplateRequest.Request.FormData[itr->first] = HTTPfd;
 			TemplateRequest.Request.PostParams[itr->first] = itr->second;
-			TemplateRequest.Request.Params[itr->first] = itr->second;
 		}  // for itr - Data->m_Form[]
+		
+		// Parse the URL into individual params:
+		size_t idxQM = a_Request.GetURL().find('?');
+		if (idxQM != AString::npos)
+		{
+			cHTTPFormParser URLParams(cHTTPFormParser::fpkURL, a_Request.GetURL().c_str() + idxQM + 1, a_Request.GetURL().length() - idxQM - 1, *Data);
+			URLParams.Finish();
+			for (cHTTPFormParser::const_iterator itr = URLParams.begin(), end = URLParams.end(); itr != end; ++itr)
+			{
+				TemplateRequest.Request.Params[itr->first] = itr->second;
+			}  // for itr - URLParams[]
+		}
 	}
 	
 	// Try to get the template from the Lua template script
