@@ -2096,6 +2096,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachPlayer",         tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
 			tolua_function(tolua_S, "GetBlockInfo",          tolua_cWorld_GetBlockInfo);
 			tolua_function(tolua_S, "GetBlockTypeMeta",      tolua_cWorld_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetSignLines",          tolua_cWorld_GetSignLines);
 			tolua_function(tolua_S, "QueueTask",             tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "SetSignLines",          tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "TryGetHeight",          tolua_cWorld_TryGetHeight);
