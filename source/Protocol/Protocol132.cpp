@@ -416,8 +416,11 @@ void cProtocol132::SendSpawnMob(const cMonster & a_Mob)
 	WriteShort  ((short)(a_Mob.GetSpeedX() * 400));
 	WriteShort  ((short)(a_Mob.GetSpeedY() * 400));
 	WriteShort  ((short)(a_Mob.GetSpeedZ() * 400));
-	AString MetaData = GetEntityMetaData(a_Mob);
-	SendData (MetaData.data(), MetaData.size());
+
+	WriteCommonMetadata(a_Mob);
+	WriteMobMetadata(a_Mob);
+	WriteByte(0x7f);
+
 	Flush();
 }
 

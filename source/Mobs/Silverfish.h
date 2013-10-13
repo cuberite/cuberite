@@ -14,8 +14,7 @@ class cSilverfish :
 	
 public:
 	cSilverfish(void) :
-		// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
-		super("Silverfish", 60, "mob.silverfish.hit", "mob.silverfish.kill", 0.9, 0.3)
+		super("Silverfish", 60, "mob.silverfish.hit", "mob.silverfish.kill", 0.3, 0.7)
 	{
 	}
 

@@ -90,6 +90,13 @@ public:
 		ENTITY_STATUS_WOLF_SHAKING    = 8,
 		ENTITY_STATUS_EATING_ACCEPTED = 9,
 		ENTITY_STATUS_SHEEP_EATING    = 10,
+		ENTITY_STATUS_GOLEM_ROSING    = 11,
+		ENTITY_STATUS_VILLAGER_HEARTS = 12,
+		ENTITY_STATUS_VILLAGER_ANGRY  = 13,
+		ENTITY_STATUS_VILLAGER_HAPPY  = 14,
+		ENTITY_STATUS_WITCH_MAGICKING = 15,
+		// It seems 16 (zombie conversion) is now done with metadata
+		ENTITY_STATUS_FIREWORK_EXPLODE= 17,
 	} ;
 	
 	enum
@@ -113,12 +120,14 @@ public:
 	
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 	
-	bool IsPlayer  (void) const { return (m_EntityType == etPlayer); }
-	bool IsPickup  (void) const { return (m_EntityType == etPickup); }
-	bool IsMob     (void) const { return (m_EntityType == etMob); }
-	bool IsMinecart(void) const { return (m_EntityType == etMinecart); }
-	bool IsBoat    (void) const { return (m_EntityType == etBoat); }
-	bool IsTNT     (void) const { return (m_EntityType == etTNT); }
+	bool IsPlayer      (void) const { return (m_EntityType == etPlayer); }
+	bool IsPickup      (void) const { return (m_EntityType == etPickup); }
+	bool IsMob         (void) const { return (m_EntityType == etMonster); }
+	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
+	bool IsMinecart    (void) const { return (m_EntityType == etMinecart); }
+	bool IsBoat        (void) const { return (m_EntityType == etBoat); }
+	bool IsTNT         (void) const { return (m_EntityType == etTNT); }
+	bool IsProjectile  (void) const { return (m_EntityType == etProjectile); }
 	
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;
@@ -324,12 +333,13 @@ public:
 	
 	// tolua_begin
 	
-	// Metadata flags; descendants may override the defaults:
+	// COMMON metadata flags; descendants may override the defaults:
 	virtual bool IsOnFire   (void) const {return (m_TicksLeftBurning > 0); }
 	virtual bool IsCrouched (void) const {return false; }
 	virtual bool IsRiding   (void) const {return false; }
 	virtual bool IsSprinting(void) const {return false; }
 	virtual bool IsRclking  (void) const {return false; }
+	virtual bool IsInvisible(void) const {return false; }
 	
 	// tolua_end
 	

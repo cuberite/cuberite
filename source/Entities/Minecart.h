@@ -50,16 +50,19 @@ public:
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
-	void HandleRailPhysics(float a_Dt, cChunk & a_Chunk);
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
-
 	
+	int LastDamage(void) const { return m_LastDamage; }
+	void HandleRailPhysics(float a_Dt, cChunk & a_Chunk);
 	ePayload GetPayload(void) const { return m_Payload; }
 	
 protected:
 	ePayload m_Payload;
 	
 	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
+
+	int m_LastDamage;
+
 } ;
 
 
@@ -127,6 +130,12 @@ public:
 	
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
+	bool IsFueled (void) const { return m_IsFueled; }
+
+private:
+
+	bool m_IsFueled;
+
 } ;
 
 

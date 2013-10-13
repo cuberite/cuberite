@@ -18,6 +18,8 @@ public:
 	CLASS_PROTODEF(cGhast);
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+
+	bool IsCharging(void) const {return false; }
 } ;
 
 

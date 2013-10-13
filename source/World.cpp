@@ -2591,40 +2591,57 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType)
 {
 	cMonster * Monster = NULL;
+	
+	int SlSize = GetTickRandomNumber(2) + 1;  // 1 .. 3 - Slime
+	int ShColor = GetTickRandomNumber(15); // 0 .. 15 - Sheep
+	bool SkType = GetDimension() == biNether; // Skeleton
 
-	int Size = GetTickRandomNumber(2) + 1;  // 1 .. 3
+	int VilType = GetTickRandomNumber(cVillager::vtMax); // 0 .. 6 - Villager
+	if (VilType == 6) { VilType = 0; } // Give farmers a better chance of spawning
+
+	int HseType = GetTickRandomNumber(7); // 0 .. 7 - Horse Type (donkey, zombie, etc.)
+	int HseColor = GetTickRandomNumber(6); // 0 .. 6 - Horse
+	int HseStyle = GetTickRandomNumber(4); // 0 .. 4 - Horse
+	int HseTameTimes = GetTickRandomNumber(6) + 1; // 1 .. 7 - Horse tame amount
+	if ((HseType == 5) || (HseType == 6) || (HseType == 7)) { HseType = 0; } // 5,6,7 = 0 because little chance of getting 0 with TickRand
 	
 	switch (a_MonsterType)
 	{
-		case cMonster::mtBat:          Monster = new cBat();           break;
-		case cMonster::mtBlaze:        Monster = new cBlaze();         break;
-		case cMonster::mtCaveSpider:   Monster = new cCavespider();    break;
-		case cMonster::mtChicken:      Monster = new cChicken();       break;
-		case cMonster::mtCow:          Monster = new cCow();           break;
-		case cMonster::mtCreeper:      Monster = new cCreeper();       break;
-		case cMonster::mtEnderman:     Monster = new cEnderman();      break;
-		case cMonster::mtEnderDragon:  Monster = new cEnderDragon();   break;
-		case cMonster::mtGhast:        Monster = new cGhast();         break;
-		case cMonster::mtGiant:        Monster = new cGiant();         break;
-		case cMonster::mtHorse:        Monster = new cHorse();         break;
-		case cMonster::mtIronGolem:    Monster = new cIronGolem();     break;
-		case cMonster::mtMagmaCube:    Monster = new cMagmaCube(Size); break;
-		case cMonster::mtMooshroom:    Monster = new cMooshroom();     break;
-		case cMonster::mtOcelot:       Monster = new cOcelot();        break;
-		case cMonster::mtPig:          Monster = new cPig();           break;
-		case cMonster::mtSheep:        Monster = new cSheep();         break;
-		case cMonster::mtSilverfish:   Monster = new cSilverfish();    break;
-		case cMonster::mtSkeleton:     Monster = new cSkeleton();      break;
-		case cMonster::mtSlime:        Monster = new cSlime(Size);     break;
-		case cMonster::mtSnowGolem:    Monster = new cSnowGolem();     break;
-		case cMonster::mtSpider:       Monster = new cSpider();        break;
-		case cMonster::mtSquid:        Monster = new cSquid();         break;
-		case cMonster::mtVillager:     Monster = new cVillager();      break;
-		case cMonster::mtWitch:        Monster = new cWitch();         break;
-		case cMonster::mtWither:       Monster = new cWither();        break;
-		case cMonster::mtWolf:         Monster = new cWolf();          break;
-		case cMonster::mtZombie:       Monster = new cZombie();        break;
-		case cMonster::mtZombiePigman: Monster = new cZombiePigman();  break;
+		case cMonster::mtBat:          Monster = new cBat();             break;
+		case cMonster::mtBlaze:        Monster = new cBlaze();           break;
+		case cMonster::mtCaveSpider:   Monster = new cCavespider();      break;
+		case cMonster::mtChicken:      Monster = new cChicken();         break;
+		case cMonster::mtCow:          Monster = new cCow();             break;
+		case cMonster::mtCreeper:      Monster = new cCreeper();         break;
+		case cMonster::mtEnderman:     Monster = new cEnderman();        break;
+		case cMonster::mtEnderDragon:  Monster = new cEnderDragon();     break;
+		case cMonster::mtGhast:        Monster = new cGhast();           break;
+		case cMonster::mtGiant:        Monster = new cGiant();           break;
+		case cMonster::mtHorse:
+		{
+			Monster = new cHorse(HseType, HseColor, HseStyle, HseTameTimes); break;
+		}
+		case cMonster::mtIronGolem:    Monster = new cIronGolem();       break;
+		case cMonster::mtMagmaCube:    Monster = new cMagmaCube(SlSize); break;
+		case cMonster::mtMooshroom:    Monster = new cMooshroom();       break;
+		case cMonster::mtOcelot:       Monster = new cOcelot();          break;
+		case cMonster::mtPig:          Monster = new cPig();             break;
+		case cMonster::mtSheep:        Monster = new cSheep(ShColor);    break;
+		case cMonster::mtSilverfish:   Monster = new cSilverfish();      break;
+		case cMonster::mtSkeleton:     Monster = new cSkeleton(SkType);  break;
+		case cMonster::mtSlime:        Monster = new cSlime(SlSize);     break;
+		case cMonster::mtSnowGolem:    Monster = new cSnowGolem();       break;
+		case cMonster::mtSpider:       Monster = new cSpider();          break;
+		case cMonster::mtSquid:        Monster = new cSquid();           break;
+		case cMonster::mtVillager:
+		{
+			Monster = new cVillager((cVillager::eVillagerType)VilType);  break;
+		}
+		case cMonster::mtWitch:        Monster = new cWitch();           break;
+		case cMonster::mtWither:       Monster = new cWither();          break;
+		case cMonster::mtWolf:         Monster = new cWolf();            break;
+		case cMonster::mtZombie:       Monster = new cZombie(false);     break; // TODO: Villager infection
+		case cMonster::mtZombiePigman: Monster = new cZombiePigman();    break;
 		
 		default:
 		{
@@ -2644,7 +2661,11 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 		delete Monster;
 		return -1;
 	}
+
 	BroadcastSpawnEntity(*Monster);
+	// Because it's logical that ALL mob spawns need spawn effects, not just spawners
+	BroadcastSoundParticleEffect(2004, (int)(floor(a_PosX) * 8), (int)(floor(a_PosY) * 8), (int)(floor(a_PosZ) * 8), 0);
+
 	cPluginManager::Get()->CallHookSpawnedMonster(*this, *Monster);
 	return Monster->GetUniqueID();
 }

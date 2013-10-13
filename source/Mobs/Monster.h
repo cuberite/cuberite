@@ -113,6 +113,11 @@ public:
 	
 	/// Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick
 	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
+
+	// Overridables to handle ageable mobs
+	virtual bool IsBaby    (void) const { return false; }
+	virtual bool IsTame    (void) const { return false; }
+	virtual bool IsSitting (void) const { return false; }
 	
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
 	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
@@ -147,6 +152,7 @@ protected:
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
 	
 	void HandleDaylightBurning(cChunk & a_Chunk);
+
 } ; // tolua_export
 
 

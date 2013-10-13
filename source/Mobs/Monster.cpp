@@ -24,7 +24,7 @@
 
 
 cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
-	: super(etMob, a_Width, a_Height)
+	: super(etMonster, a_Width, a_Height)
 	, m_Target(NULL)
 	, m_AttackRate(3)
 	, idle_interval(0)
