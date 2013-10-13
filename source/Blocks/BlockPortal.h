@@ -41,6 +41,11 @@ public:
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
+		if ((a_RelY - 1 < 0) || (a_RelY + 1 > cChunkDef::Height))
+		{
+			return false; // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
+		}
+
 		switch (a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ))
 		{
 			case 0x1:
