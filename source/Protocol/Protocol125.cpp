@@ -1695,18 +1695,17 @@ void cProtocol125::WriteEntityMetadata(const cEntity & a_Entity)
 		WriteByte(0x73);
 		WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
 		
-		if (a_Entity.IsA("cMinecartWithFurnace"))
+		if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
 		{
 			WriteByte(0x10);
 			WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0); // Fueled?
 		}
 	}
-	else if (a_Entity.IsA("cArrowEntity"));
+	else if ((a_Entity.IsProjectile() && ((cProjectileEntity &)a_Entity).GetProjectileKind() == cProjectileEntity::pkArrow));
 	{
 		WriteByte(0x10);
 		WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0); // Critical hitting arrow?
 	}
-
 }
 
 

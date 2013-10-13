@@ -102,13 +102,6 @@ public:
 		etBoat,
 		etTNT,
 		etProjectile,
-		
-		// DEPRECATED older constants, left over for compatibility reasons (plugins)
-		etMob = etMonster,  // DEPRECATED, use etMonster instead!
-		eEntityType_Entity = etEntity,
-		eEntityType_Player = etPlayer,
-		eEntityType_Pickup = etPickup,
-		eEntityType_Mob    = etMob,
 	} ;
 	
 	// tolua_end
@@ -123,12 +116,14 @@ public:
 	
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 	
-	bool IsPlayer  (void) const { return (m_EntityType == etPlayer); }
-	bool IsPickup  (void) const { return (m_EntityType == etPickup); }
-	bool IsMob     (void) const { return (m_EntityType == etMob); }
-	bool IsMinecart(void) const { return (m_EntityType == etMinecart); }
-	bool IsBoat    (void) const { return (m_EntityType == etBoat); }
-	bool IsTNT     (void) const { return (m_EntityType == etTNT); }
+	bool IsPlayer      (void) const { return (m_EntityType == etPlayer); }
+	bool IsPickup      (void) const { return (m_EntityType == etPickup); }
+	bool IsMob         (void) const { return (m_EntityType == etMonster); }
+	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
+	bool IsMinecart    (void) const { return (m_EntityType == etMinecart); }
+	bool IsBoat        (void) const { return (m_EntityType == etBoat); }
+	bool IsTNT         (void) const { return (m_EntityType == etTNT); }
+	bool IsProjectile  (void) const { return (m_EntityType == etProjectile); }
 	
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;

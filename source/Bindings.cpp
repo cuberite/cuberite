@@ -29494,11 +29494,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"etBoat",cEntity::etBoat);
    tolua_constant(tolua_S,"etTNT",cEntity::etTNT);
    tolua_constant(tolua_S,"etProjectile",cEntity::etProjectile);
-   tolua_constant(tolua_S,"etMob",cEntity::etMob);
-   tolua_constant(tolua_S,"eEntityType_Entity",cEntity::eEntityType_Entity);
-   tolua_constant(tolua_S,"eEntityType_Player",cEntity::eEntityType_Player);
-   tolua_constant(tolua_S,"eEntityType_Pickup",cEntity::eEntityType_Pickup);
-   tolua_constant(tolua_S,"eEntityType_Mob",cEntity::eEntityType_Mob);
    tolua_function(tolua_S,"GetEntityType",tolua_AllToLua_cEntity_GetEntityType00);
    tolua_function(tolua_S,"IsPlayer",tolua_AllToLua_cEntity_IsPlayer00);
    tolua_function(tolua_S,"IsPickup",tolua_AllToLua_cEntity_IsPickup00);

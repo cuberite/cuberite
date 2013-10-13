@@ -2576,7 +2576,7 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	int ShColor = GetTickRandomNumber(15); // 0 .. 15 - Sheep
 	bool SkType = GetDimension() == biNether; // Skeleton
 
-	int VilType = GetTickRandomNumber(6); // 0 .. 5 - Villager
+	int VilType = GetTickRandomNumber(cVillager::vtMax); // 0 .. 6 - Villager
 	if (VilType == 6) { VilType = 0; } // Give farmers a better chance of spawning
 
 	int HseType = GetTickRandomNumber(7); // 0 .. 7 - Horse Type (donkey, zombie, etc.)
