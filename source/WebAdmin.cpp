@@ -79,8 +79,14 @@ bool cWebAdmin::Init(void)
 		return false;
 	}
 	
-	AString PortsIPv4 = m_IniFile.GetValue("WebAdmin", "Port", "8080");
-	AString PortsIPv6 = m_IniFile.GetValue("WebAdmin", "PortsIPv6", "");
+	if (!m_IniFile.GetValueSetB("WebAdmin", "Enabled", true))
+	{
+		// WebAdmin is disabled, bail out faking a success
+		return true;
+	}
+	
+	AString PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
+	AString PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");
 	
 	if (!m_HTTPServer.Initialize(PortsIPv4, PortsIPv6))
 	{
