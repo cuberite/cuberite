@@ -180,7 +180,12 @@ function DumpAPIHtml()
 	
 	-- Extract hook constants:
 	for name, obj in pairs(cPluginManager) do
-		if (type(obj) == "number") and (name:match("HOOK_.*")) then
+		if (
+			(type(obj) == "number") and
+			name:match("HOOK_.*") and
+			(name ~= "HOOK_MAX") and
+			(name ~= "HOOK_NUM_HOOKS")
+		) then
 			table.insert(Hooks, { Name = name });
 		end
 	end
