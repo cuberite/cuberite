@@ -546,7 +546,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			Desc = [[
 				This class is used to represent a crafting recipe, either a built-in one, or one created dynamically in a plugin. It is used only as a parameter for {{OnCraftingNoRecipe|OnCraftingNoRecipe}}, {{OnPostCrafting|OnPostCrafting}} and {{OnPreCrafting|OnPreCrafting}} hooks. Plugins may use it to inspect or modify a crafting recipe that a player views in their crafting window, either at a crafting table or the survival inventory screen.
 </p>
-		<p>Internally, the class contains a {{cItem|cItem}} for the result.
+		<p>Internally, the class contains a {{cCraftingGrid}} for the ingredients and a {{cItem}} for the result.
 ]],
 			Functions =
 			{
