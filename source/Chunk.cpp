@@ -30,6 +30,9 @@
 #include "PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Simulator/FluidSimulator.h"
+#include "MobCensus.h"
+#include "MobSpawner.h"
+
 
 #include <json/json.h>
 
@@ -429,6 +432,133 @@ void cChunk::Stay(bool a_Stay)
 
 
 
+void cChunk::CollectMobCensus(cMobCensus& toFill)
+{
+	toFill.CollectSpawnableChunk(*this);
+	std::list<const Vector3d*> playerPositions;
+	cPlayer* currentPlayer;
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+	{
+		currentPlayer = (*itr)->GetPlayer();
+		playerPositions.push_back(&(currentPlayer->GetPosition()));
+	} 
+
+	Vector3d currentPosition;
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	{
+		//LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+		if ((*itr)->IsMob())
+		{
+			cMonster& Monster = (cMonster&)(**itr);
+			currentPosition = Monster.GetPosition();
+			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); itr2 ++)
+			{
+				toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
+			}
+		}
+	}  // for itr - m_Entitites[]
+}
+
+
+
+
+void cChunk::getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ)
+{
+	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
+	int Random = m_World->GetTickRandomNumber(0x00ffffff);
+	a_X =   Random % (a_MaxX * 2);
+	a_Y =  (Random / (a_MaxX * 2)) % (a_MaxY * 2);
+	a_Z = ((Random / (a_MaxX * 2)) / (a_MaxY * 2)) % (a_MaxZ * 2);
+	a_X /= 2;
+	a_Y /= 2;
+	a_Z /= 2;
+}
+
+
+
+
+
+void cChunk::getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z)
+{
+	// MG TODO : check if this kind of optimization (only one random call) is still needed
+	// MG TODO : if so propagate it
+
+	getThreeRandomNumber(a_X, a_Y, a_Z, Width, Height-2, Width);
+	a_Y++;
+}
+
+
+
+
+
+void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
+{
+	int Center_X,Center_Y,Center_Z;
+	getRandomBlockCoords(Center_X,Center_Y,Center_Z);
+
+	BLOCKTYPE PackCenterBlock = GetBlock(Center_X, Center_Y, Center_Z);
+	if (a_MobSpawner.CheckPackCenter(PackCenterBlock))
+	{
+		a_MobSpawner.NewPack();
+		int NumberOfTries = 0;
+		int NumberOfSuccess = 0;
+		int MaxNbOfSuccess = 4; // this can be changed during the process for Wolves and Ghass
+		while (NumberOfTries < 12 && NumberOfSuccess < MaxNbOfSuccess)
+		{
+			const int HorizontalRange = 20; // MG TODO : relocate
+			const int VerticalRange = 0; // MG TODO : relocate
+			int Try_X, Try_Y, Try_Z;
+			getThreeRandomNumber(Try_X, Try_Y, Try_Z, 2*HorizontalRange+1 , 2*VerticalRange+1 , 2*HorizontalRange+1);
+			Try_X -= HorizontalRange;
+			Try_Y -= VerticalRange;
+			Try_Z -= HorizontalRange;
+			Try_X += Center_X;
+			Try_Y += Center_Y;
+			Try_Z += Center_Z;
+
+			ASSERT(Try_Y > 0);
+			ASSERT(Try_Y < cChunkDef::Height-1);
+			
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+			BLOCKTYPE BlockType_below;
+			NIBBLETYPE BlockMeta_below;
+			BLOCKTYPE BlockType_above;
+			NIBBLETYPE BlockMeta_above;
+			if (UnboundedRelGetBlock(Try_X, Try_Y  , Try_Z, BlockType, BlockMeta) &&
+				UnboundedRelGetBlock(Try_X, Try_Y-1, Try_Z, BlockType_below, BlockMeta_below)&&
+				UnboundedRelGetBlock(Try_X, Try_Y+1, Try_Z, BlockType_above, BlockMeta_above)
+				)
+			{
+				EMCSBiome Biome = m_ChunkMap->GetBiomeAt (Try_X, Try_Z);
+				// MG TODO :
+				// Moon cycle (for slime)
+				// check player and playerspawn presence < 24 blocks
+				// check mobs presence on the block
+
+				// MG TODO: fix the "light" thing, I'm pretty sure that UnboundedRelGetBlock s not returning the right thing
+
+				// MG TODO : check that "Level" really means Y
+				cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, Biome, Try_Y, MaxNbOfSuccess);
+				if (newMob)
+				{
+					int WorldX, WorldY, WorldZ;
+					PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
+					newMob->SetPosition(WorldX, WorldY, WorldZ);
+					LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
+					NumberOfSuccess++;
+				}
+			}
+			
+			NumberOfTries++;
+		}
+	}
+
+}
+
+
+
+
 
 void cChunk::Tick(float a_Dt)
 {
@@ -457,10 +587,14 @@ void cChunk::Tick(float a_Dt)
 		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
 	}
 	
-	// Tick all entities in this chunk:
+	// Tick all entities in this chunk (except mobs):
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		(*itr)->Tick(a_Dt, *this);
+		// Mobs are tickes inside MobTick (as we don't have to tick them if they are far away from players)
+		if (!((*itr)->IsMob()))
+		{
+			(*itr)->Tick(a_Dt, *this);
+		}
 	}  // for itr - m_Entitites[]
 	
 	// Remove all entities that were scheduled for removal:

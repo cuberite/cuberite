@@ -19,6 +19,7 @@ public:
 
 	/// When hit by someone, run away
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+
 } ;
 
 

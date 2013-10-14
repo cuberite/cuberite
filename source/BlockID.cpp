@@ -663,6 +663,7 @@ public:
 		g_BlockTransparent[E_BLOCK_GLASS_PANE]            = true;
 		g_BlockTransparent[E_BLOCK_ICE]                   = true;
 		g_BlockTransparent[E_BLOCK_IRON_DOOR]             = true;
+		g_BlockTransparent[E_BLOCK_LAVA]                  = true;
 		g_BlockTransparent[E_BLOCK_LEAVES]                = true;
 		g_BlockTransparent[E_BLOCK_LEVER]                 = true;
 		g_BlockTransparent[E_BLOCK_MELON_STEM]            = true;
@@ -675,11 +676,14 @@ public:
 		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]          = true;
 		g_BlockTransparent[E_BLOCK_RED_ROSE]              = true;
 		g_BlockTransparent[E_BLOCK_SIGN_POST]             = true;
+		g_BlockTransparent[E_BLOCK_STATIONARY_LAVA]       = true;
+		g_BlockTransparent[E_BLOCK_STATIONARY_WATER]      = true;
 		g_BlockTransparent[E_BLOCK_STONE_PRESSURE_PLATE]  = true;
 		g_BlockTransparent[E_BLOCK_SNOW]                  = true;
 		g_BlockTransparent[E_BLOCK_TALL_GRASS]            = true;
 		g_BlockTransparent[E_BLOCK_TORCH]                 = true;
 		g_BlockTransparent[E_BLOCK_VINES]                 = true;
+		g_BlockTransparent[E_BLOCK_WATER]                 = true;
 		g_BlockTransparent[E_BLOCK_WALLSIGN]              = true;
 		g_BlockTransparent[E_BLOCK_WOODEN_DOOR]           = true;
 		g_BlockTransparent[E_BLOCK_WOODEN_PRESSURE_PLATE] = true;

@@ -12,3 +12,23 @@ cloc.xsl
 *.suo
 /EveryNight.cmd
 *.sublime-*
+
+# emacs stuff
+*.*~
+
+# world inside source
+ChunkWorx.ini
+groups.ini
+items.ini
+monsters.ini
+settings.ini
+terrain.ini
+users.ini
+webadmin.ini
+world.ini
+crafting.txt
+motd.txt
+logs
+players
+world
+world_nether

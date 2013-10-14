@@ -20,6 +20,7 @@ public:
 	CLASS_PROTODEF(cSquid);
 	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+
 } ;
 
 
