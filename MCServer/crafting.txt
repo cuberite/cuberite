@@ -1,3 +1,4 @@
+
 # This file describes the crafting recipes that MCServer knows.
 # The syntax is as follows:
 #   <Line> = <Recipe>#<Comment>
