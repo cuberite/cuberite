@@ -18,7 +18,7 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to 0
-		a_Pickups.push_back(cItem(m_BlockType == E_BLOCK_WOODEN_BUTTON ? E_BLOCK_WOODEN_BUTTON : E_BLOCK_STONE_BUTTON, 1, 0));
+		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
 
