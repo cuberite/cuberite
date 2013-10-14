@@ -327,7 +327,7 @@ function DumpAPIHtml()
 				f:write("\t\t" .. hook .. " =\n\t\t{\n");
 				f:write("\t\t\tCalledWhen = \"\",\n");
 				f:write("\t\t\tDefaultFnName = \"On\",  -- also used as pagename\n");
-				f:write("\t\t\tDesc = [[]],\n");
+				f:write("\t\t\tDesc = [[\n\t\t\t\t\n\t\t\t]],\n");
 				f:write("\t\t\tParams =\n\t\t\t{\n");
 				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
 				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
@@ -338,7 +338,7 @@ function DumpAPIHtml()
 				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
 				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
 				f:write("\t\t\t},\n");
-				f:write("\t\t\tReturns = [[]],\n");
+				f:write("\t\t\tReturns = [[\n\t\t\t\t\n\t\t\t]],\n");
 				f:write("\t\t},  -- " .. hook .. "\n");
 			end
 		end
