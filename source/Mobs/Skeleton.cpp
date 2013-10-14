@@ -8,8 +8,9 @@
 
 
 
-cSkeleton::cSkeleton(void) :
-	super("Skeleton", 51, "mob.skeleton.hurt", "mob.skeleton.death", 0.6, 1.8)
+cSkeleton::cSkeleton(bool IsWither) :
+	super("Skeleton", 51, "mob.skeleton.hurt", "mob.skeleton.death", 0.6, 1.8),
+	m_bIsWither(IsWither)
 {
 	SetBurnsInDaylight(true);
 }

@@ -546,7 +546,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			Desc = [[
 				This class is used to represent a crafting recipe, either a built-in one, or one created dynamically in a plugin. It is used only as a parameter for {{OnCraftingNoRecipe|OnCraftingNoRecipe}}, {{OnPostCrafting|OnPostCrafting}} and {{OnPreCrafting|OnPreCrafting}} hooks. Plugins may use it to inspect or modify a crafting recipe that a player views in their crafting window, either at a crafting table or the survival inventory screen.
 </p>
-		<p>Internally, the class contains a {{cItem|cItem}} for the result.
+		<p>Internally, the class contains a {{cCraftingGrid}} for the ingredients and a {{cItem}} for the result.
 ]],
 			Functions =
 			{
@@ -2136,6 +2136,381 @@ end;
 				the second value is not provided, the original message is used.
 			]],
 		},  -- HOOK_CHAT
+
+		HOOK_CHUNK_AVAILABLE =
+		{
+			CalledWhen = "A chunk has just been added to world, either generated or loaded. ",
+			DefaultFnName = "OnChunkAvailable",  -- also used as pagename
+			Desc = [[
+				This hook is called after a chunk is either generated or loaded from the disk. The chunk is
+				already available for manipulation using the {{cWorld}} API. This is a notification-only callback,
+				there is no behavior that plugins could override.
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world to which the chunk belongs" },
+				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
+				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
+			},
+			Returns = [[
+				If the function returns false or no value, the next plugin's callback is called. If the function
+				returns true, no other callback is called for this event.
+			]],
+		},  -- HOOK_CHUNK_AVAILABLE
+
+		HOOK_CHUNK_GENERATED =
+		{
+			CalledWhen = "After a chunk was generated. Notification only.",
+			DefaultFnName = "OnChunkGenerated",  -- also used as pagename
+			Desc = [[
+				This hook is called when world generator finished its work on a chunk. The chunk data has already
+				been generated and is about to be stored in the {{cWorld|world}}. A plugin may provide some
+				last-minute finishing touches to the generated data. Note that the chunk is not yet stored in the
+				world, so regular {{cWorld}} block API will not work! Instead, use the {{cChunkDesc}} object
+				received as the parameter.</p>
+				<p>
+				See also the {{OnChunkGenerating|HOOK_CHUNK_GENERATING}} hook.
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world to which the chunk will be added" },
+				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
+				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
+				{ Name = "ChunkDesc", Type = "{{cChunkDesc}}", Notes = "Generated chunk data. Plugins may still modify the chunk data contained." },
+			},
+			Returns = [[
+				If the plugin returns false or no value, MCServer will call other plugins' callbacks for this event.
+				If a plugin returns true, no other callback is called for this event.</p>
+				<p>
+				In either case, MCServer will then store the data from ChunkDesc as the chunk's contents in the world.
+			]],
+			CodeExamples =
+			{
+				{
+					Title = "Generate emerald ore",
+					Desc = "This example callback function generates one block of emerald ore in each chunk, under the condition that the randomly chosen location is in an ExtremeHills biome.",
+					Code = [[
+function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
+	-- Generate a psaudorandom value that is always the same for the same X/Z pair, but is otherwise random enough:
+	-- This is actually similar to how MCServer does its noise functions
+	local PseudoRandom = (a_ChunkX * 57 + a_ChunkZ) * 57 + 19785486
+	PseudoRandom = PseudoRandom * 8192 + PseudoRandom;
+	PseudoRandom = ((PseudoRandom * (PseudoRandom * PseudoRandom * 15731 + 789221) + 1376312589) % 0x7fffffff;
+	PseudoRandom = PseudoRandom / 7;
+	
+	-- Based on the PseudoRandom value, choose a location for the ore:
+	local OreX = PseudoRandom % 16;
+	local OreY = 2 + ((PseudoRandom / 16) % 20);
+	local OreZ = (PseudoRandom / 320) % 16;
+	
+	-- Check if the location is in ExtremeHills:
+	if (a_ChunkDesc:GetBiome(OreX, OreZ) ~= biExtremeHills) then
+		return false;
+	end
+	
+	-- Only replace allowed blocks with the ore:
+	local CurrBlock = a_ChunDesc:GetBlockType(OreX, OreY, OreZ);
+	if (
+		(CurrBlock == E_BLOCK_STONE) or
+		(CurrBlock == E_BLOCK_DIRT) or
+		(CurrBlock == E_BLOCK_GRAVEL)
+	) then
+		a_ChunkDesc:SetBlockTypeMeta(OreX, OreY, OreZ, E_BLOCK_EMERALD_ORE, 0);
+	end
+end;
+					]],
+				},
+			} ,  -- CodeExamples
+		},  -- HOOK_CHUNK_GENERATED
+
+		HOOK_CHUNK_GENERATING =
+		{
+			CalledWhen = "A chunk is about to be generated. Plugin can override the built-in generator.",
+			DefaultFnName = "OnChunkGenerating",  -- also used as pagename
+			Desc = [[
+				This hook is called before the world generator starts generating a chunk. The plugin may provide
+				some or all parts of the generation, by-passing the built-in generator. The function is given access
+				to the {{cChunkDesc|ChunkDesc}} object representing the contents of the chunk. It may override parts
+				of the built-in generator by using the object's <i>SetUseDefaultXXX(false)</i> functions. After all
+				the callbacks for a chunk have been processed, the server will generate the chunk based on the
+				{{cChunkDesc|ChunkDesc}} description - those parts that are set for generating (by default
+				everything) are generated, the rest are read from the ChunkDesc object.</p>
+				<p>
+				See also the {{OnChunkGenerated|HOOK_CHUNK_GENERATED}} hook.
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world to which the chunk will be added" },
+				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
+				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
+				{ Name = "ChunkDesc", Type = "{{cChunkDesc}}", Notes = "Generated chunk data." },
+			},
+			Returns = [[
+				If this function returns true, the server will not call any other plugin with the same chunk. If
+				this function returns false, the server will call the rest of the plugins with the same chunk,
+				possibly overwriting the ChunkDesc's contents.
+			]],
+		},  -- HOOK_CHUNK_GENERATING
+
+		HOOK_CHUNK_UNLOADED =
+		{
+			CalledWhen = "A chunk has been unloaded from the memory.",
+			DefaultFnName = "OnChunkUnloaded",  -- also used as pagename
+			Desc = [[
+				This hook is called when a chunk is unloaded from the memory. Though technically still in memory,
+				the plugin should behave as if the chunk was already not present. In particular, {{cWorld}} block
+				API should not be used in the area of the specified chunk.
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world from which the chunk is unloading" },
+				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
+				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
+			},
+			Returns = [[
+				If the function returns false or no value, the next plugin's callback is called. If the function
+				returns true, no other callback is called for this event. There is no behavior that plugins could
+				override.
+			]],
+		},  -- HOOK_CHUNK_UNLOADED
+
+		HOOK_CHUNK_UNLOADING =
+		{
+			CalledWhen = " 	A chunk is about to be unloaded from the memory. Plugins may refuse the unload.",
+			DefaultFnName = "OnChunkUnloading",  -- also used as pagename
+			Desc = [[
+				MCServer calls this function when a chunk is about to be unloaded from the memory. A plugin may
+				force MCServer to keep the chunk in memory by returning true.</p>
+				<p>
+				FIXME: The return value should be used only for event propagation stopping, not for the actual
+				decision whether to unload.
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world from which the chunk is unloading" },
+				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
+				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
+			},
+			Returns = [[
+				If the function returns false or no value, the next plugin's callback is called and finally MCServer
+				unloads the chunk. If the function returns true, no other callback is called for this event and the
+				chunk is left in the memory.
+			]],
+		},  -- HOOK_CHUNK_UNLOADING
+
+		HOOK_COLLECTING_PICKUP =
+		{
+			CalledWhen = "Player is about to collect a pickup. Plugin can refuse / override behavior. ",
+			DefaultFnName = "OnCollectingPickup",  -- also used as pagename
+			Desc = [[
+				This hook is called when a player is about to collect a pickup. Plugins may refuse the action.</p>
+				<p>
+				Pickup collection happens within the world tick, so if the collecting is refused, it will be tried
+				again in the next world tick, as long as the player is within reach of the pickup.</p>
+				<p>
+				FIXME: There is no OnCollectedPickup() callback.</p>
+				<p>
+				FIXME: This callback is called even if the pickup doesn't fit into the player's inventory.</p>
+			]],
+			Params =
+			{
+				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who's collecting the pickup" },
+				{ Name = "Pickup", Type = "{{cPickup}}", Notes = "The pickup being collected" },
+			},
+			Returns = [[
+				If the function returns false or no value, MCServer calls other plugins' callbacks and finally the
+				pickup is collected. If the function returns true, no other plugins are called for this event and
+				the pickup is not collected.
+			]],
+		},  -- HOOK_COLLECTING_PICKUP
+
+		HOOK_CRAFTING_NO_RECIPE =
+		{
+			CalledWhen = " 	No built-in crafting recipe is found. Plugin may provide a recipe.",
+			DefaultFnName = "OnCraftingNoRecipe",  -- also used as pagename
+			Desc = [[
+				This callback is called when a player places items in their {{cCraftingGrid|crafting grid}} and
+				MCServer cannot find a built-in {{cCraftingRecipe|recipe}} for the combination. Plugins may provide
+				a recipe for the ingredients given.
+			]],
+			Params =
+			{
+				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player whose crafting is reported in this hook" },
+				{ Name = "Grid", Type = "{{cCraftingGrid}}", Notes = "Contents of the player's crafting grid" },
+				{ Name = "Recipe", Type = "{{cCraftingRecipe}}", Notes = "The recipe that will be used (can be filled by plugins)" },
+			},
+			Returns = [[
+				If the function returns false or no value, no recipe will be used. If the function returns true, no
+				other plugin will have their callback called for this event and MCServer will use the crafting
+				recipe in Recipe.</p>
+				<p>
+				FIXME: To allow plugins give suggestions and overwrite other plugins' suggestions, we should change
+				the behavior with returning false, so that the recipe will still be used, but fill the recipe with
+				empty values by default.
+			]],
+		},  -- HOOK_CRAFTING_NO_RECIPE
+
+		HOOK_DISCONNECT =
+		{
+			CalledWhen = "A player has explicitly disconnected.",
+			DefaultFnName = "OnDisconnect",  -- also used as pagename
+			Desc = [[
+				This hook is called when a client sends the disconnect packet and is about to be disconnected from
+				the server.</p>
+				<p>
+				Note that this callback is not called if the client drops the connection or is kicked by the
+				server.</p>
+				<p>
+				FIXME: There is no callback for "client destroying" that would be called in all circumstances.</p>
+			]],
+			Params =
+			{
+				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has disconnected" },
+				{ Name = "Reason", Type = "string", Notes = "The reason that the client has sent in the disconnect packet" },
+			},
+			Returns = [[
+				If the function returns false or no value, MCServer calls other plugins' callbacks for this event
+				and finally broadcasts a disconnect message to the player's world. If the function returns true, no
+				other plugins are called for this event and the disconnect message is not broadcast. In either case,
+				the player is disconnected.
+			]],
+		},  -- HOOK_DISCONNECT
+
+		HOOK_EXECUTE_COMMAND =
+		{
+			CalledWhen = "A player executes an in-game command, or the admin issues a console command. Note that built-in console commands are exempt to this hook - they are always performed and the hook is not called.",
+			DefaultFnName = "OnExecuteCommand",  -- also used as pagename
+			Desc = [[
+				A plugin may implement a callback for this hook to intercept both in-game commands executed by the
+				players and console commands executed by the server admin. The function is called for every in-game
+				command sent from any player and for those server console commands that are not built in in the
+				server.</p>
+				<p>
+				If the command is in-game, the first parameter to the hook function is the {{cPlayer|player}} who's
+				executing the command. If the command comes from the server console, the first parameter is nil.
+			]],
+			Params =
+			{
+				{ Name = "Player", Type = "{{cPlayer}}", Notes = "For in-game commands, the player who has sent the message. For console commands, nil" },
+				{ Name = "Command", Type = "table of strings", Notes = "The command and its parameters, broken into a table by spaces" },
+			},
+			Returns = [[
+				If the plugin returns true, the command will be blocked and none of the remaining hook handlers will
+				be called. If the plugin returns false, MCServer calls all the remaining hook handlers and finally
+				the command will be executed.
+			]],
+		},  -- HOOK_EXECUTE_COMMAND
+
+		HOOK_EXPLODED =
+		{
+			CalledWhen = "An explosion has happened",
+			DefaultFnName = "OnExploded",  -- also used as pagename
+			Desc = [[
+				This hook is called after an explosion has been processed in a world.</p>
+				<p>
+				See also {{OnHookExploding|HOOK_EXPLODING}} for a similar hook called before the explosion.</p>
+				<p>
+				The explosion carries with it the type of its source - whether it's a creeper exploding, or TNT,
+				etc. It also carries the identification of the actual source. The exact type of the identification
+				depends on the source kind:
+				<table>
+				<tr><th>Source</th><th>SourceData Type</th><th>Notes</th></tr>
+				<tr><td>esPrimedTNT</td><td>{{cTNTEntity}}</td><td>An exploding primed TNT entity</td></tr>
+				<tr><td>esCreeper</td><td>{{cCreeper}}</td><td>An exploding creeper or charged creeper</td></tr>
+				<tr><td>esBed</td><td>{{Vector3i}}</td><td>A bed exploding in the Nether or in the End. The bed coords are given.</td></tr>
+				<tr><td>esEnderCrystal</td><td>{{Vector3i}}</td><td>An ender crystal exploding upon hit. The block coords are given.</td></tr>
+				<tr><td>esGhastFireball</td><td>{{cGhastFireballEntity}}</td><td>A ghast fireball hitting ground or an {{cEntity|entity}}.</td></tr>
+				<tr><td>esWitherSkullBlack</td><td><i>TBD</i></td><td>A black wither skull hitting ground or an {{cEntity|entity}}.</td></tr>
+				<tr><td>esWitherSkullBlue</td><td><i>TBD</i></td><td>A blue wither skull hitting ground or an {{cEntity|entity}}.</td></tr>
+				<tr><td>esWitherBirth</td><td><i>TBD</i></td><td>A wither boss being created</td></tr>
+				<tr><td>esOther</td><td><i>TBD</i></td><td>Any other previously unspecified type.</td></tr>
+				<tr><td>esPlugin</td><td>object</td><td>An explosion created by a plugin. The plugin may specify any kind of data.</td></tr>
+				</table></p>
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world where the explosion happened" },
+				{ Name = "ExplosionSize", Type = "number", Notes = "The relative explosion size" },
+				{ Name = "CanCauseFire", Type = "bool", Notes = "True if the explosion has turned random air blocks to fire (such as a ghast fireball)" },
+				{ Name = "X", Type = "number", Notes = "X-coord of the explosion center" },
+				{ Name = "Y", Type = "number", Notes = "Y-coord of the explosion center" },
+				{ Name = "Z", Type = "number", Notes = "Z-coord of the explosion center" },
+				{ Name = "Source", Type = "eExplosionSource", Notes = "Source of the explosion. See the table above." },
+				{ Name = "SourceData", Type = "varies", Notes = "Additional data for the source. The exact type varies by the source. See the table above." },
+			},
+			Returns = [[
+				If the function returns false or no value, the next plugin's callback is called. If the function
+				returns true, no other callback is called for this event. There is no overridable behaviour.
+			]],
+		},  -- HOOK_EXPLODED
+
+		HOOK_EXPLODING =
+		{
+			CalledWhen = "An explosion is about to be processed",
+			DefaultFnName = "OnExploding",  -- also used as pagename
+			Desc = [[
+				This hook is called before an explosion has been processed in a world.</p>
+				<p>
+				See also {{OnHookExploded|HOOK_EXPLODED}} for a similar hook called after the explosion.</p>
+				<p>
+				The explosion carries with it the type of its source - whether it's a creeper exploding, or TNT,
+				etc. It also carries the identification of the actual source. The exact type of the identification
+				depends on the source kind:
+				<table>
+				<tr><th>Source</th><th>SourceData Type</th><th>Notes</th></tr>
+				<tr><td>esPrimedTNT</td><td>{{cTNTEntity}}</td><td>An exploding primed TNT entity</td></tr>
+				<tr><td>esCreeper</td><td>{{cCreeper}}</td><td>An exploding creeper or charged creeper</td></tr>
+				<tr><td>esBed</td><td>{{Vector3i}}</td><td>A bed exploding in the Nether or in the End. The bed coords are given.</td></tr>
+				<tr><td>esEnderCrystal</td><td>{{Vector3i}}</td><td>An ender crystal exploding upon hit. The block coords are given.</td></tr>
+				<tr><td>esGhastFireball</td><td>{{cGhastFireballEntity}}</td><td>A ghast fireball hitting ground or an {{cEntity|entity}}.</td></tr>
+				<tr><td>esWitherSkullBlack</td><td><i>TBD</i></td><td>A black wither skull hitting ground or an {{cEntity|entity}}.</td></tr>
+				<tr><td>esWitherSkullBlue</td><td><i>TBD</i></td><td>A blue wither skull hitting ground or an {{cEntity|entity}}.</td></tr>
+				<tr><td>esWitherBirth</td><td><i>TBD</i></td><td>A wither boss being created</td></tr>
+				<tr><td>esOther</td><td><i>TBD</i></td><td>Any other previously unspecified type.</td></tr>
+				<tr><td>esPlugin</td><td>object</td><td>An explosion created by a plugin. The plugin may specify any kind of data.</td></tr>
+				</table></p>
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world where the explosion happens" },
+				{ Name = "ExplosionSize", Type = "number", Notes = "The relative explosion size" },
+				{ Name = "CanCauseFire", Type = "bool", Notes = "True if the explosion will turn random air blocks to fire (such as a ghast fireball)" },
+				{ Name = "X", Type = "number", Notes = "X-coord of the explosion center" },
+				{ Name = "Y", Type = "number", Notes = "Y-coord of the explosion center" },
+				{ Name = "Z", Type = "number", Notes = "Z-coord of the explosion center" },
+				{ Name = "Source", Type = "eExplosionSource", Notes = "Source of the explosion. See the table above." },
+				{ Name = "SourceData", Type = "varies", Notes = "Additional data for the source. The exact type varies by the source. See the table above." },
+			},
+			Returns = [[
+				If the function returns false or no value, the next plugin's callback is called, and finally
+				MCServer will process the explosion - destroy blocks and push + hurt entities. If the function
+				returns true, no other callback is called for this event and the explosion will not occur.
+			]],
+		},  -- HOOK_EXPLODING
+
+		HOOK_HANDSHAKE =
+		{
+			CalledWhen = "A client is connecting.",
+			DefaultFnName = "OnHandshake",  -- also used as pagename
+			Desc = [[
+				This hook is called when a client sends the Handshake packet. At this stage, only the client IP and
+				(unverified) username are known. Plugins may refuse access to the server based on this
+				information.</p>
+				<p>
+				Note that the username is not authenticated - the authentication takes place only after this hook is
+				processed.
+			]],
+			Params =
+			{
+				{ Name = "Client", Type = "{{cClientHandle}}", Notes = "The client handle representing the connection. Note that there's no {{cPlayer}} object for this client yet." },
+				{ Name = "UserName", Type = "string", Notes = "The username presented in the packet. Note that this username is unverified." },
+			},
+			Returns = [[
+				If the function returns false, the user is let in to the server. If the function returns true, no
+				other plugin's callback is called, the user is kicked and the connection is closed.
+			]],
+		},  -- HOOK_HANDSHAKE
+
 	},  -- Hooks[]
 	
 

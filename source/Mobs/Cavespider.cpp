@@ -9,8 +9,7 @@
 
 
 cCavespider::cCavespider(void) :
-	// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
-	super("Cavespider", 59, "mob.spider.say", "mob.spider.death", 0.9, 0.6)
+	super("Cavespider", 59, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
 {
 }
 

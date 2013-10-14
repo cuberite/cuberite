@@ -19,6 +19,7 @@ public:
 	CLASS_PROTODEF(cSlime);
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	int GetSize(void) const { return m_Size; }
 	
 protected:
 

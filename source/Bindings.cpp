@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/11/13 10:08:32.
+** Generated automatically by tolua++-1.0.92 on 10/13/13 18:01:21.
 */
 
 #ifndef __cplusplus
@@ -4998,6 +4998,38 @@ static int tolua_AllToLua_cEntity_IsMob00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsFallingBlock of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsFallingBlock00
+static int tolua_AllToLua_cEntity_IsFallingBlock00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsFallingBlock'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsFallingBlock();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsFallingBlock'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: IsMinecart of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsMinecart00
 static int tolua_AllToLua_cEntity_IsMinecart00(lua_State* tolua_S)
@@ -5089,6 +5121,38 @@ static int tolua_AllToLua_cEntity_IsTNT00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsTNT'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsProjectile of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsProjectile00
+static int tolua_AllToLua_cEntity_IsProjectile00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsProjectile'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsProjectile();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsProjectile'.",&tolua_err);
  return 0;
 #endif
 }
@@ -7953,6 +8017,38 @@ static int tolua_AllToLua_cEntity_IsRclking00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsRclking'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInvisible of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsInvisible00
+static int tolua_AllToLua_cEntity_IsInvisible00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInvisible'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInvisible();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsInvisible'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29131,8 +29227,47 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"biExtremeHillsEdge",biExtremeHillsEdge);
   tolua_constant(tolua_S,"biJungle",biJungle);
   tolua_constant(tolua_S,"biJungleHills",biJungleHills);
+  tolua_constant(tolua_S,"biJungleEdge",biJungleEdge);
+  tolua_constant(tolua_S,"biDeepOcean",biDeepOcean);
+  tolua_constant(tolua_S,"biStoneBeach",biStoneBeach);
+  tolua_constant(tolua_S,"biColdBeach",biColdBeach);
+  tolua_constant(tolua_S,"biBirchForest",biBirchForest);
+  tolua_constant(tolua_S,"biBirchForestHills",biBirchForestHills);
+  tolua_constant(tolua_S,"biRoofedForest",biRoofedForest);
+  tolua_constant(tolua_S,"biColdTaiga",biColdTaiga);
+  tolua_constant(tolua_S,"biColdTaigaHills",biColdTaigaHills);
+  tolua_constant(tolua_S,"biMegaTaiga",biMegaTaiga);
+  tolua_constant(tolua_S,"biMegaTaigaHills",biMegaTaigaHills);
+  tolua_constant(tolua_S,"biExtremeHillsPlus",biExtremeHillsPlus);
+  tolua_constant(tolua_S,"biSavanna",biSavanna);
+  tolua_constant(tolua_S,"biSavannaPlateau",biSavannaPlateau);
+  tolua_constant(tolua_S,"biMesa",biMesa);
+  tolua_constant(tolua_S,"biMesaPlateauF",biMesaPlateauF);
+  tolua_constant(tolua_S,"biMesaPlateau",biMesaPlateau);
   tolua_constant(tolua_S,"biNumBiomes",biNumBiomes);
   tolua_constant(tolua_S,"biMaxBiome",biMaxBiome);
+  tolua_constant(tolua_S,"biVariant",biVariant);
+  tolua_constant(tolua_S,"biSunflowerPlains",biSunflowerPlains);
+  tolua_constant(tolua_S,"biDesertM",biDesertM);
+  tolua_constant(tolua_S,"biExtremeHillsM",biExtremeHillsM);
+  tolua_constant(tolua_S,"biFlowerForest",biFlowerForest);
+  tolua_constant(tolua_S,"biTaigaM",biTaigaM);
+  tolua_constant(tolua_S,"biSwamplandM",biSwamplandM);
+  tolua_constant(tolua_S,"biIcePlainsSpikes",biIcePlainsSpikes);
+  tolua_constant(tolua_S,"biJungleM",biJungleM);
+  tolua_constant(tolua_S,"biJungleEdgeM",biJungleEdgeM);
+  tolua_constant(tolua_S,"biBirchForestM",biBirchForestM);
+  tolua_constant(tolua_S,"biBirchForestHillsM",biBirchForestHillsM);
+  tolua_constant(tolua_S,"biRoofedForestM",biRoofedForestM);
+  tolua_constant(tolua_S,"biColdTaigaM",biColdTaigaM);
+  tolua_constant(tolua_S,"biMegaSpruceTaiga",biMegaSpruceTaiga);
+  tolua_constant(tolua_S,"biMegaSpruceTaigaHills",biMegaSpruceTaigaHills);
+  tolua_constant(tolua_S,"biExtremeHillsPlusM",biExtremeHillsPlusM);
+  tolua_constant(tolua_S,"biSavannaM",biSavannaM);
+  tolua_constant(tolua_S,"biSavannaPlateauM",biSavannaPlateauM);
+  tolua_constant(tolua_S,"biMesaBryce",biMesaBryce);
+  tolua_constant(tolua_S,"biMesaPlateauFM",biMesaPlateauFM);
+  tolua_constant(tolua_S,"biMesaPlateauM",biMesaPlateauM);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cIniFile","cIniFile","",tolua_collect_cIniFile);
   #else
@@ -30008,9 +30143,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsPlayer",tolua_AllToLua_cEntity_IsPlayer00);
    tolua_function(tolua_S,"IsPickup",tolua_AllToLua_cEntity_IsPickup00);
    tolua_function(tolua_S,"IsMob",tolua_AllToLua_cEntity_IsMob00);
+   tolua_function(tolua_S,"IsFallingBlock",tolua_AllToLua_cEntity_IsFallingBlock00);
    tolua_function(tolua_S,"IsMinecart",tolua_AllToLua_cEntity_IsMinecart00);
    tolua_function(tolua_S,"IsBoat",tolua_AllToLua_cEntity_IsBoat00);
    tolua_function(tolua_S,"IsTNT",tolua_AllToLua_cEntity_IsTNT00);
+   tolua_function(tolua_S,"IsProjectile",tolua_AllToLua_cEntity_IsProjectile00);
    tolua_function(tolua_S,"IsA",tolua_AllToLua_cEntity_IsA00);
    tolua_function(tolua_S,"GetClass",tolua_AllToLua_cEntity_GetClass00);
    tolua_function(tolua_S,"GetClassStatic",tolua_AllToLua_cEntity_GetClassStatic00);
@@ -30097,6 +30234,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsRiding",tolua_AllToLua_cEntity_IsRiding00);
    tolua_function(tolua_S,"IsSprinting",tolua_AllToLua_cEntity_IsSprinting00);
    tolua_function(tolua_S,"IsRclking",tolua_AllToLua_cEntity_IsRclking00);
+   tolua_function(tolua_S,"IsInvisible",tolua_AllToLua_cEntity_IsInvisible00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPawn","cPawn","cEntity",NULL);
   tolua_beginmodule(tolua_S,"cPawn");
