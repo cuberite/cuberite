@@ -444,12 +444,6 @@ void cWorld::Start(void)
 	m_SpawnY = cChunkDef::Height;
 	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
 	m_GameMode = eGameMode_Creative;
-	static AString SettingsName = "settings.ini";
-	cIniFile Settings(SettingsName);
-	if (!Settings.ReadFile())
-	{
-		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", SettingsName.c_str());
-	}
 
 	cIniFile IniFile(m_IniFileName);
 	if (!IniFile.ReadFile())
@@ -495,11 +489,8 @@ void cWorld::Start(void)
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
 
-	m_bAnimals = Settings.GetValueB("Monsters", "AnimalsOn", true);
-	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", m_bAnimals);
+	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", true);
 	AString sAllMonsters = IniFile.GetValue("Monsters", "Types");
-	if (!sAllMonsters.size())
-		sAllMonsters = Settings.GetValue("Monsters", "Types");
 	AStringVector SplitList = StringSplit(sAllMonsters, ",");
 	for (unsigned int i = 0; i < SplitList.size(); ++i)
 	{
