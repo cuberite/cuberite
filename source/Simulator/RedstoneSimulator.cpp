@@ -3,13 +3,10 @@
 
 #include "RedstoneSimulator.h"
 #include "../BlockEntities/DropSpenserEntity.h"
+#include "../Entities/TNTEntity.h"
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
 #include "../Piston.h"
-#include "../World.h"
-#include "../BlockID.h"
-#include "../Chunk.h"
-#include "../Entities/TNTEntity.h"
 
 
 
@@ -43,15 +40,15 @@ void cRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk
 	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 
 	// Check if any close neighbor is redstone-related:
-	int MinY = (a_BlockY > 0) ? -2 : 0;
-	int MaxY = (a_BlockY < cChunkDef::Height - 1) ? 2 : 0;
+	int MinY = (a_BlockY > 0) ? -4 : 0;
+	int MaxY = (a_BlockY < cChunkDef::Height - 1) ? 4 : 0;
 
-	for (int y = MinY; y <= MaxY; y++) for (int x = -2; x < 3; x++) for (int z = -2; z < 3; z++)
+	for (int y = MinY; y <= MaxY; y++) for (int x = -4; x < 5; x++) for (int z = -4; z < 5; z++)
 	{
 		BLOCKTYPE BlockType;
 		if (!a_Chunk->UnboundedRelGetBlockType(RelX + x, a_BlockY + y, RelZ + z, BlockType))
 		{
-			continue;
+			continue; // Noo! Bad chunks!
 		}
 		switch (BlockType)
 		{
@@ -106,17 +103,17 @@ void cRedstoneSimulator::Simulate(float a_Dt)
 	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
 	{
 		sPoweredBlocks & Change = *itr;
+		BLOCKTYPE SourceBlockType = m_World.GetBlock(Change.a_SourcePos);
 
-		if (m_World.GetBlock(Change.a_SourcePos) != Change.a_SourceBlock)
+		if (SourceBlockType != Change.a_SourceBlock)
 		{
 			itr = m_PoweredBlocks.erase(itr);
 		}
 		else if (
-			((m_World.GetBlock(Change.a_SourcePos) == E_BLOCK_REDSTONE_WIRE) && (m_World.GetBlockMeta(Change.a_SourcePos) == 0)) ||
-			((m_World.GetBlock(Change.a_SourcePos) == E_BLOCK_LEVER) && (!IsLeverOn(m_World.GetBlockMeta(Change.a_SourcePos)))) ||
-			(m_World.GetBlock(Change.a_SourcePos) == E_BLOCK_REDSTONE_TORCH_OFF) ||
-			(m_World.GetBlock(Change.a_SourcePos) == E_BLOCK_REDSTONE_REPEATER_OFF) ||
-			(m_World.GetBlock(Change.a_SourcePos) == E_BLOCK_INACTIVE_COMPARATOR)
+			// Changeable sources
+			((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (m_World.GetBlockMeta(Change.a_SourcePos) == 0)) ||
+			((SourceBlockType == E_BLOCK_LEVER) && (!IsLeverOn(m_World.GetBlockMeta(Change.a_SourcePos)))) ||
+			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(m_World.GetBlockMeta(Change.a_SourcePos))))
 			)
 		{
 			itr = m_PoweredBlocks.erase(itr);
@@ -127,22 +124,24 @@ void cRedstoneSimulator::Simulate(float a_Dt)
 		}
 	}
 
+	// Check to see if LinkedPoweredBlocks have invalid items: source, block powered through, or power destination block has changed
 	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
 	{
 		sLinkedPoweredBlocks & Change = *itr;
-		
-		if (m_World.GetBlock(Change.a_SourcePos) != Change.a_SourceBlock)
+		BLOCKTYPE SourceBlockType = m_World.GetBlock(Change.a_SourcePos);
+		BLOCKTYPE MiddleBlockType = m_World.GetBlock(Change.a_MiddlePos);
+
+		if (SourceBlockType != Change.a_SourceBlock)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
 		}
-		else if (m_World.GetBlock(Change.a_BlockPos) != Change.a_BlockBlock)
+		else if (MiddleBlockType != Change.a_MiddleBlock)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
 		}
 		else if (
-			((m_World.GetBlock(Change.a_SourcePos) == E_BLOCK_REDSTONE_WIRE) && (m_World.GetBlockMeta(Change.a_SourcePos) == 0)) ||
-			(m_World.GetBlock(Change.a_SourcePos) == E_BLOCK_REDSTONE_REPEATER_OFF) ||
-			(m_World.GetBlock(Change.a_SourcePos) == E_BLOCK_INACTIVE_COMPARATOR)
+			// The only things that can send power through a block
+			((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (m_World.GetBlockMeta(Change.a_SourcePos) == 0))
 			)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
@@ -152,7 +151,6 @@ void cRedstoneSimulator::Simulate(float a_Dt)
 			itr++;
 		}
 	}
-
 
 	// PoweredBlock list was fine, now to the actual handling
 	for (BlockList::iterator itr = m_Blocks.begin(); itr != m_Blocks.end(); ++itr)
@@ -175,6 +173,12 @@ void cRedstoneSimulator::Simulate(float a_Dt)
 			case E_BLOCK_LEVER:
 			{
 				HandleRedstoneLever(*itr);
+				break;
+			}
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_WOODEN_BUTTON:
+			{
+				HandleRedstoneButton(*itr, BlockType);
 				break;
 			}
 			case E_BLOCK_REDSTONE_WIRE:
@@ -228,7 +232,7 @@ void cRedstoneSimulator::Simulate(float a_Dt)
 
 
 
-void cRedstoneSimulator::HandleRedstoneTorch(const Vector3i & a_BlockPos, BLOCKTYPE & a_MyState)
+void cRedstoneSimulator::HandleRedstoneTorch(const Vector3i & a_BlockPos, BLOCKTYPE a_MyState)
 {
 	static const struct // Define which directions the torch can power
 	{
@@ -286,7 +290,6 @@ void cRedstoneSimulator::HandleRedstoneTorch(const Vector3i & a_BlockPos, BLOCKT
 				SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y - 1, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_TORCH_ON);
 			}
 		}
-
 	}
 	else
 	{
@@ -339,7 +342,7 @@ void cRedstoneSimulator::HandleRedstoneLever(const Vector3i & a_BlockPos)
 {
 	if (IsLeverOn(m_World.GetBlockMeta(a_BlockPos)))
 	{
-		static const struct // Define which directions the redstone torch can power (all sides)
+		static const struct // Define which directions the redstone lever can power (all sides)
 		{
 			int x, y, z;
 		} gCrossCoords[] =
@@ -355,10 +358,39 @@ void cRedstoneSimulator::HandleRedstoneLever(const Vector3i & a_BlockPos)
 		for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 		{
 			// Power everything
-			SetBlockPowered(Vector3i(a_BlockPos.x + gCrossCoords[i].x, a_BlockPos.y + gCrossCoords[i].y, a_BlockPos.z + gCrossCoords[i].z), a_BlockPos, E_BLOCK_BLOCK_OF_REDSTONE);
+			SetBlockPowered(Vector3i(a_BlockPos.x + gCrossCoords[i].x, a_BlockPos.y + gCrossCoords[i].y, a_BlockPos.z + gCrossCoords[i].z), a_BlockPos, E_BLOCK_LEVER);
 		}
 	}
 	return;
+}
+
+
+
+
+
+void cRedstoneSimulator::HandleRedstoneButton(const Vector3i & a_BlockPos, BLOCKTYPE a_BlockType)
+{
+	if (IsButtonOn(m_World.GetBlockMeta(a_BlockPos)))
+	{
+		static const struct // Define which directions the redstone button can power (all sides)
+		{
+			int x, y, z;
+		} gCrossCoords[] =
+		{
+			{ 1, 0,  0},
+			{-1, 0,  0},
+			{ 0, 0,  1},
+			{ 0, 0, -1},
+			{ 0, 1,  0},
+			{ 0,-1,  0},
+		} ;
+
+		for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+		{
+			// Power everything
+			SetBlockPowered(Vector3i(a_BlockPos.x + gCrossCoords[i].x, a_BlockPos.y + gCrossCoords[i].y, a_BlockPos.z + gCrossCoords[i].z), a_BlockPos, a_BlockType);
+		}
+	}
 }
 
 
@@ -493,7 +525,7 @@ void cRedstoneSimulator::HandleRedstoneWire(const Vector3i & a_BlockPos)
 
 				for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 				{
-					// Power if mechanism (i.e. not torch or wire)
+					// Power if block is solid, CURRENTLY all mechanisms are solid
 					if (g_BlockIsSolid[m_World.GetBlock(Vector3i(a_BlockPos.x + gCrossCoords[i].x, a_BlockPos.y + gCrossCoords[i].y, a_BlockPos.z + gCrossCoords[i].z))])
 					{
 						SetBlockPowered(Vector3i(a_BlockPos.x + gCrossCoords[i].x, a_BlockPos.y + gCrossCoords[i].y, a_BlockPos.z + gCrossCoords[i].z), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
@@ -505,17 +537,23 @@ void cRedstoneSimulator::HandleRedstoneWire(const Vector3i & a_BlockPos)
 			{
 				if (g_BlockIsSolid[m_World.GetBlock(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z))])
 				{
+					BLOCKTYPE MiddleBlock =  m_World.GetBlock(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z);
 					SetBlockPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
-					//SetBlockPowered(Vector3i(a_BlockPos.x + 2, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 2, a_BlockPos.y, a_BlockPos.z), Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z + 1), Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z - 1), Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
 				}
 				break;
 			}
 			case REDSTONE_X_NEG:
 			{
 				if (g_BlockIsSolid[m_World.GetBlock(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z))])
-				{
+				{					
+					BLOCKTYPE MiddleBlock =  m_World.GetBlock(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z);
 					SetBlockPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
-					//SetBlockPowered(Vector3i(a_BlockPos.x - 2, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 2, a_BlockPos.y, a_BlockPos.z), Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z + 1), Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z - 1), Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
 				}
 				break;
 			}
@@ -523,8 +561,11 @@ void cRedstoneSimulator::HandleRedstoneWire(const Vector3i & a_BlockPos)
 			{
 				if (g_BlockIsSolid[m_World.GetBlock(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1))])
 				{
+					BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1);
 					SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
-					//SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 2), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 2), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z + 1), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z + 1), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
 				}
 				break;
 			}
@@ -532,8 +573,11 @@ void cRedstoneSimulator::HandleRedstoneWire(const Vector3i & a_BlockPos)
 			{
 				if (g_BlockIsSolid[m_World.GetBlock(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1))])
 				{
+					BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1);
 					SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
-					//SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 2), a_BlockPos, E_BLOCK_REDSTONE_WIRE);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 2), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z - 1), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_WIRE, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z - 1), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos,E_BLOCK_REDSTONE_WIRE, MiddleBlock);
 				}
 				break;
 			}
@@ -557,63 +601,51 @@ void cRedstoneSimulator::HandleRedstoneRepeater(const Vector3i & a_BlockPos)
 		{
 			case 0x0:
 			{
-				// Can't power through a nonsolid block
-				if (!g_BlockIsSolid[m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1)])
+				// Power if block is solid, CURRENTLY all mechanisms are solid
+				if (g_BlockIsSolid[m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1)])
 				{
+					// 2-5th LinkedPowered - set blocks around block in front to be powered
+					BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1);
 					SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON);
-				}
-				else
-				{
-					// 2-4th LinkedPowered - set block around block in front to be powered, with invalidation checks
-					SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON);
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 2), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1));
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z - 1));
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos,E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z - 1));
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 2), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z - 1), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z - 1), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos,E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
 				}
 				break;
 			}
 			case 0x1:
 			{
-				if (!g_BlockIsSolid[m_World.GetBlock(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z)])
+				if (g_BlockIsSolid[m_World.GetBlock(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z)])
 				{
+					BLOCKTYPE MiddleBlock =  m_World.GetBlock(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z);
 					SetBlockPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON);
-				}
-				else
-				{
-					SetBlockPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON);
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 2, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x + 2, a_BlockPos.y, a_BlockPos.z));
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z + 1));
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z - 1));
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 2, a_BlockPos.y, a_BlockPos.z), Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z + 1), Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z - 1), Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
 				}
 				break;
 			}
 			case 0x2:
 			{
-				if (!g_BlockIsSolid[m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1)])
+				if (g_BlockIsSolid[m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1)])
 				{
+					BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1);
 					SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON);
-				}
-				else
-				{
-					SetBlockPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON);
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 2), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 2));
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z + 1));
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos,E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z + 1));
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 2), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z + 1), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z + 1), Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
 				}
 				break;
 			}
 			case 0x3:
 			{
-				if (!g_BlockIsSolid[m_World.GetBlock(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z)])
+				if (g_BlockIsSolid[m_World.GetBlock(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z)])
 				{
+					BLOCKTYPE MiddleBlock =  m_World.GetBlock(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z);
 					SetBlockPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON);
-				}
-				else
-				{
-					SetBlockPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON);
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 2, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x - 2, a_BlockPos.y, a_BlockPos.z));
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z + 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z + 1));
-					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z - 1), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, m_World.GetBlock(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z - 1));
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 2, a_BlockPos.y, a_BlockPos.z), Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z + 1), Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
+					SetBlockLinkedPowered(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z - 1), Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z), a_BlockPos, E_BLOCK_REDSTONE_REPEATER_ON, MiddleBlock);
 				}
 				break;
 			}
@@ -673,7 +705,7 @@ void cRedstoneSimulator::HandleDropSpenser(const Vector3i & a_BlockPos)
 
 
 
-void cRedstoneSimulator::HandleRedstoneLamp(const Vector3i & a_BlockPos, BLOCKTYPE & a_MyState)
+void cRedstoneSimulator::HandleRedstoneLamp(const Vector3i & a_BlockPos, BLOCKTYPE a_MyState)
 {
 	if (a_MyState == E_BLOCK_REDSTONE_LAMP_OFF)
 	{
@@ -713,10 +745,7 @@ void cRedstoneSimulator::HandleTNT(const Vector3i & a_BlockPos)
 
 void cRedstoneSimulator::HandleDoor(const Vector3i & a_BlockPos)
 {
-	if (AreCoordsPowered(a_BlockPos))
-	{
-		cBlockDoorHandler::ChangeDoor(&m_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
-	}
+	cBlockDoorHandler::ChangeDoor(&m_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 	return;
 }
 
@@ -726,24 +755,17 @@ void cRedstoneSimulator::HandleDoor(const Vector3i & a_BlockPos)
 
 bool cRedstoneSimulator::AreCoordsPowered(const Vector3i & a_BlockPos)
 {
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr) // Check powered list
 	{
 		sPoweredBlocks & Change = *itr;
 
-		if ((m_World.GetBlock(a_BlockPos) == E_BLOCK_REDSTONE_WIRE) && (Change.a_SourceBlock == E_BLOCK_REDSTONE_WIRE) && (Change.a_SourcePos.Equals(a_BlockPos)))
-		{
-			// Coords in question is wire, source is wire, and source coords are the same as the coords in question
-			// The powered coord came about due to a redstone wire powering it
-			// But, if we say true, the block will feedback the wire that powered it etc. so we say false
-			return false;
-		}
-		else if (Change.a_BlockPos.Equals(a_BlockPos))
+		if (Change.a_BlockPos.Equals(a_BlockPos))
 		{
 			return true;
 		}
 	}
 
-	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
+	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr) // Check linked powered list
 	{
 		sLinkedPoweredBlocks & Change = *itr;
 
@@ -761,6 +783,7 @@ bool cRedstoneSimulator::AreCoordsPowered(const Vector3i & a_BlockPos)
 
 bool cRedstoneSimulator::IsRepeaterPowered(const Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 {
+	// Check through powered blocks list
 	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
 	{
 		sPoweredBlocks & Change = *itr;
@@ -790,7 +813,37 @@ bool cRedstoneSimulator::IsRepeaterPowered(const Vector3i & a_BlockPos, NIBBLETY
 			}
 		}
 	}
-	return false;
+
+	// Check linked powered list, 'middle' blocks
+	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
+	{
+		sLinkedPoweredBlocks & Change = *itr;
+
+		switch (a_Meta)
+		{
+			case 0x0:
+			{
+				if (Change.a_MiddlePos.Equals(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z + 1))) { return true; }
+				break;
+			}
+			case 0x1:
+			{
+				if (Change.a_MiddlePos.Equals(Vector3i(a_BlockPos.x - 1, a_BlockPos.y, a_BlockPos.z))) { return true; }
+				break;
+			}
+			case 0x2:
+			{
+				if (Change.a_MiddlePos.Equals(Vector3i(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z - 1))) { return true; }
+				break;
+			}
+			case 0x3:
+			{
+				if (Change.a_MiddlePos.Equals(Vector3i(a_BlockPos.x + 1, a_BlockPos.y, a_BlockPos.z))) { return true; }
+				break;
+			}
+		}
+	}
+	return false; // Couldn't find power source behind repeater
 }
 
 
@@ -811,13 +864,15 @@ void cRedstoneSimulator::SetBlockPowered(const Vector3i & a_BlockPos, const Vect
 
 
 
-void cRedstoneSimulator::SetBlockLinkedPowered(const Vector3i & a_BlockPos, const Vector3i & a_SourcePos, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_BlockBlock)
+void cRedstoneSimulator::SetBlockLinkedPowered(const Vector3i & a_BlockPos, const Vector3i & a_MiddlePos, const Vector3i & a_SourcePos,
+											   BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddleBlock)
 {
 	sLinkedPoweredBlocks RC;
-	RC.a_BlockBlock = a_BlockBlock;
 	RC.a_BlockPos = a_BlockPos;
+	RC.a_MiddlePos = a_MiddlePos;
 	RC.a_SourcePos = a_SourcePos;
 	RC.a_SourceBlock = a_SourceBlock;
+	RC.a_MiddleBlock = a_MiddleBlock;
 	m_LinkedPoweredBlocks.push_back(RC);
 	return;
 }
@@ -826,7 +881,6 @@ void cRedstoneSimulator::SetBlockLinkedPowered(const Vector3i & a_BlockPos, cons
 
 
 
-// Believe me, it works!! TODO: Add repeaters and low/high wires
 cRedstoneSimulator::eRedstoneDirection cRedstoneSimulator::GetWireDirection(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	int Dir = REDSTONE_NONE;
@@ -934,6 +988,15 @@ bool cRedstoneSimulator::IsLeverOn(NIBBLETYPE a_BlockMeta)
 {
 	// Extract the ON bit from metadata and return if true if it is set:
 	return ((a_BlockMeta & 0x8) == 0x8);
+}
+
+
+
+
+
+bool cRedstoneSimulator::IsButtonOn(NIBBLETYPE a_BlockMeta)
+{
+	return IsLeverOn(a_BlockMeta);
 }
 
 

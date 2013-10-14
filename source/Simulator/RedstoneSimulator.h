@@ -12,6 +12,7 @@ class cRedstoneSimulator :
 {
 	typedef cSimulator super;
 public:
+
 	cRedstoneSimulator(cWorld & a_World);
 	~cRedstoneSimulator();
 
@@ -32,10 +33,9 @@ public:
 
 	static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation);
 	static NIBBLETYPE LeverDirectionToMetaData(char a_Dir);
-	static bool IsLeverOn(NIBBLETYPE a_BlockMeta);
-
 
 private:
+
 	struct sPoweredBlocks // Define structure of the directly powered blocks list
 	{
 		Vector3i a_BlockPos; // Position of powered block
@@ -46,25 +46,27 @@ private:
 	struct sLinkedPoweredBlocks // Define structure of the indirectly powered blocks list (i.e. repeaters powering through a block to the block at the other side)
 	{
 		Vector3i a_BlockPos;
+		Vector3i a_MiddlePos;
 		Vector3i a_SourcePos;
-		BLOCKTYPE a_BlockBlock;
 		BLOCKTYPE a_SourceBlock;
+		BLOCKTYPE a_MiddleBlock;
 	};
 	
 	typedef std::deque <Vector3i> BlockList;
 	typedef std::deque <sPoweredBlocks> PoweredBlocksList;
 	typedef std::deque <sLinkedPoweredBlocks> LinkedBlocksList;
 
+	BlockList m_Blocks;
 	PoweredBlocksList m_PoweredBlocks;
 	LinkedBlocksList m_LinkedPoweredBlocks;
-	BlockList m_Blocks;
 
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override {}
 
 	// Sources
-	void HandleRedstoneTorch(const Vector3i & a_BlockPos, BLOCKTYPE & a_MyState);
+	void HandleRedstoneTorch(const Vector3i & a_BlockPos, BLOCKTYPE a_MyState);
 	void HandleRedstoneBlock(const Vector3i & a_BlockPos);
 	void HandleRedstoneLever(const Vector3i & a_BlockPos);
+	void HandleRedstoneButton(const Vector3i & a_BlockPos, BLOCKTYPE a_BlockType);
 
 	// The all important wire and repeater
 	void HandleRedstoneWire(const Vector3i & a_BlockPos);
@@ -74,14 +76,16 @@ private:
 	void HandlePiston(const Vector3i & a_BlockPos);
 	void HandleDropSpenser(const Vector3i & a_BlockPos);
 	void HandleTNT(const Vector3i & a_BlockPos);
-	void HandleRedstoneLamp(const Vector3i & a_BlockPos, BLOCKTYPE & a_MyState);
+	void HandleRedstoneLamp(const Vector3i & a_BlockPos, BLOCKTYPE a_MyState);
 	void HandleDoor(const Vector3i & a_BlockPos);
 
 	// Helper functions
 	void SetBlockPowered(const Vector3i & a_BlockPos, const Vector3i & a_SourcePos, BLOCKTYPE a_SourceBlock);
-	void SetBlockLinkedPowered(const Vector3i & a_BlockPos, const Vector3i & a_SourcePos, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_BlockBlock);
+	void SetBlockLinkedPowered(const Vector3i & a_BlockPos, const Vector3i & a_MiddlePos, const Vector3i & a_SourcePos, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock);
 	bool AreCoordsPowered(const Vector3i & a_BlockPos);
 	bool IsRepeaterPowered(const Vector3i & a_BlockPos, NIBBLETYPE a_Meta);
+	bool IsLeverOn(NIBBLETYPE a_BlockMeta);
+	bool IsButtonOn(NIBBLETYPE a_BlockMeta);
 
 	inline static bool IsMechanism(BLOCKTYPE a_Block)
 	{
@@ -105,10 +109,12 @@ private:
 		return false;
 	}
 
-	inline static bool IsPotentialSource(BLOCKTYPE & a_Block)
+	inline static bool IsPotentialSource(BLOCKTYPE a_Block)
 	{
 		switch (a_Block)
 		{
+			case E_BLOCK_WOODEN_BUTTON:
+			case E_BLOCK_STONE_BUTTON:
 			case E_BLOCK_REDSTONE_WIRE:
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
@@ -124,4 +130,5 @@ private:
 		}
 		return false;
 	}
+
 };
