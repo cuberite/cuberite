@@ -2157,6 +2157,32 @@ end;
 				returns true, no other callback is called for this event.
 			]],
 		},  -- HOOK_CHUNK_AVAILABLE
+
+		HOOK_CHUNK_GENERATED =
+		{
+			CalledWhen = "After a chunk was generated. Notification only.",
+			DefaultFnName = "OnChunkGenerated",  -- also used as pagename
+			Desc = [[
+				This hook is called when world generator finished its work on a chunk. The chunk data has already
+				been generated and is about to be stored in the {{cWorld|world}}. A plugin may provide some
+				last-minute finishing touches to the generated data. Note that the chunk is not yet stored in the
+				world, so regular {{cWorld}} block API will not work! Instead, use the {{cChunkDesc}} object
+				received as the parameter.
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world to which the chunk will be added" },
+				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
+				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
+				{ Name = "ChunkDesc", Type = "{{cChunkDesc}}", Notes = "Generated chunk data. Plugins may still modify the chunk data contained." },
+			},
+			Returns = [[
+				If the plugin returns false or no value, MCServer will call other plugins' callbacks for this event.
+				If a plugin returns true, no other callback is called for this event.</p>
+				<p>
+				In either case, MCServer will then store the data from ChunkDesc as the chunk's contents in the world.
+			]],
+		},  -- HOOK_CHUNK_GENERATED
 	},  -- Hooks[]
 	
 
