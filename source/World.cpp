@@ -444,6 +444,12 @@ void cWorld::Start(void)
 	m_SpawnY = cChunkDef::Height;
 	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
 	m_GameMode = eGameMode_Creative;
+	static AString SettingsName = "settings.ini";
+	cIniFile Settings(SettingsName);
+	if (!Settings.ReadFile())
+	{
+		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", SettingsName.c_str());
+	}
 
 	cIniFile IniFile(m_IniFileName);
 	if (!IniFile.ReadFile())
@@ -489,8 +495,11 @@ void cWorld::Start(void)
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
 
-	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", true);
+	m_bAnimals = Settings.GetValueB("Monsters", "AnimalsOn", true);
+	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", m_bAnimals);
 	AString sAllMonsters = IniFile.GetValue("Monsters", "Types");
+	if (!sAllMonsters.size())
+		sAllMonsters = Settings.GetValue("Monsters", "Types");
 	AStringVector SplitList = StringSplit(sAllMonsters, ",");
 	for (unsigned int i = 0; i < SplitList.size(); ++i)
 	{
@@ -728,7 +737,6 @@ void cWorld::TickMobs(float a_Dt)
 	// before every Mob action, we have to "counts" them depending on the distance to players, on their megatype ...
 	cMobCensus MobCensus;
 	m_ChunkMap->CollectMobCensus(MobCensus);
-
 	for(cMobFamilyCollecter::tMobFamilyList::const_iterator itr = cMobFamilyCollecter::m_AllFamilies().begin(); itr != cMobFamilyCollecter::m_AllFamilies().end(); itr++)
 	{
 		cMobCensus::tMobSpawnRate::const_iterator spawnrate = cMobCensus::m_SpawnRate().find(*itr);
@@ -741,6 +749,7 @@ void cWorld::TickMobs(float a_Dt)
 			{
 				if (m_bAnimals)
 				{
+
 					cMobSpawner Spawner(*itr,m_AllowedMobs);
 					if (Spawner.CanSpawnSomething())
 					{
@@ -2511,11 +2520,11 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	
 	int SlSize = GetTickRandomNumber(2) + 1;  // 1 .. 3 - Slime
 	int ShColor = GetTickRandomNumber(15); // 0 .. 15 - Sheep
-	bool SkType = GetDimension() == biNether; // Skeleton
+	bool SkType = GetDimension() == dimNether ; // Skeleton
 
-	cMobTypesManager::NewMonsterFromType(a_MonsterType);
-	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
-
+	Monster = cMobTypesManager::NewMonsterFromType(a_MonsterType);
+	if (Monster)
+		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	return SpawnMobFinalize(Monster);
 }
 
@@ -2524,6 +2533,8 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 
 int cWorld::SpawnMobFinalize(cMonster* a_Monster)
 {
+	if (!a_Monster)
+		return -1;
 	a_Monster->SetHealth(a_Monster->GetMaxHealth());
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
