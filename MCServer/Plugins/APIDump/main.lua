@@ -330,6 +330,13 @@ function DumpAPIHtml()
 				f:write("\t\t\tDesc = [[]],\n");
 				f:write("\t\t\tParams =\n\t\t\t{\n");
 				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
 				f:write("\t\t\tReturns = [[]],\n");
 				f:write("\t\t},  -- " .. hook .. "\n");
 			end
