@@ -2632,6 +2632,8 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 			return -1;
 		}
 	}
+	while(this->GetBlock(a_PosX, a_PosY - 1, a_PosZ) == E_BLOCK_AIR)
+		--a_PosY;
 	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	Monster->SetHealth(Monster->GetMaxHealth());
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *Monster))
