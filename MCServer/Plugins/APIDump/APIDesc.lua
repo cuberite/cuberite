@@ -364,8 +364,8 @@ g_APIDesc =
 			},
 			Constants =
 			{
-				Color         = { Notes = "The first character of the color-code-sequence, ß" },
-				Delimiter     = { Notes = "The first character of the color-code-sequence, ß" },
+				Color         = { Notes = "The first character of the color-code-sequence, ¬ß" },
+				Delimiter     = { Notes = "The first character of the color-code-sequence, ¬ß" },
 				Random        = { Notes = "Random letters and symbols animate instead of the text" },
 				Plain         = { Notes = "Resets all formatting to normal" },
 			},
@@ -2029,14 +2029,14 @@ World:ForEachEntity(
 				GetTime = {Return = "number", Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)"},
 				IsValidBlock = {Params = "BlockType", Return = "bool", Notes = "Returns true if BlockType is a known block type"},
 				IsValidItem = {Params = "ItemType", Return = "bool", Notes = "Returns true if ItemType is a known item type"},
-				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format ìItemTypeText:ItemDamage * Countî"},
+				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format ‚ÄúItemTypeText:ItemDamage * Count‚Äù"},
 				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
 				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
-				LOG = {Params = "string", Notes = "Logs a text into the server console using ìnormalî severity (gray text) "},
-				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using ìerrorî severity (black text on red background)"},
-				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using ìinfoî severity (yellow text)"},
-				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using ìwarningî severity (red text); OBSOLETE"},
-				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using ìwarningî severity (red text)"},
+				LOG = {Params = "string", Notes = "Logs a text into the server console using ‚Äúnormal‚Äù severity (gray text) "},
+				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using ‚Äúerror‚Äù severity (black text on red background)"},
+				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using ‚Äúinfo‚Äù severity (yellow text)"},
+				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using ‚Äúwarning‚Äù severity (red text); OBSOLETE"},
+				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using ‚Äúwarning‚Äù severity (red text)"},
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
 				ReplaceString = {Params = "full-string, to-be-replaced-string, to-replace-string", Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string"},
 				StringSplit = {Params = "string, Seperator", Return = "list", Notes = "Seperates string into multiple by splitting every time Seperator is encountered."},
@@ -2863,6 +2863,36 @@ end;
 				the specified coords to the client and drops the packet.
 			]],
 		},  -- HOOK_PLAYER_PLACING_BLOCK
+
+		HOOK_PLAYER_RIGHT_CLICK =
+		{
+			CalledWhen = "A right-click packet is received from the client. Plugin may override / refuse.",
+			DefaultFnName = "OnPlayerRightClick",  -- also used as pagename
+			Desc = [[
+				This hook is called when MCServer receives a right-click packet from the {{cClientHandle|client}}. It
+				is called before any processing whatsoever is performed on the packet, meaning that hacked /
+				malicious clients may be trigerring this event very often and with unchecked parameters. Therefore
+				plugin authors are advised to use extreme caution with this callback.</p>
+				<p>
+				Plugins may refuse the default processing for the packet, causing MCServer to behave as if the
+				packet has never arrived. This may, however, create inconsistencies in the client - the client may
+				think that they placed a block, while the server didn't process the placing, etc.
+			]],
+			Params =
+			{
+				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player whose client sent the packet" },
+				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
+				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
+				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
+				{ Name = "BlockFace", Type = "number", Notes = "Face of the block upon which the player interacted. One of the BLOCK_FACE_ constants" },
+			},
+			Returns = [[
+				If the function returns false or no value, MCServer calls other plugins' callbacks and finally sends
+				the packet for further processing.</p>
+				<p>
+				If the function returns true, no other plugins are called, processing is halted.
+			]],
+		},  -- HOOK_PLAYER_RIGHT_CLICK
 
 		HOOK_POST_CRAFTING =
 		{
