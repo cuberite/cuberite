@@ -107,6 +107,18 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 	
 	m_TameAttemptTimes++;
 	a_Player.AttachTo(this);
+	
+	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+
+		// Set saddle state & broadcast metadata
+		m_bIsSaddled = true;
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 
