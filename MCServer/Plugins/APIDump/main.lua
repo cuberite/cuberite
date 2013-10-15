@@ -180,7 +180,12 @@ function DumpAPIHtml()
 	
 	-- Extract hook constants:
 	for name, obj in pairs(cPluginManager) do
-		if (type(obj) == "number") and (name:match("HOOK_.*")) then
+		if (
+			(type(obj) == "number") and
+			name:match("HOOK_.*") and
+			(name ~= "HOOK_MAX") and
+			(name ~= "HOOK_NUM_HOOKS")
+		) then
 			table.insert(Hooks, { Name = name });
 		end
 	end
@@ -327,10 +332,18 @@ function DumpAPIHtml()
 				f:write("\t\t" .. hook .. " =\n\t\t{\n");
 				f:write("\t\t\tCalledWhen = \"\",\n");
 				f:write("\t\t\tDefaultFnName = \"On\",  -- also used as pagename\n");
-				f:write("\t\t\tDesc = [[]],\n");
+				f:write("\t\t\tDesc = [[\n\t\t\t\t\n\t\t\t]],\n");
 				f:write("\t\t\tParams =\n\t\t\t{\n");
-				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n\t\t\t},\n");
-				f:write("\t\t\tReturns = [[]],\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
+				f:write("\t\t\t\t{ Name = \"\", Type = \"\", Notes = \"\" },\n");
+				f:write("\t\t\t},\n");
+				f:write("\t\t\tReturns = [[\n\t\t\t\t\n\t\t\t]],\n");
 				f:write("\t\t},  -- " .. hook .. "\n");
 			end
 		end
@@ -604,8 +617,39 @@ end
 
 -- Make a link out of anything with the special linkifying syntax {{link|title}}
 function LinkifyString(a_String)
-	local txt = a_String:gsub("{{([^|}]*)|([^}]*)}}", "<a href=\"%1.html\">%2</a>")  -- {{link|title}}
-	txt = txt:gsub("{{([^|}]*)}}", "<a href=\"%1.html\">%1</a>")  -- {{LinkAndTitle}}
+	local function CreateLink(Link, Title)
+		if (Link:sub(1, 7) == "http://") then
+			-- The link is a full absolute URL, do not modify, do not track:
+			return "<a href=\"" .. Link .. "\">" .. Title .. "</a>";
+		end
+		local idxHash = Link:find("#");
+		if (idxHash ~= nil) then
+			-- The link contains an anchor:
+			if (idxHash == 1) then
+				-- Anchor in the current page, no need to track:
+				return "<a href=\"" .. Link .. "\">" .. Title .. "</a>";
+			end
+			-- Anchor in another page:
+			-- TODO: track this link
+			return "<a href=\"" .. Link:sub(1, idxHash - 1) .. ".html#" .. Link:sub(idxHash + 1) .. "\">" .. Title .. "</a>";
+		end
+		-- Link without anchor:
+		-- TODO; track this link
+		return "<a href=\"" .. Link .. ".html\">" .. Title .. "</a>";
+	end
+	
+	local txt = a_String:gsub("{{([^|}]*)|([^}]*)}}", CreateLink)  -- {{link|title}}
+	
+	txt = txt:gsub("{{([^|}]*)}}",  -- {{LinkAndTitle}}
+		function(LinkAndTitle)
+			local idxHash = LinkAndTitle:find("#");
+			if (idxHash ~= nil) then
+				-- The LinkAndTitle contains a hash, remove the hashed part from the title:
+				return CreateLink(LinkAndTitle, LinkAndTitle:sub(1, idxHash - 1));
+			end
+			return CreateLink(LinkAndTitle, LinkAndTitle);
+		end
+	);
 	return txt;
 end
 

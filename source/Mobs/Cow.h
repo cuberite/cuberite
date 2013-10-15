@@ -18,6 +18,7 @@ public:
 	CLASS_PROTODEF(cCow);
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void OnRightClicked(cPlayer & a_Player) override;
 } ;
 
 

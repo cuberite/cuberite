@@ -26,6 +26,13 @@ class cHTTPFormParser :
 	public cMultipartParser::cCallbacks
 {
 public:
+	enum eKind
+	{
+		fpkURL,             ///< The form has been transmitted as parameters to a GET request
+		fpkFormUrlEncoded,  ///< The form has been POSTed or PUT, with Content-Type of "application/x-www-form-urlencoded"
+		fpkMultipart,       ///< The form has been POSTed or PUT, with Content-Type of "multipart/form-data"
+	} ;
+
 	class cCallbacks
 	{
 	public:
@@ -40,7 +47,11 @@ public:
 	} ;
 	
 	
+	/// Creates a parser that is tied to a request and notifies of various events using a callback mechanism
 	cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callbacks);
+	
+	/// Creates a parser with the specified content type that reads data from a string
+	cHTTPFormParser(eKind a_Kind, const char * a_Data, int a_Size, cCallbacks & a_Callbacks);
 	
 	/// Adds more data into the parser, as the request body is received
 	void Parse(const char * a_Data, int a_Size);
@@ -54,12 +65,6 @@ public:
 	static bool HasFormData(const cHTTPRequest & a_Request);
 	
 protected:
-	enum eKind
-	{
-		fpkURL,             ///< The form has been transmitted as parameters to a GET request
-		fpkFormUrlEncoded,  ///< The form has been POSTed or PUT, with Content-Type of "application/x-www-form-urlencoded"
-		fpkMultipart,       ///< The form has been POSTed or PUT, with Content-Type of "multipart/form-data"
-	};
 	
 	/// The callbacks to call for incoming file data
 	cCallbacks & m_Callbacks;

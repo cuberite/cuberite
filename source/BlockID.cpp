@@ -1,4 +1,3 @@
-
 // BlockID.cpp
 
 // Implements the helper functions for converting Block ID string to int etc.
@@ -930,6 +929,7 @@ public:
 		g_BlockIsTorchPlaceable[E_BLOCK_STAINED_CLAY]          = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_WOOL]                  = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_STONE]                 = true;
+		g_BlockIsTorchPlaceable[E_BLOCK_STONE_BRICKS]          = true;
 	}
 } BlockPropertiesInitializer;
 
