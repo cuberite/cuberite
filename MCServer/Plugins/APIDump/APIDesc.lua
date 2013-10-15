@@ -2928,7 +2928,7 @@ end;
 			CalledWhen = "After an entity is spawned in the world.",
 			DefaultFnName = "OnSpawnedEntity",  -- also used as pagename
 			Desc = [[
-				This callback is called after the server spawns an {{cEntity|entity}}. This is an information-only
+				This hook is called after the server spawns an {{cEntity|entity}}. This is an information-only
 				callback, the entity is already spawned by the time it is called. If the entity spawned is a
 				{{cMonster|monster}}, the {{OnSpawnedMonster|HOOK_SPAWNED_MONSTER}} hook is called before this hook.
 			]],
@@ -2942,6 +2942,26 @@ end;
 				returns true, no other callback is called for this event.
 			]],
 		},  -- HOOK_SPAWNED_ENTITY
+
+		HOOK_SPAWNED_MONSTER =
+		{
+			CalledWhen = "After a monster is spawned in the world",
+			DefaultFnName = "OnSpawnedMonster",  -- also used as pagename
+			Desc = [[
+				This hook is called after the server spawns a {{cMonster|monster}}. This is an information-only
+				callback, the monster is already spawned by the time it is called. After this hook is called, the
+				{{OnSpawnedEntity|HOOK_SPAWNED_ENTITY}} is called for the monster entity.
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the monster has spawned" },
+				{ Name = "Monster", Type = "{{cMonster}} descendant", Notes = "The monster that has spawned" },
+			},
+			Returns = [[
+				If the function returns false or no value, the next plugin's callback is called. If the function
+				returns true, no other callback is called for this event.
+			]],
+		},  -- HOOK_SPAWNED_MONSTER
 
 	},  -- Hooks[]
 	
