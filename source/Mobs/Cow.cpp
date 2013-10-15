@@ -7,10 +7,6 @@
 
 
 
-// TODO: Milk Cow
-
-
-
 
 
 cCow::cCow(void) :
@@ -28,6 +24,18 @@ void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 1, 3, IsOnFire() ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
 }
 
+void cCow::OnRightClicked(cPlayer & a_Player)
+{
+	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_BUCKET))
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+			a_Player.GetInventory().AddItem(E_ITEM_MILK)
+		}
+
+	}
+}
 
 
 
