@@ -2930,7 +2930,11 @@ end;
 			Desc = [[
 				This hook is called after the server spawns an {{cEntity|entity}}. This is an information-only
 				callback, the entity is already spawned by the time it is called. If the entity spawned is a
-				{{cMonster|monster}}, the {{OnSpawnedMonster|HOOK_SPAWNED_MONSTER}} hook is called before this hook.
+				{{cMonster|monster}}, the {{OnSpawnedMonster|HOOK_SPAWNED_MONSTER}} hook is called before this
+				hook.</p>
+				<p>
+				See also the {{OnSpawningEntity|HOOK_SPAWNING_ENTITY}} hook for a similar hook called before the
+				entity is spawned.
 			]],
 			Params =
 			{
@@ -2950,7 +2954,10 @@ end;
 			Desc = [[
 				This hook is called after the server spawns a {{cMonster|monster}}. This is an information-only
 				callback, the monster is already spawned by the time it is called. After this hook is called, the
-				{{OnSpawnedEntity|HOOK_SPAWNED_ENTITY}} is called for the monster entity.
+				{{OnSpawnedEntity|HOOK_SPAWNED_ENTITY}} is called for the monster entity.</p>
+				<p>
+				See also the {{OnSpawningMonster|HOOK_SPAWNING_MONSTER}} hook for a similar hook called before the
+				monster is spawned.
 			]],
 			Params =
 			{
@@ -2962,6 +2969,31 @@ end;
 				returns true, no other callback is called for this event.
 			]],
 		},  -- HOOK_SPAWNED_MONSTER
+
+		HOOK_SPAWNING_ENTITY =
+		{
+			CalledWhen = "Before an entity is spawned in the world.",
+			DefaultFnName = "OnSpawningEntity",  -- also used as pagename
+			Desc = [[
+				This hook is called before the server spawns an {{cEntity|entity}}. The plugin can either modify the
+				entity before it is spawned, or disable the spawning altogether. If the entity spawning is a
+				monster, the {{OnSpawningMonster|HOOK_SPAWNING_MONSTER}} hook is called before this hook.</p>
+				<p>
+				See also the {{OnSpawnedEntity|HOOK_SPAWNED_ENTITY}} hook for a similar hook called after the
+				entity is spawned.
+			]],
+			Params =
+			{
+				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the entity will spawn" },
+				{ Name = "Entity", Type = "{{cEntity}} descentant", Notes = "The entity that will spawn" },
+			},
+			Returns = [[
+				If the function returns false or no value, the next plugin's callback is called. Finally, the server
+				spawns the entity with whatever parameters have been set on the {{cEntity}} object by the callbacks.
+				If the function returns true, no other callback is called for this event and the entity is not
+				spawned.
+			]],
+		},  -- HOOK_SPAWNING_ENTITY
 
 	},  -- Hooks[]
 	
