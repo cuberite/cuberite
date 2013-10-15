@@ -2773,6 +2773,59 @@ end;
 			]],
 		},  -- HOOK_PLAYER_LEFT_CLICK
 
+		HOOK_PLAYER_MOVING =
+		{
+			CalledWhen = "Player tried to move in the tick being currently processed. Plugin may refuse movement.",
+			DefaultFnName = "OnPlayerMoving",  -- also used as pagename
+			Desc = [[
+				This function is called in each server tick for each {{cPlayer|player}} that has sent any of the
+				player-move packets. Plugins may refuse the movement.
+			]],
+			Params =
+			{
+				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has moved. The object already has the new position stored in it." },
+			},
+			Returns = [[
+				If the function returns true, movement is prohibited. FIXME: The player's client is not informed.</p>
+				<p>
+				If the function returns false or no value, other plugins' callbacks are called and finally the new
+				position is permanently stored in the cPlayer object.</p>
+			]],
+		},  -- HOOK_PLAYER_MOVING
+
+		HOOK_PLAYER_PLACED_BLOCK =
+		{
+			CalledWhen = "After a player has placed a block. Notification only.",
+			DefaultFnName = "OnPlayerPlacedBlock",  -- also used as pagename
+			Desc = [[
+				This hook is called after a {{cPlayer|player}} has placed a block in the {{cWorld|world}}. The block
+				is already added to the world and the corresponding item removed from player's
+				{{cInventory|inventory}}.</p>
+				<p>
+				Use the {{cPlayer}}:GetWorld() function to get the world to which the block belongs.</p>
+				<p>
+				See also the {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}} hook for a similar hook called
+				before the placement.
+			]],
+			Params =
+			{
+				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who placed the block" },
+				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
+				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
+				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
+				{ Name = "BlockFace", Type = "number", Notes = "Face of the existing block upon which the player interacted. One of the BLOCK_FACE_ constants" },
+				{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor within the block face (0 .. 15)" },
+				{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor within the block face (0 .. 15)" },
+				{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor within the block face (0 .. 15)" },
+				{ Name = "BlockType", Type = "BLOCKTYPE", Notes = "The block type of the block" },
+				{ Name = "BlockMeta", Type = "NIBBLETYPE", Notes = "The block meta of the block" },
+			},
+			Returns = [[
+				If this function returns false or no value, MCServer calls other plugins with the same event. If
+				this function returns true, no other plugin is called for this event.
+			]],
+		},  -- HOOK_PLAYER_PLACED_BLOCK
+
 	},  -- Hooks[]
 	
 
