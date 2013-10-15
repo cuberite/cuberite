@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Horse.h"
@@ -105,9 +104,6 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 		m_Attachee->Detach();
 	}
 	
-	m_TameAttemptTimes++;
-	a_Player.AttachTo(this);
-	
 	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
 	{
 		if (!a_Player.IsGameModeCreative())
@@ -118,6 +114,11 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 		// Set saddle state & broadcast metadata
 		m_bIsSaddled = true;
 		m_World->BroadcastEntityMetadata(*this);
+	}
+	else
+	{
+		m_TameAttemptTimes++;
+	        a_Player.AttachTo(this);
 	}
 }
 
