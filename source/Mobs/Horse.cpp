@@ -89,38 +89,38 @@ void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cHorse::OnRightClicked(cPlayer & a_Player)
 {
-	if (m_Attachee != NULL)
-	{
-		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
-		{
-			a_Player.Detach();
-			return;
-		}
-		
-		if (m_Attachee->IsPlayer())
-		{
-			return;
-		}
-		
-		m_Attachee->Detach();
-	}
-	
-	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
-	{
-		if (!a_Player.IsGameModeCreative())
-		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
-		}
+        if (m_Attachee != NULL)
+        {
+                if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
+                {
+                        a_Player.Detach();
+                        return;
+                }
+                
+                if (m_Attachee->IsPlayer())
+                {
+                        return;
+                }
+                
+                m_Attachee->Detach();
+        }
+        
+        if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE && !m_bIsSaddled && m_bIsTame)
+        {
+                if (!a_Player.IsGameModeCreative())
+                {
+                        a_Player.GetInventory().RemoveOneEquippedItem();
+                }
 
-		// Set saddle state & broadcast metadata
-		m_bIsSaddled = true;
-		m_World->BroadcastEntityMetadata(*this);
-	}
-	else
-	{
-		m_TameAttemptTimes++;
-	        a_Player.AttachTo(this);
-	}
+                // Set saddle state & broadcast metadata
+                m_bIsSaddled = true;
+                m_World->BroadcastEntityMetadata(*this);
+        }
+        else
+        {
+                m_TameAttemptTimes++;
+                a_Player.AttachTo(this);
+        }
 }
 
 
