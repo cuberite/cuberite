@@ -1,3 +1,8 @@
+html
+{
+	background-color: #C0C0C0;
+}
+
 table
 {
 	background-color: #fff;
@@ -26,3 +31,26 @@ pre
 	border: 1px solid #ccc;
 	background-color: #eee;
 }
+
+body
+{
+	min-width: 800px;
+	width: 95%;
+	margin: 10px auto;
+	background-color: white;
+	border: 4px #FF8C00 solid;
+	border-radius: 20px;
+	font-family: Calibri, Trebuchet MS;
+}
+
+header
+{
+	text-align: center;
+	font-family: Segoe UI Light, Helvetica;
+}
+
+#content
+{
+	padding: 0px 25px 25px 25px;
+}
+
