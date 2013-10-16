@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Cow.h"
+#include "../Entities/Player.h"
 
 
 
@@ -24,6 +25,10 @@ void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 1, 3, IsOnFire() ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
 }
 
+
+
+
+
 void cCow::OnRightClicked(cPlayer & a_Player)
 {
 	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_BUCKET))
@@ -31,9 +36,8 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 		if (!a_Player.IsGameModeCreative())
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
-			a_Player.GetInventory().AddItem(E_ITEM_MILK)
+			a_Player.GetInventory().AddItem(E_ITEM_MILK);
 		}
-
 	}
 }
 
