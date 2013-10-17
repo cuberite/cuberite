@@ -867,9 +867,9 @@ function WriteHtmlHook(a_Hook)
 	f:write("</pre>\n\n");
 	local Examples = a_Hook.CodeExamples or {};
 	for i, example in ipairs(Examples) do
-		f:write("			<h2>" .. example.Title .. "</h2>\n");
-		f:write("			<p>" .. example.Desc .. "</p>\n\n");
-		f:write("			<pre class=\"prettyprint lang-lua\">" .. example.Code .. "\n			</pre>\n\n");
+		f:write("			<h2>" .. (example.Title or "<i>missing Title</i>") .. "</h2>\n");
+		f:write("			<p>" .. (example.Desc or "<i>missing Desc</i>") .. "</p>\n\n");
+		f:write("			<pre class=\"prettyprint lang-lua\">" .. (example.Code or "<i>missing Code</i>") .. "\n			</pre>\n\n");
 	end
 	f:write([[		</div>
 	</body>
