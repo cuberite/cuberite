@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Horse.h"
@@ -76,6 +75,7 @@ void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
 		if (m_RearTickCount == 20)
 		{
 			m_bIsRearing = false;
+			m_RearTickCount = 0;
 		}
 		else { m_RearTickCount++;}
 	}
@@ -105,7 +105,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
                 m_Attachee->Detach();
         }
         
-        if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE && !m_bIsSaddled && m_bIsTame)
+        if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE) && (!m_bIsSaddled) && (m_bIsTame))
         {
                 if (!a_Player.IsGameModeCreative())
                 {
@@ -116,7 +116,12 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
                 m_bIsSaddled = true;
                 m_World->BroadcastEntityMetadata(*this);
         }
-        else
+		else if ((a_Player.GetEquippedItem().m_ItemType != E_ITEM_EMPTY) && (!m_bIsSaddled) && (!m_bIsTame))
+        {
+                m_bIsRearing = true;
+				m_RearTickCount = 0;
+        }
+        else 
         {
                 m_TameAttemptTimes++;
                 a_Player.AttachTo(this);
