@@ -748,7 +748,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	end
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
-			cf:write("				<li><a href=\"#additionalinfo_" .. i .. "\">" .. additional.Header .. "</a></li>\n");
+			cf:write("				<li><a href=\"#additionalinfo_" .. i .. "\">" .. (additional.Header or "<i>(No header)</i>").. "</a></li>\n");
 		end
 	end
 	cf:write("			</ul>\n\n");

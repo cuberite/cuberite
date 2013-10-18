@@ -1003,6 +1003,34 @@ cFile:Delete("/usr/bin/virus.exe");
 			Constants =
 			{
 			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Practical usage",
+					Contents = [[
+						If you want to use cIniFile you need to know a couple of things; what is the key name and what
+						is the value name. Below is a demonstration of what is what.</p>
+<pre class="prettyprint lang-ini">
+; Comment line
+[KeyName1]
+ValueName1=Value1
+ValueName2=Value2
+
+[KeyName2]
+ValueName1=Value3
+</pre></p>
+						<p>
+						cIniFile is very easy to use. For example, you can find out what port the server is supposed to
+						use according to settings.ini by using this little snippet:
+<pre class="prettyprint lang-lua">
+local IniFile = cIniFile("settings.ini");
+if (IniFile:ReadFile()) then
+	ServerPort = IniFile:GetValueI("Server", "Port");
+end
+</pre>
+					]],
+				},
+			},
 		},
 
 		cInventory =
