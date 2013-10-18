@@ -55,7 +55,17 @@ public:
 		mtWolf         = E_META_SPAWN_EGG_WOLF,
 		mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
 		mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
+		mtInvalidType
+	} ;
 
+	enum eFamily
+	{
+		mfHostile  = 0, // Spider, Zombies ...
+		mfPassive  = 1, // Cows, Pigs
+		mfAmbient  = 2, // Bats
+		mfWater    = 3, // Squid
+
+		mfMaxplusone, // Nothing. Be sure this is the last and the others are in order
 	} ;
 	
 	// tolua_end
@@ -82,7 +92,10 @@ public:
 	virtual void MoveToPosition(const Vector3f & a_Position);
 	virtual bool ReachedDestination(void);
 	
-	char GetMobType(void) const {return m_MobType; }
+	char GetMobType(void) const {return m_MobType; } // MG TODO : see if we can delete this one.
+	eType GetMobTypeAsEnum(void) const {return (eType)m_MobType; }  // MG TODO : see if we should store m_MobType as enum instead of char.
+	eFamily GetMobFamily(void) const;
+
 
 	const char * GetState();
 	void SetState(const AString & str);

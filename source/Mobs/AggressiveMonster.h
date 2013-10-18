@@ -19,6 +19,7 @@ public:
 	virtual void InStateChasing(float a_Dt) override;
 	
 	virtual void EventSeePlayer(cEntity *) override;
+
 	
 protected:
 	float m_ChaseTime;

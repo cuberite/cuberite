@@ -28,35 +28,10 @@
 #include "Simulator/VaporizeFluidSimulator.h"
 
 // Mobs:
-#include "Mobs/Bat.h"
-#include "Mobs/Blaze.h"
-#include "Mobs/Cavespider.h"
-#include "Mobs/Chicken.h"
-#include "Mobs/Cow.h"
-#include "Mobs/Creeper.h"
-#include "Mobs/Enderman.h"
-#include "Mobs/EnderDragon.h"
-#include "Mobs/Ghast.h"
-#include "Mobs/Giant.h"
-#include "Mobs/Horse.h"
-#include "Mobs/IronGolem.h"
-#include "Mobs/Magmacube.h"
-#include "Mobs/Mooshroom.h"
-#include "Mobs/Ocelot.h"
-#include "Mobs/Pig.h"
-#include "Mobs/Sheep.h"
-#include "Mobs/Silverfish.h"
-#include "Mobs/Skeleton.h"
-#include "Mobs/Slime.h"
-#include "Mobs/SnowGolem.h"
-#include "Mobs/Spider.h"
-#include "Mobs/Squid.h"
-#include "Mobs/Villager.h"
-#include "Mobs/Witch.h"
-#include "Mobs/Wither.h"
-#include "Mobs/Wolf.h"
-#include "Mobs/Zombie.h"
-#include "Mobs/Zombiepigman.h"
+#include "Mobs/IncludeAllMonsters.h"
+#include "MobCensus.h"
+#include "MobSpawner.h"
+#include "MobTypesManager.h"
 
 #include "MersenneTwister.h"
 #include "Generating/Trees.h"
@@ -252,7 +227,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
-	m_LastSpawnMonster(0),
 	m_RSList(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
@@ -515,15 +489,19 @@ void cWorld::Start(void)
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
 
-	m_bAnimals = true;
-	m_SpawnMonsterRate = 200;  // 1 mob each 10 seconds
-	cIniFile IniFile2("settings.ini");
-	if (IniFile2.ReadFile())
+	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", true);
+	AString sAllMonsters = IniFile.GetValue("Monsters", "Types");
+	AStringVector SplitList = StringSplit(sAllMonsters, ",");
+	for (unsigned int i = 0; i < SplitList.size(); ++i)
 	{
-		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true);
-		m_SpawnMonsterRate = (Int64)(IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10) * 20);  // Convert from secs to ticks
-		
-	}
+		cMonster::eType ToAdd = cMobTypesManager::fromStringToMobType(SplitList[i]);
+		if (ToAdd != cMonster::mtInvalidType)
+		{
+			m_AllowedMobs.insert(ToAdd);
+			LOGD("Allowed mob: %s",cMobTypesManager::fromMobTypeToString(ToAdd).c_str()); // a bit reverse working, but very few ressources wasted
+		}
+	};
+
 
 	m_ChunkMap = new cChunkMap(this);
 	
@@ -552,6 +530,13 @@ void cWorld::Start(void)
 	m_Generator.Start(this, IniFile);
 	m_ChunkSender.Start(this);
 	m_TickThread.Start();
+
+	// Init of the spawn monster time (as they are supposed to have different spawn rate)
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily,Int64>::value_type(cMonster::mfHostile,0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily,Int64>::value_type(cMonster::mfPassive,0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily,Int64>::value_type(cMonster::mfAmbient,0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily,Int64>::value_type(cMonster::mfWater,0));
+
 
 	// Save any changes that the defaults may have done to the ini file:
 	if (!IniFile.WriteFile())
@@ -648,7 +633,7 @@ void cWorld::Tick(float a_Dt)
 		UnloadUnusedChunks();
 	}
 
-	TickSpawnMobs(a_Dt);
+	TickMobs(a_Dt);
 
 	std::vector<int> m_RSList_copy(m_RSList);
 	
@@ -733,125 +718,57 @@ void cWorld::TickWeather(float a_Dt)
 
 
 
-void cWorld::TickSpawnMobs(float a_Dt)
+void cWorld::TickMobs(float a_Dt)
 {
-	if (!m_bAnimals || (m_WorldAge - m_LastSpawnMonster <= m_SpawnMonsterRate))
+	if (!m_bAnimals)
 	{
 		return;
 	}
-	
-	m_LastSpawnMonster = m_WorldAge;
-	Vector3d SpawnPos;
+
+	// before every Mob action, we have to "counts" them depending on the distance to players, on their megatype ...
+	cMobCensus MobCensus;
+	m_ChunkMap->CollectMobCensus(MobCensus);
+	for(cMobFamilyCollecter::tMobFamilyList::const_iterator itr = cMobFamilyCollecter::m_AllFamilies().begin(); itr != cMobFamilyCollecter::m_AllFamilies().end(); itr++)
 	{
-		cCSLock Lock(m_CSPlayers);
-		if (m_Players.size() <= 0)
+		cMobCensus::tMobSpawnRate::const_iterator spawnrate = cMobCensus::m_SpawnRate().find(*itr);
+		// hostile mobs are spawned more often
+		if (spawnrate != cMobCensus::m_SpawnRate().end() && m_LastSpawnMonster[*itr] < m_WorldAge - spawnrate->second)
 		{
-			return;
+			m_LastSpawnMonster[*itr] = m_WorldAge;
+			// each megatype of mob has it's own cap
+			if (!(MobCensus.isCaped(*itr)))
+			{
+				if (m_bAnimals)
+				{
+
+					cMobSpawner Spawner(*itr,m_AllowedMobs);
+					if (Spawner.CanSpawnSomething())
+					{
+						m_ChunkMap->SpawnMobs(Spawner);
+						// do the spawn
+						
+						for(cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); itr2++)
+						{
+							SpawnMobFinalize(*itr2);
+						}
+					}
+				}
+			}		   
 		}
-		int RandomPlayerIdx = m_TickRand.randInt() & m_Players.size();
-		cPlayerList::iterator itr = m_Players.begin();
-		for (int i = 1; i < RandomPlayerIdx; i++)
-		{
-			itr++;
-		}
-		SpawnPos = (*itr)->GetPosition();
 	}
 
-	int dayRand   = (m_TickRand.randInt() /  7) %  6;
-	int nightRand = (m_TickRand.randInt() / 11) % 10;
-
-	SpawnPos += Vector3d((double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32);
-	int Height = GetHeight((int)SpawnPos.x, (int)SpawnPos.z);
-
-	int MobType = -1;
-	int Biome = GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z);
-	switch (Biome)
+	// move close mobs
+	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.getProximityCounter().getMobWithinThosesDistances(-1,64*16);// MG TODO : deal with this magic number (the 16 is the size of a block)
+	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; itr++)
 	{
-		case biNether:
-		{
-			// Spawn nether mobs
-			switch (nightRand)
-			{
-				case 0: MobType = cMonster::mtBlaze;        break;
-				case 1: MobType = cMonster::mtGhast;        break;
-				case 2: MobType = cMonster::mtGhast;        break;
-				case 3: MobType = cMonster::mtGhast;        break;
-				case 4: MobType = cMonster::mtZombiePigman; break;
-				case 5: MobType = cMonster::mtZombiePigman; break;
-				case 6: MobType = cMonster::mtZombiePigman; break;
-				case 7: MobType = cMonster::mtZombiePigman; break;
-				case 8: MobType = cMonster::mtZombiePigman; break;
-				case 9: MobType = cMonster::mtZombiePigman; break;
-			}
-			break;
-		}
-		
-		case biEnd:
-		{
-			// Spawn only The End mobs
-			switch (nightRand)
-			{
-				case 0: MobType = cMonster::mtEnderDragon;  break;
-				case 1: MobType = cMonster::mtEnderman;     break;
-				case 2: MobType = cMonster::mtEnderman;     break;
-				case 3: MobType = cMonster::mtEnderman;     break;
-				case 4: MobType = cMonster::mtEnderman;     break;
-				case 5: MobType = cMonster::mtEnderman;     break;
-				case 6: MobType = cMonster::mtEnderman;     break;
-				case 7: MobType = cMonster::mtEnderman;     break;
-				case 8: MobType = cMonster::mtEnderman;     break;
-				case 9: MobType = cMonster::mtEnderman;     break;
-			}
-			break;
-		}
-		
-		case biMushroomIsland:
-		case biMushroomShore:
-		{
-			// Mushroom land gets only mooshrooms
-			MobType = cMonster::mtMooshroom;
-			break;
-		}
-		
-		default:
-		{
-			// Overworld biomes depend on whether it's night or day:
-			if (m_TimeOfDay >= 12000 + 1000)
-			{
-				// Night mobs:
-				switch (nightRand)
-				{			
-					case 0: MobType = cMonster::mtSpider;     break;
-					case 1: MobType = cMonster::mtZombie;     break;				
-					case 2: MobType = cMonster::mtEnderman;   break;
-					case 3: MobType = cMonster::mtCreeper;    break;
-					case 4: MobType = cMonster::mtCaveSpider; break;
-					case 7: MobType = cMonster::mtSlime;      break;
-					case 8: MobType = cMonster::mtSilverfish; break;
-					case 9: MobType = cMonster::mtSkeleton;   break;
-				}
-			}  // if (night)
-			else
-			{
-				// During the day:
-				switch (dayRand)
-				{
-					case 0: MobType = cMonster::mtChicken; break;
-					case 1: MobType = cMonster::mtCow;     break;
-					case 2: MobType = cMonster::mtPig;     break;
-					case 3: MobType = cMonster::mtSheep;   break;
-					case 4: MobType = cMonster::mtSquid;   break;
-					case 5: MobType = cMonster::mtWolf;    break;
-					case 6: MobType = cMonster::mtHorse;   break;
-				}
-			}  // else (night)
-		}  // case overworld biomes
-	}  // switch (biome)
+		itr->second.m_Monster.Tick(a_Dt,itr->second.m_Chunk);
+	}
 
-	if (MobType >= 0)
+	// remove too far mobs
+	cMobProximityCounter::sIterablePair allTooFarMobs = MobCensus.getProximityCounter().getMobWithinThosesDistances(128*16,-1);// MG TODO : deal with this magic number (the 16 is the size of a block)
+	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; itr++)
 	{
-		// A proper mob type was selected, now spawn the mob:
-		SpawnMob(SpawnPos.x, SpawnPos.y, SpawnPos.z, (cMonster::eType)MobType);
+		itr->second.m_Monster.Destroy(true);
 	}
 }
 
@@ -2594,80 +2511,36 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	
 	int SlSize = GetTickRandomNumber(2) + 1;  // 1 .. 3 - Slime
 	int ShColor = GetTickRandomNumber(15); // 0 .. 15 - Sheep
-	bool SkType = GetDimension() == biNether; // Skeleton
+	bool SkType = GetDimension() == dimNether ; // Skeleton
 
-	int VilType = GetTickRandomNumber(cVillager::vtMax); // 0 .. 6 - Villager
-	if (VilType == 6) { VilType = 0; } // Give farmers a better chance of spawning
+	Monster = cMobTypesManager::NewMonsterFromType(a_MonsterType);
+	if (Monster)
+		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
+	return SpawnMobFinalize(Monster);
+}
 
-	int HseType = GetTickRandomNumber(7); // 0 .. 7 - Horse Type (donkey, zombie, etc.)
-	int HseColor = GetTickRandomNumber(6); // 0 .. 6 - Horse
-	int HseStyle = GetTickRandomNumber(4); // 0 .. 4 - Horse
-	int HseTameTimes = GetTickRandomNumber(6) + 1; // 1 .. 7 - Horse tame amount
-	if ((HseType == 5) || (HseType == 6) || (HseType == 7)) { HseType = 0; } // 5,6,7 = 0 because little chance of getting 0 with TickRand
-	
-	switch (a_MonsterType)
+
+
+
+int cWorld::SpawnMobFinalize(cMonster* a_Monster)
+{
+	if (!a_Monster)
+		return -1;
+	a_Monster->SetHealth(a_Monster->GetMaxHealth());
+	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
-		case cMonster::mtBat:          Monster = new cBat();             break;
-		case cMonster::mtBlaze:        Monster = new cBlaze();           break;
-		case cMonster::mtCaveSpider:   Monster = new cCavespider();      break;
-		case cMonster::mtChicken:      Monster = new cChicken();         break;
-		case cMonster::mtCow:          Monster = new cCow();             break;
-		case cMonster::mtCreeper:      Monster = new cCreeper();         break;
-		case cMonster::mtEnderman:     Monster = new cEnderman();        break;
-		case cMonster::mtEnderDragon:  Monster = new cEnderDragon();     break;
-		case cMonster::mtGhast:        Monster = new cGhast();           break;
-		case cMonster::mtGiant:        Monster = new cGiant();           break;
-		case cMonster::mtHorse:
-		{
-			Monster = new cHorse(HseType, HseColor, HseStyle, HseTameTimes); break;
-		}
-		case cMonster::mtIronGolem:    Monster = new cIronGolem();       break;
-		case cMonster::mtMagmaCube:    Monster = new cMagmaCube(SlSize); break;
-		case cMonster::mtMooshroom:    Monster = new cMooshroom();       break;
-		case cMonster::mtOcelot:       Monster = new cOcelot();          break;
-		case cMonster::mtPig:          Monster = new cPig();             break;
-		case cMonster::mtSheep:        Monster = new cSheep(ShColor);    break;
-		case cMonster::mtSilverfish:   Monster = new cSilverfish();      break;
-		case cMonster::mtSkeleton:     Monster = new cSkeleton(SkType);  break;
-		case cMonster::mtSlime:        Monster = new cSlime(SlSize);     break;
-		case cMonster::mtSnowGolem:    Monster = new cSnowGolem();       break;
-		case cMonster::mtSpider:       Monster = new cSpider();          break;
-		case cMonster::mtSquid:        Monster = new cSquid();           break;
-		case cMonster::mtVillager:
-		{
-			Monster = new cVillager((cVillager::eVillagerType)VilType);  break;
-		}
-		case cMonster::mtWitch:        Monster = new cWitch();           break;
-		case cMonster::mtWither:       Monster = new cWither();          break;
-		case cMonster::mtWolf:         Monster = new cWolf();            break;
-		case cMonster::mtZombie:       Monster = new cZombie(false);     break; // TODO: Villager infection
-		case cMonster::mtZombiePigman: Monster = new cZombiePigman();    break;
-		
-		default:
-		{
-			LOGWARNING("%s: Unhandled monster type: %d. Not spawning.", __FUNCTION__, a_MonsterType);
-			return -1;
-		}
-	}
-	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
-	Monster->SetHealth(Monster->GetMaxHealth());
-	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *Monster))
-	{
-		delete Monster;
+		delete a_Monster;
 		return -1;
 	}
-	if (!Monster->Initialize(this))
+	if (!a_Monster->Initialize(this))
 	{
-		delete Monster;
+		delete a_Monster;
 		return -1;
 	}
+	BroadcastSpawnEntity(*a_Monster);
+	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
 
-	BroadcastSpawnEntity(*Monster);
-	// Because it's logical that ALL mob spawns need spawn effects, not just spawners
-	BroadcastSoundParticleEffect(2004, (int)(floor(a_PosX) * 8), (int)(floor(a_PosY) * 8), (int)(floor(a_PosZ) * 8), 0);
-
-	cPluginManager::Get()->CallHookSpawnedMonster(*this, *Monster);
-	return Monster->GetUniqueID();
+	return a_Monster->GetUniqueID();
 }
 
 
