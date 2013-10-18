@@ -1065,7 +1065,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				cItem is what defines an item or stack of items in the game, it contains the item ID, damage,
 				quantity and enchantments. Each slot in a {{cInventory}} class or a {{cItemGrid}} class is a cItem
 				and each {{cPickup}} contains a cItem. The enchantments are contained in a separate
-				{{cEnchantments}} class and are accessible through the m_Enchantments variable.
+				{{cEnchantments}} class and are accessible through the m_Enchantments variable.</p>
+				<p>
+				To test if a cItem object represents an empty item, do not compare the item type nor the item count,
+				but rather use the IsEmpty() function.
 			]],
 			
 			Functions =
@@ -1086,11 +1089,15 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
 				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage and enchantments)" },
 				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
-				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object" },
-				IsStackableWith = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is stackable with the one stored in the object" },
+				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object. This is true even if the two items have different enchantments" },
+				IsStackableWith = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is stackable with the one stored in the object. Two items with different enchantments cannot be stacked" },
 			},
-			Constants =
+			Variables =
 			{
+				m_Enchantments = { Type = "{{cEnchantments}}", Notes = "The enchantments that this item has" },
+				m_ItemCount    = { Type = "number", Notes = "Number of items in this stack" },
+				m_ItemDamage   = { Type = "number", Notes = "The damage of the item. Zero means no damage. Maximum damage can be queried with GetMaxDamage()" },
+				m_ItemType     = { Type = "number", Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants" },
 			},
 		},
 
