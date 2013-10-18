@@ -6,7 +6,7 @@
 
 
 
-cMobFamilyCollecter::tMobFamilyList cMobFamilyCollecter::initMobFamilyBeforeCx11()
+cMobFamilyCollecter::tMobFamilyList cMobFamilyCollecter::InitMobFamilyBeforeCx11(void)
 {
 	std::set<cMonster::eFamily> toReturn;
 	toReturn.insert(cMonster::mfHostile);
@@ -15,11 +15,21 @@ cMobFamilyCollecter::tMobFamilyList cMobFamilyCollecter::initMobFamilyBeforeCx11
 	toReturn.insert(cMonster::mfWater);
 	return toReturn;
 }
-cMobFamilyCollecter::tMobFamilyList& cMobFamilyCollecter::m_AllFamilies()
+
+
+
+
+
+cMobFamilyCollecter::tMobFamilyList & cMobFamilyCollecter::m_AllFamilies(void)
 {
-	static tMobFamilyList* AllFamilies = new tMobFamilyList(initMobFamilyBeforeCx11());
+	// TODO: This memory is leaked:
+	static tMobFamilyList * AllFamilies = new tMobFamilyList(InitMobFamilyBeforeCx11());
 	return *AllFamilies;
 }
+
+
+
+
 
 void cMobFamilyCollecter::CollectMob(cMonster& a_Monster)
 {
@@ -27,7 +37,15 @@ void cMobFamilyCollecter::CollectMob(cMonster& a_Monster)
 	m_Mobs[MobFamily].insert(&a_Monster);
 }
 
-int cMobFamilyCollecter::getNumberOfCollectedMobs(cMonster::eFamily a_Family)
+
+
+
+
+int cMobFamilyCollecter::GetNumberOfCollectedMobs(cMonster::eFamily a_Family)
 {
 	return m_Mobs[a_Family].size();
 }
+
+
+
+

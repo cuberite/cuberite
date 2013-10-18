@@ -732,21 +732,19 @@ void cWorld::TickMobs(float a_Dt)
 	{
 		cMobCensus::tMobSpawnRate::const_iterator spawnrate = cMobCensus::m_SpawnRate().find(*itr);
 		// hostile mobs are spawned more often
-		if (spawnrate != cMobCensus::m_SpawnRate().end() && m_LastSpawnMonster[*itr] < m_WorldAge - spawnrate->second)
+		if ((spawnrate != cMobCensus::m_SpawnRate().end()) && (m_LastSpawnMonster[*itr] < m_WorldAge - spawnrate->second))
 		{
 			m_LastSpawnMonster[*itr] = m_WorldAge;
 			// each megatype of mob has it's own cap
-			if (!(MobCensus.isCaped(*itr)))
+			if (!(MobCensus.IsCapped(*itr)))
 			{
 				if (m_bAnimals)
 				{
-
 					cMobSpawner Spawner(*itr,m_AllowedMobs);
 					if (Spawner.CanSpawnSomething())
 					{
 						m_ChunkMap->SpawnMobs(Spawner);
 						// do the spawn
-						
 						for(cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); itr2++)
 						{
 							SpawnMobFinalize(*itr2);
@@ -758,14 +756,14 @@ void cWorld::TickMobs(float a_Dt)
 	}
 
 	// move close mobs
-	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.getProximityCounter().getMobWithinThosesDistances(-1,64*16);// MG TODO : deal with this magic number (the 16 is the size of a block)
+	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
 	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; itr++)
 	{
-		itr->second.m_Monster.Tick(a_Dt,itr->second.m_Chunk);
+		itr->second.m_Monster.Tick(a_Dt, itr->second.m_Chunk);
 	}
 
 	// remove too far mobs
-	cMobProximityCounter::sIterablePair allTooFarMobs = MobCensus.getProximityCounter().getMobWithinThosesDistances(128*16,-1);// MG TODO : deal with this magic number (the 16 is the size of a block)
+	cMobProximityCounter::sIterablePair allTooFarMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(128 * 16, -1);// MG TODO : deal with this magic number (the 16 is the size of a block)
 	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; itr++)
 	{
 		itr->second.m_Monster.Destroy(true);
