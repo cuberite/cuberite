@@ -813,7 +813,14 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 	end
 
-	cf:write("		</div>\n	</body>\n</html>");
+	cf:write([[
+		</div>
+		<script>
+			prettyPrint();
+		</script>
+	</body>
+</html>
+	]]);
 	cf:close();
 end
 
@@ -879,6 +886,9 @@ function WriteHtmlHook(a_Hook)
 		f:write("			<pre class=\"prettyprint lang-lua\">" .. (example.Code or "<i>missing Code</i>") .. "\n			</pre>\n\n");
 	end
 	f:write([[		</div>
+		<script>
+			prettyPrint();
+		</script>
 	</body>
 </html>]]);
 	f:close();
