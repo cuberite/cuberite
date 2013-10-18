@@ -79,40 +79,43 @@ public:
 	
 	bool ResolveItem(const AString & a_ItemName, cItem & a_Item)
 	{
-		ItemMap::iterator itr = m_Map.find(a_ItemName);
+		// Split into parts divided by either ':' or '^'
+		AStringVector Split = StringSplitAndTrim(a_ItemName, ":^");
+		if (Split.empty())
+		{
+			return false;
+		}
+
+		ItemMap::iterator itr = m_Map.find(Split[0]);
 		if (itr != m_Map.end())
 		{
+			// Resolved as a string, assign the type and the default damage / count
 			a_Item.m_ItemType = itr->second.first;
 			a_Item.m_ItemDamage = itr->second.second;
 			if (a_Item.m_ItemDamage == -1)
 			{
 				a_Item.m_ItemDamage = 0;
 			}
-			a_Item.m_ItemCount = 1;
-			return true;
 		}
-
-		// Not a resolvable string, try pure numbers: "45:6", "45^6" etc.
-		AStringVector Split = StringSplit(a_ItemName, ":");
-		if (Split.size() == 1)
+		else
 		{
-			Split = StringSplit(a_ItemName, "^");
+			// Not a resolvable string, try pure numbers: "45:6", "45^6" etc.
+			a_Item.m_ItemType = (short)atoi(Split[0].c_str());
+			if ((a_Item.m_ItemType == 0) && (Split[0] != "0"))
+			{
+				// Parsing the number failed
+				return false;
+			}
 		}
-		if (Split.empty())
-		{
-			return false;
-		}
-		a_Item.m_ItemType = (short)atoi(Split[0].c_str());
-		if ((a_Item.m_ItemType == 0) && (Split[0] != "0"))
-		{
-			// Parsing the number failed
-			return false;
-		}
+		
+		// Parse the damage, if present:
 		if (Split.size() < 2)
 		{
+			// Not present, set the item as valid and return success:
 			a_Item.m_ItemCount = 1;
 			return true;
 		}
+		
 		a_Item.m_ItemDamage = atoi(Split[1].c_str());
 		if ((a_Item.m_ItemDamage == 0) && (Split[1] != "0"))
 		{
