@@ -53,6 +53,18 @@ cWebAdmin::cWebAdmin(void) :
 
 
 
+cWebAdmin::~cWebAdmin()
+{
+	if (m_IsInitialized)
+	{
+		LOG("Stopping WebAdmin...");
+	}
+}
+
+
+
+
+
 void cWebAdmin::AddPlugin( cWebPlugin * a_Plugin )
 {
 	m_Plugins.remove( a_Plugin );
@@ -78,6 +90,8 @@ bool cWebAdmin::Init(void)
 	{
 		return false;
 	}
+	
+	LOG("Initialising WebAdmin...");
 	
 	if (!m_IniFile.GetValueSetB("WebAdmin", "Enabled", true))
 	{
@@ -107,6 +121,8 @@ bool cWebAdmin::Start(void)
 		// Not initialized
 		return false;
 	}
+	
+	LOG("Starting WebAdmin...");
 	
 	// Initialize the WebAdmin template script and load the file
 	m_TemplateScript.Create();

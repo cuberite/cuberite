@@ -140,7 +140,6 @@ void cRoot::Start(void)
 		}
 		IniFile.WriteFile();
 
-		LOG("Initialising WebAdmin...");
 		m_WebAdmin = new cWebAdmin();
 		m_WebAdmin->Init();
 
@@ -172,7 +171,6 @@ void cRoot::Start(void)
 		LOGD("Finalising startup...");
 		m_Server->Start();
 		
-		LOG("Starting WebAdmin...");
 		m_WebAdmin->Start();
 
 		#if !defined(ANDROID_NDK)
@@ -210,7 +208,6 @@ void cRoot::Start(void)
 
 		LOGD("Freeing MonsterConfig...");
 		delete m_MonsterConfig; m_MonsterConfig = NULL;
-		LOGD("Stopping WebAdmin...");
 		delete m_WebAdmin; m_WebAdmin = NULL;
 		LOGD("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;

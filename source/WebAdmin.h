@@ -106,6 +106,7 @@ public:
 
 
 	cWebAdmin(void);
+	~cWebAdmin();
 
 	/// Initializes the object. Returns true if successfully initialized and ready to start
 	bool Init(void);
