@@ -728,7 +728,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	cf:write([[<!DOCTYPE html>
 <html>
 	<head>
-		<title>MCServer API - ]] .. a_ClassAPI.Name .. [[</title>
+		<title>MCServer API - ]] .. a_ClassAPI.Name .. [[ Class</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 		<script src="http://google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
@@ -827,7 +827,7 @@ function WriteHtmlHook(a_Hook)
 	f:write([[<!DOCTYPE html>
 <html>
 	<head>
-		<title>MCServer API - Hook ]] .. a_Hook.DefaultFnName .. [[</title>
+		<title>MCServer API - ]] .. a_Hook.DefaultFnName .. [[ Hook</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 		<script src="http://google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
