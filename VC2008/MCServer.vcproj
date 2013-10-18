@@ -707,6 +707,46 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\MobCensus.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobCensus.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobFamilyCollecter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobFamilyCollecter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobProximityCounter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobProximityCounter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobSpawner.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobSpawner.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobTypesManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MobTypesManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\MonsterConfig.cpp"
 				>
 			</File>
@@ -917,6 +957,10 @@
 				</File>
 				<File
 					RelativePath="..\source\Mobs\AggressiveMonster.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Bat.cpp"
 					>
 				</File>
 				<File
