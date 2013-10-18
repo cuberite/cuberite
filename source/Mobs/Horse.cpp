@@ -78,7 +78,10 @@ void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
 			m_bIsRearing = false;
 			m_RearTickCount = 0;
 		}
-		else { m_RearTickCount++;}
+		else
+		{
+			m_RearTickCount++;
+		}
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
@@ -90,43 +93,46 @@ void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cHorse::OnRightClicked(cPlayer & a_Player)
 {
-        if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE) && (!m_bIsSaddled) && (m_bIsTame))
-        {
-                if (!a_Player.IsGameModeCreative())
-                {
-                        a_Player.GetInventory().RemoveOneEquippedItem();
-                }
+	if (!m_bIsSaddled && m_bIsTame)
+	{
+		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
+		{
+			// Saddle the horse:
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
+			m_bIsSaddled = true;
+			m_World->BroadcastEntityMetadata(*this);
+		}
+		else if (!a_Player.GetEquippedItem().IsEmpty())
+		{
+			// The horse doesn't like being hit, make it rear:
+			m_bIsRearing = true;
+			m_RearTickCount = 0;
+		}
+	}
+	else
+	{
+		if (m_Attachee != NULL)
+		{
+			if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
+			{
+				a_Player.Detach();
+				return;
+			}
 
-                // Set saddle state & broadcast metadata
-                m_bIsSaddled = true;
-                m_World->BroadcastEntityMetadata(*this);
-        }
-		else if ((a_Player.GetEquippedItem().m_ItemType != E_ITEM_EMPTY) && (!m_bIsSaddled) && (!m_bIsTame))
-        {
-                m_bIsRearing = true;
-				m_RearTickCount = 0;
-        }
-        else 
-        {
-        	if (m_Attachee != NULL)
-        {
-                if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
-                {
-                        a_Player.Detach();
-                        return;
-                }
-                
-                if (m_Attachee->IsPlayer())
-                {
-                        return;
-                }
-                
-                m_Attachee->Detach();
-        }
+			if (m_Attachee->IsPlayer())
+			{
+				return;
+			}
 
-                m_TameAttemptTimes++;
-                a_Player.AttachTo(this);
-        }
+			m_Attachee->Detach();
+		}
+
+		m_TameAttemptTimes++;
+		a_Player.AttachTo(this);
+	}
 }
 
 
