@@ -3509,6 +3509,7 @@ end
 		"os",
 		"string",
 		"table",
+		"g_TrackedPages",
 	},
 	
 	IgnoreFunctions =
@@ -3528,6 +3529,7 @@ end
 		"DumpAPITxt",
 		"Initialize",
 		"LinkifyString",
+		"ListMissingPages",
 		"ReadDescriptions",
 		"ReadHooks",
 		"WriteHtmlClass",
