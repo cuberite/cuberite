@@ -3530,6 +3530,8 @@ end
 		"Initialize",
 		"LinkifyString",
 		"ListMissingPages",
+		"ListUndocumentedObjects",
+		"ListUnexportedObjects",
 		"ReadDescriptions",
 		"ReadHooks",
 		"WriteHtmlClass",
