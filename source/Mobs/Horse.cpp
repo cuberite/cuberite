@@ -76,6 +76,7 @@ void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
 		if (m_RearTickCount == 20)
 		{
 			m_bIsRearing = false;
+			m_RearTickCount = 0;
 		}
 		else { m_RearTickCount++;}
 	}
@@ -89,36 +90,43 @@ void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cHorse::OnRightClicked(cPlayer & a_Player)
 {
-	if (m_Attachee != NULL)
-	{
-		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
-		{
-			a_Player.Detach();
-			return;
-		}
-		
-		if (m_Attachee->IsPlayer())
-		{
-			return;
-		}
-		
-		m_Attachee->Detach();
-	}
-	
-	m_TameAttemptTimes++;
-	a_Player.AttachTo(this);
-	
-	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
-	{
-		if (!a_Player.IsGameModeCreative())
-		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
-		}
+        if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE) && (!m_bIsSaddled) && (m_bIsTame))
+        {
+                if (!a_Player.IsGameModeCreative())
+                {
+                        a_Player.GetInventory().RemoveOneEquippedItem();
+                }
 
-		// Set saddle state & broadcast metadata
-		m_bIsSaddled = true;
-		m_World->BroadcastEntityMetadata(*this);
-	}
+                // Set saddle state & broadcast metadata
+                m_bIsSaddled = true;
+                m_World->BroadcastEntityMetadata(*this);
+        }
+		else if ((a_Player.GetEquippedItem().m_ItemType != E_ITEM_EMPTY) && (!m_bIsSaddled) && (!m_bIsTame))
+        {
+                m_bIsRearing = true;
+				m_RearTickCount = 0;
+        }
+        else 
+        {
+        	if (m_Attachee != NULL)
+        {
+                if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
+                {
+                        a_Player.Detach();
+                        return;
+                }
+                
+                if (m_Attachee->IsPlayer())
+                {
+                        return;
+                }
+                
+                m_Attachee->Detach();
+        }
+
+                m_TameAttemptTimes++;
+                a_Player.AttachTo(this);
+        }
 }
 
 
