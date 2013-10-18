@@ -632,6 +632,24 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		cf:write("			</table>\n\n");
 	end
 	
+	local function WriteConstants(a_Constants, a_InheritedName)
+		if (#a_Constants == 0) then
+			return;
+		end
+		
+		if (a_InheritedName ~= nil) then
+			cf:write("			<h2>Constants inherited from " .. a_InheritedName .. "</h2>\n");
+		end
+		
+		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Value</th>\n					<th>Notes</th>\n				</tr>\n");
+		for i, cons in ipairs(a_Constants) do
+			cf:write("				<tr>\n					<td>" .. cons.Name .. "</td>\n");
+			cf:write("					<td>" .. cons.Value .. "</td>\n");
+			cf:write("					<td>" .. LinkifyString(cons.Notes or "", a_InheritedName or a_ClassAPI.Name) .. "</td>\n				</tr>\n");
+		end
+		cf:write("			</table>\n\n");
+	end
+	
 	local function WriteDescendants(a_Descendants)
 		if (#a_Descendants == 0) then
 			return;
@@ -676,12 +694,25 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	local HasInheritance = ((#a_ClassAPI.Descendants > 0) or (a_ClassAPI.Inherits ~= nil));
 	
+	local HasConstants = (#a_ClassAPI.Constants > 0);
+	local HasFunctions = (#a_ClassAPI.Functions > 0);
+	if (a_ClassAPI.Inherits ~= nil) then
+		for idx, cls in ipairs(a_ClassAPI.Inherits) do
+			HasConstants = HasConstants or (#cls.Constants > 0);
+			HasFunctions = HasFunctions or (#cls.Functions > 0);
+		end
+	end
+	
 	-- Write the table of contents:
 	if (HasInheritance) then
 		cf:write("				<li><a href=\"#inherits\">Inheritance</a></li>\n");
 	end
-	cf:write("				<li><a href=\"#constants\">Constants</a></li>\n");
-	cf:write("				<li><a href=\"#functions\">Functions</a></li>\n");
+	if (HasConstants) then
+		cf:write("				<li><a href=\"#constants\">Constants</a></li>\n");
+	end
+	if (HasFunctions) then
+		cf:write("				<li><a href=\"#functions\">Functions</a></li>\n");
+	end
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
 			cf:write("				<li><a href=\"#additionalinfo_" .. i .. "\">" .. additional.Header .. "</a></li>\n");
@@ -715,20 +746,21 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	end
 	
 	-- Write the constants:
-	cf:write("			<a name=\"constants\"><hr /><h1>Constants</h1></a>\n");
-	cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Value</th>\n					<th>Notes</th>\n				</tr>\n");
-	for i, cons in ipairs(a_ClassAPI.Constants) do
-		cf:write("				<tr>\n					<td>" .. cons.Name .. "</td>\n");
-		cf:write("					<td>" .. cons.Value .. "</td>\n");
-		cf:write("					<td>" .. LinkifyString(cons.Notes or "", ClassName) .. "</td>\n				</tr>\n");
-	end
-	cf:write("			</table>\n\n");
+	if (HasConstants) then
+		cf:write("			<a name=\"constants\"><hr /><h1>Constants</h1></a>\n");
+		WriteConstants(a_ClassAPI.Constants, nil);
+		for i, cls in ipairs(InheritanceChain) do
+			WriteConstants(cls.Constants, cls.Name);
+		end;
+	end;
 	
 	-- Write the functions, including the inherited ones:
-	cf:write("			<a name=\"functions\"><hr /><h1>Functions</h1></a>\n");
-	WriteFunctions(a_ClassAPI.Functions, nil);
-	for i, cls in ipairs(InheritanceChain) do
-		WriteFunctions(cls.Functions, cls.Name);
+	if (HasFunctions) then
+		cf:write("			<a name=\"functions\"><hr /><h1>Functions</h1></a>\n");
+		WriteFunctions(a_ClassAPI.Functions, nil);
+		for i, cls in ipairs(InheritanceChain) do
+			WriteFunctions(cls.Functions, cls.Name);
+		end
 	end
 	
 	-- Write the additional infos:
