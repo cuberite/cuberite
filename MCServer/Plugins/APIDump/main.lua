@@ -295,19 +295,10 @@ function DumpAPIHtml()
 </html>]]);
 	f:close();
 	
-	-- Copy the CSS file to the output folder (overwrite any existing):
-	cssf = io.open("API/main.css", "w");
-	if (cssf ~= nil) then
-		cssfi = io.open(g_Plugin:GetLocalDirectory() .. "/main.css", "r");
-		if (cssfi ~= nil) then
-			local CSS = cssfi:read("*all");
-			cssf:write(CSS);
-			cssfi:close();
-		end
-		cssf:close();
-	end
-	
-	cFile:Copy(g_Plugin:GetLocalDirectory() .. "/run_prettify.js", "API/run_prettify.js");
+	-- Copy the static files to the output folder (overwrite any existing):
+	cFile:Copy(g_Plugin:GetLocalFolder() .. "/main.css", "API/main.css");
+	cFile:Copy(g_Plugin:GetLocalFolder() .. "/prettify.js", "API/prettify.js");
+	cFile:Copy(g_Plugin:GetLocalFolder() .. "/prettify.css", "API/prettify.css");
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/lang-lua.js", "API/lang-lua.js");
 	
 	-- List the documentation problems:
@@ -678,7 +669,8 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	<head>
 		<title>MCServer API - ]] .. a_ClassAPI.Name .. [[ Class</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
-		<script src="run_prettify.js"></script>
+		<link rel="stylesheet" type="text/css" href="prettify.css" />
+		<script src="prettify.js"></script>
 		<script src="lang-lua.js"></script>
 	</head>
 	<body>
@@ -793,7 +785,8 @@ function WriteHtmlHook(a_Hook)
 	<head>
 		<title>MCServer API - ]] .. HookName .. [[ Hook</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
-		<script src="run_prettify.js"></script>
+		<link rel="stylesheet" type="text/css" href="prettify.css" />
+		<script src="prettify.js"></script>
 		<script src="lang-lua.js"></script>
 	</head>
 	<body>
