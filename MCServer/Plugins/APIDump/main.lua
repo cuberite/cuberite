@@ -459,10 +459,21 @@ function ReadDescriptions(a_API)
 					end
 				end  -- for j, cons
 			end  -- if (APIDesc.Constants ~= nil)
-		else
+			
+			-- Process member variables:
+			local vars = {};
+			for name, desc in pairs(APIDesc.Variables or {}) do
+				desc.Name = name;
+				table.insert(vars, desc);
+			end
+			cls.Variables = vars;
+			
+		else  -- if (APIDesc ~= nil)
+		
 			-- Class is not documented at all, add all its members to Undocumented lists:
 			cls.UndocumentedFunctions = {};
 			cls.UndocumentedConstants = {};
+			cls.Variables = {};
 			for j, func in ipairs(cls.Functions) do
 				local FnName = func.DocID or func.Name;
 				if not(IsFunctionIgnored(cls.Name .. "." .. FnName)) then
@@ -503,6 +514,13 @@ function ReadDescriptions(a_API)
 		table.sort(cls.Constants,
 			function(c1, c2)
 				return (c1.Name < c2.Name);
+			end
+		);
+		
+		-- Sort the member variables:
+		table.sort(cls.Variables,
+			function(v1, v2)
+				return (v1.Name < v2.Name);
 			end
 		);
 	end  -- for i, cls
@@ -618,7 +636,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 			cf:write("				<tr>\n					<td>" .. func.Name .. "</td>\n");
 			cf:write("					<td>" .. LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)).. "</td>\n");
 			cf:write("					<td>" .. LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)).. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(func.Notes or "", (a_InheritedName or a_ClassAPI.Name)) .. "</td>\n				</tr>\n");
+			cf:write("					<td>" .. LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)) .. "</td>\n				</tr>\n");
 		end
 		cf:write("			</table>\n\n");
 	end
@@ -637,6 +655,24 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 			cf:write("				<tr>\n					<td>" .. cons.Name .. "</td>\n");
 			cf:write("					<td>" .. cons.Value .. "</td>\n");
 			cf:write("					<td>" .. LinkifyString(cons.Notes or "", a_InheritedName or a_ClassAPI.Name) .. "</td>\n				</tr>\n");
+		end
+		cf:write("			</table>\n\n");
+	end
+	
+	local function WriteVariables(a_Variables, a_InheritedName)
+		if (#a_Variables == 0) then
+			return;
+		end
+		
+		if (a_InheritedName ~= nil) then
+			cf:write("			<h2>Member variables inherited from " .. a_InheritedName .. "</h2>\n");
+		end
+		
+		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Type</th>\n					<th>Notes</th>\n				</tr>\n");
+		for i, var in ipairs(a_Variables) do
+			cf:write("				<tr>\n					<td>" .. var.Name .. "</td>\n");
+			cf:write("					<td>" .. LinkifyString(var.Type or "<i>(undocumented)</i>", a_InheritedName or a_ClassAPI.Name) .. "</td>\n");
+			cf:write("					<td>" .. LinkifyString(var.Notes or "", a_InheritedName or a_ClassAPI.Name) .. "</td>\n				</tr>\n");
 		end
 		cf:write("			</table>\n\n");
 	end
@@ -688,10 +724,12 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	local HasConstants = (#a_ClassAPI.Constants > 0);
 	local HasFunctions = (#a_ClassAPI.Functions > 0);
+	local HasVariables = (#a_ClassAPI.Variables > 0);
 	if (a_ClassAPI.Inherits ~= nil) then
 		for idx, cls in ipairs(a_ClassAPI.Inherits) do
 			HasConstants = HasConstants or (#cls.Constants > 0);
 			HasFunctions = HasFunctions or (#cls.Functions > 0);
+			HasVariables = HasVariables or (#cls.Variables > 0);
 		end
 	end
 	
@@ -701,6 +739,9 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	end
 	if (HasConstants) then
 		cf:write("				<li><a href=\"#constants\">Constants</a></li>\n");
+	end
+	if (HasVariables) then
+		cf:write("				<li><a href=\"#variables\">Member variables</a></li>\n");
 	end
 	if (HasFunctions) then
 		cf:write("				<li><a href=\"#functions\">Functions</a></li>\n");
@@ -745,6 +786,15 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 			WriteConstants(cls.Constants, cls.Name);
 		end;
 	end;
+	
+	-- Write the member variables:
+	if (HasVariables) then
+		cf:write("			<a name=\"variables\"><hr /><h1>Member variables</h1></a>\n");
+		WriteVariables(a_ClassAPI.Variables, nil);
+		for i, cls in ipairs(InheritanceChain) do
+			WriteVariables(cls.Variables, cls.Name);
+		end;
+	end
 	
 	-- Write the functions, including the inherited ones:
 	if (HasFunctions) then

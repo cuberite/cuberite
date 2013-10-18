@@ -31,6 +31,11 @@ g_APIDesc =
 				ConstantName = { Notes = "Notes about the constant" },
 			} ,
 			
+			Variables =
+			{
+				VariableName = { Type = "string", Notes = "Notes about the variable" },
+			} ,
+			
 			AdditionalInfo =  -- Paragraphs to be exported after the function definitions table
 			{
 				{
@@ -610,8 +615,8 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			},
 			Variables =
 			{
-				p1 = { Notes = "{{Vector3i}} of one corner. Usually the lesser of the two coords in each set" },
-				p2 = { Notes = "{{Vector3i}} of the other corner. Usually the larger of the two coords in each set" },
+				p1 = { Type = "{{Vector3i}}", Notes = "The first corner. Usually the lesser of the two coords in each set" },
+				p2 = { Type = "{{Vector3i}}", Notes = "The second corner. Usually the larger of the two coords in each set" },
 			},
 		},
 
