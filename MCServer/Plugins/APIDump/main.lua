@@ -10,6 +10,7 @@
 -- Global variables:
 g_Plugin = nil;
 g_PluginFolder = "";
+g_TrackedPages = {};  -- List of tracked pages, to be checked later whether they exist. Each item is an array of referring pagenames.
 
 
 
@@ -262,7 +263,7 @@ function DumpAPIHtml()
 			f:write("				<tr>\n					<td>" .. hook.Name .. "</td>\n					<td><i>(No documentation yet)</i></td>\n 				</tr>\n");
 			table.insert(UndocumentedHooks, hook.Name);
 		else
-			f:write("				<tr>\n					<td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td>\n					<td>" .. LinkifyString(hook.CalledWhen) .. "</td>\n				</tr>\n");
+			f:write("				<tr>\n					<td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td>\n					<td>" .. LinkifyString(hook.CalledWhen, hook.Name) .. "</td>\n				</tr>\n");
 			WriteHtmlHook(hook);
 		end
 	end
@@ -399,6 +400,9 @@ function DumpAPIHtml()
 		f:close();
 	end
 	
+	-- List the missing pages
+	ListMissingPages();
+
 	LOG("API subfolder written");
 end
 
@@ -638,7 +642,18 @@ end
 
 
 -- Make a link out of anything with the special linkifying syntax {{link|title}}
-function LinkifyString(a_String)
+function LinkifyString(a_String, a_Referrer)
+	assert(a_Referrer ~= nil);
+	assert(a_Referrer ~= "");
+	
+	--- Adds a page to the list of tracked pages (to be checked for existence at the end)
+	local function AddTrackedPage(a_PageName)
+		local Pg = (g_TrackedPages[a_PageName] or {});
+		table.insert(Pg, a_Referrer);
+		g_TrackedPages[a_PageName] = Pg;
+	end
+	
+	--- Creates the HTML for the specified link and title
 	local function CreateLink(Link, Title)
 		if (Link:sub(1, 7) == "http://") then
 			-- The link is a full absolute URL, do not modify, do not track:
@@ -652,16 +667,17 @@ function LinkifyString(a_String)
 				return "<a href=\"" .. Link .. "\">" .. Title .. "</a>";
 			end
 			-- Anchor in another page:
-			-- TODO: track this link
-			return "<a href=\"" .. Link:sub(1, idxHash - 1) .. ".html#" .. Link:sub(idxHash + 1) .. "\">" .. Title .. "</a>";
+			local PageName = Link:sub(1, idxHash - 1);
+			AddTrackedPage(PageName);
+			return "<a href=\"" .. PageName .. ".html#" .. Link:sub(idxHash + 1) .. "\">" .. Title .. "</a>";
 		end
 		-- Link without anchor:
-		-- TODO; track this link
+		AddTrackedPage(Link);
 		return "<a href=\"" .. Link .. ".html\">" .. Title .. "</a>";
 	end
 	
+	-- Linkify the strings using the CreateLink() function:
 	local txt = a_String:gsub("{{([^|}]*)|([^}]*)}}", CreateLink)  -- {{link|title}}
-	
 	txt = txt:gsub("{{([^|}]*)}}",  -- {{LinkAndTitle}}
 		function(LinkAndTitle)
 			local idxHash = LinkAndTitle:find("#");
@@ -697,9 +713,9 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Parameters</th>\n					<th>Return value</th>\n					<th>Notes</th>\n				</tr>\n");
 		for i, func in ipairs(a_Functions) do
 			cf:write("				<tr>\n					<td>" .. func.Name .. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(func.Params or "").. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(func.Return or "").. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(func.Notes or "") .. "</td>\n				</tr>\n");
+			cf:write("					<td>" .. LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)).. "</td>\n");
+			cf:write("					<td>" .. LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)).. "</td>\n");
+			cf:write("					<td>" .. LinkifyString(func.Notes or "", (a_InheritedName or a_ClassAPI.Name)) .. "</td>\n				</tr>\n");
 		end
 		cf:write("			</table>\n\n");
 	end
@@ -716,6 +732,8 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 		cf:write("</ul>\n");
 	end
+	
+	local ClassName = a_ClassAPI.Name;
 
 	-- Build an array of inherited classes chain:
 	local InheritanceChain = {};
@@ -760,10 +778,10 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	cf:write("			</ul>\n\n");
 	
 	-- Write the class description:
-	cf:write("			<a name=\"desc\"><hr /><h1>Class " .. a_ClassAPI.Name .. "</h1></a>\n");
+	cf:write("			<a name=\"desc\"><hr /><h1>Class " .. ClassName .. "</h1></a>\n");
 	if (a_ClassAPI.Desc ~= nil) then
 		cf:write("			<p>");
-		cf:write(LinkifyString(a_ClassAPI.Desc));
+		cf:write(LinkifyString(a_ClassAPI.Desc, ClassName));
 		cf:write("			</p>\n\n");
 	end;
 	
@@ -790,7 +808,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	for i, cons in ipairs(a_ClassAPI.Constants) do
 		cf:write("				<tr>\n					<td>" .. cons.Name .. "</td>\n");
 		cf:write("					<td>" .. cons.Value .. "</td>\n");
-		cf:write("					<td>" .. LinkifyString(cons.Notes or "") .. "</td>\n				</tr>\n");
+		cf:write("					<td>" .. LinkifyString(cons.Notes or "", ClassName) .. "</td>\n				</tr>\n");
 	end
 	cf:write("			</table>\n\n");
 	
@@ -805,7 +823,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
 			cf:write("			<a name=\"additionalinfo_" .. i .. "\"><h1>" .. additional.Header .. "</h1></a>\n");
-			cf:write(LinkifyString(additional.Contents));
+			cf:write(LinkifyString(additional.Contents, ClassName));
 		end
 	end
 
@@ -824,10 +842,12 @@ function WriteHtmlHook(a_Hook)
 		LOG("Cannot write \"" .. fnam .. "\": \"" .. error .. "\".");
 		return;
 	end
+	local HookName = a_Hook.DefaultFnName;
+	
 	f:write([[<!DOCTYPE html>
 <html>
 	<head>
-		<title>MCServer API - ]] .. a_Hook.DefaultFnName .. [[ Hook</title>
+		<title>MCServer API - ]] .. HookName .. [[ Hook</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 		<script src="http://google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
@@ -840,10 +860,10 @@ function WriteHtmlHook(a_Hook)
 			</header>
 			<p>
 ]]);
-	f:write(LinkifyString(a_Hook.Desc));
+	f:write(LinkifyString(a_Hook.Desc, HookName));
 	f:write("			</p>\n			<hr /><h1>Callback function</h1>\n			<p>The default name for the callback function is ");
 	f:write(a_Hook.DefaultFnName .. ". It has the following signature:\n\n");
-	f:write("			<pre class=\"prettyprint lang-lua\">function " .. a_Hook.DefaultFnName .. "(");
+	f:write("			<pre class=\"prettyprint lang-lua\">function " .. HookName .. "(");
 	if (a_Hook.Params == nil) then
 		a_Hook.Params = {};
 	end
@@ -855,7 +875,7 @@ function WriteHtmlHook(a_Hook)
 	end
 	f:write(")</pre>\n\n			<hr /><h1>Parameters:</h1>\n\n			<table>\n				<tr>\n					<th>Name</th>\n					<th>Type</th>\n					<th>Notes</th>\n				</tr>\n");
 	for i, param in ipairs(a_Hook.Params) do
-		f:write("				<tr>\n					<td>" .. param.Name .. "</td>\n					<td>" .. LinkifyString(param.Type) .. "</td>\n					<td>" .. LinkifyString(param.Notes) .. "</td>\n				</tr>\n");
+		f:write("				<tr>\n					<td>" .. param.Name .. "</td>\n					<td>" .. LinkifyString(param.Type, HookName) .. "</td>\n					<td>" .. LinkifyString(param.Notes, HookName) .. "</td>\n				</tr>\n");
 	end
 	f:write("			</table>\n\n			<p>" .. (a_Hook.Returns or "") .. "</p>\n\n");
 	f:write([[			<hr /><h1>Code examples</h1>
@@ -874,6 +894,47 @@ function WriteHtmlHook(a_Hook)
 	f:write([[		</div>
 	</body>
 </html>]]);
+	f:close();
+end
+
+
+
+
+
+function ListMissingPages()
+	local MissingPages = {};
+	for PageName, Referrers in pairs(g_TrackedPages) do
+		if not(cFile:Exists("API/" .. PageName .. ".html")) then
+			table.insert(MissingPages, {Name = PageName, Refs = Referrers} );
+		end
+	end;
+	g_TrackedPages = {};
+	
+	if (#MissingPages == 0) then
+		-- No missing pages, congratulations!
+		return;
+	end
+	
+	-- Sort the pages by name:
+	table.sort(MissingPages,
+		function (Page1, Page2)
+			return (Page1.Name < Page2.Name);
+		end
+	);
+	
+	-- Output the pages:
+	local f, err = io.open("API/_missingPages.txt", "w");
+	if (f == nil) then
+		LOGWARNING("Cannot open _missingPages.txt for writing: '" .. err .. "'. There are " .. #MissingPages .. " pages missing.");
+		return;
+	end
+	for idx, pg in ipairs(MissingPages) do
+		f:write(pg.Name .. ":\n");
+		-- Sort and output the referrers:
+		table.sort(pg.Refs);
+		f:write("\t" .. table.concat(pg.Refs, "\n\t"));
+		f:write("\n\n");
+	end
 	f:close();
 end
 
