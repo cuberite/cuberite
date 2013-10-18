@@ -374,7 +374,7 @@ bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 	}
 	
 	// The item has broken, remove it:
-	Grid->EmptySlot(a_SlotNum);
+	Grid->EmptySlot(GridSlotNum);
 	return true;
 }
 
