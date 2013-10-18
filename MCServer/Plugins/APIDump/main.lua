@@ -307,6 +307,9 @@ function DumpAPIHtml()
 		cssf:close();
 	end
 	
+	cFile:Copy(g_Plugin:GetLocalDirectory() .. "/run_prettify.js", "API/run_prettify.js");
+	cFile:Copy(g_Plugin:GetLocalFolder() .. "/lang-lua.js", "API/lang-lua.js");
+	
 	-- List the undocumented objects:
 	f = io.open("API/_undocumented.lua", "w");
 	if (f ~= nil) then
@@ -748,8 +751,8 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	<head>
 		<title>MCServer API - ]] .. a_ClassAPI.Name .. [[ Class</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
-		<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
-		<script src="http://google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
+		<script src="run_prettify.js"></script>
+		<script src="lang-lua.js"></script>
 	</head>
 	<body>
 		<div id="content">
@@ -849,8 +852,8 @@ function WriteHtmlHook(a_Hook)
 	<head>
 		<title>MCServer API - ]] .. HookName .. [[ Hook</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
-		<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
-		<script src="http://google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
+		<script src="run_prettify.js"></script>
+		<script src="lang-lua.js"></script>
 	</head>
 	<body>
 		<div id="content">
