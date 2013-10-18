@@ -1099,6 +1099,38 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				m_ItemDamage   = { Type = "number", Notes = "The damage of the item. Zero means no damage. Maximum damage can be queried with GetMaxDamage()" },
 				m_ItemType     = { Type = "number", Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants" },
 			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Example code",
+					Contents = [[
+						The following code shows how to create items in several different ways (adapted from the Debuggers plugin):
+<pre class="prettyprint lang-lua">
+-- empty item:
+local Item1 = cItem();
+
+-- enchanted sword, enchantment given as numeric string (bad style; see Item5):
+local Item2 = cItem(E_ITEM_DIAMOND_SWORD, 1, 0, "1=1");
+
+-- 1 undamaged shovel, no enchantment:
+local Item3 = cItem(E_ITEM_DIAMOND_SHOVEL);
+
+-- Add the Unbreaking enchantment. Note that Vanilla's levelcap isn't enforced:
+Item3.m_Enchantments:SetLevel(cEnchantments.enchUnbreaking, 4);
+
+-- 1 undamaged pickaxe, no enchantment:
+local Item4 = cItem(E_ITEM_DIAMOND_PICKAXE);
+
+-- Add multiple enchantments:
+Item4.m_Enchantments:SetLevel(cEnchantments.enchUnbreaking, 5);
+Item4.m_Enchantments:SetLevel(cEnchantments.enchEfficiency, 3);
+
+-- enchanted chestplate, enchantment given as textual stringdesc (good style)
+local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
+</pre>
+]],
+				},
+			},
 		},
 
 		cItemGrid =
