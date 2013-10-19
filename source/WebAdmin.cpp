@@ -402,6 +402,7 @@ AString cWebAdmin::GetHTMLEscapedString( const AString& a_Input )
 
 	// Define a string to write the output to.
 	AString dst = "";
+	dst.reserve(a_Input.length());
 
 	// Loop over input and substitute HTML characters for their alternatives.
 	for (size_t i = 0; i < a_Input.length(); i++) {
