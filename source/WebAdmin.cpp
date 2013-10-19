@@ -32,7 +32,7 @@ class cPlayerAccum :
 		m_Contents.append("</li>");
 		return false;
 	}
-	
+
 public:
 
 	AString m_Contents;
@@ -90,18 +90,18 @@ bool cWebAdmin::Init(void)
 	{
 		return false;
 	}
-	
+
 	LOG("Initialising WebAdmin...");
-	
+
 	if (!m_IniFile.GetValueSetB("WebAdmin", "Enabled", true))
 	{
 		// WebAdmin is disabled, bail out faking a success
 		return true;
 	}
-	
+
 	AString PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
 	AString PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");
-	
+
 	if (!m_HTTPServer.Initialize(PortsIPv4, PortsIPv6))
 	{
 		return false;
@@ -121,9 +121,9 @@ bool cWebAdmin::Start(void)
 		// Not initialized
 		return false;
 	}
-	
+
 	LOG("Starting WebAdmin...");
-	
+
 	// Initialize the WebAdmin template script and load the file
 	m_TemplateScript.Create();
 	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
@@ -176,12 +176,12 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		a_Connection.SendNeedAuth("MCServer WebAdmin - bad username or password");
 		return;
 	}
-	
+
 	// Check if the contents should be wrapped in the template:
 	AString URL = a_Request.GetBareURL();
 	ASSERT(URL.length() > 0);
 	bool ShouldWrapInTemplate = ((URL.length() > 1) && (URL[1] != '~'));
-	
+
 	// Retrieve the request data:
 	cWebadminRequestData * Data = (cWebadminRequestData *)(a_Request.GetUserData());
 	if (Data == NULL)
@@ -189,14 +189,14 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		a_Connection.SendStatusAndReason(500, "Bad UserData");
 		return;
 	}
-	
+
 	// Wrap it all up for the Lua call:
 	AString Template;
 	HTTPTemplateRequest TemplateRequest;
 	TemplateRequest.Request.Username = a_Request.GetAuthUsername();
 	TemplateRequest.Request.Method = a_Request.GetMethod();
 	TemplateRequest.Request.Path = URL.substr(1);
-	
+
 	if (Data->m_Form.Finish())
 	{
 		for (cHTTPFormParser::const_iterator itr = Data->m_Form.begin(), end = Data->m_Form.end(); itr != end; ++itr)
@@ -208,7 +208,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 			TemplateRequest.Request.FormData[itr->first] = HTTPfd;
 			TemplateRequest.Request.PostParams[itr->first] = itr->second;
 		}  // for itr - Data->m_Form[]
-		
+
 		// Parse the URL into individual params:
 		size_t idxQM = a_Request.GetURL().find('?');
 		if (idxQM != AString::npos)
@@ -221,7 +221,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 			}  // for itr - URLParams[]
 		}
 	}
-	
+
 	// Try to get the template from the Lua template script
 	if (ShouldWrapInTemplate)
 	{
@@ -236,7 +236,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		a_Connection.SendStatusAndReason(500, "m_TemplateScript failed");
 		return;
 	}
-	
+
 	AString BaseURL = GetBaseURL(URL);
 	AString Menu;
 	Template = "{CONTENT}";
@@ -397,6 +397,45 @@ AString cWebAdmin::GetBaseURL( const AString& a_URL )
 
 
 
+AString cWebAdmin::GetHTMLEscapedString( const AString& a_Input )
+{
+
+	// Define a stringstream to write the output to.
+	std::stringstream dst;
+
+	// Loop over input and substitute HTML characters for their alternatives.
+	for (int i = 0; i < a_Input.length(); i++) {
+		switch ( a_Input[i] )
+		{
+			case '&':
+				dst << "&amp;";
+				break;
+			case '\'':
+				dst << "&apos;";
+				break;
+			case '"':
+				dst << "&quot;";
+				break;
+			case '<':
+				dst << "&lt;";
+				break;
+			case '>':
+				dst << "&gt;";
+				break;
+			default:
+				dst << a_Input[i];
+				break;
+		}
+	}
+
+	return dst.str();
+
+}
+
+
+
+
+
 AString cWebAdmin::GetBaseURL( const AStringVector& a_URLSplit )
 {
 	AString BaseURL = "./";
@@ -481,7 +520,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	{
 		// TODO: Handle other requests
 	}
-	
+
 	// Delete any request data assigned to the request:
 	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
 	delete Data;
