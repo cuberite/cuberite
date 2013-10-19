@@ -15,7 +15,7 @@ g_APIDesc =
 		ExampleClassName =
 		{
 			Desc = "Description, exported as the first paragraph of the class page. Usually enclosed within double brackets."
-			
+
 			Functions =
 			{
 				FunctionName = { Params = "Parameter list", Return = "Return values list", Notes = "Notes" ),
@@ -25,17 +25,17 @@ g_APIDesc =
 					{ Params = "Parameter list 2", Return = "Return values list 2", Notes = "Notes 2" },
 				}
 			} ,
-			
+
 			Constants =
 			{
 				ConstantName = { Notes = "Notes about the constant" },
 			} ,
-			
+
 			Variables =
 			{
 				VariableName = { Type = "string", Notes = "Notes about the variable" },
 			} ,
-			
+
 			AdditionalInfo =  -- Paragraphs to be exported after the function definitions table
 			{
 				{
@@ -47,17 +47,17 @@ g_APIDesc =
 					Contents = "Contents of the additional section 2",
 				}
 			},
-			
+
 			Inherits = "ParentClassName",  -- Only present if the class inherits from another API class
 		},
 		]]--
-		
+
 		cArrowEntity =
 		{
 			Desc = [[
 				Represents the arrow when it is shot from the bow. A subclass of the {{cProjectileEntity}}.
 			]],
-			
+
 			Functions =
 			{
 				CanPickup      = { Params = "{{cPlayer|Player}}", Return = "bool", Notes = "Returns true if the specified player can pick the arrow when it's on the ground" },
@@ -68,17 +68,17 @@ g_APIDesc =
 				SetIsCritical  = { Params = "bool", Return = "", Notes = "Sets the IsCritical flag on the arrow. Critical arrow deal additional damage" },
 				SetPickupState = { Params = "PickupState", Return = "", Notes = "Sets the pickup state (one of the psXXX constants, above)" },
 			},
-			
+
 			Constants =
 			{
 				psInCreative           = { Notes = "The arrow can be picked up only by players in creative gamemode" },
 				psInSurvivalOrCreative = { Notes = "The arrow can be picked up by players in survival or creative gamemode" },
 				psNoPickup             = { Notes = "The arrow cannot be picked up at all" },
 			},
-			
+
 			Inherits = "cProjectileEntity",
 		},
-		
+
 		cBlockArea =
 		{
 			Desc = [[
@@ -182,7 +182,7 @@ g_APIDesc =
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
 			},
-			
+
 			AdditionalInfo =
 			{
 				{
@@ -268,7 +268,7 @@ g_APIDesc =
 				or contents of a chest. All block entities are also saved in the chunk data of the chunk they reside in.
 				The cBlockEntity class acts as a common ancestor for all the individual block entities.
 			]],
-			
+
 			Functions =
 			{
 				GetBlockType = { Params = "", Return = "BLOCKTYPE", Notes = "Returns the blocktype which is represented by this blockentity. This is the primary means of type-identification" },
@@ -295,9 +295,9 @@ g_APIDesc =
 				number, or by XY coords within the grid. If a UI window is opened for this block entity, the item storage
 				is monitored for changes and the changes are immediately sent to clients of the UI window.
 			]],
-			
+
 			Inherits = "cBlockEntity",
-			
+
 			Functions =
 			{
 				GetContents = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the cItemGrid object representing the items stored within this block entity" },
@@ -306,7 +306,7 @@ g_APIDesc =
 					{ Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot number. Returns nil for invalid slot numbers" },
 					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot coords. Returns nil for invalid slot coords" },
 				},
-				SetSlot = 
+				SetSlot =
 				{
 					{ Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot number. Ignored if invalid slot number" },
 					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords" },
@@ -316,8 +316,8 @@ g_APIDesc =
 			{
 			},
 		},
-		
-		cBoundingBox = 
+
+		cBoundingBox =
 		{
 			Desc = [[
 			Represents two sets of coordinates, minimum and maximum for each direction; thus defining an
@@ -362,7 +362,7 @@ g_APIDesc =
 			Desc = [[
 				A wrapper class for constants representing colors or effects.
 			]],
-			
+
 			Functions =
 			{
 				MakeColor = { Params = "ColorCodeConstant", Return = "string", Notes = "Creates the complete color-code-sequence from the color or effect constant" },
@@ -390,9 +390,9 @@ g_APIDesc =
 				To manipulate a chest already in the game, you need to use {{cWorld}}'s callback mechanism with
 				either DoWithChestAt() or ForEachChestInChunk() function. See the code example below
 			]],
-			
+
 			Inherits = "cBlockEntityWithItems",
-			
+
 			Functions =
 			{
 				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cChestEntity", Notes = "Creates a new cChestEntity object. To be used only in the chunk generating hooks {{OnChunkGenerating}} and {{OnChunkGenerated}}." },
@@ -431,7 +431,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{{OnChunkGenerated|OnChunkGenerated}} hooks and cannot be constructed on its own. Plugins can use this
 				class in both those hooks to manipulate generated chunks.
 			]],
-			
+
 			Functions =
 			{
 				FillBlocks                = { Params = "BlockType, BlockMeta", Return = "", Notes = "Fills the entire chunk with the specified blocks" },
@@ -493,7 +493,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				connection. Internally, it handles all the incoming and outgoing packets, the chunks that are to be
 				sent to the client, ping times etc.
 			]],
-			
+
 			Functions =
 			{
 				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
@@ -525,7 +525,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				specifying the exact number of ingredients to consume in that recipe; plugins may use this to
 				apply the crafting recipe.</p>
 			]],
-			
+
 			Functions =
 			{
 				constructor = { Params = "Width, Height", Return = "cCraftingGrid", Notes = "Creates a new CraftingGrid object. This new crafting grid is not related to any player, but may be needed for {{cCraftingRecipe}}'s ConsumeIngredients function." },
@@ -535,7 +535,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				GetHeight = { Params = "", Return = "number", Notes = "Returns the height of the grid" },
 				GetItem = { Params = "x, y", Return = "{{cItem|cItem}}", Notes = "Returns the item at the specified coords" },
 				GetWidth = { Params = "", Return = "number", Notes = "Returns the width of the grid" },
-				SetItem = 
+				SetItem =
 				{
 					{ Params = "x, y, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified coords" },
 					{ Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified coords" },
@@ -562,7 +562,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				GetIngredientsHeight = { Params = "", Return = "number", Notes = "Returns the height of the ingredients' grid" },
 				GetIngredientsWidth = { Params = "", Return = "number", Notes = "Returns the width of the ingredients' grid" },
 				GetResult = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the result of the recipe" },
-				SetIngredient = 
+				SetIngredient =
 				{
 					{ Params = "x, y, {{cItem|cItem}}", Return = "", Notes = "Sets the ingredient at the specified coords" },
 					{ Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the ingredient at the specified coords" },
@@ -624,7 +624,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		{
 			Desc = [[This class represents a dispenser block entity in the world. Most of this block entity's functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior common with a {{cDropperEntity|dropper}} entity.
 </p>
-		<p>An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks). 
+		<p>An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
 ]],
 			Functions =
 			{
@@ -640,7 +640,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		{
 			Desc = [[This class represents a dropper block entity in the world. Most of this block entity's functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior common with the {{cDispenserEntity|dispenser}} entity.
 </p>
-		<p>An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks). 
+		<p>An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
 ]],
 			Functions =
 			{
@@ -667,13 +667,13 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid}} representing the contents" },
 				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid}} representing the contents" },
 			},
-			
+
 			Inherits = "cBlockEntity";
 		},
 
 		cEnchantments =
 		{
-			Desc = [[This class  is the storage for enchantments for a single {{cItem|cItem}} object, through its m_Enchantments member variable. Although it is possible to create a standalone object of this class, it is not yet used in any API directly. 
+			Desc = [[This class  is the storage for enchantments for a single {{cItem|cItem}} object, through its m_Enchantments member variable. Although it is possible to create a standalone object of this class, it is not yet used in any API directly.
 </p>
 		<p>Enchantments can be initialized either programmatically by calling the individual functions (SetLevel()), or by using a string description of the enchantment combination. This string description is in the form "id=lvl;id=lvl;...;id=lvl;", where id is either a numerical ID of the enchantment, or its textual representation from the table below, and lvl is the desired enchantment level. The class can also create its string description from its current contents; however that string description will only have the numerical IDs.
 ]],
@@ -855,7 +855,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 cFile:Delete("/usr/bin/virus.exe");
 </pre></p>
 			]],
-			
+
 			Functions =
 			{
 				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
@@ -870,14 +870,14 @@ cFile:Delete("/usr/bin/virus.exe");
 
 		},
 
-		cFireChargeEntity = 
+		cFireChargeEntity =
 		{
 			Desc = "",
 			Functions = {},
 			Constants = {},
 			Inherits = "cProjectileEntity",
 		} ,
-		
+
 		cFurnaceEntity =
 		{
 			Desc = [[This class represents a furnace block entity in the world. An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks)
@@ -914,7 +914,7 @@ cFile:Delete("/usr/bin/virus.exe");
 			Constants = {},
 			Inherits = "cProjectileEntity",
 		} ,
-		
+
 		cGroup =
 		{
 			Desc = [[cGroup is a group {{cPlayer|cPlayer}}'s can be in. Groups define the permissions players have, and optionally the color of their name in the chat.
@@ -1098,7 +1098,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				To test if a cItem object represents an empty item, do not compare the item type nor the item count,
 				but rather use the IsEmpty() function.
 			]],
-			
+
 			Functions =
 			{
 				constructor =
@@ -1278,7 +1278,7 @@ various events. See below for further information.
 			{
 				Trace = { Params = "{{cWorld}}, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ", Return = "bool", Notes = "(STATIC) Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)" },
 			},
-			
+
 			AdditionalInfo =
 			{
 				{
@@ -1333,17 +1333,17 @@ function HandleSpideyCmd(a_Split, a_Player)
 			World:SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COBWEB, 0);
 		end
 	};
-	
+
 	local EyePos = a_Player:GetEyePosition();
 	local LookVector = a_Player:GetLookVector();
 	LookVector:Normalize();  -- Make the vector 1 m long
-	
+
 	-- Start cca 2 blocks away from the eyes
 	local Start = EyePos + LookVector + LookVector;
 	local End = EyePos + LookVector * 50;
-	
+
 	cLineBlockTracer.Trace(World, Callbacks, Start.x, Start.y, Start.z, End.x, End.y, End.z);
-	
+
 	return true;
 end
 </pre>
@@ -1352,7 +1352,7 @@ end
 				},
 			},  -- AdditionalInfo
 		},  -- cLineBlockTracer
-		
+
 		cLuaWindow =
 		{
 			Desc = [[This class is used by plugins wishing to display a custom window to the player, unrelated to block entities or entities near the player. The window can be of any type and have any contents that the plugin defines. Callbacks for when the player modifies the window contents and when the player closes the window can be set.
@@ -1447,7 +1447,7 @@ a_Player:OpenWindow(Window);
 			Constants = {},
 			Inherits = "cPawn",
 		},
-		
+
 		cPawn =
 		{
 			Desc = [[cPawn is a controllable pawn object, controlled by either AI or a player. cPawn inherits all functions and members of {{centity|centity}}
@@ -1554,7 +1554,7 @@ a_Player:OpenWindow(Window);
 			Constants = {},
 			Inherits = "cPlugin",
 		},
-		
+
 		cPluginManager =
 		{
 			Desc = [[
@@ -1667,7 +1667,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			Constants = {},
 			Inherits = "cEntity",
 		},
-		
+
 		cRoot =
 		{
 			Desc = [[There is always only one cRoot object in MCServer. cRoot manages all the important objects such as {{cServer|cServer}}
@@ -1728,7 +1728,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 			Constants =
 			{
 			},
-			
+
 			Inherits = "cBlockEntity";
 		},
 
@@ -1743,7 +1743,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 			{
 			},
 		},
-		
+
 		cThrownEggEntity =
 		{
 			Desc = "",
@@ -1751,7 +1751,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 			Constants = {},
 			Inherits = "cProjectileEntity",
 		},
-		
+
 		cThrownEnderPearlEntity =
 		{
 			Desc = "",
@@ -1759,7 +1759,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 			Constants = {},
 			Inherits = "cProjectileEntity",
 		},
-		
+
 		cThrownSnowballEntity =
 		{
 			Desc = "",
@@ -1767,7 +1767,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 			Constants = {},
 			Inherits = "cProjectileEntity",
 		},
-		
+
 		cTracer =
 		{
 			Desc = [[A cTracer object is used to trace lines in the world. One thing you can use the cTracer for, is tracing what block a player is looking at, but you can do more with it if you want.
@@ -1785,17 +1785,20 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 		cWebAdmin =
 		{
 			Desc = "",
-			Functions = {},
+			Functions =
+			{
+				GetHTMLEscapedString = { Params = "string", Return = "string", Notes = "Gets the HTML escaped representation of a requested string. This is useful for user input and game data that is not guaranteed to be escaped already." },
+			},
 			Constants = {},
 		},
-		
+
 		cWebPlugin =
 		{
 			Desc = "",
 			Functions = {},
 			Constants = {},
 		},
-		
+
 		cWindow =
 		{
 			Desc = [[This class is the common ancestor for all window classes used by MCServer. It is inherited by the {{cLuaWindow|cLuaWindow}} class that plugins use for opening custom windows. It is planned to be used for window-related hooks in the future. It implements the basic functionality of any window.
@@ -1861,7 +1864,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 				<p>
 				Game time is also handled by the world. It provides the time-of-day and the total world age.
 			]],
-			
+
 			Functions =
 			{
 				BroadcastChat = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the Message to all players in this world, except the optional ExceptClient" },
@@ -2126,8 +2129,8 @@ World:ForEachEntity(
 			},
 		},
 	},
-	
-	
+
+
 	Hooks =
 	{
 		HOOK_BLOCK_TO_PICKUPS =
@@ -2173,10 +2176,10 @@ function OnBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_Blo
 		-- Not a tall grass being washed away
 		return false;
 	end
-	
+
 	-- Remove all pickups suggested by MCServer:
 	a_Pickups:Clear();
-	
+
 	-- Drop a diamond:
 	a_Pickups:Add(cItem(E_ITEM_DIAMOND));
 	return true;
@@ -2269,17 +2272,17 @@ function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	PseudoRandom = PseudoRandom * 8192 + PseudoRandom;
 	PseudoRandom = ((PseudoRandom * (PseudoRandom * PseudoRandom * 15731 + 789221) + 1376312589) % 0x7fffffff;
 	PseudoRandom = PseudoRandom / 7;
-	
+
 	-- Based on the PseudoRandom value, choose a location for the ore:
 	local OreX = PseudoRandom % 16;
 	local OreY = 2 + ((PseudoRandom / 16) % 20);
 	local OreZ = (PseudoRandom / 320) % 16;
-	
+
 	-- Check if the location is in ExtremeHills:
 	if (a_ChunkDesc:GetBiome(OreX, OreZ) ~= biExtremeHills) then
 		return false;
 	end
-	
+
 	-- Only replace allowed blocks with the ore:
 	local CurrBlock = a_ChunDesc:GetBlockType(OreX, OreY, OreZ);
 	if (
@@ -3569,7 +3572,7 @@ end
 		},  -- HOOK_WORLD_TICK
 
 	},  -- Hooks[]
-	
+
 
 	IgnoreClasses =
 	{
@@ -3583,7 +3586,7 @@ end
 		"table",
 		"g_TrackedPages",
 	},
-	
+
 	IgnoreFunctions =
 	{
 		"Globals.assert",
@@ -3594,7 +3597,7 @@ end
 		"%a+\.new",          -- AnyClass.new
 		"%a+.new_local",     -- AnyClass.new_local
 		"%a+.delete",        -- AnyClass.delete
-		
+
 		-- Functions global in the APIDump plugin:
 		"CreateAPITables",
 		"DumpAPIHtml",
@@ -3609,7 +3612,7 @@ end
 		"WriteHtmlClass",
 		"WriteHtmlHook",
 	},
-	
+
 	ExtraPages =
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
