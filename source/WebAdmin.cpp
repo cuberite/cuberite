@@ -400,35 +400,35 @@ AString cWebAdmin::GetBaseURL( const AString& a_URL )
 AString cWebAdmin::GetHTMLEscapedString( const AString& a_Input )
 {
 
-	// Define a stringstream to write the output to.
-	std::stringstream dst;
+	// Define a string to write the output to.
+	AString dst = "";
 
 	// Loop over input and substitute HTML characters for their alternatives.
-	for (int i = 0; i < a_Input.length(); i++) {
+	for (size_t i = 0; i < a_Input.length(); i++) {
 		switch ( a_Input[i] )
 		{
 			case '&':
-				dst << "&amp;";
+				dst =+ "&amp;";
 				break;
 			case '\'':
-				dst << "&apos;";
+				dst =+ "&apos;";
 				break;
 			case '"':
-				dst << "&quot;";
+				dst =+ "&quot;";
 				break;
 			case '<':
-				dst << "&lt;";
+				dst =+ "&lt;";
 				break;
 			case '>':
-				dst << "&gt;";
+				dst =+ "&gt;";
 				break;
 			default:
-				dst << a_Input[i];
+				dst =+ a_Input[i];
 				break;
 		}
 	}
 
-	return dst.str();
+	return dst();
 
 }
 
