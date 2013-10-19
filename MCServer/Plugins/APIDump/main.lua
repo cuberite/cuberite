@@ -954,7 +954,8 @@ function ListUndocumentedObjects(API, UndocumentedHooks)
 		for i, cls in ipairs(API) do
 			local HasFunctions = ((cls.UndocumentedFunctions ~= nil) and (#cls.UndocumentedFunctions > 0));
 			local HasConstants = ((cls.UndocumentedConstants ~= nil) and (#cls.UndocumentedConstants > 0));
-			if (HasFunctions or HasConstants) then
+			local HasVariables = ((cls.UndocumentedVariables ~= nil) and (#cls.UndocumentedVariables > 0));
+			if (HasFunctions or HasConstants or HasVariables) then
 				f:write("\t\t" .. cls.Name .. " =\n\t\t{\n");
 				if ((cls.Desc == nil) or (cls.Desc == "")) then
 					f:write("\t\t\tDesc = \"\"\n");
@@ -966,7 +967,7 @@ function ListUndocumentedObjects(API, UndocumentedHooks)
 				table.sort(cls.UndocumentedFunctions);
 				for j, fn in ipairs(cls.UndocumentedFunctions) do
 					f:write("\t\t\t\t" .. fn .. " = { Params = \"\", Return = \"\", Notes = \"\" },\n");
-				end  -- for j, fn - cls.Undocumented[]
+				end  -- for j, fn - cls.UndocumentedFunctions[]
 				f:write("\t\t\t},\n\n");
 			end
 			
@@ -975,11 +976,20 @@ function ListUndocumentedObjects(API, UndocumentedHooks)
 				table.sort(cls.UndocumentedConstants);
 				for j, cn in ipairs(cls.UndocumentedConstants) do
 					f:write("\t\t\t\t" .. cn .. " = { Notes = \"\" },\n");
-				end  -- for j, fn - cls.Undocumented[]
+				end  -- for j, fn - cls.UndocumentedConstants[]
 				f:write("\t\t\t},\n\n");
 			end
 			
-			if (HasFunctions or HasConstants) then
+			if (HasVariables) then
+				f:write("\t\t\tVariables =\n\t\t\t{\n");
+				table.sort(cls.UndocumentedVariables);
+				for j, vn in ipairs(cls.UndocumentedVariables) do
+					f:write("\t\t\t\t" .. vn .. " = { Type = \"\", Notes = \"\" },\n");
+				end  -- for j, fn - cls.UndocumentedVariables[]
+				f:write("\t\t\t},\n\n");
+			end
+			
+			if (HasFunctions or HasConstants or HasVariables) then
 				f:write("\t\t},\n\n");
 			end
 		end  -- for i, cls - API[]
@@ -1008,7 +1018,9 @@ function ListUndocumentedObjects(API, UndocumentedHooks)
 				f:write("\t\t\tReturns = [[\n\t\t\t\t\n\t\t\t]],\n");
 				f:write("\t\t},  -- " .. hook .. "\n");
 			end
+			f:write("\t},\n");
 		end
+		f:write("}\n\n\n\n");
 		f:close();
 	end
 end
