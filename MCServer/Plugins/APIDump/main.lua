@@ -754,7 +754,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	cf:write("			</ul>\n\n");
 	
 	-- Write the class description:
-	cf:write("			<a name=\"desc\"><hr /><h1>Class " .. ClassName .. "</h1></a>\n");
+	cf:write("			<a name=\"desc\"><hr /><h1>" .. ClassName .. " class</h1></a>\n");
 	if (a_ClassAPI.Desc ~= nil) then
 		cf:write("			<p>");
 		cf:write(LinkifyString(a_ClassAPI.Desc, ClassName));
