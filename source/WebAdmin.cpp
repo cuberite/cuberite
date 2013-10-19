@@ -404,8 +404,8 @@ AString cWebAdmin::GetHTMLEscapedString( const AString& a_Input )
 	std::stringstream dst;
 
 	// Loop over input and substitute HTML characters for their alternatives.
-	for (char workingCharacter : a_Input) {
-		switch (workingCharacter)
+	for (int i = 0; i < a_Input.length(); i++) {
+		switch ( a_Input[i] )
 		{
 			case '&':
 				dst << "&amp;";
@@ -423,7 +423,7 @@ AString cWebAdmin::GetHTMLEscapedString( const AString& a_Input )
 				dst << "&gt;";
 				break;
 			default:
-				dst << workingCharacter;
+				dst << a_Input[i];
 				break;
 		}
 	}
