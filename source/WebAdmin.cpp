@@ -428,7 +428,7 @@ AString cWebAdmin::GetHTMLEscapedString( const AString& a_Input )
 		}
 	}
 
-	return dst();
+	return dst;
 
 }
 
