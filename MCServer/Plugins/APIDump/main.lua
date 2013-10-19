@@ -555,6 +555,15 @@ function ReadDescriptions(a_API)
 			end
 		);
 		
+		-- Remove ignored functions:
+		local NewVariables = {};
+		for j, var in ipairs(cls.Variables) do
+			if (not(IsVariableIgnored(cls.Name .. "." .. var.Name))) then
+				table.insert(NewVariables, var);
+			end
+		end  -- for j, var
+		cls.Variables = NewVariables;
+		
 		-- Sort the member variables:
 		table.sort(cls.Variables,
 			function(v1, v2)

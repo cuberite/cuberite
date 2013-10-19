@@ -3610,6 +3610,11 @@ end
 		"WriteHtmlHook",
 	},
 	
+	IgnoreVariables =
+	{
+		"__.*__",  -- tolua exports multiple inheritance this way
+	} ,
+	
 	ExtraPages =
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
