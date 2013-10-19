@@ -117,7 +117,7 @@ function CreateAPITables()
 	};
 	--]]
 
-	local Globals = {Functions = {}, Constants = {}, Descendants = {}};
+	local Globals = {Functions = {}, Constants = {}, Variables = {}, Descendants = {}};
 	local API = {};
 	
 	local function Add(a_APIContainer, a_ObjName, a_ObjValue)
@@ -132,9 +132,17 @@ function CreateAPITables()
 	end
 	
 	local function ParseClass(a_ClassName, a_ClassObj)
-		local res = {Name = a_ClassName, Functions = {}, Constants = {}, Descendants = {}};
+		local res = {Name = a_ClassName, Functions = {}, Constants = {}, Variables = {}, Descendants = {}};
+		-- Add functions and constants:
 		for i, v in pairs(a_ClassObj) do
 			Add(res, i, v);
+		end
+		
+		-- Member variables:
+		if ((a_ClassObj[".get"] ~= nil) and (type(a_ClassObj[".get"]) == "table")) then
+			for k, v in pairs(a_ClassObj[".get"]) do
+				table.insert(res.Variables, { Name = k });
+			end
 		end
 		return res;
 	end
@@ -353,6 +361,19 @@ function ReadDescriptions(a_API)
 		return false;
 	end
 	
+	-- Returns true if the member variable (specified by its fully qualified name) is to be ignored
+	local function IsVariableIgnored(a_VarName)
+		if (g_APIDesc.IgnoreVariables == nil) then
+			return false;
+		end;
+		for i, name in ipairs(g_APIDesc.IgnoreVariables) do
+			if (a_VarName:match(name)) then
+				return true;
+			end
+		end
+		return false;
+	end
+	
 	-- Remove ignored classes from a_API:
 	local APICopy = {};
 	for i, cls in ipairs(a_API) do
@@ -407,6 +428,7 @@ function ReadDescriptions(a_API)
 
 			cls.UndocumentedFunctions = {};  -- This will contain names of all the functions that are not documented
 			cls.UndocumentedConstants = {};  -- This will contain names of all the constants that are not documented
+			cls.UndocumentedVariables = {};  -- This will contain names of all the variables that are not documented
 			
 			local DoxyFunctions = {};  -- This will contain all the API functions together with their documentation
 			
@@ -460,20 +482,31 @@ function ReadDescriptions(a_API)
 				end  -- for j, cons
 			end  -- if (APIDesc.Constants ~= nil)
 			
-			-- Process member variables:
-			local vars = {};
-			for name, desc in pairs(APIDesc.Variables or {}) do
-				desc.Name = name;
-				table.insert(vars, desc);
-			end
-			cls.Variables = vars;
+			-- Assign member variables' descriptions:
+			if (APIDesc.Variables ~= nil) then
+				for j, var in ipairs(cls.Variables) do
+					local VarDesc = APIDesc.Variables[var.Name];
+					if (VarDesc == nil) then
+						-- Not documented
+						if not(IsVariableIgnored(cls.Name .. "." .. var.Name)) then
+							table.insert(cls.UndocumentedVariables, var.Name);
+						end
+					else
+						-- Copy all documentation:
+						for k, v in pairs(VarDesc) do
+							var[k] = v
+						end
+					end
+				end  -- for j, var
+			end  -- if (APIDesc.Variables ~= nil)
 			
 		else  -- if (APIDesc ~= nil)
 		
 			-- Class is not documented at all, add all its members to Undocumented lists:
 			cls.UndocumentedFunctions = {};
 			cls.UndocumentedConstants = {};
-			cls.Variables = {};
+			cls.UndocumentedVariables = {};
+			cls.Variables = cls.Variables or {};
 			for j, func in ipairs(cls.Functions) do
 				local FnName = func.DocID or func.Name;
 				if not(IsFunctionIgnored(cls.Name .. "." .. FnName)) then
@@ -485,6 +518,11 @@ function ReadDescriptions(a_API)
 					table.insert(cls.UndocumentedConstants, cons.Name);
 				end
 			end  -- for j, cons - cls.Constants[]
+			for j, var in ipairs(cls.Variables) do
+				if not(IsConstantIgnored(cls.Name .. "." .. var.Name)) then
+					table.insert(cls.UndocumentedVariables, var.Name);
+				end
+			end  -- for j, var - cls.Variables[]
 		end  -- else if (APIDesc ~= nil)
 		
 		-- Remove ignored functions:
