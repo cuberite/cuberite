@@ -570,45 +570,34 @@ cMonster::eType cMonster::StringToMobType(const AString & a_Name)
 
 cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 {
-	static const struct
+	switch (a_Type)
 	{
-		eType m_Type;
-		eFamily m_Family;
-	} TypeMap[] =
-	{
-		{mtBat,          mfAmbient},
-		{mtBlaze,        mfHostile},
-		{mtCaveSpider,   mfHostile},
-		{mtChicken,      mfPassive},
-		{mtCow,          mfPassive},
-		{mtCreeper,      mfHostile},
-		{mtEnderman,     mfHostile},
-		{mtGhast,        mfHostile},
-		{mtHorse,        mfPassive},
-		{mtMagmaCube,    mfHostile},
-		{mtMooshroom,    mfHostile},
-		{mtOcelot,       mfHostile},
-		{mtPig,          mfPassive},
-		{mtSheep,        mfPassive},
-		{mtSilverfish,   mfHostile},
-		{mtSkeleton,     mfHostile},
-		{mtSlime,        mfHostile},
-		{mtSpider,       mfHostile},
-		{mtSquid,        mfWater},
-		{mtVillager,     mfPassive},
-		{mtWitch,        mfHostile},
-		{mtWolf,         mfHostile},
-		{mtZombie,       mfHostile},
-		{mtZombiePigman, mfHostile},
+		case mtBat:          return mfAmbient;
+		case mtBlaze:        return mfHostile;
+		case mtCaveSpider:   return mfHostile;
+		case mtChicken:      return mfPassive;
+		case mtCow:          return mfPassive;
+		case mtCreeper:      return mfHostile;
+		case mtEnderman:     return mfHostile;
+		case mtGhast:        return mfHostile;
+		case mtHorse:        return mfPassive;
+		case mtMagmaCube:    return mfHostile;
+		case mtMooshroom:    return mfHostile;
+		case mtOcelot:       return mfHostile;
+		case mtPig:          return mfPassive;
+		case mtSheep:        return mfPassive;
+		case mtSilverfish:   return mfHostile;
+		case mtSkeleton:     return mfHostile;
+		case mtSlime:        return mfHostile;
+		case mtSpider:       return mfHostile;
+		case mtSquid:        return mfWater;
+		case mtVillager:     return mfPassive;
+		case mtWitch:        return mfHostile;
+		case mtWolf:         return mfHostile;
+		case mtZombie:       return mfHostile;
+		case mtZombiePigman: return mfHostile;
 	} ;
-	
-	for (int i = 0; i < ARRAYCOUNT(TypeMap); i++)
-	{
-		if (TypeMap[i].m_Type == a_Type)
-		{
-			return TypeMap[i].m_Family;
-		}
-	}
+	ASSERT(!"Unhandled mob type");
 	return mfMaxplusone;
 }
 
