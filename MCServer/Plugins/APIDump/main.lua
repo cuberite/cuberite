@@ -89,7 +89,9 @@ function CreateAPITables()
 				{Name = "IsInside"}
 			},
 			Constants = {
-			}
+			},
+			Variables = {
+			},
 			Descendants = {},  -- Will be filled by ReadDescriptions(), array of class APIs (references to other member in the tree)
 		}},
 		{
@@ -98,12 +100,14 @@ function CreateAPITables()
 				{Name = "Clear"},
 				{Name = "CopyFrom"},
 				...
-			}
+			},
 			Constants = {
 				{Name = "baTypes", Value = 0},
 				{Name = "baMetas", Value = 1},
 				...
-			}
+			},
+			Variables = {
+			},
 			...
 		}}
 	};
@@ -464,6 +468,12 @@ function ReadDescriptions(a_API)
 				
 				-- Replace functions with their described and overload-expanded versions:
 				cls.Functions = DoxyFunctions;
+			else  -- if (APIDesc.Functions ~= nil)
+				for j, func in ipairs(cls.Functions) do
+					if not(IsFunctionIgnored(cls.Name .. "." .. FnName)) then
+						table.insert(cls.UndocumentedFunctions, FnName);
+					end
+				end
 			end  -- if (APIDesc.Functions ~= nil)
 			
 			if (APIDesc.Constants ~= nil) then
@@ -480,7 +490,13 @@ function ReadDescriptions(a_API)
 						CnDesc.IsExported = true;
 					end
 				end  -- for j, cons
-			end  -- if (APIDesc.Constants ~= nil)
+			else  -- if (APIDesc.Constants ~= nil)
+				for j, cons in ipairs(cls.Constants) do
+					if not(IsConstantIgnored(cls.Name .. "." .. cons.Name)) then
+						table.insert(cls.UndocumentedConstants, cons.Name);
+					end
+				end
+			end  -- else if (APIDesc.Constants ~= nil)
 			
 			-- Assign member variables' descriptions:
 			if (APIDesc.Variables ~= nil) then
@@ -498,7 +514,13 @@ function ReadDescriptions(a_API)
 						end
 					end
 				end  -- for j, var
-			end  -- if (APIDesc.Variables ~= nil)
+			else  -- if (APIDesc.Variables ~= nil)
+				for j, var in ipairs(cls.Variables) do
+					if not(IsVariableIgnored(cls.Name .. "." .. var.Name)) then
+						table.insert(cls.UndocumentedVariables, var.Name);
+					end
+				end
+			end  -- else if (APIDesc.Variables ~= nil)
 			
 		else  -- if (APIDesc ~= nil)
 		
