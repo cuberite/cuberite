@@ -4,46 +4,6 @@
 #include "MobSpawner.h"
 #include "Mobs/IncludeAllMonsters.h"
 
-cMobSpawner::tMobTypes& cMobSpawner::m_MobTypes()
-{
-	static tMobTypes* value = new tMobTypes(initMobTypesBeforeCx11());
-	return *value;
-}
-
-cMobSpawner::tMobTypes cMobSpawner::initMobTypesBeforeCx11()
-{
-	std::set<cMonster::eType> toReturn;
-	toReturn.insert(cMonster::mtCreeper);
-	toReturn.insert(cMonster::mtSkeleton);
-	toReturn.insert(cMonster::mtSpider);
-	toReturn.insert(cMonster::mtGiant);
-	toReturn.insert(cMonster::mtZombie);
-	toReturn.insert(cMonster::mtSlime);
-	toReturn.insert(cMonster::mtGhast);
-	toReturn.insert(cMonster::mtZombiePigman);
-	toReturn.insert(cMonster::mtEnderman);
-	toReturn.insert(cMonster::mtCaveSpider);
-	toReturn.insert(cMonster::mtSilverfish);
-	toReturn.insert(cMonster::mtBlaze);
-	toReturn.insert(cMonster::mtMagmaCube);
-	toReturn.insert(cMonster::mtEnderDragon);
-	toReturn.insert(cMonster::mtWither);
-	toReturn.insert(cMonster::mtBat);
-	toReturn.insert(cMonster::mtWitch);
-	toReturn.insert(cMonster::mtPig);
-	toReturn.insert(cMonster::mtSheep);
-	toReturn.insert(cMonster::mtCow);
-	toReturn.insert(cMonster::mtChicken);
-	toReturn.insert(cMonster::mtSquid);
-	toReturn.insert(cMonster::mtWolf);
-	toReturn.insert(cMonster::mtMooshroom);
-	toReturn.insert(cMonster::mtSnowGolem);
-	toReturn.insert(cMonster::mtOcelot);
-	toReturn.insert(cMonster::mtIronGolem);
-	toReturn.insert(cMonster::mtVillager);
-	return toReturn;
-}
-
 
 
 
@@ -80,6 +40,10 @@ bool cMobSpawner::CheckPackCenter(BLOCKTYPE a_BlockType)
 	}
 }
 
+
+
+
+
 void cMobSpawner::addIfAllowed(cMonster::eType toAdd, std::set<cMonster::eType>& toAddIn)
 {
 	std::set<cMonster::eType>::iterator itr = m_AllowedTypes.find(toAdd);
@@ -88,6 +52,10 @@ void cMobSpawner::addIfAllowed(cMonster::eType toAdd, std::set<cMonster::eType>&
 		toAddIn.insert(toAdd);
 	}
 }
+
+
+
+
 
 cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 {
@@ -151,6 +119,9 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 	}
 	return cMonster::mtInvalidType;
 }
+
+
+
 
 
 bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, EMCSBiome a_Biome, int a_Level)
@@ -230,6 +201,9 @@ bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType,
 }
 
 
+
+
+
 cMonster* cMobSpawner::TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, EMCSBiome a_Biome, int a_Level, int& a_MaxPackSize)
 {
 	cMonster* toReturn = NULL;
@@ -264,17 +238,33 @@ cMonster* cMobSpawner::TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockM
 	return toReturn;
 }
 
+
+
+
+
 void cMobSpawner::NewPack()
 {
 	m_NewPack = true;
 }
 
-cMobSpawner::tSpawnedContainer& cMobSpawner::getSpawned()
+
+
+
+
+cMobSpawner::tSpawnedContainer & cMobSpawner::getSpawned(void)
 {
 	return m_Spawned;
 }
 
-bool cMobSpawner::CanSpawnSomething()
+
+
+
+
+bool cMobSpawner::CanSpawnAnything(void)
 {
-	return m_AllowedTypes.size() > 0;
+	return !m_AllowedTypes.empty();
 }
+
+
+
+

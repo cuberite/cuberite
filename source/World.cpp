@@ -757,7 +757,7 @@ void cWorld::TickMobs(float a_Dt)
 				if (m_bAnimals)
 				{
 					cMobSpawner Spawner(*itr,m_AllowedMobs);
-					if (Spawner.CanSpawnSomething())
+					if (Spawner.CanSpawnAnything())
 					{
 						m_ChunkMap->SpawnMobs(Spawner);
 						// do the spawn
