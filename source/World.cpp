@@ -31,7 +31,6 @@
 #include "Mobs/IncludeAllMonsters.h"
 #include "MobCensus.h"
 #include "MobSpawner.h"
-#include "MobTypesManager.h"
 
 #include "MersenneTwister.h"
 #include "Generating/Trees.h"
@@ -508,11 +507,11 @@ void cWorld::Start(void)
 	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
 	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
 	{
-		cMonster::eType ToAdd = cMobTypesManager::StringToMobType(*itr);
+		cMonster::eType ToAdd = cMonster::StringToMobType(*itr);
 		if (ToAdd != cMonster::mtInvalidType)
 		{
 			m_AllowedMobs.insert(ToAdd);
-			LOGD("Allowed mob: %s", cMobTypesManager::MobTypeToString(ToAdd).c_str()); // a bit reverse working, but very few ressources wasted
+			LOGD("Allowed mob: %s", itr->c_str());
 		}
 		else
 		{
@@ -2524,20 +2523,21 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 {
 	cMonster * Monster = NULL;
 	
-	int SlSize = GetTickRandomNumber(2) + 1;  // 1 .. 3 - Slime
 	int ShColor = GetTickRandomNumber(15); // 0 .. 15 - Sheep
 	bool SkType = GetDimension() == dimNether ; // Skeleton
 
-	Monster = cMobTypesManager::NewMonsterFromType(a_MonsterType);
-	if (Monster)
+	Monster = cMonster::NewMonsterFromType(a_MonsterType);
+	if (Monster != NULL)
+	{
 		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
+	}
 	return SpawnMobFinalize(Monster);
 }
 
 
 
 
-int cWorld::SpawnMobFinalize(cMonster* a_Monster)
+int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 {
 	if (!a_Monster)
 		return -1;

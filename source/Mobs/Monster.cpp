@@ -1,7 +1,7 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "Monster.h"
+#include "IncludeAllMonsters.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
@@ -9,7 +9,6 @@
 #include "../Entities/Player.h"
 #include "../Defines.h"
 #include "../MonsterConfig.h"
-#include "../MobTypesManager.h"
 #include "../MersenneTwister.h"
 
 #include "../Vector3f.h"
@@ -17,13 +16,54 @@
 #include "../Vector3d.h"
 #include "../Tracer.h"
 #include "../Chunk.h"
-
-
-// #include "../../iniFile/iniFile.h"
-
+#include "../FastRandom.h"
 
 
 
+
+
+/** Map for eType <-> string
+Needs to be alpha-sorted by the strings, because binary search is used in StringToMobType()
+The strings need to be lowercase (for more efficient comparisons in StringToMobType())
+*/
+static const struct
+{
+	cMonster::eType m_Type;
+	const char * m_lcName;
+} g_MobTypeNames[] =
+{
+	{cMonster::mtBat,          "bat"},
+	{cMonster::mtBlaze,        "blaze"},
+	{cMonster::mtCaveSpider,   "cavespider"},
+	{cMonster::mtChicken,      "chicken"},
+	{cMonster::mtCow,          "cow"},
+	{cMonster::mtCreeper,      "creeper"},
+	{cMonster::mtEnderman,     "enderman"},
+	{cMonster::mtGhast,        "ghast"},
+	{cMonster::mtHorse,        "horse"},
+	{cMonster::mtMagmaCube,    "magmacube"},
+	{cMonster::mtMooshroom,    "mooshroom"},
+	{cMonster::mtOcelot,       "ocelot"},
+	{cMonster::mtPig,          "pig"},
+	{cMonster::mtSheep,        "sheep"},
+	{cMonster::mtSilverfish,   "silverfish"},
+	{cMonster::mtSkeleton,     "skeleton"},
+	{cMonster::mtSlime,        "slime"},
+	{cMonster::mtSpider,       "spider"},
+	{cMonster::mtSquid,        "squid"},
+	{cMonster::mtVillager,     "villager"},
+	{cMonster::mtWitch,        "witch"},
+	{cMonster::mtWolf,         "wolf"},
+	{cMonster::mtZombie,       "zombie"},
+	{cMonster::mtZombiePigman, "zombiepigman"},
+} ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cMonster:
 
 cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
 	: super(etMonster, a_Width, a_Height)
@@ -467,6 +507,183 @@ void cMonster::SetSightDistance(float sd)
 
 
 
+AString cMonster::MobTypeToString(cMonster::eType a_MobType)
+{
+	// Mob types aren't sorted, so we need to search linearly:
+	for (int i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	{
+		if (g_MobTypeNames[i].m_Type == a_MobType)
+		{
+			return g_MobTypeNames[i].m_lcName;
+		}
+	}
+	
+	// Not found:
+	return "";
+}
+
+
+
+
+
+cMonster::eType cMonster::StringToMobType(const AString & a_Name)
+{
+	AString lcName(a_Name);
+	StrToLower(lcName);
+	
+	// Binary-search for the lowercase name:
+	int lo = 0, hi = ARRAYCOUNT(g_MobTypeNames);
+	while (hi - lo > 1)
+	{
+		int mid = (lo + hi) / 2;
+		int res = strcmp(g_MobTypeNames[mid].m_lcName, lcName.c_str());
+		if (res == 0)
+		{
+			return g_MobTypeNames[mid].m_Type;
+		}
+		if (res < 0)
+		{
+			hi = mid;
+		}
+		else
+		{
+			lo = mid;
+		}
+	}
+	// Range has collapsed to at most two elements, compare each:
+	if (strcmp(g_MobTypeNames[lo].m_lcName, lcName.c_str()) == 0)
+	{
+		return g_MobTypeNames[lo].m_Type;
+	}
+	if ((lo != hi) && (strcmp(g_MobTypeNames[hi].m_lcName, lcName.c_str()) == 0))
+	{
+		return g_MobTypeNames[hi].m_Type;
+	}
+	
+	// Not found:
+	return mtInvalidType;
+}
+
+
+
+
+
+cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
+{
+	static const struct
+	{
+		eType m_Type;
+		eFamily m_Family;
+	} TypeMap[] =
+	{
+		{mtBat,          mfAmbient},
+		{mtBlaze,        mfHostile},
+		{mtCaveSpider,   mfHostile},
+		{mtChicken,      mfPassive},
+		{mtCow,          mfPassive},
+		{mtCreeper,      mfHostile},
+		{mtEnderman,     mfHostile},
+		{mtGhast,        mfHostile},
+		{mtHorse,        mfPassive},
+		{mtMagmaCube,    mfHostile},
+		{mtMooshroom,    mfHostile},
+		{mtOcelot,       mfHostile},
+		{mtPig,          mfPassive},
+		{mtSheep,        mfPassive},
+		{mtSilverfish,   mfHostile},
+		{mtSkeleton,     mfHostile},
+		{mtSlime,        mfHostile},
+		{mtSpider,       mfHostile},
+		{mtSquid,        mfWater},
+		{mtVillager,     mfPassive},
+		{mtWitch,        mfHostile},
+		{mtWolf,         mfHostile},
+		{mtZombie,       mfHostile},
+		{mtZombiePigman, mfHostile},
+	} ;
+	
+	for (int i = 0; i < ARRAYCOUNT(TypeMap); i++)
+	{
+		if (TypeMap[i].m_Type == a_Type)
+		{
+			return TypeMap[i].m_Family;
+		}
+	}
+	return mfMaxplusone;
+}
+
+
+
+
+
+cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType, int a_Size)
+{
+	cFastRandom Random;
+	
+	cMonster * toReturn = NULL;
+
+	// unspecified size get rand[1,3] for Monsters that need size
+	switch (a_MobType)
+	{
+		case mtMagmaCube:
+		case mtSlime:
+		{
+			if (a_Size == -1)
+			{
+				a_Size = Random.NextInt(2, a_MobType) + 1;
+			}
+			if ((a_Size <= 0) || (a_Size >= 4))
+			{
+				ASSERT(!"Random for size was supposed to pick in [1..3] and picked outside");
+				a_Size = 1;
+			}
+			break;
+		}
+		default: break;
+	}  // switch (a_MobType)
+
+	// Create the mob entity
+	switch (a_MobType)
+	{
+		case mtMagmaCube:     toReturn  = new cMagmaCube(a_Size);             break;
+		case mtSlime:         toReturn  = new cSlime(a_Size);                 break;
+		case mtBat:           toReturn  = new cBat();                         break;
+		case mtBlaze:         toReturn  = new cBlaze();                       break;
+		case mtCaveSpider:    toReturn  = new cCavespider();                  break;
+		case mtChicken:       toReturn  = new cChicken();                     break;
+		case mtCow:           toReturn  = new cCow();                         break;
+		case mtCreeper:       toReturn  = new cCreeper();                     break;
+		case mtEnderman:      toReturn  = new cEnderman();                    break;
+		case mtGhast:         toReturn  = new cGhast();                       break;
+		// TODO: 
+		// case cMonster::mtHorse:         toReturn  = new cHorse();                       break;
+		case mtMooshroom:     toReturn  = new cMooshroom();                   break;
+		case mtOcelot:        toReturn  = new cOcelot();                      break;
+		case mtPig:           toReturn  = new cPig();                         break;
+		// TODO: Implement sheep color
+		case mtSheep:         toReturn  = new cSheep(0);                      break;
+		case mtSilverfish:    toReturn  = new cSilverfish();                  break;
+		// TODO: Implement wither skeleton geration
+		case mtSkeleton:      toReturn  = new cSkeleton(false);               break;
+		case mtSpider:        toReturn  = new cSpider();                      break;
+		case mtSquid:         toReturn  = new cSquid();                       break;
+		case mtVillager:      toReturn  = new cVillager(cVillager::vtFarmer); break;
+		case mtWitch:         toReturn  = new cWitch();                       break;
+		case mtWolf:          toReturn  = new cWolf();                        break;
+		case mtZombie:        toReturn  = new cZombie(false);                 break;
+		case mtZombiePigman:  toReturn  = new cZombiePigman();                break;
+		default:
+		{
+			ASSERT(!"Unhandled Mob type");
+		}
+	}
+	return toReturn;
+}
+
+
+
+
+
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
 	MTRand r1;
@@ -514,7 +731,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 
 cMonster::eFamily cMonster::GetMobFamily(void) const
 {
-	return cMobTypesManager::FamilyFromType(m_MobType);
+	return FamilyFromType(m_MobType);
 }
 
 

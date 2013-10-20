@@ -739,14 +739,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobTypesManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\MobTypesManager.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\MonsterConfig.cpp"
 				>
 			</File>

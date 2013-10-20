@@ -2,8 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "MobSpawner.h"
-#include "MobTypesManager.h"
-#include "Mobs/Monster.h"
 #include "Mobs/IncludeAllMonsters.h"
 
 cMobSpawner::tMobTypes& cMobSpawner::m_MobTypes()
@@ -57,7 +55,7 @@ cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily,const std::set<cMonst
 {
 	for (std::set<cMonster::eType>::const_iterator itr = a_AllowedTypes.begin(); itr != a_AllowedTypes.end(); itr++)
 	{
-		if (cMobTypesManager::FamilyFromType(*itr) == a_MonsterFamily)
+		if (cMonster::FamilyFromType(*itr) == a_MonsterFamily)
 		{
 			m_AllowedTypes.insert(*itr);
 		}
@@ -256,7 +254,7 @@ cMonster* cMobSpawner::TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockM
 	
 	if (CanSpawnHere(m_MobType, a_BlockType, a_BlockMeta, a_BlockType_below, a_BlockMeta_below, a_BlockType_above, a_BlockMeta_above, a_Biome, a_Level))
 	{
-		cMonster* newMob = cMobTypesManager::NewMonsterFromType(m_MobType);
+		cMonster * newMob = cMonster::NewMonsterFromType(m_MobType);
 		if (newMob)
 		{
 			m_Spawned.insert(newMob);

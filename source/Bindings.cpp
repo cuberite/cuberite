@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/20/13 10:19:10.
+** Generated automatically by tolua++-1.0.92 on 10/20/13 13:24:03.
 */
 
 #ifndef __cplusplus
@@ -29261,6 +29261,97 @@ static int tolua_AllToLua_cMonster_GetMobFamily00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: MobTypeToString of class  cMonster */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cMonster_MobTypeToString00
+static int tolua_AllToLua_cMonster_MobTypeToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cMonster",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cMonster::eType a_MobType = ((cMonster::eType) (int)  tolua_tonumber(tolua_S,2,0));
+  {
+   AString tolua_ret = (AString)  cMonster::MobTypeToString(a_MobType);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MobTypeToString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: StringToMobType of class  cMonster */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cMonster_StringToMobType00
+static int tolua_AllToLua_cMonster_StringToMobType00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cMonster",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_MobTypeName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   cMonster::eType tolua_ret = (cMonster::eType)  cMonster::StringToMobType(a_MobTypeName);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_MobTypeName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StringToMobType'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: FamilyFromType of class  cMonster */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cMonster_FamilyFromType00
+static int tolua_AllToLua_cMonster_FamilyFromType00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cMonster",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cMonster::eType a_MobType = ((cMonster::eType) (int)  tolua_tonumber(tolua_S,2,0));
+  {
+   cMonster::eFamily tolua_ret = (cMonster::eFamily)  cMonster::FamilyFromType(a_MobType);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'FamilyFromType'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
 {
@@ -31353,6 +31444,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"mfMaxplusone",cMonster::mfMaxplusone);
    tolua_function(tolua_S,"GetMobType",tolua_AllToLua_cMonster_GetMobType00);
    tolua_function(tolua_S,"GetMobFamily",tolua_AllToLua_cMonster_GetMobFamily00);
+   tolua_function(tolua_S,"MobTypeToString",tolua_AllToLua_cMonster_MobTypeToString00);
+   tolua_function(tolua_S,"StringToMobType",tolua_AllToLua_cMonster_StringToMobType00);
+   tolua_function(tolua_S,"FamilyFromType",tolua_AllToLua_cMonster_FamilyFromType00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLineBlockTracer","cLineBlockTracer","",NULL);
   tolua_beginmodule(tolua_S,"cLineBlockTracer");

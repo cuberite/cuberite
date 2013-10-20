@@ -71,6 +71,9 @@ public:
 	
 	// tolua_end
 	
+	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
+	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
+	
 	float m_SightDistance;
 	
 	/** Creates the mob object.
@@ -132,9 +135,28 @@ public:
 	virtual bool IsTame    (void) const { return false; }
 	virtual bool IsSitting (void) const { return false; }
 	
-	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
-	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
+	// tolua_begin
 	
+	/// Translates MobType enum to a string
+	static AString MobTypeToString(eType a_MobType);
+	
+	/// Translates MobType string to the enum
+	static eType StringToMobType(const AString & a_MobTypeName);
+	
+	/// Returns the mob family based on the type
+	static eFamily FamilyFromType(eType a_MobType);
+
+	// tolua_end
+	
+	/** Creates a new object of the specified mob.
+	a_MobType is the type of the mob to be created
+	a_Size is the size (for mobs with size)
+	if a_Size is let to -1 for entities that need size, size will be random
+	asserts and returns null if mob type is not specified
+	asserts if invalid size for mobs that need size
+	*/
+	static cMonster * NewMonsterFromType(eType a_MobType, int a_Size = -1);
+
 protected:
 	
 	cEntity * m_Target;
