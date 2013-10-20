@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/20/13 13:24:03.
+** Generated automatically by tolua++-1.0.92 on 10/20/13 13:59:04.
 */
 
 #ifndef __cplusplus
@@ -29352,6 +29352,36 @@ static int tolua_AllToLua_cMonster_FamilyFromType00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetSpawnRate of class  cMonster */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cMonster_GetSpawnRate00
+static int tolua_AllToLua_cMonster_GetSpawnRate00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cMonster",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cMonster::eFamily a_MobFamily = ((cMonster::eFamily) (int)  tolua_tonumber(tolua_S,2,0));
+  {
+   int tolua_ret = (int)  cMonster::GetSpawnRate(a_MobFamily);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetSpawnRate'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
 {
@@ -31447,6 +31477,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"MobTypeToString",tolua_AllToLua_cMonster_MobTypeToString00);
    tolua_function(tolua_S,"StringToMobType",tolua_AllToLua_cMonster_StringToMobType00);
    tolua_function(tolua_S,"FamilyFromType",tolua_AllToLua_cMonster_FamilyFromType00);
+   tolua_function(tolua_S,"GetSpawnRate",tolua_AllToLua_cMonster_GetSpawnRate00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLineBlockTracer","cLineBlockTracer","",NULL);
   tolua_beginmodule(tolua_S,"cLineBlockTracer");

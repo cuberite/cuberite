@@ -7,59 +7,9 @@
 
 
 
-cMobCensus::tCapMultipliersMap cMobCensus::CapMultiplierInitializerBeforeCx11(void)
-{
-	std::map<cMonster::eFamily,int> toReturn;
-	toReturn[cMonster::mfHostile] = 79;
-	toReturn[cMonster::mfPassive] = 11;
-	toReturn[cMonster::mfAmbient] = 16;
-	toReturn[cMonster::mfWater] = 5;
-	return toReturn;
-}
-
-
-
-
-
-cMobCensus::tMobSpawnRate cMobCensus::MobSpawnRateInitializerBeforeCx11(void)
-{
-	std::map<cMonster::eFamily,int> toReturn;
-	toReturn[cMonster::mfHostile] = 1;
-	toReturn[cMonster::mfPassive] = 400;
-	toReturn[cMonster::mfAmbient] = 400;
-	toReturn[cMonster::mfWater] = 400;
-	return toReturn;
-}
-
-
-
-
-
-cMobCensus::tCapMultipliersMap & cMobCensus::m_CapMultipliers(void)
-{
-	// TODO: This memory leaks:
-	static tCapMultipliersMap * value = new tCapMultipliersMap(CapMultiplierInitializerBeforeCx11());
-	return *value;
-}
-
-
-
-
-
-cMobCensus::tMobSpawnRate & cMobCensus::m_SpawnRate(void)
-{
-	// TODO: This memory leaks:
-	static tMobSpawnRate* value = new tMobSpawnRate(MobSpawnRateInitializerBeforeCx11());
-	return *value;
-}
-
-
-
-
-
 void cMobCensus::CollectMob(cMonster & a_Monster, cChunk & a_Chunk, double a_Distance)
 {
-	m_ProximityCounter.CollectMob(a_Monster,a_Chunk,a_Distance);
+	m_ProximityCounter.CollectMob(a_Monster, a_Chunk, a_Distance);
 	m_MobFamilyCollecter.CollectMob(a_Monster);
 }
 
@@ -73,15 +23,28 @@ bool cMobCensus::IsCapped(cMonster::eFamily a_MobFamily)
 	const int ratio = 319; // this should be 256 as we are only supposed to take account from chunks that are in 17x17 from a player
 	// but for now, we use all chunks loaded by players. that means 19 x 19 chunks. That's why we use 256 * (19*19) / (17*17) = 319
 	// MG TODO : code the correct count	
-	tCapMultipliersMap::const_iterator capMultiplier = m_CapMultipliers().find(a_MobFamily);
-	if (
-		(capMultiplier != m_CapMultipliers().end()) &&
-		((capMultiplier->second * GetNumChunks()) / ratio >= m_MobFamilyCollecter.GetNumberOfCollectedMobs(a_MobFamily))
-	)
+	if ((GetCapMultiplier(a_MobFamily) * GetNumChunks()) / ratio >= m_MobFamilyCollecter.GetNumberOfCollectedMobs(a_MobFamily))
 	{
 		return false;
 	}
 	return true;
+}
+
+
+
+
+
+int cMobCensus::GetCapMultiplier(cMonster::eFamily a_MobFamily)
+{
+	switch (a_MobFamily)
+	{
+		case cMonster::mfHostile: return 79;
+		case cMonster::mfPassive: return 11;
+		case cMonster::mfAmbient: return 16;
+		case cMonster::mfWater:   return 5;
+	}
+	ASSERT(!"Unhandled mob family");
+	return -1;
 }
 
 
@@ -122,6 +85,7 @@ void cMobCensus::Logd()
 	LOGD("Water mobs   : %d %s", m_MobFamilyCollecter.GetNumberOfCollectedMobs(cMonster::mfWater),   IsCapped(cMonster::mfWater)   ? "(capped)" : "");
 	LOGD("Passive mobs : %d %s", m_MobFamilyCollecter.GetNumberOfCollectedMobs(cMonster::mfPassive), IsCapped(cMonster::mfPassive) ? "(capped)" : "");
 }
+
 
 
 

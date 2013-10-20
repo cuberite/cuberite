@@ -25,9 +25,6 @@ as side effect 2 : it also know the caps for mobs number and can compare census 
 class cMobCensus
 {
 public:
-	typedef const std::map<cMonster::eFamily,int> tMobSpawnRate;
-	static tMobSpawnRate & m_SpawnRate(void);
-
 	/// Returns the nested proximity counter
 	cMobProximityCounter & GetProximityCounter(void);
 
@@ -40,25 +37,21 @@ public:
 
 	/// Returns true if the family is capped (i.e. there are more mobs of this family than max)
 	bool IsCapped(cMonster::eFamily a_MobFamily);
-
+	
 	/// log the results of census to server console
 	void Logd(void);
-
+	
 protected :
 	cMobProximityCounter m_ProximityCounter;
 	cMobFamilyCollecter m_MobFamilyCollecter;
-
-	typedef const std::map<cMonster::eFamily,int> tCapMultipliersMap;
-	
-	static tCapMultipliersMap & m_CapMultipliers(void);
 
 	std::set<cChunk *> m_EligibleForSpawnChunks;
 
 	/// Returns the number of chunks that are elligible for spawning (for now, the loaded, valid chunks)
 	int GetNumChunks();
 
-	static tCapMultipliersMap CapMultiplierInitializerBeforeCx11(void);
-	static tCapMultipliersMap MobSpawnRateInitializerBeforeCx11(void);
+	/// Returns the cap multiplier value of the given monster family
+	static int GetCapMultiplier(cMonster::eFamily a_MobFamily);
 } ;
 
 

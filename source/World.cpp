@@ -744,32 +744,31 @@ void cWorld::TickMobs(float a_Dt)
 	// before every Mob action, we have to "counts" them depending on the distance to players, on their megatype ...
 	cMobCensus MobCensus;
 	m_ChunkMap->CollectMobCensus(MobCensus);
-	for(cMobFamilyCollecter::tMobFamilyList::const_iterator itr = cMobFamilyCollecter::m_AllFamilies().begin(); itr != cMobFamilyCollecter::m_AllFamilies().end(); itr++)
+	if (m_bAnimals)
 	{
-		cMobCensus::tMobSpawnRate::const_iterator spawnrate = cMobCensus::m_SpawnRate().find(*itr);
-		// hostile mobs are spawned more often
-		if ((spawnrate != cMobCensus::m_SpawnRate().end()) && (m_LastSpawnMonster[*itr] < m_WorldAge - spawnrate->second))
+		for (cMobFamilyCollecter::tMobFamilyList::const_iterator itr = cMobFamilyCollecter::m_AllFamilies().begin(); itr != cMobFamilyCollecter::m_AllFamilies().end(); itr++)
 		{
-			m_LastSpawnMonster[*itr] = m_WorldAge;
-			// each megatype of mob has it's own cap
-			if (!(MobCensus.IsCapped(*itr)))
+			int spawnrate = cMonster::GetSpawnRate(*itr);
+			if (
+				(m_LastSpawnMonster[*itr] > m_WorldAge - spawnrate) ||  // Not reached the needed tiks before the next round
+				MobCensus.IsCapped(*itr)
+			)
 			{
-				if (m_bAnimals)
+				continue;
+			}
+			m_LastSpawnMonster[*itr] = m_WorldAge;
+			cMobSpawner Spawner(*itr, m_AllowedMobs);
+			if (Spawner.CanSpawnAnything())
+			{
+				m_ChunkMap->SpawnMobs(Spawner);
+				// do the spawn
+				for(cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); itr2++)
 				{
-					cMobSpawner Spawner(*itr,m_AllowedMobs);
-					if (Spawner.CanSpawnAnything())
-					{
-						m_ChunkMap->SpawnMobs(Spawner);
-						// do the spawn
-						for(cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); itr2++)
-						{
-							SpawnMobFinalize(*itr2);
-						}
-					}
+					SpawnMobFinalize(*itr2);
 				}
-			}		   
-		}
-	}
+			}
+		}  // for itr - Families[]
+	}		// if (Spawning enabled)
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)

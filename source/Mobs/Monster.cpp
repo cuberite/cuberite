@@ -616,6 +616,23 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 
 
 
+int cMonster::GetSpawnRate(cMonster::eFamily a_MobFamily)
+{
+	switch (a_MobFamily)
+	{
+		case mfHostile: return 1;
+		case mfPassive: return 400;
+		case mfAmbient: return 400;
+		case mfWater:   return 400;
+	}
+	ASSERT(!"Unhandled mob family");
+	return -1;
+}
+
+
+
+
+
 cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType, int a_Size)
 {
 	cFastRandom Random;

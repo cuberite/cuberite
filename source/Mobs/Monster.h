@@ -146,6 +146,9 @@ public:
 	/// Returns the mob family based on the type
 	static eFamily FamilyFromType(eType a_MobType);
 
+	/// Returns the spawn rate (number of game ticks between spawn attempts) for the given mob family
+	static int GetSpawnRate(cMonster::eFamily a_MobFamily);
+
 	// tolua_end
 	
 	/** Creates a new object of the specified mob.
