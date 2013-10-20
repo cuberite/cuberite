@@ -668,7 +668,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid}} representing the contents" },
 			},
 
-			Inherits = "cBlockEntity";
+			Inherits = "cBlockEntityWithItems";
 		},
 
 		cEnchantments =
@@ -1040,8 +1040,12 @@ Internally, the class uses three {{cItemGrid|cItemGrid}} objects to store the co
 <li>Armor</li>
 <li>Inventory</li>
 <li>Hotbar</li>
-These ItemGrids are available in the API and can be manipulated by the plugins, too.
-]],
+These ItemGrids are available in the API and can be manipulated by the plugins, too.</p>
+				<p>
+				When using the raw slot access functions, such as GetSlot() and SetSlot(), the slots are numbered
+				consecutively, each ItemGrid has its offset and count. To future-proff your plugins, use the named
+				constants instead of hard-coded numbers.
+			]],
 			Functions =
 			{
 				AddItem = { Params = "{{cItem|cItem}}, [AllowNewStacks]", Return = "number", Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Returns the number of items added" },
@@ -1130,6 +1134,15 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			AdditionalInfo =
 			{
 				{
+					Header = "Usage notes",
+					Contents = [[
+						Note that the object contained in a cItem class is quite complex and quite often new Minecraft
+						versions add more stuff. Therefore it is recommended to copy cItem objects using the
+						copy-constructor ("local copy = cItem(original);"), this is the only way that guarantees that
+						the object will be copied at full, even with future versions of MCServer.
+					]],
+				},
+				{
 					Header = "Example code",
 					Contents = [[
 						The following code shows how to create items in several different ways (adapted from the Debuggers plugin):
@@ -1164,14 +1177,14 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 		cItemGrid =
 		{
 			Desc = [[This class represents a 2D array of items. It is used as the underlying storage and API for all cases that use a grid of items:
-<li>Chest contents</li>
+<li>{{cChestEntity|Chest}} contents</li>
 <li>(TODO) Chest minecart contents</li>
-<li>{{cDispenserEntity|Dispenser|| contents</li>
+<li>{{cDispenserEntity|Dispenser}} contents</li>
 <li>{{cDropperEntity|Dropper}} contents</li>
 <li>{{cFurnaceEntity|Furnace}} contents (?)</li>
 <li>{{cHopperEntity|Hopper}} contents</li>
 <li>(TODO) Hopper minecart contents</li>
-<li>Player Inventory areas</li>
+<li>{{cPlayer|Player}} Inventory areas</li>
 <li>(TODO) Trapped chest contents</li>
 </p>
 		<p>The items contained in this object are accessed either by a pair of XY coords, or a slot number (x + Width * y). There are functions available for converting between the two formats.
@@ -1232,6 +1245,40 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 			Constants =
 			{
 			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Code example: Add items to player inventory",
+					Contents = [[
+						The following code tries to add 32 sticks to a player's main inventory:
+<pre class="prettyprint lang-lua">
+local Items = cItem(E_ITEM_STICK, 32);
+local PlayerMainInventory = Player:GetInventorySlots();  -- PlayerMainInventory is of type cItemGrid
+local NumAdded = PlayerMainInventory:AddItem(Items);
+if (NumAdded == Items.m_ItemCount) then
+  -- All the sticks did fit
+  LOG("Added 32 sticks");
+else
+  -- Some (or all) of the sticks didn't fit
+  LOG("Tried to add 32 sticks, but only " .. NumAdded .. " could fit");
+end
+</pre>
+					]],
+				},
+				{
+					Header = "Code example: Damage an item",
+					Contents = [[
+						The following code damages the helmet in the player's armor and destroys it if it reaches max damage:
+<pre class="prettyprint lang-lua">
+local PlayerArmor = Player:GetArmorSlots();  -- PlayerArmor is of type cItemGrid
+if (PlayerArmor:DamageItem(0)) then  -- Helmet is at SlotNum 0
+  -- The helmet has reached max damage, destroy it:
+  PlayerArmor:EmptySlot(0);
+end
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
 		},
 
 		cItems =
