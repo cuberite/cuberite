@@ -841,7 +841,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				etMinecart = { Notes = "The entity is a {{cMinecart}} descendant" },
 				etPlayer = { Notes = "The entity is a {{cPlayer}}" },
 				etPickup = { Notes = "The entity is a {{cPickup}}" },
-				etProjectile = { Notes = "The entity is a {{cProjectile}} descendant" },
+				etProjectile = { Notes = "The entity is a {{cProjectileEntity}} descendant" },
 				etTNT = { Notes = "The entity is a {{cTNTEntity}}" },
 			},
 		},
@@ -1872,7 +1872,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 				BroadcastSoundParticleEffect = { Params = "EffectID, X, Y, Z, EffectData, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified effect to all players in this world, except the optional ExceptClient" },
 				CastThunderbolt = { Params = "X, Y, Z", Return = "", Notes = "Creates a thunderbolt at the specified coords" },
 				ChangeWeather = { Params = "", Return = "", Notes = "Forces the weather to change in the next game tick. Weather is changed according to the normal rules: wSunny <-> wRain <-> wStorm" },
-				CreateProjectile = { Params = "X, Y, Z, {{cProjectile|ProjectileKind}}, {{cEntity|Creator}}, [{{Vector3d|Speed}}]", Return = "", Notes = "Creates a new projectile of the specified kind at the specified coords. The projectile's creator is set to Creator (may be nil). Optional speed indicates the initial speed for the projectile." },
+				CreateProjectile = { Params = "X, Y, Z, {{cProjectileEntity|ProjectileKind}}, {{cEntity|Creator}}, [{{Vector3d|Speed}}]", Return = "", Notes = "Creates a new projectile of the specified kind at the specified coords. The projectile's creator is set to Creator (may be nil). Optional speed indicates the initial speed for the projectile." },
 				DigBlock = { Params = "X, Y, Z", Return = "", Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors." },
 				DoExplosionAt = { Params = "Force, X, Y, Z, CanCauseFire, Source, SourceData", Return = "", Notes = "Creates an explosion of the specified relative force in the specified position. If CanCauseFire is set, the explosion will set blocks on fire, too. The Source parameter specifies the source of the explosion, one of the esXXX constants. The SourceData parameter is specific to each source type, usually it provides more info about the source." },
 				DoWithChestAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a chest at the specified coords, calls the CallbackFunction with the {{cChestEntity}} parameter representing the chest. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}}, [CallbackData])</pre> The function returns false if there is no chest, or if there is, it returns the bool value that the callback has returned." },
@@ -2483,7 +2483,7 @@ end;
 			Desc = [[
 				This hook is called after an explosion has been processed in a world.</p>
 				<p>
-				See also {{OnHookExploding|HOOK_EXPLODING}} for a similar hook called before the explosion.</p>
+				See also {{OnExploding|HOOK_EXPLODING}} for a similar hook called before the explosion.</p>
 				<p>
 				The explosion carries with it the type of its source - whether it's a creeper exploding, or TNT,
 				etc. It also carries the identification of the actual source. The exact type of the identification
@@ -2526,7 +2526,7 @@ end;
 			Desc = [[
 				This hook is called before an explosion has been processed in a world.</p>
 				<p>
-				See also {{OnHookExploded|HOOK_EXPLODED}} for a similar hook called after the explosion.</p>
+				See also {{OnExploded|HOOK_EXPLODED}} for a similar hook called after the explosion.</p>
 				<p>
 				The explosion carries with it the type of its source - whether it's a creeper exploding, or TNT,
 				etc. It also carries the identification of the actual source. The exact type of the identification
