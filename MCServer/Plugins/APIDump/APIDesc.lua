@@ -1497,7 +1497,7 @@ a_Player:OpenWindow(Window);
 
 		cPawn =
 		{
-			Desc = [[cPawn is a controllable pawn object, controlled by either AI or a player. cPawn inherits all functions and members of {{centity|centity}}
+			Desc = [[cPawn is a controllable pawn object, controlled by either AI or a player. cPawn inherits all functions and members of {{cEntity}}
 ]],
 			Functions =
 			{
