@@ -736,38 +736,42 @@ void cWorld::TickWeather(float a_Dt)
 
 void cWorld::TickMobs(float a_Dt)
 {
-	if (!m_bAnimals)
-	{
-		return;
-	}
-
-	// before every Mob action, we have to "counts" them depending on the distance to players, on their megatype ...
+	// before every Mob action, we have to count them depending on the distance to players, on their family ...
 	cMobCensus MobCensus;
 	m_ChunkMap->CollectMobCensus(MobCensus);
 	if (m_bAnimals)
 	{
-		for (cMobFamilyCollecter::tMobFamilyList::const_iterator itr = cMobFamilyCollecter::m_AllFamilies().begin(); itr != cMobFamilyCollecter::m_AllFamilies().end(); itr++)
+		// Spawning is enabled, spawn now:
+		static const cMonster::eFamily AllFamilies[] =
 		{
-			int spawnrate = cMonster::GetSpawnRate(*itr);
+			cMonster::mfHostile,
+			cMonster::mfPassive,
+			cMonster::mfAmbient,
+			cMonster::mfWater,
+		} ;
+		for (int i = 0; i < ARRAYCOUNT(AllFamilies); i++)
+		{
+			cMonster::eFamily Family = AllFamilies[i];
+			int spawnrate = cMonster::GetSpawnRate(Family);
 			if (
-				(m_LastSpawnMonster[*itr] > m_WorldAge - spawnrate) ||  // Not reached the needed tiks before the next round
-				MobCensus.IsCapped(*itr)
+				(m_LastSpawnMonster[Family] > m_WorldAge - spawnrate) ||  // Not reached the needed tiks before the next round
+				MobCensus.IsCapped(Family)
 			)
 			{
 				continue;
 			}
-			m_LastSpawnMonster[*itr] = m_WorldAge;
-			cMobSpawner Spawner(*itr, m_AllowedMobs);
+			m_LastSpawnMonster[Family] = m_WorldAge;
+			cMobSpawner Spawner(Family, m_AllowedMobs);
 			if (Spawner.CanSpawnAnything())
 			{
 				m_ChunkMap->SpawnMobs(Spawner);
 				// do the spawn
-				for(cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); itr2++)
+				for (cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); itr2++)
 				{
 					SpawnMobFinalize(*itr2);
 				}
 			}
-		}  // for itr - Families[]
+		}  // for i - AllFamilies[]
 	}		// if (Spawning enabled)
 
 	// move close mobs
