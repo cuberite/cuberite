@@ -532,7 +532,7 @@ cMonster::eType cMonster::StringToMobType(const AString & a_Name)
 	StrToLower(lcName);
 	
 	// Binary-search for the lowercase name:
-	int lo = 0, hi = ARRAYCOUNT(g_MobTypeNames);
+	int lo = 0, hi = ARRAYCOUNT(g_MobTypeNames) - 1;
 	while (hi - lo > 1)
 	{
 		int mid = (lo + hi) / 2;
@@ -543,11 +543,11 @@ cMonster::eType cMonster::StringToMobType(const AString & a_Name)
 		}
 		if (res < 0)
 		{
-			hi = mid;
+			lo = mid;
 		}
 		else
 		{
-			lo = mid;
+			hi = mid;
 		}
 	}
 	// Range has collapsed to at most two elements, compare each:
