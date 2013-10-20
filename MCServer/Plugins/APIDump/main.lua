@@ -11,6 +11,21 @@
 g_Plugin = nil;
 g_PluginFolder = "";
 g_TrackedPages = {};  -- List of tracked pages, to be checked later whether they exist. Each item is an array of referring pagenames.
+g_Stats =  -- Statistics about the documentation
+{
+	NumTotalClasses = 0,
+	NumUndocumentedClasses = 0,
+	NumTotalFunctions = 0,
+	NumUndocumentedFunctions = 0,
+	NumTotalConstants = 0,
+	NumUndocumentedConstants = 0,
+	NumTotalVariables = 0,
+	NumUndocumentedVariables = 0,
+	NumTotalHooks = 0,
+	NumUndocumentedHooks = 0,
+	NumTrackedLinks = 0,
+	NumInvalidLinks = 0,
+}
 
 
 
@@ -187,6 +202,8 @@ function DumpAPIHtml()
 		end
 	);
 	
+	g_Stats.NumTotalClasses = #API;
+	
 	-- Add Globals into the API:
 	Globals.Name = "Globals";
 	table.insert(API, Globals);
@@ -243,6 +260,7 @@ function DumpAPIHtml()
 				<li><a href="#classes">Class index</a></li>
 				<li><a href="#hooks">Hooks</a></li>
 				<li><a href="#extra">Extra pages</a></li>
+				<li><a href="#docstats">Documentation statistics</a></li>
 			</ul>
 			
 			<hr />
@@ -301,12 +319,8 @@ function DumpAPIHtml()
 			f:write("				<li>" .. extra.Title .. " <i>(file is missing)</i></li>\n");
 		end
 	end
-	f:write([[			</ul>
-		</div>
-	</body>
-</html>]]);
-	f:close();
-	
+	f:write("</ul>");
+
 	-- Copy the static files to the output folder (overwrite any existing):
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/main.css", "API/main.css");
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/prettify.js", "API/prettify.js");
@@ -318,6 +332,14 @@ function DumpAPIHtml()
 	ListUnexportedObjects();
 	ListMissingPages();
 
+	WriteStats(f);
+	
+	f:write([[			</ul>
+		</div>
+	</body>
+</html>]]);
+	f:close();
+	
 	LOG("API subfolder written");
 end
 
@@ -529,6 +551,7 @@ function ReadDescriptions(a_API)
 			cls.UndocumentedConstants = {};
 			cls.UndocumentedVariables = {};
 			cls.Variables = cls.Variables or {};
+			g_Stats.NumUndocumentedClasses = g_Stats.NumUndocumentedClasses + 1;
 			for j, func in ipairs(cls.Functions) do
 				local FnName = func.DocID or func.Name;
 				if not(IsFunctionIgnored(cls.Name .. "." .. FnName)) then
@@ -625,6 +648,7 @@ function ReadHooks(a_Hooks)
 			end
 		end
 	end  -- for i, hook - a_Hooks[]
+	g_Stats.NumTotalHooks = #a_Hooks;
 end
 
 
@@ -851,6 +875,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	if (HasConstants) then
 		cf:write("			<a name=\"constants\"><hr /><h1>Constants</h1></a>\n");
 		WriteConstants(a_ClassAPI.Constants, nil);
+		g_Stats.NumTotalConstants = g_Stats.NumTotalConstants  + #a_ClassAPI.Constants;
 		for i, cls in ipairs(InheritanceChain) do
 			WriteConstants(cls.Constants, cls.Name);
 		end;
@@ -860,6 +885,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	if (HasVariables) then
 		cf:write("			<a name=\"variables\"><hr /><h1>Member variables</h1></a>\n");
 		WriteVariables(a_ClassAPI.Variables, nil);
+		g_Stats.NumTotalVariables = g_Stats.NumTotalVariables + #a_ClassAPI.Variables;
 		for i, cls in ipairs(InheritanceChain) do
 			WriteVariables(cls.Variables, cls.Name);
 		end;
@@ -869,6 +895,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	if (HasFunctions) then
 		cf:write("			<a name=\"functions\"><hr /><h1>Functions</h1></a>\n");
 		WriteFunctions(a_ClassAPI.Functions, nil);
+		g_Stats.NumTotalFunctions = g_Stats.NumTotalFunctions + #a_ClassAPI.Functions;
 		for i, cls in ipairs(InheritanceChain) do
 			WriteFunctions(cls.Functions, cls.Name);
 		end
@@ -977,6 +1004,9 @@ function ListUndocumentedObjects(API, UndocumentedHooks)
 			local HasFunctions = ((cls.UndocumentedFunctions ~= nil) and (#cls.UndocumentedFunctions > 0));
 			local HasConstants = ((cls.UndocumentedConstants ~= nil) and (#cls.UndocumentedConstants > 0));
 			local HasVariables = ((cls.UndocumentedVariables ~= nil) and (#cls.UndocumentedVariables > 0));
+			g_Stats.NumUndocumentedFunctions = g_Stats.NumUndocumentedFunctions + #cls.UndocumentedFunctions;
+			g_Stats.NumUndocumentedConstants = g_Stats.NumUndocumentedConstants + #cls.UndocumentedConstants;
+			g_Stats.NumUndocumentedVariables = g_Stats.NumUndocumentedVariables + #cls.UndocumentedVariables;
 			if (HasFunctions or HasConstants or HasVariables) then
 				f:write("\t\t" .. cls.Name .. " =\n\t\t{\n");
 				if ((cls.Desc == nil) or (cls.Desc == "")) then
@@ -1045,6 +1075,7 @@ function ListUndocumentedObjects(API, UndocumentedHooks)
 		f:write("}\n\n\n\n");
 		f:close();
 	end
+	g_Stats.NumUndocumentedHooks = #UndocumentedHooks;
 end
 
 
@@ -1086,11 +1117,14 @@ end
 
 function ListMissingPages()
 	local MissingPages = {};
+	local NumLinks = 0;
 	for PageName, Referrers in pairs(g_TrackedPages) do
+		NumLinks = NumLinks + 1;
 		if not(cFile:Exists("API/" .. PageName .. ".html")) then
 			table.insert(MissingPages, {Name = PageName, Refs = Referrers} );
 		end
 	end;
+	g_Stats.NumTrackedLinks = NumLinks;
 	g_TrackedPages = {};
 	
 	if (#MissingPages == 0) then
@@ -1119,6 +1153,47 @@ function ListMissingPages()
 		f:write("\n\n");
 	end
 	f:close();
+	g_Stats.NumInvalidLinks = #MissingPages;
+end
+
+
+
+
+
+--- Writes the documentation statistics (in g_Stats) into the given HTML file
+function WriteStats(f)
+	f:write([[
+		<hr /><a name="docstats"><h2>Documentation statistics</h2></a>
+		<table><tr><th>Object</th><th>Total</th><th>Documented</th><th>Undocumented</th><th>Documented %</th></tr>
+	]]);
+	f:write("<tr><td>Classes</td><td>", g_Stats.NumTotalClasses);
+	f:write("</td><td>", g_Stats.NumTotalClasses - g_Stats.NumUndocumentedClasses);
+	f:write("</td><td>", g_Stats.NumUndocumentedClasses);
+	f:write("</td><td>", 100 * (g_Stats.NumTotalClasses - g_Stats.NumUndocumentedClasses) / g_Stats.NumTotalClasses);
+	f:write("</td></tr>");
+
+	f:write("<tr><td>Functions</td><td>", g_Stats.NumTotalFunctions);
+	f:write("</td><td>", g_Stats.NumTotalFunctions - g_Stats.NumUndocumentedFunctions);
+	f:write("</td><td>", g_Stats.NumUndocumentedFunctions);
+	f:write("</td><td>", 100 * (g_Stats.NumTotalFunctions - g_Stats.NumUndocumentedFunctions) / g_Stats.NumTotalFunctions);
+	f:write("</td></tr>");
+
+	f:write("<tr><td>Member variables</td><td>", g_Stats.NumTotalVariables);
+	f:write("</td><td>", g_Stats.NumTotalVariables - g_Stats.NumUndocumentedVariables);
+	f:write("</td><td>", g_Stats.NumUndocumentedVariables);
+	f:write("</td><td>", 100 * (g_Stats.NumTotalVariables - g_Stats.NumUndocumentedVariables) / g_Stats.NumTotalVariables);
+	f:write("</td></tr>");
+
+	f:write("<tr><td>Constants</td><td>", g_Stats.NumTotalConstants);
+	f:write("</td><td>", g_Stats.NumTotalConstants - g_Stats.NumUndocumentedConstants);
+	f:write("</td><td>", g_Stats.NumUndocumentedConstants);
+	f:write("</td><td>", 100 * (g_Stats.NumTotalConstants - g_Stats.NumUndocumentedConstants) / g_Stats.NumTotalConstants);
+	f:write("</td></tr>");
+	
+	f:write([[
+		</table>
+		<p>There are ]], g_Stats.NumTrackedLinks, " internal links, ", g_Stats.NumInvalidLinks, " of them are invalid.</p>"
+	);
 end
 
 

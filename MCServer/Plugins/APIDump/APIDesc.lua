@@ -3585,6 +3585,7 @@ end
 		"string",
 		"table",
 		"g_TrackedPages",
+		"g_Stats",
 	},
 
 	IgnoreFunctions =
@@ -3611,6 +3612,7 @@ end
 		"ReadHooks",
 		"WriteHtmlClass",
 		"WriteHtmlHook",
+		"WriteStats",
 	},
 	
 	IgnoreVariables =
