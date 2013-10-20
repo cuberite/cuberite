@@ -1100,7 +1100,11 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				{{cEnchantments}} class and are accessible through the m_Enchantments variable.</p>
 				<p>
 				To test if a cItem object represents an empty item, do not compare the item type nor the item count,
-				but rather use the IsEmpty() function.
+				but rather use the IsEmpty() function.</p>
+				<p>
+				To translate from a cItem to its string representation, use the {{Globals#functions|global function}}
+				ItemToString(), ItemTypeToString() or ItemToFullString(). To translate from a string to a cItem,
+				use the StringToItem() global function.
 			]],
 
 			Functions =
