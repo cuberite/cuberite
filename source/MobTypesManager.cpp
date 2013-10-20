@@ -11,106 +11,41 @@
 
 
 
-cMobTypesManager::tMobTypes2Names & cMobTypesManager::m_MobsTypes2Names(void)
+/** Map for cMonster::eType <-> string
+Needs to be alpha-sorted by the strings, because binary search is used in StringToMobType()
+The strings need to be lowercase (for more efficient comparisons in StringToMobType())
+*/
+static const struct
 {
-	// TODO: This memory leaks
-	static std::map<cMonster::eType, AString> * value = new std::map<cMonster::eType, AString>(MobTypes2NamesInitializerBeforeCx11());
-	return *value;
-}
-
-
-
-
-
-cMobTypesManager::tMobTypes2Names cMobTypesManager::MobTypes2NamesInitializerBeforeCx11()
-{	
-	std::map<cMonster::eType, AString> toReturn;
-	typedef std::map<cMonster::eType, AString>::value_type ValueType;
-	// The strings need to be lowercase (for more efficient comparisons in StringToMobType())
-	toReturn.insert(ValueType(cMonster::mtBat,          "bat"));
-	toReturn.insert(ValueType(cMonster::mtBlaze,        "blaze"));
-	toReturn.insert(ValueType(cMonster::mtCaveSpider,   "cavespider"));
-	toReturn.insert(ValueType(cMonster::mtChicken,      "chicken"));
-	toReturn.insert(ValueType(cMonster::mtCow,          "cow"));
-	toReturn.insert(ValueType(cMonster::mtCreeper,      "creeper"));
-	toReturn.insert(ValueType(cMonster::mtEnderman,     "enderman"));
-	toReturn.insert(ValueType(cMonster::mtGhast,        "ghast"));
-	toReturn.insert(ValueType(cMonster::mtHorse,        "horse"));
-	toReturn.insert(ValueType(cMonster::mtMagmaCube,    "magmacube"));
-	toReturn.insert(ValueType(cMonster::mtMooshroom,    "mooshroom"));
-	toReturn.insert(ValueType(cMonster::mtOcelot,       "ocelot"));
-	toReturn.insert(ValueType(cMonster::mtPig,          "pig"));
-	toReturn.insert(ValueType(cMonster::mtSheep,        "sheep"));
-	toReturn.insert(ValueType(cMonster::mtSilverfish,   "silverfish"));
-	toReturn.insert(ValueType(cMonster::mtSkeleton,     "skeleton"));
-	toReturn.insert(ValueType(cMonster::mtSlime,        "slime"));
-	toReturn.insert(ValueType(cMonster::mtSpider,       "spider"));
-	toReturn.insert(ValueType(cMonster::mtSquid,        "squid"));
-	toReturn.insert(ValueType(cMonster::mtVillager,     "villager"));
-	toReturn.insert(ValueType(cMonster::mtWitch,        "witch"));
-	toReturn.insert(ValueType(cMonster::mtWolf,         "wolf"));
-	toReturn.insert(ValueType(cMonster::mtZombie,       "zombie"));
-	toReturn.insert(ValueType(cMonster::mtZombiePigman, "zombiepigman"));
-	return toReturn;
-}
-
-
-
-
-
-cMobTypesManager::tMobType2Family & cMobTypesManager::m_MobsType2Family(void)
+	cMonster::eType m_Type;
+	const char * m_lcName;
+} g_MobTypeNames[] =
 {
-	// TODO: This memory is leaked:
-	static std::map<cMonster::eType,cMonster::eFamily> * value = new std::map<cMonster::eType,cMonster::eFamily>(MobType2FamilyInitializerBeforeCx11());
-	return *value;
-}
-
-
-
-
-
-cMobTypesManager::tMobType2Family cMobTypesManager::MobType2FamilyInitializerBeforeCx11()
-{
-	std::map<cMonster::eType,cMonster::eFamily> toReturn;
-	typedef std::map<cMonster::eType,cMonster::eFamily>::value_type ValueType;
-	toReturn.insert(ValueType(cMonster::mtBat,          cMonster::mfAmbient));
-	toReturn.insert(ValueType(cMonster::mtBlaze,        cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtCaveSpider,   cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtChicken,      cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtCow,          cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtCreeper,      cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtEnderman,     cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtGhast,        cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtHorse,        cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtMagmaCube,    cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtMooshroom,    cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtOcelot,       cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtPig,          cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtSheep,        cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtSilverfish,   cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtSkeleton,     cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtSlime,        cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtSpider,       cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtSquid,        cMonster::mfWater));
-	toReturn.insert(ValueType(cMonster::mtVillager,     cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtWitch,        cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtWolf,         cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtZombie,       cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtZombiePigman, cMonster::mfHostile));
-
-	return toReturn;
-}
-
-
-
-
-
-cFastRandom & cMobTypesManager::m_Random(void)
-{
-	// TODO: This memory is leaked:
-	static cFastRandom * value = new cFastRandom();
-	return *value;
-}
+	{cMonster::mtBat,          "bat"},
+	{cMonster::mtBlaze,        "blaze"},
+	{cMonster::mtCaveSpider,   "cavespider"},
+	{cMonster::mtChicken,      "chicken"},
+	{cMonster::mtCow,          "cow"},
+	{cMonster::mtCreeper,      "creeper"},
+	{cMonster::mtEnderman,     "enderman"},
+	{cMonster::mtGhast,        "ghast"},
+	{cMonster::mtHorse,        "horse"},
+	{cMonster::mtMagmaCube,    "magmacube"},
+	{cMonster::mtMooshroom,    "mooshroom"},
+	{cMonster::mtOcelot,       "ocelot"},
+	{cMonster::mtPig,          "pig"},
+	{cMonster::mtSheep,        "sheep"},
+	{cMonster::mtSilverfish,   "silverfish"},
+	{cMonster::mtSkeleton,     "skeleton"},
+	{cMonster::mtSlime,        "slime"},
+	{cMonster::mtSpider,       "spider"},
+	{cMonster::mtSquid,        "squid"},
+	{cMonster::mtVillager,     "villager"},
+	{cMonster::mtWitch,        "witch"},
+	{cMonster::mtWolf,         "wolf"},
+	{cMonster::mtZombie,       "zombie"},
+	{cMonster::mtZombiePigman, "zombiepigman"},
+} ;
 
 
 
@@ -118,6 +53,8 @@ cFastRandom & cMobTypesManager::m_Random(void)
 
 cMonster * cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a_Size)
 {
+	cFastRandom Random;
+	
 	cMonster * toReturn = NULL;
 
 	// unspecified size get rand[1,3] for Monsters that need size
@@ -128,7 +65,7 @@ cMonster * cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a
 		{
 			if (a_Size == -1)
 			{
-				a_Size = m_Random().NextInt(2, a_MobType) + 1;
+				a_Size = Random.NextInt(2, a_MobType) + 1;
 			}
 			if ((a_Size <= 0) || (a_Size >= 4))
 			{
@@ -184,11 +121,16 @@ cMonster * cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a
 
 AString cMobTypesManager::MobTypeToString(cMonster::eType a_MobType)
 {
-	std::map<cMonster::eType, AString>::const_iterator itr = m_MobsTypes2Names().find(a_MobType);
-	if (itr != m_MobsTypes2Names().end())
+	// Mob types aren't sorted, so we need to search linearly:
+	for (int i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
 	{
-		return itr->second;
+		if (g_MobTypeNames[i].m_Type == a_MobType)
+		{
+			return g_MobTypeNames[i].m_lcName;
+		}
 	}
+	
+	// Not found:
 	return "";
 }
 
@@ -200,13 +142,37 @@ cMonster::eType cMobTypesManager::StringToMobType(const AString & a_Name)
 {
 	AString lcName(a_Name);
 	StrToLower(lcName);
-	for (std::map<cMonster::eType, AString>::const_iterator itr = m_MobsTypes2Names().begin(); itr != m_MobsTypes2Names().end(); itr++)
+	
+	// Binary-search for the lowercase name:
+	int lo = 0, hi = ARRAYCOUNT(g_MobTypeNames);
+	while (hi - lo > 1)
 	{
-		if (itr->second == a_Name)
+		int mid = (lo + hi) / 2;
+		int res = strcmp(g_MobTypeNames[mid].m_lcName, lcName.c_str());
+		if (res == 0)
 		{
-			return itr->first;			
+			return g_MobTypeNames[mid].m_Type;
+		}
+		if (res < 0)
+		{
+			hi = mid;
+		}
+		else
+		{
+			lo = mid;
 		}
 	}
+	// Range has collapsed to at most two elements, compare each:
+	if (strcmp(g_MobTypeNames[lo].m_lcName, lcName.c_str()) == 0)
+	{
+		return g_MobTypeNames[lo].m_Type;
+	}
+	if ((lo != hi) && (strcmp(g_MobTypeNames[hi].m_lcName, lcName.c_str()) == 0))
+	{
+		return g_MobTypeNames[hi].m_Type;
+	}
+	
+	// Not found:
 	return cMonster::mtInvalidType;
 }
 
@@ -216,13 +182,46 @@ cMonster::eType cMobTypesManager::StringToMobType(const AString & a_Name)
 
 cMonster::eFamily cMobTypesManager::FamilyFromType(cMonster::eType a_Type)
 {
-	cMonster::eFamily toReturn = cMonster::mfMaxplusone;
-	std::map<cMonster::eType, cMonster::eFamily>::const_iterator itr = m_MobsType2Family().find(a_Type);
-	if (itr != m_MobsType2Family().end())
+	static const struct
 	{
-		toReturn = itr->second;
+		cMonster::eType m_Type;
+		cMonster::eFamily m_Family;
+	} TypeMap[] =
+	{
+		{cMonster::mtBat,          cMonster::mfAmbient},
+		{cMonster::mtBlaze,        cMonster::mfHostile},
+		{cMonster::mtCaveSpider,   cMonster::mfHostile},
+		{cMonster::mtChicken,      cMonster::mfPassive},
+		{cMonster::mtCow,          cMonster::mfPassive},
+		{cMonster::mtCreeper,      cMonster::mfHostile},
+		{cMonster::mtEnderman,     cMonster::mfHostile},
+		{cMonster::mtGhast,        cMonster::mfHostile},
+		{cMonster::mtHorse,        cMonster::mfPassive},
+		{cMonster::mtMagmaCube,    cMonster::mfHostile},
+		{cMonster::mtMooshroom,    cMonster::mfHostile},
+		{cMonster::mtOcelot,       cMonster::mfHostile},
+		{cMonster::mtPig,          cMonster::mfPassive},
+		{cMonster::mtSheep,        cMonster::mfPassive},
+		{cMonster::mtSilverfish,   cMonster::mfHostile},
+		{cMonster::mtSkeleton,     cMonster::mfHostile},
+		{cMonster::mtSlime,        cMonster::mfHostile},
+		{cMonster::mtSpider,       cMonster::mfHostile},
+		{cMonster::mtSquid,        cMonster::mfWater},
+		{cMonster::mtVillager,     cMonster::mfPassive},
+		{cMonster::mtWitch,        cMonster::mfHostile},
+		{cMonster::mtWolf,         cMonster::mfHostile},
+		{cMonster::mtZombie,       cMonster::mfHostile},
+		{cMonster::mtZombiePigman, cMonster::mfHostile},
+	} ;
+	
+	for (int i = 0; i < ARRAYCOUNT(TypeMap); i++)
+	{
+		if (TypeMap[i].m_Type == a_Type)
+		{
+			return TypeMap[i].m_Family;
+		}
 	}
-	return toReturn;
+	return cMonster::mfMaxplusone;
 }
 
 

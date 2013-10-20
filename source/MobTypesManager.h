@@ -15,9 +15,9 @@ class cFastRandom;
 
 /**
 This class aggregates static functions about mob types:
- - create a mob from its type (as enum) (in that way it is a compiler-proxy for mobs)
- - transform MobTypes from enums to string and vice versa
- - return mob family from given type
+	- create a mob from its type (as enum) (in that way it is a compiler-proxy for mobs)
+	- transform MobTypes from enums to string and vice versa
+	- return mob family from given type
 */
 class cMobTypesManager
 {
@@ -34,19 +34,6 @@ public:
 	asserts if invalid size for mobs that need size
 	*/
 	static cMonster * NewMonsterFromType(cMonster::eType a_MobType, int a_Size = -1);
-
-protected : 
-	typedef const std::map<cMonster::eType,std::string> tMobTypes2Names;
-	static tMobTypes2Names& m_MobsTypes2Names(void);
-	static tMobTypes2Names MobTypes2NamesInitializerBeforeCx11(void);
-
-	typedef const std::map<cMonster::eType,cMonster::eFamily> tMobType2Family;
-	static tMobType2Family& m_MobsType2Family(void);
-	static tMobType2Family MobType2FamilyInitializerBeforeCx11(void);
-
-	static cFastRandom & m_Random(void);
-	
-public :
 } ;
 
 
