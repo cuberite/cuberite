@@ -26,6 +26,8 @@ public:
 	/// This identifies individual monster type, as well as their network type-ID
 	enum eType
 	{
+		mtInvalidType = -1,
+		
 		mtBat          = E_META_SPAWN_EGG_BAT,
 		mtBlaze        = E_META_SPAWN_EGG_BLAZE,
 		mtCaveSpider   = E_META_SPAWN_EGG_CAVE_SPIDER,
@@ -55,7 +57,6 @@ public:
 		mtWolf         = E_META_SPAWN_EGG_WOLF,
 		mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
 		mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
-		mtInvalidType
 	} ;
 
 	enum eFamily
@@ -74,10 +75,10 @@ public:
 	
 	/** Creates the mob object.
 	* If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
-	* a_ProtocolMobType is the ID of the mob used in the protocol ( http://wiki.vg/Entities#Mobs , 2012_12_22)
+	* a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs , 2012_12_22))
 	* a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
 	CLASS_PROTODEF(cMonster);
 	
@@ -92,9 +93,10 @@ public:
 	virtual void MoveToPosition(const Vector3f & a_Position);
 	virtual bool ReachedDestination(void);
 	
-	char GetMobType(void) const {return m_MobType; } // MG TODO : see if we can delete this one.
-	eType GetMobTypeAsEnum(void) const {return (eType)m_MobType; }  // MG TODO : see if we should store m_MobType as enum instead of char.
+	// tolua_begin
+	eType GetMobType(void) const {return m_MobType; }
 	eFamily GetMobFamily(void) const;
+	// tolua_end
 
 
 	const char * GetState();
@@ -115,8 +117,6 @@ public:
 	virtual void InStateEscaping(float a_Dt);
 	
 	virtual void Attack(float a_Dt);
-	
-	int GetMobType() { return m_MobType; }  // tolua_export
 	
 	int GetAttackRate(){return (int)m_AttackRate;}
 	void SetAttackRate(int ar);
@@ -150,7 +150,7 @@ protected:
 	float m_DestroyTimer;
 	float m_Jump;
 
-	char m_MobType;
+	eType m_MobType;
 
 	AString m_SoundHurt;
 	AString m_SoundDeath;

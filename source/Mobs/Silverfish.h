@@ -14,7 +14,7 @@ class cSilverfish :
 	
 public:
 	cSilverfish(void) :
-		super("Silverfish", 60, "mob.silverfish.hit", "mob.silverfish.kill", 0.3, 0.7)
+		super("Silverfish", mtSilverfish, "mob.silverfish.hit", "mob.silverfish.kill", 0.3, 0.7)
 	{
 	}
 

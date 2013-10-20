@@ -11,7 +11,7 @@
 
 
 cSheep::cSheep(int a_Color) :
-	super("Sheep", 91, "mob.sheep.say", "mob.sheep.say", 0.6, 1.3),
+	super("Sheep", mtSheep, "mob.sheep.say", "mob.sheep.say", 0.6, 1.3),
 	m_IsSheared(false),
 	m_WoolColor(a_Color)
 {

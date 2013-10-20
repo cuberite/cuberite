@@ -14,7 +14,7 @@
 
 
 cChicken::cChicken(void) :
-	super("Chicken", 93, "mob.chicken.hurt", "mob.chicken.hurt", 0.3, 0.4)
+	super("Chicken", mtChicken, "mob.chicken.hurt", "mob.chicken.hurt", 0.3, 0.4)
 {
 }
 

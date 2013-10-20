@@ -9,7 +9,7 @@
 
 /// Creates a slime of the specified size; size is 1 .. 3, with 1 being the smallest
 cSlime::cSlime(int a_Size) :
-	super("Slime", 55, "mob.slime.attack", "mob.slime.attack", 0.6 * a_Size, 0.6 * a_Size),
+	super("Slime", mtSlime, "mob.slime.attack", "mob.slime.attack", 0.6 * a_Size, 0.6 * a_Size),
 	m_Size(a_Size)
 {
 }

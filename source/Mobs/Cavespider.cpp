@@ -9,7 +9,7 @@
 
 
 cCavespider::cCavespider(void) :
-	super("Cavespider", 59, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
+	super("Cavespider", mtCaveSpider, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
 {
 }
 

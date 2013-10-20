@@ -47,6 +47,9 @@ cMobSpawner::tMobTypes cMobSpawner::initMobTypesBeforeCx11()
 }
 
 
+
+
+
 cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily,const std::set<cMonster::eType>& a_AllowedTypes) :
 	m_MonsterFamily(a_MonsterFamily),
 	m_NewPack(true),
@@ -54,12 +57,16 @@ cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily,const std::set<cMonst
 {
 	for (std::set<cMonster::eType>::const_iterator itr = a_AllowedTypes.begin(); itr != a_AllowedTypes.end(); itr++)
 	{
-		if (cMobTypesManager::getFamilyFromType(*itr) == a_MonsterFamily)
+		if (cMobTypesManager::FamilyFromType(*itr) == a_MonsterFamily)
 		{
 			m_AllowedTypes.insert(*itr);
 		}
 	}
 }
+
+
+
+
 
 bool cMobSpawner::CheckPackCenter(BLOCKTYPE a_BlockType)
 {

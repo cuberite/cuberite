@@ -25,7 +25,7 @@
 
 
 
-cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
 	: super(etMonster, a_Width, a_Height)
 	, m_Target(NULL)
 	, m_AttackRate(3)
@@ -34,7 +34,7 @@ cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const A
 	, m_DestinationTime( 0 )
 	, m_DestroyTimer( 0 )
 	, m_Jump(0)
-	, m_MobType(a_ProtocolMobType)
+	, m_MobType(a_MobType)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
 	, m_EMState(IDLE)
@@ -514,5 +514,9 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 
 cMonster::eFamily cMonster::GetMobFamily(void) const
 {
-	return cMobTypesManager::getFamilyFromType(GetMobTypeAsEnum());
+	return cMobTypesManager::FamilyFromType(m_MobType);
 }
+
+
+
+

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/13/13 18:01:21.
+** Generated automatically by tolua++-1.0.92 on 10/20/13 10:19:10.
 */
 
 #ifndef __cplusplus
@@ -19303,6 +19303,41 @@ static int tolua_AllToLua_cWebAdmin_GetBaseURL00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetHTMLEscapedString of class  cWebAdmin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWebAdmin_GetHTMLEscapedString00
+static int tolua_AllToLua_cWebAdmin_GetHTMLEscapedString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWebAdmin* self = (cWebAdmin*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_Input = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHTMLEscapedString'", NULL);
+#endif
+  {
+   AString tolua_ret = (AString)  self->GetHTMLEscapedString(a_Input);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Input);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetHTMLEscapedString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetWebTitle of class  cWebPlugin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWebPlugin_GetWebTitle00
 static int tolua_AllToLua_cWebPlugin_GetWebTitle00(lua_State* tolua_S)
@@ -29169,19 +29204,19 @@ static int tolua_AllToLua_cMonster_GetMobType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cMonster",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cMonster",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cMonster* self = (cMonster*)  tolua_tousertype(tolua_S,1,0);
+  const cMonster* self = (const cMonster*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMobType'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->GetMobType();
+   cMonster::eType tolua_ret = (cMonster::eType)  self->GetMobType();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -29189,6 +29224,38 @@ static int tolua_AllToLua_cMonster_GetMobType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetMobType'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetMobFamily of class  cMonster */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cMonster_GetMobFamily00
+static int tolua_AllToLua_cMonster_GetMobFamily00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cMonster",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cMonster* self = (const cMonster*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMobFamily'", NULL);
+#endif
+  {
+   cMonster::eFamily tolua_ret = (cMonster::eFamily)  self->GetMobFamily();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMobFamily'.",&tolua_err);
  return 0;
 #endif
 }
@@ -30826,6 +30893,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetPage",tolua_AllToLua_cWebAdmin_GetPage00);
    tolua_function(tolua_S,"GetDefaultPage",tolua_AllToLua_cWebAdmin_GetDefaultPage00);
    tolua_function(tolua_S,"GetBaseURL",tolua_AllToLua_cWebAdmin_GetBaseURL00);
+   tolua_function(tolua_S,"GetHTMLEscapedString",tolua_AllToLua_cWebAdmin_GetHTMLEscapedString00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWebPlugin","cWebPlugin","",NULL);
   tolua_beginmodule(tolua_S,"cWebPlugin");
@@ -31248,6 +31316,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cMonster","cMonster","cPawn",NULL);
   tolua_beginmodule(tolua_S,"cMonster");
+   tolua_constant(tolua_S,"mtInvalidType",cMonster::mtInvalidType);
    tolua_constant(tolua_S,"mtBat",cMonster::mtBat);
    tolua_constant(tolua_S,"mtBlaze",cMonster::mtBlaze);
    tolua_constant(tolua_S,"mtCaveSpider",cMonster::mtCaveSpider);
@@ -31277,7 +31346,13 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"mtWolf",cMonster::mtWolf);
    tolua_constant(tolua_S,"mtZombie",cMonster::mtZombie);
    tolua_constant(tolua_S,"mtZombiePigman",cMonster::mtZombiePigman);
+   tolua_constant(tolua_S,"mfHostile",cMonster::mfHostile);
+   tolua_constant(tolua_S,"mfPassive",cMonster::mfPassive);
+   tolua_constant(tolua_S,"mfAmbient",cMonster::mfAmbient);
+   tolua_constant(tolua_S,"mfWater",cMonster::mfWater);
+   tolua_constant(tolua_S,"mfMaxplusone",cMonster::mfMaxplusone);
    tolua_function(tolua_S,"GetMobType",tolua_AllToLua_cMonster_GetMobType00);
+   tolua_function(tolua_S,"GetMobFamily",tolua_AllToLua_cMonster_GetMobFamily00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLineBlockTracer","cLineBlockTracer","",NULL);
   tolua_beginmodule(tolua_S,"cLineBlockTracer");

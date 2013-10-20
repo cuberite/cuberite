@@ -9,7 +9,7 @@
 
 
 cZombiePigman::cZombiePigman(void) :
-	super("ZombiePigman", 57, "mob.zombiepig.zpighurt", "mob.zombiepig.zpigdeath", 0.6, 1.8)
+	super("ZombiePigman", mtZombiePigman, "mob.zombiepig.zpighurt", "mob.zombiepig.zpigdeath", 0.6, 1.8)
 {
 }
 

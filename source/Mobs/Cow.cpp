@@ -11,7 +11,7 @@
 
 
 cCow::cCow(void) :
-	super("Cow", 92, "mob.cow.hurt", "mob.cow.hurt", 0.9, 1.3)
+	super("Cow", mtCow, "mob.cow.hurt", "mob.cow.hurt", 0.9, 1.3)
 {
 }
 

@@ -489,19 +489,36 @@ void cWorld::Start(void)
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
 
-	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", true);
-	AString sAllMonsters = IniFile.GetValue("Monsters", "Types");
-	AStringVector SplitList = StringSplit(sAllMonsters, ",");
-	for (unsigned int i = 0; i < SplitList.size(); ++i)
+	// Load allowed mobs:
+	const char * DefaultMonsters = "";
+	switch (m_Dimension)
 	{
-		cMonster::eType ToAdd = cMobTypesManager::fromStringToMobType(SplitList[i]);
+		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
+		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
+		case dimEnd:       DefaultMonsters = "enderman"; break;
+		default:
+		{
+			ASSERT(!"Unhandled world dimension");
+			DefaultMonsters = "wither";
+			break;
+		}
+	}
+	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", true);
+	AString AllMonsters = IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
+	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
+	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
+	{
+		cMonster::eType ToAdd = cMobTypesManager::StringToMobType(*itr);
 		if (ToAdd != cMonster::mtInvalidType)
 		{
 			m_AllowedMobs.insert(ToAdd);
-			LOGD("Allowed mob: %s",cMobTypesManager::fromMobTypeToString(ToAdd).c_str()); // a bit reverse working, but very few ressources wasted
+			LOGD("Allowed mob: %s", cMobTypesManager::MobTypeToString(ToAdd).c_str()); // a bit reverse working, but very few ressources wasted
 		}
-	};
-
+		else
+		{
+			LOG("World \"%s\": Unknown mob type: %s", m_WorldName.c_str(), itr->c_str());
+		}
+	}
 
 	m_ChunkMap = new cChunkMap(this);
 	
@@ -532,10 +549,10 @@ void cWorld::Start(void)
 	m_TickThread.Start();
 
 	// Init of the spawn monster time (as they are supposed to have different spawn rate)
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily,Int64>::value_type(cMonster::mfHostile,0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily,Int64>::value_type(cMonster::mfPassive,0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily,Int64>::value_type(cMonster::mfAmbient,0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily,Int64>::value_type(cMonster::mfWater,0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfHostile, 0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfPassive, 0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfAmbient, 0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfWater, 0));
 
 
 	// Save any changes that the defaults may have done to the ini file:

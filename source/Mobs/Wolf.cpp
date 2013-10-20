@@ -10,7 +10,7 @@
 
 
 cWolf::cWolf(void) :
-	super("Wolf", 95, "mob.wolf.hurt", "mob.wolf.death", 0.6, 0.8),
+	super("Wolf", mtWolf, "mob.wolf.hurt", "mob.wolf.death", 0.6, 0.8),
 	m_bIsAngry(false),
 	m_bIsTame(false),
 	m_bIsSitting(false),

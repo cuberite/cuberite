@@ -9,7 +9,7 @@
 
 
 cCreeper::cCreeper(void) :
-	super("Creeper", 50, "mob.creeper.say", "mob.creeper.say", 0.6, 1.8),
+	super("Creeper", mtCreeper, "mob.creeper.say", "mob.creeper.say", 0.6, 1.8),
 	m_bIsBlowing(false),
 	m_bIsCharged(false)
 {

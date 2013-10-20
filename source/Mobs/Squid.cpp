@@ -10,7 +10,7 @@
 
 
 cSquid::cSquid(void) :
-	super("Squid", 94, "", "", 0.95, 0.95)
+	super("Squid", mtSquid, "", "", 0.95, 0.95)
 {
 }
 

@@ -8,88 +8,115 @@
 #include "FastRandom.h"
 
 
-cMobTypesManager::tMobTypes2Names& cMobTypesManager::m_MobsTypes2Names()
+
+
+
+cMobTypesManager::tMobTypes2Names & cMobTypesManager::m_MobsTypes2Names(void)
 {
-	static std::map<cMonster::eType,std::string>* value = new std::map<cMonster::eType,std::string>(MobTypes2NamesInitializerBeforeCx11());
+	// TODO: This memory leaks
+	static std::map<cMonster::eType, AString> * value = new std::map<cMonster::eType, AString>(MobTypes2NamesInitializerBeforeCx11());
 	return *value;
 }
+
+
+
+
 
 cMobTypesManager::tMobTypes2Names cMobTypesManager::MobTypes2NamesInitializerBeforeCx11()
 {	
-	std::map<cMonster::eType,std::string> toReturn;
-	typedef std::map<cMonster::eType,std::string>::value_type ValueType;
-	toReturn.insert(ValueType(cMonster::mtMagmaCube,"Magmacube"));
-	toReturn.insert(ValueType(cMonster::mtSlime,"Slime"));
-	toReturn.insert(ValueType(cMonster::mtBat,"Bat"));
-	toReturn.insert(ValueType(cMonster::mtBlaze,"Blaze"));
-	toReturn.insert(ValueType(cMonster::mtCaveSpider,"Cavespider"));
-	toReturn.insert(ValueType(cMonster::mtChicken,"Chicken"));
-	toReturn.insert(ValueType(cMonster::mtCow,"Cow"));
-	toReturn.insert(ValueType(cMonster::mtCreeper,"Creeper"));
-	toReturn.insert(ValueType(cMonster::mtEnderman,"Enderman"));
-	toReturn.insert(ValueType(cMonster::mtGhast,"Ghast"));
-	toReturn.insert(ValueType(cMonster::mtMooshroom,"Mooshroom"));
-	toReturn.insert(ValueType(cMonster::mtOcelot,"Ocelot"));
-	toReturn.insert(ValueType(cMonster::mtPig,"Pig"));
-	toReturn.insert(ValueType(cMonster::mtSheep,"Sheep"));
-	toReturn.insert(ValueType(cMonster::mtSilverfish,"Silverfish"));
-	toReturn.insert(ValueType(cMonster::mtSkeleton,"Skeleton"));
-	toReturn.insert(ValueType(cMonster::mtSpider,"Spider"));
-	toReturn.insert(ValueType(cMonster::mtSquid,"Squid"));
-	toReturn.insert(ValueType(cMonster::mtVillager,"Villager"));
-	toReturn.insert(ValueType(cMonster::mtWitch,"Witch"));
-	toReturn.insert(ValueType(cMonster::mtWolf,"Wolf"));
-	toReturn.insert(ValueType(cMonster::mtZombie,"Zombie"));
-	toReturn.insert(ValueType(cMonster::mtZombiePigman,"Zombiepigman"));	
+	std::map<cMonster::eType, AString> toReturn;
+	typedef std::map<cMonster::eType, AString>::value_type ValueType;
+	// The strings need to be lowercase (for more efficient comparisons in StringToMobType())
+	toReturn.insert(ValueType(cMonster::mtBat,          "bat"));
+	toReturn.insert(ValueType(cMonster::mtBlaze,        "blaze"));
+	toReturn.insert(ValueType(cMonster::mtCaveSpider,   "cavespider"));
+	toReturn.insert(ValueType(cMonster::mtChicken,      "chicken"));
+	toReturn.insert(ValueType(cMonster::mtCow,          "cow"));
+	toReturn.insert(ValueType(cMonster::mtCreeper,      "creeper"));
+	toReturn.insert(ValueType(cMonster::mtEnderman,     "enderman"));
+	toReturn.insert(ValueType(cMonster::mtGhast,        "ghast"));
+	toReturn.insert(ValueType(cMonster::mtHorse,        "horse"));
+	toReturn.insert(ValueType(cMonster::mtMagmaCube,    "magmacube"));
+	toReturn.insert(ValueType(cMonster::mtMooshroom,    "mooshroom"));
+	toReturn.insert(ValueType(cMonster::mtOcelot,       "ocelot"));
+	toReturn.insert(ValueType(cMonster::mtPig,          "pig"));
+	toReturn.insert(ValueType(cMonster::mtSheep,        "sheep"));
+	toReturn.insert(ValueType(cMonster::mtSilverfish,   "silverfish"));
+	toReturn.insert(ValueType(cMonster::mtSkeleton,     "skeleton"));
+	toReturn.insert(ValueType(cMonster::mtSlime,        "slime"));
+	toReturn.insert(ValueType(cMonster::mtSpider,       "spider"));
+	toReturn.insert(ValueType(cMonster::mtSquid,        "squid"));
+	toReturn.insert(ValueType(cMonster::mtVillager,     "villager"));
+	toReturn.insert(ValueType(cMonster::mtWitch,        "witch"));
+	toReturn.insert(ValueType(cMonster::mtWolf,         "wolf"));
+	toReturn.insert(ValueType(cMonster::mtZombie,       "zombie"));
+	toReturn.insert(ValueType(cMonster::mtZombiePigman, "zombiepigman"));
 	return toReturn;
 }
 
-cMobTypesManager::tMobType2Family& cMobTypesManager::m_MobsType2Family()
+
+
+
+
+cMobTypesManager::tMobType2Family & cMobTypesManager::m_MobsType2Family(void)
 {
-	static std::map<cMonster::eType,cMonster::eFamily>* value = new std::map<cMonster::eType,cMonster::eFamily>(MobType2FamilyInitializerBeforeCx11());
+	// TODO: This memory is leaked:
+	static std::map<cMonster::eType,cMonster::eFamily> * value = new std::map<cMonster::eType,cMonster::eFamily>(MobType2FamilyInitializerBeforeCx11());
 	return *value;
 }
+
+
+
+
 
 cMobTypesManager::tMobType2Family cMobTypesManager::MobType2FamilyInitializerBeforeCx11()
 {
 	std::map<cMonster::eType,cMonster::eFamily> toReturn;
 	typedef std::map<cMonster::eType,cMonster::eFamily>::value_type ValueType;
-	toReturn.insert(ValueType(cMonster::mtBat,cMonster::mfAmbient));
-	toReturn.insert(ValueType(cMonster::mtSquid,cMonster::mfWater));
-	toReturn.insert(ValueType(cMonster::mtCow,cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtPig,cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtSheep,cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtChicken,cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtVillager,cMonster::mfPassive));
-	toReturn.insert(ValueType(cMonster::mtMagmaCube,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtSlime,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtBlaze,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtCaveSpider,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtCreeper,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtEnderman,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtGhast,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtMooshroom,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtOcelot,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtSilverfish,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtSkeleton,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtSpider,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtWitch,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtWolf,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtZombie,cMonster::mfHostile));
-	toReturn.insert(ValueType(cMonster::mtZombiePigman,cMonster::mfHostile));	
+	toReturn.insert(ValueType(cMonster::mtBat,          cMonster::mfAmbient));
+	toReturn.insert(ValueType(cMonster::mtBlaze,        cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtCaveSpider,   cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtChicken,      cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtCow,          cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtCreeper,      cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtEnderman,     cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtGhast,        cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtHorse,        cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtMagmaCube,    cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtMooshroom,    cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtOcelot,       cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtPig,          cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtSheep,        cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtSilverfish,   cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtSkeleton,     cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtSlime,        cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtSpider,       cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtSquid,        cMonster::mfWater));
+	toReturn.insert(ValueType(cMonster::mtVillager,     cMonster::mfPassive));
+	toReturn.insert(ValueType(cMonster::mtWitch,        cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtWolf,         cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtZombie,       cMonster::mfHostile));
+	toReturn.insert(ValueType(cMonster::mtZombiePigman, cMonster::mfHostile));
 
 	return toReturn;
 }
 
 
-cFastRandom& cMobTypesManager::m_Random()
+
+
+
+cFastRandom & cMobTypesManager::m_Random(void)
 {
-	static cFastRandom* value = new cFastRandom();
+	// TODO: This memory is leaked:
+	static cFastRandom * value = new cFastRandom();
 	return *value;
 }
 
 
-cMonster* cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a_Size)
+
+
+
+cMonster * cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a_Size)
 {
 	cMonster * toReturn = NULL;
 
@@ -98,20 +125,22 @@ cMonster* cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a_
 	{
 		case cMonster::mtMagmaCube:
 		case cMonster::mtSlime:
+		{
 			if (a_Size == -1)
 			{
-				a_Size = m_Random().NextInt(2,a_MobType)+1;
+				a_Size = m_Random().NextInt(2, a_MobType) + 1;
 			}
-			if (a_Size <= 0 || a_Size >= 4)
+			if ((a_Size <= 0) || (a_Size >= 4))
 			{
 				ASSERT(!"Random for size was supposed to pick in [1..3] and picked outside");
 				a_Size = 1;
 			}
 			break;
-		default : break;
-	}
+		}
+		default: break;
+	}  // switch (a_MobType)
 
-	// the big switch
+	// Create the mob entity
 	switch (a_MobType)
 	{
 		case cMonster::mtMagmaCube:     toReturn  = new cMagmaCube(a_Size);             break;
@@ -124,13 +153,15 @@ cMonster* cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a_
 		case cMonster::mtCreeper:       toReturn  = new cCreeper();                     break;
 		case cMonster::mtEnderman:      toReturn  = new cEnderman();                    break;
 		case cMonster::mtGhast:         toReturn  = new cGhast();                       break;
+		// TODO: 
+		// case cMonster::mtHorse:         toReturn  = new cHorse();                       break;
 		case cMonster::mtMooshroom:     toReturn  = new cMooshroom();                   break;
 		case cMonster::mtOcelot:        toReturn  = new cOcelot();                      break;
 		case cMonster::mtPig:           toReturn  = new cPig();                         break;
 		// TODO: Implement sheep color
 		case cMonster::mtSheep:         toReturn  = new cSheep(0);                      break;
 		case cMonster::mtSilverfish:    toReturn  = new cSilverfish();                  break;
-		// TODO: Implement wither geration
+		// TODO: Implement wither skeleton geration
 		case cMonster::mtSkeleton:      toReturn  = new cSkeleton(false);               break;
 		case cMonster::mtSpider:        toReturn  = new cSpider();                      break;
 		case cMonster::mtSquid:         toReturn  = new cSquid();                       break;
@@ -148,21 +179,28 @@ cMonster* cMobTypesManager::NewMonsterFromType(cMonster::eType a_MobType, int a_
 }
 
 
-const std::string& cMobTypesManager::fromMobTypeToString(cMonster::eType a_MobType)
+
+
+
+AString cMobTypesManager::MobTypeToString(cMonster::eType a_MobType)
 {
-	static std::string toReturnDefault = "";
-	std::string& toReturn = toReturnDefault;
-	std::map<cMonster::eType,std::string>::const_iterator itr = m_MobsTypes2Names().find(a_MobType);
+	std::map<cMonster::eType, AString>::const_iterator itr = m_MobsTypes2Names().find(a_MobType);
 	if (itr != m_MobsTypes2Names().end())
 	{
-		toReturn = itr->second;
+		return itr->second;
 	}
-	return toReturn;
+	return "";
 }
 
-cMonster::eType cMobTypesManager::fromStringToMobType(const std::string& a_Name)
+
+
+
+
+cMonster::eType cMobTypesManager::StringToMobType(const AString & a_Name)
 {
-	for(std::map<cMonster::eType,std::string>::const_iterator itr = m_MobsTypes2Names().begin(); itr != m_MobsTypes2Names().end(); itr++)
+	AString lcName(a_Name);
+	StrToLower(lcName);
+	for (std::map<cMonster::eType, AString>::const_iterator itr = m_MobsTypes2Names().begin(); itr != m_MobsTypes2Names().end(); itr++)
 	{
 		if (itr->second == a_Name)
 		{
@@ -172,13 +210,21 @@ cMonster::eType cMobTypesManager::fromStringToMobType(const std::string& a_Name)
 	return cMonster::mtInvalidType;
 }
 
-cMonster::eFamily cMobTypesManager::getFamilyFromType(cMonster::eType a_Type)
+
+
+
+
+cMonster::eFamily cMobTypesManager::FamilyFromType(cMonster::eType a_Type)
 {
 	cMonster::eFamily toReturn = cMonster::mfMaxplusone;
-	std::map<cMonster::eType,cMonster::eFamily>::const_iterator itr = m_MobsType2Family().find(a_Type);
+	std::map<cMonster::eType, cMonster::eFamily>::const_iterator itr = m_MobsType2Family().find(a_Type);
 	if (itr != m_MobsType2Family().end())
 	{
 		toReturn = itr->second;
 	}
 	return toReturn;
 }
+
+
+
+

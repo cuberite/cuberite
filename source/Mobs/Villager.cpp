@@ -9,7 +9,7 @@
 
 
 cVillager::cVillager(eVillagerType VillagerType) :
-	super("Villager", 120, "", "", 0.6, 1.8),
+	super("Villager", mtVillager, "", "", 0.6, 1.8),
 	m_Type(VillagerType)
 {
 }

@@ -9,7 +9,7 @@
 
 cBlaze::cBlaze(void) :
 	// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
-	super("Blaze", 61, "mob.blaze.hit", "mob.blaze.death", 0.7, 1.8)
+	super("Blaze", mtBlaze, "mob.blaze.hit", "mob.blaze.death", 0.7, 1.8)
 {
 }
 

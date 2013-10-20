@@ -8,7 +8,7 @@
 
 
 cMagmaCube::cMagmaCube(int a_Size) :
-	super("MagmaCube", 62, "mob.MagmaCube.big", "mob.MagmaCube.big", 0.6 * a_Size, 0.6 * a_Size),
+	super("MagmaCube", mtMagmaCube, "mob.MagmaCube.big", "mob.MagmaCube.big", 0.6 * a_Size, 0.6 * a_Size),
 	m_Size(a_Size)
 {
 }

@@ -8,7 +8,7 @@
 
 
 cEnderman::cEnderman(void) :
-	super("Enderman", 58, "mob.endermen.hit", "mob.endermen.death", 0.5, 2.9),
+	super("Enderman", mtEnderman, "mob.endermen.hit", "mob.endermen.death", 0.5, 2.9),
 	m_bIsScreaming(false),
 	CarriedBlock(E_BLOCK_AIR),
 	CarriedMeta(0)

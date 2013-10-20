@@ -8,7 +8,7 @@
 
 
 cSpider::cSpider(void) :
-	super("Spider", 52, "mob.spider.say", "mob.spider.death", 1.4, 0.9)
+	super("Spider", mtSpider, "mob.spider.say", "mob.spider.death", 1.4, 0.9)
 {
 }
 

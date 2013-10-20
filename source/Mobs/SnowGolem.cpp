@@ -8,7 +8,7 @@
 
 
 cSnowGolem::cSnowGolem(void) :
-	super("SnowGolem", 97, "", "", 0.4, 1.8)
+	super("SnowGolem", mtSnowGolem, "", "", 0.4, 1.8)
 {
 }
 

@@ -8,7 +8,7 @@
 
 
 cWither::cWither(void) :
-	super("Wither", 64, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0)
+	super("Wither", mtWither, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0)
 {
 }
 

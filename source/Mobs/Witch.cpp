@@ -8,7 +8,7 @@
 
 
 cWitch::cWitch(void) :
-	super("Witch", 66, "", "", 0.6, 1.8)
+	super("Witch", mtWitch, "", "", 0.6, 1.8)
 {
 }
 
