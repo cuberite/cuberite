@@ -1162,33 +1162,63 @@ end
 
 --- Writes the documentation statistics (in g_Stats) into the given HTML file
 function WriteStats(f)
+	local function ExportMeter(a_Percent)
+		local Color;
+		if (a_Percent > 95) then
+			Color = "green";
+		elseif (a_Percent > 50) then
+			Color = "orange";
+		else
+			Color = "red";
+		end
+		
+		local meter = {
+			"\n",
+			"<div style=\"background-color: black; padding: 1px; width: 100px\">\n",
+			"<div style=\"background-color: ",
+			Color,
+			"; width: ",
+			a_Percent,
+			"%; height: 16px\"></div></div>\n</td><td>",
+			string.format("%.2f", a_Percent),
+			" %",
+		};
+		return table.concat(meter, "");
+	end
+	
 	f:write([[
 		<hr /><a name="docstats"><h2>Documentation statistics</h2></a>
-		<table><tr><th>Object</th><th>Total</th><th>Documented</th><th>Undocumented</th><th>Documented %</th></tr>
+		<table><tr><th>Object</th><th>Total</th><th>Documented</th><th>Undocumented</th><th colspan="2">Documented %</th></tr>
 	]]);
 	f:write("<tr><td>Classes</td><td>", g_Stats.NumTotalClasses);
 	f:write("</td><td>", g_Stats.NumTotalClasses - g_Stats.NumUndocumentedClasses);
 	f:write("</td><td>", g_Stats.NumUndocumentedClasses);
-	f:write("</td><td>", 100 * (g_Stats.NumTotalClasses - g_Stats.NumUndocumentedClasses) / g_Stats.NumTotalClasses);
-	f:write("</td></tr>");
+	f:write("</td><td>", ExportMeter(100 * (g_Stats.NumTotalClasses - g_Stats.NumUndocumentedClasses) / g_Stats.NumTotalClasses));
+	f:write("</td></tr>\n");
 
 	f:write("<tr><td>Functions</td><td>", g_Stats.NumTotalFunctions);
 	f:write("</td><td>", g_Stats.NumTotalFunctions - g_Stats.NumUndocumentedFunctions);
 	f:write("</td><td>", g_Stats.NumUndocumentedFunctions);
-	f:write("</td><td>", 100 * (g_Stats.NumTotalFunctions - g_Stats.NumUndocumentedFunctions) / g_Stats.NumTotalFunctions);
-	f:write("</td></tr>");
+	f:write("</td><td>", ExportMeter(100 * (g_Stats.NumTotalFunctions - g_Stats.NumUndocumentedFunctions) / g_Stats.NumTotalFunctions));
+	f:write("</td></tr>\n");
 
 	f:write("<tr><td>Member variables</td><td>", g_Stats.NumTotalVariables);
 	f:write("</td><td>", g_Stats.NumTotalVariables - g_Stats.NumUndocumentedVariables);
 	f:write("</td><td>", g_Stats.NumUndocumentedVariables);
-	f:write("</td><td>", 100 * (g_Stats.NumTotalVariables - g_Stats.NumUndocumentedVariables) / g_Stats.NumTotalVariables);
-	f:write("</td></tr>");
+	f:write("</td><td>", ExportMeter(100 * (g_Stats.NumTotalVariables - g_Stats.NumUndocumentedVariables) / g_Stats.NumTotalVariables));
+	f:write("</td></tr>\n");
 
 	f:write("<tr><td>Constants</td><td>", g_Stats.NumTotalConstants);
 	f:write("</td><td>", g_Stats.NumTotalConstants - g_Stats.NumUndocumentedConstants);
 	f:write("</td><td>", g_Stats.NumUndocumentedConstants);
-	f:write("</td><td>", 100 * (g_Stats.NumTotalConstants - g_Stats.NumUndocumentedConstants) / g_Stats.NumTotalConstants);
-	f:write("</td></tr>");
+	f:write("</td><td>", ExportMeter(100 * (g_Stats.NumTotalConstants - g_Stats.NumUndocumentedConstants) / g_Stats.NumTotalConstants));
+	f:write("</td></tr>\n");
+	
+	f:write("<tr><td>Hooks</td><td>", g_Stats.NumTotalHooks);
+	f:write("</td><td>", g_Stats.NumTotalHooks - g_Stats.NumUndocumentedHooks);
+	f:write("</td><td>", g_Stats.NumUndocumentedHooks);
+	f:write("</td><td>", ExportMeter(100 * (g_Stats.NumTotalHooks - g_Stats.NumUndocumentedHooks) / g_Stats.NumTotalHooks));
+	f:write("</td></tr>\n");
 	
 	f:write([[
 		</table>
