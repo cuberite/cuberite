@@ -118,26 +118,25 @@ public:
 	void RemovePlugin( cWebPlugin* a_Plugin );
 
 	// TODO: Convert this to the auto-locking callback mechanism used for looping players in worlds and such
-	PluginList          GetPlugins() const { return m_Plugins; } // >> EXPORTED IN MANUALBINDINGS <<
+	PluginList GetPlugins() const { return m_Plugins; } // >> EXPORTED IN MANUALBINDINGS <<
 
 	// tolua_begin
 
-	/// Returns the amount of currently used memory, in KiB, or -1 if it cannot be queried
-	static int GetMemoryUsage(void);
-
-	sWebAdminPage       GetPage(const HTTPRequest& a_Request);
+	sWebAdminPage GetPage(const HTTPRequest & a_Request);
 
 	/// Returns the contents of the default page - the list of plugins and players
 	AString GetDefaultPage(void);
 
-	AString             GetBaseURL(const AString& a_URL);
+	/// Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style)
+	AString GetBaseURL(const AString & a_URL);
 
-	// Escapes text passed into it, so it can be embedded into html.
-	AString             GetHTMLEscapedString( const AString& a_Input );
+	/// Escapes text passed into it, so it can be embedded into html.
+	static AString GetHTMLEscapedString(const AString & a_Input);
 
 	// tolua_end
 
-	AString             GetBaseURL(const AStringVector& a_URLSplit);
+	/// Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style)
+	AString GetBaseURL(const AStringVector& a_URLSplit);
 
 protected:
 	/// Common base class for request body data handlers

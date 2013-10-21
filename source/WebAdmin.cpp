@@ -270,7 +270,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
 	}
 
-	int MemUsageKiB = GetMemoryUsage();
+	int MemUsageKiB = cRoot::GetPhysicalRAMUsage();
 	if (MemUsageKiB > 0)
 	{
 		ReplaceString(Template, "{MEM}",       Printf("%.02f", (double)MemUsageKiB / 1024));
@@ -440,16 +440,6 @@ AString cWebAdmin::GetBaseURL(const AStringVector & a_URLSplit)
 		BaseURL += "webadmin/";
 	}
 	return BaseURL;
-}
-
-
-
-
-
-int cWebAdmin::GetMemoryUsage(void)
-{
-	LOGWARNING("%s: This function is obsolete, use cRoot::GetPhysicalRAMUsage() or cRoot::GetVirtualRAMUsage() instead", __FUNCTION__);
-	return cRoot::GetPhysicalRAMUsage();
 }
 
 

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/20/13 13:59:04.
+** Generated automatically by tolua++-1.0.92 on 10/21/13 13:17:19.
 */
 
 #ifndef __cplusplus
@@ -19164,34 +19164,6 @@ static int tolua_set_sWebAdminPage_TabName(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetMemoryUsage of class  cWebAdmin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWebAdmin_GetMemoryUsage00
-static int tolua_AllToLua_cWebAdmin_GetMemoryUsage00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   int tolua_ret = (int)  cWebAdmin::GetMemoryUsage();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetMemoryUsage'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetPage of class  cWebAdmin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWebAdmin_GetPage00
 static int tolua_AllToLua_cWebAdmin_GetPage00(lua_State* tolua_S)
@@ -19310,7 +19282,7 @@ static int tolua_AllToLua_cWebAdmin_GetHTMLEscapedString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
+     !tolua_isusertable(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -19318,13 +19290,9 @@ static int tolua_AllToLua_cWebAdmin_GetHTMLEscapedString00(lua_State* tolua_S)
  else
 #endif
  {
-  cWebAdmin* self = (cWebAdmin*)  tolua_tousertype(tolua_S,1,0);
   const AString a_Input = ((const AString)  tolua_tocppstring(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHTMLEscapedString'", NULL);
-#endif
   {
-   AString tolua_ret = (AString)  self->GetHTMLEscapedString(a_Input);
+   AString tolua_ret = (AString)  cWebAdmin::GetHTMLEscapedString(a_Input);
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_Input);
   }
@@ -31010,7 +30978,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWebAdmin","cWebAdmin","cHTTPServer::cCallbacks",NULL);
   tolua_beginmodule(tolua_S,"cWebAdmin");
-   tolua_function(tolua_S,"GetMemoryUsage",tolua_AllToLua_cWebAdmin_GetMemoryUsage00);
    tolua_function(tolua_S,"GetPage",tolua_AllToLua_cWebAdmin_GetPage00);
    tolua_function(tolua_S,"GetDefaultPage",tolua_AllToLua_cWebAdmin_GetDefaultPage00);
    tolua_function(tolua_S,"GetBaseURL",tolua_AllToLua_cWebAdmin_GetBaseURL00);
