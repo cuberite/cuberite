@@ -38,7 +38,7 @@ public :
 	// if this is the first of a Pack : determine the type of monster
 	// BlockType & BlockMeta are used to decide what kind of Mob can Spawn here
 	// MaxPackSize is set to the maximal size for a pack this type of mob
-	cMonster * TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, EMCSBiome a_Biome, int a_Level, int& a_MaxPackSize);
+	cMonster * TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, NIBBLETYPE a_Skylight, NIBBLETYPE a_Blocklight, EMCSBiome a_Biome, int a_Level, int& a_MaxPackSize);
 
 	// mark the beginning of a new Pack
 	// all mobs of the same Pack are the same type
@@ -52,7 +52,7 @@ public :
 
 protected : 
 	// return true if specified type of mob can spawn on specified block
-	bool CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, EMCSBiome a_Biome, int a_Level);
+	bool CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, NIBBLETYPE a_Skylight, NIBBLETYPE a_Blocklight, EMCSBiome a_Biome, int a_Level);
 
 	// return a random type that can spawn on specified biome.
 	// returns E_ENTITY_TYPE_DONOTUSE if none is possible

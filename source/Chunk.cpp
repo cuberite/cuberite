@@ -539,14 +539,29 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 				// MG TODO: fix the "light" thing, I'm pretty sure that UnboundedRelGetBlock s not returning the right thing
 
 				// MG TODO : check that "Level" really means Y
-				cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, Biome, Try_Y, MaxNbOfSuccess);
-				if (newMob)
+				NIBBLETYPE SkyLight = GetSkyLight(Try_X, Try_Y+1, Try_Z);
+				if (!SkyLight)
+					SkyLight = GetSkyLight(Try_X, Try_Y, Try_Z);
+				if (!SkyLight)
+					SkyLight = GetSkyLight(Try_X, Try_Y - 1, Try_Z);
+
+				NIBBLETYPE BlockLight = GetBlockLight(Try_X, Try_Y+1, Try_Z);
+				if (!BlockLight)
+					BlockLight = GetBlockLight(Try_X, Try_Y, Try_Z);
+				if (!BlockLight)
+					BlockLight = GetBlockLight(Try_X, Try_Y - 1, Try_Z);
+
+				if (IsLightValid())
 				{
-					int WorldX, WorldY, WorldZ;
-					PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
-					newMob->SetPosition(WorldX, WorldY, WorldZ);
-					LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
-					NumberOfSuccess++;
+					cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, SkyLight, BlockLight, Biome, Try_Y, MaxNbOfSuccess);
+					if (newMob)
+					{
+						int WorldX, WorldY, WorldZ;
+						PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
+						newMob->SetPosition(WorldX, WorldY, WorldZ);
+						LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
+						NumberOfSuccess++;
+					}
 				}
 			}
 			

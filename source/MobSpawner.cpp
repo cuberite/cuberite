@@ -124,7 +124,7 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 
 
-bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, EMCSBiome a_Biome, int a_Level)
+bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, NIBBLETYPE a_Skylight, NIBBLETYPE a_Blocklight, EMCSBiome a_Biome, int a_Level)
 {
 	bool toReturn = false;
 	std::set<cMonster::eType>::iterator itr = m_AllowedTypes.find(a_MobType);
@@ -154,31 +154,31 @@ bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType,
 				if (a_MobType == cMonster::mtChicken || a_MobType == cMonster::mtPig || a_MobType == cMonster::mtCow || a_MobType == cMonster::mtSheep)
 				{
 					toReturn = (
-						a_BlockType_below == E_BLOCK_GRASS /*&& // MG TODO
-						a_LightLevel >= 9 */
+						(a_BlockType_below == E_BLOCK_GRASS) &&
+						(a_Skylight >= 9 )
 						);
 				}
 				else if (a_MobType == cMonster::mtOcelot)
 				{
 					toReturn = (
-						a_Level >= 62 &&
+						(a_Level >= 62) &&
 						(
-							a_BlockType_below == E_BLOCK_GRASS ||
-							a_BlockType_below == E_BLOCK_LEAVES
+							(a_BlockType_below == E_BLOCK_GRASS) ||
+							(a_BlockType_below == E_BLOCK_LEAVES)
 						) &&
-						m_Random.NextInt(3,a_Biome) != 0
+						(m_Random.NextInt(3,a_Biome) != 0)
 						);
 				}
 				else if (a_MobType == cMonster::mtCreeper || a_MobType == cMonster::mtSkeleton || a_MobType == cMonster::mtZombie || a_MobType == cMonster::mtSpider || a_MobType == cMonster::mtEnderman || a_MobType == cMonster::mtZombiePigman)
 				{
-					toReturn = true /*a_LightLevel <= 7 MG TODO*/;
-					/*if (a_SunLight) MG TODO 
+					toReturn = (a_Skylight <= 7) && (a_Blocklight <= 7);
+					if (a_Skylight) 
 					{
 						if (m_Random.NextInt(2,a_Biome) != 0)
 						{
 							toReturn = false;
 						}
-					}*/
+					}
 				}
 				else if (a_MobType == cMonster::mtSlime)
 				{
@@ -192,7 +192,7 @@ bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType,
 				else
 				{
 					LOGD("MG TODO : check I've got a Rule to write for type %d",a_MobType);
-					toReturn = true;
+					toReturn = false;
 				}
 			}
 		}
@@ -204,7 +204,7 @@ bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType,
 
 
 
-cMonster* cMobSpawner::TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, EMCSBiome a_Biome, int a_Level, int& a_MaxPackSize)
+cMonster* cMobSpawner::TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, NIBBLETYPE a_Skylight, NIBBLETYPE a_Blocklight, EMCSBiome a_Biome, int a_Level, int& a_MaxPackSize)
 {
 	cMonster* toReturn = NULL;
 	if (m_NewPack)
@@ -226,7 +226,7 @@ cMonster* cMobSpawner::TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockM
 	}
 
 	
-	if (CanSpawnHere(m_MobType, a_BlockType, a_BlockMeta, a_BlockType_below, a_BlockMeta_below, a_BlockType_above, a_BlockMeta_above, a_Biome, a_Level))
+	if (CanSpawnHere(m_MobType, a_BlockType, a_BlockMeta, a_BlockType_below, a_BlockMeta_below, a_BlockType_above, a_BlockMeta_above, a_Skylight, a_Blocklight, a_Biome, a_Level))
 	{
 		cMonster * newMob = cMonster::NewMonsterFromType(m_MobType);
 		if (newMob)
