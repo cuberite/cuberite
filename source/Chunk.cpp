@@ -539,15 +539,15 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 				// MG TODO: fix the "light" thing, I'm pretty sure that UnboundedRelGetBlock s not returning the right thing
 
 				// MG TODO : check that "Level" really means Y
-				NIBBLETYPE SkyLight = GetSkyLight(Try_X, Try_Y+1, Try_Z);
+				NIBBLETYPE SkyLight = GetSkyLight(Try_X, Try_Y, Try_Z);
 				if (!SkyLight)
-					SkyLight = GetSkyLight(Try_X, Try_Y, Try_Z);
+					SkyLight = GetSkyLight(Try_X, Try_Y + 1, Try_Z);
 				if (!SkyLight)
 					SkyLight = GetSkyLight(Try_X, Try_Y - 1, Try_Z);
 
-				NIBBLETYPE BlockLight = GetBlockLight(Try_X, Try_Y+1, Try_Z);
+				NIBBLETYPE BlockLight = GetBlockLight(Try_X, Try_Y, Try_Z);
 				if (!BlockLight)
-					BlockLight = GetBlockLight(Try_X, Try_Y, Try_Z);
+					BlockLight = GetBlockLight(Try_X, Try_Y + 1, Try_Z);
 				if (!BlockLight)
 					BlockLight = GetBlockLight(Try_X, Try_Y - 1, Try_Z);
 
