@@ -539,17 +539,10 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 				// MG TODO: fix the "light" thing, I'm pretty sure that UnboundedRelGetBlock s not returning the right thing
 
 				// MG TODO : check that "Level" really means Y
-				NIBBLETYPE SkyLight = GetSkyLight(Try_X, Try_Y, Try_Z);
-				if (!SkyLight)
-					SkyLight = GetSkyLight(Try_X, Try_Y + 1, Try_Z);
-				if (!SkyLight)
-					SkyLight = GetSkyLight(Try_X, Try_Y - 1, Try_Z);
+				
+				NIBBLETYPE SkyLight = UnboundedRelGetSkyLight(Try_X, Try_Y, Try_Z);
 
-				NIBBLETYPE BlockLight = GetBlockLight(Try_X, Try_Y, Try_Z);
-				if (!BlockLight)
-					BlockLight = GetBlockLight(Try_X, Try_Y + 1, Try_Z);
-				if (!BlockLight)
-					BlockLight = GetBlockLight(Try_X, Try_Y - 1, Try_Z);
+				NIBBLETYPE BlockLight = UnboundedRelGetBlockLight(Try_X, Try_Y, Try_Z);
 
 				if (IsLightValid())
 				{
@@ -1357,6 +1350,102 @@ void cChunk::UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 	}
 
 	// Neighbors not available, ignore altogether
+}
+
+
+
+
+
+NIBBLETYPE cChunk::UnboundedRelGetSkyLight(int a_RelX, int a_RelY, int a_RelZ)
+{
+if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	{
+		LOGWARNING("UnboundedRelGetSkyLight(): requesting a block with a_RelY out of range: %d", a_RelY);
+		return -1;
+	}
+
+	// Is it in this chunk?	
+	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
+	{
+		if (!IsValid())
+		{
+			return -1;
+		}
+		return GetSkyLight(a_RelX, a_RelY, a_RelZ);
+	}
+
+	// Not in this chunk, try walking the neighbors first:
+	if ((a_RelX < 0) && (m_NeighborXM != NULL))
+	{
+		return m_NeighborXM->UnboundedRelGetSkyLight(a_RelX + cChunkDef::Width, a_RelY, a_RelZ);
+	}
+	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
+	{
+		return m_NeighborXP->UnboundedRelGetSkyLight(a_RelX - cChunkDef::Width, a_RelY, a_RelZ);
+	}
+	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
+	{
+		return m_NeighborZM->UnboundedRelGetSkyLight(a_RelX, a_RelY, a_RelZ + cChunkDef::Width);
+	}
+	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
+	{
+		return m_NeighborZP->UnboundedRelGetSkyLight(a_RelX, a_RelY, a_RelZ - cChunkDef::Width);
+	}
+
+	// Neighbors not available, use the chunkmap to locate the chunk:
+	return m_ChunkMap->GetBlockSkyLight(
+		m_PosX * cChunkDef::Width + a_RelX,
+		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
+		m_PosZ * cChunkDef::Width + a_RelZ
+	);
+}
+
+
+
+
+
+NIBBLETYPE cChunk::UnboundedRelGetBlockLight(int a_RelX, int a_RelY, int a_RelZ)
+{
+if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	{
+		LOGWARNING("UnboundedRelGetBlockLight(): requesting a block with a_RelY out of range: %d", a_RelY);
+		return -1;
+	}
+
+	// Is it in this chunk?	
+	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
+	{
+		if (!IsValid())
+		{
+			return -1;
+		}
+		return GetBlockLight(a_RelX, a_RelY, a_RelZ);
+	}
+
+	// Not in this chunk, try walking the neighbors first:
+	if ((a_RelX < 0) && (m_NeighborXM != NULL))
+	{
+		return m_NeighborXM->UnboundedRelGetBlockLight(a_RelX + cChunkDef::Width, a_RelY, a_RelZ);
+	}
+	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
+	{
+		return m_NeighborXP->UnboundedRelGetBlockLight(a_RelX - cChunkDef::Width, a_RelY, a_RelZ);
+	}
+	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
+	{
+		return m_NeighborZM->UnboundedRelGetBlockLight(a_RelX, a_RelY, a_RelZ + cChunkDef::Width);
+	}
+	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
+	{
+		return m_NeighborZP->UnboundedRelGetBlockLight(a_RelX, a_RelY, a_RelZ - cChunkDef::Width);
+	}
+
+	// Neighbors not available, use the chunkmap to locate the chunk:
+	return m_ChunkMap->GetBlockBlockLight(
+		m_PosX * cChunkDef::Width + a_RelX,
+		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
+		m_PosZ * cChunkDef::Width + a_RelZ
+	);
 }
 
 
