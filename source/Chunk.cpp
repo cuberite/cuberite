@@ -544,7 +544,7 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 				NIBBLETYPE BlockLight = UnboundedRelGetBlockLight(Try_X, Try_Y, Try_Z);
 
-				if (IsLightValid())
+				if (IsLightValid() && (SkyLight != 127) && (BlockLight != 127))
 				{
 					cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, SkyLight, BlockLight, Biome, Try_Y, MaxNbOfSuccess);
 					if (newMob)
@@ -1361,7 +1361,7 @@ NIBBLETYPE cChunk::UnboundedRelGetSkyLight(int a_RelX, int a_RelY, int a_RelZ)
 if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
 	{
 		LOGWARNING("UnboundedRelGetSkyLight(): requesting a block with a_RelY out of range: %d", a_RelY);
-		return -1;
+		return 127;
 	}
 
 	// Is it in this chunk?	
@@ -1369,7 +1369,7 @@ if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
 	{
 		if (!IsValid())
 		{
-			return -1;
+			return 127;
 		}
 		return GetSkyLight(a_RelX, a_RelY, a_RelZ);
 	}
@@ -1409,7 +1409,7 @@ NIBBLETYPE cChunk::UnboundedRelGetBlockLight(int a_RelX, int a_RelY, int a_RelZ)
 if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
 	{
 		LOGWARNING("UnboundedRelGetBlockLight(): requesting a block with a_RelY out of range: %d", a_RelY);
-		return -1;
+		return 127;
 	}
 
 	// Is it in this chunk?	
@@ -1417,7 +1417,7 @@ if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
 	{
 		if (!IsValid())
 		{
-			return -1;
+			return 127;
 		}
 		return GetBlockLight(a_RelX, a_RelY, a_RelZ);
 	}
