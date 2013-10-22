@@ -141,7 +141,7 @@ bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType,
 		}
 		else if (a_MobType == cMonster::mtBat)
 		{
-			toReturn = a_Level <= 60; // MG TODO  : find a real rule
+			toReturn = a_Level <= 63 && (a_Skylight == 0) && (a_Blocklight <= 4); // MG TODO  : find a real rule
 		}
 		else
 		{
