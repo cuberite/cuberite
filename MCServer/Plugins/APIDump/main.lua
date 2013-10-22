@@ -818,12 +818,10 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	local HasConstants = (#a_ClassAPI.Constants > 0);
 	local HasFunctions = (#a_ClassAPI.Functions > 0);
 	local HasVariables = (#a_ClassAPI.Variables > 0);
-	if (a_ClassAPI.Inherits ~= nil) then
-		for idx, cls in ipairs(a_ClassAPI.Inherits) do
-			HasConstants = HasConstants or (#cls.Constants > 0);
-			HasFunctions = HasFunctions or (#cls.Functions > 0);
-			HasVariables = HasVariables or (#cls.Variables > 0);
-		end
+	for idx, cls in ipairs(InheritanceChain) do
+		HasConstants = HasConstants or (#cls.Constants > 0);
+		HasFunctions = HasFunctions or (#cls.Functions > 0);
+		HasVariables = HasVariables or (#cls.Variables > 0);
 	end
 	
 	-- Write the table of contents:
