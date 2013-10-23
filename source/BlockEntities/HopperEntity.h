@@ -38,14 +38,11 @@ public:
 	/// Constructor used for normal operation
 	cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	
-	// tolua_begin
-	
 	/** Returns the block coords of the block receiving the output items, based on the meta
-	Returns false if unattached
+	Returns false if unattached.
+	Exported in ManualBindings.cpp
 	*/
 	bool GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, int & a_OutputY, int & a_OutputZ);
-	
-	// tolua_end
 	
 	static const char * GetClassStatic(void) { return "cHopperEntity"; }
 	
