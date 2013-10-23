@@ -1,6 +1,7 @@
 Debug/
 Debug profiled/
 Release/
+Release profiled/
 *.user
 *.ncb
 *.suo

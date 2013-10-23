@@ -17,6 +17,7 @@
 #include "BlockEntities/DispenserEntity.h"
 #include "BlockEntities/DropperEntity.h"
 #include "BlockEntities/FurnaceEntity.h"
+#include "BlockEntities/HopperEntity.h"
 #include "md5/md5.h"
 #include "LuaWindow.h"
 #include "LineBlockTracer.h"
@@ -2059,6 +2060,45 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 
 
+static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
+{
+	// function cHopperEntity::GetOutputBlockPos()
+	// Exported manually because tolua would require meaningless params
+	
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cHopperEntity") ||
+		!L.CheckParamNumber  (2) ||
+		!L.CheckParamEnd     (3)
+	)
+	{
+		return 0;
+	}
+	cHopperEntity * self = (cHopperEntity *)tolua_tousertype(tolua_S, 1, 0);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cHopperEntity::GetOutputBlockPos()'", NULL);
+		return 0;
+	}
+
+	NIBBLETYPE a_BlockMeta = ((NIBBLETYPE)tolua_tonumber(tolua_S, 2, 0));
+	int a_OutputX, a_OutputY, a_OutputZ;
+	bool res = self->GetOutputBlockPos(a_BlockMeta, a_OutputX, a_OutputY, a_OutputZ);
+	tolua_pushboolean(tolua_S, res);
+	if (res)
+	{
+		tolua_pushnumber(tolua_S, (lua_Number)a_OutputX);
+		tolua_pushnumber(tolua_S, (lua_Number)a_OutputY);
+		tolua_pushnumber(tolua_S, (lua_Number)a_OutputZ);
+		return 4;
+	}
+	return 1;
+}
+
+
+
+
+
 void ManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, NULL);
@@ -2069,6 +2109,10 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGWARN",            tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGWARNING",         tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",           tolua_LOGERROR);
+		
+		tolua_beginmodule(tolua_S, "cHopperEntity");
+			tolua_function(tolua_S, "GetOutputBlockPos", tolua_cHopperEntity_GetOutputBlockPos);
+		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cLineBlockTracer");
 			tolua_function(tolua_S, "Trace", tolua_cLineBlockTracer_Trace);

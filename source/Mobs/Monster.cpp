@@ -718,8 +718,8 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		return;
 	}
 	
-	int RelX = (int)floor(GetPosX()) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelZ = (int)floor(GetPosZ()) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int RelX = (int)floor(GetPosX()) - GetChunkX() * cChunkDef::Width;
+	int RelZ = (int)floor(GetPosZ()) - GetChunkZ() * cChunkDef::Width;
 	if (
 		(a_Chunk.GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
 		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand

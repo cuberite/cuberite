@@ -208,10 +208,15 @@ public:
 
 	inline static unsigned int MakeIndex(int x, int y, int z )
 	{
-		if( x < cChunkDef::Width && x > -1 && y < cChunkDef::Height && y > -1 && z < cChunkDef::Width && z > -1 )
+		if (
+			(x < Width)  && (x > -1) &&
+			(y < Height) && (y > -1) &&
+			(z < Width)  && (z > -1)
+		)
 		{
 			return MakeIndexNoCheck(x, y, z);
 		}
+		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
 		return INDEX_OUT_OF_RANGE;
 	}
 
@@ -256,6 +261,7 @@ public:
 	
 	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_Index, BLOCKTYPE a_Type)
 	{
+		ASSERT((a_Index >= 0) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
 	}
 	
@@ -271,41 +277,50 @@ public:
 	
 	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_Idx)
 	{
-		ASSERT((a_Idx >= 0) && (a_Idx < Width * Width * Height));
+		ASSERT((a_Idx >= 0) && (a_Idx < NumBlocks));
 		return a_BlockTypes[a_Idx];
 	}
 	
 	
 	inline static int GetHeight(const HeightMap & a_HeightMap, int a_X, int a_Z)
 	{
+		ASSERT((a_X >= 0) && (a_X <= Width));
+		ASSERT((a_Z >= 0) && (a_Z <= Width));
 		return a_HeightMap[a_X + Width * a_Z];
 	}
 	
 	
 	inline static void SetHeight(HeightMap & a_HeightMap, int a_X, int a_Z, unsigned char a_Height)
 	{
+		ASSERT((a_X >= 0) && (a_X <= Width));
+		ASSERT((a_Z >= 0) && (a_Z <= Width));
 		a_HeightMap[a_X + Width * a_Z] = a_Height;
 	}
 	
 	
 	inline static EMCSBiome GetBiome(const BiomeMap & a_BiomeMap, int a_X, int a_Z)
 	{
+		ASSERT((a_X >= 0) && (a_X <= Width));
+		ASSERT((a_Z >= 0) && (a_Z <= Width));
 		return a_BiomeMap[a_X + Width * a_Z];
 	}
 	
 	
 	inline static void SetBiome(BiomeMap & a_BiomeMap, int a_X, int a_Z, EMCSBiome a_Biome)
 	{
+		ASSERT((a_X >= 0) && (a_X <= Width));
+		ASSERT((a_Z >= 0) && (a_Z <= Width));
 		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
 	}
 	
 	
 	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int a_BlockIdx)
 	{
-		if ((a_BlockIdx > -1) && (a_BlockIdx < cChunkDef::NumBlocks))
+		if ((a_BlockIdx > -1) && (a_BlockIdx < NumBlocks))
 		{
 			return (a_Buffer[a_BlockIdx / 2] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
 		}
+		ASSERT(!"cChunkDef::GetNibble(): index out of chunk range!");
 		return 0;
 	}
 	
@@ -317,38 +332,48 @@ public:
 			int Index = MakeIndexNoCheck(x, y, z);
 			return (a_Buffer[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
 		}
+		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
 		return 0;
 	}
 
 
 	static void SetNibble(NIBBLETYPE * a_Buffer, int a_BlockIdx, NIBBLETYPE a_Nibble)
 	{
-		if ((a_BlockIdx > -1) && (a_BlockIdx < cChunkDef::NumBlocks))
+		if ((a_BlockIdx < 0) || (a_BlockIdx >= NumBlocks))
 		{
-			a_Buffer[a_BlockIdx / 2] = (
-				(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
-				((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
-			);
+			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
+			return;
 		}
+		a_Buffer[a_BlockIdx / 2] = (
+			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
+			((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
+		);
 	}
 	
 	
 	static void SetNibble(NIBBLETYPE * a_Buffer, int x, int y, int z, NIBBLETYPE a_Nibble)
 	{
-		if ((x < cChunkDef::Width) && (x > -1) && (y < cChunkDef::Height) && (y > -1) && (z < cChunkDef::Width) && (z > -1))
+		if (
+			(x >= Width)  || (x < 0) ||
+			(y >= Height) || (y < 0) ||
+			(z >= Width)  || (z < 0)
+		)
 		{
-			int Index = MakeIndexNoCheck(x, y, z);
-			a_Buffer[Index / 2] = (
-				(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
-				((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
-			);
+			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
+			return;
 		}
+
+		int Index = MakeIndexNoCheck(x, y, z);
+		a_Buffer[Index / 2] = (
+			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
+			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
+		);
 	}
 
 
 	inline static char GetNibble(const NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos )
 	{
-		return GetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
+		return GetNibble(a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
 	}
 	
 	

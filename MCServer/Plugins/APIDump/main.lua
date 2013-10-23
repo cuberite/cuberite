@@ -158,9 +158,16 @@ function CreateAPITables()
 		end
 		
 		-- Member variables:
+		local SetField = a_ClassObj[".set"] or {};
 		if ((a_ClassObj[".get"] ~= nil) and (type(a_ClassObj[".get"]) == "table")) then
 			for k, v in pairs(a_ClassObj[".get"]) do
-				table.insert(res.Variables, { Name = k });
+				if (SetField[k] == nil) then
+					-- It is a read-only variable, add it as a constant:
+					table.insert(res.Constants, {Name = k, Value = ""});
+				else
+					-- It is a read-write variable, add it as a variable:
+					table.insert(res.Variables, { Name = k });
+				end
 			end
 		end
 		return res;
@@ -818,12 +825,10 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	local HasConstants = (#a_ClassAPI.Constants > 0);
 	local HasFunctions = (#a_ClassAPI.Functions > 0);
 	local HasVariables = (#a_ClassAPI.Variables > 0);
-	if (a_ClassAPI.Inherits ~= nil) then
-		for idx, cls in ipairs(a_ClassAPI.Inherits) do
-			HasConstants = HasConstants or (#cls.Constants > 0);
-			HasFunctions = HasFunctions or (#cls.Functions > 0);
-			HasVariables = HasVariables or (#cls.Variables > 0);
-		end
+	for idx, cls in ipairs(InheritanceChain) do
+		HasConstants = HasConstants or (#cls.Constants > 0);
+		HasFunctions = HasFunctions or (#cls.Functions > 0);
+		HasVariables = HasVariables or (#cls.Variables > 0);
 	end
 	
 	-- Write the table of contents:

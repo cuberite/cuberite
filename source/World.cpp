@@ -736,6 +736,9 @@ void cWorld::TickWeather(float a_Dt)
 
 void cWorld::TickMobs(float a_Dt)
 {
+	// _X 2013_10_22: This is a quick fix for #283 - the world needs to be locked while ticking mobs
+	cWorld::cLock Lock(*this);
+
 	// before every Mob action, we have to count them depending on the distance to players, on their family ...
 	cMobCensus MobCensus;
 	m_ChunkMap->CollectMobCensus(MobCensus);

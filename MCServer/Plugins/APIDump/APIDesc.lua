@@ -369,10 +369,30 @@ g_APIDesc =
 			},
 			Constants =
 			{
-				Color         = { Notes = "The first character of the color-code-sequence, ยง" },
-				Delimiter     = { Notes = "The first character of the color-code-sequence, ยง" },
-				Random        = { Notes = "Random letters and symbols animate instead of the text" },
+				Black         = { Notes = "" },
+				Blue          = { Notes = "" },
+				Bold          = { Notes = "" },
+				Color         = { Notes = "The first character of the color-code-sequence, ง" },
+				DarkPurple    = { Notes = "" },
+				Delimiter     = { Notes = "The first character of the color-code-sequence, ง" },
+				Gold          = { Notes = "" },
+				Gray          = { Notes = "" },
+				Green         = { Notes = "" },
+				Italic        = { Notes = "" },
+				LightBlue     = { Notes = "" },
+				LightGray     = { Notes = "" },
+				LightGreen    = { Notes = "" },
+				LightPurple   = { Notes = "" },
+				Navy          = { Notes = "" },
 				Plain         = { Notes = "Resets all formatting to normal" },
+				Purple        = { Notes = "" },
+				Random        = { Notes = "Random letters and symbols animate instead of the text" },
+				Red           = { Notes = "" },
+				Rose          = { Notes = "" },
+				Strikethrough = { Notes = "" },
+				Underlined    = { Notes = "" },
+				White         = { Notes = "" },
+				Yellow        = { Notes = "" },
 			},
 		},
 
@@ -755,12 +775,12 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				GetHealth = { Params = "", Return = "number", Notes = "Returns the current health of the entity." },
 				GetHeight = { Params = "", Return = "number", Notes = "Returns the height (Y size) of the entity" },
 				GetKnockbackAmountAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the amount of knockback that the currently equipped items would cause when attacking the ReceiverEntity." },
-				GetLookVector = { Params = "", Return = "Vector3f", Notes = "Returns the vector that defines the direction in which the entity is looking" },
+				GetLookVector = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the vector that defines the direction in which the entity is looking" },
 				GetMass = { Params = "", Return = "number", Notes = "Returns the mass of the entity. Currently unused." },
 				GetMaxHealth = { Params = "", Return = "number", Notes = "Returns the maximum number of hitpoints this entity is allowed to have." },
 				GetParentClass = { Params = "", Return = "string", Notes = "Returns the name of the direct parent class for this entity" },
 				GetPitch = { Params = "", Return = "number", Notes = "Returns the pitch (nose-down rotation) of the entity" },
-				GetPosition = { Params = "", Return = "Vector3d", Notes = "Returns the entity's pivot position as a 3D vector" },
+				GetPosition = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the entity's pivot position as a 3D vector" },
 				GetPosX = { Params = "", Return = "number", Notes = "Returns the X-coord of the entity's pivot" },
 				GetPosY = { Params = "", Return = "number", Notes = "Returns the Y-coord of the entity's pivot" },
 				GetPosZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the entity's pivot" },
@@ -768,23 +788,26 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity. Currently unused." },
 				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the entire rotation vector (Yaw, Pitch, Roll)" },
 				GetRotation = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. FIXME: Rename to GetYaw()." },
-				GetSpeed = { Params = "", Return = "Vector3d", Notes = "Returns the complete speed vector of the entity" },
+				GetSpeed = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the complete speed vector of the entity" },
 				GetSpeedX = { Params = "", Return = "number", Notes = "Returns the X-part of the speed vector" },
 				GetSpeedY = { Params = "", Return = "number", Notes = "Returns the Y-part of the speed vector" },
 				GetSpeedZ = { Params = "", Return = "number", Notes = "Returns the Z-part of the speed vector" },
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity within the running server. Note that this ID is not persisted to the data files." },
 				GetWidth = { Params = "", Return = "number", Notes = "Returns the width (X and Z size) of the entity." },
-				GetWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world where the entity resides" },
+				GetWorld = { Params = "", Return = "{{cWorld}}", Notes = "Returns the world where the entity resides" },
 				Heal = { Params = "Hitpoints", Return = "", Notes = "Heals the specified number of hitpoints. Hitpoints is expected to be a positive number." },
 				IsA = { Params = "ClassName", Return = "bool", Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself" },
 				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
 				IsCrouched = { Params = "", Return = "bool", Notes = "Returns true if the entity is crouched. Always false for entities that don't support crouching." },
 				IsDestroyed = { Params = "", Return = "bool", Notes = "Returns true if the entity has been destroyed and is awaiting removal from the internal structures." },
+				IsFallingBlock = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cFallingBlock}} entity." },
+				IsInvisible = { Params = "", Return = "bool", Notes = "Returns true if the entity is invisible" },
 				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cMinecart|minecart}}" },
 				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any {{cMonster|mob}}." },
 				IsOnFire = { Params = "", Return = "bool", Notes = "Returns true if the entity is on fire" },
 				IsPickup = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPickup|pickup}}." },
 				IsPlayer = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPlayer|player}}" },
+				IsProjectile = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cProjectileEntity}} descendant." },
 				IsRclking = { Params = "", Return = "bool", Notes = "Currently unimplemented" },
 				IsRiding = { Params = "", Return = "bool", Notes = "Returns true if the entity is attached to (riding) another entity." },
 				IsSprinting = { Params = "", Return = "bool", Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false" },
@@ -933,6 +956,28 @@ cFile:Delete("/usr/bin/virus.exe");
 			Constants =
 			{
 			},
+		},
+
+		cHopperEntity =
+		{
+			Desc = [[
+				This class represents a hopper block entity in the world.</p>
+				<p>
+				Plugins may use this class during chunk generation ({{OnChunkGenerated|HOOK_CHUNK_GENERATED}} and
+				{{OnChunkGenerating|HOOK_CHUNK_GENERATING}}) to add hoppers to the generated chunk.
+			]],
+			Functions =
+			{
+				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cHopperEntity", Notes = "Creates and returns a new hopper at the specified coords." },
+				GetOutputBlockPos = { Params = "BlockMeta", Return = "bool, BlockX, BlockY, BlockZ", Notes = "Returns whether the hopper is attached, and if so, the block coords of the block receiving the output items, based on the given meta." },
+			},
+			Constants =
+			{
+				ContentsHeight = { Notes = "Height (Y) of the internal {{cItemGrid}} representing the hopper contents." },
+				ContentsWidth = { Notes = "Width (X) of the internal {{cItemGrid}} representing the hopper contents." },
+				TICKS_PER_TRANSFER = { Notes = "Number of ticks between when the hopper transfers items." },
+			},
+			Inherits = "cBlockEntityWithItems",
 		},
 
 		cIniFile =
