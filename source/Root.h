@@ -32,10 +32,7 @@ typedef cItemCallback<cWorld>  cWorldListCallback;
 class cRoot	// tolua_export
 {			// tolua_export
 public:
-	/// The version of the protocol that is primary for the server (reported in the server list). All versions are still supported.
-	int m_PrimaryServerVersion;  // tolua_export
-	
-	static cRoot* Get() { return s_Root; }							// tolua_export
+	static cRoot * Get() { return s_Root; }							// tolua_export
 
 	cRoot(void);
 	~cRoot();
@@ -55,7 +52,7 @@ public:
 	int GetPrimaryServerVersion(void) const { return m_PrimaryServerVersion; }  // tolua_export
 	void SetPrimaryServerVersion(int a_Version) { m_PrimaryServerVersion = a_Version; }  // tolua_export
 	
-	cMonsterConfig * GetMonsterConfig() { return m_MonsterConfig; }
+	cMonsterConfig * GetMonsterConfig(void) { return m_MonsterConfig; }
 
 	cGroupManager *    GetGroupManager   (void) { return m_GroupManager; }     // tolua_export
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
@@ -135,6 +132,9 @@ private:
 	typedef std::map<AString, cWorld *> WorldMap;
 	typedef std::vector<cCommand> cCommandQueue;
 	
+	/// The version of the protocol that is primary for the server (reported in the server list). All versions are still supported.
+	int m_PrimaryServerVersion;
+
 	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;
 	

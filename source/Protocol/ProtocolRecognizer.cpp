@@ -727,7 +727,7 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 void cProtocolRecognizer::HandleServerPing(void)
 {
 	AString Reply;
-	switch (cRoot::Get()->m_PrimaryServerVersion)
+	switch (cRoot::Get()->GetPrimaryServerVersion())
 	{
 		case PROTO_VERSION_1_2_5:
 		case PROTO_VERSION_1_3_2:
@@ -771,8 +771,8 @@ void cProtocolRecognizer::HandleServerPing(void)
 			Printf(MaxPlayers, "%d", cRoot::Get()->GetServer()->GetMaxPlayers());
 			
 			AString ProtocolVersionNum;
-			Printf(ProtocolVersionNum, "%d", cRoot::Get()->m_PrimaryServerVersion);
-			AString ProtocolVersionTxt(GetVersionTextFromInt(cRoot::Get()->m_PrimaryServerVersion));
+			Printf(ProtocolVersionNum, "%d", cRoot::Get()->GetPrimaryServerVersion());
+			AString ProtocolVersionTxt(GetVersionTextFromInt(cRoot::Get()->GetPrimaryServerVersion()));
 
 			// Cannot use Printf() because of in-string NUL bytes.
 			Reply = cChatColor::Delimiter;
