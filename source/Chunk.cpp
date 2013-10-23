@@ -536,17 +536,23 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 				// check player and playerspawn presence < 24 blocks
 				// check mobs presence on the block
 
-				// MG TODO: fix the "light" thing, I'm pretty sure that UnboundedRelGetBlock s not returning the right thing
-
 				// MG TODO : check that "Level" really means Y
-				cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, Biome, Try_Y, MaxNbOfSuccess);
-				if (newMob)
+				
+				NIBBLETYPE SkyLight = 0;
+
+				NIBBLETYPE BlockLight = 0;
+
+				if (IsLightValid() && (UnboundedRelGetBlockBlockLight(Try_X, Try_Y, Try_Z, BlockLight)) && (UnboundedRelGetBlockSkyLight(Try_X, Try_Y, Try_Z, SkyLight)))
 				{
-					int WorldX, WorldY, WorldZ;
-					PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
-					newMob->SetPosition(WorldX, WorldY, WorldZ);
-					LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
-					NumberOfSuccess++;
+					cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, SkyLight, BlockLight, Biome, Try_Y, MaxNbOfSuccess);
+					if (newMob)
+					{
+						int WorldX, WorldY, WorldZ;
+						PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
+						newMob->SetPosition(WorldX, WorldY, WorldZ);
+						LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
+						NumberOfSuccess++;
+					}
 				}
 			}
 			

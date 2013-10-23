@@ -324,6 +324,7 @@ public:
 	/// Same as QueueTickBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s in such a case), ignores unsuccessful attempts
 	void UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
 
+
 	// Simulator data:
 	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }
 	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
