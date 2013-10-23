@@ -536,15 +536,13 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 				// check player and playerspawn presence < 24 blocks
 				// check mobs presence on the block
 
-				// MG TODO: fix the "light" thing, I'm pretty sure that UnboundedRelGetBlock s not returning the right thing
-
 				// MG TODO : check that "Level" really means Y
 				
-				NIBBLETYPE SkyLight = UnboundedRelGetSkyLight(Try_X, Try_Y, Try_Z);
+				NIBBLETYPE SkyLight = 0;
 
-				NIBBLETYPE BlockLight = UnboundedRelGetBlockLight(Try_X, Try_Y, Try_Z);
+				NIBBLETYPE BlockLight = 0;
 
-				if (IsLightValid() && (SkyLight != 127) && (BlockLight != 127))
+				if (IsLightValid() && (UnboundedRelGetBlockBlockLight(Try_X, Try_Y, Try_Z, BlockLight)) && (UnboundedRelGetBlockSkyLight(Try_X, Try_Y, Try_Z, SkyLight)))
 				{
 					cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, SkyLight, BlockLight, Biome, Try_Y, MaxNbOfSuccess);
 					if (newMob)
