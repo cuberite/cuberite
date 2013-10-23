@@ -95,7 +95,7 @@ protected:
 
 	/// Moves one piece to the specified entity's contents' slot. Returns true if contents have changed.
 	bool MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstSlotNum);
-} ;
+} ;  // tolua_export
 
 
 
