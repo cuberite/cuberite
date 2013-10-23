@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/23/13 11:08:31.
+** Generated automatically by tolua++-1.0.92 on 10/23/13 11:13:15.
 */
 
 #ifndef __cplusplus
@@ -255,16 +255,15 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cHopperEntity");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cWindow");
- tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"HTTPFormData");
- tolua_usertype(tolua_S,"HTTPRequest");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
  tolua_usertype(tolua_S,"cBlockArea");
- tolua_usertype(tolua_S,"cGroup");
- tolua_usertype(tolua_S,"cBoundingBox");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cStringMap");
+ tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
@@ -281,8 +280,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cGroupManager");
- tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
  tolua_usertype(tolua_S,"cItem");
+ tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"cProjectileEntity");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
  tolua_usertype(tolua_S,"cDropperEntity");
@@ -18318,23 +18317,6 @@ static int tolua_AllToLua_cDropSpenserEntity_SetRedstonePower00(lua_State* tolua
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: __cBlockEntityWindowOwner__ of class  cDropSpenserEntity */
-#ifndef TOLUA_DISABLE_tolua_get_cDropSpenserEntity___cBlockEntityWindowOwner__
-static int tolua_get_cDropSpenserEntity___cBlockEntityWindowOwner__(lua_State* tolua_S)
-{
-  cDropSpenserEntity* self = (cDropSpenserEntity*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cBlockEntityWindowOwner__'",NULL);
-#endif
-#ifdef __cplusplus
-   tolua_pushusertype(tolua_S,(void*)static_cast<cBlockEntityWindowOwner*>(self), "cBlockEntityWindowOwner");
-#else
-   tolua_pushusertype(tolua_S,(void*)((cBlockEntityWindowOwner*)self), "cBlockEntityWindowOwner");
-#endif
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: new of class  cDispenserEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cDispenserEntity_new00
 static int tolua_AllToLua_cDispenserEntity_new00(lua_State* tolua_S)
@@ -30994,7 +30976,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddDropSpenserDir",tolua_AllToLua_cDropSpenserEntity_AddDropSpenserDir00);
    tolua_function(tolua_S,"Activate",tolua_AllToLua_cDropSpenserEntity_Activate00);
    tolua_function(tolua_S,"SetRedstonePower",tolua_AllToLua_cDropSpenserEntity_SetRedstonePower00);
-   tolua_variable(tolua_S,"__cBlockEntityWindowOwner__",tolua_get_cDropSpenserEntity___cBlockEntityWindowOwner__,NULL);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cDispenserEntity","cDispenserEntity","cDropSpenserEntity",tolua_collect_cDispenserEntity);
