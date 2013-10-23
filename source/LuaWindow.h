@@ -23,8 +23,6 @@ class cPluginLua;
 
 
 
-// tolua_begin
-
 /** A window that has been created by a Lua plugin and is handled entirely by that plugin
 This object needs extra care with its lifetime management:
 - It is created by Lua, so Lua expects to garbage-collect it later
@@ -35,9 +33,10 @@ Additionally, to forbid Lua from deleting this object while it is used by player
 cPlayer:OpenWindow check if the window is of this class, and if so, make a global Lua reference for this object.
 This reference needs to be unreferenced in the Destroy() function.
 */
-class cLuaWindow :
-	public cWindow,
-	public cItemGrid::cListener
+class cLuaWindow :  // tolua_export
+	public cItemGrid::cListener,
+	// tolua_begin
+	public cWindow
 {
 	typedef cWindow super;
 	

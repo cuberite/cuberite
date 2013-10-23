@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/23/13 12:07:27.
+** Generated automatically by tolua++-1.0.92 on 10/23/13 13:30:23.
 */
 
 #ifndef __cplusplus
@@ -29178,23 +29178,6 @@ static int tolua_AllToLua_cLuaWindow_GetContents00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: __cItemGrid of class  cLuaWindow */
-#ifndef TOLUA_DISABLE_tolua_get_cLuaWindow___cItemGrid__cListener__
-static int tolua_get_cLuaWindow___cItemGrid__cListener__(lua_State* tolua_S)
-{
-  cLuaWindow* self = (cLuaWindow*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cItemGrid'",NULL);
-#endif
-#ifdef __cplusplus
-   tolua_pushusertype(tolua_S,(void*)static_cast<cItemGrid::cListener*>(self), "cItemGrid::cListener");
-#else
-   tolua_pushusertype(tolua_S,(void*)((cItemGrid::cListener*)self), "cItemGrid::cListener");
-#endif
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetMobType of class  cMonster */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cMonster_GetMobType00
 static int tolua_AllToLua_cMonster_GetMobType00(lua_State* tolua_S)
@@ -31441,7 +31424,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,".call",tolua_AllToLua_cLuaWindow_new00_local);
    tolua_function(tolua_S,"delete",tolua_AllToLua_cLuaWindow_delete00);
    tolua_function(tolua_S,"GetContents",tolua_AllToLua_cLuaWindow_GetContents00);
-   tolua_variable(tolua_S,"__cItemGrid__cListener__",tolua_get_cLuaWindow___cItemGrid__cListener__,NULL);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cMonster","cMonster","cPawn",NULL);
   tolua_beginmodule(tolua_S,"cMonster");
