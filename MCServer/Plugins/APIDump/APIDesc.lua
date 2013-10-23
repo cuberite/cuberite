@@ -938,6 +938,28 @@ cFile:Delete("/usr/bin/virus.exe");
 			},
 		},
 
+		cHopperEntity =
+		{
+			Desc = [[
+				This class represents a hopper block entity in the world.</p>
+				<p>
+				Plugins may use this class during chunk generation ({{OnChunkGenerated|HOOK_CHUNK_GENERATED}} and
+				{{OnChunkGenerating|HOOK_CHUNK_GENERATING}}) to add hoppers to the generated chunk.
+			]],
+			Functions =
+			{
+				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cHopperEntity", Notes = "Creates and returns a new hopper at the specified coords." },
+				GetOutputBlockPos = { Params = "BlockMeta", Return = "bool, BlockX, BlockY, BlockZ", Notes = "Returns whether the hopper is attached, and if so, the block coords of the block receiving the output items, based on the given meta." },
+			},
+			Constants =
+			{
+				ContentsHeight = { Notes = "Height (Y) of the internal {{cItemGrid}} representing the hopper contents." },
+				ContentsWidth = { Notes = "Width (X) of the internal {{cItemGrid}} representing the hopper contents." },
+				TICKS_PER_TRANSFER = { Notes = "Number of ticks between when the hopper transfers items." },
+			},
+			Inherits = "cBlockEntityWithItems",
+		},
+
 		cIniFile =
 		{
 			Desc = [[The cIniFile is a class that makes it simple to read from and write to INI files. MCServer uses mostly INI files for settings and options.
