@@ -1574,9 +1574,58 @@ a_Player:OpenWindow(Window);
 
 		cMonster =
 		{
-			Desc = "",
-			Functions = {},
-			Constants = {},
+			Desc = [[
+				This class is the base class for all computer-controlled mobs in the game.</p>
+				<p>
+				To spawn a mob in a world, use the {{cWorld}}:SpawnMob() function.
+			]],
+			Functions =
+			{
+				FamilyFromType = { Params = "MobType", Return = "MobFamily", Notes = "(STATIC) Returns the mob family (mfXXX constants) based on the mob type (mtXXX constants)" },
+				GetMobFamily = { Params = "", Return = "MobFamily", Notes = "Returns this mob's family (mfXXX constant)" },
+				GetMobType = { Params = "", Return = "MobType", Notes = "Returns the type of this mob (mtXXX constant)" },
+				GetSpawnDelay = { Params = "MobFamily", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
+				MobTypeToString = { Params = "MobType", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type (mtXXX constant), or empty string if unknown type." },
+				StringToMobType = { Params = "string", Return = "MobType", Notes = "(STATIC) Returns the mob type (mtXXX constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
+			},
+			Constants =
+			{
+				mfAmbient = { Notes = "Family: ambient (bat)" },
+				mfHostile = { Notes = "Family: hostile (blaze, cavespider, creeper, enderdragon, enderman, ghast, giant, magmacube, silverfish, skeleton, slime, spider, witch, wither, zombie, zombiepigman)" },
+				mfMaxplusone = { Notes = "The maximum family value, plus one. Returned when monster family not recognized." },
+				mfPassive = { Notes = "Family: passive (chicken, cow, horse, irongolem, mooshroom, ocelot, pig, sheep, snowgolem, villager, wolf)" },
+				mfWater = { Notes = "Family: water (squid)" },
+				mtBat = { Notes = "" },
+				mtBlaze = { Notes = "" },
+				mtCaveSpider = { Notes = "" },
+				mtChicken = { Notes = "" },
+				mtCow = { Notes = "" },
+				mtCreeper = { Notes = "" },
+				mtEnderDragon = { Notes = "" },
+				mtEnderman = { Notes = "" },
+				mtGhast = { Notes = "" },
+				mtGiant = { Notes = "" },
+				mtHorse = { Notes = "" },
+				mtInvalidType = { Notes = "Invalid monster type. Returned when monster type not recognized" },
+				mtIronGolem = { Notes = "" },
+				mtMagmaCube = { Notes = "" },
+				mtMooshroom = { Notes = "" },
+				mtOcelot = { Notes = "" },
+				mtPig = { Notes = "" },
+				mtSheep = { Notes = "" },
+				mtSilverfish = { Notes = "" },
+				mtSkeleton = { Notes = "" },
+				mtSlime = { Notes = "" },
+				mtSnowGolem = { Notes = "" },
+				mtSpider = { Notes = "" },
+				mtSquid = { Notes = "" },
+				mtVillager = { Notes = "" },
+				mtWitch = { Notes = "" },
+				mtWither = { Notes = "" },
+				mtWolf = { Notes = "" },
+				mtZombie = { Notes = "" },
+				mtZombiePigman = { Notes = "" },
+			},
 			Inherits = "cPawn",
 		},
 
