@@ -693,10 +693,20 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 
 		cEnchantments =
 		{
-			Desc = [[This class  is the storage for enchantments for a single {{cItem|cItem}} object, through its m_Enchantments member variable. Although it is possible to create a standalone object of this class, it is not yet used in any API directly.
-</p>
-		<p>Enchantments can be initialized either programmatically by calling the individual functions (SetLevel()), or by using a string description of the enchantment combination. This string description is in the form "id=lvl;id=lvl;...;id=lvl;", where id is either a numerical ID of the enchantment, or its textual representation from the table below, and lvl is the desired enchantment level. The class can also create its string description from its current contents; however that string description will only have the numerical IDs.
-]],
+			Desc = [[
+				This class  is the storage for enchantments for a single {{cItem|cItem}} object, through its
+				m_Enchantments member variable. Although it is possible to create a standalone object of this class,
+				it is not yet used in any API directly.</p>
+				<p>
+				Enchantments can be initialized either programmatically by calling the individual functions
+				(SetLevel()), or by using a string description of the enchantment combination. This string
+				description is in the form "id=lvl;id=lvl;...;id=lvl;", where id is either a numerical ID of the
+				enchantment, or its textual representation from the table below, and lvl is the desired enchantment
+				level. The class can also create its string description from its current contents; however that
+				string description will only have the numerical IDs.</p>
+				<p>
+				See the {{cItem}} class for usage examples.
+			]],
 			Functions =
 			{
 				constructor =
@@ -715,6 +725,29 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			},
 			Constants =
 			{
+				-- Only list these enchantment IDs, as they don't really need any kind of documentation:
+				enchAquaAffinity = { Notes = "" },
+				enchBaneOfArthropods = { Notes = "" },
+				enchBlastProtection = { Notes = "" },
+				enchEfficiency = { Notes = "" },
+				enchFeatherFalling = { Notes = "" },
+				enchFireAspect = { Notes = "" },
+				enchFireProtection = { Notes = "" },
+				enchFlame = { Notes = "" },
+				enchFortune = { Notes = "" },
+				enchInfinity = { Notes = "" },
+				enchKnockback = { Notes = "" },
+				enchLooting = { Notes = "" },
+				enchPower = { Notes = "" },
+				enchProjectileProtection = { Notes = "" },
+				enchProtection = { Notes = "" },
+				enchPunch = { Notes = "" },
+				enchRespiration = { Notes = "" },
+				enchSharpness = { Notes = "" },
+				enchSilkTouch = { Notes = "" },
+				enchSmite = { Notes = "" },
+				enchThorns = { Notes = "" },
+				enchUnbreaking = { Notes = "" },
 			},
 		},
 
