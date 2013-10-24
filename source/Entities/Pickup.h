@@ -31,7 +31,7 @@ public:
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	
-	virtual bool CollectedBy(cPlayer * a_Dest);					// tolua_export
+	bool CollectedBy(cPlayer * a_Dest);					// tolua_export
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	
