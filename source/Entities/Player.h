@@ -167,13 +167,15 @@ public:
 	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
 	bool IsInGroup( const AString & a_Group );								// tolua_export
 
-	AString GetColor(void) const;											// tolua_export
-
-	void TossItem(bool a_bDraggingItem, char a_Amount = 1, short a_CreateType = 0, short a_CreateHealth = 0);				// tolua_export
-
-	void Heal( int a_Health );												// tolua_export
-	
 	// tolua_begin
+	
+	/// Returns the full color code to use for this player, based on their primary group or set in m_Color
+	AString GetColor(void) const;
+
+	void TossItem(bool a_bDraggingItem, char a_Amount = 1, short a_CreateType = 0, short a_CreateHealth = 0);
+
+	/// Heals the player by the specified amount of HPs (positive only); sends health update
+	void Heal(int a_Health);
 	
 	int    GetFoodLevel                 (void) const { return m_FoodLevel; }
 	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }
@@ -181,7 +183,7 @@ public:
 	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
 	int    GetFoodPoisonedTicksRemaining(void) const { return m_FoodPoisonedTicksRemaining; }
 
-        int GetAirLevel                     (void) const { return m_AirLevel; }
+	int GetAirLevel                     (void) const { return m_AirLevel; }
 	
 	/// Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore
 	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
@@ -302,6 +304,7 @@ protected:
 
 	/// Player's air level (for swimming)
 	int m_AirLevel;
+
 	/// used to time ticks between damage taken via drowning/suffocation
 	int m_AirTickTimer;
 

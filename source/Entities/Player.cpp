@@ -349,11 +349,8 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 void cPlayer::Heal(int a_Health)
 {
-	if (m_Health < GetMaxHealth())
-	{
-		m_Health = (short)std::min((int)a_Health + m_Health, (int)GetMaxHealth());
-		SendHealth();
-	}
+	super::Heal(a_Health);
+	SendHealth();
 }
 
 
