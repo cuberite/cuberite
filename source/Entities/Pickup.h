@@ -24,7 +24,7 @@ class cPickup :
 public:
 	CLASS_PROTODEF(cPickup);
 
-	cPickup(double a_X, double a_Y, double a_Z, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);	// tolua_export
+	cPickup(double a_MicroPosX, double a_MicroPosY, double a_MicroPosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);	// tolua_export
 	
 	cItem &       GetItem(void)       {return m_Item; }								// tolua_export
 	const cItem & GetItem(void) const {return m_Item; }
@@ -40,6 +40,9 @@ public:
 	
 	/// Returns true if the pickup has already been collected
 	bool IsCollected(void) const { return m_bCollected; }  // tolua_export
+
+	/// Returns true if created by player (i.e. vomiting), used for determining picking-up delay time
+	bool IsPlayerCreated(void) const { return m_bIsPlayerCreated; } // tolua_export
 	
 private:
 	Vector3d   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
@@ -52,6 +55,8 @@ private:
 	cItem m_Item;
 
 	bool m_bCollected;
+
+	bool m_bIsPlayerCreated;
 };  // tolua_export
 
 

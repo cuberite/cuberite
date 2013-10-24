@@ -24,11 +24,12 @@
 
 
 
-cPickup::cPickup(double a_X, double a_Y, double a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
+cPickup::cPickup(double a_X, double a_Y, double a_Z, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity(etPickup, a_X, a_Y, a_Z, 0.2, 0.2)
 	, m_Timer( 0.f )
 	, m_Item(a_Item)
 	, m_bCollected( false )
+	, m_bIsPlayerCreated( IsPlayerCreated )
 {
 	m_MaxHealth = 5;
 	m_Health = 5;
@@ -126,8 +127,8 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		return false; // It's already collected!
 	}
 	
-	// 800 is to long
-	if (m_Timer < 500.f)
+	// Two seconds if player created the pickup (vomiting), half a second if anything else
+	if (m_Timer < (m_bIsPlayerCreated ? 2000.f : 500.f))
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it is not old enough.", m_UniqueID, a_Dest->GetName().c_str());
 		return false; // Not old enough
