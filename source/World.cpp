@@ -755,9 +755,9 @@ void cWorld::TickMobs(float a_Dt)
 		for (int i = 0; i < ARRAYCOUNT(AllFamilies); i++)
 		{
 			cMonster::eFamily Family = AllFamilies[i];
-			int spawnrate = cMonster::GetSpawnRate(Family);
+			int SpawnDelay = cMonster::GetSpawnDelay(Family);
 			if (
-				(m_LastSpawnMonster[Family] > m_WorldAge - spawnrate) ||  // Not reached the needed tiks before the next round
+				(m_LastSpawnMonster[Family] > m_WorldAge - SpawnDelay) ||  // Not reached the needed ticks before the next round
 				MobCensus.IsCapped(Family)
 			)
 			{
