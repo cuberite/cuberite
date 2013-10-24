@@ -128,8 +128,8 @@ public:
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
-	/// Tries to move to a new position, with collision checks and stuff
-	virtual void MoveTo( const Vector3d & a_NewPos );  // tolua_export
+	/// Tries to move to a new position, with attachment-related checks (y == -999)
+	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
 
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
@@ -159,8 +159,10 @@ public:
 
 	/// Adds a player to existing group or creates a new group when it doesn't exist
 	void AddToGroup( const AString & a_GroupName );							// tolua_export
+	
 	/// Removes a player from the group, resolves permissions and group inheritance (case sensitive)
 	void RemoveFromGroup( const AString & a_GroupName );					// tolua_export
+	
 	bool CanUseCommand( const AString & a_Command );						// tolua_export
 	bool HasPermission( const AString & a_Permission );						// tolua_export
 	const GroupList & GetGroups() { return m_Groups; }						// >> EXPORTED IN MANUALBINDINGS <<
