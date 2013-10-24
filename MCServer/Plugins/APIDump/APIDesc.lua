@@ -1568,16 +1568,18 @@ a_Player:OpenWindow(Window);
 
 		cPickup =
 		{
-			Desc = [[cPickup is a pickup object representation. It is also commonly known as "drops". With this class you could create your own "drop" or modify automatically created.
-]],
+			Desc = [[
+				This class represents a pickup entity (an item that the player or mobs can pick up). It is also
+				commonly known as "drops". With this class you could create your own "drop" or modify those
+				created automatically.
+			]],
 			Functions =
 			{
-				cPickup = { Notes = "[[cPickup}}" },
-				GetItem = { Notes = "{{cItem|cItem}}" },
-				CollectedBy = { Return = "bool" },
-			},
-			Constants =
-			{
+				constructor = { Params = "PosX, PosY, PosZ, {{cItem|Item}}, IsPlayerCreated, [SpeedX, SpeedY, SpeedZ]", Return = "cPickup", Notes = "Creates a new pickup at the specified coords. If IsPlayerCreated is true, the pickup has a longer initial collection interval." },
+				CollectedBy = { Params = "{{cPlayer}}", Return = "bool", Notes = "Tries to make the player collect the pickup. Returns true if the pickup was collected, at least partially." },
+				GetAge = { Params = "", Return = "number", Notes = "Returns the number of ticks that the pickup has existed." },
+				GetItem = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item represented by this pickup" },
+				IsCollected = { Params = "", Return = "bool", Notes = "Returns true if this pickup has already been collected (is waiting to be destroyed)" },
 			},
 			Inherits = "cEntity",
 		},
