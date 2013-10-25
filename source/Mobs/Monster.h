@@ -137,10 +137,10 @@ public:
 	
 	// tolua_begin
 	
-	/// Translates MobType enum to a string
+	/// Translates MobType enum to a string, empty string if unknown
 	static AString MobTypeToString(eType a_MobType);
 	
-	/// Translates MobType string to the enum
+	/// Translates MobType string to the enum, mtInvalidType if not recognized
 	static eType StringToMobType(const AString & a_MobTypeName);
 	
 	/// Returns the mob family based on the type
