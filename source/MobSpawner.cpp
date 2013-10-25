@@ -126,78 +126,48 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, NIBBLETYPE a_Skylight, NIBBLETYPE a_Blocklight, EMCSBiome a_Biome, int a_Level)
 {
-	bool toReturn = false;
-	std::set<cMonster::eType>::iterator itr = m_AllowedTypes.find(a_MobType);
-	if (itr != m_AllowedTypes.end())
+	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end())
 	{
-		// MG TODO : find a nicer paging
-		if (a_MobType == cMonster::mtSquid)
+		switch(a_MobType)
 		{
-			toReturn = (
-				IsBlockLiquid(a_BlockType) &&
-				a_Level >= 45 &&
-				a_Level <= 62
-			);
-		}
-		else if (a_MobType == cMonster::mtBat)
-		{
-			toReturn = a_Level <= 63 && (a_Skylight == 0) && (a_Blocklight <= 4); // MG TODO  : find a real rule
-		}
-		else
-		{
-			if (
-				a_BlockType == E_BLOCK_AIR &&
-				a_BlockType_above == E_BLOCK_AIR &&
-				! (g_BlockTransparent[a_BlockType_below])
-				)
-			{
-				if (a_MobType == cMonster::mtChicken || a_MobType == cMonster::mtPig || a_MobType == cMonster::mtCow || a_MobType == cMonster::mtSheep)
-				{
-					toReturn = (
-						(a_BlockType_below == E_BLOCK_GRASS) &&
-						(a_Skylight >= 9 )
-						);
-				}
-				else if (a_MobType == cMonster::mtOcelot)
-				{
-					toReturn = (
-						(a_Level >= 62) &&
-						(
-							(a_BlockType_below == E_BLOCK_GRASS) ||
-							(a_BlockType_below == E_BLOCK_LEAVES)
-						) &&
-						(m_Random.NextInt(3,a_Biome) != 0)
-						);
-				}
-				else if (a_MobType == cMonster::mtCreeper || a_MobType == cMonster::mtSkeleton || a_MobType == cMonster::mtZombie || a_MobType == cMonster::mtSpider || a_MobType == cMonster::mtEnderman || a_MobType == cMonster::mtZombiePigman)
-				{
-					toReturn = (a_Skylight <= 7) && (a_Blocklight <= 7);
-					if (a_Skylight) 
-					{
-						if (m_Random.NextInt(2,a_Biome) != 0)
-						{
-							toReturn = false;
-						}
-					}
-				}
-				else if (a_MobType == cMonster::mtSlime)
-				{
-					toReturn = a_Level <= 40;
-					// MG TODO : much more complicated rules		
-				}
-				else if (a_MobType == cMonster::mtGhast)
-				{
-					toReturn = m_Random.NextInt(20,a_Biome) == 0;
-				}
-				else
-				{
-					LOGD("MG TODO : check I've got a Rule to write for type %d",a_MobType);
-					toReturn = false;
-				}
-			}
+			case cMonster::mtSquid:
+				return IsBlockWater(a_BlockType) && (a_Level >= 45) && (a_Level <= 62);
+
+			case cMonster::mtBat:
+				return a_Level <= 63 && (a_Skylight == 0) && (a_Blocklight <= 4) && (a_BlockType == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_above]);
+
+			case cMonster::mtChicken:
+			case cMonster::mtCow:
+			case cMonster::mtPig:
+			case cMonster::mtHorse:
+			case cMonster::mtSheep:
+				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_below]) &&
+						(a_BlockType_below == E_BLOCK_GRASS) && (a_Skylight >= 9);
+
+			case cMonster::mtOcelot:
+				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) &&
+						((a_BlockType_below == E_BLOCK_GRASS) || (a_BlockType_below == E_BLOCK_LEAVES)) && (a_Level >= 62) && (m_Random.NextInt(3,a_Biome) != 0);
+
+			case cMonster::mtEnderman:
+				return false;
+			case cMonster::mtCreeper:
+			case cMonster::mtZombie:
+			case cMonster::mtSpider:
+				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_below]) &&
+						(a_Skylight <= 7) && (a_Blocklight <= 7) && (m_Random.NextInt(2,a_Biome) == 0);
+
+			case cMonster::mtSlime:
+				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_below]) &&
+						(a_Level <= 40);
+			case cMonster::mtGhast:
+			case cMonster::mtZombiePigman:
+				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_below]) &&
+						(m_Random.NextInt(20,a_Biome) == 0);
+			default:
+				LOGD("MG TODO : check I've got a Rule to write for type %d",a_MobType);
+				return false;
 		}
 	}
-	return toReturn;
 }
 
 
