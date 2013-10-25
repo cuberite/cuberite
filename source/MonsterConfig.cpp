@@ -63,10 +63,10 @@ void cMonsterConfig::Initialize()
 		return;
 	}
 	
-	for (int i = (int)MonstersIniFile.NumKeys(); i >= 0; i--)
+	for (int i = (int)MonstersIniFile.GetNumKeys(); i >= 0; i--)
 	{
 		sAttributesStruct Attributes;
-		AString Name = MonstersIniFile.KeyName(i);
+		AString Name = MonstersIniFile.GetKeyName(i);
 		Attributes.m_Name = Name;
 		Attributes.m_AttackDamage  = MonstersIniFile.GetValueF(Name, "AttackDamage",  0);
 		Attributes.m_AttackRange   = MonstersIniFile.GetValueF(Name, "AttackRange",   0);

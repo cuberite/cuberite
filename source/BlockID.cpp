@@ -47,15 +47,15 @@ public:
 		{
 			return;
 		}
-		long KeyID = Ini.FindKey("Items");
+		int KeyID = Ini.FindKey("Items");
 		if (KeyID == cIniFile::noID)
 		{
 			return;
 		}
-		unsigned NumValues = Ini.GetNumValues(KeyID);
-		for (unsigned i = 0; i < NumValues; i++)
+		int NumValues = Ini.GetNumValues(KeyID);
+		for (int i = 0; i < NumValues; i++)
 		{
-			AString Name = Ini.ValueName(KeyID, i);
+			AString Name = Ini.GetValueName(KeyID, i);
 			if (Name.empty())
 			{
 				continue;

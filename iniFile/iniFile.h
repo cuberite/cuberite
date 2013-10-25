@@ -39,17 +39,17 @@ private:
 	
 	struct key
 	{
-		std::vector<std::string> names;
-		std::vector<std::string> values; 
-		std::vector<std::string> comments;
+		std::vector<AString> names;
+		std::vector<AString> values;
+		std::vector<AString> comments;
 	} ;
 	
-	std::vector<key>         keys;
-	std::vector<std::string> names;
-	std::vector<std::string> comments;
+	std::vector<key>     keys;
+	std::vector<AString> names;
+	std::vector<AString> comments;
 	
 	/// If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is
-	std::string CheckCase(const std::string & s) const;
+	AString CheckCase(const AString & s) const;
 
 public:
 	enum errors
@@ -77,54 +77,40 @@ public:
 
 	/// Deletes all stored ini data (but doesn't touch the file)
 	void Clear(void);
-	void Reset(void) { Clear(); }
-	void Erase(void) { Clear(); }  // OBSOLETE, this name is misguiding and will be removed from the interface
 
 	/// Returns index of specified key, or noID if not found
-	long FindKey(const std::string & keyname) const;
+	int FindKey(const AString & keyname) const;
 
 	/// Returns index of specified value, in the specified key, or noID if not found
-	long FindValue(const unsigned keyID, const std::string & valuename) const;
+	int FindValue(const int keyID, const AString & valuename) const;
 
 	/// Returns number of keys currently in the ini
-	unsigned NumKeys   (void) const {return names.size();}
-	unsigned GetNumKeys(void) const {return NumKeys();}
+	int GetNumKeys(void) const { return (int)keys.size(); }
 
 	/// Add a key name
-	unsigned AddKeyName(const std::string & keyname);
+	int AddKeyName(const AString & keyname);
 
 	// Returns key names by index.
-	std::string KeyName(const unsigned keyID) const;
-	std::string GetKeyName(const unsigned keyID) const {return KeyName(keyID);}
+	AString GetKeyName(const int keyID) const;
 
 	// Returns number of values stored for specified key.
-	unsigned NumValues   (const std::string & keyname);
-	unsigned GetNumValues(const std::string & keyname) {return NumValues(keyname);}
-	unsigned NumValues   (const unsigned keyID);
-	unsigned GetNumValues(const unsigned keyID) {return NumValues(keyID);}
+	int GetNumValues(const AString & keyname) const;
+	int GetNumValues(const int keyID) const;
 
 	// Returns value name by index for a given keyname or keyID.
-	std::string ValueName( const std::string & keyname, const unsigned valueID) const;
-	std::string GetValueName( const std::string & keyname, const unsigned valueID) const
-	{
-		return ValueName(keyname, valueID);
-	}
-	std::string ValueName   (const unsigned keyID, const unsigned valueID) const;
-	std::string GetValueName(const unsigned keyID, const unsigned valueID) const
-	{
-		return ValueName(keyID, valueID);
-	}
+	AString GetValueName(const AString & keyname, const int valueID) const;
+	AString GetValueName(const int keyID, const int valueID) const;
 
 	// Gets value of [keyname] valuename =.
 	// Overloaded to return string, int, and double.
 	// Returns defValue if key/value not found.
 	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const;
-	AString GetValue (const unsigned keyID,    const unsigned valueID,    const AString & defValue = "")    const;
+	AString GetValue (const int keyID,    const int valueID,    const AString & defValue = "")    const;
 	double  GetValueF(const AString & keyname, const AString & valuename, const double    defValue = 0)     const;
 	int     GetValueI(const AString & keyname, const AString & valuename, const int       defValue = 0)     const;
 	bool    GetValueB(const AString & keyname, const AString & valuename, const bool      defValue = false) const
 	{
-		return (GetValueI(keyname, valuename, int(defValue)) > 0);
+		return (GetValueI(keyname, valuename, defValue ? 1 : 0) != 0);
 	}
 	
 	// Gets the value; if not found, write the default to the INI file
@@ -133,50 +119,54 @@ public:
 	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0);
 	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false)
 	{
-		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) > 0);
+		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) != 0);
 	}
 
 	// Sets value of [keyname] valuename =.
 	// Specify the optional paramter as false (0) if you do not want it to create
 	// the key if it doesn't exist. Returns true if data entered, false otherwise.
 	// Overloaded to accept string, int, and double.
-	bool SetValue( const unsigned keyID, const unsigned valueID, const std::string & value);
-	bool SetValue( const std::string & keyname, const std::string & valuename, const std::string & value, const bool create = true);
-	bool SetValueI( const std::string & keyname, const std::string & valuename, const int value, const bool create = true);
-	bool SetValueB( const std::string & keyname, const std::string & valuename, const bool value, const bool create = true)
+	bool SetValue( const int keyID, const int valueID, const AString & value);
+	bool SetValue( const AString & keyname, const AString & valuename, const AString & value, const bool create = true);
+	bool SetValueI( const AString & keyname, const AString & valuename, const int value, const bool create = true);
+	bool SetValueB( const AString & keyname, const AString & valuename, const bool value, const bool create = true)
 	{
 		return SetValueI( keyname, valuename, int(value), create);
 	}
-	bool SetValueF( const std::string & keyname, const std::string & valuename, const double value, const bool create = true);
+	bool SetValueF( const AString & keyname, const AString & valuename, const double value, const bool create = true);
 	
 	// tolua_end
 	
-	bool SetValueV( const std::string & keyname, const std::string & valuename, char *format, ...);
+	bool SetValueV( const AString & keyname, const AString & valuename, char *format, ...);
 	
 	// tolua_begin
 
 	// Deletes specified value.
 	// Returns true if value existed and deleted, false otherwise.
-	bool DeleteValueByID( const unsigned keyID, const unsigned valueID );
-	bool DeleteValue( const std::string & keyname, const std::string & valuename);
+	bool DeleteValueByID(const int keyID, const int valueID);
+	bool DeleteValue(const AString & keyname, const AString & valuename);
 
 	// Deletes specified key and all values contained within.
 	// Returns true if key existed and deleted, false otherwise.
-	bool DeleteKey(const std::string & keyname);
+	bool DeleteKey(const AString & keyname);
 
 	// Header comment functions.
 	// Header comments are those comments before the first key.
-	//
-	// Number of header comments.
-	unsigned NumHeaderComments(void) {return comments.size();}
-	// Add a header comment.
-	void     HeaderComment(const std::string & comment);
-	// Return a header comment.
-	std::string   HeaderComment(const unsigned commentID) const;
-	// Delete a header comment.
-	bool     DeleteHeaderComment(unsigned commentID);
-	// Delete all header comments.
-	void     DeleteHeaderComments(void) {comments.clear();}
+
+	/// Get number of header comments
+	int GetNumHeaderComments(void) {return (int)comments.size();}
+	
+	/// Add a header comment
+	void AddHeaderComment(const AString & comment);
+	
+	/// Return a header comment
+	AString GetHeaderComment(const int commentID) const;
+	
+	/// Delete a header comment.
+	bool DeleteHeaderComment(int commentID);
+	
+	/// Delete all header comments.
+	void DeleteHeaderComments(void) {comments.clear();}
 
 
 	// Key comment functions.
@@ -184,26 +174,30 @@ public:
 	// defined within value names will be added to this list. Therefore,
 	// these comments will be moved to the top of the key definition when
 	// the CIniFile::WriteFile() is called.
-	//
-	// Number of key comments.
-	unsigned NumKeyComments( const unsigned keyID) const;
-	unsigned NumKeyComments( const std::string & keyname) const;
+
+	/// Get number of key comments
+	int GetNumKeyComments(const int keyID) const;
+
+	/// Get number of key comments
+	int GetNumKeyComments(const AString & keyname) const;
 	
-	// Add a key comment.
-	bool     KeyComment(const unsigned keyID, const std::string & comment);
-	bool     KeyComment(const std::string & keyname, const std::string & comment);
+	/// Add a key comment
+	bool AddKeyComment(const int keyID, const AString & comment);
+
+	/// Add a key comment
+	bool AddKeyComment(const AString & keyname, const AString & comment);
 	
-	// Return a key comment.
-	std::string   KeyComment(const unsigned keyID, const unsigned commentID) const;
-	std::string   KeyComment(const std::string & keyname, const unsigned commentID) const;
+	/// Return a key comment
+	AString GetKeyComment(const int keyID, const int commentID) const;
+	AString GetKeyComment(const AString & keyname, const int commentID) const;
 	
 	// Delete a key comment.
-	bool     DeleteKeyComment(const unsigned keyID, const unsigned commentID);
-	bool     DeleteKeyComment(const std::string & keyname, const unsigned commentID);
+	bool DeleteKeyComment(const int keyID, const int commentID);
+	bool DeleteKeyComment(const AString & keyname, const int commentID);
 	
 	// Delete all comments for a key.
-	bool     DeleteKeyComments(const unsigned keyID);
-	bool     DeleteKeyComments(const std::string & keyname);
+	bool DeleteKeyComments(const int keyID);
+	bool DeleteKeyComments(const AString & keyname);
 };
 
 // tolua_end
