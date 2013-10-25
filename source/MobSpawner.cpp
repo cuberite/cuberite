@@ -149,7 +149,6 @@ bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType,
 						((a_BlockType_below == E_BLOCK_GRASS) || (a_BlockType_below == E_BLOCK_LEAVES)) && (a_Level >= 62) && (m_Random.NextInt(3,a_Biome) != 0);
 
 			case cMonster::mtEnderman:
-				return false;
 			case cMonster::mtCreeper:
 			case cMonster::mtZombie:
 			case cMonster::mtSpider:
