@@ -1,10 +1,43 @@
+
+-- chunkworx_web.lua
+
+-- WebAdmin-related functions
+
+
+
+
+
 local function Buttons_Player( Name )
 	return "<form method='POST'><input type='hidden' name='PlayerName' value='"..Name.."'><input type='submit' name='PlayerExact' value='Exact'><input type='submit' name='Player3x3' value='3x3'></form>"
 end
 
+
+
+
+
 local function Button_World( Name )
 	return "<form method='POST'><input type='hidden' name='WorldName' value='"..Name.."'><input type='submit' name='SelectWorld' value='Select'></form>"
 end
+
+
+
+
+
+local function SaveSettings()
+	local SettingsIni = cIniFile()
+	SettingsIni:SetValueI("Area data",   "StartX",  AreaStartX)
+	SettingsIni:SetValueI("Area data",   "StartZ",  AreaStartZ)
+	SettingsIni:SetValueI("Area data",   "EndX",    AreaEndX)
+	SettingsIni:SetValueI("Area data",   "EndZ",    AreaEndZ)
+	SettingsIni:SetValueI("Radial data", "RadialX", RadialX)
+	SettingsIni:SetValueI("Radial data", "RadialZ", RadialZ)
+	SettingsIni:SetValueI("Radial data", "Radius",  Radius)
+	SettingsIni:WriteFile("ChunkWorx.ini")
+end
+
+
+
+
 
 function HandleRequest_Generation( Request )
 	local Content = ""
@@ -69,21 +102,12 @@ function HandleRequest_Generation( Request )
 					AreaStartZ = tonumber(Request.PostParams["FormAreaStartZ"])
 					AreaEndX = tonumber(Request.PostParams["FormAreaEndX"])
 					AreaEndZ = tonumber(Request.PostParams["FormAreaEndZ"])
-					
-					PLUGIN.IniFile:DeleteValue("Area data", "StartX")
-					PLUGIN.IniFile:DeleteValue("Area data", "StartZ")
-					PLUGIN.IniFile:DeleteValue("Area data", "EndX")
-					PLUGIN.IniFile:DeleteValue("Area data", "EndZ")
-					PLUGIN.IniFile:SetValueI("Area data", "StartX", AreaStartX)
-					PLUGIN.IniFile:SetValueI("Area data", "StartZ", AreaStartZ)
-					PLUGIN.IniFile:SetValueI("Area data", "EndX", AreaEndX)
-					PLUGIN.IniFile:SetValueI("Area data", "EndZ", AreaEndZ)
+					SaveSettings();
 					if (OPERATION_CODE == 0) then
 						GENERATION_STATE = 1
 					elseif (OPERATION_CODE == 1) then
 						GENERATION_STATE = 3
 					end
-					PLUGIN.IniFile:WriteFile()
 					Content = ProcessingContent()
 					return Content
 				end
@@ -93,26 +117,19 @@ function HandleRequest_Generation( Request )
 			and Request.PostParams["FormRadius"] ~= nil ) then	--(Re)Generation valid!
 				-- COMMON (Re)gen
 				if( Request.PostParams["StartRadial"]) then
-					RadialX =  tonumber(Request.PostParams["FormRadialX"])
-					RadialZ =  tonumber(Request.PostParams["FormRadialZ"])
-					Radius =  tonumber(Request.PostParams["FormRadius"])
+					RadialX = tonumber(Request.PostParams["FormRadialX"]) or 0
+					RadialZ = tonumber(Request.PostParams["FormRadialZ"]) or 0
+					Radius =  tonumber(Request.PostParams["FormRadius"])  or 10
 					AreaStartX = RadialX - Radius
 					AreaStartZ = RadialZ - Radius
 					AreaEndX = RadialX + Radius
 					AreaEndZ = RadialZ + Radius
-					
-					PLUGIN.IniFile:DeleteValue("Radial data", "RadialX")
-					PLUGIN.IniFile:DeleteValue("Radial data", "RadialZ")
-					PLUGIN.IniFile:DeleteValue("Radial data", "Radius")
-					PLUGIN.IniFile:SetValueI("Radial data", "RadialX", RadialX)
-					PLUGIN.IniFile:SetValueI("Radial data", "RadialZ", RadialZ)
-					PLUGIN.IniFile:SetValueI("Radial data", "Radius", Radius)
+					SaveSettings()
 					if (OPERATION_CODE == 0) then
 						GENERATION_STATE = 1
 					elseif (OPERATION_CODE == 1) then
 						GENERATION_STATE = 3
 					end
-					PLUGIN.IniFile:WriteFile()
 					Content = ProcessingContent()
 					return Content
 				end
@@ -214,7 +231,7 @@ function HandleRequest_Generation( Request )
 		Content = Content .. "</form>"
 		
 		-- SELECTING RADIAL
-		Content = Content .. "<h4>Radial:   </h4>Center X, Center Z, Raduis (0 to any)"
+		Content = Content .. "<h4>Radial:   </h4>Center X, Center Z, Radius"
 		Content = Content .. "<form method='POST'>"
 		Content = Content .. "<input type='text' name='FormRadialX' value='" .. RadialX .. "'><input type='text' name='FormRadialZ' value='" .. RadialZ .. "'><input type='text' name='FormRadius' value='" .. Radius .. "'>"
 		Content = Content .. "<input type='submit' name='StartRadial' value='Start'>"
