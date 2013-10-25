@@ -18,7 +18,7 @@ public:
 
 	virtual void OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
-		a_BlockY--; // Because we want block below fire
+		a_BlockY--; // Because we want the block below the fire
 		HandeNetherPortal(a_BlockX, a_BlockY, a_BlockZ, a_World);
 	}
 
@@ -42,209 +42,142 @@ public:
 		return "step.wood";
 	}
 
-	
-
-	inline static void HandeNetherPortal(int X, int Y, int Z, cWorld * a_World)
+	inline static void HandeNetherPortal(int X, int Y, int Z, cWorld * a_World) // Brought to you by Aperture Science
 	{
-		static const struct
+		static const struct // Define a base template for checking portal-eligibility
 		{
-			int x, y, z;
-		} Portal1Block1[] =
+			int xz, y;
+		} PortalTemplate[] =
 		{
-			{-1, 0,  0},
-			{-2, 1,  0},
-			{-2, 2,  0},
-			{-2, 3,  0},
-			{-1, 4,  0},
-			{ 0, 4,  0},
-			{ 1, 1,  0},
-			{ 1, 2,  0},
-			{ 1, 3,  0},
+			{-1, 0},
+			{-2, 1},
+			{-2, 2},
+			{-2, 3},
+			{-1, 4},
+			{ 0, 4},
+			{ 1, 1},
+			{ 1, 2},
+			{ 1, 3},
 		} ;
 
-		static const struct
-		{
-			int x, y, z;
-		} Portal1Block2[] =
-		{
-			{ 1, 0,  0},
-			{ 2, 1,  0},
-			{ 2, 2,  0},
-			{ 2, 3,  0},
-			{ 1, 4,  0},
-			{ 0, 4,  0},
-			{-1, 1,  0},
-			{-1, 2,  0},
-			{-1, 3,  0},
-		} ;
-
-		static const struct
-		{
-			int x, y, z;
-		} Portal2Block1[] =
-		{
-			{ 0, 0, -1},
-			{ 0, 1, -2},
-			{ 0, 2, -2},
-			{ 0, 3, -2},
-			{ 0, 4, -1},
-			{ 0, 4,  0},
-			{ 0, 1,  1},
-			{ 0, 2,  1},
-			{ 0, 3,  1},
-		} ;
-
-		static const struct
-		{
-			int x, y, z;
-		} Portal2Block2[] =
-		{
-			{ 0, 0,  1},
-			{ 0, 1,  2},
-			{ 0, 2,  2},
-			{ 0, 3,  2},
-			{ 0, 4,  1},
-			{ 0, 4,  0},
-			{ 0, 1, -1},
-			{ 0, 2, -1},
-			{ 0, 3, -1},
-		} ;
-
-		bool AllObsidian = false;
+		const int NumberOfDirections = 4; // How many cases we have to check, basically
+		const int TemplateCount = ARRAYCOUNT(PortalTemplate);
 		int PortalNumber = 0;
 		int PortalBlock = 0;
 
-		bool Portal1Block1Success = true;
-		for (int i = 0; i < ARRAYCOUNT(Portal1Block1); i++)
+		for (int i = 0; i < NumberOfDirections; i++)
 		{
-			if (a_World->GetBlock(X + Portal1Block1[i].x, Y + Portal1Block1[i].y, Z + Portal1Block1[i].z) != E_BLOCK_OBSIDIAN)
+			switch (i)
 			{
-				Portal1Block1Success = false; // Wasn't complete frame, abort
-				break;
+				case 0:
+				{
+					for (int x = 0; x < TemplateCount; x++)
+					{
+						if (a_World->GetBlock(X + PortalTemplate[x].xz, Y + PortalTemplate[x].y, Z) != E_BLOCK_OBSIDIAN)
+						{
+							goto nexti; // Because gotos are underused but secretly awesome
+						}
+					}
+					PortalNumber = 1; PortalBlock = 1; // No goto break, we have an eligible portal frame!
+					break;
+				}
+				case 1:
+				{
+					for (int x = 0; x < TemplateCount; x++)
+					{
+						if (a_World->GetBlock(X - PortalTemplate[x].xz, Y + PortalTemplate[x].y, Z) != E_BLOCK_OBSIDIAN)
+						{
+							goto nexti;
+						}
+					}
+					PortalNumber = 1; PortalBlock = 2;
+					break;
+				}
+				case 2:
+				{
+					for (int x = 0; x < TemplateCount; x++)
+					{
+						if (a_World->GetBlock(X, Y + PortalTemplate[x].y, Z + PortalTemplate[x].xz) != E_BLOCK_OBSIDIAN)
+						{
+							goto nexti;
+						}
+					}
+					PortalNumber = 2; PortalBlock = 1;
+					break;
+				}
+				case 3:
+				{
+					for (int x = 0; x < TemplateCount; x++)
+					{
+						if (a_World->GetBlock(X, Y + PortalTemplate[x].y, Z - PortalTemplate[x].xz) != E_BLOCK_OBSIDIAN)
+						{
+							goto nexti;
+						}
+					}
+					PortalNumber = 2; PortalBlock = 2;
+					break;
+				}
 			}
-		}
-		if (Portal1Block1Success)
-		{
-			AllObsidian = true;
-			PortalNumber = 1;
-			PortalBlock = 1;
+
+		nexti:
+			continue;
 		}
 
-		bool Portal1Block2Success = true;
-		for (int i = 0; i < ARRAYCOUNT(Portal1Block2); i++)
-		{
-			if (a_World->GetBlock(X + Portal1Block2[i].x, Y + Portal1Block2[i].y, Z + Portal1Block2[i].z) != E_BLOCK_OBSIDIAN)
-			{
-				Portal1Block2Success = false;
-				break;
-			}
-		}
-		if (Portal1Block2Success)
-		{
-			AllObsidian = true;
-			PortalNumber = 1;
-			PortalBlock = 2;
-		}
-
-		bool Portal2Block1Success = true;
-		for (int i = 0; i < ARRAYCOUNT(Portal2Block1); i++)
-		{
-			if (a_World->GetBlock(X + Portal2Block1[i].x, Y + Portal2Block1[i].y, Z + Portal2Block1[i].z) != E_BLOCK_OBSIDIAN)
-			{
-				Portal2Block1Success = false;
-				break;
-			}
-		}
-		if (Portal2Block1Success)
-		{
-			AllObsidian = true;
-			PortalNumber = 2;
-			PortalBlock = 1;
-		}
-
-		bool Portal2Block2Success = true;
-		for (int i = 0; i < ARRAYCOUNT(Portal2Block2); i++)
-		{
-			if (a_World->GetBlock(X + Portal2Block2[i].x, Y + Portal2Block2[i].y, Z + Portal2Block2[i].z) != E_BLOCK_OBSIDIAN)
-			{
-				Portal2Block2Success = false;
-				break;
-			}
-		}
-		if (Portal2Block2Success)
-		{
-			AllObsidian = true;
-			PortalNumber = 2;
-			PortalBlock = 2;
-		}
-
-		if (AllObsidian)
+		if ((PortalNumber != 0) && (PortalBlock != 0))
 		{
 			SetPortalBlocks(X, Y, Z, PortalNumber, PortalBlock, a_World);
 		}
 	}
 
-
 	inline static void SetPortalBlocks(int X, int Y, int Z, int a_PortalType, int a_PortalBlock, cWorld * a_World)
 	{
+		static const struct
+		{
+			int xz, y;
+		} PortalSetTemplate[] =
+		{
+			{ 0, 1},
+			{ 0, 2},
+			{ 0, 3},
+			{-1, 1},
+			{-1, 2},
+			{-1, 3},
+		};
+
+		const int TemplateCount = ARRAYCOUNT(PortalSetTemplate);
+
 		if (a_PortalType == 1)
 		{
 			if (a_PortalBlock == 1)
 			{
-				static const struct
+				for (int i = 0; i < TemplateCount; i++)
 				{
-					int x, y, z;
-				} Portal1Block1Set[] =
-				{
-					{ 0, 1,  0},
-					{ 0, 2,  0},
-					{ 0, 3,  0},
-					{-1, 1,  0},
-					{-1, 2,  0},
-					{-1, 3,  0},
-				} ;
-
-				for (int i = 0; i < ARRAYCOUNT(Portal1Block1Set); i++)
-				{
-					BLOCKTYPE InsideBlock = a_World->GetBlock(X + Portal1Block1Set[i].x, Y + Portal1Block1Set[i].y, Z + Portal1Block1Set[i].z);
+					BLOCKTYPE InsideBlock = a_World->GetBlock(X + PortalSetTemplate[i].xz, Y + PortalSetTemplate[i].y, Z);
 					if ((InsideBlock != E_BLOCK_AIR) && (InsideBlock != E_BLOCK_FIRE))
 					{
 						return; // Interior of frame wasn't empty, abort
 					}
 				}
-				for (int i = 0; i < ARRAYCOUNT(Portal1Block1Set); i++)
+				for (int i = 0; i < TemplateCount; i++)
 				{
 					// Meta doesn't do anything on client, but tells server what direction portal block is
 					// This is to allow the server to check for invalid positionings
-					a_World->SetBlock(X + Portal1Block1Set[i].x, Y + Portal1Block1Set[i].y, Z + Portal1Block1Set[i].z, E_BLOCK_NETHER_PORTAL, 1);
+					a_World->SetBlock(X + PortalSetTemplate[i].xz, Y + PortalSetTemplate[i].y, Z, E_BLOCK_NETHER_PORTAL, 1);
 				}
 			}
 			else if (a_PortalBlock == 2)
 			{
-				static const struct
+				for (int i = 0; i < TemplateCount; i++)
 				{
-					int x, y, z;
-				} Portal1Block2Set[] =
-				{
-					{ 0, 1,  0},
-					{ 0, 2,  0},
-					{ 0, 3,  0},
-					{ 1, 1,  0},
-					{ 1, 2,  0},
-					{ 1, 3,  0},
-				} ;
-
-				for (int i = 0; i < ARRAYCOUNT(Portal1Block2Set); i++)
-				{
-					BLOCKTYPE InsideBlock = a_World->GetBlock(X + Portal1Block2Set[i].x, Y + Portal1Block2Set[i].y, Z + Portal1Block2Set[i].z);
+					BLOCKTYPE InsideBlock = a_World->GetBlock(X - PortalSetTemplate[i].xz, Y + PortalSetTemplate[i].y, Z);
 					if ((InsideBlock != E_BLOCK_AIR) && (InsideBlock != E_BLOCK_FIRE))
 					{
 						return;
 					}
 				}
-				for (int i = 0; i < ARRAYCOUNT(Portal1Block2Set); i++)
+				for (int i = 0; i < TemplateCount; i++)
 				{
-					a_World->SetBlock(X + Portal1Block2Set[i].x, Y + Portal1Block2Set[i].y, Z + Portal1Block2Set[i].z, E_BLOCK_NETHER_PORTAL, 1);
+					a_World->SetBlock(X - PortalSetTemplate[i].xz, Y + PortalSetTemplate[i].y, Z, E_BLOCK_NETHER_PORTAL, 1);
 				}
 			}
 			else { ASSERT(!"Bad nether portal bottom clicked block!"); return; }
@@ -253,58 +186,32 @@ public:
 		{
 			if (a_PortalBlock == 1)
 			{
-				static const struct
+				for (int i = 0; i < TemplateCount; i++)
 				{
-					int x, y, z;
-				} Portal2Block1Set[] =
-				{
-					{ 0, 1,  0},
-					{ 0, 2,  0},
-					{ 0, 3,  0},
-					{ 0, 1, -1},
-					{ 0, 2, -1},
-					{ 0, 3, -1},
-				} ;
-
-				for (int i = 0; i < ARRAYCOUNT(Portal2Block1Set); i++)
-				{
-					BLOCKTYPE InsideType = a_World->GetBlock(X + Portal2Block1Set[i].x, Y + Portal2Block1Set[i].y, Z + Portal2Block1Set[i].z);
-					if ((InsideType != E_BLOCK_AIR) && (InsideType != E_BLOCK_FIRE))
-					{
-						return;
-					}
-				}
-				for (int i = 0; i < ARRAYCOUNT(Portal2Block1Set); i++)
-				{
-					a_World->SetBlock(X + Portal2Block1Set[i].x, Y + Portal2Block1Set[i].y, Z + Portal2Block1Set[i].z, E_BLOCK_NETHER_PORTAL, 2);
-				}
-			}
-			else if (a_PortalBlock == 2)
-			{
-				static const struct
-				{
-					int x, y, z;
-				} Portal2Block2Set[] =
-				{
-					{ 0, 1,  0},
-					{ 0, 2,  0},
-					{ 0, 3,  0},
-					{ 0, 1,  1},
-					{ 0, 2,  1},
-					{ 0, 3,  1},
-				} ;
-
-				for (int i = 0; i < ARRAYCOUNT(Portal2Block2Set); i++)
-				{
-					BLOCKTYPE InsideBlock = a_World->GetBlock(X + Portal2Block2Set[i].x, Y + Portal2Block2Set[i].y, Z + Portal2Block2Set[i].z);
+					BLOCKTYPE InsideBlock = a_World->GetBlock(X, Y + PortalSetTemplate[i].y, Z + PortalSetTemplate[i].xz);
 					if ((InsideBlock != E_BLOCK_AIR) && (InsideBlock != E_BLOCK_FIRE))
 					{
 						return;
 					}
 				}
-				for (int i = 0; i < ARRAYCOUNT(Portal2Block2Set); i++)
+				for (int i = 0; i < TemplateCount; i++)
 				{
-					a_World->SetBlock(X + Portal2Block2Set[i].x, Y + Portal2Block2Set[i].y, Z + Portal2Block2Set[i].z, E_BLOCK_NETHER_PORTAL, 2);
+					a_World->SetBlock(X, Y + PortalSetTemplate[i].y, Z + PortalSetTemplate[i].xz, E_BLOCK_NETHER_PORTAL, 2);
+				}
+			}
+			else if (a_PortalBlock == 2)
+			{
+				for (int i = 0; i < TemplateCount; i++)
+				{
+					BLOCKTYPE InsideBlock = a_World->GetBlock(X, Y + PortalSetTemplate[i].y, Z - PortalSetTemplate[i].xz);
+					if ((InsideBlock != E_BLOCK_AIR) && (InsideBlock != E_BLOCK_FIRE))
+					{
+						return;
+					}
+				}
+				for (int i = 0; i < TemplateCount; i++)
+				{
+					a_World->SetBlock(X, Y + PortalSetTemplate[i].y, Z - PortalSetTemplate[i].xz, E_BLOCK_NETHER_PORTAL, 2);
 				}
 			}
 			else { ASSERT(!"Bad nether portal bottom clicked block!"); return; }
