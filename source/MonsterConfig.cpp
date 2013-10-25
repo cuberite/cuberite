@@ -55,9 +55,9 @@ cMonsterConfig::~cMonsterConfig()
 
 void cMonsterConfig::Initialize()
 {
-	cIniFile MonstersIniFile("monsters.ini");
+	cIniFile MonstersIniFile;
 	
-	if (!MonstersIniFile.ReadFile())
+	if (!MonstersIniFile.ReadFile("monsters.ini"))
 	{
 		LOGWARNING("%s: Cannot read monsters.ini file, monster attributes not available", __FUNCTION__);
 		return;

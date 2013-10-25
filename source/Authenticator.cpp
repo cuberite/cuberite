@@ -47,8 +47,8 @@ cAuthenticator::~cAuthenticator()
 /// Read custom values from INI
 void cAuthenticator::ReadINI(void)
 {
-	cIniFile IniFile("settings.ini");
-	if (!IniFile.ReadFile())
+	cIniFile IniFile;
+	if (!IniFile.ReadFile("settings.ini"))
 	{
 		return;
 	}
@@ -74,7 +74,7 @@ void cAuthenticator::ReadINI(void)
 	if (bSave)
 	{
 		IniFile.SetValueB("Authentication", "Authenticate", m_ShouldAuthenticate);
-		IniFile.WriteFile();
+		IniFile.WriteFile("settings.ini");
 	}
 }
 

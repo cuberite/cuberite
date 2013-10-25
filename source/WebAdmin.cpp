@@ -44,8 +44,7 @@ public:
 
 cWebAdmin::cWebAdmin(void) :
 	m_IsInitialized(false),
-	m_TemplateScript("<webadmin_template>"),
-	m_IniFile("webadmin.ini")
+	m_TemplateScript("<webadmin_template>")
 {
 }
 
@@ -86,18 +85,18 @@ void cWebAdmin::RemovePlugin( cWebPlugin * a_Plugin )
 
 bool cWebAdmin::Init(void)
 {
-	if (!m_IniFile.ReadFile())
+	if (!m_IniFile.ReadFile("webadmin.ini"))
 	{
 		return false;
 	}
-
-	LOG("Initialising WebAdmin...");
 
 	if (!m_IniFile.GetValueSetB("WebAdmin", "Enabled", true))
 	{
 		// WebAdmin is disabled, bail out faking a success
 		return true;
 	}
+
+	LOG("Initialising WebAdmin...");
 
 	AString PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
 	AString PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");

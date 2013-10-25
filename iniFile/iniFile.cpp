@@ -42,17 +42,16 @@ using namespace std;
 
 
 
-cIniFile::cIniFile(const string & a_Path) :
+cIniFile::cIniFile(void) :
 	m_IsCaseInsensitive(true)
 {
-	Path(a_Path);
 }
 
 
 
 
 
-bool cIniFile::ReadFile(bool a_AllowExampleRedirect)
+bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 {
 	// Normally you would use ifstream, but the SGI CC compiler has
 	// a few bugs with ifstream. So ... fstream used.
@@ -62,14 +61,14 @@ bool cIniFile::ReadFile(bool a_AllowExampleRedirect)
 	string::size_type pLeft, pRight;
 	bool IsFromExampleRedirect = false;
 	
-	f.open((FILE_IO_PREFIX + m_Path).c_str(), ios::in);
+	f.open((FILE_IO_PREFIX + a_FileName).c_str(), ios::in);
 	if (f.fail())
 	{
 		f.clear();
 		if (a_AllowExampleRedirect)
 		{
 			// Retry with the .example.ini file instead of .ini:
-			string ExPath(m_Path.substr(0, m_Path.length() - 4));
+			string ExPath(a_FileName.substr(0, a_FileName.length() - 4));
 			ExPath.append(".example.ini");
 			f.open((FILE_IO_PREFIX + ExPath).c_str(), ios::in);
 			if (f.fail())
@@ -166,7 +165,7 @@ bool cIniFile::ReadFile(bool a_AllowExampleRedirect)
 	
 	if (IsFromExampleRedirect)
 	{
-		WriteFile();
+		WriteFile(FILE_IO_PREFIX + a_FileName);
 	}
 	return true;
 }
@@ -175,14 +174,14 @@ bool cIniFile::ReadFile(bool a_AllowExampleRedirect)
 
 
 
-bool cIniFile::WriteFile(void) const
+bool cIniFile::WriteFile(const AString & a_FileName) const
 {
 	unsigned commentID, keyID, valueID;
 	// Normally you would use ofstream, but the SGI CC compiler has
 	// a few bugs with ofstream. So ... fstream used.
 	fstream f;
 
-	f.open((FILE_IO_PREFIX + m_Path).c_str(), ios::out);
+	f.open((FILE_IO_PREFIX + a_FileName).c_str(), ios::out);
 	if (f.fail())
 	{
 		return false;

@@ -42,8 +42,8 @@ class cBlockIDMap
 public:
 	cBlockIDMap(void)
 	{
-		cIniFile Ini("items.ini");
-		if (!Ini.ReadFile())
+		cIniFile Ini;
+		if (!Ini.ReadFile("items.ini"))
 		{
 			return;
 		}

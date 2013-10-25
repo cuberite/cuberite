@@ -36,7 +36,6 @@ class cIniFile
 {
 private:
 	bool        m_IsCaseInsensitive;
-	std::string m_Path;
 	
 	struct key
 	{
@@ -58,28 +57,23 @@ public:
 		noID = -1,
 	};
 	
-	/// Creates a new instance; sets m_Path to a_Path, but doesn't read the file
-	cIniFile(const std::string & a_Path = "");
+	/// Creates a new instance with no data
+	cIniFile(void);
 
 	// Sets whether or not keynames and valuenames should be case sensitive.
 	// The default is case insensitive.
 	void CaseSensitive  (void) { m_IsCaseInsensitive = false; }
 	void CaseInsensitive(void) { m_IsCaseInsensitive = true; }
 
-	// Sets path of ini file to read and write from.
-	void Path(const std::string & newPath)    {m_Path = newPath;}
-	const std::string & Path(void) const      {return m_Path;}
-	void SetPath(const std::string & newPath) {Path(newPath);}
-
-	/** Reads the ini file specified in m_Path
+	/** Reads the contents of the specified ini file
 	If the file doesn't exist and a_AllowExampleRedirect is true, tries to read <basename>.example.ini, and
 	writes its contents as <basename>.ini, if successful.
 	Returns true if successful, false otherwise.
 	*/
-	bool ReadFile(bool a_AllowExampleRedirect = true);
+	bool ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect = true);
 
-	/// Writes data stored in class to ini file specified in m_Path
-	bool WriteFile(void) const;
+	/// Writes data stored in class to the specified ini file
+	bool WriteFile(const AString & a_FileName) const;
 
 	/// Deletes all stored ini data (but doesn't touch the file)
 	void Clear(void);

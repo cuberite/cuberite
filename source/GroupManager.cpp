@@ -44,8 +44,8 @@ cGroupManager::cGroupManager()
 	: m_pState( new sGroupManagerState )
 {
 	LOGD("-- Loading Groups --");
-	cIniFile IniFile("groups.ini");
-	if (!IniFile.ReadFile())
+	cIniFile IniFile;
+	if (!IniFile.ReadFile("groups.ini"))
 	{
 		LOGWARNING("groups.ini inaccessible, no groups are defined");
 		return;

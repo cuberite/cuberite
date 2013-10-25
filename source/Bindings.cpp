@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/24/13 16:43:14.
+** Generated automatically by tolua++-1.0.92 on 10/25/13 10:38:50.
 */
 
 #ifndef __cplusplus
@@ -345,59 +345,6 @@ static int tolua_AllToLua_cIniFile_new00_local(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: new of class  cIniFile */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_new01
-static int tolua_AllToLua_cIniFile_new01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  const std::string a_Path = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  {
-   cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)(a_Path));
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
-   tolua_pushcppstring(tolua_S,(const char*)a_Path);
-  }
- }
- return 2;
-tolua_lerror:
- return tolua_AllToLua_cIniFile_new00(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  cIniFile */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_new01_local
-static int tolua_AllToLua_cIniFile_new01_local(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  const std::string a_Path = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  {
-   cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)(a_Path));
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-   tolua_pushcppstring(tolua_S,(const char*)a_Path);
-  }
- }
- return 2;
-tolua_lerror:
- return tolua_AllToLua_cIniFile_new00_local(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: CaseSensitive of class  cIniFile */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_CaseSensitive00
 static int tolua_AllToLua_cIniFile_CaseSensitive00(lua_State* tolua_S)
@@ -460,101 +407,6 @@ static int tolua_AllToLua_cIniFile_CaseInsensitive00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: Path of class  cIniFile */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_Path00
-static int tolua_AllToLua_cIniFile_Path00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
-  const std::string newPath = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Path'", NULL);
-#endif
-  {
-   self->Path(newPath);
-   tolua_pushcppstring(tolua_S,(const char*)newPath);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Path'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Path of class  cIniFile */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_Path01
-static int tolua_AllToLua_cIniFile_Path01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Path'", NULL);
-#endif
-  {
-   const std::string tolua_ret = (const std::string)  self->Path();
-   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
-  }
- }
- return 1;
-tolua_lerror:
- return tolua_AllToLua_cIniFile_Path00(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: SetPath of class  cIniFile */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_SetPath00
-static int tolua_AllToLua_cIniFile_SetPath00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
-  const std::string newPath = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetPath'", NULL);
-#endif
-  {
-   self->SetPath(newPath);
-   tolua_pushcppstring(tolua_S,(const char*)newPath);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetPath'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: ReadFile of class  cIniFile */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_ReadFile00
 static int tolua_AllToLua_cIniFile_ReadFile00(lua_State* tolua_S)
@@ -563,24 +415,27 @@ static int tolua_AllToLua_cIniFile_ReadFile00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
-  bool a_AllowExampleRedirect = ((bool)  tolua_toboolean(tolua_S,2,true));
+  const AString a_FileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  bool a_AllowExampleRedirect = ((bool)  tolua_toboolean(tolua_S,3,true));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ReadFile'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->ReadFile(a_AllowExampleRedirect);
+   bool tolua_ret = (bool)  self->ReadFile(a_FileName,a_AllowExampleRedirect);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_FileName);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ReadFile'.",&tolua_err);
@@ -597,22 +452,25 @@ static int tolua_AllToLua_cIniFile_WriteFile00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_FileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'WriteFile'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->WriteFile();
+   bool tolua_ret = (bool)  self->WriteFile(a_FileName);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_FileName);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'WriteFile'.",&tolua_err);
@@ -29487,14 +29345,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_AllToLua_cIniFile_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cIniFile_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cIniFile_new00_local);
-   tolua_function(tolua_S,"new",tolua_AllToLua_cIniFile_new01);
-   tolua_function(tolua_S,"new_local",tolua_AllToLua_cIniFile_new01_local);
-   tolua_function(tolua_S,".call",tolua_AllToLua_cIniFile_new01_local);
    tolua_function(tolua_S,"CaseSensitive",tolua_AllToLua_cIniFile_CaseSensitive00);
    tolua_function(tolua_S,"CaseInsensitive",tolua_AllToLua_cIniFile_CaseInsensitive00);
-   tolua_function(tolua_S,"Path",tolua_AllToLua_cIniFile_Path00);
-   tolua_function(tolua_S,"Path",tolua_AllToLua_cIniFile_Path01);
-   tolua_function(tolua_S,"SetPath",tolua_AllToLua_cIniFile_SetPath00);
    tolua_function(tolua_S,"ReadFile",tolua_AllToLua_cIniFile_ReadFile00);
    tolua_function(tolua_S,"WriteFile",tolua_AllToLua_cIniFile_WriteFile00);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cIniFile_Clear00);
