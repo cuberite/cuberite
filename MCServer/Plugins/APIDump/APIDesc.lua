@@ -1716,9 +1716,10 @@ a_Player:OpenWindow(Window);
 				GetAge = { Params = "", Return = "number", Notes = "Returns the number of ticks that the pickup has existed." },
 				GetItem = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item represented by this pickup" },
 				IsCollected = { Params = "", Return = "bool", Notes = "Returns true if this pickup has already been collected (is waiting to be destroyed)" },
+				IsPlayerCreated = { Params = "", Return = "bool", Notes = "Returns true if the pickup was created by a player" },
 			},
 			Inherits = "cEntity",
-		},
+		},  -- cPickup
 
 		cPlayer =
 		{
