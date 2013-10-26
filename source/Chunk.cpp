@@ -549,7 +549,9 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 					{
 						int WorldX, WorldY, WorldZ;
 						PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
-						newMob->SetPosition(WorldX, WorldY, WorldZ);
+						double ActualX = WorldX + 0.5;
+						double ActualZ = WorldZ + 0.5;
+						newMob->SetPosition(ActualX, WorldY, ActualZ);
 						LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
 						NumberOfSuccess++;
 					}
