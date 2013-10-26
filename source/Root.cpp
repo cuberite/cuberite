@@ -116,8 +116,8 @@ void cRoot::Start(void)
 		m_Server = new cServer();
 
 		LOG("Reading server config...");
-		cIniFile IniFile("settings.ini");
-		if (!IniFile.ReadFile())
+		cIniFile IniFile;
+		if (!IniFile.ReadFile("settings.ini"))
 		{
 			LOGWARNING("settings.ini inaccessible, all settings are reset to default values");
 		}
@@ -138,7 +138,7 @@ void cRoot::Start(void)
 			LOGERROR("Failure starting server, aborting...");
 			return;
 		}
-		IniFile.WriteFile();
+		IniFile.WriteFile("settings.ini");
 
 		m_WebAdmin = new cWebAdmin();
 		m_WebAdmin->Init();
@@ -247,7 +247,8 @@ void cRoot::LoadGlobalSettings()
 
 void cRoot::LoadWorlds(void)
 {
-	cIniFile IniFile("settings.ini"); IniFile.ReadFile();
+	cIniFile IniFile;
+	IniFile.ReadFile("settings.ini");  // Doesn't matter if success or not
 
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");

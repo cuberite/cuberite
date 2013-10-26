@@ -75,8 +75,6 @@ bool cChunkGenerator::Start(cWorld * a_World, cIniFile & a_IniFile)
 	
 	m_Generator->Initialize(a_World, a_IniFile);
 	
-	a_IniFile.WriteFile();
-	
 	return super::Start();
 }
 
