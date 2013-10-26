@@ -37,13 +37,13 @@ public:
 	~cAuthenticator();
 
 	/// (Re-)read server and address from INI:
-	void ReadINI(void);
+	void ReadINI(cIniFile IniFile);
 
 	/// Queues a request for authenticating a user. If the auth fails, the user is kicked
 	void Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash);
 
 	/// Starts the authenticator thread. The thread may be started and stopped repeatedly
-	void Start(void);
+	void Start(cIniFile IniFile);
 	
 	/// Stops the authenticator thread. The thread may be started and stopped repeatedly
 	void Stop(void);
