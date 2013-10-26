@@ -153,19 +153,19 @@ public:
 	// Header comment functions.
 	// Header comments are those comments before the first key.
 
-	/// Get number of header comments
+	/// Returns the number of header comments
 	int GetNumHeaderComments(void) {return (int)comments.size();}
 	
-	/// Add a header comment
+	/// Adds a header comment
 	void AddHeaderComment(const AString & comment);
 	
-	/// Return a header comment
+	/// Returns a header comment, or empty string if out of range
 	AString GetHeaderComment(const int commentID) const;
 	
-	/// Delete a header comment.
+	/// Deletes a header comment. Returns true if successful
 	bool DeleteHeaderComment(int commentID);
 	
-	/// Delete all header comments.
+	/// Deletes all header comments
 	void DeleteHeaderComments(void) {comments.clear();}
 
 
