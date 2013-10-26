@@ -1224,11 +1224,11 @@ void cPlayer::LoadPermissionsFromDisk()
 	m_Groups.clear();
 	m_Permissions.clear();
 
-	cIniFile IniFile("users.ini");
-	if( IniFile.ReadFile() )
+	cIniFile IniFile;
+	if (IniFile.ReadFile("users.ini"))
 	{
 		std::string Groups = IniFile.GetValue(m_PlayerName, "Groups", "");
-		if( Groups.size() > 0 )
+		if (!Groups.empty())
 		{
 			AStringVector Split = StringSplit( Groups, "," );
 			for( unsigned int i = 0; i < Split.size(); i++ )
@@ -1245,7 +1245,7 @@ void cPlayer::LoadPermissionsFromDisk()
 	}
 	else
 	{
-		LOGWARN("WARNING: Failed to read ini file users.ini");
+		LOGWARN("Failed to read the users.ini file. The player will be added only to the Default group.");
 		AddToGroup("Default");
 	}
 	ResolvePermissions();

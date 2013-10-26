@@ -444,8 +444,8 @@ void cWorld::Start(void)
 	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
 	m_GameMode = eGameMode_Creative;
 
-	cIniFile IniFile(m_IniFileName);
-	if (!IniFile.ReadFile())
+	cIniFile IniFile;
+	if (!IniFile.ReadFile(m_IniFileName))
 	{
 		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
 	}
@@ -555,7 +555,7 @@ void cWorld::Start(void)
 
 
 	// Save any changes that the defaults may have done to the ini file:
-	if (!IniFile.WriteFile())
+	if (!IniFile.WriteFile(m_IniFileName))
 	{
 		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
 	}

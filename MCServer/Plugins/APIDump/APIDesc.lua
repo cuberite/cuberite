@@ -1015,101 +1015,155 @@ cFile:Delete("/usr/bin/virus.exe");
 
 		cIniFile =
 		{
-			Desc = [[The cIniFile is a class that makes it simple to read from and write to INI files. MCServer uses mostly INI files for settings and options.
-]],
+			Desc = [[
+				This class implements a simple name-value storage represented on disk by an INI file. These files
+				are suitable for low-volume high-latency human-readable information storage, such as for
+				configuration. MCServer itself uses INI files for settings and options.</p>
+				<p>
+				The INI files follow this basic structure:
+<pre class="prettyprint lang-ini">
+; Header comment line
+[KeyName0]
+; Key comment line 0
+ValueName0=Value0
+ValueName1=Value1
+
+[KeyName1]
+; Key comment line 0
+; Key comment line 1
+ValueName0=SomeOtherValue
+</pre>
+				The cIniFile object stores all the objects in numbered arrays and provides access to the information
+				either based on names (KeyName, ValueName) or zero-based indices.</p>
+				<p>
+				The objects of this class are created empty. You need to either load a file using ReadFile(), or
+				insert values by hand. Then you can store the object's contents to a disk file using WriteFile(), or
+				just forget everything by destroying the object. Note that the file operations are quite slow.</p>
+				<p>
+				For storing high-volume low-latency data, use the {{sqlite}} class. For storing
+				hierarchically-structured data, use the XML format, using the LuaExpat parser in the {{lxp}} class.
+			]],
 			Functions =
 			{
-				constructor = { Return = "{{cIniFile|cIniFile}}" },
-				CaseSensitive = { Return = "" },
-				CaseInsensitive = { Return = "" },
-				Path = { Return = "" },
-				Path = { Return = "string" },
-				SetPath = { Return = "" },
-				ReadFile = { Return = "bool" },
-				WriteFile = { Return = "bool" },
-				Erase = { Return = "" },
-				Clear = { Return = "" },
-				Reset = { Return = "" },
-				FindKey = { Notes = "long i" },
-				FindValue = { Notes = "long i" },
-				NumKeys = { Notes = "unsigned i" },
-				GetNumKeys = { Notes = "unsigned i" },
-				AddKeyName = { Notes = "unsigned int" },
-				KeyName = { Notes = "Stri" },
-				GetKeyName = { Notes = "Stri" },
-				NumValues = { Notes = "unsigned int" },
-				GetNumValues = { Notes = "unsigned int" },
-				NumValues = { Notes = "unsigned int" },
-				GetNumValues = { Notes = "unsigned int" },
-				ValueName = { Notes = "Stri" },
-				GetValueName = { Notes = "Stri" },
-				ValueName = { Notes = "Stri" },
-				GetValueName = { Notes = "Stri" },
-				GetValue = { Notes = "Stri" },
-				GetValue = { Notes = "Stri" },
-				GetValueI = { Notes = "i" },
-				GetValueB = { Notes = "bo" },
-				GetValueF = { Notes = "doub" },
-				GetValueSet = { Notes = "Stri" },
-				GetValueSetI = { Notes = "i" },
-				GetValueSetB = { Notes = "bo" },
-				GetValueSetF = { Notes = "doub" },
-				SetValue = { Return = "bool" },
-				SetValue = { Return = "bool" },
-				SetValueI = { Return = "bool" },
-				SetValueB = { Return = "bool" },
-				SetValueF = { Return = "bool" },
-				DeleteValueByID = { Return = "bool" },
-				DeleteValue = { Return = "bool" },
-				DeleteKey = { Return = "bool" },
-				NumHeaderComments = { Notes = "unsigned int" },
-				HeaderComment = { Return = "" },
-				HeaderComment = { Notes = "Stri" },
-				DeleteHeaderComment = { Return = "bool" },
-				DeleteHeaderComments = { Return = "" },
-				NumKeyComments = { Notes = "unsigned i" },
-				NumKeyComments = { Notes = "unsigned i" },
-				KeyComment = { Return = "bool" },
-				KeyComment = { Return = "bool" },
-				KeyComment = { Notes = "Stri" },
-				KeyComment = { Notes = "Stri" },
-				DeleteKeyComment = { Return = "bool" },
-				DeleteKeyComment = { Return = "bool" },
-				DeleteKeyComments = { Return = "bool" },
-				DeleteKeyComments = { Return = "bool" },
+				constructor = { Params = "", Return = "cIniFile", Notes = "Creates a new empty cIniFile object." },
+				AddHeaderComment = { Params = "Comment", Return = "", Notes = "Adds a comment to be stored in the file header." },
+				AddKeyComment = 
+				{
+					{ Params = "KeyID, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
+					{ Params = "KeyName, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
+				},
+				AddKeyName = { Params = "KeyName", Returns = "number", Notes = "Adds a new key of the specified name. Returns the KeyID of the new key." },
+				CaseInsensitive = { Params = "", Return = "", Notes = "Sets key names' and value names' comparisons to case insensitive (default)." },
+				CaseSensitive = { Params = "", Return = "", Notes = "Sets key names and value names comparisons to case sensitive." },
+				Clear = { Params = "", Return = "", Notes = "Removes all the in-memory data. Note that , like all the other operations, this doesn't affect any file data." },
+				DeleteHeaderComment = { Params = "CommentID", Return = "bool" , Notes = "Deletes the specified header comment. Returns true if successful."},
+				DeleteHeaderComments = { Params = "", Return = "", Notes = "Deletes all headers comments." },
+				DeleteKey = { Params = "KeyName", Return = "bool", Notes = "Deletes the specified key, and all values in that key. Returns true if successful." },
+				DeleteKeyComment =
+				{
+					{ Params = "KeyID, CommentID", Return = "bool", Notes = "Deletes the specified key comment. Returns true if successful." },
+					{ Params = "KeyName, CommentID", Return = "bool", Notes = "Deletes the specified key comment. Returns true if successful." },
+				},
+				DeleteKeyComments =
+				{
+					{ Params = "KeyID", Return = "bool", Notes = "Deletes all comments for the specified key. Returns true if successful." },
+					{ Params = "KeyName", Return = "bool", Notes = "Deletes all comments for the specified key. Returns true if successful." },
+				},
+				DeleteValue = { Params = "KeyName, ValueName", Return = "bool", Notes = "Deletes the specified value. Returns true if successful." },
+				DeleteValueByID = { Params = "KeyID, ValueID", Return = "bool", Notes = "Deletes the specified value. Returns true if successful." },
+				FindKey = { Params = "KeyName", Return = "number", Notes = "Returns the KeyID for the specified key name, or the noID constant if the key doesn't exist." },
+				FindValue = { Params = "KeyID, ValueName", Return = "numebr", Notes = "Returns the ValueID for the specified value name, or the noID constant if the specified key doesn't contain a value of that name." },
+				GetHeaderComment = { Params = "CommentID", Return = "string", Notes = "Returns the specified header comment, or an empty string if such comment doesn't exist" },
+				GetKeyComment =
+				{
+					{ Params = "KeyID, CommentID", Return = "string", Notes = "Returns the specified key comment, or an empty string if such a comment doesn't exist" },
+					{ Params = "KeyName, CommentID", Return = "string", Notes = "Returns the specified key comment, or an empty string if such a comment doesn't exist" },
+				},
+				GetKeyName = { Params = "KeyID", Return = "string", Notes = "Returns the key name for the specified key ID. Inverse for FindKey()." },
+				GetNumHeaderComments = { Params = "", Return = "number", Notes = "Retuns the number of header comments." },
+				GetNumKeyComments =
+				{
+					{ Params = "KeyID", Return = "number", Notes = "Returns the number of comments under the specified key" },
+					{ Params = "KeyName", Return = "number", Notes = "Returns the number of comments under the specified key" },
+				},
+				GetNumKeys = { Params = "", Return = "number", Notes = "Returns the total number of keys. This is the range for the KeyID (0 .. GetNumKeys() - 1)" },
+				GetNumValues = 
+				{
+					{ Params = "KeyID", Return = "number", Notes = "Returns the number of values stored under the specified key." },
+					{ Params = "KeyName", Return = "number", Notes = "Returns the number of values stored under the specified key." },
+				},
+				GetValue = 
+				{
+					{ Params = "KeyName, ValueName", Return = "string", Notes = "Returns the value of the specified name under the specified key. Returns an empty string if the value doesn't exist." },
+					{ Params = "KeyID, ValueID", Return = "string", Notes = "Returns the value of the specified name under the specified key. Returns an empty string if the value doesn't exist." },
+				},
+				GetValueB = { Params = "KeyName, ValueName", Return = "bool", Notes = "Returns the value of the specified name under the specified key, as a bool. Returns false if the value doesn't exist." },
+				GetValueF = { Params = "KeyName, ValueName", Return = "number", Notes = "Returns the value of the specified name under the specified key, as a floating-point number. Returns zero if the value doesn't exist." },
+				GetValueI = { Params = "KeyName, ValueName", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. Returns zero if the value doesn't exist." },
+				GetValueName = 
+				{
+					{ Params = "KeyID, ValueID", Return = "string", Notes = "Returns the name of the specified value Inverse for FindValue()." },
+					{ Params = "KeyName, ValueID", Return = "string", Notes = "Returns the name of the specified value Inverse for FindValue()." },
+				},
+				GetValueSet = { Params = "KeyName, ValueName, Default", Return = "string", Notes = "Returns the value of the specified name under the specified key. If the value doesn't exist, creates it with the specified default." },
+				GetValueSetB = { Params = "KeyName, ValueName, Default", Return = "bool", Notes = "Returns the value of the specified name under the specified key, as a bool. If the value doesn't exist, creates it with the specified default." },
+				GetValueSetF = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as a floating-point number. If the value doesn't exist, creates it with the specified default." },
+				GetValueSetI = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. If the value doesn't exist, creates it with the specified default." },
+				ReadFile = { Params = "FileName, [AllowExampleFallback]", Return = "bool", Notes = "Reads the values from the specified file. Previous in-memory contents are lost. If the file cannot be opened, and AllowExample is true, another file, \"filename.example.ini\", is loaded and then saved as \"filename.ini\". Returns true if successful, false if not." },
+				SetValue = 
+				{
+					{ Params = "KeyID, ValueID, NewValue", Return = "bool", Notes = "Overwrites the specified value with a new value. If the specified value doesn't exist, returns false (doesn't add)." },
+					{ Params = "KeyName, ValueName, NewValue, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+				},
+				SetValueB = { Params = "KeyName, ValueName, NewValueBool, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new bool value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+				SetValueF = { Params = "KeyName, ValueName, NewValueFloat, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new floating-point number value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+				SetValueI = { Params = "KeyName, ValueName, NewValueInt, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new integer value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+				WriteFile = { Params = "FileName", Return = "bool", Notes = "Writes the current in-memory data into the specified file. Returns true if successful, false if not." },
 			},
 			Constants =
 			{
+				noID = { Notes = "" },
 			},
 			AdditionalInfo =
 			{
 				{
-					Header = "Practical usage",
+					Header = "Code example: Reading a simple value",
 					Contents = [[
-						If you want to use cIniFile you need to know a couple of things; what is the key name and what
-						is the value name. Below is a demonstration of what is what.</p>
-<pre class="prettyprint lang-ini">
-; Comment line
-[KeyName1]
-ValueName1=Value1
-ValueName2=Value2
-
-[KeyName2]
-ValueName1=Value3
-</pre></p>
-						<p>
 						cIniFile is very easy to use. For example, you can find out what port the server is supposed to
 						use according to settings.ini by using this little snippet:
 <pre class="prettyprint lang-lua">
-local IniFile = cIniFile("settings.ini");
-if (IniFile:ReadFile()) then
+local IniFile = cIniFile();
+if (IniFile:ReadFile("settings.ini")) then
 	ServerPort = IniFile:GetValueI("Server", "Port");
 end
 </pre>
 					]],
 				},
-			},
-		},
+				{
+					Header = "Code example: Enumerating all objects in a file",
+					Contents = [[
+						To enumerate all keys in a file, you need to query the total number of keys, using GetNumKeys(),
+						and then query each key's name using GetKeyName(). Similarly, to enumerate all values under a
+						key, you need to query the total number of values using GetNumValues() and then query each
+						value's name using GetValueName().</p>
+						<p>
+						The following code logs all keynames and their valuenames into the server log:
+<pre class="prettyprint lang-lua">
+local IniFile = cIniFile();
+IniFile:ReadFile("somefile.ini")
+local NumKeys = IniFile:GetNumKeys();
+for k = 0, NumKeys do
+	local NumValues = IniFile:GetNumValues(k);
+	LOG("key \"" .. IniFile:GetKeyName(k) .. "\" has " .. NumValues .. " values:");
+	for v = 0, NumValues do
+		LOG("  value \"" .. IniFile:GetValueName(k, v) .. "\".");
+	end
+end
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cIniFile
 
 		cInventory =
 		{
@@ -1167,7 +1221,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invHotbarOffset    = { Notes = "Starting slot number of the Hotbar part" },
 				invNumSlots        = { Notes = "Total number of slots in a cInventory" },
 			},
-		},
+		},  -- cInventory
 
 		cItem =
 		{
@@ -1254,7 +1308,7 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 ]],
 				},
 			},
-		},
+		},  -- cItem
 
 		cItemGrid =
 		{
@@ -1364,7 +1418,7 @@ end
 					]],
 				},
 			},  -- AdditionalInfo
-		},
+		},  -- cItemGrid
 
 		cItems =
 		{
@@ -1394,7 +1448,7 @@ end
 			Constants =
 			{
 			},
-		},
+		},  -- cItems
 
 		cLineBlockTracer =
 		{

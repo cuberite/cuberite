@@ -103,8 +103,8 @@ void cPluginManager::ReloadPluginsNow(void)
 
 	cServer::BindBuiltInConsoleCommands();
 
-	cIniFile IniFile("settings.ini");
-	if (!IniFile.ReadFile())
+	cIniFile IniFile;
+	if (!IniFile.ReadFile("settings.ini"))
 	{
 		LOGWARNING("cPluginManager: Can't find settings.ini, so can't load any plugins.");
 	}
