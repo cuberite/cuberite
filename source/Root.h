@@ -162,7 +162,7 @@ private:
 	void LoadGlobalSettings();
 
 	/// Loads the worlds from settings.ini, creates the worldmap
-	void LoadWorlds(cIniFile IniFile);
+	void LoadWorlds(cIniFile & IniFile);
 	
 	/// Starts each world's life
 	void StartWorlds(void);

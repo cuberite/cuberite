@@ -44,7 +44,7 @@ cAuthenticator::~cAuthenticator()
 
 
 /// Read custom values from INI
-void cAuthenticator::ReadINI(cIniFile IniFile)
+void cAuthenticator::ReadINI(cIniFile & IniFile)
 {
 	m_Server  = IniFile.GetValue("Authentication", "Server");
 	m_Address = IniFile.GetValue("Authentication", "Address");
@@ -93,7 +93,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 
 
 
-void cAuthenticator::Start(cIniFile IniFile)
+void cAuthenticator::Start(cIniFile & IniFile)
 {
 	ReadINI(IniFile);
 	m_ShouldTerminate = false;

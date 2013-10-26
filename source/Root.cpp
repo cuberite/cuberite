@@ -245,7 +245,7 @@ void cRoot::LoadGlobalSettings()
 
 
 
-void cRoot::LoadWorlds(cIniFile IniFile)
+void cRoot::LoadWorlds(cIniFile & IniFile)
 {
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
