@@ -1968,11 +1968,18 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 
 		cRoot =
 		{
-			Desc = [[There is always only one cRoot object in MCServer. cRoot manages all the important objects such as {{cServer|cServer}}
-]],
+			Desc = [[
+				This class represents the root of MCServer's object hierarchy. There is always only one cRoot
+				object. It manages and allows querying all the other objects, such as {{cServer}},
+				{{cPluginManager}}, individual {{cWorld|worlds}} etc.</p>
+				<p>
+				To get the singleton instance of this object, you call the cRoot:Get() function. Then you can call
+				the individual functions on this object. Note that some of the functions are static and don't need
+				the instance, they are to be called directly on the cRoot class, such as cRoot:GetPhysicalRAMUsage()
+			]],
 			Functions =
 			{
-				Get = { Params = "", Return = "Root object", Notes = "This function returns the cRoot object." },
+				Get = { Params = "", Return = "Root object", Notes = "(STATIC)This function returns the cRoot object." },
 				BroadcastChat = { Params = "Message", Return = "", Notes = "Broadcasts a message to every player in the server." },
 				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for the given player." },
 				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
@@ -1981,11 +1988,13 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
 				GetFurnaceRecipe = { Params = "", Return = "{{cFurnaceRecipe|cFurnaceRecipe}}", Notes = "Returns the cFurnaceRecipes object." },
 				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object." },
+				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
 				GetPrimaryServerVersion = { Params = "", Return = "number", Notes = "Returns the servers primary server version." },
 				GetProtocolVersionTextFromInt = { Params = "Protocol Version", Return = "string", Notes = "Returns the Minecraft version from the given Protocol. If there is no version found, it returns 'Unknown protocol(Parameter)'" },
 				GetServer = { Params = "", Return = "{{cServer|cServer}}", Notes = "Returns the cServer object." },
 				GetTotalChunkCount = { Params = "", Return = "number", Notes = "Returns the amount of loaded chunks." },
+				GetVirtualRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of virtual RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetWebAdmin = { Params = "", Return = "{{cWebAdmin|cWebAdmin}}", Notes = "Returns the cWebAdmin object." },
 				GetWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Returns the cWorld object of the given world. It returns nil if there is no world with the given name." },
 				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread The command's output will be sent to console " .. '"stop" and "restart" commands have special handling.' },
