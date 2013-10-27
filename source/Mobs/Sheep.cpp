@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Sheep.h"
@@ -13,7 +12,7 @@
 cSheep::cSheep(int a_Color) :
 	super("Sheep", mtSheep, "mob.sheep.say", "mob.sheep.say", 0.6, 1.3),
 	m_IsSheared(false),
-	m_WoolColor(a_Color)
+	m_WoolColor(0)
 {
 }
 
@@ -33,6 +32,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
 	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_SHEARS) && (!m_IsSheared))
@@ -46,10 +46,25 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		}
 
 		cItems Drops;
-		Drops.push_back(cItem(E_BLOCK_WOOL, 4, m_WoolColor));
-		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+		int wooldrops = m_World->GetTickRandomNumber(2);
+		if (wooldrops == 0)
+		{
+		    Drops.push_back(cItem(E_BLOCK_WOOL, 1, m_WoolColor));
+		    m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+		}
+	    if (wooldrops == 1)
+		{
+		    Drops.push_back(cItem(E_BLOCK_WOOL, 2, m_WoolColor));
+		    m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+		}
+		if (wooldrops == 2)
+		{
+		    Drops.push_back(cItem(E_BLOCK_WOOL, 3, m_WoolColor));
+		    m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+		}
 	}
 }
+
 
 
 
