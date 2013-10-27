@@ -138,7 +138,6 @@ void cRoot::Start(void)
 			LOGERROR("Failure starting server, aborting...");
 			return;
 		}
-		IniFile.WriteFile("settings.ini");
 
 		m_WebAdmin = new cWebAdmin();
 		m_WebAdmin->Init();
@@ -162,6 +161,8 @@ void cRoot::Start(void)
 		LOGD("Starting Authenticator...");
 		m_Authenticator.Start(IniFile);
 		
+		IniFile.WriteFile("settings.ini");
+
 		LOGD("Starting worlds...");
 		StartWorlds();
 		

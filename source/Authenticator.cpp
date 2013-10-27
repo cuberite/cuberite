@@ -67,7 +67,6 @@ void cAuthenticator::ReadINI(cIniFile & IniFile)
 	if (bSave)
 	{
 		IniFile.SetValueB("Authentication", "Authenticate", m_ShouldAuthenticate);
-		IniFile.WriteFile("settings.ini");
 	}
 }
 
