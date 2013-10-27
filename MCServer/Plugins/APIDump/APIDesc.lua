@@ -1040,7 +1040,7 @@ ValueName0=SomeOtherValue
 				insert values by hand. Then you can store the object's contents to a disk file using WriteFile(), or
 				just forget everything by destroying the object. Note that the file operations are quite slow.</p>
 				<p>
-				For storing high-volume low-latency data, use the {{sqlite}} class. For storing
+				For storing high-volume low-latency data, use the {{sqlite3}} class. For storing
 				hierarchically-structured data, use the XML format, using the LuaExpat parser in the {{lxp}} class.
 			]],
 			Functions =
@@ -1943,8 +1943,26 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 		cProjectileEntity =
 		{
 			Desc = "",
-			Functions = {},
-			Constants = {},
+			Functions =
+			{
+				GetCreator = { Params = "", Return = "{{cEntity}} descendant", Notes = "Returns the entity who created this projectile. May return nil." },
+				GetMCAClassName = { Params = "", Return = "string", Notes = "Returns the string that identifies the projectile type  (class name) in MCA files" },
+				GetProjectileKind = { Params = "", Return = "ProjectileKind", Notes = "Returns the kind of this projectile (pkXXX constant)" },
+				IsInGround = { Params = "", Return = "bool", Notes = "Returns true if this projectile has hit the ground." },
+			},
+			Constants =
+			{
+				pkArrow = { Notes = "The projectile is an {{cArrowEntity|arrow}}" },
+				pkEgg = { Notes = "The projectile is a {{cThrownEggEntity|thrown egg}}" },
+				pkEnderPearl = { Notes = "The projectile is a {{cThrownEnderPearlEntity|thrown enderpearl}}" },
+				pkExpBottle = { Notes = "The projectile is a thrown exp bottle (NYI)" },
+				pkFireCharge = { Notes = "The projectile is a {{cFireChargeEntity|fire charge}}" },
+				pkFishingFloat = { Notes = "The projectile is a fishing float (NYI)" },
+				pkGhastFireball = { Notes = "The projectile is a {{cGhastFireballEntity|ghast fireball}}" },
+				pkSnowball = { Notes = "The projectile is a {{cThrownSnowballEntity|thrown snowball}}" },
+				pkSplashPotion = { Notes = "The projectile is a thrown splash potion (NYI)" },
+				pkWitherSkull = { Notes = "The projectile is a wither skull (NYI)" },
+			},
 			Inherits = "cEntity",
 		},
 
