@@ -28,7 +28,6 @@ cAuthenticator::cAuthenticator(void) :
 	m_Address(DEFAULT_AUTH_ADDRESS),
 	m_ShouldAuthenticate(true)
 {
-	ReadINI();
 }
 
 
@@ -45,14 +44,8 @@ cAuthenticator::~cAuthenticator()
 
 
 /// Read custom values from INI
-void cAuthenticator::ReadINI(void)
+void cAuthenticator::ReadINI(cIniFile & IniFile)
 {
-	cIniFile IniFile;
-	if (!IniFile.ReadFile("settings.ini"))
-	{
-		return;
-	}
-	
 	m_Server  = IniFile.GetValue("Authentication", "Server");
 	m_Address = IniFile.GetValue("Authentication", "Address");
 	m_ShouldAuthenticate = IniFile.GetValueB("Authentication", "Authenticate", true);
@@ -100,8 +93,9 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 
 
 
-void cAuthenticator::Start(void)
+void cAuthenticator::Start(cIniFile & IniFile)
 {
+	ReadINI(IniFile);
 	m_ShouldTerminate = false;
 	super::Start();
 }

@@ -149,7 +149,7 @@ void cRoot::Start(void)
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
 		LOGD("Loading worlds...");
-		LoadWorlds();
+		LoadWorlds(IniFile);
 
 		LOGD("Loading plugin manager...");
 		m_PluginManager = new cPluginManager();
@@ -160,7 +160,7 @@ void cRoot::Start(void)
 
 		// This sets stuff in motion
 		LOGD("Starting Authenticator...");
-		m_Authenticator.Start();
+		m_Authenticator.Start(IniFile);
 		
 		LOGD("Starting worlds...");
 		StartWorlds();
@@ -245,11 +245,8 @@ void cRoot::LoadGlobalSettings()
 
 
 
-void cRoot::LoadWorlds(void)
+void cRoot::LoadWorlds(cIniFile & IniFile)
 {
-	cIniFile IniFile;
-	IniFile.ReadFile("settings.ini");  // Doesn't matter if success or not
-
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
 	m_pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
