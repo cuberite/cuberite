@@ -128,8 +128,8 @@ public:
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
-	/// Tries to move to a new position, with collision checks and stuff
-	virtual void MoveTo( const Vector3d & a_NewPos );  // tolua_export
+	/// Tries to move to a new position, with attachment-related checks (y == -999)
+	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
 
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
@@ -159,21 +159,25 @@ public:
 
 	/// Adds a player to existing group or creates a new group when it doesn't exist
 	void AddToGroup( const AString & a_GroupName );							// tolua_export
+	
 	/// Removes a player from the group, resolves permissions and group inheritance (case sensitive)
 	void RemoveFromGroup( const AString & a_GroupName );					// tolua_export
+	
 	bool CanUseCommand( const AString & a_Command );						// tolua_export
 	bool HasPermission( const AString & a_Permission );						// tolua_export
 	const GroupList & GetGroups() { return m_Groups; }						// >> EXPORTED IN MANUALBINDINGS <<
 	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
 	bool IsInGroup( const AString & a_Group );								// tolua_export
 
-	AString GetColor(void) const;											// tolua_export
-
-	void TossItem(bool a_bDraggingItem, char a_Amount = 1, short a_CreateType = 0, short a_CreateHealth = 0);				// tolua_export
-
-	void Heal( int a_Health );												// tolua_export
-	
 	// tolua_begin
+	
+	/// Returns the full color code to use for this player, based on their primary group or set in m_Color
+	AString GetColor(void) const;
+
+	void TossItem(bool a_bDraggingItem, char a_Amount = 1, short a_CreateType = 0, short a_CreateHealth = 0);
+
+	/// Heals the player by the specified amount of HPs (positive only); sends health update
+	void Heal(int a_Health);
 	
 	int    GetFoodLevel                 (void) const { return m_FoodLevel; }
 	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }
@@ -181,7 +185,7 @@ public:
 	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
 	int    GetFoodPoisonedTicksRemaining(void) const { return m_FoodPoisonedTicksRemaining; }
 
-        int GetAirLevel                     (void) const { return m_AirLevel; }
+	int GetAirLevel                     (void) const { return m_AirLevel; }
 	
 	/// Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore
 	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
@@ -302,6 +306,7 @@ protected:
 
 	/// Player's air level (for swimming)
 	int m_AirLevel;
+
 	/// used to time ticks between damage taken via drowning/suffocation
 	int m_AirTickTimer;
 

@@ -469,12 +469,12 @@ bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Usernam
 void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem)
 {
 	// This is for creative Inventory changes
-	if (m_Player->GetGameMode() != eGameMode_Creative)
+	if (m_Player->IsGameModeCreative())
 	{
 		LOGWARNING("Got a CreativeInventoryAction packet from user \"%s\" while not in creative mode. Ignoring.", m_Username.c_str());
 		return;
 	}
-	if (m_Player->GetWindow()->GetWindowType() != cWindow::Inventory)
+	if (m_Player->GetWindow()->GetWindowType() != cWindow::wtInventory)
 	{
 		LOGWARNING("Got a CreativeInventoryAction packet from user \"%s\" while not in the inventory window. Ignoring.", m_Username.c_str());
 		return;

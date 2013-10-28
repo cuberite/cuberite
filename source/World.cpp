@@ -444,8 +444,8 @@ void cWorld::Start(void)
 	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
 	m_GameMode = eGameMode_Creative;
 
-	cIniFile IniFile(m_IniFileName);
-	if (!IniFile.ReadFile())
+	cIniFile IniFile;
+	if (!IniFile.ReadFile(m_IniFileName))
 	{
 		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
 	}
@@ -555,7 +555,7 @@ void cWorld::Start(void)
 
 
 	// Save any changes that the defaults may have done to the ini file:
-	if (!IniFile.WriteFile())
+	if (!IniFile.WriteFile(m_IniFileName))
 	{
 		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
 	}
@@ -755,9 +755,9 @@ void cWorld::TickMobs(float a_Dt)
 		for (int i = 0; i < ARRAYCOUNT(AllFamilies); i++)
 		{
 			cMonster::eFamily Family = AllFamilies[i];
-			int spawnrate = cMonster::GetSpawnRate(Family);
+			int SpawnDelay = cMonster::GetSpawnDelay(Family);
 			if (
-				(m_LastSpawnMonster[Family] > m_WorldAge - spawnrate) ||  // Not reached the needed tiks before the next round
+				(m_LastSpawnMonster[Family] > m_WorldAge - SpawnDelay) ||  // Not reached the needed ticks before the next round
 				MobCensus.IsCapped(Family)
 			)
 			{
@@ -1470,7 +1470,7 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool IsPlayerCreated)
 {
 	MTRand r1;
 	a_FlyAwaySpeed /= 1000;  // Pre-divide, so that we don't have to divide each time inside the loop
@@ -1482,7 +1482,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		
 		cPickup * Pickup = new cPickup(
 			a_BlockX, a_BlockY, a_BlockZ,
-			*itr, SpeedX, SpeedY, SpeedZ
+			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
 		);
 		Pickup->Initialize(this);
 	}
@@ -1492,13 +1492,13 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated)
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
 		cPickup * Pickup = new cPickup(
 			a_BlockX, a_BlockY, a_BlockZ,
-			*itr, (float)a_SpeedX, (float)a_SpeedY, (float)a_SpeedZ
+			*itr, IsPlayerCreated, (float)a_SpeedX, (float)a_SpeedY, (float)a_SpeedZ
 		);
 		Pickup->Initialize(this);
 	}

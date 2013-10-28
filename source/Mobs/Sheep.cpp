@@ -33,6 +33,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
 	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_SHEARS) && (!m_IsSheared))
@@ -46,10 +47,12 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		}
 
 		cItems Drops;
-		Drops.push_back(cItem(E_BLOCK_WOOL, 4, m_WoolColor));
+		int NumDrops = m_World->GetTickRandomNumber(2) + 1;
+		Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
 }
+
 
 
 

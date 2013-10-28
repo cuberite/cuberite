@@ -499,6 +499,7 @@ function ReadDescriptions(a_API)
 				cls.Functions = DoxyFunctions;
 			else  -- if (APIDesc.Functions ~= nil)
 				for j, func in ipairs(cls.Functions) do
+					local FnName = func.DocID or func.Name;
 					if not(IsFunctionIgnored(cls.Name .. "." .. FnName)) then
 						table.insert(cls.UndocumentedFunctions, FnName);
 					end

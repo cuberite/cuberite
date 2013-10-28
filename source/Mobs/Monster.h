@@ -137,17 +137,17 @@ public:
 	
 	// tolua_begin
 	
-	/// Translates MobType enum to a string
+	/// Translates MobType enum to a string, empty string if unknown
 	static AString MobTypeToString(eType a_MobType);
 	
-	/// Translates MobType string to the enum
+	/// Translates MobType string to the enum, mtInvalidType if not recognized
 	static eType StringToMobType(const AString & a_MobTypeName);
 	
 	/// Returns the mob family based on the type
 	static eFamily FamilyFromType(eType a_MobType);
 
-	/// Returns the spawn rate (number of game ticks between spawn attempts) for the given mob family
-	static int GetSpawnRate(cMonster::eFamily a_MobFamily);
+	/// Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family
+	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
 
 	// tolua_end
 	

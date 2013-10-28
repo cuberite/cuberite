@@ -605,7 +605,7 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 
 
 
-int cMonster::GetSpawnRate(cMonster::eFamily a_MobFamily)
+int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{

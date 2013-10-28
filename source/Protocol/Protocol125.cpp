@@ -963,7 +963,7 @@ void cProtocol125::SendWholeInventory(const cWindow & a_Window)
 
 void cProtocol125::SendWindowClose(const cWindow & a_Window)
 {
-	if (a_Window.GetWindowType() == cWindow::Inventory)
+	if (a_Window.GetWindowType() == cWindow::wtInventory)
 	{
 		// Do not send inventory-window-close
 		return;

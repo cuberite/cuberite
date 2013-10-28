@@ -49,17 +49,17 @@ class cWindow
 public:
 	enum WindowType
 	{
-		Inventory   = -1,  // This value is never actually sent to a client
-		Chest       = 0,
-		Workbench   = 1,
-		Furnace     = 2,
-		DropSpenser = 3,  // Dropper or Dispenser
-		Enchantment = 4,
-		Brewery     = 5,
-		NPCTrade    = 6,
-		Beacon      = 7,
-		Anvil       = 8,
-		Hopper      = 9,
+		wtInventory   = -1,  // This value is never actually sent to a client
+		wtChest       = 0,
+		wtWorkbench   = 1,
+		wtFurnace     = 2,
+		wtDropSpenser = 3,  // Dropper or Dispenser
+		wtEnchantment = 4,
+		wtBrewery     = 5,
+		wtNPCTrade    = 6,
+		wtBeacon      = 7,
+		wtAnvil       = 8,
+		wtHopper      = 9,
 	};
 	
 	// tolua_end

@@ -1152,6 +1152,29 @@ bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NI
 
 
 
+bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const
+{
+	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	{
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
+		return false;
+	}
+	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		// The chunk is not available, bail out
+		return false;
+	}
+	int idx = Chunk->MakeIndex(a_RelX, a_RelY, a_RelZ);
+	a_BlockLight = Chunk->GetBlockLight(idx);
+	a_SkyLight = Chunk->GetSkyLight(idx);
+	return true;
+}
+
+
+
+
+
 bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))

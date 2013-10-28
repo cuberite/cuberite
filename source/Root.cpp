@@ -116,8 +116,8 @@ void cRoot::Start(void)
 		m_Server = new cServer();
 
 		LOG("Reading server config...");
-		cIniFile IniFile("settings.ini");
-		if (!IniFile.ReadFile())
+		cIniFile IniFile;
+		if (!IniFile.ReadFile("settings.ini"))
 		{
 			LOGWARNING("settings.ini inaccessible, all settings are reset to default values");
 		}
@@ -138,7 +138,6 @@ void cRoot::Start(void)
 			LOGERROR("Failure starting server, aborting...");
 			return;
 		}
-		IniFile.WriteFile();
 
 		m_WebAdmin = new cWebAdmin();
 		m_WebAdmin->Init();
@@ -149,7 +148,7 @@ void cRoot::Start(void)
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
 		LOGD("Loading worlds...");
-		LoadWorlds();
+		LoadWorlds(IniFile);
 
 		LOGD("Loading plugin manager...");
 		m_PluginManager = new cPluginManager();
@@ -160,8 +159,10 @@ void cRoot::Start(void)
 
 		// This sets stuff in motion
 		LOGD("Starting Authenticator...");
-		m_Authenticator.Start();
+		m_Authenticator.Start(IniFile);
 		
+		IniFile.WriteFile("settings.ini");
+
 		LOGD("Starting worlds...");
 		StartWorlds();
 		
@@ -245,10 +246,8 @@ void cRoot::LoadGlobalSettings()
 
 
 
-void cRoot::LoadWorlds(void)
+void cRoot::LoadWorlds(cIniFile & IniFile)
 {
-	cIniFile IniFile("settings.ini"); IniFile.ReadFile();
-
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
 	m_pDefaultWorld = new cWorld( DefaultWorldName.c_str() );

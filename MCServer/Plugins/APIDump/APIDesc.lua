@@ -693,10 +693,20 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 
 		cEnchantments =
 		{
-			Desc = [[This class  is the storage for enchantments for a single {{cItem|cItem}} object, through its m_Enchantments member variable. Although it is possible to create a standalone object of this class, it is not yet used in any API directly.
-</p>
-		<p>Enchantments can be initialized either programmatically by calling the individual functions (SetLevel()), or by using a string description of the enchantment combination. This string description is in the form "id=lvl;id=lvl;...;id=lvl;", where id is either a numerical ID of the enchantment, or its textual representation from the table below, and lvl is the desired enchantment level. The class can also create its string description from its current contents; however that string description will only have the numerical IDs.
-]],
+			Desc = [[
+				This class  is the storage for enchantments for a single {{cItem|cItem}} object, through its
+				m_Enchantments member variable. Although it is possible to create a standalone object of this class,
+				it is not yet used in any API directly.</p>
+				<p>
+				Enchantments can be initialized either programmatically by calling the individual functions
+				(SetLevel()), or by using a string description of the enchantment combination. This string
+				description is in the form "id=lvl;id=lvl;...;id=lvl;", where id is either a numerical ID of the
+				enchantment, or its textual representation from the table below, and lvl is the desired enchantment
+				level. The class can also create its string description from its current contents; however that
+				string description will only have the numerical IDs.</p>
+				<p>
+				See the {{cItem}} class for usage examples.
+			]],
 			Functions =
 			{
 				constructor =
@@ -715,6 +725,29 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			},
 			Constants =
 			{
+				-- Only list these enchantment IDs, as they don't really need any kind of documentation:
+				enchAquaAffinity = { Notes = "" },
+				enchBaneOfArthropods = { Notes = "" },
+				enchBlastProtection = { Notes = "" },
+				enchEfficiency = { Notes = "" },
+				enchFeatherFalling = { Notes = "" },
+				enchFireAspect = { Notes = "" },
+				enchFireProtection = { Notes = "" },
+				enchFlame = { Notes = "" },
+				enchFortune = { Notes = "" },
+				enchInfinity = { Notes = "" },
+				enchKnockback = { Notes = "" },
+				enchLooting = { Notes = "" },
+				enchPower = { Notes = "" },
+				enchProjectileProtection = { Notes = "" },
+				enchProtection = { Notes = "" },
+				enchPunch = { Notes = "" },
+				enchRespiration = { Notes = "" },
+				enchSharpness = { Notes = "" },
+				enchSilkTouch = { Notes = "" },
+				enchSmite = { Notes = "" },
+				enchThorns = { Notes = "" },
+				enchUnbreaking = { Notes = "" },
 			},
 		},
 
@@ -982,101 +1015,155 @@ cFile:Delete("/usr/bin/virus.exe");
 
 		cIniFile =
 		{
-			Desc = [[The cIniFile is a class that makes it simple to read from and write to INI files. MCServer uses mostly INI files for settings and options.
-]],
+			Desc = [[
+				This class implements a simple name-value storage represented on disk by an INI file. These files
+				are suitable for low-volume high-latency human-readable information storage, such as for
+				configuration. MCServer itself uses INI files for settings and options.</p>
+				<p>
+				The INI files follow this basic structure:
+<pre class="prettyprint lang-ini">
+; Header comment line
+[KeyName0]
+; Key comment line 0
+ValueName0=Value0
+ValueName1=Value1
+
+[KeyName1]
+; Key comment line 0
+; Key comment line 1
+ValueName0=SomeOtherValue
+</pre>
+				The cIniFile object stores all the objects in numbered arrays and provides access to the information
+				either based on names (KeyName, ValueName) or zero-based indices.</p>
+				<p>
+				The objects of this class are created empty. You need to either load a file using ReadFile(), or
+				insert values by hand. Then you can store the object's contents to a disk file using WriteFile(), or
+				just forget everything by destroying the object. Note that the file operations are quite slow.</p>
+				<p>
+				For storing high-volume low-latency data, use the {{sqlite3}} class. For storing
+				hierarchically-structured data, use the XML format, using the LuaExpat parser in the {{lxp}} class.
+			]],
 			Functions =
 			{
-				constructor = { Return = "{{cIniFile|cIniFile}}" },
-				CaseSensitive = { Return = "" },
-				CaseInsensitive = { Return = "" },
-				Path = { Return = "" },
-				Path = { Return = "string" },
-				SetPath = { Return = "" },
-				ReadFile = { Return = "bool" },
-				WriteFile = { Return = "bool" },
-				Erase = { Return = "" },
-				Clear = { Return = "" },
-				Reset = { Return = "" },
-				FindKey = { Notes = "long i" },
-				FindValue = { Notes = "long i" },
-				NumKeys = { Notes = "unsigned i" },
-				GetNumKeys = { Notes = "unsigned i" },
-				AddKeyName = { Notes = "unsigned int" },
-				KeyName = { Notes = "Stri" },
-				GetKeyName = { Notes = "Stri" },
-				NumValues = { Notes = "unsigned int" },
-				GetNumValues = { Notes = "unsigned int" },
-				NumValues = { Notes = "unsigned int" },
-				GetNumValues = { Notes = "unsigned int" },
-				ValueName = { Notes = "Stri" },
-				GetValueName = { Notes = "Stri" },
-				ValueName = { Notes = "Stri" },
-				GetValueName = { Notes = "Stri" },
-				GetValue = { Notes = "Stri" },
-				GetValue = { Notes = "Stri" },
-				GetValueI = { Notes = "i" },
-				GetValueB = { Notes = "bo" },
-				GetValueF = { Notes = "doub" },
-				GetValueSet = { Notes = "Stri" },
-				GetValueSetI = { Notes = "i" },
-				GetValueSetB = { Notes = "bo" },
-				GetValueSetF = { Notes = "doub" },
-				SetValue = { Return = "bool" },
-				SetValue = { Return = "bool" },
-				SetValueI = { Return = "bool" },
-				SetValueB = { Return = "bool" },
-				SetValueF = { Return = "bool" },
-				DeleteValueByID = { Return = "bool" },
-				DeleteValue = { Return = "bool" },
-				DeleteKey = { Return = "bool" },
-				NumHeaderComments = { Notes = "unsigned int" },
-				HeaderComment = { Return = "" },
-				HeaderComment = { Notes = "Stri" },
-				DeleteHeaderComment = { Return = "bool" },
-				DeleteHeaderComments = { Return = "" },
-				NumKeyComments = { Notes = "unsigned i" },
-				NumKeyComments = { Notes = "unsigned i" },
-				KeyComment = { Return = "bool" },
-				KeyComment = { Return = "bool" },
-				KeyComment = { Notes = "Stri" },
-				KeyComment = { Notes = "Stri" },
-				DeleteKeyComment = { Return = "bool" },
-				DeleteKeyComment = { Return = "bool" },
-				DeleteKeyComments = { Return = "bool" },
-				DeleteKeyComments = { Return = "bool" },
+				constructor = { Params = "", Return = "cIniFile", Notes = "Creates a new empty cIniFile object." },
+				AddHeaderComment = { Params = "Comment", Return = "", Notes = "Adds a comment to be stored in the file header." },
+				AddKeyComment = 
+				{
+					{ Params = "KeyID, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
+					{ Params = "KeyName, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
+				},
+				AddKeyName = { Params = "KeyName", Returns = "number", Notes = "Adds a new key of the specified name. Returns the KeyID of the new key." },
+				CaseInsensitive = { Params = "", Return = "", Notes = "Sets key names' and value names' comparisons to case insensitive (default)." },
+				CaseSensitive = { Params = "", Return = "", Notes = "Sets key names and value names comparisons to case sensitive." },
+				Clear = { Params = "", Return = "", Notes = "Removes all the in-memory data. Note that , like all the other operations, this doesn't affect any file data." },
+				DeleteHeaderComment = { Params = "CommentID", Return = "bool" , Notes = "Deletes the specified header comment. Returns true if successful."},
+				DeleteHeaderComments = { Params = "", Return = "", Notes = "Deletes all headers comments." },
+				DeleteKey = { Params = "KeyName", Return = "bool", Notes = "Deletes the specified key, and all values in that key. Returns true if successful." },
+				DeleteKeyComment =
+				{
+					{ Params = "KeyID, CommentID", Return = "bool", Notes = "Deletes the specified key comment. Returns true if successful." },
+					{ Params = "KeyName, CommentID", Return = "bool", Notes = "Deletes the specified key comment. Returns true if successful." },
+				},
+				DeleteKeyComments =
+				{
+					{ Params = "KeyID", Return = "bool", Notes = "Deletes all comments for the specified key. Returns true if successful." },
+					{ Params = "KeyName", Return = "bool", Notes = "Deletes all comments for the specified key. Returns true if successful." },
+				},
+				DeleteValue = { Params = "KeyName, ValueName", Return = "bool", Notes = "Deletes the specified value. Returns true if successful." },
+				DeleteValueByID = { Params = "KeyID, ValueID", Return = "bool", Notes = "Deletes the specified value. Returns true if successful." },
+				FindKey = { Params = "KeyName", Return = "number", Notes = "Returns the KeyID for the specified key name, or the noID constant if the key doesn't exist." },
+				FindValue = { Params = "KeyID, ValueName", Return = "numebr", Notes = "Returns the ValueID for the specified value name, or the noID constant if the specified key doesn't contain a value of that name." },
+				GetHeaderComment = { Params = "CommentID", Return = "string", Notes = "Returns the specified header comment, or an empty string if such comment doesn't exist" },
+				GetKeyComment =
+				{
+					{ Params = "KeyID, CommentID", Return = "string", Notes = "Returns the specified key comment, or an empty string if such a comment doesn't exist" },
+					{ Params = "KeyName, CommentID", Return = "string", Notes = "Returns the specified key comment, or an empty string if such a comment doesn't exist" },
+				},
+				GetKeyName = { Params = "KeyID", Return = "string", Notes = "Returns the key name for the specified key ID. Inverse for FindKey()." },
+				GetNumHeaderComments = { Params = "", Return = "number", Notes = "Retuns the number of header comments." },
+				GetNumKeyComments =
+				{
+					{ Params = "KeyID", Return = "number", Notes = "Returns the number of comments under the specified key" },
+					{ Params = "KeyName", Return = "number", Notes = "Returns the number of comments under the specified key" },
+				},
+				GetNumKeys = { Params = "", Return = "number", Notes = "Returns the total number of keys. This is the range for the KeyID (0 .. GetNumKeys() - 1)" },
+				GetNumValues = 
+				{
+					{ Params = "KeyID", Return = "number", Notes = "Returns the number of values stored under the specified key." },
+					{ Params = "KeyName", Return = "number", Notes = "Returns the number of values stored under the specified key." },
+				},
+				GetValue = 
+				{
+					{ Params = "KeyName, ValueName", Return = "string", Notes = "Returns the value of the specified name under the specified key. Returns an empty string if the value doesn't exist." },
+					{ Params = "KeyID, ValueID", Return = "string", Notes = "Returns the value of the specified name under the specified key. Returns an empty string if the value doesn't exist." },
+				},
+				GetValueB = { Params = "KeyName, ValueName", Return = "bool", Notes = "Returns the value of the specified name under the specified key, as a bool. Returns false if the value doesn't exist." },
+				GetValueF = { Params = "KeyName, ValueName", Return = "number", Notes = "Returns the value of the specified name under the specified key, as a floating-point number. Returns zero if the value doesn't exist." },
+				GetValueI = { Params = "KeyName, ValueName", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. Returns zero if the value doesn't exist." },
+				GetValueName = 
+				{
+					{ Params = "KeyID, ValueID", Return = "string", Notes = "Returns the name of the specified value Inverse for FindValue()." },
+					{ Params = "KeyName, ValueID", Return = "string", Notes = "Returns the name of the specified value Inverse for FindValue()." },
+				},
+				GetValueSet = { Params = "KeyName, ValueName, Default", Return = "string", Notes = "Returns the value of the specified name under the specified key. If the value doesn't exist, creates it with the specified default." },
+				GetValueSetB = { Params = "KeyName, ValueName, Default", Return = "bool", Notes = "Returns the value of the specified name under the specified key, as a bool. If the value doesn't exist, creates it with the specified default." },
+				GetValueSetF = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as a floating-point number. If the value doesn't exist, creates it with the specified default." },
+				GetValueSetI = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. If the value doesn't exist, creates it with the specified default." },
+				ReadFile = { Params = "FileName, [AllowExampleFallback]", Return = "bool", Notes = "Reads the values from the specified file. Previous in-memory contents are lost. If the file cannot be opened, and AllowExample is true, another file, \"filename.example.ini\", is loaded and then saved as \"filename.ini\". Returns true if successful, false if not." },
+				SetValue = 
+				{
+					{ Params = "KeyID, ValueID, NewValue", Return = "bool", Notes = "Overwrites the specified value with a new value. If the specified value doesn't exist, returns false (doesn't add)." },
+					{ Params = "KeyName, ValueName, NewValue, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+				},
+				SetValueB = { Params = "KeyName, ValueName, NewValueBool, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new bool value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+				SetValueF = { Params = "KeyName, ValueName, NewValueFloat, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new floating-point number value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+				SetValueI = { Params = "KeyName, ValueName, NewValueInt, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new integer value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+				WriteFile = { Params = "FileName", Return = "bool", Notes = "Writes the current in-memory data into the specified file. Returns true if successful, false if not." },
 			},
 			Constants =
 			{
+				noID = { Notes = "" },
 			},
 			AdditionalInfo =
 			{
 				{
-					Header = "Practical usage",
+					Header = "Code example: Reading a simple value",
 					Contents = [[
-						If you want to use cIniFile you need to know a couple of things; what is the key name and what
-						is the value name. Below is a demonstration of what is what.</p>
-<pre class="prettyprint lang-ini">
-; Comment line
-[KeyName1]
-ValueName1=Value1
-ValueName2=Value2
-
-[KeyName2]
-ValueName1=Value3
-</pre></p>
-						<p>
 						cIniFile is very easy to use. For example, you can find out what port the server is supposed to
 						use according to settings.ini by using this little snippet:
 <pre class="prettyprint lang-lua">
-local IniFile = cIniFile("settings.ini");
-if (IniFile:ReadFile()) then
+local IniFile = cIniFile();
+if (IniFile:ReadFile("settings.ini")) then
 	ServerPort = IniFile:GetValueI("Server", "Port");
 end
 </pre>
 					]],
 				},
-			},
-		},
+				{
+					Header = "Code example: Enumerating all objects in a file",
+					Contents = [[
+						To enumerate all keys in a file, you need to query the total number of keys, using GetNumKeys(),
+						and then query each key's name using GetKeyName(). Similarly, to enumerate all values under a
+						key, you need to query the total number of values using GetNumValues() and then query each
+						value's name using GetValueName().</p>
+						<p>
+						The following code logs all keynames and their valuenames into the server log:
+<pre class="prettyprint lang-lua">
+local IniFile = cIniFile();
+IniFile:ReadFile("somefile.ini")
+local NumKeys = IniFile:GetNumKeys();
+for k = 0, NumKeys do
+	local NumValues = IniFile:GetNumValues(k);
+	LOG("key \"" .. IniFile:GetKeyName(k) .. "\" has " .. NumValues .. " values:");
+	for v = 0, NumValues do
+		LOG("  value \"" .. IniFile:GetValueName(k, v) .. "\".");
+	end
+end
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cIniFile
 
 		cInventory =
 		{
@@ -1134,7 +1221,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invHotbarOffset    = { Notes = "Starting slot number of the Hotbar part" },
 				invNumSlots        = { Notes = "Total number of slots in a cInventory" },
 			},
-		},
+		},  -- cInventory
 
 		cItem =
 		{
@@ -1221,7 +1308,7 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 ]],
 				},
 			},
-		},
+		},  -- cItem
 
 		cItemGrid =
 		{
@@ -1260,9 +1347,12 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 					{ Params = "X, Y", Return = "", Notes = "Destroys the item in the specified slot" },
 				},
 				GetFirstEmptySlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the first empty slot, -1 if all slots are full" },
+				GetFirstUsedSlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the first non-empty slot, -1 if all slots are empty" },
 				GetHeight = { Params = "", Return = "number", Notes = "Returns the Y dimension of the grid" },
 				GetLastEmptySlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the last empty slot, -1 if all slots are full" },
+				GetLastUsedSlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the last non-empty slot, -1 if all slots are empty" },
 				GetNextEmptySlot = { Params = "StartFrom", Return = "number", Notes = "Returns the SlotNumber of the first empty slot following StartFrom, -1 if all the following slots are full" },
+				GetNextUsedSlot = { Params = "StartFrom", Return = "number", Notes = "Returns the SlotNumber of the first non-empty slot following StartFrom, -1 if all the following slots are full" },
 				GetNumSlots = { Params = "", Return = "number", Notes = "Returns the total number of slots in the grid (Width * Height)" },
 				GetSlot =
 				{
@@ -1328,7 +1418,7 @@ end
 					]],
 				},
 			},  -- AdditionalInfo
-		},
+		},  -- cItemGrid
 
 		cItems =
 		{
@@ -1358,7 +1448,7 @@ end
 			Constants =
 			{
 			},
-		},
+		},  -- cItems
 
 		cLineBlockTracer =
 		{
@@ -1538,9 +1628,58 @@ a_Player:OpenWindow(Window);
 
 		cMonster =
 		{
-			Desc = "",
-			Functions = {},
-			Constants = {},
+			Desc = [[
+				This class is the base class for all computer-controlled mobs in the game.</p>
+				<p>
+				To spawn a mob in a world, use the {{cWorld}}:SpawnMob() function.
+			]],
+			Functions =
+			{
+				FamilyFromType = { Params = "MobType", Return = "MobFamily", Notes = "(STATIC) Returns the mob family (mfXXX constants) based on the mob type (mtXXX constants)" },
+				GetMobFamily = { Params = "", Return = "MobFamily", Notes = "Returns this mob's family (mfXXX constant)" },
+				GetMobType = { Params = "", Return = "MobType", Notes = "Returns the type of this mob (mtXXX constant)" },
+				GetSpawnDelay = { Params = "MobFamily", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
+				MobTypeToString = { Params = "MobType", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type (mtXXX constant), or empty string if unknown type." },
+				StringToMobType = { Params = "string", Return = "MobType", Notes = "(STATIC) Returns the mob type (mtXXX constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
+			},
+			Constants =
+			{
+				mfAmbient = { Notes = "Family: ambient (bat)" },
+				mfHostile = { Notes = "Family: hostile (blaze, cavespider, creeper, enderdragon, enderman, ghast, giant, magmacube, silverfish, skeleton, slime, spider, witch, wither, zombie, zombiepigman)" },
+				mfMaxplusone = { Notes = "The maximum family value, plus one. Returned when monster family not recognized." },
+				mfPassive = { Notes = "Family: passive (chicken, cow, horse, irongolem, mooshroom, ocelot, pig, sheep, snowgolem, villager, wolf)" },
+				mfWater = { Notes = "Family: water (squid)" },
+				mtBat = { Notes = "" },
+				mtBlaze = { Notes = "" },
+				mtCaveSpider = { Notes = "" },
+				mtChicken = { Notes = "" },
+				mtCow = { Notes = "" },
+				mtCreeper = { Notes = "" },
+				mtEnderDragon = { Notes = "" },
+				mtEnderman = { Notes = "" },
+				mtGhast = { Notes = "" },
+				mtGiant = { Notes = "" },
+				mtHorse = { Notes = "" },
+				mtInvalidType = { Notes = "Invalid monster type. Returned when monster type not recognized" },
+				mtIronGolem = { Notes = "" },
+				mtMagmaCube = { Notes = "" },
+				mtMooshroom = { Notes = "" },
+				mtOcelot = { Notes = "" },
+				mtPig = { Notes = "" },
+				mtSheep = { Notes = "" },
+				mtSilverfish = { Notes = "" },
+				mtSkeleton = { Notes = "" },
+				mtSlime = { Notes = "" },
+				mtSnowGolem = { Notes = "" },
+				mtSpider = { Notes = "" },
+				mtSquid = { Notes = "" },
+				mtVillager = { Notes = "" },
+				mtWitch = { Notes = "" },
+				mtWither = { Notes = "" },
+				mtWolf = { Notes = "" },
+				mtZombie = { Notes = "" },
+				mtZombiePigman = { Notes = "" },
+			},
 			Inherits = "cPawn",
 		},
 
@@ -1565,58 +1704,103 @@ a_Player:OpenWindow(Window);
 
 		cPickup =
 		{
-			Desc = [[cPickup is a pickup object representation. It is also commonly known as "drops". With this class you could create your own "drop" or modify automatically created.
-]],
+			Desc = [[
+				This class represents a pickup entity (an item that the player or mobs can pick up). It is also
+				commonly known as "drops". With this class you could create your own "drop" or modify those
+				created automatically.
+			]],
 			Functions =
 			{
-				cPickup = { Notes = "[[cPickup}}" },
-				GetItem = { Notes = "{{cItem|cItem}}" },
-				CollectedBy = { Return = "bool" },
-			},
-			Constants =
-			{
+				constructor = { Params = "PosX, PosY, PosZ, {{cItem|Item}}, IsPlayerCreated, [SpeedX, SpeedY, SpeedZ]", Return = "cPickup", Notes = "Creates a new pickup at the specified coords. If IsPlayerCreated is true, the pickup has a longer initial collection interval." },
+				CollectedBy = { Params = "{{cPlayer}}", Return = "bool", Notes = "Tries to make the player collect the pickup. Returns true if the pickup was collected, at least partially." },
+				GetAge = { Params = "", Return = "number", Notes = "Returns the number of ticks that the pickup has existed." },
+				GetItem = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item represented by this pickup" },
+				IsCollected = { Params = "", Return = "bool", Notes = "Returns true if this pickup has already been collected (is waiting to be destroyed)" },
+				IsPlayerCreated = { Params = "", Return = "bool", Notes = "Returns true if the pickup was created by a player" },
 			},
 			Inherits = "cEntity",
-		},
+		},  -- cPickup
 
 		cPlayer =
 		{
-			Desc = [[cPlayer describes a human player in the server. cPlayer inherits all functions and members of {{cPawn|cPawn}}
-]],
+			Desc = [[
+				This class describes a player in the server. cPlayer inherits all functions and members of
+				{{cPawn|cPawn}}. It handles all the aspects of the gameplay, such as hunger, sprinting, inventory
+				etc.
+			]],
 			Functions =
 			{
-				GetEyeHeight = { Return = "number" },
-				GetEyePosition = { Return = "{{Vector3d|EyePositionVector}}" },
-				GetFlying = { Return = "bool" },
-				GetStance = { Return = "number" },
-				GetInventory = { Return = "{{cInventory|Inventory}}" },
+				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
+				AddToGroup = { Params = "GroupName", Return = "", Notes = "Temporarily adds the player to the specified group. The assignment is lost when the player disconnects." },
+				CanUseCommand = { Params = "Command", Return = "bool", Notes = "Returns true if the player is allowed to use the specified command." },
+				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
+				CloseWindowIfID = { Params = "WindowID, [CanRefuse]", Return = "", Notes = "Closes the currently open UI window if its ID matches the given ID. If CanRefuse is true (default), the window may refuse the closing." },
+				Feed = { Params = "AddFood, AddSaturation", Return = "bool", Notes = "Tries to add the specified amounts to food level and food saturation level (only positive amounts expected). Returns true if player was hungry and the food was consumed, false if too satiated." },
+				FoodPoison = { Params = "NumTicks", Return = "", Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two" },
+				GetAirLevel = { Params = "", Return = "number", Notes = "Returns the air level (number of ticks of air left)." },
+				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
+				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player (based on the first group). Prefix player messages with this code." },
+				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
+				GetEyeHeight = { Return = "number", Notes = "Returns the height of the player's eyes, in absolute coords" },
+				GetEyePosition = { Return = "{{Vector3d|EyePositionVector}}", Notes = "Returns the position of the player's eyes, as a {{Vector3d}}" },
+				GetFoodExhaustionLevel = { Params = "", Return = "number", Notes = "Returns the food exhaustion level" },
+				GetFoodLevel = { Params = "", Return = "number", Notes = "Returns the food level (number of half-drumsticks on-screen)" },
+				GetFoodPoisonedTicksRemaining = { Params = "", Return = "", Notes = "Returns the number of ticks left for the food posoning effect" },
+				GetFoodSaturationLevel = { Params = "", Return = "number", Notes = "Returns the food saturation (overcharge of the food level, is depleted before food level)" },
+				GetFoodTickTimer = { Params = "", Return = "", Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
 				GetGameMode = { Return = "{{eGameMode|GameMode}}", Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically."},
-				GetIP = { Return = "string" },
-				SetGameMode = { Return = "" },
-				MoveTo = { Return = "" },
-				GetClientHandle = { Return = "{{cClientHandle|ClientHandle}}" },
-				SendMessage = { Return = "" },
-				GetName = { Return = "String" },
-				SetName = { Return = "" },
-				AddToGroup = { Return = "" },
-				CanUseCommand = { Return = "bool" },
-				HasPermission = { Return = "bool" },
-				IsInGroup = { Return = "bool" },
-				GetColor = { Return = "string" },
-				TossItem = { Return = "" },
-				Heal = { Return = "" },
-				TakeDamage = { Return = "" },
-				KilledBy = { Return = "" },
-				Respawn = { Return = "" },
-				SetVisible = { Return = "" },
-				IsVisible = { Return = "bool" },
-				MoveToWorld = { Return = "bool" },
-				LoadPermissionsFromDisk = { Return = "" },
-				GetGroups = { Return = "list<{{cGroup|cGroup}}>" },
-				GetResolvedPermissions = { Return = "string" },
+				GetGroups = { Return = "array-table of {{cGroup}}", Notes = "Returns all the groups that this player is member of, as a table. The groups are stored in the array part of the table, beginning with index 1."},
+				GetIP = { Return = "string", Notes = "Returns the IP address of the player, if available. Returns an empty string if there's no IP to report."},
+				GetInventory = { Return = "{{cInventory|Inventory}}", Notes = "Returns the player's inventory"},
+				GetMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's current maximum speed (as reported by the 1.6.1+ protocols)" },
+				GetName = { Return = "string", Notes = "Returns the player's name" },
+				GetNormalMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's maximum walking speed (as reported by the 1.6.1+ protocols)" },
+				GetResolvedPermissions = { Return = "array-table of string", Notes = "Returns all the player's permissions, as a table. The permissions are stored in the array part of the table, beginning with index 1." },
+				GetSprintingMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's maximum sprinting speed (as reported by the 1.6.1+ protocols)" },
+				GetStance = { Return = "number", Notes = "Returns the player's stance (Y-pos of player's eyes)" },
+				GetThrowSpeed = { Params = "SpeedCoeff", Return = "{{Vector3d}}", Notes = "Returns the speed vector for an object thrown with the specified speed coeff. Basically returns the normalized look vector multiplied by the coeff, with a slight random variation." },
+				GetThrowStartPos = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the position where the projectiles should start when thrown by this player." },
+				GetWindow = { Params = "", Return = "{{cWindow}}", Notes = "Returns the currently open UI window. If the player doesn't have any UI window open, returns the inventory window." },
+				HasPermission = { Params = "PermissionString", Return = "bool", Notes = "Returns true if the player has the specified permission" },
+				Heal = { Params = "HitPoints", Return = "", Notes = "Heals the player by the specified amount of HPs. Only positive amounts are expected. Sends a health update to the client." },
+				IsEating = { Params = "", Return = "bool", Notes = "Returns true if the player is currently eating the item in their hand." },
+				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmAdventure gamemode, or has their gamemode unset and the world is a gmAdventure world." },
+				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmCreative gamemode, or has their gamemode unset and the world is a gmCreative world." },
+				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmSurvival gamemode, or has their gamemode unset and the world is a gmSurvival world." },
+				IsInGroup = { Params = "GroupNameString", Return = "bool", Notes = "Returns true if the player is a member of the specified group." },
+				IsOnGround = { Params = "", Return = "bool", Notes = "Returns true if the player is on ground (not falling, not jumping, not flying)" },
+				IsSatiated = { Params = "", Return = "bool", Notes = "Returns true if the player is satiated (cannot eat)." },
+				IsSubmerged = { Params = "", Return = "bool", Notes = "Returns true if the player is submerged in water (the player's head is in a water block)" },
+				IsSwimming = { Params = "", Return = "bool", Notes = "Returns true if the player is swimming in water (the player's feet are in a water block)" },
+				IsVisible = { Params = "", Return = "bool", Notes = "Returns true if the player is visible to other players" },
+				LoadPermissionsFromDisk = { Params = "", Return = "", Notes = "Reloads the player's permissions from the disk. This loses any temporary changes made to the player's groups." },
+				MoveTo = { Params = "{{Vector3d|NewPosition}}", Return = "Tries to move the player into the specified position." },
+				MoveToWorld = { Params = "WorldName", Return = "bool", Return = "Moves the player to the specified world. Returns true if successful." },
+				OpenWindow = { Params = "{{cWindow|Window}}", Return = "", Notes = "Opens the specified UI window for the player." },
+				RemoveFromGroup = { Params = "GroupName", Return = "", Notes = "Temporarily removes the player from the specified group. This change is lost when the player disconnects." },
+				Respawn = { Params = "", Return = "", Notes = "Restores the health, extinguishes fire, makes visible and sends the Respawn packet." },
+				SendMessage = { Params = "MessageString", Return = "", Notes = "Sends the specified message to the player." },
+				SetCrouch = { Params = "IsCrouched", Return = "", Notes = "Sets the crouch state, broadcasts the change to other players." },
+				SetFoodExhaustionLevel = { Params = "ExhaustionLevel", Return = "", Notes = "Sets the food exhaustion to the specified level." },
+				SetFoodLevel = { Params = "FoodLevel", Return = "", Notes = "Sets the food level (number of half-drumsticks on-screen)" },
+				SetFoodPoisonedTicksRemaining = { Params = "FoodPoisonedTicksRemaining", Return = "", Notes = "Sets the number of ticks remaining for food poisoning. Doesn't send foodpoisoning effect to the client, use FoodPoison() for that." },
+				SetFoodSaturationLevel = { Params = "FoodSaturationLevel", Return = "", Notes = "Sets the food saturation (overcharge of the food level)." },
+				SetFoodTickTimer = { Params = "FoodTickTimer", Return = "", Notes = "Sets the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
+				SetGameMode = { Params = "{{eGameMode|NewGameMode}}", Return = "", Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit." },
+				SetName = { Params = "Name", Return = "", Notes = "Sets the player name. This rename will NOT be visible to any players already in the server who are close enough to see this player." },
+				SetNormalMaxSpeed = { Params = "NormalMaxSpeed", Return = "", Notes = "Sets the normal (walking) maximum speed (as reported by the 1.6.1+ protocols)" },
+				SetSprint = { Params = "IsSprinting", Return = "", Notes = "Sets whether the player is sprinting or not." },
+				SetSprintingMaxSpeed = { Params = "SprintingMaxSpeed", Return = "", Notes = "Sets the sprinting maximum speed (as reported by the 1.6.1+ protocols)" },
+				SetVisible = { Params = "IsVisible", Return = "", Notes = "Sets the player visibility to other players" },
+				TossItem = { Params = "DraggedItem, [Amount], [CreateType], [CreateDamage]", Return = "", Notes = "FIXME: This function will be rewritten, avoid it. It tosses an item, either from the inventory, dragged in hand (while in UI window) or a newly created one." },
 			},
 			Constants =
 			{
+				DROWNING_TICKS = { Notes = "Number of ticks per heart of damage when drowning (zero AirLevel)" },
+				EATING_TICKS   = { Notes = "Number of ticks required for consuming an item." },
+				MAX_AIR_LEVEL  = { Notes = "The maximum air level value. AirLevel gets reset to this value when the player exits water." },
+				MAX_FOOD_LEVEL = { Notes = "The maximum food level value. When the food level is at this value, the player cannot eat." },
+				MAX_HEALTH     = { Notes = "The maximum health value" },
 			},
 			Inherits = "cPawn",
 		},
@@ -1759,18 +1943,43 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 		cProjectileEntity =
 		{
 			Desc = "",
-			Functions = {},
-			Constants = {},
+			Functions =
+			{
+				GetCreator = { Params = "", Return = "{{cEntity}} descendant", Notes = "Returns the entity who created this projectile. May return nil." },
+				GetMCAClassName = { Params = "", Return = "string", Notes = "Returns the string that identifies the projectile type  (class name) in MCA files" },
+				GetProjectileKind = { Params = "", Return = "ProjectileKind", Notes = "Returns the kind of this projectile (pkXXX constant)" },
+				IsInGround = { Params = "", Return = "bool", Notes = "Returns true if this projectile has hit the ground." },
+			},
+			Constants =
+			{
+				pkArrow = { Notes = "The projectile is an {{cArrowEntity|arrow}}" },
+				pkEgg = { Notes = "The projectile is a {{cThrownEggEntity|thrown egg}}" },
+				pkEnderPearl = { Notes = "The projectile is a {{cThrownEnderPearlEntity|thrown enderpearl}}" },
+				pkExpBottle = { Notes = "The projectile is a thrown exp bottle (NYI)" },
+				pkFireCharge = { Notes = "The projectile is a {{cFireChargeEntity|fire charge}}" },
+				pkFishingFloat = { Notes = "The projectile is a fishing float (NYI)" },
+				pkGhastFireball = { Notes = "The projectile is a {{cGhastFireballEntity|ghast fireball}}" },
+				pkSnowball = { Notes = "The projectile is a {{cThrownSnowballEntity|thrown snowball}}" },
+				pkSplashPotion = { Notes = "The projectile is a thrown splash potion (NYI)" },
+				pkWitherSkull = { Notes = "The projectile is a wither skull (NYI)" },
+			},
 			Inherits = "cEntity",
 		},
 
 		cRoot =
 		{
-			Desc = [[There is always only one cRoot object in MCServer. cRoot manages all the important objects such as {{cServer|cServer}}
-]],
+			Desc = [[
+				This class represents the root of MCServer's object hierarchy. There is always only one cRoot
+				object. It manages and allows querying all the other objects, such as {{cServer}},
+				{{cPluginManager}}, individual {{cWorld|worlds}} etc.</p>
+				<p>
+				To get the singleton instance of this object, you call the cRoot:Get() function. Then you can call
+				the individual functions on this object. Note that some of the functions are static and don't need
+				the instance, they are to be called directly on the cRoot class, such as cRoot:GetPhysicalRAMUsage()
+			]],
 			Functions =
 			{
-				Get = { Params = "", Return = "Root object", Notes = "This function returns the cRoot object." },
+				Get = { Params = "", Return = "Root object", Notes = "(STATIC)This function returns the cRoot object." },
 				BroadcastChat = { Params = "Message", Return = "", Notes = "Broadcasts a message to every player in the server." },
 				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for the given player." },
 				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
@@ -1779,11 +1988,13 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
 				GetFurnaceRecipe = { Params = "", Return = "{{cFurnaceRecipe|cFurnaceRecipe}}", Notes = "Returns the cFurnaceRecipes object." },
 				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object." },
+				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
 				GetPrimaryServerVersion = { Params = "", Return = "number", Notes = "Returns the servers primary server version." },
 				GetProtocolVersionTextFromInt = { Params = "Protocol Version", Return = "string", Notes = "Returns the Minecraft version from the given Protocol. If there is no version found, it returns 'Unknown protocol(Parameter)'" },
 				GetServer = { Params = "", Return = "{{cServer|cServer}}", Notes = "Returns the cServer object." },
 				GetTotalChunkCount = { Params = "", Return = "number", Notes = "Returns the amount of loaded chunks." },
+				GetVirtualRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of virtual RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetWebAdmin = { Params = "", Return = "{{cWebAdmin|cWebAdmin}}", Notes = "Returns the cWebAdmin object." },
 				GetWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Returns the cWorld object of the given world. It returns nil if there is no world with the given name." },
 				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread The command's output will be sent to console " .. '"stop" and "restart" commands have special handling.' },
@@ -1897,36 +2108,48 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 
 		cWindow =
 		{
-			Desc = [[This class is the common ancestor for all window classes used by MCServer. It is inherited by the {{cLuaWindow|cLuaWindow}} class that plugins use for opening custom windows. It is planned to be used for window-related hooks in the future. It implements the basic functionality of any window.
-</p>
-		<p>Note that one cWindow object can be used for multiple players at the same time, and therefore the slot contents are player-specific (e. g. crafting grid, or player inventory). Thus the GetSlot() and SetSlot() functions need to have the {{cPlayer|cPlayer}} parameter that specifies the player for which the contents are to be queried.
-]],
+			Desc = [[
+				This class is the common ancestor for all window classes used by MCServer. It is inherited by the
+				{{cLuaWindow|cLuaWindow}} class that plugins use for opening custom windows. It is planned to be
+				used for window-related hooks in the future. It implements the basic functionality of any
+				window.</p>
+				<p>
+				Note that one cWindow object can be used for multiple players at the same time, and therefore the
+				slot contents are player-specific (e. g. crafting grid, or player inventory). Thus the GetSlot() and
+				SetSlot() functions need to have the {{cPlayer|cPlayer}} parameter that specifies the player for
+				whom the contents are to be queried.</p>
+				<p>
+				Windows also have numeric properties, these are used to set the progressbars for furnaces or the XP
+				costs for enchantment tables.
+			]],
 			Functions =
 			{
+				GetSlot = { Params = "{{cPlayer|Player}}, SlotNumber", Return = "{{cItem}}", Notes = "Returns the item at the specified slot for the specified player. Returns nil and logs to server console on error." },
 				GetWindowID = { Params = "", Return = "number", Notes = "Returns the ID of the window, as used by the network protocol" },
 				GetWindowTitle = { Params = "", Return = "string", Notes = "Returns the window title that will be displayed to the player" },
 				GetWindowType = { Params = "", Return = "number", Notes = "Returns the type of the window, one of the constants in the table above" },
-				IsSlotInPlayerHotbar = { Params = "number", Return = "bool", Notes = "Returns true if the specified slot number is in the player hotbar" },
-				IsSlotInPlayerInventory = { Params = "number", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory or in the hotbar. Note that this returns false for armor slots!" },
-				IsSlotInPlayerMainInventory = { Params = "number", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory" },
-				SetSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the contents of the specified slot for the specified player. Ignored if the slot number is invalid" },
+				IsSlotInPlayerHotbar = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player hotbar" },
+				IsSlotInPlayerInventory = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory or in the hotbar. Note that this returns false for armor slots!" },
+				IsSlotInPlayerMainInventory = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory" },
+				SetProperty = { Params = "PropertyID, PropartyValue, {{cPlayer|Player}}", Return = "", Notes = "Sends the UpdateWindowProperty (0x69) packet to the specified player; or to all players who are viewing this window if Player is not specified or nil." },
+				SetSlot = { Params = "{{cPlayer|Player}}, SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the contents of the specified slot for the specified player. Ignored if the slot number is invalid" },
 				SetWindowTitle = { Params = "string", Return = "", Notes = "Sets the window title that will be displayed to the player" },
 			},
 			Constants =
 			{
-				Inventory = { Notes = "" },
-				Chest = { Notes = "0" },
-				Workbench = { Notes = "1" },
-				Furnace = { Notes = "2" },
-				DropSpenser = { Notes = "3" },
-				Enchantment = { Notes = "4" },
-				Brewery = { Notes = "5" },
-				NPCTrade = { Notes = "6" },
-				Beacon = { Notes = "7" },
-				Anvil = { Notes = "8" },
-				Hopper = { Notes = "9" },
+				wtInventory = { Notes = "An inventory window" },
+				wtChest = { Notes = "A {{cChestEntity|chest}} or doublechest window" },
+				wtWorkbench = { Notes = "A workbench (crafting table) window" },
+				wtFurnace = { Notes = "A {{cFurnaceEntity|furnace}} window" },
+				wtDropSpenser = { Notes = "A {{cDropperEntity|dropper}} or a {{cDispenserEntity|dispenser}} window" },
+				wtEnchantment = { Notes = "An enchantment table window" },
+				wtBrewery = { Notes = "A brewing stand window" },
+				wtNPCTrade = { Notes = "A villager trade window" },
+				wtBeacon = { Notes = "A beacon window" },
+				wtAnvil = { Notes = "An anvil window" },
+				wtHopper = { Notes = "A {{cHopperEntity|hopper}} window" },
 			},
-		},
+		},  -- cWindow
 
 		cWorld =
 		{
@@ -2046,6 +2269,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 				QueueBlockForTick = { Params = "BlockX, BlockY, BlockZ, TicksToWait", Return = "", Notes = "Queues the specified block to be ticked after the specified number of gameticks." },
 				QueueSaveAllChunks = { Params = "", Return = "", Notes = "Queues all chunks to be saved in the world storage thread" },
 				QueueSetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta, TickDelay", Return = "", Notes = "Queues the block to be set to the specified blocktype and meta after the specified amount of game ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are handled correctly." },
+				QueueTask = { Params = "TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the tick thread. This is the primary means of interaction with a cWorld from the WebAdmin page handlers (see {{WebWorldThreads}}). The function signature is <pre class=\"pretty-print lang-lua\">function()</pre>All return values from the function are ignored. Note that this function is actually called *after* the QueueTask() function returns." },
 				RegenerateChunk = { Params = "ChunkX, ChunkZ", Return = "", Notes = "Queues the specified chunk to be re-generated, overwriting the current data. To queue a chunk for generating only if it doesn't exist, use the GenerateChunk() instead." },
 				SendBlockTo = { Params = "BlockX, BlockY, BlockZ, {{cPlayer|Player}}", Return = "", Notes = "Sends the block at the specified coords to the specified player's client, as an UpdateBlock packet." },
 				SetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances." },
@@ -2136,7 +2360,40 @@ World:ForEachEntity(
 					]],
 				},
 			},  -- AdditionalInfo
-		},
+		},  -- cWorld
+
+		HTTPFormData =
+		{
+			Desc = "This class stores data for one form element for a {{HTTPRequest|HTTP request}}.",
+			Variables =
+			{
+				Name = { Type = "string", Notes = "Name of the form element" },
+				Type = { Type = "string", Notes = "Type of the data (usually empty)" },
+				Value = { Type = "string", Notes = "Value of the form element. Contains the raw data as sent by the browser." },
+			},
+		},  -- HTTPFormData
+
+		HTTPRequest =
+		{
+			Desc = [[
+				This class encapsulates all the data that is sent to the WebAdmin through one HTTP request. Plugins
+				receive this class as a parameter to the function handling the web requests, as registered in the
+				FIXME: {{cPluginLua}}:AddWebPage().
+			]],
+			Constants =
+			{
+				FormData = { Notes = "Array-table of {{HTTPFormData}}, contains the values of individual form elements submitted by the client" },
+				Params = { Notes = "Map-table of parameters given to the request in the URL (?param=value); if a form uses GET method, this is the same as FormData. For each parameter given as \"param=value\", there is an entry in the table with \"param\" as its key and \"value\" as its value." },
+				PostParams = { Notes = "Map-table of data posted through a FORM - either a GET or POST method. Logically the same as FormData, but in a map-table format (for each parameter given as \"param=value\", there is an entry in the table with \"param\" as its key and \"value\" as its value)." },
+			},
+
+			Variables =
+			{
+				Method = { Type = "string", Notes = "The HTTP method used to make the request. Usually GET or POST." },
+				Path = { Type = "string", Notes = "The Path part of the URL (excluding the parameters)" },
+				Username = { Type = "string", Notes = "Name of the logged-in user." },
+			},
+		},  -- HTTPRequest
 
 		TakeDamageInfo =
 		{
@@ -2148,7 +2405,7 @@ World:ForEachEntity(
 			Constants =
 			{
 			},
-		},
+		},  -- TakeDamageInfo
 
 		Vector3d =
 		{
@@ -2161,7 +2418,7 @@ World:ForEachEntity(
 			Constants =
 			{
 			},
-		},
+		},  -- Vector3d
 
 		Vector3f =
 		{
@@ -2173,7 +2430,7 @@ World:ForEachEntity(
 			Constants =
 			{
 			},
-		},
+		},  -- Vector3f
 
 		Vector3i =
 		{
@@ -2185,7 +2442,8 @@ World:ForEachEntity(
 			Constants =
 			{
 			},
-		},
+		},  -- Vector3i
+		
 		Globals =
 		{
 			Desc = [[These functions are available directly, without a class instance. Any plugin cal call them at any time.]],

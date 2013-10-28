@@ -349,11 +349,8 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 void cPlayer::Heal(int a_Health)
 {
-	if (m_Health < GetMaxHealth())
-	{
-		m_Health = (short)std::min((int)a_Health + m_Health, (int)GetMaxHealth());
-		SendHealth();
-	}
+	super::Heal(a_Health);
+	SendHealth();
 }
 
 
@@ -1183,7 +1180,7 @@ void cPlayer::TossItem(
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetRotation(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 3, vY * 3, vZ * 3);
+	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
 
 
@@ -1227,11 +1224,11 @@ void cPlayer::LoadPermissionsFromDisk()
 	m_Groups.clear();
 	m_Permissions.clear();
 
-	cIniFile IniFile("users.ini");
-	if( IniFile.ReadFile() )
+	cIniFile IniFile;
+	if (IniFile.ReadFile("users.ini"))
 	{
 		std::string Groups = IniFile.GetValue(m_PlayerName, "Groups", "");
-		if( Groups.size() > 0 )
+		if (!Groups.empty())
 		{
 			AStringVector Split = StringSplit( Groups, "," );
 			for( unsigned int i = 0; i < Split.size(); i++ )
@@ -1248,7 +1245,7 @@ void cPlayer::LoadPermissionsFromDisk()
 	}
 	else
 	{
-		LOGWARN("WARNING: Failed to read ini file users.ini");
+		LOGWARN("Failed to read the users.ini file. The player will be added only to the Default group.");
 		AddToGroup("Default");
 	}
 	ResolvePermissions();

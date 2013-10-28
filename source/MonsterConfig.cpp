@@ -55,18 +55,18 @@ cMonsterConfig::~cMonsterConfig()
 
 void cMonsterConfig::Initialize()
 {
-	cIniFile MonstersIniFile("monsters.ini");
+	cIniFile MonstersIniFile;
 	
-	if (!MonstersIniFile.ReadFile())
+	if (!MonstersIniFile.ReadFile("monsters.ini"))
 	{
 		LOGWARNING("%s: Cannot read monsters.ini file, monster attributes not available", __FUNCTION__);
 		return;
 	}
 	
-	for (int i = (int)MonstersIniFile.NumKeys(); i >= 0; i--)
+	for (int i = (int)MonstersIniFile.GetNumKeys(); i >= 0; i--)
 	{
 		sAttributesStruct Attributes;
-		AString Name = MonstersIniFile.KeyName(i);
+		AString Name = MonstersIniFile.GetKeyName(i);
 		Attributes.m_Name = Name;
 		Attributes.m_AttackDamage  = MonstersIniFile.GetValueF(Name, "AttackDamage",  0);
 		Attributes.m_AttackRange   = MonstersIniFile.GetValueF(Name, "AttackRange",   0);

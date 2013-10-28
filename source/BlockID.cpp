@@ -42,20 +42,20 @@ class cBlockIDMap
 public:
 	cBlockIDMap(void)
 	{
-		cIniFile Ini("items.ini");
-		if (!Ini.ReadFile())
+		cIniFile Ini;
+		if (!Ini.ReadFile("items.ini"))
 		{
 			return;
 		}
-		long KeyID = Ini.FindKey("Items");
+		int KeyID = Ini.FindKey("Items");
 		if (KeyID == cIniFile::noID)
 		{
 			return;
 		}
-		unsigned NumValues = Ini.GetNumValues(KeyID);
-		for (unsigned i = 0; i < NumValues; i++)
+		int NumValues = Ini.GetNumValues(KeyID);
+		for (int i = 0; i < NumValues; i++)
 		{
-			AString Name = Ini.ValueName(KeyID, i);
+			AString Name = Ini.GetValueName(KeyID, i);
 			if (Name.empty())
 			{
 				continue;

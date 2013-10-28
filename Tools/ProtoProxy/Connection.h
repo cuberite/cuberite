@@ -79,6 +79,9 @@ protected:
 	
 	/// Set to true when PACKET_PING is received from the client; will cause special parsing for server kick
 	bool m_HasClientPinged;
+	
+	/// State the protocol is in (as defined by the initial handshake), -1 if no initial handshake received yet
+	int m_ProtocolState;
 
 	bool ConnectToServer(void);
 	
@@ -130,6 +133,8 @@ protected:
 	bool HandleClientPlayerPositionLook(void);
 	bool HandleClientPluginMessage(void);
 	bool HandleClientSlotSelect(void);
+	bool HandleClientStatusPing(void);
+	bool HandleClientStatusRequest(void);
 	bool HandleClientTabCompletion(void);
 	bool HandleClientUpdateSign(void);
 	bool HandleClientUseEntity(void);
@@ -181,6 +186,8 @@ protected:
 	bool HandleServerSpawnObjectVehicle(void);
 	bool HandleServerSpawnPainting(void);
 	bool HandleServerSpawnPickup(void);
+	bool HandleServerStatusPing(void);
+	bool HandleServerStatusResponse(void);
 	bool HandleServerTabCompletion(void);
 	bool HandleServerTimeUpdate(void);
 	bool HandleServerUpdateHealth(void);

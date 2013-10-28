@@ -13,8 +13,54 @@
 
 
 
-#define NEEDBYTES(Num) if (!CanReadBytes(Num))  return false;
-#define PUTBYTES(Num)  if (!CanWriteBytes(Num)) return false;
+// If a string sent over the protocol is larger than this, a warning is emitted to the console
+#define MAX_STRING_SIZE (512 KiB)
+
+#define NEEDBYTES(Num) if (!CanReadBytes(Num))  return false;  // Check if at least Num bytes can be read from  the buffer, return false if not
+#define PUTBYTES(Num)  if (!CanWriteBytes(Num)) return false;  // Check if at least Num bytes can be written to the buffer, return false if not
+
+
+
+
+
+#if 0
+
+/// Self-test of the VarInt-reading and writing code
+class cByteBufferSelfTest
+{
+public:
+	cByteBufferSelfTest(void)
+	{
+		TestRead();
+		TestWrite();
+	}
+	
+	void TestRead(void)
+	{
+		cByteBuffer buf(50);
+		buf.Write("\x05\xac\x02\x00", 4);
+		UInt32 v1;
+		ASSERT(buf.ReadVarInt(v1) && (v1 == 5));
+		UInt32 v2;
+		ASSERT(buf.ReadVarInt(v2) && (v2 == 300));
+		UInt32 v3;
+		ASSERT(buf.ReadVarInt(v3) && (v3 == 0));
+	}
+	
+	void TestWrite(void)
+	{
+		cByteBuffer buf(50);
+		buf.WriteVarInt(5);
+		buf.WriteVarInt(300);
+		buf.WriteVarInt(0);
+		AString All;
+		buf.ReadAll(All);
+		ASSERT(All.size() == 4);
+		ASSERT(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
+	}
+} g_ByteBufferTest;
+
+#endif
 
 
 
@@ -328,6 +374,48 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 
 
 
+bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
+{
+	CHECK_THREAD;
+	CheckValid();
+	UInt32 Value = 0;
+	int Shift = 0;
+	unsigned char b = 0;
+	do
+	{
+		NEEDBYTES(1);
+		ReadBuf(&b, 1);
+		Value = Value | (((Int64)(b & 0x7f)) << Shift);
+		Shift += 7;
+	} while ((b & 0x80) != 0);
+	a_Value = Value;
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
+{
+	CHECK_THREAD;
+	CheckValid();
+	UInt32 Size = 0;
+	if (!ReadVarInt(Size))
+	{
+		return false;
+	}
+	if (Size > MAX_STRING_SIZE)
+	{
+		LOGWARNING("%s: String too large: %llu (%llu KiB)", __FUNCTION__, Size, Size / 1024);
+	}
+	return ReadString(a_Value, (int)Size);
+}
+
+
+
+
+
 bool cByteBuffer::WriteChar(char a_Value)
 {
 	CHECK_THREAD;
@@ -440,6 +528,44 @@ bool cByteBuffer::WriteBEUTF16String16(const AString & a_Value)
 	PUTBYTES(UTF16BE.size());
 	WriteBuf(UTF16BE.data(), UTF16BE.size());
 	return true;
+}
+
+
+
+
+
+bool cByteBuffer::WriteVarInt(UInt32 a_Value)
+{
+	CHECK_THREAD;
+	CheckValid();
+	
+	// A 32-bit integer can be encoded by at most 5 bytes:
+	unsigned char b[5];
+	int idx = 0;
+	do
+	{
+		b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
+		a_Value = a_Value >> 7;
+		idx++;
+	} while (a_Value > 0);
+
+	return WriteBuf(b, idx);
+}
+
+
+
+
+bool cByteBuffer::WriteVarUTF8String(AString & a_Value)
+{
+	CHECK_THREAD;
+	CheckValid();
+	PUTBYTES(a_Value.size() + 1);  // This is a lower-bound on the bytes that will be actually written. Fail early.
+	bool res = WriteVarInt(a_Value.size());
+	if (!res)
+	{
+		return false;
+	}
+	return WriteBuf(a_Value.data(), a_Value.size());
 }
 
 
