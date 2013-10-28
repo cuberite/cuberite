@@ -2108,36 +2108,48 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 
 		cWindow =
 		{
-			Desc = [[This class is the common ancestor for all window classes used by MCServer. It is inherited by the {{cLuaWindow|cLuaWindow}} class that plugins use for opening custom windows. It is planned to be used for window-related hooks in the future. It implements the basic functionality of any window.
-</p>
-		<p>Note that one cWindow object can be used for multiple players at the same time, and therefore the slot contents are player-specific (e. g. crafting grid, or player inventory). Thus the GetSlot() and SetSlot() functions need to have the {{cPlayer|cPlayer}} parameter that specifies the player for which the contents are to be queried.
-]],
+			Desc = [[
+				This class is the common ancestor for all window classes used by MCServer. It is inherited by the
+				{{cLuaWindow|cLuaWindow}} class that plugins use for opening custom windows. It is planned to be
+				used for window-related hooks in the future. It implements the basic functionality of any
+				window.</p>
+				<p>
+				Note that one cWindow object can be used for multiple players at the same time, and therefore the
+				slot contents are player-specific (e. g. crafting grid, or player inventory). Thus the GetSlot() and
+				SetSlot() functions need to have the {{cPlayer|cPlayer}} parameter that specifies the player for
+				whom the contents are to be queried.</p>
+				<p>
+				Windows also have numeric properties, these are used to set the progressbars for furnaces or the XP
+				costs for enchantment tables.
+			]],
 			Functions =
 			{
+				GetSlot = { Params = "{{cPlayer|Player}}, SlotNumber", Return = "{{cItem}}", Notes = "Returns the item at the specified slot for the specified player. Returns nil and logs to server console on error." },
 				GetWindowID = { Params = "", Return = "number", Notes = "Returns the ID of the window, as used by the network protocol" },
 				GetWindowTitle = { Params = "", Return = "string", Notes = "Returns the window title that will be displayed to the player" },
 				GetWindowType = { Params = "", Return = "number", Notes = "Returns the type of the window, one of the constants in the table above" },
-				IsSlotInPlayerHotbar = { Params = "number", Return = "bool", Notes = "Returns true if the specified slot number is in the player hotbar" },
-				IsSlotInPlayerInventory = { Params = "number", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory or in the hotbar. Note that this returns false for armor slots!" },
-				IsSlotInPlayerMainInventory = { Params = "number", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory" },
-				SetSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the contents of the specified slot for the specified player. Ignored if the slot number is invalid" },
+				IsSlotInPlayerHotbar = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player hotbar" },
+				IsSlotInPlayerInventory = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory or in the hotbar. Note that this returns false for armor slots!" },
+				IsSlotInPlayerMainInventory = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory" },
+				SetProperty = { Params = "PropertyID, PropartyValue, {{cPlayer|Player}}", Return = "", Notes = "Sends the UpdateWindowProperty (0x69) packet to the specified player; or to all players who are viewing this window if Player is not specified or nil." },
+				SetSlot = { Params = "{{cPlayer|Player}}, SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the contents of the specified slot for the specified player. Ignored if the slot number is invalid" },
 				SetWindowTitle = { Params = "string", Return = "", Notes = "Sets the window title that will be displayed to the player" },
 			},
 			Constants =
 			{
-				Inventory = { Notes = "" },
-				Chest = { Notes = "0" },
-				Workbench = { Notes = "1" },
-				Furnace = { Notes = "2" },
-				DropSpenser = { Notes = "3" },
-				Enchantment = { Notes = "4" },
-				Brewery = { Notes = "5" },
-				NPCTrade = { Notes = "6" },
-				Beacon = { Notes = "7" },
-				Anvil = { Notes = "8" },
-				Hopper = { Notes = "9" },
+				wtInventory = { Notes = "An inventory window" },
+				wtChest = { Notes = "A {{cChestEntity|chest}} or doublechest window" },
+				wtWorkbench = { Notes = "A workbench (crafting table) window" },
+				wtFurnace = { Notes = "A {{cFurnaceEntity|furnace}} window" },
+				wtDropSpenser = { Notes = "A {{cDropperEntity|dropper}} or a {{cDispenserEntity|dispenser}} window" },
+				wtEnchantment = { Notes = "An enchantment table window" },
+				wtBrewery = { Notes = "A brewing stand window" },
+				wtNPCTrade = { Notes = "A villager trade window" },
+				wtBeacon = { Notes = "A beacon window" },
+				wtAnvil = { Notes = "An anvil window" },
+				wtHopper = { Notes = "A {{cHopperEntity|hopper}} window" },
 			},
-		},
+		},  -- cWindow
 
 		cWorld =
 		{
