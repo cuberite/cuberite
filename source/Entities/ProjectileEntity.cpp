@@ -1,4 +1,3 @@
-
 // ProjectileEntity.cpp
 
 // Implements the cProjectileEntity class representing the common base class for projectiles, as well as individual projectile types
@@ -247,8 +246,6 @@ void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFac
 	SetPosition(a_HitPos);
 	SetSpeed(0, 0, 0);
 
-
-
 	// DEBUG:
 	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, hit solid block at face %d",
 		m_UniqueID,
@@ -483,10 +480,10 @@ void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace
 	else if (m_World->GetTickRandomNumber(32) == 1)
 	{
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
-	    m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
+	        m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
-    }
+        }
 	Destroy();
 }
 
