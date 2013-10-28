@@ -519,42 +519,30 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 			ASSERT(Try_Y > 0);
 			ASSERT(Try_Y < cChunkDef::Height-1);
 			
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
-			BLOCKTYPE BlockType_below;
-			NIBBLETYPE BlockMeta_below;
-			BLOCKTYPE BlockType_above;
-			NIBBLETYPE BlockMeta_above;
-			if (UnboundedRelGetBlock(Try_X, Try_Y  , Try_Z, BlockType, BlockMeta) &&
-				UnboundedRelGetBlock(Try_X, Try_Y-1, Try_Z, BlockType_below, BlockMeta_below)&&
-				UnboundedRelGetBlock(Try_X, Try_Y+1, Try_Z, BlockType_above, BlockMeta_above)
-				)
+			EMCSBiome Biome = m_ChunkMap->GetBiomeAt (Try_X, Try_Z);
+			// MG TODO :
+			// Moon cycle (for slime)
+			// check player and playerspawn presence < 24 blocks
+			// check mobs presence on the block
+
+			// MG TODO : check that "Level" really means Y
+			
+			NIBBLETYPE SkyLight = 0;
+
+			NIBBLETYPE BlockLight = 0;
+
+			if (IsLightValid())
 			{
-				EMCSBiome Biome = m_ChunkMap->GetBiomeAt (Try_X, Try_Z);
-				// MG TODO :
-				// Moon cycle (for slime)
-				// check player and playerspawn presence < 24 blocks
-				// check mobs presence on the block
-
-				// MG TODO : check that "Level" really means Y
-				
-				NIBBLETYPE SkyLight = 0;
-
-				NIBBLETYPE BlockLight = 0;
-
-				if (IsLightValid() && (UnboundedRelGetBlockBlockLight(Try_X, Try_Y, Try_Z, BlockLight)) && (UnboundedRelGetBlockSkyLight(Try_X, Try_Y, Try_Z, SkyLight)))
+				cEntity* newMob = a_MobSpawner.TryToSpawnHere(this, Try_X, Try_Y, Try_Z, Biome, MaxNbOfSuccess);
+				if (newMob)
 				{
-					cEntity* newMob = a_MobSpawner.TryToSpawnHere(BlockType, BlockMeta, BlockType_below, BlockMeta_below, BlockType_above, BlockMeta_above, SkyLight, BlockLight, Biome, Try_Y, MaxNbOfSuccess);
-					if (newMob)
-					{
-						int WorldX, WorldY, WorldZ;
-						PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
-						double ActualX = WorldX + 0.5;
-						double ActualZ = WorldZ + 0.5;
-						newMob->SetPosition(ActualX, WorldY, ActualZ);
-						LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
-						NumberOfSuccess++;
-					}
+					int WorldX, WorldY, WorldZ;
+					PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
+					double ActualX = WorldX + 0.5;
+					double ActualZ = WorldZ + 0.5;
+					newMob->SetPosition(ActualX, WorldY, ActualZ);
+					LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
+					NumberOfSuccess++;
 				}
 			}
 			

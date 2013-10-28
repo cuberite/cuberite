@@ -124,57 +124,95 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 
 
-bool cMobSpawner::CanSpawnHere(cMonster::eType a_MobType, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, NIBBLETYPE a_Skylight, NIBBLETYPE a_Blocklight, EMCSBiome a_Biome, int a_Level)
+bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome)
 {
-	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end())
+	BLOCKTYPE TargetBlock;
+	BLOCKTYPE BlockAbove;
+	BLOCKTYPE BlockBelow;
+	NIBBLETYPE BlockLight;
+	NIBBLETYPE SkyLight;
+	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end() && a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
+		
+		a_Chunk->UnboundedRelGetBlockBlockLight(a_RelX, a_RelY, a_RelZ, BlockLight);
+		a_Chunk->UnboundedRelGetBlockSkyLight(a_RelX, a_RelY, a_RelZ, SkyLight);
+		a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY + 1, a_RelZ, BlockAbove);
+		a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY - 1, a_RelZ, BlockBelow);
 		switch(a_MobType)
 		{
 			case cMonster::mtSquid:
-				return IsBlockWater(a_BlockType) && (a_Level >= 45) && (a_Level <= 62);
+				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
 
 			case cMonster::mtBat:
-				return a_Level <= 63 && (a_Skylight == 0) && (a_Blocklight <= 4) && (a_BlockType == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_above]);
+				return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4) && (TargetBlock == E_BLOCK_AIR) && (!g_BlockTransparent[BlockAbove]);
 
 			case cMonster::mtChicken:
 			case cMonster::mtCow:
 			case cMonster::mtPig:
 			case cMonster::mtHorse:
 			case cMonster::mtSheep:
-				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_below]) &&
-						(a_BlockType_below == E_BLOCK_GRASS) && (a_Skylight >= 9);
-
+			{
+				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
+						(BlockBelow == E_BLOCK_GRASS) && (SkyLight >= 9);
+			}
+				
 			case cMonster::mtOcelot:
-				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) &&
-						((a_BlockType_below == E_BLOCK_GRASS) || (a_BlockType_below == E_BLOCK_LEAVES)) && (a_Level >= 62) && (m_Random.NextInt(3,a_Biome) != 0);
-
+			{
+				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) &&
+						((BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES)) && (a_RelY >= 62) && (m_Random.NextInt(3,a_Biome) != 0);
+			}
 			case cMonster::mtEnderman:
+			{
+				if (a_RelY < 250)
+				{
+					BLOCKTYPE BlockTop;
+					a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY + 2, a_RelZ, BlockTop);
+					return  (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (BlockTop == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
+					(SkyLight <= 7) && (BlockLight <= 7);
+				}
+				break;
+			}
 			case cMonster::mtSpider:
-				return false;
+			{
+				bool CanSpawn = true;
+				for (int x = -1; x < 2; ++x)
+				{
+					for(int z = -1; z < 2; ++x)
+					{
+						CanSpawn = a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY, a_RelZ + z, TargetBlock);
+						CanSpawn = CanSpawn && (TargetBlock == E_BLOCK_AIR);
+						if (!CanSpawn)
+							return false;
+					}
+				}
+				return CanSpawn && (!g_BlockTransparent[BlockBelow]) && (SkyLight <= 7) && (BlockLight <= 7);
+
+			}
 			case cMonster::mtCreeper:
 			case cMonster::mtZombie:
-				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_below]) &&
-						(a_Skylight <= 7) && (a_Blocklight <= 7) && (m_Random.NextInt(2,a_Biome) == 0);
+				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
+						(SkyLight <= 7) && (BlockLight <= 7) && (m_Random.NextInt(2,a_Biome) == 0);
 
 			case cMonster::mtSlime:
-				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_below]) &&
-						(a_Level <= 40);
+				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
+						(a_RelY <= 40);
 			case cMonster::mtGhast:
 			case cMonster::mtZombiePigman:
-				return (a_BlockType == E_BLOCK_AIR) && (a_BlockType_above == E_BLOCK_AIR) && (!g_BlockTransparent[a_BlockType_below]) &&
+				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
 						(m_Random.NextInt(20,a_Biome) == 0);
 			default:
 				LOGD("MG TODO : check I've got a Rule to write for type %d",a_MobType);
 				return false;
 		}
 	}
+	return false;
 }
 
 
 
 
 
-cMonster* cMobSpawner::TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, BLOCKTYPE a_BlockType_below, NIBBLETYPE a_BlockMeta_below, BLOCKTYPE a_BlockType_above, NIBBLETYPE a_BlockMeta_above, NIBBLETYPE a_Skylight, NIBBLETYPE a_Blocklight, EMCSBiome a_Biome, int a_Level, int& a_MaxPackSize)
+cMonster* cMobSpawner::TryToSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int& a_MaxPackSize)
 {
 	cMonster* toReturn = NULL;
 	if (m_NewPack)
@@ -196,7 +234,7 @@ cMonster* cMobSpawner::TryToSpawnHere(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockM
 	}
 
 	
-	if (CanSpawnHere(m_MobType, a_BlockType, a_BlockMeta, a_BlockType_below, a_BlockMeta_below, a_BlockType_above, a_BlockMeta_above, a_Skylight, a_Blocklight, a_Biome, a_Level))
+	if (CanSpawnHere(a_Chunk, a_RelX, a_RelY, a_RelZ, m_MobType, a_Biome))
 	{
 		cMonster * newMob = cMonster::NewMonsterFromType(m_MobType);
 		if (newMob)
