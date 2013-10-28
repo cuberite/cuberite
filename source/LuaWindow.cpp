@@ -31,8 +31,8 @@ cLuaWindow::cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_Slo
 	// If appropriate, add an Armor slot area:
 	switch (a_WindowType)
 	{
-		case cWindow::Inventory:
-		case cWindow::Workbench:
+		case cWindow::wtInventory:
+		case cWindow::wtWorkbench:
 		{
 			m_SlotAreas.push_back(new cSlotAreaArmor(*this));
 			break;

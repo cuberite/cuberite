@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/25/13 11:34:58.
+** Generated automatically by tolua++-1.0.92 on 10/28/13 13:11:03.
 */
 
 #ifndef __cplusplus
@@ -31025,17 +31025,17 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWindow","cWindow","",NULL);
   tolua_beginmodule(tolua_S,"cWindow");
-   tolua_constant(tolua_S,"Inventory",cWindow::Inventory);
-   tolua_constant(tolua_S,"Chest",cWindow::Chest);
-   tolua_constant(tolua_S,"Workbench",cWindow::Workbench);
-   tolua_constant(tolua_S,"Furnace",cWindow::Furnace);
-   tolua_constant(tolua_S,"DropSpenser",cWindow::DropSpenser);
-   tolua_constant(tolua_S,"Enchantment",cWindow::Enchantment);
-   tolua_constant(tolua_S,"Brewery",cWindow::Brewery);
-   tolua_constant(tolua_S,"NPCTrade",cWindow::NPCTrade);
-   tolua_constant(tolua_S,"Beacon",cWindow::Beacon);
-   tolua_constant(tolua_S,"Anvil",cWindow::Anvil);
-   tolua_constant(tolua_S,"Hopper",cWindow::Hopper);
+   tolua_constant(tolua_S,"wtInventory",cWindow::wtInventory);
+   tolua_constant(tolua_S,"wtChest",cWindow::wtChest);
+   tolua_constant(tolua_S,"wtWorkbench",cWindow::wtWorkbench);
+   tolua_constant(tolua_S,"wtFurnace",cWindow::wtFurnace);
+   tolua_constant(tolua_S,"wtDropSpenser",cWindow::wtDropSpenser);
+   tolua_constant(tolua_S,"wtEnchantment",cWindow::wtEnchantment);
+   tolua_constant(tolua_S,"wtBrewery",cWindow::wtBrewery);
+   tolua_constant(tolua_S,"wtNPCTrade",cWindow::wtNPCTrade);
+   tolua_constant(tolua_S,"wtBeacon",cWindow::wtBeacon);
+   tolua_constant(tolua_S,"wtAnvil",cWindow::wtAnvil);
+   tolua_constant(tolua_S,"wtHopper",cWindow::wtHopper);
    tolua_function(tolua_S,"GetWindowID",tolua_AllToLua_cWindow_GetWindowID00);
    tolua_function(tolua_S,"GetWindowType",tolua_AllToLua_cWindow_GetWindowType00);
    tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cWindow_GetSlot00);

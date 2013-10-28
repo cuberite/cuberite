@@ -23,7 +23,7 @@ char cWindow::m_WindowIDCounter = 1;
 
 
 
-cWindow::cWindow(cWindow::WindowType a_WindowType, const AString & a_WindowTitle) :
+cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
 	m_WindowID((++m_WindowIDCounter) % 127),
 	m_WindowType(a_WindowType),
 	m_WindowTitle(a_WindowTitle),
@@ -31,7 +31,7 @@ cWindow::cWindow(cWindow::WindowType a_WindowType, const AString & a_WindowTitle
 	m_IsDestroyed(false),
 	m_ShouldDistributeToHotbarFirst(true)
 {
-	if (a_WindowType == Inventory)
+	if (a_WindowType == wtInventory)
 	{
 		m_WindowID = 0;
 	}
@@ -277,7 +277,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 
 		m_OpenedBy.remove(&a_Player);
 		
-		if ((m_WindowType != Inventory) && m_OpenedBy.empty())
+		if ((m_WindowType != wtInventory) && m_OpenedBy.empty())
 		{
 			Destroy();
 		}
@@ -703,7 +703,7 @@ void cWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
 // cInventoryWindow:
 
 cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
-	cWindow(cWindow::Inventory, "Inventory"),
+	cWindow(wtInventory, "Inventory"),
 	m_Player(a_Player)
 {
 	m_SlotAreas.push_back(new cSlotAreaCrafting(2, *this));  // The creative inventory doesn't display it, but it's still counted into slot numbers
@@ -720,7 +720,7 @@ cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
 // cCraftingWindow:
 
 cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	cWindow(cWindow::Workbench, "Crafting Table")
+	cWindow(wtWorkbench, "Crafting Table")
 {
 	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
@@ -735,7 +735,7 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 // cChestWindow:
 
 cChestWindow::cChestWindow(cChestEntity * a_Chest) :
-	cWindow(cWindow::Chest, "Chest"),
+	cWindow(wtChest, "Chest"),
 	m_World(a_Chest->GetWorld()),
 	m_BlockX(a_Chest->GetPosX()),
 	m_BlockY(a_Chest->GetPosY()),
@@ -757,7 +757,7 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest) :
 
 
 cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest) :
-	cWindow(cWindow::Chest, "Double Chest"),
+	cWindow(wtChest, "Double Chest"),
 	m_World(a_PrimaryChest->GetWorld()),
 	m_BlockX(a_PrimaryChest->GetPosX()),
 	m_BlockY(a_PrimaryChest->GetPosY()),
@@ -796,7 +796,7 @@ cChestWindow::~cChestWindow()
 // cDropSpenserWindow:
 
 cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_DropSpenser) :
-	cWindow(cWindow::DropSpenser, "Dropspenser")
+	cWindow(wtDropSpenser, "Dropspenser")
 {
 	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_DropSpenser->GetContents(), *this));
@@ -812,7 +812,7 @@ cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ,
 // cHopperWindow:
 
 cHopperWindow::cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEntity * a_Hopper) :
-	super(cWindow::Hopper, "Hopper")
+	super(wtHopper, "Hopper")
 {
 	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_Hopper->GetContents(), *this));
@@ -828,7 +828,7 @@ cHopperWindow::cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEn
 // cFurnaceWindow:
 
 cFurnaceWindow::cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace) :
-	cWindow(cWindow::Furnace, "Furnace")
+	cWindow(wtFurnace, "Furnace")
 {
 	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaFurnace(a_Furnace, *this));
