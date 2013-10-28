@@ -533,7 +533,8 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 			if (IsLightValid())
 			{
-				cEntity* newMob = a_MobSpawner.TryToSpawnHere(this, Try_X, Try_Y, Try_Z, Biome, MaxNbOfSuccess);
+				int TimeOfDay = m_World->GetTimeOfDay();
+				cEntity* newMob = a_MobSpawner.TryToSpawnHere(this, Try_X, Try_Y, Try_Z, Biome, TimeOfDay, MaxNbOfSuccess);
 				if (newMob)
 				{
 					int WorldX, WorldY, WorldZ;

@@ -124,7 +124,7 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 
 
-bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome)
+bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, int a_TimeOfDay, EMCSBiome a_Biome)
 {
 	BLOCKTYPE TargetBlock;
 	BLOCKTYPE BlockAbove;
@@ -144,7 +144,7 @@ bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, i
 				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
 
 			case cMonster::mtBat:
-				return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4) && (TargetBlock == E_BLOCK_AIR) && (!g_BlockTransparent[BlockAbove]);
+				return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4 || a_TimeOfDay > 12500) && (TargetBlock == E_BLOCK_AIR) && (!g_BlockTransparent[BlockAbove]);
 
 			case cMonster::mtChicken:
 			case cMonster::mtCow:
@@ -153,7 +153,7 @@ bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, i
 			case cMonster::mtSheep:
 			{
 				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-						(BlockBelow == E_BLOCK_GRASS) && (SkyLight >= 9);
+						(BlockBelow == E_BLOCK_GRASS) && (SkyLight >= 9) && (a_TimeOfDay <= 12500);
 			}
 				
 			case cMonster::mtOcelot:
@@ -168,34 +168,42 @@ bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, i
 					BLOCKTYPE BlockTop;
 					a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY + 2, a_RelZ, BlockTop);
 					return  (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (BlockTop == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-					(SkyLight <= 7) && (BlockLight <= 7);
+					((SkyLight <= 7) || a_TimeOfDay > 12500 ) && (BlockLight <= 7) ;
 				}
 				break;
 			}
 			case cMonster::mtSpider:
 			{
 				bool CanSpawn = true;
-				for (int x = -1; x < 2; ++x)
+				bool HaveFloor = false;
+				for (int x = 0; x < 2; ++x)
 				{
-					for(int z = -1; z < 2; ++x)
+					for(int z = 0; z < 2; ++z)
 					{
 						CanSpawn = a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY, a_RelZ + z, TargetBlock);
 						CanSpawn = CanSpawn && (TargetBlock == E_BLOCK_AIR);
 						if (!CanSpawn)
+						{
 							return false;
+						}
+						if (!HaveFloor)
+						{
+							a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock);
+							HaveFloor = HaveFloor || !g_BlockTransparent[TargetBlock];
+						}
 					}
 				}
-				return CanSpawn && (!g_BlockTransparent[BlockBelow]) && (SkyLight <= 7) && (BlockLight <= 7);
+				return CanSpawn && HaveFloor && ((SkyLight <= 7) || a_TimeOfDay > 12500) && (BlockLight <= 7);
 
 			}
 			case cMonster::mtCreeper:
 			case cMonster::mtZombie:
 				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-						(SkyLight <= 7) && (BlockLight <= 7) && (m_Random.NextInt(2,a_Biome) == 0);
+						((SkyLight <= 7) || a_TimeOfDay > 12500) && (BlockLight <= 7) && (m_Random.NextInt(2,a_Biome) == 0);
 
 			case cMonster::mtSlime:
 				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-						(a_RelY <= 40);
+						((a_RelY <= 40) || a_Biome == biSwampland);
 			case cMonster::mtGhast:
 			case cMonster::mtZombiePigman:
 				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
@@ -212,7 +220,7 @@ bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, i
 
 
 
-cMonster* cMobSpawner::TryToSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int& a_MaxPackSize)
+cMonster* cMobSpawner::TryToSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int a_TimeOfDay, int& a_MaxPackSize)
 {
 	cMonster* toReturn = NULL;
 	if (m_NewPack)
@@ -234,7 +242,7 @@ cMonster* cMobSpawner::TryToSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_
 	}
 
 	
-	if (CanSpawnHere(a_Chunk, a_RelX, a_RelY, a_RelZ, m_MobType, a_Biome))
+	if (CanSpawnHere(a_Chunk, a_RelX, a_RelY, a_RelZ, m_MobType, a_TimeOfDay, a_Biome))
 	{
 		cMonster * newMob = cMonster::NewMonsterFromType(m_MobType);
 		if (newMob)

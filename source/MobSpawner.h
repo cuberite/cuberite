@@ -39,7 +39,7 @@ public :
 	// if this is the first of a Pack : determine the type of monster
 	// BlockType & BlockMeta are used to decide what kind of Mob can Spawn here
 	// MaxPackSize is set to the maximal size for a pack this type of mob
-	cMonster * TryToSpawnHere(const cChunk * a_Chunk, int A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int& a_MaxPackSize);
+	cMonster * TryToSpawnHere(const cChunk * a_Chunk, int A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int a_TimeOfDay, int& a_MaxPackSize);
 
 	// mark the beginning of a new Pack
 	// all mobs of the same Pack are the same type
@@ -53,7 +53,7 @@ public :
 
 protected : 
 	// return true if specified type of mob can spawn on specified block
-	bool CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome);
+	bool CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, int a_TimeOfDay, EMCSBiome a_Biome);
 
 	// return a random type that can spawn on specified biome.
 	// returns E_ENTITY_TYPE_DONOTUSE if none is possible
