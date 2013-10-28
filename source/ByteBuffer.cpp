@@ -39,11 +39,11 @@ public:
 	{
 		cByteBuffer buf(50);
 		buf.Write("\x05\xac\x02\x00", 4);
-		UInt64 v1;
+		UInt32 v1;
 		ASSERT(buf.ReadVarInt(v1) && (v1 == 5));
-		UInt64 v2;
+		UInt32 v2;
 		ASSERT(buf.ReadVarInt(v2) && (v2 == 300));
-		UInt64 v3;
+		UInt32 v3;
 		ASSERT(buf.ReadVarInt(v3) && (v3 == 0));
 	}
 	
@@ -374,11 +374,11 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 
 
 
-bool cByteBuffer::ReadVarInt(UInt64 & a_Value)
+bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
 {
 	CHECK_THREAD;
 	CheckValid();
-	UInt64 Value = 0;
+	UInt32 Value = 0;
 	int Shift = 0;
 	unsigned char b = 0;
 	do
@@ -400,7 +400,7 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 {
 	CHECK_THREAD;
 	CheckValid();
-	UInt64 Size = 0;
+	UInt32 Size = 0;
 	if (!ReadVarInt(Size))
 	{
 		return false;
@@ -534,13 +534,13 @@ bool cByteBuffer::WriteBEUTF16String16(const AString & a_Value)
 
 
 
-bool cByteBuffer::WriteVarInt(UInt64 a_Value)
+bool cByteBuffer::WriteVarInt(UInt32 a_Value)
 {
 	CHECK_THREAD;
 	CheckValid();
 	
-	// A 64-bit integer can be encoded by at most 10 bytes:
-	unsigned char b[10];
+	// A 32-bit integer can be encoded by at most 5 bytes:
+	unsigned char b[5];
 	int idx = 0;
 	do
 	{
