@@ -484,7 +484,7 @@ void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace
 	  m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
-    }
+  }
 	Destroy();
 }
 
