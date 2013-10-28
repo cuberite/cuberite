@@ -13,7 +13,7 @@
 cSheep::cSheep(int a_Color) :
 	super("Sheep", mtSheep, "mob.sheep.say", "mob.sheep.say", 0.6, 1.3),
 	m_IsSheared(false),
-	m_WoolColor(0)
+	m_WoolColor(a_Color)
 {
 }
 
@@ -47,22 +47,9 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		}
 
 		cItems Drops;
-		int wooldrops = m_World->GetTickRandomNumber(2);
-		if (wooldrops == 0)
-		{
-		    Drops.push_back(cItem(E_BLOCK_WOOL, 1, m_WoolColor));
-		    m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
-		}
-	    if (wooldrops == 1)
-		{
-		    Drops.push_back(cItem(E_BLOCK_WOOL, 2, m_WoolColor));
-		    m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
-		}
-		if (wooldrops == 2)
-		{
-		    Drops.push_back(cItem(E_BLOCK_WOOL, 3, m_WoolColor));
-		    m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
-		}
+                int NumDrops = m_World->GetTickRandomumber(2) + 1
+                Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
+                m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
 }
 
