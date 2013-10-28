@@ -47,9 +47,9 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		}
 
 		cItems Drops;
-                int NumDrops = m_World->GetTickRandomNumber(2) + 1;
-                Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
-                m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+		int NumDrops = m_World->GetTickRandomNumber(2) + 1;
+		Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
+		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
 }
 
