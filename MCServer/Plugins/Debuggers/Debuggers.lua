@@ -606,7 +606,7 @@ end
 
 
 function HandleTestWndCmd(a_Split, a_Player)
-	local WindowType  = cWindow.Hopper;
+	local WindowType  = cWindow.wtHopper;
 	local WindowSizeX = 5;
 	local WindowSizeY = 1;
 	if (#a_Split == 4) then
@@ -789,7 +789,7 @@ end
 
 
 function HandleEnchCmd(a_Split, a_Player)
-	local Wnd = cLuaWindow(cWindow.Enchantment, 1, 1, "Ench");
+	local Wnd = cLuaWindow(cWindow.wtEnchantment, 1, 1, "Ench");
 	a_Player:OpenWindow(Wnd);
 	Wnd:SetProperty(0, 10);
 	Wnd:SetProperty(1, 15);
