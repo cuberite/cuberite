@@ -37,7 +37,7 @@ public:
 		if (a_BlockY < cChunkDef::Height - 1)
 		{
 			BLOCKTYPE Above = a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
-			if (!g_BlockTransparent[Above] && !g_BlockOneHitDig[Above])
+			if ((!g_BlockTransparent[Above] && !g_BlockOneHitDig[Above]) || IsBlockWater(Above))
 			{
 				a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DIRT, 0);
 				return;
@@ -69,7 +69,7 @@ public:
 			NIBBLETYPE AboveMeta;
 			IsValid = a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, AboveDest, AboveMeta);
 			ASSERT(IsValid);  // WTF - how did we get the DestBlock if AboveBlock is not valid?
-			if (g_BlockOneHitDig[AboveDest] || g_BlockTransparent[AboveDest])
+			if ((g_BlockOneHitDig[AboveDest] || g_BlockTransparent[AboveDest]) && !IsBlockWater(AboveDest))
 			{
 				a_World->FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, E_BLOCK_GRASS, 0);
 			}
