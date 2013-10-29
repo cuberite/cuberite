@@ -646,6 +646,8 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				// Game:
 				switch (PacketType)
 				{
+					case 0x00: HANDLE_CLIENT_READ(HandleClientKeepAlive); break;
+
 					case PACKET_BLOCK_DIG:                 HANDLE_CLIENT_READ(HandleClientBlockDig); break;
 					case PACKET_BLOCK_PLACE:               HANDLE_CLIENT_READ(HandleClientBlockPlace); break;
 					case PACKET_S_CHAT_MESSAGE:            HANDLE_CLIENT_READ(HandleClientChatMessage); break;
@@ -653,7 +655,6 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 					case PACKET_CREATIVE_INVENTORY_ACTION: HANDLE_CLIENT_READ(HandleClientCreativeInventoryAction); break;
 					case PACKET_DISCONNECT:                HANDLE_CLIENT_READ(HandleClientDisconnect); break;
 					case PACKET_ENTITY_ACTION:             HANDLE_CLIENT_READ(HandleClientEntityAction); break;
-					case PACKET_S_KEEPALIVE:               HANDLE_CLIENT_READ(HandleClientKeepAlive); break;
 					case PACKET_LOCALE_AND_VIEW:           HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
 					case PACKET_PING:                      HANDLE_CLIENT_READ(HandleClientPing); break;
 					case PACKET_PLAYER_ABILITIES:          HANDLE_CLIENT_READ(HandleClientPlayerAbilities); break;
@@ -671,7 +672,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 					case PACKET_WINDOW_CLOSE:              HANDLE_CLIENT_READ(HandleClientWindowClose); break;
 				}
 				break;
-			}  // case 2
+			}  // case 3 - Game
 			
 			default:
 			{
@@ -778,61 +779,60 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				// Game:
 				switch (PacketType)
 				{
-					/*
-					case 0x1b: HANDLE_SERVER_READ(HandleServerAttachEntity); break;
-					case 0x24: HANDLE_SERVER_READ(HandleServerBlockAction); break;
-					case 0x23: HANDLE_SERVER_READ(HandleServerBlockChange); break;
-					case 0x2b: HANDLE_SERVER_READ(HandleServerChangeGameState); break;
+					case 0x00: HANDLE_SERVER_READ(HandleServerKeepAlive); break;
+					case 0x01: HANDLE_SERVER_READ(HandleServerJoinGame); break;
 					case 0x02: HANDLE_SERVER_READ(HandleServerChatMessage); break;
+					case 0x04: HANDLE_SERVER_READ(HandleServerEntityEquipment); break;
+					case 0x05: HANDLE_SERVER_READ(HandleServerCompass); break;
+					case 0x06: HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
+					case 0x07: HANDLE_SERVER_READ(HandleServerRespawn); break;
+					case 0x08: HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
+					case 0x09: HANDLE_SERVER_READ(HandleServerSlotSelect); break;
+					case 0x0a: HANDLE_SERVER_READ(HandleServerUseBed); break;
+					case 0x0b: HANDLE_SERVER_READ(HandleServerPlayerAnimation); break;
+					case 0x0c: HANDLE_SERVER_READ(HandleServerSpawnNamedEntity); break;
 					case 0x0d: HANDLE_SERVER_READ(HandleServerCollectPickup); break;
+					case 0x0e: HANDLE_SERVER_READ(HandleServerSpawnObjectVehicle); break;
+					case 0x0f: HANDLE_SERVER_READ(HandleServerSpawnMob); break;
+					case 0x10: HANDLE_SERVER_READ(HandleServerSpawnPainting); break;
+					case 0x11: HANDLE_SERVER_READ(HandleServerSpawnExperienceOrbs); break;
+					case 0x12: HANDLE_SERVER_READ(HandleServerEntityVelocity); break;
 					case 0x13: HANDLE_SERVER_READ(HandleServerDestroyEntities); break;
-					*/
-					case PACKET_ENTITY:                    HANDLE_SERVER_READ(HandleServerEntity); break;
-					case PACKET_ENTITY_EQUIPMENT:          HANDLE_SERVER_READ(HandleServerEntityEquipment); break;
-					case PACKET_ENTITY_HEAD_LOOK:          HANDLE_SERVER_READ(HandleServerEntityHeadLook); break;
-					case PACKET_ENTITY_LOOK:               HANDLE_SERVER_READ(HandleServerEntityLook); break;
-					case PACKET_ENTITY_METADATA:           HANDLE_SERVER_READ(HandleServerEntityMetadata); break;
-					case PACKET_ENTITY_PROPERTIES:         HANDLE_SERVER_READ(HandleServerEntityProperties); break;
-					case PACKET_ENTITY_RELATIVE_MOVE:      HANDLE_SERVER_READ(HandleServerEntityRelativeMove); break;
-					case PACKET_ENTITY_RELATIVE_MOVE_LOOK: HANDLE_SERVER_READ(HandleServerEntityRelativeMoveLook); break;
-					case PACKET_ENTITY_STATUS:             HANDLE_SERVER_READ(HandleServerEntityStatus); break;
-					case PACKET_ENTITY_TELEPORT:           HANDLE_SERVER_READ(HandleServerEntityTeleport); break;
-					case PACKET_ENTITY_VELOCITY:           HANDLE_SERVER_READ(HandleServerEntityVelocity); break;
-					case PACKET_EXPLOSION:                 HANDLE_SERVER_READ(HandleServerExplosion); break;
-					case PACKET_INCREMENT_STATISTIC:       HANDLE_SERVER_READ(HandleServerIncrementStatistic); break;
-					case PACKET_C_JOIN_GAME:                 HANDLE_SERVER_READ(HandleServerLogin); break;
-					case PACKET_C_KEEPALIVE:                 HANDLE_SERVER_READ(HandleServerKeepAlive); break;
-					case PACKET_KICK:                      HANDLE_SERVER_READ(HandleServerKick); break;
-					case PACKET_MAP_CHUNK:                 HANDLE_SERVER_READ(HandleServerMapChunk); break;
-					case PACKET_MAP_CHUNK_BULK:            HANDLE_SERVER_READ(HandleServerMapChunkBulk); break;
-					case PACKET_MULTI_BLOCK_CHANGE:        HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
-					case PACKET_NAMED_SOUND_EFFECT:        HANDLE_SERVER_READ(HandleServerNamedSoundEffect); break;
-					case PACKET_PLAYER_ABILITIES:          HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
-					case PACKET_PLAYER_ANIMATION:          HANDLE_SERVER_READ(HandleServerPlayerAnimation); break;
-					case PACKET_PLAYER_LIST_ITEM:          HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
-					case PACKET_PLAYER_POSITION_LOOK:      HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
-					case PACKET_PLUGIN_MESSAGE:            HANDLE_SERVER_READ(HandleServerPluginMessage); break;
-					case PACKET_SET_EXPERIENCE:            HANDLE_SERVER_READ(HandleServerSetExperience); break;
-					case PACKET_SET_SLOT:                  HANDLE_SERVER_READ(HandleServerSetSlot); break;
-					case PACKET_SLOT_SELECT:               HANDLE_SERVER_READ(HandleServerSlotSelect); break;
-					case PACKET_SOUND_EFFECT:              HANDLE_SERVER_READ(HandleServerSoundEffect); break;
-					case PACKET_SPAWN_MOB:                 HANDLE_SERVER_READ(HandleServerSpawnMob); break;
-					case PACKET_SPAWN_NAMED_ENTITY:        HANDLE_SERVER_READ(HandleServerSpawnNamedEntity); break;
-					case PACKET_SPAWN_OBJECT_VEHICLE:      HANDLE_SERVER_READ(HandleServerSpawnObjectVehicle); break;
-					case PACKET_SPAWN_PAINTING:            HANDLE_SERVER_READ(HandleServerSpawnPainting); break;
-					case PACKET_SPAWN_PICKUP:              HANDLE_SERVER_READ(HandleServerSpawnPickup); break;
-					case PACKET_SPAWN_POSITION:            HANDLE_SERVER_READ(HandleServerCompass); break;
-					case PACKET_TAB_COMPLETION:            HANDLE_SERVER_READ(HandleServerTabCompletion); break;
-					case PACKET_TIME_UPDATE:               HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
-					case PACKET_UPDATE_HEALTH:             HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
-					case PACKET_UPDATE_SIGN:               HANDLE_SERVER_READ(HandleServerUpdateSign); break;
-					case PACKET_UPDATE_TILE_ENTITY:        HANDLE_SERVER_READ(HandleServerUpdateTileEntity); break;
-					case PACKET_WINDOW_CLOSE:              HANDLE_SERVER_READ(HandleServerWindowClose); break;
-					case PACKET_WINDOW_CONTENTS:           HANDLE_SERVER_READ(HandleServerWindowContents); break;
-					case PACKET_WINDOW_OPEN:               HANDLE_SERVER_READ(HandleServerWindowOpen); break;
+					case 0x14: HANDLE_SERVER_READ(HandleServerEntity); break;
+					case 0x15: HANDLE_SERVER_READ(HandleServerEntityRelativeMove); break;
+					case 0x16: HANDLE_SERVER_READ(HandleServerEntityLook); break;
+					case 0x17: HANDLE_SERVER_READ(HandleServerEntityRelativeMoveLook); break;
+					case 0x18: HANDLE_SERVER_READ(HandleServerEntityTeleport); break;
+					case 0x19: HANDLE_SERVER_READ(HandleServerEntityHeadLook); break;
+					case 0x1a: HANDLE_SERVER_READ(HandleServerEntityStatus); break;
+					case 0x1b: HANDLE_SERVER_READ(HandleServerAttachEntity); break;
+					case 0x1c: HANDLE_SERVER_READ(HandleServerEntityMetadata); break;
+					case 0x1f: HANDLE_SERVER_READ(HandleServerSetExperience); break;
+					case 0x20: HANDLE_SERVER_READ(HandleServerEntityProperties); break;
+					case 0x21: HANDLE_SERVER_READ(HandleServerMapChunk); break;
+					case 0x22: HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
+					case 0x23: HANDLE_SERVER_READ(HandleServerBlockChange); break;
+					case 0x24: HANDLE_SERVER_READ(HandleServerBlockAction); break;
+					case 0x26: HANDLE_SERVER_READ(HandleServerMapChunkBulk); break;
+					case 0x27: HANDLE_SERVER_READ(HandleServerExplosion); break;
+					case 0x28: HANDLE_SERVER_READ(HandleServerSoundEffect); break;
+					case 0x29: HANDLE_SERVER_READ(HandleServerNamedSoundEffect); break;
+					case 0x2b: HANDLE_SERVER_READ(HandleServerChangeGameState); break;
+					case 0x2d: HANDLE_SERVER_READ(HandleServerWindowOpen); break;
+					case 0x2e: HANDLE_SERVER_READ(HandleServerWindowClose); break;
+					case 0x2f: HANDLE_SERVER_READ(HandleServerSetSlot); break;
+					case 0x30: HANDLE_SERVER_READ(HandleServerWindowContents); break;
+					case 0x33: HANDLE_SERVER_READ(HandleServerUpdateSign); break;
+					case 0x35: HANDLE_SERVER_READ(HandleServerUpdateTileEntity); break;
+					case 0x37: HANDLE_SERVER_READ(HandleServerStatistics); break;
+					case 0x38: HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
+					case 0x39: HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
+					case 0x3a: HANDLE_SERVER_READ(HandleServerTabCompletion); break;
+					case 0x3f: HANDLE_SERVER_READ(HandleServerPluginMessage); break;
+					case 0x40: HANDLE_SERVER_READ(HandleServerKick); break;
 				}  // switch (PacketType)
 				break;
-			}  // case 2
+			}  // case 3 - Game
 			
 			// TODO: Move this elsewhere
 			default:
@@ -1006,7 +1006,7 @@ bool cConnection::HandleClientBlockPlace(void)
 
 bool cConnection::HandleClientChatMessage(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Message);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Message);
 	Log("Received a PACKET_CHAT_MESSAGE from the client:");
 	Log("  Message = \"%s\"", Message.c_str());
 	COPY_TO_SERVER();
@@ -1052,7 +1052,7 @@ bool cConnection::HandleClientCreativeInventoryAction(void)
 
 bool cConnection::HandleClientDisconnect(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Reason);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Reason);
 	Log("Received a PACKET_DISCONNECT from the client:");
 	Log("  Reason = \"%s\"", Reason.c_str());
 	COPY_TO_SERVER();
@@ -1094,7 +1094,7 @@ bool cConnection::HandleClientKeepAlive(void)
 
 bool cConnection::HandleClientLocaleAndView(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Locale);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Locale);
 	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ViewDistance);
 	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ChatFlags);
 	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    Difficulty);
@@ -1208,7 +1208,7 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 
 bool cConnection::HandleClientPluginMessage(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, ChannelName);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, ChannelName);
 	HANDLE_CLIENT_PACKET_READ(ReadBEShort,         short,   Length);
 	AString Data;
 	if (!m_ClientBuffer.ReadString(Data, Length))
@@ -1265,7 +1265,7 @@ bool cConnection::HandleClientStatusRequest(void)
 
 bool cConnection::HandleClientTabCompletion(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Query);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Query);
 	Log("Received a PACKET_TAB_COMPLETION query from the client");
 	Log("  Query = \"%s\"", Query.c_str());
 	COPY_TO_SERVER();
@@ -1281,10 +1281,10 @@ bool cConnection::HandleClientUpdateSign(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEInt,           int,   BlockX);
 	HANDLE_CLIENT_PACKET_READ(ReadBEShort,         short, BlockY);
 	HANDLE_CLIENT_PACKET_READ(ReadBEInt,           int,   BlockZ);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Line1);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Line2);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Line3);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Line4);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line1);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line2);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line3);
+	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line4);
 	Log("Received a PACKET_UPDATE_SIGN from the client:");
 	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Lines = \"%s\", \"%s\", \"%s\", \"%s\"", Line1.c_str(), Line2.c_str(), Line3.c_str(), Line4.c_str());
@@ -1449,16 +1449,16 @@ bool cConnection::HandleServerAttachEntity(void)
 
 bool cConnection::HandleServerBlockAction(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Byte1);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Byte2);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Byte1);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Byte2);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, BlockID);
 	Log("Received a PACKET_BLOCK_ACTION from the server:");
 	Log("  Pos = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Bytes = (%d, %d) == (0x%x, 0x%x)", Byte1, Byte2, Byte1, Byte2);
-	Log("  BlockID = %d", BlockID);
+	Log("  BlockID = %u", BlockID);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1469,11 +1469,11 @@ bool cConnection::HandleServerBlockAction(void)
 
 bool cConnection::HandleServerBlockChange(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockType);
-	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  BlockMeta);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, BlockType);
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,   BlockMeta);
 	Log("Received a PACKET_BLOCK_CHANGE from the server");
 	COPY_TO_CLIENT();
 	return true;
@@ -1500,7 +1500,7 @@ bool cConnection::HandleServerChangeGameState(void)
 
 bool cConnection::HandleServerChatMessage(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Message);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Message);
 	Log("Received a PACKET_CHAT_MESSAGE from the server:");
 	Log("  Message = \"%s\"", Message.c_str());
 	COPY_TO_CLIENT();
@@ -1656,20 +1656,18 @@ bool cConnection::HandleServerEntityProperties(void)
 	
 	for (int i = 0; i < Count; i++)
 	{
-		HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Key);
-		HANDLE_SERVER_PACKET_READ(ReadBEDouble,        double,  Value);
-		Log(" \"%s\" = %f", Key.c_str(), Value);
-	}  // for i
-	
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ListLength);
-	Log("  ListLength = %d", ListLength);
-	for (int i = 0; i < ListLength; i++)
-	{
-		HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDHi);
-		HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDLo);
-		HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, DblVal);
-		HANDLE_SERVER_PACKET_READ(ReadByte,     Byte,   ByteVal);
-		Log("  [%d] = {0x%08llx%08llx, %f, %i}", i, UUIDHi, UUIDLo, DblVal, ByteVal);
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Key);
+		HANDLE_SERVER_PACKET_READ(ReadBEDouble,      double,  Value);
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ListLength);
+		Log(" \"%s\" = %f; %d modifiers", Key.c_str(), Value, ListLength);
+		for (short j = 0; j < ListLength; j++)
+		{
+			HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDHi);
+			HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDLo);
+			HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, DblVal);
+			HANDLE_SERVER_PACKET_READ(ReadByte,     Byte,   ByteVal);
+			Log("  [%d] = {0x%08llx%08llx, %f, %u}", j, UUIDHi, UUIDLo, DblVal, ByteVal);
+		}
 	}  // for i
 	COPY_TO_CLIENT();
 	return true;
@@ -1734,7 +1732,7 @@ bool cConnection::HandleServerEntityStatus(void)
 
 bool cConnection::HandleServerEntityTeleport(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsX);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsZ);
@@ -1742,7 +1740,7 @@ bool cConnection::HandleServerEntityTeleport(void)
 	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
 	Log("Received a PACKET_ENTITY_TELEPORT from the server:");
 	Log("  EntityID = %d", EntityID);
-	Log("  Pos = (%d, %d, %d) ~ {%.02f, %.02f, %.02f}", AbsX, AbsY, AbsZ, (double)AbsX / 32, (double)AbsY / 32, (double)AbsZ / 32);
+	Log("  Pos = %s", PrintableAbsIntTriplet(AbsX, AbsY, AbsZ).c_str());
 	Log("  Yaw = %d", Yaw);
 	Log("  Pitch = %d", Pitch);
 	COPY_TO_CLIENT();
@@ -1772,11 +1770,11 @@ bool cConnection::HandleServerEntityVelocity(void)
 
 bool cConnection::HandleServerExplosion(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Force);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,    int,    NumRecords);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Force);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   NumRecords);
 	struct sCoords
 	{
 		int x, y, z;
@@ -1829,6 +1827,29 @@ bool cConnection::HandleServerIncrementStatistic(void)
 
 
 
+bool cConnection::HandleServerJoinGame(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    GameMode);
+	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    Dimension);
+	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    Difficulty);
+	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    MaxPlayers);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, LevelType);
+	Log("Received a PACKET_LOGIN from the server:");
+	Log("  EntityID = %d",      EntityID);
+	Log("  GameMode = %d",      GameMode);
+	Log("  Dimension = %d",     Dimension);
+	Log("  Difficulty = %d",    Difficulty);
+	Log("  MaxPlayers = %d",    MaxPlayers);
+	Log("  LevelType = \"%s\"", LevelType.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerKeepAlive(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, PingID);
@@ -1844,7 +1865,7 @@ bool cConnection::HandleServerKeepAlive(void)
 
 bool cConnection::HandleServerKick(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Reason);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Reason);
 	Log("Received PACKET_KICK from the SERVER:");
 	if (m_HasClientPinged)
 	{
@@ -1906,31 +1927,6 @@ bool cConnection::HandleServerKick(void)
 	{
 		Log("  Reason = \"%s\"", Reason.c_str());
 	}
-	COPY_TO_CLIENT();
-	return true;
-}
-
-
-
-
-
-bool cConnection::HandleServerLogin(void)
-{
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, LevelType);
-	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    GameMode);
-	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    Dimension);
-	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    Difficulty);
-	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    Unused);
-	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    MaxPlayers);
-	Log("Received a PACKET_LOGIN from the server:");
-	Log("  EntityID = %d",      EntityID);
-	Log("  LevelType = \"%s\"", LevelType.c_str());
-	Log("  GameMode = %d",      GameMode);
-	Log("  Dimension = %d",     Dimension);
-	Log("  Difficulty = %d",    Difficulty);
-	Log("  Unused = %d",        Unused);
-	Log("  MaxPlayers = %d",    MaxPlayers);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2049,15 +2045,15 @@ bool cConnection::HandleServerMultiBlockChange(void)
 
 bool cConnection::HandleServerNamedSoundEffect(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, SoundName);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,         float,   Volume);
-	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, SoundName);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat,       float,   Volume);
+	HANDLE_SERVER_PACKET_READ(ReadByte,          Byte,    Pitch);
 	Log("Received a PACKET_NAMED_SOUND_EFFECT from the server:");
 	Log("  SoundName = \"%s\"", SoundName.c_str());
-	Log("  Pos = (%d, %d, %d) ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 8, PosY / 8, PosZ / 8);
+	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ, 8).c_str());
 	Log("  Volume = %f", Volume);
 	Log("  Pitch = %d", Pitch);
 	COPY_TO_CLIENT();
@@ -2087,10 +2083,10 @@ bool cConnection::HandleServerPlayerAbilities(void)
 
 bool cConnection::HandleServerPlayerAnimation(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  PlayerID);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, AnimationID);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, PlayerID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,   Byte,   AnimationID);
 	Log("Received a PACKET_PLAYER_ANIMATION from the server:");
-	Log("  PlayerID: %d (0x%x)", PlayerID, PlayerID);
+	Log("  PlayerID: %u (0x%x)", PlayerID, PlayerID);
 	Log("  Animation: %d", AnimationID);
 	COPY_TO_CLIENT();
 	return true;
@@ -2102,7 +2098,7 @@ bool cConnection::HandleServerPlayerAnimation(void)
 
 bool cConnection::HandleServerPlayerListItem(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, PlayerName);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, PlayerName);
 	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    IsOnline);
 	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short,   Ping);
 	Log("Received a PACKET_PLAYERLIST_ITEM from the server:");
@@ -2119,7 +2115,6 @@ bool cConnection::HandleServerPlayerListItem(void)
 bool cConnection::HandleServerPlayerPositionLook(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, Stance);
 	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosY);
 	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Yaw);
@@ -2139,7 +2134,7 @@ bool cConnection::HandleServerPlayerPositionLook(void)
 
 bool cConnection::HandleServerPluginMessage(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, ChannelName);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, ChannelName);
 	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short,   Length);
 	AString Data;
 	if (!m_ServerBuffer.ReadString(Data, Length))
@@ -2149,7 +2144,26 @@ bool cConnection::HandleServerPluginMessage(void)
 	Log("Received a PACKET_PLUGIN_MESSAGE from the server");
 	Log("  ChannelName = \"%s\"", ChannelName.c_str());
 	DataLog(Data.data(), Length, "  Data: %d bytes", Length);
-	COPY_TO_SERVER();
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerRespawn(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     Dimension);
+	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    Difficulty);
+	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    GameMode);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, LevelType);
+	Log("Received a respawn packet from the server:");
+	Log("  Dimension = %d", Dimension);
+	Log("  Difficulty = %d", Difficulty);
+	Log("  GameMode = %d", GameMode);
+	Log("  LevelType = \"%s\"", LevelType.c_str());
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -2197,7 +2211,7 @@ bool cConnection::HandleServerSetSlot(void)
 
 bool cConnection::HandleServerSlotSelect(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SlotNum);
+	HANDLE_SERVER_PACKET_READ(ReadByte, Byte, SlotNum);
 	Log("Received a PACKET_SLOT_SELECT from the server:");
 	Log("  SlotNum = %d", SlotNum);
 	COPY_TO_CLIENT();
@@ -2221,6 +2235,25 @@ bool cConnection::HandleServerSoundEffect(void)
 	Log("  Pos = {%d, %d, %d}", PosX, PosY, PosZ);
 	Log("  Data = %d", Data);
 	Log("  NoVolumeDecrease = %d", NoVolumeDecrease);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerSpawnExperienceOrbs(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  Count);
+	Log("Received a SPAWN_EXPERIENCE_ORBS packet from the server:");
+	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
+	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
+	Log("  Count = %d", Count);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2267,14 +2300,15 @@ bool cConnection::HandleServerSpawnMob(void)
 
 bool cConnection::HandleServerSpawnNamedEntity(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, EntityName);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short,   CurrentItem);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, EntityUUID);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, EntityName);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,          Byte,    Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadByte,          Byte,    Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort,       short,   CurrentItem);
 	AString Metadata;
 	if (!ParseMetadata(m_ServerBuffer, Metadata))
 	{
@@ -2283,7 +2317,8 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	AString HexDump;
 	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
 	Log("Received a PACKET_SPAWN_NAMED_ENTITY from the server:");
-	Log("  EntityID = %d (0x%x)", EntityID, EntityID);
+	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
+	Log("  UUID = %s", EntityUUID.c_str());
 	Log("  Name = %s", EntityName.c_str());
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
@@ -2316,14 +2351,14 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	DataLog(Buffer.data(), Buffer.size(), "Buffer while parsing the PACKET_SPAWN_OBJECT_VEHICLE packet (%d bytes):", Buffer.size());
 	#endif  // _DEBUG
 	
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  ObjType);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   DataIndicator);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   ObjType);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    DataIndicator);
 	AString ExtraData;
 	short VelocityX, VelocityY, VelocityZ;
 	if (DataIndicator != 0)
@@ -2356,7 +2391,7 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 		*/
 	}
 	Log("Received a PACKET_SPAWN_OBJECT_VEHICLE from the server:");
-	Log("  EntityID = %d (0x%x)", EntityID, EntityID);
+	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
 	Log("  ObjType = %d (0x%x)", ObjType, ObjType);
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
@@ -2376,14 +2411,14 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 
 bool cConnection::HandleServerSpawnPainting(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, ImageName);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     Direction);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, ImageName);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     Direction);
 	Log("Received a PACKET_SPAWN_PAINTING from the server:");
-	Log("  EntityID = %d", EntityID);
+	Log("  EntityID = %u", EntityID);
 	Log("  ImageName = \"%s\"", ImageName.c_str());
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Direction = %d", Direction);
@@ -2418,6 +2453,21 @@ bool cConnection::HandleServerSpawnPickup(void)
 	return true;
 }
 
+
+
+
+
+bool cConnection::HandleServerStatistics(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, NumEntries);
+	for (UInt32 i = 0; i < NumEntries; i++)
+	{
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, StatName);
+		HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  StatValue);
+	}
+	COPY_TO_CLIENT();
+	return true;
+}
 
 
 
@@ -2464,7 +2514,8 @@ bool cConnection::HandleServerStatusResponse(void)
 
 bool cConnection::HandleServerTabCompletion(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Results);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  NumResults);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Results);
 	Log("Received a PACKET_TAB_COMPLETION from the server, results given:");
 
 	// Parse the zero-terminated list of results:
@@ -2522,10 +2573,10 @@ bool cConnection::HandleServerUpdateSign(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,   BlockX);
 	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short, BlockY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,   BlockZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Line1);
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Line2);
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Line3);
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Line4);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line1);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line2);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line3);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line4);
 	Log("Received a PACKET_UPDATE_SIGN from the server:");
 	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Lines = \"%s\", \"%s\", \"%s\", \"%s\"", Line1.c_str(), Line2.c_str(), Line3.c_str(), Line4.c_str());
@@ -2552,7 +2603,24 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	Log("Received a PACKET_UPDATE_TILE_ENTITY from the server:");
 	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Action = %d", Action);
-	DataLog(Data.data(), Data.size(), "  Data (%d bytes)", Data.size());
+	DataLog(Data.data(), Data.size(), "  Data (%u bytes)", Data.size());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerUseBed(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BedX);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, BedY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BedZ);
+	Log("Received a use bed packet from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Bed = {%d, %d, %d}", BedX, BedY, BedZ);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2604,14 +2672,14 @@ bool cConnection::HandleServerWindowOpen(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    WindowID);
 	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    WindowType);
-	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Title);
+	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Title);
 	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    NumSlots);
 	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    UseProvidedTitle);
-	int HorseInt = 0;
+	int HorseEntityID = 0;
 	if (WindowType == 11)  // Horse / Donkey / Mule
 	{
 		HANDLE_SERVER_PACKET_READ(ReadBEInt, int, intHorseInt);
-		HorseInt = intHorseInt;
+		HorseEntityID = intHorseInt;
 	}
 	Log("Received a PACKET_WINDOW_OPEN from the server:");
 	Log("  WindowID = %d", WindowID);
@@ -2620,7 +2688,7 @@ bool cConnection::HandleServerWindowOpen(void)
 	Log("  NumSlots = %d", NumSlots);
 	if (WindowType == 11)
 	{
-		Log("  HorseInt = %d (0x%08x)", HorseInt, HorseInt);
+		Log("  HorseEntityID = %d (0x%08x)", HorseEntityID, HorseEntityID);
 	}
 	COPY_TO_CLIENT();
 	return true;
