@@ -650,7 +650,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockZ = a_BlockZ;
 
 	if (
-		(m_Player->GetGameMode() == eGameMode_Creative) ||  // In creative mode, digging is done immediately
+		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
 		g_BlockOneHitDig[a_OldBlock]                        // One-hit blocks get destroyed immediately, too
 	)
 	{

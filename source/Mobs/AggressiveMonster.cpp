@@ -33,7 +33,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt)
 		if (m_Target->IsPlayer())
 		{
 			cPlayer * Player = (cPlayer *) m_Target;
-			if (Player->GetGameMode() == 1)
+			if (Player->IsGameModeCreative())
 			{
 				m_EMState = IDLE;
 				return;
