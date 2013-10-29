@@ -112,7 +112,7 @@
 
 #define HANDLE_CLIENT_READ(Proc) \
 	{ \
-		if (!Proc()) \
+		if (!Proc) \
 		{ \
 			AString Leftover; \
 			m_ClientBuffer.ReadAgain(Leftover); \
@@ -124,7 +124,7 @@
 	
 #define HANDLE_SERVER_READ(Proc) \
 	{ \
-		if (!Proc()) \
+		if (!Proc) \
 		{ \
 			m_ServerBuffer.ResetRead(); \
 			return true; \
@@ -604,8 +604,10 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			// Not a complete packet yet
 			break;
 		}
-		UInt32 PacketType;
+		UInt32 PacketType, PacketReadSoFar;
+		PacketReadSoFar = m_ClientBuffer.GetReadableSpace();
 		VERIFY(m_ClientBuffer.ReadVarInt(PacketType));
+		PacketReadSoFar -= m_ClientBuffer.GetReadableSpace();
 		Log("Decoding client's packets, there are now %d bytes in the queue; next packet is 0x%0x, %u bytes long", m_ClientBuffer.GetReadableSpace(), PacketType, PacketLen);
 		switch (m_ClientProtocolState)
 		{
@@ -614,7 +616,8 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				// No initial handshake received yet
 				switch (PacketType)
 				{
-					case 0: HANDLE_CLIENT_READ(HandleClientHandshake); break;
+					case 0x00: HANDLE_CLIENT_READ(HandleClientHandshake()); break;
+					default:   HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
 				}
 				break;
 			}  // case -1
@@ -624,8 +627,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				// Status query
 				switch (PacketType)
 				{
-					case 0x00: HANDLE_CLIENT_READ(HandleClientStatusRequest); break;
-					case 0x01: HANDLE_CLIENT_READ(HandleClientStatusPing); break;
+					case 0x00: HANDLE_CLIENT_READ(HandleClientStatusRequest()); break;
+					case 0x01: HANDLE_CLIENT_READ(HandleClientStatusPing()); break;
+					default:   HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
 				}
 				break;
 			}
@@ -635,8 +639,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				// Login
 				switch (PacketType)
 				{
-					case 0x00: HANDLE_CLIENT_READ(HandleClientLoginStart); break;
-					case 0x01: HANDLE_CLIENT_READ(HandleClientLoginEncryptionKeyResponse); break;
+					case 0x00: HANDLE_CLIENT_READ(HandleClientLoginStart()); break;
+					case 0x01: HANDLE_CLIENT_READ(HandleClientLoginEncryptionKeyResponse()); break;
+					default:   HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
 				}
 				break;
 			}
@@ -646,62 +651,38 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				// Game:
 				switch (PacketType)
 				{
-					case 0x00: HANDLE_CLIENT_READ(HandleClientKeepAlive); break;
-
-					case PACKET_BLOCK_DIG:                 HANDLE_CLIENT_READ(HandleClientBlockDig); break;
-					case PACKET_BLOCK_PLACE:               HANDLE_CLIENT_READ(HandleClientBlockPlace); break;
-					case PACKET_S_CHAT_MESSAGE:            HANDLE_CLIENT_READ(HandleClientChatMessage); break;
-					case PACKET_CLIENT_STATUSES:           HANDLE_CLIENT_READ(HandleClientClientStatuses); break;
-					case PACKET_CREATIVE_INVENTORY_ACTION: HANDLE_CLIENT_READ(HandleClientCreativeInventoryAction); break;
-					case PACKET_DISCONNECT:                HANDLE_CLIENT_READ(HandleClientDisconnect); break;
-					case PACKET_ENTITY_ACTION:             HANDLE_CLIENT_READ(HandleClientEntityAction); break;
-					case PACKET_LOCALE_AND_VIEW:           HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
-					case PACKET_PING:                      HANDLE_CLIENT_READ(HandleClientPing); break;
-					case PACKET_PLAYER_ABILITIES:          HANDLE_CLIENT_READ(HandleClientPlayerAbilities); break;
-					case PACKET_PLAYER_ANIMATION:          HANDLE_CLIENT_READ(HandleClientAnimation); break;
-					case PACKET_PLAYER_LOOK:               HANDLE_CLIENT_READ(HandleClientPlayerLook); break;
-					case PACKET_PLAYER_ON_GROUND:          HANDLE_CLIENT_READ(HandleClientPlayerOnGround); break;
-					case PACKET_PLAYER_POSITION:           HANDLE_CLIENT_READ(HandleClientPlayerPosition); break;
-					case PACKET_PLAYER_POSITION_LOOK:      HANDLE_CLIENT_READ(HandleClientPlayerPositionLook); break;
-					case PACKET_PLUGIN_MESSAGE:            HANDLE_CLIENT_READ(HandleClientPluginMessage); break;
-					case PACKET_SLOT_SELECT:               HANDLE_CLIENT_READ(HandleClientSlotSelect); break;
-					case PACKET_TAB_COMPLETION:            HANDLE_CLIENT_READ(HandleClientTabCompletion); break;
-					case PACKET_UPDATE_SIGN:               HANDLE_CLIENT_READ(HandleClientUpdateSign); break;
-					case PACKET_USE_ENTITY:                HANDLE_CLIENT_READ(HandleClientUseEntity); break;
-					case PACKET_WINDOW_CLICK:              HANDLE_CLIENT_READ(HandleClientWindowClick); break;
-					case PACKET_WINDOW_CLOSE:              HANDLE_CLIENT_READ(HandleClientWindowClose); break;
+					case 0x00: HANDLE_CLIENT_READ(HandleClientKeepAlive()); break;
+					case 0x01: HANDLE_CLIENT_READ(HandleClientChatMessage()); break;
+					case 0x02: HANDLE_CLIENT_READ(HandleClientUseEntity()); break;
+					case 0x03: HANDLE_CLIENT_READ(HandleClientPlayerOnGround()); break;
+					case 0x04: HANDLE_CLIENT_READ(HandleClientPlayerPosition()); break;
+					case 0x05: HANDLE_CLIENT_READ(HandleClientPlayerLook()); break;
+					case 0x06: HANDLE_CLIENT_READ(HandleClientPlayerPositionLook()); break;
+					case 0x07: HANDLE_CLIENT_READ(HandleClientBlockDig()); break;
+					case 0x08: HANDLE_CLIENT_READ(HandleClientBlockPlace()); break;
+					case 0x09: HANDLE_CLIENT_READ(HandleClientSlotSelect()); break;
+					case 0x0a: HANDLE_CLIENT_READ(HandleClientAnimation()); break;
+					case 0x0b: HANDLE_CLIENT_READ(HandleClientEntityAction()); break;
+					case 0x0d: HANDLE_CLIENT_READ(HandleClientWindowClose()); break;
+					case 0x0e: HANDLE_CLIENT_READ(HandleClientWindowClick()); break;
+					case 0x10: HANDLE_CLIENT_READ(HandleClientCreativeInventoryAction()); break;
+					case 0x12: HANDLE_CLIENT_READ(HandleClientUpdateSign()); break;
+					case 0x13: HANDLE_CLIENT_READ(HandleClientPlayerAbilities()); break;
+					case 0x14: HANDLE_CLIENT_READ(HandleClientTabCompletion()); break;
+					case 0x15: HANDLE_CLIENT_READ(HandleClientLocaleAndView()); break;
+					case 0x16: HANDLE_CLIENT_READ(HandleClientClientStatuses()); break;
+					case 0x17: HANDLE_CLIENT_READ(HandleClientPluginMessage()); break;
+					default:   HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
 				}
 				break;
 			}  // case 3 - Game
 			
 			default:
 			{
-				// TODO: Move this elsewhere
-				if (m_ClientState == csEncryptedUnderstood)
-				{
-					Log("****************** Unknown packet 0x%02x from the client while encrypted; continuing to relay blind only", PacketType);
-					AString Data;
-					m_ClientBuffer.ResetRead();
-					m_ClientBuffer.ReadAll(Data);
-					DataLog(Data.data(), Data.size(), "Current data in the client packet queue: %d bytes", Data.size());
-					m_ClientState = csEncryptedUnknown;
-					m_ClientBuffer.ResetRead();
-					if (m_ServerState == csUnencrypted)
-					{
-						SERVERSEND(m_ClientBuffer);
-					}
-					else
-					{
-						SERVERENCRYPTSEND(m_ClientBuffer);
-					}
-					return true;
-				}
-				else
-				{
-					Log("Unknown packet 0x%02x from the client while unencrypted; aborting connection", PacketType);
-					return false;
-				}
-			}  // default
+				Log("Receiving server packets while in an unknown protocol state (%d)!", m_ClientProtocolState);
+				HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+				break;
+			}
 		}  // switch (m_ProtocolState)
 		m_ClientBuffer.CommitRead();
 	}  // while (true)
@@ -739,8 +720,10 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			// Not a complete packet yet
 			break;
 		}
-		UInt32 PacketType;
+		UInt32 PacketType, PacketReadSoFar;
+		PacketReadSoFar = m_ServerBuffer.GetReadableSpace();
 		VERIFY(m_ServerBuffer.ReadVarInt(PacketType));
+		PacketReadSoFar -= m_ServerBuffer.GetReadableSpace();
 		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%0x, %u bytes long", m_ServerBuffer.GetReadableSpace(), PacketType, PacketLen);
 		LogFlush();
 		switch (m_ServerProtocolState)
@@ -748,6 +731,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case -1:
 			{
 				Log("Receiving data from the server without an initial handshake message!");
+				HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
 				break;
 			}
 			
@@ -756,8 +740,9 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				// Status query:
 				switch (PacketType)
 				{
-					case 0: HANDLE_SERVER_READ(HandleServerStatusResponse); break;
-					case 1: HANDLE_SERVER_READ(HandleServerStatusPing);     break;
+					case 0x00: HANDLE_SERVER_READ(HandleServerStatusResponse()); break;
+					case 0x01: HANDLE_SERVER_READ(HandleServerStatusPing());     break;
+					default:   HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
 				}
 				break;
 			}
@@ -767,9 +752,10 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				// Login:
 				switch (PacketType)
 				{
-					case 0x00: HANDLE_SERVER_READ(HandleServerLoginDisconnect); break;
-					case 0x01: HANDLE_SERVER_READ(HandleServerLoginEncryptionKeyRequest); break;
-					case 0x02: HANDLE_SERVER_READ(HandleServerLoginSuccess); break;
+					case 0x00: HANDLE_SERVER_READ(HandleServerLoginDisconnect()); break;
+					case 0x01: HANDLE_SERVER_READ(HandleServerLoginEncryptionKeyRequest()); break;
+					case 0x02: HANDLE_SERVER_READ(HandleServerLoginSuccess()); break;
+					default:   HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
 				}
 				break;
 			}
@@ -779,57 +765,59 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				// Game:
 				switch (PacketType)
 				{
-					case 0x00: HANDLE_SERVER_READ(HandleServerKeepAlive); break;
-					case 0x01: HANDLE_SERVER_READ(HandleServerJoinGame); break;
-					case 0x02: HANDLE_SERVER_READ(HandleServerChatMessage); break;
-					case 0x04: HANDLE_SERVER_READ(HandleServerEntityEquipment); break;
-					case 0x05: HANDLE_SERVER_READ(HandleServerCompass); break;
-					case 0x06: HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
-					case 0x07: HANDLE_SERVER_READ(HandleServerRespawn); break;
-					case 0x08: HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
-					case 0x09: HANDLE_SERVER_READ(HandleServerSlotSelect); break;
-					case 0x0a: HANDLE_SERVER_READ(HandleServerUseBed); break;
-					case 0x0b: HANDLE_SERVER_READ(HandleServerPlayerAnimation); break;
-					case 0x0c: HANDLE_SERVER_READ(HandleServerSpawnNamedEntity); break;
-					case 0x0d: HANDLE_SERVER_READ(HandleServerCollectPickup); break;
-					case 0x0e: HANDLE_SERVER_READ(HandleServerSpawnObjectVehicle); break;
-					case 0x0f: HANDLE_SERVER_READ(HandleServerSpawnMob); break;
-					case 0x10: HANDLE_SERVER_READ(HandleServerSpawnPainting); break;
-					case 0x11: HANDLE_SERVER_READ(HandleServerSpawnExperienceOrbs); break;
-					case 0x12: HANDLE_SERVER_READ(HandleServerEntityVelocity); break;
-					case 0x13: HANDLE_SERVER_READ(HandleServerDestroyEntities); break;
-					case 0x14: HANDLE_SERVER_READ(HandleServerEntity); break;
-					case 0x15: HANDLE_SERVER_READ(HandleServerEntityRelativeMove); break;
-					case 0x16: HANDLE_SERVER_READ(HandleServerEntityLook); break;
-					case 0x17: HANDLE_SERVER_READ(HandleServerEntityRelativeMoveLook); break;
-					case 0x18: HANDLE_SERVER_READ(HandleServerEntityTeleport); break;
-					case 0x19: HANDLE_SERVER_READ(HandleServerEntityHeadLook); break;
-					case 0x1a: HANDLE_SERVER_READ(HandleServerEntityStatus); break;
-					case 0x1b: HANDLE_SERVER_READ(HandleServerAttachEntity); break;
-					case 0x1c: HANDLE_SERVER_READ(HandleServerEntityMetadata); break;
-					case 0x1f: HANDLE_SERVER_READ(HandleServerSetExperience); break;
-					case 0x20: HANDLE_SERVER_READ(HandleServerEntityProperties); break;
-					case 0x21: HANDLE_SERVER_READ(HandleServerMapChunk); break;
-					case 0x22: HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
-					case 0x23: HANDLE_SERVER_READ(HandleServerBlockChange); break;
-					case 0x24: HANDLE_SERVER_READ(HandleServerBlockAction); break;
-					case 0x26: HANDLE_SERVER_READ(HandleServerMapChunkBulk); break;
-					case 0x27: HANDLE_SERVER_READ(HandleServerExplosion); break;
-					case 0x28: HANDLE_SERVER_READ(HandleServerSoundEffect); break;
-					case 0x29: HANDLE_SERVER_READ(HandleServerNamedSoundEffect); break;
-					case 0x2b: HANDLE_SERVER_READ(HandleServerChangeGameState); break;
-					case 0x2d: HANDLE_SERVER_READ(HandleServerWindowOpen); break;
-					case 0x2e: HANDLE_SERVER_READ(HandleServerWindowClose); break;
-					case 0x2f: HANDLE_SERVER_READ(HandleServerSetSlot); break;
-					case 0x30: HANDLE_SERVER_READ(HandleServerWindowContents); break;
-					case 0x33: HANDLE_SERVER_READ(HandleServerUpdateSign); break;
-					case 0x35: HANDLE_SERVER_READ(HandleServerUpdateTileEntity); break;
-					case 0x37: HANDLE_SERVER_READ(HandleServerStatistics); break;
-					case 0x38: HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
-					case 0x39: HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
-					case 0x3a: HANDLE_SERVER_READ(HandleServerTabCompletion); break;
-					case 0x3f: HANDLE_SERVER_READ(HandleServerPluginMessage); break;
-					case 0x40: HANDLE_SERVER_READ(HandleServerKick); break;
+					case 0x00: HANDLE_SERVER_READ(HandleServerKeepAlive()); break;
+					case 0x01: HANDLE_SERVER_READ(HandleServerJoinGame()); break;
+					case 0x02: HANDLE_SERVER_READ(HandleServerChatMessage()); break;
+					case 0x03: HANDLE_SERVER_READ(HandleServerTimeUpdate()); break;
+					case 0x04: HANDLE_SERVER_READ(HandleServerEntityEquipment()); break;
+					case 0x05: HANDLE_SERVER_READ(HandleServerCompass()); break;
+					case 0x06: HANDLE_SERVER_READ(HandleServerUpdateHealth()); break;
+					case 0x07: HANDLE_SERVER_READ(HandleServerRespawn()); break;
+					case 0x08: HANDLE_SERVER_READ(HandleServerPlayerPositionLook()); break;
+					case 0x09: HANDLE_SERVER_READ(HandleServerSlotSelect()); break;
+					case 0x0a: HANDLE_SERVER_READ(HandleServerUseBed()); break;
+					case 0x0b: HANDLE_SERVER_READ(HandleServerPlayerAnimation()); break;
+					case 0x0c: HANDLE_SERVER_READ(HandleServerSpawnNamedEntity()); break;
+					case 0x0d: HANDLE_SERVER_READ(HandleServerCollectPickup()); break;
+					case 0x0e: HANDLE_SERVER_READ(HandleServerSpawnObjectVehicle()); break;
+					case 0x0f: HANDLE_SERVER_READ(HandleServerSpawnMob()); break;
+					case 0x10: HANDLE_SERVER_READ(HandleServerSpawnPainting()); break;
+					case 0x11: HANDLE_SERVER_READ(HandleServerSpawnExperienceOrbs()); break;
+					case 0x12: HANDLE_SERVER_READ(HandleServerEntityVelocity()); break;
+					case 0x13: HANDLE_SERVER_READ(HandleServerDestroyEntities()); break;
+					case 0x14: HANDLE_SERVER_READ(HandleServerEntity()); break;
+					case 0x15: HANDLE_SERVER_READ(HandleServerEntityRelativeMove()); break;
+					case 0x16: HANDLE_SERVER_READ(HandleServerEntityLook()); break;
+					case 0x17: HANDLE_SERVER_READ(HandleServerEntityRelativeMoveLook()); break;
+					case 0x18: HANDLE_SERVER_READ(HandleServerEntityTeleport()); break;
+					case 0x19: HANDLE_SERVER_READ(HandleServerEntityHeadLook()); break;
+					case 0x1a: HANDLE_SERVER_READ(HandleServerEntityStatus()); break;
+					case 0x1b: HANDLE_SERVER_READ(HandleServerAttachEntity()); break;
+					case 0x1c: HANDLE_SERVER_READ(HandleServerEntityMetadata()); break;
+					case 0x1f: HANDLE_SERVER_READ(HandleServerSetExperience()); break;
+					case 0x20: HANDLE_SERVER_READ(HandleServerEntityProperties()); break;
+					case 0x21: HANDLE_SERVER_READ(HandleServerMapChunk()); break;
+					case 0x22: HANDLE_SERVER_READ(HandleServerMultiBlockChange()); break;
+					case 0x23: HANDLE_SERVER_READ(HandleServerBlockChange()); break;
+					case 0x24: HANDLE_SERVER_READ(HandleServerBlockAction()); break;
+					case 0x26: HANDLE_SERVER_READ(HandleServerMapChunkBulk()); break;
+					case 0x27: HANDLE_SERVER_READ(HandleServerExplosion()); break;
+					case 0x28: HANDLE_SERVER_READ(HandleServerSoundEffect()); break;
+					case 0x29: HANDLE_SERVER_READ(HandleServerNamedSoundEffect()); break;
+					case 0x2b: HANDLE_SERVER_READ(HandleServerChangeGameState()); break;
+					case 0x2d: HANDLE_SERVER_READ(HandleServerWindowOpen()); break;
+					case 0x2e: HANDLE_SERVER_READ(HandleServerWindowClose()); break;
+					case 0x2f: HANDLE_SERVER_READ(HandleServerSetSlot()); break;
+					case 0x30: HANDLE_SERVER_READ(HandleServerWindowContents()); break;
+					case 0x33: HANDLE_SERVER_READ(HandleServerUpdateSign()); break;
+					case 0x35: HANDLE_SERVER_READ(HandleServerUpdateTileEntity()); break;
+					case 0x37: HANDLE_SERVER_READ(HandleServerStatistics()); break;
+					case 0x38: HANDLE_SERVER_READ(HandleServerPlayerListItem()); break;
+					case 0x39: HANDLE_SERVER_READ(HandleServerPlayerAbilities()); break;
+					case 0x3a: HANDLE_SERVER_READ(HandleServerTabCompletion()); break;
+					case 0x3f: HANDLE_SERVER_READ(HandleServerPluginMessage()); break;
+					case 0x40: HANDLE_SERVER_READ(HandleServerKick()); break;
+					default:   HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
 				}  // switch (PacketType)
 				break;
 			}  // case 3 - Game
@@ -837,30 +825,9 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			// TODO: Move this elsewhere
 			default:
 			{
-				if (m_ServerState == csEncryptedUnderstood)
-				{
-					Log("********************** Unknown packet 0x%02x from the server while encrypted; continuing to relay blind only", PacketType);
-					AString Data;
-					m_ServerBuffer.ResetRead();
-					m_ServerBuffer.ReadAll(Data);
-					DataLog(Data.data(), Data.size(), "Current data in the server packet queue: %d bytes", Data.size());
-					m_ServerState = csEncryptedUnknown;
-					m_ServerBuffer.ResetRead();
-					if (m_ClientState == csUnencrypted)
-					{
-						CLIENTSEND(m_ServerBuffer);
-					}
-					else
-					{
-						CLIENTENCRYPTSEND(m_ServerBuffer);
-					}
-					return true;
-				}
-				else
-				{
-					Log("Unknown packet 0x%02x from the server while unencrypted; aborting connection", PacketType);
-					return false;
-				}
+				Log("Received a packet from the server while in an unknown state: %d", m_ServerProtocolState);
+				HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+				break;
 			}
 		}  // switch (m_ProtocolState)
 		
@@ -1067,11 +1034,11 @@ bool cConnection::HandleClientEntityAction(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  PlayerID);
 	HANDLE_CLIENT_PACKET_READ(ReadByte,  Byte, ActionType);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  UnknownHorseVal);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  HorseJumpBoost);
 	Log("Received a PACKET_ENTITY_ACTION from the client:");
 	Log("  PlayerID = %d", PlayerID);
 	Log("  ActionType = %d", ActionType);
-	Log("  UnknownHorseVal = %d (0x%08x)", UnknownHorseVal, UnknownHorseVal);
+	Log("  HorseJumpBoost = %d (0x%08x)", HorseJumpBoost, HorseJumpBoost);
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1095,10 +1062,11 @@ bool cConnection::HandleClientKeepAlive(void)
 bool cConnection::HandleClientLocaleAndView(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Locale);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ViewDistance);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ChatFlags);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    Difficulty);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ShowCape);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    ViewDistance);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    ChatFlags);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    Unused);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    Difficulty);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    ShowCape);
 	Log("Received a PACKET_LOCALE_AND_VIEW from the client");
 	COPY_TO_SERVER();
 	return true;
@@ -1123,7 +1091,7 @@ bool cConnection::HandleClientPing(void)
 
 bool cConnection::HandleClientPlayerAbilities(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadChar, char, Flags);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,    char, Flags);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, FlyingSpeed);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, WalkingSpeed);
 	Log("Receives a PACKET_PLAYER_ABILITIES from the client:");
@@ -1154,7 +1122,7 @@ bool cConnection::HandleClientPlayerLook(void)
 
 bool cConnection::HandleClientPlayerOnGround(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  OnGround);
+	HANDLE_CLIENT_PACKET_READ(ReadChar, char, OnGround);
 	Log("Received a PACKET_PLAYER_ON_GROUND from the client");
 	COPY_TO_SERVER();
 	return true;
@@ -1167,8 +1135,8 @@ bool cConnection::HandleClientPlayerOnGround(void)
 bool cConnection::HandleClientPlayerPosition(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosX);
-	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosZ);
 	HANDLE_CLIENT_PACKET_READ(ReadChar,     char,   IsOnGround);
 	Log("Received a PACKET_PLAYER_POSITION from the client");
@@ -1186,8 +1154,8 @@ bool cConnection::HandleClientPlayerPosition(void)
 bool cConnection::HandleClientPlayerPositionLook(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosX);
-	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosZ);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Yaw);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Pitch);
@@ -1195,7 +1163,7 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 	Log("Received a PACKET_PLAYER_POSITION_LOOK from the client");
 	Log("  Pos = {%.03f, %.03f, %.03f}", PosX, PosY, PosZ);
 	Log("  Stance = %.03f", Stance);
-	Log("  Y, P = %.03f, %.03f", Yaw, Pitch);
+	Log("  Yaw, Pitch = <%.03f, %.03f>", Yaw, Pitch);
 	Log("  IsOnGround = %s", IsOnGround ? "true" : "false");
 	
 	COPY_TO_SERVER();
@@ -1278,9 +1246,9 @@ bool cConnection::HandleClientTabCompletion(void)
 
 bool cConnection::HandleClientUpdateSign(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt,           int,   BlockX);
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort,         short, BlockY);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt,           int,   BlockZ);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt,         int,     BlockX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort,       short,   BlockY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt,         int,     BlockZ);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line1);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line2);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line3);
@@ -1298,11 +1266,9 @@ bool cConnection::HandleClientUpdateSign(void)
 
 bool cConnection::HandleClientUseEntity(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  PlayerID);
 	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  EntityID);
 	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, MouseButton);
 	Log("Received a PACKET_USE_ENTITY from the client:");
-	Log("  PlayerID = %d", PlayerID);
 	Log("  EntityID = %d", EntityID);
 	Log("  MouseButton = %d", MouseButton);
 	COPY_TO_SERVER();
@@ -1317,9 +1283,9 @@ bool cConnection::HandleClientWindowClick(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  WindowID);
 	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, SlotNum);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  IsRightClick);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  Button);
 	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, TransactionID);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  IsShiftClick);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  Mode);
 	AString Item;
 	if (!ParseSlot(m_ClientBuffer, Item))
 	{
@@ -1328,7 +1294,7 @@ bool cConnection::HandleClientWindowClick(void)
 	Log("Received a PACKET_WINDOW_CLICK from the client");
 	Log("  WindowID = %d", WindowID);
 	Log("  SlotNum = %d", SlotNum);
-	Log("  IsRclk = %d, IsShift = %d", IsRightClick, IsShiftClick);
+	Log("  Button = %d, Mode = %d", Button, Mode);
 	Log("  TransactionID = 0x%x", TransactionID);
 	Log("  ClickedItem = %s", Item.c_str());
 	COPY_TO_SERVER();
@@ -1344,6 +1310,22 @@ bool cConnection::HandleClientWindowClose(void)
 	HANDLE_CLIENT_PACKET_READ(ReadChar, char, WindowID);
 	Log("Received a PACKET_WINDOW_CLOSE from the client:");
 	Log("  WindowID = %d", WindowID);
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar)
+{
+	AString Data;
+	if (!m_ClientBuffer.ReadString(Data, a_PacketLen - a_PacketReadSoFar))
+	{
+		return false;
+	}
+	DataLog(Data.data(), Data.size(), "****************** Unknown packet 0x%x from the client; relaying and ignoring", a_PacketType);
 	COPY_TO_SERVER();
 	return true;
 }
@@ -2690,6 +2672,22 @@ bool cConnection::HandleServerWindowOpen(void)
 	{
 		Log("  HorseEntityID = %d (0x%08x)", HorseEntityID, HorseEntityID);
 	}
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar)
+{
+	AString Data;
+	if (!m_ServerBuffer.ReadString(Data, a_PacketLen - a_PacketReadSoFar))
+	{
+		return false;
+	}
+	DataLog(Data.data(), Data.size(), "****************** Unknown packet 0x%x from the server; relaying and ignoring", a_PacketType);
 	COPY_TO_CLIENT();
 	return true;
 }

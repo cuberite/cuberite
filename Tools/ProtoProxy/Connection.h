@@ -157,6 +157,8 @@ protected:
 	bool HandleClientUseEntity(void);
 	bool HandleClientWindowClick(void);
 	bool HandleClientWindowClose(void);
+	
+	bool HandleClientUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar);
 
 	// Packet handling, server-side, login:
 	bool HandleServerLoginDisconnect(void);
@@ -222,6 +224,8 @@ protected:
 	bool HandleServerWindowContents(void);
 	bool HandleServerWindowOpen(void);
 	
+	bool HandleServerUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar);
+
 	/// Parses the slot data in a_Buffer into item description; returns true if successful, false if not enough data
 	bool ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc);
 	
