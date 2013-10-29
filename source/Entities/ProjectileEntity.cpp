@@ -474,8 +474,17 @@ cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, 
 
 void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
-	// TODO: Random-spawn a chicken or four
-	
+	if (m_World->GetTickRandomNumber(7) == 1)
+	{
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
+	}
+	else if (m_World->GetTickRandomNumber(32) == 1)
+	{
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
+	}
 	Destroy();
 }
 
