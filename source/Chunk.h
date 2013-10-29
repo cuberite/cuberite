@@ -329,6 +329,9 @@ public:
 	/// Same as QueueTickBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s in such a case), ignores unsuccessful attempts
 	void UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
 
+	// Light alterations based on time
+	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
+
 
 	// Simulator data:
 	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }

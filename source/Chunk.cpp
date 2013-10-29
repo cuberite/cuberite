@@ -533,8 +533,7 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 			if (IsLightValid())
 			{
-				int TimeOfDay = m_World->GetTimeOfDay();
-				cEntity* newMob = a_MobSpawner.TryToSpawnHere(this, Try_X, Try_Y, Try_Z, Biome, TimeOfDay, MaxNbOfSuccess);
+				cEntity* newMob = a_MobSpawner.TryToSpawnHere(this, Try_X, Try_Y, Try_Z, Biome, MaxNbOfSuccess);
 				if (newMob)
 				{
 					int WorldX, WorldY, WorldZ;
@@ -2781,6 +2780,16 @@ void cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ, int & a
 Vector3i cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ)
 {
 	return Vector3i(m_PosX * Width + a_RelX, m_PosY * Height + a_RelY, m_PosZ * Width + a_RelZ);
+}
+
+
+
+
+
+NIBBLETYPE cChunk::GetTimeAlteredLight(NIBBLETYPE a_Skylight) const
+{
+	a_Skylight -= m_World->GetSkyDarkness();
+	return (a_Skylight < 16)? a_Skylight : 0;
 }
 
 

@@ -609,9 +609,9 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{
-		case mfHostile: return 1;
-		case mfPassive: return 400;
-		case mfAmbient: return 400;
+		case mfHostile: return 40;
+		case mfPassive: return 40;
+		case mfAmbient: return 40;
 		case mfWater:   return 400;
 	}
 	ASSERT(!"Unhandled mob family");
