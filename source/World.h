@@ -593,7 +593,7 @@ public:
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
 
 	/// Get the current darkness level based on the time
-	Int64 GetSkyDarkness() { return m_SkyDarkness; }
+	NIBBLETYPE GetSkyDarkness() { return m_SkyDarkness; }
 
 private:
 
@@ -639,7 +639,7 @@ private:
 	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
 	std::map<cMonster::eFamily,Int64> m_LastSpawnMonster; // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster) // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
-	Int64 m_SkyDarkness;
+	NIBBLETYPE m_SkyDarkness;
 
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;

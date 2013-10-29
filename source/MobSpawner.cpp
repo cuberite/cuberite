@@ -124,20 +124,15 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 
 
-bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome)
+bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome)
 {
 	BLOCKTYPE TargetBlock;
-	BLOCKTYPE BlockAbove;
-	BLOCKTYPE BlockBelow;
-	NIBBLETYPE BlockLight;
-	NIBBLETYPE SkyLight;
 	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end() && a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
-		
-		a_Chunk->UnboundedRelGetBlockBlockLight(a_RelX, a_RelY, a_RelZ, BlockLight);
-		a_Chunk->UnboundedRelGetBlockSkyLight(a_RelX, a_RelY, a_RelZ, SkyLight);
-		a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY + 1, a_RelZ, BlockAbove);
-		a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY - 1, a_RelZ, BlockBelow);
+		NIBBLETYPE BlockLight = a_Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
+		NIBBLETYPE SkyLight = a_Chunk->GetSkyLight(a_RelX, a_RelY, a_RelZ);
+		BLOCKTYPE BlockAbove = a_Chunk->GetBlock(a_RelX, a_RelY + 1, a_RelZ);
+		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 
 		SkyLight = a_Chunk->GetTimeAlteredLight(SkyLight);
 
@@ -168,11 +163,10 @@ bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, i
 			{
 				if (a_RelY < 250)
 				{
-					BLOCKTYPE BlockTop;
-					a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY + 2, a_RelZ, BlockTop);
+					BLOCKTYPE BlockTop = a_Chunk->GetBlock(a_RelX, a_RelY + 2, a_RelZ);
 					if (BlockTop == E_BLOCK_AIR)
 					{
-						a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY + 3, a_RelZ, BlockTop);
+						BlockTop = a_Chunk->GetBlock(a_RelX, a_RelY + 3, a_RelZ);
 						return  (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (BlockTop == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
 						(SkyLight <= 7) && (BlockLight <= 7);
 					}
@@ -227,7 +221,7 @@ bool cMobSpawner::CanSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, i
 
 
 
-cMonster* cMobSpawner::TryToSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int& a_MaxPackSize)
+cMonster* cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int& a_MaxPackSize)
 {
 	cMonster* toReturn = NULL;
 	if (m_NewPack)
@@ -248,6 +242,8 @@ cMonster* cMobSpawner::TryToSpawnHere(const cChunk * a_Chunk, int a_RelX, int a_
 		m_NewPack = false;
 	}
 
+	// Make sure we are looking at the right chunk to spawn in
+	a_Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
 	
 	if (CanSpawnHere(a_Chunk, a_RelX, a_RelY, a_RelZ, m_MobType, a_Biome))
 	{

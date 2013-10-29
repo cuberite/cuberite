@@ -609,6 +609,7 @@ void cWorld::Tick(float a_Dt)
 	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
 	m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
 
+	// Updates the sky darkness based on current time of day
 	UpdateSkyDarkness();
 
 	// Broadcast time update every 40 ticks (2 seconds)
