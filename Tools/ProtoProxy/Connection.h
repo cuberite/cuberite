@@ -185,6 +185,7 @@ protected:
 	bool HandleServerEntityVelocity(void);
 	bool HandleServerExplosion(void);
 	bool HandleServerIncrementStatistic(void);
+	bool HandleServerJoinGame(void);
 	bool HandleServerKeepAlive(void);
 	bool HandleServerKick(void);
 	bool HandleServerLogin(void);
@@ -197,15 +198,18 @@ protected:
 	bool HandleServerPlayerListItem(void);
 	bool HandleServerPlayerPositionLook(void);
 	bool HandleServerPluginMessage(void);
+	bool HandleServerRespawn(void);
 	bool HandleServerSetExperience(void);
 	bool HandleServerSetSlot(void);
 	bool HandleServerSlotSelect(void);
 	bool HandleServerSoundEffect(void);
+	bool HandleServerSpawnExperienceOrbs(void);
 	bool HandleServerSpawnMob(void);
 	bool HandleServerSpawnNamedEntity(void);
 	bool HandleServerSpawnObjectVehicle(void);
 	bool HandleServerSpawnPainting(void);
 	bool HandleServerSpawnPickup(void);
+	bool HandleServerStatistics(void);
 	bool HandleServerStatusPing(void);
 	bool HandleServerStatusResponse(void);
 	bool HandleServerTabCompletion(void);
@@ -213,6 +217,7 @@ protected:
 	bool HandleServerUpdateHealth(void);
 	bool HandleServerUpdateSign(void);
 	bool HandleServerUpdateTileEntity(void);
+	bool HandleServerUseBed(void);
 	bool HandleServerWindowClose(void);
 	bool HandleServerWindowContents(void);
 	bool HandleServerWindowOpen(void);
