@@ -2528,6 +2528,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Protocol\Protocol17x.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Protocol\Protocol17x.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Protocol\ProtocolRecognizer.cpp"
 					>
 				</File>

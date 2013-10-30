@@ -47,6 +47,9 @@ public:
 		
 		PROTO_VERSION_NEXT,
 		PROTO_VERSION_LATEST = PROTO_VERSION_NEXT - 1,  ///< Automatically assigned to the last protocol version, this serves as the default for PrimaryServerVersion
+
+		// These will be kept "under" the next / latest, because the next and latest are only needed for previous protocols
+		PROTO_VERSION_1_7_2 = 4,
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
@@ -124,8 +127,23 @@ protected:
 	/// Tries to recognize protocol based on m_Buffer contents; returns true if recognized
 	bool TryRecognizeProtocol(void);
 	
-	/// Called when the recognizer gets a server ping packet; responds with server stats and destroys the client
-	void HandleServerPing(void);
+	/** Tries to recognize a protocol in the length-less family, based on m_Buffer; returns true if recognized.
+	Handles protocols before release 1.7, that didn't include packet lengths, and started with a 0x02 handshake packet
+	Note that length-less server ping is handled directly in TryRecognizeProtocol(), this function is called only
+	when the 0x02 Handshake packet has been received
+	*/
+	bool TryRecognizeLengthlessProtocol(void);
+	
+	/** Tries to recognize a protocol in the leghted family (1.7+), based on m_Buffer; returns true if recognized.
+	The packet length and type have already been read, type is 0
+	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining
+	**/
+	bool TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining);
+	
+	/** Called when the recognizer gets a length-less protocol's server ping packet
+	Responds with server stats and destroys the client.
+	*/
+	void SendLengthlessServerPing(void);
 } ;
 
 

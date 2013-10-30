@@ -12,6 +12,7 @@
 #include "Protocol14x.h"
 #include "Protocol15x.h"
 #include "Protocol16x.h"
+#include "Protocol17x.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -667,11 +668,65 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	}
 	switch (PacketType)
 	{
-		case 0x02: break;  // Handshake, continue recognizing
-		case 0xfe: HandleServerPing(); return false;
-		default: return false;
+		case 0x02: return TryRecognizeLengthlessProtocol();  // Handshake, continue recognizing
+		case 0xfe:
+		{
+			// This may be either a packet length or the length-less Ping packet
+			Byte NextByte;
+			if (!m_Buffer.ReadByte(NextByte))
+			{
+				// Not enough data for either protocol
+				// This could actually happen with the 1.2 / 1.3 client, but their support is fading out anyway
+				return false;
+			}
+			if (NextByte != 0x01)
+			{
+				// This is definitely NOT a length-less Ping packet, handle as lengthed protocol:
+				break;
+			}
+			if (!m_Buffer.ReadByte(NextByte))
+			{
+				// There is no more data. Although this *could* mean TCP fragmentation, it is highly unlikely
+				// and rather this is a 1.4 client sending a regular Ping packet (without the following Plugin message)
+				SendLengthlessServerPing();
+				return false;
+			}
+			if (NextByte == 0xfa)
+			{
+				// Definitely a length-less Ping followed by a Plugin message
+				SendLengthlessServerPing();
+				return false;
+			}
+			// Definitely a lengthed Initial handshake, handle below:
+			break;
+		}
+	}  // switch (PacketType)
+
+	// This must be a lengthed protocol, try if it has the entire initial handshake packet:
+	m_Buffer.ResetRead();
+	UInt32 PacketLen;
+	UInt32 ReadSoFar = m_Buffer.GetReadableSpace();
+	if (!m_Buffer.ReadVarInt(PacketLen))
+	{
+		// Not enough bytes for the packet length, keep waiting
+		return false;
 	}
-	
+	ReadSoFar -= m_Buffer.GetReadableSpace();
+	if (!m_Buffer.CanReadBytes(PacketLen))
+	{
+		// Not enough bytes for the packet, keep waiting
+		return false;
+	}
+	return TryRecognizeLengthedProtocol(PacketLen - ReadSoFar);
+}
+
+
+
+
+
+bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
+{
+	// The comm started with 0x02, which is a Handshake packet in the length-less protocol family
 	// 1.3.2 starts with 0x02 0x39 <name-length-short>
 	// 1.2.5 starts with 0x02 <name-length-short> and name is expected to less than 0x3900 long :)
 	char ch;
@@ -724,7 +779,56 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 
 
 
-void cProtocolRecognizer::HandleServerPing(void)
+bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
+{
+	UInt32 PacketType;
+	UInt32 NumBytesRead = m_Buffer.GetReadableSpace();
+	if (!m_Buffer.ReadVarInt(PacketType))
+	{
+		return false;
+	}
+	if (PacketType != 0x00)
+	{
+		// Not an initial handshake packet, we don't know how to talk to them
+		LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, initial packet %u)",
+			m_Client->GetIPString().c_str(), PacketType
+		);
+		m_Client->Kick("Unsupported protocol version");
+		return false;
+	}
+	UInt32 ProtocolVersion;
+	if (!m_Buffer.ReadVarInt(ProtocolVersion))
+	{
+		return false;
+	}
+	NumBytesRead -= m_Buffer.GetReadableSpace();
+	switch (ProtocolVersion)
+	{
+		case PROTO_VERSION_1_7_2:
+		{
+			AString ServerAddress;
+			short ServerPort;
+			UInt32 NextState;
+			m_Buffer.ReadVarUTF8String(ServerAddress);
+			m_Buffer.ReadBEShort(ServerPort);
+			m_Buffer.ReadVarInt(NextState);
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+	}
+	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u)",
+		m_Client->GetIPString().c_str(), ProtocolVersion
+	);
+	m_Client->Kick("Unsupported protocol version");
+	return false;
+}
+
+
+
+
+
+void cProtocolRecognizer::SendLengthlessServerPing(void)
 {
 	AString Reply;
 	switch (cRoot::Get()->GetPrimaryServerVersion())
@@ -757,10 +861,12 @@ void cProtocolRecognizer::HandleServerPing(void)
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3101#Server_List_Ping_.280xFE.29
 			// _X 2012_10_31: I know that this needn't eat the byte, since it still may be in transit.
 			//    Who cares? We're disconnecting anyway.
-			if (m_Buffer.CanReadBytes(1))
+			m_Buffer.ResetRead();
+			if (m_Buffer.CanReadBytes(2))
 			{
 				byte val;
-				m_Buffer.ReadByte(val);
+				m_Buffer.ReadByte(val);  // Packet type - Serverlist ping
+				m_Buffer.ReadByte(val);  // 0x01 magic value
 				ASSERT(val == 0x01);
 			}
 			

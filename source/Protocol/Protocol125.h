@@ -92,9 +92,9 @@ protected:
 		PARSE_INCOMPLETE = -3,
 	} ;
 	
-	cByteBuffer m_ReceivedData;  //< Buffer for the received data
+	cByteBuffer m_ReceivedData;  ///< Buffer for the received data
 	
-	AString m_Username;  //< Stored in ParseHandshake(), compared to Login username
+	AString m_Username;  ///< Stored in ParseHandshake(), compared to Login username
 	
 	virtual void SendData(const char * a_Data, int a_Size) override;
 	

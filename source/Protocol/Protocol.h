@@ -186,6 +186,27 @@ protected:
 		WriteInt(a_Vector.y);
 		WriteInt(a_Vector.z);
 	}
+	
+	void WriteVarInt(UInt32 a_Value)
+	{
+		// A 32-bit integer can be encoded by at most 5 bytes:
+		unsigned char b[5];
+		int idx = 0;
+		do
+		{
+			b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
+			a_Value = a_Value >> 7;
+			idx++;
+		} while (a_Value > 0);
+
+		SendData((const char *)b, idx);
+	}
+	
+	void WriteVarUTF8String(const AString & a_String)
+	{
+		WriteVarInt(a_String.size());
+		SendData(a_String.data(), a_String.size());
+	}
 } ;
 
 
