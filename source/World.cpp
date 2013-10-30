@@ -229,7 +229,8 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_RSList(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
-	m_TickThread(*this)
+	m_TickThread(*this),
+	m_SkyDarkness(0)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -607,6 +608,9 @@ void cWorld::Tick(float a_Dt)
 
 	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
 	m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
+
+	// Updates the sky darkness based on current time of day
+	UpdateSkyDarkness();
 
 	// Broadcast time update every 40 ticks (2 seconds)
 	if (m_LastTimeUpdate < m_WorldAge - 40)
@@ -2671,6 +2675,33 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 {
 	a_World.SaveAllChunks();
+}
+
+
+
+
+
+#define TIME_SUNSET 		12000
+#define TIME_NIGHT_START	13187
+#define TIME_NIGHT_END		22812
+#define TIME_SUNRISE		23999
+#define TIME_SPAWN_DIVIZOR	148
+
+
+
+
+
+void cWorld::UpdateSkyDarkness()
+{
+	int TempTime = m_TimeOfDay;
+	if (TempTime <= TIME_SUNSET)
+		m_SkyDarkness = 0;
+	else if (TempTime <= TIME_NIGHT_START)
+		m_SkyDarkness = (TIME_NIGHT_START - TempTime)/TIME_SPAWN_DIVIZOR;
+	else if (TempTime <= TIME_NIGHT_END)
+		m_SkyDarkness = 8;
+	else
+		m_SkyDarkness = (TIME_SUNRISE - TempTime)/TIME_SPAWN_DIVIZOR;
 }
 
 

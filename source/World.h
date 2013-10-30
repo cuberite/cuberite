@@ -592,6 +592,9 @@ public:
 	/// Appends all usernames starting with a_Text (case-insensitive) into Results
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
 
+	/// Get the current darkness level based on the time
+	NIBBLETYPE GetSkyDarkness() { return m_SkyDarkness; }
+
 private:
 
 	friend class cRoot;
@@ -635,6 +638,8 @@ private:
 	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
 	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
 	std::map<cMonster::eFamily,Int64> m_LastSpawnMonster; // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster) // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
+
+	NIBBLETYPE m_SkyDarkness;
 
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
@@ -727,6 +732,8 @@ private:
 	
 	/// Ticks all clients that are in this world
 	void TickClients(float a_Dt);
+
+	void UpdateSkyDarkness();
 	
 	/// Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section)
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
