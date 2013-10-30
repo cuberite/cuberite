@@ -51,6 +51,9 @@ public:
 	}
 
 
+	void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) { cBlockHandler::ConvertToPickups(a_Pickups, 0); }
+
+
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY <= 0)
