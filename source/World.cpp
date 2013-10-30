@@ -55,6 +55,12 @@
 /// Up to this many m_SpreadQueue elements are handled each world tick
 const int MAX_LIGHTING_SPREAD_PER_TICK = 10;
 
+const int TIME_SUNSET        = 12000;
+const int TIME_NIGHT_START   = 13187;
+const int TIME_NIGHT_END     = 22812;
+const int TIME_SUNRISE       = 23999;
+const int TIME_SPAWN_DIVISOR =   148;
+
 
 
 
@@ -866,6 +872,31 @@ void cWorld::TickClients(float a_Dt)
 	{
 		delete *itr;
 	} // for itr - RemoveClients[]
+}
+
+
+
+
+
+void cWorld::UpdateSkyDarkness(void)
+{
+	int TempTime = (int)m_TimeOfDay;
+	if (TempTime <= TIME_SUNSET)
+	{
+		m_SkyDarkness = 0;
+	}
+	else if (TempTime <= TIME_NIGHT_START)
+	{
+		m_SkyDarkness = (TIME_NIGHT_START - TempTime) / TIME_SPAWN_DIVISOR;
+	}
+	else if (TempTime <= TIME_NIGHT_END)
+	{
+		m_SkyDarkness = 8;
+	}
+	else
+	{
+		m_SkyDarkness = (TIME_SUNRISE - TempTime) / TIME_SPAWN_DIVISOR;
+	}
 }
 
 
@@ -2677,32 +2708,6 @@ void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 	a_World.SaveAllChunks();
 }
 
-
-
-
-
-#define TIME_SUNSET 		12000
-#define TIME_NIGHT_START	13187
-#define TIME_NIGHT_END		22812
-#define TIME_SUNRISE		23999
-#define TIME_SPAWN_DIVIZOR	148
-
-
-
-
-
-void cWorld::UpdateSkyDarkness()
-{
-	int TempTime = m_TimeOfDay;
-	if (TempTime <= TIME_SUNSET)
-		m_SkyDarkness = 0;
-	else if (TempTime <= TIME_NIGHT_START)
-		m_SkyDarkness = (TIME_NIGHT_START - TempTime)/TIME_SPAWN_DIVIZOR;
-	else if (TempTime <= TIME_NIGHT_END)
-		m_SkyDarkness = 8;
-	else
-		m_SkyDarkness = (TIME_SUNRISE - TempTime)/TIME_SPAWN_DIVIZOR;
-}
 
 
 
