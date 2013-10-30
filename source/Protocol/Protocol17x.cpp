@@ -103,6 +103,7 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_RemainingBytes); return;
+				case 0x01: HandlePacketStatusPing   (a_RemainingBytes); return;
 			}
 			break;
 		}
@@ -150,6 +151,30 @@ void cProtocol172::HandlePacketStatusRequest(UInt32 a_RemainingBytes)
 	cByteBuffer Packet(Response.size() + 10);
 	Packet.WriteVarInt(0x00);  // Response packet
 	Packet.WriteVarUTF8String(Response);
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::HandlePacketStatusPing(UInt32 a_RemainingBytes)
+{
+	ASSERT(a_RemainingBytes == 8);
+	if (a_RemainingBytes != 8)
+	{
+		m_Client->PacketError(0x01);
+		m_ReceivedData.SkipRead(a_RemainingBytes);
+		m_ReceivedData.CommitRead();
+		return;
+	}
+	Int64 Timestamp;
+	m_ReceivedData.ReadBEInt64(Timestamp);
+	m_ReceivedData.CommitRead();
+	
+	cByteBuffer Packet(18);
+	Packet.WriteVarInt(0x01);
+	Packet.WriteBEInt64(Timestamp);
 	WritePacket(Packet);
 }
 

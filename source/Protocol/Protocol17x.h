@@ -58,7 +58,9 @@ protected:
 	/// Reads and handles the packet. The packet length and type have already been read.
 	void HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes);
 	
+	// Packet handlers while in the Status state (m_State == 1)
 	void HandlePacketStatusRequest(UInt32 a_RemainingBytes);
+	void HandlePacketStatusPing   (UInt32 a_RemainingBytes);
 	
 	/// Writes an entire packet into the output stream. a_Packet is expected to start with the packet type; data length is prepended here.
 	void WritePacket(cByteBuffer & a_Packet);
