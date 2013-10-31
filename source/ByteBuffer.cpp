@@ -555,7 +555,7 @@ bool cByteBuffer::WriteVarInt(UInt32 a_Value)
 
 
 
-bool cByteBuffer::WriteVarUTF8String(AString & a_Value)
+bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 {
 	CHECK_THREAD;
 	CheckValid();
