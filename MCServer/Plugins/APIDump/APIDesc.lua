@@ -3017,7 +3017,7 @@ end;
 
 		HOOK_LOGIN =
 		{
-			CalledWhen = "Right after player authentication. If auth is disabled, right after the player sends their name.",
+			CalledWhen = "Right before player authentication. If auth is disabled, right after the player sends their name.",
 			DefaultFnName = "OnLogin",  -- also used as pagename
 			Desc = [[
 				This hook is called whenever a client logs in. It is called right before the client's name is sent
