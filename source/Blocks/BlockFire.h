@@ -16,19 +16,26 @@ public:
 	{
 	}
 
-	struct sAirBlocksList
-	{
-		Vector3i a_BlockPos;
-		NIBBLETYPE Direction;
-	};
-
-	typedef std::vector <sAirBlocksList> AirBlocks;
-	AirBlocks m_AirBlocks;
+	/// Portal boundary and direction variables
+	int XZP, XZM, Dir; // For wont of a better name...
 
 	virtual void OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
+		/*
+		PORTAL FINDING ALGORITH
+		=======================
+		-Get clicked base block
+		-Trace upwards to find first obsidian block; aborts if anything other than obsidian or air is encountered.
+		 Uses this value as a reference (the 'ceiling')
+		-For both directions (if one fails, try the other), BASE (clicked) block:
+		 -Go in one direction, only stop if a non obsidian block is encountered (abort) OR a portal border is encountered (FindObsidianCeiling returns -1)
+		 -If a border was encountered, go the other direction and repeat above
+		 -Write borders to XZP and XZM, write direction portal faces to Dir
+		-Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir		
+		*/
+
 		a_BlockY--; // Because we want the block below the fire
-		FindAndSetPortalFrame(a_BlockX, a_BlockY, a_BlockZ, a_World); // Brought to you by the Aperture Science Handheld Portal Device Testing Programme
+		FindAndSetPortalFrame(a_BlockX, a_BlockY, a_BlockZ, a_World); // Brought to you by Aperture Science
 	}
 
 	virtual void OnDigging(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
@@ -51,11 +58,13 @@ public:
 		return "step.wood";
 	}
 
-	int FindObsidianCeiling(int X, int Y, int Z, NIBBLETYPE a_Dir, cWorld * a_World, int MaxY = NULL)
+	/// Traces along YP until it finds an obsidian block, returns Y difference or 0 if no portal, and -1 for border
+	/// Takes the X, Y, and Z of the base block; with an optional MaxY for portal border finding
+	int FindObsidianCeiling(int X, int Y, int Z, NIBBLETYPE a_Dir, cWorld * a_World, int MaxY = 0)
 	{
 		if (a_World->GetBlock(X, Y, Z) != E_BLOCK_OBSIDIAN)
 		{
-			return NULL;
+			return 0;
 		}
 
 		int newY = Y + 1;
@@ -65,31 +74,25 @@ public:
 			BLOCKTYPE Block = a_World->GetBlock(X, newY, Z);
 			if ((Block == E_BLOCK_AIR) || (Block == E_BLOCK_FIRE))
 			{
-				if (a_Dir != NULL)
-				{
-					sAirBlocksList RC;
-					RC.a_BlockPos = Vector3i(X, newY, Z);
-					RC.Direction = a_Dir;
-					m_AirBlocks.push_back(RC);
-				}
+				continue;
 			}
 			else if (Block == E_BLOCK_OBSIDIAN)
 			{
 				// We found an obsidian ceiling
 				// Make sure MaxY has a value and newY ('ceiling' location) is at one above the base block
 				// This is because the frame is a solid obsidian pillar
-				if ((MaxY != NULL) && (newY == Y + 1))
+				if ((MaxY != 0) && (newY == Y + 1))
 				{
 					for (int checkBorder = newY + 1; checkBorder <= MaxY - 1; checkBorder++) // newY + 1: newY has already been checked; MaxY - 1: portal doesn't need corners
 					{
 						if (a_World->GetBlock(X, checkBorder, Z) != E_BLOCK_OBSIDIAN)
 						{
 							// Base obsidian, base + 1 obsidian, base + x NOT obsidian -> not complete portal
-							return NULL;
+							return 0;
 						}
 					}
 					// Everything was obsidian, found a border!
-					return NULL - 1; // What do you get if you take something away from nothing? Negative one, apparently :P
+					return 0 - 1; // Return -1 for a frame
 				}
 				else
 				{
@@ -97,20 +100,20 @@ public:
 					return newY;
 				}
 			}
-			else { return NULL; }
+			else { return 0; }
 		}
 
-		return NULL;
+		return 0;
 	}
 
+	/// Finds entire frame in any direction with the coordinates of a base block and fills hole with nether portal (START HERE)
 	void FindAndSetPortalFrame(int X, int Y, int Z, cWorld * a_World)
 	{
-		int MaxY = FindObsidianCeiling(X, Y, Z, NULL, a_World); // Get topmost obsidian block as reference for all other checks; we don't know meta yet, so NULL
+		int MaxY = FindObsidianCeiling(X, Y, Z, 0, a_World); // Get topmost obsidian block as reference for all other checks; we don't know meta yet, so 0
 		int X1 = X + 1, Z1 = Z + 1, X2 = X - 1, Z2 = Z - 1; // Duplicate XZ values, add/subtract one as we've checked the original already the line above
 
-		if (MaxY == NULL) // Oh noes! Not a portal coordinate :(
+		if (MaxY == 0) // Oh noes! Not a portal coordinate :(
 		{
-			m_AirBlocks.clear();
 			return;
 		}
 
@@ -118,92 +121,98 @@ public:
 		{
 			if (!FindPortalSliceZ(X, Y, Z1, Z2, MaxY, a_World))
 			{
-				m_AirBlocks.clear();
-				return;
+				return; // No eligible portal construct, abort abort abort!!
 			}
-			else { FindObsidianCeiling(X, Y, Z, 2, a_World); } // This because we now know meta and need to add the air blocks to the vector
 		}
-		else { FindObsidianCeiling(X, Y, Z, 1, a_World); } // See above
 
-		for (AirBlocks::iterator r = m_AirBlocks.begin(); r != m_AirBlocks.end(); r++)
+		for (int Height = Y + 1; Height <= MaxY - 1; Height++) // Loop through boundary to set portal blocks
 		{
-			sAirBlocksList & Change = *r;
-			a_World->SetBlock(Change.a_BlockPos.x, Change.a_BlockPos.y, Change.a_BlockPos.z, E_BLOCK_NETHER_PORTAL, Change.Direction);
+			for (int Width = XZM; Width <= XZP; Width++)
+			{
+				if (Dir == 1)
+				{
+					a_World->SetBlock(Width, Height, Z, E_BLOCK_NETHER_PORTAL, Dir);
+				}
+				else
+				{
+					a_World->SetBlock(X, Height, Width, E_BLOCK_NETHER_PORTAL, Dir);
+				}
+			}
 		}
 
-		m_AirBlocks.clear();
 		return;
 	}
 
+	/// Evaluates if coordinates are a portal going XP/XM; returns true if so, and writes boundaries to variable
+	/// Takes coordinates of base block and Y coord of target obsidian ceiling
 	bool FindPortalSliceX(int X1, int X2, int Y, int Z, int MaxY, cWorld * a_World)
 	{
+		Dir = 1; // Set assumed direction (will change if portal turns out to be facing the other direction)
 		bool FoundFrameXP = false, FoundFrameXM = false;
 		for (X1; ((a_World->GetBlock(X1, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X1, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X1++) // Check XP for obsidian blocks, exempting corners
 		{
 			int Value = FindObsidianCeiling(X1, Y, Z, 1, a_World, MaxY);
 			int ValueTwo = FindObsidianCeiling(X1, Y + 1, Z, 1, a_World, MaxY); // For corners without obsidian
-			if ((Value == NULL - 1) || (ValueTwo == NULL - 1)) // FindObsidianCeiling returns NULL - 1 upon frame-find
+			if ((Value == 0 - 1) || (ValueTwo == 0 - 1)) // FindObsidianCeiling returns 0 - 1 upon frame-find
 			{
 				FoundFrameXP = true; // Found a frame border in this direction, proceed in other direction (don't go further)
 				break;
 			}
 			else if ((Value != MaxY) && (ValueTwo != MaxY)) // Make sure that there is a valid portal 'slice'
 			{
-				m_AirBlocks.clear();
 				return false; // Not valid slice, no portal can be formed
 			}
-		}
+		} XZM = X1 - 2; // Set boundary of frame interior (hence the -2)
 		for (X2; ((a_World->GetBlock(X2, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X2, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X2--) // Go the other direction (XM)
 		{
 			int Value = FindObsidianCeiling(X2, Y, Z, 1, a_World, MaxY);
 			int ValueTwo = FindObsidianCeiling(X2, Y + 1, Z, 1, a_World, MaxY);
-			if ((Value == NULL - 1) || (ValueTwo == NULL - 1))
+			if ((Value == 0 - 1) || (ValueTwo == 0 - 1))
 			{
 				FoundFrameXM = true;
 				break;
 			}
 			else if ((Value != MaxY) && (ValueTwo != MaxY))
 			{
-				m_AirBlocks.clear();
 				return false;
 			}
-		}
+		} XZP = X2 + 2; // Set boundary, see previous
 		return (FoundFrameXP && FoundFrameXM);
 	}
 
+	/// Evaluates if coords are a portal going ZP/ZM; returns true if so, and writes boundaries to variable
 	bool FindPortalSliceZ(int X, int Y, int Z1, int Z2, int MaxY, cWorld * a_World)
 	{
+		Dir = 2;
 		bool FoundFrameZP = false, FoundFrameZM = false;
 		for (Z1; ((a_World->GetBlock(X, Y, Z1) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X, Y + 1, Z1) == E_BLOCK_OBSIDIAN)); Z1++)
 		{
 			int Value = FindObsidianCeiling(X, Y, Z1, 2, a_World, MaxY);
 			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z1, 2, a_World, MaxY);
-			if ((Value == NULL - 1) || (ValueTwo == NULL - 1))
+			if ((Value == 0 - 1) || (ValueTwo == 0 - 1))
 			{
 				FoundFrameZP = true;
 				continue;
 			}
 			else if ((Value != MaxY) && (ValueTwo != MaxY))
 			{
-				m_AirBlocks.clear();
 				return false;
 			}
-		}
+		} XZP = Z1 - 2;
 		for (Z2; ((a_World->GetBlock(X, Y, Z2) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X, Y + 1, Z2) == E_BLOCK_OBSIDIAN)); Z2--)
 		{
 			int Value = FindObsidianCeiling(X, Y, Z2, 2, a_World, MaxY);
 			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z2, 2, a_World, MaxY);
-			if ((Value == NULL - 1) || (ValueTwo == NULL - 1))
+			if ((Value == 0 - 1) || (ValueTwo == 0 - 1))
 			{
 				FoundFrameZM = true;
 				continue;
 			}
 			else if ((Value != MaxY) && (ValueTwo != MaxY))
 			{
-				m_AirBlocks.clear();
 				return false;
 			}
-		}
+		} XZM = Z2 + 2;
 		return (FoundFrameZP && FoundFrameZM);
 	}
 };
