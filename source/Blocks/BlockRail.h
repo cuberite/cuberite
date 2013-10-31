@@ -22,6 +22,8 @@ enum ENUM_PURE
 class cBlockRailHandler :
 	public cBlockHandler
 {
+	typedef cBlockHandler super;
+	
 public:
 	cBlockRailHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
@@ -51,7 +53,10 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override { cBlockHandler::ConvertToPickups(a_Pickups, 0); }
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		super::ConvertToPickups(a_Pickups, 0);
+	}
 
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
