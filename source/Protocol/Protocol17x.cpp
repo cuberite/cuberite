@@ -13,6 +13,15 @@ Implements the 1.7.x protocol classes:
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
+#include "../Entities/Player.h"
+
+
+
+
+
+#define HANDLE_PACKET_READ(Proc, Type, Var) \
+	Type Var; \
+	m_ReceivedData.Proc(Var);
 
 
 
@@ -79,14 +88,25 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			return;
 		}
 		UInt32 PacketType;
-		UInt32 NumBytesRead = m_ReceivedData.GetReadableSpace();
+		UInt32 Mark1 = m_ReceivedData.GetReadableSpace();
 		if (!m_ReceivedData.ReadVarInt(PacketType))
 		{
 			// Not enough data
 			return;
 		}
-		NumBytesRead -= m_ReceivedData.GetReadableSpace();
+		UInt32 NumBytesRead = Mark1 - m_ReceivedData.GetReadableSpace();
 		HandlePacket(PacketType, PacketLen - NumBytesRead);
+		
+		if (Mark1 - m_ReceivedData.GetReadableSpace() > PacketLen)
+		{
+			// Read more than packet length, report as error
+			m_Client->PacketError(PacketType);
+		}
+
+		// Go to packet end in any case:
+		m_ReceivedData.ResetRead();
+		m_ReceivedData.SkipRead(PacketLen);
+		m_ReceivedData.CommitRead();
 	}  // while (true)
 }
 
@@ -111,12 +131,43 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 		case 2:
 		{
 			// Login
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketLoginStart(a_RemainingBytes); return;
+				case 0x01: HandlePacketLoginEncryptionResponse(a_RemainingBytes); return;
+			}
 			break;
 		}
 		
 		case 3:
 		{
 			// Game
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketKeepAlive              (a_RemainingBytes); break;
+				case 0x01: HandlePacketChatMessage            (a_RemainingBytes); break;
+				case 0x02: HandlePacketUseEntity              (a_RemainingBytes); break;
+				case 0x03: HandlePacketPlayer                 (a_RemainingBytes); break;
+				case 0x04: HandlePacketPlayerPos              (a_RemainingBytes); break;
+				case 0x05: HandlePacketPlayerLook             (a_RemainingBytes); break;
+				case 0x06: HandlePacketPlayerPosLook          (a_RemainingBytes); break;
+				case 0x07: HandlePacketBlockDig               (a_RemainingBytes); break;
+				case 0x08: HandlePacketBlockPlace             (a_RemainingBytes); break;
+				case 0x09: HandlePacketSlotSelect             (a_RemainingBytes); break;
+				case 0x0a: HandlePacketAnimation              (a_RemainingBytes); break;
+				case 0x0b: HandlePacketEntityAction           (a_RemainingBytes); break;
+				case 0x0c: HandlePacketSteerVehicle           (a_RemainingBytes); break;
+				case 0x0d: HandlePacketWindowClose            (a_RemainingBytes); break;
+				case 0x0e: HandlePacketWindowClick            (a_RemainingBytes); break;
+				case 0x0f: // Confirm transaction - not used in MCS
+				case 0x10: HandlePacketCreativeInventoryAction(a_RemainingBytes); break;
+				case 0x12: HandlePacketUpdateSign             (a_RemainingBytes); break;
+				case 0x13: HandlePacketPlayerAbilities        (a_RemainingBytes); break;
+				case 0x14: HandlePacketTabComplete            (a_RemainingBytes); break;
+				case 0x15: HandlePacketClientSettings         (a_RemainingBytes); break;
+				case 0x16: HandlePacketClientStatus           (a_RemainingBytes); break;
+				case 0x17: HandlePacketPluginMessage          (a_RemainingBytes); break;
+			}
 			break;
 		}
 	}  // switch (m_State)
@@ -125,6 +176,30 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 	m_Client->PacketUnknown(a_PacketType);
 	m_ReceivedData.SkipRead(a_RemainingBytes);
 	m_ReceivedData.CommitRead();
+}
+
+
+
+
+
+void cProtocol172::HandlePacketStatusPing(UInt32 a_RemainingBytes)
+{
+	ASSERT(a_RemainingBytes == 8);
+	if (a_RemainingBytes != 8)
+	{
+		m_Client->PacketError(0x01);
+		m_ReceivedData.SkipRead(a_RemainingBytes);
+		m_ReceivedData.CommitRead();
+		return;
+	}
+	Int64 Timestamp;
+	m_ReceivedData.ReadBEInt64(Timestamp);
+	m_ReceivedData.CommitRead();
+	
+	cByteBuffer Packet(18);
+	Packet.WriteVarInt(0x01);
+	Packet.WriteBEInt64(Timestamp);
+	WritePacket(Packet);
 }
 
 
@@ -158,24 +233,249 @@ void cProtocol172::HandlePacketStatusRequest(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketStatusPing(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketLoginEncryptionResponse(UInt32 a_RemainingBytes)
 {
-	ASSERT(a_RemainingBytes == 8);
-	if (a_RemainingBytes != 8)
-	{
-		m_Client->PacketError(0x01);
-		m_ReceivedData.SkipRead(a_RemainingBytes);
-		m_ReceivedData.CommitRead();
-		return;
-	}
-	Int64 Timestamp;
-	m_ReceivedData.ReadBEInt64(Timestamp);
-	m_ReceivedData.CommitRead();
+	// TODO: Add protocol encryption
+}
+
+
+
+
+
+void cProtocol172::HandlePacketLoginStart(UInt32 a_RemainingBytes)
+{
+	AString Username;
+	m_ReceivedData.ReadVarUTF8String(Username);
 	
-	cByteBuffer Packet(18);
-	Packet.WriteVarInt(0x01);
-	Packet.WriteBEInt64(Timestamp);
+	// TODO: Protocol encryption should be set up here if not localhost / auth
+	
+	// Send login success:
+	cByteBuffer Packet(Username.size() + 30);
+	Packet.WriteVarInt(0x02);  // Login success packet
+	Packet.WriteVarUTF8String(Printf("%d", m_Client->GetUniqueID()));  // TODO: UUID
+	Packet.WriteVarUTF8String(Username);
 	WritePacket(Packet);
+
+	m_Client->HandleLogin(4, Username);
+}
+
+
+
+
+
+void cProtocol172::HandlePacketAnimation(UInt32 a_RemainingBytes)
+{
+	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_PACKET_READ(ReadByte,  Byte, Animation);
+	m_Client->HandleAnimation(Animation);
+}
+
+
+
+
+
+void cProtocol172::HandlePacketBlockDig(UInt32 a_RemainingBytes)
+{
+	HANDLE_PACKET_READ(ReadByte,  Byte, Status);
+	HANDLE_PACKET_READ(ReadBEInt, int,  BlockX);
+	HANDLE_PACKET_READ(ReadByte,  Byte, BlockY);
+	HANDLE_PACKET_READ(ReadBEInt, int,  BlockZ);
+	HANDLE_PACKET_READ(ReadByte,  Byte, Face);
+	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, Face, Status);
+}
+
+
+
+
+
+void cProtocol172::HandlePacketBlockPlace(UInt32 a_RemainingBytes)
+{
+	HANDLE_PACKET_READ(ReadBEInt, int,  BlockX);
+	HANDLE_PACKET_READ(ReadByte,  Byte, BlockY);
+	HANDLE_PACKET_READ(ReadBEInt, int,  BlockZ);
+	HANDLE_PACKET_READ(ReadByte,  Byte, Face);
+	HANDLE_PACKET_READ(ReadByte,  Byte, CursorX);
+	HANDLE_PACKET_READ(ReadByte,  Byte, CursorY);
+	HANDLE_PACKET_READ(ReadByte,  Byte, CursorZ);
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+}
+
+
+
+
+
+void cProtocol172::HandlePacketChatMessage(UInt32 a_RemainingBytes)
+{
+	HANDLE_PACKET_READ(ReadVarUTF8String, AString, Message);
+	m_Client->HandleChat(Message);
+}
+
+
+
+
+
+void cProtocol172::HandlePacketClientSettings(UInt32 a_RemainingBytes)
+{
+	HANDLE_PACKET_READ(ReadVarUTF8String, AString, Locale);
+	HANDLE_PACKET_READ(ReadByte,          Byte,    ViewDistance);
+	HANDLE_PACKET_READ(ReadByte,          Byte,    ChatFlags);
+	HANDLE_PACKET_READ(ReadByte,          Byte,    Unused);
+	HANDLE_PACKET_READ(ReadByte,          Byte,    Difficulty);
+	HANDLE_PACKET_READ(ReadByte,          Byte,    ShowCape);
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketClientStatus(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketCreativeInventoryAction(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketEntityAction(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketKeepAlive(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketPlayer(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketPlayerAbilities(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketPlayerLook(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketPlayerPos(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketPlayerPosLook(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketPluginMessage(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketSlotSelect(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketSteerVehicle(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketTabComplete(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketUpdateSign(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketUseEntity(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketWindowClick(UInt32 a_RemainingBytes)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::HandlePacketWindowClose(UInt32 a_RemainingBytes)
+{
+	// TODO
 }
 
 
