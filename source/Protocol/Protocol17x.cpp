@@ -14,6 +14,9 @@ Implements the 1.7.x protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../Entities/Player.h"
+#include "../World.h"
+#include "ChunkDataSerializer.h"
+#include "../Entities/Pickup.h"
 
 
 
@@ -60,6 +63,579 @@ void cProtocol172::DataReceived(const char * a_Data, int a_Size)
 		AddReceivedData(a_Data, a_Size);
 	}
 }
+
+
+
+
+
+void cProtocol172::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+{
+	cByteBuffer Packet(20);
+	Packet.WriteVarInt(0x1b);  // Attach Entity packet
+	Packet.WriteBEInt(a_Entity.GetUniqueID());
+	Packet.WriteBEInt((a_Vehicle != NULL) ? a_Vehicle->GetUniqueID() : 0);
+	Packet.WriteBool(false);
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
+{
+	cByteBuffer Packet(30);
+	Packet.WriteVarInt(0x24);  // Block Action packet
+	Packet.WriteBEInt(a_BlockX);
+	Packet.WriteBEShort(a_BlockY);
+	Packet.WriteBEInt(a_BlockZ);
+	Packet.WriteChar(a_Byte1);
+	Packet.WriteChar(a_Byte2);
+	Packet.WriteVarInt(a_BlockType);
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendBlockBreakAnim	(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
+{
+	cByteBuffer Packet(20);
+	Packet.WriteVarInt(0x24);  // Block Action packet
+	Packet.WriteBEInt(a_EntityID);
+	Packet.WriteBEInt(a_BlockX);
+	Packet.WriteBEInt(a_BlockY);
+	Packet.WriteBEInt(a_BlockZ);
+	Packet.WriteChar(a_Stage);
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	cByteBuffer Packet(20);
+	Packet.WriteVarInt(0x23);  // Block Change packet
+	Packet.WriteBEInt(a_BlockX);
+	Packet.WriteByte(a_BlockY);
+	Packet.WriteBEInt(a_BlockZ);
+	Packet.WriteVarInt(a_BlockType);
+	Packet.WriteByte(a_BlockMeta);
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+{
+	cByteBuffer Packet(20 + a_Changes.size() * 4);
+	Packet.WriteVarInt(0x22);  // Multi Block Change packet
+	Packet.WriteBEInt(a_ChunkX);
+	Packet.WriteBEInt(a_ChunkZ);
+	Packet.WriteBEShort((short)a_Changes.size());
+	Packet.WriteBEInt(a_Changes.size() * 4);
+	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
+	{
+		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
+		unsigned int Blocks = itr->BlockMeta | (itr->BlockType << 4);
+		Packet.WriteBEInt((Coords << 16) | Blocks);
+	}  // for itr - a_Changes[]
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendChat(const AString & a_Message)
+{
+	AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str());
+	cByteBuffer Packet(20 + Message.size());
+	Packet.WriteVarInt(0x02);  // Chat Message packet
+	Packet.WriteVarUTF8String(Message);
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+{
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);  // This contains the flags and bitmasks, too
+	cByteBuffer Packet(40 + ChunkData.size());
+	Packet.WriteVarInt(0x21);  // Chunk Data packet
+	Packet.WriteBEInt(a_ChunkX);
+	Packet.WriteBEInt(a_ChunkZ);
+	Packet.Write(ChunkData.data(), ChunkData.size());
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+{
+	cByteBuffer Packet(9);
+	Packet.WriteVarInt(0x0d);  // Collect Item packet
+	Packet.WriteBEInt(a_Pickup.GetUniqueID());
+	Packet.WriteBEInt(a_Player.GetUniqueID());
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendDestroyEntity(const cEntity & a_Entity)
+{
+	cByteBuffer Packet(6);
+	Packet.WriteVarInt(0x13);  // Destroy Entities packet
+	Packet.WriteByte(0);
+	Packet.WriteBEInt(a_Entity.GetUniqueID());
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendDisconnect(const AString & a_Reason)
+{
+	cByteBuffer Packet(10 + a_Reason.size());
+	Packet.WriteVarInt(0x40);  // Disconnect packet
+	Packet.WriteVarUTF8String(a_Reason);
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)  ///< Request the client to open up the sign editor for the sign(1.6+)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityHeadLook(const cEntity & a_Entity)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityLook(const cEntity & a_Entity)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityMetadata(const cEntity & a_Entity)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityProperties(const cEntity & a_Entity)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityStatus(const cEntity & a_Entity, char a_Status)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendEntityVelocity(const cEntity & a_Entity)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendGameMode(eGameMode a_GameMode)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendHealth(void)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendKeepAlive(int a_PingID)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
+{
+	// Send the spawn position:
+	cByteBuffer Packet(20);
+	Packet.WriteVarInt(0x05);  // Spawn Position packet
+	Packet.WriteBEInt((int)a_World.GetSpawnX());
+	Packet.WriteBEInt((int)a_World.GetSpawnY());
+	Packet.WriteBEInt((int)a_World.GetSpawnZ());
+	WritePacket(Packet);
+	
+	// Send player abilities:
+	SendPlayerAbilities();
+}
+
+
+
+
+
+void cProtocol172::SendPickupSpawn(const cPickup & a_Pickup)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendPlayerAbilities(void)
+{
+	cByteBuffer Packet(20);
+	Packet.WriteVarInt(0x39);  // Player Abilities packet
+	Byte Flags = 0;
+	if (m_Client->GetPlayer()->IsGameModeCreative())
+	{
+		Flags |= 0x01;
+	}
+	// TODO: Other flags (god mode, flying, can fly
+	Packet.WriteByte(Flags);
+	// TODO: Packet.WriteBEFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
+	Packet.WriteBEFloat(0.05f);
+	Packet.WriteBEFloat((float)m_Client->GetPlayer()->GetMaxSpeed());
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+{
+	cByteBuffer Packet(10 + a_Player.GetName().size());
+	Packet.WriteVarInt(0x38);  // Playerlist Item packet
+	Packet.WriteVarUTF8String(a_Player.GetName());
+	Packet.WriteBool(a_IsOnline);
+	Packet.WriteBEShort(a_Player.GetClientHandle()->GetPing());
+	WritePacket(Packet);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerMaxSpeed(void)
+{
+	SendPlayerAbilities();
+}
+
+
+
+
+
+void cProtocol172::SendPlayerMoveLook(void)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendPlayerPosition(void)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendRespawn(void)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)  // a_Src coords are Block * 8
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendSpawnMob(const cMonster & a_Mob)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendTabCompletionResults(const AStringVector & a_Results)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendTeleportEntity(const cEntity & a_Entity)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendWeather(eWeather a_Weather)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendWholeInventory(const cInventory & a_Inventory)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendWholeInventory(const cWindow    & a_Window)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendWindowClose(const cWindow    & a_Window)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+{
+	// TODO
+}
+
 
 
 
@@ -534,6 +1110,7 @@ void cProtocol172::Flush(void)
 	}
 	m_DataToSend.clear();
 }
+
 
 
 

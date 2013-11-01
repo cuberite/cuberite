@@ -77,6 +77,7 @@ public:
 	virtual void SendKeepAlive           (int a_PingID) = 0;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) = 0;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) = 0;
+	virtual void SendPlayerAbilities     (void) = 0;
 	virtual void SendPlayerAnimation     (const cPlayer & a_Player, char a_Animation) = 0;
 	virtual void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline) = 0;
 	virtual void SendPlayerMaxSpeed      (void) = 0;  ///< Informs the client of the maximum player speed (1.6.1+)

@@ -385,6 +385,16 @@ void cProtocolRecognizer::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
+void cProtocolRecognizer::SendPlayerAbilities(void)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerAbilities();
+}
+
+
+
+
+
 void cProtocolRecognizer::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
 {
 	ASSERT(m_Protocol != NULL);

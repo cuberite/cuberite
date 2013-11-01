@@ -54,6 +54,7 @@ public:
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
+	virtual void SendPlayerAbilities     (void) override {}  // This protocol doesn't support such message
 	virtual void SendPlayerAnimation     (const cPlayer & a_Player, char a_Animation) override;
 	virtual void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline) override;
 	virtual void SendPlayerMaxSpeed      (void) override;
