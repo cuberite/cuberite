@@ -22,6 +22,8 @@ enum ENUM_PURE
 class cBlockRailHandler :
 	public cBlockHandler
 {
+	typedef cBlockHandler super;
+	
 public:
 	cBlockRailHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
@@ -48,6 +50,12 @@ public:
 		{
 			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, FindMeta(a_World, a_BlockX, a_BlockY, a_BlockZ));
 		}
+	}
+
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		super::ConvertToPickups(a_Pickups, 0);
 	}
 
 
