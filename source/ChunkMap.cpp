@@ -12,6 +12,7 @@
 #include "BlockArea.h"
 #include "PluginManager.h"
 #include "Entities/TNTEntity.h"
+#include "Blocks/BlockHandler.h"
 #include "MobCensus.h"
 #include "MobSpawner.h"
 
@@ -1610,7 +1611,9 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					// Too far away
 					continue;
 				}
-				switch (area.GetBlockType(bx + x, by + y, bz + z))
+
+				BLOCKTYPE Block = area.GetBlockType(bx + x, by + y, bz + z);
+				switch (Block)
 				{
 					case E_BLOCK_TNT:
 					{
@@ -1644,8 +1647,22 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 						break;
 					}
 					
+					case E_BLOCK_AIR:
+					{
+						// No pickups for air
+						break;
+					}
+					
 					default:
 					{
+						if (m_World->GetTickRandomNumber(10) == 5)
+						{
+							cItems Drops;
+							cBlockHandler * Handler = BlockHandler(Block);
+
+							Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z));
+							m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
+						}
 						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
 						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
 					}
