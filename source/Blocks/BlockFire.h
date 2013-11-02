@@ -83,16 +83,7 @@ public:
 				// This is because the frame is a solid obsidian pillar
 				if ((MaxY != 0) && (newY == Y + 1))
 				{
-					for (int checkBorder = newY + 1; checkBorder <= MaxY - 1; checkBorder++) // newY + 1: newY has already been checked; MaxY - 1: portal doesn't need corners
-					{
-						if (a_World->GetBlock(X, checkBorder, Z) != E_BLOCK_OBSIDIAN)
-						{
-							// Base obsidian, base + 1 obsidian, base + x NOT obsidian -> not complete portal
-							return 0;
-						}
-					}
-					// Everything was obsidian, found a border!
-					return -1; // Return -1 for a frame
+					return EvaluatePortalBorder(X, newY, Z, MaxY, a_World);
 				}
 				else
 				{
@@ -104,6 +95,21 @@ public:
 		}
 
 		return 0;
+	}
+
+	/// Evaluates if coords have a valid border on top, based on MaxY
+	int EvaluatePortalBorder(int X, int FoundObsidianY, int Z, int MaxY, cWorld * a_World)
+	{
+		for (int checkBorder = FoundObsidianY + 1; checkBorder <= MaxY - 1; checkBorder++) // FoundObsidianY + 1: FoundObsidianY has already been checked in FindObsidianCeiling; MaxY - 1: portal doesn't need corners
+		{
+			if (a_World->GetBlock(X, checkBorder, Z) != E_BLOCK_OBSIDIAN)
+			{
+				// Base obsidian, base + 1 obsidian, base + x NOT obsidian -> not complete portal
+				return 0;
+			}
+		}
+		// Everything was obsidian, found a border!
+		return -1; // Return -1 for a frame border
 	}
 
 	/// Finds entire frame in any direction with the coordinates of a base block and fills hole with nether portal (START HERE)
