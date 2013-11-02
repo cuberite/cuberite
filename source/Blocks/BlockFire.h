@@ -60,7 +60,7 @@ public:
 
 	/// Traces along YP until it finds an obsidian block, returns Y difference or 0 if no portal, and -1 for border
 	/// Takes the X, Y, and Z of the base block; with an optional MaxY for portal border finding
-	int FindObsidianCeiling(int X, int Y, int Z, NIBBLETYPE a_Dir, cWorld * a_World, int MaxY = 0)
+	int FindObsidianCeiling(int X, int Y, int Z, cWorld * a_World, int MaxY = 0)
 	{
 		if (a_World->GetBlock(X, Y, Z) != E_BLOCK_OBSIDIAN)
 		{
@@ -92,7 +92,7 @@ public:
 						}
 					}
 					// Everything was obsidian, found a border!
-					return 0 - 1; // Return -1 for a frame
+					return -1; // Return -1 for a frame
 				}
 				else
 				{
@@ -109,7 +109,7 @@ public:
 	/// Finds entire frame in any direction with the coordinates of a base block and fills hole with nether portal (START HERE)
 	void FindAndSetPortalFrame(int X, int Y, int Z, cWorld * a_World)
 	{
-		int MaxY = FindObsidianCeiling(X, Y, Z, 0, a_World); // Get topmost obsidian block as reference for all other checks; we don't know meta yet, so 0
+		int MaxY = FindObsidianCeiling(X, Y, Z, a_World); // Get topmost obsidian block as reference for all other checks
 		int X1 = X + 1, Z1 = Z + 1, X2 = X - 1, Z2 = Z - 1; // Duplicate XZ values, add/subtract one as we've checked the original already the line above
 
 		if (MaxY == 0) // Oh noes! Not a portal coordinate :(
@@ -151,9 +151,9 @@ public:
 		bool FoundFrameXP = false, FoundFrameXM = false;
 		for (X1; ((a_World->GetBlock(X1, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X1, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X1++) // Check XP for obsidian blocks, exempting corners
 		{
-			int Value = FindObsidianCeiling(X1, Y, Z, 1, a_World, MaxY);
-			int ValueTwo = FindObsidianCeiling(X1, Y + 1, Z, 1, a_World, MaxY); // For corners without obsidian
-			if ((Value == 0 - 1) || (ValueTwo == 0 - 1)) // FindObsidianCeiling returns 0 - 1 upon frame-find
+			int Value = FindObsidianCeiling(X1, Y, Z, a_World, MaxY);
+			int ValueTwo = FindObsidianCeiling(X1, Y + 1, Z, a_World, MaxY); // For corners without obsidian
+			if ((Value == -1) || (ValueTwo == -1)) // FindObsidianCeiling returns -1 upon frame-find
 			{
 				FoundFrameXP = true; // Found a frame border in this direction, proceed in other direction (don't go further)
 				break;
@@ -165,9 +165,9 @@ public:
 		} XZM = X1 - 2; // Set boundary of frame interior (hence the -2)
 		for (X2; ((a_World->GetBlock(X2, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X2, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X2--) // Go the other direction (XM)
 		{
-			int Value = FindObsidianCeiling(X2, Y, Z, 1, a_World, MaxY);
-			int ValueTwo = FindObsidianCeiling(X2, Y + 1, Z, 1, a_World, MaxY);
-			if ((Value == 0 - 1) || (ValueTwo == 0 - 1))
+			int Value = FindObsidianCeiling(X2, Y, Z, a_World, MaxY);
+			int ValueTwo = FindObsidianCeiling(X2, Y + 1, Z, a_World, MaxY);
+			if ((Value == -1) || (ValueTwo == -1))
 			{
 				FoundFrameXM = true;
 				break;
@@ -187,9 +187,9 @@ public:
 		bool FoundFrameZP = false, FoundFrameZM = false;
 		for (Z1; ((a_World->GetBlock(X, Y, Z1) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X, Y + 1, Z1) == E_BLOCK_OBSIDIAN)); Z1++)
 		{
-			int Value = FindObsidianCeiling(X, Y, Z1, 2, a_World, MaxY);
-			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z1, 2, a_World, MaxY);
-			if ((Value == 0 - 1) || (ValueTwo == 0 - 1))
+			int Value = FindObsidianCeiling(X, Y, Z1, a_World, MaxY);
+			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z1, a_World, MaxY);
+			if ((Value == -1) || (ValueTwo == -1))
 			{
 				FoundFrameZP = true;
 				continue;
@@ -201,9 +201,9 @@ public:
 		} XZP = Z1 - 2;
 		for (Z2; ((a_World->GetBlock(X, Y, Z2) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X, Y + 1, Z2) == E_BLOCK_OBSIDIAN)); Z2--)
 		{
-			int Value = FindObsidianCeiling(X, Y, Z2, 2, a_World, MaxY);
-			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z2, 2, a_World, MaxY);
-			if ((Value == 0 - 1) || (ValueTwo == 0 - 1))
+			int Value = FindObsidianCeiling(X, Y, Z2, a_World, MaxY);
+			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z2, a_World, MaxY);
+			if ((Value == -1) || (ValueTwo == -1))
 			{
 				FoundFrameZM = true;
 				continue;
