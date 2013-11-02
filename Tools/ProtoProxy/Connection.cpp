@@ -143,112 +143,6 @@ typedef unsigned char Byte;
 
 
 
-enum
-{
-	// client-bound packets:
-	PACKET_C_KEEPALIVE               = 0x00,
-	PACKET_C_JOIN_GAME               = 0x01,
-	PACKET_C_CHAT_MESSAGE            = 0x02,
-
-	// server-bound packets:
-	PACKET_S_KEEPALIVE               = 0x00,  // Also the initial handshake, as the very first packet
-	PACKET_S_CHAT_MESSAGE            = 0x01,
-
-	PACKET_TIME_UPDATE               = 0x03,
-	PACKET_ENTITY_EQUIPMENT          = 0x04,
-	PACKET_SPAWN_POSITION            = 0x05,
-	PACKET_UPDATE_HEALTH             = 0x06,
-	PACKET_USE_ENTITY                = 0x07,
-	PACKET_PLAYER_ON_GROUND          = 0x0a,
-	PACKET_PLAYER_POSITION           = 0x0b,
-	PACKET_PLAYER_LOOK               = 0x0c,
-	PACKET_PLAYER_POSITION_LOOK      = 0x0d,
-	PACKET_BLOCK_DIG                 = 0x0e,
-	PACKET_BLOCK_PLACE               = 0x0f,
-	PACKET_SLOT_SELECT               = 0x10,
-	PACKET_PLAYER_ANIMATION          = 0x12,
-	PACKET_ENTITY_ACTION             = 0x13,
-	PACKET_SPAWN_NAMED_ENTITY        = 0x14,
-	PACKET_SPAWN_PICKUP              = 0x15,
-	PACKET_COLLECT_PICKUP            = 0x16,
-	PACKET_SPAWN_OBJECT_VEHICLE      = 0x17,
-	PACKET_SPAWN_MOB                 = 0x18,
-	PACKET_SPAWN_PAINTING            = 0x19,
-	PACKET_SPAWN_EXPERIENCE_ORB      = 0x1a,
-	PACKET_ENTITY_VELOCITY           = 0x1c,
-	PACKET_DESTROY_ENTITIES          = 0x1d,
-	PACKET_ENTITY                    = 0x1e,
-	PACKET_ENTITY_RELATIVE_MOVE      = 0x1f,
-	PACKET_ENTITY_LOOK               = 0x20,
-	PACKET_ENTITY_RELATIVE_MOVE_LOOK = 0x21,
-	PACKET_ENTITY_TELEPORT           = 0x22,
-	PACKET_ENTITY_HEAD_LOOK          = 0x23,
-	PACKET_ENTITY_STATUS             = 0x26,
-	PACKET_ATTACH_ENTITY             = 0x27,
-	PACKET_ENTITY_METADATA           = 0x28,
-	PACKET_ENTITY_EFFECT             = 0x29,
-	PACKET_ENTITY_EFFECT_REMOVE      = 0x2a,
-	PACKET_SET_EXPERIENCE            = 0x2b,
-	PACKET_ENTITY_PROPERTIES         = 0x2c,
-	PACKET_MAP_CHUNK                 = 0x33,
-	PACKET_MULTI_BLOCK_CHANGE        = 0x34,
-	PACKET_BLOCK_CHANGE              = 0x35,
-	PACKET_BLOCK_ACTION              = 0x36,
-	PACKET_MAP_CHUNK_BULK            = 0x38,
-	PACKET_EXPLOSION                 = 0x3c,
-	PACKET_SOUND_EFFECT              = 0x3d,
-	PACKET_NAMED_SOUND_EFFECT        = 0x3e,
-	PACKET_CHANGE_GAME_STATE         = 0x46,
-	PACKET_WINDOW_OPEN               = 0x64,
-	PACKET_WINDOW_CLOSE              = 0x65,
-	PACKET_WINDOW_CLICK              = 0x66,
-	PACKET_SET_SLOT                  = 0x67,
-	PACKET_WINDOW_CONTENTS           = 0x68,
-	PACKET_CREATIVE_INVENTORY_ACTION = 0x6b,
-	PACKET_UPDATE_SIGN               = 0x82,
-	PACKET_UPDATE_TILE_ENTITY        = 0x84,
-	PACKET_PLAYER_LIST_ITEM          = 0xc9,
-	PACKET_PLAYER_ABILITIES          = 0xca,
-	PACKET_INCREMENT_STATISTIC       = 0xc8,
-	PACKET_TAB_COMPLETION            = 0xcb,
-	PACKET_LOCALE_AND_VIEW           = 0xcc,
-	PACKET_CLIENT_STATUSES           = 0xcd,
-	PACKET_PLUGIN_MESSAGE            = 0xfa,
-	PACKET_ENCRYPTION_KEY_RESPONSE   = 0xfc,
-	PACKET_ENCRYPTION_KEY_REQUEST    = 0xfd,
-	PACKET_PING                      = 0xfe,
-	PACKET_KICK                      = 0xff,
-	
-	// Synonyms:
-	PACKET_DISCONNECT                = PACKET_KICK,
-} ;
-
-
-
-
-enum
-{
-	OBJECT_BOAT             = 1,
-	OBJECT_MINECART         = 10,
-	OBJECT_MINECART_STORAGE = 11,
-	OBJECT_MINECART_POWERED = 12,
-	OBJECT_MINECART_TNT     = 13,
-	OBJECT_MINECART_HOPPER  = 14,
-	OBJECT_TNT              = 50,
-	OBJECT_ENDERCRYSTAL     = 51,
-	OBJECT_ARROW            = 60,
-	OBJECT_SNOWBALL         = 61,
-	OBJECT_EGG              = 62,
-	OBJECT_FALLING_BLOCK    = 70,
-	OBJECT_EYE_OF_ENDER     = 72,
-	OBJECT_DRAGON_EGG       = 74,
-	OBJECT_FISHING_FLOAT    = 90,
-} ;
-
-
-
-
-
 AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor = 32)
 {
 	return Printf("<%d, %d, %d> ~ {%.02f, %.02f, %.02f}",
@@ -1468,11 +1362,11 @@ bool cConnection::HandleServerBlockChange(void)
 
 bool cConnection::HandleServerChangeGameState(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadChar, char,  Reason);
-	HANDLE_SERVER_PACKET_READ(ReadChar, char,  Data);
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  Reason);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Data);
 	Log("Received a PACKET_CHANGE_GAME_STATE from the server:");
 	Log("  Reason = %d", Reason);
-	Log("  Data = %d", Data);
+	Log("  Data = %f", Data);
 	COPY_TO_CLIENT();
 	return true;
 }
