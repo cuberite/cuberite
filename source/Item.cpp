@@ -38,6 +38,7 @@ short cItem::GetMaxDamage(void) const
 {
 	switch (m_ItemType)
 	{
+		case E_ITEM_BOW:             return 384;
 		case E_ITEM_DIAMOND_AXE:     return 1563;
 		case E_ITEM_DIAMOND_HOE:     return 1563;
 		case E_ITEM_DIAMOND_PICKAXE: return 1563;

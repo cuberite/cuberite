@@ -71,6 +71,11 @@ public:
 			return;
 		}
 		a_Player->GetWorld()->BroadcastSpawnEntity(*Arrow);
+
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->UseEquippedItem();
+		}
 	}
 } ;
 
