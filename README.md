@@ -10,7 +10,7 @@ Installation
 
 To install MCServer, you can either download the repository and compile it, or download a pre-compiled version.
 
-If you are cloning the repository, you are required to recursively download the submodules also with `git clone -r`. When pulling, you should use `git pull --recurse-submodules`. You might want to set the base forms as aliases to these.
+After you've cloned the repository, you probably want to pull down the submodules (core plugins, some dependencies). This can be achieved with `git submodule init` and then on a regular basis (to keep up to date) `git submodule update`.
 
 Compilation instructions are available in the COMPILING file.
 
