@@ -615,6 +615,15 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			m_ServerBuffer.ResetRead();
 			break;
 		}
+		if (PacketLen == 0)
+		{
+			m_ServerBuffer.ResetRead();
+			AString All;
+			m_ServerBuffer.ReadAll(All);
+			DataLog(All.data(), All.size(), "====== Received a bad packet length? Inspect the contents below ======");
+			m_ServerBuffer.CommitRead();  // Try to recover by marking everything as read
+			break;
+		}
 		UInt32 PacketType, PacketReadSoFar;
 		PacketReadSoFar = m_ServerBuffer.GetReadableSpace();
 		VERIFY(m_ServerBuffer.ReadVarInt(PacketType));
@@ -1891,6 +1900,7 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	// TODO: Save the compressed data into a file for later analysis
 	
 	COPY_TO_CLIENT();
+	Sleep(50);
 	return true;
 }
 
@@ -2219,7 +2229,9 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	m_ServerBuffer.ResetRead();
 	m_ServerBuffer.ReadAll(Buffer);
 	m_ServerBuffer.ResetRead();
-	m_ServerBuffer.SkipRead(1);
+	UInt32 PacketLen, PacketType;
+	m_ServerBuffer.ReadVarInt(PacketLen);
+	m_ServerBuffer.ReadVarInt(PacketType);
 	if (Buffer.size() > 128)
 	{
 		// Only log up to 128 bytes
