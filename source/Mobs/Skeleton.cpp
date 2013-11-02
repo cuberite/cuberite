@@ -3,9 +3,6 @@
 
 #include "Skeleton.h"
 #include "../World.h"
-#include "../Entities/ProjectileEntity.h"
-#include "../Entities/Entity.h"
-
 
 
 
