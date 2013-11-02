@@ -318,7 +318,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				(BlockType == E_BLOCK_STATIONARY_WATER) ||
 				(BlockType == E_BLOCK_LADDER) ||
 				(BlockType == E_BLOCK_VINES)
-				)
+			)
 			{
 				m_LastGroundHeight = (float)GetPosY();
 			}
