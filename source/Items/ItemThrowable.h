@@ -28,9 +28,15 @@ public:
 
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
 	{
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
+
 		Vector3d Pos = a_Player->GetThrowStartPos();
 		Vector3d Speed = a_Player->GetLookVector() * m_SpeedCoeff;
 		a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, &Speed);
+
 		return true;
 	}
 	

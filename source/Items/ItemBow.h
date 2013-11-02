@@ -71,6 +71,7 @@ public:
 			return;
 		}
 		a_Player->GetWorld()->BroadcastSpawnEntity(*Arrow);
+		a_Player->UseEquippedItem();
 	}
 } ;
 

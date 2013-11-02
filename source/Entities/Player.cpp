@@ -297,7 +297,6 @@ void cPlayer::CancelChargingBow(void)
 
 void cPlayer::SetTouchGround(bool a_bTouchGround)
 {
-	// If just
 	m_bTouchGround = a_bTouchGround;
 
 	if (!m_bTouchGround)
@@ -307,12 +306,11 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			m_LastJumpHeight = (float)GetPosY();
 		}
 		cWorld * World = GetWorld();
-		if ((GetPosY() >= 0) && (GetPosY() < 256))
+		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
 		{
-			BLOCKTYPE BlockType = World->GetBlock( float2int(GetPosX()), float2int(GetPosY()), float2int(GetPosZ()) );
+			BLOCKTYPE BlockType = World->GetBlock(float2int(GetPosX()), float2int(GetPosY()), float2int(GetPosZ()));
 			if (BlockType != E_BLOCK_AIR)
 			{
-				// LOGD("TouchGround set to true by server");
 				m_bTouchGround = true;
 			}
 			if (
@@ -320,21 +318,20 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				(BlockType == E_BLOCK_STATIONARY_WATER) ||
 				(BlockType == E_BLOCK_LADDER) ||
 				(BlockType == E_BLOCK_VINES)
-			)
+				)
 			{
-				// LOGD("Water / Ladder / Torch");
 				m_LastGroundHeight = (float)GetPosY();
 			}
 		}
 	}
-
-	if (m_bTouchGround)
+	else
 	{
 		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
 		int Damage = (int)(Dist - 3.f);
-		if(m_LastJumpHeight > m_LastGroundHeight) Damage++;
+		if (m_LastJumpHeight > m_LastGroundHeight) Damage++;
 		m_LastJumpHeight = (float)GetPosY();
-		if (Damage > 0)
+
+		if ((Damage > 0) && (!IsGameModeCreative()))
 		{
 			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 		}
@@ -1416,11 +1413,11 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 void cPlayer::UseEquippedItem(void)
 {
-	if (GetGameMode() == gmCreative)  // No damage in creative
+	if (IsGameModeCreative()) // No damage in creative
 	{
 		return;
 	}
-	
+
 	GetInventory().DamageEquippedItem();
 }
 
