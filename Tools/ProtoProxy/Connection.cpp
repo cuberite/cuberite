@@ -718,6 +718,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		)
 		{
 			// Not a complete packet yet
+			m_ServerBuffer.ResetRead();
 			break;
 		}
 		UInt32 PacketType, PacketReadSoFar;
@@ -2683,6 +2684,7 @@ bool cConnection::HandleServerWindowOpen(void)
 bool cConnection::HandleServerUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar)
 {
 	AString Data;
+	ASSERT(a_PacketLen >= a_PacketReadSoFar);
 	if (!m_ServerBuffer.ReadString(Data, a_PacketLen - a_PacketReadSoFar))
 	{
 		return false;
