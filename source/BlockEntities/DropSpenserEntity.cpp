@@ -89,6 +89,8 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	int SmokeDir = 0;
 	switch (Meta)
 	{
+		case E_META_DROPSPENSER_FACING_YP: SmokeDir = 4; break; // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
+		case E_META_DROPSPENSER_FACING_YM: SmokeDir = 4; break;
 		case E_META_DROPSPENSER_FACING_XM: SmokeDir = 3; break;
 		case E_META_DROPSPENSER_FACING_XP: SmokeDir = 5; break;
 		case E_META_DROPSPENSER_FACING_ZM: SmokeDir = 1; break;
@@ -237,7 +239,27 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 	cItems Pickups;
 	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum));
-	m_World->SpawnItemPickups(Pickups, DispX, DispY, DispZ);
+
+	int PickupSpeedX = 0;
+	int PickupSpeedY = 0;
+	int PickupSpeedZ = 0;
+	switch (Meta)
+	{
+		case E_META_DROPSPENSER_FACING_YP: PickupSpeedY =  4; break;
+		case E_META_DROPSPENSER_FACING_YM: PickupSpeedY = -4; break;
+		case E_META_DROPSPENSER_FACING_XM: PickupSpeedX = -4; break;
+		case E_META_DROPSPENSER_FACING_XP: PickupSpeedX =  4; break;
+		case E_META_DROPSPENSER_FACING_ZM: PickupSpeedZ = -4; break;
+		case E_META_DROPSPENSER_FACING_ZP: PickupSpeedZ =  4; break;
+	}
+
+	double MicroX, MicroY, MicroZ;
+	MicroX = DispX + 0.5;
+	MicroY = DispY + 0.4; // Slightly less than half, to accomodate actual texture hole on DropSpenser
+	MicroZ = DispZ + 0.5;
+
+
+	m_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ, PickupSpeedX, PickupSpeedY, PickupSpeedZ);
 }
 
 

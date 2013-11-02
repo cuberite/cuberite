@@ -38,6 +38,9 @@ public:
 				a_World->SetBlock(a_BlockX,a_BlockY,a_BlockZ, E_BLOCK_AIR, 0);
 				break;
 			}
+
+			// Nether portals are handled in BlockFire.h
+
 			default:
 			{
 				// Light a fire next to/on top of the block if air:
@@ -49,7 +52,6 @@ public:
 				}
 			}
 		}
-
 		return false;
 	}
 } ;
