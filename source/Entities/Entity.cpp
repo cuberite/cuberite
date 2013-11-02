@@ -1178,9 +1178,9 @@ void cEntity::SetMass(double a_Mass)
 
 
 
-void cEntity::SetRotation(double a_Rotation)
+void cEntity::SetYaw(double a_Yaw)
 {
-	m_Rot.x = a_Rotation;
+	m_Rot.x = a_Yaw;
 	m_bDirtyOrientation = true;
 	WrapRotation();
 }

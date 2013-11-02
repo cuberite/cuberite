@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/28/13 13:11:03.
+** Generated automatically by tolua++-1.0.92 on 11/02/13 17:43:37.
 */
 
 #ifndef __cplusplus
@@ -5220,6 +5220,38 @@ static int tolua_AllToLua_cEntity_GetRotation00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetYaw of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetYaw00
+static int tolua_AllToLua_cEntity_GetYaw00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetYaw'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetYaw();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetYaw'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetPitch of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetPitch00
 static int tolua_AllToLua_cEntity_GetPitch00(lua_State* tolua_S)
@@ -5874,6 +5906,39 @@ static int tolua_AllToLua_cEntity_SetRotation00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetRotation'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetYaw of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetYaw00
+static int tolua_AllToLua_cEntity_SetYaw00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_Yaw = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetYaw'", NULL);
+#endif
+  {
+   self->SetYaw(a_Yaw);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetYaw'.",&tolua_err);
  return 0;
 #endif
 }
@@ -7985,6 +8050,38 @@ static int tolua_AllToLua_cPlayer_GetGameMode00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetGameMode'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetEffectiveGameMode of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetEffectiveGameMode00
+static int tolua_AllToLua_cPlayer_GetEffectiveGameMode00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEffectiveGameMode'", NULL);
+#endif
+  {
+   eGameMode tolua_ret = (eGameMode)  self->GetEffectiveGameMode();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetEffectiveGameMode'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29965,6 +30062,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetPosZ",tolua_AllToLua_cEntity_GetPosZ00);
    tolua_function(tolua_S,"GetRot",tolua_AllToLua_cEntity_GetRot00);
    tolua_function(tolua_S,"GetRotation",tolua_AllToLua_cEntity_GetRotation00);
+   tolua_function(tolua_S,"GetYaw",tolua_AllToLua_cEntity_GetYaw00);
    tolua_function(tolua_S,"GetPitch",tolua_AllToLua_cEntity_GetPitch00);
    tolua_function(tolua_S,"GetRoll",tolua_AllToLua_cEntity_GetRoll00);
    tolua_function(tolua_S,"GetLookVector",tolua_AllToLua_cEntity_GetLookVector00);
@@ -29985,6 +30083,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetPosition",tolua_AllToLua_cEntity_SetPosition01);
    tolua_function(tolua_S,"SetRot",tolua_AllToLua_cEntity_SetRot00);
    tolua_function(tolua_S,"SetRotation",tolua_AllToLua_cEntity_SetRotation00);
+   tolua_function(tolua_S,"SetYaw",tolua_AllToLua_cEntity_SetYaw00);
    tolua_function(tolua_S,"SetPitch",tolua_AllToLua_cEntity_SetPitch00);
    tolua_function(tolua_S,"SetRoll",tolua_AllToLua_cEntity_SetRoll00);
    tolua_function(tolua_S,"SetSpeed",tolua_AllToLua_cEntity_SetSpeed00);
@@ -30058,6 +30157,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetThrowStartPos",tolua_AllToLua_cPlayer_GetThrowStartPos00);
    tolua_function(tolua_S,"GetThrowSpeed",tolua_AllToLua_cPlayer_GetThrowSpeed00);
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cPlayer_GetGameMode00);
+   tolua_function(tolua_S,"GetEffectiveGameMode",tolua_AllToLua_cPlayer_GetEffectiveGameMode00);
    tolua_function(tolua_S,"SetGameMode",tolua_AllToLua_cPlayer_SetGameMode00);
    tolua_function(tolua_S,"IsGameModeCreative",tolua_AllToLua_cPlayer_IsGameModeCreative00);
    tolua_function(tolua_S,"IsGameModeSurvival",tolua_AllToLua_cPlayer_IsGameModeSurvival00);
