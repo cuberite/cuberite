@@ -195,7 +195,7 @@ int cByteBuffer::GetUsedSpace(void) const
 {
 	CHECK_THREAD;
 	CheckValid();
-	return m_BufferSize - GetFreeSpace();
+	return m_BufferSize - GetFreeSpace() - 1;
 }
 
 
