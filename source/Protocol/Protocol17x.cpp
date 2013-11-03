@@ -17,6 +17,8 @@ Implements the 1.7.x protocol classes:
 #include "../World.h"
 #include "ChunkDataSerializer.h"
 #include "../Entities/Pickup.h"
+#include "../WorldStorage/FastNBT.h"
+#include "../StringCompression.h"
 
 
 
@@ -36,6 +38,8 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
 	m_ReceivedData(32 KiB),
+	m_OutPacketBuffer(64 KiB),
+	m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
 	m_IsEncrypted(false)
 {
 }
@@ -70,12 +74,10 @@ void cProtocol172::DataReceived(const char * a_Data, int a_Size)
 
 void cProtocol172::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
 {
-	cByteBuffer Packet(20);
-	Packet.WriteVarInt(0x1b);  // Attach Entity packet
-	Packet.WriteBEInt(a_Entity.GetUniqueID());
-	Packet.WriteBEInt((a_Vehicle != NULL) ? a_Vehicle->GetUniqueID() : 0);
-	Packet.WriteBool(false);
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteInt((a_Vehicle != NULL) ? a_Vehicle->GetUniqueID() : 0);
+	Pkt.WriteBool(false);
 }
 
 
@@ -84,31 +86,27 @@ void cProtocol172::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_
 
 void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
-	cByteBuffer Packet(30);
-	Packet.WriteVarInt(0x24);  // Block Action packet
-	Packet.WriteBEInt(a_BlockX);
-	Packet.WriteBEShort(a_BlockY);
-	Packet.WriteBEInt(a_BlockZ);
-	Packet.WriteChar(a_Byte1);
-	Packet.WriteChar(a_Byte2);
-	Packet.WriteVarInt(a_BlockType);
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x24);  // Block Action packet
+	Pkt.WriteInt(a_BlockX);
+	Pkt.WriteShort(a_BlockY);
+	Pkt.WriteInt(a_BlockZ);
+	Pkt.WriteByte(a_Byte1);
+	Pkt.WriteByte(a_Byte2);
+	Pkt.WriteVarInt(a_BlockType);
 }
 
 
 
 
 
-void cProtocol172::SendBlockBreakAnim	(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
+void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
-	cByteBuffer Packet(20);
-	Packet.WriteVarInt(0x24);  // Block Action packet
-	Packet.WriteBEInt(a_EntityID);
-	Packet.WriteBEInt(a_BlockX);
-	Packet.WriteBEInt(a_BlockY);
-	Packet.WriteBEInt(a_BlockZ);
-	Packet.WriteChar(a_Stage);
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x24);  // Block Break Animation packet
+	Pkt.WriteInt(a_EntityID);
+	Pkt.WriteInt(a_BlockX);
+	Pkt.WriteInt(a_BlockY);
+	Pkt.WriteInt(a_BlockZ);
+	Pkt.WriteChar(a_Stage);
 }
 
 
@@ -117,14 +115,12 @@ void cProtocol172::SendBlockBreakAnim	(int a_EntityID, int a_BlockX, int a_Block
 
 void cProtocol172::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	cByteBuffer Packet(20);
-	Packet.WriteVarInt(0x23);  // Block Change packet
-	Packet.WriteBEInt(a_BlockX);
-	Packet.WriteByte(a_BlockY);
-	Packet.WriteBEInt(a_BlockZ);
-	Packet.WriteVarInt(a_BlockType);
-	Packet.WriteByte(a_BlockMeta);
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x23);  // Block Change packet
+	Pkt.WriteInt(a_BlockX);
+	Pkt.WriteByte(a_BlockY);
+	Pkt.WriteInt(a_BlockZ);
+	Pkt.WriteVarInt(a_BlockType);
+	Pkt.WriteByte(a_BlockMeta);
 }
 
 
@@ -133,19 +129,17 @@ void cProtocol172::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 
 void cProtocol172::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
-	cByteBuffer Packet(20 + a_Changes.size() * 4);
-	Packet.WriteVarInt(0x22);  // Multi Block Change packet
-	Packet.WriteBEInt(a_ChunkX);
-	Packet.WriteBEInt(a_ChunkZ);
-	Packet.WriteBEShort((short)a_Changes.size());
-	Packet.WriteBEInt(a_Changes.size() * 4);
+	cPacketizer Pkt(*this, 0x22);  // Multi Block Change packet
+	Pkt.WriteInt(a_ChunkX);
+	Pkt.WriteInt(a_ChunkZ);
+	Pkt.WriteShort((short)a_Changes.size());
+	Pkt.WriteInt(a_Changes.size() * 4);
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
 		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
 		unsigned int Blocks = itr->BlockMeta | (itr->BlockType << 4);
-		Packet.WriteBEInt((Coords << 16) | Blocks);
+		Pkt.WriteInt((Coords << 16) | Blocks);
 	}  // for itr - a_Changes[]
-	WritePacket(Packet);
 }
 
 
@@ -154,11 +148,8 @@ void cProtocol172::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 
 void cProtocol172::SendChat(const AString & a_Message)
 {
-	AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str());
-	cByteBuffer Packet(20 + Message.size());
-	Packet.WriteVarInt(0x02);  // Chat Message packet
-	Packet.WriteVarUTF8String(Message);
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x02);  // Chat Message packet
+	Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()));
 }
 
 
@@ -168,12 +159,10 @@ void cProtocol172::SendChat(const AString & a_Message)
 void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);  // This contains the flags and bitmasks, too
-	cByteBuffer Packet(40 + ChunkData.size());
-	Packet.WriteVarInt(0x21);  // Chunk Data packet
-	Packet.WriteBEInt(a_ChunkX);
-	Packet.WriteBEInt(a_ChunkZ);
-	Packet.Write(ChunkData.data(), ChunkData.size());
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
+	Pkt.WriteInt(a_ChunkX);
+	Pkt.WriteInt(a_ChunkZ);
+	Pkt.WriteBuf(ChunkData.data(), ChunkData.size());
 }
 
 
@@ -182,11 +171,9 @@ void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 void cProtocol172::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
 {
-	cByteBuffer Packet(9);
-	Packet.WriteVarInt(0x0d);  // Collect Item packet
-	Packet.WriteBEInt(a_Pickup.GetUniqueID());
-	Packet.WriteBEInt(a_Player.GetUniqueID());
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x0d);  // Collect Item packet
+	Pkt.WriteInt(a_Pickup.GetUniqueID());
+	Pkt.WriteInt(a_Player.GetUniqueID());
 }
 
 
@@ -195,11 +182,9 @@ void cProtocol172::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a
 
 void cProtocol172::SendDestroyEntity(const cEntity & a_Entity)
 {
-	cByteBuffer Packet(6);
-	Packet.WriteVarInt(0x13);  // Destroy Entities packet
-	Packet.WriteByte(0);
-	Packet.WriteBEInt(a_Entity.GetUniqueID());
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x13);  // Destroy Entities packet
+	Pkt.WriteByte(1);
+	Pkt.WriteInt(a_Entity.GetUniqueID());
 }
 
 
@@ -208,19 +193,20 @@ void cProtocol172::SendDestroyEntity(const cEntity & a_Entity)
 
 void cProtocol172::SendDisconnect(const AString & a_Reason)
 {
-	cByteBuffer Packet(10 + a_Reason.size());
-	Packet.WriteVarInt(0x40);  // Disconnect packet
-	Packet.WriteVarUTF8String(a_Reason);
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x40);
+	Pkt.WriteString(a_Reason);
 }
 
 
 
 
 
-void cProtocol172::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)  ///< Request the client to open up the sign editor for the sign(1.6+)
+void cProtocol172::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x36);  // Sign Editor Open packet
+	Pkt.WriteInt(a_BlockX);
+	Pkt.WriteInt(a_BlockY);
+	Pkt.WriteInt(a_BlockZ);
 }
 
 
@@ -229,7 +215,10 @@ void cProtocol172::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)  ///< 
 
 void cProtocol172::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteShort(a_SlotNum);
+	Pkt.WriteItem(a_Item);
 }
 
 
@@ -238,7 +227,9 @@ void cProtocol172::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 
 void cProtocol172::SendEntityHeadLook(const cEntity & a_Entity)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x19);  // Entity Head Look packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
 }
 
 
@@ -247,7 +238,10 @@ void cProtocol172::SendEntityHeadLook(const cEntity & a_Entity)
 
 void cProtocol172::SendEntityLook(const cEntity & a_Entity)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x16);  // Entity Look packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
 }
 
 
@@ -256,7 +250,12 @@ void cProtocol172::SendEntityLook(const cEntity & a_Entity)
 
 void cProtocol172::SendEntityMetadata(const cEntity & a_Entity)
 {
+	/*
 	// TODO
+	cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	WriteEntityMetadata(Pkt, a_Entity);
+	*/
 }
 
 
@@ -265,7 +264,11 @@ void cProtocol172::SendEntityMetadata(const cEntity & a_Entity)
 
 void cProtocol172::SendEntityProperties(const cEntity & a_Entity)
 {
+	/*
+	cPacketizer Pkt(*this, 0x20);  // Entity Properties packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
 	// TODO
+	*/
 }
 
 
@@ -274,7 +277,11 @@ void cProtocol172::SendEntityProperties(const cEntity & a_Entity)
 
 void cProtocol172::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x15);  // Entity Relative Move packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_RelX);
+	Pkt.WriteByte(a_RelY);
+	Pkt.WriteByte(a_RelZ);
 }
 
 
@@ -283,7 +290,13 @@ void cProtocol172::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char
 
 void cProtocol172::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x17);  // Entity Look And Relative Move packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_RelX);
+	Pkt.WriteByte(a_RelY);
+	Pkt.WriteByte(a_RelZ);
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
 }
 
 
@@ -292,7 +305,9 @@ void cProtocol172::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, 
 
 void cProtocol172::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x1a);  // Entity Status packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteChar(a_Status);
 }
 
 
@@ -301,7 +316,12 @@ void cProtocol172::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 void cProtocol172::SendEntityVelocity(const cEntity & a_Entity)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	// 400 = 8000 / 20 ... Conversion from our speed in m/s to 8000 m/tick
+	Pkt.WriteShort((short)(a_Entity.GetSpeedX() * 400));
+	Pkt.WriteShort((short)(a_Entity.GetSpeedY() * 400));
+	Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));
 }
 
 
@@ -310,7 +330,21 @@ void cProtocol172::SendEntityVelocity(const cEntity & a_Entity)
 
 void cProtocol172::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x27);  // Explosion packet
+	Pkt.WriteFloat((float)a_BlockX);
+	Pkt.WriteFloat((float)a_BlockY);
+	Pkt.WriteFloat((float)a_BlockZ);
+	Pkt.WriteFloat((float)a_Radius);
+	Pkt.WriteInt(a_BlocksAffected.size());
+	for (cVector3iArray::const_iterator itr = a_BlocksAffected.begin(), end = a_BlocksAffected.end(); itr != end; ++itr)
+	{
+		Pkt.WriteChar((char)itr->x);
+		Pkt.WriteChar((char)itr->y);
+		Pkt.WriteChar((char)itr->z);
+	}  // for itr - a_BlockAffected[]
+	Pkt.WriteFloat((float)a_PlayerMotion.x);
+	Pkt.WriteFloat((float)a_PlayerMotion.y);
+	Pkt.WriteFloat((float)a_PlayerMotion.z);
 }
 
 
@@ -319,7 +353,9 @@ void cProtocol172::SendExplosion(double a_BlockX, double a_BlockY, double a_Bloc
 
 void cProtocol172::SendGameMode(eGameMode a_GameMode)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x2b);  // Change Game State packet
+	Pkt.WriteByte(3);  // Reason: Change game mode
+	Pkt.WriteFloat((float)a_GameMode);
 }
 
 
@@ -328,7 +364,10 @@ void cProtocol172::SendGameMode(eGameMode a_GameMode)
 
 void cProtocol172::SendHealth(void)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x06);  // Update Health packet
+	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetHealth());
+	Pkt.WriteShort(m_Client->GetPlayer()->GetFoodLevel());
+	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
 }
 
 
@@ -337,7 +376,10 @@ void cProtocol172::SendHealth(void)
 
 void cProtocol172::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x2f);  // Set Slot packet
+	Pkt.WriteChar(a_WindowID);
+	Pkt.WriteShort(a_SlotNum);
+	Pkt.WriteItem(a_Item);
 }
 
 
@@ -346,7 +388,8 @@ void cProtocol172::SendInventorySlot(char a_WindowID, short a_SlotNum, const cIt
 
 void cProtocol172::SendKeepAlive(int a_PingID)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x00);  // Keep Alive packet
+	Pkt.WriteInt(a_PingID);
 }
 
 
@@ -355,13 +398,24 @@ void cProtocol172::SendKeepAlive(int a_PingID)
 
 void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
+	// Send the Join Game packet:
+	{
+		cPacketizer Pkt(*this, 0x01);  // Join Game packet
+		Pkt.WriteInt(a_Player.GetUniqueID());
+		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode());
+		Pkt.WriteChar((char)a_World.GetDimension());
+		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
+		Pkt.WriteByte(cRoot::Get()->GetServer()->GetMaxPlayers());
+		Pkt.WriteString("default");  // Level type - wtf?
+	}
+	
 	// Send the spawn position:
-	cByteBuffer Packet(20);
-	Packet.WriteVarInt(0x05);  // Spawn Position packet
-	Packet.WriteBEInt((int)a_World.GetSpawnX());
-	Packet.WriteBEInt((int)a_World.GetSpawnY());
-	Packet.WriteBEInt((int)a_World.GetSpawnZ());
-	WritePacket(Packet);
+	{
+		cPacketizer Pkt(*this, 0x05);  // Spawn Position packet
+		Pkt.WriteInt((int)a_World.GetSpawnX());
+		Pkt.WriteInt((int)a_World.GetSpawnY());
+		Pkt.WriteInt((int)a_World.GetSpawnZ());
+	}
 	
 	// Send player abilities:
 	SendPlayerAbilities();
@@ -373,7 +427,24 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 void cProtocol172::SendPickupSpawn(const cPickup & a_Pickup)
 {
-	// TODO
+	{
+		cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
+		Pkt.WriteInt(a_Pickup.GetUniqueID());
+		Pkt.WriteByte(2);  // Type = Pickup
+		Pkt.WriteFPInt(a_Pickup.GetPosX());
+		Pkt.WriteFPInt(a_Pickup.GetPosY());
+		Pkt.WriteFPInt(a_Pickup.GetPosZ());
+		Pkt.WriteByteAngle(a_Pickup.GetYaw());
+		Pkt.WriteByteAngle(a_Pickup.GetPitch());
+		Pkt.WriteInt(0);  // No object data
+	}
+	{
+		cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
+		Pkt.WriteInt(a_Pickup.GetUniqueID());
+		Pkt.WriteByte((0x05 << 5) | 10);  // Slot type + index 10
+		Pkt.WriteItem(a_Pickup.GetItem());
+		Pkt.WriteByte(0x7f);  // End of metadata
+	}
 }
 
 
@@ -382,19 +453,17 @@ void cProtocol172::SendPickupSpawn(const cPickup & a_Pickup)
 
 void cProtocol172::SendPlayerAbilities(void)
 {
-	cByteBuffer Packet(20);
-	Packet.WriteVarInt(0x39);  // Player Abilities packet
+	cPacketizer Pkt(*this, 0x39);  // Player Abilities packet
 	Byte Flags = 0;
 	if (m_Client->GetPlayer()->IsGameModeCreative())
 	{
 		Flags |= 0x01;
 	}
 	// TODO: Other flags (god mode, flying, can fly
-	Packet.WriteByte(Flags);
-	// TODO: Packet.WriteBEFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
-	Packet.WriteBEFloat(0.05f);
-	Packet.WriteBEFloat((float)m_Client->GetPlayer()->GetMaxSpeed());
-	WritePacket(Packet);
+	Pkt.WriteByte(Flags);
+	// TODO: Pkt.WriteFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
+	Pkt.WriteFloat(0.05f);
+	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetMaxSpeed());
 }
 
 
@@ -403,7 +472,9 @@ void cProtocol172::SendPlayerAbilities(void)
 
 void cProtocol172::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x0b);  // Animation packet
+	Pkt.WriteInt(a_Player.GetUniqueID());
+	Pkt.WriteChar(a_Animation);
 }
 
 
@@ -412,12 +483,10 @@ void cProtocol172::SendPlayerAnimation(const cPlayer & a_Player, char a_Animatio
 
 void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 {
-	cByteBuffer Packet(10 + a_Player.GetName().size());
-	Packet.WriteVarInt(0x38);  // Playerlist Item packet
-	Packet.WriteVarUTF8String(a_Player.GetName());
-	Packet.WriteBool(a_IsOnline);
-	Packet.WriteBEShort(a_Player.GetClientHandle()->GetPing());
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
+	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteBool(a_IsOnline);
+	Pkt.WriteShort(a_Player.GetClientHandle()->GetPing());
 }
 
 
@@ -435,7 +504,13 @@ void cProtocol172::SendPlayerMaxSpeed(void)
 
 void cProtocol172::SendPlayerMoveLook(void)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
+	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosX());
+	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosY());
+	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosZ());
+	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetYaw());
+	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetPitch());
+	Pkt.WriteBool(m_Client->GetPlayer()->IsOnGround());
 }
 
 
@@ -444,7 +519,8 @@ void cProtocol172::SendPlayerMoveLook(void)
 
 void cProtocol172::SendPlayerPosition(void)
 {
-	// TODO
+	// There is no dedicated packet for this, send the whole thing:
+	SendPlayerMoveLook();
 }
 
 
@@ -453,7 +529,21 @@ void cProtocol172::SendPlayerPosition(void)
 
 void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 {
-	// TODO
+	// Called to spawn another player for the client
+	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
+	Pkt.WriteInt(a_Player.GetUniqueID());
+	Pkt.WriteString(Printf("%d", a_Player.GetUniqueID()));  // TODO: Proper UUID
+	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteFPInt(a_Player.GetPosX());
+	Pkt.WriteFPInt(a_Player.GetPosY());
+	Pkt.WriteFPInt(a_Player.GetPosZ());
+	Pkt.WriteByteAngle(a_Player.GetYaw());
+	Pkt.WriteByteAngle(a_Player.GetPitch());
+	short ItemType = a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType;
+	Pkt.WriteShort(ItemType);
+	Pkt.WriteByte((3 << 5) | 6);  // Metadata: float + index 6
+	Pkt.WriteFloat((float)a_Player.GetHealth());
+	Pkt.WriteByte(0x7f);  // Metadata: end
 }
 
 
@@ -462,7 +552,11 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cProtocol172::SendRespawn(void)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x07);  // Respawn packet
+	Pkt.WriteInt(m_Client->GetPlayer()->GetWorld()->GetDimension());
+	Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
+	Pkt.WriteByte((Byte)m_Client->GetPlayer()->GetEffectiveGameMode());
+	Pkt.WriteString("default");
 }
 
 
@@ -670,6 +764,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			// Not enough data
 			return;
 		}
+
 		UInt32 NumBytesRead = Mark1 - m_ReceivedData.GetReadableSpace();
 		HandlePacket(PacketType, PacketLen - NumBytesRead);
 		
@@ -681,6 +776,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 
 		// Go to packet end in any case:
 		m_ReceivedData.ResetRead();
+		m_ReceivedData.ReadVarInt(PacketType);
 		m_ReceivedData.SkipRead(PacketLen);
 		m_ReceivedData.CommitRead();
 	}  // while (true)
@@ -720,29 +816,29 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 			// Game
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketKeepAlive              (a_RemainingBytes); break;
-				case 0x01: HandlePacketChatMessage            (a_RemainingBytes); break;
-				case 0x02: HandlePacketUseEntity              (a_RemainingBytes); break;
-				case 0x03: HandlePacketPlayer                 (a_RemainingBytes); break;
-				case 0x04: HandlePacketPlayerPos              (a_RemainingBytes); break;
-				case 0x05: HandlePacketPlayerLook             (a_RemainingBytes); break;
-				case 0x06: HandlePacketPlayerPosLook          (a_RemainingBytes); break;
-				case 0x07: HandlePacketBlockDig               (a_RemainingBytes); break;
-				case 0x08: HandlePacketBlockPlace             (a_RemainingBytes); break;
-				case 0x09: HandlePacketSlotSelect             (a_RemainingBytes); break;
-				case 0x0a: HandlePacketAnimation              (a_RemainingBytes); break;
-				case 0x0b: HandlePacketEntityAction           (a_RemainingBytes); break;
-				case 0x0c: HandlePacketSteerVehicle           (a_RemainingBytes); break;
-				case 0x0d: HandlePacketWindowClose            (a_RemainingBytes); break;
-				case 0x0e: HandlePacketWindowClick            (a_RemainingBytes); break;
+				case 0x00: HandlePacketKeepAlive              (a_RemainingBytes); return;
+				case 0x01: HandlePacketChatMessage            (a_RemainingBytes); return;
+				case 0x02: HandlePacketUseEntity              (a_RemainingBytes); return;
+				case 0x03: HandlePacketPlayer                 (a_RemainingBytes); return;
+				case 0x04: HandlePacketPlayerPos              (a_RemainingBytes); return;
+				case 0x05: HandlePacketPlayerLook             (a_RemainingBytes); return;
+				case 0x06: HandlePacketPlayerPosLook          (a_RemainingBytes); return;
+				case 0x07: HandlePacketBlockDig               (a_RemainingBytes); return;
+				case 0x08: HandlePacketBlockPlace             (a_RemainingBytes); return;
+				case 0x09: HandlePacketSlotSelect             (a_RemainingBytes); return;
+				case 0x0a: HandlePacketAnimation              (a_RemainingBytes); return;
+				case 0x0b: HandlePacketEntityAction           (a_RemainingBytes); return;
+				case 0x0c: HandlePacketSteerVehicle           (a_RemainingBytes); return;
+				case 0x0d: HandlePacketWindowClose            (a_RemainingBytes); return;
+				case 0x0e: HandlePacketWindowClick            (a_RemainingBytes); return;
 				case 0x0f: // Confirm transaction - not used in MCS
-				case 0x10: HandlePacketCreativeInventoryAction(a_RemainingBytes); break;
-				case 0x12: HandlePacketUpdateSign             (a_RemainingBytes); break;
-				case 0x13: HandlePacketPlayerAbilities        (a_RemainingBytes); break;
-				case 0x14: HandlePacketTabComplete            (a_RemainingBytes); break;
-				case 0x15: HandlePacketClientSettings         (a_RemainingBytes); break;
-				case 0x16: HandlePacketClientStatus           (a_RemainingBytes); break;
-				case 0x17: HandlePacketPluginMessage          (a_RemainingBytes); break;
+				case 0x10: HandlePacketCreativeInventoryAction(a_RemainingBytes); return;
+				case 0x12: HandlePacketUpdateSign             (a_RemainingBytes); return;
+				case 0x13: HandlePacketPlayerAbilities        (a_RemainingBytes); return;
+				case 0x14: HandlePacketTabComplete            (a_RemainingBytes); return;
+				case 0x15: HandlePacketClientSettings         (a_RemainingBytes); return;
+				case 0x16: HandlePacketClientStatus           (a_RemainingBytes); return;
+				case 0x17: HandlePacketPluginMessage          (a_RemainingBytes); return;
 			}
 			break;
 		}
@@ -772,10 +868,8 @@ void cProtocol172::HandlePacketStatusPing(UInt32 a_RemainingBytes)
 	m_ReceivedData.ReadBEInt64(Timestamp);
 	m_ReceivedData.CommitRead();
 	
-	cByteBuffer Packet(18);
-	Packet.WriteVarInt(0x01);
-	Packet.WriteBEInt64(Timestamp);
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x01);  // Ping packet
+	Pkt.WriteInt64(Timestamp);
 }
 
 
@@ -799,10 +893,8 @@ void cProtocol172::HandlePacketStatusRequest(UInt32 a_RemainingBytes)
 	);
 	Response.append("}");
 	
-	cByteBuffer Packet(Response.size() + 10);
-	Packet.WriteVarInt(0x00);  // Response packet
-	Packet.WriteVarUTF8String(Response);
-	WritePacket(Packet);
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Response);
 }
 
 
@@ -826,12 +918,13 @@ void cProtocol172::HandlePacketLoginStart(UInt32 a_RemainingBytes)
 	// TODO: Protocol encryption should be set up here if not localhost / auth
 	
 	// Send login success:
-	cByteBuffer Packet(Username.size() + 30);
-	Packet.WriteVarInt(0x02);  // Login success packet
-	Packet.WriteVarUTF8String(Printf("%d", m_Client->GetUniqueID()));  // TODO: UUID
-	Packet.WriteVarUTF8String(Username);
-	WritePacket(Packet);
+	{
+		cPacketizer Pkt(*this, 0x02);  // Login success packet
+		Pkt.WriteString(Printf("%d", m_Client->GetUniqueID()));  // TODO: proper UUID
+		Pkt.WriteString(Username);
+	}
 
+	m_State = 3;  // State = Game
 	m_Client->HandleLogin(4, Username);
 }
 
@@ -898,7 +991,7 @@ void cProtocol172::HandlePacketClientSettings(UInt32 a_RemainingBytes)
 	HANDLE_PACKET_READ(ReadByte,          Byte,    Unused);
 	HANDLE_PACKET_READ(ReadByte,          Byte,    Difficulty);
 	HANDLE_PACKET_READ(ReadByte,          Byte,    ShowCape);
-	// TODO
+	// TODO: handle in m_Client
 }
 
 
@@ -1074,24 +1167,6 @@ void cProtocol172::WritePacket(cByteBuffer & a_Packet)
 
 void cProtocol172::SendData(const char * a_Data, int a_Size)
 {
-	m_DataToSend.append(a_Data, a_Size);
-}
-
-
-
-
-
-void cProtocol172::Flush(void)
-{
-	ASSERT(m_CSPacket.IsLockedByCurrentThread());  // Did all packets lock the CS properly?
-	
-	if (m_DataToSend.empty())
-	{
-		LOGD("Flushing empty");
-		return;
-	}
-	const char * a_Data = m_DataToSend.data();
-	int a_Size = m_DataToSend.size();
 	if (m_IsEncrypted)
 	{
 		byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
@@ -1108,10 +1183,92 @@ void cProtocol172::Flush(void)
 	{
 		m_Client->SendData(a_Data, a_Size);
 	}
-	m_DataToSend.clear();
 }
 
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol172::cPacketizer:
+
+cProtocol172::cPacketizer::~cPacketizer()
+{
+	AString DataToSend;
+
+	// Send the packet length
+	UInt32 PacketLen = m_Out.GetUsedSpace();
+	m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
+	m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
+	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
+	m_Protocol.m_OutPacketLenBuffer.CommitRead();
+	
+	// Send the packet data:
+	m_Out.ReadAll(DataToSend);
+	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
+	m_Out.CommitRead();
+}
+
+
+
+
+
+void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
+{
+	short ItemType = a_Item.m_ItemType;
+	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
+	if (ItemType <= 0)
+	{
+		// Fix, to make sure no invalid values are sent.
+		ItemType = -1;
+	}
+	
+	if (a_Item.IsEmpty())
+	{
+		WriteShort(-1);
+		return;
+	}
+	
+	WriteShort(ItemType);
+	WriteByte (a_Item.m_ItemCount);
+	WriteShort(a_Item.m_ItemDamage);
+	
+	if (a_Item.m_Enchantments.IsEmpty())
+	{
+		WriteShort(-1);
+		return;
+	}
+
+	// Send the enchantments:
+	cFastNBTWriter Writer;
+	const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+	a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	Writer.Finish();
+	AString Compressed;
+	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
+	WriteShort(Compressed.size());
+	WriteBuf(Compressed.data(), Compressed.size());
+}
+
+
+
+
+
+void cProtocol172::cPacketizer::WriteByteAngle(double a_Angle)
+{
+	WriteByte((char)(255 * a_Angle / 360));
+}
+
+
+
+
+
+void cProtocol172::cPacketizer::WriteFPInt(double a_Value)
+{
+	int Value = (int)(a_Value * 32);
+	WriteInt(Value);
+}
 
 
 
