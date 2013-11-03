@@ -1470,7 +1470,7 @@ void cClientHandle::Tick(float a_Dt)
 	}
 	
 	// If the chunk the player's in was just sent, spawn the player:
-	if (m_HasSentPlayerChunk && (m_State != csPlaying))
+	if (m_HasSentPlayerChunk && (m_State != csPlaying) && !IsDestroying())
 	{
 		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 		{
@@ -2138,7 +2138,7 @@ void cClientHandle::PacketUnknown(unsigned char a_PacketType)
 	LOGERROR("Unknown packet type 0x%02x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_IPString.c_str());
 
 	AString Reason;
-	Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", a_PacketType);
+	Printf(Reason, "Unknown [C->S] PacketType: 0x%02x", a_PacketType);
 	SendDisconnect(Reason);
 	Destroy();
 }
