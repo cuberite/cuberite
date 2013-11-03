@@ -1000,7 +1000,28 @@ void cProtocol172::HandlePacketClientSettings(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketClientStatus(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_PACKET_READ(ReadByte, Byte, ActionID);
+	switch (ActionID)
+	{
+		case 0:
+		{
+			// Respawn
+			m_Client->HandleRespawn();
+			break;
+		}
+		case 1:
+		{
+			// Request stats
+			// TODO
+			break;
+		}
+		case 2:
+		{
+			// Open Inventory achievement
+			// TODO
+			break;
+		}
+	}
 }
 
 
