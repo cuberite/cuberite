@@ -10,15 +10,16 @@ Implements the 1.7.x protocol classes:
 
 #include "Globals.h"
 #include "Protocol17x.h"
+#include "ChunkDataSerializer.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
-#include "../Entities/Player.h"
 #include "../World.h"
-#include "ChunkDataSerializer.h"
-#include "../Entities/Pickup.h"
 #include "../WorldStorage/FastNBT.h"
 #include "../StringCompression.h"
+#include "../Entities/FallingBlock.h"
+#include "../Entities/Pickup.h"
+#include "../Entities/Player.h"
 
 
 
@@ -158,7 +159,10 @@ void cProtocol172::SendChat(const AString & a_Message)
 
 void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);  // This contains the flags and bitmasks, too
+	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
+	// This contains the flags and bitmasks, too
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);
+	
 	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
 	Pkt.WriteInt(a_ChunkX);
 	Pkt.WriteInt(a_ChunkZ);
@@ -254,7 +258,7 @@ void cProtocol172::SendEntityMetadata(const cEntity & a_Entity)
 	// TODO
 	cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
 	Pkt.WriteInt(a_Entity.GetUniqueID());
-	WriteEntityMetadata(Pkt, a_Entity);
+	Pkt.WriteEntityMetadata(a_Entity);
 	*/
 }
 
@@ -565,7 +569,13 @@ void cProtocol172::SendRespawn(void)
 
 void cProtocol172::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)  // a_Src coords are Block * 8
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x29);  // Sound Effect packet
+	Pkt.WriteString(a_SoundName);
+	Pkt.WriteInt(a_SrcX);
+	Pkt.WriteInt(a_SrcY);
+	Pkt.WriteInt(a_SrcZ);
+	Pkt.WriteFloat(a_Volume);
+	Pkt.WriteByte((Byte)(a_Pitch * 63));
 }
 
 
@@ -574,7 +584,13 @@ void cProtocol172::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int 
 
 void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x28);  // Effect packet
+	Pkt.WriteInt(a_EffectID);
+	Pkt.WriteInt(a_SrcX);
+	Pkt.WriteInt(a_SrcY);
+	Pkt.WriteInt(a_SrcZ);
+	Pkt.WriteInt(a_Data);
+	Pkt.WriteBool(false);
 }
 
 
@@ -583,7 +599,18 @@ void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 
 void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
+	Pkt.WriteInt(a_FallingBlock.GetUniqueID());
+	Pkt.WriteByte(70);  // Falling block
+	Pkt.WriteFPInt(a_FallingBlock.GetPosX());
+	Pkt.WriteFPInt(a_FallingBlock.GetPosY());
+	Pkt.WriteFPInt(a_FallingBlock.GetPosZ());
+	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
+	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
+	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 12));
+	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedX() * 400));
+	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedY() * 400));
+	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedZ() * 400));
 }
 
 
@@ -592,7 +619,20 @@ void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 
 void cProtocol172::SendSpawnMob(const cMonster & a_Mob)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
+	Pkt.WriteInt(a_Mob.GetUniqueID());
+	Pkt.WriteByte((Byte)a_Mob.GetMobType());
+	Pkt.WriteFPInt(a_Mob.GetPosX());
+	Pkt.WriteFPInt(a_Mob.GetPosY());
+	Pkt.WriteFPInt(a_Mob.GetPosZ());
+	Pkt.WriteByteAngle(a_Mob.GetPitch());
+	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
+	Pkt.WriteByteAngle(a_Mob.GetYaw());
+	Pkt.WriteShort((short)(a_Mob.GetSpeedX() * 400));
+	Pkt.WriteShort((short)(a_Mob.GetSpeedY() * 400));
+	Pkt.WriteShort((short)(a_Mob.GetSpeedZ() * 400));
+	Pkt.WriteEntityMetadata(a_Mob);
+	Pkt.WriteByte(0x7f);  // Metadata terminator
 }
 
 
@@ -601,7 +641,21 @@ void cProtocol172::SendSpawnMob(const cMonster & a_Mob)
 
 void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_ObjectType);
+	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(a_Entity.GetPosY());
+	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteInt(a_ObjectData);
+	if (a_ObjectData != 0)
+	{
+		Pkt.WriteShort((short)(a_Entity.GetSpeedX() * 400));
+		Pkt.WriteShort((short)(a_Entity.GetSpeedY() * 400));
+		Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));
+	}
 }
 
 
@@ -610,7 +664,21 @@ void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 
 void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
+	Pkt.WriteInt(a_Vehicle.GetUniqueID());
+	Pkt.WriteByte(a_VehicleType);
+	Pkt.WriteFPInt(a_Vehicle.GetPosX());
+	Pkt.WriteFPInt(a_Vehicle.GetPosY());
+	Pkt.WriteFPInt(a_Vehicle.GetPosZ());
+	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
+	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
+	Pkt.WriteInt(a_VehicleSubType);
+	if (a_VehicleSubType != 0)
+	{
+		Pkt.WriteShort((short)(a_Vehicle.GetSpeedX() * 400));
+		Pkt.WriteShort((short)(a_Vehicle.GetSpeedY() * 400));
+		Pkt.WriteShort((short)(a_Vehicle.GetSpeedZ() * 400));
+	}
 }
 
 
@@ -619,7 +687,17 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 
 void cProtocol172::SendTabCompletionResults(const AStringVector & a_Results)
 {
-	// TODO
+	AString Results;
+	Results.reserve(500);  // Make a moderate reservation to avoid excessive reallocations
+	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
+	{
+		Results.append(*itr);
+		Results.push_back(0);
+	}
+	
+	cPacketizer Pkt(*this, 0x3a);  // Tab-Complete packet
+	Pkt.WriteVarInt(a_Results.size());
+	Pkt.WriteString(Results);
 }
 
 
@@ -628,7 +706,13 @@ void cProtocol172::SendTabCompletionResults(const AStringVector & a_Results)
 
 void cProtocol172::SendTeleportEntity(const cEntity & a_Entity)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x18);
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(a_Entity.GetPosY());
+	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
 }
 
 
@@ -637,7 +721,12 @@ void cProtocol172::SendTeleportEntity(const cEntity & a_Entity)
 
 void cProtocol172::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x2c);  // Spawn Global Entity packet
+	Pkt.WriteVarInt(0);  // EntityID = 0, always
+	Pkt.WriteByte(1);  // Type = Thunderbolt
+	Pkt.WriteFPInt(a_BlockX);
+	Pkt.WriteFPInt(a_BlockY);
+	Pkt.WriteFPInt(a_BlockZ);
 }
 
 
@@ -646,7 +735,9 @@ void cProtocol172::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cProtocol172::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x03);
+	Pkt.WriteInt64(a_WorldAge);
+	Pkt.WriteInt64(a_TimeOfDay);
 }
 
 
@@ -1289,6 +1380,64 @@ void cProtocol172::cPacketizer::WriteFPInt(double a_Value)
 {
 	int Value = (int)(a_Value * 32);
 	WriteInt(Value);
+}
+
+
+
+
+
+void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
+{
+	// Common metadata:
+	Byte Flags = 0;
+	if (a_Entity.IsOnFire())
+	{
+		Flags |= 0x01;
+	}
+	if (a_Entity.IsCrouched())
+	{
+		Flags |= 0x02;
+	}
+	if (a_Entity.IsSprinting())
+	{
+		Flags |= 0x08;
+	}
+	if (a_Entity.IsRclking())
+	{
+		Flags |= 0x10;
+	}
+	if (a_Entity.IsInvisible())
+	{
+		Flags |= 0x20;
+	}
+	WriteByte(0);  // Byte(0) + index 0
+	WriteByte(Flags);
+	
+	switch (a_Entity.GetEntityType())
+	{
+		case cEntity::etPlayer: break;  // TODO?
+		case cEntity::etPickup:
+		{
+			WriteByte((5 << 5) | 10);  // Slot(5) + index 10
+			WriteItem(((const cPickup &)a_Entity).GetItem());
+			break;
+		}
+		case cEntity::etMonster:
+		{
+			WriteMobMetadata((const cMonster &)a_Entity);
+			break;
+		}
+		// TODO: Other types
+	}
+}
+
+
+
+
+
+void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
+{
+	// TODO
 }
 
 

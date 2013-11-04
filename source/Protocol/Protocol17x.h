@@ -167,6 +167,8 @@ protected:
 		void WriteItem(const cItem & a_Item);
 		void WriteByteAngle(double a_Angle);  // Writes the specified angle using a single byte
 		void WriteFPInt(double a_Value);  // Writes the double value as a 27:5 fixed-point integer
+		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
+		void WriteMobMetadata(const cMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
 		
 	protected:
 		cProtocol172 & m_Protocol;
