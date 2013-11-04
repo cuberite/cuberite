@@ -271,7 +271,14 @@ private:
 	cPluginManager();
 	~cPluginManager();
 
+	/// Reloads all plugins, defaulting to settings.ini for settings location
 	void ReloadPluginsNow(void);
+
+	/// Reloads all plugins with a cIniFile object expected to be initialised to settings.ini
+	/// Used because cRoot otherwise overwrites any configuration generation here if cRoot's IniFile is not used
+	void ReloadPluginsNow(cIniFile & a_SettingsIni);
+
+	/// Unloads all plugins
 	void UnloadPluginsNow(void);
 
 	/// Adds the plugin into the internal list of plugins and initializes it. If initialization fails, the plugin is removed again.

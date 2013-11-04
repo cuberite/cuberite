@@ -56,7 +56,7 @@ cWebAdmin::~cWebAdmin()
 {
 	if (m_IsInitialized)
 	{
-		LOG("Stopping WebAdmin...");
+		LOGD("Stopping WebAdmin...");
 	}
 }
 
@@ -87,7 +87,11 @@ bool cWebAdmin::Init(void)
 {
 	if (!m_IniFile.ReadFile("webadmin.ini"))
 	{
-		return false;
+		LOGWARN("Regenerating webadmin.ini, all settings will be reset");
+		m_IniFile.AddHeaderComment(" This file controls the webadmin feature of MCServer");
+		m_IniFile.AddHeaderComment(" Username format: [User:*username*] | Password format: Password=*password*; for example:");
+		m_IniFile.AddHeaderComment(" [User:admin]");
+		m_IniFile.AddHeaderComment(" Password=admin");
 	}
 
 	if (!m_IniFile.GetValueSetB("WebAdmin", "Enabled", true))
@@ -96,16 +100,17 @@ bool cWebAdmin::Init(void)
 		return true;
 	}
 
-	LOG("Initialising WebAdmin...");
+	LOGD("Initialising WebAdmin...");
 
 	AString PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
-	AString PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");
+	AString PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "Port-IPv6", "");
 
 	if (!m_HTTPServer.Initialize(PortsIPv4, PortsIPv6))
 	{
 		return false;
 	}
 	m_IsInitialized = true;
+	m_IniFile.WriteFile("webadmin.ini");
 	return true;
 }
 
@@ -121,7 +126,7 @@ bool cWebAdmin::Start(void)
 		return false;
 	}
 
-	LOG("Starting WebAdmin...");
+	LOGD("Starting WebAdmin...");
 
 	// Initialize the WebAdmin template script and load the file
 	m_TemplateScript.Create();

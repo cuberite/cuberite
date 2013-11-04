@@ -509,7 +509,7 @@ void cWorld::Start(void)
 			break;
 		}
 	}
-	m_bAnimals = IniFile.GetValueB("Monsters", "AnimalsOn", true);
+	m_bAnimals = IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
 	AString AllMonsters = IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
 	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
 	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
@@ -784,8 +784,8 @@ void cWorld::TickMobs(float a_Dt)
 					SpawnMobFinalize(*itr2);
 				}
 			}
-		}  // for i - AllFamilies[]
-	}		// if (Spawning enabled)
+		} // for i - AllFamilies[]
+	} // if (Spawning enabled)
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
