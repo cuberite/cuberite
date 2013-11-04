@@ -440,70 +440,12 @@ void cMonster::InStateEscaping(float a_Dt)
 void cMonster::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
-	if ((m_Target != NULL) && (m_AttackInterval > 3.0))
-	// Setting this higher gives us more wiggle room for attackrate
-	{
-		switch (GetMobType())
-		{
-			case mtSkeleton:
-			{
-				Vector3d Speed = GetLookVector() * 20;
-				Speed.y = Speed.y + 1;
-				cArrowEntity * Arrow = new cArrowEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-				if (Arrow == NULL)
-				{
-					return;
-				}
-				if (!Arrow->Initialize(m_World))
-				{
-					delete Arrow;
-					return;
-				}
-				m_World->BroadcastSpawnEntity(*Arrow);
-				break;
-			}
-			case mtGhast:
-			{
-				Vector3d Speed = GetLookVector() * 20;
-				Speed.y = Speed.y + 1;
-				cGhastFireballEntity * GhastBall = new cGhastFireballEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-				if (GhastBall == NULL)
-				{
-					return;
-				}
-				if (!GhastBall->Initialize(m_World))
-				{
-					delete GhastBall;
-					return;
-				}
-				m_World->BroadcastSpawnEntity(*GhastBall);
-				break;
-			}
-			case mtBlaze:
-			{
-				Vector3d Speed = GetLookVector() * 20;
-				Speed.y = Speed.y + 1;
-				cFireChargeEntity * FireCharge = new cFireChargeEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-				if (FireCharge == NULL)
-				{
-					return;
-				}
-				if (!FireCharge->Initialize(m_World))
-				{
-					delete FireCharge;
-					return;
-				}
-				m_World->BroadcastSpawnEntity(*FireCharge);
-				break;
-				// ToDo: Shoot 3 fireballs instead of 1.
-			}
-			default:
-			{
-				((cPawn *)m_Target)->TakeDamage(*this);
-			}
-		}
-		m_AttackInterval = 0.0;
-	}
+    if ((m_Target != NULL) && (m_AttackInterval > 3.0))
+    {
+        // Setting this higher gives us more wiggle room for attackrate
+        m_AttackInterval = 0.0;
+        ((cPawn *)m_Target)->TakeDamage(*this);
+    }
 }
 
 
