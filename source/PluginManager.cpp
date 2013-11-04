@@ -119,7 +119,12 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	if (KeyNum == -1)
 	{
 		a_SettingsIni.AddKeyName("Plugins");
-		a_SettingsIni.AddKeyComment("Plugins", " Plugin=Core");
+		a_SettingsIni.AddKeyComment("Plugins", " Plugin=Debuggers");
+		a_SettingsIni.AddKeyComment("Plugins", " Plugin=HookNotify");
+		a_SettingsIni.AddKeyComment("Plugins", " Plugin=ChunkWorx");
+		a_SettingsIni.SetValue("Plugins", "Plugin", "Core");
+		a_SettingsIni.SetValue("Plugins", "Plugin", "TransAPI");
+		a_SettingsIni.SetValue("Plugins", "Plugin", "ChatLog");
 	}
 	else if (NumPlugins > 0)
 	{
