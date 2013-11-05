@@ -131,12 +131,12 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 
 
-int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)
+bool cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)
 {
 	if ((a_Start.y < 0) || (a_Start.y >= cChunkDef::Height))
 	{
 		LOGD("%s: Start Y is outside the world (%.2f), not tracing.", __FUNCTION__, a_Start.y);
-		return 0;
+		return false;
 	}
 	
 	SetValues(a_Start, a_Direction);
@@ -157,7 +157,7 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	// check if first is occupied
 	if (pos.Equals(end1))
 	{
-		return 0;
+		return false;
 	}
 
 	bool reachedX = false, reachedY = false, reachedZ = false;
@@ -236,7 +236,7 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 
