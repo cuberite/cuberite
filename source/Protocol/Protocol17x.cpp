@@ -254,12 +254,10 @@ void cProtocol172::SendEntityLook(const cEntity & a_Entity)
 
 void cProtocol172::SendEntityMetadata(const cEntity & a_Entity)
 {
-	/*
-	// TODO
 	cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
 	Pkt.WriteInt(a_Entity.GetUniqueID());
 	Pkt.WriteEntityMetadata(a_Entity);
-	*/
+	Pkt.WriteByte(0x7f);  // The termination byte
 }
 
 
@@ -587,6 +585,8 @@ void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 	cPacketizer Pkt(*this, 0x28);  // Effect packet
 	Pkt.WriteInt(a_EffectID);
 	Pkt.WriteInt(a_SrcX);
+	// TODO: Check if this is really an int
+	// wiki.vg says it's a byte, but that wouldn't cover the entire range needed (Y location * 8 = 0..2048)
 	Pkt.WriteInt(a_SrcY);
 	Pkt.WriteInt(a_SrcZ);
 	Pkt.WriteInt(a_Data);
@@ -746,7 +746,13 @@ void cProtocol172::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 
 void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
+	Pkt.WriteInt(a_ChunkX);
+	Pkt.WriteInt(a_ChunkZ);
+	Pkt.WriteBool(true);
+	Pkt.WriteShort(0);  // Primary bitmap
+	Pkt.WriteShort(0);  // Add bitmap
+	Pkt.WriteInt(0);  // Compressed data size
 }
 
 
@@ -755,16 +761,27 @@ void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x33);
+	Pkt.WriteInt(a_BlockX);
+	Pkt.WriteShort((short)a_BlockY);
+	Pkt.WriteInt(a_BlockZ);
+	Pkt.WriteString(a_Line1);
+	Pkt.WriteString(a_Line2);
+	Pkt.WriteString(a_Line3);
+	Pkt.WriteString(a_Line4);
 }
 
 
 
 
 
-void cProtocol172::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cProtocol172::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x0a);
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteInt(a_BlockX);
+	Pkt.WriteByte((Byte)a_BlockY);
+	Pkt.WriteInt(a_BlockZ);
 }
 
 
@@ -773,16 +790,9 @@ void cProtocol172::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 
 void cProtocol172::SendWeather(eWeather a_Weather)
 {
-	// TODO
-}
-
-
-
-
-
-void cProtocol172::SendWholeInventory(const cInventory & a_Inventory)
-{
-	// TODO
+	cPacketizer Pkt(*this, 0x2b);
+	Pkt.WriteByte((a_Weather == wSunny) ? 2 : 1);  // begin rain / end rain
+	Pkt.WriteFloat(0);  // unused
 }
 
 
