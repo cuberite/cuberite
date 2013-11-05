@@ -2395,6 +2395,44 @@ World:ForEachEntity(
 			},
 		},  -- HTTPRequest
 
+		ItemCategory =
+		{
+			Desc = [[
+				This class contains static functions for determining item categories. All of the functions are
+				called directly on the class table, unlike most other object, which require an instance first.
+			]],
+			Functions =
+			{
+				IsArmor      = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of an armor." },
+				IsAxe        = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of an axe." },
+				IsBoots      = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of boots." },
+				IsChestPlate = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a chestplate." },
+				IsHelmet     = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a helmet." },
+				IsHoe        = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a hoe." },
+				IsLeggings   = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a leggings." },
+				IsPickaxe    = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a pickaxe." },
+				IsShovel     = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a shovel." },
+				IsSword      = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a sword." },
+				IsTool       = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a tool (axe, hoe, pickaxe, shovel or FIXME: sword)" },
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Code example",
+					Contents = [[
+						The following code snippet checks if the player holds a shovel.
+<pre class="prettyprint lang-lua">
+-- a_Player is a {{cPlayer}} object, possibly received as a hook param
+local HeldItem = a_Player:GetEquippedItem();
+if (cItemCategory:IsShovel(HeldItem.m_ItemType)) then
+	-- It's a shovel
+end
+</pre>
+					]],
+				}
+			},
+		},  -- ItemCategory
+		
 		TakeDamageInfo =
 		{
 			Desc = [[The TakeDamageInfo is a struct that contains the amount of damage, and the entity that caused the damage. It is used in the {{OnTakeDamage|OnTakeDamage}}() hook and in the {{cEntity|cEntity}}'s TakeDamage() function.
