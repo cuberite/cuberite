@@ -23790,41 +23790,6 @@ static int tolua_AllToLua_cTracer_Trace00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetValues of class  cTracer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cTracer_SetValues00
-static int tolua_AllToLua_cTracer_SetValues00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cTracer",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3f",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
-  const Vector3f* a_Start = ((const Vector3f*)  tolua_tousertype(tolua_S,2,0));
-  const Vector3f* a_Direction = ((const Vector3f*)  tolua_tousertype(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetValues'", NULL);
-#endif
-  {
-   self->SetValues(*a_Start,*a_Direction);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetValues'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: BlockHitPosition of class  cTracer */
 #ifndef TOLUA_DISABLE_tolua_get_cTracer_BlockHitPosition
 static int tolua_get_cTracer_BlockHitPosition(lua_State* tolua_S)
@@ -30959,7 +30924,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,".call",tolua_AllToLua_cTracer_new00_local);
    tolua_function(tolua_S,"delete",tolua_AllToLua_cTracer_delete00);
    tolua_function(tolua_S,"Trace",tolua_AllToLua_cTracer_Trace00);
-   tolua_function(tolua_S,"SetValues",tolua_AllToLua_cTracer_SetValues00);
    tolua_variable(tolua_S,"BlockHitPosition",tolua_get_cTracer_BlockHitPosition,tolua_set_cTracer_BlockHitPosition);
    tolua_variable(tolua_S,"HitNormal",tolua_get_cTracer_HitNormal,tolua_set_cTracer_HitNormal);
    tolua_variable(tolua_S,"RealHit",tolua_get_cTracer_RealHit,tolua_set_cTracer_RealHit);
