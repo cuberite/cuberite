@@ -225,15 +225,24 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		
 		BLOCKTYPE BlockID = m_World->GetBlock(pos.x, pos.y, pos.z);
 		// No collision with water ;)
-		if ((BlockID != E_BLOCK_AIR) || IsBlockWater(BlockID))  // _X 2013_03_29: Why is the IsBlockWater condition here? water equals air?
+		switch(BlockID)
 		{
-			BlockHitPosition = pos;
-			int Normal = GetHitNormal(a_Start, End, pos );
-			if(Normal > 0)
+			case E_BLOCK_AIR:
+			case E_BLOCK_YELLOW_FLOWER:
+			case E_BLOCK_RED_ROSE:
+			case E_BLOCK_RED_MUSHROOM:
+			case E_BLOCK_BROWN_MUSHROOM:
+				break;
+			default:
 			{
-				HitNormal = m_NormalTable[Normal-1];
+				BlockHitPosition = pos;
+				int Normal = GetHitNormal(a_Start, End, pos );
+				if(Normal > 0)
+				{
+					HitNormal = m_NormalTable[Normal-1];
+				}
+				return true;
 			}
-			return 1;
 		}
 	}
 	return 0;
