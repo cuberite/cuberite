@@ -35,9 +35,14 @@ extern bool g_BlockPistonBreakable[256];
 /// Can this block hold snow atop?
 extern bool g_BlockIsSnowable[256];
 
+/// Does this block require a tool to drop?
 extern bool g_BlockRequiresSpecialTool[256];
 
+/// Is this block solid (player cannot walk through)?
 extern bool g_BlockIsSolid[256];
+
+/// Can torches be placed on this block?
+extern bool g_BlockIsTorchPlaceable[256];
 
 
 

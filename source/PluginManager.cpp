@@ -118,13 +118,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	unsigned int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
 	if (KeyNum == -1)
 	{
-		a_SettingsIni.AddKeyName("Plugins");
-		a_SettingsIni.AddKeyComment("Plugins", " Plugin=Debuggers");
-		a_SettingsIni.AddKeyComment("Plugins", " Plugin=HookNotify");
-		a_SettingsIni.AddKeyComment("Plugins", " Plugin=ChunkWorx");
-		a_SettingsIni.SetValue("Plugins", "Plugin", "Core");
-		a_SettingsIni.SetValue("Plugins", "Plugin", "TransAPI");
-		a_SettingsIni.SetValue("Plugins", "Plugin", "ChatLog");
+		InsertDefaultPlugins(a_SettingsIni);
 	}
 	else if (NumPlugins > 0)
 	{
@@ -157,6 +151,22 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	{
 		LOG("-- Loaded 1 Plugin --");
 	}
+}
+
+
+
+
+
+void cPluginManager::InsertDefaultPlugins(cIniFile & a_SettingsIni)
+{
+	a_SettingsIni.AddKeyName("Plugins");
+	a_SettingsIni.AddKeyComment("Plugins", " Plugin=Debuggers");
+	a_SettingsIni.AddKeyComment("Plugins", " Plugin=HookNotify");
+	a_SettingsIni.AddKeyComment("Plugins", " Plugin=ChunkWorx");
+	a_SettingsIni.AddKeyComment("Plugins", " Plugin=APIDump");
+	a_SettingsIni.SetValue("Plugins", "Plugin", "Core");
+	a_SettingsIni.SetValue("Plugins", "Plugin", "TransAPI");
+	a_SettingsIni.SetValue("Plugins", "Plugin", "ChatLog");
 }
 
 

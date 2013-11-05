@@ -103,7 +103,7 @@ bool cWebAdmin::Init(void)
 	LOGD("Initialising WebAdmin...");
 
 	AString PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
-	AString PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "Port-IPv6", "");
+	AString PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");
 
 	if (!m_HTTPServer.Initialize(PortsIPv4, PortsIPv6))
 	{
