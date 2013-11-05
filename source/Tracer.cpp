@@ -131,12 +131,12 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 
 
-int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)
+bool cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight)
 {
 	if ((a_Start.y < 0) || (a_Start.y >= cChunkDef::Height))
 	{
 		LOGD("%s: Start Y is outside the world (%.2f), not tracing.", __FUNCTION__, a_Start.y);
-		return 0;
+		return false;
 	}
 	
 	SetValues(a_Start, a_Direction);
@@ -157,7 +157,7 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	// check if first is occupied
 	if (pos.Equals(end1))
 	{
-		return 0;
+		return false;
 	}
 
 	bool reachedX = false, reachedY = false, reachedZ = false;
@@ -224,8 +224,9 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		}
 		
 		BLOCKTYPE BlockID = m_World->GetBlock(pos.x, pos.y, pos.z);
-		// No collision with water ;)
-		if ((BlockID != E_BLOCK_AIR) || IsBlockWater(BlockID))  // _X 2013_03_29: Why is the IsBlockWater condition here? water equals air?
+		// Block is counted as a collision if we are not doing a line of sight and it is solid,
+		// or if the block is not air and not water. That way mobs can still see underwater.
+		if ((!a_LineOfSight && g_BlockIsSolid[BlockID]) || (a_LineOfSight && (BlockID != E_BLOCK_AIR) && !IsBlockWater(BlockID)))
 		{
 			BlockHitPosition = pos;
 			int Normal = GetHitNormal(a_Start, End, pos );
@@ -233,10 +234,10 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			{
 				HitNormal = m_NormalTable[Normal-1];
 			}
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 

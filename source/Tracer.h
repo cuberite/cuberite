@@ -12,14 +12,42 @@ public:				// tolua_export
 	Vector3f BoxOffset;
 	cTracer( cWorld* a_World);		// tolua_export
 	~cTracer();						// tolua_export
-	int Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance );		// tolua_export
-	void SetValues( const Vector3f & a_Start, const Vector3f & a_Direction );					// tolua_export
+
+	/// Determines if a collision occures along a line. Returns true if a collision occurs.
+	bool Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)	// tolua_export
+	{
+		return Trace(a_Start, a_Direction, a_Distance, false);
+	}
+
+	/// Determines if a collision occures along a line. Returns true if a collision occurs.
+	/// When a_LineOfSight is true, we don't use the standard collision detection rules. Instead we use
+	/// the rules for monster vision. E.g. Only water and air do not block vision.
+	bool Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight);		// tolua_export
+
+	/// Contains the position of the block that caused the collision
 	Vector3f BlockHitPosition;		// tolua_export
+
+	/// Contains which face was hit
 	Vector3f HitNormal;			// tolua_export
+
+	/// Contains the exact position where a collision occured. (BlockHitPosition + Offset on block)
 	Vector3f RealHit;				// tolua_export
 private:
+
+	/// Preps Tracer object for call of Trace function. Only used internally.
+	void SetValues( const Vector3f & a_Start, const Vector3f & a_Direction );
+
+	/// Calculates where on the block a collision occured, if it does occur
+	/// Returns 0 if no intersection occured
+	/// Returns 1 if an intersection occured at a single point
+	/// Returns 2 if the line segment lies in the plane being checked 
 	int intersect3D_SegmentPlane( const Vector3f & a_Origin, const Vector3f & a_End, const Vector3f & a_PlanePos, const Vector3f & a_PlaneNormal );
+	
+	/// Determines which face on the block a collision occured, if it does occur
+	/// Returns 0 if the block is air, water or no collision occured
+	/// Return 1 through 6 for the following block faces, repectively: -x, -z, x, z, y, -y
 	int GetHitNormal( const Vector3f & start, const Vector3f & end, const Vector3i &  a_BlockPos);
+
 	float SigNum( float a_Num );
 	cWorld* m_World;
 
