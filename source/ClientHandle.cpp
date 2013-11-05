@@ -255,8 +255,8 @@ void cClientHandle::Authenticate(void)
 	// Send time
 	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay());
 
-	// Send inventory
-	m_Player->GetInventory().SendWholeInventory(*this);
+	// Send contents of the inventory window
+	m_Protocol->SendWholeInventory(*m_Player->GetWindow());
 
 	// Send health
 	m_Player->SendHealth();
@@ -1998,15 +1998,6 @@ void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Blo
 void cClientHandle::SendWeather(eWeather a_Weather)
 {
 	m_Protocol->SendWeather(a_Weather);
-}
-
-
-
-
-
-void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
-{
-	m_Protocol->SendWholeInventory(a_Inventory);
 }
 
 

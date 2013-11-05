@@ -110,8 +110,6 @@ public:
 	
 	// tolua_end
 
-	void SendWholeInventory(cClientHandle & a_Client);
-
 	/// Returns the player associated with this inventory (const version)
 	const cPlayer & GetOwner(void) const { return m_Owner; }
 	
