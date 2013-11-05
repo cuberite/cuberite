@@ -44,6 +44,7 @@ void cSkeleton::MoveToPosition(const Vector3f & a_Position)
 
 
 
+
 void cSkeleton::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;

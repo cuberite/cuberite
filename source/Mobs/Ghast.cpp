@@ -25,6 +25,7 @@ void cGhast::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
 void cGhast::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
