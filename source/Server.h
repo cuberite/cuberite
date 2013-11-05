@@ -46,6 +46,9 @@ public:												// tolua_export
 	int  GetNumPlayers(void);
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
+	// Hardcore mode or not:
+	bool IsHardcore(void) const {return m_bIsHardcore; }
+
 	// tolua_end
 
 	bool Start(void);
@@ -161,6 +164,7 @@ private:
 	
 	AString m_Description;
 	int m_MaxPlayers;
+	bool m_bIsHardcore;
 	
 	cTickThread m_TickThread;
 	cEvent m_RestartEvent;

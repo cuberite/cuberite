@@ -119,8 +119,12 @@ void cRoot::Start(void)
 		cIniFile IniFile;
 		if (!IniFile.ReadFile("settings.ini"))
 		{
-			LOGWARNING("settings.ini inaccessible, all settings are reset to default values");
+			LOGWARN("Regenerating settings.ini, all settings will be reset");
+			IniFile.AddHeaderComment(" This is the main server configuration");
+			IniFile.AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
+			IniFile.AddHeaderComment(" See: http://www.mc-server.org/wiki/doku.php?id=configure:settings.ini for further configuration help");
 		}
+
 		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
 		if (m_PrimaryServerVersion == 0)
 		{
@@ -129,7 +133,7 @@ void cRoot::Start(void)
 		else
 		{
 			// Make a note in the log that the primary server version is explicitly set in the ini file
-			LOGINFO("settings.ini: [Server].PrimaryServerVersion set to %d.", m_PrimaryServerVersion);
+			LOGINFO("Primary server version set explicitly to %d.", m_PrimaryServerVersion);
 		}
 
 		LOG("Starting server...");
@@ -152,7 +156,7 @@ void cRoot::Start(void)
 
 		LOGD("Loading plugin manager...");
 		m_PluginManager = new cPluginManager();
-		m_PluginManager->ReloadPluginsNow();
+		m_PluginManager->ReloadPluginsNow(IniFile);
 		
 		LOGD("Loading MonsterConfig...");
 		m_MonsterConfig = new cMonsterConfig;
@@ -261,6 +265,7 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 		return;
 	}
 	
+	bool FoundAdditionalWorlds = false;
 	for (unsigned int i = 0; i < NumWorlds; i++)
 	{
 		AString ValueName = IniFile.GetValueName(KeyNum, i );
@@ -273,9 +278,15 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 		{
 			continue;
 		}
+		FoundAdditionalWorlds = true;
 		cWorld* NewWorld = new cWorld( WorldName.c_str() );
 		m_WorldsByName[ WorldName ] = NewWorld;
 	}  // for i - Worlds
+
+	if (!FoundAdditionalWorlds)
+	{
+		IniFile.AddKeyComment("Worlds", " World=secondworld");
+	}
 }
 
 

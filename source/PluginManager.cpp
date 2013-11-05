@@ -95,6 +95,17 @@ void cPluginManager::FindPlugins(void)
 
 void cPluginManager::ReloadPluginsNow(void)
 {
+	cIniFile a_SettingsIni;
+	a_SettingsIni.ReadFile("settings.ini");
+	ReloadPluginsNow(a_SettingsIni);
+}
+
+
+
+
+
+void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
+{
 	LOG("-- Loading Plugins --");
 	m_bReloadPlugins = false;
 	UnloadPluginsNow();
@@ -102,26 +113,21 @@ void cPluginManager::ReloadPluginsNow(void)
 	FindPlugins();
 
 	cServer::BindBuiltInConsoleCommands();
-
-	cIniFile IniFile;
-	if (!IniFile.ReadFile("settings.ini"))
+	
+	unsigned int KeyNum = a_SettingsIni.FindKey("Plugins");
+	unsigned int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
+	if (KeyNum == -1)
 	{
-		LOGWARNING("cPluginManager: Can't find settings.ini, so can't load any plugins.");
+		InsertDefaultPlugins(a_SettingsIni);
 	}
-		
-	unsigned int KeyNum = IniFile.FindKey("Plugins");
-	unsigned int NumPlugins = IniFile.GetNumValues(KeyNum);
-	if (NumPlugins > 0)
+	else if (NumPlugins > 0)
 	{
 		for(unsigned int i = 0; i < NumPlugins; i++)
 		{
-			AString ValueName = IniFile.GetValueName(KeyNum, i );
-			if (
-				(ValueName.compare("NewPlugin") == 0) || 
-				(ValueName.compare("Plugin") == 0)
-			)
+			AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
+			if (ValueName.compare("Plugin") == 0)
 			{
-				AString PluginFile = IniFile.GetValue(KeyNum, i);
+				AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
 				if (!PluginFile.empty())
 				{
 					if (m_Plugins.find(PluginFile) != m_Plugins.end())
@@ -137,7 +143,7 @@ void cPluginManager::ReloadPluginsNow(void)
 	{
 		LOG("-- No Plugins Loaded --");
 	}
-	else if ((GetNumPlugins() > 1) || (GetNumPlugins() == 0))
+	else if (GetNumPlugins() > 1)
 	{
 		LOG("-- Loaded %i Plugins --", GetNumPlugins());
 	}
@@ -145,6 +151,22 @@ void cPluginManager::ReloadPluginsNow(void)
 	{
 		LOG("-- Loaded 1 Plugin --");
 	}
+}
+
+
+
+
+
+void cPluginManager::InsertDefaultPlugins(cIniFile & a_SettingsIni)
+{
+	a_SettingsIni.AddKeyName("Plugins");
+	a_SettingsIni.AddKeyComment("Plugins", " Plugin=Debuggers");
+	a_SettingsIni.AddKeyComment("Plugins", " Plugin=HookNotify");
+	a_SettingsIni.AddKeyComment("Plugins", " Plugin=ChunkWorx");
+	a_SettingsIni.AddKeyComment("Plugins", " Plugin=APIDump");
+	a_SettingsIni.SetValue("Plugins", "Plugin", "Core");
+	a_SettingsIni.SetValue("Plugins", "Plugin", "TransAPI");
+	a_SettingsIni.SetValue("Plugins", "Plugin", "ChatLog");
 }
 
 

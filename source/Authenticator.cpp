@@ -46,28 +46,9 @@ cAuthenticator::~cAuthenticator()
 /// Read custom values from INI
 void cAuthenticator::ReadINI(cIniFile & IniFile)
 {
-	m_Server  = IniFile.GetValue("Authentication", "Server");
-	m_Address = IniFile.GetValue("Authentication", "Address");
-	m_ShouldAuthenticate = IniFile.GetValueB("Authentication", "Authenticate", true);
-	bool bSave = false;
-	
-	if (m_Server.length() == 0)
-	{
-		m_Server = DEFAULT_AUTH_SERVER;
-		IniFile.SetValue("Authentication", "Server", m_Server);
-		bSave = true;
-	}
-	if (m_Address.length() == 0)
-	{
-		m_Address = DEFAULT_AUTH_ADDRESS;
-		IniFile.SetValue("Authentication", "Address", m_Address);
-		bSave = true;
-	}
-
-	if (bSave)
-	{
-		IniFile.SetValueB("Authentication", "Authenticate", m_ShouldAuthenticate);
-	}
+	m_Server  = IniFile.GetValueSet("Authentication", "Server", DEFAULT_AUTH_SERVER);
+	m_Address = IniFile.GetValueSet("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
+	m_ShouldAuthenticate = IniFile.GetValueSetB("Authentication", "Authenticate", true);
 }
 
 
@@ -199,7 +180,7 @@ bool cAuthenticator::AuthFromAddress(const AString & a_Server, const AString & a
 		}
 		else if (code == 200)
 		{
-			LOGINFO("Got 200 OK :D");
+			LOGD("cAuthenticator: Received status 200 OK! :D");
 			bOK = true;
 		}
 	}
@@ -268,17 +249,16 @@ bool cAuthenticator::AuthFromAddress(const AString & a_Server, const AString & a
 
 	std::string Result;
 	ss >> Result;
-	LOGINFO("Got result: %s", Result.c_str());
-	//if (Result.compare("3") == 0) // FIXME: Quick and dirty hack to support auth
-	//Lapayo: Wtf 3? 
+	LOGD("cAuthenticator: Authentication result was %s", Result.c_str());
+
 	if (Result.compare("YES") == 0)	//Works well
 	{
-		LOGINFO("Result was \"YES\", so player is authenticated!");
+		LOGINFO("Authentication result \"YES\", player authentication success!");
 		return true;
 	}
 
 
-	LOGINFO("Result was \"%s\", so player is NOT authenticated!", Result.c_str());
+	LOGINFO("Authentication result was \"%s\", player authentication failure!", Result.c_str());
 	return false;
 }
 
