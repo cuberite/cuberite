@@ -226,7 +226,7 @@ bool cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int
 		BLOCKTYPE BlockID = m_World->GetBlock(pos.x, pos.y, pos.z);
 		// Block is counted as a collision if we are not doing a line of sight and it is solid,
 		// or if the block is not air and not water. That way mobs can still see underwater.
-		if ((!a_LineOfSight && g_BlockIsSolid[BlockID]) || (BlockID != E_BLOCK_AIR && !IsBlockWater(BlockID)))
+		if ((!a_LineOfSight && g_BlockIsSolid[BlockID]) || (a_LineOfSight && (BlockID != E_BLOCK_AIR) && !IsBlockWater(BlockID)))
 		{
 			BlockHitPosition = pos;
 			int Normal = GetHitNormal(a_Start, End, pos );
