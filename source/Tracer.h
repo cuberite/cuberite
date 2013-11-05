@@ -18,7 +18,10 @@ public:				// tolua_export
 	{
 		return Trace(a_Start, a_Direction, a_Distance, false);
 	}
-	
+
+	/// Determines if a collision occures along a line. Returns true if a collision occurs.
+	/// When a_LineOfSight is true, we don't use the standard collision detection rules. Instead we use
+	/// the rules for monster vision. E.g. Only water and air do not block vision.
 	bool Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight);		// tolua_export
 
 	/// Contains the position of the block that caused the collision
