@@ -4,6 +4,7 @@
 #include "Pawn.h"
 #include "../Inventory.h"
 #include "../Defines.h"
+#include "../World.h"
 
 
 
@@ -98,6 +99,9 @@ public:
 	
 	/// Returns the current gamemode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable
 	eGameMode GetGameMode(void) const { return m_GameMode; }
+	
+	/// Returns the current effective gamemode (inherited gamemode is resolved before returning)
+	eGameMode GetEffectiveGameMode(void) const { return (m_GameMode == gmNotSet) ? m_World->GetGameMode() : m_GameMode; }
 	
 	/** Sets the gamemode for the player.
 	The gamemode may be gmNotSet, in that case the player inherits the world's gamemode.

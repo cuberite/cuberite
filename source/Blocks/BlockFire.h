@@ -168,7 +168,7 @@ public:
 			{
 				return false; // Not valid slice, no portal can be formed
 			}
-		} XZM = X1 - 2; // Set boundary of frame interior (hence the -2)
+		} XZP = X1 - 1; // Set boundary of frame interior, note that for some reason, the loop of X and the loop of Z go to different numbers, hence -1 here and -2 there
 		for (X2; ((a_World->GetBlock(X2, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X2, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X2--) // Go the other direction (XM)
 		{
 			int Value = FindObsidianCeiling(X2, Y, Z, a_World, MaxY);
@@ -182,7 +182,7 @@ public:
 			{
 				return false;
 			}
-		} XZP = X2 + 2; // Set boundary, see previous
+		} XZM = X2 + 1; // Set boundary, see previous
 		return (FoundFrameXP && FoundFrameXM);
 	}
 

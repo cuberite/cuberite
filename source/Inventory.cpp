@@ -393,15 +393,6 @@ void cInventory::CopyToItems(cItems & a_Items)
 
 
 
-void cInventory::SendWholeInventory(cClientHandle & a_Client)
-{
-	a_Client.SendWholeInventory(*this);
-}
-
-
-
-
-
 void cInventory::SendSlot(int a_SlotNum)
 {
 	cItem Item(GetSlot(a_SlotNum));

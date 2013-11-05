@@ -134,7 +134,6 @@ public:
 	void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 	void SendWeather             (eWeather a_Weather);
-	void SendWholeInventory      (const cInventory & a_Inventory);
 	void SendWholeInventory      (const cWindow    & a_Window);
 	void SendWindowClose         (const cWindow    & a_Window);
 	void SendWindowOpen          (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);

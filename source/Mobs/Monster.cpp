@@ -440,12 +440,12 @@ void cMonster::InStateEscaping(float a_Dt)
 void cMonster::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
-	if ((m_Target != NULL) && (m_AttackInterval > 3.0))
-	{
-		// Setting this higher gives us more wiggle room for attackrate
-		m_AttackInterval = 0.0;
-		((cPawn *)m_Target)->TakeDamage(*this);
-	}
+    if ((m_Target != NULL) && (m_AttackInterval > 3.0))
+    {
+        // Setting this higher gives us more wiggle room for attackrate
+        m_AttackInterval = 0.0;
+        ((cPawn *)m_Target)->TakeDamage(*this);
+    }
 }
 
 

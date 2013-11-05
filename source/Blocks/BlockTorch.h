@@ -166,19 +166,6 @@ public:
 	}
 
 
-	/*
-	virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
-	{
-		if (TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
-		{
-			return true;
-		}
-
-		return (FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ) != BLOCK_FACE_BOTTOM);
-	}
-	*/
-
-
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		char Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));

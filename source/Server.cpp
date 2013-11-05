@@ -195,8 +195,9 @@ void cServer::PlayerDestroying(const cPlayer * a_Player)
 
 bool cServer::InitServer(cIniFile & a_SettingsIni)
 {
-	m_Description = a_SettingsIni.GetValue ("Server", "Description", "MCServer! - In C++!").c_str();
-	m_MaxPlayers  = a_SettingsIni.GetValueI("Server", "MaxPlayers", 100);
+	m_Description = a_SettingsIni.GetValueSet("Server", "Description", "MCServer - in C++!").c_str();
+	m_MaxPlayers  = a_SettingsIni.GetValueSetI("Server", "MaxPlayers", 100);
+	m_bIsHardcore = a_SettingsIni.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
@@ -320,7 +321,7 @@ void cServer::OnConnectionAccepted(cSocket & a_Socket)
 		return;
 	}
 
-	LOG("Client \"%s\" connected!", ClientIP.c_str());
+	LOGD("Client \"%s\" connected!", ClientIP.c_str());
 
 	cClientHandle * NewHandle = new cClientHandle(&a_Socket, m_ClientViewDistance);
 	if (!m_SocketThreads.AddClient(a_Socket, NewHandle))
@@ -507,7 +508,7 @@ void cServer::BindBuiltInConsoleCommands(void)
 	PlgMgr->BindConsoleCommand("chunkstats", NULL, " - Displays detailed chunk memory statistics");
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	PlgMgr->BindConsoleCommand("dumpmem", NULL, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
-	#endif	
+	#endif
 }
 
 

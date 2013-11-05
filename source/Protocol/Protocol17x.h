@@ -85,7 +85,6 @@ public:
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
 	virtual void SendWeather             (eWeather a_Weather) override;
-	virtual void SendWholeInventory      (const cInventory & a_Inventory) override;
 	virtual void SendWholeInventory      (const cWindow    & a_Window) override;
 	virtual void SendWindowClose         (const cWindow    & a_Window) override;
 	virtual void SendWindowOpen          (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) override;
@@ -94,6 +93,87 @@ public:
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
 protected:
+
+	/// Composes individual packets in the protocol's m_OutPacketBuffer; sends them upon being destructed
+	class cPacketizer
+	{
+	public:
+		cPacketizer(cProtocol172 & a_Protocol, UInt32 a_PacketType) :
+			m_Protocol(a_Protocol),
+			m_Out(a_Protocol.m_OutPacketBuffer),
+			m_Lock(a_Protocol.m_CSPacket)
+		{
+			m_Out.WriteVarInt(a_PacketType);
+		}
+		
+		~cPacketizer();
+
+		void WriteBool(bool a_Value)
+		{
+			m_Out.WriteBool(a_Value);
+		}
+		
+		void WriteByte(Byte a_Value)
+		{
+			m_Out.WriteByte(a_Value);
+		}
+		
+		void WriteChar(char a_Value)
+		{
+			m_Out.WriteChar(a_Value);
+		}
+		
+		void WriteShort(short a_Value)
+		{
+			m_Out.WriteBEShort(a_Value);
+		}
+		
+		void WriteInt(int a_Value)
+		{
+			m_Out.WriteBEInt(a_Value);
+		}
+		
+		void WriteInt64(Int64 a_Value)
+		{
+			m_Out.WriteBEInt64(a_Value);
+		}
+		
+		void WriteFloat(float a_Value)
+		{
+			m_Out.WriteBEFloat(a_Value);
+		}
+		
+		void WriteDouble(double a_Value)
+		{
+			m_Out.WriteBEDouble(a_Value);
+		}
+		
+		void WriteVarInt(UInt32 a_Value)
+		{
+			m_Out.WriteVarInt(a_Value);
+		}
+		
+		void WriteString(const AString & a_Value)
+		{
+			m_Out.WriteVarUTF8String(a_Value);
+		}
+		
+		void WriteBuf(const char * a_Data, int a_Size)
+		{
+			m_Out.Write(a_Data, a_Size);
+		}
+		
+		void WriteItem(const cItem & a_Item);
+		void WriteByteAngle(double a_Angle);  // Writes the specified angle using a single byte
+		void WriteFPInt(double a_Value);  // Writes the double value as a 27:5 fixed-point integer
+		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
+		void WriteMobMetadata(const cMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
+		
+	protected:
+		cProtocol172 & m_Protocol;
+		cByteBuffer & m_Out;
+		cCSLock m_Lock;
+	} ;
 
 	AString m_ServerAddress;
 	
@@ -107,12 +187,15 @@ protected:
 	/// Buffer for the received data
 	cByteBuffer m_ReceivedData;
 	
+	/// Buffer for composing the outgoing packets, through cPacketizer
+	cByteBuffer m_OutPacketBuffer;
+	
+	/// Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer)
+	cByteBuffer m_OutPacketLenBuffer;
+	
 	bool m_IsEncrypted;
 	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor;
 	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
-	
-	/// (Unencrypted) data to be sent to the client. Written by SendData, cleared by Flush()
-	AString m_DataToSend;
 	
 	
 	/// Adds the received (unencrypted) data to m_ReceivedData, parses complete packets
@@ -157,12 +240,9 @@ protected:
 	/// Writes an entire packet into the output stream. a_Packet is expected to start with the packet type; data length is prepended here.
 	void WritePacket(cByteBuffer & a_Packet);
 
-	/// Adds unencrypted data to the outgoing data buffer
+	/// Sends the data to the client, encrypting them if needed.
 	virtual void SendData(const char * a_Data, int a_Size) override;
 
-	/// Flushes m_DataToSend through the optional encryption into the outgoing socket data
-	virtual void Flush(void) override;
-	
 	void SendCompass(const cWorld & a_World);
 } ;
 

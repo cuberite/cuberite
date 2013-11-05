@@ -271,8 +271,17 @@ private:
 	cPluginManager();
 	~cPluginManager();
 
+	/// Reloads all plugins, defaulting to settings.ini for settings location
 	void ReloadPluginsNow(void);
+
+	/// Reloads all plugins with a cIniFile object expected to be initialised to settings.ini
+	void ReloadPluginsNow(cIniFile & a_SettingsIni);
+
+	/// Unloads all plugins
 	void UnloadPluginsNow(void);
+
+	/// Handles writing default plugins if 'Plugins' key not found using a cIniFile object expected to be intialised to settings.ini
+	void InsertDefaultPlugins(cIniFile & a_SettingsIni);
 
 	/// Adds the plugin into the internal list of plugins and initializes it. If initialization fails, the plugin is removed again.
 	bool AddPlugin(cPlugin * a_Plugin);

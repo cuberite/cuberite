@@ -205,7 +205,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 {
 	if (m_State >= csAuthenticating)  // Don't log pings
 	{
-		LOG("Kicking user \"%s\" for \"%s\"", m_Username.c_str(), a_Reason.c_str());
+		LOG("Kicking user \"%s\" for \"%s\"", m_Username.c_str(), StripColorCodes(a_Reason).c_str());
 	}
 	SendDisconnect(a_Reason);
 }
@@ -255,8 +255,8 @@ void cClientHandle::Authenticate(void)
 	// Send time
 	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay());
 
-	// Send inventory
-	m_Player->GetInventory().SendWholeInventory(*this);
+	// Send contents of the inventory window
+	m_Protocol->SendWholeInventory(*m_Player->GetWindow());
 
 	// Send health
 	m_Player->SendHealth();
@@ -1470,7 +1470,7 @@ void cClientHandle::Tick(float a_Dt)
 	}
 	
 	// If the chunk the player's in was just sent, spawn the player:
-	if (m_HasSentPlayerChunk && (m_State != csPlaying))
+	if (m_HasSentPlayerChunk && (m_State != csPlaying) && !IsDestroying())
 	{
 		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 		{
@@ -2004,15 +2004,6 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 
 
 
-void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
-{
-	m_Protocol->SendWholeInventory(a_Inventory);
-}
-
-
-
-
-
 void cClientHandle::SendWholeInventory(const cWindow & a_Window)
 {
 	m_Protocol->SendWholeInventory(a_Window);
@@ -2138,7 +2129,7 @@ void cClientHandle::PacketUnknown(unsigned char a_PacketType)
 	LOGERROR("Unknown packet type 0x%02x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_IPString.c_str());
 
 	AString Reason;
-	Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", a_PacketType);
+	Printf(Reason, "Unknown [C->S] PacketType: 0x%02x", a_PacketType);
 	SendDisconnect(Reason);
 	Destroy();
 }
@@ -2196,7 +2187,7 @@ void cClientHandle::SocketClosed(void)
 {
 	// The socket has been closed for any reason
 	
-	LOG("Client \"%s\" @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
+	LOGD("Client \"%s\" @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 	Destroy();
 }
 

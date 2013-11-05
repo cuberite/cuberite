@@ -71,10 +71,10 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 		addIfAllowed(cMonster::mtZombiePigman, allowedMobs);
 		addIfAllowed(cMonster::mtMagmaCube, allowedMobs);
 	}
-	/*else if (a_Biome == biEnder)	MG TODO : figure out what are the biomes of the ender
+	else if (a_Biome == biEnd)
 	{
 		addIfAllowed(cMonster::mtEnderman, allowedMobs);
-	}*/
+	}
 	else
 	{
 		addIfAllowed(cMonster::mtBat, allowedMobs);
@@ -210,7 +210,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
 						(m_Random.NextInt(20,a_Biome) == 0);
 			default:
-				LOGD("MG TODO : check I've got a Rule to write for type %d",a_MobType);
+				LOGD("MG TODO: Write spawning rule for mob type %d", a_MobType);
 				return false;
 		}
 	}

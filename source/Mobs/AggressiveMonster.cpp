@@ -44,7 +44,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt)
 		Vector3f Their = Vector3f( m_Target->GetPosition() );
 		if ((Their - Pos).Length() <= m_AttackRange)
 		{
-			cMonster::Attack(a_Dt);
+			Attack(a_Dt);
 		}
 		MoveToPosition(Their + Vector3f(0, 0.65f, 0));
 	}

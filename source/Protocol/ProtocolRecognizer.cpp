@@ -605,16 +605,6 @@ void cProtocolRecognizer::SendWeather(eWeather a_Weather)
 
 
 
-void cProtocolRecognizer::SendWholeInventory(const cInventory & a_Inventory)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendWholeInventory(a_Inventory);
-}
-
-
-
-
-
 void cProtocolRecognizer::SendWholeInventory(const cWindow & a_Window)
 {
 	ASSERT(m_Protocol != NULL);
