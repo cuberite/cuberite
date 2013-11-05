@@ -131,7 +131,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 
 
-bool cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)
+bool cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight)
 {
 	if ((a_Start.y < 0) || (a_Start.y >= cChunkDef::Height))
 	{
@@ -224,8 +224,9 @@ bool cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int
 		}
 		
 		BLOCKTYPE BlockID = m_World->GetBlock(pos.x, pos.y, pos.z);
-		// No collision with water ;)
-		if (g_BlockIsSolid[BlockID])
+		// Block is counted as a collision if we are not doing a line of sight and it is solid,
+		// or if the block is not air and not water. That way mobs can still see underwater.
+		if ((!a_LineOfSight && g_BlockIsSolid[BlockID]) || (BlockID != E_BLOCK_AIR && !IsBlockWater(BlockID)))
 		{
 			BlockHitPosition = pos;
 			int Normal = GetHitNormal(a_Start, End, pos );

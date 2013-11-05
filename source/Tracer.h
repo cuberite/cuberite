@@ -14,7 +14,12 @@ public:				// tolua_export
 	~cTracer();						// tolua_export
 
 	/// Determines if a collision occures along a line. Returns true if a collision occurs.
-	bool Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance);		// tolua_export
+	bool Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)	// tolua_export
+	{
+		return Trace(a_Start, a_Direction, a_Distance, false);
+	}
+	
+	bool Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight);		// tolua_export
 
 	/// Contains the position of the block that caused the collision
 	Vector3f BlockHitPosition;		// tolua_export
