@@ -20,6 +20,7 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
+#include "../UI/Window.h"
 
 
 
@@ -790,7 +791,7 @@ void cProtocol172::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 
 void cProtocol172::SendWeather(eWeather a_Weather)
 {
-	cPacketizer Pkt(*this, 0x2b);
+	cPacketizer Pkt(*this, 0x2b);  // Change Game State packet
 	Pkt.WriteByte((a_Weather == wSunny) ? 2 : 1);  // begin rain / end rain
 	Pkt.WriteFloat(0);  // unused
 }
@@ -799,18 +800,27 @@ void cProtocol172::SendWeather(eWeather a_Weather)
 
 
 
-void cProtocol172::SendWholeInventory(const cWindow    & a_Window)
+void cProtocol172::SendWholeInventory(const cWindow & a_Window)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x30);  // Window Items packet
+	Pkt.WriteChar(a_Window.GetWindowID());
+	Pkt.WriteShort(a_Window.GetNumSlots());
+	cItems Slots;
+	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
+	for (cItems::const_iterator itr = Slots.begin(), end = Slots.end(); itr != end; ++itr)
+	{
+		Pkt.WriteItem(*itr);
+	}  // for itr - Slots[]
 }
 
 
 
 
 
-void cProtocol172::SendWindowClose(const cWindow    & a_Window)
+void cProtocol172::SendWindowClose(const cWindow & a_Window)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x2e);
+	Pkt.WriteChar(a_Window.GetWindowID());
 }
 
 
@@ -819,7 +829,19 @@ void cProtocol172::SendWindowClose(const cWindow    & a_Window)
 
 void cProtocol172::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x2d);
+	Pkt.WriteChar(a_WindowID);
+	Pkt.WriteChar(a_WindowType);
+	Pkt.WriteString(a_WindowTitle);
+	Pkt.WriteChar(a_NumSlots);
+	Pkt.WriteBool(true);
+	/*
+	// TODO:
+	if (a_WindowType == cWindow::wtHorse)
+	{
+		Pkt.WriteInt(HorseID);
+	}
+	*/
 }
 
 
@@ -828,7 +850,10 @@ void cProtocol172::SendWindowOpen(char a_WindowID, char a_WindowType, const AStr
 
 void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
-	// TODO
+	cPacketizer Pkt(*this, 0x31);  // Window Property packet
+	Pkt.WriteChar(a_Window.GetWindowID());
+	Pkt.WriteShort(a_Property);
+	Pkt.WriteShort(a_Value);
 }
 
 
