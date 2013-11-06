@@ -26,9 +26,24 @@ Implements the 1.7.x protocol classes:
 
 
 
-#define HANDLE_PACKET_READ(Proc, Type, Var) \
+#define HANDLE_READ(Proc, Type, Var) \
 	Type Var; \
 	m_ReceivedData.Proc(Var);
+
+
+
+
+
+#define HANDLE_PACKET_READ(Proc, Type, Var) \
+	Type Var; \
+	{ \
+		if (!m_ReceivedData.Proc(Var)) \
+		{ \
+			m_ReceivedData.CheckValid(); \
+			return false; \
+		} \
+		m_ReceivedData.CheckValid(); \
+	}
 
 
 
@@ -1060,8 +1075,8 @@ void cProtocol172::HandlePacketLoginStart(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketAnimation(UInt32 a_RemainingBytes)
 {
-	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_PACKET_READ(ReadByte,  Byte, Animation);
+	HANDLE_READ(ReadBEInt, int,  EntityID);
+	HANDLE_READ(ReadByte,  Byte, Animation);
 	m_Client->HandleAnimation(Animation);
 }
 
@@ -1071,11 +1086,11 @@ void cProtocol172::HandlePacketAnimation(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketBlockDig(UInt32 a_RemainingBytes)
 {
-	HANDLE_PACKET_READ(ReadByte,  Byte, Status);
-	HANDLE_PACKET_READ(ReadBEInt, int,  BlockX);
-	HANDLE_PACKET_READ(ReadByte,  Byte, BlockY);
-	HANDLE_PACKET_READ(ReadBEInt, int,  BlockZ);
-	HANDLE_PACKET_READ(ReadByte,  Byte, Face);
+	HANDLE_READ(ReadByte,  Byte, Status);
+	HANDLE_READ(ReadBEInt, int,  BlockX);
+	HANDLE_READ(ReadByte,  Byte, BlockY);
+	HANDLE_READ(ReadBEInt, int,  BlockZ);
+	HANDLE_READ(ReadByte,  Byte, Face);
 	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, Face, Status);
 }
 
@@ -1085,13 +1100,13 @@ void cProtocol172::HandlePacketBlockDig(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketBlockPlace(UInt32 a_RemainingBytes)
 {
-	HANDLE_PACKET_READ(ReadBEInt, int,  BlockX);
-	HANDLE_PACKET_READ(ReadByte,  Byte, BlockY);
-	HANDLE_PACKET_READ(ReadBEInt, int,  BlockZ);
-	HANDLE_PACKET_READ(ReadByte,  Byte, Face);
-	HANDLE_PACKET_READ(ReadByte,  Byte, CursorX);
-	HANDLE_PACKET_READ(ReadByte,  Byte, CursorY);
-	HANDLE_PACKET_READ(ReadByte,  Byte, CursorZ);
+	HANDLE_READ(ReadBEInt, int,  BlockX);
+	HANDLE_READ(ReadByte,  Byte, BlockY);
+	HANDLE_READ(ReadBEInt, int,  BlockZ);
+	HANDLE_READ(ReadByte,  Byte, Face);
+	HANDLE_READ(ReadByte,  Byte, CursorX);
+	HANDLE_READ(ReadByte,  Byte, CursorY);
+	HANDLE_READ(ReadByte,  Byte, CursorZ);
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
@@ -1101,7 +1116,7 @@ void cProtocol172::HandlePacketBlockPlace(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketChatMessage(UInt32 a_RemainingBytes)
 {
-	HANDLE_PACKET_READ(ReadVarUTF8String, AString, Message);
+	HANDLE_READ(ReadVarUTF8String, AString, Message);
 	m_Client->HandleChat(Message);
 }
 
@@ -1111,12 +1126,12 @@ void cProtocol172::HandlePacketChatMessage(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketClientSettings(UInt32 a_RemainingBytes)
 {
-	HANDLE_PACKET_READ(ReadVarUTF8String, AString, Locale);
-	HANDLE_PACKET_READ(ReadByte,          Byte,    ViewDistance);
-	HANDLE_PACKET_READ(ReadByte,          Byte,    ChatFlags);
-	HANDLE_PACKET_READ(ReadByte,          Byte,    Unused);
-	HANDLE_PACKET_READ(ReadByte,          Byte,    Difficulty);
-	HANDLE_PACKET_READ(ReadByte,          Byte,    ShowCape);
+	HANDLE_READ(ReadVarUTF8String, AString, Locale);
+	HANDLE_READ(ReadByte,          Byte,    ViewDistance);
+	HANDLE_READ(ReadByte,          Byte,    ChatFlags);
+	HANDLE_READ(ReadByte,          Byte,    Unused);
+	HANDLE_READ(ReadByte,          Byte,    Difficulty);
+	HANDLE_READ(ReadByte,          Byte,    ShowCape);
 	// TODO: handle in m_Client
 }
 
@@ -1126,7 +1141,7 @@ void cProtocol172::HandlePacketClientSettings(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketClientStatus(UInt32 a_RemainingBytes)
 {
-	HANDLE_PACKET_READ(ReadByte, Byte, ActionID);
+	HANDLE_READ(ReadByte, Byte, ActionID);
 	switch (ActionID)
 	{
 		case 0:
@@ -1156,7 +1171,13 @@ void cProtocol172::HandlePacketClientStatus(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketCreativeInventoryAction(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEShort, short, SlotNum);
+	cItem Item;
+	if (!ReadItem(Item))
+	{
+		return;
+	}
+	m_Client->HandleCreativeInventory(SlotNum, Item);
 }
 
 
@@ -1165,7 +1186,10 @@ void cProtocol172::HandlePacketCreativeInventoryAction(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketEntityAction(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEInt, int,  PlayerID);
+	HANDLE_READ(ReadByte,  Byte, Action);
+	HANDLE_READ(ReadBEInt, int,  JumpBoost);
+	m_Client->HandleEntityAction(PlayerID, Action);
 }
 
 
@@ -1332,6 +1356,89 @@ void cProtocol172::SendData(const char * a_Data, int a_Size)
 	}
 }
 
+
+
+
+
+
+bool cProtocol172::ReadItem(cItem & a_Item)
+{
+	HANDLE_PACKET_READ(ReadBEShort, short, ItemType);
+	if (ItemType == -1)
+	{
+		// The item is empty, no more data follows
+		a_Item.Empty();
+		return true;
+	}
+	a_Item.m_ItemType = ItemType;
+	
+	HANDLE_PACKET_READ(ReadChar,    char,  ItemCount);
+	HANDLE_PACKET_READ(ReadBEShort, short, ItemDamage);
+	a_Item.m_ItemCount  = ItemCount;
+	a_Item.m_ItemDamage = ItemDamage;
+	if (ItemCount <= 0)
+	{
+		a_Item.Empty();
+	}
+
+	HANDLE_PACKET_READ(ReadBEShort, short, MetadataLength);
+	if (MetadataLength <= 0)
+	{
+		return true;
+	}
+	
+	// Read the metadata
+	AString Metadata;
+	if (!m_ReceivedData.ReadString(Metadata, MetadataLength))
+	{
+		return false;
+	}
+	
+	ParseItemMetadata(a_Item, Metadata);
+	return true;
+}
+
+
+
+
+
+void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
+{
+	// Uncompress the GZIPped data:
+	AString Uncompressed;
+	if (UncompressStringGZIP(a_Metadata.data(), a_Metadata.size(), Uncompressed) != Z_OK)
+	{
+		AString HexDump;
+		CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
+		LOGWARNING("Cannot unGZIP item metadata (%u bytes):\n%s", a_Metadata.size(), HexDump.c_str());
+		return;
+	}
+	
+	// Parse into NBT:
+	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
+	if (!NBT.IsValid())
+	{
+		AString HexDump;
+		CreateHexDump(HexDump, Uncompressed.data(), Uncompressed.size(), 16);
+		LOGWARNING("Cannot parse NBT item metadata: (%u bytes)\n%s", Uncompressed.size(), HexDump.c_str());
+		return;
+	}
+	
+	// Load enchantments from the NBT:
+	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
+	{
+		if (
+			(NBT.GetType(tag) == TAG_List) &&
+			(
+				(NBT.GetName(tag) == "ench") ||
+				(NBT.GetName(tag) == "StoredEnchantments")
+			)
+		)
+		{
+			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+		}
+	}
+}
 
 
 
