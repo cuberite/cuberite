@@ -210,7 +210,6 @@ int cProtocol161::ParseSteerVehicle(void)
 	HANDLE_PACKET_READ(ReadBEFloat, float, Forward);
 	HANDLE_PACKET_READ(ReadBool,    bool,  Jump);
 	HANDLE_PACKET_READ(ReadBool,    bool,  Unmount);
-	// TODO: m_Client->HandleSteerVehicle(...);
 	if (Unmount)
 	{
 		m_Client->HandleUnmount();

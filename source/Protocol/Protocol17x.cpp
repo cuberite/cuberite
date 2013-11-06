@@ -1198,7 +1198,8 @@ void cProtocol172::HandlePacketEntityAction(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketKeepAlive(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEInt, int, KeepAliveID);
+	m_Client->HandleKeepAlive(KeepAliveID);
 }
 
 
@@ -1207,7 +1208,8 @@ void cProtocol172::HandlePacketKeepAlive(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketPlayer(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBool, bool, IsOnGround);
+	// TODO: m_Client->HandlePlayerOnGround(IsOnGround);
 }
 
 
@@ -1216,7 +1218,10 @@ void cProtocol172::HandlePacketPlayer(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketPlayerAbilities(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadByte,    Byte,  Flags);
+	HANDLE_READ(ReadBEFloat, float, FlyingSpeed);
+	HANDLE_READ(ReadBEFloat, float, WalkingSpeed);
+	// TODO: m_Client->HandlePlayerAbilities();
 }
 
 
@@ -1225,7 +1230,10 @@ void cProtocol172::HandlePacketPlayerAbilities(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketPlayerLook(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEFloat, float, Yaw);
+	HANDLE_READ(ReadBEFloat, float, Pitch);
+	HANDLE_READ(ReadBool,    bool,  IsOnGround);
+	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround);
 }
 
 
@@ -1234,7 +1242,12 @@ void cProtocol172::HandlePacketPlayerLook(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketPlayerPos(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEDouble, double, PosX);
+	HANDLE_READ(ReadBEDouble, double, PosY);
+	HANDLE_READ(ReadBEDouble, double, Stance);
+	HANDLE_READ(ReadBEDouble, double, PosZ);
+	HANDLE_READ(ReadBool,     bool,   IsOnGround);
+	m_Client->HandlePlayerPos(PosX, PosY, PosZ, Stance, IsOnGround);
 }
 
 
@@ -1243,7 +1256,14 @@ void cProtocol172::HandlePacketPlayerPos(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketPlayerPosLook(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEDouble, double, PosX);
+	HANDLE_READ(ReadBEDouble, double, PosY);
+	HANDLE_READ(ReadBEDouble, double, Stance);
+	HANDLE_READ(ReadBEDouble, double, PosZ);
+	HANDLE_READ(ReadBEFloat,  float,  Yaw);
+	HANDLE_READ(ReadBEFloat,  float,  Pitch);
+	HANDLE_READ(ReadBool,     bool,   IsOnGround);
+	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Stance, Yaw, Pitch, IsOnGround);
 }
 
 
@@ -1252,7 +1272,11 @@ void cProtocol172::HandlePacketPlayerPosLook(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketPluginMessage(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadVarUTF8String, AString, Channel);
+	HANDLE_READ(ReadBEShort,       short,   Length);
+	AString Data;
+	m_ReceivedData.ReadString(Data, Length);
+	// TODO: m_Client->HandlePluginMessage(Channel, Data);
 }
 
 
@@ -1261,7 +1285,8 @@ void cProtocol172::HandlePacketPluginMessage(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketSlotSelect(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEShort, short, SlotNum);
+	m_Client->HandleSlotSelected(SlotNum);
 }
 
 
@@ -1270,7 +1295,18 @@ void cProtocol172::HandlePacketSlotSelect(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketSteerVehicle(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEFloat, float, Forward);
+	HANDLE_READ(ReadBEFloat, float, Sideways);
+	HANDLE_READ(ReadBool,    bool,  ShouldJump);
+	HANDLE_READ(ReadBool,    bool,  ShouldUnmount);
+	if (ShouldUnmount)
+	{
+		m_Client->HandleUnmount();
+	}
+	else
+	{
+		m_Client->HandleSteerVehicle(Forward, Sideways);
+	}
 }
 
 
@@ -1279,7 +1315,8 @@ void cProtocol172::HandlePacketSteerVehicle(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketTabComplete(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadVarUTF8String, AString, Text);
+	m_Client->HandleTabCompletion(Text);
 }
 
 
@@ -1288,7 +1325,14 @@ void cProtocol172::HandlePacketTabComplete(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketUpdateSign(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEInt,         int,     BlockX);
+	HANDLE_READ(ReadBEShort,       short,   BlockY);
+	HANDLE_READ(ReadBEInt,         int,     BlockZ);
+	HANDLE_READ(ReadVarUTF8String, AString, Line1);
+	HANDLE_READ(ReadVarUTF8String, AString, Line2);
+	HANDLE_READ(ReadVarUTF8String, AString, Line3);
+	HANDLE_READ(ReadVarUTF8String, AString, Line4);
+	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
 }
 
 
@@ -1297,7 +1341,10 @@ void cProtocol172::HandlePacketUpdateSign(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketUseEntity(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadBEInt, int,  EntityID);
+	HANDLE_READ(ReadByte,  Byte, MouseButton);
+	// TODO: Verify that this works, wiki.vg has no info on the MouseButton values
+	m_Client->HandleUseEntity(EntityID, (MouseButton == 0));
 }
 
 
@@ -1306,7 +1353,44 @@ void cProtocol172::HandlePacketUseEntity(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketWindowClick(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadChar,    char,  WindowID);
+	HANDLE_READ(ReadBEShort, short, SlotNum);
+	HANDLE_READ(ReadByte,    Byte,  Button);
+	HANDLE_READ(ReadBEShort, short, TransactionID);
+	HANDLE_READ(ReadByte,    Byte,  Mode);
+	cItem Item;
+	ReadItem(Item);
+
+	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
+	eClickAction Action;
+	switch ((Mode << 8) | Button)
+	{
+		case 0x0000: Action = (SlotNum != -999) ? caLeftClick  : caLeftClickOutside;  break;
+		case 0x0001: Action = (SlotNum != -999) ? caRightClick : caRightClickOutside; break;
+		case 0x0100: Action = caShiftLeftClick;  break;
+		case 0x0101: Action = caShiftRightClick; break;
+		case 0x0200: Action = caNumber1;         break;
+		case 0x0201: Action = caNumber2;         break;
+		case 0x0202: Action = caNumber3;         break;
+		case 0x0203: Action = caNumber4;         break;
+		case 0x0204: Action = caNumber5;         break;
+		case 0x0205: Action = caNumber6;         break;
+		case 0x0206: Action = caNumber7;         break;
+		case 0x0207: Action = caNumber8;         break;
+		case 0x0208: Action = caNumber9;         break;
+		case 0x0300: Action = caMiddleClick;     break;
+		case 0x0400: Action = (SlotNum == -999) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
+		case 0x0401: Action = (SlotNum == -999) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
+		case 0x0500: Action = (SlotNum == -999) ? caLeftPaintBegin               : caUnknown;     break;
+		case 0x0501: Action = (SlotNum != -999) ? caLeftPaintProgress            : caUnknown;     break;
+		case 0x0502: Action = (SlotNum == -999) ? caLeftPaintEnd                 : caUnknown;     break;
+		case 0x0504: Action = (SlotNum == -999) ? caRightPaintBegin              : caUnknown;     break;
+		case 0x0505: Action = (SlotNum != -999) ? caRightPaintProgress           : caUnknown;     break;
+		case 0x0506: Action = (SlotNum == -999) ? caRightPaintEnd                : caUnknown;     break;
+		case 0x0600: Action = caDblClick; break;
+	}
+
+	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
 }
 
 
@@ -1315,7 +1399,8 @@ void cProtocol172::HandlePacketWindowClick(UInt32 a_RemainingBytes)
 
 void cProtocol172::HandlePacketWindowClose(UInt32 a_RemainingBytes)
 {
-	// TODO
+	HANDLE_READ(ReadChar, char, WindowID);
+	m_Client->HandleWindowClose(WindowID);
 }
 
 
