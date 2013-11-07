@@ -658,7 +658,7 @@ void cProtocol172::SendSpawnMob(const cMonster & a_Mob)
 void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
 	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
-	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByte(a_ObjectType);
 	Pkt.WriteFPInt(a_Entity.GetPosX());
 	Pkt.WriteFPInt(a_Entity.GetPosY());
