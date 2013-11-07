@@ -2151,17 +2151,17 @@ bool cConnection::HandleServerSpawnExperienceOrbs(void)
 
 bool cConnection::HandleServerSpawnMob(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  MobType);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  HeadYaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityX);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityY);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityZ);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,   MobType);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   HeadYaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  VelocityX);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  VelocityY);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  VelocityZ);
 	AString Metadata;
 	if (!ParseMetadata(m_ServerBuffer, Metadata))
 	{
@@ -2170,7 +2170,7 @@ bool cConnection::HandleServerSpawnMob(void)
 	AString HexDump;
 	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
 	Log("Received a PACKET_SPAWN_MOB from the server:");
-	Log("  EntityID = %d", EntityID);
+	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
 	Log("  MobType = %d", MobType);
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Angles = [%d, %d, %d]", Yaw, Pitch, HeadYaw);
@@ -2705,6 +2705,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 				break;
 			}
 			case 6: Length = 12; break;  // 3 * int
+			case 7:
 			default:
 			{
 				ASSERT(!"Unknown metadata type");
