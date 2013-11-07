@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="zlib" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug Win32/zlib" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+				</Compiler>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release Win32/zlib" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add option="-O2" />
+				</Compiler>
+			</Target>
+			<Target title="Release profiled Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release profiled Win32/zlib" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add option="-O2" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Unit filename="../zlib-1.2.7/adler32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/compress.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/crc32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/crc32.h" />
+		<Unit filename="../zlib-1.2.7/deflate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/deflate.h" />
+		<Unit filename="../zlib-1.2.7/gzclose.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/gzguts.h" />
+		<Unit filename="../zlib-1.2.7/gzlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/gzread.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/gzwrite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/infback.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/inffast.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/inffast.h" />
+		<Unit filename="../zlib-1.2.7/inffixed.h" />
+		<Unit filename="../zlib-1.2.7/inflate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/inflate.h" />
+		<Unit filename="../zlib-1.2.7/inftrees.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/inftrees.h" />
+		<Unit filename="../zlib-1.2.7/trees.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/trees.h" />
+		<Unit filename="../zlib-1.2.7/uncompr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/zconf.h" />
+		<Unit filename="../zlib-1.2.7/zlib.h" />
+		<Unit filename="../zlib-1.2.7/zutil.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../zlib-1.2.7/zutil.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
