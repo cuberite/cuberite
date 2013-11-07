@@ -139,7 +139,7 @@ void cDeadlockDetect::DeadlockDetected(void)
 	// TODO: Make a crashdump / coredump
 	
 	// Crash the server intentionally:
-	*((int *)0) = 0;
+	*((volatile int *)0) = 0;
 }
 
 

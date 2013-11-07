@@ -244,6 +244,12 @@ protected:
 	virtual void SendData(const char * a_Data, int a_Size) override;
 
 	void SendCompass(const cWorld & a_World);
+	
+	/// Reads an item out of the received data, sets a_Item to the values read. Returns false if not enough received data
+	bool ReadItem(cItem & a_Item);
+	
+	/// Parses item metadata as read by ReadItem(), into the item enchantments.
+	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
 } ;
 
 
