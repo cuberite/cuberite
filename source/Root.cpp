@@ -285,7 +285,10 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 
 	if (!FoundAdditionalWorlds)
 	{
-		IniFile.AddKeyComment("Worlds", " World=secondworld");
+		if (IniFile.GetKeyComment("Worlds", 0) != " World=secondworld")
+		{
+			IniFile.AddKeyComment("Worlds", " World=secondworld");
+		}
 	}
 }
 
