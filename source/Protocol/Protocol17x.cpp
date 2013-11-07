@@ -636,7 +636,7 @@ void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 void cProtocol172::SendSpawnMob(const cMonster & a_Mob)
 {
 	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
-	Pkt.WriteInt(a_Mob.GetUniqueID());
+	Pkt.WriteVarInt(a_Mob.GetUniqueID());
 	Pkt.WriteByte((Byte)a_Mob.GetMobType());
 	Pkt.WriteFPInt(a_Mob.GetPosX());
 	Pkt.WriteFPInt(a_Mob.GetPosY());
