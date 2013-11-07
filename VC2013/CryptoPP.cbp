@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="CryptoPP" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release Win32/CryptoPP" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DUSE_PRECOMPILED_HEADERS" />
+					<Add option="-DWIN32" />
+					<Add option="-W" />
+					<Add option="-O2" />
+				</Compiler>
+			</Target>
+			<Target title="Debug Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug Win32/CryptoPP" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-D_DEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DUSE_PRECOMPILED_HEADERS" />
+					<Add option="-DWIN32" />
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+				</Compiler>
+			</Target>
+			<Target title="Release x64">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Win32/CryptoPP/Release x64" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DUSE_PRECOMPILED_HEADERS" />
+					<Add option="-DWIN32" />
+					<Add option="-W" />
+					<Add option="-O2" />
+				</Compiler>
+			</Target>
+			<Target title="DLL-Import Release x64">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Win32/CryptoPP/DLL-Import Release x64" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DUSE_PRECOMPILED_HEADERS" />
+					<Add option="-DWIN32" />
+					<Add option="-DCRYPTOPP_IMPORTS" />
+					<Add option="-W" />
+					<Add option="-O2" />
+				</Compiler>
+			</Target>
+			<Target title="Debug x64">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Win32/CryptoPP/Debug x64" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-D_DEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DUSE_PRECOMPILED_HEADERS" />
+					<Add option="-DWIN32" />
+					<Add option="-W" />
+					<Add option="-O0" />
+				</Compiler>
+			</Target>
+			<Target title="DLL-Import Debug x64">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Win32/CryptoPP/DLL-Import Debug x64" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-D_DEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DUSE_PRECOMPILED_HEADERS" />
+					<Add option="-DWIN32" />
+					<Add option="-DCRYPTOPP_IMPORTS" />
+					<Add option="-W" />
+					<Add option="-O0" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Unit filename="../CryptoPP/Doxyfile" />
+		<Unit filename="../CryptoPP/GNUmakefile" />
+		<Unit filename="../CryptoPP/License.txt" />
+		<Unit filename="../CryptoPP/Readme.txt" />
+		<Unit filename="../CryptoPP/adler32.cpp" />
+		<Unit filename="../CryptoPP/adler32.h" />
+		<Unit filename="../CryptoPP/aes.h" />
+		<Unit filename="../CryptoPP/algebra.cpp" />
+		<Unit filename="../CryptoPP/algebra.h" />
+		<Unit filename="../CryptoPP/algparam.cpp" />
+		<Unit filename="../CryptoPP/algparam.h" />
+		<Unit filename="../CryptoPP/arc4.h" />
+		<Unit filename="../CryptoPP/argnames.h" />
+		<Unit filename="../CryptoPP/asn.cpp" />
+		<Unit filename="../CryptoPP/asn.h" />
+		<Unit filename="../CryptoPP/authenc.cpp" />
+		<Unit filename="../CryptoPP/authenc.h" />
+		<Unit filename="../CryptoPP/base32.cpp" />
+		<Unit filename="../CryptoPP/base32.h" />
+		<Unit filename="../CryptoPP/base64.cpp" />
+		<Unit filename="../CryptoPP/base64.h" />
+		<Unit filename="../CryptoPP/basecode.cpp" />
+		<Unit filename="../CryptoPP/basecode.h" />
+		<Unit filename="../CryptoPP/cbcmac.cpp" />
+		<Unit filename="../CryptoPP/cbcmac.h" />
+		<Unit filename="../CryptoPP/ccm.cpp" />
+		<Unit filename="../CryptoPP/ccm.h" />
+		<Unit filename="../CryptoPP/channels.cpp" />
+		<Unit filename="../CryptoPP/channels.h" />
+		<Unit filename="../CryptoPP/cmac.cpp" />
+		<Unit filename="../CryptoPP/cmac.h" />
+		<Unit filename="../CryptoPP/config.h" />
+		<Unit filename="../CryptoPP/cpu.cpp" />
+		<Unit filename="../CryptoPP/cpu.h" />
+		<Unit filename="../CryptoPP/crc.cpp" />
+		<Unit filename="../CryptoPP/crc.h" />
+		<Unit filename="../CryptoPP/cryptlib.cpp" />
+		<Unit filename="../CryptoPP/cryptlib.h" />
+		<Unit filename="../CryptoPP/default.cpp" />
+		<Unit filename="../CryptoPP/default.h" />
+		<Unit filename="../CryptoPP/des.cpp" />
+		<Unit filename="../CryptoPP/des.h" />
+		<Unit filename="../CryptoPP/dessp.cpp" />
+		<Unit filename="../CryptoPP/dh.cpp" />
+		<Unit filename="../CryptoPP/dh.h" />
+		<Unit filename="../CryptoPP/dh2.cpp" />
+		<Unit filename="../CryptoPP/dh2.h" />
+		<Unit filename="../CryptoPP/dll.cpp" />
+		<Unit filename="../CryptoPP/dmac.h" />
+		<Unit filename="../CryptoPP/dsa.cpp" />
+		<Unit filename="../CryptoPP/dsa.h" />
+		<Unit filename="../CryptoPP/eax.cpp" />
+		<Unit filename="../CryptoPP/eax.h" />
+		<Unit filename="../CryptoPP/ec2n.cpp" />
+		<Unit filename="../CryptoPP/ec2n.h" />
+		<Unit filename="../CryptoPP/eccrypto.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../CryptoPP/eccrypto.h" />
+		<Unit filename="../CryptoPP/ecp.cpp" />
+		<Unit filename="../CryptoPP/ecp.h" />
+		<Unit filename="../CryptoPP/elgamal.cpp" />
+		<Unit filename="../CryptoPP/elgamal.h" />
+		<Unit filename="../CryptoPP/emsa2.cpp" />
+		<Unit filename="../CryptoPP/emsa2.h" />
+		<Unit filename="../CryptoPP/eprecomp.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../CryptoPP/eprecomp.h" />
+		<Unit filename="../CryptoPP/esign.cpp" />
+		<Unit filename="../CryptoPP/esign.h" />
+		<Unit filename="../CryptoPP/files.cpp" />
+		<Unit filename="../CryptoPP/files.h" />
+		<Unit filename="../CryptoPP/filters.cpp" />
+		<Unit filename="../CryptoPP/filters.h" />
+		<Unit filename="../CryptoPP/fips140.cpp" />
+		<Unit filename="../CryptoPP/fips140.h" />
+		<Unit filename="../CryptoPP/fltrimpl.h" />
+		<Unit filename="../CryptoPP/gcm.cpp" />
+		<Unit filename="../CryptoPP/gcm.h" />
+		<Unit filename="../CryptoPP/gf256.cpp" />
+		<Unit filename="../CryptoPP/gf256.h" />
+		<Unit filename="../CryptoPP/gf2_32.cpp" />
+		<Unit filename="../CryptoPP/gf2_32.h" />
+		<Unit filename="../CryptoPP/gf2n.cpp" />
+		<Unit filename="../CryptoPP/gf2n.h" />
+		<Unit filename="../CryptoPP/gfpcrypt.cpp" />
+		<Unit filename="../CryptoPP/gfpcrypt.h" />
+		<Unit filename="../CryptoPP/gzip.h" />
+		<Unit filename="../CryptoPP/hex.cpp" />
+		<Unit filename="../CryptoPP/hex.h" />
+		<Unit filename="../CryptoPP/hmac.cpp" />
+		<Unit filename="../CryptoPP/hmac.h" />
+		<Unit filename="../CryptoPP/hrtimer.cpp" />
+		<Unit filename="../CryptoPP/hrtimer.h" />
+		<Unit filename="../CryptoPP/integer.cpp" />
+		<Unit filename="../CryptoPP/integer.h" />
+		<Unit filename="../CryptoPP/iterhash.cpp" />
+		<Unit filename="../CryptoPP/iterhash.h" />
+		<Unit filename="../CryptoPP/lubyrack.h" />
+		<Unit filename="../CryptoPP/luc.cpp" />
+		<Unit filename="../CryptoPP/luc.h" />
+		<Unit filename="../CryptoPP/md2.cpp" />
+		<Unit filename="../CryptoPP/md2.h" />
+		<Unit filename="../CryptoPP/md4.cpp" />
+		<Unit filename="../CryptoPP/md4.h" />
+		<Unit filename="../CryptoPP/md5.cpp" />
+		<Unit filename="../CryptoPP/md5.h" />
+		<Unit filename="../CryptoPP/mdc.h" />
+		<Unit filename="../CryptoPP/misc.cpp" />
+		<Unit filename="../CryptoPP/misc.h" />
+		<Unit filename="../CryptoPP/modarith.h" />
+		<Unit filename="../CryptoPP/modes.cpp" />
+		<Unit filename="../CryptoPP/modes.h" />
+		<Unit filename="../CryptoPP/modexppc.h" />
+		<Unit filename="../CryptoPP/mqueue.cpp" />
+		<Unit filename="../CryptoPP/mqueue.h" />
+		<Unit filename="../CryptoPP/mqv.cpp" />
+		<Unit filename="../CryptoPP/mqv.h" />
+		<Unit filename="../CryptoPP/nbtheory.cpp" />
+		<Unit filename="../CryptoPP/nbtheory.h" />
+		<Unit filename="../CryptoPP/network.cpp" />
+		<Unit filename="../CryptoPP/network.h" />
+		<Unit filename="../CryptoPP/nr.h" />
+		<Unit filename="../CryptoPP/oaep.cpp" />
+		<Unit filename="../CryptoPP/oaep.h" />
+		<Unit filename="../CryptoPP/oids.h" />
+		<Unit filename="../CryptoPP/osrng.cpp" />
+		<Unit filename="../CryptoPP/osrng.h" />
+		<Unit filename="../CryptoPP/pch.cpp" />
+		<Unit filename="../CryptoPP/pch.h" />
+		<Unit filename="../CryptoPP/pkcspad.cpp" />
+		<Unit filename="../CryptoPP/pkcspad.h" />
+		<Unit filename="../CryptoPP/polynomi.cpp" />
+		<Unit filename="../CryptoPP/polynomi.h" />
+		<Unit filename="../CryptoPP/pssr.cpp" />
+		<Unit filename="../CryptoPP/pssr.h" />
+		<Unit filename="../CryptoPP/pubkey.cpp" />
+		<Unit filename="../CryptoPP/pubkey.h" />
+		<Unit filename="../CryptoPP/pwdbased.h" />
+		<Unit filename="../CryptoPP/queue.cpp" />
+		<Unit filename="../CryptoPP/queue.h" />
+		<Unit filename="../CryptoPP/rabin.cpp" />
+		<Unit filename="../CryptoPP/rabin.h" />
+		<Unit filename="../CryptoPP/randpool.cpp" />
+		<Unit filename="../CryptoPP/randpool.h" />
+		<Unit filename="../CryptoPP/rdtables.cpp" />
+		<Unit filename="../CryptoPP/rijndael.cpp" />
+		<Unit filename="../CryptoPP/rijndael.h" />
+		<Unit filename="../CryptoPP/rng.cpp" />
+		<Unit filename="../CryptoPP/rng.h" />
+		<Unit filename="../CryptoPP/rsa.cpp" />
+		<Unit filename="../CryptoPP/rsa.h" />
+		<Unit filename="../CryptoPP/rw.cpp" />
+		<Unit filename="../CryptoPP/rw.h" />
+		<Unit filename="../CryptoPP/safer.cpp" />
+		<Unit filename="../CryptoPP/safer.h" />
+		<Unit filename="../CryptoPP/seal.cpp" />
+		<Unit filename="../CryptoPP/seal.h" />
+		<Unit filename="../CryptoPP/secblock.h" />
+		<Unit filename="../CryptoPP/seckey.h" />
+		<Unit filename="../CryptoPP/seed.cpp" />
+		<Unit filename="../CryptoPP/seed.h" />
+		<Unit filename="../CryptoPP/sha.cpp" />
+		<Unit filename="../CryptoPP/sha.h" />
+		<Unit filename="../CryptoPP/shacal2.cpp" />
+		<Unit filename="../CryptoPP/shacal2.h" />
+		<Unit filename="../CryptoPP/simple.cpp" />
+		<Unit filename="../CryptoPP/simple.h" />
+		<Unit filename="../CryptoPP/smartptr.h" />
+		<Unit filename="../CryptoPP/socketft.cpp" />
+		<Unit filename="../CryptoPP/socketft.h" />
+		<Unit filename="../CryptoPP/square.cpp" />
+		<Unit filename="../CryptoPP/square.h" />
+		<Unit filename="../CryptoPP/squaretb.cpp" />
+		<Unit filename="../CryptoPP/stdcpp.h" />
+		<Unit filename="../CryptoPP/strciphr.cpp" />
+		<Unit filename="../CryptoPP/strciphr.h" />
+		<Unit filename="../CryptoPP/tea.cpp" />
+		<Unit filename="../CryptoPP/tea.h" />
+		<Unit filename="../CryptoPP/tiger.cpp" />
+		<Unit filename="../CryptoPP/tiger.h" />
+		<Unit filename="../CryptoPP/tigertab.cpp" />
+		<Unit filename="../CryptoPP/trdlocal.cpp" />
+		<Unit filename="../CryptoPP/trdlocal.h" />
+		<Unit filename="../CryptoPP/trunhash.h" />
+		<Unit filename="../CryptoPP/ttmac.cpp" />
+		<Unit filename="../CryptoPP/ttmac.h" />
+		<Unit filename="../CryptoPP/vmac.cpp" />
+		<Unit filename="../CryptoPP/vmac.h" />
+		<Unit filename="../CryptoPP/wait.cpp" />
+		<Unit filename="../CryptoPP/wait.h" />
+		<Unit filename="../CryptoPP/wake.h" />
+		<Unit filename="../CryptoPP/winpipes.cpp" />
+		<Unit filename="../CryptoPP/winpipes.h" />
+		<Unit filename="../CryptoPP/words.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

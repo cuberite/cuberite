@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="expat" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug Win32" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-DCOMPILED_FROM_DSP" />
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+				</Compiler>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release Win32" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-DCOMPILED_FROM_DSP" />
+					<Add option="-W" />
+					<Add option="-O2" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Unit filename="../expat/ascii.h" />
+		<Unit filename="../expat/asciitab.h" />
+		<Unit filename="../expat/expat.h" />
+		<Unit filename="../expat/expat_external.h" />
+		<Unit filename="../expat/iasciitab.h" />
+		<Unit filename="../expat/internal.h" />
+		<Unit filename="../expat/latin1tab.h" />
+		<Unit filename="../expat/nametab.h" />
+		<Unit filename="../expat/utf8tab.h" />
+		<Unit filename="../expat/winconfig.h" />
+		<Unit filename="../expat/xmlparse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../expat/xmlrole.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../expat/xmlrole.h" />
+		<Unit filename="../expat/xmltok.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../expat/xmltok.h" />
+		<Unit filename="../expat/xmltok_impl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../expat/xmltok_impl.h" />
+		<Unit filename="../expat/xmltok_ns.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Lua" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug Win32/Lua" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+				</Compiler>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release Win32/Lua" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add option="-O2" />
+				</Compiler>
+			</Target>
+			<Target title="Release profiled Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release profiled Win32/Lua" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add option="-O2" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Unit filename="../lua-5.1.4/src/lapi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lapi.h" />
+		<Unit filename="../lua-5.1.4/src/lauxlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lauxlib.h" />
+		<Unit filename="../lua-5.1.4/src/lbaselib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lcode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lcode.h" />
+		<Unit filename="../lua-5.1.4/src/ldblib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/ldebug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/ldebug.h" />
+		<Unit filename="../lua-5.1.4/src/ldo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/ldo.h" />
+		<Unit filename="../lua-5.1.4/src/ldump.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lfunc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lfunc.h" />
+		<Unit filename="../lua-5.1.4/src/lgc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lgc.h" />
+		<Unit filename="../lua-5.1.4/src/linit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/liolib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/llex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/llex.h" />
+		<Unit filename="../lua-5.1.4/src/llimits.h" />
+		<Unit filename="../lua-5.1.4/src/lmathlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lmem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lmem.h" />
+		<Unit filename="../lua-5.1.4/src/loadlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lobject.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lobject.h" />
+		<Unit filename="../lua-5.1.4/src/lopcodes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lopcodes.h" />
+		<Unit filename="../lua-5.1.4/src/loslib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lparser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lparser.h" />
+		<Unit filename="../lua-5.1.4/src/lstate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lstate.h" />
+		<Unit filename="../lua-5.1.4/src/lstring.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lstring.h" />
+		<Unit filename="../lua-5.1.4/src/lstrlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/ltable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/ltable.h" />
+		<Unit filename="../lua-5.1.4/src/ltablib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/ltm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/ltm.h" />
+		<Unit filename="../lua-5.1.4/src/lua.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lua.h" />
+		<Unit filename="../lua-5.1.4/src/luac.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/luaconf.h" />
+		<Unit filename="../lua-5.1.4/src/lualib.h" />
+		<Unit filename="../lua-5.1.4/src/lundump.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lundump.h" />
+		<Unit filename="../lua-5.1.4/src/lvm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lvm.h" />
+		<Unit filename="../lua-5.1.4/src/lzio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua-5.1.4/src/lzio.h" />
+		<Unit filename="../lua-5.1.4/src/print.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
