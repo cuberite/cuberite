@@ -139,10 +139,14 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 		switch(a_MobType)
 		{
 			case cMonster::mtSquid:
+			{
 				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
+			}
 
 			case cMonster::mtBat:
+			{
 				return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4) && (TargetBlock == E_BLOCK_AIR) && (!g_BlockTransparent[BlockAbove]);
+			}
 
 			case cMonster::mtChicken:
 			case cMonster::mtCow:
@@ -150,15 +154,28 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			case cMonster::mtHorse:
 			case cMonster::mtSheep:
 			{
-				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-						(BlockBelow == E_BLOCK_GRASS) && (SkyLight >= 9);
+				return (
+					(TargetBlock == E_BLOCK_AIR) &&
+					(BlockAbove == E_BLOCK_AIR) &&
+					(!g_BlockTransparent[BlockBelow]) &&
+					(BlockBelow == E_BLOCK_GRASS) &&
+					(SkyLight >= 9)
+				);
 			}
 				
 			case cMonster::mtOcelot:
 			{
-				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) &&
-						((BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES)) && (a_RelY >= 62) && (m_Random.NextInt(3,a_Biome) != 0);
+				return (
+					(TargetBlock == E_BLOCK_AIR) &&
+					(BlockAbove == E_BLOCK_AIR) &&
+					(
+						(BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES)
+					) &&
+					(a_RelY >= 62) &&
+					(m_Random.NextInt(3, a_Biome) != 0)
+				);
 			}
+			
 			case cMonster::mtEnderman:
 			{
 				if (a_RelY < 250)
@@ -167,12 +184,19 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					if (BlockTop == E_BLOCK_AIR)
 					{
 						BlockTop = a_Chunk->GetBlock(a_RelX, a_RelY + 3, a_RelZ);
-						return  (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (BlockTop == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-						(SkyLight <= 7) && (BlockLight <= 7);
+						return (
+							(TargetBlock == E_BLOCK_AIR) &&
+							(BlockAbove == E_BLOCK_AIR) &&
+							(BlockTop == E_BLOCK_AIR) &&
+							(!g_BlockTransparent[BlockBelow]) &&
+							(SkyLight <= 7) &&
+							(BlockLight <= 7)
+						);
 					}
 				}
 				break;
 			}
+			
 			case cMonster::mtSpider:
 			{
 				bool CanSpawn = true;
@@ -187,31 +211,79 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 						{
 							return false;
 						}
-						if (!HaveFloor)
-						{
-							a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock);
-							HaveFloor = HaveFloor || !g_BlockTransparent[TargetBlock];
-						}
+						HaveFloor = (
+							HaveFloor ||
+							(
+								a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock) &&
+								!g_BlockTransparent[TargetBlock]
+							)
+						);
 					}
 				}
 				return CanSpawn && HaveFloor && (SkyLight <= 7) && (BlockLight <= 7);
-
 			}
+			
 			case cMonster::mtCreeper:
+			case cMonster::mtSkeleton:
 			case cMonster::mtZombie:
-				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-						(SkyLight <= 7) && (BlockLight <= 7) && (m_Random.NextInt(2,a_Biome) == 0);
-
+			{
+				return (
+					(TargetBlock == E_BLOCK_AIR) &&
+					(BlockAbove == E_BLOCK_AIR) &&
+					(!g_BlockTransparent[BlockBelow]) &&
+					(SkyLight <= 7) &&
+					(BlockLight <= 7) &&
+					(m_Random.NextInt(2, a_Biome) == 0)
+				);
+			}
+			
 			case cMonster::mtSlime:
-				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-						((a_RelY <= 40) || a_Biome == biSwampland);
+			{
+				return (
+					(TargetBlock == E_BLOCK_AIR) &&
+					(BlockAbove == E_BLOCK_AIR) &&
+					(!g_BlockTransparent[BlockBelow]) &&
+					(
+						(a_RelY <= 40) || (a_Biome == biSwampland)
+					)
+				);
+			}
+			
 			case cMonster::mtGhast:
 			case cMonster::mtZombiePigman:
-				return (TargetBlock == E_BLOCK_AIR) && (BlockAbove == E_BLOCK_AIR) && (!g_BlockTransparent[BlockBelow]) &&
-						(m_Random.NextInt(20,a_Biome) == 0);
+			{
+				return (
+					(TargetBlock == E_BLOCK_AIR) &&
+					(BlockAbove == E_BLOCK_AIR) &&
+					(!g_BlockTransparent[BlockBelow]) &&
+					(m_Random.NextInt(20, a_Biome) == 0)
+				);
+			}
+			
+			case cMonster::mtWolf:
+			{
+				return (
+					(TargetBlock == E_BLOCK_GRASS) &&
+					(BlockAbove == E_BLOCK_AIR) &&
+					(
+						(a_Biome == biTaiga) ||
+						(a_Biome == biTaigaHills) ||
+						(a_Biome == biForest) ||
+						(a_Biome == biForestHills) ||
+						(a_Biome == biColdTaiga) ||
+						(a_Biome == biColdTaigaHills) ||
+						(a_Biome == biTaigaM) ||
+						(a_Biome == biMegaTaiga) ||
+						(a_Biome == biMegaTaigaHills)
+					)
+				);
+			}
+			
 			default:
+			{
 				LOGD("MG TODO: Write spawning rule for mob type %d", a_MobType);
 				return false;
+			}
 		}
 	}
 	return false;
