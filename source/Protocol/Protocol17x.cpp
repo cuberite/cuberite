@@ -1342,8 +1342,7 @@ void cProtocol172::HandlePacketUseEntity(UInt32 a_RemainingBytes)
 {
 	HANDLE_READ(ReadBEInt, int,  EntityID);
 	HANDLE_READ(ReadByte,  Byte, MouseButton);
-	// TODO: Verify that this works, wiki.vg has no info on the MouseButton values
-	m_Client->HandleUseEntity(EntityID, (MouseButton == 0));
+	m_Client->HandleUseEntity(EntityID, (MouseButton == 1));
 }
 
 
