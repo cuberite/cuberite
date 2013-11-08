@@ -512,7 +512,23 @@ void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 
 void cProtocol172::SendPlayerMaxSpeed(void)
 {
-	SendPlayerAbilities();
+	cPacketizer Pkt(*this, 0x20);  // Entity Properties
+	Pkt.WriteInt(m_Client->GetPlayer()->GetUniqueID());
+	Pkt.WriteInt(1);  // Count
+	Pkt.WriteString("generic.movementSpeed");
+	Pkt.WriteDouble(0.1);
+	if (m_Client->GetPlayer()->IsSprinting())
+	{
+		Pkt.WriteShort(1);  // Modifier count
+		Pkt.WriteInt64(0x662a6b8dda3e4c1c);
+		Pkt.WriteInt64(0x881396ea6097278d);  // UUID of the modifier
+		Pkt.WriteDouble(0.3);
+		Pkt.WriteByte(2);
+	}
+	else
+	{
+		Pkt.WriteShort(0);  // Modifier count
+	}
 }
 
 
