@@ -29,21 +29,7 @@ Documentation:
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
 
-#include "../Mobs/Monster.h"
-#include "../Mobs/Creeper.h"
-#include "../Mobs/Bat.h"
-#include "../Mobs/Pig.h"
-#include "../Mobs/Villager.h"
-#include "../Mobs/Zombie.h"
-#include "../Mobs/Ghast.h"
-#include "../Mobs/Wolf.h"
-#include "../Mobs/Sheep.h"
-#include "../Mobs/Enderman.h"
-#include "../Mobs/Skeleton.h"
-#include "../Mobs/Witch.h"
-#include "../Mobs/Slime.h"
-#include "../Mobs/Magmacube.h"
-#include "../Mobs/Horse.h"
+#include "../Mobs/IncludeAllMonsters.h"
 
 
 

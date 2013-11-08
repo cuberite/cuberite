@@ -20,6 +20,7 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
+#include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
 
 
@@ -282,11 +283,9 @@ void cProtocol172::SendEntityMetadata(const cEntity & a_Entity)
 
 void cProtocol172::SendEntityProperties(const cEntity & a_Entity)
 {
-	/*
 	cPacketizer Pkt(*this, 0x20);  // Entity Properties packet
 	Pkt.WriteInt(a_Entity.GetUniqueID());
-	// TODO
-	*/
+	Pkt.WriteEntityProperties(a_Entity);
 }
 
 
@@ -1664,7 +1663,199 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 
 void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 {
-	// TODO
+	switch (a_Mob.GetMobType())
+	{
+		case cMonster::mtCreeper:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1);
+			WriteByte(0x11);
+			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0);
+			break;
+		}
+		
+		case cMonster::mtBat:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0);
+			break;
+		}
+		
+		case cMonster::mtPig:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0);
+			break;
+		}
+		
+		case cMonster::mtVillager:
+		{
+			WriteByte(0x50);
+			WriteInt(((const cVillager &)a_Mob).GetVilType());
+			break;
+		}
+		
+		case cMonster::mtZombie:
+		{
+			WriteByte(0x0c);
+			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0);
+			WriteByte(0x0d);
+			WriteByte(((const cZombie &)a_Mob).IsVillagerZombie() ? 1 : 0);
+			WriteByte(0x0e);
+			WriteByte(((const cZombie &)a_Mob).IsConverting() ? 1 : 0);
+			break;
+		}
+		
+		case cMonster::mtGhast:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cGhast &)a_Mob).IsCharging());
+			break;
+		}
+		
+		case cMonster::mtWolf:
+		{
+			const cWolf & Wolf = (const cWolf &)a_Mob;
+			Byte WolfStatus = 0;
+			if (Wolf.IsSitting())
+			{
+				WolfStatus |= 0x1;
+			}
+			if (Wolf.IsAngry())
+			{
+				WolfStatus |= 0x2;
+			}
+			if (Wolf.IsTame())
+			{
+				WolfStatus |= 0x4;
+			}
+			WriteByte(0x10);
+			WriteByte(WolfStatus);
+
+			WriteByte(0x72);
+			WriteFloat((float)(a_Mob.GetHealth()));
+			WriteByte(0x13);
+			WriteByte(Wolf.IsBegging() ? 1 : 0);
+			break;
+		}
+		
+		case cMonster::mtSheep:
+		{
+			WriteByte(0x10);
+			Byte SheepMetadata = 0;
+			SheepMetadata = ((const cSheep &)a_Mob).GetFurColor();
+			if (((const cSheep &)a_Mob).IsSheared())
+			{
+				SheepMetadata |= 0x10;
+			}
+			WriteByte(SheepMetadata);
+			break;
+		}
+		
+		case cMonster::mtEnderman:
+		{
+			WriteByte(0x10);
+			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));
+			WriteByte(0x11);
+			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedMeta()));
+			WriteByte(0x12);
+			WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0);
+			break;
+		}
+		
+		case cMonster::mtSkeleton:
+		{
+			WriteByte(0x0d);
+			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0);
+			break;
+		}
+		
+		case cMonster::mtWitch:
+		{
+			WriteByte(0x15);
+			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);
+			break;
+		}
+		
+		case cMonster::mtSlime:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cSlime &)a_Mob).GetSize());
+			break;
+		}
+		
+		case cMonster::mtMagmaCube:
+		{
+			WriteByte(0x10);
+			WriteByte(((const cMagmaCube &)a_Mob).GetSize());
+			break;
+		}
+		
+		case cMonster::mtHorse:
+		{
+			const cHorse & Horse = (const cHorse &)a_Mob;
+			int Flags = 0;
+			if (Horse.IsTame())
+			{
+				Flags |= 0x02;
+			}
+			if (Horse.IsSaddled())
+			{
+				Flags |= 0x04;
+			}
+			if (Horse.IsChested())
+			{
+				Flags |= 0x08;
+			}
+			if (Horse.IsBaby())
+			{
+				Flags |= 0x10;
+			}
+			if (Horse.IsEating())
+			{
+				Flags |= 0x20;
+			}
+			if (Horse.IsRearing())
+			{
+				Flags |= 0x40;
+			}
+			if (Horse.IsMthOpen())
+			{
+				Flags |= 0x80;
+			}
+			WriteByte(0x50);  // Int at index 16
+			WriteInt(Flags);
+			WriteByte(0x13);  // Byte at index 19
+			WriteByte(Horse.GetHorseType());
+			WriteByte(0x54);  // Int at index 20
+			int Appearance = 0;
+			Appearance = Horse.GetHorseColor();
+			Appearance |= Horse.GetHorseStyle() << 8;
+			WriteInt(Appearance);
+			WriteByte(0x56);  // Int at index 22
+			WriteInt(Horse.GetHorseArmour());
+			break;
+		}
+	}  // switch (a_Mob.GetType())
+}
+
+
+
+
+
+void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
+{
+	if (!a_Entity.IsMob())
+	{
+		// No properties for anything else than mobs
+		WriteInt(0);
+		return;
+	}
+	const cMonster & Mob = (const cMonster &)a_Entity;
+
+	// TODO: Send properties and modifiers based on the mob type
+	
+	WriteInt(0);  // NumProperties
 }
 
 
