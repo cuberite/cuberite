@@ -23,14 +23,14 @@ void cChicken::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if (m_EggDropTimer == 6000 && m_World->GetTickRandomNumber(1) == 0)
+	if ((m_EggDropTimer == 6000) && (m_World->GetTickRandomNumber(1) == 0))
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;
 		Drops.push_back(cItem(E_ITEM_EGG, 1));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
-	else if (m_EggDropTimer  == 12000)
+	else if (m_EggDropTimer == 12000)
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;
