@@ -28,7 +28,7 @@ class cProtocol150 :
 public:
 	cProtocol150(cClientHandle * a_Client);
 	
-	virtual void SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) override;
+	virtual void SendWindowOpen(const cWindow & a_Window) override;
 	
 	virtual int ParseWindowClick(void);
 } ;

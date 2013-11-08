@@ -245,7 +245,7 @@ void cWindow::OpenedByPlayer(cPlayer & a_Player)
 		}  // for itr - m_SlotAreas[]
 	}
 
-	a_Player.GetClientHandle()->SendWindowOpen(m_WindowID, m_WindowType, m_WindowTitle, GetNumSlots() - c_NumInventorySlots);
+	a_Player.GetClientHandle()->SendWindowOpen(*this);
 }
 
 

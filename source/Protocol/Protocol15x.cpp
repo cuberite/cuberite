@@ -12,6 +12,7 @@ Implements the 1.5.x protocol classes:
 #include "Protocol15x.h"
 #include "../ClientHandle.h"
 #include "../Item.h"
+#include "../UI/Window.h"
 
 
 
@@ -54,19 +55,19 @@ cProtocol150::cProtocol150(cClientHandle * a_Client) :
 
 
 
-void cProtocol150::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
+void cProtocol150::SendWindowOpen(const cWindow & a_Window)
 {
-	if (a_WindowType < 0)
+	if (a_Window.GetWindowType() < 0)
 	{
 		// Do not send for inventory windows
 		return;
 	}
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_WINDOW_OPEN);
-	WriteByte  (a_WindowID);
-	WriteByte  (a_WindowType);
-	WriteString(a_WindowTitle);
-	WriteByte  (a_NumSlots);
+	WriteByte  (a_Window.GetWindowID());
+	WriteByte  (a_Window.GetWindowType());
+	WriteString(a_Window.GetWindowTitle());
+	WriteByte  (a_Window.GetNumNonInventorySlots());
 	WriteByte  (1);  // Use title
 	Flush();
 }

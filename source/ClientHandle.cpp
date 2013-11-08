@@ -2022,9 +2022,9 @@ void cClientHandle::SendWindowClose(const cWindow & a_Window)
 
 
 
-void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
+void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 {
-	m_Protocol->SendWindowOpen(a_WindowID, a_WindowType, a_WindowTitle, a_NumSlots);
+	m_Protocol->SendWindowOpen(a_Window);
 }
 
 

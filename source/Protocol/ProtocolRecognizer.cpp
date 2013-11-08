@@ -625,10 +625,10 @@ void cProtocolRecognizer::SendWindowClose(const cWindow & a_Window)
 
 
 
-void cProtocolRecognizer::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
+void cProtocolRecognizer::SendWindowOpen(const cWindow & a_Window)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendWindowOpen(a_WindowID, a_WindowType, a_WindowTitle, a_NumSlots);
+	m_Protocol->SendWindowOpen(a_Window);
 }
 
 

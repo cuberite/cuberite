@@ -841,21 +841,24 @@ void cProtocol172::SendWindowClose(const cWindow & a_Window)
 
 
 
-void cProtocol172::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
+void cProtocol172::SendWindowOpen(const cWindow & a_Window)
 {
-	cPacketizer Pkt(*this, 0x2d);
-	Pkt.WriteChar(a_WindowID);
-	Pkt.WriteChar(a_WindowType);
-	Pkt.WriteString(a_WindowTitle);
-	Pkt.WriteChar(a_NumSlots);
-	Pkt.WriteBool(true);
-	/*
-	// TODO:
-	if (a_WindowType == cWindow::wtHorse)
+	if (a_Window.GetWindowType() < 0)
 	{
-		Pkt.WriteInt(HorseID);
+		// Do not send this packet for player inventory windows
+		return;
 	}
-	*/
+	
+	cPacketizer Pkt(*this, 0x2d);
+	Pkt.WriteChar(a_Window.GetWindowID());
+	Pkt.WriteChar(a_Window.GetWindowType());
+	Pkt.WriteString(a_Window.GetWindowTitle());
+	Pkt.WriteChar(a_Window.GetNumNonInventorySlots());
+	Pkt.WriteBool(true);
+	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
+	{
+		Pkt.WriteInt(0);  // TODO: The animal's EntityID
+	}
 }
 
 

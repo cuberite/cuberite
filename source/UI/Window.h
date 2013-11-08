@@ -60,6 +60,8 @@ public:
 		wtBeacon      = 7,
 		wtAnvil       = 8,
 		wtHopper      = 9,
+		// Unknown: 10
+		wtAnimalChest = 11,
 	};
 	
 	// tolua_end
@@ -75,7 +77,11 @@ public:
 	cWindowOwner * GetOwner(void) { return m_Owner; }
 	void SetOwner( cWindowOwner * a_Owner ) { m_Owner = a_Owner; }
 	
+	/// Returns the total number of slots
 	int GetNumSlots(void) const;
+	
+	/// Returns the number of slots, excluding the player's inventory (used for network protocols)
+	int GetNumNonInventorySlots(void) const { return GetNumSlots() - c_NumInventorySlots; }
 	
 	// tolua_begin
 	
