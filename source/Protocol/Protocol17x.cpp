@@ -420,7 +420,7 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	{
 		cPacketizer Pkt(*this, 0x01);  // Join Game packet
 		Pkt.WriteInt(a_Player.GetUniqueID());
-		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode());
+		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (cRoot::Get()->GetServer()->IsHardcore() ? 0x08 : 0)); // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
 		Pkt.WriteByte(cRoot::Get()->GetServer()->GetMaxPlayers());
@@ -447,7 +447,7 @@ void cProtocol172::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	{
 		cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
-		Pkt.WriteInt(a_Pickup.GetUniqueID());
+		Pkt.WriteVarInt(a_Pickup.GetUniqueID());
 		Pkt.WriteByte(2);  // Type = Pickup
 		Pkt.WriteFPInt(a_Pickup.GetPosX());
 		Pkt.WriteFPInt(a_Pickup.GetPosY());
@@ -616,7 +616,7 @@ void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 {
 	cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
-	Pkt.WriteInt(a_FallingBlock.GetUniqueID());
+	Pkt.WriteVarInt(a_FallingBlock.GetUniqueID());
 	Pkt.WriteByte(70);  // Falling block
 	Pkt.WriteFPInt(a_FallingBlock.GetPosX());
 	Pkt.WriteFPInt(a_FallingBlock.GetPosY());
@@ -681,7 +681,7 @@ void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
 {
 	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
-	Pkt.WriteInt(a_Vehicle.GetUniqueID());
+	Pkt.WriteVarInt(a_Vehicle.GetUniqueID());
 	Pkt.WriteByte(a_VehicleType);
 	Pkt.WriteFPInt(a_Vehicle.GetPosX());
 	Pkt.WriteFPInt(a_Vehicle.GetPosY());
