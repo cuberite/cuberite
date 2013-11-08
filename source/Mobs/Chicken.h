@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "PassiveMonster.h"
@@ -23,7 +22,7 @@ public:
 private:
 
 
-	int m_DropEggCount;
+	int m_EggDropTimer;
 } ;
 
 
