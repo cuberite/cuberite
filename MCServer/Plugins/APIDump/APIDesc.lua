@@ -820,7 +820,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				GetRawDamageAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the raw damage that this entity's equipment would cause when attacking the ReceiverEntity. This includes this entity's weapon {{cEnchantments|enchantments}}, but excludes the receiver's armor or potion effects. See {{TakeDamageInfo}} for more information on attack damage." },
 				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity. Currently unused." },
 				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the entire rotation vector (Yaw, Pitch, Roll)" },
-				GetRotation = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. FIXME: Rename to GetYaw()." },
+				GetRotation = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. OBSOLETE, use GetYaw() instead." },
 				GetSpeed = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the complete speed vector of the entity" },
 				GetSpeedX = { Params = "", Return = "number", Notes = "Returns the X-part of the speed vector" },
 				GetSpeedY = { Params = "", Return = "number", Notes = "Returns the Y-part of the speed vector" },
@@ -828,6 +828,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity within the running server. Note that this ID is not persisted to the data files." },
 				GetWidth = { Params = "", Return = "number", Notes = "Returns the width (X and Z size) of the entity." },
 				GetWorld = { Params = "", Return = "{{cWorld}}", Notes = "Returns the world where the entity resides" },
+				GetYaw = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity." },
 				Heal = { Params = "Hitpoints", Return = "", Notes = "Heals the specified number of hitpoints. Hitpoints is expected to be a positive number." },
 				IsA = { Params = "ClassName", Return = "bool", Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself" },
 				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
@@ -864,7 +865,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				SetPosZ = { Params = "number", Return = "", Notes = "Sets the Z-coord of the entity's pivot" },
 				SetRoll = { Params = "number", Return = "", Notes = "Sets the roll (sideways rotation) of the entity. Currently unused." },
 				SetRot = { Params = "{{Vector3f|Rotation}}", Return = "", Notes = "Sets the entire rotation vector (Yaw, Pitch, Roll)" },
-				SetRotation = { Params = "number", Return = "", Notes = "Sets the yaw (direction) of the entity. FIXME: Rename to SetYaw()." },
+				SetRotation = { Params = "number", Return = "", Notes = "Sets the yaw (direction) of the entity. OBSOLETE, use SetYaw() instead." },
 				SetRotationFromSpeed = { Params = "", Return = "", Notes = "Sets the entity's yaw to match its current speed (entity looking forwards as it moves). (FIXME: Rename to SetYawFromSpeed)" },
 				SetSpeed =
 				{
@@ -875,6 +876,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				SetSpeedY = { Params = "SpeedY", Return = "", Notes = "Sets the Y component of the entity speed" },
 				SetSpeedZ = { Params = "SpeedZ", Return = "", Notes = "Sets the Z component of the entity speed" },
 				SetWidth = { Params = "", Return = "", Notes = "FIXME: Remove this from API" },
+				SetYaw = { Params = "number", Return = "", Notes = "Sets the yaw (direction) of the entity." },
 				StartBurning = { Params = "NumTicks", Return = "", Notes = "Sets the entity on fire for the specified number of ticks. If entity is on fire already, makes it burn for either NumTicks or the number of ticks left from the previous fire, whichever is larger." },
 				SteerVehicle = { Params = "ForwardAmount, SidewaysAmount", Return = "", Notes = "Applies the specified steering to the vehicle this entity is attached to. Ignored if not attached to any entity." },
 				StopBurning = { Params = "", Return = "", Notes = "Extinguishes the entity fire, cancels all fire timers." },
@@ -1740,6 +1742,7 @@ a_Player:OpenWindow(Window);
 				GetAirLevel = { Params = "", Return = "number", Notes = "Returns the air level (number of ticks of air left)." },
 				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
 				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player (based on the first group). Prefix player messages with this code." },
+				GetEffectiveGameMode = { Params = "", Return = "{{eGameMode|GameMode}}", Notes = "Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions." },
 				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
 				GetEyeHeight = { Return = "number", Notes = "Returns the height of the player's eyes, in absolute coords" },
 				GetEyePosition = { Return = "{{Vector3d|EyePositionVector}}", Notes = "Returns the position of the player's eyes, as a {{Vector3d}}" },
@@ -2444,6 +2447,49 @@ end
 			{
 			},
 		},  -- TakeDamageInfo
+
+		tolua =
+		{
+			Desc = [[
+				This class represents the tolua bridge between the Lua API and MCServer. It supports some low
+				level operations and queries on the objects. See also the tolua++'s documentation at
+				{{http://www.codenix.com/~tolua/tolua++.html#utilities}}. Normally you shouldn't use any of these
+				functions except for cast() and type()
+			]],
+			Functions =
+			{
+				cast = { Params = "Object, TypeStr", Return = "Object", Notes = "Casts the object to the specified type through the inheritance hierarchy." },
+				getpeer = { Params = "", Return = "", Notes = "" },
+				inherit = { Params = "", Return = "", Notes = "" },
+				releaseownership = { Params = "", Return = "", Notes = "" },
+				setpeer = { Params = "", Return = "", Notes = "" },
+				takeownership = { Params = "", Return = "", Notes = "" },
+				type = { Params = "Object", Return = "TypeStr", Notes = "Returns a string representing the type of the object. This works similar to Lua's built-in type() function, but recognizes the underlying C++ types, too." },
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Usage example",
+					Contents =
+					[[
+						The tolua.cast() function is normally used to cast between related types. For example in the
+						hook callbacks you often receive a generic {{cEntity}} object, when in fact you know that the
+						object is a {{cMonster}}. You can cast the object to access its cMonster functions:
+<pre class="prettyprint lang-lua">
+function OnTakeDamage(a_ReceiverEntity, TDI)
+	if (a_ReceiverEntity.IsMob()) then
+		local Mob = tolua.cast(a_ReceiverEntity, "cMonster");  -- Cast a_ReceiverEntity into a {{cMonster}} instance
+		if (Mob:GetMonsterType() == cMonster.mtSheep) then
+			local Sheep = tolua.cast(Mob, "cSheep");  -- Cast Mob into a {{cSheep}} instance
+			-- Do something sheep-specific
+		end
+	end
+end
+</pre>
+					]],
+				}
+			}  -- AdditionalInfo
+		},  -- tolua
 
 		Vector3d =
 		{
