@@ -1,0 +1,18 @@
+﻿Build started 11/8/2013 9:52:57 PM.
+     1>Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\JsonCpp.vcxproj" on node 3 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"../jsoncpp-src-0.5.0/include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /Zc:wchar_t /Zc:forScope /Fo"Debug\JsonCpp\\" /Fd"Debug\JsonCpp\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt "..\jsoncpp-src-0.5.0\src\lib_json\json_reader.cpp" "..\jsoncpp-src-0.5.0\src\lib_json\json_value.cpp" "..\jsoncpp-src-0.5.0\src\lib_json\json_writer.cpp"
+         json_writer.cpp
+         json_value.cpp
+         json_reader.cpp
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug\JsonCpp\JsonCpp.lib" /NOLOGO Debug\JsonCpp\json_reader.obj
+         Debug\JsonCpp\json_value.obj
+         Debug\JsonCpp\json_writer.obj
+         JsonCpp.vcxproj -> C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug\JsonCpp\JsonCpp.lib
+     1>Done Building Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\JsonCpp.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:03.41
