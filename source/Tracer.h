@@ -1,20 +1,41 @@
+
 #pragma once
 
 #include "Vector3i.h"
 #include "Vector3f.h"
 
 
+
+
+
+// fwd:
 class cWorld;
-class cTracer		// tolua_export
-{					// tolua_export
-public:				// tolua_export
-	Vector3f DotPos;				
-	Vector3f BoxOffset;
-	cTracer( cWorld* a_World);		// tolua_export
-	~cTracer();						// tolua_export
+
+
+
+
+
+// tolua_begin
+
+class cTracer
+{
+public:
+
+	/// Contains the position of the block that caused the collision
+	Vector3f BlockHitPosition;
+
+	/// Contains which face was hit
+	Vector3f HitNormal;
+
+	/// Contains the exact position where a collision occured. (BlockHitPosition + Offset on block)
+	Vector3f RealHit;
+
+
+	cTracer(cWorld * a_World);
+	~cTracer();
 
 	/// Determines if a collision occures along a line. Returns true if a collision occurs.
-	bool Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)	// tolua_export
+	bool Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)
 	{
 		return Trace(a_Start, a_Direction, a_Distance, false);
 	}
@@ -22,16 +43,9 @@ public:				// tolua_export
 	/// Determines if a collision occures along a line. Returns true if a collision occurs.
 	/// When a_LineOfSight is true, we don't use the standard collision detection rules. Instead we use
 	/// the rules for monster vision. E.g. Only water and air do not block vision.
-	bool Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight);		// tolua_export
+	/// a_Distance is the number of iterations (blocks hits) that are tested.
+	bool Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight);
 
-	/// Contains the position of the block that caused the collision
-	Vector3f BlockHitPosition;		// tolua_export
-
-	/// Contains which face was hit
-	Vector3f HitNormal;			// tolua_export
-
-	/// Contains the exact position where a collision occured. (BlockHitPosition + Offset on block)
-	Vector3f RealHit;				// tolua_export
 private:
 
 	/// Preps Tracer object for call of Trace function. Only used internally.
@@ -59,4 +73,10 @@ private:
 	Vector3i end1;
 	Vector3i step;
 	Vector3f tMax;
-}; // tolua_export
+};
+
+// tolua_end
+
+
+
+
