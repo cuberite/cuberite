@@ -11,7 +11,6 @@
 #include "PluginManager.h"
 #include "Entities/Player.h"
 #include "WebAdmin.h"
-#include "StringMap.h"
 #include "ClientHandle.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/DispenserEntity.h"

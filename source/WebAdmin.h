@@ -26,7 +26,6 @@
 
 
 // fwd:
-class cStringMap;
 class cEvent;
 class cWebPlugin;
 

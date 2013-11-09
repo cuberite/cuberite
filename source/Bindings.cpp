@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/02/13 17:43:37.
+** Generated automatically by tolua++-1.0.92 on 11/09/13 19:50:08.
 */
 
 #ifndef __cplusplus
@@ -22,7 +22,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "StringUtils.h"
 #include "Defines.h"
 #include "LuaFunctions.h"
-#include "StringMap.h"
 #include "ChatColor.h"
 #include "ClientHandle.h"
 #include "Entities/Entity.h"
@@ -255,21 +254,20 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cHopperEntity");
  tolua_usertype(tolua_S,"std::vector<AString>");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
- tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"HTTPFormData");
- tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
+ tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cPlayer");
- tolua_usertype(tolua_S,"cBlockArea");
- tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cStringMap");
+ tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
- tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cFile");
  tolua_usertype(tolua_S,"cItems");
@@ -3186,6 +3184,50 @@ static int tolua_set_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: g_BlockIsTorchPlaceable */
+#ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsTorchPlaceable
+static int tolua_get_AllToLua_g_BlockIsTorchPlaceable(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)g_BlockIsTorchPlaceable[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: g_BlockIsTorchPlaceable */
+#ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockIsTorchPlaceable
+static int tolua_set_AllToLua_g_BlockIsTorchPlaceable(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=256)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  g_BlockIsTorchPlaceable[tolua_index] = ((bool)  tolua_toboolean(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: ClickActionToString */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_ClickActionToString00
 static int tolua_AllToLua_ClickActionToString00(lua_State* tolua_S)
@@ -3685,104 +3727,6 @@ static int tolua_AllToLua_GetChar00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetChar'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: clear of class  cStringMap */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cStringMap_clear00
-static int tolua_AllToLua_cStringMap_clear00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cStringMap",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cStringMap* self = (cStringMap*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'clear'", NULL);
-#endif
-  {
-   self->clear();
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'clear'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: size of class  cStringMap */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cStringMap_size00
-static int tolua_AllToLua_cStringMap_size00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cStringMap",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cStringMap* self = (const cStringMap*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'size'", NULL);
-#endif
-  {
-   unsigned int tolua_ret = (unsigned int)  self->size();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'size'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: get of class  cStringMap */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cStringMap_get00
-static int tolua_AllToLua_cStringMap_get00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cStringMap",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cStringMap* self = (cStringMap*)  tolua_tousertype(tolua_S,1,0);
-  const std::string index = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'get'", NULL);
-#endif
-  {
-   std::string tolua_ret = (std::string)  self->get(index);
-   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
-   tolua_pushcppstring(tolua_S,(const char*)index);
-  }
- }
- return 2;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'get'.",&tolua_err);
  return 0;
 #endif
 }
@@ -11148,6 +11092,38 @@ static int tolua_AllToLua_cServer_SetMaxPlayers00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetMaxPlayers'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsHardcore of class  cServer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cServer_IsHardcore00
+static int tolua_AllToLua_cServer_IsHardcore00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cServer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cServer* self = (const cServer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsHardcore'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsHardcore();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsHardcore'.",&tolua_err);
  return 0;
 #endif
 }
@@ -23662,6 +23638,96 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: BlockHitPosition of class  cTracer */
+#ifndef TOLUA_DISABLE_tolua_get_cTracer_BlockHitPosition
+static int tolua_get_cTracer_BlockHitPosition(lua_State* tolua_S)
+{
+  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'BlockHitPosition'",NULL);
+#endif
+   tolua_pushusertype(tolua_S,(void*)&self->BlockHitPosition,"Vector3f");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: BlockHitPosition of class  cTracer */
+#ifndef TOLUA_DISABLE_tolua_set_cTracer_BlockHitPosition
+static int tolua_set_cTracer_BlockHitPosition(lua_State* tolua_S)
+{
+  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'BlockHitPosition'",NULL);
+  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3f",0,&tolua_err)))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->BlockHitPosition = *((Vector3f*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: HitNormal of class  cTracer */
+#ifndef TOLUA_DISABLE_tolua_get_cTracer_HitNormal
+static int tolua_get_cTracer_HitNormal(lua_State* tolua_S)
+{
+  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'HitNormal'",NULL);
+#endif
+   tolua_pushusertype(tolua_S,(void*)&self->HitNormal,"Vector3f");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: HitNormal of class  cTracer */
+#ifndef TOLUA_DISABLE_tolua_set_cTracer_HitNormal
+static int tolua_set_cTracer_HitNormal(lua_State* tolua_S)
+{
+  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'HitNormal'",NULL);
+  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3f",0,&tolua_err)))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->HitNormal = *((Vector3f*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: RealHit of class  cTracer */
+#ifndef TOLUA_DISABLE_tolua_get_cTracer_RealHit
+static int tolua_get_cTracer_RealHit(lua_State* tolua_S)
+{
+  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RealHit'",NULL);
+#endif
+   tolua_pushusertype(tolua_S,(void*)&self->RealHit,"Vector3f");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: RealHit of class  cTracer */
+#ifndef TOLUA_DISABLE_tolua_set_cTracer_RealHit
+static int tolua_set_cTracer_RealHit(lua_State* tolua_S)
+{
+  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RealHit'",NULL);
+  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3f",0,&tolua_err)))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->RealHit = *((Vector3f*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cTracer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cTracer_new00
 static int tolua_AllToLua_cTracer_new00(lua_State* tolua_S)
@@ -23777,8 +23843,8 @@ static int tolua_AllToLua_cTracer_Trace00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Trace'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->Trace(*a_Start,*a_Direction,a_Distance);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   bool tolua_ret = (bool)  self->Trace(*a_Start,*a_Direction,a_Distance);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
  return 1;
@@ -23790,93 +23856,38 @@ static int tolua_AllToLua_cTracer_Trace00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: BlockHitPosition of class  cTracer */
-#ifndef TOLUA_DISABLE_tolua_get_cTracer_BlockHitPosition
-static int tolua_get_cTracer_BlockHitPosition(lua_State* tolua_S)
+/* method: Trace of class  cTracer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cTracer_Trace01
+static int tolua_AllToLua_cTracer_Trace01(lua_State* tolua_S)
 {
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cTracer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
   cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3f* a_Start = ((const Vector3f*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3f* a_Direction = ((const Vector3f*)  tolua_tousertype(tolua_S,3,0));
+  int a_Distance = ((int)  tolua_tonumber(tolua_S,4,0));
+  bool a_LineOfSight = ((bool)  tolua_toboolean(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'BlockHitPosition'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Trace'", NULL);
 #endif
-   tolua_pushusertype(tolua_S,(void*)&self->BlockHitPosition,"Vector3f");
+  {
+   bool tolua_ret = (bool)  self->Trace(*a_Start,*a_Direction,a_Distance,a_LineOfSight);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
  return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: BlockHitPosition of class  cTracer */
-#ifndef TOLUA_DISABLE_tolua_set_cTracer_BlockHitPosition
-static int tolua_set_cTracer_BlockHitPosition(lua_State* tolua_S)
-{
-  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'BlockHitPosition'",NULL);
-  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3f",0,&tolua_err)))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->BlockHitPosition = *((Vector3f*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: HitNormal of class  cTracer */
-#ifndef TOLUA_DISABLE_tolua_get_cTracer_HitNormal
-static int tolua_get_cTracer_HitNormal(lua_State* tolua_S)
-{
-  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'HitNormal'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)&self->HitNormal,"Vector3f");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: HitNormal of class  cTracer */
-#ifndef TOLUA_DISABLE_tolua_set_cTracer_HitNormal
-static int tolua_set_cTracer_HitNormal(lua_State* tolua_S)
-{
-  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'HitNormal'",NULL);
-  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3f",0,&tolua_err)))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->HitNormal = *((Vector3f*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: RealHit of class  cTracer */
-#ifndef TOLUA_DISABLE_tolua_get_cTracer_RealHit
-static int tolua_get_cTracer_RealHit(lua_State* tolua_S)
-{
-  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RealHit'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)&self->RealHit,"Vector3f");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: RealHit of class  cTracer */
-#ifndef TOLUA_DISABLE_tolua_set_cTracer_RealHit
-static int tolua_set_cTracer_RealHit(lua_State* tolua_S)
-{
-  cTracer* self = (cTracer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RealHit'",NULL);
-  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3f",0,&tolua_err)))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->RealHit = *((Vector3f*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
+tolua_lerror:
+ return tolua_AllToLua_cTracer_Trace00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -29855,6 +29866,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_array(tolua_S,"g_BlockIsSnowable",tolua_get_AllToLua_g_BlockIsSnowable,tolua_set_AllToLua_g_BlockIsSnowable);
   tolua_array(tolua_S,"g_BlockRequiresSpecialTool",tolua_get_AllToLua_g_BlockRequiresSpecialTool,tolua_set_AllToLua_g_BlockRequiresSpecialTool);
   tolua_array(tolua_S,"g_BlockIsSolid",tolua_get_AllToLua_g_BlockIsSolid,tolua_set_AllToLua_g_BlockIsSolid);
+  tolua_array(tolua_S,"g_BlockIsTorchPlaceable",tolua_get_AllToLua_g_BlockIsTorchPlaceable,tolua_set_AllToLua_g_BlockIsTorchPlaceable);
   tolua_constant(tolua_S,"BLOCK_FACE_NONE",BLOCK_FACE_NONE);
   tolua_constant(tolua_S,"BLOCK_FACE_XM",BLOCK_FACE_XM);
   tolua_constant(tolua_S,"BLOCK_FACE_XP",BLOCK_FACE_XP);
@@ -29938,12 +29950,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_function(tolua_S,"GetTime",tolua_AllToLua_GetTime00);
   tolua_function(tolua_S,"GetChar",tolua_AllToLua_GetChar00);
-  tolua_cclass(tolua_S,"cStringMap","cStringMap","",NULL);
-  tolua_beginmodule(tolua_S,"cStringMap");
-   tolua_function(tolua_S,"clear",tolua_AllToLua_cStringMap_clear00);
-   tolua_function(tolua_S,"size",tolua_AllToLua_cStringMap_size00);
-   tolua_function(tolua_S,"get",tolua_AllToLua_cStringMap_get00);
-  tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cChatColor","cChatColor","",NULL);
   tolua_beginmodule(tolua_S,"cChatColor");
    tolua_variable(tolua_S,"Color",tolua_get_cChatColor_Color,NULL);
@@ -30321,6 +30327,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetMaxPlayers",tolua_AllToLua_cServer_GetMaxPlayers00);
    tolua_function(tolua_S,"GetNumPlayers",tolua_AllToLua_cServer_GetNumPlayers00);
    tolua_function(tolua_S,"SetMaxPlayers",tolua_AllToLua_cServer_SetMaxPlayers00);
+   tolua_function(tolua_S,"IsHardcore",tolua_AllToLua_cServer_IsHardcore00);
    tolua_function(tolua_S,"GetServerID",tolua_AllToLua_cServer_GetServerID00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWorld","cWorld","",NULL);
@@ -30919,14 +30926,15 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cTracer","cTracer","",NULL);
   #endif
   tolua_beginmodule(tolua_S,"cTracer");
+   tolua_variable(tolua_S,"BlockHitPosition",tolua_get_cTracer_BlockHitPosition,tolua_set_cTracer_BlockHitPosition);
+   tolua_variable(tolua_S,"HitNormal",tolua_get_cTracer_HitNormal,tolua_set_cTracer_HitNormal);
+   tolua_variable(tolua_S,"RealHit",tolua_get_cTracer_RealHit,tolua_set_cTracer_RealHit);
    tolua_function(tolua_S,"new",tolua_AllToLua_cTracer_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cTracer_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cTracer_new00_local);
    tolua_function(tolua_S,"delete",tolua_AllToLua_cTracer_delete00);
    tolua_function(tolua_S,"Trace",tolua_AllToLua_cTracer_Trace00);
-   tolua_variable(tolua_S,"BlockHitPosition",tolua_get_cTracer_BlockHitPosition,tolua_set_cTracer_BlockHitPosition);
-   tolua_variable(tolua_S,"HitNormal",tolua_get_cTracer_HitNormal,tolua_set_cTracer_HitNormal);
-   tolua_variable(tolua_S,"RealHit",tolua_get_cTracer_RealHit,tolua_set_cTracer_RealHit);
+   tolua_function(tolua_S,"Trace",tolua_AllToLua_cTracer_Trace01);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cGroup","cGroup","",NULL);
   tolua_beginmodule(tolua_S,"cGroup");
@@ -31100,6 +31108,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"wtBeacon",cWindow::wtBeacon);
    tolua_constant(tolua_S,"wtAnvil",cWindow::wtAnvil);
    tolua_constant(tolua_S,"wtHopper",cWindow::wtHopper);
+   tolua_constant(tolua_S,"wtAnimalChest",cWindow::wtAnimalChest);
    tolua_function(tolua_S,"GetWindowID",tolua_AllToLua_cWindow_GetWindowID00);
    tolua_function(tolua_S,"GetWindowType",tolua_AllToLua_cWindow_GetWindowType00);
    tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cWindow_GetSlot00);
