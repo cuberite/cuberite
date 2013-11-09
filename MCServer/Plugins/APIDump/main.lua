@@ -198,11 +198,13 @@ end
 function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 
+	LOG("Creating API tables...");
 	local API, Globals = CreateAPITables();
 	local Hooks = {};
 	local UndocumentedHooks = {};
 	
 	-- Sort the classes by name:
+	LOG("Sorting...");
 	table.sort(API,
 		function (c1, c2)
 			return (string.lower(c1.Name) < string.lower(c2.Name));
@@ -233,6 +235,7 @@ function DumpAPIHtml()
 	);
 	
 	-- Read in the descriptions:
+	LOG("Reading descriptions...");
 	ReadDescriptions(API);
 	ReadHooks(Hooks);
 	
@@ -243,6 +246,7 @@ function DumpAPIHtml()
 
 	-- Create a "class index" file, write each class as a link to that file,
 	-- then dump class contents into class-specific file
+	LOG("Writing HTML files...");
 	local f = io.open("API/index.html", "w");
 	if (f == nil) then
 		LOGINFO("Cannot output HTML API: " .. err);
@@ -335,6 +339,7 @@ function DumpAPIHtml()
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/lang-lua.js", "API/lang-lua.js");
 	
 	-- List the documentation problems:
+	LOG("Listing leftovers...");
 	ListUndocumentedObjects(API, UndocumentedHooks);
 	ListUnexportedObjects();
 	ListMissingPages();
