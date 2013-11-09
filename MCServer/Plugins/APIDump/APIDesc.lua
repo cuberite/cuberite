@@ -2438,14 +2438,38 @@ end
 		
 		TakeDamageInfo =
 		{
-			Desc = [[The TakeDamageInfo is a struct that contains the amount of damage, and the entity that caused the damage. It is used in the {{OnTakeDamage|OnTakeDamage}}() hook and in the {{cEntity|cEntity}}'s TakeDamage() function.
-]],
-			Functions =
+			Desc = [[
+				This class contains the amount of damage, and the entity that caused the damage. It is used in the
+				{{OnTakeDamage|HOOK_TAKE_DAMAGE}} hook and in the {{cEntity}}'s TakeDamage() function.
+			]],
+			Variables =
 			{
+				Attacker = { Type = "{{cEntity}}", Notes = "The entity who is attacking. Only valid if dtAttack." },
+				DamageType = { Type = "eDamageType", Notes = "Source of the damage. One of the dtXXX constants." },
+				FinalDamage = { Type = "number", Notes = "	The final amount of damage that will be applied to the Receiver. It is the RawDamage minus any Receiver's armor-protection " },
+				Knockback = { Type = "{{Vector3d}}", Notes = "Vector specifying the amount and direction of knockback that will be applied to the Receiver " },
+				RawDamage = { Type = "number", Notes = "Amount of damage that the attack produces on the Receiver, including the Attacker's equipped weapon, but excluding the Receiver's armor." },
 			},
-			Constants =
+			AdditionalInfo =
 			{
-			},
+				{
+					Header = "",
+					Contents = [[
+						The TDI is passed as the second parameter in the HOOK_TAKE_DAMAGE hook, and can be used to
+						modify the damage before it is applied to the receiver:
+<pre class="prettyprint lang-lua">
+function Plugin:OnTakeDamage(Receiver, TDI)
+	LOG("Damage: Raw ".. TDI.RawDamage .. ", Final:" .. TDI.FinalDamage);
+
+	-- If the attacker is a spider, make it deal 999 points of damage (insta-death spiders):
+	if ((TDI.Attacker ~= nil) and TDI.Attacker:IsA("cSpider")) then
+		TDI.FinalDamage = 999;
+	end
+end
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
 		},  -- TakeDamageInfo
 
 		tolua =
