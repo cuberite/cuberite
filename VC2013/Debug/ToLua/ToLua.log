@@ -1,0 +1,18 @@
+﻿Build started 11/8/2013 10:00:10 PM.
+     1>Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\ToLua.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"../tolua++-1.0.93/include" /I"../lua-5.1.4/src" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /Zc:wchar_t /Zc:forScope /Fo"Debug\ToLua\\" /Fd"Debug\ToLua\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt "..\tolua++-1.0.93\src\lib\tolua_is.c"
+         tolua_is.c
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug\ToLua\ToLua.lib" /NOLOGO Debug\ToLua\tolua.obj
+         Debug\ToLua\tolua_event.obj
+         Debug\ToLua\tolua_is.obj
+         Debug\ToLua\tolua_map.obj
+         Debug\ToLua\tolua_push.obj
+         Debug\ToLua\tolua_to.obj
+         ToLua.vcxproj -> C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug\ToLua\ToLua.lib
+     1>Done Building Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\ToLua.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.35

@@ -1,0 +1,42 @@
+﻿Build started 11/8/2013 9:52:57 PM.
+     1>Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\zlib.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /Zc:wchar_t /Zc:forScope /Fo"Debug\zlib\\" /Fd"Debug\zlib\vc120.pdb" /Gd /TC /wd4996 /analyze- /errorReport:prompt "..\zlib-1.2.7\adler32.c" "..\zlib-1.2.7\compress.c" "..\zlib-1.2.7\crc32.c" "..\zlib-1.2.7\deflate.c" "..\zlib-1.2.7\gzclose.c" "..\zlib-1.2.7\gzlib.c" "..\zlib-1.2.7\gzread.c" "..\zlib-1.2.7\gzwrite.c" "..\zlib-1.2.7\infback.c" "..\zlib-1.2.7\inffast.c" "..\zlib-1.2.7\inflate.c" "..\zlib-1.2.7\inftrees.c" "..\zlib-1.2.7\trees.c" "..\zlib-1.2.7\uncompr.c" "..\zlib-1.2.7\zutil.c"
+         zutil.c
+         uncompr.c
+         trees.c
+         inftrees.c
+         inflate.c
+         inffast.c
+         infback.c
+         gzwrite.c
+         gzread.c
+         gzlib.c
+         gzclose.c
+         deflate.c
+         crc32.c
+         compress.c
+         adler32.c
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug\zlib\zlib.lib" /NOLOGO Debug\zlib\adler32.obj
+         Debug\zlib\compress.obj
+         Debug\zlib\crc32.obj
+         Debug\zlib\deflate.obj
+         Debug\zlib\gzclose.obj
+         Debug\zlib\gzlib.obj
+         Debug\zlib\gzread.obj
+         Debug\zlib\gzwrite.obj
+         Debug\zlib\infback.obj
+         Debug\zlib\inffast.obj
+         Debug\zlib\inflate.obj
+         Debug\zlib\inftrees.obj
+         Debug\zlib\trees.obj
+         Debug\zlib\uncompr.obj
+         Debug\zlib\zutil.obj
+         zlib.vcxproj -> C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug\zlib\zlib.lib
+     1>Done Building Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\zlib.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.70

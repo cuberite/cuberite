@@ -1,0 +1,22 @@
+﻿Build started 11/8/2013 9:52:58 PM.
+     1>Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\expat.vcxproj" on node 7 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D COMPILED_FROM_DSP /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /Zc:wchar_t /Zc:forScope /Fo"Debug/expat\\" /Fd"Debug/expat\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt ..\expat\xmlparse.c ..\expat\xmlrole.c ..\expat\xmltok.c ..\expat\xmltok_impl.c ..\expat\xmltok_ns.c
+         xmltok_ns.c
+         xmltok_impl.c
+         xmltok.c
+         xmlrole.c
+         xmlparse.c
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug/expat\expat.lib" /NOLOGO Debug/expat\xmlparse.obj
+         Debug/expat\xmlrole.obj
+         Debug/expat\xmltok.obj
+         Debug/expat\xmltok_impl.obj
+         Debug/expat\xmltok_ns.obj
+         expat.vcxproj -> C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug/expat\expat.lib
+     1>Done Building Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\expat.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.74

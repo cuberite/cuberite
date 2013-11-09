@@ -1,0 +1,78 @@
+﻿Build started 11/8/2013 9:52:57 PM.
+     1>Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Lua.vcxproj" on node 4 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /Zc:wchar_t /Zc:forScope /Fo"Debug\Lua\\" /Fd"Debug\Lua\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt "..\lua-5.1.4\src\lapi.c" "..\lua-5.1.4\src\lauxlib.c" "..\lua-5.1.4\src\lbaselib.c" "..\lua-5.1.4\src\lcode.c" "..\lua-5.1.4\src\ldblib.c" "..\lua-5.1.4\src\ldebug.c" "..\lua-5.1.4\src\ldo.c" "..\lua-5.1.4\src\ldump.c" "..\lua-5.1.4\src\lfunc.c" "..\lua-5.1.4\src\lgc.c" "..\lua-5.1.4\src\linit.c" "..\lua-5.1.4\src\liolib.c" "..\lua-5.1.4\src\llex.c" "..\lua-5.1.4\src\lmathlib.c" "..\lua-5.1.4\src\lmem.c" "..\lua-5.1.4\src\loadlib.c" "..\lua-5.1.4\src\lobject.c" "..\lua-5.1.4\src\lopcodes.c" "..\lua-5.1.4\src\loslib.c" "..\lua-5.1.4\src\lparser.c" "..\lua-5.1.4\src\lstate.c" "..\lua-5.1.4\src\lstring.c" "..\lua-5.1.4\src\lstrlib.c" "..\lua-5.1.4\src\ltable.c" "..\lua-5.1.4\src\ltablib.c" "..\lua-5.1.4\src\ltm.c" "..\lua-5.1.4\src\lua.c" "..\lua-5.1.4\src\luac.c" "..\lua-5.1.4\src\lundump.c" "..\lua-5.1.4\src\lvm.c" "..\lua-5.1.4\src\lzio.c" "..\lua-5.1.4\src\print.c"
+         print.c
+         lzio.c
+         lvm.c
+         lundump.c
+         luac.c
+         lua.c
+         ltm.c
+         ltablib.c
+         ltable.c
+         lstrlib.c
+         lstring.c
+         lstate.c
+         lparser.c
+         loslib.c
+         lopcodes.c
+         lobject.c
+         loadlib.c
+         lmem.c
+         lmathlib.c
+         llex.c
+         Generating Code...
+         Compiling...
+         liolib.c
+         linit.c
+         lgc.c
+         lfunc.c
+         ldump.c
+         ldo.c
+         ldebug.c
+         ldblib.c
+         lcode.c
+         lbaselib.c
+         lauxlib.c
+         lapi.c
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug\Lua\Lua.lib" /NOLOGO Debug\Lua\lapi.obj
+         Debug\Lua\lauxlib.obj
+         Debug\Lua\lbaselib.obj
+         Debug\Lua\lcode.obj
+         Debug\Lua\ldblib.obj
+         Debug\Lua\ldebug.obj
+         Debug\Lua\ldo.obj
+         Debug\Lua\ldump.obj
+         Debug\Lua\lfunc.obj
+         Debug\Lua\lgc.obj
+         Debug\Lua\linit.obj
+         Debug\Lua\liolib.obj
+         Debug\Lua\llex.obj
+         Debug\Lua\lmathlib.obj
+         Debug\Lua\lmem.obj
+         Debug\Lua\loadlib.obj
+         Debug\Lua\lobject.obj
+         Debug\Lua\lopcodes.obj
+         Debug\Lua\loslib.obj
+         Debug\Lua\lparser.obj
+         Debug\Lua\lstate.obj
+         Debug\Lua\lstring.obj
+         Debug\Lua\lstrlib.obj
+         Debug\Lua\ltable.obj
+         Debug\Lua\ltablib.obj
+         Debug\Lua\ltm.obj
+         Debug\Lua\lua.obj
+         Debug\Lua\luac.obj
+         Debug\Lua\lundump.obj
+         Debug\Lua\lvm.obj
+         Debug\Lua\lzio.obj
+         Debug\Lua\print.obj
+         Lua.vcxproj -> C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Debug\Lua\Lua.lib
+     1>Done Building Project "C:\Users\mattb_000\Dropbox\Programming\MCServer\VC2013\Lua.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:03.37
