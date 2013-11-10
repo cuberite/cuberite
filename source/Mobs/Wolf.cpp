@@ -14,7 +14,8 @@ cWolf::cWolf(void) :
 	m_bIsAngry(false),
 	m_bIsTame(false),
 	m_bIsSitting(false),
-	m_bIsBegging(false)
+	m_bIsBegging(false),
+	m_bOwner(NULL)
 {
 }
 
@@ -38,7 +39,7 @@ void cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
-	if ((!m_bIsTame) && (!m_bIsAngry))
+	if ((!IsTame()) && (!IsAngry()))
 	{
 		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_BONE)
 		{
@@ -47,10 +48,11 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 
-			if (m_World->GetTickRandomNumber(10) == 5)
+			if (m_World->GetTickRandomNumber(7) == 0)
 			{
 				SetMaxHealth(20);
-				m_bIsTame = true;
+				SetIsTame(true);
+				SetOwner(&a_Player);
 				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_WOLF_TAMED);
 			}
 			else
@@ -59,15 +61,18 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			}
 		}
 	}
-	else if (m_bIsTame)
+	else if (IsTame())
 	{
-		if (m_bIsSitting)
+		if (m_bOwner != NULL && a_Player.GetUniqueID() == m_bOwner->GetUniqueID()) // Is the player the owner of the dog?
 		{
-			m_bIsSitting = false;
-		}
-		else
-		{
-			m_bIsSitting = true;
+			if (IsSitting())
+			{
+				SetIsSitting(false);
+			}
+			else
+			{
+				SetIsSitting(true);
+			}
 		}
 	}
 	
@@ -77,3 +82,70 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 
 
 
+
+void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	if (!IsAngry())
+	{
+		super::cMonster::Tick(a_Dt, a_Chunk);
+	} else {
+		super::Tick(a_Dt, a_Chunk);
+	}
+
+	if (IsSitting())
+	{
+		m_bMovingToDestination = false;
+	}
+
+	cPlayer * a_Closest_Player = FindClosestPlayer();
+	if (a_Closest_Player != NULL)
+	{
+		switch (a_Closest_Player->GetEquippedItem().m_ItemType)
+		{
+			case E_ITEM_BONE:
+			case E_ITEM_RAW_BEEF:
+			case E_ITEM_STEAK:
+			case E_ITEM_RAW_CHICKEN:
+			case E_ITEM_COOKED_CHICKEN:
+			case E_ITEM_ROTTEN_FLESH:
+			{
+				if (!IsBegging())
+				{
+					SetIsBegging(true);
+					m_World->BroadcastEntityMetadata(*this);
+				}
+				Vector3f a_NewDestination = a_Closest_Player->GetPosition();
+				a_NewDestination.y = a_NewDestination.y + 1; // Look at the head of the player, not his feet.
+				m_Destination = Vector3f(a_NewDestination);
+				m_bMovingToDestination = false;
+				break;
+			}
+			default:
+			{
+				if (IsBegging())
+				{
+					SetIsBegging(false);
+					m_World->BroadcastEntityMetadata(*this);
+				}
+			}
+		}
+	}
+
+	if (IsTame())
+	{
+		if (m_bOwner != NULL)
+		{
+			Vector3f OwnerCoords = m_bOwner->GetPosition();
+			double Distance = (OwnerCoords - GetPosition()).Length();
+			if (Distance < 3)
+			{
+				m_bMovingToDestination = false;
+			} else if((Distance > 30) && (!IsSitting())) {
+				TeleportToEntity(*m_bOwner);
+			} else {
+				m_Destination = OwnerCoords;
+			}
+		}
+	}
+	
+}
