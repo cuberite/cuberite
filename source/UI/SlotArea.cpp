@@ -50,15 +50,20 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		return;
 	}
 	
-	if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+	switch (a_ClickAction)
 	{
-		if (!a_Player.IsDraggingItem())
+		case caShiftLeftClick:
+		case caShiftRightClick:
 		{
 			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
 			return;
 		}
-		LOGD("Shift clicked, but the player is dragging an item: %s", ItemToFullString(a_Player.GetDraggingItem()).c_str());
-		return;
+		
+		case caDblClick:
+		{
+			DblClicked(a_Player, a_SlotNum);
+			return;
+		}
 	}
 	
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
@@ -182,6 +187,36 @@ void cSlotArea::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_
 
 
 
+void cSlotArea::DblClicked(cPlayer & a_Player, int a_SlotNum)
+{
+	cItem & Dragging = a_Player.GetDraggingItem();
+	if (Dragging.IsEmpty())
+	{
+		// Move the item in the dblclicked slot into hand:
+		Dragging = *GetSlot(a_SlotNum, a_Player);
+		cItem EmptyItem;
+		SetSlot(a_SlotNum, a_Player, EmptyItem);
+	}
+	if (Dragging.IsEmpty())
+	{
+		LOGD("%s DblClicked with an empty hand over empty slot, ignoring", a_Player.GetName().c_str());
+		return;
+	}
+	
+	// Add as many items from the surrounding area into hand as possible:
+	// First skip full stacks, then if there's still space, process full stacks as well:
+	if (!m_ParentWindow.CollectItemsToHand(Dragging, *this, a_Player, false))
+	{
+		m_ParentWindow.CollectItemsToHand(Dragging, *this, a_Player, true);
+	}
+	
+	m_ParentWindow.BroadcastWholeWindow();  // We need to broadcast, in case the window was a chest opened by multiple players
+}
+
+
+
+
+
 void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
 {
 	for (int i = 0; i < m_NumSlots; i++)
@@ -214,6 +249,39 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 			return;
 		}
 	}  // for i - Slots
+}
+
+
+
+
+
+bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool a_CollectFullStacks)
+{
+	int NumSlots = GetNumSlots();
+	for (int i = 0; i < NumSlots; i++)
+	{
+		const cItem & SlotItem = *GetSlot(i, a_Player);
+		if (!SlotItem.IsStackableWith(a_Dragging))
+		{
+			continue;
+		}
+		int ToMove = a_Dragging.GetMaxStackSize() - a_Dragging.m_ItemCount;
+		if (ToMove > SlotItem.m_ItemCount)
+		{
+			ToMove = SlotItem.m_ItemCount;
+		}
+		a_Dragging.m_ItemCount += ToMove;
+		cItem NewSlot(SlotItem);
+		NewSlot.m_ItemCount -= ToMove;
+		SetSlot(i, a_Player, NewSlot);
+		if (!NewSlot.IsEmpty())
+		{
+			// There are leftovers in the slot, so a_Dragging must be full
+			return true;
+		}
+	}  // for i - Slots[]
+	// a_Dragging may be full if there were exactly the number of items needed to fill it
+	return a_Dragging.IsFullStack();
 }
 
 

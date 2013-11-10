@@ -156,6 +156,12 @@ public:
 	*/
 	void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea * a_ExcludeArea, bool a_ShouldApply);
 	
+	/// Called on DblClicking to collect all stackable items from all areas into hand, starting with the specified area.
+	/// The items are accumulated in a_Dragging and removed from the SlotAreas immediately.
+	/// If a_CollectFullStacks is false, slots with full stacks in the area are skipped while collecting.
+	/// Returns true if full stack has been collected, false if there's space remaining to fill.
+	bool CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer & a_Player, bool a_CollectFullStacks);
+	
 	/// Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea
 	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum);
 	

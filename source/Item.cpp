@@ -122,6 +122,15 @@ bool cItem::IsFullStack(void) const
 
 
 
+char cItem::GetMaxStackSize(void) const
+{
+	return ItemHandler(m_ItemType)->GetMaxStackSize();
+}
+
+
+
+
+
 /// Returns the cItemHandler responsible for this item type
 cItemHandler * cItem::GetHandler(void) const
 {
