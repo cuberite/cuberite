@@ -615,11 +615,9 @@ void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 {
 	cPacketizer Pkt(*this, 0x28);  // Effect packet
 	Pkt.WriteInt(a_EffectID);
-	Pkt.WriteInt(a_SrcX);
-	// TODO: Check if this is really an int
-	// wiki.vg says it's a byte, but that wouldn't cover the entire range needed (Y location * 8 = 0..2048)
-	Pkt.WriteInt(a_SrcY);
-	Pkt.WriteInt(a_SrcZ);
+	Pkt.WriteInt(a_SrcX / 8);
+	Pkt.WriteByte(a_SrcY / 8);
+	Pkt.WriteInt(a_SrcZ / 8);
 	Pkt.WriteInt(a_Data);
 	Pkt.WriteBool(false);
 }
