@@ -132,6 +132,9 @@ public:
 	
 	/// Returns true if the item is stacked up to its maximum stacking.
 	bool IsFullStack(void) const;
+	
+	/// Returns the maximum amount of stacked items of this type.
+	char GetMaxStackSize(void) const;
 
 	// tolua_end
 	

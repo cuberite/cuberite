@@ -2020,6 +2020,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				SetMaxPlayers = { Params = "number", Notes = "Sets the max amount of players who can join." },
 				GetNumPlayers = { Return = "number", Notes = "Returns the amount of players online." },
 				GetServerID = { Return = "string", Notes = "Returns the ID of the server?" },
+				IsHardcore = { Params = "", Return = "bool", Notes = "Returns true if the server is hardcore (players get banned on death)." },
 			},
 			Constants =
 			{
