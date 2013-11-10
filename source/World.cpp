@@ -2563,15 +2563,17 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType)
 {
 	cMonster * Monster = NULL;
-	
-	int ShColor = GetTickRandomNumber(15); // 0 .. 15 - Sheep
-	bool SkType = GetDimension() == dimNether ; // Skeleton
 
 	Monster = cMonster::NewMonsterFromType(a_MonsterType);
 	if (Monster != NULL)
 	{
 		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	}
+
+	// Because it's logical that ALL mob spawns need spawn effects, not just spawners
+	// TODO: Not working - wiki.vg outdated?
+	BroadcastSoundParticleEffect(2004, (int)a_PosX, (int)a_PosY, (int)a_PosZ, 0);
+	
 	return SpawnMobFinalize(Monster);
 }
 

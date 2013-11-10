@@ -622,37 +622,41 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType, int a_Size)
+cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 {
-	cFastRandom Random;
-	
 	cMonster * toReturn = NULL;
-
-	// unspecified size get rand[1,3] for Monsters that need size
-	switch (a_MobType)
-	{
-		case mtMagmaCube:
-		case mtSlime:
-		{
-			if (a_Size == -1)
-			{
-				a_Size = Random.NextInt(2, a_MobType) + 1;
-			}
-			if ((a_Size <= 0) || (a_Size >= 4))
-			{
-				ASSERT(!"Random for size was supposed to pick in [1..3] and picked outside");
-				a_Size = 1;
-			}
-			break;
-		}
-		default: break;
-	}  // switch (a_MobType)
+	cFastRandom RandomDerps;
 
 	// Create the mob entity
 	switch (a_MobType)
 	{
-		case mtMagmaCube:     toReturn  = new cMagmaCube(a_Size);             break;
-		case mtSlime:         toReturn  = new cSlime(a_Size);                 break;
+		case mtMagmaCube:
+		case mtSlime:         toReturn = new cSlime    (RandomDerps.NextInt(2) + 1);             break; // Size parameter
+		case mtSheep:         toReturn = new cSheep    (RandomDerps.NextInt(15));                break; // Colour parameter
+		case mtSkeleton:      toReturn = new cSkeleton ((bool)(RandomDerps.NextInt(1)));         break; // TODO: Actual detection of spawning in Nether
+		case mtZombie:        toReturn = new cZombie   (false);                                  break; // TODO: Infected zombie parameter
+		case mtVillager:
+		{
+			int VilType = RandomDerps.NextInt(6);
+			if (VilType == 6) { VilType = 0; } // Give farmers a better chance of spawning
+
+			toReturn = new cVillager(cVillager::eVillagerType(VilType)); // Type (blacksmith, butcher, etc.) parameter
+			break;
+		}
+		case mtHorse:
+		{
+			// Horses take a type (species), a colour, and a style (dots, stripes, etc.)
+			int HseType = RandomDerps.NextInt(7);
+			int HseColor = RandomDerps.NextInt(6);
+			int HseStyle = RandomDerps.NextInt(6);
+			int HseTameTimes = RandomDerps.NextInt(6) + 1;
+
+			if ((HseType == 5) || (HseType == 6) || (HseType == 7)) { HseType = 0; } // Increase chances of normal horse (zero)
+
+			toReturn = new cHorse(HseType, HseColor, HseStyle, HseTameTimes);
+			break;
+		}
+
 		case mtBat:           toReturn  = new cBat();                         break;
 		case mtBlaze:         toReturn  = new cBlaze();                       break;
 		case mtCaveSpider:    toReturn  = new cCavespider();                  break;
@@ -661,26 +665,18 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType, int a_Size)
 		case mtCreeper:       toReturn  = new cCreeper();                     break;
 		case mtEnderman:      toReturn  = new cEnderman();                    break;
 		case mtGhast:         toReturn  = new cGhast();                       break;
-		// TODO: 
-		// case cMonster::mtHorse:         toReturn  = new cHorse();                       break;
 		case mtMooshroom:     toReturn  = new cMooshroom();                   break;
 		case mtOcelot:        toReturn  = new cOcelot();                      break;
 		case mtPig:           toReturn  = new cPig();                         break;
-		// TODO: Implement sheep color
-		case mtSheep:         toReturn  = new cSheep(0);                      break;
 		case mtSilverfish:    toReturn  = new cSilverfish();                  break;
-		// TODO: Implement wither skeleton geration
-		case mtSkeleton:      toReturn  = new cSkeleton(false);               break;
 		case mtSpider:        toReturn  = new cSpider();                      break;
 		case mtSquid:         toReturn  = new cSquid();                       break;
-		case mtVillager:      toReturn  = new cVillager(cVillager::vtFarmer); break;
 		case mtWitch:         toReturn  = new cWitch();                       break;
 		case mtWolf:          toReturn  = new cWolf();                        break;
-		case mtZombie:        toReturn  = new cZombie(false);                 break;
 		case mtZombiePigman:  toReturn  = new cZombiePigman();                break;
 		default:
 		{
-			ASSERT(!"Unhandled Mob type");
+			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
 		}
 	}
 	return toReturn;

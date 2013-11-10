@@ -153,12 +153,9 @@ public:
 	
 	/** Creates a new object of the specified mob.
 	a_MobType is the type of the mob to be created
-	a_Size is the size (for mobs with size)
-	if a_Size is let to -1 for entities that need size, size will be random
-	asserts and returns null if mob type is not specified
-	asserts if invalid size for mobs that need size
+	Asserts and returns null if mob type is not specified
 	*/
-	static cMonster * NewMonsterFromType(eType a_MobType, int a_Size = -1);
+	static cMonster * NewMonsterFromType(eType a_MobType);
 
 protected:
 	

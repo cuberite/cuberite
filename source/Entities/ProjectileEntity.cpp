@@ -425,6 +425,9 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
 	super::OnHitSolidBlock(a_HitPos, a_HitFace);
+
+	// Broadcast arrow hit sound
+	m_World->BroadcastSoundEffect("random.bowhit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	
 	// Broadcast the position and speed packets before teleporting:
 	BroadcastMovementUpdate();

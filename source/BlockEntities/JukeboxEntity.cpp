@@ -68,7 +68,7 @@ void cJukeboxEntity::EjectRecord( void )
 {
 	cItems Drops;
 	Drops.push_back(cItem(m_Record, 1, 0));
-	m_World->SpawnItemPickups(Drops, m_PosX, m_PosY+1, m_PosZ);
+	m_World->SpawnItemPickups(Drops, m_PosX + 0.5, m_PosY + 1, m_PosZ + 0.5, 5);
 	m_World->BroadcastSoundParticleEffect(1005, m_PosX * 8, m_PosY * 8, m_PosZ * 8, 0);
 }
 
