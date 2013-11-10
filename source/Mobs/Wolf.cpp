@@ -16,7 +16,8 @@ cWolf::cWolf(void) :
 	m_bIsTame(false),
 	m_bIsSitting(false),
 	m_bIsBegging(false),
-	m_bOwner("")
+	m_bOwner(""),
+	m_bCollar(14)
 {
 }
 
@@ -66,7 +67,15 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	{
 		if (a_Player.GetName() == m_bOwner) // Is the player the owner of the dog?
 		{
-			if (IsSitting())
+			if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE)
+			{
+				m_bCollar = 15 - a_Player.GetEquippedItem().m_ItemDamage;
+				if (!a_Player.IsGameModeCreative())
+				{
+					a_Player.GetInventory().RemoveOneEquippedItem();
+				}
+			} 
+			else if (IsSitting()) 
 			{
 				SetIsSitting(false);
 			}
@@ -144,7 +153,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		Vector3f OwnerCoords;
 	} ;
 	cCallback Callback;
-	m_World->FindAndDoWithPlayer(m_bOwner, Callback);
+	m_World->DoWithPlayer(m_bOwner, Callback);
 	Vector3f OwnerCoords = Callback.OwnerCoords;
 
 	if (IsTame())

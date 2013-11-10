@@ -28,6 +28,7 @@ public:
 	bool IsBegging(void) const     { return m_bIsBegging; }
 	bool IsAngry(void) const       { return m_bIsAngry; }
 	AString GetOwner(void) const   { return m_bOwner; }
+	int GetCollarColor(void) const { return m_bCollar; }
 
 	// Set functions
 	void SetIsSitting(bool a_IsSitting)      { m_bIsSitting = a_IsSitting; }
@@ -38,11 +39,12 @@ public:
 
 private:
 
-	bool m_bIsSitting;
-	bool m_bIsTame;
-	bool m_bIsBegging;
-	bool m_bIsAngry;
+	bool    m_bIsSitting;
+	bool    m_bIsTame;
+	bool    m_bIsBegging;
+	bool    m_bIsAngry;
 	AString m_bOwner;
+	int     m_bCollar;
 } ;
 
 

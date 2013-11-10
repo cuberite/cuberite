@@ -1752,6 +1752,8 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			WriteFloat((float)(a_Mob.GetHealth()));
 			WriteByte(0x13);
 			WriteByte(Wolf.IsBegging() ? 1 : 0);
+			WriteByte(0x14);
+			WriteByte(Wolf.GetCollarColor());
 			break;
 		}
 		
