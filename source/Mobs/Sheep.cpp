@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Sheep.h"
@@ -49,8 +50,13 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
-	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE)
+	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE) && (m_WoolColor != 15 - a_Player.GetEquippedItem().m_ItemDamage))
 	{
 		m_WoolColor = 15 - a_Player.GetEquippedItem().m_ItemDamage;
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+		m_World->BroadcastEntityMetadata(*this);
 	}
 }
