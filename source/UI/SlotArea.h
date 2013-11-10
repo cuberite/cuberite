@@ -40,8 +40,11 @@ public:
 	/// Called when a player clicks in the window. Parameters taken from the click packet.
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem);
 	
-	/// Called from Clicked if it is a valid shiftclick
+	/// Called from Clicked when the action is a shiftclick (left or right)
 	virtual void ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem);
+	
+	/// Called from Clicked when the action is a caDblClick
+	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum);
 	
 	/// Called when a new player opens the same parent window. The window already tracks the player. CS-locked.
 	virtual void OnPlayerAdded(cPlayer & a_Player) {} ;
@@ -56,6 +59,12 @@ public:
 	If a_KeepEmptySlots is true, empty slots will be skipped and won't be filled
 	*/
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots);
+	
+	/// Called on DblClicking to collect all stackable items into hand.
+	/// The items are accumulated in a_Dragging and removed from the slots immediately.
+	/// If a_CollectFullStacks is false, slots with full stacks are skipped while collecting.
+	/// Returns true if full stack has been collected in a_Dragging, false if there's space remaining to fill.
+	virtual bool CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool a_CollectFullStacks);
 	
 protected:
 	int       m_NumSlots;
