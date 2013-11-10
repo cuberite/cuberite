@@ -87,7 +87,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	if (!IsAngry())
 	{
-		super::cMonster::Tick(a_Dt, a_Chunk);
+		cMonster::Tick(a_Dt, a_Chunk);
 	} else {
 		super::Tick(a_Dt, a_Chunk);
 	}
