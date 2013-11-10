@@ -12,12 +12,12 @@
 
 cWolf::cWolf(void) :
 	super("Wolf", mtWolf, "mob.wolf.hurt", "mob.wolf.death", 0.6, 0.8),
-	m_bIsAngry(false),
-	m_bIsTame(false),
-	m_bIsSitting(false),
-	m_bIsBegging(false),
-	m_bOwner(""),
-	m_bCollar(14)
+	m_IsAngry(false),
+	m_IsTame(false),
+	m_IsSitting(false),
+	m_IsBegging(false),
+	m_Owner(""),
+	m_Collar(14)
 {
 }
 
@@ -28,9 +28,9 @@ cWolf::cWolf(void) :
 void cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	super::DoTakeDamage(a_TDI);
-	if (!m_bIsTame)
+	if (!m_IsTame)
 	{
-		m_bIsAngry = true;
+		m_IsAngry = true;
 	}
 	m_World->BroadcastEntityMetadata(*this); // Broadcast health and possibly angry face
 }
@@ -65,11 +65,11 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	}
 	else if (IsTame())
 	{
-		if (a_Player.GetName() == m_bOwner) // Is the player the owner of the dog?
+		if (a_Player.GetName() == m_Owner) // Is the player the owner of the dog?
 		{
 			if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE)
 			{
-				m_bCollar = 15 - a_Player.GetEquippedItem().m_ItemDamage;
+				m_Collar = 15 - a_Player.GetEquippedItem().m_ItemDamage;
 				if (!a_Player.IsGameModeCreative())
 				{
 					a_Player.GetInventory().RemoveOneEquippedItem();
@@ -153,12 +153,12 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		Vector3f OwnerCoords;
 	} ;
 	cCallback Callback;
-	m_World->DoWithPlayer(m_bOwner, Callback);
+	m_World->DoWithPlayer(m_Owner, Callback);
 	Vector3f OwnerCoords = Callback.OwnerCoords;
 
 	if (IsTame())
 	{
-		if (m_bOwner != "")
+		if (m_Owner != "")
 		{
 			double Distance = (OwnerCoords - GetPosition()).Length();
 			if (Distance < 3)
