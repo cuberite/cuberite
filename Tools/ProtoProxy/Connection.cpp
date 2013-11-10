@@ -2205,8 +2205,8 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
 	Log("Received a PACKET_SPAWN_NAMED_ENTITY from the server:");
 	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
-	Log("  UUID = %s", EntityUUID.c_str());
-	Log("  Name = %s", EntityName.c_str());
+	Log("  UUID = \"%s\"", EntityUUID.c_str());
+	Log("  Name = \"%s\"", EntityName.c_str());
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
 	Log("  CurrentItem = %d", CurrentItem);
