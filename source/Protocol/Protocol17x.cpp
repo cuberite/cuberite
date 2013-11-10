@@ -215,7 +215,7 @@ void cProtocol172::SendDestroyEntity(const cEntity & a_Entity)
 void cProtocol172::SendDisconnect(const AString & a_Reason)
 {
 	cPacketizer Pkt(*this, 0x40);
-	Pkt.WriteString(a_Reason);
+	Pkt.WriteString(EscapeString(a_Reason));
 }
 
 
@@ -503,7 +503,7 @@ void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
 	Pkt.WriteString(a_Player.GetName());
 	Pkt.WriteBool(a_IsOnline);
-	Pkt.WriteShort(a_Player.GetClientHandle()->GetPing());
+	Pkt.WriteShort(a_IsOnline ? a_Player.GetClientHandle()->GetPing() : 0);
 }
 
 
@@ -564,7 +564,7 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
-	Pkt.WriteInt(a_Player.GetUniqueID());
+	Pkt.WriteVarInt(a_Player.GetUniqueID());
 	Pkt.WriteString(Printf("%d", a_Player.GetUniqueID()));  // TODO: Proper UUID
 	Pkt.WriteString(a_Player.GetName());
 	Pkt.WriteFPInt(a_Player.GetPosX());
