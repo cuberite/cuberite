@@ -17,7 +17,7 @@ cWolf::cWolf(void) :
 	m_IsSitting(false),
 	m_IsBegging(false),
 	m_Owner(""),
-	m_Collar(14)
+	m_CollarColor(14)
 {
 }
 
@@ -41,7 +41,7 @@ void cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
-	if ((!IsTame()) && (!IsAngry()))
+	if (!IsTame() && !IsAngry())
 	{
 		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_BONE)
 		{
@@ -69,7 +69,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 		{
 			if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE)
 			{
-				m_Collar = 15 - a_Player.GetEquippedItem().m_ItemDamage;
+				m_CollarColor = 15 - a_Player.GetEquippedItem().m_ItemDamage;
 				if (!a_Player.IsGameModeCreative())
 				{
 					a_Player.GetInventory().RemoveOneEquippedItem();
@@ -98,7 +98,9 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 	if (!IsAngry())
 	{
 		cMonster::Tick(a_Dt, a_Chunk);
-	} else {
+	}
+	else
+	{
 		super::Tick(a_Dt, a_Chunk);
 	}
 
@@ -151,8 +153,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	public:
 		Vector3f OwnerCoords;
-	} ;
-	cCallback Callback;
+	} Callback;
 	m_World->DoWithPlayer(m_Owner, Callback);
 	Vector3f OwnerCoords = Callback.OwnerCoords;
 
@@ -164,11 +165,19 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 			if (Distance < 3)
 			{
 				m_bMovingToDestination = false;
-			} else if((Distance > 30) && (!IsSitting())) {
+			}
+			else if ((Distance > 30) && (!IsSitting()))
+			{
 				TeleportToCoords(OwnerCoords.x, OwnerCoords.y, OwnerCoords.z);
-			} else {
+			}
+			else
+			{
 				m_Destination = OwnerCoords;
 			}
 		}
 	}
 }
+
+
+
+
