@@ -96,7 +96,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 		case E_META_DROPSPENSER_FACING_ZM: SmokeDir = 1; break;
 		case E_META_DROPSPENSER_FACING_ZP: SmokeDir = 7; break;
 	}
-	m_World->BroadcastSoundParticleEffect(2000, m_PosX * 8, m_PosY * 8, m_PosZ * 8, SmokeDir);
+	m_World->BroadcastSoundParticleEffect(2000, m_PosX, m_PosY, m_PosZ, SmokeDir);
 	m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.0f);
 	
 	// Update the UI window, if open:

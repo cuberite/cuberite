@@ -1512,7 +1512,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
 		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
-		float SpeedY = 1;
+		float SpeedY = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 		
 		cPickup * Pickup = new cPickup(
@@ -2571,7 +2571,6 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	}
 
 	// Because it's logical that ALL mob spawns need spawn effects, not just spawners
-	// TODO: Not working - wiki.vg outdated?
 	BroadcastSoundParticleEffect(2004, (int)a_PosX, (int)a_PosY, (int)a_PosZ, 0);
 	
 	return SpawnMobFinalize(Monster);

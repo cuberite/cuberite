@@ -729,7 +729,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	
 	if (a_OldBlock == E_BLOCK_AIR)
 	{
-		LOGD("Digged air? wtf?");
+		LOGD("Dug air - what the function?");
 		return;
 	}
 	
@@ -738,7 +738,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	// The ItemHandler is also responsible for spawning the pickups
 	
 	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-	World->BroadcastSoundParticleEffect(2001, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, a_OldBlock, this);
+	World->BroadcastSoundParticleEffect(2001, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);

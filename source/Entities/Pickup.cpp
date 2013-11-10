@@ -31,8 +31,9 @@ cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_It
 	, m_bCollected( false )
 	, m_bIsPlayerCreated( IsPlayerCreated )
 {
-	m_MaxHealth = 5;
-	m_Health = 5;
+	SetGravity(-10.5f);
+	SetMaxHealth(5);
+	SetHealth(5);
 	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 

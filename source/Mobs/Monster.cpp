@@ -633,8 +633,13 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtMagmaCube:
 		case mtSlime:         toReturn = new cSlime    (RandomDerps.NextInt(2) + 1);             break; // Size parameter
 		case mtSheep:         toReturn = new cSheep    (RandomDerps.NextInt(15));                break; // Colour parameter
-		case mtSkeleton:      toReturn = new cSkeleton ((bool)(RandomDerps.NextInt(1)));         break; // TODO: Actual detection of spawning in Nether
 		case mtZombie:        toReturn = new cZombie   (false);                                  break; // TODO: Infected zombie parameter
+		case mtSkeleton:
+		{
+			// TODO: Actual detection of spawning in Nether
+			toReturn = new cSkeleton(RandomDerps.NextInt(1) == 0 ? false : true);
+			break;
+		}
 		case mtVillager:
 		{
 			int VilType = RandomDerps.NextInt(6);

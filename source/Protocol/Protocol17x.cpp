@@ -491,7 +491,7 @@ void cProtocol172::SendPlayerAbilities(void)
 void cProtocol172::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
 {
 	cPacketizer Pkt(*this, 0x0b);  // Animation packet
-	Pkt.WriteInt(a_Player.GetUniqueID());
+	Pkt.WriteVarInt(a_Player.GetUniqueID());
 	Pkt.WriteChar(a_Animation);
 }
 
@@ -616,8 +616,8 @@ void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 {
 	cPacketizer Pkt(*this, 0x28);  // Effect packet
 	Pkt.WriteInt(a_EffectID);
-	Pkt.WriteByte(a_SrcX);
-	Pkt.WriteInt(a_SrcY);
+	Pkt.WriteInt(a_SrcX);
+	Pkt.WriteByte(a_SrcY);
 	Pkt.WriteInt(a_SrcZ);
 	Pkt.WriteInt(a_Data);
 	Pkt.WriteBool(false);
