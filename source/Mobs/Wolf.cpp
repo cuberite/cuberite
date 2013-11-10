@@ -4,6 +4,7 @@
 #include "Wolf.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "../Root.h"
 
 
 
@@ -15,7 +16,7 @@ cWolf::cWolf(void) :
 	m_bIsTame(false),
 	m_bIsSitting(false),
 	m_bIsBegging(false),
-	m_bOwner(NULL)
+	m_bOwner("")
 {
 }
 
@@ -52,7 +53,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			{
 				SetMaxHealth(20);
 				SetIsTame(true);
-				SetOwner(&a_Player);
+				SetOwner(a_Player.GetName());
 				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_WOLF_TAMED);
 			}
 			else
@@ -63,7 +64,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	}
 	else if (IsTame())
 	{
-		if (m_bOwner != NULL && a_Player.GetUniqueID() == m_bOwner->GetUniqueID()) // Is the player the owner of the dog?
+		if (a_Player.GetName() == m_bOwner) // Is the player the owner of the dog?
 		{
 			if (IsSitting())
 			{
@@ -130,22 +131,35 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 			}
 		}
 	}
+	
+	class cCallback :
+		public cPlayerListCallback
+	{
+		virtual bool Item(cPlayer * Player) override
+		{
+			OwnerCoords = Player->GetPosition();
+			return false;
+		}
+	public:
+		Vector3f OwnerCoords;
+	} ;
+	cCallback Callback;
+	m_World->FindAndDoWithPlayer(m_bOwner, Callback);
+	Vector3f OwnerCoords = Callback.OwnerCoords;
 
 	if (IsTame())
 	{
-		if (m_bOwner != NULL)
+		if (m_bOwner != "")
 		{
-			Vector3f OwnerCoords = m_bOwner->GetPosition();
 			double Distance = (OwnerCoords - GetPosition()).Length();
 			if (Distance < 3)
 			{
 				m_bMovingToDestination = false;
 			} else if((Distance > 30) && (!IsSitting())) {
-				TeleportToEntity(*m_bOwner);
+				TeleportToCoords(OwnerCoords.x, OwnerCoords.y, OwnerCoords.z);
 			} else {
 				m_Destination = OwnerCoords;
 			}
 		}
 	}
-	
 }
