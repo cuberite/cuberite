@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/09/13 19:50:08.
+** Generated automatically by tolua++-1.0.92 on 11/10/13 18:40:47.
 */
 
 #ifndef __cplusplus
@@ -15845,6 +15845,38 @@ static int tolua_AllToLua_cItem_IsFullStack00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetMaxStackSize of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_GetMaxStackSize00
+static int tolua_AllToLua_cItem_GetMaxStackSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cItem* self = (const cItem*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxStackSize'", NULL);
+#endif
+  {
+   char tolua_ret = (char)  self->GetMaxStackSize();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMaxStackSize'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: m_ItemType of class  cItem */
 #ifndef TOLUA_DISABLE_tolua_get_cItem_m_ItemType
 static int tolua_get_cItem_m_ItemType(lua_State* tolua_S)
@@ -30521,6 +30553,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsDamageable",tolua_AllToLua_cItem_IsDamageable00);
    tolua_function(tolua_S,"IsStackableWith",tolua_AllToLua_cItem_IsStackableWith00);
    tolua_function(tolua_S,"IsFullStack",tolua_AllToLua_cItem_IsFullStack00);
+   tolua_function(tolua_S,"GetMaxStackSize",tolua_AllToLua_cItem_GetMaxStackSize00);
    tolua_variable(tolua_S,"m_ItemType",tolua_get_cItem_m_ItemType,tolua_set_cItem_m_ItemType);
    tolua_variable(tolua_S,"m_ItemCount",tolua_get_cItem_m_ItemCount,tolua_set_cItem_m_ItemCount);
    tolua_variable(tolua_S,"m_ItemDamage",tolua_get_cItem_m_ItemDamage,tolua_set_cItem_m_ItemDamage);
