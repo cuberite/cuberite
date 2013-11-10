@@ -50,164 +50,167 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_BLACK)
-	{
-		m_WoolColor = 15;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE
+	)
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_BLACK)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 15;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_RED)
-	{
-		m_WoolColor = 14;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_RED)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 14;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_GREEN)
-	{
-		m_WoolColor = 13;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_GREEN)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 13;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_BROWN)
-	{
-		m_WoolColor = 12;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_BROWN)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 12;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_BLUE)
-	{
-		m_WoolColor = 11;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_BLUE)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 11;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_PURPLE)
-	{
-		m_WoolColor = 10;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_PURPLE)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 10;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_CYAN)
-	{
-		m_WoolColor = 9;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_CYAN)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 9;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_LIGHTGRAY)
-	{
-		m_WoolColor = 8;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_LIGHTGRAY)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 8;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_GRAY)
-	{
-		m_WoolColor = 7;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_GRAY)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 7;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_PINK)
-	{
-		m_WoolColor = 6;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_PINK)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 6;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_LIGHTGREEN)
-	{
-		m_WoolColor = 5;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_LIGHTGREEN)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 5;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_YELLOW)
-	{
-		m_WoolColor = 4;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_YELLOW)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 4;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_LIGHTBLUE)
-	{
-		m_WoolColor = 3;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_LIGHTBLUE)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 3;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_MAGENTA)
-	{
-		m_WoolColor = 2;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_MAGENTA)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 2;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_ORANGE)
-	{
-		m_WoolColor = 1;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_ORANGE)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 1;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
-	}
-	if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_WHITE)
-	{
-		m_WoolColor = 0;
-		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
+		if (a_Player.GetEquippedItem().m_ItemDamage == E_META_DYE_WHITE)
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
+			m_WoolColor = 0;
+			m_World->BroadcastEntityMetadata(*this);
+	
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
 	}
 }
