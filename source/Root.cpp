@@ -547,9 +547,9 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 			}
 			if (Rating == NameLength) // Perfect match
 			{
-				return false;
+				return true;
 			}
-			return true;
+			return false;
 		}
 
 	public:
