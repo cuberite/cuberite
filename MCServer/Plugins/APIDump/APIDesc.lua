@@ -2011,8 +2011,13 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 
 		cServer =
 		{
-			Desc = [[cServer is typically only used by plugins to broadcast a chat message(Now replaced by the {{cRoot|cRoot}} BroadcastChat function) to all players in the server. Natively however, cServer accepts connections from clients and adds those clients to the game.
-]],
+			Desc = [[
+				This class manages all the client connections internally. In the API layer, it allows to get and set
+				the general properties of the server, such as the description and max players.</p>
+				<p>
+				It used to support broadcasting chat messages to all players, this functionality has been moved to
+				{{cRoot}}:BroadcastChat().
+				]],
 			Functions =
 			{
 				GetDescription = { Return = "string", Notes = "Returns the server description set in the settings.ini." },
@@ -2030,9 +2035,9 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 		cSignEntity =
 		{
 			Desc = [[
-A sign entity represents a sign in the world.
-Sign entities are saved and loaded from disk when the chunk they reside in is saved or loaded
-]],
+				A sign entity represents a sign in the world. This class is only used when generating chunks, so
+				that the plugins may generate signs within new chunks.
+			]],
 			Functions =
 			{
 			},
@@ -2152,6 +2157,7 @@ Sign entities are saved and loaded from disk when the chunk they reside in is sa
 				wtBeacon = { Notes = "A beacon window" },
 				wtAnvil = { Notes = "An anvil window" },
 				wtHopper = { Notes = "A {{cHopperEntity|hopper}} window" },
+				wtAnimalChest = { Notes = "A horse or donkey window" },
 			},
 		},  -- cWindow
 
@@ -2518,14 +2524,43 @@ end
 
 		Vector3d =
 		{
-			Desc = [[A Vector3d object uses double precision floating point values to describe a point in space. Vector3d is part of the {{vector3|vector3}} family.
-]],
+			Desc = [[
+				A Vector3d object uses double precision floating point values to describe a point in 3D space.
+			]],
 			Functions =
 			{
-				operator_plus = {Params = "{{Vector3d}}", Return = "{{Vector3d}}", Notes = "Returns the sum of this vector with the specified vector" },
+				constructor =
+				{
+					{ Params = "{{Vector3f}}", Return = "Vector3d", Notes = "Creates a new Vector3d object by copying the coords from the given Vector3f." },
+					{ Params = "", Return = "Vector3d", Notes = "Creates a new Vector3d object with all its coords set to 0." },
+					{ Params = "X, Y, Z", Return = "Vector3d", Notes = "Creates a new Vector3d object with its coords set to the specified values." },
+				},
+				operator_div = { Params = "number", Return = "Vector3d", Notes = "Returns a new Vector3d with each coord divided by the specified number." },
+				operator_mul = { Params = "number", Return = "Vector3d", Notes = "Returns a new Vector3d with each coord multiplied." },
+				operator_sub = { Params = "Vector3d", Return = "Vector3d", Notes = "Returns a new Vector3d containing the difference between this object and the specified vector." },
+				operator_plus = {Params = "Vector3d", Return = "Vector3d", Notes = "Returns a new Vector3d containing the sum of this vector and the specified vector" },
+				Cross = { Params = "Vector3d", Return = "Vector3d", Notes = "Returns a new Vector3d that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector." },
+				Dot = { Params = "Vector3d", Return = "number", Notes = "Returns the dot product of this vector and the specified vector." },
+				Equals = { Params = "Vector3d", Return = "bool", Notes = "Returns true if this vector is exactly equal to the specified vector." },
+				Length = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of the vector." },
+				LineCoeffToXYPlane = { Params = "Vector3d, Z", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified Z coord. The result satisfies the following equation: (this + Result * (Param - this)).z = Z. Returns the NO_INTERSECTION constant if there's no intersection." },
+				LineCoeffToXZPlane = { Params = "Vector3d, Y", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified Y coord. The result satisfies the following equation: (this + Result * (Param - this)).y = Y. Returns the NO_INTERSECTION constant if there's no intersection." },
+				LineCoeffToYZPlane = { Params = "Vector3d, X", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified X coord. The result satisfies the following equation: (this + Result * (Param - this)).x = X. Returns the NO_INTERSECTION constant if there's no intersection." },
+				Normalize = { Params = "", Return = "", Notes = "Changes this vector so that it keeps current direction but is exactly 1 unit long. FIXME: Fails for a zero vector." },
+				NormalizeCopy = { Params = "", Return = "Vector3d", Notes = "Returns a new vector that has the same directino as this but is exactly 1 unit long. FIXME: Fails for a zero vector." },
+				Set = { Params = "X, Y, Z", Return = "", Notes = "Sets all the coords in this object." },
+				SqrLength = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector, squared. This operation is slightly less computationally expensive than Length(), while it conserves some properties of Length(), such as comparison. " },
 			},
 			Constants =
 			{
+				EPS = { Notes = "The max difference between two coords for which the coords are assumed equal (in LineCoeffToXYPlane() et al)." },
+				NO_INTERSECTION = { Notes = "Special return value for the LineCoeffToXYPlane() et al meaning that there's no intersectino with the plane." },
+			},
+			Variables =
+			{
+				x = { Type = "number", Notes = "The X coord of the vector." },
+				y = { Type = "number", Notes = "The Y coord of the vector." },
+				z = { Type = "number", Notes = "The Z coord of the vector." },
 			},
 		},  -- Vector3d
 
