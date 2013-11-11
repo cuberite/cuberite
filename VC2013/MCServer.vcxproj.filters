@@ -1,0 +1,1683 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Mobs">
+      <UniqueIdentifier>{74c155c0-0f2d-4d4d-bf75-cc60408854f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entities">
+      <UniqueIdentifier>{0e9000fa-a1b6-4899-b0fb-66d8daa8c0e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{a9d61705-26a1-4f89-ab9c-d73286417d25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simulator">
+      <UniqueIdentifier>{6f57d9e4-3758-4a17-a3a4-fd8ee5f9e398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OSSupport">
+      <UniqueIdentifier>{b58a4bc8-5be3-438d-8c21-bc56db2e66d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OSSupport\Android Specific">
+      <UniqueIdentifier>{6f4125b6-47ff-4de0-8294-839dab538b65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Bindings">
+      <UniqueIdentifier>{6fe6ae96-c1aa-4968-b4ef-9d6f8c3f2888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\External">
+      <UniqueIdentifier>{30704df7-b1ff-4bfc-aedf-afe4afcada3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WorldStorage">
+      <UniqueIdentifier>{0a54250c-fdb6-4b65-9102-20cd793a9b78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Generating">
+      <UniqueIdentifier>{bea06b59-4fed-4e7f-ac87-2e9c0a1b6d27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blocks">
+      <UniqueIdentifier>{a5a43ccd-e85d-4723-9c8a-3f83c730f597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Items">
+      <UniqueIdentifier>{b5f65bf0-470c-4c3c-9777-a7f3b79b8166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Protocol">
+      <UniqueIdentifier>{95e9878e-81c3-4b84-aa1c-d464d2a95883}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SQLite">
+      <UniqueIdentifier>{a67840b7-95ac-447f-9f23-d779aeaf5f49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LuaExpat">
+      <UniqueIdentifier>{bee4489c-556e-4eff-876e-b46b16eb33dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BlockEntities">
+      <UniqueIdentifier>{28f497b8-c75d-44e6-8e0c-8617cb56eb37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HTTPServer">
+      <UniqueIdentifier>{a9725758-b517-4602-a8e1-ffb950215db8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Config files">
+      <UniqueIdentifier>{ab501743-5b5d-449e-8ed7-bc823368a58c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins">
+      <UniqueIdentifier>{baf72963-ce16-452e-80b2-a653fe04b25a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Core">
+      <UniqueIdentifier>{05040adb-d357-4712-b326-d8cad05f6e40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\ChatLog">
+      <UniqueIdentifier>{f2962218-2274-4d13-bd40-ff09c634ae1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Debuggers">
+      <UniqueIdentifier>{ad918b66-c94a-4c54-ad79-6733424e8083}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\APIDump">
+      <UniqueIdentifier>{7f151cf3-a835-4e77-9c43-0a3d4bd02714}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MCServer.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource_MCServer.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Authenticator.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockArea.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockID.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockTracer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BoundingBox.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ByteBuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ChatColor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Chunk.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Chunk.inl.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ChunkDef.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ChunkMap.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ChunkSender.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ClientHandle.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CommandOutput.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CraftingRecipes.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Cuboid.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\DeadlockDetect.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Defines.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Enchantments.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Endianness.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\FastRandom.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\FurnaceRecipe.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Globals.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Group.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\GroupManager.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Inventory.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Item.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ItemGrid.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Ladder.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LeakFinder.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LightingThread.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LinearInterpolation.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LinearUpscale.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LineBlockTracer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Log.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Matrix4f.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\MCLogger.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\MemoryLeak.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\MersenneTwister.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\MobCensus.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\MobFamilyCollecter.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\MobProximityCounter.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\MobSpawner.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\MonsterConfig.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Noise.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Piston.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ProbabDistrib.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\RCONServer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ReferenceManager.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Root.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Server.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Sign.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\StackWalker.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\StringCompression.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\StringUtils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Tracer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Vector3d.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Vector3f.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Vector3i.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WebAdmin.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\World.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\AggressiveMonster.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Bat.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Blaze.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Cavespider.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Chicken.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Cow.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Creeper.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\EnderDragon.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Enderman.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Ghast.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Giant.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Horse.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\IronGolem.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\MagmaCube.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Monster.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Mooshroom.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Ocelot.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\PassiveAggressiveMonster.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\PassiveMonster.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Pig.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Sheep.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Silverfish.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Skeleton.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Slime.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\SnowGolem.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Spider.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Squid.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Villager.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Witch.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Wither.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Wolf.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\Zombie.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Mobs\ZombiePigman.h">
+      <Filter>Source Files\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\Boat.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\Entity.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\FallingBlock.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\Minecart.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\Pawn.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\Pickup.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\Player.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\ProjectileEntity.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Entities\TNTEntity.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\UI\SlotArea.h">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\UI\Window.h">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\UI\WindowOwner.h">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\DelayedFluidSimulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\FireSimulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\FloodyFluidSimulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\FluidSimulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\NoopFluidSimulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\RedstoneSimulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\SandSimulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\Simulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\SimulatorManager.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Simulator\VaporizeFluidSimulator.h">
+      <Filter>Source Files\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\BlockingTCPLink.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\CriticalSection.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\Event.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\File.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\GZipFile.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\IsThread.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\ListenThread.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\Semaphore.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\Sleep.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\Socket.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\SocketThreads.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\Thread.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\OSSupport\Timer.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Bindings.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LuaFunctions.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LuaState.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LuaWindow.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ManualBindings.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Plugin.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\PluginLua.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\PluginManager.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\tolua++.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\tolua_base.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WebPlugin.h">
+      <Filter>Source Files\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\iniFile\iniFile.h">
+      <Filter>Source Files\External</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\md5\md5.h">
+      <Filter>Source Files\External</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WorldStorage\FastNBT.h">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WorldStorage\NBTChunkSerializer.h">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WorldStorage\WorldStorage.h">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WorldStorage\WSSAnvil.h">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WorldStorage\WSSCompact.h">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\BioGen.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\Caves.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\ChunkDesc.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\ChunkGenerator.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\CompoGen.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\ComposableGenerator.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\DistortedHeightmap.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\EndGen.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\FinishGen.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\HeiGen.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\MineShafts.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\Noise3DGenerator.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\Ravines.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\StructGen.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Generating\Trees.h">
+      <Filter>Source Files\Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockBed.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockBrewingStand.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockButton.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockCactus.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockCarpet.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockCauldron.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockChest.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockCloth.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockCobWeb.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockComparator.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockCrops.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockDeadBush.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockDirt.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockDoor.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockDropSpenser.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockEnderchest.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockEntity.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockFarmland.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockFenceGate.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockFire.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockFlower.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockFlowerPot.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockFluid.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockFurnace.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockGlass.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockGlowstone.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockGravel.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockHandler.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockHopper.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockIce.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockLadder.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockLeaves.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockLever.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockMelon.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockMushroom.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockMycelium.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockNote.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockOre.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockPiston.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockPlanks.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockPortal.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockPumpkin.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Blocks\BlockRail.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockRedstone.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockRedstoneOre.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockRedstoneRepeater.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockRedstoneTorch.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSand.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSapling.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSign.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSlab.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSnow.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockStairs.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockStems.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockStone.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSugarcane.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockTallGrass.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockTorch.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockVine.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockWood.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockWorkbench.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemBed.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemBoat.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemBow.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemBrewingStand.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemBucket.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemCauldron.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemCloth.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemComparator.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemDoor.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemDye.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemFlowerPot.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemFood.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemHandler.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemHoe.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemLeaves.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemLighter.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemMinecart.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemPickaxe.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemRedstoneDust.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemRedstoneRepeater.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSapling.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSeeds.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemShears.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemShovel.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSign.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemSpawnEgg.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSugarcane.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSword.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Items\ItemThrowable.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\ChunkDataSerializer.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\Protocol.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\Protocol125.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\Protocol132.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\Protocol14x.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\Protocol15x.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\Protocol16x.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\Protocol17x.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol\ProtocolRecognizer.h">
+      <Filter>Source Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sqlite\sqlite3.h">
+      <Filter>Source Files\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LuaExpat\lxplib.h">
+      <Filter>Source Files\LuaExpat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\BlockEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\BlockEntityWithItems.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\ChestEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\DispenserEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\DropperEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\DropSpenserEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\FurnaceEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\HopperEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\JukeboxEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\NoteEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BlockEntities\SignEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\HTTPServer\EnvelopeParser.h">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\HTTPServer\HTTPConnection.h">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\HTTPServer\HTTPFormParser.h">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\HTTPServer\HTTPMessage.h">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\HTTPServer\HTTPServer.h">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\HTTPServer\MultipartParser.h">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\HTTPServer\NameValueParser.h">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\webadmin\template.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\MCServer\groups.ini">
+      <Filter>Config files</Filter>
+    </None>
+    <None Include="..\MCServer\items.ini">
+      <Filter>Config files</Filter>
+    </None>
+    <None Include="..\MCServer\monsters.ini">
+      <Filter>Config files</Filter>
+    </None>
+    <None Include="..\MCServer\settings.ini">
+      <Filter>Config files</Filter>
+    </None>
+    <None Include="..\MCServer\terrain.ini">
+      <Filter>Config files</Filter>
+    </None>
+    <None Include="..\MCServer\users.ini">
+      <Filter>Config files</Filter>
+    </None>
+    <None Include="..\MCServer\webadmin.ini">
+      <Filter>Config files</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\back.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\ban-unban.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\clear.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\console.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\do.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\functions.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\give.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\gm.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\help.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\item.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\itemrepair.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\kick.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\kill.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\locate.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\main.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\me.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\motd.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\onbreakplaceblock.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\ondeath.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\onjoinleave.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\onlogin.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\plugins.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\portal-worlds.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\rank-groups.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\regen.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\save-reload-stop.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\spawn.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\teleport.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\tell.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\time.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\top.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\viewdistance.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\weather.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\web_chat.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\web_manageplugins.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\web_manageserver.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\web_permissions.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\web_playerlist.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\web_serversettings.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\web_whitelist.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Core\worldlimiter.lua">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\ChatLog\plugin.lua">
+      <Filter>Plugins\ChatLog</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\Debuggers\Debuggers.lua">
+      <Filter>Plugins\Debuggers</Filter>
+    </None>
+    <None Include="..\MCServer\Plugins\APIDump\main.lua">
+      <Filter>Plugins\APIDump</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\Authenticator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BoundingBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ByteBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ChatColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Chunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ChunkMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ChunkSender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ClientHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CommandOutput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CraftingRecipes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Cuboid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\DeadlockDetect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Enchantments.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\FastRandom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\FurnaceRecipe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Group.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\GroupManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Inventory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Item.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ItemGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\LeakFinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\LightingThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\LinearInterpolation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\LineBlockTracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Matrix4f.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\MCLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\MobCensus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\MobFamilyCollecter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\MobProximityCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\MobSpawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\MonsterConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Noise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Piston.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ProbabDistrib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\RCONServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ReferenceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Root.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\StackWalker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\StringCompression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\StringUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Tracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Vector3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Vector3f.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Vector3i.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WebAdmin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\World.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\AggressiveMonster.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Bat.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Blaze.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Cavespider.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Chicken.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Cow.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Creeper.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\EnderDragon.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Enderman.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Ghast.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Giant.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Horse.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\IronGolem.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\MagmaCube.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Monster.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Mooshroom.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\PassiveAggressiveMonster.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\PassiveMonster.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Pig.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Sheep.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Skeleton.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Slime.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\SnowGolem.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Spider.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Squid.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Villager.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Witch.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Wither.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Wolf.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\Zombie.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mobs\ZombiePigman.cpp">
+      <Filter>Source Files\Mobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\Boat.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\Entity.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\FallingBlock.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\Minecart.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\Pawn.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\Pickup.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\Player.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\ProjectileEntity.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Entities\TNTEntity.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\UI\SlotArea.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\UI\Window.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\DelayedFluidSimulator.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\FireSimulator.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\FloodyFluidSimulator.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\FluidSimulator.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\RedstoneSimulator.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\SandSimulator.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\Simulator.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\SimulatorManager.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Simulator\VaporizeFluidSimulator.cpp">
+      <Filter>Source Files\Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\BlockingTCPLink.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\CriticalSection.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\Event.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\File.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\GZipFile.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\IsThread.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\ListenThread.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\Semaphore.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\Sleep.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\Socket.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\SocketThreads.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\Thread.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\OSSupport\Timer.cpp">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Android\jni\app-android.cpp">
+      <Filter>Source Files\OSSupport\Android Specific</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Android\jni\ToJava.cpp">
+      <Filter>Source Files\OSSupport\Android Specific</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Bindings.cpp">
+      <Filter>Source Files\Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\LuaState.cpp">
+      <Filter>Source Files\Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\LuaWindow.cpp">
+      <Filter>Source Files\Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ManualBindings.cpp">
+      <Filter>Source Files\Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Plugin.cpp">
+      <Filter>Source Files\Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\PluginLua.cpp">
+      <Filter>Source Files\Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\PluginManager.cpp">
+      <Filter>Source Files\Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WebPlugin.cpp">
+      <Filter>Source Files\Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\iniFile\iniFile.cpp">
+      <Filter>Source Files\External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\md5\md5.cpp">
+      <Filter>Source Files\External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WorldStorage\FastNBT.cpp">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WorldStorage\NBTChunkSerializer.cpp">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WorldStorage\WorldStorage.cpp">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WorldStorage\WSSAnvil.cpp">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WorldStorage\WSSCompact.cpp">
+      <Filter>Source Files\WorldStorage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\BioGen.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\Caves.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\ChunkDesc.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\ChunkGenerator.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\CompoGen.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\ComposableGenerator.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\DistortedHeightmap.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\EndGen.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\FinishGen.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\HeiGen.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\MineShafts.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\Noise3DGenerator.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\Ravines.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\StructGen.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Generating\Trees.cpp">
+      <Filter>Source Files\Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Blocks\BlockBed.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Blocks\BlockButton.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Blocks\BlockComparator.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockDoor.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockHandler.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Blocks\BlockLever.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockPiston.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockRedstone.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockRedstoneRepeater.cpp">
+      <Filter>Source Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\items\ItemHandler.cpp">
+      <Filter>Source Files\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Protocol\ChunkDataSerializer.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Protocol\Protocol125.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Protocol\Protocol132.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Protocol\Protocol14x.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Protocol\Protocol15x.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Protocol\Protocol16x.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Protocol\Protocol17x.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Protocol\ProtocolRecognizer.cpp">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sqlite\lsqlite3.c">
+      <Filter>Source Files\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sqlite\sqlite3.c">
+      <Filter>Source Files\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\LuaExpat\lxplib.c">
+      <Filter>Source Files\LuaExpat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\ChestEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\DispenserEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\DropperEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\DropSpenserEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\FurnaceEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\HopperEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\JukeboxEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\NoteEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\SignEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\HTTPServer\EnvelopeParser.cpp">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\HTTPServer\HTTPConnection.cpp">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\HTTPServer\HTTPFormParser.cpp">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\HTTPServer\HTTPMessage.cpp">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\HTTPServer\HTTPServer.cpp">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\HTTPServer\MultipartParser.cpp">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\HTTPServer\NameValueParser.cpp">
+      <Filter>Source Files\HTTPServer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\MCServer\API.txt">
+      <Filter>Source Files\Bindings</Filter>
+    </Text>
+    <Text Include="..\source\sqlite\urls.txt">
+      <Filter>Source Files\SQLite</Filter>
+    </Text>
+    <Text Include="..\MCServer\crafting.txt">
+      <Filter>Config files</Filter>
+    </Text>
+    <Text Include="..\MCServer\furnace.txt">
+      <Filter>Config files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\Android\jni\Android.mk">
+      <Filter>Source Files\OSSupport\Android Specific</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\Android\jni\Application.mk">
+      <Filter>Source Files\OSSupport\Android Specific</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\Android\jni\ToJava.h">
+      <Filter>Source Files\OSSupport\Android Specific</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\source\AllToLua.pkg">
+      <Filter>Source Files\Bindings</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

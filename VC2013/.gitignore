@@ -1,7 +1,9 @@
-Debug/
-Debug profiled/
-Release/
-Release profiled/
+Debug/**
+Debug profiled/**
+Release/**
+Release profiled/**
+ipch/**
 *.user
 *.ncb
 *.suo
+*.obj

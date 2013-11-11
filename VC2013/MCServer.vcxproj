@@ -1,0 +1,895 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug profiled|Win32">
+      <Configuration>Debug profiled</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release profiled|Win32">
+      <Configuration>Release profiled</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{32012054-0C96-4C43-AB27-174FF8E72D66}</ProjectGuid>
+    <RootNamespace>MCServer</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\MCServer\</OutDir>
+    <IntDir>Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>Release\</OutDir>
+    <IntDir>Release\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+    <OutDir>$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+    <OutDir>$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP /FS %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../zlib-1.2.7;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include;..;../expat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)\..\MCServer\$(ProjectName).exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../zlib-1.2.7;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include;..;../expat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)\..\MCServer\$(ProjectName).exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../zlib-1.2.7;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include;..;../expat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)\..\MCServer\$(ProjectName)_profiled.exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <TargetMachine>MachineX86</TargetMachine>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../zlib-1.2.7;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include;..;../expat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)\..\MCServer\$(ProjectName)_dbgprof.exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Image Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MCServer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource_MCServer.h" />
+    <ClInclude Include="..\source\Authenticator.h" />
+    <ClInclude Include="..\source\BlockArea.h" />
+    <ClInclude Include="..\source\BlockID.h" />
+    <ClInclude Include="..\source\BlockTracer.h" />
+    <ClInclude Include="..\source\BoundingBox.h" />
+    <ClInclude Include="..\source\ByteBuffer.h" />
+    <ClInclude Include="..\source\ChatColor.h" />
+    <ClInclude Include="..\source\Chunk.h" />
+    <ClInclude Include="..\source\Chunk.inl.h" />
+    <ClInclude Include="..\source\ChunkDef.h" />
+    <ClInclude Include="..\source\ChunkMap.h" />
+    <ClInclude Include="..\source\ChunkSender.h" />
+    <ClInclude Include="..\source\ClientHandle.h" />
+    <ClInclude Include="..\source\CommandOutput.h" />
+    <ClInclude Include="..\source\CraftingRecipes.h" />
+    <ClInclude Include="..\source\Cuboid.h" />
+    <ClInclude Include="..\source\DeadlockDetect.h" />
+    <ClInclude Include="..\source\Defines.h" />
+    <ClInclude Include="..\source\Enchantments.h" />
+    <ClInclude Include="..\source\Endianness.h" />
+    <ClInclude Include="..\source\FastRandom.h" />
+    <ClInclude Include="..\source\FurnaceRecipe.h" />
+    <ClInclude Include="..\source\Globals.h" />
+    <ClInclude Include="..\source\Group.h" />
+    <ClInclude Include="..\source\GroupManager.h" />
+    <ClInclude Include="..\source\Inventory.h" />
+    <ClInclude Include="..\source\Item.h" />
+    <ClInclude Include="..\source\ItemGrid.h" />
+    <ClInclude Include="..\source\Ladder.h" />
+    <ClInclude Include="..\source\LeakFinder.h" />
+    <ClInclude Include="..\source\LightingThread.h" />
+    <ClInclude Include="..\source\LinearInterpolation.h" />
+    <ClInclude Include="..\source\LinearUpscale.h" />
+    <ClInclude Include="..\source\LineBlockTracer.h" />
+    <ClInclude Include="..\source\Log.h" />
+    <ClInclude Include="..\source\Matrix4f.h" />
+    <ClInclude Include="..\source\MCLogger.h" />
+    <ClInclude Include="..\source\MemoryLeak.h" />
+    <ClInclude Include="..\source\MersenneTwister.h" />
+    <ClInclude Include="..\source\MobCensus.h" />
+    <ClInclude Include="..\source\MobFamilyCollecter.h" />
+    <ClInclude Include="..\source\MobProximityCounter.h" />
+    <ClInclude Include="..\source\MobSpawner.h" />
+    <ClInclude Include="..\source\MonsterConfig.h" />
+    <ClInclude Include="..\source\Noise.h" />
+    <ClInclude Include="..\source\Piston.h" />
+    <ClInclude Include="..\source\ProbabDistrib.h" />
+    <ClInclude Include="..\source\RCONServer.h" />
+    <ClInclude Include="..\source\ReferenceManager.h" />
+    <ClInclude Include="..\source\Root.h" />
+    <ClInclude Include="..\source\Server.h" />
+    <ClInclude Include="..\source\Sign.h" />
+    <ClInclude Include="..\source\StackWalker.h" />
+    <ClInclude Include="..\source\StringCompression.h" />
+    <ClInclude Include="..\source\StringUtils.h" />
+    <ClInclude Include="..\source\Tracer.h" />
+    <ClInclude Include="..\source\Vector3d.h" />
+    <ClInclude Include="..\source\Vector3f.h" />
+    <ClInclude Include="..\source\Vector3i.h" />
+    <ClInclude Include="..\source\WebAdmin.h" />
+    <ClInclude Include="..\source\World.h" />
+    <ClInclude Include="..\source\Mobs\AggressiveMonster.h" />
+    <ClInclude Include="..\source\Mobs\Bat.h" />
+    <ClInclude Include="..\source\Mobs\Blaze.h" />
+    <ClInclude Include="..\source\Mobs\Cavespider.h" />
+    <ClInclude Include="..\source\Mobs\Chicken.h" />
+    <ClInclude Include="..\source\Mobs\Cow.h" />
+    <ClInclude Include="..\source\Mobs\Creeper.h" />
+    <ClInclude Include="..\source\Mobs\EnderDragon.h" />
+    <ClInclude Include="..\source\Mobs\Enderman.h" />
+    <ClInclude Include="..\source\Mobs\Ghast.h" />
+    <ClInclude Include="..\source\Mobs\Giant.h" />
+    <ClInclude Include="..\source\Mobs\Horse.h" />
+    <ClInclude Include="..\source\Mobs\IronGolem.h" />
+    <ClInclude Include="..\source\Mobs\MagmaCube.h" />
+    <ClInclude Include="..\source\Mobs\Monster.h" />
+    <ClInclude Include="..\source\Mobs\Mooshroom.h" />
+    <ClInclude Include="..\source\Mobs\Ocelot.h" />
+    <ClInclude Include="..\source\Mobs\PassiveAggressiveMonster.h" />
+    <ClInclude Include="..\source\Mobs\PassiveMonster.h" />
+    <ClInclude Include="..\source\Mobs\Pig.h" />
+    <ClInclude Include="..\source\Mobs\Sheep.h" />
+    <ClInclude Include="..\source\Mobs\Silverfish.h" />
+    <ClInclude Include="..\source\Mobs\Skeleton.h" />
+    <ClInclude Include="..\source\Mobs\Slime.h" />
+    <ClInclude Include="..\source\Mobs\SnowGolem.h" />
+    <ClInclude Include="..\source\Mobs\Spider.h" />
+    <ClInclude Include="..\source\Mobs\Squid.h" />
+    <ClInclude Include="..\source\Mobs\Villager.h" />
+    <ClInclude Include="..\source\Mobs\Witch.h" />
+    <ClInclude Include="..\source\Mobs\Wither.h" />
+    <ClInclude Include="..\source\Mobs\Wolf.h" />
+    <ClInclude Include="..\source\Mobs\Zombie.h" />
+    <ClInclude Include="..\source\Mobs\ZombiePigman.h" />
+    <ClInclude Include="..\source\Entities\Boat.h" />
+    <ClInclude Include="..\source\Entities\Entity.h" />
+    <ClInclude Include="..\source\Entities\FallingBlock.h" />
+    <ClInclude Include="..\source\Entities\Minecart.h" />
+    <ClInclude Include="..\source\Entities\Pawn.h" />
+    <ClInclude Include="..\source\Entities\Pickup.h" />
+    <ClInclude Include="..\source\Entities\Player.h" />
+    <ClInclude Include="..\source\Entities\ProjectileEntity.h" />
+    <ClInclude Include="..\source\Entities\TNTEntity.h" />
+    <ClInclude Include="..\source\UI\SlotArea.h" />
+    <ClInclude Include="..\source\UI\Window.h" />
+    <ClInclude Include="..\source\UI\WindowOwner.h" />
+    <ClInclude Include="..\source\Simulator\DelayedFluidSimulator.h" />
+    <ClInclude Include="..\source\Simulator\FireSimulator.h" />
+    <ClInclude Include="..\source\Simulator\FloodyFluidSimulator.h" />
+    <ClInclude Include="..\source\Simulator\FluidSimulator.h" />
+    <ClInclude Include="..\source\Simulator\NoopFluidSimulator.h" />
+    <ClInclude Include="..\source\Simulator\RedstoneSimulator.h" />
+    <ClInclude Include="..\source\Simulator\SandSimulator.h" />
+    <ClInclude Include="..\source\Simulator\Simulator.h" />
+    <ClInclude Include="..\source\Simulator\SimulatorManager.h" />
+    <ClInclude Include="..\source\Simulator\VaporizeFluidSimulator.h" />
+    <ClInclude Include="..\source\OSSupport\BlockingTCPLink.h" />
+    <ClInclude Include="..\source\OSSupport\CriticalSection.h" />
+    <ClInclude Include="..\source\OSSupport\Event.h" />
+    <ClInclude Include="..\source\OSSupport\File.h" />
+    <ClInclude Include="..\source\OSSupport\GZipFile.h" />
+    <ClInclude Include="..\source\OSSupport\IsThread.h" />
+    <ClInclude Include="..\source\OSSupport\ListenThread.h" />
+    <ClInclude Include="..\source\OSSupport\Semaphore.h" />
+    <ClInclude Include="..\source\OSSupport\Sleep.h" />
+    <ClInclude Include="..\source\OSSupport\Socket.h" />
+    <ClInclude Include="..\source\OSSupport\SocketThreads.h" />
+    <ClInclude Include="..\source\OSSupport\Thread.h" />
+    <ClInclude Include="..\source\OSSupport\Timer.h" />
+    <CustomBuild Include="..\Android\jni\ToJava.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <ClInclude Include="..\source\Bindings.h" />
+    <ClInclude Include="..\source\LuaFunctions.h" />
+    <ClInclude Include="..\source\LuaState.h" />
+    <ClInclude Include="..\source\LuaWindow.h" />
+    <ClInclude Include="..\source\ManualBindings.h" />
+    <ClInclude Include="..\source\Plugin.h" />
+    <ClInclude Include="..\source\PluginLua.h" />
+    <ClInclude Include="..\source\PluginManager.h" />
+    <ClInclude Include="..\source\tolua++.h" />
+    <ClInclude Include="..\source\tolua_base.h" />
+    <ClInclude Include="..\source\WebPlugin.h" />
+    <ClInclude Include="..\iniFile\iniFile.h" />
+    <ClInclude Include="..\source\md5\md5.h" />
+    <ClInclude Include="..\source\WorldStorage\FastNBT.h" />
+    <ClInclude Include="..\source\WorldStorage\NBTChunkSerializer.h" />
+    <ClInclude Include="..\source\WorldStorage\WorldStorage.h" />
+    <ClInclude Include="..\source\WorldStorage\WSSAnvil.h" />
+    <ClInclude Include="..\source\WorldStorage\WSSCompact.h" />
+    <ClInclude Include="..\source\Generating\BioGen.h" />
+    <ClInclude Include="..\source\Generating\Caves.h" />
+    <ClInclude Include="..\source\Generating\ChunkDesc.h" />
+    <ClInclude Include="..\source\Generating\ChunkGenerator.h" />
+    <ClInclude Include="..\source\Generating\CompoGen.h" />
+    <ClInclude Include="..\source\Generating\ComposableGenerator.h" />
+    <ClInclude Include="..\source\Generating\DistortedHeightmap.h" />
+    <ClInclude Include="..\source\Generating\EndGen.h" />
+    <ClInclude Include="..\source\Generating\FinishGen.h" />
+    <ClInclude Include="..\source\Generating\HeiGen.h" />
+    <ClInclude Include="..\source\Generating\MineShafts.h" />
+    <ClInclude Include="..\source\Generating\Noise3DGenerator.h" />
+    <ClInclude Include="..\source\Generating\Ravines.h" />
+    <ClInclude Include="..\source\Generating\StructGen.h" />
+    <ClInclude Include="..\source\Generating\Trees.h" />
+    <ClInclude Include="..\source\blocks\BlockBed.h" />
+    <ClInclude Include="..\source\Blocks\BlockBrewingStand.h" />
+    <ClInclude Include="..\source\Blocks\BlockButton.h" />
+    <ClInclude Include="..\source\blocks\BlockCactus.h" />
+    <ClInclude Include="..\source\Blocks\BlockCarpet.h" />
+    <ClInclude Include="..\source\Blocks\BlockCauldron.h" />
+    <ClInclude Include="..\source\blocks\BlockChest.h" />
+    <ClInclude Include="..\source\blocks\BlockCloth.h" />
+    <ClInclude Include="..\source\Blocks\BlockCobWeb.h" />
+    <ClInclude Include="..\source\Blocks\BlockComparator.h" />
+    <ClInclude Include="..\source\blocks\BlockCrops.h" />
+    <ClInclude Include="..\source\Blocks\BlockDeadBush.h" />
+    <ClInclude Include="..\source\blocks\BlockDirt.h" />
+    <ClInclude Include="..\source\blocks\BlockDoor.h" />
+    <ClInclude Include="..\source\blocks\BlockDropSpenser.h" />
+    <ClInclude Include="..\source\Blocks\BlockEnderchest.h" />
+    <ClInclude Include="..\source\blocks\BlockEntity.h" />
+    <ClInclude Include="..\source\Blocks\BlockFarmland.h" />
+    <ClInclude Include="..\source\Blocks\BlockFenceGate.h" />
+    <ClInclude Include="..\source\blocks\BlockFire.h" />
+    <ClInclude Include="..\source\blocks\BlockFlower.h" />
+    <ClInclude Include="..\source\Blocks\BlockFlowerPot.h" />
+    <ClInclude Include="..\source\blocks\BlockFluid.h" />
+    <ClInclude Include="..\source\blocks\BlockFurnace.h" />
+    <ClInclude Include="..\source\Blocks\BlockGlass.h" />
+    <ClInclude Include="..\source\blocks\BlockGlowstone.h" />
+    <ClInclude Include="..\source\blocks\BlockGravel.h" />
+    <ClInclude Include="..\source\blocks\BlockHandler.h" />
+    <ClInclude Include="..\source\Blocks\BlockHopper.h" />
+    <ClInclude Include="..\source\blocks\BlockIce.h" />
+    <ClInclude Include="..\source\blocks\BlockLadder.h" />
+    <ClInclude Include="..\source\blocks\BlockLeaves.h" />
+    <ClInclude Include="..\source\Blocks\BlockLever.h" />
+    <ClInclude Include="..\source\blocks\BlockMelon.h" />
+    <ClInclude Include="..\source\blocks\BlockMushroom.h" />
+    <ClInclude Include="..\source\Blocks\BlockMycelium.h" />
+    <ClInclude Include="..\source\blocks\BlockNote.h" />
+    <ClInclude Include="..\source\blocks\BlockOre.h" />
+    <ClInclude Include="..\source\blocks\BlockPiston.h" />
+    <ClInclude Include="..\source\blocks\BlockPlanks.h" />
+    <ClInclude Include="..\source\blocks\BlockPortal.h" />
+    <ClInclude Include="..\source\Blocks\BlockPumpkin.h" />
+    <ClInclude Include="..\source\Blocks\BlockRail.h" />
+    <ClInclude Include="..\source\blocks\BlockRedstone.h" />
+    <ClInclude Include="..\source\blocks\BlockRedstoneOre.h" />
+    <ClInclude Include="..\source\blocks\BlockRedstoneRepeater.h" />
+    <ClInclude Include="..\source\blocks\BlockRedstoneTorch.h" />
+    <ClInclude Include="..\source\blocks\BlockSand.h" />
+    <ClInclude Include="..\source\blocks\BlockSapling.h" />
+    <ClInclude Include="..\source\blocks\BlockSign.h" />
+    <ClInclude Include="..\source\blocks\BlockSlab.h" />
+    <ClInclude Include="..\source\blocks\BlockSnow.h" />
+    <ClInclude Include="..\source\blocks\BlockStairs.h" />
+    <ClInclude Include="..\source\blocks\BlockStems.h" />
+    <ClInclude Include="..\source\blocks\BlockStone.h" />
+    <ClInclude Include="..\source\blocks\BlockSugarcane.h" />
+    <ClInclude Include="..\source\blocks\BlockTallGrass.h" />
+    <ClInclude Include="..\source\blocks\BlockTorch.h" />
+    <ClInclude Include="..\source\blocks\BlockVine.h" />
+    <ClInclude Include="..\source\blocks\BlockWood.h" />
+    <ClInclude Include="..\source\blocks\BlockWorkbench.h" />
+    <ClInclude Include="..\source\items\ItemBed.h" />
+    <ClInclude Include="..\source\Items\ItemBoat.h" />
+    <ClInclude Include="..\source\Items\ItemBow.h" />
+    <ClInclude Include="..\source\Items\ItemBrewingStand.h" />
+    <ClInclude Include="..\source\items\ItemBucket.h" />
+    <ClInclude Include="..\source\Items\ItemCauldron.h" />
+    <ClInclude Include="..\source\items\ItemCloth.h" />
+    <ClInclude Include="..\source\Items\ItemComparator.h" />
+    <ClInclude Include="..\source\items\ItemDoor.h" />
+    <ClInclude Include="..\source\items\ItemDye.h" />
+    <ClInclude Include="..\source\Items\ItemFlowerPot.h" />
+    <ClInclude Include="..\source\items\ItemFood.h" />
+    <ClInclude Include="..\source\items\ItemHandler.h" />
+    <ClInclude Include="..\source\items\ItemHoe.h" />
+    <ClInclude Include="..\source\items\ItemLeaves.h" />
+    <ClInclude Include="..\source\items\ItemLighter.h" />
+    <ClInclude Include="..\source\Items\ItemMinecart.h" />
+    <ClInclude Include="..\source\items\ItemPickaxe.h" />
+    <ClInclude Include="..\source\items\ItemRedstoneDust.h" />
+    <ClInclude Include="..\source\items\ItemRedstoneRepeater.h" />
+    <ClInclude Include="..\source\items\ItemSapling.h" />
+    <ClInclude Include="..\source\items\ItemSeeds.h" />
+    <ClInclude Include="..\source\items\ItemShears.h" />
+    <ClInclude Include="..\source\items\ItemShovel.h" />
+    <ClInclude Include="..\source\items\ItemSign.h" />
+    <ClInclude Include="..\source\Items\ItemSpawnEgg.h" />
+    <ClInclude Include="..\source\items\ItemSugarcane.h" />
+    <ClInclude Include="..\source\items\ItemSword.h" />
+    <ClInclude Include="..\source\Items\ItemThrowable.h" />
+    <ClInclude Include="..\source\Protocol\ChunkDataSerializer.h" />
+    <ClInclude Include="..\source\Protocol\Protocol.h" />
+    <ClInclude Include="..\source\Protocol\Protocol125.h" />
+    <ClInclude Include="..\source\Protocol\Protocol132.h" />
+    <ClInclude Include="..\source\Protocol\Protocol14x.h" />
+    <ClInclude Include="..\source\Protocol\Protocol15x.h" />
+    <ClInclude Include="..\source\Protocol\Protocol16x.h" />
+    <ClInclude Include="..\source\Protocol\Protocol17x.h" />
+    <ClInclude Include="..\source\Protocol\ProtocolRecognizer.h" />
+    <ClInclude Include="..\source\sqlite\sqlite3.h" />
+    <ClInclude Include="..\source\LuaExpat\lxplib.h" />
+    <ClInclude Include="..\source\BlockEntities\BlockEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\BlockEntityWithItems.h" />
+    <ClInclude Include="..\source\BlockEntities\ChestEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\DispenserEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\DropperEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\DropSpenserEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\FurnaceEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\HopperEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\JukeboxEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\NoteEntity.h" />
+    <ClInclude Include="..\source\BlockEntities\SignEntity.h" />
+    <ClInclude Include="..\source\HTTPServer\EnvelopeParser.h" />
+    <ClInclude Include="..\source\HTTPServer\HTTPConnection.h" />
+    <ClInclude Include="..\source\HTTPServer\HTTPFormParser.h" />
+    <ClInclude Include="..\source\HTTPServer\HTTPMessage.h" />
+    <ClInclude Include="..\source\HTTPServer\HTTPServer.h" />
+    <ClInclude Include="..\source\HTTPServer\MultipartParser.h" />
+    <ClInclude Include="..\source\HTTPServer\NameValueParser.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\webadmin\template.html" />
+    <CustomBuild Include="..\Android\jni\Android.mk">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\Android\jni\Application.mk">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\source\AllToLua.pkg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">GenerateBindings.cmd
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">cTorch.h;cStairs.h;cLadder.h;../iniFile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Bindings.cpp;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GenerateBindings.cmd
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cTorch.h;cStairs.h;cLadder.h;../iniFile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Bindings.cpp;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">GenerateBindings.cmd
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">cTorch.h;cStairs.h;cLadder.h;../iniFile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">Bindings.cpp;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">GenerateBindings.cmd
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cTorch.h;cStairs.h;cLadder.h;../iniFile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Bindings.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="..\MCServer\groups.ini" />
+    <None Include="..\MCServer\items.ini" />
+    <None Include="..\MCServer\monsters.ini" />
+    <None Include="..\MCServer\settings.ini" />
+    <None Include="..\MCServer\terrain.ini" />
+    <None Include="..\MCServer\users.ini" />
+    <None Include="..\MCServer\webadmin.ini" />
+    <None Include="..\MCServer\Plugins\Core\back.lua" />
+    <None Include="..\MCServer\Plugins\Core\ban-unban.lua" />
+    <None Include="..\MCServer\Plugins\Core\clear.lua" />
+    <None Include="..\MCServer\Plugins\Core\console.lua" />
+    <None Include="..\MCServer\Plugins\Core\do.lua" />
+    <None Include="..\MCServer\Plugins\Core\functions.lua" />
+    <None Include="..\MCServer\Plugins\Core\give.lua" />
+    <None Include="..\MCServer\Plugins\Core\gm.lua" />
+    <None Include="..\MCServer\Plugins\Core\help.lua" />
+    <None Include="..\MCServer\Plugins\Core\item.lua" />
+    <None Include="..\MCServer\Plugins\Core\itemrepair.lua" />
+    <None Include="..\MCServer\Plugins\Core\kick.lua" />
+    <None Include="..\MCServer\Plugins\Core\kill.lua" />
+    <None Include="..\MCServer\Plugins\Core\locate.lua" />
+    <None Include="..\MCServer\Plugins\Core\main.lua" />
+    <None Include="..\MCServer\Plugins\Core\me.lua" />
+    <None Include="..\MCServer\Plugins\Core\motd.lua" />
+    <None Include="..\MCServer\Plugins\Core\onbreakplaceblock.lua" />
+    <None Include="..\MCServer\Plugins\Core\ondeath.lua" />
+    <None Include="..\MCServer\Plugins\Core\onjoinleave.lua" />
+    <None Include="..\MCServer\Plugins\Core\onlogin.lua" />
+    <None Include="..\MCServer\Plugins\Core\plugins.lua" />
+    <None Include="..\MCServer\Plugins\Core\portal-worlds.lua" />
+    <None Include="..\MCServer\Plugins\Core\rank-groups.lua" />
+    <None Include="..\MCServer\Plugins\Core\regen.lua" />
+    <None Include="..\MCServer\Plugins\Core\save-reload-stop.lua" />
+    <None Include="..\MCServer\Plugins\Core\spawn.lua" />
+    <None Include="..\MCServer\Plugins\Core\teleport.lua" />
+    <None Include="..\MCServer\Plugins\Core\tell.lua" />
+    <None Include="..\MCServer\Plugins\Core\time.lua" />
+    <None Include="..\MCServer\Plugins\Core\top.lua" />
+    <None Include="..\MCServer\Plugins\Core\viewdistance.lua" />
+    <None Include="..\MCServer\Plugins\Core\weather.lua" />
+    <None Include="..\MCServer\Plugins\Core\web_chat.lua" />
+    <None Include="..\MCServer\Plugins\Core\web_manageplugins.lua" />
+    <None Include="..\MCServer\Plugins\Core\web_manageserver.lua" />
+    <None Include="..\MCServer\Plugins\Core\web_permissions.lua" />
+    <None Include="..\MCServer\Plugins\Core\web_playerlist.lua" />
+    <None Include="..\MCServer\Plugins\Core\web_serversettings.lua" />
+    <None Include="..\MCServer\Plugins\Core\web_whitelist.lua" />
+    <None Include="..\MCServer\Plugins\Core\worldlimiter.lua" />
+    <None Include="..\MCServer\Plugins\ChatLog\plugin.lua" />
+    <None Include="..\MCServer\Plugins\Debuggers\Debuggers.lua" />
+    <None Include="..\MCServer\Plugins\APIDump\main.lua" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\Authenticator.cpp" />
+    <ClCompile Include="..\source\BlockArea.cpp" />
+    <ClCompile Include="..\source\BlockID.cpp" />
+    <ClCompile Include="..\source\BoundingBox.cpp" />
+    <ClCompile Include="..\source\ByteBuffer.cpp" />
+    <ClCompile Include="..\source\ChatColor.cpp" />
+    <ClCompile Include="..\source\Chunk.cpp" />
+    <ClCompile Include="..\source\ChunkMap.cpp" />
+    <ClCompile Include="..\source\ChunkSender.cpp" />
+    <ClCompile Include="..\source\ClientHandle.cpp" />
+    <ClCompile Include="..\source\CommandOutput.cpp" />
+    <ClCompile Include="..\source\CraftingRecipes.cpp" />
+    <ClCompile Include="..\source\Cuboid.cpp" />
+    <ClCompile Include="..\source\DeadlockDetect.cpp" />
+    <ClCompile Include="..\source\Enchantments.cpp" />
+    <ClCompile Include="..\source\FastRandom.cpp" />
+    <ClCompile Include="..\source\FurnaceRecipe.cpp" />
+    <ClCompile Include="..\source\Globals.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\Group.cpp" />
+    <ClCompile Include="..\source\GroupManager.cpp" />
+    <ClCompile Include="..\source\Inventory.cpp" />
+    <ClCompile Include="..\source\Item.cpp" />
+    <ClCompile Include="..\source\ItemGrid.cpp" />
+    <ClCompile Include="..\source\LeakFinder.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Level3</WarningLevel>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level3</WarningLevel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\LightingThread.cpp" />
+    <ClCompile Include="..\source\LinearInterpolation.cpp" />
+    <ClCompile Include="..\source\LineBlockTracer.cpp" />
+    <ClCompile Include="..\source\Log.cpp" />
+    <ClCompile Include="..\source\main.cpp" />
+    <ClCompile Include="..\source\Matrix4f.cpp" />
+    <ClCompile Include="..\source\MCLogger.cpp" />
+    <ClCompile Include="..\source\MobCensus.cpp" />
+    <ClCompile Include="..\source\MobFamilyCollecter.cpp" />
+    <ClCompile Include="..\source\MobProximityCounter.cpp" />
+    <ClCompile Include="..\source\MobSpawner.cpp" />
+    <ClCompile Include="..\source\MonsterConfig.cpp" />
+    <ClCompile Include="..\source\Noise.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</IntrinsicFunctions>
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Speed</FavorSizeOrSpeed>
+      <OmitFramePointers Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</OmitFramePointers>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Default</BasicRuntimeChecks>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Speed</FavorSizeOrSpeed>
+      <OmitFramePointers Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</OmitFramePointers>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\Piston.cpp" />
+    <ClCompile Include="..\source\ProbabDistrib.cpp" />
+    <ClCompile Include="..\source\RCONServer.cpp" />
+    <ClCompile Include="..\source\ReferenceManager.cpp" />
+    <ClCompile Include="..\source\Root.cpp" />
+    <ClCompile Include="..\source\Server.cpp" />
+    <ClCompile Include="..\source\StackWalker.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Level3</WarningLevel>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level3</WarningLevel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\StringCompression.cpp" />
+    <ClCompile Include="..\source\StringUtils.cpp" />
+    <ClCompile Include="..\source\Tracer.cpp" />
+    <ClCompile Include="..\source\Vector3d.cpp" />
+    <ClCompile Include="..\source\Vector3f.cpp" />
+    <ClCompile Include="..\source\Vector3i.cpp" />
+    <ClCompile Include="..\source\WebAdmin.cpp" />
+    <ClCompile Include="..\source\World.cpp" />
+    <ClCompile Include="..\source\Mobs\AggressiveMonster.cpp" />
+    <ClCompile Include="..\source\Mobs\Bat.cpp" />
+    <ClCompile Include="..\source\Mobs\Blaze.cpp" />
+    <ClCompile Include="..\source\Mobs\Cavespider.cpp" />
+    <ClCompile Include="..\source\Mobs\Chicken.cpp" />
+    <ClCompile Include="..\source\Mobs\Cow.cpp" />
+    <ClCompile Include="..\source\Mobs\Creeper.cpp" />
+    <ClCompile Include="..\source\Mobs\EnderDragon.cpp" />
+    <ClCompile Include="..\source\Mobs\Enderman.cpp" />
+    <ClCompile Include="..\source\Mobs\Ghast.cpp" />
+    <ClCompile Include="..\source\Mobs\Giant.cpp" />
+    <ClCompile Include="..\source\Mobs\Horse.cpp" />
+    <ClCompile Include="..\source\Mobs\IronGolem.cpp" />
+    <ClCompile Include="..\source\Mobs\MagmaCube.cpp" />
+    <ClCompile Include="..\source\Mobs\Monster.cpp" />
+    <ClCompile Include="..\source\Mobs\Mooshroom.cpp" />
+    <ClCompile Include="..\source\Mobs\PassiveAggressiveMonster.cpp" />
+    <ClCompile Include="..\source\Mobs\PassiveMonster.cpp" />
+    <ClCompile Include="..\source\Mobs\Pig.cpp" />
+    <ClCompile Include="..\source\Mobs\Sheep.cpp" />
+    <ClCompile Include="..\source\Mobs\Skeleton.cpp" />
+    <ClCompile Include="..\source\Mobs\Slime.cpp" />
+    <ClCompile Include="..\source\Mobs\SnowGolem.cpp" />
+    <ClCompile Include="..\source\Mobs\Spider.cpp" />
+    <ClCompile Include="..\source\Mobs\Squid.cpp" />
+    <ClCompile Include="..\source\Mobs\Villager.cpp" />
+    <ClCompile Include="..\source\Mobs\Witch.cpp" />
+    <ClCompile Include="..\source\Mobs\Wither.cpp" />
+    <ClCompile Include="..\source\Mobs\Wolf.cpp" />
+    <ClCompile Include="..\source\Mobs\Zombie.cpp" />
+    <ClCompile Include="..\source\Mobs\ZombiePigman.cpp" />
+    <ClCompile Include="..\source\Entities\Boat.cpp" />
+    <ClCompile Include="..\source\Entities\Entity.cpp" />
+    <ClCompile Include="..\source\Entities\FallingBlock.cpp" />
+    <ClCompile Include="..\source\Entities\Minecart.cpp" />
+    <ClCompile Include="..\source\Entities\Pawn.cpp" />
+    <ClCompile Include="..\source\Entities\Pickup.cpp" />
+    <ClCompile Include="..\source\Entities\Player.cpp" />
+    <ClCompile Include="..\source\Entities\ProjectileEntity.cpp" />
+    <ClCompile Include="..\source\Entities\TNTEntity.cpp" />
+    <ClCompile Include="..\source\UI\SlotArea.cpp" />
+    <ClCompile Include="..\source\UI\Window.cpp" />
+    <ClCompile Include="..\source\Simulator\DelayedFluidSimulator.cpp" />
+    <ClCompile Include="..\source\Simulator\FireSimulator.cpp" />
+    <ClCompile Include="..\source\Simulator\FloodyFluidSimulator.cpp" />
+    <ClCompile Include="..\source\Simulator\FluidSimulator.cpp" />
+    <ClCompile Include="..\source\Simulator\RedstoneSimulator.cpp" />
+    <ClCompile Include="..\source\Simulator\SandSimulator.cpp" />
+    <ClCompile Include="..\source\Simulator\Simulator.cpp" />
+    <ClCompile Include="..\source\Simulator\SimulatorManager.cpp" />
+    <ClCompile Include="..\source\Simulator\VaporizeFluidSimulator.cpp" />
+    <ClCompile Include="..\source\OSSupport\BlockingTCPLink.cpp" />
+    <ClCompile Include="..\source\OSSupport\CriticalSection.cpp" />
+    <ClCompile Include="..\source\OSSupport\Event.cpp" />
+    <ClCompile Include="..\source\OSSupport\File.cpp" />
+    <ClCompile Include="..\source\OSSupport\GZipFile.cpp" />
+    <ClCompile Include="..\source\OSSupport\IsThread.cpp" />
+    <ClCompile Include="..\source\OSSupport\ListenThread.cpp" />
+    <ClCompile Include="..\source\OSSupport\Semaphore.cpp" />
+    <ClCompile Include="..\source\OSSupport\Sleep.cpp" />
+    <ClCompile Include="..\source\OSSupport\Socket.cpp" />
+    <ClCompile Include="..\source\OSSupport\SocketThreads.cpp" />
+    <ClCompile Include="..\source\OSSupport\Thread.cpp" />
+    <ClCompile Include="..\source\OSSupport\Timer.cpp" />
+    <ClCompile Include="..\Android\jni\app-android.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Android\jni\ToJava.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\source\Bindings.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\LuaState.cpp" />
+    <ClCompile Include="..\source\LuaWindow.cpp" />
+    <ClCompile Include="..\source\ManualBindings.cpp" />
+    <ClCompile Include="..\source\Plugin.cpp" />
+    <ClCompile Include="..\source\PluginLua.cpp" />
+    <ClCompile Include="..\source\PluginManager.cpp" />
+    <ClCompile Include="..\source\WebPlugin.cpp" />
+    <ClCompile Include="..\iniFile\iniFile.cpp" />
+    <ClCompile Include="..\source\md5\md5.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+      </PrecompiledHeader>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\WorldStorage\FastNBT.cpp" />
+    <ClCompile Include="..\source\WorldStorage\NBTChunkSerializer.cpp" />
+    <ClCompile Include="..\source\WorldStorage\WorldStorage.cpp" />
+    <ClCompile Include="..\source\WorldStorage\WSSAnvil.cpp" />
+    <ClCompile Include="..\source\WorldStorage\WSSCompact.cpp" />
+    <ClCompile Include="..\source\Generating\BioGen.cpp" />
+    <ClCompile Include="..\source\Generating\Caves.cpp" />
+    <ClCompile Include="..\source\Generating\ChunkDesc.cpp" />
+    <ClCompile Include="..\source\Generating\ChunkGenerator.cpp" />
+    <ClCompile Include="..\source\Generating\CompoGen.cpp" />
+    <ClCompile Include="..\source\Generating\ComposableGenerator.cpp" />
+    <ClCompile Include="..\source\Generating\DistortedHeightmap.cpp" />
+    <ClCompile Include="..\source\Generating\EndGen.cpp" />
+    <ClCompile Include="..\source\Generating\FinishGen.cpp" />
+    <ClCompile Include="..\source\Generating\HeiGen.cpp" />
+    <ClCompile Include="..\source\Generating\MineShafts.cpp" />
+    <ClCompile Include="..\source\Generating\Noise3DGenerator.cpp" />
+    <ClCompile Include="..\source\Generating\Ravines.cpp" />
+    <ClCompile Include="..\source\Generating\StructGen.cpp" />
+    <ClCompile Include="..\source\Generating\Trees.cpp" />
+    <ClCompile Include="..\source\Blocks\BlockBed.cpp" />
+    <ClCompile Include="..\source\Blocks\BlockButton.cpp" />
+    <ClCompile Include="..\source\Blocks\BlockComparator.cpp" />
+    <ClCompile Include="..\source\blocks\BlockDoor.cpp" />
+    <ClCompile Include="..\source\blocks\BlockHandler.cpp" />
+    <ClCompile Include="..\source\Blocks\BlockLever.cpp" />
+    <ClCompile Include="..\source\blocks\BlockPiston.cpp" />
+    <ClCompile Include="..\source\blocks\BlockRedstone.cpp" />
+    <ClCompile Include="..\source\blocks\BlockRedstoneRepeater.cpp" />
+    <ClCompile Include="..\source\items\ItemHandler.cpp" />
+    <ClCompile Include="..\source\Protocol\ChunkDataSerializer.cpp" />
+    <ClCompile Include="..\source\Protocol\Protocol125.cpp" />
+    <ClCompile Include="..\source\Protocol\Protocol132.cpp" />
+    <ClCompile Include="..\source\Protocol\Protocol14x.cpp" />
+    <ClCompile Include="..\source\Protocol\Protocol15x.cpp" />
+    <ClCompile Include="..\source\Protocol\Protocol16x.cpp" />
+    <ClCompile Include="..\source\Protocol\Protocol17x.cpp" />
+    <ClCompile Include="..\source\Protocol\ProtocolRecognizer.cpp" />
+    <ClCompile Include="..\source\sqlite\lsqlite3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\sqlite\sqlite3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\LuaExpat\lxplib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\ChestEntity.cpp" />
+    <ClCompile Include="..\source\BlockEntities\DispenserEntity.cpp" />
+    <ClCompile Include="..\source\BlockEntities\DropperEntity.cpp" />
+    <ClCompile Include="..\source\BlockEntities\DropSpenserEntity.cpp" />
+    <ClCompile Include="..\source\BlockEntities\FurnaceEntity.cpp" />
+    <ClCompile Include="..\source\BlockEntities\HopperEntity.cpp" />
+    <ClCompile Include="..\source\BlockEntities\JukeboxEntity.cpp" />
+    <ClCompile Include="..\source\BlockEntities\NoteEntity.cpp" />
+    <ClCompile Include="..\source\BlockEntities\SignEntity.cpp" />
+    <ClCompile Include="..\source\HTTPServer\EnvelopeParser.cpp" />
+    <ClCompile Include="..\source\HTTPServer\HTTPConnection.cpp" />
+    <ClCompile Include="..\source\HTTPServer\HTTPFormParser.cpp" />
+    <ClCompile Include="..\source\HTTPServer\HTTPMessage.cpp" />
+    <ClCompile Include="..\source\HTTPServer\HTTPServer.cpp" />
+    <ClCompile Include="..\source\HTTPServer\MultipartParser.cpp" />
+    <ClCompile Include="..\source\HTTPServer\NameValueParser.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\MCServer\API.txt" />
+    <Text Include="..\source\sqlite\urls.txt" />
+    <Text Include="..\MCServer\crafting.txt" />
+    <Text Include="..\MCServer\furnace.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="CryptoPP.vcxproj">
+      <Project>{3423ec9a-52e4-4a4d-9753-edebc38785ef}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="expat.vcxproj">
+      <Project>{5fcfaf8d-ff2c-456d-a72c-1d76f913ad96}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="JsonCpp.vcxproj">
+      <Project>{5aaa90b9-946d-4034-83f3-676b06a6e326}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="Lua.vcxproj">
+      <Project>{082e8185-7b3a-4945-8c82-9132341a329d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="ToLua.vcxproj">
+      <Project>{eeab54ad-114c-4ab8-8482-0a52d502bd35}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="zlib.vcxproj">
+      <Project>{ea9d50fd-937a-4ef5-8c37-5f4175af4fea}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
