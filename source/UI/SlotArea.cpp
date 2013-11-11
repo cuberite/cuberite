@@ -404,6 +404,20 @@ void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction 
 
 
 
+void cSlotAreaCrafting::DblClicked(cPlayer & a_Player, int a_SlotNum)
+{
+	if (a_SlotNum == 0)
+	{
+		// Dbl-clicking the crafting result slot shouldn't collect items to hand
+		return;
+	}
+	super::DblClicked(a_Player, a_SlotNum);
+}
+
+
+
+
+
 void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 {
 	// Toss all items on the crafting grid:

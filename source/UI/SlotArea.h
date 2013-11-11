@@ -221,6 +221,7 @@ public:
 
 	// cSlotAreaTemporary overrides:
 	virtual void Clicked        (cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void DblClicked     (cPlayer & a_Player, int a_SlotNum);
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 	
 	// Distributing items into this area is completely disabled
