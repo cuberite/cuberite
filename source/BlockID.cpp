@@ -930,7 +930,7 @@ public:
 		g_BlockIsTorchPlaceable[E_BLOCK_NETHER_QUARTZ_ORE]     = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_NOTE_BLOCK]            = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_OBSIDIAN]              = true;
-		g_BlockIsTorchPlaceable[E_BLOC_PACKED_ICE]             = true;
+		g_BlockIsTorchPlaceable[E_BLOCK_PACKED_ICE]             = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_PLANKS]                = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_PUMPKIN]               = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_QUARTZ_BLOCK]          = true;
