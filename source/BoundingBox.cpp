@@ -243,11 +243,11 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 	{
 		// The starting point is inside the bounding box.
 		a_LineCoeff = 0;
-		a_Face = BLOCK_FACE_YM;  // Make it look as the top face was hit, although none really are.
+		a_Face = BLOCK_FACE_NONE;  // No faces hit
 		return true;
 	}
 	
-	char Face = 0;
+	char Face = BLOCK_FACE_NONE;
 	double Coeff = Vector3d::NO_INTERSECTION;
 	
 	// Check each individual bbox face for intersection with the line, remember the one with the lowest coeff

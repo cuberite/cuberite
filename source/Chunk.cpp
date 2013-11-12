@@ -1679,9 +1679,9 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		if (!(*itr)->IsPickup())
+		if ((!(*itr)->IsPickup()) && (!(*itr)->IsProjectile()))
 		{
-			continue; // Only pickups
+			continue; // Only pickups and projectiles
 		}
 		float DiffX = (float)((*itr)->GetPosX() - PosX );
 		float DiffY = (float)((*itr)->GetPosY() - PosY );
@@ -1695,7 +1695,14 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 			);
 			*/
 			MarkDirty();
-			(reinterpret_cast<cPickup *>(*itr))->CollectedBy( a_Player );
+			if ((*itr)->IsPickup())
+			{
+				(reinterpret_cast<cPickup *>(*itr))->CollectedBy(a_Player);
+			}
+			else
+			{
+				(reinterpret_cast<cProjectileEntity *>(*itr))->CollectedBy(a_Player);
+			}
 		}
 		else if (SqrDist < 5 * 5)
 		{

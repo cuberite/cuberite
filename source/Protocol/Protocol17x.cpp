@@ -820,9 +820,13 @@ void cProtocol172::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 
 void cProtocol172::SendWeather(eWeather a_Weather)
 {
-	cPacketizer Pkt(*this, 0x2b);  // Change Game State packet
-	Pkt.WriteByte((a_Weather == wSunny) ? 2 : 1);  // begin rain / end rain
-	Pkt.WriteFloat(0);  // unused
+	{
+		cPacketizer Pkt(*this, 0x2b);  // Change Game State packet
+		Pkt.WriteByte((a_Weather == wSunny) ? 1 : 2);  // End rain / begin rain
+		Pkt.WriteFloat(0);  // Unused for weather
+	}
+
+	// TODO: Fade effect, somehow
 }
 
 
