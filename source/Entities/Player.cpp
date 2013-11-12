@@ -1624,3 +1624,4 @@ int cPlayer::PlayerLevel(int m_XPAmount)
 		return static_cast<int> ((151.5 + sqrt(22952.25 - 14 * (2220 - m_XPAmount))) / 7);
 	}
 }
+
