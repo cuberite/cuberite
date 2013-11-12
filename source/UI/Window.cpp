@@ -628,7 +628,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 		
 		// Modify the item at the slot
 		cItem AtSlot(*Area->GetSlot(LocalSlotNum, a_Player));
-		int MaxStack = ItemHandler(AtSlot.m_ItemType)->GetMaxStackSize();
+		int MaxStack = AtSlot.GetMaxStackSize();
 		if (AtSlot.IsEmpty())
 		{
 			// Empty, just move all of it there:
@@ -637,7 +637,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 			Area->SetSlot(LocalSlotNum, a_Player, ToStore);
 			NumDistributed += ToStore.m_ItemCount;
 		}
-		else
+		else if (AtSlot.IsStackableWith(a_Item))
 		{
 			// Occupied, add and cap at MaxStack:
 			int CanStore = std::min(a_NumToEachSlot, (int)MaxStack - AtSlot.m_ItemCount);
