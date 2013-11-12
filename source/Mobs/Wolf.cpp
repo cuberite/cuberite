@@ -15,8 +15,8 @@ cWolf::cWolf(void) :
 	m_IsTame(false),
 	m_IsSitting(false),
 	m_IsBegging(false),
-	m_Owner(""),
-	m_Collar(14)
+	m_OwnerName(""),
+	m_CollarColor(14)
 {
 }
 
@@ -40,7 +40,7 @@ void cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
-	if ((!IsTame()) && (!IsAngry()))
+	if (!IsTame() && !IsAngry())
 	{
 		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_BONE)
 		{
@@ -64,11 +64,11 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	}
 	else if (IsTame())
 	{
-		if (a_Player.GetName() == m_Owner) // Is the player the owner of the dog?
+		if (a_Player.GetName() == m_OwnerName) // Is the player the owner of the dog?
 		{
 			if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE)
 			{
-				m_Collar = 15 - a_Player.GetEquippedItem().m_ItemDamage;
+				SetCollarColor(15 - a_Player.GetEquippedItem().m_ItemDamage);
 				if (!a_Player.IsGameModeCreative())
 				{
 					a_Player.GetInventory().RemoveOneEquippedItem();
@@ -97,7 +97,9 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 	if (!IsAngry())
 	{
 		cMonster::Tick(a_Dt, a_Chunk);
-	} else {
+	}
+	else
+	{
 		super::Tick(a_Dt, a_Chunk);
 	}
 
@@ -139,35 +141,45 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 			}
 		}
 	}
-	
-	class cCallback :
-		public cPlayerListCallback
-	{
-		virtual bool Item(cPlayer * Player) override
-		{
-			OwnerCoords = Player->GetPosition();
-			return false;
-		}
-	public:
-		Vector3f OwnerCoords;
-	} ;
-	cCallback Callback;
-	m_World->DoWithPlayer(m_Owner, Callback);
-	Vector3f OwnerCoords = Callback.OwnerCoords;
 
 	if (IsTame())
 	{
-		if (m_Owner != "")
+		TickFollowPlayer();
+	}
+}
+
+
+
+
+
+void cWolf::TickFollowPlayer()
+{
+	class cCallback :
+		public cPlayerListCallback
+	{
+		virtual bool Item(cPlayer * a_Player) override
 		{
-			double Distance = (OwnerCoords - GetPosition()).Length();
-			if (Distance < 3)
-			{
-				m_bMovingToDestination = false;
-			} else if((Distance > 30) && (!IsSitting())) {
-				TeleportToCoords(OwnerCoords.x, OwnerCoords.y, OwnerCoords.z);
-			} else {
-				m_Destination = OwnerCoords;
-			}
+			OwnerPos = a_Player->GetPosition();
+			return false;
+		}
+	public:
+		Vector3f OwnerPos;
+	} Callback;
+	if (m_World->DoWithPlayer(m_OwnerName, Callback))
+	{
+		// The player is present in the world, follow them:
+		double Distance = (Callback.OwnerPos - GetPosition()).Length();
+		if (Distance < 3)
+		{
+			m_bMovingToDestination = false;
+		}
+		else if ((Distance > 30) && (!IsSitting()))
+		{
+			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+		}
+		else
+		{
+			m_Destination = Callback.OwnerPos;
 		}
 	}
 }
