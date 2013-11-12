@@ -649,8 +649,8 @@ public:
 		g_BlockSpreadLightFalloff[E_BLOCK_WATER]            = 3;
 
 		// Transparent blocks
-		g_BlockTransparent[E_BLOCK_AIR]                   = true;
 		g_BlockTransparent[E_BLOCK_ACTIVATOR_RAIL]        = true;
+		g_BlockTransparent[E_BLOCK_AIR]                   = true;
 		g_BlockTransparent[E_BLOCK_BIG_FLOWER]            = true;
 		g_BlockTransparent[E_BLOCK_BROWN_MUSHROOM]        = true;
 		g_BlockTransparent[E_BLOCK_CARROTS]               = true;
@@ -672,10 +672,10 @@ public:
 		g_BlockTransparent[E_BLOCK_IRON_DOOR]             = true;
 		g_BlockTransparent[E_BLOCK_LAVA]                  = true;
 		g_BlockTransparent[E_BLOCK_LEAVES]                = true;
-		g_BlockTransparent[E_BLOCK_NEW_LEAVES]            = true;
 		g_BlockTransparent[E_BLOCK_LEVER]                 = true;
 		g_BlockTransparent[E_BLOCK_MELON_STEM]            = true;
 		g_BlockTransparent[E_BLOCK_NETHER_BRICK_FENCE]    = true;
+		g_BlockTransparent[E_BLOCK_NEW_LEAVES]            = true;
 		g_BlockTransparent[E_BLOCK_POTATOES]              = true;
 		g_BlockTransparent[E_BLOCK_POWERED_RAIL]          = true;
 		g_BlockTransparent[E_BLOCK_PISTON_EXTENSION]      = true;
@@ -683,15 +683,15 @@ public:
 		g_BlockTransparent[E_BLOCK_RAIL]                  = true;
 		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]          = true;
 		g_BlockTransparent[E_BLOCK_SIGN_POST]             = true;
+		g_BlockTransparent[E_BLOCK_SNOW]                  = true;
 		g_BlockTransparent[E_BLOCK_STATIONARY_LAVA]       = true;
 		g_BlockTransparent[E_BLOCK_STATIONARY_WATER]      = true;
 		g_BlockTransparent[E_BLOCK_STONE_PRESSURE_PLATE]  = true;
-		g_BlockTransparent[E_BLOCK_SNOW]                  = true;
 		g_BlockTransparent[E_BLOCK_TALL_GRASS]            = true;
 		g_BlockTransparent[E_BLOCK_TORCH]                 = true;
 		g_BlockTransparent[E_BLOCK_VINES]                 = true;
-		g_BlockTransparent[E_BLOCK_WATER]                 = true;
 		g_BlockTransparent[E_BLOCK_WALLSIGN]              = true;
+		g_BlockTransparent[E_BLOCK_WATER]                 = true;
 		g_BlockTransparent[E_BLOCK_WOODEN_DOOR]           = true;
 		g_BlockTransparent[E_BLOCK_WOODEN_PRESSURE_PLATE] = true;
 
