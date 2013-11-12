@@ -1,4 +1,3 @@
-
 // Enchantments.h
 
 // Declares the cEnchantments class representing a storage for item enchantments and stored-enchantments
@@ -58,6 +57,8 @@ public:
 		enchPunch                = 49,
 		enchFlame                = 50,
 		enchInfinity             = 51,
+		enchLuckOfTheSea	 = 61,
+		enchLure		 = 62,
 	} ;
 	
 	/// Creates an empty enchantments container
