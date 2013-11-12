@@ -295,7 +295,11 @@ public:
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const { return IsEating(); }
 
+	/// Player's XP
+	int m_XPAmount;
 
+	/// Returns the current player level from the amount of XP
+	int PlayerLevel(int m_XPAmount);
 
 protected:
 	typedef std::map< std::string, bool > PermissionMap;

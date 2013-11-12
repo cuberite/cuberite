@@ -65,6 +65,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
+	, m_XPAmount(0)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -1605,4 +1606,21 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 
 
 
+// Ref: http://minecraft.gamepedia.com/Experience
+int cPlayer::PlayerLevel(int m_XPAmount)
+{
+	if (m_XPAmount <= 255)
+	{
+		return static_cast<int> (m_XPAmount / 17);
+	}
 
+	else if (m_XPAmount <= 766)
+	{
+		return static_cast<int> ((29.5 + sqrt(870.25 - 6 * (360 - m_XPAmount))) / 3);
+	}
+
+	else
+	{
+		return static_cast<int> ((151.5 + sqrt(22952.25 - 14 * (2220 - m_XPAmount))) / 7);
+	}
+}
