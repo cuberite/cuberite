@@ -651,15 +651,18 @@ public:
 		// Transparent blocks
 		g_BlockTransparent[E_BLOCK_AIR]                   = true;
 		g_BlockTransparent[E_BLOCK_ACTIVATOR_RAIL]        = true;
+		g_BlockTransparent[E_BLOCK_BIG_FLOWER]            = true;
 		g_BlockTransparent[E_BLOCK_BROWN_MUSHROOM]        = true;
 		g_BlockTransparent[E_BLOCK_CARROTS]               = true;
 		g_BlockTransparent[E_BLOCK_CHEST]                 = true;
 		g_BlockTransparent[E_BLOCK_COBWEB]                = true;
 		g_BlockTransparent[E_BLOCK_CROPS]                 = true;
+		g_BlockTransparent[E_BLOCK_DANDELION]             = true;
 		g_BlockTransparent[E_BLOCK_DETECTOR_RAIL]         = true;
 		g_BlockTransparent[E_BLOCK_FENCE]                 = true;
 		g_BlockTransparent[E_BLOCK_FENCE_GATE]            = true;
 		g_BlockTransparent[E_BLOCK_FIRE]                  = true;
+		g_BlockTransparent[E_BLOCK_FLOWER]                = true;
 		g_BlockTransparent[E_BLOCK_FLOWER_POT]            = true;
 		g_BlockTransparent[E_BLOCK_GLASS]                 = true;
 		g_BlockTransparent[E_BLOCK_GLASS_PANE]            = true;
@@ -691,9 +694,6 @@ public:
 		g_BlockTransparent[E_BLOCK_WALLSIGN]              = true;
 		g_BlockTransparent[E_BLOCK_WOODEN_DOOR]           = true;
 		g_BlockTransparent[E_BLOCK_WOODEN_PRESSURE_PLATE] = true;
-		g_BlockTransparent[E_BLOCK_DANDELION]             = true;
-		g_BlockTransparent[E_BLOCK_FLOWER]                = true;
-		g_BlockTransparent[E_BLOCK_BIG_FLOWER]            = true;
 
 		// TODO: Any other transparent blocks?
 
