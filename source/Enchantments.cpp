@@ -1,4 +1,3 @@
-
 // Enchantments.cpp
 
 // Implements the cEnchantments class representing a storage for item enchantments and stored-enchantments
@@ -179,6 +178,8 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 		{ enchPunch,                "Punch"},
 		{ enchFlame,                "Flame"},
 		{ enchInfinity,             "Infinity"},
+		{ enchLuckOfTheSea	    "LuckOfTheSea"},
+		{ enchLure		    "Lure"},
 	} ;
 	for (int i = 0; i < ARRAYCOUNT(EnchantmentNames); i++)
 	{
