@@ -654,8 +654,8 @@ enum
 	// Item metas:
 	
 	// E_ITEM_COAL metas:
-	E_META_COAL_NORMAL   = 0,
-	E_META_COAL_CHARCOAL   = 1,
+	E_META_COAL_NORMAL    = 0,
+	E_META_COAL_CHARCOAL  = 1,
 	
 	// E_ITEM_DYE metas:
 	E_META_DYE_BLACK      = 0,
