@@ -622,65 +622,78 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType, int a_Size)
+cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 {
 	cFastRandom Random;
-	
 	cMonster * toReturn = NULL;
 
-	// unspecified size get rand[1,3] for Monsters that need size
+	// Create the mob entity
 	switch (a_MobType)
 	{
 		case mtMagmaCube:
 		case mtSlime:
 		{
-			if (a_Size == -1)
-			{
-				a_Size = Random.NextInt(2, a_MobType) + 1;
-			}
-			if ((a_Size <= 0) || (a_Size >= 4))
-			{
-				ASSERT(!"Random for size was supposed to pick in [1..3] and picked outside");
-				a_Size = 1;
-			}
+			toReturn = new cSlime    (Random.NextInt(2) + 1);
 			break;
 		}
-		default: break;
-	}  // switch (a_MobType)
+		case mtSkeleton:
+		{
+			// TODO: Actual detection of spawning in Nether
+			toReturn = new cSkeleton(Random.NextInt(1) == 0 ? false : true);
+			break;
+		}
+		case mtVillager:
+		{
+			int VillagerType = Random.NextInt(6);
+			if (VillagerType == 6)
+			{
+				// Give farmers a better chance of spawning
+				VillagerType = 0;
+			}
 
-	// Create the mob entity
-	switch (a_MobType)
-	{
-		case mtMagmaCube:     toReturn  = new cMagmaCube(a_Size);             break;
-		case mtSlime:         toReturn  = new cSlime(a_Size);                 break;
-		case mtBat:           toReturn  = new cBat();                         break;
-		case mtBlaze:         toReturn  = new cBlaze();                       break;
-		case mtCaveSpider:    toReturn  = new cCavespider();                  break;
-		case mtChicken:       toReturn  = new cChicken();                     break;
-		case mtCow:           toReturn  = new cCow();                         break;
-		case mtCreeper:       toReturn  = new cCreeper();                     break;
-		case mtEnderman:      toReturn  = new cEnderman();                    break;
-		case mtGhast:         toReturn  = new cGhast();                       break;
-		// TODO: 
-		// case cMonster::mtHorse:         toReturn  = new cHorse();                       break;
-		case mtMooshroom:     toReturn  = new cMooshroom();                   break;
-		case mtOcelot:        toReturn  = new cOcelot();                      break;
-		case mtPig:           toReturn  = new cPig();                         break;
-		// TODO: Implement sheep color
-		case mtSheep:         toReturn  = new cSheep(0);                      break;
-		case mtSilverfish:    toReturn  = new cSilverfish();                  break;
-		// TODO: Implement wither skeleton geration
-		case mtSkeleton:      toReturn  = new cSkeleton(false);               break;
-		case mtSpider:        toReturn  = new cSpider();                      break;
-		case mtSquid:         toReturn  = new cSquid();                       break;
-		case mtVillager:      toReturn  = new cVillager(cVillager::vtFarmer); break;
-		case mtWitch:         toReturn  = new cWitch();                       break;
-		case mtWolf:          toReturn  = new cWolf();                        break;
-		case mtZombie:        toReturn  = new cZombie(false);                 break;
-		case mtZombiePigman:  toReturn  = new cZombiePigman();                break;
+			toReturn = new cVillager((cVillager::eVillagerType)VillagerType);
+			break;
+		}
+		case mtHorse:
+		{
+			// Horses take a type (species), a colour, and a style (dots, stripes, etc.)
+			int HorseType = Random.NextInt(7);
+			int HorseColor = Random.NextInt(6);
+			int HorseStyle = Random.NextInt(6);
+			int HorseTameTimes = Random.NextInt(6) + 1;
+
+			if ((HorseType == 5) || (HorseType == 6) || (HorseType == 7))
+			{
+				// Increase chances of normal horse (zero)
+				HorseType = 0;
+			}
+
+			toReturn = new cHorse(HorseType, HorseColor, HorseStyle, HorseTameTimes);
+			break;
+		}
+
+		case mtBat:           toReturn = new cBat();                      break;
+		case mtBlaze:         toReturn = new cBlaze();                    break;
+		case mtCaveSpider:    toReturn = new cCavespider();               break;
+		case mtChicken:       toReturn = new cChicken();                  break;
+		case mtCow:           toReturn = new cCow();                      break;
+		case mtCreeper:       toReturn = new cCreeper();                  break;
+		case mtEnderman:      toReturn = new cEnderman();                 break;
+		case mtGhast:         toReturn = new cGhast();                    break;
+		case mtMooshroom:     toReturn = new cMooshroom();                break;
+		case mtOcelot:        toReturn = new cOcelot();                   break;
+		case mtPig:           toReturn = new cPig();                      break;
+		case mtSheep:         toReturn = new cSheep (Random.NextInt(15)); break; // Colour parameter
+		case mtSilverfish:    toReturn = new cSilverfish();               break;
+		case mtSpider:        toReturn = new cSpider();                   break;
+		case mtSquid:         toReturn = new cSquid();                    break;
+		case mtWitch:         toReturn = new cWitch();                    break;
+		case mtWolf:          toReturn = new cWolf();                     break;
+		case mtZombie:        toReturn = new cZombie(false);              break; // TODO: Infected zombie parameter
+		case mtZombiePigman:  toReturn = new cZombiePigman();             break;
 		default:
 		{
-			ASSERT(!"Unhandled Mob type");
+			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
 		}
 	}
 	return toReturn;

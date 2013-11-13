@@ -53,6 +53,9 @@ public:
 	/// Called by the physics blocktracer when the entity hits another entity
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) {}
 	
+	/// Called by Chunk when the projectile is eligible for player collection
+	virtual void CollectedBy(cPlayer * a_Dest);
+
 	// tolua_begin
 
 	/// Returns the kind of the projectile (fast class identification)
@@ -153,9 +156,20 @@ protected:
 	/// If true, the arrow deals more damage
 	bool m_IsCritical;
 
+	/// Timer for pickup collection animation or five minute timeout
+	float m_Timer;
+
+	/// If true, the arrow is in the process of being collected - don't go to anyone else
+	bool m_bIsCollected;
+
+	/// Stores the block position that arrow is lodged into, sets m_IsInGround to false if it becomes air
+	Vector3i m_HitBlockPos;
+	
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	virtual void CollectedBy(cPlayer * a_Player) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	
 	// tolua_begin
 } ;

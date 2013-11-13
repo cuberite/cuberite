@@ -1512,7 +1512,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
 		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
-		float SpeedY = 1;
+		float SpeedY = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 		
 		cPickup * Pickup = new cPickup(
@@ -2563,15 +2563,16 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType)
 {
 	cMonster * Monster = NULL;
-	
-	int ShColor = GetTickRandomNumber(15); // 0 .. 15 - Sheep
-	bool SkType = GetDimension() == dimNether ; // Skeleton
 
 	Monster = cMonster::NewMonsterFromType(a_MonsterType);
 	if (Monster != NULL)
 	{
 		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	}
+
+	// Because it's logical that ALL mob spawns need spawn effects, not just spawners
+	BroadcastSoundParticleEffect(2004, (int)a_PosX, (int)a_PosY, (int)a_PosZ, 0);
+	
 	return SpawnMobFinalize(Monster);
 }
 

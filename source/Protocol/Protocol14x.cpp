@@ -109,9 +109,9 @@ void cProtocol142::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_SOUND_PARTICLE_EFFECT);
 	WriteInt (a_EffectID);
-	WriteInt (a_SrcX / 8);
-	WriteByte(a_SrcY / 8);
-	WriteInt (a_SrcZ / 8);
+	WriteInt (a_SrcX);
+	WriteByte(a_SrcY);
+	WriteInt (a_SrcZ);
 	WriteInt (a_Data);
 	WriteBool(0);
 	Flush();

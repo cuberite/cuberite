@@ -31,8 +31,9 @@ cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_It
 	, m_bCollected( false )
 	, m_bIsPlayerCreated( IsPlayerCreated )
 {
-	m_MaxHealth = 5;
-	m_Health = 5;
+	SetGravity(-10.5f);
+	SetMaxHealth(5);
+	SetHealth(5);
 	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
@@ -145,6 +146,8 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 	{
 		m_Item.m_ItemCount -= NumAdded;
 		m_World->BroadcastCollectPickup(*this, *a_Dest);
+		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
+		m_World->BroadcastSoundEffect("random.pop",(int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		if (m_Item.m_ItemCount == 0)
 		{
 			// All of the pickup has been collected, schedule the pickup for destroying

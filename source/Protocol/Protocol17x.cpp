@@ -17,6 +17,7 @@ Implements the 1.7.x protocol classes:
 #include "../World.h"
 #include "../WorldStorage/FastNBT.h"
 #include "../StringCompression.h"
+#include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
@@ -215,7 +216,7 @@ void cProtocol172::SendDestroyEntity(const cEntity & a_Entity)
 void cProtocol172::SendDisconnect(const AString & a_Reason)
 {
 	cPacketizer Pkt(*this, 0x40);
-	Pkt.WriteString(EscapeString(a_Reason));
+	Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 }
 
 
@@ -615,9 +616,9 @@ void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 {
 	cPacketizer Pkt(*this, 0x28);  // Effect packet
 	Pkt.WriteInt(a_EffectID);
-	Pkt.WriteInt(a_SrcX / 8);
-	Pkt.WriteByte(a_SrcY / 8);
-	Pkt.WriteInt(a_SrcZ / 8);
+	Pkt.WriteInt(a_SrcX);
+	Pkt.WriteByte(a_SrcY);
+	Pkt.WriteInt(a_SrcZ);
 	Pkt.WriteInt(a_Data);
 	Pkt.WriteBool(false);
 }
@@ -819,9 +820,13 @@ void cProtocol172::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 
 void cProtocol172::SendWeather(eWeather a_Weather)
 {
-	cPacketizer Pkt(*this, 0x2b);  // Change Game State packet
-	Pkt.WriteByte((a_Weather == wSunny) ? 2 : 1);  // begin rain / end rain
-	Pkt.WriteFloat(0);  // unused
+	{
+		cPacketizer Pkt(*this, 0x2b);  // Change Game State packet
+		Pkt.WriteByte((a_Weather == wSunny) ? 1 : 2);  // End rain / begin rain
+		Pkt.WriteFloat(0);  // Unused for weather
+	}
+
+	// TODO: Fade effect, somehow
 }
 
 
@@ -1664,12 +1669,43 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteItem(((const cPickup &)a_Entity).GetItem());
 			break;
 		}
+		case cEntity::etMinecart:
+		{
+			WriteByte(0x51);
+
+			// The following expression makes Minecarts shake more with less health or higher damage taken
+			// It gets half the maximum health, and takes it away from the current health minus the half health:
+			/* Health: 5 | 3 - (5 - 3) = 1 (shake power)
+			   Health: 3 | 3 - (3 - 3) = 3
+			   Health: 1 | 3 - (1 - 3) = 5
+			*/
+			WriteInt((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * ((const cMinecart &)a_Entity).LastDamage()) * 4);
+			WriteByte(0x52);
+			WriteInt(1); // Shaking direction, doesn't seem to affect anything
+			WriteByte(0x73);
+			WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
+
+			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
+			{
+				WriteByte(0x10);
+				WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0);
+			}
+			break;
+		}
+		case cEntity::etProjectile:
+		{
+			if (((cProjectileEntity &)a_Entity).GetProjectileKind() == cProjectileEntity::pkArrow)
+			{
+				WriteByte(0x10);
+				WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0);
+			}
+			break;
+		}
 		case cEntity::etMonster:
 		{
 			WriteMobMetadata((const cMonster &)a_Entity);
 			break;
 		}
-		// TODO: Other types
 	}
 }
 
