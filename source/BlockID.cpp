@@ -461,23 +461,26 @@ eDimension StringToDimension(const AString & a_DimensionString)
 /// Translates damage type constant to a string representation (built-in).
 AString DamageTypeToString(eDamageType a_DamageType)
 {
+	// Make sure to keep this alpha-sorted.
 	switch (a_DamageType)
 	{
+		case dtAdmin:           return "dtAdmin";
 		case dtAttack:          return "dtAttack";
-		case dtRangedAttack:    return "dtRangedAttack";
-		case dtLightning:       return "dtLightning";
-		case dtFalling:         return "dtFalling";
-		case dtDrowning:        return "dtDrowning";
-		case dtSuffocating:     return "dtSuffocation";
-		case dtStarving:        return "dtStarving";
 		case dtCactusContact:   return "dtCactusContact";
-		case dtLavaContact:     return "dtLavaContact";
-		case dtPoisoning:       return "dtPoisoning";
-		case dtOnFire:          return "dtOnFire";
+		case dtDrowning:        return "dtDrowning";
+		case dtEnderPearl:      return "dtEnderPearl";
+		case dtFalling:         return "dtFalling";
 		case dtFireContact:     return "dtFireContact";
 		case dtInVoid:          return "dtInVoid";
+		case dtLavaContact:     return "dtLavaContact";
+		case dtLightning:       return "dtLightning";
+		case dtOnFire:          return "dtOnFire";
+		case dtPoisoning:       return "dtPoisoning";
 		case dtPotionOfHarming: return "dtPotionOfHarming";
-		case dtAdmin:           return "dtAdmin";
+		case dtRangedAttack:    return "dtRangedAttack";
+		case dtStarving:        return "dtStarving";
+		case dtSuffocating:     return "dtSuffocation";
+
 	}
 	
 	// Unknown damage type:
