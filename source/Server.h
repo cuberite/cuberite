@@ -57,6 +57,9 @@ public:												// tolua_export
 	
 	/// Executes the console command, sends output through the specified callback
 	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
+	
+	/// Lists all available console commands and their helpstrings
+	void PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
 
 	/// Binds the built-in console commands with the plugin manager
 	static void BindBuiltInConsoleCommands(void);

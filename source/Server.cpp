@@ -462,6 +462,18 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		return;
 	}
 	
+	// "help" and "reload" are to be handled by MCS, so that they work no matter what
+	if (split[0] == "help")
+	{
+		PrintHelp(split, a_Output);
+		return;
+	}
+	if (split[0] == "reload")
+	{
+		cPluginManager::Get()->ReloadPlugins();
+		return;
+	}
+	
 	// There is currently no way a plugin can do these (and probably won't ever be):
 	if (split[0].compare("chunkstats") == 0)
 	{
@@ -500,9 +512,20 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 
 
 
+void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
+{
+	// TODO
+}
+
+
+
+
+
 void cServer::BindBuiltInConsoleCommands(void)
 {
 	cPluginManager * PlgMgr = cPluginManager::Get();
+	PlgMgr->BindConsoleCommand("help", NULL, " - Shows the available commands");
+	PlgMgr->BindConsoleCommand("reload", NULL, " - Reloads all plugins");
 	PlgMgr->BindConsoleCommand("restart", NULL, " - Restarts the server cleanly");
 	PlgMgr->BindConsoleCommand("stop", NULL, " - Stops the server cleanly");
 	PlgMgr->BindConsoleCommand("chunkstats", NULL, " - Displays detailed chunk memory statistics");
