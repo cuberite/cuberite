@@ -1374,12 +1374,13 @@ bool cPlayer::LoadFromDisk()
 	}
 
 	m_Health = root.get("health", 0).asInt();
-	m_XpLevel             = root.get("experience",     0).asInt();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
+
+	SetExperience(root.get("experience", 0).asInt());
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 	
