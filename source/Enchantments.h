@@ -57,8 +57,8 @@ public:
 		enchPunch                = 49,
 		enchFlame                = 50,
 		enchInfinity             = 51,
-		enchLuckOfTheSea	 = 61,
-		enchLure		 = 62,
+		enchLuckOfTheSea         = 61,
+		enchLure                 = 62,
 	} ;
 	
 	/// Creates an empty enchantments container
