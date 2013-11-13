@@ -1372,7 +1372,7 @@ bool cPlayer::LoadFromDisk()
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
 	{
-		// This is a new player whom we haven't seen yet, bail, let them have the defaults
+		// This is a new player whom we haven't seen yet, bail out, let them have the defaults
 		return false;
 	}
 
