@@ -514,7 +514,39 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 
 void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
 {
-	// TODO
+	typedef std::pair<AString, AString> AStringPair;
+	typedef std::vector<AStringPair> AStringPairs;
+	
+	class cCallback :
+		public cPluginManager::cCommandEnumCallback
+	{
+	public:
+		cCallback(void) : m_MaxLen(0) {}
+		
+		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
+		{
+			if (!a_HelpString.empty())
+			{
+				m_Commands.push_back(AStringPair(a_Command, a_HelpString));
+				if (m_MaxLen < a_Command.length())
+				{
+					m_MaxLen = a_Command.length();
+				}
+			}
+			return false;
+		}
+		
+		AStringPairs m_Commands;
+		size_t m_MaxLen;
+	} Callback;
+	cPluginManager::Get()->ForEachConsoleCommand(Callback);
+	std::sort(Callback.m_Commands.begin(), Callback.m_Commands.end());
+	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
+	{
+		const AStringPair & cmd = *itr;
+		a_Output.Out(Printf("%-*s%s\n", Callback.m_MaxLen, cmd.first.c_str(), cmd.second.c_str()));
+	}  // for itr - Callback.m_Commands[]
+	a_Output.Finished();
 }
 
 
