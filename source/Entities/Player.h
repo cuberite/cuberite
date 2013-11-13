@@ -77,7 +77,7 @@ public:
 	bool AddExperience(int a_Xp_delta);
 
 	/// Gets the experience total - XpTotal
-	inline int GetExperience(void) { return m_XpTotal; }
+	inline int GetExperienceTotal(void) { return m_XpTotal; }
 
 	/// Gets the current level - XpLevel
 	inline int GetExperienceLevel(void) { return m_XpLevel; }
