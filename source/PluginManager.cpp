@@ -1511,11 +1511,11 @@ bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_P
 	{
 		if (cmd->second.m_Plugin == NULL)
 		{
-			LOGWARNING("Console command \"%s\" is already bound internally by MCServer.", a_Command.c_str());
+			LOGWARNING("Console command \"%s\" is already bound internally by MCServer, cannot bind in plugin \"%s\".", a_Command.c_str(), a_Plugin->GetName().c_str());
 		}
 		else
 		{
-			LOGWARNING("Console command \"%s\" is already bound to plugin \"%s\".", a_Command.c_str(), cmd->second.m_Plugin->GetName().c_str());
+			LOGWARNING("Console command \"%s\" is already bound to plugin \"%s\", cannot bind in plugin \"%s\".", a_Command.c_str(), cmd->second.m_Plugin->GetName().c_str(), a_Plugin->GetName().c_str());
 		}
 		return false;
 	}
