@@ -1,4 +1,3 @@
-
 # This file describes the crafting recipes that MCServer knows.
 # The syntax is as follows:
 #   <Line> = <Recipe>#<Comment>
@@ -380,8 +379,45 @@ GreenWool     = Wool, * | GreenDye, *
 RedWool       = Wool, * | RedDye, *
 BlackWool     = Wool, * | BlackDye, *
 
+#******************************************************#
+# Stained Glass:
+#
+WhiteStainedGlass, 8     = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BoneMeal, 2:2
+OrangeStainedGlass, 8    = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | OrangeDye, 2:2
+MagentaStainedGlass, 8   = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | MagentaDye, 2:2
+LightBlueStainedGlass, 8 = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LightBlueDye, 2:2
+YellowStainedGlass, 8    = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | YellowDye, 2:2
+LimeStainedGlass, 8      = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LimeDye, 2:2
+PinkStainedGlass, 8      = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | PinkDye, 2:2
+GrayStainedGlass, 8      = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | GrayDye, 2:2
+LightGrayStainedGlass, 8 = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LightGrayDye, 2:2
+CyanStainedGlass, 8      = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | CyanDye, 2:2
+VioletStainedGlass, 8    = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | VioletDye, 2:2
+BlueStainedGlass, 8      = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BlueDye, 2:2
+BrownStainedGlass, 8     = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BrownDye, 2:2
+GreenStainedGlass, 8     = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | GreenDye, 2:2
+RedStainedGlass, 8       = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | RedDye, 2:2
+BlackStainedGlass, 8     = Glass, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BlackDye, 2:2
 
-
+#******************************************************#
+# Stained Glass Pane:
+#
+WhiteStainedGlassPane, 16     = WhiteStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+OrangeStainedGlassPane, 16    = OrangeStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+MagentaStainedGlassPane, 16   = MagentaStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+LightBlueStainedGlassPane, 16 = LightBlueStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+YellowStainedGlassPane, 16    = YellowStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+LimeStainedGlassPane, 16      = LimeStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+PinkStainedGlassPane, 16      = PinkStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+GrayStainedGlassPane, 16      = GrayStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+LightGrayStainedGlassPane, 16 = LightGrayStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+CyanStainedGlassPane, 16      = CyanStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+VioletStainedGlassPane, 16    = VioletStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+BlueStainedGlassPane, 16      = BlueStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+BrownStainedGlassPane, 16     = BrownStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+GreenStainedGlassPane, 16     = GreenStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+RedStainedGlassPane, 16       = RedStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+BlackStainedGlassPane , 16    = BlackStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
 
 
 #******************************************************#
