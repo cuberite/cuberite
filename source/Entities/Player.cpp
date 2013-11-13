@@ -66,10 +66,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
-	, m_XpLevel(0)
-	, m_XpP(0.f)
 	, m_XpTotal(0)
-	, m_XpNextLevelTotal(0)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -265,6 +262,70 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
+int cPlayer::CalcLevelFromXp(int a_XpTotal)
+{
+	//level 0 to 15
+	if(a_XpTotal <= XP_TO_LEVEL15)
+	{
+		return (int) a_XpTotal / XP_PER_LEVEL_TO15;
+	}
+
+	//level 30+
+	if(a_XpTotal > XP_TO_LEVEL30)
+	{
+		return (int) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
+	}
+
+	//level 16 to 30
+	return (int) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
+}
+
+
+
+
+
+int cPlayer::XpAtLevel(int a_Level)
+{
+	//level 0 to 15
+	if(a_Level <= 15)
+	{
+		return a_Level * XP_PER_LEVEL_TO15;
+	}
+
+	//level 30+
+	if(a_Level >= 31)
+	{
+		return (int) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
+	}
+
+	//level 16 to 30
+	return (int) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
+}
+
+
+
+
+
+int cPlayer::GetExperienceLevel()
+{
+	return CalcLevelFromXp(m_XpTotal);
+}
+
+
+
+
+
+float cPlayer::GetExperiencePercentage()
+{
+	int currentLevel = CalcLevelFromXp(m_XpTotal);
+
+	return (float)m_XpTotal / (float)XpAtLevel(1+currentLevel);
+}
+
+
+
+
+
 bool cPlayer::SetExperience(int a_XpTotal)
 {
 	if(!(a_XpTotal >= 0) || (a_XpTotal > (INT_MAX - m_XpTotal)))
@@ -273,53 +334,30 @@ bool cPlayer::SetExperience(int a_XpTotal)
 		return false; //oops, they gave us a dodgey number
 	}
 
-
 	m_XpTotal = a_XpTotal;
 
-	//now calculate XpP and XpLevel
-	//First Calc current level using quadratic eqn
-	m_XpLevel = CalcLevelFromXp(m_XpTotal);
-
-	//calculate total Xp for next level
-	m_XpNextLevelTotal = XpAtLevel(m_XpLevel+1);
-
-	//calulate Xp Percentage
-	m_XpP = (float)m_XpLevel / (float)m_XpNextLevelTotal;
-
-	return true;//aka happy :)
+	return true;
 }
 
 
 
 
 
-bool cPlayer::AddExperience(int a_Xp_delta)
+int cPlayer::AddExperience(int a_Xp_delta)
 {
 	if(a_Xp_delta > MAX_EXPERIENCE_ORB_SIZE || a_Xp_delta < 0)
 	{
 		//value was too large or negative, abort and report
 		LOGWARNING("Attempt was made to increment Xp by %d, max is %d and must be positive",
 			a_Xp_delta, MAX_EXPERIENCE_ORB_SIZE);
-		return false;
+		return -1; //should we instead just return the current Xp?
 	}
 	
 	LOGD("Player \"%s\" earnt %d experience", m_PlayerName.c_str(), a_Xp_delta);
 
-	//update Xp, note there is no min
 	m_XpTotal += a_Xp_delta;
 
-	//update Xp percentage
-	if(m_XpTotal >= m_XpNextLevelTotal)
-	{
-		//oh actually, update their level first
-
-		m_XpLevel++;
-		m_XpNextLevelTotal = XpAtLevel(m_XpLevel+1);
-	}
-
-	m_XpP = (float)m_XpLevel / (float)m_XpNextLevelTotal;
-
-	return true;
+	return m_XpTotal;
 }
 
 

@@ -44,8 +44,12 @@ extern bool g_BlockIsSolid[256];
 /// Can torches be placed on this block?
 extern bool g_BlockIsTorchPlaceable[256];
 
-/// Max Erperience that possible to be incremented at once
-#define MAX_EXPERIENCE_ORB_SIZE 2000 //ie from a ender dragon
+/// Experience Orb setup
+enum
+{
+	//open to suggestion on naming convention here :)
+	MAX_EXPERIENCE_ORB_SIZE = 2000
+} ;
 
 
 

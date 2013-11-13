@@ -64,26 +64,25 @@ public:
 	/// Returns the currently equipped boots; empty item if none
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
-	/** Sets the experience total - XpTotal, updates XpLevel and XpP as appropriate
+	/** Sets the experience total
 	Returns true on success
 	should really only be called at init or player death
 	*/
 	bool SetExperience(int a_XpTotal);
 
 	/* Adds Xp, will not inc more than MAX_EXPERIENCE_ORB_SIZE!
-	Returns true on success
-	Updates XpLevel and XpP appropriately
+	Returns the new total experience, -1 on error
 	*/
-	bool AddExperience(int a_Xp_delta);
+	int AddExperience(int a_Xp_delta);
 
 	/// Gets the experience total - XpTotal
 	inline int GetExperienceTotal(void) { return m_XpTotal; }
 
 	/// Gets the current level - XpLevel
-	inline int GetExperienceLevel(void) { return m_XpLevel; }
+	int GetExperienceLevel(void);
 
 	/// Gets the experience bar percentage - XpP
-	inline float GetExperiencePercentage(void) { return m_XpP; }
+	float GetExperiencePercentage(void);
 	
 	/// Starts charging the equipped bow
 	void StartChargingBow(void);
@@ -329,6 +328,14 @@ protected:
 	std::string m_PlayerName;
 	std::string m_LoadedWorldName;
 
+	/// Xp Level stuff
+	enum 
+	{
+		XP_TO_LEVEL15 = 255,
+		XP_PER_LEVEL_TO15 = 17,
+		XP_TO_LEVEL30 = 825
+	} ;
+
 	/// Player's air level (for swimming)
 	int m_AirLevel;
 
@@ -400,26 +407,14 @@ protected:
 	/// The world tick in which eating will be finished. -1 if not eating
 	Int64 m_EatingFinishTick;
 
-	/// Player Xp levels etc
-	int m_XpLevel; //store this and m_XpP to save calculating each time
-	float m_XpP; //between 0 & 1
+	/// Player Xp level
 	int m_XpTotal;
-	int m_XpNextLevelTotal; //save calculating this often
-
-	//Xp level defines
-	#define XP_TO_LEVEL15 255
-	#define XP_PER_LEVEL_TO15 17
-	#define XP_TO_LEVEL30 825
 
 	/// Caculates the Xp at a given level, ref: http://minecraft.gamepedia.com/XP
-	inline int XpAtLevel(int level) { return (int) ((level <= 15)? (15*level) : 
-		((level <= 31)? (1.5*level*level - 29.5*level + 360) : 
-		(3.5*level*level - 151.5*level + 2220))); }
+	static int XpAtLevel(int a_Level);
 
 	/// inverse of XpAtLevel, ref: http://minecraft.gamepedia.com/XP values are as per this with pre-calculations
-	inline int CalcLevelFromXp(int XpTotal) { return (int) ((XpTotal <= XP_TO_LEVEL15)? XpTotal / XP_PER_LEVEL_TO15 : //level 0-15 or...
-		(XpTotal <= XP_TO_LEVEL30)? ( 29.5 + sqrt( 870.25 - (6 * ( 360 - XpTotal )))) / 3 : //level 15-30
-		(151.5 + sqrt( 22952.25 - (14 * (2220 - XpTotal)))) / 7); }//level 30+
+	static int CalcLevelFromXp(int a_XpTotal);
 	
 	bool m_IsChargingBow;
 	int  m_BowCharge;
