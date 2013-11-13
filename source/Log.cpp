@@ -124,7 +124,7 @@ void cLog::Log(const char * a_Format, va_list argList)
 	#endif
 	if (m_File)
 	{
-		fprintf(m_File, "%s\n", Line.c_str(), m_File);
+		fprintf(m_File, "%s\n", Line.c_str());
 		fflush(m_File);
 	}
 
