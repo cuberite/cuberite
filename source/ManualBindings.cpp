@@ -1347,7 +1347,9 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 	
 	if (!self->BindCommand(Command, Plugin, Permission, HelpString))
 	{
-		// Refused. Possibly already bound. Error message has been given, bail out silently.
+		// Refused. Possibly already bound. Error message has been given, display the callstack:
+		cLuaState LS(L);
+		LS.LogStackTrace();
 		return 0;
 	}
 	
@@ -1409,7 +1411,9 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	
 	if (!self->BindConsoleCommand(Command, Plugin, HelpString))
 	{
-		// Refused. Possibly already bound. Error message has been given, bail out silently.
+		// Refused. Possibly already bound. Error message has been given, display the callstack:
+		cLuaState LS(L);
+		LS.LogStackTrace();
 		return 0;
 	}
 	
