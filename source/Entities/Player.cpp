@@ -306,7 +306,7 @@ int cPlayer::XpAtLevel(int a_Level)
 
 
 
-int cPlayer::GetExperienceLevel()
+int cPlayer::XpGetLevel()
 {
 	return CalcLevelFromXp(m_XpTotal);
 }
@@ -315,7 +315,7 @@ int cPlayer::GetExperienceLevel()
 
 
 
-float cPlayer::GetExperiencePercentage()
+float cPlayer::XpGetPercentage()
 {
 	int currentLevel = CalcLevelFromXp(m_XpTotal);
 

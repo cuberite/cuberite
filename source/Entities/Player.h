@@ -76,13 +76,13 @@ public:
 	int AddExperience(int a_Xp_delta);
 
 	/// Gets the experience total - XpTotal
-	inline int GetExperienceTotal(void) { return m_XpTotal; }
+	inline int XpGetTotal(void) { return m_XpTotal; }
 
 	/// Gets the current level - XpLevel
-	int GetExperienceLevel(void);
+	int XpGetLevel(void);
 
 	/// Gets the experience bar percentage - XpP
-	float GetExperiencePercentage(void);
+	float XpGetPercentage(void);
 	
 	/// Starts charging the equipped bow
 	void StartChargingBow(void);
