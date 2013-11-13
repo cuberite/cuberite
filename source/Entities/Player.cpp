@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
@@ -28,6 +28,7 @@
 #include <json/json.h>
 
 #define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
+
 
 
 
@@ -65,6 +66,10 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
+	, m_XpLevel(0)
+	, m_XpP(0.f)
+	, m_XpTotal(0)
+	, m_XpNextLevelTotal(0)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -254,6 +259,67 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		m_World->SendPlayerList(this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
+}
+
+
+
+
+
+bool cPlayer::SetExperience(int a_XpTotal)
+{
+	if(!(a_XpTotal >= 0) || (a_XpTotal > (INT_MAX - m_XpTotal)))
+	{
+		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_XpTotal);
+		return false; //oops, they gave us a dodgey number
+	}
+
+
+	m_XpTotal = a_XpTotal;
+
+	//now calculate XpP and XpLevel
+	//First Calc current level using quadratic eqn
+	m_XpLevel = CalcLevelFromXp(m_XpTotal);
+
+	//calculate total Xp for next level
+	m_XpNextLevelTotal = XpAtLevel(m_XpLevel+1);
+
+	//calulate Xp Percentage
+	m_XpP = (float)m_XpLevel / (float)m_XpNextLevelTotal;
+
+	return true;//aka happy :)
+}
+
+
+
+
+
+bool cPlayer::AddExperience(int a_Xp_delta)
+{
+	if(a_Xp_delta > MAX_EXPERIENCE_ORB_SIZE || a_Xp_delta < 0)
+	{
+		//value was too large or negative, abort and report
+		LOGWARNING("Attempt was made to increment Xp by %d, max is %d and must be positive",
+			a_Xp_delta, MAX_EXPERIENCE_ORB_SIZE);
+		return false;
+	}
+	
+	LOGD("Player \"%s\" earnt %d experience", m_PlayerName.c_str(), a_Xp_delta);
+
+	//update Xp, note there is no min
+	m_XpTotal += a_Xp_delta;
+
+	//update Xp percentage
+	if(m_XpTotal >= m_XpNextLevelTotal)
+	{
+		//oh actually, update their level first
+
+		m_XpLevel++;
+		m_XpNextLevelTotal = XpAtLevel(m_XpLevel+1);
+	}
+
+	m_XpP = (float)m_XpLevel / (float)m_XpNextLevelTotal;
+
+	return true;
 }
 
 
@@ -1268,7 +1334,7 @@ bool cPlayer::LoadFromDisk()
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
 	{
-		// This is a new player whom we haven't seen yet, bail out, let them have the defaults
+		// This is a new player whom we haven't seen yet, bail, let them have the defaults
 		return false;
 	}
 
@@ -1278,7 +1344,7 @@ bool cPlayer::LoadFromDisk()
 		LOGWARNING("Cannot read player data from file \"%s\"", SourceFile.c_str()); 
 		return false;
 	}
-	f.Close();
+	f.Close(); //cool kids play nice
 
 	Json::Value root;
 	Json::Reader reader;
@@ -1308,6 +1374,7 @@ bool cPlayer::LoadFromDisk()
 	}
 
 	m_Health = root.get("health", 0).asInt();
+	m_XpLevel             = root.get("experience",     0).asInt();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
@@ -1354,6 +1421,7 @@ bool cPlayer::SaveToDisk()
 	root["rotation"]       = JSON_PlayerRotation;
 	root["inventory"]      = JSON_Inventory;
 	root["health"]         = m_Health;
+	root["experience"]     = m_XpTotal;
 	root["air"]            = m_AirLevel;
 	root["food"]           = m_FoodLevel;
 	root["foodSaturation"] = m_FoodSaturationLevel;
