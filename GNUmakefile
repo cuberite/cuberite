@@ -103,7 +103,7 @@ endif
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
-	LNK_LIBS = -lstdc++ -ldl
+	LNK_LIBS = -lstdc++ -ldl -lm
 else
 	LNK_LIBS = -lstdc++ -lltdl
 endif
