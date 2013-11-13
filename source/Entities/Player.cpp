@@ -284,7 +284,7 @@ int cPlayer::CalcLevelFromXp(int a_XpTotal)
 
 
 
-int cPlayer::XpAtLevel(int a_Level)
+int cPlayer::XpForLevel(int a_Level)
 {
 	//level 0 to 15
 	if(a_Level <= 15)

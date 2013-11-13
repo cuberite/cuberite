@@ -66,7 +66,7 @@ public:
 
 	/** Sets the experience total
 	Returns true on success
-	should really only be called at init or player death
+	"should" really only be called at init or player death, plugins excepted
 	*/
 	bool SetExperience(int a_XpTotal);
 
@@ -410,8 +410,8 @@ protected:
 	/// Player Xp level
 	int m_XpTotal;
 
-	/// Caculates the Xp at a given level, ref: http://minecraft.gamepedia.com/XP
-	static int XpAtLevel(int a_Level);
+	/// Caculates the Xp needed for a given level, ref: http://minecraft.gamepedia.com/XP
+	static int XpForLevel(int a_Level);
 
 	/// inverse of XpAtLevel, ref: http://minecraft.gamepedia.com/XP values are as per this with pre-calculations
 	static int CalcLevelFromXp(int a_XpTotal);
