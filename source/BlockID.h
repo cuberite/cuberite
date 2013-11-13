@@ -40,10 +40,8 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_PISTON_EXTENSION = 34,
 	E_BLOCK_WOOL = 35,
 	E_BLOCK_PISTON_MOVED_BLOCK = 36,
-	E_BLOCK_DANDELION = 37,             // Minecraft 1.7.x IDs
+	E_BLOCK_DANDELION = 37,
 	E_BLOCK_FLOWER = 38,
-	E_BLOCK_YELLOW_FLOWER = 37,
-	E_BLOCK_RED_ROSE = 38,              // Older IDs
 	E_BLOCK_BROWN_MUSHROOM = 39,
 	E_BLOCK_RED_MUSHROOM = 40,
 	E_BLOCK_GOLD_BLOCK = 41,
@@ -188,6 +186,12 @@ enum ENUM_BLOCK_ID
 	// IsValidBlock() depends on this
 	E_BLOCK_NUMBER_OF_TYPES,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1  ///< Maximum BlockType number used
+	
+	// Synonym or ID compatibility
+	
+	E_BLOCK_YELLOW_FLOWER = E_BLOCK_DANDELION,
+	E_BLOCK_RED_ROSE = E_BLOCK_FLOWER,
+	E_BLOCK_LOCKED_CHEST = E_BLOCK_STAINED_GLASS,
 };
 // tolua_end
 
