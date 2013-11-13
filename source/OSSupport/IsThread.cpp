@@ -53,7 +53,7 @@ static void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
 cIsThread::cIsThread(const AString & iThreadName) :
 	m_ThreadName(iThreadName),
 	m_ShouldTerminate(false),
-	m_Handle(NULL)
+	m_Handle(NULL_HANDLE)
 {
 }
 
@@ -73,8 +73,7 @@ cIsThread::~cIsThread()
 
 bool cIsThread::Start(void)
 {
-	ASSERT(m_Handle == NULL);  // Has already started one thread?
-	
+	ASSERT(m_Handle == NULL_HANDLE);  // Has already started one thread?
 	#ifdef _WIN32
 		// Create the thread suspended, so that the mHandle variable is valid in the thread procedure
 		DWORD ThreadID = 0;
@@ -111,7 +110,7 @@ bool cIsThread::Start(void)
 
 void cIsThread::Stop(void)
 {
-	if (m_Handle == NULL)
+	if (m_Handle == NULL_HANDLE)
 	{
 		return;
 	}

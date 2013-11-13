@@ -51,15 +51,28 @@ public:
 protected:
 	AString m_ThreadName;
 	
+	// Value used for "no handle":
+	#ifdef _WIN32
+		#define NULL_HANDLE NULL
+	#else
+		#define NULL_HANDLE 0
+	#endif
+
 	#ifdef _WIN32
 	
 		HANDLE m_Handle;
 		
 		static DWORD_PTR __stdcall thrExecute(LPVOID a_Param)
 		{
+			// Create a window so that the thread can be identified by 3rd party tools:
 			HWND IdentificationWnd = CreateWindow("STATIC", ((cIsThread *)a_Param)->m_ThreadName.c_str(), 0, 0, 0, 0, WS_OVERLAPPED, NULL, NULL, NULL, NULL);
+			
+			// Run the thread:
 			((cIsThread *)a_Param)->Execute();
+			
+			// Destroy the identification window:
 			DestroyWindow(IdentificationWnd);
+			
 			return 0;
 		}
 		
