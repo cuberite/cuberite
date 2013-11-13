@@ -185,7 +185,7 @@ enum ENUM_BLOCK_ID
 	// Keep these two as the last values, without a number - they will get their correct number assigned automagically by C++
 	// IsValidBlock() depends on this
 	E_BLOCK_NUMBER_OF_TYPES,  ///< Number of individual (different) blocktypes
-	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1  ///< Maximum BlockType number used
+	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 	
 	// Synonym or ID compatibility
 	
