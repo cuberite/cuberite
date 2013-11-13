@@ -70,7 +70,7 @@ public:
 	*/
 	bool SetExperience(int a_XpTotal);
 
-	/* Adds Xp, will not inc more than MAX_EXPERIENCE_ORB_SIZE!
+	/* Adds Xp, "should" not inc more than MAX_EXPERIENCE_ORB_SIZE unless you're a plugin being funny, *cough* cheating
 	Returns the new total experience, -1 on error
 	*/
 	int AddExperience(int a_Xp_delta);

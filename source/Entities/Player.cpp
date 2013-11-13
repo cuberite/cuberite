@@ -267,7 +267,7 @@ int cPlayer::CalcLevelFromXp(int a_XpTotal)
 	//level 0 to 15
 	if(a_XpTotal <= XP_TO_LEVEL15)
 	{
-		return (int) a_XpTotal / XP_PER_LEVEL_TO15;
+		return a_XpTotal / XP_PER_LEVEL_TO15;
 	}
 
 	//level 30+
@@ -345,11 +345,11 @@ bool cPlayer::SetExperience(int a_XpTotal)
 
 int cPlayer::AddExperience(int a_Xp_delta)
 {
-	if(a_Xp_delta > MAX_EXPERIENCE_ORB_SIZE || a_Xp_delta < 0)
+	if(a_Xp_delta < 0)
 	{
-		//value was too large or negative, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, max is %d and must be positive",
-			a_Xp_delta, MAX_EXPERIENCE_ORB_SIZE);
+		//value was negative, abort and report
+		LOGWARNING("Attempt was made to increment Xp by %d, must be positive",
+			a_Xp_delta);
 		return -1; //should we instead just return the current Xp?
 	}
 	
