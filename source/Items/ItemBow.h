@@ -72,7 +72,7 @@ public:
 			return;
 		}
 		a_Player->GetWorld()->BroadcastSpawnEntity(*Arrow);
-		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", (int)a_Player->GetPosX() * 8, (int)a_Player->GetPosY() * 8, (int)a_Player->GetPosZ() * 8, 0.5, Force);
+		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", (int)a_Player->GetPosX() * 8, (int)a_Player->GetPosY() * 8, (int)a_Player->GetPosZ() * 8, 0.5, (float)Force);
 
 		if (!a_Player->IsGameModeCreative())
 		{
