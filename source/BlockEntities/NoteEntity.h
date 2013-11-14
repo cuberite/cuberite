@@ -26,30 +26,37 @@ enum ENUM_NOTE_INSTRUMENTS
 
 
 
+// tolua_begin
+
 class cNoteEntity : 
 	public cBlockEntity
 {
 	typedef cBlockEntity super;
 public:
 
-	/// Creates a new note entity that is not assigned to a world
-	cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
-	
+	// tolua_end
+
+	/// Creates a new note entity. a_World may be NULL
 	cNoteEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 
-	bool LoadFromJson( const Json::Value& a_Value );
-	virtual void SaveToJson( Json::Value& a_Value ) override;
+	bool LoadFromJson(const Json::Value & a_Value);
+	virtual void SaveToJson(Json::Value & a_Value) override;
 
-	char GetPitch( void );
-	void SetPitch( char a_Pitch );
-	void IncrementPitch( void );
-	void MakeSound( void );
-	virtual void UsedBy( cPlayer * a_Player ) override;
+	// tolua_begin
+	
+	char GetPitch(void);
+	void SetPitch(char a_Pitch);
+	void IncrementPitch(void);
+	void MakeSound(void);
+	
+	// tolua_end
+	
+	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override { };
 
 private:
-	unsigned char m_Pitch;
-};
+	char m_Pitch;
+} ;  // tolua_export
 
 
 

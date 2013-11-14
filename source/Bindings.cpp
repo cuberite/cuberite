@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/14/13 15:39:43.
+** Generated automatically by tolua++-1.0.92 on 11/14/13 17:13:46.
 */
 
 #ifndef __cplusplus
@@ -266,34 +266,35 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"std::vector<AString>");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cItem");
- tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
- tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cBoundingBox");
+ tolua_usertype(tolua_S,"cNoteEntity");
  tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
- tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cPlayer");
- tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cSignEntity");
  tolua_usertype(tolua_S,"cFile");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cIniFile");
- tolua_usertype(tolua_S,"cChatColor");
  tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"cChatColor");
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cThrownEggEntity");
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cWebAdmin");
  tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"cProjectileEntity");
- tolua_usertype(tolua_S,"cSignEntity");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
  tolua_usertype(tolua_S,"cDropperEntity");
 }
@@ -19020,6 +19021,133 @@ static int tolua_AllToLua_cJukeboxEntity_EjectRecord00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetPitch of class  cNoteEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cNoteEntity_GetPitch00
+static int tolua_AllToLua_cNoteEntity_GetPitch00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cNoteEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cNoteEntity* self = (cNoteEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPitch'", NULL);
+#endif
+  {
+   char tolua_ret = (char)  self->GetPitch();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetPitch'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetPitch of class  cNoteEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cNoteEntity_SetPitch00
+static int tolua_AllToLua_cNoteEntity_SetPitch00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cNoteEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cNoteEntity* self = (cNoteEntity*)  tolua_tousertype(tolua_S,1,0);
+  char a_Pitch = ((char)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetPitch'", NULL);
+#endif
+  {
+   self->SetPitch(a_Pitch);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetPitch'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IncrementPitch of class  cNoteEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cNoteEntity_IncrementPitch00
+static int tolua_AllToLua_cNoteEntity_IncrementPitch00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cNoteEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cNoteEntity* self = (cNoteEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IncrementPitch'", NULL);
+#endif
+  {
+   self->IncrementPitch();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IncrementPitch'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: MakeSound of class  cNoteEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cNoteEntity_MakeSound00
+static int tolua_AllToLua_cNoteEntity_MakeSound00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cNoteEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cNoteEntity* self = (cNoteEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MakeSound'", NULL);
+#endif
+  {
+   self->MakeSound();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MakeSound'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cSignEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cSignEntity_new00
 static int tolua_AllToLua_cSignEntity_new00(lua_State* tolua_S)
@@ -31375,6 +31503,13 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetRecord",tolua_AllToLua_cJukeboxEntity_SetRecord00);
    tolua_function(tolua_S,"PlayRecord",tolua_AllToLua_cJukeboxEntity_PlayRecord00);
    tolua_function(tolua_S,"EjectRecord",tolua_AllToLua_cJukeboxEntity_EjectRecord00);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cNoteEntity","cNoteEntity","cBlockEntity",NULL);
+  tolua_beginmodule(tolua_S,"cNoteEntity");
+   tolua_function(tolua_S,"GetPitch",tolua_AllToLua_cNoteEntity_GetPitch00);
+   tolua_function(tolua_S,"SetPitch",tolua_AllToLua_cNoteEntity_SetPitch00);
+   tolua_function(tolua_S,"IncrementPitch",tolua_AllToLua_cNoteEntity_IncrementPitch00);
+   tolua_function(tolua_S,"MakeSound",tolua_AllToLua_cNoteEntity_MakeSound00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cSignEntity","cSignEntity","cBlockEntity",tolua_collect_cSignEntity);
