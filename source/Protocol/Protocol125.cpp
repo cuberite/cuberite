@@ -72,6 +72,7 @@ enum
 	PACKET_ENT_STATUS                = 0x26,
 	PACKET_ATTACH_ENTITY             = 0x27,
 	PACKET_METADATA                  = 0x28,
+	PACKET_EXPERIENCE                = 0x2b,
 	PACKET_PRE_CHUNK                 = 0x32,
 	PACKET_MAP_CHUNK                 = 0x33,
 	PACKET_MULTI_BLOCK               = 0x34,
@@ -684,6 +685,20 @@ void cProtocol125::SendRespawn(void)
 	WriteByte  ((char)m_Client->GetPlayer()->GetGameMode());
 	WriteShort (256);  // Current world height
 	WriteString("default");
+}
+
+
+
+
+
+void cProtocol125::SendSetExperience(void)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte  (PACKET_EXPERIENCE);
+	WriteFloat (m_Client->GetPlayer()->XpGetPercentage());
+	WriteShort (m_Client->GetPlayer()->XpGetLevel());
+	WriteShort (m_Client->GetPlayer()->XpGetTotal());
+	Flush();
 }
 
 

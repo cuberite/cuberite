@@ -466,6 +466,16 @@ void cProtocolRecognizer::SendRespawn(void)
 
 
 
+void cProtocolRecognizer::SendSetExperience(void)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendSetExperience();
+}
+
+
+
+
+
 void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_Protocol != NULL);

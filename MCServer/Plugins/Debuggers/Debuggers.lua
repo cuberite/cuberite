@@ -44,6 +44,7 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
 	PluginManager:BindCommand("/arr",     "debuggers", HandleArrowCmd,        "- Creates an arrow going away from the player");
 	PluginManager:BindCommand("/fb",      "debuggers", HandleFireballCmd,     "- Creates a ghast fireball as if shot by the player");
+	PluginManager:BindCommand("/xpa",     "debuggers", HandleAddExperience,   "- Adds 200 experience to the player");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -839,3 +840,8 @@ end
 
 
 
+function HandleAddExperience(a_Split, a_Player)
+	a_Player->AddExperience(200);
+
+	return true;
+end
