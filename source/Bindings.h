@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/14/13 15:31:52.
+** Generated automatically by tolua++-1.0.92 on 11/14/13 15:39:43.
 */
 
 /* Exported function */

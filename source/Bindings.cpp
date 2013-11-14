@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/14/13 15:31:51.
+** Generated automatically by tolua++-1.0.92 on 11/14/13 15:39:43.
 */
 
 #ifndef __cplusplus
@@ -46,6 +46,8 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "BlockEntities/DropperEntity.h"
 #include "BlockEntities/FurnaceEntity.h"
 #include "BlockEntities/HopperEntity.h"
+#include "BlockEntities/JukeboxEntity.h"
+#include "BlockEntities/NoteEntity.h"
 #include "BlockEntities/SignEntity.h"
 #include "WebAdmin.h"
 #include "WebPlugin.h"
@@ -245,6 +247,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"cCraftingRecipes");
+ tolua_usertype(tolua_S,"cJukeboxEntity");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cDispenserEntity");
  tolua_usertype(tolua_S,"cGhastFireballEntity");
@@ -263,21 +266,21 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"std::vector<AString>");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cWindow");
- tolua_usertype(tolua_S,"HTTPFormData");
- tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cItem");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
  tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"cBlockArea");
- tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cBoundingBox");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
  tolua_usertype(tolua_S,"cServer");
- tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cPlayer");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cFile");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"cClientHandle");
@@ -288,7 +291,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cThrownEggEntity");
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"cItem");
+ tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"cProjectileEntity");
  tolua_usertype(tolua_S,"cSignEntity");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
@@ -18890,6 +18893,133 @@ static int tolua_AllToLua_cHopperEntity_new00_local(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetRecord of class  cJukeboxEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cJukeboxEntity_GetRecord00
+static int tolua_AllToLua_cJukeboxEntity_GetRecord00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cJukeboxEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cJukeboxEntity* self = (cJukeboxEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRecord'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetRecord();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetRecord'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetRecord of class  cJukeboxEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cJukeboxEntity_SetRecord00
+static int tolua_AllToLua_cJukeboxEntity_SetRecord00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cJukeboxEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cJukeboxEntity* self = (cJukeboxEntity*)  tolua_tousertype(tolua_S,1,0);
+  int a_Record = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRecord'", NULL);
+#endif
+  {
+   self->SetRecord(a_Record);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetRecord'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: PlayRecord of class  cJukeboxEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cJukeboxEntity_PlayRecord00
+static int tolua_AllToLua_cJukeboxEntity_PlayRecord00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cJukeboxEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cJukeboxEntity* self = (cJukeboxEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'PlayRecord'", NULL);
+#endif
+  {
+   self->PlayRecord();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'PlayRecord'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: EjectRecord of class  cJukeboxEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cJukeboxEntity_EjectRecord00
+static int tolua_AllToLua_cJukeboxEntity_EjectRecord00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cJukeboxEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cJukeboxEntity* self = (cJukeboxEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'EjectRecord'", NULL);
+#endif
+  {
+   self->EjectRecord();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'EjectRecord'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cSignEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cSignEntity_new00
 static int tolua_AllToLua_cSignEntity_new00(lua_State* tolua_S)
@@ -31238,6 +31368,13 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_AllToLua_cHopperEntity_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cHopperEntity_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cHopperEntity_new00_local);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cJukeboxEntity","cJukeboxEntity","cBlockEntity",NULL);
+  tolua_beginmodule(tolua_S,"cJukeboxEntity");
+   tolua_function(tolua_S,"GetRecord",tolua_AllToLua_cJukeboxEntity_GetRecord00);
+   tolua_function(tolua_S,"SetRecord",tolua_AllToLua_cJukeboxEntity_SetRecord00);
+   tolua_function(tolua_S,"PlayRecord",tolua_AllToLua_cJukeboxEntity_PlayRecord00);
+   tolua_function(tolua_S,"EjectRecord",tolua_AllToLua_cJukeboxEntity_EjectRecord00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cSignEntity","cSignEntity","cBlockEntity",tolua_collect_cSignEntity);
