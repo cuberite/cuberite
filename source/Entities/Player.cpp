@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
@@ -28,6 +28,7 @@
 #include <json/json.h>
 
 #define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
+
 
 
 
@@ -65,6 +66,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
+	, m_XpTotal(0)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -254,6 +256,108 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		m_World->SendPlayerList(this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
+}
+
+
+
+
+
+int cPlayer::CalcLevelFromXp(int a_XpTotal)
+{
+	//level 0 to 15
+	if(a_XpTotal <= XP_TO_LEVEL15)
+	{
+		return a_XpTotal / XP_PER_LEVEL_TO15;
+	}
+
+	//level 30+
+	if(a_XpTotal > XP_TO_LEVEL30)
+	{
+		return (int) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
+	}
+
+	//level 16 to 30
+	return (int) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
+}
+
+
+
+
+
+int cPlayer::XpForLevel(int a_Level)
+{
+	//level 0 to 15
+	if(a_Level <= 15)
+	{
+		return a_Level * XP_PER_LEVEL_TO15;
+	}
+
+	//level 30+
+	if(a_Level >= 31)
+	{
+		return (int) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
+	}
+
+	//level 16 to 30
+	return (int) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
+}
+
+
+
+
+
+int cPlayer::XpGetLevel()
+{
+	return CalcLevelFromXp(m_XpTotal);
+}
+
+
+
+
+
+float cPlayer::XpGetPercentage()
+{
+	int currentLevel = CalcLevelFromXp(m_XpTotal);
+
+	return (float)m_XpTotal / (float)XpForLevel(1+currentLevel);
+}
+
+
+
+
+
+bool cPlayer::SetExperience(int a_XpTotal)
+{
+	if(!(a_XpTotal >= 0) || (a_XpTotal > (INT_MAX - m_XpTotal)))
+	{
+		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_XpTotal);
+		return false; //oops, they gave us a dodgey number
+	}
+
+	m_XpTotal = a_XpTotal;
+
+	return true;
+}
+
+
+
+
+
+int cPlayer::AddExperience(int a_Xp_delta)
+{
+	if(a_Xp_delta < 0)
+	{
+		//value was negative, abort and report
+		LOGWARNING("Attempt was made to increment Xp by %d, must be positive",
+			a_Xp_delta);
+		return -1; //should we instead just return the current Xp?
+	}
+	
+	LOGD("Player \"%s\" earnt %d experience", m_PlayerName.c_str(), a_Xp_delta);
+
+	m_XpTotal += a_Xp_delta;
+
+	return m_XpTotal;
 }
 
 
@@ -1278,7 +1382,7 @@ bool cPlayer::LoadFromDisk()
 		LOGWARNING("Cannot read player data from file \"%s\"", SourceFile.c_str()); 
 		return false;
 	}
-	f.Close();
+	f.Close(); //cool kids play nice
 
 	Json::Value root;
 	Json::Reader reader;
@@ -1313,6 +1417,8 @@ bool cPlayer::LoadFromDisk()
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
+
+	SetExperience(root.get("experience", 0).asInt());
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 	
@@ -1354,6 +1460,7 @@ bool cPlayer::SaveToDisk()
 	root["rotation"]       = JSON_PlayerRotation;
 	root["inventory"]      = JSON_Inventory;
 	root["health"]         = m_Health;
+	root["experience"]     = m_XpTotal;
 	root["air"]            = m_AirLevel;
 	root["food"]           = m_FoodLevel;
 	root["foodSaturation"] = m_FoodSaturationLevel;

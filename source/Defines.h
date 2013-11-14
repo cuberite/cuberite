@@ -44,6 +44,13 @@ extern bool g_BlockIsSolid[256];
 /// Can torches be placed on this block?
 extern bool g_BlockIsTorchPlaceable[256];
 
+/// Experience Orb setup
+enum
+{
+	//open to suggestion on naming convention here :)
+	MAX_EXPERIENCE_ORB_SIZE = 2000
+} ;
+
 
 
 

@@ -63,6 +63,31 @@ public:
 	
 	/// Returns the currently equipped boots; empty item if none
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
+
+
+	// tolua_begin
+
+	/** Sets the experience total
+	Returns true on success
+	"should" really only be called at init or player death, plugins excepted
+	*/
+	bool SetExperience(int a_XpTotal);
+
+	/* Adds Xp, "should" not inc more than MAX_EXPERIENCE_ORB_SIZE unless you're a plugin being funny, *cough* cheating
+	Returns the new total experience, -1 on error
+	*/
+	int AddExperience(int a_Xp_delta);
+
+	/// Gets the experience total - XpTotal
+	inline int XpGetTotal(void) { return m_XpTotal; }
+
+	/// Gets the current level - XpLevel
+	int XpGetLevel(void);
+
+	/// Gets the experience bar percentage - XpP
+	float XpGetPercentage(void);
+
+	// tolua_end
 	
 	/// Starts charging the equipped bow
 	void StartChargingBow(void);
@@ -289,7 +314,7 @@ public:
 	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
 
 	// tolua_end
-	
+
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
@@ -307,6 +332,14 @@ protected:
 
 	std::string m_PlayerName;
 	std::string m_LoadedWorldName;
+
+	/// Xp Level stuff
+	enum 
+	{
+		XP_TO_LEVEL15 = 255,
+		XP_PER_LEVEL_TO15 = 17,
+		XP_TO_LEVEL30 = 825
+	} ;
 
 	/// Player's air level (for swimming)
 	int m_AirLevel;
@@ -378,6 +411,15 @@ protected:
 
 	/// The world tick in which eating will be finished. -1 if not eating
 	Int64 m_EatingFinishTick;
+
+	/// Player Xp level
+	int m_XpTotal;
+
+	/// Caculates the Xp needed for a given level, ref: http://minecraft.gamepedia.com/XP
+	static int XpForLevel(int a_Level);
+
+	/// inverse of XpAtLevel, ref: http://minecraft.gamepedia.com/XP values are as per this with pre-calculations
+	static int CalcLevelFromXp(int a_XpTotal);
 	
 	bool m_IsChargingBow;
 	int  m_BowCharge;
