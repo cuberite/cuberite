@@ -595,6 +595,7 @@ void cStructGenDirectOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
 					}  // for y
 					break;
 				}
+				default: break;
 			}  // switch (biome)
 		}  // for z, x
 		
