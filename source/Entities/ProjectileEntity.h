@@ -83,7 +83,7 @@ protected:
 	
 	/// True if the projectile has hit the ground and is stuck there
 	bool m_IsInGround;
-	
+		
 	// cEntity overrides:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
@@ -158,6 +158,8 @@ protected:
 
 	/// Timer for pickup collection animation or five minute timeout
 	float m_Timer;
+
+	float m_HitGroundTimer;
 
 	/// If true, the arrow is in the process of being collected - don't go to anyone else
 	bool m_bIsCollected;

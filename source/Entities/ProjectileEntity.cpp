@@ -287,7 +287,11 @@ AString cProjectileEntity::GetMCAClassName(void) const
 void cProjectileEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	BroadcastMovementUpdate();
+
+	if (GetProjectileKind() != pkArrow) // See cArrow::Tick
+	{
+		BroadcastMovementUpdate();
+	}
 }
 
 
@@ -391,7 +395,8 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	m_IsCritical(false),
 	m_Timer(0),
 	m_bIsCollected(false),
-	m_HitBlockPos(Vector3i(0, 0, 0))
+	m_HitBlockPos(Vector3i(0, 0, 0)),
+	m_HitGroundTimer(0)
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
@@ -414,7 +419,8 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	m_IsCritical((a_Force >= 1)),
 	m_Timer(0),
 	m_bIsCollected(false),
-	m_HitBlockPos(0, 0, 0)
+	m_HitBlockPos(0, 0, 0),
+	m_HitGroundTimer(0)
 {
 }
 
@@ -440,37 +446,29 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
-	if (a_HitFace == BLOCK_FACE_NONE)
-	{
-		return;
-	}
-
 	super::OnHitSolidBlock(a_HitPos, a_HitFace);
 	int a_X = (int)a_HitPos.x, a_Y = (int)a_HitPos.y, a_Z = (int)a_HitPos.z;
 	
-	if (a_HitFace != BLOCK_FACE_YP)
+	if (a_HitFace != BLOCK_FACE_NONE)
 	{
-		AddFaceDirection(a_X, a_Y, a_Z, a_HitFace);
-	}
-	else if (a_HitFace == BLOCK_FACE_YP) // These conditions because xoft got a little confused on block face directions, so AddFace works with all but YP & YM
-	{
-		a_Y--;
-	}
-	else
-	{
-		a_Y++;
+		if (a_HitFace != BLOCK_FACE_YP)
+		{
+			AddFaceDirection(a_X, a_Y, a_Z, a_HitFace);
+		}
+		else if (a_HitFace == BLOCK_FACE_YP) // These conditions because xoft got a little confused on block face directions, so AddFace works with all but YP & YM
+		{
+			a_Y--;
+		}
+		else
+		{
+			a_Y++;
+		}
 	}
 
 	m_HitBlockPos = Vector3i(a_X, a_Y, a_Z);
 
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("random.bowhit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-	
-	// Broadcast the position and speed packets before teleporting:
-	BroadcastMovementUpdate();
-	
-	// Teleport the entity to the exact hit coords:
-	m_World->BroadcastTeleportEntity(*this);
 }
 
 
@@ -542,6 +540,25 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_IsInGround)
 	{
+		// When an arrow hits, the client sometimes doesn't think it's in the ground, and therefore it keeps on moving (glitches)
+		// Temporary fix is to simply not sync with the client and send a teleport to confirm pos after arrow has stabilised
+		// We can afford to do this because xoft's algorithm for trajectory is near perfect, so things are pretty close anyway without sync
+		// BroadcastMovementUpdate seems to be part of its cause, but why?
+		// TODO: Find cause of arrow syncing issues and fix
+
+		if (m_HitGroundTimer != -1) // Sent a teleport already, don't do again
+		{
+			if (m_HitGroundTimer > 1000.f) // Send after a second, could be less, but just in case
+			{
+				m_World->BroadcastTeleportEntity(*this);
+				m_HitGroundTimer = -1;
+			}
+			else
+			{
+				m_HitGroundTimer += a_Dt;
+			}
+		}
+
 		int RelPosX = m_HitBlockPos.x - a_Chunk.GetPosX() * cChunkDef::Width;
 		int RelPosZ = m_HitBlockPos.z - a_Chunk.GetPosZ() * cChunkDef::Width;
 		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
