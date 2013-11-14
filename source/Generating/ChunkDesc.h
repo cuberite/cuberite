@@ -170,9 +170,12 @@ public:
 		);
 	}
 	
-	// tolua_end
+	/// Returns the block entity at the specified coords.
+	/// If there is no block entity at those coords, tries to create one, based on the block type
+	/// If the blocktype doesn't support a block entity, returns NULL.
+	cBlockEntity * GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ);
 	
-	void AddBlockEntity(cBlockEntity * a_BlockEntity);
+	// tolua_end
 	
 	// Accessors used by cChunkGenerator::Generator descendants:
 	inline cChunkDef::BiomeMap &     GetBiomeMap              (void) { return m_BiomeMap; }

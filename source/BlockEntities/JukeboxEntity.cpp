@@ -9,9 +9,19 @@
 
 
 
-cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
-	: cBlockEntity(E_BLOCK_JUKEBOX, a_BlockX, a_BlockY, a_BlockZ, a_World)
-	, m_Record( 0 )
+cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	super(E_BLOCK_JUKEBOX, a_BlockX, a_BlockY, a_BlockZ, NULL),
+	m_Record(0)
+{
+}
+
+
+
+
+
+cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	super(E_BLOCK_JUKEBOX, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	m_Record(0)
 {
 }
 

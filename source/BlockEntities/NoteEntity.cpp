@@ -6,9 +6,12 @@
 #include <json/json.h>
 
 
-cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
-	: cBlockEntity(E_BLOCK_NOTE_BLOCK, a_BlockX, a_BlockY, a_BlockZ, a_World)
-	, m_Pitch( 0 )
+
+
+
+cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	super(E_BLOCK_NOTE_BLOCK, a_BlockX, a_BlockY, a_BlockZ, NULL),
+	m_Pitch(0)
 {
 }
 
@@ -16,7 +19,9 @@ cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_Wo
 
 
 
-cNoteEntity::~cNoteEntity()
+cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	super(E_BLOCK_NOTE_BLOCK, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	m_Pitch(0)
 {
 }
 

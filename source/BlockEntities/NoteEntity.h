@@ -29,9 +29,13 @@ enum ENUM_NOTE_INSTRUMENTS
 class cNoteEntity : 
 	public cBlockEntity
 {
+	typedef cBlockEntity super;
 public:
+
+	/// Creates a new note entity that is not assigned to a world
+	cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
+	
 	cNoteEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
-	virtual ~cNoteEntity();
 
 	bool LoadFromJson( const Json::Value& a_Value );
 	virtual void SaveToJson( Json::Value& a_Value ) override;

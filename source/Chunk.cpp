@@ -1261,75 +1261,22 @@ void cChunk::CreateBlockEntities(void)
 				switch (BlockType)
 				{
 					case E_BLOCK_CHEST:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
-						{
-							m_BlockEntities.push_back(new cChestEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
-						}
-						break;
-					}
-
 					case E_BLOCK_DISPENSER:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
-						{
-							m_BlockEntities.push_back(new cDispenserEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
-						}
-						break;
-					}
-					
 					case E_BLOCK_DROPPER:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
-						{
-							m_BlockEntities.push_back(new cDropperEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
-						}
-						break;
-					}
-					
 					case E_BLOCK_LIT_FURNACE:
 					case E_BLOCK_FURNACE:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
-						{
-							NIBBLETYPE BlockMeta = cChunkDef::GetNibble(m_BlockMeta, x, y, z);
-							m_BlockEntities.push_back(new cFurnaceEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, BlockType, BlockMeta, m_World));
-						}
-						break;
-					}
-					
 					case E_BLOCK_HOPPER:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
-						{
-							m_BlockEntities.push_back(new cHopperEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
-						}
-					}
-					
 					case E_BLOCK_SIGN_POST:
 					case E_BLOCK_WALLSIGN:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
-						{
-							m_BlockEntities.push_back( new cSignEntity(BlockType, x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
-						}
-						break;
-					}
-
 					case E_BLOCK_NOTE_BLOCK:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
-						{
-							m_BlockEntities.push_back(new cNoteEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
-						}
-						break;
-					}
-
 					case E_BLOCK_JUKEBOX:
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back(new cJukeboxEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
+							m_BlockEntities.push_back(cBlockEntity::CreateByBlockType(
+								BlockType, GetMeta(x, y, z),
+								x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World
+							));
 						}
 						break;
 					}
@@ -1426,45 +1373,17 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	switch (a_BlockType)
 	{
 		case E_BLOCK_CHEST:
-		{
-			AddBlockEntity(new cChestEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
-			break;
-		}
 		case E_BLOCK_DISPENSER:
-		{
-			AddBlockEntity(new cDispenserEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
-			break;
-		}
 		case E_BLOCK_DROPPER:
-		{
-			AddBlockEntity(new cDropperEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
-			break;
-		}
 		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
-		{
-			AddBlockEntity(new cFurnaceEntity(WorldPos.x, WorldPos.y, WorldPos.z, a_BlockType, a_BlockMeta, m_World));
-			break;
-		}
 		case E_BLOCK_HOPPER:
-		{
-			AddBlockEntity(new cHopperEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
-			break;
-		}
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
-		{
-			AddBlockEntity(new cSignEntity(a_BlockType, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
-			break;
-		}
 		case E_BLOCK_NOTE_BLOCK:
-		{
-			AddBlockEntity(new cNoteEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
-			break;
-		}
 		case E_BLOCK_JUKEBOX:
 		{
-			AddBlockEntity(new cJukeboxEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 	}  // switch (a_BlockType)

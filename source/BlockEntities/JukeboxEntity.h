@@ -20,7 +20,12 @@ namespace Json
 class cJukeboxEntity : 
 	public cBlockEntity
 {
+	typedef cBlockEntity super;
 public:
+
+	/// Creates a new jukebox entity that is not assigned to a world
+	cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
+	
 	cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cJukeboxEntity();
 

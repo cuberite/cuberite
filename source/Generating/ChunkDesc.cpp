@@ -8,6 +8,7 @@
 #include "../BlockArea.h"
 #include "../Cuboid.h"
 #include "../Noise.h"
+#include "../BlockEntities/BlockEntity.h"
 
 
 
@@ -526,9 +527,28 @@ void cChunkDesc::RandomFillRelCuboid(
 
 
 
-void cChunkDesc::AddBlockEntity(cBlockEntity * a_BlockEntity)
+cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 {
-	m_BlockEntities.push_back(a_BlockEntity);
+	int AbsX = a_RelX + m_ChunkX * cChunkDef::Width;
+	int AbsZ = a_RelZ + m_ChunkZ * cChunkDef::Width;
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
+	{
+		if (((*itr)->GetPosX() == AbsX) && ((*itr)->GetPosY() == a_RelY) && ((*itr)->GetPosZ() == AbsZ))
+		{
+			// Already in the list, return it:
+			return *itr;
+		}
+	}  // for itr - m_BlockEntities[]
+	
+	// The block entity is not created yet, try to create it and add to list:
+	cBlockEntity * be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), AbsX, a_RelY, AbsZ);
+	if (be == NULL)
+	{
+		// No block entity for this block type
+		return NULL;
+	}
+	m_BlockEntities.push_back(be);
+	return be;
 }
 
 
