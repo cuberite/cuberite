@@ -64,6 +64,9 @@ public:
 	/// Returns the currently equipped boots; empty item if none
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
+
+	// tolua_begin
+
 	/** Sets the experience total
 	Returns true on success
 	"should" really only be called at init or player death, plugins excepted
@@ -83,6 +86,8 @@ public:
 
 	/// Gets the experience bar percentage - XpP
 	float XpGetPercentage(void);
+
+	// tolua_end
 	
 	/// Starts charging the equipped bow
 	void StartChargingBow(void);
