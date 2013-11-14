@@ -318,8 +318,10 @@ int cPlayer::XpGetLevel()
 float cPlayer::XpGetPercentage()
 {
 	int currentLevel = CalcLevelFromXp(m_XpTotal);
+	int currentLevel_XpBase = XpForLevel(currentLevel);
 
-	return (float)m_XpTotal / (float)XpForLevel(1+currentLevel);
+	return (float)(m_XpTotal - currentLevel_XpBase) / 
+		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
 }
 
 
