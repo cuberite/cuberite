@@ -504,7 +504,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 					Contents = [[
 						To manipulate block entities while the chunk is generated, first use SetBlockTypeMeta() to set
 						the correct block type and meta at the position. Then use the GetBlockEntity() to create and
-						return the correct block entity instance. Finally, use tolua.cast() to cast to the proper
+						return the correct block entity instance. Finally, use {{tolua}}.cast() to cast to the proper
 						type.</p>
 						Note that you don't need to check if a block entity has previously existed at the place, because
 						GetBlockEntity() will automatically re-create the correct type for you.</p>
@@ -756,6 +756,8 @@ end
 				enchInfinity = { Notes = "" },
 				enchKnockback = { Notes = "" },
 				enchLooting = { Notes = "" },
+				enchLuckOfTheSea = { Notes = "" },
+				enchLure = { Notes = "" },
 				enchPower = { Notes = "" },
 				enchProjectileProtection = { Notes = "" },
 				enchProtection = { Notes = "" },
@@ -1267,6 +1269,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				DamageItem = { Params = "[Amount]", Return = "bool", Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)" },
 				Empty = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
 				GetMaxDamage = { Params = "", Return = "number", Notes = "Returns the maximum value for damage that this item can get before breaking; zero if damage is not accounted for for this item type" },
+				GetMaxStackSize = { Params = "", Return = "number", Notes = "Returns the maximum stack size for this item." },
 				IsDamageable = { Params = "", Return = "bool", Notes = "Returns true if this item does account for its damage" },
 				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
 				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage and enchantments)" },
