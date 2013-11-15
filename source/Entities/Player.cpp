@@ -339,7 +339,7 @@ bool cPlayer::SetExperience(short int a_XpTotal)
 	m_XpTotal = a_XpTotal;
 
 	//send details to client
-	m_ClientHandle->SendSetExperience();
+	SendExperience();
 
 	return true;
 }
@@ -363,7 +363,7 @@ short cPlayer::AddExperience(short a_Xp_delta)
 	m_XpTotal += a_Xp_delta;
 
 	//send details to client
-	m_ClientHandle->SendSetExperience();
+	SendExperience();
 
 	return m_XpTotal;
 }
@@ -608,6 +608,18 @@ void cPlayer::SendHealth(void)
 	if (m_ClientHandle != NULL)
 	{
 		m_ClientHandle->SendHealth();
+	}
+}
+
+
+
+
+
+void cPlayer::SendExperience(void)
+{
+	if (m_ClientHandle != NULL)
+	{
+		m_ClientHandle->SendExperience();
 	}
 }
 
@@ -1419,12 +1431,13 @@ bool cPlayer::LoadFromDisk()
 		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
 	}
 
-	m_Health = root.get("health", 0).asInt();
+	m_Health              = root.get("health", 0).asInt();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
+	m_XpTotal             = root.get("experience", 0).asInt();
 
 	//SetExperience(root.get("experience", 0).asInt());
 

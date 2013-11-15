@@ -260,6 +260,9 @@ void cClientHandle::Authenticate(void)
 
 	// Send health
 	m_Player->SendHealth();
+
+	// Send experience
+	m_Player->SendExperience();
 	
 	// Send gamemode (1.6.1 movementSpeed):
 	SendGameMode(m_Player->GetGameMode());
@@ -1873,9 +1876,9 @@ void cClientHandle::SendRespawn(void)
 
 
 
-void cClientHandle::SendSetExperience(void)
+void cClientHandle::SendExperience(void)
 {
-	m_Protocol->SendSetExperience();
+	m_Protocol->SendExperience();
 }
 
 

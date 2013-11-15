@@ -691,7 +691,7 @@ void cProtocol125::SendRespawn(void)
 
 
 
-void cProtocol125::SendSetExperience(void)
+void cProtocol125::SendExperience(void)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_EXPERIENCE);

@@ -269,6 +269,8 @@ public:
 	void UseEquippedItem(void);
 	
 	void SendHealth(void);
+
+	void SendExperience(void);
 	
 	// In UI windows, the item that the player is dragging:
 	bool IsDraggingItem(void) const { return !m_DraggingItem.IsEmpty(); }

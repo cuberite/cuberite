@@ -466,10 +466,10 @@ void cProtocolRecognizer::SendRespawn(void)
 
 
 
-void cProtocolRecognizer::SendSetExperience(void)
+void cProtocolRecognizer::SendExperience(void)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendSetExperience();
+	m_Protocol->SendExperience();
 }
 
 
