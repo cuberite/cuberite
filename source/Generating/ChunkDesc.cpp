@@ -535,7 +535,14 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 	{
 		if (((*itr)->GetPosX() == AbsX) && ((*itr)->GetPosY() == a_RelY) && ((*itr)->GetPosZ() == AbsZ))
 		{
-			// Already in the list, return it:
+			// Already in the list:
+			if ((*itr)->GetBlockType() != GetBlockType(a_RelX, a_RelY, a_RelZ))
+			{
+				// Wrong type, the block type has been overwritten. Erase and create new:
+				m_BlockEntities.erase(itr);
+				break;
+			}
+			// Correct type, already present. Return it:
 			return *itr;
 		}
 	}  // for itr - m_BlockEntities[]
