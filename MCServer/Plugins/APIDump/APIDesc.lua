@@ -1711,7 +1711,26 @@ a_Player:OpenWindow(Window);
 				mtZombiePigman = { Notes = "" },
 			},
 			Inherits = "cPawn",
-		},
+		},  -- cMonster
+
+		cNoteEntity =
+		{
+			Desc = [[
+				This class represents a note block entity in the world. It takes care of the note block's pitch,
+				and also can play the sound, either when the {{cPlayer|player}} right-clicks it, redstone activates
+				it, or upon a plugin's request.</p>
+				<p>
+				The pitch is stored as an integer between 0 and 24.
+			]],
+			Functions =
+			{
+				GetPitch = { Params = "", Return = "number", Notes = "Returns the current pitch set for the block" },
+				IncrementPitch = { Params = "", Return = "", Notes = "Adds 1 to the current pitch. Wraps around to 0 when the pitch cannot go any higher." },
+				MakeSound = { Params = "", Return = "", Notes = "Plays the sound for all {{cClientHandle|clients}} near this block." },
+				SetPitch = { Params = "Pitch", Return = "", Notes = "Sets a new pitch for the block." },
+			},
+			Inherits = "cBlockEntity",
+		},  -- cNoteEntity
 
 		cPawn =
 		{
