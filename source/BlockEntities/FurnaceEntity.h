@@ -39,9 +39,6 @@ public:
 		ContentsHeight = 1,
 	};
 	
-	/// Constructor used while generating a chunk; sets m_World to NULL
-	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	
 	// tolua_end
 	
 	/// Constructor used for normal operation

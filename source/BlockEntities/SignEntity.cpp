@@ -12,15 +12,6 @@
 
 
 
-cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ) :
-	super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, NULL)
-{
-}
-
-
-
-
-
 cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World) :
 	super(a_BlockType, a_X, a_Y, a_Z, a_World)
 {

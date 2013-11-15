@@ -403,20 +403,12 @@ g_APIDesc =
 				in the world. Note that doublechests consist of two separate cChestEntity objects, they do not collaborate
 				in any way.</p>
 				<p>
-				The chest entity can be created by the plugins only in the {{OnChunkGenerating}} and
-				{{OnChunkGenerated}} hooks, as part of the new chunk being generated. Plugins may generate chests
-				with contents in this way.</p>
-				<p>
 				To manipulate a chest already in the game, you need to use {{cWorld}}'s callback mechanism with
 				either DoWithChestAt() or ForEachChestInChunk() function. See the code example below
 			]],
 
 			Inherits = "cBlockEntityWithItems",
 
-			Functions =
-			{
-				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cChestEntity", Notes = "Creates a new cChestEntity object. To be used only in the chunk generating hooks {{OnChunkGenerating}} and {{OnChunkGenerated}}." },
-			},
 			Constants =
 			{
 				ContentsHeight = { Notes = "Height of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}" },
@@ -466,6 +458,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, BlockType, BlockMeta", Return = "", Notes = "Fills those blocks of the cuboid (specified in relative coords) that are considered non-floor (air, water) with the specified block type and meta. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
 				},
 				GetBiome                  = { Params = "RelX, RelZ", Return = "EMCSBiome", Notes = "Returns the biome at the specified relative coords" },
+				GetBlockEntity            = { Params = "RelX, RelY, RelZ", Return = "{{cBlockEntity}} descendant", Notes = "Returns the block entity for the block at the specified coords. Creates it if it doesn't exist. Returns nil if the block has no block entity capability." },
 				GetBlockMeta              = { Params = "RelX, RelY, RelZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
 				GetBlockType              = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified relative coords" },
 				GetBlockTypeMeta          = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified relative coords" },
@@ -504,7 +497,42 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			Constants =
 			{
 			},
-		},
+			AdditionalInfo =
+			{
+				{
+					Header = "Manipulating block entities",
+					Contents = [[
+						To manipulate block entities while the chunk is generated, first use SetBlockTypeMeta() to set
+						the correct block type and meta at the position. Then use the GetBlockEntity() to create and
+						return the correct block entity instance. Finally, use {{tolua}}.cast() to cast to the proper
+						type.</p>
+						Note that you don't need to check if a block entity has previously existed at the place, because
+						GetBlockEntity() will automatically re-create the correct type for you.</p>
+						<p>
+						The following code is taken from the Debuggers plugin, it creates a sign at each chunk's [0, 0]
+						coords, with the text being the chunk coords:
+<pre class="prettyprint lang-lua">
+function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
+	-- Get the topmost block coord:
+	local Height = a_ChunkDesc:GetHeight(0, 0);
+	
+	-- Create a sign there:
+	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
+	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
+	if (BlockEntity ~= nil) then
+		LOG("Setting sign lines...");
+		local SignEntity = tolua.cast(BlockEntity, "cSignEntity");
+		SignEntity:SetLines("Chunk:", tonumber(a_ChunkX) .. ", " .. tonumber(a_ChunkZ), "", "(Debuggers)");
+	end
+
+	-- Update the heightmap:
+	a_ChunkDesc:SetHeight(0, 0, Height + 1);
+end
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cChunkDesc
 
 		cClientHandle =
 		{
@@ -642,40 +670,31 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 
 		cDispenserEntity =
 		{
-			Desc = [[This class represents a dispenser block entity in the world. Most of this block entity's functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior common with a {{cDropperEntity|dropper}} entity.
-</p>
-		<p>An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
-]],
-			Functions =
-			{
-				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cDispenserEntity", Notes = "Creates a new cDispenserEntity at the specified coords" },
-			},
-			Constants =
-			{
-			},
+			Desc = [[
+				This class represents a dispenser block entity in the world. Most of this block entity's
+				functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents
+				the behavior common with a {{cDropperEntity|dropper}} entity.
+			]],
 			Inherits = "cDropSpenserEntity",
 		},
 
 		cDropperEntity =
 		{
-			Desc = [[This class represents a dropper block entity in the world. Most of this block entity's functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior common with the {{cDispenserEntity|dispenser}} entity.
-</p>
-		<p>An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
-]],
-			Functions =
-			{
-				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cDropperEntity", Notes = "Creates a new cDropperEntity at the specified coords" },
-			},
-			Constants =
-			{
-			},
+			Desc = [[
+				This class represents a dropper block entity in the world. Most of this block entity's functionality
+				is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior
+				common with the {{cDispenserEntity|dispenser}} entity.</p>
+				<p>
+				An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
+			]],
 			Inherits = "cDropSpenserEntity",
-		},
+		},  -- cDropperEntity
 
 		cDropSpenserEntity =
 		{
-			Desc = [[This is a class that implements behavior common to both {{cDispenserEntity|dispensers}} and {{cDropperEntity|droppers}}.
-]],
+			Desc = [[
+				This is a class that implements behavior common to both {{cDispenserEntity|dispensers}} and {{cDropperEntity|droppers}}.
+			]],
 			Functions =
 			{
 				Activate = { Params = "", Return = "", Notes = "Sets the block entity to dropspense an item in the next tick" },
@@ -687,9 +706,8 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid}} representing the contents" },
 				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid}} representing the contents" },
 			},
-
 			Inherits = "cBlockEntityWithItems";
-		},
+		},  -- cDropSpenserEntity
 
 		cEnchantments =
 		{
@@ -738,6 +756,8 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				enchInfinity = { Notes = "" },
 				enchKnockback = { Notes = "" },
 				enchLooting = { Notes = "" },
+				enchLuckOfTheSea = { Notes = "" },
+				enchLure = { Notes = "" },
 				enchPower = { Notes = "" },
 				enchProjectileProtection = { Notes = "" },
 				enchProtection = { Notes = "" },
@@ -913,7 +933,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 cFile:Delete("/usr/bin/virus.exe");
 </pre></p>
 			]],
-
 			Functions =
 			{
 				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
@@ -925,8 +944,7 @@ cFile:Delete("/usr/bin/virus.exe");
 				IsFolder = { Params = "Path", Return = "bool", Notes = "Returns true if the specified path points to an existing folder." },
 				Rename = { Params = "OrigPath, NewPath", Return = "bool", Notes = "Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists." },
 			},
-
-		},
+		},  -- cFile
 
 		cFireChargeEntity =
 		{
@@ -938,11 +956,11 @@ cFile:Delete("/usr/bin/virus.exe");
 
 		cFurnaceEntity =
 		{
-			Desc = [[This class represents a furnace block entity in the world. An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks)
-]],
+			Desc = [[
+				This class represents a furnace block entity in the world.
+			]],
 			Functions =
 			{
-				constructor = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "cFurnaceEntity", Notes = "Creates a new cFurnaceEntity at the specified coords and the specified block type / meta" },
 				GetCookTimeLeft = { Params = "", Return = "number", Notes = "Returns the time until the current item finishes cooking, in ticks" },
 				GetFuelBurnTimeLeft = { Params = "", Return = "number", Notes = "Returns the time until the current fuel is depleted, in ticks" },
 				GetFuelSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the fuel slot" },
@@ -996,14 +1014,10 @@ cFile:Delete("/usr/bin/virus.exe");
 		cHopperEntity =
 		{
 			Desc = [[
-				This class represents a hopper block entity in the world.</p>
-				<p>
-				Plugins may use this class during chunk generation ({{OnChunkGenerated|HOOK_CHUNK_GENERATED}} and
-				{{OnChunkGenerating|HOOK_CHUNK_GENERATING}}) to add hoppers to the generated chunk.
+				This class represents a hopper block entity in the world.
 			]],
 			Functions =
 			{
-				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cHopperEntity", Notes = "Creates and returns a new hopper at the specified coords." },
 				GetOutputBlockPos = { Params = "BlockMeta", Return = "bool, BlockX, BlockY, BlockZ", Notes = "Returns whether the hopper is attached, and if so, the block coords of the block receiving the output items, based on the given meta." },
 			},
 			Constants =
@@ -1255,6 +1269,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				DamageItem = { Params = "[Amount]", Return = "bool", Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)" },
 				Empty = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
 				GetMaxDamage = { Params = "", Return = "number", Notes = "Returns the maximum value for damage that this item can get before breaking; zero if damage is not accounted for for this item type" },
+				GetMaxStackSize = { Params = "", Return = "number", Notes = "Returns the maximum stack size for this item." },
 				IsDamageable = { Params = "", Return = "bool", Notes = "Returns true if this item does account for its damage" },
 				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
 				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage and enchantments)" },
@@ -1451,6 +1466,22 @@ end
 			{
 			},
 		},  -- cItems
+
+		cJukeboxEntity =
+		{
+			Desc = [[
+				This class represents a jukebox in the world. It can play the records, either when the
+				{{cPlayer|player}} uses the record on the jukebox, or when a plugin instructs it to play.
+			]],
+			Inherits = "cBlockEntity",
+			Functions =
+			{
+				EjectRecord = { Params = "", Return = "", Notes = "Ejects the current record as a {{cPickup|pickup}}. No action if there's no current record. To remove record without generating the pickup, use SetRecord(0)" },
+				GetRecord = { Params = "", Return = "number", Notes = "Returns the record currently present. Zero for no record, E_ITEM_*_DISC for records." },
+				PlayRecord = { Params = "", Return = "", Notes = "Plays the currently present record. No action if there's no current record." },
+				SetRecord = { Params = "number", Return = "", Notes = "Sets the currently present record. Use zero for no record, or E_ITEM_*_DISC for records." },
+			},
+		},  -- cJukeboxEntity
 
 		cLineBlockTracer =
 		{
@@ -1683,7 +1714,26 @@ a_Player:OpenWindow(Window);
 				mtZombiePigman = { Notes = "" },
 			},
 			Inherits = "cPawn",
-		},
+		},  -- cMonster
+
+		cNoteEntity =
+		{
+			Desc = [[
+				This class represents a note block entity in the world. It takes care of the note block's pitch,
+				and also can play the sound, either when the {{cPlayer|player}} right-clicks it, redstone activates
+				it, or upon a plugin's request.</p>
+				<p>
+				The pitch is stored as an integer between 0 and 24.
+			]],
+			Functions =
+			{
+				GetPitch = { Params = "", Return = "number", Notes = "Returns the current pitch set for the block" },
+				IncrementPitch = { Params = "", Return = "", Notes = "Adds 1 to the current pitch. Wraps around to 0 when the pitch cannot go any higher." },
+				MakeSound = { Params = "", Return = "", Notes = "Plays the sound for all {{cClientHandle|clients}} near this block." },
+				SetPitch = { Params = "Pitch", Return = "", Notes = "Sets a new pitch for the block." },
+			},
+			Inherits = "cBlockEntity",
+		},  -- cNoteEntity
 
 		cPawn =
 		{
@@ -1852,7 +1902,7 @@ a_Player:OpenWindow(Window);
 <pre class="prettyprint lang-lua">
 cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 </pre></p>
-]],
+			]],
 			Functions =
 			{
 				AddHook =
@@ -1872,7 +1922,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				},
 				DisablePlugin = { Params = "PluginName", Return = "bool", Notes = "Disables a plugin specified by its name. Returns true if the plugin was disabled, false if it wasn't found or wasn't active." },
 				ExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Executes the command as if given by the specified Player. Checks permissions. Returns true if executed." },
-				ExecuteConsoleCommand = { Params = "CommandStr", Return = "bool", Notes = "Executes the command as if given on the server console. Returns true if executed." },
 				FindPlugins = { Params = "", Return = "", Notes = "Refreshes the list of plugins to include all folders inside the Plugins folder (potentially new disabled plugins)" },
 				ForceExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Same as ExecuteCommand, but doesn't check permissions" },
 				ForEachCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function(Command, Permission, HelpString)</pre>. If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
@@ -2000,8 +2049,8 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				GetVirtualRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of virtual RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetWebAdmin = { Params = "", Return = "{{cWebAdmin|cWebAdmin}}", Notes = "Returns the cWebAdmin object." },
 				GetWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Returns the cWorld object of the given world. It returns nil if there is no world with the given name." },
-				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread The command's output will be sent to console " .. '"stop" and "restart" commands have special handling.' },
-				SaveAllChunks = { Params = "", Return = "", Notes = "Saves all the chunks in all the worlds." },
+				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread. The command's output will be sent to console." },
+				SaveAllChunks = { Params = "", Return = "", Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved." },
 				SetPrimaryServerVersion = { Params = "Protocol Version", Return = "", Notes = "Sets the servers PrimaryServerVersion to the given protocol number." }
 			},
 			Constants =
@@ -2030,35 +2079,22 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			Constants =
 			{
 			},
-		},
+		},  -- cServer
 
 		cSignEntity =
 		{
 			Desc = [[
 				A sign entity represents a sign in the world. This class is only used when generating chunks, so
-				that the plugins may generate signs within new chunks.
+				that the plugins may generate signs within new chunks. See the code example in {{cChunkDesc}}.
 			]],
 			Functions =
 			{
+				GetLine = { Params = "LineIndex", Return = "string", Notes = "Returns the specified line. LineIndex is expected between 0 and 3. Returns empty string and logs to server console when LineIndex is invalid." },
+				SetLine = { Params = "LineIndex, LineText", Return = "", Notes = "Sets the specified line. LineIndex is expected between 0 and 3. Logs to server console when LineIndex is invalid." },
+				SetLines = { Params = "Line1, Line2, Line3, Line4", Return = "", Notes = "Sets all the sign's lines at once." },
 			},
-			Constants =
-			{
-			},
-
 			Inherits = "cBlockEntity";
-		},
-
-		cStringMap =
-		{
-			Desc = [[cStringMap is an object that maps strings with strings, it's also known as a dictionary
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
-		},
+		},  -- cSignEntity
 
 		cThrownEggEntity =
 		{
@@ -2238,7 +2274,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				},
 				GetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the block skylight of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
 				GetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ", Return = "BlockValid, BlockType, BlockMeta", Notes = "Returns the block type and metadata for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true." },
-				GetClassStatic = { Params = "", Return = "string", Notes = "Returns the name of the class, \"cWorld\"." },
 				GetDimension = { Params = "", Return = "eDimension", Notes = "Returns the dimension of the world - dimOverworld, dimNether or dimEnd." },
 				GetGameMode = { Params = "", Return = "eGameMode", Notes = "Returns the gamemode of the world - gmSurvival, gmCreative or gmAdventure." },
 				GetGeneratorQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks that are queued in the chunk generator." },
