@@ -403,20 +403,12 @@ g_APIDesc =
 				in the world. Note that doublechests consist of two separate cChestEntity objects, they do not collaborate
 				in any way.</p>
 				<p>
-				The chest entity can be created by the plugins only in the {{OnChunkGenerating}} and
-				{{OnChunkGenerated}} hooks, as part of the new chunk being generated. Plugins may generate chests
-				with contents in this way.</p>
-				<p>
 				To manipulate a chest already in the game, you need to use {{cWorld}}'s callback mechanism with
 				either DoWithChestAt() or ForEachChestInChunk() function. See the code example below
 			]],
 
 			Inherits = "cBlockEntityWithItems",
 
-			Functions =
-			{
-				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cChestEntity", Notes = "Creates a new cChestEntity object. To be used only in the chunk generating hooks {{OnChunkGenerating}} and {{OnChunkGenerated}}." },
-			},
 			Constants =
 			{
 				ContentsHeight = { Notes = "Height of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}" },
@@ -642,40 +634,31 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 
 		cDispenserEntity =
 		{
-			Desc = [[This class represents a dispenser block entity in the world. Most of this block entity's functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior common with a {{cDropperEntity|dropper}} entity.
-</p>
-		<p>An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
-]],
-			Functions =
-			{
-				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cDispenserEntity", Notes = "Creates a new cDispenserEntity at the specified coords" },
-			},
-			Constants =
-			{
-			},
+			Desc = [[
+				This class represents a dispenser block entity in the world. Most of this block entity's
+				functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents
+				the behavior common with a {{cDropperEntity|dropper}} entity.
+			]],
 			Inherits = "cDropSpenserEntity",
 		},
 
 		cDropperEntity =
 		{
-			Desc = [[This class represents a dropper block entity in the world. Most of this block entity's functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior common with the {{cDispenserEntity|dispenser}} entity.
-</p>
-		<p>An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
-]],
-			Functions =
-			{
-				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cDropperEntity", Notes = "Creates a new cDropperEntity at the specified coords" },
-			},
-			Constants =
-			{
-			},
+			Desc = [[
+				This class represents a dropper block entity in the world. Most of this block entity's functionality
+				is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior
+				common with the {{cDispenserEntity|dispenser}} entity.</p>
+				<p>
+				An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
+			]],
 			Inherits = "cDropSpenserEntity",
-		},
+		},  -- cDropperEntity
 
 		cDropSpenserEntity =
 		{
-			Desc = [[This is a class that implements behavior common to both {{cDispenserEntity|dispensers}} and {{cDropperEntity|droppers}}.
-]],
+			Desc = [[
+				This is a class that implements behavior common to both {{cDispenserEntity|dispensers}} and {{cDropperEntity|droppers}}.
+			]],
 			Functions =
 			{
 				Activate = { Params = "", Return = "", Notes = "Sets the block entity to dropspense an item in the next tick" },
@@ -687,9 +670,8 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid}} representing the contents" },
 				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid}} representing the contents" },
 			},
-
 			Inherits = "cBlockEntityWithItems";
-		},
+		},  -- cDropSpenserEntity
 
 		cEnchantments =
 		{
@@ -913,7 +895,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 cFile:Delete("/usr/bin/virus.exe");
 </pre></p>
 			]],
-
 			Functions =
 			{
 				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
@@ -925,8 +906,7 @@ cFile:Delete("/usr/bin/virus.exe");
 				IsFolder = { Params = "Path", Return = "bool", Notes = "Returns true if the specified path points to an existing folder." },
 				Rename = { Params = "OrigPath, NewPath", Return = "bool", Notes = "Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists." },
 			},
-
-		},
+		},  -- cFile
 
 		cFireChargeEntity =
 		{
@@ -938,11 +918,11 @@ cFile:Delete("/usr/bin/virus.exe");
 
 		cFurnaceEntity =
 		{
-			Desc = [[This class represents a furnace block entity in the world. An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks)
-]],
+			Desc = [[
+				This class represents a furnace block entity in the world.
+			]],
 			Functions =
 			{
-				constructor = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "cFurnaceEntity", Notes = "Creates a new cFurnaceEntity at the specified coords and the specified block type / meta" },
 				GetCookTimeLeft = { Params = "", Return = "number", Notes = "Returns the time until the current item finishes cooking, in ticks" },
 				GetFuelBurnTimeLeft = { Params = "", Return = "number", Notes = "Returns the time until the current fuel is depleted, in ticks" },
 				GetFuelSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the fuel slot" },
@@ -996,14 +976,10 @@ cFile:Delete("/usr/bin/virus.exe");
 		cHopperEntity =
 		{
 			Desc = [[
-				This class represents a hopper block entity in the world.</p>
-				<p>
-				Plugins may use this class during chunk generation ({{OnChunkGenerated|HOOK_CHUNK_GENERATED}} and
-				{{OnChunkGenerating|HOOK_CHUNK_GENERATING}}) to add hoppers to the generated chunk.
+				This class represents a hopper block entity in the world.
 			]],
 			Functions =
 			{
-				constructor = { Params = "BlockX, BlockY, BlockZ", Return = "cHopperEntity", Notes = "Creates and returns a new hopper at the specified coords." },
 				GetOutputBlockPos = { Params = "BlockMeta", Return = "bool, BlockX, BlockY, BlockZ", Notes = "Returns whether the hopper is attached, and if so, the block coords of the block receiving the output items, based on the given meta." },
 			},
 			Constants =
@@ -1852,7 +1828,7 @@ a_Player:OpenWindow(Window);
 <pre class="prettyprint lang-lua">
 cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 </pre></p>
-]],
+			]],
 			Functions =
 			{
 				AddHook =
@@ -1872,7 +1848,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				},
 				DisablePlugin = { Params = "PluginName", Return = "bool", Notes = "Disables a plugin specified by its name. Returns true if the plugin was disabled, false if it wasn't found or wasn't active." },
 				ExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Executes the command as if given by the specified Player. Checks permissions. Returns true if executed." },
-				ExecuteConsoleCommand = { Params = "CommandStr", Return = "bool", Notes = "Executes the command as if given on the server console. Returns true if executed." },
 				FindPlugins = { Params = "", Return = "", Notes = "Refreshes the list of plugins to include all folders inside the Plugins folder (potentially new disabled plugins)" },
 				ForceExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Same as ExecuteCommand, but doesn't check permissions" },
 				ForEachCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function(Command, Permission, HelpString)</pre>. If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
@@ -2000,7 +1975,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				GetVirtualRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of virtual RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetWebAdmin = { Params = "", Return = "{{cWebAdmin|cWebAdmin}}", Notes = "Returns the cWebAdmin object." },
 				GetWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Returns the cWorld object of the given world. It returns nil if there is no world with the given name." },
-				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread The command's output will be sent to console " .. '"stop" and "restart" commands have special handling.' },
+				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread. The command's output will be sent to console." },
 				SaveAllChunks = { Params = "", Return = "", Notes = "Saves all the chunks in all the worlds." },
 				SetPrimaryServerVersion = { Params = "Protocol Version", Return = "", Notes = "Sets the servers PrimaryServerVersion to the given protocol number." }
 			},
@@ -2046,18 +2021,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 
 			Inherits = "cBlockEntity";
-		},
-
-		cStringMap =
-		{
-			Desc = [[cStringMap is an object that maps strings with strings, it's also known as a dictionary
-]],
-			Functions =
-			{
-			},
-			Constants =
-			{
-			},
 		},
 
 		cThrownEggEntity =
@@ -2238,7 +2201,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				},
 				GetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the block skylight of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
 				GetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ", Return = "BlockValid, BlockType, BlockMeta", Notes = "Returns the block type and metadata for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true." },
-				GetClassStatic = { Params = "", Return = "string", Notes = "Returns the name of the class, \"cWorld\"." },
 				GetDimension = { Params = "", Return = "eDimension", Notes = "Returns the dimension of the world - dimOverworld, dimNether or dimEnd." },
 				GetGameMode = { Params = "", Return = "eGameMode", Notes = "Returns the gamemode of the world - gmSurvival, gmCreative or gmAdventure." },
 				GetGeneratorQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks that are queued in the chunk generator." },
