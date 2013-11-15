@@ -449,19 +449,25 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 	super::OnHitSolidBlock(a_HitPos, a_HitFace);
 	int a_X = (int)a_HitPos.x, a_Y = (int)a_HitPos.y, a_Z = (int)a_HitPos.z;
 	
-	if (a_HitFace != BLOCK_FACE_NONE)
+	// Projectiles mistakenly think a face faces the direction a player faces when looking directly at said face
+	// This therefore breaks YP & YM of AddFaceDirection - see #350 for more details
+	switch (a_HitFace)
 	{
-		if (a_HitFace != BLOCK_FACE_YP)
-		{
-			AddFaceDirection(a_X, a_Y, a_Z, a_HitFace);
-		}
-		else if (a_HitFace == BLOCK_FACE_YP) // These conditions because xoft got a little confused on block face directions, so AddFace works with all but YP & YM
+		case BLOCK_FACE_NONE: break; // Block tracer sometimes returns this, in this case, the coords will be correct
+		case BLOCK_FACE_YP:
 		{
 			a_Y--;
+			break;
 		}
-		else
+		case BLOCK_FACE_YM:
 		{
 			a_Y++;
+			break;
+		}
+		default:
+		{
+			AddFaceDirection(a_X, a_Y, a_Z, a_HitFace);
+			break;
 		}
 	}
 
@@ -540,11 +546,10 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_IsInGround)
 	{
-		// When an arrow hits, the client sometimes doesn't think it's in the ground, and therefore it keeps on moving (glitches)
-		// Temporary fix is to simply not sync with the client and send a teleport to confirm pos after arrow has stabilised
+		// When an arrow hits, the client doesn't think its in the ground and keeps on moving, IF BroadcastMovementUpdate() and TeleportEntity was called during flight, AT ALL
+		// Fix is to simply not sync with the client and send a teleport to confirm pos after arrow has stabilised (around 1 sec after landing)
 		// We can afford to do this because xoft's algorithm for trajectory is near perfect, so things are pretty close anyway without sync
-		// BroadcastMovementUpdate seems to be part of its cause, but why?
-		// TODO: Find cause of arrow syncing issues and fix
+		// Besides, this seems to be what the vanilla server does, note how arrows teleport half a second after they hit to the server position
 
 		if (m_HitGroundTimer != -1) // Sent a teleport already, don't do again
 		{
