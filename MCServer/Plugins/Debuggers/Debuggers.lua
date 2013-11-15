@@ -500,21 +500,6 @@ end
 
 
 
-function OnChunkGenerated(World, ChunkX, ChunkZ, ChunkDesc)
-	-- Test ChunkDesc / BlockArea interaction
-	local BlockArea = cBlockArea();
-	ChunkDesc:ReadBlockArea(BlockArea, 0, 15, 50, 70, 0, 15);
-	
-	-- BlockArea:SaveToSchematicFile("ChunkBlocks_" .. ChunkX .. "_" .. ChunkZ .. ".schematic");
-
-	ChunkDesc:WriteBlockArea(BlockArea, 5, 115, 5);
-	return false;
-end
-
-
-
-
-
 function OnChat(a_Player, a_Message)
 	return false, "blabla " .. a_Message;
 end
