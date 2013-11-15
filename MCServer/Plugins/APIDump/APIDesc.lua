@@ -2478,6 +2478,112 @@ end
 			},
 		},  -- ItemCategory
 		
+		lxp =
+		{
+			Desc = [[
+				This class provides an interface to the XML parser,
+				{{http://matthewwild.co.uk/projects/luaexpat/|LuaExpat}}. It provides a SAX interface with an
+				incremental XML parser.</p>
+				<p>
+				With an event-based API like SAX the XML document can be fed to the parser in chunks, and the
+				parsing begins as soon as the parser receives the first document chunk. LuaExpat reports parsing
+				events (such as the start and end of elements) directly to the application through callbacks. The
+				parsing of huge documents can benefit from this piecemeal operation.</p>
+				<p>
+				See the online
+				{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}} for details
+				on how to work with this parser. The code examples below should provide some basic help, too.
+			]],
+			Functions =
+			{
+				new = {Params = "CallbacksTable, [SeparatorChar]", Return = "XMLParser object", Notes = "Creates a new XML parser object, with the specified callbacks table and optional separator character."},
+			},
+			Constants =
+			{
+				_COPYRIGHT = { Notes = "" },
+				_DESCRIPTION = { Notes = "" },
+				_VERSION = { Notes = "" },
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Parser callbacks",
+					Contents = [[
+						The callbacks table passed to the new() function specifies the Lua functions that the parser
+						calls upon various events. The following table lists the most common functions used, for a
+						complete list see the online
+						{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.</p>
+						<table>
+						<tr><th>Function name</th><th>Parameters</th><th>Notes</th></tr>
+						<tr><td>CharacterData</td><td>Parser, string</td><td>Called when the parser recognizes a raw string inside the element</td></tr>
+						<tr><td>EndElement</td><td>Parser, ElementName</td><td>Called when the parser detects the ending of an XML element</td></tr>
+						<tr><td>StartElement</td><td>Parser, ElementName, AttributesTable</td><td>Called when the parser detects the start of an XML element. The AttributesTable is a Lua table containing all the element's attributes, both in the array section (in the order received) and in the dictionary section.</td></tr>
+						</table>
+					]],
+				},
+				{
+					Header = "XMLParser object",
+					Contents = [[
+						The XMLParser object returned by lxp.new provides the functions needed to parse the XML. The
+						following list provides the most commonly used ones, for a complete list see the online
+						{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.
+						<ul>
+							<li>close() - closes the parser, freeing all memory used by it.</li>
+							<li>getCallbacks() - returns the callbacks table for this parser.</li>
+							<li>parse(string) - parses more document data. the string contains the next part (or possibly all) of the document. Returns non-nil for success or nil, msg, line, col, pos for error.</li>
+							<li>stop() - aborts parsing (can be called from within the parser callbacks).</li>
+						</ul>
+					]],
+				},
+				{
+					Header = "Code example",
+					Contents = [[
+						The following code reads an entire XML file and outputs its logical structure into the console:
+<pre class="prettyprint lang-lua">
+local Depth = 0;
+
+-- Define the callbacks:
+local Callbacks = {
+	CharacterData = function(a_Parser, a_String)
+		LOG(string.rep(" ", Depth) .. "* " .. a_String);
+	end
+	
+	EndElement = function(a_Parser, a_ElementName)
+		Depth = Depth - 1;
+		LOG(string.rep(" ", Depth) .. "- " .. a_ElementName);
+	end
+
+	StartElement = function(a_Parser, a_ElementName, a_Attribs)
+		LOG(string.rep(" ", Depth) .. "+ " .. a_ElementName);
+		Depth = Depth + 1;
+	end
+}
+
+-- Create the parser:
+local Parser = lxp.new(Callbacks);
+
+-- Parse the XML file:
+local f = io.open("file.xml", "rb");
+while (true) do
+	local block = f:read(128 * 1024);  -- Use a 128KiB buffer for reading
+	if (block == nil) then
+		-- End of file
+		break;
+	end
+	Parser:parse(block);
+end
+
+-- Signalize to the parser that no more data is coming
+Parser:parse();
+
+-- Close the parser:
+Parser:close();
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- lxp
+		
 		TakeDamageInfo =
 		{
 			Desc = [[
