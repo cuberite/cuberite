@@ -262,7 +262,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-int cPlayer::CalcLevelFromXp(int a_XpTotal)
+short cPlayer::CalcLevelFromXp(short a_XpTotal)
 {
 	//level 0 to 15
 	if(a_XpTotal <= XP_TO_LEVEL15)
@@ -273,18 +273,18 @@ int cPlayer::CalcLevelFromXp(int a_XpTotal)
 	//level 30+
 	if(a_XpTotal > XP_TO_LEVEL30)
 	{
-		return (int) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
+		return (short) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
 	}
 
 	//level 16 to 30
-	return (int) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
+	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
 }
 
 
 
 
 
-int cPlayer::XpForLevel(int a_Level)
+short cPlayer::XpForLevel(short a_Level)
 {
 	//level 0 to 15
 	if(a_Level <= 15)
@@ -295,18 +295,18 @@ int cPlayer::XpForLevel(int a_Level)
 	//level 30+
 	if(a_Level >= 31)
 	{
-		return (int) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
+		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
 	}
 
 	//level 16 to 30
-	return (int) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
+	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
 }
 
 
 
 
 
-int cPlayer::XpGetLevel()
+short cPlayer::XpGetLevel()
 {
 	return CalcLevelFromXp(m_XpTotal);
 }
@@ -317,8 +317,8 @@ int cPlayer::XpGetLevel()
 
 float cPlayer::XpGetPercentage()
 {
-	int currentLevel = CalcLevelFromXp(m_XpTotal);
-	int currentLevel_XpBase = XpForLevel(currentLevel);
+	short int currentLevel = CalcLevelFromXp(m_XpTotal);
+	short int currentLevel_XpBase = XpForLevel(currentLevel);
 
 	return (float)(m_XpTotal - currentLevel_XpBase) / 
 		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
@@ -328,15 +328,18 @@ float cPlayer::XpGetPercentage()
 
 
 
-bool cPlayer::SetExperience(int a_XpTotal)
+bool cPlayer::SetExperience(short int a_XpTotal)
 {
-	if(!(a_XpTotal >= 0) || (a_XpTotal > (INT_MAX - m_XpTotal)))
+	if(!(a_XpTotal >= 0) || (a_XpTotal > (SHRT_MAX - m_XpTotal)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_XpTotal);
 		return false; //oops, they gave us a dodgey number
 	}
 
 	m_XpTotal = a_XpTotal;
+
+	//send details to client
+	m_ClientHandle->SendSetExperience();
 
 	return true;
 }
@@ -345,7 +348,7 @@ bool cPlayer::SetExperience(int a_XpTotal)
 
 
 
-int cPlayer::AddExperience(int a_Xp_delta)
+short cPlayer::AddExperience(short a_Xp_delta)
 {
 	if(a_Xp_delta < 0)
 	{
@@ -358,6 +361,9 @@ int cPlayer::AddExperience(int a_Xp_delta)
 	LOGD("Player \"%s\" earnt %d experience", m_PlayerName.c_str(), a_Xp_delta);
 
 	m_XpTotal += a_Xp_delta;
+
+	//send details to client
+	m_ClientHandle->SendSetExperience();
 
 	return m_XpTotal;
 }
@@ -1420,7 +1426,7 @@ bool cPlayer::LoadFromDisk()
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
 
-	SetExperience(root.get("experience", 0).asInt());
+	//SetExperience(root.get("experience", 0).asInt());
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 	

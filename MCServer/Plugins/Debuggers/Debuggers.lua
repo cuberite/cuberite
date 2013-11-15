@@ -841,7 +841,7 @@ end
 
 
 function HandleAddExperience(a_Split, a_Player)
-	a_Player->AddExperience(200);
+	a_Player:AddExperience(200);
 
 	return true;
 end

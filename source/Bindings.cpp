@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/14/13 17:13:46.
+** Generated automatically by tolua++-1.0.92 on 11/15/13 18:43:44.
 */
 
 #ifndef __cplusplus
@@ -7708,7 +7708,7 @@ static int tolua_AllToLua_cPlayer_SetExperience00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  int a_XpTotal = ((int)  tolua_tonumber(tolua_S,2,0));
+  short a_XpTotal = ((short)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetExperience'", NULL);
 #endif
@@ -7742,12 +7742,12 @@ static int tolua_AllToLua_cPlayer_AddExperience00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  int a_Xp_delta = ((int)  tolua_tonumber(tolua_S,2,0));
+  short a_Xp_delta = ((short)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddExperience'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->AddExperience(a_Xp_delta);
+   short tolua_ret = (short)  self->AddExperience(a_Xp_delta);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -7779,7 +7779,7 @@ static int tolua_AllToLua_cPlayer_XpGetTotal00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'XpGetTotal'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->XpGetTotal();
+   short tolua_ret = (short)  self->XpGetTotal();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -7811,7 +7811,7 @@ static int tolua_AllToLua_cPlayer_XpGetLevel00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'XpGetLevel'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->XpGetLevel();
+   short tolua_ret = (short)  self->XpGetLevel();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
