@@ -2076,23 +2076,22 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			Constants =
 			{
 			},
-		},
+		},  -- cServer
 
 		cSignEntity =
 		{
 			Desc = [[
 				A sign entity represents a sign in the world. This class is only used when generating chunks, so
-				that the plugins may generate signs within new chunks.
+				that the plugins may generate signs within new chunks. See the code example in {{cChunkDesc}}.
 			]],
 			Functions =
 			{
+				GetLine = { Params = "LineIndex", Return = "string", Notes = "Returns the specified line. LineIndex is expected between 0 and 3. Returns empty string and logs to server console when LineIndex is invalid." },
+				SetLine = { Params = "LineIndex, LineText", Return = "", Notes = "Sets the specified line. LineIndex is expected between 0 and 3. Logs to server console when LineIndex is invalid." },
+				SetLines = { Params = "Line1, Line2, Line3, Line4", Return = "", Notes = "Sets all the sign's lines at once." },
 			},
-			Constants =
-			{
-			},
-
 			Inherits = "cBlockEntity";
-		},
+		},  -- cSignEntity
 
 		cThrownEggEntity =
 		{
