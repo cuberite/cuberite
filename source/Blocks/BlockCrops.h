@@ -79,6 +79,12 @@ public:
 	{
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		NIBBLETYPE Light = a_World->GetBlockBlockLight(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE SkyLight = a_World->GetBlockSkyLight(a_BlockX, a_BlockY, a_BlockZ);
+
+		if (SkyLight > Light)
+		{
+			Light = SkyLight;
+		}
 		
 		if ((Meta < 7) && (Light > 8))
 		{

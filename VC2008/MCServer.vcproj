@@ -2672,6 +2672,10 @@
 				Name="BlockEntities"
 				>
 				<File
+					RelativePath="..\source\BlockEntities\BlockEntity.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\source\BlockEntities\BlockEntity.h"
 					>
 				</File>

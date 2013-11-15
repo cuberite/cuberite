@@ -9,9 +9,9 @@
 
 
 
-cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
-	: cBlockEntity(E_BLOCK_JUKEBOX, a_BlockX, a_BlockY, a_BlockZ, a_World)
-	, m_Record( 0 )
+cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	super(E_BLOCK_JUKEBOX, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	m_Record(0)
 {
 }
 
@@ -21,11 +21,7 @@ cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld 
 
 cJukeboxEntity::~cJukeboxEntity()
 {
-	if (m_Record >= 2256 && m_Record <= 2267)
-	{
-		EjectRecord();
-		m_Record = 0;
-	}
+	EjectRecord();
 }
 
 
@@ -44,10 +40,9 @@ void cJukeboxEntity::UsedBy(cPlayer * a_Player)
 			PlayRecord();
 		}
 	}
-	else if (m_Record >= 2256 && m_Record <= 2267)
+	else
 	{
 		EjectRecord();
-		m_Record = 0;
 	}
 }
 
@@ -55,7 +50,7 @@ void cJukeboxEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cJukeboxEntity::PlayRecord( void )
+void cJukeboxEntity::PlayRecord(void)
 {
 	m_World->BroadcastSoundParticleEffect(1005, m_PosX, m_PosY, m_PosZ, m_Record);
 }
@@ -64,19 +59,26 @@ void cJukeboxEntity::PlayRecord( void )
 
 
 
-void cJukeboxEntity::EjectRecord( void )
+void cJukeboxEntity::EjectRecord(void)
 {
+	if ((m_Record < E_ITEM_FIRST_DISC) || (m_Record > E_ITEM_LAST_DISC))
+	{
+		// There's no record here
+		return;
+	}
+
 	cItems Drops;
 	Drops.push_back(cItem(m_Record, 1, 0));
 	m_World->SpawnItemPickups(Drops, m_PosX + 0.5, m_PosY + 1, m_PosZ + 0.5, 8);
 	m_World->BroadcastSoundParticleEffect(1005, m_PosX, m_PosY, m_PosZ, 0);
+	m_Record = 0;
 }
 
 
 
 
 
-int cJukeboxEntity::GetRecord( void )
+int cJukeboxEntity::GetRecord(void)
 {
 	return m_Record;
 }
@@ -85,7 +87,7 @@ int cJukeboxEntity::GetRecord( void )
 
 
 
-void cJukeboxEntity::SetRecord( int a_Record )
+void cJukeboxEntity::SetRecord(int a_Record)
 {
 	m_Record = a_Record;
 }
@@ -94,7 +96,7 @@ void cJukeboxEntity::SetRecord( int a_Record )
 
 
 
-bool cJukeboxEntity::LoadFromJson( const Json::Value & a_Value )
+bool cJukeboxEntity::LoadFromJson(const Json::Value & a_Value)
 {
 	m_PosX = a_Value.get("x", 0).asInt();
 	m_PosY = a_Value.get("y", 0).asInt();
@@ -109,7 +111,7 @@ bool cJukeboxEntity::LoadFromJson( const Json::Value & a_Value )
 
 
 
-void cJukeboxEntity::SaveToJson( Json::Value & a_Value )
+void cJukeboxEntity::SaveToJson(Json::Value & a_Value)
 {
 	a_Value["x"] = m_PosX;
 	a_Value["y"] = m_PosY;

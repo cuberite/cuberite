@@ -6,9 +6,12 @@
 #include <json/json.h>
 
 
-cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
-	: cBlockEntity(E_BLOCK_NOTE_BLOCK, a_BlockX, a_BlockY, a_BlockZ, a_World)
-	, m_Pitch( 0 )
+
+
+
+cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	super(E_BLOCK_NOTE_BLOCK, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	m_Pitch(0)
 {
 }
 
@@ -16,15 +19,7 @@ cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_Wo
 
 
 
-cNoteEntity::~cNoteEntity()
-{
-}
-
-
-
-
-
-void cNoteEntity::UsedBy( cPlayer * a_Player )
+void cNoteEntity::UsedBy(cPlayer * a_Player)
 {
 	IncrementPitch();
 	MakeSound();
@@ -34,7 +29,7 @@ void cNoteEntity::UsedBy( cPlayer * a_Player )
 
 
 
-void cNoteEntity::MakeSound( void )
+void cNoteEntity::MakeSound(void)
 {
 	char instrument;
 	AString sampleName;
@@ -102,7 +97,7 @@ void cNoteEntity::MakeSound( void )
 
 
 
-char cNoteEntity::GetPitch( void )
+char cNoteEntity::GetPitch(void)
 {
 	return m_Pitch;
 }
@@ -111,7 +106,7 @@ char cNoteEntity::GetPitch( void )
 
 
 
-void cNoteEntity::SetPitch( char a_Pitch )
+void cNoteEntity::SetPitch(char a_Pitch)
 {
 	m_Pitch = a_Pitch % 25;
 }
@@ -120,16 +115,16 @@ void cNoteEntity::SetPitch( char a_Pitch )
 
 
 
-void cNoteEntity::IncrementPitch( void )
+void cNoteEntity::IncrementPitch(void)
 {
-	SetPitch( m_Pitch + 1 );
+	SetPitch(m_Pitch + 1);
 }
 
 
 
 
 
-bool cNoteEntity::LoadFromJson( const Json::Value & a_Value )
+bool cNoteEntity::LoadFromJson(const Json::Value & a_Value)
 {
 
 	m_PosX = a_Value.get("x", 0).asInt();
@@ -145,7 +140,7 @@ bool cNoteEntity::LoadFromJson( const Json::Value & a_Value )
 
 
 
-void cNoteEntity::SaveToJson( Json::Value & a_Value )
+void cNoteEntity::SaveToJson(Json::Value & a_Value)
 {
 	a_Value["x"] = m_PosX;
 	a_Value["y"] = m_PosY;
