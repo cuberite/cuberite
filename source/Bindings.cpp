@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/15/13 09:35:12.
+** Generated automatically by tolua++-1.0.92 on 11/15/13 10:14:19.
 */
 
 #ifndef __cplusplus
@@ -17578,46 +17578,6 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: CreateByBlockType of class  cBlockEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockEntity_CreateByBlockType00
-static int tolua_AllToLua_cBlockEntity_CreateByBlockType00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cBlockEntity",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,7,"cWorld",1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,8,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,2,0));
-  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,3,0));
-  int a_BlockX = ((int)  tolua_tonumber(tolua_S,4,0));
-  int a_BlockY = ((int)  tolua_tonumber(tolua_S,5,0));
-  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,6,0));
-  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,7,NULL));
-  {
-   cBlockEntity* tolua_ret = (cBlockEntity*)  cBlockEntity::CreateByBlockType(a_BlockType,a_BlockMeta,a_BlockX,a_BlockY,a_BlockZ,a_World);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBlockEntity");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'CreateByBlockType'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetPosX of class  cBlockEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockEntity_GetPosX00
 static int tolua_AllToLua_cBlockEntity_GetPosX00(lua_State* tolua_S)
@@ -30932,7 +30892,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cBlockEntity","cBlockEntity","",NULL);
   #endif
   tolua_beginmodule(tolua_S,"cBlockEntity");
-   tolua_function(tolua_S,"CreateByBlockType",tolua_AllToLua_cBlockEntity_CreateByBlockType00);
    tolua_function(tolua_S,"GetPosX",tolua_AllToLua_cBlockEntity_GetPosX00);
    tolua_function(tolua_S,"GetPosY",tolua_AllToLua_cBlockEntity_GetPosY00);
    tolua_function(tolua_S,"GetPosZ",tolua_AllToLua_cBlockEntity_GetPosZ00);
