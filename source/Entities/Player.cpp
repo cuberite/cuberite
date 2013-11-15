@@ -1437,7 +1437,7 @@ bool cPlayer::LoadFromDisk()
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
-	m_XpTotal             = root.get("experience", 0).asInt();
+	m_XpTotal             = (short) root.get("experience", 0).asInt();
 
 	//SetExperience(root.get("experience", 0).asInt());
 
