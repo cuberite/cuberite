@@ -23,27 +23,6 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL),
-	m_BlockType(a_BlockType),
-	m_BlockMeta(a_BlockMeta),
-	m_CurrentRecipe(NULL),
-	m_IsCooking(false),
-	m_NeedCookTime(0),
-	m_TimeCooked(0),
-	m_FuelBurnTime(0),
-	m_TimeBurned(0),
-	m_LastProgressFuel(0),
-	m_LastProgressCook(0)
-{
-	SetBlockEntity(this);  // cBlockEntityWindowOwner
-	m_Contents.AddListener(*this);
-}
-
-
-
-
-
 cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World) :
 	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_BlockType(a_BlockType),
@@ -57,7 +36,7 @@ cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 	m_LastProgressFuel(0),
 	m_LastProgressCook(0)
 {
-	SetBlockEntity(this);  // cBlockEntityWindowOwner
+	cBlockEntityWindowOwner::SetBlockEntity(this);
 	m_Contents.AddListener(*this);
 }
 

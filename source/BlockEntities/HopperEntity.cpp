@@ -16,17 +16,6 @@
 
 
 
-cHopperEntity::cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	super(E_BLOCK_HOPPER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL),
-	m_LastMoveItemsInTick(0),
-	m_LastMoveItemsOutTick(0)
-{
-}
-
-
-
-
-
 cHopperEntity::cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(E_BLOCK_HOPPER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),

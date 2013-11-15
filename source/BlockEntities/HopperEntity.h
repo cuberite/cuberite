@@ -30,9 +30,6 @@ public:
 		TICKS_PER_TRANSFER = 8,  ///< How many ticks at minimum between two item transfers to or from the hopper
 	} ;
 
-	/// Constructor used while generating a chunk; sets m_World to NULL
-	cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
-	
 	// tolua_end
 	
 	/// Constructor used for normal operation

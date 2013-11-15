@@ -15,9 +15,6 @@ class cDispenserEntity :
 	
 public:
 
-	/// Constructor used while generating a chunk; sets m_World to NULL
-	cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
-	
 	// tolua_end
 	
 	/// Constructor used for normal operation

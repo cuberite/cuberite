@@ -33,12 +33,9 @@ class cSignEntity :
 	
 public:
 
-	/// Creates a new empty sign entity at the specified block coords and block type (wall or standing)
-	/// Used mainly by plugins while generating chunks
-	cSignEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ);
-	
 	// tolua_end
 	
+	/// Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be NULL
 	cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);
 
 	bool LoadFromJson( const Json::Value& a_Value );

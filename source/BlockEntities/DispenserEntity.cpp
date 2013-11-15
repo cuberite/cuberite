@@ -10,16 +10,6 @@
 
 
 
-cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	super(E_BLOCK_DISPENSER, a_BlockX, a_BlockY, a_BlockZ, NULL)
-{
-	SetBlockEntity(this);  // cBlockEntityWindowOwner
-}
-
-
-
-
-
 cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(E_BLOCK_DISPENSER, a_BlockX, a_BlockY, a_BlockZ, a_World)
 {
