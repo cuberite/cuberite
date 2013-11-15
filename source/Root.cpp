@@ -489,7 +489,7 @@ void cRoot::SaveAllChunks(void)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
-		itr->second->SaveAllChunks();
+		itr->second->QueueSaveAllChunks();
 	}
 }
 
