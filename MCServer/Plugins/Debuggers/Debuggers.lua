@@ -26,6 +26,7 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
 	cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
+	cPluginManager.AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
 	PluginManager = cRoot:Get():GetPluginManager();
 	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
@@ -525,6 +526,27 @@ end
 function OnPlayerRightClickingEntity(a_Player, a_Entity)
 	LOG("Player " .. a_Player:GetName() .. " right-clicking entity ID " .. a_Entity:GetUniqueID() .. ", a " .. a_Entity:GetClass());
 	return false;
+end
+
+
+
+
+
+function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
+	-- Get the topmost block coord:
+	local Height = a_ChunkDesc:GetHeight(0, 0);
+	
+	-- Create a sign there:
+	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
+	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
+	if (BlockEntity ~= nil) then
+		LOG("Setting sign lines...");
+		local SignEntity = tolua.cast(BlockEntity, "cSignEntity");
+		SignEntity:SetLines("Chunk:", tonumber(a_ChunkX) .. ", " .. tonumber(a_ChunkZ), "", "(Debuggers)");
+	end
+
+	-- Update the heightmap:
+	a_ChunkDesc:SetHeight(0, 0, Height + 1);
 end
 
 
