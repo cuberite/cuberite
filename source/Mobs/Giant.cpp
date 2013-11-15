@@ -10,7 +10,7 @@ cGiant::cGiant(void) :
 	// 6.0 * (0.6|1.8)
 	super("Giant", mtGiant, "mob.zombie.hurt", "mob.zombie.death", 3.6, 10.8)
 {
-	this->SetMaxHealth(100);
+
 }
 
 
