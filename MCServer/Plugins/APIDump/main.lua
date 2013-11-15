@@ -373,13 +373,18 @@ function ReadDescriptions(a_API)
 		return false;
 	end
 	
-	-- Returns true if the function (specified by its fully qualified name) is to be ignored
-	local function IsFunctionIgnored(a_FnName)
+	-- Returns true if the function is to be ignored
+	local function IsFunctionIgnored(a_ClassName, a_FnName)
 		if (g_APIDesc.IgnoreFunctions == nil) then
 			return false;
 		end
+		if (((g_APIDesc.Classes[a_ClassName] or {}).Functions or {})[a_FnName] ~= nil) then
+			-- The function is documented, don't ignore
+			return false;
+		end
+		local FnName = a_ClassName .. "." .. a_FnName;
 		for i, name in ipairs(g_APIDesc.IgnoreFunctions) do
-			if (a_FnName:match(name)) then
+			if (FnName:match(name)) then
 				return true;
 			end
 		end
@@ -482,7 +487,7 @@ function ReadDescriptions(a_API)
 					if (FnDesc == nil) then
 						-- No description for this API function
 						AddFunction(func.Name);
-						if not(IsFunctionIgnored(cls.Name .. "." .. FnName)) then
+						if not(IsFunctionIgnored(cls.Name, FnName)) then
 							table.insert(cls.UndocumentedFunctions, FnName);
 						end
 					else
@@ -505,7 +510,7 @@ function ReadDescriptions(a_API)
 			else  -- if (APIDesc.Functions ~= nil)
 				for j, func in ipairs(cls.Functions) do
 					local FnName = func.DocID or func.Name;
-					if not(IsFunctionIgnored(cls.Name .. "." .. FnName)) then
+					if not(IsFunctionIgnored(cls.Name, FnName)) then
 						table.insert(cls.UndocumentedFunctions, FnName);
 					end
 				end
@@ -567,7 +572,7 @@ function ReadDescriptions(a_API)
 			g_Stats.NumUndocumentedClasses = g_Stats.NumUndocumentedClasses + 1;
 			for j, func in ipairs(cls.Functions) do
 				local FnName = func.DocID or func.Name;
-				if not(IsFunctionIgnored(cls.Name .. "." .. FnName)) then
+				if not(IsFunctionIgnored(cls.Name, FnName)) then
 					table.insert(cls.UndocumentedFunctions, FnName);
 				end
 			end  -- for j, func - cls.Functions[]
@@ -586,7 +591,7 @@ function ReadDescriptions(a_API)
 		-- Remove ignored functions:
 		local NewFunctions = {};
 		for j, fn in ipairs(cls.Functions) do
-			if (not(IsFunctionIgnored(cls.Name .. "." .. fn.Name))) then
+			if (not(IsFunctionIgnored(cls.Name, fn.Name))) then
 				table.insert(NewFunctions, fn);
 			end
 		end  -- for j, fn
