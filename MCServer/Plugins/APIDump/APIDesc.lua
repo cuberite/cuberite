@@ -458,6 +458,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, BlockType, BlockMeta", Return = "", Notes = "Fills those blocks of the cuboid (specified in relative coords) that are considered non-floor (air, water) with the specified block type and meta. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
 				},
 				GetBiome                  = { Params = "RelX, RelZ", Return = "EMCSBiome", Notes = "Returns the biome at the specified relative coords" },
+				GetBlockEntity            = { Params = "RelX, RelY, RelZ", Return = "{{cBlockEntity}} descendant", Notes = "Returns the block entity for the block at the specified coords. Creates it if it doesn't exist. Returns nil if the block has no block entity capability." },
 				GetBlockMeta              = { Params = "RelX, RelY, RelZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
 				GetBlockType              = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified relative coords" },
 				GetBlockTypeMeta          = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified relative coords" },
@@ -496,7 +497,42 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			Constants =
 			{
 			},
-		},
+			AdditionalInfo =
+			{
+				{
+					Header = "Manipulating block entities",
+					Contents = [[
+						To manipulate block entities while the chunk is generated, first use SetBlockTypeMeta() to set
+						the correct block type and meta at the position. Then use the GetBlockEntity() to create and
+						return the correct block entity instance. Finally, use tolua.cast() to cast to the proper
+						type.</p>
+						Note that you don't need to check if a block entity has previously existed at the place, because
+						GetBlockEntity() will automatically re-create the correct type for you.</p>
+						<p>
+						The following code is taken from the Debuggers plugin, it creates a sign at each chunk's [0, 0]
+						coords, with the text being the chunk coords:
+<pre class="prettyprint lang-lua">
+function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
+	-- Get the topmost block coord:
+	local Height = a_ChunkDesc:GetHeight(0, 0);
+	
+	-- Create a sign there:
+	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
+	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
+	if (BlockEntity ~= nil) then
+		LOG("Setting sign lines...");
+		local SignEntity = tolua.cast(BlockEntity, "cSignEntity");
+		SignEntity:SetLines("Chunk:", tonumber(a_ChunkX) .. ", " .. tonumber(a_ChunkZ), "", "(Debuggers)");
+	end
+
+	-- Update the heightmap:
+	a_ChunkDesc:SetHeight(0, 0, Height + 1);
+end
+</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cChunkDesc
 
 		cClientHandle =
 		{
