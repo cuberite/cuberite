@@ -950,7 +950,6 @@ void cStructGenDualRidgeCaves::GenStructures(cChunkDesc & a_ChunkDesc)
 			for (int y = 1; y <= Top; ++y)
 			{
 				const float yy = (float)y / 10;
-				const float WaveNoise = 1;
 				float n1 = m_Noise1.CubicNoise3D(xx, yy, zz);
 				float n2 = m_Noise2.CubicNoise3D(xx, yy, zz);
 				float n3 = m_Noise1.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
