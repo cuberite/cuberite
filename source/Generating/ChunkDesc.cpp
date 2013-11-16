@@ -270,7 +270,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 	a_MaxRelX += 1;
 	a_MaxRelY += 1;
 	a_MaxRelZ += 1;
-	
+
 	// Check coords validity:
 	if (a_MinRelX < 0)
 	{
@@ -313,7 +313,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		LOGWARNING("%s: MaxRelY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MaxRelY = cChunkDef::Height - 1;
 	}
-	
+
 	if (a_MinRelZ < 0)
 	{
 		LOGWARNING("%s: MinRelZ less than zero, adjusting to zero", __FUNCTION__);
@@ -370,7 +370,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
 {
 	HEIGHTTYPE MaxHeight = m_HeightMap[0];
-	for (int i = 1; i < ARRAYCOUNT(m_HeightMap); i++)
+	for (unsigned int i = 1; i < ARRAYCOUNT(m_HeightMap); i++)
 	{
 		if (m_HeightMap[i] > MaxHeight)
 		{
@@ -397,7 +397,7 @@ void cChunkDesc::FillRelCuboid(
 	int MaxX = std::min(a_MaxX, cChunkDef::Width - 1);
 	int MaxY = std::min(a_MaxY, cChunkDef::Height - 1);
 	int MaxZ = std::min(a_MaxZ, cChunkDef::Width - 1);
-	
+
 	for (int y = MinY; y <= MaxY; y++)
 	{
 		for (int z = MinZ; z <= MaxZ; z++)
@@ -428,7 +428,7 @@ void cChunkDesc::ReplaceRelCuboid(
 	int MaxX = std::min(a_MaxX, cChunkDef::Width - 1);
 	int MaxY = std::min(a_MaxY, cChunkDef::Height - 1);
 	int MaxZ = std::min(a_MaxZ, cChunkDef::Width - 1);
-	
+
 	for (int y = MinY; y <= MaxY; y++)
 	{
 		for (int z = MinZ; z <= MaxZ; z++)
@@ -464,7 +464,7 @@ void cChunkDesc::FloorRelCuboid(
 	int MaxX = std::min(a_MaxX, cChunkDef::Width - 1);
 	int MaxY = std::min(a_MaxY, cChunkDef::Height - 1);
 	int MaxZ = std::min(a_MaxZ, cChunkDef::Width - 1);
-	
+
 	for (int y = MinY; y <= MaxY; y++)
 	{
 		for (int z = MinZ; z <= MaxZ; z++)
@@ -505,7 +505,7 @@ void cChunkDesc::RandomFillRelCuboid(
 	int MaxX = std::min(a_MaxX, cChunkDef::Width - 1);
 	int MaxY = std::min(a_MaxY, cChunkDef::Height - 1);
 	int MaxZ = std::min(a_MaxZ, cChunkDef::Width - 1);
-	
+
 	for (int y = MinY; y <= MaxY; y++)
 	{
 		for (int z = MinZ; z <= MaxZ; z++)
