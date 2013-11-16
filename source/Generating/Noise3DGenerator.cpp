@@ -25,8 +25,8 @@ public:
 		DoTest1();
 		DoTest2();
 	}
-	
-	
+
+
 	void DoTest1(void)
 	{
 		float In[3 * 3 * 3];
@@ -39,8 +39,8 @@ public:
 		LinearUpscale3DArray(In, 3, 3, 3, Out, 8, 16, 17);
 		Debug3DNoise(Out, 17, 33, 35, "Upscale3D test");
 	}
-	
-	
+
+
 	void DoTest2(void)
 	{
 		float In[3 * 3];
@@ -53,7 +53,7 @@ public:
 		LinearUpscale2DArray(In, 3, 3, Out, 8, 16);
 		Debug2DNoise(Out, 17, 33, "Upscale2D test");
 	}
-	
+
 } gTest;
 //*/
 
@@ -72,7 +72,7 @@ cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
 	m_Perlin.AddOctave(1, (NOISE_DATATYPE)0.5);
 	m_Perlin.AddOctave((NOISE_DATATYPE)0.5, 1);
 	m_Perlin.AddOctave((NOISE_DATATYPE)0.5, 2);
-	
+
 	#if 0
 	// DEBUG: Test the noise generation:
 	// NOTE: In order to be able to run MCS with this code, you need to increase the default thread stack size
@@ -84,7 +84,7 @@ cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
 	m_FrequencyY          = 4;
 	m_FrequencyZ          = 4;
 	m_AirThreshold        = 0.5;
-	
+
 	const int NumChunks = 4;
 	NOISE_DATATYPE Noise[NumChunks][cChunkDef::Width * cChunkDef::Width * cChunkDef::Height];
 	for (int x = 0; x < NumChunks; x++)
@@ -153,7 +153,7 @@ cNoise3DGenerator::~cNoise3DGenerator()
 void cNoise3DGenerator::Initialize(cWorld * a_World, cIniFile & a_IniFile)
 {
 	m_World = a_World;
-	
+
 	// Params:
 	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
 	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0);
@@ -170,7 +170,7 @@ void cNoise3DGenerator::Initialize(cWorld * a_World, cIniFile & a_IniFile)
 
 void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	for (int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (unsigned int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
 		a_BiomeMap[i] = biExtremeHills;
 	}
@@ -184,7 +184,7 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 {
 	NOISE_DATATYPE Noise[17 * 257 * 17];
 	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise);
-	
+
 	// Output noise into chunk:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -207,7 +207,7 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 			}
 		}
 	}
-	
+
 	UpdateHeightmap(a_ChunkDesc);
 	ComposeTerrain (a_ChunkDesc);
 }
@@ -228,11 +228,11 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	NOISE_DATATYPE EndZ   = ((NOISE_DATATYPE)((a_ChunkZ + 1) * cChunkDef::Width) - 1) / m_FrequencyZ;
 	NOISE_DATATYPE StartY = 0;
 	NOISE_DATATYPE EndY   = ((NOISE_DATATYPE)256) / m_FrequencyY;
-	
+
 	m_Perlin.Generate3D(NoiseO, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, NoiseW);
-	
+
 	// DEBUG: Debug3DNoise(NoiseO, DIM_X, DIM_Y, DIM_Z, Printf("Chunk_%d_%d_orig", a_ChunkX, a_ChunkZ));
-	
+
 	// Precalculate a "height" array:
 	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
 	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 25, EndX / 25, StartZ / 25, EndZ / 25);
@@ -240,7 +240,7 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	{
 		Height[i] = abs(Height[i]) * m_HeightAmplification + 1;
 	}
-	
+
 	// Modify the noise by height data:
 	for (int y = 0; y < DIM_Y; y++)
 	{
@@ -257,13 +257,13 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	}
 
 	// DEBUG: Debug3DNoise(NoiseO, DIM_X, DIM_Y, DIM_Z, Printf("Chunk_%d_%d_hei", a_ChunkX, a_ChunkZ));
-	
+
 	// Upscale the Perlin noise into full-blown chunk dimensions:
 	LinearUpscale3DArray(
 		NoiseO, DIM_X, DIM_Y, DIM_Z,
 		a_OutNoise, UPSCALE_X, UPSCALE_Y, UPSCALE_Z
 	);
-	
+
 	// DEBUG: Debug3DNoise(a_OutNoise, 17, 257, 17, Printf("Chunk_%d_%d_lerp", a_ChunkX, a_ChunkZ));
 }
 
@@ -383,12 +383,12 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 	}
 	m_LastChunkX = a_ChunkX;
 	m_LastChunkZ = a_ChunkZ;
-	
+
 	// Upscaling parameters:
 	const int UPSCALE_X = 8;
 	const int UPSCALE_Y = 4;
 	const int UPSCALE_Z = 8;
-	
+
 	const int DIM_X = 1 + cChunkDef::Width  / UPSCALE_X;
 	const int DIM_Y = 1 + cChunkDef::Height / UPSCALE_Y;
 	const int DIM_Z = 1 + cChunkDef::Width  / UPSCALE_Z;
@@ -405,7 +405,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 			Height[x + 17 * z] = val * val * val;
 		}
 	}
-		
+
 	int idx = 0;
 	for (int y = 0; y < 257; y += UPSCALE_Y)
 	{
@@ -419,7 +419,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 			for (int x = 0; x < 17; x += UPSCALE_X)
 			{
 				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
-				CurFloor[x + 17 * z] = 
+				CurFloor[x + 17 * z] =
 					m_Noise1.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * (NOISE_DATATYPE)0.5 +
 					m_Noise2.CubicNoise3D(NoiseX / 2, NoiseY / 2, NoiseZ / 2) +
 					m_Noise3.CubicNoise3D(NoiseX / 4, NoiseY / 4, NoiseZ / 4) * 2 +
@@ -429,7 +429,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 		// Linear-interpolate this XZ floor:
 		LinearUpscale2DArrayInPlace(CurFloor, 17, 17, UPSCALE_X, UPSCALE_Z);
 	}
-	
+
 	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis
 	for (int y = 1; y < cChunkDef::Height; y++)
 	{
@@ -455,7 +455,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 			idx += 1;  // Skipping one X column
 		}
 	}
-	
+
 	// The noise array is now fully interpolated
 	/*
 	// DEBUG: Output two images of the array, sliced by XY and XZ:
@@ -504,7 +504,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 void cNoise3DComposable::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
 {
 	GenerateNoiseArrayIfNeeded(a_ChunkX, a_ChunkZ);
-	
+
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -529,9 +529,9 @@ void cNoise3DComposable::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Hei
 void cNoise3DComposable::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
 	GenerateNoiseArrayIfNeeded(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
-	
+
 	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
-	
+
 	// Make basic terrain composition:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
