@@ -67,6 +67,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
 	, m_XpTotal(0)
+	, m_IsExperienceDirty(false)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -222,6 +223,12 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		m_BowCharge += 1;
 	}
+	
+	//handle updating experience
+	if (m_bDirtyExperience)
+	{
+		SendExperience();
+	}
 
 	if (m_bDirtyPosition)
 	{
@@ -306,21 +313,21 @@ short cPlayer::XpForLevel(short a_Level)
 
 
 
-short cPlayer::XpGetLevel()
+short cPlayer::GetXpLevel()
 {
-	return CalcLevelFromXp(m_XpTotal);
+	return CalcLevelFromXp(m_CurrentXp);
 }
 
 
 
 
 
-float cPlayer::XpGetPercentage()
+float cPlayer::GetXpPercentage()
 {
-	short int currentLevel = CalcLevelFromXp(m_XpTotal);
+	short int currentLevel = CalcLevelFromXp(m_CurrentXp);
 	short int currentLevel_XpBase = XpForLevel(currentLevel);
 
-	return (float)(m_XpTotal - currentLevel_XpBase) / 
+	return (float)(m_CurrentXp - currentLevel_XpBase) / 
 		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
 }
 
@@ -328,18 +335,18 @@ float cPlayer::XpGetPercentage()
 
 
 
-bool cPlayer::SetExperience(short int a_XpTotal)
+bool cPlayer::SetCurrentExperience(short int a_XpTotal)
 {
-	if(!(a_XpTotal >= 0) || (a_XpTotal > (SHRT_MAX - m_XpTotal)))
+	if(!(a_XpTotal >= 0) || (a_XpTotal > (SHRT_MAX - m_CurrentXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_XpTotal);
 		return false; //oops, they gave us a dodgey number
 	}
 
-	m_XpTotal = a_XpTotal;
+	m_CurrentXp = a_XpTotal;
 
-	//send details to client
-	SendExperience();
+	// Set experience to be updated
+	m_bDirtyExperience = true;
 
 	return true;
 }
@@ -352,20 +359,24 @@ short cPlayer::AddExperience(short a_Xp_delta)
 {
 	if(a_Xp_delta < 0)
 	{
-		//value was negative, abort and report
+		// Value was negative, abort and report
 		LOGWARNING("Attempt was made to increment Xp by %d, must be positive",
 			a_Xp_delta);
-		return -1; //should we instead just return the current Xp?
+		return -1; // Should we instead just return the current Xp?
 	}
-	
-	LOGD("Player \"%s\" earnt %d experience", m_PlayerName.c_str(), a_Xp_delta);
 
-	m_XpTotal += a_Xp_delta;
+	m_CurrentXp += a_Xp_delta;
 
-	//send details to client
-	SendExperience();
+	// Update total for score calculation
+	m_LifetimeTotalXp += a_Xp_delta;
 
-	return m_XpTotal;
+	LOGD("Player \"%s\" earnt %d experience, total is now: %d", 
+		m_PlayerName.c_str(), a_Xp_delta, m_XpTotal);
+
+	// Set experience to be updated
+	m_bDirtyExperience = true;
+
+	return m_CurrentXp;
 }
 
 
@@ -620,6 +631,7 @@ void cPlayer::SendExperience(void)
 	if (m_ClientHandle != NULL)
 	{
 		m_ClientHandle->SendExperience();
+		m_bDirtyExperience = false;
 	}
 }
 

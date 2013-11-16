@@ -71,21 +71,24 @@ public:
 	Returns true on success
 	"should" really only be called at init or player death, plugins excepted
 	*/
-	bool SetExperience(short a_XpTotal);
+	bool SetCurrentExperience(short a_XpTotal);
 
 	/* Adds Xp, "should" not inc more than MAX_EXPERIENCE_ORB_SIZE unless you're a plugin being funny, *cough* cheating
-	Returns the new total experience, -1 on error
+	Returns the new current experience, -1 on error
 	*/
 	short AddExperience(short a_Xp_delta);
 
-	/// Gets the experience total - XpTotal
-	inline short XpGetTotal(void) { return m_XpTotal; }
+	/// Gets the experience total - XpTotal for score on death
+	inline short GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
+
+	/// Gets the currrent experience
+	inline short GetCurrentXp(void) { return m_CurrentXp; }
 
 	/// Gets the current level - XpLevel
-	short XpGetLevel(void);
+	short GetXpLevel(void);
 
 	/// Gets the experience bar percentage - XpP
-	float XpGetPercentage(void);
+	float GetXpPercentage(void);
 
 	// tolua_end
 	
@@ -415,13 +418,17 @@ protected:
 	Int64 m_EatingFinishTick;
 
 	/// Player Xp level
-	short int m_XpTotal;
+	short int m_LifetimeTotalXp;
+	short int m_CurrentXp;
+
+	// flag saying we need to send a xp update to client
+	bool m_bDirtyExperience;
 
 	/// Caculates the Xp needed for a given level, ref: http://minecraft.gamepedia.com/XP
 	static short XpForLevel(short int a_Level);
 
 	/// inverse of XpAtLevel, ref: http://minecraft.gamepedia.com/XP values are as per this with pre-calculations
-	static short CalcLevelFromXp(short int a_XpTotal);
+	static short CalcLevelFromXp(short int a_XpCurrent);
 	
 	bool m_IsChargingBow;
 	int  m_BowCharge;
