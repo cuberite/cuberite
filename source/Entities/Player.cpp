@@ -359,15 +359,21 @@ bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 short cPlayer::DeltaExperience(short a_Xp_delta)
 {
 	//ToDo: figure out a better name?...
-	if(a_Xp_delta > (SHRT_MAX - m_LifetimeTotalXp) || (m_CurrentXp + a_Xp_delta) < MIN_EXPERIENCE)
+	if(a_Xp_delta > (SHRT_MAX - m_LifetimeTotalXp))
 	{
-		// Value was negative, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, which was invalid",
+		// Value was bad, abort and report
+		LOGWARNING("Attempt was made to increment Xp by %d, which was bad",
 			a_Xp_delta);
 		return -1; // Should we instead just return the current Xp?
 	}
 
 	m_CurrentXp += a_Xp_delta;
+
+	// Make sure they didn't subtract too much
+	if(m_CurrentXp < 0)
+	{
+		m_CurrentXp = 0;
+	}
 
 	// Update total for score calculation
 	if(a_Xp_delta > 0)

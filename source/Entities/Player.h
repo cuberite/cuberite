@@ -74,7 +74,8 @@ public:
 	*/
 	bool SetCurrentExperience(short a_XpTotal);
 
-	/* changes Xp by Xp_delta, you "shouldn't" not inc more than MAX_EXPERIENCE_ORB_SIZE
+	/* changes Xp by Xp_delta, you "shouldn't" inc more than MAX_EXPERIENCE_ORB_SIZE
+	Wont't allow xp to go negative
 	Returns the new current experience, -1 on error
 	*/
 	short DeltaExperience(short a_Xp_delta);
