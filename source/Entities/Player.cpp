@@ -381,8 +381,8 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		m_LifetimeTotalXp += a_Xp_delta;
 	}
 
-	LOGD("Player \"%s\" earnt %d experience, total is now: %d", 
-		m_PlayerName.c_str(), a_Xp_delta, m_XpTotal);
+	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", 
+		m_PlayerName.c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
 	m_bDirtyExperience = true;
