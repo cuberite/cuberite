@@ -461,7 +461,7 @@ void cCaveTunnel::ProcessChunk(
 	int BaseZ = a_ChunkZ * cChunkDef::Width;
 	if (
 		(BaseX > m_MaxBlockX) || (BaseX + cChunkDef::Width < m_MinBlockX) ||
-		(BaseX > m_MaxBlockX) || (BaseX + cChunkDef::Width < m_MinBlockX)
+		(BaseZ > m_MaxBlockZ) || (BaseZ + cChunkDef::Width < m_MinBlockZ)
 	)
 	{
 		// Tunnel does not intersect the chunk at all, bail out
