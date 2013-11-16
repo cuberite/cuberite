@@ -849,7 +849,7 @@ end
 
 
 function HandleAddExperience(a_Split, a_Player)
-	a_Player:DelatExperience(200);
+	a_Player:DeltaExperience(200);
 
 	return true;
 end
