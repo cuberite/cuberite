@@ -41,8 +41,8 @@ public:
 		mskCrossing,
 		mskStaircase,
 	} ;
-	
-	
+
+
 	enum eDirection
 	{
 		dirXP,
@@ -50,8 +50,8 @@ public:
 		dirXM,
 		dirZM,
 	} ;
-	
-	
+
+
 	cStructGenMineShafts::cMineShaftSystem & m_ParentSystem;
 	eKind   m_Kind;
 	cCuboid m_BoundingBox;
@@ -62,25 +62,25 @@ public:
 		m_Kind(a_Kind)
 	{
 	}
-	
+
 	cMineShaft(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, eKind a_Kind, const cCuboid & a_BoundingBox) :
 		m_ParentSystem(a_ParentSystem),
 		m_Kind(a_Kind),
 		m_BoundingBox(a_BoundingBox)
 	{
 	}
-	
+
 	/// Returns true if this mineshaft intersects the specified cuboid
 	bool DoesIntersect(const cCuboid & a_Other)
 	{
 		return m_BoundingBox.DoesIntersect(a_Other);
 	}
-	
+
 	/** If recursion level is not too large, appends more branches to the parent system,
 	using exit points specific to this class.
 	*/
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) = 0;
-	
+
 	/// Imprints this shape into the specified chunk's data
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) = 0;
 } ;
@@ -95,10 +95,10 @@ class cMineShaftDirtRoom :
 	public cMineShaft
 {
 	typedef cMineShaft super;
-	
+
 public:
 	cMineShaftDirtRoom(cStructGenMineShafts::cMineShaftSystem & a_Parent, cNoise & a_Noise);
-	
+
 	// cMineShaft overrides:
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
@@ -112,7 +112,7 @@ class cMineShaftCorridor :
 	public cMineShaft
 {
 	typedef cMineShaft super;
-	
+
 public:
 	/** Creates a new Corridor attached to the specified pivot point and direction.
 	Checks all ParentSystem's objects and disallows intersecting. Initializes the new object to fit.
@@ -123,36 +123,36 @@ public:
 		int a_PivotX, int a_PivotY, int a_PivotZ, eDirection a_Direction,
 		cNoise & a_Noise
 	);
-	
+
 protected:
 	static const int MAX_SEGMENTS = 5;
-	
+
 	int        m_NumSegments;
 	eDirection m_Direction;
 	bool       m_HasFullBeam[MAX_SEGMENTS];  ///< If true, segment at that index has a full beam support (planks in the top center block)
 	int        m_ChestPosition;              ///< If <0, no chest; otherwise an offset from m_BoundingBox's p1.x or p1.z, depenging on m_Direction
 	int        m_SpawnerPosition;            ///< If <0, no spawner; otherwise an offset from m_BoundingBox's p1.x or p1.z, depenging on m_Direction
 	bool       m_HasTracks;                  ///< If true, random tracks will be placed on the floor
-	
+
 	cMineShaftCorridor(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
 		const cCuboid & a_BoundingBox, int a_NumSegments, eDirection a_Direction,
 		cNoise & a_Noise
 	);
-	
+
 	// cMineShaft overrides:
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
 
 	/// Places a chest, if the corridor has one
 	void PlaceChest(cChunkDesc & a_ChunkDesc);
-	
+
 	/// If this corridor has tracks, places them randomly
 	void PlaceTracks(cChunkDesc & a_ChunkDesc);
-	
+
 	/// If this corridor has a spawner, places the spawner
 	void PlaceSpawner(cChunkDesc & a_ChunkDesc);
-	
+
 	/// Randomly places torches around the central beam block
 	void PlaceTorches(cChunkDesc & a_ChunkDesc);
 } ;
@@ -165,7 +165,7 @@ class cMineShaftCrossing :
 	public cMineShaft
 {
 	typedef cMineShaft super;
-	
+
 public:
 	/** Creates a new Crossing attached to the specified pivot point and direction.
 	Checks all ParentSystem's objects and disallows intersecting. Initializes the new object to fit.
@@ -176,10 +176,10 @@ public:
 		int a_PivotX, int a_PivotY, int a_PivotZ, eDirection a_Direction,
 		cNoise & a_Noise
 	);
-	
+
 protected:
 	cMineShaftCrossing(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, const cCuboid & a_BoundingBox);
-	
+
 	// cMineShaft overrides:
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
@@ -193,14 +193,14 @@ class cMineShaftStaircase :
 	public cMineShaft
 {
 	typedef cMineShaft super;
-	
+
 public:
 	enum eSlope
 	{
 		sUp,
 		sDown,
 	} ;
-	
+
 	/** Creates a new Staircase attached to the specified pivot point and direction.
 	Checks all ParentSystem's objects and disallows intersecting. Initializes the new object to fit.
 	May return NULL if cannot fit.
@@ -210,12 +210,12 @@ public:
 		int a_PivotX, int a_PivotY, int a_PivotZ, eDirection a_Direction,
 		cNoise & a_Noise
 	);
-	
+
 protected:
 	eDirection m_Direction;
 	eSlope     m_Slope;
-	
-	
+
+
 	cMineShaftStaircase(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
 		const cCuboid & a_BoundingBox,
@@ -257,7 +257,7 @@ public:
 
 	/// Carves the system into the chunk data
 	void ProcessChunk(cChunkDesc & a_Chunk);
-	
+
 	/** Creates new cMineShaft descendant connected at the specified point, heading the specified direction,
 	if it fits, appends it to the list and calls its AppendBranches()
 	*/
@@ -266,7 +266,7 @@ public:
 		cMineShaft::eDirection a_Direction, cNoise & a_Noise,
 		int a_RecursionLevel
 	);
-	
+
 	/// Returns true if none of the objects in m_MineShafts intersect with the specified bounding box and the bounding box is valid
 	bool CanAppend(const cCuboid & a_BoundingBox);
 } ;
@@ -294,7 +294,7 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 	m_ChanceTorch(1000)  // TODO: settable
 {
 	m_MineShafts.reserve(100);
-	
+
 	cMineShaft * Start = new cMineShaftDirtRoom(*this, a_Noise);
 	m_MineShafts.push_back(Start);
 
@@ -302,9 +302,9 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 		Start->m_BoundingBox.p1.x - a_MaxSystemSize / 2, 2,  Start->m_BoundingBox.p1.z - a_MaxSystemSize / 2,
 		Start->m_BoundingBox.p2.x + a_MaxSystemSize / 2, 50, Start->m_BoundingBox.p2.z + a_MaxSystemSize / 2
 	);
-	
+
 	Start->AppendBranches(0, a_Noise);
-	
+
 	for (cMineShafts::const_iterator itr = m_MineShafts.begin(), end = m_MineShafts.end(); itr != end; ++itr)
 	{
 		ASSERT((*itr)->m_BoundingBox.IsSorted());
@@ -341,7 +341,7 @@ void cStructGenMineShafts::cMineShaftSystem::ProcessChunk(cChunkDesc & a_Chunk)
 
 
 void cStructGenMineShafts::cMineShaftSystem::AppendBranch(
-	int a_PivotX, int a_PivotY, int a_PivotZ, 
+	int a_PivotX, int a_PivotY, int a_PivotZ,
 	cMineShaft::eDirection a_Direction, cNoise & a_Noise,
 	int a_RecursionLevel
 )
@@ -350,7 +350,7 @@ void cStructGenMineShafts::cMineShaftSystem::AppendBranch(
 	{
 		return;
 	}
-	
+
 	cMineShaft * Next = NULL;
 	int rnd = (a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_RecursionLevel * 16, a_PivotZ) / 13) % m_ProbLevelStaircase;
 	if (rnd < m_ProbLevelCorridor)
@@ -384,7 +384,7 @@ bool cStructGenMineShafts::cMineShaftSystem::CanAppend(const cCuboid & a_Boundin
 		// Too far away, or too low / too high
 		return false;
 	}
-		
+
 	// Check intersections:
 	for (cMineShafts::const_iterator itr = m_MineShafts.begin(), end = m_MineShafts.end(); itr != end; ++itr)
 	{
@@ -436,7 +436,7 @@ void cMineShaftDirtRoom::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 		rnd >>= 4;
 		m_ParentSystem.AppendBranch(x, m_BoundingBox.p1.y + (rnd % Height), m_BoundingBox.p2.z + 1, dirZP, a_Noise, a_RecursionLevel);
 	}
-	
+
 	for (int z = m_BoundingBox.p1.z + 1; z < m_BoundingBox.p2.z; z += 4)
 	{
 		int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x, a_RecursionLevel, z) / 13;
@@ -464,13 +464,13 @@ void cMineShaftDirtRoom::ProcessChunk(cChunkDesc & a_ChunkDesc)
 		// Early bailout - cannot intersect this chunk
 		return;
 	}
-	
+
 	// Chunk-relative coords of the boundaries:
 	int MinX = std::max(BlockX, m_BoundingBox.p1.x) - BlockX;
 	int MaxX = std::min(BlockX + cChunkDef::Width, m_BoundingBox.p2.x + 1) - BlockX;
 	int MinZ = std::max(BlockZ, m_BoundingBox.p1.z) - BlockZ;
 	int MaxZ = std::min(BlockZ + cChunkDef::Width, m_BoundingBox.p2.z + 1) - BlockZ;
-	
+
 	// Carve the room out:
 	for (int z = MinZ; z < MaxZ; z++)
 	{
@@ -513,7 +513,7 @@ cMineShaftCorridor::cMineShaftCorridor(
 		rnd >>= 2;
 	}
 	m_HasTracks = ((rnd % 4) < 2);  // 50 % chance of tracks
-	
+
 	rnd = a_Noise.IntNoise3DInt(a_BoundingBox.p1.z, a_BoundingBox.p1.x, a_BoundingBox.p1.y) / 7;
 	int ChestCheck = rnd % 250;
 	rnd >>= 8;
@@ -597,7 +597,7 @@ void cMineShaftCorridor::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 			}
 			break;
 		}
-		
+
 		case dirZM:
 		{
 			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, Height, m_BoundingBox.p1.z - 1, dirZM, a_Noise, a_RecursionLevel);
@@ -646,14 +646,14 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	Top.p2.y += 1;
 	Top.p1.y = Top.p2.y;
 	a_ChunkDesc.FillRelCuboid(RelBoundingBox, E_BLOCK_AIR, 0);
-	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_AIR, 0, BlockX ^ BlockZ + BlockX, 8000);
+	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_AIR, 0, (BlockX ^ (BlockZ + BlockX)), 8000);
 	if (m_SpawnerPosition >= 0)
 	{
 		// Cobwebs around the spider spawner
-		a_ChunkDesc.RandomFillRelCuboid(RelBoundingBox, E_BLOCK_COBWEB, 0, BlockX ^ BlockZ + BlockZ, 8000);
-		a_ChunkDesc.RandomFillRelCuboid(Top,            E_BLOCK_COBWEB, 0, BlockX ^ BlockZ + BlockX, 5000);
+		a_ChunkDesc.RandomFillRelCuboid(RelBoundingBox, E_BLOCK_COBWEB, 0, (BlockX ^ (BlockZ + BlockZ)), 8000);
+		a_ChunkDesc.RandomFillRelCuboid(Top,            E_BLOCK_COBWEB, 0, (BlockX ^ (BlockZ + BlockX)), 5000);
 	}
-	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_COBWEB, 0, BlockX ^ BlockZ + BlockX + 10, 500);
+	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_COBWEB, 0, (BlockX ^ (BlockZ + BlockX + 10)), 500);
 	RelBoundingBox.p1.y = m_BoundingBox.p1.y;
 	RelBoundingBox.p2.y = m_BoundingBox.p1.y;
 	a_ChunkDesc.FloorRelCuboid(RelBoundingBox, E_BLOCK_PLANKS, 0);
@@ -693,7 +693,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			}  // for i - NumSegments
 			break;
 		}
-		
+
 		case dirZM:
 		case dirZP:
 		{
@@ -729,7 +729,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			break;
 		}  // case dirZ?
 	}  // for i
-	
+
 	PlaceChest(a_ChunkDesc);
 	PlaceTracks(a_ChunkDesc);
 	PlaceSpawner(a_ChunkDesc); // (must be after Tracks!)
@@ -762,7 +762,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 	{
 		return;
 	}
-	
+
 	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	int x, z;
@@ -777,7 +777,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 			Meta = E_META_CHEST_FACING_ZP;
 			break;
 		}
-		
+
 		case dirZM:
 		case dirZP:
 		{
@@ -829,7 +829,7 @@ void cMineShaftCorridor::PlaceTracks(cChunkDesc & a_ChunkDesc)
 			Meta = E_META_TRACKS_X;
 			break;
 		}
-		
+
 		case dirZM:
 		case dirZP:
 		{
@@ -921,7 +921,7 @@ void cMineShaftCorridor::PlaceTorches(cChunkDesc & a_ChunkDesc)
 			}  // for i
 			break;
 		}
-		
+
 		case dirZM:
 		case dirZP:
 		{
@@ -1041,7 +1041,7 @@ void cMineShaftCrossing::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 			// This exit is not available (two-level exit on a one-level crossing)
 			continue;
 		}
-		
+
 		int Height = m_BoundingBox.p1.y + Exits[i].y;
 		m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + Exits[i].x, Height, m_BoundingBox.p1.z + Exits[i].z, Exits[i].dir, a_Noise, a_RecursionLevel);
 	}  // for i
@@ -1089,7 +1089,7 @@ void cMineShaftCrossing::ProcessChunk(cChunkDesc & a_ChunkDesc)
 		a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Mid, Ceil, box.p1.z,     box.p1.z,     E_BLOCK_AIR, 0);
 		a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Mid, Ceil, box.p2.z,     box.p2.z,     E_BLOCK_AIR, 0);
 	}
-	
+
 	// The floor, if needed:
 	box.p2.y = box.p1.y;
 	a_ChunkDesc.FloorRelCuboid(box, E_BLOCK_PLANKS, 0);
@@ -1198,7 +1198,7 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 		// No intersection between this staircase and this chunk
 		return;
 	}
-	
+
 	int SFloor = RelB.p1.y + ((m_Slope == sDown) ? 5 : 1);
 	int DFloor = RelB.p1.y + ((m_Slope == sDown) ? 1 : 5);
 	int Add = (m_Slope == sDown) ? -1 : 1;
@@ -1221,7 +1221,7 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			}
 			break;
 		}
-		
+
 		case dirXP:
 		{
 			a_ChunkDesc.FillRelCuboid (RelB.p1.x,     RelB.p1.x + 1, SFloor,     SFloor + 2, RelB.p1.z, RelB.p2.z, E_BLOCK_AIR, 0);
@@ -1253,7 +1253,7 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			}
 			break;
 		}
-		
+
 		case dirZP:
 		{
 			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, SFloor,     SFloor + 2, RelB.p1.z,     RelB.p1.z + 1,  E_BLOCK_AIR, 0);
@@ -1269,7 +1269,7 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			}
 			break;
 		}
-		
+
 	}  // switch (m_Direction)
 }
 
@@ -1359,7 +1359,7 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 			++itr;
 		}
 	}  // for itr - m_Cache[]
-	
+
 	for (int x = 0; x < NEIGHBORHOOD_SIZE; x++)
 	{
 		int RealX = (BaseX + x) * m_GridSize;
@@ -1381,11 +1381,11 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 			}
 		}  // for z
 	}  // for x
-	
+
 	// Copy a_MineShafts into m_Cache to the beginning:
 	cMineShaftSystems MineShaftsCopy(a_MineShafts);
 	m_Cache.splice(m_Cache.begin(), MineShaftsCopy, MineShaftsCopy.begin(), MineShaftsCopy.end());
-	
+
 	// Trim the cache if it's too long:
 	if (m_Cache.size() > 100)
 	{
