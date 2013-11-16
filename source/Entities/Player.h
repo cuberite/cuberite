@@ -32,6 +32,7 @@ public:
 		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
 		MAX_AIR_LEVEL = 300,
 		DROWNING_TICKS = 10, //number of ticks per heart of damage
+		MIN_EXPERIENCE = 0,
 	} ;
 	// tolua_end
 	
@@ -77,6 +78,9 @@ public:
 	Returns the new current experience, -1 on error
 	*/
 	short AddExperience(short a_Xp_delta);
+
+	/// "Spend" some experience - ie on enchanting, returns new currentXp
+	short SpendExperience(short a_Xp_delta);
 
 	/// Gets the experience total - XpTotal for score on death
 	inline short GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }

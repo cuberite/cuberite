@@ -66,8 +66,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
-	, m_XpTotal(0)
-	, m_IsExperienceDirty(false)
+	, m_CurrentXp(0)
+	, m_LifetimeTotalXp(0)
+	, m_bDirtyExperience(false)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -371,6 +372,31 @@ short cPlayer::AddExperience(short a_Xp_delta)
 	m_LifetimeTotalXp += a_Xp_delta;
 
 	LOGD("Player \"%s\" earnt %d experience, total is now: %d", 
+		m_PlayerName.c_str(), a_Xp_delta, m_XpTotal);
+
+	// Set experience to be updated
+	m_bDirtyExperience = true;
+
+	return m_CurrentXp;
+}
+
+
+
+
+
+short cPlayer::SpendExperience(short a_Xp_delta)
+{
+	if(a_Xp_delta < 0)
+	{
+		// Value was negative, abort and report
+		LOGWARNING("Attempt was made to decrement Xp by %d, must be positive",
+			a_Xp_delta);
+		return -1; // Should we instead just return the current Xp?
+	}
+
+	m_CurrentXp -= a_Xp_delta;
+
+	LOGD("Player \"%s\" spent %d experience, total is now: %d", 
 		m_PlayerName.c_str(), a_Xp_delta, m_XpTotal);
 
 	// Set experience to be updated
@@ -790,6 +816,11 @@ void cPlayer::Respawn(void)
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;
 	m_FoodSaturationLevel = 5;
+
+	// Reset Experience
+	m_CurrentXp = MIN_EXPERIENCE;
+	m_LifetimeTotalXp = MIN_EXPERIENCE;
+	// ToDo: send score to client? How?
 
 	m_ClientHandle->SendRespawn();
 	
@@ -1449,7 +1480,8 @@ bool cPlayer::LoadFromDisk()
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
-	m_XpTotal             = (short) root.get("experience", 0).asInt();
+	m_LifetimeTotalXp     = (short) root.get("xpTotal", 0).asInt();
+	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
 
 	//SetExperience(root.get("experience", 0).asInt());
 
@@ -1493,7 +1525,8 @@ bool cPlayer::SaveToDisk()
 	root["rotation"]       = JSON_PlayerRotation;
 	root["inventory"]      = JSON_Inventory;
 	root["health"]         = m_Health;
-	root["experience"]     = m_XpTotal;
+	root["xpTotal"]        = m_LifetimeTotalXp;
+	root["xpCurrent"]      = m_CurrentXp;
 	root["air"]            = m_AirLevel;
 	root["food"]           = m_FoodLevel;
 	root["foodSaturation"] = m_FoodSaturationLevel;

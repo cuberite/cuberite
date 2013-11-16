@@ -600,9 +600,9 @@ void cProtocol172::SendRespawn(void)
 void cProtocol172::SendExperience (void)
 {
 	cPacketizer Pkt(*this, 0x1F); //Experience Packet
-	Pkt.WriteFloat(m_Client->GetPlayer()->XpGetPercentage());
-	Pkt.WriteShort(m_Client->GetPlayer()->XpGetLevel());
-	Pkt.WriteShort(m_Client->GetPlayer()->XpGetTotal());
+	Pkt.WriteFloat(m_Client->GetPlayer()->GetXpPercentage());
+	Pkt.WriteShort(m_Client->GetPlayer()->GetXpLevel());
+	Pkt.WriteShort(m_Client->GetPlayer()->GetCurrentXp());
 }
 
 

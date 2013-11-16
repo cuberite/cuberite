@@ -695,9 +695,9 @@ void cProtocol125::SendExperience(void)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_EXPERIENCE);
-	WriteFloat (m_Client->GetPlayer()->XpGetPercentage());
-	WriteShort (m_Client->GetPlayer()->XpGetLevel());
-	WriteShort (m_Client->GetPlayer()->XpGetTotal());
+	WriteFloat (m_Client->GetPlayer()->GetXpPercentage());
+	WriteShort (m_Client->GetPlayer()->GetXpLevel());
+	WriteShort (m_Client->GetPlayer()->GetCurrentXp());
 	Flush();
 }
 
