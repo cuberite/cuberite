@@ -402,7 +402,6 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 		}
 	}
 
-	int idx = 0;
 	for (int y = 0; y < 257; y += UPSCALE_Y)
 	{
 		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)y) / m_FrequencyY;
