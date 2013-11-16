@@ -274,7 +274,6 @@ int cStructGenTrees::GetNumTrees(
 			case biExtremeHillsEdge: Add =   5; break;
 			case biJungle:           Add = 120; break;
 			case biJungleHills:      Add =  90; break;
-			default:                 Add =   0; break;
 		}
 		NumTrees += Add;
 	}
