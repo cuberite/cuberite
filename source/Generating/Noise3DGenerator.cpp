@@ -236,7 +236,7 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	// Precalculate a "height" array:
 	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
 	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 25, EndX / 25, StartZ / 25, EndZ / 25);
-	for (int i = 0; i < ARRAYCOUNT(Height); i++)
+	for (unsigned int i = 0; i < ARRAYCOUNT(Height); i++)
 	{
 		Height[i] = abs(Height[i]) * m_HeightAmplification + 1;
 	}
