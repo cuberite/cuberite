@@ -429,7 +429,7 @@ protected:
 	static short XpForLevel(short int a_Level);
 
 	/// inverse of XpAtLevel, ref: http://minecraft.gamepedia.com/XP values are as per this with pre-calculations
-	static short CalcLevelFromXp(short int a_XpCurrent);
+	static short CalcLevelFromXp(short int a_CurrentXp);
 	
 	bool m_IsChargingBow;
 	int  m_BowCharge;

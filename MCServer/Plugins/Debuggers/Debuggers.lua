@@ -859,7 +859,7 @@ end
 
 
 function HandleRemoveXp(a_Split, a_Player)
-	a_Player:SetExperience(0);
+	a_Player:SetCurrentExperience(0);
 	
 	return true;
 end

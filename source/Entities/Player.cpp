@@ -336,15 +336,15 @@ float cPlayer::GetXpPercentage()
 
 
 
-bool cPlayer::SetCurrentExperience(short int a_XpTotal)
+bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 {
-	if(!(a_XpTotal >= 0) || (a_XpTotal > (SHRT_MAX - m_LifetimeTotalXp)))
+	if(!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
 	{
-		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_XpTotal);
+		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
 		return false; //oops, they gave us a dodgey number
 	}
 
-	m_CurrentXp = a_XpTotal;
+	m_CurrentXp = a_CurrentXp;
 
 	// Set experience to be updated
 	m_bDirtyExperience = true;
