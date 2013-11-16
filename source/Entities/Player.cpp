@@ -370,9 +370,9 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	if(m_CurrentXp < 0)
+	if(m_CurrentXp < MIN_EXPERIENCE)
 	{
-		m_CurrentXp = 0;
+		m_CurrentXp = MIN_EXPERIENCE;
 	}
 
 	// Update total for score calculation
