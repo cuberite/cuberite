@@ -88,6 +88,10 @@ endif
 endif
 endif
 
+##################################################
+# Always be warning.
+
+CXX_OPTIONS += -Wall
 
 ###################################################
 # Fix Crypto++ warnings in clang
