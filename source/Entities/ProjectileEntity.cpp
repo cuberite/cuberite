@@ -230,6 +230,8 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkSnowball:      return new cThrownSnowballEntity  (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkFirework:      return new cFireworkEntity        (a_Creator, a_X, a_Y, a_Z       );
 		// TODO: the rest
 	}
 	
@@ -446,29 +448,19 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
+	if (a_HitFace == BLOCK_FACE_NONE) { return; }
+
 	super::OnHitSolidBlock(a_HitPos, a_HitFace);
 	int a_X = (int)a_HitPos.x, a_Y = (int)a_HitPos.y, a_Z = (int)a_HitPos.z;
-	
-	// Projectiles mistakenly think a face faces the direction a player faces when looking directly at said face
-	// This therefore breaks YP & YM of AddFaceDirection - see #350 for more details
+
 	switch (a_HitFace)
 	{
-		case BLOCK_FACE_NONE: break; // Block tracer sometimes returns this, in this case, the coords will be correct
-		case BLOCK_FACE_YP:
-		{
-			a_Y--;
-			break;
-		}
+		case BLOCK_FACE_XM: // Strangely, bounding boxes / block tracers return the actual block for these two directions, so AddFace not needed
 		case BLOCK_FACE_YM:
 		{
-			a_Y++;
 			break;
 		}
-		default:
-		{
-			AddFaceDirection(a_X, a_Y, a_Z, a_HitFace);
-			break;
-		}
+		default: AddFaceDirection(a_X, a_Y, a_Z, a_HitFace, true);
 	}
 
 	m_HitBlockPos = Vector3i(a_X, a_Y, a_Z);
@@ -666,6 +658,104 @@ void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_Hi
 	// TODO: Apply damage to certain mobs (blaze etc.) and anger all mobs
 	
 	Destroy();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBottleOEnchantingEntity :
+
+cExpBottleEntity::cExpBottleEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
+super(pkExpBottle, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+{
+	SetSpeed(a_Speed);
+}
+
+
+
+
+
+void cExpBottleEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+{
+	// TODO: Spawn experience orbs
+
+	Destroy();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFireworkEntity :
+
+cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z) :
+super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+{
+}
+
+
+
+
+
+void cFireworkEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+{
+	if ((a_HitFace != BLOCK_FACE_BOTTOM) && (a_HitFace != BLOCK_FACE_NONE))
+	{
+		return;
+	}
+
+	SetSpeed(0, 0, 0);
+	SetPosition(GetPosX(), GetPosY() - 0.5, GetPosZ());
+
+	std::cout << a_HitPos.x << " " << a_HitPos.y << " " << a_HitPos.z << std::endl;
+
+	m_IsInGround = true;
+
+	BroadcastMovementUpdate();
+}
+
+
+
+
+
+void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
+{
+	if (m_IsInGround)
+	{
+		if (a_Chunk.GetBlock((int)GetPosX(), (int)GetPosY() + 1, (int)GetPosZ()) == E_BLOCK_AIR)
+		{
+			m_IsInGround = false;
+		}
+		else
+		{
+			return;
+		}
+	}
+
+	Vector3d PerTickSpeed = GetSpeed() / 20;
+	Vector3d Pos = GetPosition();
+
+	// Trace the tick's worth of movement as a line:
+	Vector3d NextPos = Pos + PerTickSpeed;
+	cProjectileTracerCallback TracerCallback(this);
+	if (!cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
+	{
+		// Something has been hit, abort all other processing
+		return;
+	}
+	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later in its SlowdownCoeff
+
+	// Update the position:
+	SetPosition(NextPos);
+
+	// Add slowdown and gravity effect to the speed:
+	Vector3d NewSpeed(GetSpeed());
+	NewSpeed.y += 2;
+	NewSpeed *= TracerCallback.GetSlowdownCoeff();
+	SetSpeed(NewSpeed);
 }
 
 

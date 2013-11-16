@@ -34,6 +34,7 @@ public:
 		pkEnderPearl    = 65,
 		pkExpBottle     = 75,
 		pkSplashPotion  = 73,
+		pkFirework      = 76,
 		pkWitherSkull   = 66,
 		pkFishingFloat  = 90,
 	} ;
@@ -159,6 +160,7 @@ protected:
 	/// Timer for pickup collection animation or five minute timeout
 	float m_Timer;
 
+	/// Timer for client arrow position confirmation via TeleportEntity
 	float m_HitGroundTimer;
 
 	/// If true, the arrow is in the process of being collected - don't go to anyone else
@@ -257,6 +259,59 @@ protected:
 	// tolua_begin
 	
 } ;
+
+
+
+
+
+class cExpBottleEntity :
+	public cProjectileEntity
+{
+	typedef cProjectileEntity super;
+
+public:
+
+	// tolua_end
+
+	CLASS_PROTODEF(cExpBottleEntity);
+
+	cExpBottleEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+
+protected:
+
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+
+	// tolua_begin
+
+};
+
+
+
+
+
+class cFireworkEntity :
+	public cProjectileEntity
+{
+	typedef cProjectileEntity super;
+
+public:
+
+	// tolua_end
+
+	CLASS_PROTODEF(cFireworkEntity);
+
+	cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z);
+
+protected:
+
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
+
+	// tolua_begin
+
+};
 
 
 
