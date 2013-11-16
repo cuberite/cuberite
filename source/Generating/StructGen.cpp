@@ -620,7 +620,6 @@ bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
 			{
 				return true;
 			}
-			default: break;
 		}
 	}  // for i
 	return false;
