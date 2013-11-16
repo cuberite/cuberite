@@ -31,7 +31,7 @@ Linearly interpolates values in the array between the equidistant anchor points 
 Works in-place (input is already present at the correct output coords)
 */
 template<typename TYPE> void LinearUpscale2DArrayInPlace(
-	TYPE * a_Array, 
+	TYPE * a_Array,
 	int a_SizeX, int a_SizeY,  // Dimensions of the array
 	int a_AnchorStepX, int a_AnchorStepY  // Distances between the anchor points in each direction
 )
@@ -53,7 +53,7 @@ template<typename TYPE> void LinearUpscale2DArrayInPlace(
 			Idx += a_AnchorStepX;
 		}  // for x
 	}  // for y
-	
+
 	// Now interpolate in rows, each row has values in the anchor columns
 	int LastXCell = a_SizeX - a_AnchorStepX;
 	for (int y = 0; y < a_SizeY; y++)
@@ -92,7 +92,7 @@ template<typename TYPE> void LinearUpscale2DArray(
 	// Feel free to enlarge them if needed, but keep in mind that they're on the stack
 	const int MAX_UPSCALE_X = 128;
 	const int MAX_UPSCALE_Y = 128;
-	
+
 	ASSERT(a_Src != NULL);
 	ASSERT(a_Dst != NULL);
 	ASSERT(a_SrcSizeX > 0);
@@ -101,7 +101,7 @@ template<typename TYPE> void LinearUpscale2DArray(
 	ASSERT(a_UpscaleY > 0);
 	ASSERT(a_UpscaleX <= MAX_UPSCALE_X);
 	ASSERT(a_UpscaleY <= MAX_UPSCALE_Y);
-	
+
 	// Pre-calculate the upscaling ratios:
 	TYPE RatioX[MAX_UPSCALE_X];
 	TYPE RatioY[MAX_UPSCALE_Y];
@@ -113,7 +113,7 @@ template<typename TYPE> void LinearUpscale2DArray(
 	{
 		RatioY[y] = (TYPE)y / a_UpscaleY;
 	}
-	
+
 	// Interpolate each XY cell:
 	int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
 	int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
@@ -163,7 +163,7 @@ template<typename TYPE> void LinearUpscale3DArray(
 	const int MAX_UPSCALE_X = 128;
 	const int MAX_UPSCALE_Y = 128;
 	const int MAX_UPSCALE_Z = 128;
-	
+
 	ASSERT(a_Src != NULL);
 	ASSERT(a_Dst != NULL);
 	ASSERT(a_SrcSizeX > 0);
@@ -175,11 +175,11 @@ template<typename TYPE> void LinearUpscale3DArray(
 	ASSERT(a_UpscaleX <= MAX_UPSCALE_X);
 	ASSERT(a_UpscaleY <= MAX_UPSCALE_Y);
 	ASSERT(a_UpscaleZ <= MAX_UPSCALE_Z);
-	
+
 	// Pre-calculate the upscaling ratios:
 	TYPE RatioX[MAX_UPSCALE_X];
 	TYPE RatioY[MAX_UPSCALE_Y];
-	TYPE RatioZ[MAX_UPSCALE_Y];
+	TYPE RatioZ[MAX_UPSCALE_Z];
 	for (int x = 0; x <= a_UpscaleX; x++)
 	{
 		RatioX[x] = (TYPE)x / a_UpscaleX;
@@ -192,7 +192,7 @@ template<typename TYPE> void LinearUpscale3DArray(
 	{
 		RatioZ[z] = (TYPE)z / a_UpscaleZ;
 	}
-	
+
 	// Interpolate each XYZ cell:
 	int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
 	int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
