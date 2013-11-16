@@ -389,10 +389,6 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 	const int UPSCALE_Y = 4;
 	const int UPSCALE_Z = 8;
 
-	const int DIM_X = 1 + cChunkDef::Width  / UPSCALE_X;
-	const int DIM_Y = 1 + cChunkDef::Height / UPSCALE_Y;
-	const int DIM_Z = 1 + cChunkDef::Width  / UPSCALE_Z;
-
 	// Precalculate a "height" array:
 	NOISE_DATATYPE Height[17 * 17];  // x + 17 * z
 	for (int z = 0; z < 17; z += UPSCALE_Z)
