@@ -179,9 +179,9 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	// Based on the wall hit, adjust the current coords
 	switch (Direction)
 	{
-		case dirX:    m_CurrentX += m_DirX; m_CurrentFace = (m_DirX > 0) ? BLOCK_FACE_EAST   : BLOCK_FACE_WEST;  break;
-		case dirY:    m_CurrentY += m_DirY; m_CurrentFace = (m_DirY > 0) ? BLOCK_FACE_BOTTOM : BLOCK_FACE_TOP;   break;
-		case dirZ:    m_CurrentZ += m_DirZ; m_CurrentFace = (m_DirZ > 0) ? BLOCK_FACE_SOUTH  : BLOCK_FACE_NORTH; break;
+		case dirX:    m_CurrentX += m_DirX; m_CurrentFace = (m_DirX > 0) ? BLOCK_FACE_XM : BLOCK_FACE_XP; break;
+		case dirY:    m_CurrentY += m_DirY; m_CurrentFace = (m_DirY > 0) ? BLOCK_FACE_YM : BLOCK_FACE_YP; break;
+		case dirZ:    m_CurrentZ += m_DirZ; m_CurrentFace = (m_DirZ > 0) ? BLOCK_FACE_ZM : BLOCK_FACE_ZP; break;
 		case dirNONE: return false;
 	}
 	return true;
