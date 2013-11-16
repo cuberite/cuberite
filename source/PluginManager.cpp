@@ -113,9 +113,13 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	FindPlugins();
 
 	cServer::BindBuiltInConsoleCommands();
-	
-	unsigned int KeyNum = a_SettingsIni.FindKey("Plugins");
+
+	// Check if the Plugins section exists.
+	int KeyNum = a_SettingsIni.FindKey("Plugins");
+
+	// If it does, how many plugins are there?
 	unsigned int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
+
 	if (KeyNum == -1)
 	{
 		InsertDefaultPlugins(a_SettingsIni);
@@ -202,7 +206,7 @@ void cPluginManager::Tick(float a_Dt)
 
 bool cPluginManager::CallHookBlockToPickups(
 	cWorld * a_World, cEntity * a_Digger,
-	int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
 	cItems & a_Pickups
 )
 {
@@ -247,7 +251,7 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 	{
 		return false;
 	}
-	
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnChat(a_Player, a_Message))
@@ -255,7 +259,7 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -1230,27 +1234,27 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, float a_Dt)
 bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
 	ASSERT(a_Player != NULL);
-	
+
 	AStringVector Split(StringSplit(a_Command, " "));
 	if (Split.empty())
 	{
 		return false;
 	}
-	
+
 	CommandMap::iterator cmd = m_Commands.find(Split[0]);
 	if (cmd == m_Commands.end())
 	{
 		// Command not found
 		return false;
 	}
-	
+
 	// Ask plugins first if a command is okay to execute the command:
 	if (CallHookExecuteCommand(a_Player, Split))
 	{
 		LOGINFO("Player \"%s\" tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player->GetName().c_str(), Split[0].c_str());
 		return false;
 	}
-	
+
 	if (
 		a_ShouldCheckPermissions &&
 		!cmd->second.m_Permission.empty() &&
@@ -1262,8 +1266,8 @@ bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command
 	}
 
 	ASSERT(cmd->second.m_Plugin != NULL);
-	
-	return cmd->second.m_Plugin->HandleCommand(Split, a_Player);	
+
+	return cmd->second.m_Plugin->HandleCommand(Split, a_Player);
 }
 
 
@@ -1320,7 +1324,7 @@ bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 	{
 		return false;
 	}
-	
+
 	if (itr->first.compare(a_PluginName) == 0)  // _X 2013_02_01: wtf? Isn't this supposed to be what find() does?
 	{
 		m_DisablePluginList.push_back(itr->second);
@@ -1365,7 +1369,7 @@ void cPluginManager::RemovePlugin(cPlugin * a_Plugin)
 			break;
 		}
 	}
-	
+
 	RemovePluginCommands(a_Plugin);
 	RemovePluginConsoleCommands(a_Plugin);
 	RemoveHooks(a_Plugin);
@@ -1386,7 +1390,7 @@ void cPluginManager::RemovePluginCommands(cPlugin * a_Plugin)
 	{
 		a_Plugin->ClearCommands();
 	}
-	
+
 	for (CommandMap::iterator itr = m_Commands.begin(); itr != m_Commands.end();)
 	{
 		if (itr->second.m_Plugin == a_Plugin)
@@ -1414,7 +1418,7 @@ bool cPluginManager::BindCommand(const AString & a_Command, cPlugin * a_Plugin, 
 		LOGWARNING("Command \"%s\" is already bound to plugin \"%s\".", a_Command.c_str(), cmd->second.m_Plugin->GetName().c_str());
 		return false;
 	}
-	
+
 	m_Commands[a_Command].m_Plugin     = a_Plugin;
 	m_Commands[a_Command].m_Permission = a_Permission;
 	m_Commands[a_Command].m_HelpString = a_HelpString;
@@ -1484,7 +1488,7 @@ void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
 	{
 		a_Plugin->ClearConsoleCommands();
 	}
-	
+
 	for (CommandMap::iterator itr = m_ConsoleCommands.begin(); itr != m_ConsoleCommands.end();)
 	{
 		if (itr->second.m_Plugin == a_Plugin)
@@ -1519,7 +1523,7 @@ bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_P
 		}
 		return false;
 	}
-	
+
 	m_ConsoleCommands[a_Command].m_Plugin     = a_Plugin;
 	m_ConsoleCommands[a_Command].m_Permission = "";
 	m_ConsoleCommands[a_Command].m_HelpString = a_HelpString;
@@ -1561,20 +1565,20 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 	{
 		return false;
 	}
-	
+
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
 	if (cmd == m_ConsoleCommands.end())
 	{
 		// Command not found
 		return false;
 	}
-	
+
 	if (cmd->second.m_Plugin == NULL)
 	{
 		// This is a built-in command
 		return false;
 	}
-	
+
 	// Ask plugins first if a command is okay to execute the console command:
 	if (CallHookExecuteCommand(NULL, a_Split))
 	{
@@ -1582,7 +1586,7 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 		return false;
 	}
 
-	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output);	
+	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output);
 }
 
 
@@ -1656,7 +1660,7 @@ void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
 
 unsigned int cPluginManager::GetNumPlugins() const
 {
-	return m_Plugins.size(); 
+	return m_Plugins.size();
 }
 
 
