@@ -338,7 +338,7 @@ float cPlayer::GetXpPercentage()
 
 bool cPlayer::SetCurrentExperience(short int a_XpTotal)
 {
-	if(!(a_XpTotal >= 0) || (a_XpTotal > (SHRT_MAX - m_CurrentXp)))
+	if(!(a_XpTotal >= 0) || (a_XpTotal > (SHRT_MAX - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_XpTotal);
 		return false; //oops, they gave us a dodgey number
@@ -356,12 +356,13 @@ bool cPlayer::SetCurrentExperience(short int a_XpTotal)
 
 
 
-short cPlayer::AddExperience(short a_Xp_delta)
+short cPlayer::DeltaExperience(short a_Xp_delta)
 {
-	if(a_Xp_delta < 0)
+	//ToDo: figure out a better name?...
+	if(a_Xp_delta > (SHRT_MAX - m_LifetimeTotalXp) || (m_CurrentXp + a_Xp_delta) < MIN_EXPERIENCE)
 	{
 		// Value was negative, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, must be positive",
+		LOGWARNING("Attempt was made to increment Xp by %d, which was invalid",
 			a_Xp_delta);
 		return -1; // Should we instead just return the current Xp?
 	}
@@ -369,34 +370,12 @@ short cPlayer::AddExperience(short a_Xp_delta)
 	m_CurrentXp += a_Xp_delta;
 
 	// Update total for score calculation
-	m_LifetimeTotalXp += a_Xp_delta;
-
-	LOGD("Player \"%s\" earnt %d experience, total is now: %d", 
-		m_PlayerName.c_str(), a_Xp_delta, m_XpTotal);
-
-	// Set experience to be updated
-	m_bDirtyExperience = true;
-
-	return m_CurrentXp;
-}
-
-
-
-
-
-short cPlayer::SpendExperience(short a_Xp_delta)
-{
-	if(a_Xp_delta < 0)
+	if(a_Xp_delta > 0)
 	{
-		// Value was negative, abort and report
-		LOGWARNING("Attempt was made to decrement Xp by %d, must be positive",
-			a_Xp_delta);
-		return -1; // Should we instead just return the current Xp?
+		m_LifetimeTotalXp += a_Xp_delta;
 	}
 
-	m_CurrentXp -= a_Xp_delta;
-
-	LOGD("Player \"%s\" spent %d experience, total is now: %d", 
+	LOGD("Player \"%s\" earnt %d experience, total is now: %d", 
 		m_PlayerName.c_str(), a_Xp_delta, m_XpTotal);
 
 	// Set experience to be updated

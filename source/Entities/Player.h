@@ -74,13 +74,10 @@ public:
 	*/
 	bool SetCurrentExperience(short a_XpTotal);
 
-	/* Adds Xp, "should" not inc more than MAX_EXPERIENCE_ORB_SIZE unless you're a plugin being funny, *cough* cheating
+	/* changes Xp by Xp_delta, you "shouldn't" not inc more than MAX_EXPERIENCE_ORB_SIZE
 	Returns the new current experience, -1 on error
 	*/
-	short AddExperience(short a_Xp_delta);
-
-	/// "Spend" some experience - ie on enchanting, returns new currentXp
-	short SpendExperience(short a_Xp_delta);
+	short DeltaExperience(short a_Xp_delta);
 
 	/// Gets the experience total - XpTotal for score on death
 	inline short GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
