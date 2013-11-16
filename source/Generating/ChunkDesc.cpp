@@ -538,7 +538,7 @@ void cChunkDesc::AddBlockEntity(cBlockEntity * a_BlockEntity)
 void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 {
 	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();
-	for (int i = 0; i < ARRAYCOUNT(a_DestMetas); i++)
+	for (unsigned int i = 0; i < ARRAYCOUNT(a_DestMetas); i++)
 	{
 		a_DestMetas[i] = AreaMetas[2 * i] | (AreaMetas[2 * i + 1] << 4);
 	}
