@@ -2707,13 +2707,43 @@ end
 
 		Vector3f =
 		{
-			Desc = [[A Vector3f object uses floating point values to describe a point in space. Vector3f is part of the {{vector3|vector3}} family.
-]],
+			Desc = [[
+				A Vector3f object uses floating point values to describe a point in space.</p>
+				<p>
+				See also {{Vector3d}} for double-precision floating point 3D coords and {{Vector3i}} for integer
+				point 3D coords.
+			]],
 			Functions =
 			{
+				constructor =
+				{
+					{ Params = "", Return = "Vector3f", Notes = "Creates a new Vector3f object with zero coords" },
+					{ Params = "x, y, z", Return = "Vector3f", Notes = "Creates a new Vector3f object with the specified coords" },
+					{ Params = "Vector3f", Return = "Vector3f", Notes = "Creates a new Vector3f object as a copy of the specified vector" },
+					{ Params = "{{Vector3d}}", Return = "Vector3f", Notes = "Creates a new Vector3f object as a copy of the specified {{Vector3d}}" },
+					{ Params = "{{Vector3i}}", Return = "Vector3f", Notes = "Creates a new Vector3f object as a copy of the specified {{Vector3i}}" },
+				},
+				operator_mul =
+				{
+					{ Params = "number", Return = "Vector3f", Notes = "Returns a new Vector3f object that has each of its coords multiplied by the specified number" },
+					{ Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that has each of its coords multiplied by the respective coord of the specified vector." },
+				},
+				operator_plus = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the vector sum of this vector and the specified vector." },
+				operator_sub = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the vector differrence between this vector and the specified vector." },
+				Cross = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the cross product of this vector and the specified vector." },
+				Dot = { Params = "Vector3f", Return = "number", Notes = "Returns the dot product of this vector and the specified vector." },
+				Equals = { Params = "Vector3f", Return = "bool", Notes = "Returns true if the specified vector is exactly equal to this vector." },
+				Length = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector" },
+				Normalize = { Params = "", Return = "", Notes = "Normalizes this vector (makes it 1 unit long while keeping the direction). FIXME: Fails for zero vectors." },
+				NormalizeCopy = { Params = "", Return = "Vector3f", Notes = "Returns a copy of this vector that is normalized (1 unit long while keeping the same direction). FIXME: Fails for zero vectors." },
+				Set = { Params = "x, y, z", Return = "", Notes = "Sets all the coords of the vector at once." },
+				SqrLength = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector, squared. This operation is slightly less computationally expensive than Length(), while it conserves some properties of Length(), such as comparison." },
 			},
-			Constants =
+			Variables =
 			{
+				x = { Type = "number", Notes = "The X coord of the vector." },
+				y = { Type = "number", Notes = "The Y coord of the vector." },
+				z = { Type = "number", Notes = "The Z coord of the vector." },
 			},
 		},  -- Vector3f
 
