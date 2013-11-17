@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/15/13 10:14:19.
+** Generated automatically by tolua++-1.0.92 on 11/16/13 21:58:48.
 */
 
 #ifndef __cplusplus
@@ -7650,9 +7650,9 @@ static int tolua_AllToLua_cEntity_IsInvisible00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetExperience of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetExperience00
-static int tolua_AllToLua_cPlayer_SetExperience00(lua_State* tolua_S)
+/* method: SetCurrentExperience of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetCurrentExperience00
+static int tolua_AllToLua_cPlayer_SetCurrentExperience00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -7666,27 +7666,27 @@ static int tolua_AllToLua_cPlayer_SetExperience00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  int a_XpTotal = ((int)  tolua_tonumber(tolua_S,2,0));
+  short a_XpTotal = ((short)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetExperience'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetCurrentExperience'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->SetExperience(a_XpTotal);
+   bool tolua_ret = (bool)  self->SetCurrentExperience(a_XpTotal);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetExperience'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'SetCurrentExperience'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: AddExperience of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_AddExperience00
-static int tolua_AllToLua_cPlayer_AddExperience00(lua_State* tolua_S)
+/* method: DeltaExperience of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_DeltaExperience00
+static int tolua_AllToLua_cPlayer_DeltaExperience00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -7700,27 +7700,27 @@ static int tolua_AllToLua_cPlayer_AddExperience00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  int a_Xp_delta = ((int)  tolua_tonumber(tolua_S,2,0));
+  short a_Xp_delta = ((short)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddExperience'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DeltaExperience'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->AddExperience(a_Xp_delta);
+   short tolua_ret = (short)  self->DeltaExperience(a_Xp_delta);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'AddExperience'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'DeltaExperience'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: XpGetTotal of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_XpGetTotal00
-static int tolua_AllToLua_cPlayer_XpGetTotal00(lua_State* tolua_S)
+/* method: GetXpLifetimeTotal of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetXpLifetimeTotal00
+static int tolua_AllToLua_cPlayer_GetXpLifetimeTotal00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -7734,25 +7734,25 @@ static int tolua_AllToLua_cPlayer_XpGetTotal00(lua_State* tolua_S)
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'XpGetTotal'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetXpLifetimeTotal'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->XpGetTotal();
+   short tolua_ret = (short)  self->GetXpLifetimeTotal();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'XpGetTotal'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetXpLifetimeTotal'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: XpGetLevel of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_XpGetLevel00
-static int tolua_AllToLua_cPlayer_XpGetLevel00(lua_State* tolua_S)
+/* method: GetCurrentXp of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetCurrentXp00
+static int tolua_AllToLua_cPlayer_GetCurrentXp00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -7766,25 +7766,25 @@ static int tolua_AllToLua_cPlayer_XpGetLevel00(lua_State* tolua_S)
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'XpGetLevel'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetCurrentXp'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->XpGetLevel();
+   short tolua_ret = (short)  self->GetCurrentXp();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'XpGetLevel'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetCurrentXp'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: XpGetPercentage of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_XpGetPercentage00
-static int tolua_AllToLua_cPlayer_XpGetPercentage00(lua_State* tolua_S)
+/* method: GetXpLevel of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetXpLevel00
+static int tolua_AllToLua_cPlayer_GetXpLevel00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -7798,17 +7798,49 @@ static int tolua_AllToLua_cPlayer_XpGetPercentage00(lua_State* tolua_S)
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'XpGetPercentage'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetXpLevel'", NULL);
 #endif
   {
-   float tolua_ret = (float)  self->XpGetPercentage();
+   short tolua_ret = (short)  self->GetXpLevel();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'XpGetPercentage'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetXpLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetXpPercentage of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetXpPercentage00
+static int tolua_AllToLua_cPlayer_GetXpPercentage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetXpPercentage'", NULL);
+#endif
+  {
+   float tolua_ret = (float)  self->GetXpPercentage();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetXpPercentage'.",&tolua_err);
  return 0;
 #endif
 }
@@ -30417,11 +30449,13 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"EATING_TICKS",cPlayer::EATING_TICKS);
    tolua_constant(tolua_S,"MAX_AIR_LEVEL",cPlayer::MAX_AIR_LEVEL);
    tolua_constant(tolua_S,"DROWNING_TICKS",cPlayer::DROWNING_TICKS);
-   tolua_function(tolua_S,"SetExperience",tolua_AllToLua_cPlayer_SetExperience00);
-   tolua_function(tolua_S,"AddExperience",tolua_AllToLua_cPlayer_AddExperience00);
-   tolua_function(tolua_S,"XpGetTotal",tolua_AllToLua_cPlayer_XpGetTotal00);
-   tolua_function(tolua_S,"XpGetLevel",tolua_AllToLua_cPlayer_XpGetLevel00);
-   tolua_function(tolua_S,"XpGetPercentage",tolua_AllToLua_cPlayer_XpGetPercentage00);
+   tolua_constant(tolua_S,"MIN_EXPERIENCE",cPlayer::MIN_EXPERIENCE);
+   tolua_function(tolua_S,"SetCurrentExperience",tolua_AllToLua_cPlayer_SetCurrentExperience00);
+   tolua_function(tolua_S,"DeltaExperience",tolua_AllToLua_cPlayer_DeltaExperience00);
+   tolua_function(tolua_S,"GetXpLifetimeTotal",tolua_AllToLua_cPlayer_GetXpLifetimeTotal00);
+   tolua_function(tolua_S,"GetCurrentXp",tolua_AllToLua_cPlayer_GetCurrentXp00);
+   tolua_function(tolua_S,"GetXpLevel",tolua_AllToLua_cPlayer_GetXpLevel00);
+   tolua_function(tolua_S,"GetXpPercentage",tolua_AllToLua_cPlayer_GetXpPercentage00);
    tolua_function(tolua_S,"GetEyeHeight",tolua_AllToLua_cPlayer_GetEyeHeight00);
    tolua_function(tolua_S,"GetEyePosition",tolua_AllToLua_cPlayer_GetEyePosition00);
    tolua_function(tolua_S,"IsOnGround",tolua_AllToLua_cPlayer_IsOnGround00);

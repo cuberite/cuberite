@@ -32,6 +32,7 @@ public:
 		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
 		MAX_AIR_LEVEL = 300,
 		DROWNING_TICKS = 10, //number of ticks per heart of damage
+		MIN_EXPERIENCE = 0,
 	} ;
 	// tolua_end
 	
@@ -71,21 +72,25 @@ public:
 	Returns true on success
 	"should" really only be called at init or player death, plugins excepted
 	*/
-	bool SetExperience(int a_XpTotal);
+	bool SetCurrentExperience(short a_XpTotal);
 
-	/* Adds Xp, "should" not inc more than MAX_EXPERIENCE_ORB_SIZE unless you're a plugin being funny, *cough* cheating
-	Returns the new total experience, -1 on error
+	/* changes Xp by Xp_delta, you "shouldn't" inc more than MAX_EXPERIENCE_ORB_SIZE
+	Wont't allow xp to go negative
+	Returns the new current experience, -1 on error
 	*/
-	int AddExperience(int a_Xp_delta);
+	short DeltaExperience(short a_Xp_delta);
 
-	/// Gets the experience total - XpTotal
-	inline int XpGetTotal(void) { return m_XpTotal; }
+	/// Gets the experience total - XpTotal for score on death
+	inline short GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
+
+	/// Gets the currrent experience
+	inline short GetCurrentXp(void) { return m_CurrentXp; }
 
 	/// Gets the current level - XpLevel
-	int XpGetLevel(void);
+	short GetXpLevel(void);
 
 	/// Gets the experience bar percentage - XpP
-	float XpGetPercentage(void);
+	float GetXpPercentage(void);
 
 	// tolua_end
 	
@@ -269,6 +274,8 @@ public:
 	void UseEquippedItem(void);
 	
 	void SendHealth(void);
+
+	void SendExperience(void);
 	
 	// In UI windows, the item that the player is dragging:
 	bool IsDraggingItem(void) const { return !m_DraggingItem.IsEmpty(); }
@@ -413,13 +420,17 @@ protected:
 	Int64 m_EatingFinishTick;
 
 	/// Player Xp level
-	int m_XpTotal;
+	short int m_LifetimeTotalXp;
+	short int m_CurrentXp;
+
+	// flag saying we need to send a xp update to client
+	bool m_bDirtyExperience;
 
 	/// Caculates the Xp needed for a given level, ref: http://minecraft.gamepedia.com/XP
-	static int XpForLevel(int a_Level);
+	static short XpForLevel(short int a_Level);
 
 	/// inverse of XpAtLevel, ref: http://minecraft.gamepedia.com/XP values are as per this with pre-calculations
-	static int CalcLevelFromXp(int a_XpTotal);
+	static short CalcLevelFromXp(short int a_CurrentXp);
 	
 	bool m_IsChargingBow;
 	int  m_BowCharge;

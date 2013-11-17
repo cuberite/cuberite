@@ -66,7 +66,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
-	, m_XpTotal(0)
+	, m_CurrentXp(0)
+	, m_LifetimeTotalXp(0)
+	, m_bDirtyExperience(false)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -222,6 +224,12 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		m_BowCharge += 1;
 	}
+	
+	//handle updating experience
+	if (m_bDirtyExperience)
+	{
+		SendExperience();
+	}
 
 	if (m_bDirtyPosition)
 	{
@@ -262,7 +270,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-int cPlayer::CalcLevelFromXp(int a_XpTotal)
+short cPlayer::CalcLevelFromXp(short a_XpTotal)
 {
 	//level 0 to 15
 	if(a_XpTotal <= XP_TO_LEVEL15)
@@ -273,18 +281,18 @@ int cPlayer::CalcLevelFromXp(int a_XpTotal)
 	//level 30+
 	if(a_XpTotal > XP_TO_LEVEL30)
 	{
-		return (int) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
+		return (short) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
 	}
 
 	//level 16 to 30
-	return (int) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
+	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
 }
 
 
 
 
 
-int cPlayer::XpForLevel(int a_Level)
+short cPlayer::XpForLevel(short a_Level)
 {
 	//level 0 to 15
 	if(a_Level <= 15)
@@ -295,46 +303,51 @@ int cPlayer::XpForLevel(int a_Level)
 	//level 30+
 	if(a_Level >= 31)
 	{
-		return (int) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
+		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
 	}
 
 	//level 16 to 30
-	return (int) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
+	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
 }
 
 
 
 
 
-int cPlayer::XpGetLevel()
+short cPlayer::GetXpLevel()
 {
-	return CalcLevelFromXp(m_XpTotal);
+	return CalcLevelFromXp(m_CurrentXp);
 }
 
 
 
 
 
-float cPlayer::XpGetPercentage()
+float cPlayer::GetXpPercentage()
 {
-	int currentLevel = CalcLevelFromXp(m_XpTotal);
+	short int currentLevel = CalcLevelFromXp(m_CurrentXp);
+	short int currentLevel_XpBase = XpForLevel(currentLevel);
 
-	return (float)m_XpTotal / (float)XpForLevel(1+currentLevel);
+	return (float)(m_CurrentXp - currentLevel_XpBase) / 
+		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
 }
 
 
 
 
 
-bool cPlayer::SetExperience(int a_XpTotal)
+bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 {
-	if(!(a_XpTotal >= 0) || (a_XpTotal > (INT_MAX - m_XpTotal)))
+	if(!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
 	{
-		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_XpTotal);
+		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
 		return false; //oops, they gave us a dodgey number
 	}
 
-	m_XpTotal = a_XpTotal;
+	m_CurrentXp = a_CurrentXp;
+
+	// Set experience to be updated
+	m_bDirtyExperience = true;
 
 	return true;
 }
@@ -343,21 +356,38 @@ bool cPlayer::SetExperience(int a_XpTotal)
 
 
 
-int cPlayer::AddExperience(int a_Xp_delta)
+short cPlayer::DeltaExperience(short a_Xp_delta)
 {
-	if(a_Xp_delta < 0)
+	//ToDo: figure out a better name?...
+	if(a_Xp_delta > (SHRT_MAX - m_LifetimeTotalXp))
 	{
-		//value was negative, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, must be positive",
+		// Value was bad, abort and report
+		LOGWARNING("Attempt was made to increment Xp by %d, which was bad",
 			a_Xp_delta);
-		return -1; //should we instead just return the current Xp?
+		return -1; // Should we instead just return the current Xp?
 	}
-	
-	LOGD("Player \"%s\" earnt %d experience", m_PlayerName.c_str(), a_Xp_delta);
 
-	m_XpTotal += a_Xp_delta;
+	m_CurrentXp += a_Xp_delta;
 
-	return m_XpTotal;
+	// Make sure they didn't subtract too much
+	if(m_CurrentXp < MIN_EXPERIENCE)
+	{
+		m_CurrentXp = MIN_EXPERIENCE;
+	}
+
+	// Update total for score calculation
+	if(a_Xp_delta > 0)
+	{
+		m_LifetimeTotalXp += a_Xp_delta;
+	}
+
+	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", 
+		m_PlayerName.c_str(), a_Xp_delta, m_CurrentXp);
+
+	// Set experience to be updated
+	m_bDirtyExperience = true;
+
+	return m_CurrentXp;
 }
 
 
@@ -607,6 +637,19 @@ void cPlayer::SendHealth(void)
 
 
 
+void cPlayer::SendExperience(void)
+{
+	if (m_ClientHandle != NULL)
+	{
+		m_ClientHandle->SendExperience();
+		m_bDirtyExperience = false;
+	}
+}
+
+
+
+
+
 void cPlayer::ClearInventoryPaintSlots(void)
 {
 	// Clear the list of slots that are being inventory-painted. Used by cWindow only
@@ -758,6 +801,11 @@ void cPlayer::Respawn(void)
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;
 	m_FoodSaturationLevel = 5;
+
+	// Reset Experience
+	m_CurrentXp = MIN_EXPERIENCE;
+	m_LifetimeTotalXp = MIN_EXPERIENCE;
+	// ToDo: send score to client? How?
 
 	m_ClientHandle->SendRespawn();
 	
@@ -1411,14 +1459,16 @@ bool cPlayer::LoadFromDisk()
 		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
 	}
 
-	m_Health = root.get("health", 0).asInt();
+	m_Health              = root.get("health", 0).asInt();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
+	m_LifetimeTotalXp     = (short) root.get("xpTotal", 0).asInt();
+	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
 
-	SetExperience(root.get("experience", 0).asInt());
+	//SetExperience(root.get("experience", 0).asInt());
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 	
@@ -1460,7 +1510,8 @@ bool cPlayer::SaveToDisk()
 	root["rotation"]       = JSON_PlayerRotation;
 	root["inventory"]      = JSON_Inventory;
 	root["health"]         = m_Health;
-	root["experience"]     = m_XpTotal;
+	root["xpTotal"]        = m_LifetimeTotalXp;
+	root["xpCurrent"]      = m_CurrentXp;
 	root["air"]            = m_AirLevel;
 	root["food"]           = m_FoodLevel;
 	root["foodSaturation"] = m_FoodSaturationLevel;

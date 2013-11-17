@@ -597,6 +597,18 @@ void cProtocol172::SendRespawn(void)
 
 
 
+void cProtocol172::SendExperience (void)
+{
+	cPacketizer Pkt(*this, 0x1F); //Experience Packet
+	Pkt.WriteFloat(m_Client->GetPlayer()->GetXpPercentage());
+	Pkt.WriteShort(m_Client->GetPlayer()->GetXpLevel());
+	Pkt.WriteShort(m_Client->GetPlayer()->GetCurrentXp());
+}
+
+
+
+
+
 void cProtocol172::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)  // a_Src coords are Block * 8
 {
 	cPacketizer Pkt(*this, 0x29);  // Sound Effect packet
