@@ -30,7 +30,7 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[biNumBiomes
 	/* biExtremeHills     */ {16.0f, 16.0f},
 	/* biForest           */ { 3.0f,  3.0f},
 	/* biTaiga            */ { 1.5f,  1.5f},
-	
+
 	/* biSwampland        */ { 0.0f,  0.0f},
 	/* biRiver            */ { 0.0f,  0.0f},
 	/* biNether           */ { 0.0f,  0.0f},  // Unused, but must be here due to indexing
@@ -81,7 +81,7 @@ void cDistortedHeightmap::Initialize(cIniFile & a_IniFile)
 	{
 		return;
 	}
-	
+
 	// Read the params from the INI file:
 	m_SeaLevel   =                 a_IniFile.GetValueSetI("Generator", "DistortedHeightmapSeaLevel",   62);
 	m_FrequencyX = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyX", 10);
@@ -103,8 +103,8 @@ void cDistortedHeightmap::PrepareState(int a_ChunkX, int a_ChunkZ)
 	}
 	m_CurChunkX = a_ChunkX;
 	m_CurChunkZ = a_ChunkZ;
-	
-	
+
+
 	m_HeightGen.GenHeightMap(a_ChunkX, a_ChunkZ, m_CurChunkHeights);
 	UpdateDistortAmps();
 	GenerateHeightArray();
@@ -126,13 +126,13 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 	NOISE_DATATYPE EndY   = ((NOISE_DATATYPE)(257)) / m_FrequencyY;
 	NOISE_DATATYPE StartZ = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width)) / m_FrequencyZ;
 	NOISE_DATATYPE EndZ   = ((NOISE_DATATYPE)((m_CurChunkZ + 1) * cChunkDef::Width - 1)) / m_FrequencyZ;
-	
+
 	m_NoiseDistortX.Generate3D(DistortNoiseX, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
 	m_NoiseDistortZ.Generate3D(DistortNoiseZ, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
 
 	// The distorted heightmap, before linear upscaling
 	NOISE_DATATYPE DistHei[DIM_X * DIM_Y * DIM_Z];
-	
+
 	// Distort the heightmap using the distortion:
 	for (int z = 0; z < DIM_Z; z++)
 	{
@@ -151,7 +151,7 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 			}
 		}
 	}
-	
+
 	// Upscale the distorted heightmap into full dimensions:
 	LinearUpscale3DArray(
 		DistHei, DIM_X, DIM_Y, DIM_Z,
@@ -208,7 +208,7 @@ void cDistortedHeightmap::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 	// Prepare the internal state for generating this chunk:
 	PrepareState(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
-	
+
 	// Compose:
 	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 	for (int z = 0; z < cChunkDef::Width; z++)
@@ -348,7 +348,7 @@ int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 	{
 		return cChunkDef::GetHeight(m_CurChunkHeights, RelX, RelZ);
 	}
-	
+
 	// Ask the cache:
 	HEIGHTTYPE res = 0;
 	if (m_HeightGen.GetHeightAt(ChunkX, ChunkZ, RelX, RelZ, res))
@@ -356,7 +356,7 @@ int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 		// The height was in the cache
 		return res;
 	}
-	
+
 	// The height is not in the cache, generate full heightmap and get it there:
 	cChunkDef::HeightMap Heightmap;
 	m_HeightGen.GenHeightMap(ChunkX, ChunkZ, Heightmap);
@@ -385,7 +385,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 			GetDistortAmpsAt(Biomes, x * INTERPOL_X, z * INTERPOL_Z, m_DistortAmpX[x + DIM_X * z], m_DistortAmpZ[x + DIM_X * z]);
 		}
 	}
-}	
+}
 
 
 
@@ -430,7 +430,7 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 	// For each biome type that has a nonzero count, calc its amps and add it:
 	NOISE_DATATYPE AmpX = 0;
 	NOISE_DATATYPE AmpZ = 0;
-	for (int i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
+	for (unsigned int i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
 	{
 		AmpX += BiomeCounts[i] * m_GenParam[i].m_DistortAmpX;
 		AmpZ += BiomeCounts[i] * m_GenParam[i].m_DistortAmpZ;

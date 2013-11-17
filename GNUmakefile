@@ -46,8 +46,9 @@ ifeq ($(release),1)
 ################
 # release build - fastest run-time, no gdb support
 ################
-CC_OPTIONS = -s -g -O3 -DNDEBUG
-CXX_OPTIONS = -s -g -O3 -DNDEBUG
+
+CC_OPTIONS = -g -O3 -DNDEBUG
+CXX_OPTIONS = -g -O3 -DNDEBUG
 LNK_OPTIONS = -pthread -O3
 BUILDDIR = build/release/
 
@@ -56,6 +57,7 @@ ifeq ($(profile),1)
 ################
 # profile build - a release build with symbols and profiling engine built in
 ################
+
 CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 LNK_OPTIONS = -pthread -ggdb -O3 -pg
@@ -66,6 +68,7 @@ ifeq ($(pedantic),1)
 ################
 # pedantic build - basically a debug build with lots of warnings
 ################
+
 CC_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
 CXX_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
 LNK_OPTIONS = -pthread -ggdb
@@ -76,6 +79,7 @@ else
 # debug build - fully traceable by gdb in C++ code, slowest
 # Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
 ################
+
 CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
 CXX_OPTIONS = -s -ggdb -g -D_DEBUG
 LNK_OPTIONS = -pthread -g -ggdb
@@ -84,6 +88,10 @@ endif
 endif
 endif
 
+##################################################
+# Always be warning.
+
+CXX_OPTIONS += -Wall
 
 ###################################################
 # Fix Crypto++ warnings in clang
@@ -103,7 +111,7 @@ endif
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
-	LNK_LIBS = -lstdc++ -ldl
+	LNK_LIBS = -lstdc++ -ldl -lm
 else
 	LNK_LIBS = -lstdc++ -lltdl
 endif
@@ -140,7 +148,6 @@ endif
 
 ###################################################
 # INCLUDE directories for MCServer
-#
 
 INCLUDE = -I.\
 		-Isource\
@@ -162,9 +169,6 @@ INCLUDE = -I.\
 
 ###################################################
 # Build MCServer
-#
-
-# 2012_11_08 _X: Removed: squirrel_3_0_1_stable 
 
 SOURCES := $(shell find CryptoPP lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source tolua++-1.0.93 iniFile expat '(' -name '*.cpp' -o -name '*.c' ')')
 SOURCES := $(filter-out %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp %StackWalker.cpp %example.c,$(SOURCES))

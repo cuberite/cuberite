@@ -18,7 +18,7 @@ enum
 	INTERPOL_X = 4,
 	INTERPOL_Y = 4,
 	INTERPOL_Z = 4,
-	
+
 	// Size of chunk data, downscaled before interpolation:
 	DIM_X = 16  / INTERPOL_X + 1,
 	DIM_Y = 256 / INTERPOL_Y + 1,
@@ -59,7 +59,7 @@ void cEndGen::Initialize(cIniFile & a_IniFile)
 	m_FrequencyX = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "EndGenFrequencyX", m_FrequencyX);
 	m_FrequencyY = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "EndGenFrequencyY", m_FrequencyY);
 	m_FrequencyZ = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "EndGenFrequencyZ", m_FrequencyZ);
-	
+
 	// Recalculate the min and max chunk coords of the island
 	m_MaxChunkX = (m_IslandSizeX + cChunkDef::Width - 1) / cChunkDef::Width;
 	m_MinChunkX = -m_MaxChunkX;
@@ -75,15 +75,15 @@ void cEndGen::Initialize(cIniFile & a_IniFile)
 void cEndGen::PrepareState(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(!IsChunkOutsideRange(a_ChunkX, a_ChunkZ));  // Should be filtered before calling this function
-	
+
 	if ((m_LastChunkX == a_ChunkX) && (m_LastChunkZ == a_ChunkZ))
 	{
 		return;
 	}
-	
+
 	m_LastChunkX = a_ChunkX;
 	m_LastChunkZ = a_ChunkZ;
-	
+
 	GenerateNoiseArray();
 }
 
@@ -96,7 +96,7 @@ void cEndGen::GenerateNoiseArray(void)
 {
 	NOISE_DATATYPE NoiseData[DIM_X * DIM_Y * DIM_Z];  // [x + DIM_X * z + DIM_X * DIM_Z * y]
 	NOISE_DATATYPE Workspace[DIM_X * DIM_Y * DIM_Z];  // [x + DIM_X * z + DIM_X * DIM_Z * y]
-	
+
 	// Generate the downscaled noise:
 	NOISE_DATATYPE StartX = ((NOISE_DATATYPE)(m_LastChunkX       * cChunkDef::Width)) / m_FrequencyX;
 	NOISE_DATATYPE EndX   = ((NOISE_DATATYPE)((m_LastChunkX + 1) * cChunkDef::Width)) / m_FrequencyX;
@@ -105,7 +105,7 @@ void cEndGen::GenerateNoiseArray(void)
 	NOISE_DATATYPE StartY = 0;
 	NOISE_DATATYPE EndY   = ((NOISE_DATATYPE)257) / m_FrequencyY;
 	m_Perlin.Generate3D(NoiseData, DIM_X, DIM_Z, DIM_Y, StartX, EndX, StartZ, EndZ, StartY, EndY, Workspace);
-	
+
 	// Add distance:
 	int idx = 0;
 	for (int y = 0; y < DIM_Y; y++)
@@ -125,7 +125,7 @@ void cEndGen::GenerateNoiseArray(void)
 			}  // for x
 		}  // for z
 	}  // for y
-	
+
 	// Upscale into real chunk size:
 	LinearUpscale3DArray(NoiseData, DIM_X, DIM_Z, DIM_Y, m_NoiseArray, INTERPOL_X, INTERPOL_Z, INTERPOL_Y);
 }
@@ -133,14 +133,14 @@ void cEndGen::GenerateNoiseArray(void)
 
 
 
-	
+
 /// Returns true if the chunk is outside of the island's dimensions
 bool cEndGen::IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ)
 {
 	return (
 		(a_ChunkX < m_MinChunkX) || (a_ChunkX > m_MaxChunkX) ||
 		(a_ChunkZ < m_MinChunkZ) || (a_ChunkZ > m_MaxChunkZ)
-	);		
+	);
 }
 
 
@@ -151,15 +151,15 @@ void cEndGen::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_
 {
 	if (IsChunkOutsideRange(a_ChunkX, a_ChunkZ))
 	{
-		for (int i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
+		for (unsigned int i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
 		{
 			a_HeightMap[i] = 0;
 		}
 		return;
 	}
-	
+
 	PrepareState(a_ChunkX, a_ChunkZ);
-	
+
 	int MaxY = std::min((int)(1.75 * m_IslandSizeY + 1), cChunkDef::Height - 1);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -189,9 +189,9 @@ void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 		return;
 	}
-	
+
 	PrepareState(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
-	
+
 	int MaxY = std::min((int)(1.75 * m_IslandSizeY + 1), cChunkDef::Height - 1);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
