@@ -1,7 +1,7 @@
 
 #include "Globals.h"
 #include "BlockComparator.h"
-#include "../Simulator/RedstoneSimulator.h"
+#include "BlockRedstoneRepeater.h"
 #include "../Entities/Player.h"
 
 
@@ -44,7 +44,7 @@ bool cBlockComparatorHandler::GetPlacementBlockTypeMeta(
 )
 {
 	a_BlockType = m_BlockType;
-	a_BlockMeta = cRedstoneSimulator::RepeaterRotationToMetaData(a_Player->GetRotation());
+	a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetRotation());
 	return true;
 }
 
