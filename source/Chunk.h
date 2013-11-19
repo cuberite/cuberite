@@ -6,6 +6,7 @@
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
+#include "Simulator/RedstoneSimulator.h"
 
 
 
@@ -338,6 +339,7 @@ public:
 	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
+	cRedstoneSimulatorChunkData & GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
@@ -407,6 +409,7 @@ private:
 	cFluidSimulatorData *   m_WaterSimulatorData;
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
+	cRedstoneSimulatorChunkData m_RedstoneSimulatorData;
 
 
 	// pick up a random block of this chunk

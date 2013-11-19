@@ -63,9 +63,6 @@ public:
 	
 	/// Returns true if the piston (with the specified meta) is extended
 	static bool IsExtended(NIBBLETYPE a_PistonMeta);
-
-	/// Returns true if the extension (with the specified meta) is sticky
-	static bool IsStickyExtension(NIBBLETYPE a_ExtMeta);
 	
 	/// Returns true if the specified block can be pushed by a piston (and left intact)
 	static bool CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);

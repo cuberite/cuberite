@@ -669,13 +669,13 @@ public:
 		g_BlockTransparent[E_BLOCK_FLOWER_POT]            = true;
 		g_BlockTransparent[E_BLOCK_GLASS]                 = true;
 		g_BlockTransparent[E_BLOCK_GLASS_PANE]            = true;
-		g_BlockTransparent[E_BLOCK_STAINED_GLASS]         = true;
-		g_BlockTransparent[E_BLOCK_STAINED_GLASS_PANE]    = true;
+		g_BlockTransparent[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE] = true;
 		g_BlockTransparent[E_BLOCK_ICE]                   = true;
 		g_BlockTransparent[E_BLOCK_IRON_DOOR]             = true;
 		g_BlockTransparent[E_BLOCK_LAVA]                  = true;
 		g_BlockTransparent[E_BLOCK_LEAVES]                = true;
 		g_BlockTransparent[E_BLOCK_LEVER]                 = true;
+		g_BlockTransparent[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE] = true;
 		g_BlockTransparent[E_BLOCK_MELON_STEM]            = true;
 		g_BlockTransparent[E_BLOCK_NETHER_BRICK_FENCE]    = true;
 		g_BlockTransparent[E_BLOCK_NEW_LEAVES]            = true;
@@ -687,6 +687,8 @@ public:
 		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]          = true;
 		g_BlockTransparent[E_BLOCK_SIGN_POST]             = true;
 		g_BlockTransparent[E_BLOCK_SNOW]                  = true;
+		g_BlockTransparent[E_BLOCK_STAINED_GLASS]         = true;
+		g_BlockTransparent[E_BLOCK_STAINED_GLASS_PANE]    = true;
 		g_BlockTransparent[E_BLOCK_STATIONARY_LAVA]       = true;
 		g_BlockTransparent[E_BLOCK_STATIONARY_WATER]      = true;
 		g_BlockTransparent[E_BLOCK_STONE_PRESSURE_PLATE]  = true;
@@ -700,7 +702,7 @@ public:
 
 		// TODO: Any other transparent blocks?
 
-		// One hit break blocks
+		// One hit break blocks:
 		g_BlockOneHitDig[E_BLOCK_ACTIVE_COMPARATOR]     = true;
 		g_BlockOneHitDig[E_BLOCK_BIG_FLOWER]            = true;
 		g_BlockOneHitDig[E_BLOCK_BROWN_MUSHROOM]        = true;
@@ -711,7 +713,6 @@ public:
 		g_BlockOneHitDig[E_BLOCK_FLOWER]                = true;
 		g_BlockOneHitDig[E_BLOCK_FLOWER_POT]            = true;
 		g_BlockOneHitDig[E_BLOCK_INACTIVE_COMPARATOR]   = true;
-		g_BlockOneHitDig[E_BLOCK_LOCKED_CHEST]          = true;
 		g_BlockOneHitDig[E_BLOCK_MELON_STEM]            = true;
 		g_BlockOneHitDig[E_BLOCK_POTATOES]              = true;
 		g_BlockOneHitDig[E_BLOCK_PUMPKIN_STEM]          = true;
@@ -727,7 +728,7 @@ public:
 		g_BlockOneHitDig[E_BLOCK_TALL_GRASS]            = true;
 		g_BlockOneHitDig[E_BLOCK_TORCH]                 = true;
 
-		// Blocks that breaks when pushed by piston
+		// Blocks that break when pushed by piston:
 		g_BlockPistonBreakable[E_BLOCK_ACTIVE_COMPARATOR]     = true;
 		g_BlockPistonBreakable[E_BLOCK_AIR]                   = true;
 		g_BlockPistonBreakable[E_BLOCK_BED]                   = true;
@@ -765,11 +766,12 @@ public:
 		g_BlockPistonBreakable[E_BLOCK_TORCH]                 = true;
 		g_BlockPistonBreakable[E_BLOCK_VINES]                 = true;
 		g_BlockPistonBreakable[E_BLOCK_WATER]                 = true;
+		g_BlockPistonBreakable[E_BLOCK_WOODEN_BUTTON]         = true;
 		g_BlockPistonBreakable[E_BLOCK_WOODEN_DOOR]           = true;
 		g_BlockPistonBreakable[E_BLOCK_WOODEN_PRESSURE_PLATE] = true;
 
 
-		// Blocks that can be snowed over:
+		// Blocks that cannot be snowed over:
 		g_BlockIsSnowable[E_BLOCK_ACTIVE_COMPARATOR]     = false;
 		g_BlockIsSnowable[E_BLOCK_AIR]                   = false;
 		g_BlockIsSnowable[E_BLOCK_BIG_FLOWER]            = false;
@@ -785,7 +787,6 @@ public:
 		g_BlockIsSnowable[E_BLOCK_INACTIVE_COMPARATOR]   = false;
 		g_BlockIsSnowable[E_BLOCK_LAVA]                  = false;
 		g_BlockIsSnowable[E_BLOCK_LILY_PAD]              = false;
-		g_BlockIsSnowable[E_BLOCK_LOCKED_CHEST]          = false;
 		g_BlockIsSnowable[E_BLOCK_REDSTONE_REPEATER_OFF] = false;
 		g_BlockIsSnowable[E_BLOCK_REDSTONE_REPEATER_ON]  = false;
 		g_BlockIsSnowable[E_BLOCK_REDSTONE_TORCH_OFF]    = false;
@@ -796,6 +797,8 @@ public:
 		g_BlockIsSnowable[E_BLOCK_SAPLING]               = false;
 		g_BlockIsSnowable[E_BLOCK_SIGN_POST]             = false;
 		g_BlockIsSnowable[E_BLOCK_SNOW]                  = false;
+		g_BlockIsSnowable[E_BLOCK_STAINED_GLASS]         = false;
+		g_BlockIsSnowable[E_BLOCK_STAINED_GLASS_PANE]    = false;
 		g_BlockIsSnowable[E_BLOCK_STATIONARY_LAVA]       = false;
 		g_BlockIsSnowable[E_BLOCK_STATIONARY_WATER]      = false;
 		g_BlockIsSnowable[E_BLOCK_TALL_GRASS]            = false;
@@ -806,7 +809,7 @@ public:
 		g_BlockIsSnowable[E_BLOCK_WATER]                 = false;
 		
 
-		// Blocks that don't drop without a special tool
+		// Blocks that don't drop without a special tool:
 		g_BlockRequiresSpecialTool[E_BLOCK_BRICK]                = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_CAULDRON]             = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_COAL_ORE]             = true;
@@ -841,7 +844,7 @@ public:
 		g_BlockRequiresSpecialTool[E_BLOCK_STONE_SLAB]           = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_VINES]                = true;
 
-		// Nonsolid Blocks:
+		// Nonsolid blocks:
 		g_BlockIsSolid[E_BLOCK_ACTIVATOR_RAIL]        = false;
 		g_BlockIsSolid[E_BLOCK_AIR]                   = false;
 		g_BlockIsSolid[E_BLOCK_BIG_FLOWER]            = false;
@@ -860,11 +863,8 @@ public:
 		g_BlockIsSolid[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE] = false;
 		g_BlockIsSolid[E_BLOCK_MELON_STEM]            = false;
 		g_BlockIsSolid[E_BLOCK_NETHER_PORTAL]         = false;
-		g_BlockIsSolid[E_BLOCK_PISTON]                = false;
 		g_BlockIsSolid[E_BLOCK_PISTON_EXTENSION]      = false;
 		g_BlockIsSolid[E_BLOCK_RAIL]                  = false;
-		g_BlockIsSolid[E_BLOCK_REDSTONE_REPEATER_OFF] = false;
-		g_BlockIsSolid[E_BLOCK_REDSTONE_REPEATER_ON]  = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_TORCH_OFF]    = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_TORCH_ON]     = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_WIRE]         = false;
@@ -887,7 +887,7 @@ public:
 		g_BlockIsSolid[E_BLOCK_WOODEN_PRESSURE_PLATE] = false;
 		g_BlockIsSolid[E_BLOCK_WOODEN_SLAB]           = false;
 
-		// Torch placeable
+		// Torch placeable blocks:
 		g_BlockIsTorchPlaceable[E_BLOCK_BEDROCK]               = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_BLOCK_OF_COAL]         = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_BLOCK_OF_REDSTONE]     = true;
@@ -933,7 +933,7 @@ public:
 		g_BlockIsTorchPlaceable[E_BLOCK_NETHER_QUARTZ_ORE]     = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_NOTE_BLOCK]            = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_OBSIDIAN]              = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_PACKED_ICE]             = true;
+		g_BlockIsTorchPlaceable[E_BLOCK_PACKED_ICE]            = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_PLANKS]                = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_PUMPKIN]               = true;
 		g_BlockIsTorchPlaceable[E_BLOCK_QUARTZ_BLOCK]          = true;
@@ -951,6 +951,7 @@ public:
 		g_BlockIsTorchPlaceable[E_BLOCK_STONE_BRICKS]          = true;
 	}
 } BlockPropertiesInitializer;
+
 
 
 
