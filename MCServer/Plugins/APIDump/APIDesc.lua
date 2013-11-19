@@ -2666,7 +2666,10 @@ end
 		Vector3d =
 		{
 			Desc = [[
-				A Vector3d object uses double precision floating point values to describe a point in 3D space.
+				A Vector3d object uses double precision floating point values to describe a point in 3D space.</p>
+				<p>
+				See also {{Vector3f}} for single-precision floating point 3D coords and {{Vector3i}} for integer
+				3D coords.
 			]],
 			Functions =
 			{
@@ -2711,7 +2714,7 @@ end
 				A Vector3f object uses floating point values to describe a point in space.</p>
 				<p>
 				See also {{Vector3d}} for double-precision floating point 3D coords and {{Vector3i}} for integer
-				point 3D coords.
+				3D coords.
 			]],
 			Functions =
 			{
@@ -2749,13 +2752,30 @@ end
 
 		Vector3i =
 		{
-			Desc = [[A Vector3i object uses integer values to describe a point in space. Vector3i is part of the {{vector3|vector3}} family.
-]],
+			Desc = [[
+				A Vector3i object uses integer values to describe a point in space.</p>
+				<p>
+				See also {{Vector3d}} for double-precision floating point 3D coords and {{Vector3f}} for
+				single-precision floating point 3D coords.
+			]],
 			Functions =
 			{
+				constructor =
+				{
+					{ Params = "", Return = "Vector3i", Notes = "Creates a new Vector3i object with zero coords." },
+					{ Params = "x, y, z", Return = "Vector3i", Notes = "Creates a new Vector3i object with the specified coords." },
+					{ Params = "{{Vector3d}}", Return = "Vector3i", Notes = "Creates a new Vector3i object with coords copied and floor()-ed from the specified {{Vector3d}}." },
+				},
+				Equals = { Params = "Vector3i", Return = "bool", Notes = "Returns true if this vector is exactly the same as the specified vector." },
+				Length = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector." },
+				Set = { Params = "x, y, z", Return = "", Notes = "Sets all the coords of the vector at once" },
+				SqrLength = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector, squared. This operation is slightly less computationally expensive than Length(), while it conserves some properties of Length(), such as comparison." },
 			},
-			Constants =
+			Variables =
 			{
+				x = { Type = "number", Notes = "The X coord of the vector." },
+				y = { Type = "number", Notes = "The Y coord of the vector." },
+				z = { Type = "number", Notes = "The Z coord of the vector." },
 			},
 		},  -- Vector3i
 		
