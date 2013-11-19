@@ -740,14 +740,14 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 
 		if (a_InheritedName ~= nil) then
-			cf:write("			<h2>Functions inherited from " .. a_InheritedName .. "</h2>\n");
+			cf:write("			<h2>Functions inherited from ", a_InheritedName, "</h2>\n");
 		end
 		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Parameters</th>\n					<th>Return value</th>\n					<th>Notes</th>\n				</tr>\n");
 		for i, func in ipairs(a_Functions) do
 			cf:write("				<tr>\n					<td>" .. func.Name .. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)).. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)).. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)) .. "</td>\n				</tr>\n");
+			cf:write("					<td>", LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
+			cf:write("					<td>", LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
+			cf:write("					<td>", LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)), "</td>\n				</tr>\n");
 		end
 		cf:write("			</table>\n\n");
 	end
@@ -758,14 +758,14 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 		
 		if (a_InheritedName ~= nil) then
-			cf:write("			<h2>Constants inherited from " .. a_InheritedName .. "</h2>\n");
+			cf:write("			<h2>Constants inherited from ", a_InheritedName, "</h2>\n");
 		end
 		
 		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Value</th>\n					<th>Notes</th>\n				</tr>\n");
 		for i, cons in ipairs(a_Constants) do
-			cf:write("				<tr>\n					<td>" .. cons.Name .. "</td>\n");
-			cf:write("					<td>" .. cons.Value .. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(cons.Notes or "", a_InheritedName or a_ClassAPI.Name) .. "</td>\n				</tr>\n");
+			cf:write("				<tr>\n					<td>", cons.Name, "</td>\n");
+			cf:write("					<td>", cons.Value, "</td>\n");
+			cf:write("					<td>", LinkifyString(cons.Notes or "", a_InheritedName or a_ClassAPI.Name), "</td>\n				</tr>\n");
 		end
 		cf:write("			</table>\n\n");
 	end
@@ -776,14 +776,14 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 		
 		if (a_InheritedName ~= nil) then
-			cf:write("			<h2>Member variables inherited from " .. a_InheritedName .. "</h2>\n");
+			cf:write("			<h2>Member variables inherited from ", a_InheritedName, "</h2>\n");
 		end
 		
 		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Type</th>\n					<th>Notes</th>\n				</tr>\n");
 		for i, var in ipairs(a_Variables) do
-			cf:write("				<tr>\n					<td>" .. var.Name .. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(var.Type or "<i>(undocumented)</i>", a_InheritedName or a_ClassAPI.Name) .. "</td>\n");
-			cf:write("					<td>" .. LinkifyString(var.Notes or "", a_InheritedName or a_ClassAPI.Name) .. "</td>\n				</tr>\n");
+			cf:write("				<tr>\n					<td>", var.Name, "</td>\n");
+			cf:write("					<td>", LinkifyString(var.Type or "<i>(undocumented)</i>", a_InheritedName or a_ClassAPI.Name), "</td>\n");
+			cf:write("					<td>", LinkifyString(var.Notes or "", a_InheritedName or a_ClassAPI.Name), "</td>\n				</tr>\n");
 		end
 		cf:write("			</table>\n\n");
 	end
@@ -794,7 +794,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 		cf:write("<ul>");
 		for i, desc in ipairs(a_Descendants) do
-			cf:write("<li><a href=\"".. desc.Name .. ".html\">" .. desc.Name .. "</a>");
+			cf:write("<li><a href=\"", desc.Name, ".html\">", desc.Name, "</a>");
 			WriteDescendants(desc.Descendants);
 			cf:write("</li>\n");
 		end
@@ -814,7 +814,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	cf:write([[<!DOCTYPE html>
 <html>
 	<head>
-		<title>MCServer API - ]] .. a_ClassAPI.Name .. [[ Class</title>
+		<title>MCServer API - ]], a_ClassAPI.Name, [[ Class</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -823,7 +823,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	<body>
 		<div id="content">
 			<header>
-				<h1>]] .. a_ClassAPI.Name .. [[</h1>
+				<h1>]], a_ClassAPI.Name, [[</h1>
 				<hr />
 			</header>
 			<h1>Contents</h1>
@@ -857,7 +857,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	end
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
-			cf:write("				<li><a href=\"#additionalinfo_" .. i .. "\">" .. (additional.Header or "<i>(No header)</i>").. "</a></li>\n");
+			cf:write("				<li><a href=\"#additionalinfo_", i, "\">", (additional.Header or "<i>(No header)</i>"), "</a></li>\n");
 		end
 	end
 	cf:write("			</ul>\n\n");
@@ -920,7 +920,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	-- Write the additional infos:
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
-			cf:write("			<a name=\"additionalinfo_" .. i .. "\"><h1>" .. additional.Header .. "</h1></a>\n");
+			cf:write("			<a name=\"additionalinfo_", i, "\"><h1>", additional.Header, "</h1></a>\n");
 			cf:write(LinkifyString(additional.Contents, ClassName));
 		end
 	end
