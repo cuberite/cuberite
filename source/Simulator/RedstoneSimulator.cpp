@@ -76,7 +76,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	int BaseX = a_Chunk->GetPosX() * cChunkDef::Width;
 	int BaseZ = a_Chunk->GetPosZ() * cChunkDef::Width;
 
-	for (cRedstoneSimulatorChunkData::const_iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
+	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
 	{
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(dataitr->x, dataitr->y, dataitr->z);
 		if (!IsAllowedBlock(BlockType))

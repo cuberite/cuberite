@@ -169,8 +169,6 @@ public:
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		char Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
-		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 		BLOCKTYPE BlockInQuestion;
