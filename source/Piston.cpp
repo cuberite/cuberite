@@ -71,9 +71,6 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 		return;
 	}
 
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
-	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	
 	int dist = FirstPassthroughBlock(pistx, pisty, pistz, pistonMeta);
 	if (dist < 0)
 	{
@@ -81,6 +78,9 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 		return;
 	}
 
+	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
+	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);	
+	
 	// Drop the breakable block in the line, if appropriate:
 	AddDir(pistx, pisty, pistz, pistonMeta, dist + 1);  // "pist" now at the breakable / empty block
 	BLOCKTYPE currBlock;
