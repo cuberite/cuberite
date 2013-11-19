@@ -59,20 +59,20 @@ enum
 enum eBlockFace
 {
 	BLOCK_FACE_NONE = -1,  // Interacting with no block face - swinging the item in the air
-	BLOCK_FACE_XM   = 5,   // Interacting with the X- face of the block
-	BLOCK_FACE_XP   = 4,   // Interacting with the X+ face of the block
+	BLOCK_FACE_XM   = 4,   // Interacting with the X- face of the block
+	BLOCK_FACE_XP   = 5,   // Interacting with the X+ face of the block
 	BLOCK_FACE_YM   = 0,   // Interacting with the Y- face of the block
 	BLOCK_FACE_YP   = 1,   // Interacting with the Y+ face of the block
-	BLOCK_FACE_ZM   = 3,   // Interacting with the Z- face of the block
-	BLOCK_FACE_ZP   = 2,   // Interacting with the Z+ face of the block
+	BLOCK_FACE_ZM   = 2,   // Interacting with the Z- face of the block
+	BLOCK_FACE_ZP   = 3,   // Interacting with the Z+ face of the block
 	
 	// Synonyms using the (deprecated) world directions:
 	BLOCK_FACE_BOTTOM = BLOCK_FACE_YM,  // Interacting with the bottom   face of the block
 	BLOCK_FACE_TOP    = BLOCK_FACE_YP,  // Interacting with the top      face of the block
-	BLOCK_FACE_NORTH  = BLOCK_FACE_ZP,  // Interacting with the northern face of the block
-	BLOCK_FACE_SOUTH  = BLOCK_FACE_ZM,  // Interacting with the southern face of the block
-	BLOCK_FACE_WEST   = BLOCK_FACE_XP,  // Interacting with the western  face of the block
-	BLOCK_FACE_EAST   = BLOCK_FACE_XM,  // Interacting with the eastern  face of the block
+	BLOCK_FACE_NORTH  = BLOCK_FACE_ZM,  // Interacting with the northern face of the block
+	BLOCK_FACE_SOUTH  = BLOCK_FACE_ZP,  // Interacting with the southern face of the block
+	BLOCK_FACE_WEST   = BLOCK_FACE_XM,  // Interacting with the western  face of the block
+	BLOCK_FACE_EAST   = BLOCK_FACE_XP,  // Interacting with the eastern  face of the block
 } ;
 
 
@@ -305,12 +305,12 @@ inline void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, cha
 	{
 		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_BOTTOM: a_BlockY--; break;
-			case BLOCK_FACE_TOP:    a_BlockY++; break;
-			case BLOCK_FACE_EAST:   a_BlockX++; break;
-			case BLOCK_FACE_WEST:   a_BlockX--; break;
-			case BLOCK_FACE_NORTH:  a_BlockZ--; break;
-			case BLOCK_FACE_SOUTH:  a_BlockZ++; break;
+			case BLOCK_FACE_YP: a_BlockY++; break;
+			case BLOCK_FACE_YM: a_BlockY--; break;
+			case BLOCK_FACE_ZM: a_BlockZ--; break;
+			case BLOCK_FACE_ZP: a_BlockZ++; break;
+			case BLOCK_FACE_XP: a_BlockX++; break;
+			case BLOCK_FACE_XM: a_BlockX--; break;
 			default:
 			{
 				LOGWARNING("%s: Unknown face: %d", __FUNCTION__, a_BlockFace);
@@ -323,12 +323,12 @@ inline void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, cha
 	{
 		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_BOTTOM: a_BlockY++; break;
-			case BLOCK_FACE_TOP:    a_BlockY--; break;
-			case BLOCK_FACE_EAST:   a_BlockX--; break;
-			case BLOCK_FACE_WEST:   a_BlockX++; break;
-			case BLOCK_FACE_NORTH:  a_BlockZ++; break;
-			case BLOCK_FACE_SOUTH:  a_BlockZ--; break;
+			case BLOCK_FACE_YP: a_BlockY--; break;
+			case BLOCK_FACE_YM: a_BlockY++; break;
+			case BLOCK_FACE_ZM: a_BlockZ++; break;
+			case BLOCK_FACE_ZP: a_BlockZ--; break;
+			case BLOCK_FACE_XP: a_BlockX--; break;
+			case BLOCK_FACE_XM: a_BlockX++; break;
 			default:
 			{
 				LOGWARNING("%s: Unknown inv face: %d", __FUNCTION__, a_BlockFace);

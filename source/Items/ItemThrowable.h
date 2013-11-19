@@ -94,3 +94,47 @@ public:
 
 
 
+
+class cItemBottleOEnchantingHandler :
+	public cItemThrowableHandler
+{
+	typedef cItemThrowableHandler super;
+public:
+	cItemBottleOEnchantingHandler(void) :
+		super(E_ITEM_BOTTLE_O_ENCHANTING, cProjectileEntity::pkExpBottle, 10)
+	{
+	}
+};
+
+
+
+
+
+class cItemFireworkHandler :
+	public cItemThrowableHandler
+{
+	typedef cItemThrowableHandler super;
+public:
+	cItemFireworkHandler(void) :
+		super(E_ITEM_FIREWORK_ROCKET, cProjectileEntity::pkFirework, 0)
+	{
+	}
+
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	{
+		if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+		{
+			return false;
+		}
+
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
+
+		a_World->CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, a_Player, 0);
+
+		return true;
+	}
+
+};

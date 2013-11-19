@@ -230,6 +230,8 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkSnowball:      return new cThrownSnowballEntity  (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkFirework:      return new cFireworkEntity        (a_Creator, a_X, a_Y, a_Z       );
 		// TODO: the rest
 	}
 	
@@ -287,7 +289,11 @@ AString cProjectileEntity::GetMCAClassName(void) const
 void cProjectileEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	BroadcastMovementUpdate();
+
+	if (GetProjectileKind() != pkArrow) // See cArrow::Tick
+	{
+		BroadcastMovementUpdate();
+	}
 }
 
 
@@ -391,7 +397,8 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	m_IsCritical(false),
 	m_Timer(0),
 	m_bIsCollected(false),
-	m_HitBlockPos(Vector3i(0, 0, 0))
+	m_HitBlockPos(Vector3i(0, 0, 0)),
+	m_HitGroundTimer(0)
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
@@ -414,7 +421,8 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	m_IsCritical((a_Force >= 1)),
 	m_Timer(0),
 	m_bIsCollected(false),
-	m_HitBlockPos(0, 0, 0)
+	m_HitBlockPos(0, 0, 0),
+	m_HitGroundTimer(0)
 {
 }
 
@@ -440,37 +448,25 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
-	if (a_HitFace == BLOCK_FACE_NONE)
-	{
-		return;
-	}
+	if (a_HitFace == BLOCK_FACE_NONE) { return; }
 
 	super::OnHitSolidBlock(a_HitPos, a_HitFace);
 	int a_X = (int)a_HitPos.x, a_Y = (int)a_HitPos.y, a_Z = (int)a_HitPos.z;
-	
-	if (a_HitFace != BLOCK_FACE_YP)
+
+	switch (a_HitFace)
 	{
-		AddFaceDirection(a_X, a_Y, a_Z, a_HitFace);
-	}
-	else if (a_HitFace == BLOCK_FACE_YP) // These conditions because xoft got a little confused on block face directions, so AddFace works with all but YP & YM
-	{
-		a_Y--;
-	}
-	else
-	{
-		a_Y++;
+		case BLOCK_FACE_XM: // Strangely, bounding boxes / block tracers return the actual block for these two directions, so AddFace not needed
+		case BLOCK_FACE_YM:
+		{
+			break;
+		}
+		default: AddFaceDirection(a_X, a_Y, a_Z, a_HitFace, true);
 	}
 
 	m_HitBlockPos = Vector3i(a_X, a_Y, a_Z);
 
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("random.bowhit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-	
-	// Broadcast the position and speed packets before teleporting:
-	BroadcastMovementUpdate();
-	
-	// Teleport the entity to the exact hit coords:
-	m_World->BroadcastTeleportEntity(*this);
 }
 
 
@@ -542,6 +538,24 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_IsInGround)
 	{
+		// When an arrow hits, the client doesn't think its in the ground and keeps on moving, IF BroadcastMovementUpdate() and TeleportEntity was called during flight, AT ALL
+		// Fix is to simply not sync with the client and send a teleport to confirm pos after arrow has stabilised (around 1 sec after landing)
+		// We can afford to do this because xoft's algorithm for trajectory is near perfect, so things are pretty close anyway without sync
+		// Besides, this seems to be what the vanilla server does, note how arrows teleport half a second after they hit to the server position
+
+		if (m_HitGroundTimer != -1) // Sent a teleport already, don't do again
+		{
+			if (m_HitGroundTimer > 1000.f) // Send after a second, could be less, but just in case
+			{
+				m_World->BroadcastTeleportEntity(*this);
+				m_HitGroundTimer = -1;
+			}
+			else
+			{
+				m_HitGroundTimer += a_Dt;
+			}
+		}
+
 		int RelPosX = m_HitBlockPos.x - a_Chunk.GetPosX() * cChunkDef::Width;
 		int RelPosZ = m_HitBlockPos.z - a_Chunk.GetPosZ() * cChunkDef::Width;
 		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
@@ -644,6 +658,104 @@ void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_Hi
 	// TODO: Apply damage to certain mobs (blaze etc.) and anger all mobs
 	
 	Destroy();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBottleOEnchantingEntity :
+
+cExpBottleEntity::cExpBottleEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
+super(pkExpBottle, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+{
+	SetSpeed(a_Speed);
+}
+
+
+
+
+
+void cExpBottleEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+{
+	// TODO: Spawn experience orbs
+
+	Destroy();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFireworkEntity :
+
+cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z) :
+super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+{
+}
+
+
+
+
+
+void cFireworkEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+{
+	if ((a_HitFace != BLOCK_FACE_BOTTOM) && (a_HitFace != BLOCK_FACE_NONE))
+	{
+		return;
+	}
+
+	SetSpeed(0, 0, 0);
+	SetPosition(GetPosX(), GetPosY() - 0.5, GetPosZ());
+
+	std::cout << a_HitPos.x << " " << a_HitPos.y << " " << a_HitPos.z << std::endl;
+
+	m_IsInGround = true;
+
+	BroadcastMovementUpdate();
+}
+
+
+
+
+
+void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
+{
+	if (m_IsInGround)
+	{
+		if (a_Chunk.GetBlock((int)GetPosX(), (int)GetPosY() + 1, (int)GetPosZ()) == E_BLOCK_AIR)
+		{
+			m_IsInGround = false;
+		}
+		else
+		{
+			return;
+		}
+	}
+
+	Vector3d PerTickSpeed = GetSpeed() / 20;
+	Vector3d Pos = GetPosition();
+
+	// Trace the tick's worth of movement as a line:
+	Vector3d NextPos = Pos + PerTickSpeed;
+	cProjectileTracerCallback TracerCallback(this);
+	if (!cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
+	{
+		// Something has been hit, abort all other processing
+		return;
+	}
+	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later in its SlowdownCoeff
+
+	// Update the position:
+	SetPosition(NextPos);
+
+	// Add slowdown and gravity effect to the speed:
+	Vector3d NewSpeed(GetSpeed());
+	NewSpeed.y += 2;
+	NewSpeed *= TracerCallback.GetSlowdownCoeff();
+	SetSpeed(NewSpeed);
 }
 
 
