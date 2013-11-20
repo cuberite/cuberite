@@ -568,6 +568,7 @@
   <ItemGroup>
     <ClCompile Include="..\source\Authenticator.cpp" />
     <ClCompile Include="..\source\BlockArea.cpp" />
+    <ClCompile Include="..\source\BlockEntities\BlockEntity.cpp" />
     <ClCompile Include="..\source\BlockID.cpp" />
     <ClCompile Include="..\source\BoundingBox.cpp" />
     <ClCompile Include="..\source\ByteBuffer.cpp" />

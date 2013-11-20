@@ -97,14 +97,23 @@ private:
 	/* ===================== */
 
 	/* ====== Helper functions ====== */
+	///<summary>Marks a block as powered</summary>
 	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock);
+	///<summary>Marks a block as being powered through another block</summary>
 	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock);
-	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceType);
+	///<summary>Marks the second block in a direction as linked powered</summary>
+	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock);
+	///<summary>Marks all blocks immediately surrounding a coordinate as powered</summary>
+	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock);
 
+	///<summary>Returns if a coordiante is powered or linked powered</summary>
 	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
+	///<summary>Returns if a repeater is powered</summary>
 	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
 
+	///<summary>Returns if lever metadata marks it as emitting power</summary>
 	bool IsLeverOn(NIBBLETYPE a_BlockMeta);
+	///<summary>Returns if button metadata marks it as emitting power</summary>
 	bool IsButtonOn(NIBBLETYPE a_BlockMeta);
 	/* ============================== */
 
@@ -112,11 +121,16 @@ private:
 	{
 		switch (Block)
 		{
+			case E_BLOCK_ACTIVATOR_RAIL:
 			case E_BLOCK_PISTON:
 			case E_BLOCK_STICKY_PISTON:
 			case E_BLOCK_DISPENSER:
 			case E_BLOCK_DROPPER:
+			case E_BLOCK_FENCE_GATE:
+			case E_BLOCK_HOPPER:
+			case E_BLOCK_NOTE_BLOCK:
 			case E_BLOCK_TNT:
+			case E_BLOCK_TRAPDOOR:
 			case E_BLOCK_REDSTONE_LAMP_OFF:
 			case E_BLOCK_REDSTONE_LAMP_ON:
 			case E_BLOCK_WOODEN_DOOR:
