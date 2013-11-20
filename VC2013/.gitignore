@@ -7,3 +7,4 @@ ipch/**
 *.ncb
 *.suo
 *.obj
+*.sdf
