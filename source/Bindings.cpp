@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/16/13 21:58:48.
+** Generated automatically by tolua++-1.0.92 on 11/21/13 22:02:55.
 */
 
 #ifndef __cplusplus
@@ -190,7 +190,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cThrownEnderPearlEntity");
  tolua_usertype(tolua_S,"cFurnaceEntity");
  tolua_usertype(tolua_S,"cEntity");
- tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"cExpBottleEntity");
  tolua_usertype(tolua_S,"cEnchantments");
  tolua_usertype(tolua_S,"cMonster");
  tolua_usertype(tolua_S,"cPluginLua");
@@ -212,49 +212,51 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cLineBlockTracer");
  tolua_usertype(tolua_S,"cListeners");
  tolua_usertype(tolua_S,"cThrownSnowballEntity");
- tolua_usertype(tolua_S,"Vector3d");
+ tolua_usertype(tolua_S,"cFireworkEntity");
  tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin");
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cHTTPServer::cCallbacks");
  tolua_usertype(tolua_S,"cLuaWindow");
- tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cHopperEntity");
  tolua_usertype(tolua_S,"std::vector<AString>");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"cBlockArea");
+ tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cItem");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
- tolua_usertype(tolua_S,"cGroup");
- tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cBoundingBox");
- tolua_usertype(tolua_S,"cNoteEntity");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cNoteEntity");
+ tolua_usertype(tolua_S,"Vector3d");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
- tolua_usertype(tolua_S,"cPlayer");
- tolua_usertype(tolua_S,"cServer");
- tolua_usertype(tolua_S,"cSignEntity");
+ tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"cFile");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"cClientHandle");
- tolua_usertype(tolua_S,"cIniFile");
- tolua_usertype(tolua_S,"cWebPlugin");
- tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"cPawn");
- tolua_usertype(tolua_S,"cThrownEggEntity");
- tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cWebAdmin");
+ tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"HTTPRequest");
- tolua_usertype(tolua_S,"cProjectileEntity");
  tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cPawn");
+ tolua_usertype(tolua_S,"cPlayer");
+ tolua_usertype(tolua_S,"cGroupManager");
+ tolua_usertype(tolua_S,"cSignEntity");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
+ tolua_usertype(tolua_S,"cProjectileEntity");
  tolua_usertype(tolua_S,"cDropperEntity");
+ tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"cThrownEggEntity");
 }
 
 /* method: new of class  cIniFile */
@@ -7841,6 +7843,66 @@ static int tolua_AllToLua_cPlayer_GetXpPercentage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetXpPercentage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: XpForLevel of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_XpForLevel00
+static int tolua_AllToLua_cPlayer_XpForLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  short int a_Level = ((short int)  tolua_tonumber(tolua_S,2,0));
+  {
+   short tolua_ret = (short)  cPlayer::XpForLevel(a_Level);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'XpForLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CalcLevelFromXp of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_CalcLevelFromXp00
+static int tolua_AllToLua_cPlayer_CalcLevelFromXp00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  short int a_CurrentXp = ((short int)  tolua_tonumber(tolua_S,2,0));
+  {
+   short tolua_ret = (short)  cPlayer::CalcLevelFromXp(a_CurrentXp);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CalcLevelFromXp'.",&tolua_err);
  return 0;
 #endif
 }
@@ -30449,13 +30511,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"EATING_TICKS",cPlayer::EATING_TICKS);
    tolua_constant(tolua_S,"MAX_AIR_LEVEL",cPlayer::MAX_AIR_LEVEL);
    tolua_constant(tolua_S,"DROWNING_TICKS",cPlayer::DROWNING_TICKS);
-   tolua_constant(tolua_S,"MIN_EXPERIENCE",cPlayer::MIN_EXPERIENCE);
    tolua_function(tolua_S,"SetCurrentExperience",tolua_AllToLua_cPlayer_SetCurrentExperience00);
    tolua_function(tolua_S,"DeltaExperience",tolua_AllToLua_cPlayer_DeltaExperience00);
    tolua_function(tolua_S,"GetXpLifetimeTotal",tolua_AllToLua_cPlayer_GetXpLifetimeTotal00);
    tolua_function(tolua_S,"GetCurrentXp",tolua_AllToLua_cPlayer_GetCurrentXp00);
    tolua_function(tolua_S,"GetXpLevel",tolua_AllToLua_cPlayer_GetXpLevel00);
    tolua_function(tolua_S,"GetXpPercentage",tolua_AllToLua_cPlayer_GetXpPercentage00);
+   tolua_function(tolua_S,"XpForLevel",tolua_AllToLua_cPlayer_XpForLevel00);
+   tolua_function(tolua_S,"CalcLevelFromXp",tolua_AllToLua_cPlayer_CalcLevelFromXp00);
    tolua_function(tolua_S,"GetEyeHeight",tolua_AllToLua_cPlayer_GetEyeHeight00);
    tolua_function(tolua_S,"GetEyePosition",tolua_AllToLua_cPlayer_GetEyePosition00);
    tolua_function(tolua_S,"IsOnGround",tolua_AllToLua_cPlayer_IsOnGround00);
@@ -30543,6 +30606,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"pkEnderPearl",cProjectileEntity::pkEnderPearl);
    tolua_constant(tolua_S,"pkExpBottle",cProjectileEntity::pkExpBottle);
    tolua_constant(tolua_S,"pkSplashPotion",cProjectileEntity::pkSplashPotion);
+   tolua_constant(tolua_S,"pkFirework",cProjectileEntity::pkFirework);
    tolua_constant(tolua_S,"pkWitherSkull",cProjectileEntity::pkWitherSkull);
    tolua_constant(tolua_S,"pkFishingFloat",cProjectileEntity::pkFishingFloat);
    tolua_function(tolua_S,"GetProjectileKind",tolua_AllToLua_cProjectileEntity_GetProjectileKind00);
@@ -30571,6 +30635,12 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cThrownSnowballEntity","cThrownSnowballEntity","cProjectileEntity",NULL);
   tolua_beginmodule(tolua_S,"cThrownSnowballEntity");
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cExpBottleEntity","cExpBottleEntity","cProjectileEntity",NULL);
+  tolua_beginmodule(tolua_S,"cExpBottleEntity");
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cFireworkEntity","cFireworkEntity","cProjectileEntity",NULL);
+  tolua_beginmodule(tolua_S,"cFireworkEntity");
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cGhastFireballEntity","cGhastFireballEntity","cProjectileEntity",NULL);
   tolua_beginmodule(tolua_S,"cGhastFireballEntity");

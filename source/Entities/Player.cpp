@@ -358,11 +358,10 @@ bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 
 short cPlayer::DeltaExperience(short a_Xp_delta)
 {
-	//ToDo: figure out a better name?...
-	if(a_Xp_delta > (SHRT_MAX - m_LifetimeTotalXp))
+	if (a_Xp_delta > (SHRT_MAX - m_CurrentXp))
 	{
 		// Value was bad, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, which was bad",
+		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.",
 			a_Xp_delta);
 		return -1; // Should we instead just return the current Xp?
 	}
@@ -370,13 +369,13 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	if(m_CurrentXp < MIN_EXPERIENCE)
+	if (m_CurrentXp < 0)
 	{
-		m_CurrentXp = MIN_EXPERIENCE;
+		m_CurrentXp = 0;
 	}
 
 	// Update total for score calculation
-	if(a_Xp_delta > 0)
+	if (a_Xp_delta > 0)
 	{
 		m_LifetimeTotalXp += a_Xp_delta;
 	}
@@ -803,8 +802,8 @@ void cPlayer::Respawn(void)
 	m_FoodSaturationLevel = 5;
 
 	// Reset Experience
-	m_CurrentXp = MIN_EXPERIENCE;
-	m_LifetimeTotalXp = MIN_EXPERIENCE;
+	m_CurrentXp = 0;
+	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
 	m_ClientHandle->SendRespawn();
