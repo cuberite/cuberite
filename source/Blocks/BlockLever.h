@@ -46,13 +46,13 @@ public:
 		// Determine lever direction:
 		switch (a_Dir)
 		{
-			case BLOCK_FACE_TOP:    return 0x6;
-			case BLOCK_FACE_EAST:   return 0x1;
-			case BLOCK_FACE_WEST:   return 0x2;
-			case BLOCK_FACE_SOUTH:  return 0x3;
-			case BLOCK_FACE_NORTH:  return 0x4;
-			case BLOCK_FACE_BOTTOM: return 0x0;
-			default:                return 0x6;
+			case BLOCK_FACE_YP: return 0x6;
+			case BLOCK_FACE_XP: return 0x1;
+			case BLOCK_FACE_XM: return 0x2;
+			case BLOCK_FACE_ZP: return 0x3;
+			case BLOCK_FACE_ZM: return 0x4;
+			case BLOCK_FACE_YM: return 0x0;
+			default:            return 0x6;
 		}
 	}
 
@@ -60,6 +60,39 @@ public:
 	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
+	}
+
+
+	inline static NIBBLETYPE BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta & 0x7)
+		{
+			case 0x1: return BLOCK_FACE_XP;
+			case 0x2: return BLOCK_FACE_XM;
+			case 0x3: return BLOCK_FACE_ZP;
+			case 0x4: return BLOCK_FACE_ZM;
+			case 0x5:
+			case 0x6: return BLOCK_FACE_YP;
+			case 0x7:
+			case 0x0: return BLOCK_FACE_YM;
+			default:
+			{
+				ASSERT(!"Unhandled block meta!");
+				return BLOCK_FACE_NONE;
+			}
+		}
+	}
+
+
+	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	{
+		NIBBLETYPE Meta;
+		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
+
+		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
+		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+
+		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
 	}
 } ;
 

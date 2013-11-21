@@ -106,7 +106,7 @@ private:
 	///<summary>Marks all blocks immediately surrounding a coordinate as powered</summary>
 	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock);
 
-	///<summary>Returns if a coordiante is powered or linked powered</summary>
+	///<summary>Returns if a coordinate is powered or linked powered</summary>
 	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
 	///<summary>Returns if a repeater is powered</summary>
 	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
@@ -117,6 +117,29 @@ private:
 	bool IsButtonOn(NIBBLETYPE a_BlockMeta);
 	/* ============================== */
 
+	/* ====== Misc Functions ====== */
+
+	///<summary>Returns if a block is viable to be the MiddleBlock of a SetLinkedPowered operation</summary>
+	inline static bool IsViableMiddleBlock(BLOCKTYPE Block)
+	{
+		if (!g_BlockIsSolid[Block]) { return false; }
+
+		switch (Block)
+		{
+			// Add SOLID but not viable middle blocks here
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			{
+				return false;
+			}
+			default:
+			{
+				return true;
+			}
+		}
+	}
+
+	///<summary>Returns if a block is a mechanism (something that accepts power and does something)</summary>
 	inline static bool IsMechanism(BLOCKTYPE Block)
 	{
 		switch (Block)
@@ -145,6 +168,7 @@ private:
 		}
 	}
 
+	///<summary>Returns if a block has the potential to output power</summary>
 	inline static bool IsPotentialSource(BLOCKTYPE Block)
 	{
 		switch (Block)
@@ -167,6 +191,7 @@ private:
 		}
 	}
 
+	///<summary>Returns if a block is any sort of redstone device</summary>
 	inline static bool IsRedstone(BLOCKTYPE Block)
 	{
 		switch (Block)

@@ -81,10 +81,13 @@ public:
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		NIBBLETYPE Meta;
+		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		return (a_RelY > 0) && (g_BlockIsSolid[a_Chunk.GetBlock(a_RelX, a_RelY, a_RelZ)]);
+		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+
+		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
 	}
 } ;
 
