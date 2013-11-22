@@ -2067,15 +2067,16 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
 	if (
-		!L.CheckParamUserType(1, "const cItem") ||
-		!L.CheckParamEnd     (2)
+		!L.CheckParamUserTable(1, "cRoot") ||
+		!L.CheckParamUserType (2, "const cItem") ||
+		!L.CheckParamEnd      (3)
 	)
 	{
 		return 0;
 	}
 	
 	// Check the input param:
-	cItem * Input = (cItem *)tolua_tousertype(L, 1, NULL);
+	cItem * Input = (cItem *)tolua_tousertype(L, 2, NULL);
 	if (Input == NULL)
 	{
 		LOGWARNING("cRoot:GetFurnaceRecipe: the Input parameter is nil or missing.");

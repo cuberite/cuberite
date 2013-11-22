@@ -764,7 +764,10 @@ public:
 	*/
 	bool CallFunction(int a_NumReturnValues);
 	
-	/// Returns true if the specified parameters on the stack are of the specified usertype; also logs warning if not
+	/// Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions
+	bool CheckParamUserTable(int a_StartParam, const char * a_UserTable, int a_EndParam = -1);
+	
+	/// Returns true if the specified parameters on the stack are of the specified usertype; also logs warning if not. Used for regular functions
 	bool CheckParamUserType(int a_StartParam, const char * a_UserType, int a_EndParam = -1);
 	
 	/// Returns true if the specified parameters on the stack are a table; also logs warning if not
