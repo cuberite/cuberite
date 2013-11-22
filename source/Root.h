@@ -57,6 +57,10 @@ public:
 	cGroupManager *    GetGroupManager   (void) { return m_GroupManager; }     // tolua_export
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
 	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
+	
+	/// Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel
+	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
+	
 	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }

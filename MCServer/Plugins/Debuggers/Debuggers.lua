@@ -49,6 +49,7 @@ function Initialize(Plugin)
 	PM:BindCommand("/xpr",     "debuggers", HandleRemoveXp,        "- Remove all xp");
 	PM:BindCommand("/fill",    "debuggers", HandleFill,            "- Fills all block entities in current chunk with junk");
 	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
+	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -907,7 +908,7 @@ end
 
 function HandleFurnaceRecipe(a_Split, a_Player)
 	local HeldItem = a_Player:GetEquippedItem();
-	local Out, NumTicks, In = cRoot.GetFurnaceRecipe(HeldItem);
+	local Out, NumTicks, In = cRoot:GetFurnaceRecipe(HeldItem);
 	if (Out ~= nil) then
 		a_Player:SendMessage(
 			"Furnace turns " .. ItemToFullString(In) ..
@@ -917,6 +918,24 @@ function HandleFurnaceRecipe(a_Split, a_Player)
 		);
 	else
 		a_Player:SendMessage("There is no furnace recipe that would smelt " .. ItemToString(HeldItem));
+	end
+	return true;
+end
+
+
+
+
+
+function HandleFurnaceFuel(a_Split, a_Player)
+	local HeldItem = a_Player:GetEquippedItem();
+	local NumTicks = cRoot:GetFurnaceFuelBurnTime(HeldItem);
+	if (NumTicks > 0) then
+		a_Player:SendMessage(
+			ItemToFullString(HeldItem) .. " would power a furnace for " .. NumTicks ..
+			" ticks (" .. tostring(NumTicks / 20) .. " seconds)."
+		);
+	else
+		a_Player:SendMessage(ItemToString(HeldItem) .. " will not power furnaces.");
 	end
 	return true;
 end

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/22/13 11:58:39.
+** Generated automatically by tolua++-1.0.92 on 11/22/13 16:24:50.
 */
 
 #ifndef __cplusplus
@@ -19714,6 +19714,36 @@ static int tolua_AllToLua_cRoot_GetCraftingRecipes00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetFurnaceFuelBurnTime of class  cRoot */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetFurnaceFuelBurnTime00
+static int tolua_AllToLua_cRoot_GetFurnaceFuelBurnTime00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cRoot",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cItem* a_Fuel = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
+  {
+   int tolua_ret = (int)  cRoot::GetFurnaceFuelBurnTime(*a_Fuel);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetFurnaceFuelBurnTime'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetWebAdmin of class  cRoot */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetWebAdmin00
 static int tolua_AllToLua_cRoot_GetWebAdmin00(lua_State* tolua_S)
@@ -31093,6 +31123,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetPrimaryServerVersion",tolua_AllToLua_cRoot_SetPrimaryServerVersion00);
    tolua_function(tolua_S,"GetGroupManager",tolua_AllToLua_cRoot_GetGroupManager00);
    tolua_function(tolua_S,"GetCraftingRecipes",tolua_AllToLua_cRoot_GetCraftingRecipes00);
+   tolua_function(tolua_S,"GetFurnaceFuelBurnTime",tolua_AllToLua_cRoot_GetFurnaceFuelBurnTime00);
    tolua_function(tolua_S,"GetWebAdmin",tolua_AllToLua_cRoot_GetWebAdmin00);
    tolua_function(tolua_S,"GetPluginManager",tolua_AllToLua_cRoot_GetPluginManager00);
    tolua_function(tolua_S,"QueueExecuteConsoleCommand",tolua_AllToLua_cRoot_QueueExecuteConsoleCommand00);
