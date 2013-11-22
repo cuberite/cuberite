@@ -48,6 +48,7 @@ function Initialize(Plugin)
 	PM:BindCommand("/xpa",     "debuggers", HandleAddExperience,   "- Adds 200 experience to the player");
 	PM:BindCommand("/xpr",     "debuggers", HandleRemoveXp,        "- Remove all xp");
 	PM:BindCommand("/fill",    "debuggers", HandleFill,            "- Fills all block entities in current chunk with junk");
+	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -897,6 +898,26 @@ function HandleFill(a_Split, a_Player)
 			end
 		end
 	);
+	return true;
+end
+
+
+
+
+
+function HandleFurnaceRecipe(a_Split, a_Player)
+	local HeldItem = a_Player:GetEquippedItem();
+	local Out, NumTicks, In = cRoot.GetFurnaceRecipe(HeldItem);
+	if (Out ~= nil) then
+		a_Player:SendMessage(
+			"Furnace turns " .. ItemToFullString(In) ..
+			" to " .. ItemToFullString(Out) ..
+			" in " .. NumTicks .. " ticks (" ..
+			tostring(NumTicks / 20) .. " seconds)."
+		);
+	else
+		a_Player:SendMessage("There is no furnace recipe that would smelt " .. ItemToString(HeldItem));
+	end
 	return true;
 end
 
