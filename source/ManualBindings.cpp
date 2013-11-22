@@ -171,6 +171,29 @@ cPluginLua * GetLuaPlugin(lua_State * L)
 
 
 
+static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+	if (
+		!LuaState.CheckParamUserTable(1, "cFile") ||
+		!LuaState.CheckParamString   (2) ||
+		!LuaState.CheckParamEnd      (3)
+	)
+	{
+		return 0;
+	}
+	
+	AString Folder = (AString)tolua_tocppstring(LuaState, 1, 0);
+
+	AStringVector Contents = cFile::GetFolderContents(Folder);
+	LuaState.Push(Contents);
+	return 1;
+}
+
+
+
+
+
 template<
 	class Ty1,
 	class Ty2,
@@ -2152,6 +2175,10 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGWARN",            tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGWARNING",         tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",           tolua_LOGERROR);
+		
+		tolua_beginmodule(tolua_S, "cFile");
+			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);
+		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cHopperEntity");
 			tolua_function(tolua_S, "GetOutputBlockPos", tolua_cHopperEntity_GetOutputBlockPos);

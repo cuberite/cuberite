@@ -51,6 +51,8 @@ function Initialize(Plugin)
 	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
 
+	Plugin:AddWebTab("Debuggers", HandleRequest_Debuggers);
+
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	
@@ -938,6 +940,15 @@ function HandleFurnaceFuel(a_Split, a_Player)
 		a_Player:SendMessage(ItemToString(HeldItem) .. " will not power furnaces.");
 	end
 	return true;
+end
+
+
+
+
+
+function HandleRequest_Debuggers(a_Request)
+	local FolderContents = cFile:GetFolderContents("./");
+	return "<p>The following objects have been returned by cFile:GetFolderContents():<ul><li>" .. table.concat(FolderContents, "</li><li>") .. "</li></ul></p>";
 end
 
 

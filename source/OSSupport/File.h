@@ -123,6 +123,9 @@ public:
 	
 	// tolua_end
 	
+	/// Returns the list of all items in the specified folder (files, folders, nix pipes, whatever's there).
+	static AStringVector GetFolderContents(const AString & a_Folder);  // Exported in ManualBindings.cpp
+
 	int Printf(const char * a_Fmt, ...);
 	
 private:

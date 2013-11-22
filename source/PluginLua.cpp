@@ -86,11 +86,11 @@ bool cPluginLua::Initialize(void)
 		lua_setglobal(m_LuaState, "g_Plugin");
 	}
 
-	std::string PluginPath = FILE_IO_PREFIX + GetLocalDirectory() + "/";
+	std::string PluginPath = FILE_IO_PREFIX + GetLocalFolder() + "/";
 
 	// Load all files for this plugin, and execute them
-	AStringList Files = GetDirectoryContents(PluginPath.c_str());
-	for (AStringList::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
+	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
+	for (AStringVector::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
 	{
 		if (itr->rfind(".lua") == AString::npos)
 		{
