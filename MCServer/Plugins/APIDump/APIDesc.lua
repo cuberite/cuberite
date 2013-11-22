@@ -30,6 +30,17 @@ g_APIDesc =
 			{
 				ConstantName = { Notes = "Notes about the constant" },
 			} ,
+			
+			ConstantGroups =
+			{
+				GroupName1 =  -- GroupName1 is used as the HTML anchor name
+				{
+					Include = {"constant1", "constant2", "const_.*"},  -- Constants to include in this group, array of identifiers, accepts wildcards
+					TextBefore = "This text will be written in front of the constant list",
+					TextAfter = "This text will be written after the constant list",
+					ShowInDescendants = false,  -- If false, descendant classes won't list these constants
+				}
+			},
 
 			Variables =
 			{
@@ -74,6 +85,18 @@ g_APIDesc =
 				psInCreative           = { Notes = "The arrow can be picked up only by players in creative gamemode" },
 				psInSurvivalOrCreative = { Notes = "The arrow can be picked up by players in survival or creative gamemode" },
 				psNoPickup             = { Notes = "The arrow cannot be picked up at all" },
+			},
+			
+			ConstantGroups =
+			{
+				PickupState =
+				{
+					Include = "ps.*",
+					TextBefore = [[
+						The following constants are used to signalize whether the arrow, once it lands, can be picked by
+						players:
+					]],
+				},
 			},
 
 			Inherits = "cProjectileEntity",
@@ -182,7 +205,25 @@ g_APIDesc =
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
 			},
-
+			ConstantGroups =
+			{
+				BATypes =
+				{
+					Include = "ba.*",
+					TextBefore = [[
+						The following constants are used to signalize the datatype to read or write:
+					]],
+				},
+				MergeStrategies =
+				{
+					Include = "ms.*",
+					TextBefore = [[
+						The Merge() function can use different strategies to combine the source and destination blocks.
+						The following constants are used:
+					]],
+					TextAfter = "See below for a detailed explanation of the individual merge strategies.",
+				},
+			},
 			AdditionalInfo =
 			{
 				{
@@ -817,7 +858,7 @@ end
 				GetChunkZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the chunk in which the entity is placed" },
 				GetClass = { Params = "", Return = "string", Notes = "Returns the classname of the entity, such as \"cSpider\" or \"cPickup\"" },
 				GetClassStatic = { Params = "", Return = "string", Notes = "Returns the entity classname that this class implements. Each descendant overrides this function. Is static" },
-				GetEntityType = { Params = "", Return = "eEntityType", Notes = "Returns the type of the entity, one of the etXXX constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call." },
+				GetEntityType = { Params = "", Return = "{{cEntity#EntityType|EntityType}}", Notes = "Returns the type of the entity, one of the {{cEntity#EntityType|etXXX}} constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call." },
 				GetEquippedBoots = { Params = "", Return = "{{cItem}}", Notes = "Returns the boots that the entity has equipped. Returns an empty cItem if no boots equipped or not applicable." },
 				GetEquippedChestplate = { Params = "", Return = "{{cItem}}", Notes = "Returns the chestplate that the entity has equipped. Returns an empty cItem if no chestplate equipped or not applicable." },
 				GetEquippedHelmet = { Params = "", Return = "{{cItem}}", Notes = "Returns the helmet that the entity has equipped. Returns an empty cItem if no helmet equipped or not applicable." },
@@ -921,6 +962,14 @@ end
 				etPickup = { Notes = "The entity is a {{cPickup}}" },
 				etProjectile = { Notes = "The entity is a {{cProjectileEntity}} descendant" },
 				etTNT = { Notes = "The entity is a {{cTNTEntity}}" },
+			},
+			ConstantGroups =
+			{
+				EntityType =
+				{
+					Include = "et.*",
+					TextBefore = "The following constants are used to distinguish between different entity types:",
+				},
 			},
 		},
 
@@ -2018,11 +2067,20 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				pkEnderPearl = { Notes = "The projectile is a {{cThrownEnderPearlEntity|thrown enderpearl}}" },
 				pkExpBottle = { Notes = "The projectile is a thrown exp bottle (NYI)" },
 				pkFireCharge = { Notes = "The projectile is a {{cFireChargeEntity|fire charge}}" },
+				pkFirework = { Notes = "The projectile is a (flying) firework (NYI)" },
 				pkFishingFloat = { Notes = "The projectile is a fishing float (NYI)" },
 				pkGhastFireball = { Notes = "The projectile is a {{cGhastFireballEntity|ghast fireball}}" },
 				pkSnowball = { Notes = "The projectile is a {{cThrownSnowballEntity|thrown snowball}}" },
 				pkSplashPotion = { Notes = "The projectile is a thrown splash potion (NYI)" },
 				pkWitherSkull = { Notes = "The projectile is a wither skull (NYI)" },
+			},
+			ConstantGroups =
+			{
+				ProjectileKind =
+				{
+					Include = "pk.*",
+					TextBefore = "The following constants are used to distinguish between the different projectile kinds:",
+				},
 			},
 			Inherits = "cEntity",
 		},

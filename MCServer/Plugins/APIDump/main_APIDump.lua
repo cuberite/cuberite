@@ -38,7 +38,7 @@ function Initialize(Plugin)
 	Plugin:SetName("APIDump");
 	Plugin:SetVersion(1);
 	
-	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	
 	g_PluginFolder = Plugin:GetLocalFolder();
 
@@ -47,6 +47,8 @@ function Initialize(Plugin)
 	
 	-- Dump all available API object in HTML format into a subfolder:
 	DumpAPIHtml();
+	
+	LOG("APIDump finished");
 	
 	return true
 end
@@ -430,6 +432,11 @@ function ReadDescriptions(a_API)
 
 	-- Process the documentation for each class:
 	for i, cls in ipairs(a_API) do
+		-- Initialize default values for each class:
+		cls.ConstantGroups = {};
+		cls.NumConstantsInGroups = 0;
+		cls.NumConstantsInGroupsForDescendants = 0;
+		
 		-- Rename special functions:
 		for j, fn in ipairs(cls.Functions) do
 			if (fn.Name == ".call") then
@@ -561,6 +568,52 @@ function ReadDescriptions(a_API)
 					end
 				end
 			end  -- else if (APIDesc.Variables ~= nil)
+			
+			if (APIDesc.ConstantGroups ~= nil) then
+				-- Create links between the constants and the groups:
+				local NumInGroups = 0;
+				local NumInDescendantGroups = 0;
+				for j, group in pairs(APIDesc.ConstantGroups) do
+					group.Name = j;
+					group.Constants = {};
+					if (type(group.Include == "string")) then
+						group.Include = { group.Include };
+					end
+					local NumInGroup = 0;
+					for idx, incl in ipairs(group.Include or {}) do
+						for cidx, cons in ipairs(cls.Constants) do
+							if ((cons.Group == nil) and cons.Name:match(incl)) then
+								cons.Group = group;
+								table.insert(group.Constants, cons);
+								NumInGroup = NumInGroup + 1;
+							end
+						end  -- for cidx - cls.Constants[]
+					end  -- for idx - group.Include[]
+					NumInGroups = NumInGroups + NumInGroup;
+					if (group.ShowInDescendants) then
+						NumInDescendantGroups = NumInDescendantGroups + NumInGroup;
+					end
+					
+					-- Sort the constants:
+					table.sort(group.Constants,
+						function(c1, c2)
+							return (c1.Name < c2.Name);
+						end
+					);
+				end  -- for j - APIDesc.ConstantGroups[]
+				cls.ConstantGroups = APIDesc.ConstantGroups;
+				cls.NumConstantsInGroups = NumInGroups;
+				cls.NumConstantsInGroupsForDescendants = NumInDescendantGroups;
+				
+				-- Remove grouped constants from the normal list:
+				local NewConstants = {};
+				for idx, cons in ipairs(cls.Constants) do
+					if (cons.Group == nil) then
+						table.insert(NewConstants, cons);
+					end
+				end
+				cls.Constants = NewConstants;
+			end  -- if (ConstantGroups ~= nil)
 			
 		else  -- if (APIDesc ~= nil)
 		
@@ -752,22 +805,37 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		cf:write("			</table>\n\n");
 	end
 	
-	local function WriteConstants(a_Constants, a_InheritedName)
-		if (#a_Constants == 0) then
+	local function WriteConstantTable(a_Constants, a_Source)
+		cf:write("<table>\n<tr><th>Name</th><th>Value</th><th>Notes</th></tr>\n");
+		for i, cons in ipairs(a_Constants) do
+			cf:write("<tr><td>", cons.Name, "</td>\n");
+			cf:write("<td>", cons.Value, "</td>\n");
+			cf:write("<td>", LinkifyString(cons.Notes or "", a_Source), "</td></tr>\n");
+		end
+		cf:write("</table>\n\n");
+	end
+	
+	local function WriteConstants(a_Constants, a_ConstantGroups, a_NumConstantGroups, a_InheritedName)
+		if ((#a_Constants == 0) and (a_NumConstantGroups == 0)) then
 			return;
 		end
 		
 		if (a_InheritedName ~= nil) then
-			cf:write("			<h2>Constants inherited from ", a_InheritedName, "</h2>\n");
+			cf:write("<h2>Constants inherited from ", a_InheritedName, "</h2>\n");
 		end
 		
-		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Value</th>\n					<th>Notes</th>\n				</tr>\n");
-		for i, cons in ipairs(a_Constants) do
-			cf:write("				<tr>\n					<td>", cons.Name, "</td>\n");
-			cf:write("					<td>", cons.Value, "</td>\n");
-			cf:write("					<td>", LinkifyString(cons.Notes or "", a_InheritedName or a_ClassAPI.Name), "</td>\n				</tr>\n");
+		if (#a_Constants > 0) then
+			WriteConstantTable(a_Constants, a_InheritedName or a_ClassAPI.Name);
 		end
-		cf:write("			</table>\n\n");
+		
+		for k, group in pairs(a_ConstantGroups) do
+			if ((a_InheritedName == nil) or group.ShowInDescendants) then
+				cf:write("<a name='", group.Name, "'><p>");
+				cf:write(group.TextBefore or "");
+				WriteConstantTable(group.Constants, a_InheritedName or a_ClassAPI.Name);
+				cf:write(group.TextAfter or "", "</a></p>");
+			end
+		end
 	end
 	
 	local function WriteVariables(a_Variables, a_InheritedName)
@@ -833,11 +901,11 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	local HasInheritance = ((#a_ClassAPI.Descendants > 0) or (a_ClassAPI.Inherits ~= nil));
 	
-	local HasConstants = (#a_ClassAPI.Constants > 0);
+	local HasConstants = (#a_ClassAPI.Constants > 0) or (a_ClassAPI.NumConstantsInGroups > 0);
 	local HasFunctions = (#a_ClassAPI.Functions > 0);
 	local HasVariables = (#a_ClassAPI.Variables > 0);
 	for idx, cls in ipairs(InheritanceChain) do
-		HasConstants = HasConstants or (#cls.Constants > 0);
+		HasConstants = HasConstants or (#cls.Constants > 0) or (cls.NumConstantsInGroupsForDescendants > 0);
 		HasFunctions = HasFunctions or (#cls.Functions > 0);
 		HasVariables = HasVariables or (#cls.Variables > 0);
 	end
@@ -890,10 +958,10 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	-- Write the constants:
 	if (HasConstants) then
 		cf:write("			<a name=\"constants\"><hr /><h1>Constants</h1></a>\n");
-		WriteConstants(a_ClassAPI.Constants, nil);
-		g_Stats.NumTotalConstants = g_Stats.NumTotalConstants  + #a_ClassAPI.Constants;
+		WriteConstants(a_ClassAPI.Constants, a_ClassAPI.ConstantGroups, a_ClassAPI.NumConstantsInGroups, nil);
+		g_Stats.NumTotalConstants = g_Stats.NumTotalConstants  + #a_ClassAPI.Constants + (a_ClassAPI.NumConstantsInGroups or 0);
 		for i, cls in ipairs(InheritanceChain) do
-			WriteConstants(cls.Constants, cls.Name);
+			WriteConstants(cls.Constants, cls.ConstantGroups, cls.NumConstantsInGroupsForDescendants, cls.Name);
 		end;
 	end;
 	
@@ -1180,7 +1248,7 @@ end
 function WriteStats(f)
 	local function ExportMeter(a_Percent)
 		local Color;
-		if (a_Percent > 95) then
+		if (a_Percent > 99) then
 			Color = "green";
 		elseif (a_Percent > 50) then
 			Color = "orange";
