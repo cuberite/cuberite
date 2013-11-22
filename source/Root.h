@@ -56,7 +56,7 @@ public:
 
 	cGroupManager *    GetGroupManager   (void) { return m_GroupManager; }     // tolua_export
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
-	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // tolua_export
+	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
 	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }

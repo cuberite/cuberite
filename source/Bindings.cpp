@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/21/13 22:02:55.
+** Generated automatically by tolua++-1.0.92 on 11/22/13 11:58:39.
 */
 
 #ifndef __cplusplus
@@ -199,9 +199,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"sWebAdminPage");
  tolua_usertype(tolua_S,"cFireChargeEntity");
- tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
- tolua_usertype(tolua_S,"cFurnaceRecipe");
  tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"cCraftingRecipes");
@@ -225,24 +224,24 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"cBlockArea");
- tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cItem");
- tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"cCuboid");
- tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cNoteEntity");
- tolua_usertype(tolua_S,"Vector3d");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
- tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"Vector3d");
  tolua_usertype(tolua_S,"cFile");
  tolua_usertype(tolua_S,"cItems");
- tolua_usertype(tolua_S,"cClientHandle");
+ tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"cWebAdmin");
  tolua_usertype(tolua_S,"cChatColor");
  tolua_usertype(tolua_S,"cIniFile");
@@ -19715,38 +19714,6 @@ static int tolua_AllToLua_cRoot_GetCraftingRecipes00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetFurnaceRecipe of class  cRoot */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetFurnaceRecipe00
-static int tolua_AllToLua_cRoot_GetFurnaceRecipe00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cRoot* self = (cRoot*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFurnaceRecipe'", NULL);
-#endif
-  {
-   cFurnaceRecipe* tolua_ret = (cFurnaceRecipe*)  self->GetFurnaceRecipe();
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceRecipe");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetFurnaceRecipe'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetWebAdmin of class  cRoot */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetWebAdmin00
 static int tolua_AllToLua_cRoot_GetWebAdmin00(lua_State* tolua_S)
@@ -31126,7 +31093,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetPrimaryServerVersion",tolua_AllToLua_cRoot_SetPrimaryServerVersion00);
    tolua_function(tolua_S,"GetGroupManager",tolua_AllToLua_cRoot_GetGroupManager00);
    tolua_function(tolua_S,"GetCraftingRecipes",tolua_AllToLua_cRoot_GetCraftingRecipes00);
-   tolua_function(tolua_S,"GetFurnaceRecipe",tolua_AllToLua_cRoot_GetFurnaceRecipe00);
    tolua_function(tolua_S,"GetWebAdmin",tolua_AllToLua_cRoot_GetWebAdmin00);
    tolua_function(tolua_S,"GetPluginManager",tolua_AllToLua_cRoot_GetPluginManager00);
    tolua_function(tolua_S,"QueueExecuteConsoleCommand",tolua_AllToLua_cRoot_QueueExecuteConsoleCommand00);

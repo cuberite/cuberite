@@ -2063,6 +2063,45 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 
 
+static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "const cItem") ||
+		!L.CheckParamEnd     (2)
+	)
+	{
+		return 0;
+	}
+	
+	// Check the input param:
+	cItem * Input = (cItem *)tolua_tousertype(L, 1, NULL);
+	if (Input == NULL)
+	{
+		LOGWARNING("cRoot:GetFurnaceRecipe: the Input parameter is nil or missing.");
+		return 0;
+	}
+	
+	// Get the recipe for the input
+	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
+	const cFurnaceRecipe::Recipe * Recipe = FR->GetRecipeFrom(*Input);
+	if (Recipe == NULL)
+	{
+		// There is no such furnace recipe for this input, return no value
+		return 0;
+	}
+	
+	// Push the output, number of ticks and input as the three return values:
+	tolua_pushusertype(L, Recipe->Out, "const cItem");
+	tolua_pushnumber  (L, (lua_Number)(Recipe->CookTime));
+	tolua_pushusertype(L, Recipe->In, "const cItem");
+	return 3;
+}
+
+
+
+
+
 static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 {
 	// function cHopperEntity::GetOutputBlockPos()
@@ -2125,6 +2164,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "FindAndDoWithPlayer", tolua_DoWith <cRoot, cPlayer, &cRoot::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachPlayer",       tolua_ForEach<cRoot, cPlayer, &cRoot::ForEachPlayer>);
 			tolua_function(tolua_S, "ForEachWorld",        tolua_ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
+			tolua_function(tolua_S, "GetFurnaceRecipe",    tolua_cRoot_GetFurnaceRecipe);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cWorld");
