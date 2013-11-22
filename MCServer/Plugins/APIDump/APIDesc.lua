@@ -2046,7 +2046,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
 				GetCraftingRecipes = { Params = "", Return = "{{cCraftingRecipe|cCraftingRecipe}}", Notes = "Returns the CraftingRecipes object" },
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
-				GetFurnaceRecipe = { Params = "", Return = "{{cFurnaceRecipe|cFurnaceRecipe}}", Notes = "Returns the cFurnaceRecipes object." },
+				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that MCServer supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
 				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object." },
 				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
@@ -2064,7 +2064,32 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			Constants =
 			{
 			},
-		},
+			AdditionalInfo =
+			{
+				{
+					Header = "Querying a furnace recipe",
+					Contents = [[
+						To find the furnace recipe for an item, use the following code (adapted from the Debuggers plugin's /fr command):
+<pre class="prettyprint lang-lua">
+local HeldItem = a_Player:GetEquippedItem();
+local Out, NumTicks, In = cRoot.GetFurnaceRecipe(HeldItem);  -- Note STATIC call - using the dot operator instead of a colon
+if (Out ~= nil) then
+	-- There is a recipe, list it:
+	a_Player:SendMessage(
+		"Furnace turns " .. ItemToFullString(In) ..
+		" to " .. ItemToFullString(Out) ..
+		" in " .. NumTicks .. " ticks (" ..
+		tostring(NumTicks / 20) .. " seconds)."
+	);
+else
+	-- No recipe found
+	a_Player:SendMessage("There is no furnace recipe that would smelt " .. ItemToString(HeldItem));
+end
+</pre>
+					]],
+				},
+			},
+		},  -- cRoot
 
 		cServer =
 		{
