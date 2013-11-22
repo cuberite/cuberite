@@ -322,9 +322,6 @@ g_APIDesc =
 				GetRelZ      = { Params = "", Return = "number", Notes = "Returns the relative Z coord of the block entity's block within the chunk" },
 				GetWorld     = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world to which the block entity belongs" },
 			},
-			Constants =
-			{
-			},
 		},
 
 		cBlockEntityWithItems =
@@ -352,9 +349,6 @@ g_APIDesc =
 					{ Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot number. Ignored if invalid slot number" },
 					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords" },
 				},
-			},
-			Constants =
-			{
 			},
 		},
 
@@ -395,7 +389,6 @@ g_APIDesc =
 				},
 				Union = { Params = "OtherBoundingBox", Return = "cBoundingBox", Notes = "Returns the smallest bounding box that contains both OtherBoundingBox and this bounding box. Note that unlike the strict geometrical meaning of \"union\", this operation actually returns a cBoundingBox." },
 			},
-			Constants = {},
 		},
 
 		cChatColor =
@@ -535,9 +528,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				SetUseDefaultStructures   = { Params = "bool", Return = "", Notes = "Sets the chunk to use default structures or not" },
 				WriteBlockArea            = { Params = "{{cBlockArea|BlockArea}}, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
 			},
-			Constants =
-			{
-			},
 			AdditionalInfo =
 			{
 				{
@@ -600,7 +590,7 @@ end
 				MAX_VIEW_DISTANCE = { Notes = "The maximum value of the view distance" },
 				MIN_VIEW_DISTANCE = { Notes = "The minimum value of the view distance" },
 			},
-		},
+		},  -- cClientHandle
 
 		cCraftingGrid =
 		{
@@ -630,10 +620,7 @@ end
 					{ Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified coords" },
 				},
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cCraftingGrid
 
 		cCraftingRecipe =
 		{
@@ -662,10 +649,7 @@ end
 					{ Params = "ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the result item" },
 				},
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cCraftingRecipe
 
 		cCuboid =
 		{
@@ -707,7 +691,7 @@ end
 				p1 = { Type = "{{Vector3i}}", Notes = "The first corner. Usually the lesser of the two coords in each set" },
 				p2 = { Type = "{{Vector3i}}", Notes = "The second corner. Usually the larger of the two coords in each set" },
 			},
-		},
+		},  -- cCuboid
 
 		cDispenserEntity =
 		{
@@ -1000,14 +984,15 @@ cFile:Delete("/usr/bin/virus.exe");
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
 			Inherits = "cProjectileEntity",
 		} ,
 
 		cFurnaceEntity =
 		{
 			Desc = [[
-				This class represents a furnace block entity in the world.
+				This class represents a furnace block entity in the world.</p>
+				<p>
+				See also {{cRoot}}'s GetFurnaceRecipe() and GetFurnaceFuelBurnTime() functions
 			]],
 			Functions =
 			{
@@ -1024,27 +1009,36 @@ cFile:Delete("/usr/bin/virus.exe");
 			},
 			Constants =
 			{
-				fsInput = { Notes = "Index of the input slot, when using the GetSlot() / SetSlot() functions" },
-				fsFuel = { Notes = "Index of the fuel slot, when using the GetSlot() / SetSlot() functions" },
-				fsOutput = { Notes = "Index of the output slot, when using the GetSlot() / SetSlot() functions" },
+				fsInput = { Notes = "Index of the input slot" },
+				fsFuel = { Notes = "Index of the fuel slot" },
+				fsOutput = { Notes = "Index of the output slot" },
 				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid|cItemGrid}} representing the contents" },
 				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid|cItemGrid}} representing the contents" },
 			},
+			ConstantGroups =
+			{
+				SlotIndices =
+				{
+					Include = "fs.*",
+					TextBefore = "When using the GetSlot() or SetSlot() function, use these constants for slot index:",
+				},
+			},
 			Inherits = "cBlockEntityWithItems"
-		},
+		},  -- cFurnaceEntity
 
 		cGhastFireballEntity =
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
 			Inherits = "cProjectileEntity",
-		} ,
+		},  -- cGhastFireballEntity
 
 		cGroup =
 		{
-			Desc = [[cGroup is a group {{cPlayer|cPlayer}}'s can be in. Groups define the permissions players have, and optionally the color of their name in the chat.
-]],
+			Desc = [[
+				This class represents a group {{cPlayer|players}} can be in. Groups define the permissions players
+				have, and optionally the color of their name in the chat.
+			]],
 			Functions =
 			{
 				SetName = { Return = "" },
@@ -1056,10 +1050,7 @@ cFile:Delete("/usr/bin/virus.exe");
 				AddPermission = { Return = "" },
 				InheritFrom = { Return = "" },
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cGroup
 
 		cHopperEntity =
 		{
@@ -1077,7 +1068,7 @@ cFile:Delete("/usr/bin/virus.exe");
 				TICKS_PER_TRANSFER = { Notes = "Number of ticks between when the hopper transfers items." },
 			},
 			Inherits = "cBlockEntityWithItems",
-		},
+		},  -- cHopperEntity
 
 		cIniFile =
 		{
@@ -1287,6 +1278,16 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invHotbarOffset    = { Notes = "Starting slot number of the Hotbar part" },
 				invNumSlots        = { Notes = "Total number of slots in a cInventory" },
 			},
+			ConstantGroups =
+			{
+				SlotIndices =
+				{
+					Include = "inv.*",
+					TextBefore = [[
+						Rather than hardcoding numbers, use the following constants for slot indices and counts:
+					]],
+				},
+			},
 		},  -- cInventory
 
 		cItem =
@@ -1448,9 +1449,6 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
 				},
 			},
-			Constants =
-			{
-			},
 			AdditionalInfo =
 			{
 				{
@@ -1511,9 +1509,6 @@ end
 					{ Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified index to the specified item" },
 				},
 				Size = { Params = "", Return = "number", Notes = "Returns the number of items in the collection" },
-			},
-			Constants =
-			{
 			},
 		},  -- cItems
 
@@ -1641,9 +1636,6 @@ end
 				SetOnClosing = { Params = "OnClosingCallback", Return = "", Notes = "Sets the function that the window will call when it is about to be closed by a player" },
 				SetOnSlotChanged = { Params = "OnSlotChangedCallback", Return = "", Notes = "Sets the function that the window will call when a slot is changed by a player" },
 			},
-			Constants =
-			{
-			},
 			AdditionalInfo =
 			{
 				{
@@ -1718,12 +1710,12 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				FamilyFromType = { Params = "MobType", Return = "MobFamily", Notes = "(STATIC) Returns the mob family (mfXXX constants) based on the mob type (mtXXX constants)" },
-				GetMobFamily = { Params = "", Return = "MobFamily", Notes = "Returns this mob's family (mfXXX constant)" },
-				GetMobType = { Params = "", Return = "MobType", Notes = "Returns the type of this mob (mtXXX constant)" },
-				GetSpawnDelay = { Params = "MobFamily", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
-				MobTypeToString = { Params = "MobType", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type (mtXXX constant), or empty string if unknown type." },
-				StringToMobType = { Params = "string", Return = "MobType", Notes = "(STATIC) Returns the mob type (mtXXX constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
+				FamilyFromType = { Params = "{{cMonster#MobType|MobType}}", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "(STATIC) Returns the mob family ({{cMonster#MobFamily|mfXXX}} constants) based on the mob type ({{cMonster#MobType|mtXXX}} constants)" },
+				GetMobFamily = { Params = "", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "Returns this mob's family ({{cMonster#MobFamily|mfXXX}} constant)" },
+				GetMobType = { Params = "", Return = "{{cMonster#MobType|MobType}}", Notes = "Returns the type of this mob ({{cMonster#MobType|mtXXX}} constant)" },
+				GetSpawnDelay = { Params = "{{cMonster#MobFamily|MobFamily}}", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
+				MobTypeToString = { Params = "{{cMonster#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{cMonster#MobType|mtXXX}} constant), or empty string if unknown type." },
+				StringToMobType = { Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{cMonster#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
 			},
 			Constants =
 			{
@@ -1763,6 +1755,23 @@ a_Player:OpenWindow(Window);
 				mtZombie = { Notes = "" },
 				mtZombiePigman = { Notes = "" },
 			},
+			ConstantGroups =
+			{
+				MobFamily =
+				{
+					Include = "mf.*",
+					TextBefore = [[
+						Mobs are divided into families. The following constants are used for individual family types:
+					]],
+				},
+				MobType =
+				{
+					Include = "mt.*",
+					TextBefore = [[
+						The following constants are used for distinguishing between the individual mob types:
+					]],
+				},
+			},
 			Inherits = "cPawn",
 		},  -- cMonster
 
@@ -1798,11 +1807,8 @@ a_Player:OpenWindow(Window);
 				KilledBy = { Return = "" },
 				GetHealth = { Return = "number" },
 			},
-			Constants =
-			{
-			},
 			Inherits = "cEntity",
-		},
+		},  -- cPawn
 
 		cPickup =
 		{
@@ -1914,7 +1920,7 @@ a_Player:OpenWindow(Window);
 				MAX_HEALTH     = { Notes = "The maximum health value" },
 			},
 			Inherits = "cPawn",
-		},
+		},  -- cPlayer
 
 		cPlugin =
 		{
@@ -1933,18 +1939,14 @@ a_Player:OpenWindow(Window);
 				GetFileName = { Return = "string" },
 				CreateWebPlugin = { Notes = "{{cWebPlugin|cWebPlugin}}" },
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cPlugin
 
 		cPluginLua =
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
 			Inherits = "cPlugin",
-		},
+		},  -- cPluginLua
 
 		cPluginManager =
 		{
@@ -2121,9 +2123,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				SaveAllChunks = { Params = "", Return = "", Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved." },
 				SetPrimaryServerVersion = { Params = "Protocol Version", Return = "", Notes = "Sets the servers PrimaryServerVersion to the given protocol number." }
 			},
-			Constants =
-			{
-			},
 			AdditionalInfo =
 			{
 				{
@@ -2169,9 +2168,6 @@ end
 				GetServerID = { Return = "string", Notes = "Returns the ID of the server?" },
 				IsHardcore = { Params = "", Return = "bool", Notes = "Returns true if the server is hardcore (players get banned on death)." },
 			},
-			Constants =
-			{
-			},
 		},  -- cServer
 
 		cSignEntity =
@@ -2193,39 +2189,37 @@ end
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
 			Inherits = "cProjectileEntity",
-		},
+		},  -- cThrownEggEntity
 
 		cThrownEnderPearlEntity =
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
 			Inherits = "cProjectileEntity",
-		},
+		},  -- cThrownEnderPearlEntity
 
 		cThrownSnowballEntity =
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
 			Inherits = "cProjectileEntity",
-		},
+		},  -- cThrownSnowballEntity
 
 		cTracer =
 		{
-			Desc = [[A cTracer object is used to trace lines in the world. One thing you can use the cTracer for, is tracing what block a player is looking at, but you can do more with it if you want.
-</p>
-		<p>The cTracer is still a work in progress
-]],
+			Desc = [[
+				A cTracer object is used to trace lines in the world. One thing you can use the cTracer for, is
+				tracing what block a player is looking at, but you can do more with it if you want.</p>
+				<p>
+				The cTracer is still a work in progress.</p>
+				<p>
+				See also the {{cLineBlockTracer}} class for an alternative approach using callbacks.
+			]],
 			Functions =
 			{
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cTracer
 
 		cWebAdmin =
 		{
@@ -2234,15 +2228,13 @@ end
 			{
 				GetHTMLEscapedString = { Params = "string", Return = "string", Notes = "Gets the HTML escaped representation of a requested string. This is useful for user input and game data that is not guaranteed to be escaped already." },
 			},
-			Constants = {},
-		},
+		},  -- cWebAdmin
 
 		cWebPlugin =
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
-		},
+		},  -- cWebPlugin
 
 		cWindow =
 		{
@@ -2436,9 +2428,6 @@ end
 				UseBlockEntity = { Params = "{{cPlayer|Player}}, BlockX, BlockY, BlockZ", Return = "", Notes = "Makes the specified Player use the block entity at the specified coords (open chest UI, etc.) If the cords are in an unloaded chunk or there's no block entity, ignores the call." },
 				WakeUpSimulators = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Wakes up the simulators for the specified block." },
 				WakeUpSimulatorsInArea = { Params = "MinBlockX, MaxBlockX, MinBlockY, MaxBlockY, MinBlockZ, MaxBlockZ", Return = "", Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive)." },
-			},
-			Constants =
-			{
 			},
 			AdditionalInfo =
 			{
@@ -2908,10 +2897,7 @@ end
 				TrimString = {Params = "string", Return = "string", Notes = "Trime whitespace at both ends of the string"},
 				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- Globals
 	},
 
 
