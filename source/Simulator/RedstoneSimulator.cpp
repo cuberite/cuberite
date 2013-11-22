@@ -431,8 +431,6 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 
 	if (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) != 0) // A powered wire
 	{
-		//SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE); // No matter what, block underneath gets powered
-
 		switch (GetWireDirection(a_BlockX, a_BlockY, a_BlockZ))
 		{
 			case REDSTONE_NONE:
@@ -496,7 +494,10 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 {
 	// We do this so that the repeater can continually update block power status (without being affected by it's own block type, which would happen if the block powering code was in an IF statement)
 	bool IsOn = false;
-	if (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) { IsOn = true; }
+	if (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON)
+	{
+		IsOn = true;
+	}
 
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
@@ -533,7 +534,10 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 	}
 	else
 	{
-		if (IsOn) { m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta); }
+		if (IsOn)
+		{
+			m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
+		}
 	}
 	return;
 }
@@ -1060,6 +1064,7 @@ void cRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_B
 		{ 0, 0, 1 },
 		{ 0, 0,-1 },
 		{ 0, 1, 0 },
+		{ 0,-1, 0 }
 	};
 
 	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)

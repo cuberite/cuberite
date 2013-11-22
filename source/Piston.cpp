@@ -15,7 +15,7 @@
 
 
 /// Number of ticks that the piston extending / retracting waits before setting the block
-const int PISTON_TICK_DELAY = 5;
+const int PISTON_TICK_DELAY = 6;
 
 
 
@@ -140,9 +140,11 @@ void cPiston::RetractPiston(int pistx, int pisty, int pistz)
 		return;
 	}
 	
+	AddDir(pistx, pisty, pistz, pistonMeta, -1);
 	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);			
 	m_World->SetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
+	AddDir(pistx, pisty, pistz, pistonMeta, 1);
 	
 	// Retract the extension, pull block if appropriate
 	if (IsSticky(pistonBlock))
