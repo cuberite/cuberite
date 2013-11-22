@@ -2046,6 +2046,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
 				GetCraftingRecipes = { Params = "", Return = "{{cCraftingRecipe|cCraftingRecipe}}", Notes = "Returns the CraftingRecipes object" },
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
+				GetFurnaceFuelBurnTime = { Params = "{{cItem|Fuel}}", Return = "number", Notes = "(STATIC) Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel." },
 				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that MCServer supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
 				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object." },
 				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
@@ -2072,7 +2073,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 						To find the furnace recipe for an item, use the following code (adapted from the Debuggers plugin's /fr command):
 <pre class="prettyprint lang-lua">
 local HeldItem = a_Player:GetEquippedItem();
-local Out, NumTicks, In = cRoot.GetFurnaceRecipe(HeldItem);  -- Note STATIC call - using the dot operator instead of a colon
+local Out, NumTicks, In = cRoot:GetFurnaceRecipe(HeldItem);  -- Note STATIC call - no need for a Get()
 if (Out ~= nil) then
 	-- There is a recipe, list it:
 	a_Player:SendMessage(
@@ -4317,6 +4318,7 @@ end
 		"Globals.assert",
 		"Globals.collectgarbage",
 		"Globals.xpcall",
+		"Globals.decoda_output",  -- When running under Decoda, this function gets added to the global namespace
 		"%a+\.__%a+",        -- AnyClass.__Anything
 		"%a+\.\.collector",  -- AnyClass..collector
 		"%a+\.new",          -- AnyClass.new
