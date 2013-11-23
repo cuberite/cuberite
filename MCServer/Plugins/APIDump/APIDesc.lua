@@ -2456,7 +2456,6 @@ myDB:close()
 </pre>
 				]], },
 				open_memory = { Return = "DBClass", Notes = "Opens an SQLite database in memory and returns its handle as userdata. In case of an error, the function returns nil, an error code and an error message. (In-memory databases are volatile as they are never stored on disk.)" },
-				temp_directory = { Params = "string", Notes = "Opens an SQLite database in memory and returns its handle as userdata. In case of an error, the function returns nil, an error code and an error message. (In-memory databases are volatile as they are never stored on disk.)" },
 				version = { Return = "string", Notes = "Returns a string with SQLite version information, in the form 'x.y[.z]'." },
 			},
 		},
@@ -2813,6 +2812,7 @@ end
 		"Globals.collectgarbage",
 		"Globals.xpcall",
 		"Globals.decoda_output",  -- When running under Decoda, this function gets added to the global namespace
+		"sqlite3.__newindex",
 		"%a+\.__%a+",        -- AnyClass.__Anything
 		"%a+\.\.collector",  -- AnyClass..collector
 		"%a+\.new",          -- AnyClass.new
@@ -2828,6 +2828,7 @@ end
 		"ListMissingPages",
 		"ListUndocumentedObjects",
 		"ListUnexportedObjects",
+		"LoadAPIFiles",
 		"ReadDescriptions",
 		"ReadHooks",
 		"WriteHtmlClass",
