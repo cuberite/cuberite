@@ -41,6 +41,16 @@ function Initialize(Plugin)
 	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	
 	g_PluginFolder = Plugin:GetLocalFolder();
+	
+	-- Load the API descriptions from the Classes and Hooks subfolders:
+	if (g_APIDesc.Classes == nil) then
+		g_APIDesc.Classes = {};
+	end
+	if (g_APIDesc.Hooks == nil) then
+		g_APIDesc.Hooks = {};
+	end
+	LoadAPIFiles("/Classes/", g_APIDesc.Classes);
+	LoadAPIFiles("/Hooks/",   g_APIDesc.Hooks);
 
 	-- dump all available API functions and objects:
 	-- DumpAPITxt();
@@ -51,6 +61,29 @@ function Initialize(Plugin)
 	LOG("APIDump finished");
 	
 	return true
+end
+
+
+
+
+
+function LoadAPIFiles(a_Folder, a_DstTable)
+	local Folder = g_PluginFolder .. a_Folder;
+	for idx, fnam in ipairs(cFile:GetFolderContents(Folder)) do
+		local FileName = Folder .. fnam;
+		-- We only want .lua files from the folder:
+		if (cFile:IsFile(FileName) and fnam:match(".*%.lua$")) then
+			local TablesFn, Err = loadfile(FileName);
+			if (TablesFn == nil) then
+				LOGWARNING("Cannot load API descriptions from " .. FileName .. ", Lua error '" .. Err .. "'.");
+			else
+				local Tables = TablesFn();
+				for k, cls in pairs(Tables) do
+					a_DstTable[k] = cls;
+				end
+			end  -- if (TablesFn)
+		end  -- if (is lua file)
+	end  -- for fnam - Folder[]
 end
 
 
