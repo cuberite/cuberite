@@ -93,7 +93,10 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_
 	if ((Block == E_BLOCK_STICKY_PISTON) || (Block == E_BLOCK_PISTON))
 	{
 		a_World->DigBlock(newX, newY, newZ);
-		if (a_Player->IsGameModeCreative()) { return; } // No pickups if creative
+		if (a_Player->IsGameModeCreative())
+		{
+			return; // No pickups if creative
+		}
 
 		cItems Pickups;
 		Pickups.push_back(cItem(Block, 1));
