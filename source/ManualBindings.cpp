@@ -183,7 +183,7 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 		return 0;
 	}
 	
-	AString Folder = (AString)tolua_tocppstring(LuaState, 1, 0);
+	AString Folder = (AString)tolua_tocppstring(LuaState, 2, 0);
 
 	AStringVector Contents = cFile::GetFolderContents(Folder);
 	LuaState.Push(Contents);
