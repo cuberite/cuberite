@@ -2668,6 +2668,24 @@ Parser:close();
 			},  -- AdditionalInfo
 		},  -- lxp
 		
+		sqlite3 =
+		{
+			Desc = [[
+			]],
+			
+			Functions =
+			{
+				complete = { Params = "string", Return = "bool", Notes = "Returns true if the string sql comprises one or more complete SQL statements and false otherwise." },
+				open = { Params = "string", Return = "Userdata", Notes = [[Opens (or creates if it does not exist) an SQLite database with name filename and returns its handle as userdata (the returned object should be used for all further method calls in connection with this specific database, see {{http://lua.sqlite.org/index.cgi/doc/tip/doc/lsqlite3.wiki#database_methods|Database methods}}). Example: <pre class="prettyprint lang-lua">myDB=sqlite3.open('MyDatabase.sqlite3')  -- open
+-- do some database calls...
+myDB:close()  -- close
+TakeDamageInfo =</pre>]], },
+				open_memory = { Return = "userdata", Notes = "Opens an SQLite database in memory and returns its handle as userdata. In case of an error, the function returns nil, an error code and an error message. (In-memory databases are volatile as they are never stored on disk.)" },
+				temp_directory = { Params = "string", Notes = "Opens an SQLite database in memory and returns its handle as userdata. In case of an error, the function returns nil, an error code and an error message. (In-memory databases are volatile as they are never stored on disk.)" },
+				version = { Return = "string", Notes = "Returns a string with SQLite version information, in the form 'x.y[.z]'." },
+			},
+		},
+		
 		TakeDamageInfo =
 		{
 			Desc = [[
