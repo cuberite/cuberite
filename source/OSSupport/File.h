@@ -121,6 +121,9 @@ public:
 	/// Creates a new folder with the specified name. Returns true if successful. Path may be relative or absolute
 	static bool CreateFolder(const AString & a_FolderPath);
 	
+	/// Returns the entire contents of the specified file as a string. Returns empty string on error.
+	static AString ReadWholeFile(const AString & a_FileName);
+	
 	// tolua_end
 	
 	/// Returns the list of all items in the specified folder (files, folders, nix pipes, whatever's there).

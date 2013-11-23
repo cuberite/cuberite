@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/22/13 16:24:50.
+** Generated automatically by tolua++-1.0.92 on 11/23/13 19:57:30.
 */
 
 #ifndef __cplusplus
@@ -2298,6 +2298,37 @@ static int tolua_AllToLua_cFile_CreateFolder00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'CreateFolder'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ReadWholeFile of class  cFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cFile_ReadWholeFile00
+static int tolua_AllToLua_cFile_ReadWholeFile00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_FileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   AString tolua_ret = (AString)  cFile::ReadWholeFile(a_FileName);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_FileName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ReadWholeFile'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29538,6 +29569,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsFile",tolua_AllToLua_cFile_IsFile00);
    tolua_function(tolua_S,"GetSize",tolua_AllToLua_cFile_GetSize00);
    tolua_function(tolua_S,"CreateFolder",tolua_AllToLua_cFile_CreateFolder00);
+   tolua_function(tolua_S,"ReadWholeFile",tolua_AllToLua_cFile_ReadWholeFile00);
   tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"E_BLOCK_AIR",E_BLOCK_AIR);
   tolua_constant(tolua_S,"E_BLOCK_STONE",E_BLOCK_STONE);

@@ -420,6 +420,22 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 
 
 
+AString cFile::ReadWholeFile(const AString & a_FileName)
+{
+	cFile f;
+	if (!f.Open(a_FileName, fmRead))
+	{
+		return "";
+	}
+	AString Contents;
+	f.ReadRestOfFile(Contents);
+	return Contents;
+}
+
+
+
+
+
 int cFile::Printf(const char * a_Fmt, ...)
 {
 	AString buf;
