@@ -576,7 +576,7 @@ function ReadDescriptions(a_API)
 				for j, group in pairs(APIDesc.ConstantGroups) do
 					group.Name = j;
 					group.Constants = {};
-					if (type(group.Include == "string")) then
+					if (type(group.Include) == "string") then
 						group.Include = { group.Include };
 					end
 					local NumInGroup = 0;
@@ -820,20 +820,22 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 			return;
 		end
 		
+		local Source = a_ClassAPI.Name
 		if (a_InheritedName ~= nil) then
 			cf:write("<h2>Constants inherited from ", a_InheritedName, "</h2>\n");
+			Source = a_InheritedName;
 		end
 		
 		if (#a_Constants > 0) then
-			WriteConstantTable(a_Constants, a_InheritedName or a_ClassAPI.Name);
+			WriteConstantTable(a_Constants, Source);
 		end
 		
 		for k, group in pairs(a_ConstantGroups) do
 			if ((a_InheritedName == nil) or group.ShowInDescendants) then
 				cf:write("<a name='", group.Name, "'><p>");
-				cf:write(group.TextBefore or "");
+				cf:write(LinkifyString(group.TextBefore or "", Source));
 				WriteConstantTable(group.Constants, a_InheritedName or a_ClassAPI.Name);
-				cf:write(group.TextAfter or "", "</a></p>");
+				cf:write(LinkifyString(group.TextAfter or "", Source), "</a></p>");
 			end
 		end
 	end

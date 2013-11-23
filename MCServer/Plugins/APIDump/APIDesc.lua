@@ -2865,37 +2865,136 @@ end
 		
 		Globals =
 		{
-			Desc = [[These functions are available directly, without a class instance. Any plugin cal call them at any time.]],
+			Desc = [[
+				These functions are available directly, without a class instance. Any plugin cal call them at any
+				time.
+			]],
 			Functions =
 			{
-				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, Inverse", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified face"},
+				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, [IsInverse]", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFace|face}}"},
 				BlockStringToType = {Params = "BlockTypeString", Return = "BLOCKTYPE", Notes = "Returns the block type parsed from the given string"},
-				ClickActionToString = {Params = "ClickAction", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
-				DamageTypeToString = {Params = "{{TakeDamageInfo|eDamageType}}", Return = "string", Notes = "Converts a damage type enumerated value to a string representation "},
+				ClickActionToString = {Params = "{{Globals#ClickAction|ClickAction}}", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
+				DamageTypeToString = {Params = "{{Globals#DamageType|DamageType}}", Return = "string", Notes = "Converts the {{Globals#DamageType|DamageType}} enumerated value to a string representation "},
 				EscapeString = {Params = "string", Return = "string", Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash"},
 				GetChar = {Params = "String, Pos", Return = "string", Notes = "Returns one character from the string, specified by position "},
 				GetTime = {Return = "number", Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)"},
 				IsValidBlock = {Params = "BlockType", Return = "bool", Notes = "Returns true if BlockType is a known block type"},
 				IsValidItem = {Params = "ItemType", Return = "bool", Notes = "Returns true if ItemType is a known item type"},
-				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format “ItemTypeText:ItemDamage * Count”"},
+				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
 				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
 				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
-				LOG = {Params = "string", Notes = "Logs a text into the server console using “normal” severity (gray text) "},
-				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using “error” severity (black text on red background)"},
-				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using “info” severity (yellow text)"},
-				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using “warning” severity (red text); OBSOLETE"},
-				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using “warning” severity (red text)"},
+				LOG = {Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text) "},
+				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
+				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
+				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
 				ReplaceString = {Params = "full-string, to-be-replaced-string, to-replace-string", Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string"},
-				StringSplit = {Params = "string, Seperator", Return = "list", Notes = "Seperates string into multiple by splitting every time Seperator is encountered."},
-				StringToBiome = {Params = "string", Return = "EMCSBiome", Notes = "Converts a string representation to a biome enumerated value"},
-				StringToDamageType = {Params = "string", Return = "{{TakeDamageInfo|eDamageType}}", Notes = "Converts a string representation to an {{TakeDamageInfo|eDamageType}} enumerated value "},
-				StringToDimension = {Params = "string", Return = "eDimension", Notes = "Converts a string representation to an eDimension enumerated value"},
+				StringSplit = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered."},
+				StringSplitAndTrim = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Each of the separate strings is trimmed (whitespace removed from the beginning and end of the string)"},
+				StringToBiome = {Params = "string", Return = "{{Globals#BiomeTypes|BiomeType}}", Notes = "Converts a string representation to a {{Globals#BiomeTypes|BiomeType}} enumerated value"},
+				StringToDamageType = {Params = "string", Return = "{{Globals#DamageType|DamageType}}", Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value."},
+				StringToDimension = {Params = "string", Return = "{{Globals#WorldDimension|Dimension}}", Notes = "Converts a string representation to a {{Globals#WorldDimension|Dimension}} enumerated value"},
 				StringToItem = {Params = "string, {{cItem|cItem}}", Return = "bool", Notes = "Parses the given string and sets the item; returns true if successful"},
-				StringToMobType = {Params = "string", Return = "number", Notes = "Converts a string representation to a mob enumerated value"},
+				StringToMobType = {Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "Converts a string representation to a {{cMonster#MobType|MobType}} enumerated value"},
 				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
-				TrimString = {Params = "string", Return = "string", Notes = "Trime whitespace at both ends of the string"},
+				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
 				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
+			},
+			ConstantGroups =
+			{
+				BlockTypes =
+				{
+					Include = "^E_BLOCK_.*",
+					TextBefore = [[
+						These constants are used for block types. They correspond directly with MineCraft's data values
+						for blocks.
+					]],
+				},
+				ItemTypes =
+				{
+					Include = "^E_ITEM_.*",
+					TextBefore = [[
+						These constants are used for item types. They correspond directly with MineCraft's data values
+						for items.
+					]],
+				},
+				MetaValues =
+				{
+					Include = "^E_META_.*",
+				},
+				BiomeTypes =
+				{
+					Include = "^bi.*",
+					TextBefore = [[
+						These constants represent the biomes that the server understands. Note that there is a global
+						StringToBiome() function that can convert a string into one of these constants.
+					]],
+				},
+				BlockFaces =
+				{
+					Include = "^BLOCK_FACE_.*",
+					TextBefore = [[
+						These constants are used to describe individual faces of the block. They are used when the
+						client is interacting with a block, or when the {{cLineBlockTracer}} hits a block, etc.
+					]],
+				},
+				ClickAction =
+				{
+					Include = "^ca.*",
+					TextBefore = [[
+						These constants are used to signalize various interactions that the user can do with the
+						{{cWindow|UI windows}}. The server translates the protocol events into these constants. Note
+						that there is a global ClickActionToString() function that can translate these constants into
+						their textual representation.
+					]],
+				},
+				WorldDimension =
+				{
+					Include = "^dim.*",
+					TextBefore = [[
+						These constants represent dimension of a world. In MCServer, the dimension is only reflected in
+						the world's overall tint - overworld gets sky-like colors and dark shades, the nether gets
+						reddish haze and the end gets dark haze. World generator is not directly affected by the
+						dimension, same as fluid simulators; those only default to the expected values if not set
+						specifically otherwise in the world.ini file.
+					]],
+				},
+				DamageType =
+				{
+					Include = "^dt.*",
+					TextBefore = [[
+						These constants are used for specifying the cause of damage to entities. They are used in the
+						{{TakeDamageInfo}} structure, as well as in {{cEntity}}'s damage-related API functions.
+					]],
+				},
+				GameMode =
+				{
+					Include = { "^gm.*", "^eGameMode_.*" },
+					TextBefore = [[
+						The following constants are used for the gamemode - survival, creative or adventure. Use the
+						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
+					]],
+				},
+				Weather =
+				{
+					Include = { "^eWeather_.*", "wSunny", "wRain", "wStorm", "wThunderstorm" },
+					TextBefore = [[
+						These constants represent the weather in the world. Note that unlike vanilla, MCServer allows
+						different weathers even in non-overworld {{Globals#WorldDimension|dimensions}}.
+					]],
+				},
+				ExplosionSource =
+				{
+					Include = "^es.*",
+					TextBefore = [[
+						These constants are used to differentiate the various sources of explosions. They are used in
+						the {{OnExploded|HOOK_EXPLODED}} hook, {{OnExploding|HOOK_EXPLODING}} hook and in the
+						{{cWorld}}:DoExplosionAt() function. These constants also dictate the type of the additional
+						data provided with the explosions, such as the exploding {{cCreeper|creeper}} entity or the
+						{{Vector3i|coords}} of the exploding bed.
+					]],
+				}
 			},
 		},  -- Globals
 	},
