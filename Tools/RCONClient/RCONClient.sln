@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RCONClient", "RCONClient.vcproj", "{1A48B032-07D0-4DDD-8362-66C0FC7F7849}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A48B032-07D0-4DDD-8362-66C0FC7F7849}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1A48B032-07D0-4DDD-8362-66C0FC7F7849}.Debug|Win32.Build.0 = Debug|Win32
+		{1A48B032-07D0-4DDD-8362-66C0FC7F7849}.Release|Win32.ActiveCfg = Release|Win32
+		{1A48B032-07D0-4DDD-8362-66C0FC7F7849}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

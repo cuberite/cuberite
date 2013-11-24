@@ -60,6 +60,7 @@ public:
 	bool ReadBEUTF16String16(AString & a_Value);  // string length as BE short, then string as UTF-16BE
 	bool ReadVarInt         (UInt32 & a_Value);
 	bool ReadVarUTF8String  (AString & a_Value);  // string length as VarInt, then string as UTF-8
+	bool ReadLEInt          (int & a_Value);
 
 	/// Reads VarInt, assigns it to anything that can be assigned from an UInt32 (unsigned short, char, Byte, double, ...)
 	template <typename T> bool ReadVarInt(T & a_Value)
@@ -85,6 +86,7 @@ public:
 	bool WriteBEUTF16String16(const AString & a_Value);  // string length as BE short, then string as UTF-16BE
 	bool WriteVarInt         (UInt32 a_Value);
 	bool WriteVarUTF8String  (const AString & a_Value);  // string length as VarInt, then string as UTF-8
+	bool WriteLEInt          (int a_Value);
 	
 	/// Reads a_Count bytes into a_Buffer; returns true if successful
 	bool ReadBuf(void * a_Buffer, int a_Count);
