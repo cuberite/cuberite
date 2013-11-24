@@ -62,23 +62,13 @@ LNK_OPTIONS = -pthread -ggdb -O3 -pg
 BUILDDIR = build/profile/
 
 else
-ifeq ($(pedantic),1)
-################
-# pedantic build - basically a debug build with lots of warnings
-################
-CC_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-CXX_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-LNK_OPTIONS = -pthread -ggdb
-BUILDDIR = build/pedantic/
-
-else
 ################
 # debug build - fully traceable by gdb in C++ code, slowest
 # Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
 ################
 CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
-CXX_OPTIONS = -s -ggdb -g -D_DEBUG
-LNK_OPTIONS = -pthread -g -ggdb
+CXX_OPTIONS = -s -ggdb -g -D_DEBUG -Og
+LNK_OPTIONS = -pthread -g -ggdb -Og
 BUILDDIR = build/debug/
 endif
 endif
