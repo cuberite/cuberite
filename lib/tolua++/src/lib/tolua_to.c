@@ -12,7 +12,7 @@
 ** enhancements, or modifications.
 */
 
-#include "tolua++.h"
+#include "../../include/tolua++.h"
 
 #include <string.h>
 #include <stdlib.h>

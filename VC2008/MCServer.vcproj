@@ -1685,7 +1685,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
-							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../lib/iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
 					</FileConfiguration>
@@ -1696,7 +1696,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
-							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../lib/iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
 					</FileConfiguration>
@@ -1707,7 +1707,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
-							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../lib/iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
 					</FileConfiguration>
@@ -1718,7 +1718,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
-							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../lib/iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
 					</FileConfiguration>
@@ -1848,7 +1848,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\md5\md5.cpp"
+					RelativePath="..\lib\md5\md5.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -1888,7 +1888,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\md5\md5.h"
+					RelativePath="..\lib\md5\md5.h"
 					>
 				</File>
 			</Filter>
@@ -2544,7 +2544,7 @@
 				Name="SQLite"
 				>
 				<File
-					RelativePath="..\src\sqlite\lsqlite3.c"
+					RelativePath="..\lib\sqlite\lsqlite3.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2580,7 +2580,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\sqlite\sqlite3.c"
+					RelativePath="..\lib\sqlite\sqlite3.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2616,11 +2616,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\sqlite\sqlite3.h"
+					RelativePath="..\lib\sqlite\sqlite3.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sqlite\urls.txt"
+					RelativePath="..\lib\sqlite\urls.txt"
 					>
 				</File>
 			</Filter>
@@ -2628,7 +2628,7 @@
 				Name="LuaExpat"
 				>
 				<File
-					RelativePath="..\src\LuaExpat\lxplib.c"
+					RelativePath="..\lib\luaexpat\lxplib.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2664,7 +2664,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\LuaExpat\lxplib.h"
+					RelativePath="..\lib\luaexpat\lxplib.h"
 					>
 				</File>
 			</Filter>

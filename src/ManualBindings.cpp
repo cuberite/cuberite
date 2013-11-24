@@ -17,7 +17,7 @@
 #include "BlockEntities/DropperEntity.h"
 #include "BlockEntities/FurnaceEntity.h"
 #include "BlockEntities/HopperEntity.h"
-#include "md5/md5.h"
+#include "lib/md5/md5.h"
 #include "LuaWindow.h"
 #include "LineBlockTracer.h"
 

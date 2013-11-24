@@ -43,8 +43,8 @@ extern "C" {
 
 typedef int lua_Object;
 
-#include "lua.h"
-#include "lauxlib.h"
+#include "../lib/lua/src/lua.h"
+#include "../lib/lua/src/lauxlib.h"
 
 struct tolua_Error
 {

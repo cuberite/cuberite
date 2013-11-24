@@ -4,14 +4,14 @@
 // Implements the cProtocol132 class representing the release 1.3.2 protocol (#39)
 
 #include "Globals.h"
+#include "ChunkDataSerializer.h"
 #include "Protocol132.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
 #include "../ClientHandle.h"
-#include "../../CryptoPP/randpool.h"
+#include "../lib/cryptopp/randpool.h"
 #include "../Item.h"
-#include "ChunkDataSerializer.h"
 #include "../Entities/Player.h"
 #include "../Mobs/Monster.h"
 #include "../UI/Window.h"

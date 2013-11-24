@@ -1,6 +1,6 @@
 #include <iostream>
-#include <json/value.h>
-#include <json/writer.h>
+#include "../../include/json/json.h"
+#include "../../include/json/writer.h"
 #include <utility>
 #include <stdexcept>
 #include <cstring>

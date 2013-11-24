@@ -23,9 +23,6 @@
 					<Add directory="../jsoncpp-src-0.5.0/include" />
 					<Add directory="../lua-5.1.4/src" />
 					<Add directory="../tolua++-1.0.93/include" />
-					<Add directory="../squirrel_3_0_1_stable/include" />
-					<Add directory="../squirrel_3_0_1_stable" />
-					<Add directory="../squirrel_3_0_1_stable/sqrat" />
 					<Add directory=".." />
 					<Add directory="../expat" />
 				</Compiler>
@@ -34,9 +31,6 @@
 					<Add directory="../jsoncpp-src-0.5.0/include" />
 					<Add directory="../lua-5.1.4/src" />
 					<Add directory="../tolua++-1.0.93/include" />
-					<Add directory="../squirrel_3_0_1_stable/include" />
-					<Add directory="../squirrel_3_0_1_stable" />
-					<Add directory="../squirrel_3_0_1_stable/sqrat" />
 					<Add directory=".." />
 					<Add directory="../expat" />
 				</ResourceCompiler>
@@ -179,8 +173,8 @@
 		<Unit filename="../MCServer/terrain.ini" />
 		<Unit filename="../MCServer/users.ini" />
 		<Unit filename="../MCServer/webadmin.ini" />
-		<Unit filename="../iniFile/iniFile.cpp" />
-		<Unit filename="../iniFile/iniFile.h" />
+		<Unit filename="../lib/iniFile/iniFile.cpp" />
+		<Unit filename="../lib/iniFile/iniFile.h" />
 		<Unit filename="../src/AllToLua.pkg">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -368,10 +362,10 @@
 		<Unit filename="../src/LinearUpscale.h" />
 		<Unit filename="../src/Log.cpp" />
 		<Unit filename="../src/Log.h" />
-		<Unit filename="../src/LuaExpat/lxplib.c">
+		<Unit filename="../lib/luaexpat/lxplib.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../src/LuaExpat/lxplib.h" />
+		<Unit filename="../lib/luaexpat/lxplib.h" />
 		<Unit filename="../src/LuaFunctions.h" />
 		<Unit filename="../src/MCLogger.cpp" />
 		<Unit filename="../src/MCLogger.h" />
@@ -479,10 +473,6 @@
 		<Unit filename="../src/Plugin.h" />
 		<Unit filename="../src/PluginManager.cpp" />
 		<Unit filename="../src/PluginManager.h" />
-		<Unit filename="../src/Plugin_NewLua.cpp" />
-		<Unit filename="../src/Plugin_NewLua.h" />
-		<Unit filename="../src/Plugin_Squirrel.cpp" />
-		<Unit filename="../src/Plugin_Squirrel.h" />
 		<Unit filename="../src/ProbabDistrib.cpp" />
 		<Unit filename="../src/ProbabDistrib.h" />
 		<Unit filename="../src/Protocol/ChunkDataSerializer.cpp" />
@@ -502,14 +492,14 @@
 		<Unit filename="../src/ReferenceManager.h" />
 		<Unit filename="../src/Root.cpp" />
 		<Unit filename="../src/Root.h" />
-		<Unit filename="../src/SQLite/lsqlite3.c">
+		<Unit filename="../lib/sqlite/lsqlite3.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../src/SQLite/sqlite3.c">
+		<Unit filename="../lib/sqlite/sqlite3.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../src/SQLite/sqlite3.h" />
-		<Unit filename="../src/SQLite/urls.txt" />
+		<Unit filename="../lib/sqlite/sqlite3.h" />
+		<Unit filename="../lib/sqlite/urls.txt" />
 		<Unit filename="../src/Server.cpp" />
 		<Unit filename="../src/Server.h" />
 		<Unit filename="../src/Sign.h" />
@@ -534,8 +524,6 @@
 		<Unit filename="../src/Simulator/SimulatorManager.h" />
 		<Unit filename="../src/Simulator/VaporizeFluidSimulator.cpp" />
 		<Unit filename="../src/Simulator/VaporizeFluidSimulator.h" />
-		<Unit filename="../src/SquirrelCommandBinder.cpp" />
-		<Unit filename="../src/SquirrelCommandBinder.h" />
 		<Unit filename="../src/StackWalker.h" />
 		<Unit filename="../src/Stairs.h" />
 		<Unit filename="../src/StringCompression.cpp" />
@@ -578,15 +566,8 @@
 		<Unit filename="../src/WorldStorage/WorldStorage.cpp" />
 		<Unit filename="../src/WorldStorage/WorldStorage.h" />
 		<Unit filename="../src/main.cpp" />
-		<Unit filename="../src/md5/md5.cpp" />
-		<Unit filename="../src/md5/md5.h" />
-		<Unit filename="../src/squirrelbindings/SquirrelArray.h" />
-		<Unit filename="../src/squirrelbindings/SquirrelBaseClass.h" />
-		<Unit filename="../src/squirrelbindings/SquirrelBindings.cpp" />
-		<Unit filename="../src/squirrelbindings/SquirrelBindings.h" />
-		<Unit filename="../src/squirrelbindings/SquirrelFunctions.cpp" />
-		<Unit filename="../src/squirrelbindings/SquirrelFunctions.h" />
-		<Unit filename="../src/squirrelbindings/SquirrelObject.h" />
+		<Unit filename="../lib/md5/md5.cpp" />
+		<Unit filename="../lib/md5/md5.h" />
 		<Unit filename="../src/tolua++.h" />
 		<Unit filename="../src/tolua_base.h" />
 		<Unit filename="../webadmin/template.html" />

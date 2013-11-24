@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "BioGen.h"
-#include "../../iniFile/iniFile.h"
+#include "../lib/inifile/iniFile.h"
 #include "../LinearUpscale.h"
 
 

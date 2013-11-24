@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "Noise3DGenerator.h"
 #include "../OSSupport/File.h"
-#include "../../iniFile/iniFile.h"
+#include "../lib/inifile/iniFile.h"
 #include "../LinearInterpolation.h"
 #include "../LinearUpscale.h"
 

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -513,10 +513,10 @@
     <ClInclude Include="..\src\WebPlugin.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\iniFile\iniFile.h">
+    <ClInclude Include="..\lib\iniFile\iniFile.h">
       <Filter>Source Files\External</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\md5\md5.h">
+    <ClInclude Include="..\lib\md5\md5.h">
       <Filter>Source Files\External</Filter>
     </ClInclude>
     <ClInclude Include="..\src\WorldStorage\FastNBT.h">
@@ -876,10 +876,10 @@
     <ClInclude Include="..\src\Protocol\ProtocolRecognizer.h">
       <Filter>Source Files\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sqlite\sqlite3.h">
+    <ClInclude Include="..\lib\sqlite\sqlite3.h">
       <Filter>Source Files\SQLite</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LuaExpat\lxplib.h">
+    <ClInclude Include="..\lib\luaexpat\lxplib.h">
       <Filter>Source Files\LuaExpat</Filter>
     </ClInclude>
     <ClInclude Include="..\src\BlockEntities\BlockEntity.h">
@@ -1474,10 +1474,10 @@
     <ClCompile Include="..\src\WebPlugin.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\iniFile\iniFile.cpp">
+    <ClCompile Include="..\lib\iniFile\iniFile.cpp">
       <Filter>Source Files\External</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\md5\md5.cpp">
+    <ClCompile Include="..\lib\md5\md5.cpp">
       <Filter>Source Files\External</Filter>
     </ClCompile>
     <ClCompile Include="..\src\WorldStorage\FastNBT.cpp">
@@ -1594,13 +1594,13 @@
     <ClCompile Include="..\src\Protocol\ProtocolRecognizer.cpp">
       <Filter>Source Files\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sqlite\lsqlite3.c">
+    <ClCompile Include="..\lib\sqlite\lsqlite3.c">
       <Filter>Source Files\SQLite</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sqlite\sqlite3.c">
+    <ClCompile Include="..\lib\sqlite\sqlite3.c">
       <Filter>Source Files\SQLite</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LuaExpat\lxplib.c">
+    <ClCompile Include="..\lib\luaexpat\lxplib.c">
       <Filter>Source Files\LuaExpat</Filter>
     </ClCompile>
     <ClCompile Include="..\src\BlockEntities\BlockEntity.cpp">
@@ -1659,7 +1659,7 @@
     <Text Include="..\MCServer\API.txt">
       <Filter>Source Files\Bindings</Filter>
     </Text>
-    <Text Include="..\src\sqlite\urls.txt">
+    <Text Include="..\lib\sqlite\urls.txt">
       <Filter>Source Files\SQLite</Filter>
     </Text>
     <Text Include="..\MCServer\crafting.txt">

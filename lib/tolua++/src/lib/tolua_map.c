@@ -12,9 +12,9 @@
 ** enhancements, or modifications.
 */
 
-#include "tolua++.h"
+#include "../../include/tolua++.h"
+#include "../../../lua/src/lauxlib.h"
 #include "tolua_event.h"
-#include "lauxlib.h"
 
 #include <string.h>
 #include <stdio.h>

@@ -10,7 +10,7 @@
 #include "World.h"
 #include "ClientHandle.h"
 #include "Server.h"
-#include "zlib.h"
+#include "../lib/zlib/zlib.h"
 #include "Defines.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/DispenserEntity.h"
@@ -34,7 +34,7 @@
 #include "MobSpawner.h"
 
 
-#include <json/json.h>
+#include "lib/jsoncpp/include/json/json.h"
 
 
 

@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../Vector3i.h"
-#include "../../iniFile/iniFile.h"
+#include "../lib/inifile/iniFile.h"
 
 
 

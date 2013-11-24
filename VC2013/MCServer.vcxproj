@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug profiled|Win32">
@@ -332,8 +332,8 @@
     <ClInclude Include="..\src\tolua++.h" />
     <ClInclude Include="..\src\tolua_base.h" />
     <ClInclude Include="..\src\WebPlugin.h" />
-    <ClInclude Include="..\iniFile\iniFile.h" />
-    <ClInclude Include="..\src\md5\md5.h" />
+    <ClInclude Include="..\lib\iniFile\iniFile.h" />
+    <ClInclude Include="..\lib\md5\md5.h" />
     <ClInclude Include="..\src\WorldStorage\FastNBT.h" />
     <ClInclude Include="..\src\WorldStorage\NBTChunkSerializer.h" />
     <ClInclude Include="..\src\WorldStorage\WorldStorage.h" />
@@ -453,8 +453,8 @@
     <ClInclude Include="..\src\Protocol\Protocol16x.h" />
     <ClInclude Include="..\src\Protocol\Protocol17x.h" />
     <ClInclude Include="..\src\Protocol\ProtocolRecognizer.h" />
-    <ClInclude Include="..\src\sqlite\sqlite3.h" />
-    <ClInclude Include="..\src\LuaExpat\lxplib.h" />
+    <ClInclude Include="..\lib\sqlite\sqlite3.h" />
+    <ClInclude Include="..\lib\luaexpat\lxplib.h" />
     <ClInclude Include="..\src\BlockEntities\BlockEntity.h" />
     <ClInclude Include="..\src\BlockEntities\BlockEntityWithItems.h" />
     <ClInclude Include="..\src\BlockEntities\ChestEntity.h" />
@@ -754,8 +754,8 @@
     <ClCompile Include="..\src\PluginLua.cpp" />
     <ClCompile Include="..\src\PluginManager.cpp" />
     <ClCompile Include="..\src\WebPlugin.cpp" />
-    <ClCompile Include="..\iniFile\iniFile.cpp" />
-    <ClCompile Include="..\src\md5\md5.cpp">
+    <ClCompile Include="..\lib\iniFile\iniFile.cpp" />
+    <ClCompile Include="..\lib\md5\md5.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
@@ -807,7 +807,7 @@
     <ClCompile Include="..\src\Protocol\Protocol16x.cpp" />
     <ClCompile Include="..\src\Protocol\Protocol17x.cpp" />
     <ClCompile Include="..\src\Protocol\ProtocolRecognizer.cpp" />
-    <ClCompile Include="..\src\sqlite\lsqlite3.c">
+    <ClCompile Include="..\lib\sqlite\lsqlite3.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -817,7 +817,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\src\sqlite\sqlite3.c">
+    <ClCompile Include="..\lib\sqlite\sqlite3.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -827,7 +827,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\src\LuaExpat\lxplib.c">
+    <ClCompile Include="..\lib\luaexpat\lxplib.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -857,7 +857,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\MCServer\API.txt" />
-    <Text Include="..\src\sqlite\urls.txt" />
+    <Text Include="..\lib\sqlite\urls.txt" />
     <Text Include="..\MCServer\crafting.txt" />
     <Text Include="..\MCServer\furnace.txt" />
   </ItemGroup>

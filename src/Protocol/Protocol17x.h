@@ -16,8 +16,8 @@ Declares the 1.7.x protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
-#include "../../CryptoPP/modes.h"
-#include "../../CryptoPP/aes.h"
+#include "../lib/cryptopp/modes.h"
+#include "../lib/cryptopp/aes.h"
 
 
 

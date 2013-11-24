@@ -11,7 +11,7 @@
 
 extern "C"
 {
-	#include "lualib.h"
+	#include"lib/lua/src/lualib.h"
 }
 
 #include "tolua++.h"

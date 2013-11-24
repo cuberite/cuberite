@@ -47,9 +47,9 @@ ifeq ($(release),1)
 # release build - fastest run-time, no gdb support
 ################
 
-CC_OPTIONS = -g -O3 -DNDEBUG
-CXX_OPTIONS = -g -O3 -DNDEBUG
-LNK_OPTIONS = -pthread -O3
+CC_OPTIONS = -g -Ofast -DNDEBUG
+CXX_OPTIONS = -g -Ofast -DNDEBUG
+LNK_OPTIONS = -pthread -Ofast
 BUILDDIR = build/release/
 
 else
@@ -58,18 +58,18 @@ ifeq ($(profile),1)
 # profile build - a release build with symbols and profiling engine built in
 ################
 
-CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-LNK_OPTIONS = -pthread -ggdb -O3 -pg
+CC_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
+CXX_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
+LNK_OPTIONS = -pthread -ggdb -Ofast -pg
 BUILDDIR = build/profile/
 
 else
 ################
 # debug build - fully traceable by gdb in C++ code, slowest
-# Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
+# Since C code is used only for supporting libraries (zlib, lua), it is still Ofast-optimized
 ################
 
-CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
+CC_OPTIONS = -s -ggdb -g -D_DEBUG -Ofast
 CXX_OPTIONS = -s -ggdb -g -D_DEBUG -Og
 LNK_OPTIONS = -pthread -g -ggdb -Og
 BUILDDIR = build/debug/
@@ -139,7 +139,6 @@ endif
 
 INCLUDE = -I.\
 		-Isrc\
-		-Isrc/md5\
 		-Isrc/items\
 		-Isrce/blocks\
 		-Ilib

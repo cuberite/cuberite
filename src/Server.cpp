@@ -23,7 +23,7 @@
 
 #include "MersenneTwister.h"
 
-#include "../iniFile/iniFile.h"
+#include "lib/iniFile/iniFile.h"
 #include "Vector3f.h"
 
 #include <fstream>
@@ -31,7 +31,7 @@
 #include <iostream>
 
 extern "C" {
-	#include "zlib.h"
+	#include "lib/zlib/zlib.h"
 }
 
 

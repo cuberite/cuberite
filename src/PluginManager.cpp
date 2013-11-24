@@ -10,7 +10,7 @@
 #include "Server.h"
 #include "CommandOutput.h"
 
-#include "../iniFile/iniFile.h"
+#include "lib/iniFile/iniFile.h"
 #include "tolua++.h"
 #include "Entities/Player.h"
 

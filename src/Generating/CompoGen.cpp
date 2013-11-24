@@ -12,7 +12,7 @@
 #include "../BlockID.h"
 #include "../Item.h"
 #include "../LinearUpscale.h"
-#include "../../iniFile/iniFile.h"
+#include "../lib/inifile/iniFile.h"
 
 
 
