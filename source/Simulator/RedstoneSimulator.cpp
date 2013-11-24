@@ -100,6 +100,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			if (SourceBlockType != Change.a_SourceBlock)
 			{
 				itr = m_PoweredBlocks.erase(itr);
+				LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock));
 			}
 			else if (
 				// Changeable sources
@@ -110,6 +111,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 				)
 			{
 				itr = m_PoweredBlocks.erase(itr);
+				LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock));
 			}
 			else
 			{
@@ -136,10 +138,12 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			if (SourceBlockType != Change.a_SourceBlock)
 			{
 				itr = m_LinkedPoweredBlocks.erase(itr);
+				LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock));
 			}
 			else if (MiddleBlockType != Change.a_MiddleBlock)
 			{
 				itr = m_LinkedPoweredBlocks.erase(itr);
+				LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(Change.a_SourceBlock));
 			}
 			else if (
 				// Things that can send power through a block but which depends on meta
@@ -149,6 +153,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 				)
 			{
 				itr = m_LinkedPoweredBlocks.erase(itr);
+				LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock));
 			}
 			else
 			{
@@ -248,7 +253,6 @@ void cRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_B
 		if (AreCoordsPowered(X, Y, Z))
 		{
 			// There was a match, torch goes off
-			// FastSetBlock so the server doesn't fail an assert -_-
 			m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_OFF, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
 			return;
 		}
@@ -299,7 +303,6 @@ void cRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_B
 		}
 
 		// Block torch on not powered, can be turned on again!
-		// FastSetBlock so the server doesn't fail an assert -_-
 		m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_ON, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
 	}
 	return;
@@ -503,7 +506,10 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 
 	if (IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3))
 	{
-		if (!IsOn) { m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); } // Only set if not on; SetBlock otherwise server doesn't set it in time for SimulateChunk's invalidation
+		if (!IsOn)
+		{
+			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // Only set if not on; SetBlock otherwise server doesn't set it in time for SimulateChunk's invalidation
+		}
 		switch (a_Meta & 0x3) // We only want the direction (bottom) bits
 		{
 			case 0x0:
@@ -548,14 +554,13 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 
 void cRedstoneSimulator::HandlePiston(int a_BlockX, int a_BlockY, int a_BlockZ)
 {	
+	cPiston Piston(&m_World);
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
-		cPiston Piston(&m_World);
 		Piston.ExtendPiston(a_BlockX, a_BlockY, a_BlockZ);
 	}
 	else
 	{
-		cPiston Piston(&m_World);
 		Piston.RetractPiston(a_BlockX, a_BlockY, a_BlockZ);
 	}
 	return;
@@ -1054,7 +1059,7 @@ void cRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, i
 
 void cRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock)
 {
-	static const struct // Define which directions the torch can power
+	static const struct
 	{
 		int x, y, z;
 	} gCrossCoords[] =
@@ -1067,7 +1072,7 @@ void cRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_B
 		{ 0,-1, 0 }
 	};
 
-	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through struct to power all directions
 	{
 		SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, a_SourceBlock);
 	}

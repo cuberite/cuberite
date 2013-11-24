@@ -32,7 +32,6 @@ public:
 		REDSTONE_Z_NEG = 0x8,
 	};
 	eRedstoneDirection GetWireDirection(int a_BlockX, int a_BlockY, int a_BlockZ);
-	eRedstoneDirection GetWireDirection(const Vector3i & a_Pos) { return GetWireDirection(a_Pos.x, a_Pos.y, a_Pos.z); }
 
 private:
 
@@ -118,7 +117,6 @@ private:
 	/* ============================== */
 
 	/* ====== Misc Functions ====== */
-
 	///<summary>Returns if a block is viable to be the MiddleBlock of a SetLinkedPowered operation</summary>
 	inline static bool IsViableMiddleBlock(BLOCKTYPE Block)
 	{
