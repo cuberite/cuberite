@@ -682,17 +682,17 @@ void cChunk::ProcessQueuedSetBlocks(void)
 	Int64 CurrTick = m_World->GetWorldAge();
 	for (sSetBlockQueueVector::iterator itr = m_SetBlockQueue.begin(); itr != m_SetBlockQueue.end();)
 	{
-		if (itr->m_Tick < CurrTick)
+		if (itr->m_Tick <= CurrTick)
+		{
+			// Current world age is bigger than/equal to target world age - delay time reached
+			SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
+			itr = m_SetBlockQueue.erase(itr);
+		}
+		else
 		{
 			// Not yet
 			++itr;
 			continue;
-		}
-		else
-		{
-			// Now is the time to set the block
-			SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
-			itr = m_SetBlockQueue.erase(itr);
 		}
 	}  // for itr - m_SetBlockQueue[]
 }
@@ -1840,6 +1840,24 @@ bool cChunk::DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool
 
 
 
+bool cChunk::ForEachBlockEntity(cBlockEntityCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_BlockEntitites[]
+	return true;
+}
+
+
+
+
+
 bool cChunk::ForEachChest(cChestCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
@@ -1952,6 +1970,32 @@ bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 		}
 	}  // for itr - m_BlockEntitites[]
 	return true;
+}
+
+
+
+
+
+bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
 }
 
 

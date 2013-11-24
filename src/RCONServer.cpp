@@ -241,6 +241,7 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 			if (strncmp(a_Payload, m_RCONServer.m_Password.c_str(), a_PayloadLength) != 0)
 			{
 				LOGINFO("RCON: Invalid password from client %s, dropping connection.", m_IPAddress.c_str());
+				SendResponse(-1, RCON_PACKET_RESPONSE, 0, NULL);
 				return false;
 			}
 			m_IsAuthenticated = true;

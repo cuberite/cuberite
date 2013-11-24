@@ -30,6 +30,17 @@ g_APIDesc =
 			{
 				ConstantName = { Notes = "Notes about the constant" },
 			} ,
+			
+			ConstantGroups =
+			{
+				GroupName1 =  -- GroupName1 is used as the HTML anchor name
+				{
+					Include = {"constant1", "constant2", "const_.*"},  -- Constants to include in this group, array of identifiers, accepts wildcards
+					TextBefore = "This text will be written in front of the constant list",
+					TextAfter = "This text will be written after the constant list",
+					ShowInDescendants = false,  -- If false, descendant classes won't list these constants
+				}
+			},
 
 			Variables =
 			{
@@ -51,33 +62,6 @@ g_APIDesc =
 			Inherits = "ParentClassName",  -- Only present if the class inherits from another API class
 		},
 		]]--
-
-		cArrowEntity =
-		{
-			Desc = [[
-				Represents the arrow when it is shot from the bow. A subclass of the {{cProjectileEntity}}.
-			]],
-
-			Functions =
-			{
-				CanPickup      = { Params = "{{cPlayer|Player}}", Return = "bool", Notes = "Returns true if the specified player can pick the arrow when it's on the ground" },
-				GetDamageCoeff = { Params = "", Return = "number", Notes = "Returns the damage coefficient stored within the arrow. The damage dealt by this arrow is multiplied by this coeff" },
-				GetPickupState = { Params = "", Return = "PickupState", Notes = "Returns the pickup state (one of the psXXX constants, above)" },
-				IsCritical     = { Params = "", Return = "bool", Notes = "Returns true if the arrow should deal critical damage. Based on the bow charge when the arrow was shot." },
-				SetDamageCoeff = { Params = "number", Return = "", Notes = "Sets the damage coefficient. The damage dealt by this arrow is multiplied by this coeff" },
-				SetIsCritical  = { Params = "bool", Return = "", Notes = "Sets the IsCritical flag on the arrow. Critical arrow deal additional damage" },
-				SetPickupState = { Params = "PickupState", Return = "", Notes = "Sets the pickup state (one of the psXXX constants, above)" },
-			},
-
-			Constants =
-			{
-				psInCreative           = { Notes = "The arrow can be picked up only by players in creative gamemode" },
-				psInSurvivalOrCreative = { Notes = "The arrow can be picked up by players in survival or creative gamemode" },
-				psNoPickup             = { Notes = "The arrow cannot be picked up at all" },
-			},
-
-			Inherits = "cProjectileEntity",
-		},
 
 		cBlockArea =
 		{
@@ -182,7 +166,25 @@ g_APIDesc =
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
 			},
-
+			ConstantGroups =
+			{
+				BATypes =
+				{
+					Include = "ba.*",
+					TextBefore = [[
+						The following constants are used to signalize the datatype to read or write:
+					]],
+				},
+				MergeStrategies =
+				{
+					Include = "ms.*",
+					TextBefore = [[
+						The Merge() function can use different strategies to combine the source and destination blocks.
+						The following constants are used:
+					]],
+					TextAfter = "See below for a detailed explanation of the individual merge strategies.",
+				},
+			},
 			AdditionalInfo =
 			{
 				{
@@ -261,62 +263,6 @@ g_APIDesc =
 			},  -- AdditionalInfo
 		},  -- cBlockArea
 
-		cBlockEntity =
-		{
-			Desc = [[
-				Block entities are simply blocks in the world that have persistent data, such as the text for a sign
-				or contents of a chest. All block entities are also saved in the chunk data of the chunk they reside in.
-				The cBlockEntity class acts as a common ancestor for all the individual block entities.
-			]],
-
-			Functions =
-			{
-				GetBlockType = { Params = "", Return = "BLOCKTYPE", Notes = "Returns the blocktype which is represented by this blockentity. This is the primary means of type-identification" },
-				GetChunkX    = { Params = "", Return = "number", Notes = "Returns the chunk X-coord of the block entity's chunk" },
-				GetChunkZ    = { Params = "", Return = "number", Notes = "Returns the chunk Z-coord of the block entity's chunk" },
-				GetPosX      = { Params = "", Return = "number", Notes = "Returns the block X-coord of the block entity's block" },
-				GetPosY      = { Params = "", Return = "number", Notes = "Returns the block Y-coord of the block entity's block" },
-				GetPosZ      = { Params = "", Return = "number", Notes = "Returns the block Z-coord of the block entity's block" },
-				GetRelX      = { Params = "", Return = "number", Notes = "Returns the relative X coord of the block entity's block within the chunk" },
-				GetRelZ      = { Params = "", Return = "number", Notes = "Returns the relative Z coord of the block entity's block within the chunk" },
-				GetWorld     = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world to which the block entity belongs" },
-			},
-			Constants =
-			{
-			},
-		},
-
-		cBlockEntityWithItems =
-		{
-			Desc = [[
-				This class is a common ancestor for all {{cBlockEntity|block entities}} that provide item storage.
-				Internally, the object has a {{cItemGrid|cItemGrid}} object for storing the items; this ItemGrid is
-				accessible through the API. The storage is a grid of items, items in it can be addressed either by a slot
-				number, or by XY coords within the grid. If a UI window is opened for this block entity, the item storage
-				is monitored for changes and the changes are immediately sent to clients of the UI window.
-			]],
-
-			Inherits = "cBlockEntity",
-
-			Functions =
-			{
-				GetContents = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the cItemGrid object representing the items stored within this block entity" },
-				GetSlot =
-				{
-					{ Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot number. Returns nil for invalid slot numbers" },
-					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot coords. Returns nil for invalid slot coords" },
-				},
-				SetSlot =
-				{
-					{ Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot number. Ignored if invalid slot number" },
-					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords" },
-				},
-			},
-			Constants =
-			{
-			},
-		},
-
 		cBoundingBox =
 		{
 			Desc = [[
@@ -354,7 +300,6 @@ g_APIDesc =
 				},
 				Union = { Params = "OtherBoundingBox", Return = "cBoundingBox", Notes = "Returns the smallest bounding box that contains both OtherBoundingBox and this bounding box. Note that unlike the strict geometrical meaning of \"union\", this operation actually returns a cBoundingBox." },
 			},
-			Constants = {},
 		},
 
 		cChatColor =
@@ -394,45 +339,6 @@ g_APIDesc =
 				White         = { Notes = "" },
 				Yellow        = { Notes = "" },
 			},
-		},
-
-		cChestEntity =
-		{
-			Desc = [[
-				A chest entity is a {{cBlockEntityWithItems|cBlockEntityWithItems}} descendant that represents a chest
-				in the world. Note that doublechests consist of two separate cChestEntity objects, they do not collaborate
-				in any way.</p>
-				<p>
-				To manipulate a chest already in the game, you need to use {{cWorld}}'s callback mechanism with
-				either DoWithChestAt() or ForEachChestInChunk() function. See the code example below
-			]],
-
-			Inherits = "cBlockEntityWithItems",
-
-			Constants =
-			{
-				ContentsHeight = { Notes = "Height of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}" },
-				ContentsWidth = { Notes = "Width of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}" },
-			},
-			AdditionalInfo =
-			{
-				{
-					Header = "Code example",
-					Contents = [[
-						The following example code sets the top-left item of each chest in the same chunk as Player to
-						64 * diamond:
-<pre class="prettyprint lang-lua">
--- Player is a {{cPlayer}} object instance
-local World = Player:GetWorld();
-World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
-	function (ChestEntity)
-		ChestEntity:SetSlot(0, 0, cItem(E_ITEM_DIAMOND, 64));
-	end
-);
-</pre>
-					]],
-				},
-			},  -- AdditionalInfo
 		},
 
 		cChunkDesc =
@@ -493,9 +399,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				SetUseDefaultHeight       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default height generator or not" },
 				SetUseDefaultStructures   = { Params = "bool", Return = "", Notes = "Sets the chunk to use default structures or not" },
 				WriteBlockArea            = { Params = "{{cBlockArea|BlockArea}}, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
-			},
-			Constants =
-			{
 			},
 			AdditionalInfo =
 			{
@@ -559,7 +462,7 @@ end
 				MAX_VIEW_DISTANCE = { Notes = "The maximum value of the view distance" },
 				MIN_VIEW_DISTANCE = { Notes = "The minimum value of the view distance" },
 			},
-		},
+		},  -- cClientHandle
 
 		cCraftingGrid =
 		{
@@ -589,10 +492,7 @@ end
 					{ Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified coords" },
 				},
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cCraftingGrid
 
 		cCraftingRecipe =
 		{
@@ -621,10 +521,7 @@ end
 					{ Params = "ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the result item" },
 				},
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cCraftingRecipe
 
 		cCuboid =
 		{
@@ -666,48 +563,7 @@ end
 				p1 = { Type = "{{Vector3i}}", Notes = "The first corner. Usually the lesser of the two coords in each set" },
 				p2 = { Type = "{{Vector3i}}", Notes = "The second corner. Usually the larger of the two coords in each set" },
 			},
-		},
-
-		cDispenserEntity =
-		{
-			Desc = [[
-				This class represents a dispenser block entity in the world. Most of this block entity's
-				functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents
-				the behavior common with a {{cDropperEntity|dropper}} entity.
-			]],
-			Inherits = "cDropSpenserEntity",
-		},
-
-		cDropperEntity =
-		{
-			Desc = [[
-				This class represents a dropper block entity in the world. Most of this block entity's functionality
-				is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents the behavior
-				common with the {{cDispenserEntity|dispenser}} entity.</p>
-				<p>
-				An object of this class can be created from scratch when generating chunks ({{OnChunkGenerated|OnChunkGenerated}} and {{OnChunkGenerating|OnChunkGenerating}} hooks).
-			]],
-			Inherits = "cDropSpenserEntity",
-		},  -- cDropperEntity
-
-		cDropSpenserEntity =
-		{
-			Desc = [[
-				This is a class that implements behavior common to both {{cDispenserEntity|dispensers}} and {{cDropperEntity|droppers}}.
-			]],
-			Functions =
-			{
-				Activate = { Params = "", Return = "", Notes = "Sets the block entity to dropspense an item in the next tick" },
-				AddDropSpenserDir = { Params = "BlockX, BlockY, BlockZ, BlockMeta", Return = "BlockX, BlockY, BlockZ", Notes = "Adjusts the block coords to where the dropspenser items materialize" },
-				SetRedstonePower = { Params = "IsPowered", Return = "", Notes = "Sets the redstone status of the dropspenser. If the redstone power goes from off to on, the dropspenser will be activated" },
-			},
-			Constants =
-			{
-				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid}} representing the contents" },
-				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid}} representing the contents" },
-			},
-			Inherits = "cBlockEntityWithItems";
-		},  -- cDropSpenserEntity
+		},  -- cCuboid
 
 		cEnchantments =
 		{
@@ -817,7 +673,7 @@ end
 				GetChunkZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the chunk in which the entity is placed" },
 				GetClass = { Params = "", Return = "string", Notes = "Returns the classname of the entity, such as \"cSpider\" or \"cPickup\"" },
 				GetClassStatic = { Params = "", Return = "string", Notes = "Returns the entity classname that this class implements. Each descendant overrides this function. Is static" },
-				GetEntityType = { Params = "", Return = "eEntityType", Notes = "Returns the type of the entity, one of the etXXX constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call." },
+				GetEntityType = { Params = "", Return = "{{cEntity#EntityType|EntityType}}", Notes = "Returns the type of the entity, one of the {{cEntity#EntityType|etXXX}} constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call." },
 				GetEquippedBoots = { Params = "", Return = "{{cItem}}", Notes = "Returns the boots that the entity has equipped. Returns an empty cItem if no boots equipped or not applicable." },
 				GetEquippedChestplate = { Params = "", Return = "{{cItem}}", Notes = "Returns the chestplate that the entity has equipped. Returns an empty cItem if no chestplate equipped or not applicable." },
 				GetEquippedHelmet = { Params = "", Return = "{{cItem}}", Notes = "Returns the helmet that the entity has equipped. Returns an empty cItem if no helmet equipped or not applicable." },
@@ -922,79 +778,45 @@ end
 				etProjectile = { Notes = "The entity is a {{cProjectileEntity}} descendant" },
 				etTNT = { Notes = "The entity is a {{cTNTEntity}}" },
 			},
+			ConstantGroups =
+			{
+				EntityType =
+				{
+					Include = "et.*",
+					TextBefore = "The following constants are used to distinguish between different entity types:",
+				},
+			},
 		},
 
 		cFile =
 		{
 			Desc = [[
-				Provides helper functions for manipulating and querying the filesystem. Most functions are called
-				directly on the cFile class itself:
+				Provides helper functions for manipulating and querying the filesystem. Most functions are static,
+				so they should be called directly on the cFile class itself:
 <pre class="prettyprint lang-lua">
 cFile:Delete("/usr/bin/virus.exe");
 </pre></p>
 			]],
 			Functions =
 			{
-				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
-				CreateFolder = { Params = "FolderName", Return = "bool", Notes = "Creates a new folder. Returns true if successful." },
-				Delete = { Params = "FileName", Return = "bool", Notes = "Deletes the specified file. Returns true if successful." },
-				Exists = { Params = "FileName", Return = "bool", Notes = "Returns true if the specified file exists." },
-				GetSize = { Params = "FileName", Return = "number", Notes = "Returns the size of the file, or -1 on failure." },
-				IsFile = { Params = "Path", Return = "bool", Notes = "Returns true if the specified path points to an existing file." },
-				IsFolder = { Params = "Path", Return = "bool", Notes = "Returns true if the specified path points to an existing folder." },
-				Rename = { Params = "OrigPath, NewPath", Return = "bool", Notes = "Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists." },
+				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "(STATIC) Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
+				CreateFolder = { Params = "FolderName", Return = "bool", Notes = "(STATIC) Creates a new folder. Returns true if successful." },
+				Delete = { Params = "FileName", Return = "bool", Notes = "(STATIC) Deletes the specified file. Returns true if successful." },
+				Exists = { Params = "FileName", Return = "bool", Notes = "(STATIC) Returns true if the specified file exists." },
+				GetFolderContents = { Params = "FolderName", Return = "array table of strings", Notes = "(STATIC) Returns the contents of the specified folder, as an array table of strings. Each filesystem object is listed. Use the IsFile() and IsFolder() functions to determine the object type." },
+				GetSize = { Params = "FileName", Return = "number", Notes = "(STATIC) Returns the size of the file, or -1 on failure." },
+				IsFile = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified path points to an existing file." },
+				IsFolder = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified path points to an existing folder." },
+				Rename = { Params = "OrigPath, NewPath", Return = "bool", Notes = "(STATIC) Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists." },
 			},
 		},  -- cFile
 
-		cFireChargeEntity =
-		{
-			Desc = "",
-			Functions = {},
-			Constants = {},
-			Inherits = "cProjectileEntity",
-		} ,
-
-		cFurnaceEntity =
-		{
-			Desc = [[
-				This class represents a furnace block entity in the world.
-			]],
-			Functions =
-			{
-				GetCookTimeLeft = { Params = "", Return = "number", Notes = "Returns the time until the current item finishes cooking, in ticks" },
-				GetFuelBurnTimeLeft = { Params = "", Return = "number", Notes = "Returns the time until the current fuel is depleted, in ticks" },
-				GetFuelSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the fuel slot" },
-				GetInputSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the input slot" },
-				GetOutputSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the output slot" },
-				GetTimeCooked = { Params = "", Return = "number", Notes = "Returns the time that the current item has been cooking, in ticks" },
-				HasFuelTimeLeft = { Params = "", Return = "bool", Notes = "Returns true if there's time before the current fuel is depleted" },
-				SetFuelSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the fuel slot" },
-				SetInputSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the input slot" },
-				SetOutputSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the output slot" },
-			},
-			Constants =
-			{
-				fsInput = { Notes = "Index of the input slot, when using the GetSlot() / SetSlot() functions" },
-				fsFuel = { Notes = "Index of the fuel slot, when using the GetSlot() / SetSlot() functions" },
-				fsOutput = { Notes = "Index of the output slot, when using the GetSlot() / SetSlot() functions" },
-				ContentsWidth = { Notes = "Width (X) of the {{cItemGrid|cItemGrid}} representing the contents" },
-				ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid|cItemGrid}} representing the contents" },
-			},
-			Inherits = "cBlockEntityWithItems"
-		},
-
-		cGhastFireballEntity =
-		{
-			Desc = "",
-			Functions = {},
-			Constants = {},
-			Inherits = "cProjectileEntity",
-		} ,
-
 		cGroup =
 		{
-			Desc = [[cGroup is a group {{cPlayer|cPlayer}}'s can be in. Groups define the permissions players have, and optionally the color of their name in the chat.
-]],
+			Desc = [[
+				This class represents a group {{cPlayer|players}} can be in. Groups define the permissions players
+				have, and optionally the color of their name in the chat.
+			]],
 			Functions =
 			{
 				SetName = { Return = "" },
@@ -1006,28 +828,7 @@ cFile:Delete("/usr/bin/virus.exe");
 				AddPermission = { Return = "" },
 				InheritFrom = { Return = "" },
 			},
-			Constants =
-			{
-			},
-		},
-
-		cHopperEntity =
-		{
-			Desc = [[
-				This class represents a hopper block entity in the world.
-			]],
-			Functions =
-			{
-				GetOutputBlockPos = { Params = "BlockMeta", Return = "bool, BlockX, BlockY, BlockZ", Notes = "Returns whether the hopper is attached, and if so, the block coords of the block receiving the output items, based on the given meta." },
-			},
-			Constants =
-			{
-				ContentsHeight = { Notes = "Height (Y) of the internal {{cItemGrid}} representing the hopper contents." },
-				ContentsWidth = { Notes = "Width (X) of the internal {{cItemGrid}} representing the hopper contents." },
-				TICKS_PER_TRANSFER = { Notes = "Number of ticks between when the hopper transfers items." },
-			},
-			Inherits = "cBlockEntityWithItems",
-		},
+		},  -- cGroup
 
 		cIniFile =
 		{
@@ -1237,6 +1038,16 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invHotbarOffset    = { Notes = "Starting slot number of the Hotbar part" },
 				invNumSlots        = { Notes = "Total number of slots in a cInventory" },
 			},
+			ConstantGroups =
+			{
+				SlotIndices =
+				{
+					Include = "inv.*",
+					TextBefore = [[
+						Rather than hardcoding numbers, use the following constants for slot indices and counts:
+					]],
+				},
+			},
 		},  -- cInventory
 
 		cItem =
@@ -1398,9 +1209,6 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
 				},
 			},
-			Constants =
-			{
-			},
 			AdditionalInfo =
 			{
 				{
@@ -1462,26 +1270,7 @@ end
 				},
 				Size = { Params = "", Return = "number", Notes = "Returns the number of items in the collection" },
 			},
-			Constants =
-			{
-			},
 		},  -- cItems
-
-		cJukeboxEntity =
-		{
-			Desc = [[
-				This class represents a jukebox in the world. It can play the records, either when the
-				{{cPlayer|player}} uses the record on the jukebox, or when a plugin instructs it to play.
-			]],
-			Inherits = "cBlockEntity",
-			Functions =
-			{
-				EjectRecord = { Params = "", Return = "", Notes = "Ejects the current record as a {{cPickup|pickup}}. No action if there's no current record. To remove record without generating the pickup, use SetRecord(0)" },
-				GetRecord = { Params = "", Return = "number", Notes = "Returns the record currently present. Zero for no record, E_ITEM_*_DISC for records." },
-				PlayRecord = { Params = "", Return = "", Notes = "Plays the currently present record. No action if there's no current record." },
-				SetRecord = { Params = "number", Return = "", Notes = "Sets the currently present record. Use zero for no record, or E_ITEM_*_DISC for records." },
-			},
-		},  -- cJukeboxEntity
 
 		cLineBlockTracer =
 		{
@@ -1591,9 +1380,6 @@ end
 				SetOnClosing = { Params = "OnClosingCallback", Return = "", Notes = "Sets the function that the window will call when it is about to be closed by a player" },
 				SetOnSlotChanged = { Params = "OnSlotChangedCallback", Return = "", Notes = "Sets the function that the window will call when a slot is changed by a player" },
 			},
-			Constants =
-			{
-			},
 			AdditionalInfo =
 			{
 				{
@@ -1668,12 +1454,12 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				FamilyFromType = { Params = "MobType", Return = "MobFamily", Notes = "(STATIC) Returns the mob family (mfXXX constants) based on the mob type (mtXXX constants)" },
-				GetMobFamily = { Params = "", Return = "MobFamily", Notes = "Returns this mob's family (mfXXX constant)" },
-				GetMobType = { Params = "", Return = "MobType", Notes = "Returns the type of this mob (mtXXX constant)" },
-				GetSpawnDelay = { Params = "MobFamily", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
-				MobTypeToString = { Params = "MobType", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type (mtXXX constant), or empty string if unknown type." },
-				StringToMobType = { Params = "string", Return = "MobType", Notes = "(STATIC) Returns the mob type (mtXXX constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
+				FamilyFromType = { Params = "{{cMonster#MobType|MobType}}", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "(STATIC) Returns the mob family ({{cMonster#MobFamily|mfXXX}} constants) based on the mob type ({{cMonster#MobType|mtXXX}} constants)" },
+				GetMobFamily = { Params = "", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "Returns this mob's family ({{cMonster#MobFamily|mfXXX}} constant)" },
+				GetMobType = { Params = "", Return = "{{cMonster#MobType|MobType}}", Notes = "Returns the type of this mob ({{cMonster#MobType|mtXXX}} constant)" },
+				GetSpawnDelay = { Params = "{{cMonster#MobFamily|MobFamily}}", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
+				MobTypeToString = { Params = "{{cMonster#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{cMonster#MobType|mtXXX}} constant), or empty string if unknown type." },
+				StringToMobType = { Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{cMonster#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
 			},
 			Constants =
 			{
@@ -1713,27 +1499,25 @@ a_Player:OpenWindow(Window);
 				mtZombie = { Notes = "" },
 				mtZombiePigman = { Notes = "" },
 			},
+			ConstantGroups =
+			{
+				MobFamily =
+				{
+					Include = "mf.*",
+					TextBefore = [[
+						Mobs are divided into families. The following constants are used for individual family types:
+					]],
+				},
+				MobType =
+				{
+					Include = "mt.*",
+					TextBefore = [[
+						The following constants are used for distinguishing between the individual mob types:
+					]],
+				},
+			},
 			Inherits = "cPawn",
 		},  -- cMonster
-
-		cNoteEntity =
-		{
-			Desc = [[
-				This class represents a note block entity in the world. It takes care of the note block's pitch,
-				and also can play the sound, either when the {{cPlayer|player}} right-clicks it, redstone activates
-				it, or upon a plugin's request.</p>
-				<p>
-				The pitch is stored as an integer between 0 and 24.
-			]],
-			Functions =
-			{
-				GetPitch = { Params = "", Return = "number", Notes = "Returns the current pitch set for the block" },
-				IncrementPitch = { Params = "", Return = "", Notes = "Adds 1 to the current pitch. Wraps around to 0 when the pitch cannot go any higher." },
-				MakeSound = { Params = "", Return = "", Notes = "Plays the sound for all {{cClientHandle|clients}} near this block." },
-				SetPitch = { Params = "Pitch", Return = "", Notes = "Sets a new pitch for the block." },
-			},
-			Inherits = "cBlockEntity",
-		},  -- cNoteEntity
 
 		cPawn =
 		{
@@ -1748,11 +1532,8 @@ a_Player:OpenWindow(Window);
 				KilledBy = { Return = "" },
 				GetHealth = { Return = "number" },
 			},
-			Constants =
-			{
-			},
 			Inherits = "cEntity",
-		},
+		},  -- cPawn
 
 		cPickup =
 		{
@@ -1784,14 +1565,17 @@ a_Player:OpenWindow(Window);
 			{
 				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
 				AddToGroup = { Params = "GroupName", Return = "", Notes = "Temporarily adds the player to the specified group. The assignment is lost when the player disconnects." },
+				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
 				CanUseCommand = { Params = "Command", Return = "bool", Notes = "Returns true if the player is allowed to use the specified command." },
 				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
 				CloseWindowIfID = { Params = "WindowID, [CanRefuse]", Return = "", Notes = "Closes the currently open UI window if its ID matches the given ID. If CanRefuse is true (default), the window may refuse the closing." },
+				DeltaExperience = { Params = "DeltaXP", Return = "", Notes = "Adds or removes XP from the current XP amount. Won't allow XP to go negative. Returns the new experience, -1 on error (XP overflow)." },
 				Feed = { Params = "AddFood, AddSaturation", Return = "bool", Notes = "Tries to add the specified amounts to food level and food saturation level (only positive amounts expected). Returns true if player was hungry and the food was consumed, false if too satiated." },
 				FoodPoison = { Params = "NumTicks", Return = "", Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two" },
 				GetAirLevel = { Params = "", Return = "number", Notes = "Returns the air level (number of ticks of air left)." },
 				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
 				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player (based on the first group). Prefix player messages with this code." },
+				GetCurrentXp = { Params = "", Return = "number", Notes = "Returns the current amount of XP" },
 				GetEffectiveGameMode = { Params = "", Return = "{{eGameMode|GameMode}}", Notes = "Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions." },
 				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
 				GetEyeHeight = { Return = "number", Notes = "Returns the height of the player's eyes, in absolute coords" },
@@ -1814,6 +1598,9 @@ a_Player:OpenWindow(Window);
 				GetThrowSpeed = { Params = "SpeedCoeff", Return = "{{Vector3d}}", Notes = "Returns the speed vector for an object thrown with the specified speed coeff. Basically returns the normalized look vector multiplied by the coeff, with a slight random variation." },
 				GetThrowStartPos = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the position where the projectiles should start when thrown by this player." },
 				GetWindow = { Params = "", Return = "{{cWindow}}", Notes = "Returns the currently open UI window. If the player doesn't have any UI window open, returns the inventory window." },
+				GetXpLevel = { Params = "", Return = "number", Notes = "Returns the current XP level (based on current XP amount)." },
+				GetXpLifetimeTotal = { Params = "", Return = "number", Notes = "Returns the amount of XP that has been accumulated throughout the player's lifetime." },
+				GetXpPercentage = { Params = "", Return = "number", Notes = "Returns the percentage of the experience bar - the amount of XP towards the next XP level. Between 0 and 1." },
 				HasPermission = { Params = "PermissionString", Return = "bool", Notes = "Returns true if the player has the specified permission" },
 				Heal = { Params = "HitPoints", Return = "", Notes = "Heals the player by the specified amount of HPs. Only positive amounts are expected. Sends a health update to the client." },
 				IsEating = { Params = "", Return = "bool", Notes = "Returns true if the player is currently eating the item in their hand." },
@@ -1834,6 +1621,7 @@ a_Player:OpenWindow(Window);
 				Respawn = { Params = "", Return = "", Notes = "Restores the health, extinguishes fire, makes visible and sends the Respawn packet." },
 				SendMessage = { Params = "MessageString", Return = "", Notes = "Sends the specified message to the player." },
 				SetCrouch = { Params = "IsCrouched", Return = "", Notes = "Sets the crouch state, broadcasts the change to other players." },
+				SetCurrentExperience = { Params = "XPAmount", Return = "", Notes = "Sets the current amount of experience (and indirectly, the XP level)." },
 				SetFoodExhaustionLevel = { Params = "ExhaustionLevel", Return = "", Notes = "Sets the food exhaustion to the specified level." },
 				SetFoodLevel = { Params = "FoodLevel", Return = "", Notes = "Sets the food level (number of half-drumsticks on-screen)" },
 				SetFoodPoisonedTicksRemaining = { Params = "FoodPoisonedTicksRemaining", Return = "", Notes = "Sets the number of ticks remaining for food poisoning. Doesn't send foodpoisoning effect to the client, use FoodPoison() for that." },
@@ -1846,6 +1634,7 @@ a_Player:OpenWindow(Window);
 				SetSprintingMaxSpeed = { Params = "SprintingMaxSpeed", Return = "", Notes = "Sets the sprinting maximum speed (as reported by the 1.6.1+ protocols)" },
 				SetVisible = { Params = "IsVisible", Return = "", Notes = "Sets the player visibility to other players" },
 				TossItem = { Params = "DraggedItem, [Amount], [CreateType], [CreateDamage]", Return = "", Notes = "FIXME: This function will be rewritten, avoid it. It tosses an item, either from the inventory, dragged in hand (while in UI window) or a newly created one." },
+				XpForLevel = { Params = "XPLevel", Return = "number", Notes = "Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp()." },
 			},
 			Constants =
 			{
@@ -1856,7 +1645,7 @@ a_Player:OpenWindow(Window);
 				MAX_HEALTH     = { Notes = "The maximum health value" },
 			},
 			Inherits = "cPawn",
-		},
+		},  -- cPlayer
 
 		cPlugin =
 		{
@@ -1875,18 +1664,14 @@ a_Player:OpenWindow(Window);
 				GetFileName = { Return = "string" },
 				CreateWebPlugin = { Notes = "{{cWebPlugin|cWebPlugin}}" },
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cPlugin
 
 		cPluginLua =
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
 			Inherits = "cPlugin",
-		},
+		},  -- cPluginLua
 
 		cPluginManager =
 		{
@@ -1990,33 +1775,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				HOOK_WEATHER_CHANGING = { Notes = "Called just before the weather changes" },
 				HOOK_WORLD_TICK = { Notes = "Called in each world's tick thread when the game logic is about to tick (20 times a second)." },
 			},
-		},
-
-		cProjectileEntity =
-		{
-			Desc = "",
-			Functions =
-			{
-				GetCreator = { Params = "", Return = "{{cEntity}} descendant", Notes = "Returns the entity who created this projectile. May return nil." },
-				GetMCAClassName = { Params = "", Return = "string", Notes = "Returns the string that identifies the projectile type  (class name) in MCA files" },
-				GetProjectileKind = { Params = "", Return = "ProjectileKind", Notes = "Returns the kind of this projectile (pkXXX constant)" },
-				IsInGround = { Params = "", Return = "bool", Notes = "Returns true if this projectile has hit the ground." },
-			},
-			Constants =
-			{
-				pkArrow = { Notes = "The projectile is an {{cArrowEntity|arrow}}" },
-				pkEgg = { Notes = "The projectile is a {{cThrownEggEntity|thrown egg}}" },
-				pkEnderPearl = { Notes = "The projectile is a {{cThrownEnderPearlEntity|thrown enderpearl}}" },
-				pkExpBottle = { Notes = "The projectile is a thrown exp bottle (NYI)" },
-				pkFireCharge = { Notes = "The projectile is a {{cFireChargeEntity|fire charge}}" },
-				pkFishingFloat = { Notes = "The projectile is a fishing float (NYI)" },
-				pkGhastFireball = { Notes = "The projectile is a {{cGhastFireballEntity|ghast fireball}}" },
-				pkSnowball = { Notes = "The projectile is a {{cThrownSnowballEntity|thrown snowball}}" },
-				pkSplashPotion = { Notes = "The projectile is a thrown splash potion (NYI)" },
-				pkWitherSkull = { Notes = "The projectile is a wither skull (NYI)" },
-			},
-			Inherits = "cEntity",
-		},
+		},  -- cPluginManager
 
 		cRoot =
 		{
@@ -2038,7 +1797,8 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
 				GetCraftingRecipes = { Params = "", Return = "{{cCraftingRecipe|cCraftingRecipe}}", Notes = "Returns the CraftingRecipes object" },
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
-				GetFurnaceRecipe = { Params = "", Return = "{{cFurnaceRecipe|cFurnaceRecipe}}", Notes = "Returns the cFurnaceRecipes object." },
+				GetFurnaceFuelBurnTime = { Params = "{{cItem|Fuel}}", Return = "number", Notes = "(STATIC) Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel." },
+				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that MCServer supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
 				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object." },
 				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
@@ -2053,10 +1813,32 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				SaveAllChunks = { Params = "", Return = "", Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved." },
 				SetPrimaryServerVersion = { Params = "Protocol Version", Return = "", Notes = "Sets the servers PrimaryServerVersion to the given protocol number." }
 			},
-			Constants =
+			AdditionalInfo =
 			{
+				{
+					Header = "Querying a furnace recipe",
+					Contents = [[
+						To find the furnace recipe for an item, use the following code (adapted from the Debuggers plugin's /fr command):
+<pre class="prettyprint lang-lua">
+local HeldItem = a_Player:GetEquippedItem();
+local Out, NumTicks, In = cRoot:GetFurnaceRecipe(HeldItem);  -- Note STATIC call - no need for a Get()
+if (Out ~= nil) then
+	-- There is a recipe, list it:
+	a_Player:SendMessage(
+		"Furnace turns " .. ItemToFullString(In) ..
+		" to " .. ItemToFullString(Out) ..
+		" in " .. NumTicks .. " ticks (" ..
+		tostring(NumTicks / 20) .. " seconds)."
+	);
+else
+	-- No recipe found
+	a_Player:SendMessage("There is no furnace recipe that would smelt " .. ItemToString(HeldItem));
+end
+</pre>
+					]],
+				},
 			},
-		},
+		},  -- cRoot
 
 		cServer =
 		{
@@ -2076,63 +1858,22 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				GetServerID = { Return = "string", Notes = "Returns the ID of the server?" },
 				IsHardcore = { Params = "", Return = "bool", Notes = "Returns true if the server is hardcore (players get banned on death)." },
 			},
-			Constants =
-			{
-			},
 		},  -- cServer
-
-		cSignEntity =
-		{
-			Desc = [[
-				A sign entity represents a sign in the world. This class is only used when generating chunks, so
-				that the plugins may generate signs within new chunks. See the code example in {{cChunkDesc}}.
-			]],
-			Functions =
-			{
-				GetLine = { Params = "LineIndex", Return = "string", Notes = "Returns the specified line. LineIndex is expected between 0 and 3. Returns empty string and logs to server console when LineIndex is invalid." },
-				SetLine = { Params = "LineIndex, LineText", Return = "", Notes = "Sets the specified line. LineIndex is expected between 0 and 3. Logs to server console when LineIndex is invalid." },
-				SetLines = { Params = "Line1, Line2, Line3, Line4", Return = "", Notes = "Sets all the sign's lines at once." },
-			},
-			Inherits = "cBlockEntity";
-		},  -- cSignEntity
-
-		cThrownEggEntity =
-		{
-			Desc = "",
-			Functions = {},
-			Constants = {},
-			Inherits = "cProjectileEntity",
-		},
-
-		cThrownEnderPearlEntity =
-		{
-			Desc = "",
-			Functions = {},
-			Constants = {},
-			Inherits = "cProjectileEntity",
-		},
-
-		cThrownSnowballEntity =
-		{
-			Desc = "",
-			Functions = {},
-			Constants = {},
-			Inherits = "cProjectileEntity",
-		},
 
 		cTracer =
 		{
-			Desc = [[A cTracer object is used to trace lines in the world. One thing you can use the cTracer for, is tracing what block a player is looking at, but you can do more with it if you want.
-</p>
-		<p>The cTracer is still a work in progress
-]],
+			Desc = [[
+				A cTracer object is used to trace lines in the world. One thing you can use the cTracer for, is
+				tracing what block a player is looking at, but you can do more with it if you want.</p>
+				<p>
+				The cTracer is still a work in progress.</p>
+				<p>
+				See also the {{cLineBlockTracer}} class for an alternative approach using callbacks.
+			]],
 			Functions =
 			{
 			},
-			Constants =
-			{
-			},
-		},
+		},  -- cTracer
 
 		cWebAdmin =
 		{
@@ -2141,15 +1882,13 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				GetHTMLEscapedString = { Params = "string", Return = "string", Notes = "Gets the HTML escaped representation of a requested string. This is useful for user input and game data that is not guaranteed to be escaped already." },
 			},
-			Constants = {},
-		},
+		},  -- cWebAdmin
 
 		cWebPlugin =
 		{
 			Desc = "",
 			Functions = {},
-			Constants = {},
-		},
+		},  -- cWebPlugin
 
 		cWindow =
 		{
@@ -2240,6 +1979,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				CreateProjectile = { Params = "X, Y, Z, {{cProjectileEntity|ProjectileKind}}, {{cEntity|Creator}}, [{{Vector3d|Speed}}]", Return = "", Notes = "Creates a new projectile of the specified kind at the specified coords. The projectile's creator is set to Creator (may be nil). Optional speed indicates the initial speed for the projectile." },
 				DigBlock = { Params = "X, Y, Z", Return = "", Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors." },
 				DoExplosionAt = { Params = "Force, X, Y, Z, CanCauseFire, Source, SourceData", Return = "", Notes = "Creates an explosion of the specified relative force in the specified position. If CanCauseFire is set, the explosion will set blocks on fire, too. The Source parameter specifies the source of the explosion, one of the esXXX constants. The SourceData parameter is specific to each source type, usually it provides more info about the source." },
+				DoWithBlockEntityAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a block entity at the specified coords, calls the CallbackFunction with the {{cBlockEntity}} parameter representing the block entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}}, [CallbackData])</pre> The function returns false if there is no block entity, or if there is, it returns the bool value that the callback has returned. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant." },
 				DoWithChestAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a chest at the specified coords, calls the CallbackFunction with the {{cChestEntity}} parameter representing the chest. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}}, [CallbackData])</pre> The function returns false if there is no chest, or if there is, it returns the bool value that the callback has returned." },
 				DoWithDispenserAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dispenser at the specified coords, calls the CallbackFunction with the {{cDispenserEntity}} parameter representing the dispenser. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDispenserEntity|DispenserEntity}}, [CallbackData])</pre> The function returns false if there is no dispenser, or if there is, it returns the bool value that the callback has returned." },
 				DoWithDropSpenserAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dropper or a dispenser at the specified coords, calls the CallbackFunction with the {{cDropSpenserEntity}} parameter representing the dropper or dispenser. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropSpenserEntity|DropSpenserEntity}}, [CallbackData])</pre> Note that this can be used to access both dispensers and droppers in a similar way. The function returns false if there is neither dispenser nor dropper, or if there is, it returns the bool value that the callback has returned." },
@@ -2253,6 +1993,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 					{ Params = "{{Vector3i|BlockCoords}}, BlockType, BlockMeta", Return = "", Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it!" },
 				},
 				FindAndDoWithPlayer = { Params = "PlayerNameHint, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a player of a name similar to the specified name (weighted-match), calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}}, [CallbackData])</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found. Note that the name matching is very loose, so it is a good idea to check the player name in the callback function." },
+				ForEachBlockEntityInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each block entity in the chunk. Returns true if all block entities in the chunk have been processed (including when there are zero block entities), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next block entity, or true to abort the enumeration. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant." },
 				ForEachChestInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each chest in the chunk. Returns true if all chests in the chunk have been processed (including when there are zero chests), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next chest, or true to abort the enumeration." },
 				ForEachEntity = { Params = "CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each entity in the loaded world. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
 				ForEachEntityInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each entity in the specified chunk. Returns true if all the entities have been processed (including when there are zero entities), or false if the chunk is not loaded or the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
@@ -2341,9 +2082,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				UseBlockEntity = { Params = "{{cPlayer|Player}}, BlockX, BlockY, BlockZ", Return = "", Notes = "Makes the specified Player use the block entity at the specified coords (open chest UI, etc.) If the cords are in an unloaded chunk or there's no block entity, ignores the call." },
 				WakeUpSimulators = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Wakes up the simulators for the specified block." },
 				WakeUpSimulatorsInArea = { Params = "MinBlockX, MaxBlockX, MinBlockY, MaxBlockY, MinBlockZ, MaxBlockZ", Return = "", Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive)." },
-			},
-			Constants =
-			{
 			},
 			AdditionalInfo =
 			{
@@ -2584,6 +2322,35 @@ Parser:close();
 			},  -- AdditionalInfo
 		},  -- lxp
 		
+		sqlite3 =
+		{
+			Desc = [[
+			]],
+			
+			Functions =
+			{
+				complete = { Params = "string", Return = "bool", Notes = "Returns true if the string sql comprises one or more complete SQL statements and false otherwise." },
+				open = { Params = "FileName", Return = "DBClass", Notes = [[
+					Opens (or creates if it does not exist) an SQLite database with name filename and returns its
+					handle as userdata (the returned object should be used for all further method calls in connection
+					with this specific database, see
+					{{http://lua.sqlite.org/index.cgi/doc/tip/doc/lsqlite3.wiki#database_methods|Database methods}}).
+					Example:
+<pre class="prettyprint lang-lua">
+-- open the database:
+myDB = sqlite3.open('MyDatabaseFile.sqlite3')
+
+-- do some database calls...
+
+-- Close the database:
+myDB:close()
+</pre>
+				]], },
+				open_memory = { Return = "DBClass", Notes = "Opens an SQLite database in memory and returns its handle as userdata. In case of an error, the function returns nil, an error code and an error message. (In-memory databases are volatile as they are never stored on disk.)" },
+				version = { Return = "string", Notes = "Returns a string with SQLite version information, in the form 'x.y[.z]'." },
+			},
+		},
+		
 		TakeDamageInfo =
 		{
 			Desc = [[
@@ -2606,7 +2373,7 @@ Parser:close();
 						The TDI is passed as the second parameter in the HOOK_TAKE_DAMAGE hook, and can be used to
 						modify the damage before it is applied to the receiver:
 <pre class="prettyprint lang-lua">
-function Plugin:OnTakeDamage(Receiver, TDI)
+function OnTakeDamage(Receiver, TDI)
 	LOG("Damage: Raw ".. TDI.RawDamage .. ", Final:" .. TDI.FinalDamage);
 
 	-- If the attacker is a spider, make it deal 999 points of damage (insta-death spiders):
@@ -2666,7 +2433,10 @@ end
 		Vector3d =
 		{
 			Desc = [[
-				A Vector3d object uses double precision floating point values to describe a point in 3D space.
+				A Vector3d object uses double precision floating point values to describe a point in 3D space.</p>
+				<p>
+				See also {{Vector3f}} for single-precision floating point 3D coords and {{Vector3i}} for integer
+				3D coords.
 			]],
 			Functions =
 			{
@@ -2707,1510 +2477,210 @@ end
 
 		Vector3f =
 		{
-			Desc = [[A Vector3f object uses floating point values to describe a point in space. Vector3f is part of the {{vector3|vector3}} family.
-]],
+			Desc = [[
+				A Vector3f object uses floating point values to describe a point in space.</p>
+				<p>
+				See also {{Vector3d}} for double-precision floating point 3D coords and {{Vector3i}} for integer
+				3D coords.
+			]],
 			Functions =
 			{
+				constructor =
+				{
+					{ Params = "", Return = "Vector3f", Notes = "Creates a new Vector3f object with zero coords" },
+					{ Params = "x, y, z", Return = "Vector3f", Notes = "Creates a new Vector3f object with the specified coords" },
+					{ Params = "Vector3f", Return = "Vector3f", Notes = "Creates a new Vector3f object as a copy of the specified vector" },
+					{ Params = "{{Vector3d}}", Return = "Vector3f", Notes = "Creates a new Vector3f object as a copy of the specified {{Vector3d}}" },
+					{ Params = "{{Vector3i}}", Return = "Vector3f", Notes = "Creates a new Vector3f object as a copy of the specified {{Vector3i}}" },
+				},
+				operator_mul =
+				{
+					{ Params = "number", Return = "Vector3f", Notes = "Returns a new Vector3f object that has each of its coords multiplied by the specified number" },
+					{ Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that has each of its coords multiplied by the respective coord of the specified vector." },
+				},
+				operator_plus = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the vector sum of this vector and the specified vector." },
+				operator_sub = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the vector differrence between this vector and the specified vector." },
+				Cross = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the cross product of this vector and the specified vector." },
+				Dot = { Params = "Vector3f", Return = "number", Notes = "Returns the dot product of this vector and the specified vector." },
+				Equals = { Params = "Vector3f", Return = "bool", Notes = "Returns true if the specified vector is exactly equal to this vector." },
+				Length = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector" },
+				Normalize = { Params = "", Return = "", Notes = "Normalizes this vector (makes it 1 unit long while keeping the direction). FIXME: Fails for zero vectors." },
+				NormalizeCopy = { Params = "", Return = "Vector3f", Notes = "Returns a copy of this vector that is normalized (1 unit long while keeping the same direction). FIXME: Fails for zero vectors." },
+				Set = { Params = "x, y, z", Return = "", Notes = "Sets all the coords of the vector at once." },
+				SqrLength = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector, squared. This operation is slightly less computationally expensive than Length(), while it conserves some properties of Length(), such as comparison." },
 			},
-			Constants =
+			Variables =
 			{
+				x = { Type = "number", Notes = "The X coord of the vector." },
+				y = { Type = "number", Notes = "The Y coord of the vector." },
+				z = { Type = "number", Notes = "The Z coord of the vector." },
 			},
 		},  -- Vector3f
 
 		Vector3i =
 		{
-			Desc = [[A Vector3i object uses integer values to describe a point in space. Vector3i is part of the {{vector3|vector3}} family.
-]],
+			Desc = [[
+				A Vector3i object uses integer values to describe a point in space.</p>
+				<p>
+				See also {{Vector3d}} for double-precision floating point 3D coords and {{Vector3f}} for
+				single-precision floating point 3D coords.
+			]],
 			Functions =
 			{
+				constructor =
+				{
+					{ Params = "", Return = "Vector3i", Notes = "Creates a new Vector3i object with zero coords." },
+					{ Params = "x, y, z", Return = "Vector3i", Notes = "Creates a new Vector3i object with the specified coords." },
+					{ Params = "{{Vector3d}}", Return = "Vector3i", Notes = "Creates a new Vector3i object with coords copied and floor()-ed from the specified {{Vector3d}}." },
+				},
+				Equals = { Params = "Vector3i", Return = "bool", Notes = "Returns true if this vector is exactly the same as the specified vector." },
+				Length = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector." },
+				Set = { Params = "x, y, z", Return = "", Notes = "Sets all the coords of the vector at once" },
+				SqrLength = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector, squared. This operation is slightly less computationally expensive than Length(), while it conserves some properties of Length(), such as comparison." },
 			},
-			Constants =
+			Variables =
 			{
+				x = { Type = "number", Notes = "The X coord of the vector." },
+				y = { Type = "number", Notes = "The Y coord of the vector." },
+				z = { Type = "number", Notes = "The Z coord of the vector." },
 			},
 		},  -- Vector3i
 		
 		Globals =
 		{
-			Desc = [[These functions are available directly, without a class instance. Any plugin cal call them at any time.]],
+			Desc = [[
+				These functions are available directly, without a class instance. Any plugin cal call them at any
+				time.
+			]],
 			Functions =
 			{
-				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, Inverse", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified face"},
+				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, [IsInverse]", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFace|face}}"},
 				BlockStringToType = {Params = "BlockTypeString", Return = "BLOCKTYPE", Notes = "Returns the block type parsed from the given string"},
-				ClickActionToString = {Params = "ClickAction", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
-				DamageTypeToString = {Params = "{{TakeDamageInfo|eDamageType}}", Return = "string", Notes = "Converts a damage type enumerated value to a string representation "},
+				ClickActionToString = {Params = "{{Globals#ClickAction|ClickAction}}", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
+				DamageTypeToString = {Params = "{{Globals#DamageType|DamageType}}", Return = "string", Notes = "Converts the {{Globals#DamageType|DamageType}} enumerated value to a string representation "},
 				EscapeString = {Params = "string", Return = "string", Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash"},
 				GetChar = {Params = "String, Pos", Return = "string", Notes = "Returns one character from the string, specified by position "},
 				GetTime = {Return = "number", Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)"},
 				IsValidBlock = {Params = "BlockType", Return = "bool", Notes = "Returns true if BlockType is a known block type"},
 				IsValidItem = {Params = "ItemType", Return = "bool", Notes = "Returns true if ItemType is a known item type"},
-				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format “ItemTypeText:ItemDamage * Count”"},
+				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
 				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
 				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
-				LOG = {Params = "string", Notes = "Logs a text into the server console using “normal” severity (gray text) "},
-				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using “error” severity (black text on red background)"},
-				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using “info” severity (yellow text)"},
-				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using “warning” severity (red text); OBSOLETE"},
-				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using “warning” severity (red text)"},
+				LOG = {Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text) "},
+				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
+				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
+				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
 				ReplaceString = {Params = "full-string, to-be-replaced-string, to-replace-string", Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string"},
-				StringSplit = {Params = "string, Seperator", Return = "list", Notes = "Seperates string into multiple by splitting every time Seperator is encountered."},
-				StringToBiome = {Params = "string", Return = "EMCSBiome", Notes = "Converts a string representation to a biome enumerated value"},
-				StringToDamageType = {Params = "string", Return = "{{TakeDamageInfo|eDamageType}}", Notes = "Converts a string representation to an {{TakeDamageInfo|eDamageType}} enumerated value "},
-				StringToDimension = {Params = "string", Return = "eDimension", Notes = "Converts a string representation to an eDimension enumerated value"},
+				StringSplit = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered."},
+				StringSplitAndTrim = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Each of the separate strings is trimmed (whitespace removed from the beginning and end of the string)"},
+				StringToBiome = {Params = "string", Return = "{{Globals#BiomeTypes|BiomeType}}", Notes = "Converts a string representation to a {{Globals#BiomeTypes|BiomeType}} enumerated value"},
+				StringToDamageType = {Params = "string", Return = "{{Globals#DamageType|DamageType}}", Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value."},
+				StringToDimension = {Params = "string", Return = "{{Globals#WorldDimension|Dimension}}", Notes = "Converts a string representation to a {{Globals#WorldDimension|Dimension}} enumerated value"},
 				StringToItem = {Params = "string, {{cItem|cItem}}", Return = "bool", Notes = "Parses the given string and sets the item; returns true if successful"},
-				StringToMobType = {Params = "string", Return = "number", Notes = "Converts a string representation to a mob enumerated value"},
+				StringToMobType = {Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "Converts a string representation to a {{cMonster#MobType|MobType}} enumerated value"},
 				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
-				TrimString = {Params = "string", Return = "string", Notes = "Trime whitespace at both ends of the string"},
+				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
 				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
 			},
-			Constants =
+			ConstantGroups =
 			{
-			},
-		},
-	},
-
-
-	Hooks =
-	{
-		HOOK_BLOCK_TO_PICKUPS =
-		{
-			CalledWhen = "A block is about to be dug ({{cPlayer|player}}, {{cEntity|entity}} or natural reason), plugins may override what pickups that will produce.",
-			DefaultFnName = "OnBlockToPickups",  -- also used as pagename
-			Desc = [[
-				This callback gets called whenever a block is about to be dug. This includes {{cPlayer|players}}
-				digging blocks, entities causing blocks to disappear ({{cTNTEntity|TNT}}, Endermen) and natural
-				causes (water washing away a block). Plugins may override the amount and kinds of pickups this
-				action produces.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the block resides" },
-				{ Name = "Digger", Type = "{{cEntity}} descendant", Notes = "The entitycausing the digging. May be a {{cPlayer}}, {{cTNTEntity}} or even nil (natural causes)" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
-				{ Name = "BlockType", Type = "BLOCKTYPE", Notes = "Block type of the block" },
-				{ Name = "BlockMeta", Type = "NIBBLETYPE", Notes = "Block meta of the block" },
-				{ Name = "Pickups", Type = "{{cItems}}", Notes = "Items that will be spawned as pickups" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next callback in the hook chain will be called. If
-				the function returns true, no other callbacks in the chain will be called.</p>
-				<p>
-				Either way, the server will then spawn pickups specified in the Pickups parameter, so to disable
-				pickups, you need to Clear the object first, then return true.
-			]],
-			CodeExamples =
-			{
+				BlockTypes =
 				{
-					Title = "Modify pickups",
-					Desc = "This example callback function makes tall grass drop diamonds when digged by natural causes (washed away by water).",
-					Code = [[
-function OnBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_Pickups)
-	if (a_Digger ~= nil) then
-		-- Not a natural cause
-		return false;
-	end
-	if (a_BlockType ~= E_BLOCK_TALL_GRASS) then
-		-- Not a tall grass being washed away
-		return false;
-	end
-
-	-- Remove all pickups suggested by MCServer:
-	a_Pickups:Clear();
-
-	-- Drop a diamond:
-	a_Pickups:Add(cItem(E_ITEM_DIAMOND));
-	return true;
-end;
+					Include = "^E_BLOCK_.*",
+					TextBefore = [[
+						These constants are used for block types. They correspond directly with MineCraft's data values
+						for blocks.
 					]],
 				},
-			} ,  -- CodeExamples
-		},  -- HOOK_BLOCK_TO_PICKUPS
-
-		HOOK_CHAT =
-		{
-			CalledWhen = "Player sends a chat message",
-			DefaultFnName = "OnChat",  -- also used as pagename
-			Desc = [[
-				A plugin may implement an OnChat() function and register it as a Hook to process chat messages from
-				the players. The function is then called for every in-game message sent from any player. Note that
-				commands are handled separately using a command framework API.
-			]],
-			Params = {
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who sent the message" },
-				{ Name = "Message", Type = "string", Notes = "The message" },
-			},
-			Returns = [[
-				The plugin may return 2 values. The first is a boolean specifying whether the hook handling is to be
-				stopped or not. If it is false, the message is broadcast to all players in the world. If it is true,
-				no message is broadcast and no further action is taken.</p>
-				<p>
-				The second value is specifies the message to broadcast. This way, plugins may modify the message. If
-				the second value is not provided, the original message is used.
-			]],
-		},  -- HOOK_CHAT
-
-		HOOK_CHUNK_AVAILABLE =
-		{
-			CalledWhen = "A chunk has just been added to world, either generated or loaded. ",
-			DefaultFnName = "OnChunkAvailable",  -- also used as pagename
-			Desc = [[
-				This hook is called after a chunk is either generated or loaded from the disk. The chunk is
-				already available for manipulation using the {{cWorld}} API. This is a notification-only callback,
-				there is no behavior that plugins could override.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world to which the chunk belongs" },
-				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
-				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event.
-			]],
-		},  -- HOOK_CHUNK_AVAILABLE
-
-		HOOK_CHUNK_GENERATED =
-		{
-			CalledWhen = "After a chunk was generated. Notification only.",
-			DefaultFnName = "OnChunkGenerated",  -- also used as pagename
-			Desc = [[
-				This hook is called when world generator finished its work on a chunk. The chunk data has already
-				been generated and is about to be stored in the {{cWorld|world}}. A plugin may provide some
-				last-minute finishing touches to the generated data. Note that the chunk is not yet stored in the
-				world, so regular {{cWorld}} block API will not work! Instead, use the {{cChunkDesc}} object
-				received as the parameter.</p>
-				<p>
-				See also the {{OnChunkGenerating|HOOK_CHUNK_GENERATING}} hook.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world to which the chunk will be added" },
-				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
-				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
-				{ Name = "ChunkDesc", Type = "{{cChunkDesc}}", Notes = "Generated chunk data. Plugins may still modify the chunk data contained." },
-			},
-			Returns = [[
-				If the plugin returns false or no value, MCServer will call other plugins' callbacks for this event.
-				If a plugin returns true, no other callback is called for this event.</p>
-				<p>
-				In either case, MCServer will then store the data from ChunkDesc as the chunk's contents in the world.
-			]],
-			CodeExamples =
-			{
+				ItemTypes =
 				{
-					Title = "Generate emerald ore",
-					Desc = "This example callback function generates one block of emerald ore in each chunk, under the condition that the randomly chosen location is in an ExtremeHills biome.",
-					Code = [[
-function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
-	-- Generate a psaudorandom value that is always the same for the same X/Z pair, but is otherwise random enough:
-	-- This is actually similar to how MCServer does its noise functions
-	local PseudoRandom = (a_ChunkX * 57 + a_ChunkZ) * 57 + 19785486
-	PseudoRandom = PseudoRandom * 8192 + PseudoRandom;
-	PseudoRandom = ((PseudoRandom * (PseudoRandom * PseudoRandom * 15731 + 789221) + 1376312589) % 0x7fffffff;
-	PseudoRandom = PseudoRandom / 7;
-
-	-- Based on the PseudoRandom value, choose a location for the ore:
-	local OreX = PseudoRandom % 16;
-	local OreY = 2 + ((PseudoRandom / 16) % 20);
-	local OreZ = (PseudoRandom / 320) % 16;
-
-	-- Check if the location is in ExtremeHills:
-	if (a_ChunkDesc:GetBiome(OreX, OreZ) ~= biExtremeHills) then
-		return false;
-	end
-
-	-- Only replace allowed blocks with the ore:
-	local CurrBlock = a_ChunDesc:GetBlockType(OreX, OreY, OreZ);
-	if (
-		(CurrBlock == E_BLOCK_STONE) or
-		(CurrBlock == E_BLOCK_DIRT) or
-		(CurrBlock == E_BLOCK_GRAVEL)
-	) then
-		a_ChunkDesc:SetBlockTypeMeta(OreX, OreY, OreZ, E_BLOCK_EMERALD_ORE, 0);
-	end
-end;
+					Include = "^E_ITEM_.*",
+					TextBefore = [[
+						These constants are used for item types. They correspond directly with MineCraft's data values
+						for items.
 					]],
 				},
-			} ,  -- CodeExamples
-		},  -- HOOK_CHUNK_GENERATED
-
-		HOOK_CHUNK_GENERATING =
-		{
-			CalledWhen = "A chunk is about to be generated. Plugin can override the built-in generator.",
-			DefaultFnName = "OnChunkGenerating",  -- also used as pagename
-			Desc = [[
-				This hook is called before the world generator starts generating a chunk. The plugin may provide
-				some or all parts of the generation, by-passing the built-in generator. The function is given access
-				to the {{cChunkDesc|ChunkDesc}} object representing the contents of the chunk. It may override parts
-				of the built-in generator by using the object's <i>SetUseDefaultXXX(false)</i> functions. After all
-				the callbacks for a chunk have been processed, the server will generate the chunk based on the
-				{{cChunkDesc|ChunkDesc}} description - those parts that are set for generating (by default
-				everything) are generated, the rest are read from the ChunkDesc object.</p>
-				<p>
-				See also the {{OnChunkGenerated|HOOK_CHUNK_GENERATED}} hook.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world to which the chunk will be added" },
-				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
-				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
-				{ Name = "ChunkDesc", Type = "{{cChunkDesc}}", Notes = "Generated chunk data." },
-			},
-			Returns = [[
-				If this function returns true, the server will not call any other plugin with the same chunk. If
-				this function returns false, the server will call the rest of the plugins with the same chunk,
-				possibly overwriting the ChunkDesc's contents.
-			]],
-		},  -- HOOK_CHUNK_GENERATING
-
-		HOOK_CHUNK_UNLOADED =
-		{
-			CalledWhen = "A chunk has been unloaded from the memory.",
-			DefaultFnName = "OnChunkUnloaded",  -- also used as pagename
-			Desc = [[
-				This hook is called when a chunk is unloaded from the memory. Though technically still in memory,
-				the plugin should behave as if the chunk was already not present. In particular, {{cWorld}} block
-				API should not be used in the area of the specified chunk.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world from which the chunk is unloading" },
-				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
-				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event. There is no behavior that plugins could
-				override.
-			]],
-		},  -- HOOK_CHUNK_UNLOADED
-
-		HOOK_CHUNK_UNLOADING =
-		{
-			CalledWhen = " 	A chunk is about to be unloaded from the memory. Plugins may refuse the unload.",
-			DefaultFnName = "OnChunkUnloading",  -- also used as pagename
-			Desc = [[
-				MCServer calls this function when a chunk is about to be unloaded from the memory. A plugin may
-				force MCServer to keep the chunk in memory by returning true.</p>
-				<p>
-				FIXME: The return value should be used only for event propagation stopping, not for the actual
-				decision whether to unload.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world from which the chunk is unloading" },
-				{ Name = "ChunkX", Type = "number", Notes = "X-coord of the chunk" },
-				{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called and finally MCServer
-				unloads the chunk. If the function returns true, no other callback is called for this event and the
-				chunk is left in the memory.
-			]],
-		},  -- HOOK_CHUNK_UNLOADING
-
-		HOOK_COLLECTING_PICKUP =
-		{
-			CalledWhen = "Player is about to collect a pickup. Plugin can refuse / override behavior. ",
-			DefaultFnName = "OnCollectingPickup",  -- also used as pagename
-			Desc = [[
-				This hook is called when a player is about to collect a pickup. Plugins may refuse the action.</p>
-				<p>
-				Pickup collection happens within the world tick, so if the collecting is refused, it will be tried
-				again in the next world tick, as long as the player is within reach of the pickup.</p>
-				<p>
-				FIXME: There is no OnCollectedPickup() callback.</p>
-				<p>
-				FIXME: This callback is called even if the pickup doesn't fit into the player's inventory.</p>
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who's collecting the pickup" },
-				{ Name = "Pickup", Type = "{{cPickup}}", Notes = "The pickup being collected" },
-			},
-			Returns = [[
-				If the function returns false or no value, MCServer calls other plugins' callbacks and finally the
-				pickup is collected. If the function returns true, no other plugins are called for this event and
-				the pickup is not collected.
-			]],
-		},  -- HOOK_COLLECTING_PICKUP
-
-		HOOK_CRAFTING_NO_RECIPE =
-		{
-			CalledWhen = " 	No built-in crafting recipe is found. Plugin may provide a recipe.",
-			DefaultFnName = "OnCraftingNoRecipe",  -- also used as pagename
-			Desc = [[
-				This callback is called when a player places items in their {{cCraftingGrid|crafting grid}} and
-				MCServer cannot find a built-in {{cCraftingRecipe|recipe}} for the combination. Plugins may provide
-				a recipe for the ingredients given.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player whose crafting is reported in this hook" },
-				{ Name = "Grid", Type = "{{cCraftingGrid}}", Notes = "Contents of the player's crafting grid" },
-				{ Name = "Recipe", Type = "{{cCraftingRecipe}}", Notes = "The recipe that will be used (can be filled by plugins)" },
-			},
-			Returns = [[
-				If the function returns false or no value, no recipe will be used. If the function returns true, no
-				other plugin will have their callback called for this event and MCServer will use the crafting
-				recipe in Recipe.</p>
-				<p>
-				FIXME: To allow plugins give suggestions and overwrite other plugins' suggestions, we should change
-				the behavior with returning false, so that the recipe will still be used, but fill the recipe with
-				empty values by default.
-			]],
-		},  -- HOOK_CRAFTING_NO_RECIPE
-
-		HOOK_DISCONNECT =
-		{
-			CalledWhen = "A player has explicitly disconnected.",
-			DefaultFnName = "OnDisconnect",  -- also used as pagename
-			Desc = [[
-				This hook is called when a client sends the disconnect packet and is about to be disconnected from
-				the server.</p>
-				<p>
-				Note that this callback is not called if the client drops the connection or is kicked by the
-				server.</p>
-				<p>
-				FIXME: There is no callback for "client destroying" that would be called in all circumstances.</p>
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has disconnected" },
-				{ Name = "Reason", Type = "string", Notes = "The reason that the client has sent in the disconnect packet" },
-			},
-			Returns = [[
-				If the function returns false or no value, MCServer calls other plugins' callbacks for this event
-				and finally broadcasts a disconnect message to the player's world. If the function returns true, no
-				other plugins are called for this event and the disconnect message is not broadcast. In either case,
-				the player is disconnected.
-			]],
-		},  -- HOOK_DISCONNECT
-
-		HOOK_EXECUTE_COMMAND =
-		{
-			CalledWhen = "A player executes an in-game command, or the admin issues a console command. Note that built-in console commands are exempt to this hook - they are always performed and the hook is not called.",
-			DefaultFnName = "OnExecuteCommand",  -- also used as pagename
-			Desc = [[
-				A plugin may implement a callback for this hook to intercept both in-game commands executed by the
-				players and console commands executed by the server admin. The function is called for every in-game
-				command sent from any player and for those server console commands that are not built in in the
-				server.</p>
-				<p>
-				If the command is in-game, the first parameter to the hook function is the {{cPlayer|player}} who's
-				executing the command. If the command comes from the server console, the first parameter is nil.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "For in-game commands, the player who has sent the message. For console commands, nil" },
-				{ Name = "Command", Type = "table of strings", Notes = "The command and its parameters, broken into a table by spaces" },
-			},
-			Returns = [[
-				If the plugin returns true, the command will be blocked and none of the remaining hook handlers will
-				be called. If the plugin returns false, MCServer calls all the remaining hook handlers and finally
-				the command will be executed.
-			]],
-		},  -- HOOK_EXECUTE_COMMAND
-
-		HOOK_EXPLODED =
-		{
-			CalledWhen = "An explosion has happened",
-			DefaultFnName = "OnExploded",  -- also used as pagename
-			Desc = [[
-				This hook is called after an explosion has been processed in a world.</p>
-				<p>
-				See also {{OnExploding|HOOK_EXPLODING}} for a similar hook called before the explosion.</p>
-				<p>
-				The explosion carries with it the type of its source - whether it's a creeper exploding, or TNT,
-				etc. It also carries the identification of the actual source. The exact type of the identification
-				depends on the source kind:
-				<table>
-				<tr><th>Source</th><th>SourceData Type</th><th>Notes</th></tr>
-				<tr><td>esPrimedTNT</td><td>{{cTNTEntity}}</td><td>An exploding primed TNT entity</td></tr>
-				<tr><td>esCreeper</td><td>{{cCreeper}}</td><td>An exploding creeper or charged creeper</td></tr>
-				<tr><td>esBed</td><td>{{Vector3i}}</td><td>A bed exploding in the Nether or in the End. The bed coords are given.</td></tr>
-				<tr><td>esEnderCrystal</td><td>{{Vector3i}}</td><td>An ender crystal exploding upon hit. The block coords are given.</td></tr>
-				<tr><td>esGhastFireball</td><td>{{cGhastFireballEntity}}</td><td>A ghast fireball hitting ground or an {{cEntity|entity}}.</td></tr>
-				<tr><td>esWitherSkullBlack</td><td><i>TBD</i></td><td>A black wither skull hitting ground or an {{cEntity|entity}}.</td></tr>
-				<tr><td>esWitherSkullBlue</td><td><i>TBD</i></td><td>A blue wither skull hitting ground or an {{cEntity|entity}}.</td></tr>
-				<tr><td>esWitherBirth</td><td><i>TBD</i></td><td>A wither boss being created</td></tr>
-				<tr><td>esOther</td><td><i>TBD</i></td><td>Any other previously unspecified type.</td></tr>
-				<tr><td>esPlugin</td><td>object</td><td>An explosion created by a plugin. The plugin may specify any kind of data.</td></tr>
-				</table></p>
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world where the explosion happened" },
-				{ Name = "ExplosionSize", Type = "number", Notes = "The relative explosion size" },
-				{ Name = "CanCauseFire", Type = "bool", Notes = "True if the explosion has turned random air blocks to fire (such as a ghast fireball)" },
-				{ Name = "X", Type = "number", Notes = "X-coord of the explosion center" },
-				{ Name = "Y", Type = "number", Notes = "Y-coord of the explosion center" },
-				{ Name = "Z", Type = "number", Notes = "Z-coord of the explosion center" },
-				{ Name = "Source", Type = "eExplosionSource", Notes = "Source of the explosion. See the table above." },
-				{ Name = "SourceData", Type = "varies", Notes = "Additional data for the source. The exact type varies by the source. See the table above." },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event. There is no overridable behaviour.
-			]],
-		},  -- HOOK_EXPLODED
-
-		HOOK_EXPLODING =
-		{
-			CalledWhen = "An explosion is about to be processed",
-			DefaultFnName = "OnExploding",  -- also used as pagename
-			Desc = [[
-				This hook is called before an explosion has been processed in a world.</p>
-				<p>
-				See also {{OnExploded|HOOK_EXPLODED}} for a similar hook called after the explosion.</p>
-				<p>
-				The explosion carries with it the type of its source - whether it's a creeper exploding, or TNT,
-				etc. It also carries the identification of the actual source. The exact type of the identification
-				depends on the source kind:
-				<table>
-				<tr><th>Source</th><th>SourceData Type</th><th>Notes</th></tr>
-				<tr><td>esPrimedTNT</td><td>{{cTNTEntity}}</td><td>An exploding primed TNT entity</td></tr>
-				<tr><td>esCreeper</td><td>{{cCreeper}}</td><td>An exploding creeper or charged creeper</td></tr>
-				<tr><td>esBed</td><td>{{Vector3i}}</td><td>A bed exploding in the Nether or in the End. The bed coords are given.</td></tr>
-				<tr><td>esEnderCrystal</td><td>{{Vector3i}}</td><td>An ender crystal exploding upon hit. The block coords are given.</td></tr>
-				<tr><td>esGhastFireball</td><td>{{cGhastFireballEntity}}</td><td>A ghast fireball hitting ground or an {{cEntity|entity}}.</td></tr>
-				<tr><td>esWitherSkullBlack</td><td><i>TBD</i></td><td>A black wither skull hitting ground or an {{cEntity|entity}}.</td></tr>
-				<tr><td>esWitherSkullBlue</td><td><i>TBD</i></td><td>A blue wither skull hitting ground or an {{cEntity|entity}}.</td></tr>
-				<tr><td>esWitherBirth</td><td><i>TBD</i></td><td>A wither boss being created</td></tr>
-				<tr><td>esOther</td><td><i>TBD</i></td><td>Any other previously unspecified type.</td></tr>
-				<tr><td>esPlugin</td><td>object</td><td>An explosion created by a plugin. The plugin may specify any kind of data.</td></tr>
-				</table></p>
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world where the explosion happens" },
-				{ Name = "ExplosionSize", Type = "number", Notes = "The relative explosion size" },
-				{ Name = "CanCauseFire", Type = "bool", Notes = "True if the explosion will turn random air blocks to fire (such as a ghast fireball)" },
-				{ Name = "X", Type = "number", Notes = "X-coord of the explosion center" },
-				{ Name = "Y", Type = "number", Notes = "Y-coord of the explosion center" },
-				{ Name = "Z", Type = "number", Notes = "Z-coord of the explosion center" },
-				{ Name = "Source", Type = "eExplosionSource", Notes = "Source of the explosion. See the table above." },
-				{ Name = "SourceData", Type = "varies", Notes = "Additional data for the source. The exact type varies by the source. See the table above." },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called, and finally
-				MCServer will process the explosion - destroy blocks and push + hurt entities. If the function
-				returns true, no other callback is called for this event and the explosion will not occur.
-			]],
-		},  -- HOOK_EXPLODING
-
-		HOOK_HANDSHAKE =
-		{
-			CalledWhen = "A client is connecting.",
-			DefaultFnName = "OnHandshake",  -- also used as pagename
-			Desc = [[
-				This hook is called when a client sends the Handshake packet. At this stage, only the client IP and
-				(unverified) username are known. Plugins may refuse access to the server based on this
-				information.</p>
-				<p>
-				Note that the username is not authenticated - the authentication takes place only after this hook is
-				processed.
-			]],
-			Params =
-			{
-				{ Name = "Client", Type = "{{cClientHandle}}", Notes = "The client handle representing the connection. Note that there's no {{cPlayer}} object for this client yet." },
-				{ Name = "UserName", Type = "string", Notes = "The username presented in the packet. Note that this username is unverified." },
-			},
-			Returns = [[
-				If the function returns false, the user is let in to the server. If the function returns true, no
-				other plugin's callback is called, the user is kicked and the connection is closed.
-			]],
-		},  -- HOOK_HANDSHAKE
-
-		HOOK_HOPPER_PULLING_ITEM =
-		{
-			CalledWhen = "A hopper is pulling an item from another block entity.",
-			DefaultFnName = "OnHopperPullingItem",  -- also used as pagename
-			Desc = [[
-				This callback is called whenever a {{cHopperEntity|hopper}} transfers an {{cItem|item}} from another
-				block entity into its own internal storage. A plugin may decide to disallow the move by returning
-				true. Note that in such a case, the hook may be called again for the same hopper, with different
-				slot numbers.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "World where the hopper resides" },
-				{ Name = "Hopper", Type = "{{cHopperEntity}}", Notes = "The hopper that is pulling the item" },
-				{ Name = "DstSlot", Type = "number", Notes = "The destination slot in the hopper's {{cItemGrid|internal storage}}" },
-				{ Name = "SrcBlockEntity", Type = "{{cBlockEntityWithItems}}", Notes = "The block entity that is losing the item" },
-				{ Name = "SrcSlot", Type = "number", Notes = "Slot in SrcBlockEntity from which the item will be pulled" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event and the hopper will not pull the item.
-			]],
-		},  -- HOOK_HOPPER_PULLING_ITEM
-
-		HOOK_HOPPER_PUSHING_ITEM =
-		{
-			CalledWhen = "A hopper is pushing an item into another block entity. ",
-			DefaultFnName = "OnHopperPushingItem",  -- also used as pagename
-			Desc = [[
-				This hook is called whenever a {{cHopperEntity|hopper}} transfers an {{cItem|item}} from its own
-				internal storage into another block entity. A plugin may decide to disallow the move by returning
-				true. Note that in such a case, the hook may be called again for the same hopper and block, with
-				different slot numbers.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "World where the hopper resides" },
-				{ Name = "Hopper", Type = "{{cHopperEntity}}", Notes = "The hopper that is pushing the item" },
-				{ Name = "SrcSlot", Type = "number", Notes = "Slot in the hopper that will lose the item" },
-				{ Name = "DstBlockEntity", Type = "{{cBlockEntityWithItems}}", Notes = " 	The block entity that will receive the item" },
-				{ Name = "DstSlot", Type = "number", Notes = "	Slot in DstBlockEntity's internal storage where the item will be stored" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event and the hopper will not push the item.
-			]],
-		},  -- HOOK_HOPPER_PUSHING_ITEM
-
-		HOOK_KILLING =
-		{
-			CalledWhen = "A player or a mob is dying.",
-			DefaultFnName = "OnKilling",  -- also used as pagename
-			Desc = [[
-				This hook is called whenever a {{cPawn|pawn}}'s (a player's or a mob's) health reaches zero. This
-				means that the pawn is about to be killed, unless a plugin "revives" them by setting their health
-				back to a positive value.</p>
-				<p>
-				FIXME: There is no HOOK_KILLED notification hook yet; this is deliberate because HOOK_KILLED has
-				been recently renamed to HOOK_KILLING, and plugins need to be updated. Once updated, the HOOK_KILLED
-				notification will be implemented.
-			]],
-			Params =
-			{
-				{ Name = "Victim", Type = "{{cPawn}}", Notes = "The player or mob that is about to be killed" },
-				{ Name = "Killer", Type = "{{cEntity}}", Notes = "The entity that has caused the victim to lose the last point of health. May be nil for environment damage" },
-			},
-			Returns = [[
-				If the function returns false or no value, MCServer calls other plugins with this event. If the
-				function returns true, no other plugin is called for this event.</p>
-				<p>
-				In either case, the victim's health is then re-checked and if it is greater than zero, the victim is
-				"revived" with that health amount. If the health is less or equal to zero, the victim is killed.
-			]],
-		},  -- HOOK_KILLING
-
-		HOOK_LOGIN =
-		{
-			CalledWhen = "Right before player authentication. If auth is disabled, right after the player sends their name.",
-			DefaultFnName = "OnLogin",  -- also used as pagename
-			Desc = [[
-				This hook is called whenever a client logs in. It is called right before the client's name is sent
-				to be authenticated. Plugins may refuse the client from accessing the server. Note that when this
-				callback is called, the {{cPlayer}} object for this client doesn't exist yet - the client has no
-				representation in any world. To process new players when their world is known, use a later callback,
-				such as {{OnPlayerJoined|HOOK_PLAYER_JOINED}} or {{OnPlayerSpawned|HOOK_PLAYER_SPAWNED}}.
-			]],
-			Params =
-			{
-				{ Name = "Client", Type = "{{cClientHandle}}", Notes = "The client handle representing the connection" },
-				{ Name = "ProtocolVersion", Type = "number", Notes = "Versio of the protocol that the client is talking" },
-				{ Name = "UserName", Type = "string", Notes = "The name that the client has presented for authentication. This name will be given to the {{cPlayer}} object when it is created for this client." },
-			},
-			Returns = [[
-				If the function returns true, no other plugins are called for this event and the client is kicked.
-				If the function returns false or no value, MCServer calls other plugins' callbacks and finally
-				sends an authentication request for the client's username to the auth server. If the auth server
-				is disabled in the server settings, the player object is immediately created.
-			]],
-		},  -- HOOK_LOGIN
-
-		HOOK_PLAYER_ANIMATION =
-		{
-			CalledWhen = "A client has sent an Animation packet (0x12)",
-			DefaultFnName = "OnPlayerAnimation",  -- also used as pagename
-			Desc = [[
-				This hook is called when the server receives an Animation packet (0x12) from the client.</p>
-				<p>
-				For the list of animations that are sent by the client, see the
-				<a href="http://wiki.vg/Protocol#0x12">Protocol wiki</a>.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player from whom the packet was received" },
-				{ Name = "Animation", Type = "number", Notes = "The kind of animation" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. Afterwards, the
-				server broadcasts the animation packet to all nearby clients. If the function returns true, no other
-				callback is called for this event and the packet is not broadcasted.
-			]],
-		},  -- HOOK_PLAYER_ANIMATION
-
-		HOOK_PLAYER_BREAKING_BLOCK =
-		{
-			CalledWhen = "Just before a player breaks a block. Plugin may override / refuse. ",
-			DefaultFnName = "OnPlayerBreakingBlock",  -- also used as pagename
-			Desc = [[
-				This hook is called when a {{cPlayer|player}} breaks a block, before the block is actually broken in
-				the {{cWorld|World}}. Plugins may refuse the breaking.</p>
-				<p>
-				See also the {{OnPlayerBrokenBlock|HOOK_PLAYER_BROKEN_BLOCK}} hook for a similar hook called after
-				the block is broken.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who is digging the block" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of the block upon which the player is acting. One of the BLOCK_FACE_ constants" },
-				{ Name = "BlockType", Type = "BLOCKTYPE", Notes = "The block type of the block being broken" },
-				{ Name = "BlockMeta", Type = "NIBBLETYPE", Notes = "The block meta of the block being broken " },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called, and then the block
-				is broken. If the function returns true, no other plugin's callback is called and the block breaking
-				is cancelled. The server re-sends the block back to the player to replace it (the player's client
-				already thinks the block was broken).
-			]],
-		},  -- HOOK_PLAYER_BREAKING_BLOCK
-
-		HOOK_PLAYER_BROKEN_BLOCK =
-		{
-			CalledWhen = "After a player has broken a block. Notification only.",
-			DefaultFnName = "OnPlayerBrokenBlock",  -- also used as pagename
-			Desc = [[
-				This function is called after a {{cPlayer|player}} breaks a block. The block is already removed
-				from the {{cWorld|world}} and {{cPickup|pickups}} have been spawned. To get the world in which the
-				block has been dug, use the {{cPlayer}}:GetWorld() function.</p>
-				<p>
-				See also the {{OnPlayerBreakingBlock|HOOK_PLAYER_BREAKING_BLOCK}} hook for a similar hook called
-				before the block is broken. To intercept the creation of pickups, see the
-				{{OnBlockToPickups|HOOK_BLOCK_TO_PICKUPS}} hook.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who broke the block" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of the block upon which the player interacted. One of the BLOCK_FACE_ constants" },
-				{ Name = "BlockType", Type = "BLOCKTYPE", Notes = "The block type of the block" },
-				{ Name = "BlockMeta", Type = "NIBBLETYPE", Notes = "The block meta of the block" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event.
-			]],
-		},  -- HOOK_PLAYER_BROKEN_BLOCK
-
-		HOOK_PLAYER_EATING =
-		{
-			CalledWhen = "When the player starts eating",
-			DefaultFnName = "OnPlayerEating",  -- also used as pagename
-			Desc = [[
-				This hook gets called when the {{cPlayer|player}} starts eating, after the server checks that the
-				player can indeed eat (is not satiated and is holding food). Plugins may still refuse the eating by
-				returning true.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who started eating" },
-			},
-			Returns = [[
-				If the function returns false or no value, the server calls the next plugin handler, and finally
-				lets the player eat. If the function returns true, the server doesn't call any more callbacks for
-				this event and aborts the eating. A "disallow" packet is sent to the client.
-			]],
-		},  -- HOOK_PLAYER_EATING
-
-		HOOK_PLAYER_JOINED =
-		{
-			CalledWhen = "After Login and before Spawned, before being added to world. ",
-			DefaultFnName = "OnPlayerJoined",  -- also used as pagename
-			Desc = [[
-				This hook is called whenever a {{cPlayer|player}} has completely logged in. If authentication is
-				enabled, this function is called after their name has been authenticated. It is called after
-				{{OnLogin|HOOK_LOGIN}} and before {{OnPlayerSpawned|HOOK_PLAYER_SPAWNED}}, right after the player's
-				entity is created, but not added to the world yet. The player is not yet visible to other players.
-				This is a notification-only event, plugins wishing to refuse player's entry should kick the player
-				using the {{cPlayer}}:Kick() function.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has joined the game" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called. If the function
-				returns true, no other callbacks are called for this event. Either way the player is let in.
-			]],
-		},  -- HOOK_PLAYER_JOINED
-
-		HOOK_PLAYER_LEFT_CLICK =
-		{
-			CalledWhen = "A left-click packet is received from the client. Plugin may override / refuse.",
-			DefaultFnName = "OnPlayerLeftClick",  -- also used as pagename
-			Desc = [[
-				This hook is called when MCServer receives a left-click packet from the {{cClientHandle|client}}. It
-				is called before any processing whatsoever is performed on the packet, meaning that hacked /
-				malicious clients may be trigerring this event very often and with unchecked parameters. Therefore
-				plugin authors are advised to use extreme caution with this callback.</p>
-				<p>
-				Plugins may refuse the default processing for the packet, causing MCServer to behave as if the
-				packet has never arrived. This may, however, create inconsistencies in the client - the client may
-				think that they broke a block, while the server didn't process the breaking, etc. For this reason,
-				if a plugin refuses the processing, MCServer sends the block specified in the packet back to the
-				client (as if placed anew), if the status code specified a block-break action. For other actions,
-				plugins must rectify the situation on their own.</p>
-				<p>
-				The client sends the left-click packet for several other occasions, such as dropping the held item
-				(Q keypress) or shooting an arrow. This is reflected in the Status code. Consult the
-				<a href="http://wiki.vg/Protocol#0x0E">protocol documentation</a> for details on the actions.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player whose client sent the packet" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of the block upon which the player interacted. One of the BLOCK_FACE_ constants" },
-				{ Name = "Action", Type = "number", Notes = "Action to be performed on the block (\"status\" in the protocol docs)" },
-			},
-			Returns = [[
-				If the function returns false or no value, MCServer calls other plugins' callbacks and finally sends
-				the packet for further processing.</p>
-				<p>
-				If the function returns true, no other plugins are called, processing is halted. If the action was a
-				block dig, MCServer sends the block specified in the coords back to the client. The packet is
-				dropped.
-			]],
-		},  -- HOOK_PLAYER_LEFT_CLICK
-
-		HOOK_PLAYER_MOVING =
-		{
-			CalledWhen = "Player tried to move in the tick being currently processed. Plugin may refuse movement.",
-			DefaultFnName = "OnPlayerMoving",  -- also used as pagename
-			Desc = [[
-				This function is called in each server tick for each {{cPlayer|player}} that has sent any of the
-				player-move packets. Plugins may refuse the movement.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has moved. The object already has the new position stored in it." },
-			},
-			Returns = [[
-				If the function returns true, movement is prohibited. FIXME: The player's client is not informed.</p>
-				<p>
-				If the function returns false or no value, other plugins' callbacks are called and finally the new
-				position is permanently stored in the cPlayer object.</p>
-			]],
-		},  -- HOOK_PLAYER_MOVING
-
-		HOOK_PLAYER_PLACED_BLOCK =
-		{
-			CalledWhen = "After a player has placed a block. Notification only.",
-			DefaultFnName = "OnPlayerPlacedBlock",  -- also used as pagename
-			Desc = [[
-				This hook is called after a {{cPlayer|player}} has placed a block in the {{cWorld|world}}. The block
-				is already added to the world and the corresponding item removed from player's
-				{{cInventory|inventory}}.</p>
-				<p>
-				Use the {{cPlayer}}:GetWorld() function to get the world to which the block belongs.</p>
-				<p>
-				See also the {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}} hook for a similar hook called
-				before the placement.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who placed the block" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of the existing block upon which the player interacted. One of the BLOCK_FACE_ constants" },
-				{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor within the block face (0 .. 15)" },
-				{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor within the block face (0 .. 15)" },
-				{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor within the block face (0 .. 15)" },
-				{ Name = "BlockType", Type = "BLOCKTYPE", Notes = "The block type of the block" },
-				{ Name = "BlockMeta", Type = "NIBBLETYPE", Notes = "The block meta of the block" },
-			},
-			Returns = [[
-				If this function returns false or no value, MCServer calls other plugins with the same event. If
-				this function returns true, no other plugin is called for this event.
-			]],
-		},  -- HOOK_PLAYER_PLACED_BLOCK
-
-		HOOK_PLAYER_PLACING_BLOCK =
-		{
-			CalledWhen = "Just before a player places a block. Plugin may override / refuse.",
-			DefaultFnName = "OnPlayerPlacingBlock",  -- also used as pagename
-			Desc = [[
-				This hook is called just before a {{cPlayer|player}} places a block in the {{cWorld|world}}. The
-				block is not yet placed, plugins may choose to override the default behavior or refuse the placement
-				at all.</p>
-				<p>
-				Note that the client already expects that the block has been placed. For that reason, if a plugin
-				refuses the placement, MCServer sends the old block at the provided coords to the client.</p>
-				<p>
-				Use the {{cPlayer}}:GetWorld() function to get the world to which the block belongs.</p>
-				<p>
-				See also the {{OnPlayerPlacedBlock|HOOK_PLAYER_PLACED_BLOCK}} hook for a similar hook called after
-				the placement.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who is placing the block" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of the existing block upon which the player is interacting. One of the BLOCK_FACE_ constants" },
-				{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor within the block face (0 .. 15)" },
-				{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor within the block face (0 .. 15)" },
-				{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor within the block face (0 .. 15)" },
-				{ Name = "BlockType", Type = "BLOCKTYPE", Notes = "The block type of the block" },
-				{ Name = "BlockMeta", Type = "NIBBLETYPE", Notes = "The block meta of the block" },
-			},
-			Returns = [[
-				If this function returns false or no value, MCServer calls other plugins with the same event and
-				finally places the block and removes the corresponding item from player's inventory. If this
-				function returns true, no other plugin is called for this event, MCServer sends the old block at
-				the specified coords to the client and drops the packet.
-			]],
-		},  -- HOOK_PLAYER_PLACING_BLOCK
-
-		HOOK_PLAYER_RIGHT_CLICK =
-		{
-			CalledWhen = "A right-click packet is received from the client. Plugin may override / refuse.",
-			DefaultFnName = "OnPlayerRightClick",  -- also used as pagename
-			Desc = [[
-				This hook is called when MCServer receives a right-click packet from the {{cClientHandle|client}}. It
-				is called before any processing whatsoever is performed on the packet, meaning that hacked /
-				malicious clients may be trigerring this event very often and with unchecked parameters. Therefore
-				plugin authors are advised to use extreme caution with this callback.</p>
-				<p>
-				Plugins may refuse the default processing for the packet, causing MCServer to behave as if the
-				packet has never arrived. This may, however, create inconsistencies in the client - the client may
-				think that they placed a block, while the server didn't process the placing, etc.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player whose client sent the packet" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of the block upon which the player interacted. One of the BLOCK_FACE_ constants" },
-			},
-			Returns = [[
-				If the function returns false or no value, MCServer calls other plugins' callbacks and finally sends
-				the packet for further processing.</p>
-				<p>
-				If the function returns true, no other plugins are called, processing is halted.
-			]],
-		},  -- HOOK_PLAYER_RIGHT_CLICK
-
-		HOOK_PLAYER_RIGHT_CLICKING_ENTITY =
-		{
-			CalledWhen = "A player has right-clicked an entity. Plugins may override / refuse.",
-			DefaultFnName = "OnPlayerRightClickingEntity",  -- also used as pagename
-			Desc = [[
-				This hook is called when the {{cPlayer|player}} right-clicks an {{cEntity|entity}}. Plugins may
-				override the default behavior or even cancel the default processing.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has right-clicked the entity" },
-				{ Name = "Entity", Type = "{{cEntity}} descendant", Notes = "The entity that has been right-clicked" },
-			},
-			Returns = [[
-				If the functino returns false or no value, MCServer calls other plugins' callbacks and finally does
-				the default processing for the right-click. If the function returns true, no other callbacks are
-				called and the default processing is skipped.
-			]],
-		},  -- HOOK_PLAYER_RIGHT_CLICKING_ENTITY
-
-		HOOK_PLAYER_SHOOTING =
-		{
-			CalledWhen = "When the player releases the bow, shooting an arrow (other projectiles: unknown)",
-			DefaultFnName = "OnPlayerShooting",  -- also used as pagename
-			Desc = [[
-				This hook is called when the {{cPlayer|player}} shoots their bow. It is called for the actual
-				release of the {{cArrowEntity|arrow}}. FIXME: It is currently unknown whether other
-				{{cProjectileEntity|projectiles}} (snowballs, eggs) trigger this hook.</p>
-				<p>
-				To get the player's position and direction, use the {{cPlayer}}:GetEyePosition() and
-				cPlayer:GetLookVector() functions. Note that for shooting a bow, the position for the arrow creation
-				is not at the eye pos, some adjustments are required. FIXME: Export the {{cPlayer}} function for
-				this adjustment.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player shooting" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called, and finally
-				MCServer creates the projectile. If the functino returns true, no other callback is called and no
-				projectile is created.
-			]],
-		},  -- HOOK_PLAYER_SHOOTING
-
-		HOOK_PLAYER_SPAWNED =
-		{
-			CalledWhen = "After a player (re)spawns in the world to which they belong to.",
-			DefaultFnName = "OnPlayerSpawned",  -- also used as pagename
-			Desc = [[
-				This hook is called after a {{cPlayer|player}} has spawned in the world. It is called after
-				{{OnLogin|HOOK_LOGIN}} and {{OnPlayerJoined|HOOK_PLAYER_JOINED}}, after the player name has been
-				authenticated, the initial worldtime, inventory and health have been sent to the player and the
-				player spawn packet has been broadcast to all players near enough to the player spawn place. This is
-				a notification-only event, plugins wishing to refuse player's entry should kick the player using the
-				{{cPlayer}}:Kick() function.</p>
-				<p>
-				This hook is also called when the player respawns after death (and a respawn packet is received from
-				the client, meaning the player has already clicked the Respawn button).
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has (re)spawned" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called. If the function
-				returns true, no other callbacks are called for this event. There is no overridable behavior.
-			]],
-		},  -- HOOK_PLAYER_SPAWNED
-
-		HOOK_PLAYER_TOSSING_ITEM =
-		{
-			CalledWhen = "A player is tossing an item. Plugin may override / refuse.",
-			DefaultFnName = "OnPlayerTossingItem",  -- also used as pagename
-			Desc = [[
-				This hook is called when a {{cPlayer|player}} has tossed an item (Q keypress). The
-				{{cPickup|pickup}} has not been spawned yet. Plugins may disallow the tossing, but in that case they
-				need to clean up - the player's client already thinks the item has been tossed so the
-				{{cInventory|inventory}} needs to be re-sent to the player.</p>
-				<p>
-				To get the item that is about to be tossed, call the {{cPlayer}}:GetEquippedItem() function.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player tossing an item" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called and finally MCServer
-				creates the pickup for the item and tosses it, using {{cPlayer}}:TossItem. If the function returns
-				true, no other callbacks are called for this event and MCServer doesn't toss the item.
-			]],
-		},  -- HOOK_PLAYER_TOSSING_ITEM
-
-		HOOK_PLAYER_USED_BLOCK =
-		{
-			CalledWhen = "A player has just used a block (chest, furnace�). Notification only.",
-			DefaultFnName = "OnPlayerUsedBlock",  -- also used as pagename
-			Desc = [[
-				This hook is called after a {{cPlayer|player}} has right-clicked a block that can be used, such as a
-				{{cChestEntity|chest}} or a lever. It is called after MCServer processes the usage (sends the UI
-				handling packets / toggles redstone). Note that for UI-related blocks, the player is most likely
-				still using the UI. This is a notification-only event.</p>
-				<p>
-				Note that the block coords given in this callback are for the (solid) block that is being clicked,
-				not the air block between it and the player.</p>
-				<p>
-				To get the world at which the right-click occurred, use the {{cPlayer}}:GetWorld() function.</p>
-				<p>
-				See also the {{OnPlayerUsingBlock|HOOK_PLAYER_USING_BLOCK}} for a similar hook called before the
-				use, the {{OnPlayerUsingItem|HOOK_PLAYER_USING_ITEM}} and {{OnPlayerUsedItem|HOOK_PLAYER_USED_ITEM}}
-				for similar hooks called when a player interacts with any block with a usable item in hand, such as
-				a bucket.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who used the block" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the clicked block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the clicked block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the clicked block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of clicked block which has been clicked. One of the BLOCK_FACE_ constants" },
-				{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "BlockType", Type = "number", Notes = "Block type of the clicked block" },
-				{ Name = "BlockMeta", Type = "number", Notes = "Block meta of the clicked block" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called. If the function
-				returns true, no other callbacks are called for this event.
-			]],
-		},  -- HOOK_PLAYER_USED_BLOCK
-
-		HOOK_PLAYER_USED_ITEM =
-		{
-			CalledWhen = "A player has used an item in hand (bucket...)",
-			DefaultFnName = "OnPlayerUsedItem",  -- also used as pagename
-			Desc = [[
-				This hook is called after a {{cPlayer|player}} has right-clicked a block with an {{cItem|item}} that
-				can be used (is not placeable, is not food and clicked block is not use-able), such as a bucket or a
-				hoe. It is called after MCServer processes the usage (places fluid / turns dirt to farmland).
-				This is an information-only hook, there is no way to cancel the event anymore.</p>
-				<p>
-				Note that the block coords given in this callback are for the (solid) block that is being clicked,
-				not the air block between it and the player.</p>
-				<p>
-				To get the world at which the right-click occurred, use the {{cPlayer}}:GetWorld() function. To get
-				the item that the player is using, use the {{cPlayer}}:GetEquippedItem() function.</p>
-				<p>
-				See also the {{OnPlayerUsingItem|HOOK_PLAYER_USING_ITEM}} for a similar hook called before the use,
-				the {{OnPlayerUsingBlock|HOOK_PLAYER_USING_BLOCK}} and {{OnPlayerUsedBlock|HOOK_PLAYER_USED_BLOCK}}
-				for similar hooks called when a player interacts with a block, such as a chest.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who used the item" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the clicked block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the clicked block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the clicked block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of clicked block which has been clicked. One of the BLOCK_FACE_ constants" },
-				{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "BlockType", Type = "number", Notes = "Block type of the clicked block" },
-				{ Name = "BlockMeta", Type = "number", Notes = "Block meta of the clicked block" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called. If the function
-				returns true, no other callbacks are called for this event.
-			]],
-		},  -- HOOK_PLAYER_USED_ITEM
-
-		HOOK_PLAYER_USING_BLOCK =
-		{
-			CalledWhen = "Just before a player uses a block (chest, furnace...). Plugin may override / refuse.",
-			DefaultFnName = "OnPlayerUsingBlock",  -- also used as pagename
-			Desc = [[
-				This hook is called when a {{cPlayer|player}} has right-clicked a block that can be used, such as a
-				{{cChestEntity|chest}} or a lever. It is called before MCServer processes the usage (sends the UI
-				handling packets / toggles redstone). Plugins may refuse the interaction by returning true.</p>
-				<p>
-				Note that the block coords given in this callback are for the (solid) block that is being clicked,
-				not the air block between it and the player.</p>
-				<p>
-				To get the world at which the right-click occurred, use the {{cPlayer}}:GetWorld() function.</p>
-				<p>
-				See also the {{OnPlayerUsedBlock|HOOK_PLAYER_USED_BLOCK}} for a similar hook called after the use, the
-				{{OnPlayerUsingItem|HOOK_PLAYER_USING_ITEM}} and {{OnPlayerUsedItem|HOOK_PLAYER_USED_ITEM}} for
-				similar hooks called when a player interacts with any block with a usable item in hand, such as a
-				bucket.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who is using the block" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the clicked block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the clicked block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the clicked block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of clicked block which has been clicked. One of the BLOCK_FACE_ constants" },
-				{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "BlockType", Type = "number", Notes = "Block type of the clicked block" },
-				{ Name = "BlockMeta", Type = "number", Notes = "Block meta of the clicked block" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called and then MCServer
-				processes the interaction. If the function returns true, no other callbacks are called for this
-				event and the interaction is silently dropped.
-			]],
-		},  -- HOOK_PLAYER_USING_BLOCK
-
-		HOOK_PLAYER_USING_ITEM =
-		{
-			CalledWhen = "Just before a player uses an item in hand (bucket...). Plugin may override / refuse.",
-			DefaultFnName = "OnPlayerUsingItem",  -- also used as pagename
-			Desc = [[
-				This hook is called when a {{cPlayer|player}} has right-clicked a block with an {{cItem|item}} that
-				can be used (is not placeable, is not food and clicked block is not use-able), such as a bucket or a
-				hoe. It is called before MCServer processes the usage (places fluid / turns dirt to farmland).
-				Plugins may refuse the interaction by returning true.</p>
-				<p>
-				Note that the block coords given in this callback are for the (solid) block that is being clicked,
-				not the air block between it and the player.</p>
-				<p>
-				To get the world at which the right-click occurred, use the {{cPlayer}}:GetWorld() function. To get
-				the item that the player is using, use the {{cPlayer}}:GetEquippedItem() function.</p>
-				<p>
-				See also the {{OnPlayerUsedItem|HOOK_PLAYER_USED_ITEM}} for a similar hook called after the use, the
-				{{OnPlayerUsingBlock|HOOK_PLAYER_USING_BLOCK}} and {{OnPlayerUsedBlock|HOOK_PLAYER_USED_BLOCK}} for
-				similar hooks called when a player interacts with a block, such as a chest.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who is using the item" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the clicked block" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the clicked block" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the clicked block" },
-				{ Name = "BlockFace", Type = "number", Notes = "Face of clicked block which has been clicked. One of the BLOCK_FACE_ constants" },
-				{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor crosshair on the block being clicked" },
-				{ Name = "BlockType", Type = "number", Notes = "Block type of the clicked block" },
-				{ Name = "BlockMeta", Type = "number", Notes = "Block meta of the clicked block" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called and then MCServer
-				processes the interaction. If the function returns true, no other callbacks are called for this
-				event and the interaction is silently dropped.
-			]],
-		},  -- HOOK_PLAYER_USING_ITEM
-
-		HOOK_POST_CRAFTING =
-		{
-			CalledWhen = "After the built-in recipes are checked and a recipe was found.",
-			DefaultFnName = "OnPostCrafting",  -- also used as pagename
-			Desc = [[
-				This hook is called when a {{cPlayer|player}} changes contents of their
-				{{cCraftingGrid|crafting grid}}, after the recipe has been established by MCServer. Plugins may use
-				this to modify the resulting recipe or provide an alternate recipe.</p>
-				<p>
-				If a plugin implements custom recipes, it should do so using the {{OnPreCrafting|HOOK_PRE_CRAFTING}}
-				hook, because that will save the server from going through the built-in recipes. The
-				HOOK_POST_CRAFTING hook is intended as a notification, with a chance to tweak the result.</p>
-				<p>
-				Note that this hook is not called if a built-in recipe is not found;
-				{{OnCraftingNoRecipe|HOOK_CRAFTING_NO_RECIPE}} is called instead in such a case.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has changed their crafting grid contents" },
-				{ Name = "Grid", Type = "{{cCraftingGrid}}", Notes = "The new crafting grid contents" },
-				{ Name = "Recipe", Type = "{{cCraftingRecipe}}", Notes = "The recipe that MCServer has decided to use (can be tweaked by plugins)" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called. If the function
-				returns true, no other callbacks are called for this event. In either case, MCServer uses the value
-				of Recipe as the recipe to be presented to the player.
-			]],
-		},  -- HOOK_POST_CRAFTING
-
-		HOOK_PRE_CRAFTING =
-		{
-			CalledWhen = "Before the built-in recipes are checked.",
-			DefaultFnName = "OnPreCrafting",  -- also used as pagename
-			Desc = [[
-				This hook is called when a {{cPlayer|player}} changes contents of their
-				{{cCraftingGrid|crafting grid}}, before the built-in recipes are searched for a match by MCServer.
-				Plugins may use this hook to provide a custom recipe.</p>
-				<p>
-				If you intend to tweak built-in recipes, use the {{OnPostCrafting|HOOK_POST_CRAFTING}} hook, because
-				that will be called once the built-in recipe is matched.</p>
-				<p>
-				Also note a third hook, {{OnCraftingNoRecipe|HOOK_CRAFTING_NO_RECIPE}}, that is called when MCServer
-				cannot find any built-in recipe for the given ingredients.
-			]],
-			Params =
-			{
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has changed their crafting grid contents" },
-				{ Name = "Grid", Type = "{{cCraftingGrid}}", Notes = "The new crafting grid contents" },
-				{ Name = "Recipe", Type = "{{cCraftingRecipe}}", Notes = "The recipe that MCServer will use. Modify this object to change the recipe" },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called and then MCServer
-				searches the built-in recipes. The Recipe output parameter is ignored in this case.</p>
-				<p>
-				If the function returns true, no other callbacks are called for this event and MCServer uses the
-				recipe stored in the Recipe output parameter.
-			]],
-		},  -- HOOK_PRE_CRAFTING
-
-		HOOK_SPAWNED_ENTITY =
-		{
-			CalledWhen = "After an entity is spawned in the world.",
-			DefaultFnName = "OnSpawnedEntity",  -- also used as pagename
-			Desc = [[
-				This hook is called after the server spawns an {{cEntity|entity}}. This is an information-only
-				callback, the entity is already spawned by the time it is called. If the entity spawned is a
-				{{cMonster|monster}}, the {{OnSpawnedMonster|HOOK_SPAWNED_MONSTER}} hook is called before this
-				hook.</p>
-				<p>
-				See also the {{OnSpawningEntity|HOOK_SPAWNING_ENTITY}} hook for a similar hook called before the
-				entity is spawned.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the entity has spawned" },
-				{ Name = "Entity", Type = "{{cEntity}} descentant", Notes = "The entity that has spawned" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event.
-			]],
-		},  -- HOOK_SPAWNED_ENTITY
-
-		HOOK_SPAWNED_MONSTER =
-		{
-			CalledWhen = "After a monster is spawned in the world",
-			DefaultFnName = "OnSpawnedMonster",  -- also used as pagename
-			Desc = [[
-				This hook is called after the server spawns a {{cMonster|monster}}. This is an information-only
-				callback, the monster is already spawned by the time it is called. After this hook is called, the
-				{{OnSpawnedEntity|HOOK_SPAWNED_ENTITY}} is called for the monster entity.</p>
-				<p>
-				See also the {{OnSpawningMonster|HOOK_SPAWNING_MONSTER}} hook for a similar hook called before the
-				monster is spawned.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the monster has spawned" },
-				{ Name = "Monster", Type = "{{cMonster}} descendant", Notes = "The monster that has spawned" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event.
-			]],
-		},  -- HOOK_SPAWNED_MONSTER
-
-		HOOK_SPAWNING_ENTITY =
-		{
-			CalledWhen = "Before an entity is spawned in the world.",
-			DefaultFnName = "OnSpawningEntity",  -- also used as pagename
-			Desc = [[
-				This hook is called before the server spawns an {{cEntity|entity}}. The plugin can either modify the
-				entity before it is spawned, or disable the spawning altogether. If the entity spawning is a
-				monster, the {{OnSpawningMonster|HOOK_SPAWNING_MONSTER}} hook is called before this hook.</p>
-				<p>
-				See also the {{OnSpawnedEntity|HOOK_SPAWNED_ENTITY}} hook for a similar hook called after the
-				entity is spawned.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the entity will spawn" },
-				{ Name = "Entity", Type = "{{cEntity}} descentant", Notes = "The entity that will spawn" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. Finally, the server
-				spawns the entity with whatever parameters have been set on the {{cEntity}} object by the callbacks.
-				If the function returns true, no other callback is called for this event and the entity is not
-				spawned.
-			]],
-		},  -- HOOK_SPAWNING_ENTITY
-
-		HOOK_SPAWNING_MONSTER =
-		{
-			CalledWhen = "Before a monster is spawned in the world.",
-			DefaultFnName = "OnSpawningMonster",  -- also used as pagename
-			Desc = [[
-				This hook is called before the server spawns a {{cMonster|monster}}. The plugins may modify the
-				monster's parameters in the {{cMonster}} class, or disallow the spawning altogether. This hook is
-				called before the {{OnSpawningEntity|HOOK_SPAWNING_ENTITY}} is called for the monster entity.</p>
-				<p>
-				See also the {{OnSpawnedMonster|HOOK_SPAWNED_MONSTER}} hook for a similar hook called after the
-				monster is spawned.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the entity will spawn" },
-				{ Name = "Monster", Type = "{{cMonster}} descentant", Notes = "The monster that will spawn" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. Finally, the server
-				spawns the monster with whatever parameters the plugins set in the cMonster parameter.</p>
-				<p>
-				If the function returns true, no other callback is called for this event and the monster won't
-				spawn.
-			]],
-		},  -- HOOK_SPAWNING_MONSTER
-
-		HOOK_TAKE_DAMAGE =
-		{
-			CalledWhen = "An {{cEntity|entity}} is taking any kind of damage",
-			DefaultFnName = "OnTakeDamage",  -- also used as pagename
-			Desc = [[
-				This hook is called when any {{cEntity}} descendant, such as a {{cPlayer|player}} or a
-				{{cMonster|mob}}, takes any kind of damage. The plugins may modify the amount of damage or effects
-				with this hook by editting the {{TakeDamageInfo}} object passed.</p>
-				<p>
-				This hook is called after the final damage is calculated, including all the possible weapon
-				{{cEnchantments|enchantments}}, armor protection and potion effects.
-			]],
-			Params =
-			{
-				{ Name = "Receiver", Type = "{{cEntity}} descendant", Notes = "The entity taking damage" },
-				{ Name = "TDI", Type = "{{TakeDamageInfo}}", Notes = "The damage type, cause and effects. Plugins may modify this object to alter the final damage applied." },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called and then the server
-				applies the final values from the TDI object to Receiver. If the function returns true, no other
-				callbacks are called, and no damage nor effects are applied.
-			]],
-		},  -- HOOK_TAKE_DAMAGE
-
-		HOOK_TICK =
-		{
-			CalledWhen = "Every server tick (approximately 20 times per second)",
-			DefaultFnName = "OnTick",  -- also used as pagename
-			Desc = [[
-				This hook is called every game tick (50 msec, or 20 times a second). If the server is overloaded,
-				the interval is larger, which is indicated by the TimeDelta parameter.</p>
-				<p>
-				This hook is called in the context of the server-tick thread, that is, the thread that takes care of
-				{{cClientHandle|client connections}} before they're assigned to {{cPlayer|player entities}}, and
-				processing console commands.
-			]],
-			Params =
-			{
-				{ Name = "TimeDelta", Type = "number", Notes = "The number of milliseconds elapsed since the last server tick. Will not be less than 50 msec." },
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called. If the function
-				returns true, no other callbacks are called. There is no overridable behavior.
-			]],
-		},  -- HOOK_TICK
-
-		HOOK_UPDATED_SIGN =
-		{
-			CalledWhen = "After the sign text is updated. Notification only.",
-			DefaultFnName = "OnUpdatedSign",  -- also used as pagename
-			Desc = [[
-				This hook is called after a sign has had its text updated. The text is already updated at this
-				point.</p>
-				<p>The update may have been caused either by a {{cPlayer|player}} directly updating the sign, or by
-				a plugin changing the sign text using the API.</p>
-				<p>
-				See also the {{OnUpdatingSign|HOOK_UPDATING_SIGN}} hook for a similar hook called before the update,
-				with a chance to modify the text.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the sign resides" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the sign" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the sign" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the sign" },
-				{ Name = "Line1", Type = "string", Notes = "1st line of the new text" },
-				{ Name = "Line2", Type = "string", Notes = "2nd line of the new text" },
-				{ Name = "Line3", Type = "string", Notes = "3rd line of the new text" },
-				{ Name = "Line4", Type = "string", Notes = "4th line of the new text" },
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who is changing the text. May be nil for non-player updates." }
-			},
-			Returns = [[
-				If the function returns false or no value, other plugins' callbacks are called. If the function
-				returns true, no other callbacks are called. There is no overridable behavior.
-			]],
-		},  -- HOOK_UPDATED_SIGN
-		HOOK_UPDATING_SIGN =
-		{
-			CalledWhen = "Before the sign text is updated. Plugin may modify the text / refuse.",
-			DefaultFnName = "OnUpdatingSign",  -- also used as pagename
-			Desc = [[
-				This hook is called when a sign text is about to be updated, either as a result of player's
-				manipulation or any other event, such as a plugin setting the sign text. Plugins may modify the text
-				or refuse the update altogether.</p>
-				<p>
-				See also the {{OnUpdatedSign|HOOK_UPDATED_SIGN}} hook for a similar hook called after the update.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "The world in which the sign resides" },
-				{ Name = "BlockX", Type = "number", Notes = "X-coord of the sign" },
-				{ Name = "BlockY", Type = "number", Notes = "Y-coord of the sign" },
-				{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the sign" },
-				{ Name = "Line1", Type = "string", Notes = "1st line of the new text" },
-				{ Name = "Line2", Type = "string", Notes = "2nd line of the new text" },
-				{ Name = "Line3", Type = "string", Notes = "3rd line of the new text" },
-				{ Name = "Line4", Type = "string", Notes = "4th line of the new text" },
-				{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who is changing the text. May be nil for non-player updates." }
-			},
-			Returns = [[
-				The function may return up to five values. If the function returns true as the first value, no other
-				callbacks are called for this event and the sign is not updated. If the function returns no value or
-				false as its first value, other plugins' callbacks are called.</p>
-				<p>
-				The other up to four values returned are used to update the sign text, line by line, respectively.
-				Note that other plugins may again update the texts (if the first value returned is false).
-			]],
-			CodeExamples =
-			{
+				MetaValues =
 				{
-					Title = "Add player signature",
-					Desc = "The following example appends a player signature to the last line, if the sign is updated by a player:",
-					Code = [[
-function OnUpdatingSign(World, BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player)
-	if (Player == nil) then
-		-- Not changed by a player
-		return false;
-	end
-
-	-- Sign with playername, allow other plugins to interfere:
-	return false, Line1, Line2, Line3, Line4 .. Player:GetName();
-end
+					Include = "^E_META_.*",
+				},
+				BiomeTypes =
+				{
+					Include = "^bi.*",
+					TextBefore = [[
+						These constants represent the biomes that the server understands. Note that there is a global
+						StringToBiome() function that can convert a string into one of these constants.
+					]],
+				},
+				BlockFaces =
+				{
+					Include = "^BLOCK_FACE_.*",
+					TextBefore = [[
+						These constants are used to describe individual faces of the block. They are used when the
+						client is interacting with a block, or when the {{cLineBlockTracer}} hits a block, etc.
+					]],
+				},
+				ClickAction =
+				{
+					Include = "^ca.*",
+					TextBefore = [[
+						These constants are used to signalize various interactions that the user can do with the
+						{{cWindow|UI windows}}. The server translates the protocol events into these constants. Note
+						that there is a global ClickActionToString() function that can translate these constants into
+						their textual representation.
+					]],
+				},
+				WorldDimension =
+				{
+					Include = "^dim.*",
+					TextBefore = [[
+						These constants represent dimension of a world. In MCServer, the dimension is only reflected in
+						the world's overall tint - overworld gets sky-like colors and dark shades, the nether gets
+						reddish haze and the end gets dark haze. World generator is not directly affected by the
+						dimension, same as fluid simulators; those only default to the expected values if not set
+						specifically otherwise in the world.ini file.
+					]],
+				},
+				DamageType =
+				{
+					Include = "^dt.*",
+					TextBefore = [[
+						These constants are used for specifying the cause of damage to entities. They are used in the
+						{{TakeDamageInfo}} structure, as well as in {{cEntity}}'s damage-related API functions.
+					]],
+				},
+				GameMode =
+				{
+					Include = { "^gm.*", "^eGameMode_.*" },
+					TextBefore = [[
+						The following constants are used for the gamemode - survival, creative or adventure. Use the
+						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
+					]],
+				},
+				Weather =
+				{
+					Include = { "^eWeather_.*", "wSunny", "wRain", "wStorm", "wThunderstorm" },
+					TextBefore = [[
+						These constants represent the weather in the world. Note that unlike vanilla, MCServer allows
+						different weathers even in non-overworld {{Globals#WorldDimension|dimensions}}.
+					]],
+				},
+				ExplosionSource =
+				{
+					Include = "^es.*",
+					TextBefore = [[
+						These constants are used to differentiate the various sources of explosions. They are used in
+						the {{OnExploded|HOOK_EXPLODED}} hook, {{OnExploding|HOOK_EXPLODING}} hook and in the
+						{{cWorld}}:DoExplosionAt() function. These constants also dictate the type of the additional
+						data provided with the explosions, such as the exploding {{cCreeper|creeper}} entity or the
+						{{Vector3i|coords}} of the exploding bed.
 					]],
 				}
-			} ,
-		},  -- HOOK_UPDATING_SIGN
-
-		HOOK_WEATHER_CHANGED =
-		{
-			CalledWhen = "The weather has changed",
-			DefaultFnName = "OnWeatherChanged",  -- also used as pagename
-			Desc = [[
-				This hook is called after the weather has changed in a {{cWorld|world}}. The new weather has already
-				been sent to the clients.</p>
-				<p>
-				See also the {{OnWeatherChanging|HOOK_WEATHER_CHANGING}} hook for a similar hook called before the
-				change.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "World for which the weather has changed" },
 			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event. There is no overridable behavior.
-			]],
-		},  -- HOOK_WEATHER_CHANGED
-
-		HOOK_WEATHER_CHANGING =
-		{
-			CalledWhen = "The weather is about to change",
-			DefaultFnName = "OnWeatherChanging",  -- also used as pagename
-			Desc = [[
-				This hook is called when the current weather has expired and a new weather is selected. Plugins may
-				override the new weather setting.</p>
-				<p>
-				The new weather setting is sent to the clients only after this hook has been processed.</p>
-				<p>
-				See also the {{OnWeatherChanged|HOOK_WEATHER_CHANGED}} hook for a similar hook called after the
-				change.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "World for which the weather is changing" },
-				{ Name = "Weather", Type = "number", Notes = "The newly selected weather. One of wSunny, wRain, wStorm" },
-			},
-			Returns = [[
-				If the function returns false or no value, the server calls other plugins' callbacks and finally
-				sets the weather. If the function returns true, the server takes the second returned value (wSunny
-				by default) and sets it as the new weather. No other plugins' callbacks are called in this case.
-			]],
-		},  -- HOOK_WEATHER_CHANGING
-
-		HOOK_WORLD_TICK =
-		{
-			CalledWhen = "Every world tick (about 20 times per second), separately for each world",
-			DefaultFnName = "OnWorldTick",  -- also used as pagename
-			Desc = [[
-				This hook is called for each {{cWorld|world}} every tick (50 msec, or 20 times a second). If the
-				world is overloaded, the interval is larger, which is indicated by the TimeDelta parameter.</p>
-				<p>
-				This hook is called in the world's tick thread context and thus has access to all world data
-				guaranteed without blocking.
-			]],
-			Params =
-			{
-				{ Name = "World", Type = "{{cWorld}}", Notes = "World that is ticking" },
-				{ Name = "TimeDelta", Type = "number", Notes = "The number of milliseconds since the previous game tick. Will not be less than 50 msec" },
-			},
-			Returns = [[
-				If the function returns false or no value, the next plugin's callback is called. If the function
-				returns true, no other callback is called for this event. There is no overridable behavior.
-			]],
-		},  -- HOOK_WORLD_TICK
-
-	},  -- Hooks[]
+		},  -- Globals
+	},
 
 
 	IgnoreClasses =
@@ -4232,6 +2702,8 @@ end
 		"Globals.assert",
 		"Globals.collectgarbage",
 		"Globals.xpcall",
+		"Globals.decoda_output",  -- When running under Decoda, this function gets added to the global namespace
+		"sqlite3.__newindex",
 		"%a+\.__%a+",        -- AnyClass.__Anything
 		"%a+\.\.collector",  -- AnyClass..collector
 		"%a+\.new",          -- AnyClass.new
@@ -4247,6 +2719,7 @@ end
 		"ListMissingPages",
 		"ListUndocumentedObjects",
 		"ListUnexportedObjects",
+		"LoadAPIFiles",
 		"ReadDescriptions",
 		"ReadHooks",
 		"WriteHtmlClass",
@@ -4265,7 +2738,6 @@ end
 		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
 	}
 } ;
-
 
 
 

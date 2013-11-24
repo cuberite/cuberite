@@ -171,6 +171,29 @@ cPluginLua * GetLuaPlugin(lua_State * L)
 
 
 
+static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+	if (
+		!LuaState.CheckParamUserTable(1, "cFile") ||
+		!LuaState.CheckParamString   (2) ||
+		!LuaState.CheckParamEnd      (3)
+	)
+	{
+		return 0;
+	}
+	
+	AString Folder = (AString)tolua_tocppstring(LuaState, 2, 0);
+
+	AStringVector Contents = cFile::GetFolderContents(Folder);
+	LuaState.Push(Contents);
+	return 1;
+}
+
+
+
+
+
 template<
 	class Ty1,
 	class Ty2,
@@ -2063,6 +2086,46 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 
 
+static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cRoot") ||
+		!L.CheckParamUserType (2, "const cItem") ||
+		!L.CheckParamEnd      (3)
+	)
+	{
+		return 0;
+	}
+	
+	// Check the input param:
+	cItem * Input = (cItem *)tolua_tousertype(L, 2, NULL);
+	if (Input == NULL)
+	{
+		LOGWARNING("cRoot:GetFurnaceRecipe: the Input parameter is nil or missing.");
+		return 0;
+	}
+	
+	// Get the recipe for the input
+	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
+	const cFurnaceRecipe::Recipe * Recipe = FR->GetRecipeFrom(*Input);
+	if (Recipe == NULL)
+	{
+		// There is no such furnace recipe for this input, return no value
+		return 0;
+	}
+	
+	// Push the output, number of ticks and input as the three return values:
+	tolua_pushusertype(L, Recipe->Out, "const cItem");
+	tolua_pushnumber  (L, (lua_Number)(Recipe->CookTime));
+	tolua_pushusertype(L, Recipe->In, "const cItem");
+	return 3;
+}
+
+
+
+
+
 static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 {
 	// function cHopperEntity::GetOutputBlockPos()
@@ -2113,6 +2176,10 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGWARNING",         tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",           tolua_LOGERROR);
 		
+		tolua_beginmodule(tolua_S, "cFile");
+			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);
+		tolua_endmodule(tolua_S);
+		
 		tolua_beginmodule(tolua_S, "cHopperEntity");
 			tolua_function(tolua_S, "GetOutputBlockPos", tolua_cHopperEntity_GetOutputBlockPos);
 		tolua_endmodule(tolua_S);
@@ -2125,29 +2192,32 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "FindAndDoWithPlayer", tolua_DoWith <cRoot, cPlayer, &cRoot::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachPlayer",       tolua_ForEach<cRoot, cPlayer, &cRoot::ForEachPlayer>);
 			tolua_function(tolua_S, "ForEachWorld",        tolua_ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
+			tolua_function(tolua_S, "GetFurnaceRecipe",    tolua_cRoot_GetFurnaceRecipe);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cWorld");
-			tolua_function(tolua_S, "DoWithChestAt",         tolua_DoWithXYZ<cWorld, cChestEntity,       &cWorld::DoWithChestAt>);
-			tolua_function(tolua_S, "DoWithDispenserAt",     tolua_DoWithXYZ<cWorld, cDispenserEntity,   &cWorld::DoWithDispenserAt>);
-			tolua_function(tolua_S, "DoWithDropSpenserAt",   tolua_DoWithXYZ<cWorld, cDropSpenserEntity, &cWorld::DoWithDropSpenserAt>);
-			tolua_function(tolua_S, "DoWithDropperAt",       tolua_DoWithXYZ<cWorld, cDropperEntity,     &cWorld::DoWithDropperAt>);
-			tolua_function(tolua_S, "DoWithEntityByID",      tolua_DoWithID< cWorld, cEntity,            &cWorld::DoWithEntityByID>);
-			tolua_function(tolua_S, "DoWithFurnaceAt",       tolua_DoWithXYZ<cWorld, cFurnaceEntity,     &cWorld::DoWithFurnaceAt>);
-			tolua_function(tolua_S, "DoWithPlayer",          tolua_DoWith<   cWorld, cPlayer,            &cWorld::DoWithPlayer>);
-			tolua_function(tolua_S, "FindAndDoWithPlayer",   tolua_DoWith<   cWorld, cPlayer,            &cWorld::FindAndDoWithPlayer>);
-			tolua_function(tolua_S, "ForEachChestInChunk",   tolua_ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
-			tolua_function(tolua_S, "ForEachEntity",         tolua_ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
-			tolua_function(tolua_S, "ForEachEntityInChunk",  tolua_ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
-			tolua_function(tolua_S, "ForEachFurnaceInChunk", tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
-			tolua_function(tolua_S, "ForEachPlayer",         tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
-			tolua_function(tolua_S, "GetBlockInfo",          tolua_cWorld_GetBlockInfo);
-			tolua_function(tolua_S, "GetBlockTypeMeta",      tolua_cWorld_GetBlockTypeMeta);
-			tolua_function(tolua_S, "GetSignLines",          tolua_cWorld_GetSignLines);
-			tolua_function(tolua_S, "QueueTask",             tolua_cWorld_QueueTask);
-			tolua_function(tolua_S, "SetSignLines",          tolua_cWorld_SetSignLines);
-			tolua_function(tolua_S, "TryGetHeight",          tolua_cWorld_TryGetHeight);
-			tolua_function(tolua_S, "UpdateSign",            tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "DoWithBlockEntityAt",       tolua_DoWithXYZ<cWorld, cBlockEntity,       &cWorld::DoWithBlockEntityAt>);
+			tolua_function(tolua_S, "DoWithChestAt",             tolua_DoWithXYZ<cWorld, cChestEntity,       &cWorld::DoWithChestAt>);
+			tolua_function(tolua_S, "DoWithDispenserAt",         tolua_DoWithXYZ<cWorld, cDispenserEntity,   &cWorld::DoWithDispenserAt>);
+			tolua_function(tolua_S, "DoWithDropSpenserAt",       tolua_DoWithXYZ<cWorld, cDropSpenserEntity, &cWorld::DoWithDropSpenserAt>);
+			tolua_function(tolua_S, "DoWithDropperAt",           tolua_DoWithXYZ<cWorld, cDropperEntity,     &cWorld::DoWithDropperAt>);
+			tolua_function(tolua_S, "DoWithEntityByID",          tolua_DoWithID< cWorld, cEntity,            &cWorld::DoWithEntityByID>);
+			tolua_function(tolua_S, "DoWithFurnaceAt",           tolua_DoWithXYZ<cWorld, cFurnaceEntity,     &cWorld::DoWithFurnaceAt>);
+			tolua_function(tolua_S, "DoWithPlayer",              tolua_DoWith<   cWorld, cPlayer,            &cWorld::DoWithPlayer>);
+			tolua_function(tolua_S, "FindAndDoWithPlayer",       tolua_DoWith<   cWorld, cPlayer,            &cWorld::FindAndDoWithPlayer>);
+			tolua_function(tolua_S, "ForEachBlockEntityInChunk", tolua_ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
+			tolua_function(tolua_S, "ForEachChestInChunk",       tolua_ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
+			tolua_function(tolua_S, "ForEachEntity",             tolua_ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
+			tolua_function(tolua_S, "ForEachEntityInChunk",      tolua_ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
+			tolua_function(tolua_S, "ForEachFurnaceInChunk",     tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
+			tolua_function(tolua_S, "ForEachPlayer",             tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
+			tolua_function(tolua_S, "GetBlockInfo",              tolua_cWorld_GetBlockInfo);
+			tolua_function(tolua_S, "GetBlockTypeMeta",          tolua_cWorld_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetSignLines",              tolua_cWorld_GetSignLines);
+			tolua_function(tolua_S, "QueueTask",                 tolua_cWorld_QueueTask);
+			tolua_function(tolua_S, "SetSignLines",              tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "TryGetHeight",              tolua_cWorld_TryGetHeight);
+			tolua_function(tolua_S, "UpdateSign",                tolua_cWorld_SetSignLines);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin");

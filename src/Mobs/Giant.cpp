@@ -8,9 +8,9 @@
 
 
 cGiant::cGiant(void) :
-	// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
-	super("Giant", mtGiant, "mob.zombie.hurt", "mob.zombie.death", 2.0, 13.5)
+	super("Giant", mtGiant, "mob.zombie.hurt", "mob.zombie.death", 3.6, 10.8)
 {
+
 }
 
 

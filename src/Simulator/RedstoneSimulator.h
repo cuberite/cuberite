@@ -3,6 +3,9 @@
 
 #include "Simulator.h"
 
+/// Per-chunk data for the simulator, specified individual chunks to simulate; 'Data' is not used
+typedef cCoordWithIntList cRedstoneSimulatorChunkData;
+
 
 
 
@@ -12,13 +15,13 @@ class cRedstoneSimulator :
 {
 	typedef cSimulator super;
 public:
+
 	cRedstoneSimulator(cWorld & a_World);
 	~cRedstoneSimulator();
 
-	virtual void Simulate( float a_Dt ) override;
-	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override { return true; }
-
-	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void Simulate(float a_Dt) override {}; // Not used in this simulator
+	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override { return IsRedstone(a_BlockType); }
 
 	enum eRedstoneDirection
 	{
@@ -31,56 +34,166 @@ public:
 	eRedstoneDirection GetWireDirection(int a_BlockX, int a_BlockY, int a_BlockZ);
 	eRedstoneDirection GetWireDirection(const Vector3i & a_Pos) { return GetWireDirection(a_Pos.x, a_Pos.y, a_Pos.z); }
 
-	static bool IsRepeaterPointingTo  (const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos);
-	static bool IsRepeaterPointingAway(const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos);
-	static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation);
-	static Vector3i GetRepeaterDirection(NIBBLETYPE a_MetaData);
-	static NIBBLETYPE LeverDirectionToMetaData(char a_Dir);
-	static bool IsLeverOn(cWorld * a_World, const Vector3i & a_BlockPos);
-	static bool IsLeverOn(NIBBLETYPE a_BlockMeta);
-
-
 private:
-	struct sRepeaterChange
+
+	struct sPoweredBlocks // Define structure of the directly powered blocks list
 	{
-		Vector3i Position;
-		int Ticks;
-		bool bPowerOn;
-		bool bPowerOffNextTime;
+		Vector3i a_BlockPos; // Position of powered block
+		Vector3i a_SourcePos; // Position of source powering the block at a_BlockPos
+		BLOCKTYPE a_SourceBlock; // The source block type (for pistons pushing away sources and replacing with non source etc.)
 	};
 
-	typedef std::deque <Vector3i> BlockList;
-
-	typedef std::deque< sRepeaterChange > RepeaterList;
-	RepeaterList m_SetRepeaters;
+	struct sLinkedPoweredBlocks // Define structure of the indirectly powered blocks list (i.e. repeaters powering through a block to the block at the other side)
+	{
+		Vector3i a_BlockPos;
+		Vector3i a_MiddlePos;
+		Vector3i a_SourcePos;
+		BLOCKTYPE a_SourceBlock;
+		BLOCKTYPE a_MiddleBlock;
+	};
 	
-	void SetRepeater(const Vector3i & a_Position, int a_Ticks, bool a_bPowerOn);
+	typedef std::vector <sPoweredBlocks> PoweredBlocksList;
+	typedef std::vector <sLinkedPoweredBlocks> LinkedBlocksList;
 
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override {}
+	PoweredBlocksList m_PoweredBlocks;
+	LinkedBlocksList m_LinkedPoweredBlocks;
 
-	void HandleChange( const Vector3i & a_BlockPos );
-	BlockList RemoveCurrent( const Vector3i & a_BlockPos );
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 
-	bool PowerBlock( const Vector3i & a_BlockPos, const Vector3i & a_FromBlock, char a_Power );
-	int UnPowerBlock( const Vector3i & a_BlockPos, const Vector3i & a_FromBlock );
+	// We want a_MyState for devices needing a full FastSetBlock (as opposed to meta) because with our simulation model, we cannot keep setting the block if it is already set correctly
+	// In addition to being non-performant, it would stop the player from actually breaking said device
 
-	bool IsPowered( const Vector3i & a_BlockPos, bool a_bOnlyByWire = false );
-	bool IsPowering( const Vector3i & a_PowerPos, const Vector3i & a_BlockPos, eRedstoneDirection a_WireDirection, bool a_bOnlyByWire );
-	
-	BlockList m_Blocks;
-	BlockList m_BlocksBuffer;
+	/* ====== SOURCES ====== */
+	///<summary>Handles the redstone torch</summary>
+	void HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
+	///<summary>Handles the redstone block</summary>
+	void HandleRedstoneBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	///<summary>Handles levers</summary>
+	void HandleRedstoneLever(int a_BlockX, int a_BlockY, int a_BlockZ);
+	///<summary>Handles buttons</summary>
+	void HandleRedstoneButton(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
+	/* ==================== */
 
-	BlockList m_RefreshPistons;
-	BlockList m_RefreshDropSpensers;
+	/* ====== CARRIERS ====== */
+	///<summary>Handles redstone wire</summary>
+	void HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_BlockZ);
+	///<summary>Handles repeaters</summary>
+	void HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
+	/* ====================== */
 
-	BlockList m_RefreshTorchesAround;
-	
-	void RefreshTorchesAround( const Vector3i & a_BlockPos );
+	/* ====== DEVICES ====== */
+	///<summary>Handles pistons</summary>
+	void HandlePiston(int a_BlockX, int a_BlockY, int a_BlockZ);
+	///<summary>Handles dispensers and droppers</summary>
+	void HandleDropSpenser(int a_BlockX, int a_BlockY, int a_BlockZ);
+	///<summary>Handles TNT (exploding)</summary>
+	void HandleTNT(int a_BlockX, int a_BlockY, int a_BlockZ);
+	///<summary>Handles redstone lamps</summary>
+	void HandleRedstoneLamp(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
+	///<summary>Handles doords</summary>
+	void HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ);
+	///<summary>Handles activator, detector, and powered rails</summary>
+	void HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
+	/* ===================== */
 
-	// TODO: The entire simulator is synchronized, no need to lock data structures; remove this
-	cCriticalSection m_CS;
+	/* ====== Helper functions ====== */
+	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock);
+	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock);
+	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceType);
+
+	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
+	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
+
+	bool IsLeverOn(NIBBLETYPE a_BlockMeta);
+	bool IsButtonOn(NIBBLETYPE a_BlockMeta);
+	/* ============================== */
+
+	inline static bool IsMechanism(BLOCKTYPE Block)
+	{
+		switch (Block)
+		{
+			case E_BLOCK_PISTON:
+			case E_BLOCK_STICKY_PISTON:
+			case E_BLOCK_DISPENSER:
+			case E_BLOCK_DROPPER:
+			case E_BLOCK_TNT:
+			case E_BLOCK_REDSTONE_LAMP_OFF:
+			case E_BLOCK_REDSTONE_LAMP_ON:
+			case E_BLOCK_WOODEN_DOOR:
+			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_POWERED_RAIL:
+			{
+				return true;
+			}
+			default: return false;
+		}
+	}
+
+	inline static bool IsPotentialSource(BLOCKTYPE Block)
+	{
+		switch (Block)
+		{
+			case E_BLOCK_WOODEN_BUTTON:
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			case E_BLOCK_LEVER:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_BLOCK_OF_REDSTONE:
+			case E_BLOCK_ACTIVE_COMPARATOR:
+			case E_BLOCK_INACTIVE_COMPARATOR:
+			{
+				return true;
+			}
+			default: return false;
+		}
+	}
+
+	inline static bool IsRedstone(BLOCKTYPE Block)
+	{
+		switch (Block)
+		{
+			// All redstone devices, please alpha sort
+			case E_BLOCK_ACTIVATOR_RAIL:
+			case E_BLOCK_ACTIVE_COMPARATOR:
+			case E_BLOCK_BLOCK_OF_REDSTONE:
+			case E_BLOCK_DETECTOR_RAIL:
+			case E_BLOCK_DISPENSER:
+			case E_BLOCK_DAYLIGHT_SENSOR:
+			case E_BLOCK_DROPPER:
+			case E_BLOCK_FENCE_GATE:
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_HOPPER:
+			case E_BLOCK_INACTIVE_COMPARATOR:
+			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_LEVER:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_NOTE_BLOCK:
+			case E_BLOCK_REDSTONE_LAMP_OFF:
+			case E_BLOCK_REDSTONE_LAMP_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_STICKY_PISTON:
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+			case E_BLOCK_TNT:
+			case E_BLOCK_TRAPDOOR:
+			case E_BLOCK_TRIPWIRE_HOOK:
+			case E_BLOCK_WOODEN_BUTTON:
+			case E_BLOCK_WOODEN_DOOR:
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_PISTON:
+			{
+				 return true;
+			}
+			default: return false;
+		}
+	}
 };
-
-
-
-

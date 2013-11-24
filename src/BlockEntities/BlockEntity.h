@@ -52,6 +52,11 @@ public:
 	/// Returns NULL for unknown block types
 	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World = NULL);
 	
+	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
+	{
+		return "cBlockEntity";
+	}
+	
 	// tolua_begin
 	
 	// Position, in absolute block coordinates:

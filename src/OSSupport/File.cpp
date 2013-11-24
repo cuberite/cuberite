@@ -360,6 +360,82 @@ bool cFile::CreateFolder(const AString & a_FolderPath)
 
 
 
+AStringVector cFile::GetFolderContents(const AString & a_Folder)
+{
+	AStringVector AllFiles;
+	
+	#ifdef _WIN32
+
+	// If the folder name doesn't contain the terminating slash / backslash, add it:
+	AString FileFilter = a_Folder;
+	if (
+		!FileFilter.empty() &&
+		(FileFilter[FileFilter.length() - 1] != '\\') &&
+		(FileFilter[FileFilter.length() - 1] != '/')
+	)
+	{
+		FileFilter.push_back('\\');
+	}
+	
+	// Find all files / folders:
+	FileFilter.append("*.*");
+	HANDLE hFind;
+	WIN32_FIND_DATA FindFileData;
+	if ((hFind = FindFirstFile(FileFilter.c_str(), &FindFileData)) != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			AllFiles.push_back(FindFileData.cFileName);
+		} while (FindNextFile(hFind, &FindFileData));
+		FindClose(hFind);
+	}
+	
+	#else  // _WIN32
+
+	DIR * dp;
+	struct dirent *dirp;
+	if (*a_Directory == 0)
+	{
+		a_Directory = ".";
+	}
+	if ((dp = opendir(a_Directory)) == NULL)
+	{
+		LOGERROR("Error (%i) opening directory \"%s\"\n", errno, a_Directory );
+	}
+	else
+	{
+		while ((dirp = readdir(dp)) != NULL)
+		{
+			AllFiles.push_back(dirp->d_name);
+		}
+		closedir(dp);
+	}
+	
+	#endif  // else _WIN32
+
+	return AllFiles;
+}
+
+
+
+
+
+AString cFile::ReadWholeFile(const AString & a_FileName)
+{
+	cFile f;
+	if (!f.Open(a_FileName, fmRead))
+	{
+		return "";
+	}
+	AString Contents;
+	f.ReadRestOfFile(Contents);
+	return Contents;
+}
+
+
+
+
+
 int cFile::Printf(const char * a_Fmt, ...)
 {
 	AString buf;

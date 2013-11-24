@@ -15,10 +15,10 @@
 
 
 /// If the generation queue size exceeds this number, a warning will be output
-const int QUEUE_WARNING_LIMIT = 1000;
+const unsigned int QUEUE_WARNING_LIMIT = 1000;
 
 /// If the generation queue size exceeds this number, chunks with no clients will be skipped
-const int QUEUE_SKIP_LIMIT = 500;
+const unsigned int QUEUE_SKIP_LIMIT = 500;
 
 
 
@@ -53,7 +53,7 @@ bool cChunkGenerator::Start(cWorld * a_World, cIniFile & a_IniFile)
 	m_World = a_World;
 	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", rnd.randInt());
 	AString GeneratorName = a_IniFile.GetValueSet("Generator", "Generator", "Composable");
-	
+
 	if (NoCaseCompare(GeneratorName, "Noise3D") == 0)
 	{
 		m_Generator = new cNoise3DGenerator(*this);
@@ -72,9 +72,9 @@ bool cChunkGenerator::Start(cWorld * a_World, cIniFile & a_IniFile)
 		LOGERROR("Generator could not start, aborting the server");
 		return false;
 	}
-	
+
 	m_Generator->Initialize(a_World, a_IniFile);
-	
+
 	return super::Start();
 }
 
@@ -101,7 +101,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_Chunk
 {
 	{
 		cCSLock Lock(m_CS);
-		
+
 		// Check if it is already in the queue:
 		for (cChunkCoordsList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
 		{
@@ -111,7 +111,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_Chunk
 				return;
 			}
 		}  // for itr - m_Queue[]
-		
+
 		// Add to queue, issue a warning if too many:
 		if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
 		{
@@ -119,7 +119,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_Chunk
 		}
 		m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	}
-	
+
 	m_Event.Set();
 }
 
@@ -196,7 +196,7 @@ void cChunkGenerator::Execute(void)
 	int NumChunksGenerated = 0;  // Number of chunks generated since the queue was last empty
 	clock_t GenerationStart = clock();  // Clock tick when the queue started to fill
 	clock_t LastReportTick = clock();  // Clock tick of the last report made (so that performance isn't reported too often)
-	
+
 	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
@@ -219,7 +219,7 @@ void cChunkGenerator::Execute(void)
 			GenerationStart = clock();
 			LastReportTick = clock();
 		}
-		
+
 		cChunkCoords coords = m_Queue.front();		// Get next coord from queue
 		m_Queue.erase( m_Queue.begin() );	// Remove coordinate from queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
@@ -243,19 +243,19 @@ void cChunkGenerator::Execute(void)
 			// Already generated, ignore request
 			continue;
 		}
-		
+
 		if (SkipEnabled && !m_World->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkZ))
 		{
 			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
 			continue;
 		}
-		
+
 		LOGD("Generating chunk [%d, %d, %d]", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 		DoGenerate(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
-		
+
 		// Save the chunk right after generating, so that we don't have to generate it again on next run
 		m_World->GetStorage().QueueSaveChunk(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
-		
+
 		NumChunksGenerated++;
 	}  // while (!bStop)
 }
@@ -269,17 +269,17 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cRoot::Get()->GetPluginManager()->CallHookChunkGenerating(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
 	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc);
 	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
-	
+
 	#ifdef _DEBUG
 	// Verify that the generator has produced valid data:
 	ChunkDesc.VerifyHeightmap();
 	#endif
-	
+
 	cChunkDef::BlockNibbles BlockMetas;
 	ChunkDesc.CompressBlockMetas(BlockMetas);
-	
+
 	m_World->SetChunkData(
-		a_ChunkX, a_ChunkZ, 
+		a_ChunkX, a_ChunkZ,
 		ChunkDesc.GetBlockTypes(), BlockMetas,
 		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
 		&ChunkDesc.GetHeightMap(), &ChunkDesc.GetBiomeMap(),

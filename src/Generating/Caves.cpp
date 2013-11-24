@@ -55,7 +55,7 @@ struct cCaveDefPoint
 	int m_BlockY;
 	int m_BlockZ;
 	int m_Radius;
-	
+
 	cCaveDefPoint(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Radius) :
 		m_BlockX(a_BlockX),
 		m_BlockY(a_BlockY),
@@ -78,22 +78,22 @@ class cCaveTunnel
 	int m_MinBlockX, m_MaxBlockX;
 	int m_MinBlockY, m_MaxBlockY;
 	int m_MinBlockZ, m_MaxBlockZ;
-	
+
 	/// Generates the shaping defpoints for the ravine, based on the ravine block coords and noise
 	void Randomize(cNoise & a_Noise);
-	
+
 	/// Refines (adds and smooths) defpoints from a_Src into a_Dst; returns false if no refinement possible (segments too short)
 	bool RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints & a_Dst);
-	
+
 	/// Does rounds of smoothing, two passes of RefineDefPoints(), as long as they return true
 	void Smooth(void);
-	
+
 	/// Linearly interpolates the points so that the maximum distance between two neighbors is max 1 block
 	void FinishLinear(void);
-	
+
 	/// Calculates the bounding box of the points present
 	void CalcBoundingBox(void);
-	
+
 public:
 	cCaveDefPoints m_Points;
 
@@ -102,14 +102,14 @@ public:
 		int a_BlockEndX,   int a_BlockEndY,   int a_BlockEndZ,   int a_EndRadius,
 		cNoise & a_Noise
 	);
-	
+
 	/// Carves the tunnel into the chunk specified
 	void ProcessChunk(
-		int a_ChunkX, int a_ChunkZ, 
-		cChunkDef::BlockTypes & a_BlockTypes, 
+		int a_ChunkX, int a_ChunkZ,
+		cChunkDef::BlockTypes & a_BlockTypes,
 		cChunkDef::HeightMap & a_HeightMap
 	);
-	
+
 	#ifdef _DEBUG
 	AString ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const;
 	#endif  // _DEBUG
@@ -128,17 +128,17 @@ public:
 	// The generating block position; is read directly in cStructGenWormNestCaves::GetCavesForChunk()
 	int m_BlockX;
 	int m_BlockZ;
-	
+
 	cCaveSystem(int a_BlockX, int a_BlockZ, int a_MaxOffset, int a_Size, cNoise & a_Noise);
 	~cCaveSystem();
-	
+
 	/// Carves the cave system into the chunk specified
 	void ProcessChunk(
-		int a_ChunkX, int a_ChunkZ, 
-		cChunkDef::BlockTypes & a_BlockTypes, 
+		int a_ChunkX, int a_ChunkZ,
+		cChunkDef::BlockTypes & a_BlockTypes,
 		cChunkDef::HeightMap & a_HeightMap
 	);
-	
+
 	#ifdef _DEBUG
 	AString ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const;
 	#endif  // _DEBUG
@@ -146,15 +146,15 @@ public:
 protected:
 	int m_Size;
 	cCaveTunnels m_Tunnels;
-	
+
 	void Clear(void);
 
 	/// Generates a_Segment successive tunnels, with possible branches. Generates the same output for the same [x, y, z, a_Segments]
 	void GenerateTunnelsFromPoint(
-		int a_OriginX, int a_OriginY, int a_OriginZ, 
+		int a_OriginX, int a_OriginY, int a_OriginZ,
 		cNoise & a_Noise, int a_Segments
 	);
-	
+
 	/// Returns a radius based on the location provided.
 	int GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ);
 } ;
@@ -174,19 +174,19 @@ cCaveTunnel::cCaveTunnel(
 {
 	m_Points.push_back(cCaveDefPoint(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius));
 	m_Points.push_back(cCaveDefPoint(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius));
-	
+
 	if ((a_BlockStartY <= 0) && (a_BlockEndY <= 0))
 	{
 		// Don't bother detailing this cave, it's under the world anyway
 		return;
 	}
-	
+
 	Randomize(a_Noise);
 	Smooth();
-	
+
 	// We know that the linear finishing won't affect the bounding box, so let's calculate it now, as we have less data:
 	CalcBoundingBox();
-	
+
 	FinishLinear();
 }
 
@@ -308,7 +308,7 @@ void cCaveTunnel::FinishLinear(void)
 	// For each segment, use Bresenham's 3D line algorithm to draw a "line" of defpoints
 	cCaveDefPoints Pts;
 	std::swap(Pts, m_Points);
-	
+
 	m_Points.reserve(Pts.size() * 3);
 	int PrevX = Pts.front().m_BlockX;
 	int PrevY = Pts.front().m_BlockY;
@@ -324,7 +324,6 @@ void cCaveTunnel::FinishLinear(void)
 		int sx = (PrevX < x1) ? 1 : -1;
 		int sy = (PrevY < y1) ? 1 : -1;
 		int sz = (PrevZ < z1) ? 1 : -1;
-		int err = dx - dz;
 		int R = itr->m_Radius;
 
 		if (dx >= std::max(dy, dz))  // x dominant
@@ -418,7 +417,7 @@ void cCaveTunnel::FinishLinear(void)
 					PrevY += sy;
 					yd -= dz;
 				}
-				
+
 				// move along z
 				PrevZ += sz;
 				xd += dx;
@@ -453,8 +452,8 @@ void cCaveTunnel::CalcBoundingBox(void)
 
 
 void cCaveTunnel::ProcessChunk(
-	int a_ChunkX, int a_ChunkZ, 
-	cChunkDef::BlockTypes & a_BlockTypes, 
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,
 	cChunkDef::HeightMap & a_HeightMap
 )
 {
@@ -462,7 +461,7 @@ void cCaveTunnel::ProcessChunk(
 	int BaseZ = a_ChunkZ * cChunkDef::Width;
 	if (
 		(BaseX > m_MaxBlockX) || (BaseX + cChunkDef::Width < m_MinBlockX) ||
-		(BaseX > m_MaxBlockX) || (BaseX + cChunkDef::Width < m_MinBlockX)
+		(BaseZ > m_MaxBlockZ) || (BaseZ + cChunkDef::Width < m_MinBlockZ)
 	)
 	{
 		// Tunnel does not intersect the chunk at all, bail out
@@ -485,7 +484,7 @@ void cCaveTunnel::ProcessChunk(
 			// Cannot intersect, bail out early
 			continue;
 		}
-		
+
 		// Carve out a sphere around the xyz point, m_Radius in diameter; skip 3/7 off the top and bottom:
 		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
 		int DifY = itr->m_BlockY;
@@ -493,7 +492,7 @@ void cCaveTunnel::ProcessChunk(
 		int Bottom = std::max(itr->m_BlockY - 3 * itr->m_Radius / 7, 1);
 		int Top    = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, (int)(cChunkDef::Height));
 		int SqRad  = itr->m_Radius * itr->m_Radius;
-		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++) 
+		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			for (int y = Bottom; y <= Top; y++)
 			{
@@ -527,9 +526,9 @@ void cCaveTunnel::ProcessChunk(
 			}  // for y
 		}  // for x, z
 	}  // for itr - m_Points[]
-	
+
 	/*
-	#ifdef _DEBUG		
+	#ifdef _DEBUG
 	// For debugging purposes, outline the shape of the cave using glowstone, *after* carving the entire cave:
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
@@ -587,7 +586,7 @@ cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_BlockX, int a_BlockZ, in
 		int OriginX = a_BlockX + (a_Noise.IntNoise3DInt(13 * a_BlockX, 17 * a_BlockZ, 11 * i) / 19) % a_MaxOffset;
 		int OriginZ = a_BlockZ + (a_Noise.IntNoise3DInt(17 * a_BlockX, 13 * a_BlockZ, 11 * i) / 23) % a_MaxOffset;
 		int OriginY  = 20 + (a_Noise.IntNoise3DInt(19 * a_BlockX, 13 * a_BlockZ, 11 * i) / 17) % 20;
-		
+
 		// Generate three branches from the origin point:
 		// The tunnels generated depend on X, Y, Z and Branches,
 		// for the same set of numbers it generates the same offsets!
@@ -613,8 +612,8 @@ cStructGenWormNestCaves::cCaveSystem::~cCaveSystem()
 
 
 void cStructGenWormNestCaves::cCaveSystem::ProcessChunk(
-	int a_ChunkX, int a_ChunkZ, 
-	cChunkDef::BlockTypes & a_BlockTypes, 
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,
 	cChunkDef::HeightMap & a_HeightMap
 )
 {
@@ -645,14 +644,14 @@ AString cStructGenWormNestCaves::cCaveSystem::ExportAsSVG(int a_Color, int a_Off
 	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
 		a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ - 5, a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ + 5
 	);
-	
+
 	// A gray line from the base point to the first point of the ravine, for identification:
 	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#cfcfcf;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
-		a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ, 
-		a_OffsetX + m_Tunnels.front()->m_Points.front().m_BlockX, 
+		a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ,
+		a_OffsetX + m_Tunnels.front()->m_Points.front().m_BlockX,
 		a_OffsetZ + m_Tunnels.front()->m_Points.front().m_BlockZ
 	);
-	
+
 	// Offset guides:
 	if (a_OffsetX > 0)
 	{
@@ -666,7 +665,7 @@ AString cStructGenWormNestCaves::cCaveSystem::ExportAsSVG(int a_Color, int a_Off
 			a_OffsetZ, a_OffsetZ
 		);
 	}
-	
+
 	return SVG;
 }
 #endif  // _DEBUG
@@ -689,7 +688,7 @@ void cStructGenWormNestCaves::cCaveSystem::Clear(void)
 
 
 void cStructGenWormNestCaves::cCaveSystem::GenerateTunnelsFromPoint(
-	int a_OriginX, int a_OriginY, int a_OriginZ, 
+	int a_OriginX, int a_OriginY, int a_OriginZ,
 	cNoise & a_Noise, int a_NumSegments
 )
 {
@@ -727,7 +726,7 @@ int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_Orig
 	// We want mapping 384 -> 3, 0 -> 19, 768 -> 19, so divide by 24 to get [0 .. 31] with center at 16, then use abs() to fold around the center
 	int res = 3 + abs((sum / 24) - 16);
 	*/
-	
+
 	// Algorithm of choice: random value in the range of zero to random value - heavily towards zero
 	int res = MIN_RADIUS + (rnd >> 8) % ((rnd % (MAX_RADIUS - MIN_RADIUS)) + 1);
 	return res;
@@ -815,7 +814,7 @@ void cStructGenWormNestCaves::GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cStru
 			++itr;
 		}
 	}  // for itr - m_Cache[]
-	
+
 	for (int x = 0; x < NEIGHBORHOOD_SIZE; x++)
 	{
 		int RealX = (BaseX + x) * m_Grid;
@@ -837,11 +836,11 @@ void cStructGenWormNestCaves::GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cStru
 			}
 		}
 	}
-	
+
 	// Copy a_Caves into m_Cache to the beginning:
 	cCaveSystems CavesCopy(a_Caves);
 	m_Cache.splice(m_Cache.begin(), CavesCopy, CavesCopy.begin(), CavesCopy.end());
-	
+
 	// Trim the cache if it's too long:
 	if (m_Cache.size() > 100)
 	{
@@ -855,7 +854,7 @@ void cStructGenWormNestCaves::GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cStru
 		std::advance(itr, 100);
 		m_Cache.erase(itr, m_Cache.end());
 	}
-	
+
 	/*
 	// Uncomment this block for debugging the caves' shapes in 2D using an SVG export
 	#ifdef _DEBUG
@@ -869,7 +868,7 @@ void cStructGenWormNestCaves::GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cStru
 		SVG.append((*itr)->ExportAsSVG(Color, 512, 512));
 	}
 	SVG.append("</svg>\n");
-	
+
 	AString fnam;
 	Printf(fnam, "wnc\\%03d_%03d.svg", a_ChunkX, a_ChunkZ);
 	cFile File(fnam, cFile::fmWrite);
@@ -905,13 +904,13 @@ static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
 void cStructGenMarbleCaves::GenStructures(cChunkDesc & a_ChunkDesc)
 {
 	cNoise Noise(m_Seed);
-	for (int z = 0; z < cChunkDef::Width; z++) 
+	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		const float zz = (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z);
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			const float xx = (float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x);
-			
+
 			int Top = a_ChunkDesc.GetHeight(x, z);
 			for (int y = 1; y < Top; ++y )
 			{
@@ -940,18 +939,17 @@ void cStructGenMarbleCaves::GenStructures(cChunkDesc & a_ChunkDesc)
 
 void cStructGenDualRidgeCaves::GenStructures(cChunkDesc & a_ChunkDesc)
 {
-	for (int z = 0; z < cChunkDef::Width; z++) 
+	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		const float zz = (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			const float xx = (float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10;
-			
+
 			int Top = a_ChunkDesc.GetHeight(x, z);
 			for (int y = 1; y <= Top; ++y)
 			{
 				const float yy = (float)y / 10;
-				const float WaveNoise = 1;
 				float n1 = m_Noise1.CubicNoise3D(xx, yy, zz);
 				float n2 = m_Noise2.CubicNoise3D(xx, yy, zz);
 				float n3 = m_Noise1.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;

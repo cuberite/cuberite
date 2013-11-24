@@ -739,6 +739,39 @@ bool cLuaState::CallFunction(int a_NumResults)
 
 
 
+bool cLuaState::CheckParamUserTable(int a_StartParam, const char * a_UserTable, int a_EndParam)
+{
+	ASSERT(IsValid());
+	
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+	
+	tolua_Error tolua_err;
+	for (int i = a_StartParam; i <= a_EndParam; i++)
+	{
+		if (tolua_isusertable(m_LuaState, i, a_UserTable, 0, &tolua_err))
+		{
+			continue;
+		}
+		// Not the correct parameter
+		lua_Debug entry;
+		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+		return false;
+	}  // for i - Param
+	
+	// All params checked ok
+	return true;
+}
+
+
+
+
+
 bool cLuaState::CheckParamUserType(int a_StartParam, const char * a_UserType, int a_EndParam)
 {
 	ASSERT(IsValid());
@@ -818,6 +851,39 @@ bool cLuaState::CheckParamNumber(int a_StartParam, int a_EndParam)
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
 		if (tolua_isnumber(m_LuaState, i, 0, &tolua_err))
+		{
+			continue;
+		}
+		// Not the correct parameter
+		lua_Debug entry;
+		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+		return false;
+	}  // for i - Param
+	
+	// All params checked ok
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
+{
+	ASSERT(IsValid());
+	
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+	
+	tolua_Error tolua_err;
+	for (int i = a_StartParam; i <= a_EndParam; i++)
+	{
+		if (tolua_isstring(m_LuaState, i, 0, &tolua_err))
 		{
 			continue;
 		}

@@ -14,14 +14,8 @@
 
 
 
-extern bool g_BlockPistonBreakable[];
-
-
-
-
-
 /// Number of ticks that the piston extending / retracting waits before setting the block
-const int PISTON_TICK_DELAY = 20;
+const int PISTON_TICK_DELAY = 6;
 
 
 
@@ -77,9 +71,6 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 		return;
 	}
 
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
-	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);
-	
 	int dist = FirstPassthroughBlock(pistx, pisty, pistz, pistonMeta);
 	if (dist < 0)
 	{
@@ -87,6 +78,9 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 		return;
 	}
 
+	m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, pistonBlock);
+	m_World->BroadcastSoundEffect("tile.piston.out", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);	
+	
 	// Drop the breakable block in the line, if appropriate:
 	AddDir(pistx, pisty, pistz, pistonMeta, dist + 1);  // "pist" now at the breakable / empty block
 	BLOCKTYPE currBlock;
@@ -120,7 +114,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	AddDir(pistx, pisty, pistz, pistonMeta, -1);
 	// "pist" now at piston body, "ext" at future extension
 	
-	m_World->QueueSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8, PISTON_TICK_DELAY);
+	m_World->SetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8);
 	m_World->QueueSetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0), PISTON_TICK_DELAY);
 }
 
@@ -141,7 +135,7 @@ void cPiston::RetractPiston(int pistx, int pisty, int pistz)
 	
 	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), pistonBlock);
 	m_World->BroadcastSoundEffect("tile.piston.in", pistx * 8, pisty * 8, pistz * 8, 0.5f, 0.7f);			
-	m_World->QueueSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8), PISTON_TICK_DELAY);
+	m_World->SetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
 
 	// Check the extension:
 	AddDir(pistx, pisty, pistz, pistonMeta, 1);
@@ -193,15 +187,6 @@ bool cPiston::IsExtended(NIBBLETYPE a_PistonMeta)
 bool cPiston::IsSticky(BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_STICKY_PISTON);
-}
-
-
-
-
-
-bool cPiston::IsStickyExtension(NIBBLETYPE a_ExtMeta)
-{
-	return ((a_ExtMeta & 0x08) != 0);
 }
 
 

@@ -270,55 +270,6 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 
-AStringList GetDirectoryContents(const char * a_Directory)
-{
-	AStringList AllFiles;
-	
-	#ifdef _WIN32
-	
-	AString FileFilter = AString(a_Directory) + "*.*";
-	HANDLE hFind;
-	WIN32_FIND_DATA FindFileData;
-
-	if ((hFind = FindFirstFile(FileFilter.c_str(), &FindFileData)) != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			AllFiles.push_back(FindFileData.cFileName);
-		} while (FindNextFile(hFind, &FindFileData));
-		FindClose(hFind);
-	}
-	
-	#else  // _WIN32
-
-	DIR * dp;
-	struct dirent *dirp;
-	if (*a_Directory == 0)
-	{
-		a_Directory = ".";
-	}
-	if ((dp = opendir(a_Directory)) == NULL) 
-	{
-		LOGERROR("Error (%i) opening directory \"%s\"\n", errno, a_Directory );
-	}
-	else
-	{
-		while ((dirp = readdir(dp)) != NULL) 
-		{
-			AllFiles.push_back(dirp->d_name);
-		}
-		closedir(dp);
-	}
-	
-	#endif  // else _WIN32
-
-	return AllFiles;
-}
-
-
-
-
-
 // Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
 AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8)
 {

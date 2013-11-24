@@ -2,7 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
-#include "../Simulator/RedstoneSimulator.h"
+#include "../Blocks/BlockRedstoneRepeater.h"
 
 
 
@@ -30,7 +30,7 @@ public:
 	) override
 	{
 		a_BlockType = E_BLOCK_REDSTONE_REPEATER_OFF;
-		a_BlockMeta = cRedstoneSimulator::RepeaterRotationToMetaData(a_Player->GetRotation());
+		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetRotation());
 		return true;
 	}
 } ;

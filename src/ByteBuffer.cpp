@@ -13,6 +13,25 @@
 
 
 
+// Try to determine endianness:
+#if ( \
+	defined(__i386__) || defined(__alpha__) || \
+	defined(__ia64) || defined(__ia64__) || \
+	defined(_M_IX86) || defined(_M_IA64) || \
+	defined(_M_ALPHA) || defined(__amd64) || \
+	defined(__amd64__) || defined(_M_AMD64) || \
+	defined(__x86_64) || defined(__x86_64__) || \
+	defined(_M_X64) || defined(__bfin__) || \
+	defined(__ARMEL__) || \
+	(defined(_WIN32) && defined(__ARM__) && defined(_MSC_VER)) \
+)
+	#define IS_LITTLE_ENDIAN
+#elif defined (__ARMEB__)
+	#define IS_BIG_ENDIAN
+#else
+	#error Cannot determine endianness of this platform
+#endif
+
 // If a string sent over the protocol is larger than this, a warning is emitted to the console
 #define MAX_STRING_SIZE (512 KiB)
 
@@ -416,6 +435,25 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 
 
 
+bool cByteBuffer::ReadLEInt(int & a_Value)
+{
+	CHECK_THREAD;
+	CheckValid();
+	NEEDBYTES(4);
+	ReadBuf(&a_Value, 4);
+	
+	#ifdef IS_BIG_ENDIAN
+		// Convert:
+		a_Value = ((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
+	#endif
+	
+	return true;
+}
+
+
+
+
+
 bool cByteBuffer::WriteChar(char a_Value)
 {
 	CHECK_THREAD;
@@ -566,6 +604,22 @@ bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 		return false;
 	}
 	return WriteBuf(a_Value.data(), a_Value.size());
+}
+
+
+
+
+
+bool cByteBuffer::WriteLEInt(int a_Value)
+{
+	CHECK_THREAD;
+	CheckValid();
+	#ifdef IS_LITTLE_ENDIAN
+		return WriteBuf((const char *)&a_Value, 4);
+	#else
+		int Value = ((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
+		return WriteBuf((const char *)&Value, 4);
+	#endif
 }
 
 

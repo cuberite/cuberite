@@ -169,7 +169,7 @@ bool cSocket::SetReuseAddress(void)
 
 
 
-int cSocket::WSAStartup()
+int cSocket::WSAStartup(void)
 {
 #ifdef _WIN32
 	WSADATA wsaData;
@@ -336,23 +336,23 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 {
 	// First try IP Address string to hostent conversion, because it's faster
 	unsigned long addr = inet_addr(a_HostNameOrAddr.c_str());
-	hostent * hp = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
-	if (hp == NULL)
+	if (addr == INADDR_NONE)
 	{
 		// It is not an IP Address string, but rather a regular hostname, resolve:
-		hp = gethostbyname(a_HostNameOrAddr.c_str());
+		hostent * hp = gethostbyname(a_HostNameOrAddr.c_str());
 		if (hp == NULL)
 		{
-			LOGWARN("cTCPLink: Could not resolve hostname \"%s\"", a_HostNameOrAddr.c_str());
+			LOGWARNING("%s: Could not resolve hostname \"%s\"", __FUNCTION__, a_HostNameOrAddr.c_str());
 			CloseSocket();
 			return false;
 		}
+		addr = *((unsigned long*)hp->h_addr);
 	}
 
 	sockaddr_in server;
-	server.sin_addr.s_addr = *((unsigned long*)hp->h_addr);
+	server.sin_addr.s_addr = addr;
 	server.sin_family = AF_INET;
-	server.sin_port = htons( (unsigned short)a_Port );
+	server.sin_port = htons((unsigned short)a_Port);
 	return (connect(m_Socket, (sockaddr *)&server, sizeof(server)) == 0);
 }
 

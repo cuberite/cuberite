@@ -6,6 +6,7 @@
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
+#include "Simulator/RedstoneSimulator.h"
 
 
 
@@ -206,6 +207,9 @@ public:
 	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found.
 	bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible
 
+	/// Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true
+	bool ForEachBlockEntity(cBlockEntityCallback & a_Callback);  // Lua-accessible
+
 	/// Calls the callback for each chest; returns true if all chests processed, false if the callback aborted by returning true
 	bool ForEachChest(cChestCallback & a_Callback);  // Lua-accessible
 
@@ -221,6 +225,9 @@ public:
 	/// Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true
 	bool ForEachFurnace(cFurnaceCallback & a_Callback);  // Lua-accessible
 	
+	/// Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found
+	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
+
 	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Lua-acessible
 
@@ -338,6 +345,7 @@ public:
 	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
+	cRedstoneSimulatorChunkData & GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
@@ -407,6 +415,7 @@ private:
 	cFluidSimulatorData *   m_WaterSimulatorData;
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
+	cRedstoneSimulatorChunkData m_RedstoneSimulatorData;
 
 
 	// pick up a random block of this chunk
