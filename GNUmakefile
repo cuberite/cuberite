@@ -138,18 +138,11 @@ endif
 # INCLUDE directories for MCServer
 
 INCLUDE = -I.\
-		-Isource\
-		-Isource/md5\
-		-Isource/items\
-		-Isource/blocks\
-		-Itolua++-1.0.93/src/lib\
-		-Ilua-5.1.4/src\
-		-Izlib-1.2.7\
-		-IiniFile\
-		-Itolua++-1.0.93/include\
-		-Ijsoncpp-src-0.5.0/include\
-		-Ijsoncpp-src-0.5.0/src/lib_json\
-		-Iexpat
+		-Isrc\
+		-Isrc/md5\
+		-Isrc/items\
+		-Isrce/blocks\
+		-Ilib
 
 
 
@@ -158,7 +151,7 @@ INCLUDE = -I.\
 ###################################################
 # Build MCServer
 
-SOURCES := $(shell find CryptoPP lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source tolua++-1.0.93 iniFile expat '(' -name '*.cpp' -o -name '*.c' ')')
+SOURCES := $(shell find src lib '(' -name '*.cpp' -o -name '*.c' ')')
 SOURCES := $(filter-out %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp %StackWalker.cpp %example.c,$(SOURCES))
 OBJECTS := $(patsubst %.c,$(BUILDDIR)%.o,$(SOURCES))
 OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))
