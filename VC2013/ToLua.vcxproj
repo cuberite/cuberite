@@ -134,15 +134,15 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\tolua++-1.0.93\src\bin\tolua.c" />
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_event.c" />
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_is.c" />
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_map.c" />
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_push.c" />
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_to.c" />
+    <ClCompile Include="..\lib\tolua++\src\bin\tolua.c" />
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_event.c" />
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_is.c" />
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_map.c" />
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_push.c" />
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_to.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\tolua++-1.0.93\src\lib\tolua_event.h" />
+    <ClInclude Include="..\lib\tolua++\src\lib\tolua_event.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

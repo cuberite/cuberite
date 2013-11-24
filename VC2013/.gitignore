@@ -8,3 +8,4 @@ ipch/**
 *.suo
 *.obj
 *.sdf
+*.opensdf

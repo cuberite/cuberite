@@ -7,84 +7,84 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\zlib-1.2.7\adler32.c">
+    <ClCompile Include="..\lib\zlib\adler32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\compress.c">
+    <ClCompile Include="..\lib\zlib\compress.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\crc32.c">
+    <ClCompile Include="..\lib\zlib\crc32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\deflate.c">
+    <ClCompile Include="..\lib\zlib\deflate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\gzclose.c">
+    <ClCompile Include="..\lib\zlib\gzclose.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\gzlib.c">
+    <ClCompile Include="..\lib\zlib\gzlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\gzread.c">
+    <ClCompile Include="..\lib\zlib\gzread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\gzwrite.c">
+    <ClCompile Include="..\lib\zlib\gzwrite.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\infback.c">
+    <ClCompile Include="..\lib\zlib\infback.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\inffast.c">
+    <ClCompile Include="..\lib\zlib\inffast.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\inflate.c">
+    <ClCompile Include="..\lib\zlib\inflate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\inftrees.c">
+    <ClCompile Include="..\lib\zlib\inftrees.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\trees.c">
+    <ClCompile Include="..\lib\zlib\trees.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\uncompr.c">
+    <ClCompile Include="..\lib\zlib\uncompr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.7\zutil.c">
+    <ClCompile Include="..\lib\zlib\zutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\zlib-1.2.7\crc32.h">
+    <ClInclude Include="..\lib\zlib\crc32.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\deflate.h">
+    <ClInclude Include="..\lib\zlib\deflate.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\gzguts.h">
+    <ClInclude Include="..\lib\zlib\gzguts.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\inffast.h">
+    <ClInclude Include="..\lib\zlib\inffast.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\inffixed.h">
+    <ClInclude Include="..\lib\zlib\inffixed.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\inflate.h">
+    <ClInclude Include="..\lib\zlib\inflate.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\inftrees.h">
+    <ClInclude Include="..\lib\zlib\inftrees.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\trees.h">
+    <ClInclude Include="..\lib\zlib\trees.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\zconf.h">
+    <ClInclude Include="..\lib\zlib\zconf.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\zlib.h">
+    <ClInclude Include="..\lib\zlib\zlib.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\zlib-1.2.7\zutil.h">
+    <ClInclude Include="..\lib\zlib\zutil.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
