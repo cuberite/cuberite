@@ -289,50 +289,53 @@ function DumpAPIHtml()
 	end
 	
 	f:write([[<!DOCTYPE html>
-<html>
-	<head>
+		<html>
+		<head>
 		<title>MCServer API - Index</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
-	</head>
-	<body>
+		</head>
+		<body>
 		<div id="content">
-			<header>
-				<h1>MCServer API - Index</h1>
-				<hr />
-			</header>
-			<p>The API reference is divided into the following sections:</p>
-			
-			<ul>
-				<li><a href="#classes">Class index</a></li>
-				<li><a href="#hooks">Hooks</a></li>
-				<li><a href="#extra">Extra pages</a></li>
-				<li><a href="#docstats">Documentation statistics</a></li>
-			</ul>
-			
-			<hr />
-			<a name="classes"><h2>Class index</h2></a>
-			<p>The following classes are available in the MCServer Lua scripting language:</p>
-			
-			<ul>
-]]);
+		<header>
+		<h1>MCServer API - Index</h1>
+		<hr />
+		</header>
+		<p>The API reference is divided into the following sections:</p>
+		<ul>
+		<li><a href="#classes">Class index</a></li>
+		<li><a href="#hooks">Hooks</a></li>
+		<li><a href="#extra">Extra pages</a></li>
+		<li><a href="#docstats">Documentation statistics</a></li>
+		</ul>
+		<hr />
+		<a name="classes"><h2>Class index</h2></a>
+		<p>The following classes are available in the MCServer Lua scripting language:
+		<ul>
+	]]);
 	for i, cls in ipairs(API) do
-		f:write("			<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>\n");
+		f:write("<li><a href=\"", cls.Name, ".html\">", cls.Name, "</a></li>\n");
 		WriteHtmlClass(cls, API);
 	end
-	f:write([[			</ul>
-	
-			<hr />
-			<a name="hooks"><h2>Hooks</h2></a>
-			
-			<p>A plugin can register to be called whenever an "interesting event" occurs. It does so by calling <a href="cPluginManager.html">cPluginManager</a>'s AddHook() function and implementing a callback function to handle the event.</p>
-			<p>A plugin can decide whether it will let the event pass through to the rest of the plugins, or hide it from them. This is determined by the return value from the hook callback function. If the function returns	false or no value, the event is propagated further. If the function returns true, the processing is	stopped, no other plugin receives the notification (and possibly MCServer disables the default behavior for the event). See each hook's details to see the exact behavior.</p>
-			
-			<table>
-				<tr>
-					<th>Hook name</th>
-					<th>Called when</th>
-				</tr>
-]]);
+	f:write([[
+		</ul></p>
+		<hr />
+		<a name="hooks"><h2>Hooks</h2></a>
+		<p>
+		A plugin can register to be called whenever an "interesting event" occurs. It does so by calling
+		<a href="cPluginManager.html">cPluginManager</a>'s AddHook() function and implementing a callback
+		function to handle the event.</p>
+		<p>
+		A plugin can decide whether it will let the event pass through to the rest of the plugins, or hide it
+		from them. This is determined by the return value from the hook callback function. If the function
+		returns false or no value, the event is propagated further. If the function returns true, the processing
+		is	stopped, no other plugin receives the notification (and possibly MCServer disables the default
+		behavior for the event). See each hook's details to see the exact behavior.</p>
+		<table>
+		<tr>
+		<th>Hook name</th>
+		<th>Called when</th>
+		</tr>
+	]]);
 	for i, hook in ipairs(Hooks) do
 		if (hook.DefaultFnName == nil) then
 			-- The hook is not documented yet
@@ -826,16 +829,16 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 
 		if (a_InheritedName ~= nil) then
-			cf:write("			<h2>Functions inherited from ", a_InheritedName, "</h2>\n");
+			cf:write("<h2>Functions inherited from ", a_InheritedName, "</h2>\n");
 		end
-		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Parameters</th>\n					<th>Return value</th>\n					<th>Notes</th>\n				</tr>\n");
+		cf:write("<table>\n<tr><th>Name</th><th>Parameters</th><th>Return value</th><th>Notes</th></tr>\n");
 		for i, func in ipairs(a_Functions) do
-			cf:write("				<tr>\n					<td>" .. func.Name .. "</td>\n");
-			cf:write("					<td>", LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
-			cf:write("					<td>", LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
-			cf:write("					<td>", LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)), "</td>\n				</tr>\n");
+			cf:write("<tr><td>", func.Name, "</td>\n");
+			cf:write("<td>", LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
+			cf:write("<td>", LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
+			cf:write("<td>", LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)), "</td></tr>\n");
 		end
-		cf:write("			</table>\n\n");
+		cf:write("</table>\n");
 	end
 	
 	local function WriteConstantTable(a_Constants, a_Source)
@@ -879,16 +882,16 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 		
 		if (a_InheritedName ~= nil) then
-			cf:write("			<h2>Member variables inherited from ", a_InheritedName, "</h2>\n");
+			cf:write("<h2>Member variables inherited from ", a_InheritedName, "</h2>\n");
 		end
 		
-		cf:write("			<table>\n				<tr>\n					<th>Name</th>\n					<th>Type</th>\n					<th>Notes</th>\n				</tr>\n");
+		cf:write("<table><tr><th>Name</th><th>Type</th><th>Notes</th></tr>\n");
 		for i, var in ipairs(a_Variables) do
-			cf:write("				<tr>\n					<td>", var.Name, "</td>\n");
-			cf:write("					<td>", LinkifyString(var.Type or "<i>(undocumented)</i>", a_InheritedName or a_ClassAPI.Name), "</td>\n");
-			cf:write("					<td>", LinkifyString(var.Notes or "", a_InheritedName or a_ClassAPI.Name), "</td>\n				</tr>\n");
+			cf:write("<tr><td>", var.Name, "</td>\n");
+			cf:write("<td>", LinkifyString(var.Type or "<i>(undocumented)</i>", a_InheritedName or a_ClassAPI.Name), "</td>\n");
+			cf:write("<td>", LinkifyString(var.Notes or "", a_InheritedName or a_ClassAPI.Name), "</td>\n				</tr>\n");
 		end
-		cf:write("			</table>\n\n");
+		cf:write("</table>\n\n");
 	end
 	
 	local function WriteDescendants(a_Descendants)
@@ -914,25 +917,23 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		CurrInheritance = CurrInheritance.Inherits;
 	end
 	
-	cf:write([[<!DOCTYPE html>
-<html>
-	<head>
+	cf:write([[<!DOCTYPE html><html>
+		<head>
 		<title>MCServer API - ]], a_ClassAPI.Name, [[ Class</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
 		<script src="lang-lua.js"></script>
-	</head>
-	<body>
+		</head>
+		<body>
 		<div id="content">
-			<header>
-				<h1>]], a_ClassAPI.Name, [[</h1>
-				<hr />
-			</header>
-			<h1>Contents</h1>
-			
-			<ul>
-]]);
+		<header>
+		<h1>]], a_ClassAPI.Name, [[</h1>
+		<hr />
+		</header>
+		<h1>Contents</h1>
+		<p><ul>
+	]]);
 	
 	local HasInheritance = ((#a_ClassAPI.Descendants > 0) or (a_ClassAPI.Inherits ~= nil));
 	
@@ -947,52 +948,52 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	-- Write the table of contents:
 	if (HasInheritance) then
-		cf:write("				<li><a href=\"#inherits\">Inheritance</a></li>\n");
+		cf:write("<li><a href=\"#inherits\">Inheritance</a></li>\n");
 	end
 	if (HasConstants) then
-		cf:write("				<li><a href=\"#constants\">Constants</a></li>\n");
+		cf:write("<li><a href=\"#constants\">Constants</a></li>\n");
 	end
 	if (HasVariables) then
-		cf:write("				<li><a href=\"#variables\">Member variables</a></li>\n");
+		cf:write("<li><a href=\"#variables\">Member variables</a></li>\n");
 	end
 	if (HasFunctions) then
-		cf:write("				<li><a href=\"#functions\">Functions</a></li>\n");
+		cf:write("<li><a href=\"#functions\">Functions</a></li>\n");
 	end
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
-			cf:write("				<li><a href=\"#additionalinfo_", i, "\">", (additional.Header or "<i>(No header)</i>"), "</a></li>\n");
+			cf:write("<li><a href=\"#additionalinfo_", i, "\">", (additional.Header or "<i>(No header)</i>"), "</a></li>\n");
 		end
 	end
-	cf:write("			</ul>\n\n");
+	cf:write("</ul></p>\n");
 	
 	-- Write the class description:
-	cf:write("			<a name=\"desc\"><hr /><h1>" .. ClassName .. " class</h1></a>\n");
+	cf:write("<hr /><a name=\"desc\"><h1>", ClassName, " class</h1></a>\n");
 	if (a_ClassAPI.Desc ~= nil) then
-		cf:write("			<p>");
+		cf:write("<p>");
 		cf:write(LinkifyString(a_ClassAPI.Desc, ClassName));
-		cf:write("			</p>\n\n");
+		cf:write("</p>\n\n");
 	end;
 	
 	-- Write the inheritance, if available:
 	if (HasInheritance) then
-		cf:write("			<a name=\"inherits\">\n			<hr /><h1>Inheritance</h1></a>\n");
+		cf:write("<hr /><a name=\"inherits\"><h1>Inheritance</h1></a>\n");
 		if (#InheritanceChain > 0) then
-			cf:write("			<p>This class inherits from the following parent classes:</p>\n\n			<ul>\n");
+			cf:write("<p>This class inherits from the following parent classes:<ul>\n");
 			for i, cls in ipairs(InheritanceChain) do
-				cf:write("				<li><a href=\"" .. cls.Name .. ".html\">" .. cls.Name .. "</a></li>\n");
+				cf:write("<li><a href=\"", cls.Name, ".html\">", cls.Name, "</a></li>\n");
 			end
-			cf:write("			</ul>\n\n");
+			cf:write("</ul></p>\n");
 		end
 		if (#a_ClassAPI.Descendants > 0) then
-			cf:write("			<p>This class has the following descendants:\n");
+			cf:write("<p>This class has the following descendants:\n");
 			WriteDescendants(a_ClassAPI.Descendants);
-			cf:write("			</p>\n\n");
+			cf:write("</p>\n\n");
 		end
 	end
 	
 	-- Write the constants:
 	if (HasConstants) then
-		cf:write("			<a name=\"constants\"><hr /><h1>Constants</h1></a>\n");
+		cf:write("<a name=\"constants\"><hr /><h1>Constants</h1></a>\n");
 		WriteConstants(a_ClassAPI.Constants, a_ClassAPI.ConstantGroups, a_ClassAPI.NumConstantsInGroups, nil);
 		g_Stats.NumTotalConstants = g_Stats.NumTotalConstants  + #a_ClassAPI.Constants + (a_ClassAPI.NumConstantsInGroups or 0);
 		for i, cls in ipairs(InheritanceChain) do
@@ -1002,7 +1003,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	-- Write the member variables:
 	if (HasVariables) then
-		cf:write("			<a name=\"variables\"><hr /><h1>Member variables</h1></a>\n");
+		cf:write("<a name=\"variables\"><hr /><h1>Member variables</h1></a>\n");
 		WriteVariables(a_ClassAPI.Variables, nil);
 		g_Stats.NumTotalVariables = g_Stats.NumTotalVariables + #a_ClassAPI.Variables;
 		for i, cls in ipairs(InheritanceChain) do
@@ -1012,7 +1013,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	
 	-- Write the functions, including the inherited ones:
 	if (HasFunctions) then
-		cf:write("			<a name=\"functions\"><hr /><h1>Functions</h1></a>\n");
+		cf:write("<a name=\"functions\"><hr /><h1>Functions</h1></a>\n");
 		WriteFunctions(a_ClassAPI.Functions, nil);
 		g_Stats.NumTotalFunctions = g_Stats.NumTotalFunctions + #a_ClassAPI.Functions;
 		for i, cls in ipairs(InheritanceChain) do
@@ -1023,19 +1024,12 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 	-- Write the additional infos:
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
-			cf:write("			<a name=\"additionalinfo_", i, "\"><h1>", additional.Header, "</h1></a>\n");
+			cf:write("<a name=\"additionalinfo_", i, "\"><h1>", additional.Header, "</h1></a>\n");
 			cf:write(LinkifyString(additional.Contents, ClassName));
 		end
 	end
 
-	cf:write([[
-		</div>
-		<script>
-			prettyPrint();
-		</script>
-	</body>
-</html>
-	]]);
+	cf:write([[</div><script>prettyPrint();</script></body></html>]]);
 	cf:close();
 end
 
@@ -1052,27 +1046,26 @@ function WriteHtmlHook(a_Hook)
 	end
 	local HookName = a_Hook.DefaultFnName;
 	
-	f:write([[<!DOCTYPE html>
-<html>
-	<head>
-		<title>MCServer API - ]] .. HookName .. [[ Hook</title>
+	f:write([[<!DOCTYPE html><html>
+		<head>
+		<title>MCServer API - ]], HookName, [[ Hook</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
 		<script src="lang-lua.js"></script>
-	</head>
-	<body>
+		</head>
+		<body>
 		<div id="content">
-			<header>
-				<h1>]] .. a_Hook.Name .. [[</h1>
-				<hr />
-			</header>
-			<p>
-]]);
+		<header>
+		<h1>]], a_Hook.Name, [[</h1>
+		<hr />
+		</header>
+		<p>
+	]]);
 	f:write(LinkifyString(a_Hook.Desc, HookName));
-	f:write("			</p>\n			<hr /><h1>Callback function</h1>\n			<p>The default name for the callback function is ");
-	f:write(a_Hook.DefaultFnName .. ". It has the following signature:\n\n");
-	f:write("			<pre class=\"prettyprint lang-lua\">function " .. HookName .. "(");
+	f:write("</p>\n<hr /><h1>Callback function</h1>\n<p>The default name for the callback function is ");
+	f:write(a_Hook.DefaultFnName, ". It has the following signature:\n");
+	f:write("<pre class=\"prettyprint lang-lua\">function ", HookName, "(");
 	if (a_Hook.Params == nil) then
 		a_Hook.Params = {};
 	end
@@ -1082,30 +1075,22 @@ function WriteHtmlHook(a_Hook)
 		end
 		f:write(param.Name);
 	end
-	f:write(")</pre>\n\n			<hr /><h1>Parameters:</h1>\n\n			<table>\n				<tr>\n					<th>Name</th>\n					<th>Type</th>\n					<th>Notes</th>\n				</tr>\n");
+	f:write(")</pre>\n<hr /><h1>Parameters:</h1>\n<table><tr><th>Name</th><th>Type</th><th>Notes</th></tr>\n");
 	for i, param in ipairs(a_Hook.Params) do
-		f:write("				<tr>\n					<td>" .. param.Name .. "</td>\n					<td>" .. LinkifyString(param.Type, HookName) .. "</td>\n					<td>" .. LinkifyString(param.Notes, HookName) .. "</td>\n				</tr>\n");
+		f:write("<tr><td>", param.Name, "</td><td>", LinkifyString(param.Type, HookName), "</td><td>", LinkifyString(param.Notes, HookName), "</td></tr>\n");
 	end
-	f:write("			</table>\n\n			<p>" .. (a_Hook.Returns or "") .. "</p>\n\n");
-	f:write([[			<hr /><h1>Code examples</h1>
-			<h2>Registering the callback</h2>
-			
-]]);
-	f:write("			<pre class=\"prettyprint lang-lua\">\n");
+	f:write("</table>\n<p>" .. (a_Hook.Returns or "") .. "</p>\n\n");
+	f:write([[<hr /><h1>Code examples</h1><h2>Registering the callback</h2>]]);
+	f:write("<pre class=\"prettyprint lang-lua\">\n");
 	f:write([[cPluginManager.AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);]]);
 	f:write("</pre>\n\n");
 	local Examples = a_Hook.CodeExamples or {};
 	for i, example in ipairs(Examples) do
-		f:write("			<h2>" .. (example.Title or "<i>missing Title</i>") .. "</h2>\n");
-		f:write("			<p>" .. (example.Desc or "<i>missing Desc</i>") .. "</p>\n\n");
-		f:write("			<pre class=\"prettyprint lang-lua\">" .. (example.Code or "<i>missing Code</i>") .. "\n			</pre>\n\n");
+		f:write("<h2>", (example.Title or "<i>missing Title</i>"), "</h2>\n");
+		f:write("<p>", (example.Desc or "<i>missing Desc</i>"), "</p>\n");
+		f:write("<pre class=\"prettyprint lang-lua\">", (example.Code or "<i>missing Code</i>"), "\n</pre>\n\n");
 	end
-	f:write([[		</div>
-		<script>
-			prettyPrint();
-		</script>
-	</body>
-</html>]]);
+	f:write([[</div><script>prettyPrint();</script></body></html>]]);
 	f:close();
 end
 
