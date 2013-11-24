@@ -742,3 +742,13 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 
 
 
+
+int cRoot::GetFurnaceFuelBurnTime(const cItem & a_Fuel)
+{
+	cFurnaceRecipe * FR = Get()->GetFurnaceRecipe();
+	return FR->GetBurnTime(a_Fuel);
+}
+
+
+
+

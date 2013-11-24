@@ -28,25 +28,30 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
 	cPluginManager.AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
-	PluginManager = cRoot:Get():GetPluginManager();
-	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
-	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
-	PluginManager:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
-	PluginManager:BindCommand("/testwnd", "debuggers", HandleTestWndCmd,      "- Opens up a window using plugin API");
-	PluginManager:BindCommand("/gc",      "debuggers", HandleGCCmd,           "- Activates the Lua garbage collector");
-	PluginManager:BindCommand("/fast",    "debuggers", HandleFastCmd,         "- Switches between fast and normal movement speed");
-	PluginManager:BindCommand("/dash",    "debuggers", HandleDashCmd,         "- Switches between fast and normal sprinting speed");
-	PluginManager:BindCommand("/hunger",  "debuggers", HandleHungerCmd,       "- Lists the current hunger-related variables");
-	PluginManager:BindCommand("/poison",  "debuggers", HandlePoisonCmd,       "- Sets food-poisoning for 15 seconds");
-	PluginManager:BindCommand("/starve",  "debuggers", HandleStarveCmd,       "- Sets the food level to zero");
-	PluginManager:BindCommand("/fl",      "debuggers", HandleFoodLevelCmd,    "- Sets the food level to the given value");
-	PluginManager:BindCommand("/spidey",  "debuggers", HandleSpideyCmd,       "- Shoots a line of web blocks until it hits non-air");
-	PluginManager:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
-	PluginManager:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
-	PluginManager:BindCommand("/arr",     "debuggers", HandleArrowCmd,        "- Creates an arrow going away from the player");
-	PluginManager:BindCommand("/fb",      "debuggers", HandleFireballCmd,     "- Creates a ghast fireball as if shot by the player");
-	PluginManager:BindCommand("/xpa",     "debuggers", HandleAddExperience,   "- Adds 200 experience to the player");
-	PluginManager:BindCommand("/xpr",     "debuggers", HandleRemoveXp,        "- Remove all xp");
+	PM = cRoot:Get():GetPluginManager();
+	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
+	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
+	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
+	PM:BindCommand("/testwnd", "debuggers", HandleTestWndCmd,      "- Opens up a window using plugin API");
+	PM:BindCommand("/gc",      "debuggers", HandleGCCmd,           "- Activates the Lua garbage collector");
+	PM:BindCommand("/fast",    "debuggers", HandleFastCmd,         "- Switches between fast and normal movement speed");
+	PM:BindCommand("/dash",    "debuggers", HandleDashCmd,         "- Switches between fast and normal sprinting speed");
+	PM:BindCommand("/hunger",  "debuggers", HandleHungerCmd,       "- Lists the current hunger-related variables");
+	PM:BindCommand("/poison",  "debuggers", HandlePoisonCmd,       "- Sets food-poisoning for 15 seconds");
+	PM:BindCommand("/starve",  "debuggers", HandleStarveCmd,       "- Sets the food level to zero");
+	PM:BindCommand("/fl",      "debuggers", HandleFoodLevelCmd,    "- Sets the food level to the given value");
+	PM:BindCommand("/spidey",  "debuggers", HandleSpideyCmd,       "- Shoots a line of web blocks until it hits non-air");
+	PM:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
+	PM:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
+	PM:BindCommand("/arr",     "debuggers", HandleArrowCmd,        "- Creates an arrow going away from the player");
+	PM:BindCommand("/fb",      "debuggers", HandleFireballCmd,     "- Creates a ghast fireball as if shot by the player");
+	PM:BindCommand("/xpa",     "debuggers", HandleAddExperience,   "- Adds 200 experience to the player");
+	PM:BindCommand("/xpr",     "debuggers", HandleRemoveXp,        "- Remove all xp");
+	PM:BindCommand("/fill",    "debuggers", HandleFill,            "- Fills all block entities in current chunk with junk");
+	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
+	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
+
+	Plugin:AddWebTab("Debuggers", HandleRequest_Debuggers);
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -863,3 +868,89 @@ function HandleRemoveXp(a_Split, a_Player)
 	
 	return true;
 end
+
+
+
+
+
+function HandleFill(a_Split, a_Player)
+	local World = a_Player:GetWorld();
+	local ChunkX = a_Player:GetChunkX();
+	local ChunkZ = a_Player:GetChunkZ();
+	World:ForEachBlockEntityInChunk(ChunkX, ChunkZ,
+		function(a_BlockEntity)
+			local BlockType = a_BlockEntity:GetBlockType();
+			if (
+				(BlockType == E_BLOCK_CHEST) or
+				(BlockType == E_BLOCK_DISPENSER) or
+				(BlockType == E_BLOCK_DROPPER) or
+				(BlockType == E_BLOCK_FURNACE) or
+				(BlockType == E_BLOCK_HOPPER)
+			) then
+				-- This block entity has items (inherits from cBlockEntityWithItems), fill it:
+				-- Note that we're not touching lit furnaces, don't wanna mess them up
+				local EntityWithItems = tolua.cast(a_BlockEntity, "cBlockEntityWithItems");
+				local ItemGrid = EntityWithItems:GetContents();
+				local NumSlots = ItemGrid:GetNumSlots();
+				local ItemToSet = cItem(E_ITEM_GOLD_NUGGET);
+				for i = 0, NumSlots - 1 do
+					if (ItemGrid:GetSlot(i):IsEmpty()) then
+						ItemGrid:SetSlot(i, ItemToSet);
+					end
+				end
+			end
+		end
+	);
+	return true;
+end
+
+
+
+
+
+function HandleFurnaceRecipe(a_Split, a_Player)
+	local HeldItem = a_Player:GetEquippedItem();
+	local Out, NumTicks, In = cRoot:GetFurnaceRecipe(HeldItem);
+	if (Out ~= nil) then
+		a_Player:SendMessage(
+			"Furnace turns " .. ItemToFullString(In) ..
+			" to " .. ItemToFullString(Out) ..
+			" in " .. NumTicks .. " ticks (" ..
+			tostring(NumTicks / 20) .. " seconds)."
+		);
+	else
+		a_Player:SendMessage("There is no furnace recipe that would smelt " .. ItemToString(HeldItem));
+	end
+	return true;
+end
+
+
+
+
+
+function HandleFurnaceFuel(a_Split, a_Player)
+	local HeldItem = a_Player:GetEquippedItem();
+	local NumTicks = cRoot:GetFurnaceFuelBurnTime(HeldItem);
+	if (NumTicks > 0) then
+		a_Player:SendMessage(
+			ItemToFullString(HeldItem) .. " would power a furnace for " .. NumTicks ..
+			" ticks (" .. tostring(NumTicks / 20) .. " seconds)."
+		);
+	else
+		a_Player:SendMessage(ItemToString(HeldItem) .. " will not power furnaces.");
+	end
+	return true;
+end
+
+
+
+
+
+function HandleRequest_Debuggers(a_Request)
+	local FolderContents = cFile:GetFolderContents("./");
+	return "<p>The following objects have been returned by cFile:GetFolderContents():<ul><li>" .. table.concat(FolderContents, "</li><li>") .. "</li></ul></p>";
+end
+
+
+
+

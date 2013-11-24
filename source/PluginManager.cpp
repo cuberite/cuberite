@@ -72,8 +72,8 @@ void cPluginManager::FindPlugins(void)
 		++itr;
 	}
 
-	AStringList Files = GetDirectoryContents(PluginsPath.c_str());
-	for (AStringList::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
+	AStringVector Files = cFile::GetFolderContents(PluginsPath.c_str());
+	for (AStringVector::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
 	{
 		if ((*itr == ".") || (*itr == "..") || (!cFile::IsFolder(PluginsPath + *itr)))
 		{

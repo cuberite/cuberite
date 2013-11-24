@@ -32,7 +32,6 @@ public:
 		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
 		MAX_AIR_LEVEL = 300,
 		DROWNING_TICKS = 10, //number of ticks per heart of damage
-		MIN_EXPERIENCE = 0,
 	} ;
 	// tolua_end
 	
@@ -91,6 +90,12 @@ public:
 
 	/// Gets the experience bar percentage - XpP
 	float GetXpPercentage(void);
+
+	/// Caculates the amount of XP needed for a given level, ref: http://minecraft.gamepedia.com/XP
+	static short XpForLevel(short int a_Level);
+
+	/// inverse of XpForLevel, ref: http://minecraft.gamepedia.com/XP values are as per this with pre-calculations
+	static short CalcLevelFromXp(short int a_CurrentXp);
 
 	// tolua_end
 	
@@ -326,9 +331,7 @@ public:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const { return IsEating(); }
-
-
-
+	
 protected:
 	typedef std::map< std::string, bool > PermissionMap;
 	PermissionMap m_ResolvedPermissions;
@@ -426,14 +429,9 @@ protected:
 	// flag saying we need to send a xp update to client
 	bool m_bDirtyExperience;
 
-	/// Caculates the Xp needed for a given level, ref: http://minecraft.gamepedia.com/XP
-	static short XpForLevel(short int a_Level);
-
-	/// inverse of XpAtLevel, ref: http://minecraft.gamepedia.com/XP values are as per this with pre-calculations
-	static short CalcLevelFromXp(short int a_CurrentXp);
-	
 	bool m_IsChargingBow;
 	int  m_BowCharge;
+
 
 	virtual void Destroyed(void);
 

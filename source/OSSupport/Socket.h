@@ -38,6 +38,7 @@ public:
 	/// Sets the address-reuse socket flag; returns true on success
 	bool SetReuseAddress(void);
 	
+	/// Initializes the network stack. Returns 0 on success, or another number as an error code.
 	static int WSAStartup(void);
 
 	static AString GetErrorString(int a_ErrNo);
