@@ -75,7 +75,6 @@ LNK_OPTIONS = -pthread -g -ggdb -Og
 BUILDDIR = build/debug/
 endif
 endif
-endif
 
 ##################################################
 # Always be warning.
