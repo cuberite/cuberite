@@ -74,6 +74,7 @@ public:
 		etBoat,
 		etTNT,
 		etProjectile,
+		etExpOrb,
 		
 		// Common variations
 		etMob = etMonster,  // DEPRECATED, use etMonster instead!

@@ -1885,6 +1885,15 @@ void cClientHandle::SendExperience(void)
 
 
 
+void cClientHandle::SendExperienceOrb(const cEntity & a_Entity)
+{
+	m_Protocol->SendExperienceOrb(a_Entity);
+}
+
+
+
+
+
 void cClientHandle::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
 {
 	m_Protocol->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);

@@ -7,6 +7,7 @@
 #include "../ClientHandle.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "../Entities/ExpOrb.h"
 #include "../Defines.h"
 #include "../MonsterConfig.h"
 #include "../MersenneTwister.h"
@@ -258,6 +259,9 @@ void cMonster::KilledBy(cEntity * a_Killer)
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
 	}
+	// ToDo: Proper Exp per mob.
+	cExpOrb * ExpOrb = new cExpOrb(GetPosX(), GetPosY(), GetPosZ(), 1);
+	ExpOrb->Initialize(m_World);
 	m_DestroyTimer = 0;
 }
 
