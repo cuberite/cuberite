@@ -16,7 +16,7 @@
 
 #include "../ChunkDef.h"
 #include "../OSSupport/IsThread.h"
-#include "../lib/jsoncpp/include/json/json.h"
+#include "lib/jsoncpp/include/json/json.h"
 
 
 

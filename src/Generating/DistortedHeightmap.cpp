@@ -7,7 +7,7 @@
 
 #include "DistortedHeightmap.h"
 #include "../OSSupport/File.h"
-#include "../lib/inifile/iniFile.h"
+#include "lib/inifile/iniFile.h"
 #include "../LinearUpscale.h"
 
 

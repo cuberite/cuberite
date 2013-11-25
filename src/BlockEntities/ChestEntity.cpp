@@ -5,7 +5,7 @@
 #include "../Item.h"
 #include "../Entities/Player.h"
 #include "../UI/Window.h"
-#include "../lib/jsoncpp/include/json/json.h"
+#include "lib/jsoncpp/include/json/json.h"
 
 
 

@@ -3,7 +3,7 @@
 
 #include "NoteEntity.h"
 #include "../World.h"
-#include "../lib/jsoncpp/include/json/json.h"
+#include "lib/jsoncpp/include/json/json.h"
 
 
 

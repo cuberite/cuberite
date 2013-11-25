@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "../lib/zlib/zlib.h"
+#include "lib/zlib/zlib.h"
 
 
 

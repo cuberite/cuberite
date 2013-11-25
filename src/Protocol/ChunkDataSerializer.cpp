@@ -7,7 +7,7 @@
 
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
-#include "../lib/zlib/zlib.h"
+#include "lib/zlib/zlib.h"
 
 
 
