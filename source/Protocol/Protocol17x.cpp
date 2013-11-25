@@ -610,14 +610,14 @@ void cProtocol172::SendExperience (void)
 
 
 
-void cProtocol172::SendExperienceOrb(const cEntity & a_Entity)
+void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	cPacketizer Pkt(*this, 0x11);	
-	Pkt.WriteVarInt(a_Entity.GetUniqueID());
-	Pkt.WriteInt((int) a_Entity.GetPosX());
-	Pkt.WriteInt((int) a_Entity.GetPosY());
-	Pkt.WriteInt((int) a_Entity.GetPosZ());
-	Pkt.WriteShort(((cExpOrb &)a_Entity).GetReward());
+	Pkt.WriteVarInt(a_ExpOrb.GetUniqueID());
+	Pkt.WriteInt((int) a_ExpOrb.GetPosX());
+	Pkt.WriteInt((int) a_ExpOrb.GetPosY());
+	Pkt.WriteInt((int) a_ExpOrb.GetPosZ());
+	Pkt.WriteShort(a_ExpOrb.GetReward());
 }
 
 

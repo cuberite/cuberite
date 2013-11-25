@@ -476,10 +476,10 @@ void cProtocolRecognizer::SendExperience(void)
 
 
 
-void cProtocolRecognizer::SendExperienceOrb(const cEntity & a_Entity)
+void cProtocolRecognizer::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendExperienceOrb(a_Entity);
+	m_Protocol->SendExperienceOrb(a_ExpOrb);
 }
 
 

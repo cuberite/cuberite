@@ -1885,9 +1885,9 @@ void cClientHandle::SendExperience(void)
 
 
 
-void cClientHandle::SendExperienceOrb(const cEntity & a_Entity)
+void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
-	m_Protocol->SendExperienceOrb(a_Entity);
+	m_Protocol->SendExperienceOrb(a_ExpOrb);
 }
 
 

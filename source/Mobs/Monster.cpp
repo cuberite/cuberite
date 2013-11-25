@@ -259,7 +259,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
 	}
-	int Exp;
+	int Reward;
 	switch (m_MobType)
 	{
 		// Animals
@@ -273,7 +273,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 		case cMonster::mtOcelot:
 		case cMonster::mtWolf:
 		{
-			Exp = m_World->GetTickRandomNumber(2) + 1;
+			Reward = m_World->GetTickRandomNumber(2) + 1;
 		}
 
 		// Monsters
@@ -290,25 +290,29 @@ void cMonster::KilledBy(cEntity * a_Killer)
 		case cMonster::mtSlime:
 		case cMonster::mtMagmaCube:
 		{
-			Exp = 6 + (m_World->GetTickRandomNumber(2));
+			Reward = 6 + (m_World->GetTickRandomNumber(2));
+		}
+		case cMonster::mtBlaze:
+		{
+			Reward = 10;
 		}
 
 		// Bosses
 		case cMonster::mtEnderDragon:
 		{
-			Exp = 12000;
+			Reward = 12000;
 		}
 		case cMonster::mtWither:
 		{
-			Exp = 50;
+			Reward = 50;
 		}
 
 		default:
 		{
-			Exp = 0;
+			Reward = 0;
 		}
 	}
-	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Exp);
+	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	m_DestroyTimer = 0;
 }
 

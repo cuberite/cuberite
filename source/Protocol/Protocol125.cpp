@@ -707,15 +707,15 @@ void cProtocol125::SendExperience(void)
 
 
 
-void cProtocol125::SendExperienceOrb(const cEntity & a_Entity)
+void cProtocol125::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_SPAWN_EXPERIENCE_ORB);
-	WriteInt(a_Entity.GetUniqueID());
-	WriteInt((int) a_Entity.GetPosX());
-	WriteInt((int) a_Entity.GetPosY());
-	WriteInt((int) a_Entity.GetPosZ());
-	WriteShort(((cExpOrb &)a_Entity).GetReward());
+	WriteInt(a_ExpOrb.GetUniqueID());
+	WriteInt((int) a_ExpOrb.GetPosX());
+	WriteInt((int) a_ExpOrb.GetPosY());
+	WriteInt((int) a_ExpOrb.GetPosZ());
+	WriteShort(a_ExpOrb.GetReward());
 	Flush();
 }
 

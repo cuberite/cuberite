@@ -22,7 +22,7 @@ public:
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
 	// cExpOrb functions
-	short int GetReward(void) const { return m_Reward; }
+	int GetReward(void) const { return m_Reward; }
 
 protected:
 	int m_Reward;

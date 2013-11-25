@@ -16,6 +16,7 @@
 
 
 
+class cExpOrb;
 class cPlayer;
 class cEntity;
 class cWindow;
@@ -86,7 +87,7 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) = 0;
 	virtual void SendRespawn             (void) = 0;
 	virtual void SendExperience          (void) = 0;
-	virtual void SendExperienceOrb       (const cEntity & a_Entity) = 0;
+	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) = 0;
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) = 0;  // a_Src coords are Block * 8
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) = 0;

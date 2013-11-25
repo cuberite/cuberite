@@ -25,6 +25,7 @@ class cChunkDataSerializer;
 class cInventory;
 class cMonster;
 class cPawn;
+class cExpOrb;
 class cPickup;
 class cPlayer;
 class cProtocol;
@@ -121,7 +122,7 @@ public:
 	void SendPlayerSpawn         (const cPlayer & a_Player);
 	void SendRespawn             (void);
 	void SendExperience          (void);
-	void SendExperienceOrb       (const cEntity & a_Entity);
+	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
 	void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
 	void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);
