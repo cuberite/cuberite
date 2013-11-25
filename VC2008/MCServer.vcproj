@@ -1268,6 +1268,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Entities\ExpOrb.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Entities\ExpOrb.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Entities\TNTEntity.cpp"
 					>
 				</File>
