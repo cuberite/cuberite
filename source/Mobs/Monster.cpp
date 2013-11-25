@@ -259,9 +259,56 @@ void cMonster::KilledBy(cEntity * a_Killer)
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
 	}
-	// ToDo: Proper Exp per mob.
-	cExpOrb * ExpOrb = new cExpOrb(GetPosX(), GetPosY(), GetPosZ(), 1);
-	ExpOrb->Initialize(m_World);
+	int Exp;
+	switch (m_MobType)
+	{
+		// Animals
+		case cMonster::mtChicken:
+		case cMonster::mtCow:
+		case cMonster::mtHorse:
+		case cMonster::mtPig:
+		case cMonster::mtSheep:
+		case cMonster::mtSquid:
+		case cMonster::mtMooshroom:
+		case cMonster::mtOcelot:
+		case cMonster::mtWolf:
+		{
+			Exp = m_World->GetTickRandomNumber(2) + 1;
+		}
+
+		// Monsters
+		case cMonster::mtCaveSpider:
+		case cMonster::mtCreeper:
+		case cMonster::mtEnderman:
+		case cMonster::mtGhast:
+		case cMonster::mtSilverfish:
+		case cMonster::mtSkeleton:
+		case cMonster::mtSpider:
+		case cMonster::mtWitch:
+		case cMonster::mtZombie:
+		case cMonster::mtZombiePigman:
+		case cMonster::mtSlime:
+		case cMonster::mtMagmaCube:
+		{
+			Exp = 6 + (m_World->GetTickRandomNumber(2));
+		}
+
+		// Bosses
+		case cMonster::mtEnderDragon:
+		{
+			Exp = 12000;
+		}
+		case cMonster::mtWither:
+		{
+			Exp = 50;
+		}
+
+		default:
+		{
+			Exp = 0;
+		}
+	}
+	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Exp);
 	m_DestroyTimer = 0;
 }
 

@@ -13,6 +13,7 @@
 #include "OSSupport/Timer.h"
 
 // Entities (except mobs):
+#include "Entities/ExpOrb.h"
 #include "Entities/Pickup.h"
 #include "Entities/Player.h"
 #include "Entities/TNTEntity.h"
@@ -1555,6 +1556,16 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		);
 		Pickup->Initialize(this);
 	}
+}
+
+
+
+
+
+void cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
+{
+	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
+	ExpOrb->Initialize(this);
 }
 
 
