@@ -17,6 +17,7 @@ Documentation:
 #include "../World.h"
 #include "ChunkDataSerializer.h"
 #include "../Entities/Entity.h"
+#include "../Entities/ExpOrb.h"
 #include "../Mobs/Monster.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
@@ -72,6 +73,7 @@ enum
 	PACKET_ENT_STATUS                = 0x26,
 	PACKET_ATTACH_ENTITY             = 0x27,
 	PACKET_METADATA                  = 0x28,
+	PACKET_SPAWN_EXPERIENCE_ORB      = 0x1A,
 	PACKET_EXPERIENCE                = 0x2b,
 	PACKET_PRE_CHUNK                 = 0x32,
 	PACKET_MAP_CHUNK                 = 0x33,
@@ -698,6 +700,22 @@ void cProtocol125::SendExperience(void)
 	WriteFloat (m_Client->GetPlayer()->GetXpPercentage());
 	WriteShort (m_Client->GetPlayer()->GetXpLevel());
 	WriteShort (m_Client->GetPlayer()->GetCurrentXp());
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendExperienceOrb(const cEntity & a_Entity)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SPAWN_EXPERIENCE_ORB);
+	WriteInt(a_Entity.GetUniqueID());
+	WriteInt((int) a_Entity.GetPosX());
+	WriteInt((int) a_Entity.GetPosY());
+	WriteInt((int) a_Entity.GetPosZ());
+	WriteShort(((cExpOrb &)a_Entity).GetReward());
 	Flush();
 }
 

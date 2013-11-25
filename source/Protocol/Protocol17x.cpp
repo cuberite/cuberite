@@ -17,6 +17,7 @@ Implements the 1.7.x protocol classes:
 #include "../World.h"
 #include "../WorldStorage/FastNBT.h"
 #include "../StringCompression.h"
+#include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Pickup.h"
@@ -603,6 +604,20 @@ void cProtocol172::SendExperience (void)
 	Pkt.WriteFloat(m_Client->GetPlayer()->GetXpPercentage());
 	Pkt.WriteShort(m_Client->GetPlayer()->GetXpLevel());
 	Pkt.WriteShort(m_Client->GetPlayer()->GetCurrentXp());
+}
+
+
+
+
+
+void cProtocol172::SendExperienceOrb(const cEntity & a_Entity)
+{
+	cPacketizer Pkt(*this, 0x11);	
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteInt((int) a_Entity.GetPosX());
+	Pkt.WriteInt((int) a_Entity.GetPosY());
+	Pkt.WriteInt((int) a_Entity.GetPosZ());
+	Pkt.WriteShort(((cExpOrb &)a_Entity).GetReward());
 }
 
 
