@@ -22,11 +22,11 @@
 					<Add option="-g" />
 					<Add option="-O0" />
 					<Add directory="../lib/tolua++/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/lua/src" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="../lib/tolua++/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/lua/src" />
 				</ResourceCompiler>
 			</Target>
 			<Target title="Release Win32">
@@ -44,11 +44,11 @@
 					<Add option="-W" />
 					<Add option="-O2" />
 					<Add directory="../lib/tolua++/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/lua/src" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="../lib/tolua++/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/lua/src" />
 				</ResourceCompiler>
 			</Target>
 			<Target title="Release profiled Win32">
@@ -66,11 +66,11 @@
 					<Add option="-W" />
 					<Add option="-O2" />
 					<Add directory="../lib/tolua++/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/lua/src" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="../lib/tolua++/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/lua/src" />
 				</ResourceCompiler>
 			</Target>
 		</Build>

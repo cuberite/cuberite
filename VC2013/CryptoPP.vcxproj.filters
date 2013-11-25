@@ -2,15 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{a8e36eec-ccdc-4b5d-acfa-59253ad7d84d}</UniqueIdentifier>
+      <UniqueIdentifier>{21031ece-70f0-4aa6-9069-6947175663ea}</UniqueIdentifier>
       <Extensions>.cpp</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{edf86ea6-5226-44ca-84cf-4998c10f013d}</UniqueIdentifier>
+      <UniqueIdentifier>{20dd9259-32b4-4f5b-9af8-c689a12627ec}</UniqueIdentifier>
       <Extensions>.;.h</Extensions>
     </Filter>
     <Filter Include="Miscellaneous">
-      <UniqueIdentifier>{50010e83-45c3-4942-a66b-d959d7f4a15f}</UniqueIdentifier>
+      <UniqueIdentifier>{9a225122-4fcd-43c9-868a-6caf0dd272ce}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -579,18 +579,6 @@
     </ClInclude>
     <ClInclude Include="..\lib\cryptopp\words.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\cryptopp\dll.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\cryptopp\factory.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\cryptopp\resource.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\cryptopp\validate.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

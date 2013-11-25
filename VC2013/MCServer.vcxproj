@@ -332,7 +332,7 @@
     <ClInclude Include="..\src\tolua++.h" />
     <ClInclude Include="..\src\tolua_base.h" />
     <ClInclude Include="..\src\WebPlugin.h" />
-    <ClInclude Include="..\lib\iniFile\iniFile.h" />
+    <ClInclude Include="..\lib\inifile\iniFile.h" />
     <ClInclude Include="..\lib\md5\md5.h" />
     <ClInclude Include="..\src\WorldStorage\FastNBT.h" />
     <ClInclude Include="..\src\WorldStorage\NBTChunkSerializer.h" />
@@ -492,22 +492,22 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">GenerateBindings.cmd
 </Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">cTorch.h;cStairs.h;cLadder.h;../iniFile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">cTorch.h;cStairs.h;cLadder.h;../lib/inifile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Bindings.cpp;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GenerateBindings.cmd
 </Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cTorch.h;cStairs.h;cLadder.h;../iniFile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cTorch.h;cStairs.h;cLadder.h;../lib/inifile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Bindings.cpp;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">GenerateBindings.cmd
 </Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">cTorch.h;cStairs.h;cLadder.h;../iniFile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">cTorch.h;cStairs.h;cLadder.h;../lib/inifile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">Bindings.cpp;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">GenerateBindings.cmd
 </Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cTorch.h;cStairs.h;cLadder.h;../iniFile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cTorch.h;cStairs.h;cLadder.h;../lib/inifile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Bindings.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="..\MCServer\groups.ini" />
@@ -754,7 +754,7 @@
     <ClCompile Include="..\src\PluginLua.cpp" />
     <ClCompile Include="..\src\PluginManager.cpp" />
     <ClCompile Include="..\src\WebPlugin.cpp" />
-    <ClCompile Include="..\lib\iniFile\iniFile.cpp" />
+    <ClCompile Include="..\lib\inifile\iniFile.cpp" />
     <ClCompile Include="..\lib\md5\md5.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
@@ -860,6 +860,32 @@
     <Text Include="..\lib\sqlite\urls.txt" />
     <Text Include="..\MCServer\crafting.txt" />
     <Text Include="..\MCServer\furnace.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="CryptoPP.vcxproj">
+      <Project>{3423ec9a-52e4-4a4d-9753-edebc38785ef}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="expat.vcxproj">
+      <Project>{5fcfaf8d-ff2c-456d-a72c-1d76f913ad96}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="JsonCpp.vcxproj">
+      <Project>{5aaa90b9-946d-4034-83f3-676b06a6e326}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="Lua.vcxproj">
+      <Project>{082e8185-7b3a-4945-8c82-9132341a329d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="ToLua.vcxproj">
+      <Project>{eeab54ad-114c-4ab8-8482-0a52d502bd35}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="zlib.vcxproj">
+      <Project>{ea9d50fd-937a-4ef5-8c37-5f4175af4fea}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

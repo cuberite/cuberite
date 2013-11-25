@@ -31,7 +31,7 @@
     <ClCompile Include="..\lib\lua\src\ldump.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\luaO\src\lfunc.c">
+    <ClCompile Include="..\lib\lua\src\lfunc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\lib\lua\src\lgc.c">

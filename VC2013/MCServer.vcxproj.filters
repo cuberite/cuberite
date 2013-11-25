@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -10,73 +10,73 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Source Files\Mobs">
-      <UniqueIdentifier>{57050e42-039e-409c-83e7-1cc43de721bf}</UniqueIdentifier>
+      <UniqueIdentifier>{0c1dd2bf-04b0-4605-b963-b187e900b4a1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entities">
-      <UniqueIdentifier>{7196f6a0-ca4c-4ec0-aaae-b4d130093042}</UniqueIdentifier>
+      <UniqueIdentifier>{5c101216-8e22-4ad4-a27d-1572a4d95947}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\UI">
-      <UniqueIdentifier>{81a47e51-ed9b-484b-b8c0-2d089333846a}</UniqueIdentifier>
+      <UniqueIdentifier>{eb7a158f-f532-4db5-9314-fca01f04a38e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Simulator">
-      <UniqueIdentifier>{05094067-abbe-4828-ba59-cb4b6d904d42}</UniqueIdentifier>
+      <UniqueIdentifier>{c378fbaa-2232-4123-a58d-84f2e2e32376}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\OSSupport">
-      <UniqueIdentifier>{79ed96f3-5cb6-4e5d-b13a-477c45dedf2a}</UniqueIdentifier>
+      <UniqueIdentifier>{be34fc66-075c-45f0-a292-e4ace73a5726}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\OSSupport\Android Specific">
-      <UniqueIdentifier>{dcdcdac7-addc-4ff4-a728-b47992b8865f}</UniqueIdentifier>
+      <UniqueIdentifier>{8dcfacbc-454b-4530-af61-d9db5aebb5bd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Bindings">
-      <UniqueIdentifier>{00f82410-3b82-4104-8a8e-2fab52718f83}</UniqueIdentifier>
+      <UniqueIdentifier>{3fa4b52a-1b33-4e8c-8e0c-5818dbd5de15}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\External">
-      <UniqueIdentifier>{ffcc04a7-82d0-4107-96eb-18fb7bcc3dcb}</UniqueIdentifier>
+      <UniqueIdentifier>{50cbaa98-dc12-4cc9-9ba6-4e08e885c924}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\WorldStorage">
-      <UniqueIdentifier>{2c7fa1c0-770e-45e5-87fc-31747131fe6c}</UniqueIdentifier>
+      <UniqueIdentifier>{889b7953-c303-448a-8cf9-ca624011d131}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Generating">
-      <UniqueIdentifier>{1b2c7b1c-9062-4f04-b234-7015a267696b}</UniqueIdentifier>
+      <UniqueIdentifier>{9313323e-633a-4c87-812c-0dda81b2a509}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Blocks">
-      <UniqueIdentifier>{b2a07d02-27fb-42b7-9781-3372b03e1a49}</UniqueIdentifier>
+      <UniqueIdentifier>{61f1ea93-c0b0-4296-81fa-808116542dc8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Items">
-      <UniqueIdentifier>{84f254f6-92fc-4734-b767-ea8b92970e16}</UniqueIdentifier>
+      <UniqueIdentifier>{61efdcbf-e2d5-477f-8d67-a81c5ab3d6e6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Protocol">
-      <UniqueIdentifier>{0231c881-e8fc-4372-a820-a2af33f63ad2}</UniqueIdentifier>
+      <UniqueIdentifier>{86f6a355-fd04-4ba5-82b0-0fb57897da8d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\SQLite">
-      <UniqueIdentifier>{4ec2206a-9706-40d1-af41-5fc270046963}</UniqueIdentifier>
+      <UniqueIdentifier>{dacfe6a2-94db-4257-8727-0f9a8c70fc8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\LuaExpat">
-      <UniqueIdentifier>{97f08ad3-5335-411b-9718-4862e80ccde9}</UniqueIdentifier>
+      <UniqueIdentifier>{b41f78d8-61f8-4476-86cf-d08080418dcb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\BlockEntities">
-      <UniqueIdentifier>{266dfb32-2e86-4fb8-b20e-17351fb66385}</UniqueIdentifier>
+      <UniqueIdentifier>{78f41ac0-8ed5-4951-8373-2aed18d9c741}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\HTTPServer">
-      <UniqueIdentifier>{6eb82dc3-52a0-437f-9ed9-2af6acdfcaff}</UniqueIdentifier>
+      <UniqueIdentifier>{fc1463dd-e130-49cb-96cf-ee6755cf2de1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Config files">
-      <UniqueIdentifier>{78a8ea69-767d-40a9-b2bc-2385ca9b3184}</UniqueIdentifier>
+      <UniqueIdentifier>{a50ba11b-40c8-43ff-aa5b-aac2e4285df0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins">
-      <UniqueIdentifier>{3db4dd37-ed4c-4237-8c87-3174ab508e2b}</UniqueIdentifier>
+      <UniqueIdentifier>{37df6f7f-93ff-4c4a-89cf-77bb6feb215f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Core">
-      <UniqueIdentifier>{bbd7243f-5abd-411e-82f8-11b4d00d4c42}</UniqueIdentifier>
+      <UniqueIdentifier>{3d8e534e-8cd7-4dc5-9626-a1ce9559c118}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\ChatLog">
-      <UniqueIdentifier>{04cebff1-aaff-4550-8545-603c7bb28662}</UniqueIdentifier>
+      <UniqueIdentifier>{4419315f-3ef3-490d-ba0a-df22565b9a02}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Debuggers">
-      <UniqueIdentifier>{914562fa-6de0-4ebd-9544-6d2f1ab30b2f}</UniqueIdentifier>
+      <UniqueIdentifier>{3491f495-c715-4a5b-845e-1638a4ef0127}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\APIDump">
-      <UniqueIdentifier>{300d9995-b846-4b76-9a91-9600805ef621}</UniqueIdentifier>
+      <UniqueIdentifier>{4bb6b059-2004-4795-a0e7-d401affb3063}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -513,7 +513,7 @@
     <ClInclude Include="..\src\WebPlugin.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\iniFile\iniFile.h">
+    <ClInclude Include="..\lib\inifile\iniFile.h">
       <Filter>Source Files\External</Filter>
     </ClInclude>
     <ClInclude Include="..\lib\md5\md5.h">
@@ -1474,7 +1474,7 @@
     <ClCompile Include="..\src\WebPlugin.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\iniFile\iniFile.cpp">
+    <ClCompile Include="..\lib\inifile\iniFile.cpp">
       <Filter>Source Files\External</Filter>
     </ClCompile>
     <ClCompile Include="..\lib\md5\md5.cpp">

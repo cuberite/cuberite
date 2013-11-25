@@ -663,7 +663,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\authenc.cpp"
+				RelativePath="..\lib\cryptopp\authenc.cpp"
 				>
 			</File>
 			<File
@@ -891,7 +891,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\ccm.cpp"
+				RelativePath="..\lib\cryptopp\ccm.cpp"
 				>
 			</File>
 			<File
@@ -951,11 +951,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\cmac.cpp"
+				RelativePath="..\lib\cryptopp\cmac.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\cpu.cpp"
+				RelativePath="..\lib\cryptopp\cpu.cpp"
 				>
 			</File>
 			<File
@@ -1365,7 +1365,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\eax.cpp"
+				RelativePath="..\lib\cryptopp\eax.cpp"
 				>
 			</File>
 			<File
@@ -1889,7 +1889,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\gcm.cpp"
+				RelativePath="..\lib\cryptopp\gcm.cpp"
 				>
 			</File>
 			<File
@@ -3870,7 +3870,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\seed.cpp"
+				RelativePath="..\lib\cryptopp\seed.cpp"
 				>
 			</File>
 			<File
@@ -4546,7 +4546,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\vmac.cpp"
+				RelativePath="..\lib\cryptopp\vmac.cpp"
 				>
 			</File>
 			<File
@@ -4695,7 +4695,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\authenc.h"
+				RelativePath="..\lib\cryptopp\authenc.h"
 				>
 			</File>
 			<File
@@ -4715,7 +4715,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\ccm.h"
+				RelativePath="..\lib\cryptopp\ccm.h"
 				>
 			</File>
 			<File
@@ -4723,7 +4723,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\cmac.h"
+				RelativePath="..\lib\cryptopp\cmac.h"
 				>
 			</File>
 			<File
@@ -4731,7 +4731,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\cpu.h"
+				RelativePath="..\lib\cryptopp\cpu.h"
 				>
 			</File>
 			<File
@@ -4767,7 +4767,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\eax.h"
+				RelativePath="..\lib\cryptopp\eax.h"
 				>
 			</File>
 			<File
@@ -4815,7 +4815,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\gcm.h"
+				RelativePath="..\lib\cryptopp\gcm.h"
 				>
 			</File>
 			<File
@@ -5091,7 +5091,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\lib\cryptopp\.\Readme.txt"
+				RelativePath="..\lib\cryptopp\Readme.txt"
 				>
 			</File>
 		</Filter>

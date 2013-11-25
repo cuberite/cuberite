@@ -814,7 +814,6 @@
     <ClInclude Include="..\lib\cryptopp\des.h" />
     <ClInclude Include="..\lib\cryptopp\dh.h" />
     <ClInclude Include="..\lib\cryptopp\dh2.h" />
-    <ClInclude Include="..\lib\cryptopp\dll.h" />
     <ClInclude Include="..\lib\cryptopp\dmac.h" />
     <ClInclude Include="..\lib\cryptopp\dsa.h" />
     <ClInclude Include="..\lib\cryptopp\eax.h" />
@@ -825,7 +824,6 @@
     <ClInclude Include="..\lib\cryptopp\emsa2.h" />
     <ClInclude Include="..\lib\cryptopp\eprecomp.h" />
     <ClInclude Include="..\lib\cryptopp\esign.h" />
-    <ClInclude Include="..\lib\cryptopp\factory.h" />
     <ClInclude Include="..\lib\cryptopp\files.h" />
     <ClInclude Include="..\lib\cryptopp\filters.h" />
     <ClInclude Include="..\lib\cryptopp\fips140.h" />
@@ -868,7 +866,6 @@
     <ClInclude Include="..\lib\cryptopp\queue.h" />
     <ClInclude Include="..\lib\cryptopp\rabin.h" />
     <ClInclude Include="..\lib\cryptopp\randpool.h" />
-    <ClInclude Include="..\lib\cryptopp\resource.h" />
     <ClInclude Include="..\lib\cryptopp\rijndael.h" />
     <ClInclude Include="..\lib\cryptopp\rng.h" />
     <ClInclude Include="..\lib\cryptopp\rsa.h" />
@@ -891,7 +888,6 @@
     <ClInclude Include="..\lib\cryptopp\trdlocal.h" />
     <ClInclude Include="..\lib\cryptopp\trunhash.h" />
     <ClInclude Include="..\lib\cryptopp\ttmac.h" />
-    <ClInclude Include="..\lib\cryptopp\validate.h" />
     <ClInclude Include="..\lib\cryptopp\vmac.h" />
     <ClInclude Include="..\lib\cryptopp\wait.h" />
     <ClInclude Include="..\lib\cryptopp\wake.h" />
