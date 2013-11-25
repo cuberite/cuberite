@@ -7,6 +7,7 @@
 #include "BiomeRenderer.h"
 #include "Pixmap.h"
 #include "Timer.h"
+#include "BiomeColors.h"
 
 
 
@@ -96,40 +97,11 @@ bool cBiomeRenderer::Render(cPixmap & a_Pixmap)
 
 int cBiomeRenderer::GetBiomeColor(EMCSBiome a_Biome)
 {
-	if ((a_Biome < 0) || (a_Biome > biMaxBiome))
+	if ((a_Biome < 0) || (a_Biome >= ARRAYCOUNT(g_BiomeColors)))
 	{
-		return 0xcfcfcf;  // LtGray for unknown biomes
+		return 0xff0000;
 	}
-	
-	static int BiomeColor[] =
-	{
-		// RGB:
-		0x0000ff, /* Ocean */
-		0x00cf3f, /* Plains */
-		0xffff00, /* Desert */
-		0x7f7f7f, /* Extreme Hills */
-		0x00cf00, /* Forest */
-		0x007f3f, /* Taiga */
-		0x3f7f00, /* Swampland */
-		0x003fff, /* River */
-		0x7f0000, /* Hell */
-		0x007fff, /* Sky */
-		0x3f3fff, /* Frozen Ocean */
-		0x3f3fff, /* Frozen River */
-		0x7fffcf, /* Ice Plains */
-		0x3fcf7f, /* Ice Mountains */
-		0xcf00cf, /* Mushroom Island */
-		0x7f00ff, /* Mushroom Island Shore */
-		0xffff3f, /* Beach */
-		0xcfcf00, /* Desert Hills */
-		0x00cf3f, /* Forest Hills */
-		0x006f1f, /* Taiga Hills */
-		0x7f8f7f, /* Extreme Hills Edge */
-		0x004f00, /* Jungle */
-		0x003f00, /* Jungle Hills */
-	} ;
-	
-	return BiomeColor[a_Biome];
+	return g_BiomeColors[a_Biome];
 }
 
 

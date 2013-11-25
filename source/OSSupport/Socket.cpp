@@ -210,9 +210,6 @@ bool cSocket::BindToAnyIPv4(unsigned short a_Port)
 
 bool cSocket::BindToAnyIPv6(unsigned short a_Port)
 {
-	// Cannot use socckaddr_in6, because it is not defined in the default VS2008 SDK
-	// Must jump through hoops here
-	
 	sockaddr_in6 local;
 	memset(&local, 0, sizeof(local));
 

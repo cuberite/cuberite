@@ -138,6 +138,7 @@ typedef unsigned short     UInt16;
 
 
 // CRT stuff:
+#include <sys/stat.h>
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
