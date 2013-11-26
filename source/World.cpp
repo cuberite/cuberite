@@ -236,7 +236,8 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
 	m_TickThread(*this),
-	m_SkyDarkness(0)
+	m_SkyDarkness(0),
+	m_bSpawnExplicitlySet(false)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -327,6 +328,20 @@ void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::InitializeSpawn(void)
 {
+	if (!m_bSpawnExplicitlySet) // Check if spawn position was already explicitly set or not
+	{
+		GenerateRandomSpawn(); // Generate random solid-land coordinate and then write it to the world configuration
+
+		cIniFile IniFile;
+		IniFile.ReadFile(m_IniFileName);
+
+		IniFile.SetValueF("SpawnPosition", "X", m_SpawnX);
+		IniFile.SetValueF("SpawnPosition", "Y", m_SpawnY);
+		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ);
+
+		IniFile.WriteFile(m_IniFileName);
+	}
+
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	BlockToChunk((int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ);
 	
@@ -380,10 +395,6 @@ void cWorld::InitializeSpawn(void)
 		m_Lighting.WaitForQueueEmpty();
 		Progress.Stop();
 	}
-	
-	// TODO: Better spawn detection - move spawn out of the water if it isn't set in the INI already
-	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f; // +1.6f eye height
-	
 	
 	#ifdef TEST_LINEBLOCKTRACER
 	// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
@@ -445,10 +456,9 @@ void cWorld::InitializeSpawn(void)
 
 void cWorld::Start(void)
 {
-	// TODO: Find a proper spawn location, based on the biomes (not in ocean)
-	m_SpawnX = (double)((m_TickRand.randInt() % 1000) - 500);
+	m_SpawnX = 0;
 	m_SpawnY = cChunkDef::Height;
-	m_SpawnZ = (double)((m_TickRand.randInt() % 1000) - 500);
+	m_SpawnZ = 0;
 	m_GameMode = eGameMode_Creative;
 
 	cIniFile IniFile;
@@ -473,9 +483,36 @@ void cWorld::Start(void)
 			break;
 		}
 	}  // switch (m_Dimension)
-	m_SpawnX                    = IniFile.GetValueSetF("SpawnPosition", "X",                         m_SpawnX);
-	m_SpawnY                    = IniFile.GetValueSetF("SpawnPosition", "Y",                         m_SpawnY);
-	m_SpawnZ                    = IniFile.GetValueSetF("SpawnPosition", "Z",                         m_SpawnZ);
+
+	// Try to find the "SpawnPosition" key in the world configuration
+	// Set a boolean value if so
+	int KeyNum = IniFile.FindKey("SpawnPosition");
+	unsigned int NumSpawnPositionKeys = ((KeyNum != -1) ? (IniFile.GetNumValues(KeyNum)) : 0);
+
+	if (NumSpawnPositionKeys > 0)
+	{
+		for (unsigned int i = 0; i < NumSpawnPositionKeys; i++)
+		{
+			AString ValueName = IniFile.GetValueName(KeyNum, i);
+			if (
+				(ValueName.compare("X") == 0) ||
+				(ValueName.compare("Y") == 0) ||
+				(ValueName.compare("Z") == 0)
+				)
+			{
+				m_bSpawnExplicitlySet = true;
+				LOGD("Spawnpoint explicitly set!");
+			}
+		}
+	}
+
+	if (m_bSpawnExplicitlySet)
+	{
+		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);
+		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY);
+		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
+	}
+
 	m_StorageSchema             = IniFile.GetValueSet ("Storage",       "Schema",                    m_StorageSchema);
 	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
 	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
@@ -567,6 +604,31 @@ void cWorld::Start(void)
 		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
 	}
 
+}
+
+
+
+
+
+void cWorld::GenerateRandomSpawn(void)
+{
+	LOGD("Generating random spawnpoint...");
+
+	while (GetBiomeAt((int)m_SpawnX, (int)m_SpawnZ) == biOcean) // Anything but ocean is fine
+	{
+		if ((GetTickRandomNumber(4) % 2) == 0) // Randomise whether to increment X or Z coords
+		{
+			m_SpawnX += cChunkDef::Width;
+		}
+		else
+		{
+			m_SpawnZ += cChunkDef::Width;
+		}
+	}
+
+	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f; // 1.6f to accomodate player height
+
+	LOGD("Generated random spawnpoint %i %i %i", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
 }
 
 
