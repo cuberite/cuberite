@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/26/13 15:29:19.
+** Generated automatically by tolua++-1.0.92 on 11/26/13 22:11:10.
 */
 
 #ifndef __cplusplus
@@ -16,7 +16,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "tolua_base.h"
 #include "ChunkDef.h"
-#include "lib/iniFile/iniFile.h"
+#include "../lib/inifile/iniFile.h"
 #include "OSSupport/File.h"
 #include "BlockID.h"
 #include "StringUtils.h"

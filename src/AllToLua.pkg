@@ -15,7 +15,7 @@ typedef unsigned short     UInt16;
 
 $cfile "ChunkDef.h"
 
-$cfile "../iniFile/iniFile.h"
+$cfile "../lib/inifile/iniFile.h"
 
 $cfile "OSSupport/File.h"
 
