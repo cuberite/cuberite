@@ -63,61 +63,61 @@ private:
 	// In addition to being non-performant, it would stop the player from actually breaking said device
 
 	/* ====== SOURCES ====== */
-	///<summary>Handles the redstone torch</summary>
+	/// <summary>Handles the redstone torch</summary>
 	void HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
-	///<summary>Handles the redstone block</summary>
+	/// <summary>Handles the redstone block</summary>
 	void HandleRedstoneBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
-	///<summary>Handles levers</summary>
+	/// <summary>Handles levers</summary>
 	void HandleRedstoneLever(int a_BlockX, int a_BlockY, int a_BlockZ);
-	///<summary>Handles buttons</summary>
+	/// <summary>Handles buttons</summary>
 	void HandleRedstoneButton(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
 	/* ==================== */
 
 	/* ====== CARRIERS ====== */
-	///<summary>Handles redstone wire</summary>
+	/// <summary>Handles redstone wire</summary>
 	void HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_BlockZ);
-	///<summary>Handles repeaters</summary>
+	/// <summary>Handles repeaters</summary>
 	void HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
 	/* ====================== */
 
 	/* ====== DEVICES ====== */
-	///<summary>Handles pistons</summary>
+	/// <summary>Handles pistons</summary>
 	void HandlePiston(int a_BlockX, int a_BlockY, int a_BlockZ);
-	///<summary>Handles dispensers and droppers</summary>
+	/// <summary>Handles dispensers and droppers</summary>
 	void HandleDropSpenser(int a_BlockX, int a_BlockY, int a_BlockZ);
-	///<summary>Handles TNT (exploding)</summary>
+	/// <summary>Handles TNT (exploding)</summary>
 	void HandleTNT(int a_BlockX, int a_BlockY, int a_BlockZ);
-	///<summary>Handles redstone lamps</summary>
+	/// <summary>Handles redstone lamps</summary>
 	void HandleRedstoneLamp(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
-	///<summary>Handles doords</summary>
+	/// <summary>Handles doords</summary>
 	void HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ);
-	///<summary>Handles activator, detector, and powered rails</summary>
+	/// <summary>Handles activator, detector, and powered rails</summary>
 	void HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
 	/* ===================== */
 
 	/* ====== Helper functions ====== */
-	///<summary>Marks a block as powered</summary>
+	/// <summary>Marks a block as powered</summary>
 	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock);
-	///<summary>Marks a block as being powered through another block</summary>
+	/// <summary>Marks a block as being powered through another block</summary>
 	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock);
-	///<summary>Marks the second block in a direction as linked powered</summary>
+	/// <summary>Marks the second block in a direction as linked powered</summary>
 	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock);
-	///<summary>Marks all blocks immediately surrounding a coordinate as powered</summary>
+	/// <summary>Marks all blocks immediately surrounding a coordinate as powered</summary>
 	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock);
 
-	///<summary>Returns if a coordinate is powered or linked powered</summary>
+	/// <summary>Returns if a coordinate is powered or linked powered</summary>
 	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
-	///<summary>Returns if a repeater is powered</summary>
+	/// <summary>Returns if a repeater is powered</summary>
 	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
 
-	///<summary>Returns if lever metadata marks it as emitting power</summary>
+	/// <summary>Returns if lever metadata marks it as emitting power</summary>
 	bool IsLeverOn(NIBBLETYPE a_BlockMeta);
-	///<summary>Returns if button metadata marks it as emitting power</summary>
+	/// <summary>Returns if button metadata marks it as emitting power</summary>
 	bool IsButtonOn(NIBBLETYPE a_BlockMeta);
 	/* ============================== */
 
 	/* ====== Misc Functions ====== */
-	///<summary>Returns if a block is viable to be the MiddleBlock of a SetLinkedPowered operation</summary>
+	/// <summary>Returns if a block is viable to be the MiddleBlock of a SetLinkedPowered operation</summary>
 	inline static bool IsViableMiddleBlock(BLOCKTYPE Block)
 	{
 		if (!g_BlockIsSolid[Block]) { return false; }
@@ -137,7 +137,7 @@ private:
 		}
 	}
 
-	///<summary>Returns if a block is a mechanism (something that accepts power and does something)</summary>
+	/// <summary>Returns if a block is a mechanism (something that accepts power and does something)</summary>
 	inline static bool IsMechanism(BLOCKTYPE Block)
 	{
 		switch (Block)
@@ -166,7 +166,7 @@ private:
 		}
 	}
 
-	///<summary>Returns if a block has the potential to output power</summary>
+	/// <summary>Returns if a block has the potential to output power</summary>
 	inline static bool IsPotentialSource(BLOCKTYPE Block)
 	{
 		switch (Block)
@@ -178,10 +178,8 @@ private:
 			case E_BLOCK_REDSTONE_TORCH_ON:
 			case E_BLOCK_LEVER:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			case E_BLOCK_BLOCK_OF_REDSTONE:
 			case E_BLOCK_ACTIVE_COMPARATOR:
-			case E_BLOCK_INACTIVE_COMPARATOR:
 			{
 				return true;
 			}
@@ -189,7 +187,7 @@ private:
 		}
 	}
 
-	///<summary>Returns if a block is any sort of redstone device</summary>
+	/// <summary>Returns if a block is any sort of redstone device</summary>
 	inline static bool IsRedstone(BLOCKTYPE Block)
 	{
 		switch (Block)
