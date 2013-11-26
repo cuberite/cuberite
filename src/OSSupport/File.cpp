@@ -394,13 +394,14 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 
 	DIR * dp;
 	struct dirent *dirp;
-	if (*a_Directory == 0)
+	AString Folder = a_Folder;
+	if (Folder.empty())
 	{
-		a_Directory = ".";
+		Folder = ".";
 	}
-	if ((dp = opendir(a_Directory)) == NULL)
+	if ((dp = opendir(Folder.c_str())) == NULL)
 	{
-		LOGERROR("Error (%i) opening directory \"%s\"\n", errno, a_Directory );
+		LOGERROR("Error (%i) opening directory \"%s\"\n", errno, Folder.c_str());
 	}
 	else
 	{

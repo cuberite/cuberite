@@ -1272,6 +1272,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Entities\ExpOrb.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Entities\ExpOrb.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Entities\TNTEntity.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Entities\TNTEntity.h"
 					>
 				</File>

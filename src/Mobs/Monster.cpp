@@ -7,6 +7,7 @@
 #include "../ClientHandle.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "../Entities/ExpOrb.h"
 #include "../Defines.h"
 #include "../MonsterConfig.h"
 #include "../MersenneTwister.h"
@@ -258,6 +259,60 @@ void cMonster::KilledBy(cEntity * a_Killer)
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
 	}
+	int Reward;
+	switch (m_MobType)
+	{
+		// Animals
+		case cMonster::mtChicken:
+		case cMonster::mtCow:
+		case cMonster::mtHorse:
+		case cMonster::mtPig:
+		case cMonster::mtSheep:
+		case cMonster::mtSquid:
+		case cMonster::mtMooshroom:
+		case cMonster::mtOcelot:
+		case cMonster::mtWolf:
+		{
+			Reward = m_World->GetTickRandomNumber(2) + 1;
+		}
+
+		// Monsters
+		case cMonster::mtCaveSpider:
+		case cMonster::mtCreeper:
+		case cMonster::mtEnderman:
+		case cMonster::mtGhast:
+		case cMonster::mtSilverfish:
+		case cMonster::mtSkeleton:
+		case cMonster::mtSpider:
+		case cMonster::mtWitch:
+		case cMonster::mtZombie:
+		case cMonster::mtZombiePigman:
+		case cMonster::mtSlime:
+		case cMonster::mtMagmaCube:
+		{
+			Reward = 6 + (m_World->GetTickRandomNumber(2));
+		}
+		case cMonster::mtBlaze:
+		{
+			Reward = 10;
+		}
+
+		// Bosses
+		case cMonster::mtEnderDragon:
+		{
+			Reward = 12000;
+		}
+		case cMonster::mtWither:
+		{
+			Reward = 50;
+		}
+
+		default:
+		{
+			Reward = 0;
+		}
+	}
+	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	m_DestroyTimer = 0;
 }
 
