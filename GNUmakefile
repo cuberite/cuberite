@@ -50,12 +50,12 @@ ifeq ($(release),1)
 ifeq ($(disableofast),1)
 	CC_OPTIONS = -g -O3 -DNDEBUG
 	CXX_OPTIONS = -g -O3 -DNDEBUG
+	LNK_OPTIONS = -pthread -O3
 else
 	CC_OPTIONS = -g -Ofast -DNDEBUG
 	CXX_OPTIONS = -g -Ofast -DNDEBUG
+	LNK_OPTIONS = -pthread -Ofast
 endif
-
-LNK_OPTIONS = -pthread -Ofast
 BUILDDIR = build/release/
 
 else
@@ -67,12 +67,13 @@ ifeq ($(profile),1)
 ifeq ($(disableofast),1)
 	CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 	CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
+	LNK_OPTIONS = -pthread -ggdb -O3 -pg
 else
 	CC_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
 	CXX_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
+	LNK_OPTIONS = -pthread -ggdb -Ofast -pg
 endif
 
-LNK_OPTIONS = -pthread -ggdb -Ofast -pg
 BUILDDIR = build/profile/
 
 else
@@ -81,7 +82,12 @@ else
 # Since C code is used only for supporting libraries (zlib, lua), it is still Ofast-optimized
 ################
 
-CC_OPTIONS = -s -ggdb -g -D_DEBUG -Ofast
+ifeq ($(disableofast),1)
+	CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
+else
+	CC_OPTIONS = -s -ggdb -g -D_DEBUG -Ofast
+endif
+
 CXX_OPTIONS = -s -ggdb -g -D_DEBUG -Og
 LNK_OPTIONS = -pthread -g -ggdb -Og
 BUILDDIR = build/debug/
