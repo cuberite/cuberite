@@ -6,7 +6,7 @@
 #include "Root.h"
 #include "Server.h"
 
-#include ".inifile/iniFile.h"
+#include "lib/inifile/iniFile.h"
 
 #include <sstream>
 
