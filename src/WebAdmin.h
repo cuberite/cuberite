@@ -7,7 +7,7 @@
 
 #include "OSSupport/Socket.h"
 #include "LuaState.h"
-#include "lib/inifile/iniFile.h"
+#include "inifile/iniFile.h"
 #include "HTTPServer/HTTPServer.h"
 #include "HTTPServer/HTTPFormParser.h"
 
