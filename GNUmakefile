@@ -47,7 +47,7 @@ ifeq ($(release),1)
 # release build - fastest run-time, no gdb support
 ################
 
-ifeq ($(disableasm),1)
+ifeq ($(disableofast),1)
 	CC_OPTIONS = -g -O3 -DNDEBUG
 	CXX_OPTIONS = -g -O3 -DNDEBUG
 else
@@ -64,7 +64,7 @@ ifeq ($(profile),1)
 # profile build - a release build with symbols and profiling engine built in
 ################
 
-ifeq ($(disableasm),1)
+ifeq ($(disableofast),1)
 	CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 	CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 else
