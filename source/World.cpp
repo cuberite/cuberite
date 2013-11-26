@@ -1562,10 +1562,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-void cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
+int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 {
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
 	ExpOrb->Initialize(this);
+	return ExpOrb->GetUniqueID();
 }
 
 

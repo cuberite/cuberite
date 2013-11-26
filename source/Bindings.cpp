@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/25/13 21:47:32.
+** Generated automatically by tolua++-1.0.92 on 11/26/13 15:29:19.
 */
 
 #ifndef __cplusplus
@@ -12616,10 +12616,11 @@ static int tolua_AllToLua_cWorld_SpawnExperienceOrb00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SpawnExperienceOrb'", NULL);
 #endif
   {
-   self->SpawnExperienceOrb(a_X,a_Y,a_Z,a_Reward);
+   int tolua_ret = (int)  self->SpawnExperienceOrb(a_X,a_Y,a_Z,a_Reward);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SpawnExperienceOrb'.",&tolua_err);
