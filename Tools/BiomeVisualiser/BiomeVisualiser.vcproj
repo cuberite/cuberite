@@ -269,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BiomeColors.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\BiomeRenderer.cpp"
 				>
 			</File>
@@ -489,6 +493,10 @@
 				</Filter>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath=".\BiomeColors.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
