@@ -10,7 +10,7 @@
 #include "World.h"
 #include "ClientHandle.h"
 #include "Server.h"
-#include "../lib/zlib/zlib.h"
+#include "zlib/zlib.h"
 #include "Defines.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/DispenserEntity.h"

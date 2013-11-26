@@ -26,7 +26,7 @@ automatic resource management.
 
 extern "C"
 {
-	#include "../lib/lua/src/lauxlib.h"
+	#include "lua/src/lauxlib.h"
 }
 
 

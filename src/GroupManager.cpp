@@ -2,7 +2,7 @@
 
 #include "GroupManager.h"
 #include "Group.h"
-#include "../lib/inifile/iniFile.h"
+#include "inifile/iniFile.h"
 #include "ChatColor.h"
 #include "Root.h"
 

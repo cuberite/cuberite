@@ -4,7 +4,7 @@
 
 #include "Globals.h"
 #include "BlockID.h"
-#include "../lib/inifile/iniFile.h"
+#include "inifile/iniFile.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
 

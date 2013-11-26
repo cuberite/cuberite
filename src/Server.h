@@ -11,8 +11,8 @@
 
 #include "OSSupport/SocketThreads.h"
 #include "OSSupport/ListenThread.h"
-#include "../lib/cryptopp/rsa.h"
-#include "../lib/cryptopp/randpool.h"
+#include "cryptopp/rsa.h"
+#include "cryptopp/randpool.h"
 #include "RCONServer.h"
 
 
