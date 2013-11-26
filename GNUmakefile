@@ -47,8 +47,14 @@ ifeq ($(release),1)
 # release build - fastest run-time, no gdb support
 ################
 
-CC_OPTIONS = -g -Ofast -DNDEBUG
-CXX_OPTIONS = -g -Ofast -DNDEBUG
+ifeq ($(disableasm),1)
+	CC_OPTIONS = -g -O3 -DNDEBUG
+	CXX_OPTIONS = -g -O3 -DNDEBUG
+else
+	CC_OPTIONS = -g -Ofast -DNDEBUG
+	CXX_OPTIONS = -g -Ofast -DNDEBUG
+endif
+
 LNK_OPTIONS = -pthread -Ofast
 BUILDDIR = build/release/
 
@@ -58,8 +64,14 @@ ifeq ($(profile),1)
 # profile build - a release build with symbols and profiling engine built in
 ################
 
-CC_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
-CXX_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
+ifeq ($(disableasm),1)
+	CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
+	CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
+else
+	CC_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
+	CXX_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
+endif
+
 LNK_OPTIONS = -pthread -ggdb -Ofast -pg
 BUILDDIR = build/profile/
 
@@ -88,6 +100,7 @@ ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),0)
 CC_OPTIONS += -Wno-tautological-compare
 CXX_OPTIONS += -Wno-tautological-compare
 disableasm = 1
+disableofast = 1
 endif
 
 
@@ -141,7 +154,7 @@ INCLUDE = -I.\
 		-Isrc\
 		-Isrc/items\
 		-Isrce/blocks\
-		-Ilib
+		-Ilib\
 
 
 
