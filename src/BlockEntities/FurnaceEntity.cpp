@@ -6,7 +6,7 @@
 #include "../Entities/Player.h"
 #include "../Root.h"
 #include "../Chunk.h"
-#include "lib/jsoncpp/include/json/json.h"
+#include "jsoncpp/include/json/json.h"
 
 
 

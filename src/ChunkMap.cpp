@@ -20,8 +20,8 @@
 	#include <cstdlib> // abs
 #endif
 
-#include "lib/zlib/zlib.h"
-#include "lib/jsoncpp/include/json/json.h"
+#include "zlib/zlib.h"
+#include "jsoncpp/include/json/json.h"
 
 
 

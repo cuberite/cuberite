@@ -3,7 +3,7 @@
 
 #include "ChunkGenerator.h"
 #include "../World.h"
-#include "lib/inifile/iniFile.h"
+#include "inifile/iniFile.h"
 #include "../Root.h"
 #include "../PluginManager.h"
 #include "ChunkDesc.h"

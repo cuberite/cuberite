@@ -7,7 +7,7 @@
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
 #include "../World.h"
-#include "lib/zlib/zlib.h"
+#include "zlib/zlib.h"
 #include "../BlockID.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DispenserEntity.h"

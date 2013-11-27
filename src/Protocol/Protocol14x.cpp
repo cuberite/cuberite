@@ -16,7 +16,7 @@ Implements the 1.4.x protocol classes representing these protocols:
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
-#include "lib/cryptopp/randpool.h"
+#include "cryptopp/randpool.h"
 #include "../Item.h"
 #include "ChunkDataSerializer.h"
 #include "../Entities/Player.h"

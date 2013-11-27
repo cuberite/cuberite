@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
-#include "lib/cryptopp/randpool.h"
+#include "cryptopp/randpool.h"
 #include "Protocol132.h"
 #include "../Root.h"
 #include "../Server.h"

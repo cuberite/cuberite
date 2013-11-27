@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "HeiGen.h"
 #include "../LinearUpscale.h"
-#include "lib/inifile/iniFile.h"
+#include "inifile/iniFile.h"
 
 
 
