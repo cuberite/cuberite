@@ -7,27 +7,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\tolua++-1.0.93\src\bin\tolua.c">
+    <ClCompile Include="..\lib\tolua++\src\bin\tolua.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_event.c">
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_event.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_is.c">
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_is.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_map.c">
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_map.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_push.c">
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_push.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tolua++-1.0.93\src\lib\tolua_to.c">
+    <ClCompile Include="..\lib\tolua++\src\lib\tolua_to.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\tolua++-1.0.93\src\lib\tolua_event.h">
+    <ClInclude Include="..\lib\tolua++\src\lib\tolua_event.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

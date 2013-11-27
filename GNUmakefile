@@ -50,6 +50,7 @@ ifeq ($(release),1)
 CC_OPTIONS = -g -O3 -DNDEBUG
 CXX_OPTIONS = -g -O3 -DNDEBUG
 LNK_OPTIONS = -pthread -O3
+
 BUILDDIR = build/release/
 
 else
@@ -61,30 +62,20 @@ ifeq ($(profile),1)
 CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 LNK_OPTIONS = -pthread -ggdb -O3 -pg
+
 BUILDDIR = build/profile/
-
-else
-ifeq ($(pedantic),1)
-################
-# pedantic build - basically a debug build with lots of warnings
-################
-
-CC_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-CXX_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-LNK_OPTIONS = -pthread -ggdb
-BUILDDIR = build/pedantic/
 
 else
 ################
 # debug build - fully traceable by gdb in C++ code, slowest
-# Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
+# Since C code is used only for supporting libraries (zlib, lua), it is still Ofast-optimized
 ################
 
-CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
-CXX_OPTIONS = -s -ggdb -g -D_DEBUG
-LNK_OPTIONS = -pthread -g -ggdb
+	CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
+
+CXX_OPTIONS = -s -ggdb -g -D_DEBUG -Og
+LNK_OPTIONS = -pthread -g -ggdb -Og
 BUILDDIR = build/debug/
-endif
 endif
 endif
 
@@ -100,6 +91,7 @@ ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),0)
 CC_OPTIONS += -Wno-tautological-compare
 CXX_OPTIONS += -Wno-tautological-compare
 disableasm = 1
+disableofast = 1
 endif
 
 
@@ -150,18 +142,9 @@ endif
 # INCLUDE directories for MCServer
 
 INCLUDE = -I.\
-		-Isource\
-		-Isource/md5\
-		-Isource/items\
-		-Isource/blocks\
-		-Itolua++-1.0.93/src/lib\
-		-Ilua-5.1.4/src\
-		-Izlib-1.2.7\
-		-IiniFile\
-		-Itolua++-1.0.93/include\
-		-Ijsoncpp-src-0.5.0/include\
-		-Ijsoncpp-src-0.5.0/src/lib_json\
-		-Iexpat
+		-Isrc\
+		-Ilib\
+		-Ilib/jsoncpp/include
 
 
 
@@ -170,7 +153,7 @@ INCLUDE = -I.\
 ###################################################
 # Build MCServer
 
-SOURCES := $(shell find CryptoPP lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source tolua++-1.0.93 iniFile expat '(' -name '*.cpp' -o -name '*.c' ')')
+SOURCES := $(shell find src lib '(' -name '*.cpp' -o -name '*.c' ')')
 SOURCES := $(filter-out %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp %StackWalker.cpp %example.c,$(SOURCES))
 OBJECTS := $(patsubst %.c,$(BUILDDIR)%.o,$(SOURCES))
 OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))

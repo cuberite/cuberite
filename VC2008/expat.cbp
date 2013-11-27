@@ -40,32 +40,32 @@
 				</Compiler>
 			</Target>
 		</Build>
-		<Unit filename="../expat/ascii.h" />
-		<Unit filename="../expat/asciitab.h" />
-		<Unit filename="../expat/expat.h" />
-		<Unit filename="../expat/expat_external.h" />
-		<Unit filename="../expat/iasciitab.h" />
-		<Unit filename="../expat/internal.h" />
-		<Unit filename="../expat/latin1tab.h" />
-		<Unit filename="../expat/nametab.h" />
-		<Unit filename="../expat/utf8tab.h" />
-		<Unit filename="../expat/winconfig.h" />
-		<Unit filename="../expat/xmlparse.c">
+		<Unit filename="../lib/expat/ascii.h" />
+		<Unit filename="../lib/expat/asciitab.h" />
+		<Unit filename="../lib/expat/expat.h" />
+		<Unit filename="../lib/expat/expat_external.h" />
+		<Unit filename="../lib/expat/iasciitab.h" />
+		<Unit filename="../lib/expat/internal.h" />
+		<Unit filename="../lib/expat/latin1tab.h" />
+		<Unit filename="../lib/expat/nametab.h" />
+		<Unit filename="../lib/expat/utf8tab.h" />
+		<Unit filename="../lib/expat/winconfig.h" />
+		<Unit filename="../lib/expat/xmlparse.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../expat/xmlrole.c">
+		<Unit filename="../lib/expat/xmlrole.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../expat/xmlrole.h" />
-		<Unit filename="../expat/xmltok.c">
+		<Unit filename="../lib/expat/xmlrole.h" />
+		<Unit filename="../lib/expat/xmltok.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../expat/xmltok.h" />
-		<Unit filename="../expat/xmltok_impl.c">
+		<Unit filename="../lib/expat/xmltok.h" />
+		<Unit filename="../lib/expat/xmltok_impl.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../expat/xmltok_impl.h" />
-		<Unit filename="../expat/xmltok_ns.c">
+		<Unit filename="../lib/expat/xmltok_impl.h" />
+		<Unit filename="../lib/expat/xmltok_ns.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

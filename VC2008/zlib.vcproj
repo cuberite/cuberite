@@ -276,107 +276,107 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\zlib-1.2.7\adler32.c"
+				RelativePath="..\lib\zlib\adler32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\compress.c"
+				RelativePath="..\lib\zlib\compress.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\crc32.c"
+				RelativePath="..\lib\zlib\crc32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\crc32.h"
+				RelativePath="..\lib\zlib\crc32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\deflate.c"
+				RelativePath="..\lib\zlib\deflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\deflate.h"
+				RelativePath="..\lib\zlib\deflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\gzclose.c"
+				RelativePath="..\lib\zlib\gzclose.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\gzguts.h"
+				RelativePath="..\lib\zlib\gzguts.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\gzlib.c"
+				RelativePath="..\lib\zlib\gzlib.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\gzread.c"
+				RelativePath="..\lib\zlib\gzread.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\gzwrite.c"
+				RelativePath="..\lib\zlib\gzwrite.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\infback.c"
+				RelativePath="..\lib\zlib\infback.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\inffast.c"
+				RelativePath="..\lib\zlib\inffast.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\inffast.h"
+				RelativePath="..\lib\zlib\inffast.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\inffixed.h"
+				RelativePath="..\lib\zlib\inffixed.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\inflate.c"
+				RelativePath="..\lib\zlib\inflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\inflate.h"
+				RelativePath="..\lib\zlib\inflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\inftrees.c"
+				RelativePath="..\lib\zlib\inftrees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\inftrees.h"
+				RelativePath="..\lib\zlib\inftrees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\trees.c"
+				RelativePath="..\lib\zlib\trees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\trees.h"
+				RelativePath="..\lib\zlib\trees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\uncompr.c"
+				RelativePath="..\lib\zlib\uncompr.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\zconf.h"
+				RelativePath="..\lib\zlib\zconf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\zlib.h"
+				RelativePath="..\lib\zlib\zlib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\zutil.c"
+				RelativePath="..\lib\zlib\zutil.c"
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.7\zutil.h"
+				RelativePath="..\lib\zlib\zutil.h"
 				>
 			</File>
 		</Filter>

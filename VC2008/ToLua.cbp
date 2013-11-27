@@ -21,12 +21,12 @@
 					<Add option="-W" />
 					<Add option="-g" />
 					<Add option="-O0" />
-					<Add directory="../tolua++-1.0.93/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/tolua++/include" />
+					<Add directory="../lib/lua/src" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="../tolua++-1.0.93/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/tolua++/include" />
+					<Add directory="../lib/lua/src" />
 				</ResourceCompiler>
 			</Target>
 			<Target title="Release Win32">
@@ -43,12 +43,12 @@
 					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
 					<Add option="-W" />
 					<Add option="-O2" />
-					<Add directory="../tolua++-1.0.93/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/tolua++/include" />
+					<Add directory="../lib/lua/src" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="../tolua++-1.0.93/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/tolua++/include" />
+					<Add directory="../lib/lua/src" />
 				</ResourceCompiler>
 			</Target>
 			<Target title="Release profiled Win32">
@@ -65,32 +65,32 @@
 					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
 					<Add option="-W" />
 					<Add option="-O2" />
-					<Add directory="../tolua++-1.0.93/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/tolua++/include" />
+					<Add directory="../lib/lua/src" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="../tolua++-1.0.93/include" />
-					<Add directory="../lua-5.1.4/src" />
+					<Add directory="../lib/tolua++/include" />
+					<Add directory="../lib/lua/src" />
 				</ResourceCompiler>
 			</Target>
 		</Build>
-		<Unit filename="../tolua++-1.0.93/src/bin/tolua.c">
+		<Unit filename="../lib/tolua++/src/bin/tolua.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../tolua++-1.0.93/src/lib/tolua_event.c">
+		<Unit filename="../lib/tolua++/src/lib/tolua_event.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../tolua++-1.0.93/src/lib/tolua_event.h" />
-		<Unit filename="../tolua++-1.0.93/src/lib/tolua_is.c">
+		<Unit filename="../lib/tolua++/src/lib/tolua_event.h" />
+		<Unit filename="../lib/tolua++/src/lib/tolua_is.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../tolua++-1.0.93/src/lib/tolua_map.c">
+		<Unit filename="../lib/tolua++/src/lib/tolua_map.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../tolua++-1.0.93/src/lib/tolua_push.c">
+		<Unit filename="../lib/tolua++/src/lib/tolua_push.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../tolua++-1.0.93/src/lib/tolua_to.c">
+		<Unit filename="../lib/tolua++/src/lib/tolua_to.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

@@ -56,62 +56,62 @@
 				</Compiler>
 			</Target>
 		</Build>
-		<Unit filename="../zlib-1.2.7/adler32.c">
+		<Unit filename="../lib/zlib/adler32.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/compress.c">
+		<Unit filename="../lib/zlib/compress.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/crc32.c">
+		<Unit filename="../lib/zlib/crc32.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/crc32.h" />
-		<Unit filename="../zlib-1.2.7/deflate.c">
+		<Unit filename="../lib/zlib/crc32.h" />
+		<Unit filename="../lib/zlib/deflate.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/deflate.h" />
-		<Unit filename="../zlib-1.2.7/gzclose.c">
+		<Unit filename="../lib/zlib/deflate.h" />
+		<Unit filename="../lib/zlib/gzclose.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/gzguts.h" />
-		<Unit filename="../zlib-1.2.7/gzlib.c">
+		<Unit filename="../lib/zlib/gzguts.h" />
+		<Unit filename="../lib/zlib/gzlib.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/gzread.c">
+		<Unit filename="../lib/zlib/gzread.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/gzwrite.c">
+		<Unit filename="../lib/zlib/gzwrite.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/infback.c">
+		<Unit filename="../lib/zlib/infback.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/inffast.c">
+		<Unit filename="../lib/zlib/inffast.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/inffast.h" />
-		<Unit filename="../zlib-1.2.7/inffixed.h" />
-		<Unit filename="../zlib-1.2.7/inflate.c">
+		<Unit filename="../lib/zlib/inffast.h" />
+		<Unit filename="../lib/zlib/inffixed.h" />
+		<Unit filename="../lib/zlib/inflate.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/inflate.h" />
-		<Unit filename="../zlib-1.2.7/inftrees.c">
+		<Unit filename="../lib/zlib/inflate.h" />
+		<Unit filename="../lib/zlib/inftrees.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/inftrees.h" />
-		<Unit filename="../zlib-1.2.7/trees.c">
+		<Unit filename="../lib/zlib/inftrees.h" />
+		<Unit filename="../lib/zlib/trees.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/trees.h" />
-		<Unit filename="../zlib-1.2.7/uncompr.c">
+		<Unit filename="../lib/zlib/trees.h" />
+		<Unit filename="../lib/zlib/uncompr.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/zconf.h" />
-		<Unit filename="../zlib-1.2.7/zlib.h" />
-		<Unit filename="../zlib-1.2.7/zutil.c">
+		<Unit filename="../lib/zlib/zconf.h" />
+		<Unit filename="../lib/zlib/zlib.h" />
+		<Unit filename="../lib/zlib/zutil.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../zlib-1.2.7/zutil.h" />
+		<Unit filename="../lib/zlib/zutil.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

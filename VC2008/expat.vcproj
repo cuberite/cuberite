@@ -149,75 +149,75 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\expat\ascii.h"
+				RelativePath="..\lib\expat\ascii.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\asciitab.h"
+				RelativePath="..\lib\expat\asciitab.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\expat.h"
+				RelativePath="..\lib\expat\expat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\expat_external.h"
+				RelativePath="..\lib\expat\expat_external.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\iasciitab.h"
+				RelativePath="..\lib\expat\iasciitab.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\internal.h"
+				RelativePath="..\lib\expat\internal.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\latin1tab.h"
+				RelativePath="..\lib\expat\latin1tab.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\nametab.h"
+				RelativePath="..\lib\expat\nametab.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\utf8tab.h"
+				RelativePath="..\lib\expat\utf8tab.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\winconfig.h"
+				RelativePath="..\lib\expat\winconfig.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\xmlparse.c"
+				RelativePath="..\lib\expat\xmlparse.c"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\xmlrole.c"
+				RelativePath="..\lib\expat\xmlrole.c"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\xmlrole.h"
+				RelativePath="..\lib\expat\xmlrole.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\xmltok.c"
+				RelativePath="..\lib\expat\xmltok.c"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\xmltok.h"
+				RelativePath="..\lib\expat\xmltok.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\xmltok_impl.c"
+				RelativePath="..\lib\expat\xmltok_impl.c"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\xmltok_impl.h"
+				RelativePath="..\lib\expat\xmltok_impl.h"
 				>
 			</File>
 			<File
-				RelativePath="..\expat\xmltok_ns.c"
+				RelativePath="..\lib\expat\xmltok_ns.c"
 				>
 			</File>
 		</Filter>
