@@ -25,7 +25,7 @@
 #include "../Vector3f.h"
 
 #include "inifile/iniFile.h"
-#include "jsoncpp/include/json/json.h"
+#include "json/json.h"
 
 #define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
 

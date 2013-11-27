@@ -9,7 +9,7 @@
 #include "Root.h"
 #include "World.h"
 
-#include "jsoncpp/include/json/json.h"
+#include "json/json.h"
 
 #include "Items/ItemHandler.h"
 

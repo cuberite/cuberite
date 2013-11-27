@@ -9,10 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lib/expat/expat.h"
+#include "expat/expat.h"
 
-#include "lib/lua/src/lua.h"
-#include "lib/lua/src/lauxlib.h"
+#include "lua/src/lua.h"
+#include "lua/src/lauxlib.h"
 
 
 #include "lxplib.h"

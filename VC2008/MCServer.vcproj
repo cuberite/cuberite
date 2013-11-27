@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;../lib/zlib&quot;;&quot;../lib/jsoncpp/include&quot;;&quot;../lib/lua/src&quot;;&quot;../lib/tolua++/include&quot;;..;../lib/expat"
+				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;XML_STATIC"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -121,7 +121,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;../lib/zlib&quot;;&quot;../lib/jsoncpp/include&quot;;&quot;../lib/lua/src&quot;;&quot;../lib/tolua++/include&quot;;..;../lib/expat"
+				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;XML_STATIC"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -200,7 +200,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;../lib/zlib&quot;;&quot;../lib/jsoncpp/include&quot;;&quot;../lib/lua/src&quot;;&quot;../lib/tolua++/include&quot;;..;../lib/expat"
+				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;XML_STATIC"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -277,7 +277,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;../lib/zlib&quot;;&quot;../lib/jsoncpp/include&quot;;&quot;../lib/lua/src&quot;;&quot;../lib/tolua++/include&quot;;..;../lib/expat"
+				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;XML_STATIC"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -1220,6 +1220,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Entities\ExpOrb.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Entities\ExpOrb.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Entities\FallingBlock.cpp"
 					>
 				</File>
@@ -1269,14 +1277,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Entities\TNTEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Entities\ExpOrb.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Entities\ExpOrb.h"
 					>
 				</File>
 				<File

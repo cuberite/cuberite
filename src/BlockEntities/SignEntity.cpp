@@ -4,7 +4,7 @@
 // Implements the cSignEntity class representing a single sign in the world
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "jsoncpp/include/json/json.h"
+#include "json/json.h"
 #include "SignEntity.h"
 #include "../Entities/Player.h"
 

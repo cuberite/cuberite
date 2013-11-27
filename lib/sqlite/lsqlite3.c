@@ -44,8 +44,8 @@ extern "C" {
 #include <assert.h>
 
 #define LUA_LIB
-#include "lib/lua/src/lua.h"
-#include "lib/lua/src/lauxlib.h"
+#include "lua/src/lua.h"
+#include "lua/src/lauxlib.h"
 
 #if LUA_VERSION_NUM > 501
 //

@@ -143,9 +143,8 @@ endif
 
 INCLUDE = -I.\
 		-Isrc\
-		-Isrc/items\
-		-Isrce/blocks\
 		-Ilib\
+		-Ilib/jsoncpp/include
 
 
 
