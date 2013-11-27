@@ -47,8 +47,8 @@ ifeq ($(release),1)
 # release build - fastest run-time, no gdb support
 ################
 
-CC_OPTIONS = -g -O3 -DNDEBUG
-CXX_OPTIONS = -g -O3 -DNDEBUG
+CC_OPTIONS = -O3 -DNDEBUG
+CXX_OPTIONS = -O3 -DNDEBUG
 LNK_OPTIONS = -pthread -O3
 
 BUILDDIR = build/release/
