@@ -925,6 +925,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\VoronoiMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\VoronoiMap.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\WebAdmin.cpp"
 				>
 			</File>
