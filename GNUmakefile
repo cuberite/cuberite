@@ -47,15 +47,10 @@ ifeq ($(release),1)
 # release build - fastest run-time, no gdb support
 ################
 
-ifeq ($(disableofast),1)
-	CC_OPTIONS = -g -O3 -DNDEBUG
-	CXX_OPTIONS = -g -O3 -DNDEBUG
-	LNK_OPTIONS = -pthread -O3
-else
-	CC_OPTIONS = -g -Ofast -DNDEBUG
-	CXX_OPTIONS = -g -Ofast -DNDEBUG
-	LNK_OPTIONS = -pthread -Ofast
-endif
+CC_OPTIONS = -g -O3 -DNDEBUG
+CXX_OPTIONS = -g -O3 -DNDEBUG
+LNK_OPTIONS = -pthread -O3
+
 BUILDDIR = build/release/
 
 else
@@ -64,15 +59,9 @@ ifeq ($(profile),1)
 # profile build - a release build with symbols and profiling engine built in
 ################
 
-ifeq ($(disableofast),1)
-	CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-	CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-	LNK_OPTIONS = -pthread -ggdb -O3 -pg
-else
-	CC_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
-	CXX_OPTIONS = -s -g -ggdb -Ofast -pg -DNDEBUG
-	LNK_OPTIONS = -pthread -ggdb -Ofast -pg
-endif
+CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
+CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
+LNK_OPTIONS = -pthread -ggdb -O3 -pg
 
 BUILDDIR = build/profile/
 
@@ -82,11 +71,7 @@ else
 # Since C code is used only for supporting libraries (zlib, lua), it is still Ofast-optimized
 ################
 
-ifeq ($(disableofast),1)
 	CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
-else
-	CC_OPTIONS = -s -ggdb -g -D_DEBUG -Ofast
-endif
 
 CXX_OPTIONS = -s -ggdb -g -D_DEBUG -Og
 LNK_OPTIONS = -pthread -g -ggdb -Og
