@@ -45,9 +45,9 @@ echo Performing nightbuild of MC-Server
 set DONOTPAUSE=y
 
 :: Update the sources to the latest revision:
-del source\Bindings.cpp
-del source\Bindings.h
-git checkout -- source\Bindings.*
+del src\Bindings.cpp
+del src\Bindings.h
+git checkout -- src\Bindings.*
 git pull
 if errorlevel 1 goto haderror
 
@@ -78,11 +78,11 @@ if exist %TAGFILE% (
 
 
 :: Update the Bindings:
-del source\Bindings.cpp
-del source\Bindings.h
+del src\Bindings.cpp
+del src\Bindings.h
 echo Updating Lua bindings
 set ALLTOLUA_WAIT=N
-cd source
+cd src
 call AllToLua.bat
 cd ..
 

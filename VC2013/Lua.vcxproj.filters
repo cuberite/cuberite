@@ -7,126 +7,126 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\lua-5.1.4\src\lapi.c">
+    <ClCompile Include="..\lib\lua\src\lapi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lauxlib.c">
+    <ClCompile Include="..\lib\lua\src\lauxlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lbaselib.c">
+    <ClCompile Include="..\lib\lua\src\lbaselib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lcode.c">
+    <ClCompile Include="..\lib\lua\src\lcode.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\ldblib.c">
+    <ClCompile Include="..\lib\lua\src\ldblib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\ldebug.c">
+    <ClCompile Include="..\lib\lua\src\ldebug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\ldo.c">
+    <ClCompile Include="..\lib\lua\src\ldo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\ldump.c">
+    <ClCompile Include="..\lib\lua\src\ldump.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lfunc.c">
+    <ClCompile Include="..\lib\lua\src\lfunc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lgc.c">
+    <ClCompile Include="..\lib\lua\src\lgc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\linit.c">
+    <ClCompile Include="..\lib\lua\src\linit.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\liolib.c">
+    <ClCompile Include="..\lib\lua\src\liolib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\llex.c">
+    <ClCompile Include="..\lib\lua\src\llex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lmathlib.c">
+    <ClCompile Include="..\lib\lua\src\lmathlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lmem.c">
+    <ClCompile Include="..\lib\lua\src\lmem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\loadlib.c">
+    <ClCompile Include="..\lib\lua\src\loadlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lobject.c">
+    <ClCompile Include="..\lib\lua\src\lobject.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lopcodes.c">
+    <ClCompile Include="..\lib\lua\src\lopcodes.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\loslib.c">
+    <ClCompile Include="..\lib\lua\src\loslib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lparser.c">
+    <ClCompile Include="..\lib\lua\src\lparser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lstate.c">
+    <ClCompile Include="..\lib\lua\src\lstate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lstring.c">
+    <ClCompile Include="..\lib\lua\src\lstring.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lstrlib.c">
+    <ClCompile Include="..\lib\lua\src\lstrlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\ltable.c">
+    <ClCompile Include="..\lib\lua\src\ltable.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\ltablib.c">
+    <ClCompile Include="..\lib\lua\src\ltablib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\ltm.c">
+    <ClCompile Include="..\lib\lua\src\ltm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lua.c">
+    <ClCompile Include="..\lib\lua\src\lua.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\luac.c">
+    <ClCompile Include="..\lib\lua\src\luac.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lundump.c">
+    <ClCompile Include="..\lib\lua\src\lundump.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lvm.c">
+    <ClCompile Include="..\lib\lua\src\lvm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\lzio.c">
+    <ClCompile Include="..\lib\lua\src\lzio.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lua-5.1.4\src\print.c">
+    <ClCompile Include="..\lib\lua\src\print.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\lua-5.1.4\src\lapi.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lauxlib.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lcode.h" />
-    <ClInclude Include="..\lua-5.1.4\src\ldebug.h" />
-    <ClInclude Include="..\lua-5.1.4\src\ldo.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lfunc.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lgc.h" />
-    <ClInclude Include="..\lua-5.1.4\src\llex.h" />
-    <ClInclude Include="..\lua-5.1.4\src\llimits.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lmem.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lobject.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lopcodes.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lparser.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lstate.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lstring.h" />
-    <ClInclude Include="..\lua-5.1.4\src\ltable.h" />
-    <ClInclude Include="..\lua-5.1.4\src\ltm.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lua.h" />
-    <ClInclude Include="..\lua-5.1.4\src\luaconf.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lualib.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lundump.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lvm.h" />
-    <ClInclude Include="..\lua-5.1.4\src\lzio.h" />
+    <ClInclude Include="..\lib\lua\src\lapi.h" />
+    <ClInclude Include="..\lib\lua\src\lauxlib.h" />
+    <ClInclude Include="..\lib\lua\src\lcode.h" />
+    <ClInclude Include="..\lib\lua\src\ldebug.h" />
+    <ClInclude Include="..\lib\lua\src\ldo.h" />
+    <ClInclude Include="..\lib\lua\src\lfunc.h" />
+    <ClInclude Include="..\lib\lua\src\lgc.h" />
+    <ClInclude Include="..\lib\lua\src\llex.h" />
+    <ClInclude Include="..\lib\lua\src\llimits.h" />
+    <ClInclude Include="..\lib\lua\src\lmem.h" />
+    <ClInclude Include="..\lib\lua\src\lobject.h" />
+    <ClInclude Include="..\lib\lua\src\lopcodes.h" />
+    <ClInclude Include="..\lib\lua\src\lparser.h" />
+    <ClInclude Include="..\lib\lua\src\lstate.h" />
+    <ClInclude Include="..\lib\lua\src\lstring.h" />
+    <ClInclude Include="..\lib\lua\src\ltable.h" />
+    <ClInclude Include="..\lib\lua\src\ltm.h" />
+    <ClInclude Include="..\lib\lua\src\lua.h" />
+    <ClInclude Include="..\lib\lua\src\luaconf.h" />
+    <ClInclude Include="..\lib\lua\src\lualib.h" />
+    <ClInclude Include="..\lib\lua\src\lundump.h" />
+    <ClInclude Include="..\lib\lua\src\lvm.h" />
+    <ClInclude Include="..\lib\lua\src\lzio.h" />
   </ItemGroup>
 </Project>

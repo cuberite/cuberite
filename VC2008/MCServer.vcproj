@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;..;../expat"
+				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;XML_STATIC"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -121,7 +121,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;..;../expat"
+				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;XML_STATIC"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -200,7 +200,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;..;../expat"
+				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;XML_STATIC"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -277,7 +277,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;..;../expat"
+				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;XML_STATIC"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -359,163 +359,163 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\source\Authenticator.cpp"
+				RelativePath="..\src\Authenticator.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Authenticator.h"
+				RelativePath="..\src\Authenticator.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\BlockArea.cpp"
+				RelativePath="..\src\BlockArea.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\BlockArea.h"
+				RelativePath="..\src\BlockArea.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\BlockID.cpp"
+				RelativePath="..\src\BlockID.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\BlockID.h"
+				RelativePath="..\src\BlockID.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\BlockTracer.h"
+				RelativePath="..\src\BlockTracer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\BoundingBox.cpp"
+				RelativePath="..\src\BoundingBox.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\BoundingBox.h"
+				RelativePath="..\src\BoundingBox.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ByteBuffer.cpp"
+				RelativePath="..\src\ByteBuffer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ByteBuffer.h"
+				RelativePath="..\src\ByteBuffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ChatColor.cpp"
+				RelativePath="..\src\ChatColor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ChatColor.h"
+				RelativePath="..\src\ChatColor.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Chunk.cpp"
+				RelativePath="..\src\Chunk.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Chunk.h"
+				RelativePath="..\src\Chunk.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Chunk.inl.h"
+				RelativePath="..\src\Chunk.inl.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ChunkDef.h"
+				RelativePath="..\src\ChunkDef.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ChunkMap.cpp"
+				RelativePath="..\src\ChunkMap.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ChunkMap.h"
+				RelativePath="..\src\ChunkMap.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ChunkSender.cpp"
+				RelativePath="..\src\ChunkSender.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ChunkSender.h"
+				RelativePath="..\src\ChunkSender.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ClientHandle.cpp"
+				RelativePath="..\src\ClientHandle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ClientHandle.h"
+				RelativePath="..\src\ClientHandle.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\CommandOutput.cpp"
+				RelativePath="..\src\CommandOutput.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\CommandOutput.h"
+				RelativePath="..\src\CommandOutput.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\CraftingRecipes.cpp"
+				RelativePath="..\src\CraftingRecipes.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\CraftingRecipes.h"
+				RelativePath="..\src\CraftingRecipes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Cuboid.cpp"
+				RelativePath="..\src\Cuboid.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Cuboid.h"
+				RelativePath="..\src\Cuboid.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\DeadlockDetect.cpp"
+				RelativePath="..\src\DeadlockDetect.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\DeadlockDetect.h"
+				RelativePath="..\src\DeadlockDetect.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Defines.h"
+				RelativePath="..\src\Defines.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Enchantments.cpp"
+				RelativePath="..\src\Enchantments.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Enchantments.h"
+				RelativePath="..\src\Enchantments.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Endianness.h"
+				RelativePath="..\src\Endianness.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\FastRandom.cpp"
+				RelativePath="..\src\FastRandom.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\FastRandom.h"
+				RelativePath="..\src\FastRandom.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\FurnaceRecipe.cpp"
+				RelativePath="..\src\FurnaceRecipe.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\FurnaceRecipe.h"
+				RelativePath="..\src\FurnaceRecipe.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Globals.cpp"
+				RelativePath="..\src\Globals.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -551,55 +551,55 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\source\Globals.h"
+				RelativePath="..\src\Globals.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Group.cpp"
+				RelativePath="..\src\Group.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Group.h"
+				RelativePath="..\src\Group.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\GroupManager.cpp"
+				RelativePath="..\src\GroupManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\GroupManager.h"
+				RelativePath="..\src\GroupManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Inventory.cpp"
+				RelativePath="..\src\Inventory.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Inventory.h"
+				RelativePath="..\src\Inventory.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Item.cpp"
+				RelativePath="..\src\Item.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Item.h"
+				RelativePath="..\src\Item.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ItemGrid.cpp"
+				RelativePath="..\src\ItemGrid.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ItemGrid.h"
+				RelativePath="..\src\ItemGrid.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Ladder.h"
+				RelativePath="..\src\Ladder.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\LeakFinder.cpp"
+				RelativePath="..\src\LeakFinder.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -639,115 +639,115 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\source\LeakFinder.h"
+				RelativePath="..\src\LeakFinder.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\LightingThread.cpp"
+				RelativePath="..\src\LightingThread.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\LightingThread.h"
+				RelativePath="..\src\LightingThread.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\LinearInterpolation.cpp"
+				RelativePath="..\src\LinearInterpolation.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\LinearInterpolation.h"
+				RelativePath="..\src\LinearInterpolation.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\LinearUpscale.h"
+				RelativePath="..\src\LinearUpscale.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\LineBlockTracer.cpp"
+				RelativePath="..\src\LineBlockTracer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\LineBlockTracer.h"
+				RelativePath="..\src\LineBlockTracer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Log.cpp"
+				RelativePath="..\src\Log.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Log.h"
+				RelativePath="..\src\Log.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\main.cpp"
+				RelativePath="..\src\main.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Matrix4f.cpp"
+				RelativePath="..\src\Matrix4f.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Matrix4f.h"
+				RelativePath="..\src\Matrix4f.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MCLogger.cpp"
+				RelativePath="..\src\MCLogger.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MCLogger.h"
+				RelativePath="..\src\MCLogger.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MemoryLeak.h"
+				RelativePath="..\src\MemoryLeak.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MersenneTwister.h"
+				RelativePath="..\src\MersenneTwister.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobCensus.cpp"
+				RelativePath="..\src\MobCensus.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobCensus.h"
+				RelativePath="..\src\MobCensus.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobFamilyCollecter.cpp"
+				RelativePath="..\src\MobFamilyCollecter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobFamilyCollecter.h"
+				RelativePath="..\src\MobFamilyCollecter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobProximityCounter.cpp"
+				RelativePath="..\src\MobProximityCounter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobProximityCounter.h"
+				RelativePath="..\src\MobProximityCounter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobSpawner.cpp"
+				RelativePath="..\src\MobSpawner.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MobSpawner.h"
+				RelativePath="..\src\MobSpawner.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MonsterConfig.cpp"
+				RelativePath="..\src\MonsterConfig.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MonsterConfig.h"
+				RelativePath="..\src\MonsterConfig.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Noise.cpp"
+				RelativePath="..\src\Noise.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -777,63 +777,63 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\source\Noise.h"
+				RelativePath="..\src\Noise.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Piston.cpp"
+				RelativePath="..\src\Piston.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Piston.h"
+				RelativePath="..\src\Piston.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ProbabDistrib.cpp"
+				RelativePath="..\src\ProbabDistrib.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ProbabDistrib.h"
+				RelativePath="..\src\ProbabDistrib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\RCONServer.cpp"
+				RelativePath="..\src\RCONServer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\RCONServer.h"
+				RelativePath="..\src\RCONServer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ReferenceManager.cpp"
+				RelativePath="..\src\ReferenceManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ReferenceManager.h"
+				RelativePath="..\src\ReferenceManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Root.cpp"
+				RelativePath="..\src\Root.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Root.h"
+				RelativePath="..\src\Root.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Server.cpp"
+				RelativePath="..\src\Server.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Server.h"
+				RelativePath="..\src\Server.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Sign.h"
+				RelativePath="..\src\Sign.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StackWalker.cpp"
+				RelativePath="..\src\StackWalker.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -873,330 +873,338 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\source\StackWalker.h"
+				RelativePath="..\src\StackWalker.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StringCompression.cpp"
+				RelativePath="..\src\StringCompression.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StringCompression.h"
+				RelativePath="..\src\StringCompression.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StringUtils.cpp"
+				RelativePath="..\src\StringUtils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StringUtils.h"
+				RelativePath="..\src\StringUtils.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Tracer.cpp"
+				RelativePath="..\src\Tracer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Tracer.h"
+				RelativePath="..\src\Tracer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Vector3d.cpp"
+				RelativePath="..\src\Vector3d.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Vector3d.h"
+				RelativePath="..\src\Vector3d.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Vector3f.cpp"
+				RelativePath="..\src\Vector3f.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Vector3f.h"
+				RelativePath="..\src\Vector3f.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Vector3i.cpp"
+				RelativePath="..\src\Vector3i.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Vector3i.h"
+				RelativePath="..\src\Vector3i.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\WebAdmin.cpp"
+				RelativePath="..\src\VoronoiMap.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\WebAdmin.h"
+				RelativePath="..\src\VoronoiMap.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\World.cpp"
+				RelativePath="..\src\WebAdmin.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\World.h"
+				RelativePath="..\src\WebAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\World.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\World.h"
 				>
 			</File>
 			<Filter
 				Name="Mobs"
 				>
 				<File
-					RelativePath="..\source\Mobs\AggressiveMonster.cpp"
+					RelativePath="..\src\Mobs\AggressiveMonster.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\AggressiveMonster.h"
+					RelativePath="..\src\Mobs\AggressiveMonster.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Bat.cpp"
+					RelativePath="..\src\Mobs\Bat.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Bat.h"
+					RelativePath="..\src\Mobs\Bat.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Blaze.cpp"
+					RelativePath="..\src\Mobs\Blaze.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Blaze.h"
+					RelativePath="..\src\Mobs\Blaze.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Cavespider.cpp"
+					RelativePath="..\src\Mobs\Cavespider.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Cavespider.h"
+					RelativePath="..\src\Mobs\Cavespider.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Chicken.cpp"
+					RelativePath="..\src\Mobs\Chicken.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Chicken.h"
+					RelativePath="..\src\Mobs\Chicken.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Cow.cpp"
+					RelativePath="..\src\Mobs\Cow.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Cow.h"
+					RelativePath="..\src\Mobs\Cow.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Creeper.cpp"
+					RelativePath="..\src\Mobs\Creeper.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Creeper.h"
+					RelativePath="..\src\Mobs\Creeper.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\EnderDragon.cpp"
+					RelativePath="..\src\Mobs\EnderDragon.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\EnderDragon.h"
+					RelativePath="..\src\Mobs\EnderDragon.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Enderman.cpp"
+					RelativePath="..\src\Mobs\Enderman.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Enderman.h"
+					RelativePath="..\src\Mobs\Enderman.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Ghast.cpp"
+					RelativePath="..\src\Mobs\Ghast.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Ghast.h"
+					RelativePath="..\src\Mobs\Ghast.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Giant.cpp"
+					RelativePath="..\src\Mobs\Giant.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Giant.h"
+					RelativePath="..\src\Mobs\Giant.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Horse.cpp"
+					RelativePath="..\src\Mobs\Horse.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Horse.h"
+					RelativePath="..\src\Mobs\Horse.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\IronGolem.cpp"
+					RelativePath="..\src\Mobs\IronGolem.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\IronGolem.h"
+					RelativePath="..\src\Mobs\IronGolem.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\MagmaCube.cpp"
+					RelativePath="..\src\Mobs\MagmaCube.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\MagmaCube.h"
+					RelativePath="..\src\Mobs\MagmaCube.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Monster.cpp"
+					RelativePath="..\src\Mobs\Monster.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Monster.h"
+					RelativePath="..\src\Mobs\Monster.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Mooshroom.cpp"
+					RelativePath="..\src\Mobs\Mooshroom.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Mooshroom.h"
+					RelativePath="..\src\Mobs\Mooshroom.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Ocelot.h"
+					RelativePath="..\src\Mobs\Ocelot.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\PassiveAggressiveMonster.cpp"
+					RelativePath="..\src\Mobs\PassiveAggressiveMonster.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\PassiveAggressiveMonster.h"
+					RelativePath="..\src\Mobs\PassiveAggressiveMonster.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\PassiveMonster.cpp"
+					RelativePath="..\src\Mobs\PassiveMonster.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\PassiveMonster.h"
+					RelativePath="..\src\Mobs\PassiveMonster.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Pig.cpp"
+					RelativePath="..\src\Mobs\Pig.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Pig.h"
+					RelativePath="..\src\Mobs\Pig.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Sheep.cpp"
+					RelativePath="..\src\Mobs\Sheep.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Sheep.h"
+					RelativePath="..\src\Mobs\Sheep.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Silverfish.h"
+					RelativePath="..\src\Mobs\Silverfish.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Skeleton.cpp"
+					RelativePath="..\src\Mobs\Skeleton.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Skeleton.h"
+					RelativePath="..\src\Mobs\Skeleton.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Slime.cpp"
+					RelativePath="..\src\Mobs\Slime.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Slime.h"
+					RelativePath="..\src\Mobs\Slime.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\SnowGolem.cpp"
+					RelativePath="..\src\Mobs\SnowGolem.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\SnowGolem.h"
+					RelativePath="..\src\Mobs\SnowGolem.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Spider.cpp"
+					RelativePath="..\src\Mobs\Spider.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Spider.h"
+					RelativePath="..\src\Mobs\Spider.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Squid.cpp"
+					RelativePath="..\src\Mobs\Squid.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Squid.h"
+					RelativePath="..\src\Mobs\Squid.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Villager.cpp"
+					RelativePath="..\src\Mobs\Villager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Villager.h"
+					RelativePath="..\src\Mobs\Villager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Witch.cpp"
+					RelativePath="..\src\Mobs\Witch.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Witch.h"
+					RelativePath="..\src\Mobs\Witch.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Wither.cpp"
+					RelativePath="..\src\Mobs\Wither.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Wither.h"
+					RelativePath="..\src\Mobs\Wither.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Wolf.cpp"
+					RelativePath="..\src\Mobs\Wolf.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Wolf.h"
+					RelativePath="..\src\Mobs\Wolf.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Zombie.cpp"
+					RelativePath="..\src\Mobs\Zombie.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Zombie.h"
+					RelativePath="..\src\Mobs\Zombie.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\ZombiePigman.cpp"
+					RelativePath="..\src\Mobs\ZombiePigman.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\ZombiePigman.h"
+					RelativePath="..\src\Mobs\ZombiePigman.h"
 					>
 				</File>
 			</Filter>
@@ -1204,75 +1212,87 @@
 				Name="Entities"
 				>
 				<File
-					RelativePath="..\source\Entities\Boat.cpp"
+					RelativePath="..\src\Entities\Boat.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Boat.h"
+					RelativePath="..\src\Entities\Boat.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Entity.cpp"
+					RelativePath="..\src\Entities\Entity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Entity.h"
+					RelativePath="..\src\Entities\Entity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\FallingBlock.cpp"
+					RelativePath="..\src\Entities\ExpOrb.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\FallingBlock.h"
+					RelativePath="..\src\Entities\ExpOrb.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Minecart.cpp"
+					RelativePath="..\src\Entities\FallingBlock.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Minecart.h"
+					RelativePath="..\src\Entities\FallingBlock.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Pawn.cpp"
+					RelativePath="..\src\Entities\Minecart.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Pawn.h"
+					RelativePath="..\src\Entities\Minecart.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Pickup.cpp"
+					RelativePath="..\src\Entities\Pawn.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Pickup.h"
+					RelativePath="..\src\Entities\Pawn.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Player.cpp"
+					RelativePath="..\src\Entities\Pickup.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\Player.h"
+					RelativePath="..\src\Entities\Pickup.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\ProjectileEntity.cpp"
+					RelativePath="..\src\Entities\Player.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\ProjectileEntity.h"
+					RelativePath="..\src\Entities\Player.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\TNTEntity.cpp"
+					RelativePath="..\src\Entities\ProjectileEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Entities\TNTEntity.h"
+					RelativePath="..\src\Entities\ProjectileEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Entities\TNTEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Entities\TNTEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Entities\TNTEntity.h"
 					>
 				</File>
 			</Filter>
@@ -1280,23 +1300,23 @@
 				Name="UI"
 				>
 				<File
-					RelativePath="..\source\UI\SlotArea.cpp"
+					RelativePath="..\src\UI\SlotArea.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\UI\SlotArea.h"
+					RelativePath="..\src\UI\SlotArea.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\UI\Window.cpp"
+					RelativePath="..\src\UI\Window.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\UI\Window.h"
+					RelativePath="..\src\UI\Window.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\UI\WindowOwner.h"
+					RelativePath="..\src\UI\WindowOwner.h"
 					>
 				</File>
 			</Filter>
@@ -1304,79 +1324,79 @@
 				Name="Simulator"
 				>
 				<File
-					RelativePath="..\source\Simulator\DelayedFluidSimulator.cpp"
+					RelativePath="..\src\Simulator\DelayedFluidSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\DelayedFluidSimulator.h"
+					RelativePath="..\src\Simulator\DelayedFluidSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\FireSimulator.cpp"
+					RelativePath="..\src\Simulator\FireSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\FireSimulator.h"
+					RelativePath="..\src\Simulator\FireSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\FloodyFluidSimulator.cpp"
+					RelativePath="..\src\Simulator\FloodyFluidSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\FloodyFluidSimulator.h"
+					RelativePath="..\src\Simulator\FloodyFluidSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\FluidSimulator.cpp"
+					RelativePath="..\src\Simulator\FluidSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\FluidSimulator.h"
+					RelativePath="..\src\Simulator\FluidSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\NoopFluidSimulator.h"
+					RelativePath="..\src\Simulator\NoopFluidSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\RedstoneSimulator.cpp"
+					RelativePath="..\src\Simulator\RedstoneSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\RedstoneSimulator.h"
+					RelativePath="..\src\Simulator\RedstoneSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\SandSimulator.cpp"
+					RelativePath="..\src\Simulator\SandSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\SandSimulator.h"
+					RelativePath="..\src\Simulator\SandSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\Simulator.cpp"
+					RelativePath="..\src\Simulator\Simulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\Simulator.h"
+					RelativePath="..\src\Simulator\Simulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\SimulatorManager.cpp"
+					RelativePath="..\src\Simulator\SimulatorManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\SimulatorManager.h"
+					RelativePath="..\src\Simulator\SimulatorManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\VaporizeFluidSimulator.cpp"
+					RelativePath="..\src\Simulator\VaporizeFluidSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator\VaporizeFluidSimulator.h"
+					RelativePath="..\src\Simulator\VaporizeFluidSimulator.h"
 					>
 				</File>
 			</Filter>
@@ -1384,107 +1404,107 @@
 				Name="OSSupport"
 				>
 				<File
-					RelativePath="..\source\OSSupport\BlockingTCPLink.cpp"
+					RelativePath="..\src\OSSupport\BlockingTCPLink.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\BlockingTCPLink.h"
+					RelativePath="..\src\OSSupport\BlockingTCPLink.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\CriticalSection.cpp"
+					RelativePath="..\src\OSSupport\CriticalSection.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\CriticalSection.h"
+					RelativePath="..\src\OSSupport\CriticalSection.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Event.cpp"
+					RelativePath="..\src\OSSupport\Event.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Event.h"
+					RelativePath="..\src\OSSupport\Event.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\File.cpp"
+					RelativePath="..\src\OSSupport\File.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\File.h"
+					RelativePath="..\src\OSSupport\File.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\GZipFile.cpp"
+					RelativePath="..\src\OSSupport\GZipFile.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\GZipFile.h"
+					RelativePath="..\src\OSSupport\GZipFile.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\IsThread.cpp"
+					RelativePath="..\src\OSSupport\IsThread.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\IsThread.h"
+					RelativePath="..\src\OSSupport\IsThread.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\ListenThread.cpp"
+					RelativePath="..\src\OSSupport\ListenThread.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\ListenThread.h"
+					RelativePath="..\src\OSSupport\ListenThread.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Semaphore.cpp"
+					RelativePath="..\src\OSSupport\Semaphore.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Semaphore.h"
+					RelativePath="..\src\OSSupport\Semaphore.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Sleep.cpp"
+					RelativePath="..\src\OSSupport\Sleep.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Sleep.h"
+					RelativePath="..\src\OSSupport\Sleep.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Socket.cpp"
+					RelativePath="..\src\OSSupport\Socket.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Socket.h"
+					RelativePath="..\src\OSSupport\Socket.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\SocketThreads.cpp"
+					RelativePath="..\src\OSSupport\SocketThreads.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\SocketThreads.h"
+					RelativePath="..\src\OSSupport\SocketThreads.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Thread.cpp"
+					RelativePath="..\src\OSSupport\Thread.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Thread.h"
+					RelativePath="..\src\OSSupport\Thread.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Timer.cpp"
+					RelativePath="..\src\OSSupport\Timer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\Timer.h"
+					RelativePath="..\src\OSSupport\Timer.h"
 					>
 				</File>
 				<Filter
@@ -1676,7 +1696,7 @@
 				Name="Bindings"
 				>
 				<File
-					RelativePath="..\source\AllToLua.pkg"
+					RelativePath="..\src\AllToLua.pkg"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -1685,7 +1705,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
-							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../lib/inifile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
 					</FileConfiguration>
@@ -1696,7 +1716,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
-							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../lib/inifile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
 					</FileConfiguration>
@@ -1707,7 +1727,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
-							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../lib/inifile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
 					</FileConfiguration>
@@ -1718,7 +1738,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
-							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../lib/inifile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
 					</FileConfiguration>
@@ -1728,7 +1748,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Bindings.cpp"
+					RelativePath="..\src\Bindings.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -1764,75 +1784,75 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\source\Bindings.h"
+					RelativePath="..\src\Bindings.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\LuaFunctions.h"
+					RelativePath="..\src\LuaFunctions.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\LuaState.cpp"
+					RelativePath="..\src\LuaState.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\LuaState.h"
+					RelativePath="..\src\LuaState.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\LuaWindow.cpp"
+					RelativePath="..\src\LuaWindow.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\LuaWindow.h"
+					RelativePath="..\src\LuaWindow.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\ManualBindings.cpp"
+					RelativePath="..\src\ManualBindings.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\ManualBindings.h"
+					RelativePath="..\src\ManualBindings.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Plugin.cpp"
+					RelativePath="..\src\Plugin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Plugin.h"
+					RelativePath="..\src\Plugin.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\PluginLua.cpp"
+					RelativePath="..\src\PluginLua.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\PluginLua.h"
+					RelativePath="..\src\PluginLua.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\PluginManager.cpp"
+					RelativePath="..\src\PluginManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\PluginManager.h"
+					RelativePath="..\src\PluginManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\tolua++.h"
+					RelativePath="..\src\tolua++.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\tolua_base.h"
+					RelativePath="..\src\tolua_base.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WebPlugin.cpp"
+					RelativePath="..\src\WebPlugin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WebPlugin.h"
+					RelativePath="..\src\WebPlugin.h"
 					>
 				</File>
 			</Filter>
@@ -1840,15 +1860,15 @@
 				Name="External"
 				>
 				<File
-					RelativePath="..\iniFile\iniFile.cpp"
+					RelativePath="..\lib\inifile\iniFile.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\iniFile\iniFile.h"
+					RelativePath="..\lib\inifile\iniFile.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\md5\md5.cpp"
+					RelativePath="..\lib\md5\md5.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -1888,7 +1908,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\source\md5\md5.h"
+					RelativePath="..\lib\md5\md5.h"
 					>
 				</File>
 			</Filter>
@@ -1896,43 +1916,43 @@
 				Name="WorldStorage"
 				>
 				<File
-					RelativePath="..\source\WorldStorage\FastNBT.cpp"
+					RelativePath="..\src\WorldStorage\FastNBT.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\FastNBT.h"
+					RelativePath="..\src\WorldStorage\FastNBT.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\NBTChunkSerializer.cpp"
+					RelativePath="..\src\WorldStorage\NBTChunkSerializer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\NBTChunkSerializer.h"
+					RelativePath="..\src\WorldStorage\NBTChunkSerializer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\WorldStorage.cpp"
+					RelativePath="..\src\WorldStorage\WorldStorage.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\WorldStorage.h"
+					RelativePath="..\src\WorldStorage\WorldStorage.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\WSSAnvil.cpp"
+					RelativePath="..\src\WorldStorage\WSSAnvil.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\WSSAnvil.h"
+					RelativePath="..\src\WorldStorage\WSSAnvil.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\WSSCompact.cpp"
+					RelativePath="..\src\WorldStorage\WSSCompact.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage\WSSCompact.h"
+					RelativePath="..\src\WorldStorage\WSSCompact.h"
 					>
 				</File>
 			</Filter>
@@ -1940,123 +1960,123 @@
 				Name="Generating"
 				>
 				<File
-					RelativePath="..\source\Generating\BioGen.cpp"
+					RelativePath="..\src\Generating\BioGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\BioGen.h"
+					RelativePath="..\src\Generating\BioGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\Caves.cpp"
+					RelativePath="..\src\Generating\Caves.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\Caves.h"
+					RelativePath="..\src\Generating\Caves.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\ChunkDesc.cpp"
+					RelativePath="..\src\Generating\ChunkDesc.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\ChunkDesc.h"
+					RelativePath="..\src\Generating\ChunkDesc.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\ChunkGenerator.cpp"
+					RelativePath="..\src\Generating\ChunkGenerator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\ChunkGenerator.h"
+					RelativePath="..\src\Generating\ChunkGenerator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\CompoGen.cpp"
+					RelativePath="..\src\Generating\CompoGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\CompoGen.h"
+					RelativePath="..\src\Generating\CompoGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\ComposableGenerator.cpp"
+					RelativePath="..\src\Generating\ComposableGenerator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\ComposableGenerator.h"
+					RelativePath="..\src\Generating\ComposableGenerator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\DistortedHeightmap.cpp"
+					RelativePath="..\src\Generating\DistortedHeightmap.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\DistortedHeightmap.h"
+					RelativePath="..\src\Generating\DistortedHeightmap.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\EndGen.cpp"
+					RelativePath="..\src\Generating\EndGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\EndGen.h"
+					RelativePath="..\src\Generating\EndGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\FinishGen.cpp"
+					RelativePath="..\src\Generating\FinishGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\FinishGen.h"
+					RelativePath="..\src\Generating\FinishGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\HeiGen.cpp"
+					RelativePath="..\src\Generating\HeiGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\HeiGen.h"
+					RelativePath="..\src\Generating\HeiGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\MineShafts.cpp"
+					RelativePath="..\src\Generating\MineShafts.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\MineShafts.h"
+					RelativePath="..\src\Generating\MineShafts.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\Noise3DGenerator.cpp"
+					RelativePath="..\src\Generating\Noise3DGenerator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\Noise3DGenerator.h"
+					RelativePath="..\src\Generating\Noise3DGenerator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\Ravines.cpp"
+					RelativePath="..\src\Generating\Ravines.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\Ravines.h"
+					RelativePath="..\src\Generating\Ravines.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\StructGen.cpp"
+					RelativePath="..\src\Generating\StructGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\StructGen.h"
+					RelativePath="..\src\Generating\StructGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\Trees.cpp"
+					RelativePath="..\src\Generating\Trees.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Generating\Trees.h"
+					RelativePath="..\src\Generating\Trees.h"
 					>
 				</File>
 			</Filter>
@@ -2064,283 +2084,283 @@
 				Name="Blocks"
 				>
 				<File
-					RelativePath="..\source\Blocks\BlockBed.cpp"
+					RelativePath="..\src\Blocks\BlockBed.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockBed.h"
+					RelativePath="..\src\blocks\BlockBed.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockBrewingStand.h"
+					RelativePath="..\src\Blocks\BlockBrewingStand.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockButton.cpp"
+					RelativePath="..\src\Blocks\BlockButton.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockButton.h"
+					RelativePath="..\src\Blocks\BlockButton.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockCactus.h"
+					RelativePath="..\src\blocks\BlockCactus.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockCarpet.h"
+					RelativePath="..\src\Blocks\BlockCarpet.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockCauldron.h"
+					RelativePath="..\src\Blocks\BlockCauldron.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockChest.h"
+					RelativePath="..\src\blocks\BlockChest.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockCloth.h"
+					RelativePath="..\src\blocks\BlockCloth.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockCobWeb.h"
+					RelativePath="..\src\Blocks\BlockCobWeb.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockComparator.cpp"
+					RelativePath="..\src\Blocks\BlockComparator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockComparator.h"
+					RelativePath="..\src\Blocks\BlockComparator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockCrops.h"
+					RelativePath="..\src\blocks\BlockCrops.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockDeadBush.h"
+					RelativePath="..\src\Blocks\BlockDeadBush.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockDirt.h"
+					RelativePath="..\src\blocks\BlockDirt.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockDoor.cpp"
+					RelativePath="..\src\blocks\BlockDoor.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockDoor.h"
+					RelativePath="..\src\blocks\BlockDoor.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockDropSpenser.h"
+					RelativePath="..\src\blocks\BlockDropSpenser.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockEnderchest.h"
+					RelativePath="..\src\Blocks\BlockEnderchest.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockEntity.h"
+					RelativePath="..\src\blocks\BlockEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockFarmland.h"
+					RelativePath="..\src\Blocks\BlockFarmland.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockFenceGate.h"
+					RelativePath="..\src\Blocks\BlockFenceGate.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockFire.h"
+					RelativePath="..\src\blocks\BlockFire.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockFlower.h"
+					RelativePath="..\src\blocks\BlockFlower.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockFlowerPot.h"
+					RelativePath="..\src\Blocks\BlockFlowerPot.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockFluid.h"
+					RelativePath="..\src\blocks\BlockFluid.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockFurnace.h"
+					RelativePath="..\src\blocks\BlockFurnace.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockGlass.h"
+					RelativePath="..\src\Blocks\BlockGlass.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockGlowstone.h"
+					RelativePath="..\src\blocks\BlockGlowstone.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockGravel.h"
+					RelativePath="..\src\blocks\BlockGravel.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockHandler.cpp"
+					RelativePath="..\src\blocks\BlockHandler.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockHandler.h"
+					RelativePath="..\src\blocks\BlockHandler.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockHopper.h"
+					RelativePath="..\src\Blocks\BlockHopper.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockIce.h"
+					RelativePath="..\src\blocks\BlockIce.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockLadder.h"
+					RelativePath="..\src\blocks\BlockLadder.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockLeaves.h"
+					RelativePath="..\src\blocks\BlockLeaves.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockLever.cpp"
+					RelativePath="..\src\Blocks\BlockLever.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockLever.h"
+					RelativePath="..\src\Blocks\BlockLever.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockMelon.h"
+					RelativePath="..\src\blocks\BlockMelon.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockMushroom.h"
+					RelativePath="..\src\blocks\BlockMushroom.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockMycelium.h"
+					RelativePath="..\src\Blocks\BlockMycelium.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockNote.h"
+					RelativePath="..\src\blocks\BlockNote.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockOre.h"
+					RelativePath="..\src\blocks\BlockOre.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockPiston.cpp"
+					RelativePath="..\src\blocks\BlockPiston.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockPiston.h"
+					RelativePath="..\src\blocks\BlockPiston.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockPlanks.h"
+					RelativePath="..\src\blocks\BlockPlanks.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockPortal.h"
+					RelativePath="..\src\blocks\BlockPortal.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockPumpkin.h"
+					RelativePath="..\src\Blocks\BlockPumpkin.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockRail.h"
+					RelativePath="..\src\Blocks\BlockRail.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockRedstone.cpp"
+					RelativePath="..\src\blocks\BlockRedstone.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockRedstone.h"
+					RelativePath="..\src\blocks\BlockRedstone.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockRedstoneOre.h"
+					RelativePath="..\src\blocks\BlockRedstoneOre.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockRedstoneRepeater.cpp"
+					RelativePath="..\src\blocks\BlockRedstoneRepeater.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockRedstoneRepeater.h"
+					RelativePath="..\src\blocks\BlockRedstoneRepeater.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockRedstoneTorch.h"
+					RelativePath="..\src\blocks\BlockRedstoneTorch.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockSand.h"
+					RelativePath="..\src\blocks\BlockSand.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockSapling.h"
+					RelativePath="..\src\blocks\BlockSapling.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockSign.h"
+					RelativePath="..\src\blocks\BlockSign.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockSlab.h"
+					RelativePath="..\src\blocks\BlockSlab.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockSnow.h"
+					RelativePath="..\src\blocks\BlockSnow.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockStairs.h"
+					RelativePath="..\src\blocks\BlockStairs.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockStems.h"
+					RelativePath="..\src\blocks\BlockStems.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockStone.h"
+					RelativePath="..\src\blocks\BlockStone.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockSugarcane.h"
+					RelativePath="..\src\blocks\BlockSugarcane.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockTallGrass.h"
+					RelativePath="..\src\blocks\BlockTallGrass.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockTorch.h"
+					RelativePath="..\src\blocks\BlockTorch.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockVine.h"
+					RelativePath="..\src\blocks\BlockVine.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockWood.h"
+					RelativePath="..\src\blocks\BlockWood.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockWorkbench.h"
+					RelativePath="..\src\blocks\BlockWorkbench.h"
 					>
 				</File>
 			</Filter>
@@ -2348,123 +2368,123 @@
 				Name="Items"
 				>
 				<File
-					RelativePath="..\source\items\ItemBed.h"
+					RelativePath="..\src\items\ItemBed.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemBoat.h"
+					RelativePath="..\src\Items\ItemBoat.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemBow.h"
+					RelativePath="..\src\Items\ItemBow.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemBrewingStand.h"
+					RelativePath="..\src\Items\ItemBrewingStand.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemBucket.h"
+					RelativePath="..\src\items\ItemBucket.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemCauldron.h"
+					RelativePath="..\src\Items\ItemCauldron.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemCloth.h"
+					RelativePath="..\src\items\ItemCloth.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemComparator.h"
+					RelativePath="..\src\Items\ItemComparator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemDoor.h"
+					RelativePath="..\src\items\ItemDoor.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemDye.h"
+					RelativePath="..\src\items\ItemDye.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemFlowerPot.h"
+					RelativePath="..\src\Items\ItemFlowerPot.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemFood.h"
+					RelativePath="..\src\items\ItemFood.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemHandler.cpp"
+					RelativePath="..\src\items\ItemHandler.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemHandler.h"
+					RelativePath="..\src\items\ItemHandler.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemHoe.h"
+					RelativePath="..\src\items\ItemHoe.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemLeaves.h"
+					RelativePath="..\src\items\ItemLeaves.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemLighter.h"
+					RelativePath="..\src\items\ItemLighter.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemMinecart.h"
+					RelativePath="..\src\Items\ItemMinecart.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemPickaxe.h"
+					RelativePath="..\src\items\ItemPickaxe.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemRedstoneDust.h"
+					RelativePath="..\src\items\ItemRedstoneDust.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemRedstoneRepeater.h"
+					RelativePath="..\src\items\ItemRedstoneRepeater.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemSapling.h"
+					RelativePath="..\src\items\ItemSapling.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemSeeds.h"
+					RelativePath="..\src\items\ItemSeeds.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemShears.h"
+					RelativePath="..\src\items\ItemShears.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemShovel.h"
+					RelativePath="..\src\items\ItemShovel.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemSign.h"
+					RelativePath="..\src\items\ItemSign.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemSpawnEgg.h"
+					RelativePath="..\src\Items\ItemSpawnEgg.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemSugarcane.h"
+					RelativePath="..\src\items\ItemSugarcane.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\items\ItemSword.h"
+					RelativePath="..\src\items\ItemSword.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Items\ItemThrowable.h"
+					RelativePath="..\src\Items\ItemThrowable.h"
 					>
 				</File>
 			</Filter>
@@ -2472,71 +2492,71 @@
 				Name="Protocol"
 				>
 				<File
-					RelativePath="..\source\Protocol\ChunkDataSerializer.cpp"
+					RelativePath="..\src\Protocol\ChunkDataSerializer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\ChunkDataSerializer.h"
+					RelativePath="..\src\Protocol\ChunkDataSerializer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol.h"
+					RelativePath="..\src\Protocol\Protocol.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol125.cpp"
+					RelativePath="..\src\Protocol\Protocol125.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol125.h"
+					RelativePath="..\src\Protocol\Protocol125.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol132.cpp"
+					RelativePath="..\src\Protocol\Protocol132.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol132.h"
+					RelativePath="..\src\Protocol\Protocol132.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol14x.cpp"
+					RelativePath="..\src\Protocol\Protocol14x.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol14x.h"
+					RelativePath="..\src\Protocol\Protocol14x.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol15x.cpp"
+					RelativePath="..\src\Protocol\Protocol15x.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol15x.h"
+					RelativePath="..\src\Protocol\Protocol15x.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol16x.cpp"
+					RelativePath="..\src\Protocol\Protocol16x.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol16x.h"
+					RelativePath="..\src\Protocol\Protocol16x.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol17x.cpp"
+					RelativePath="..\src\Protocol\Protocol17x.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\Protocol17x.h"
+					RelativePath="..\src\Protocol\Protocol17x.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\ProtocolRecognizer.cpp"
+					RelativePath="..\src\Protocol\ProtocolRecognizer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol\ProtocolRecognizer.h"
+					RelativePath="..\src\Protocol\ProtocolRecognizer.h"
 					>
 				</File>
 			</Filter>
@@ -2544,7 +2564,7 @@
 				Name="SQLite"
 				>
 				<File
-					RelativePath="..\source\sqlite\lsqlite3.c"
+					RelativePath="..\lib\sqlite\lsqlite3.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2580,7 +2600,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\source\sqlite\sqlite3.c"
+					RelativePath="..\lib\sqlite\sqlite3.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2616,11 +2636,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\source\sqlite\sqlite3.h"
+					RelativePath="..\lib\sqlite\sqlite3.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\sqlite\urls.txt"
+					RelativePath="..\lib\sqlite\urls.txt"
 					>
 				</File>
 			</Filter>
@@ -2628,7 +2648,7 @@
 				Name="LuaExpat"
 				>
 				<File
-					RelativePath="..\source\LuaExpat\lxplib.c"
+					RelativePath="..\lib\luaexpat\lxplib.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2664,7 +2684,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\source\LuaExpat\lxplib.h"
+					RelativePath="..\lib\luaexpat\lxplib.h"
 					>
 				</File>
 			</Filter>
@@ -2672,87 +2692,87 @@
 				Name="BlockEntities"
 				>
 				<File
-					RelativePath="..\source\BlockEntities\BlockEntity.cpp"
+					RelativePath="..\src\BlockEntities\BlockEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\BlockEntity.h"
+					RelativePath="..\src\BlockEntities\BlockEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\BlockEntityWithItems.h"
+					RelativePath="..\src\BlockEntities\BlockEntityWithItems.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\ChestEntity.cpp"
+					RelativePath="..\src\BlockEntities\ChestEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\ChestEntity.h"
+					RelativePath="..\src\BlockEntities\ChestEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\DispenserEntity.cpp"
+					RelativePath="..\src\BlockEntities\DispenserEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\DispenserEntity.h"
+					RelativePath="..\src\BlockEntities\DispenserEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\DropperEntity.cpp"
+					RelativePath="..\src\BlockEntities\DropperEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\DropperEntity.h"
+					RelativePath="..\src\BlockEntities\DropperEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\DropSpenserEntity.cpp"
+					RelativePath="..\src\BlockEntities\DropSpenserEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\DropSpenserEntity.h"
+					RelativePath="..\src\BlockEntities\DropSpenserEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\FurnaceEntity.cpp"
+					RelativePath="..\src\BlockEntities\FurnaceEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\FurnaceEntity.h"
+					RelativePath="..\src\BlockEntities\FurnaceEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\HopperEntity.cpp"
+					RelativePath="..\src\BlockEntities\HopperEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\HopperEntity.h"
+					RelativePath="..\src\BlockEntities\HopperEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\JukeboxEntity.cpp"
+					RelativePath="..\src\BlockEntities\JukeboxEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\JukeboxEntity.h"
+					RelativePath="..\src\BlockEntities\JukeboxEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\NoteEntity.cpp"
+					RelativePath="..\src\BlockEntities\NoteEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\NoteEntity.h"
+					RelativePath="..\src\BlockEntities\NoteEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\SignEntity.cpp"
+					RelativePath="..\src\BlockEntities\SignEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntities\SignEntity.h"
+					RelativePath="..\src\BlockEntities\SignEntity.h"
 					>
 				</File>
 			</Filter>
@@ -2760,59 +2780,59 @@
 				Name="HTTPServer"
 				>
 				<File
-					RelativePath="..\source\HTTPServer\EnvelopeParser.cpp"
+					RelativePath="..\src\HTTPServer\EnvelopeParser.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\EnvelopeParser.h"
+					RelativePath="..\src\HTTPServer\EnvelopeParser.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\HTTPConnection.cpp"
+					RelativePath="..\src\HTTPServer\HTTPConnection.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\HTTPConnection.h"
+					RelativePath="..\src\HTTPServer\HTTPConnection.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\HTTPFormParser.cpp"
+					RelativePath="..\src\HTTPServer\HTTPFormParser.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\HTTPFormParser.h"
+					RelativePath="..\src\HTTPServer\HTTPFormParser.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\HTTPMessage.cpp"
+					RelativePath="..\src\HTTPServer\HTTPMessage.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\HTTPMessage.h"
+					RelativePath="..\src\HTTPServer\HTTPMessage.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\HTTPServer.cpp"
+					RelativePath="..\src\HTTPServer\HTTPServer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\HTTPServer.h"
+					RelativePath="..\src\HTTPServer\HTTPServer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\MultipartParser.cpp"
+					RelativePath="..\src\HTTPServer\MultipartParser.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\MultipartParser.h"
+					RelativePath="..\src\HTTPServer\MultipartParser.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\NameValueParser.cpp"
+					RelativePath="..\src\HTTPServer\NameValueParser.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HTTPServer\NameValueParser.h"
+					RelativePath="..\src\HTTPServer\NameValueParser.h"
 					>
 				</File>
 			</Filter>

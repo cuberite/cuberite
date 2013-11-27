@@ -134,17 +134,17 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\jsoncpp-src-0.5.0\src\lib_json\json_batchallocator.h" />
+    <ClInclude Include="..\lib\jsoncpp\src\lib_json\json_batchallocator.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\jsoncpp-src-0.5.0\src\lib_json\json_internalarray.inl" />
-    <None Include="..\jsoncpp-src-0.5.0\src\lib_json\json_internalmap.inl" />
-    <None Include="..\jsoncpp-src-0.5.0\src\lib_json\json_valueiterator.inl" />
+    <None Include="..\lib\jsoncpp\src\lib_json\json_internalarray.inl" />
+    <None Include="..\lib\jsoncpp\src\lib_json\json_internalmap.inl" />
+    <None Include="..\lib\jsoncpp\src\lib_json\json_valueiterator.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\jsoncpp-src-0.5.0\src\lib_json\json_reader.cpp" />
-    <ClCompile Include="..\jsoncpp-src-0.5.0\src\lib_json\json_value.cpp" />
-    <ClCompile Include="..\jsoncpp-src-0.5.0\src\lib_json\json_writer.cpp" />
+    <ClCompile Include="..\lib\jsoncpp\src\lib_json\json_reader.cpp" />
+    <ClCompile Include="..\lib\jsoncpp\src\lib_json\json_value.cpp" />
+    <ClCompile Include="..\lib\jsoncpp\src\lib_json\json_writer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

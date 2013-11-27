@@ -276,31 +276,31 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\jsoncpp-src-0.5.0\src\lib_json\json_batchallocator.h"
+				RelativePath="..\lib\jsoncpp\src\lib_json\json_batchallocator.h"
 				>
 			</File>
 			<File
-				RelativePath="..\jsoncpp-src-0.5.0\src\lib_json\json_internalarray.inl"
+				RelativePath="..\lib\jsoncpp\src\lib_json\json_internalarray.inl"
 				>
 			</File>
 			<File
-				RelativePath="..\jsoncpp-src-0.5.0\src\lib_json\json_internalmap.inl"
+				RelativePath="..\lib\jsoncpp\src\lib_json\json_internalmap.inl"
 				>
 			</File>
 			<File
-				RelativePath="..\jsoncpp-src-0.5.0\src\lib_json\json_reader.cpp"
+				RelativePath="..\lib\jsoncpp\src\lib_json\json_reader.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\jsoncpp-src-0.5.0\src\lib_json\json_value.cpp"
+				RelativePath="..\lib\jsoncpp\src\lib_json\json_value.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\jsoncpp-src-0.5.0\src\lib_json\json_valueiterator.inl"
+				RelativePath="..\lib\jsoncpp\src\lib_json\json_valueiterator.inl"
 				>
 			</File>
 			<File
-				RelativePath="..\jsoncpp-src-0.5.0\src\lib_json\json_writer.cpp"
+				RelativePath="..\lib\jsoncpp\src\lib_json\json_writer.cpp"
 				>
 			</File>
 		</Filter>

@@ -289,97 +289,97 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\CryptoPP\adler32.cpp">
+    <ClCompile Include="..\lib\cryptopp\adler32.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\algebra.cpp">
+    <ClCompile Include="..\lib\cryptopp\algebra.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\algparam.cpp">
+    <ClCompile Include="..\lib\cryptopp\algparam.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\asn.cpp">
+    <ClCompile Include="..\lib\cryptopp\asn.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\authenc.cpp" />
-    <ClCompile Include="..\CryptoPP\base32.cpp">
+    <ClCompile Include="..\lib\cryptopp\authenc.cpp" />
+    <ClCompile Include="..\lib\cryptopp\base32.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\base64.cpp">
+    <ClCompile Include="..\lib\cryptopp\base64.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\basecode.cpp">
+    <ClCompile Include="..\lib\cryptopp\basecode.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\cbcmac.cpp">
+    <ClCompile Include="..\lib\cryptopp\cbcmac.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\ccm.cpp" />
-    <ClCompile Include="..\CryptoPP\channels.cpp">
+    <ClCompile Include="..\lib\cryptopp\ccm.cpp" />
+    <ClCompile Include="..\lib\cryptopp\channels.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\cmac.cpp" />
-    <ClCompile Include="..\CryptoPP\cpu.cpp" />
-    <ClCompile Include="..\CryptoPP\crc.cpp">
+    <ClCompile Include="..\lib\cryptopp\cmac.cpp" />
+    <ClCompile Include="..\lib\cryptopp\cpu.cpp" />
+    <ClCompile Include="..\lib\cryptopp\crc.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\cryptlib.cpp">
+    <ClCompile Include="..\lib\cryptopp\cryptlib.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\default.cpp">
+    <ClCompile Include="..\lib\cryptopp\default.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\des.cpp" />
-    <ClCompile Include="..\CryptoPP\dessp.cpp" />
-    <ClCompile Include="..\CryptoPP\dh.cpp">
+    <ClCompile Include="..\lib\cryptopp\des.cpp" />
+    <ClCompile Include="..\lib\cryptopp\dessp.cpp" />
+    <ClCompile Include="..\lib\cryptopp\dh.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\dh2.cpp">
+    <ClCompile Include="..\lib\cryptopp\dh2.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\dll.cpp">
+    <ClCompile Include="..\lib\cryptopp\dll.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">
       </PrecompiledHeader>
@@ -397,20 +397,20 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\dsa.cpp">
+    <ClCompile Include="..\lib\cryptopp\dsa.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\eax.cpp" />
-    <ClCompile Include="..\CryptoPP\ec2n.cpp">
+    <ClCompile Include="..\lib\cryptopp\eax.cpp" />
+    <ClCompile Include="..\lib\cryptopp\ec2n.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\eccrypto.cpp">
+    <ClCompile Include="..\lib\cryptopp\eccrypto.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">true</ExcludedFromBuild>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">true</ExcludedFromBuild>
@@ -422,20 +422,20 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\ecp.cpp">
+    <ClCompile Include="..\lib\cryptopp\ecp.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\elgamal.cpp">
+    <ClCompile Include="..\lib\cryptopp\elgamal.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\emsa2.cpp" />
-    <ClCompile Include="..\CryptoPP\eprecomp.cpp">
+    <ClCompile Include="..\lib\cryptopp\emsa2.cpp" />
+    <ClCompile Include="..\lib\cryptopp\eprecomp.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">true</ExcludedFromBuild>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">true</ExcludedFromBuild>
@@ -447,74 +447,74 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\esign.cpp">
+    <ClCompile Include="..\lib\cryptopp\esign.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\files.cpp">
+    <ClCompile Include="..\lib\cryptopp\files.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\filters.cpp">
+    <ClCompile Include="..\lib\cryptopp\filters.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\fips140.cpp">
+    <ClCompile Include="..\lib\cryptopp\fips140.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\gcm.cpp" />
-    <ClCompile Include="..\CryptoPP\gf256.cpp">
+    <ClCompile Include="..\lib\cryptopp\gcm.cpp" />
+    <ClCompile Include="..\lib\cryptopp\gf256.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\gf2_32.cpp">
+    <ClCompile Include="..\lib\cryptopp\gf2_32.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\gf2n.cpp">
+    <ClCompile Include="..\lib\cryptopp\gf2n.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\gfpcrypt.cpp">
+    <ClCompile Include="..\lib\cryptopp\gfpcrypt.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\hex.cpp">
+    <ClCompile Include="..\lib\cryptopp\hex.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\hmac.cpp">
+    <ClCompile Include="..\lib\cryptopp\hmac.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\hrtimer.cpp">
+    <ClCompile Include="..\lib\cryptopp\hrtimer.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\integer.cpp">
+    <ClCompile Include="..\lib\cryptopp\integer.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
@@ -522,7 +522,7 @@
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </AssemblerListingLocation>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\iterhash.cpp">
+    <ClCompile Include="..\lib\cryptopp\iterhash.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">
       </PrecompiledHeader>
@@ -540,79 +540,79 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\luc.cpp">
+    <ClCompile Include="..\lib\cryptopp\luc.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\md2.cpp">
+    <ClCompile Include="..\lib\cryptopp\md2.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\md4.cpp">
+    <ClCompile Include="..\lib\cryptopp\md4.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\md5.cpp">
+    <ClCompile Include="..\lib\cryptopp\md5.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\misc.cpp">
+    <ClCompile Include="..\lib\cryptopp\misc.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\modes.cpp">
+    <ClCompile Include="..\lib\cryptopp\modes.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\mqueue.cpp">
+    <ClCompile Include="..\lib\cryptopp\mqueue.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\mqv.cpp">
+    <ClCompile Include="..\lib\cryptopp\mqv.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\nbtheory.cpp">
+    <ClCompile Include="..\lib\cryptopp\nbtheory.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\network.cpp">
+    <ClCompile Include="..\lib\cryptopp\network.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\oaep.cpp">
+    <ClCompile Include="..\lib\cryptopp\oaep.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\osrng.cpp">
+    <ClCompile Include="..\lib\cryptopp\osrng.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\pch.cpp">
+    <ClCompile Include="..\lib\cryptopp\pch.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Create</PrecompiledHeader>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
@@ -624,166 +624,166 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\pkcspad.cpp">
+    <ClCompile Include="..\lib\cryptopp\pkcspad.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\polynomi.cpp">
+    <ClCompile Include="..\lib\cryptopp\polynomi.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\pssr.cpp" />
-    <ClCompile Include="..\CryptoPP\pubkey.cpp">
+    <ClCompile Include="..\lib\cryptopp\pssr.cpp" />
+    <ClCompile Include="..\lib\cryptopp\pubkey.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\queue.cpp">
+    <ClCompile Include="..\lib\cryptopp\queue.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\rabin.cpp">
+    <ClCompile Include="..\lib\cryptopp\rabin.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\randpool.cpp">
+    <ClCompile Include="..\lib\cryptopp\randpool.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\rdtables.cpp">
+    <ClCompile Include="..\lib\cryptopp\rdtables.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\rijndael.cpp">
+    <ClCompile Include="..\lib\cryptopp\rijndael.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\rng.cpp">
+    <ClCompile Include="..\lib\cryptopp\rng.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\rsa.cpp">
+    <ClCompile Include="..\lib\cryptopp\rsa.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\rw.cpp">
+    <ClCompile Include="..\lib\cryptopp\rw.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\safer.cpp">
+    <ClCompile Include="..\lib\cryptopp\safer.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\seal.cpp">
+    <ClCompile Include="..\lib\cryptopp\seal.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\seed.cpp" />
-    <ClCompile Include="..\CryptoPP\sha.cpp">
+    <ClCompile Include="..\lib\cryptopp\seed.cpp" />
+    <ClCompile Include="..\lib\cryptopp\sha.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\shacal2.cpp">
+    <ClCompile Include="..\lib\cryptopp\shacal2.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\simple.cpp">
+    <ClCompile Include="..\lib\cryptopp\simple.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\socketft.cpp">
+    <ClCompile Include="..\lib\cryptopp\socketft.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\square.cpp">
+    <ClCompile Include="..\lib\cryptopp\square.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\squaretb.cpp">
+    <ClCompile Include="..\lib\cryptopp\squaretb.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\strciphr.cpp">
+    <ClCompile Include="..\lib\cryptopp\strciphr.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\tea.cpp">
+    <ClCompile Include="..\lib\cryptopp\tea.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\tiger.cpp">
+    <ClCompile Include="..\lib\cryptopp\tiger.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\tigertab.cpp">
+    <ClCompile Include="..\lib\cryptopp\tigertab.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\trdlocal.cpp">
+    <ClCompile Include="..\lib\cryptopp\trdlocal.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\ttmac.cpp">
+    <ClCompile Include="..\lib\cryptopp\ttmac.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\vmac.cpp" />
-    <ClCompile Include="..\CryptoPP\wait.cpp">
+    <ClCompile Include="..\lib\cryptopp\vmac.cpp" />
+    <ClCompile Include="..\lib\cryptopp\wait.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="..\CryptoPP\winpipes.cpp">
+    <ClCompile Include="..\lib\cryptopp\winpipes.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DLL-Import Release|x64'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
@@ -791,116 +791,116 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\CryptoPP\adler32.h" />
-    <ClInclude Include="..\CryptoPP\aes.h" />
-    <ClInclude Include="..\CryptoPP\algebra.h" />
-    <ClInclude Include="..\CryptoPP\algparam.h" />
-    <ClInclude Include="..\CryptoPP\arc4.h" />
-    <ClInclude Include="..\CryptoPP\argnames.h" />
-    <ClInclude Include="..\CryptoPP\asn.h" />
-    <ClInclude Include="..\CryptoPP\authenc.h" />
-    <ClInclude Include="..\CryptoPP\base32.h" />
-    <ClInclude Include="..\CryptoPP\base64.h" />
-    <ClInclude Include="..\CryptoPP\basecode.h" />
-    <ClInclude Include="..\CryptoPP\cbcmac.h" />
-    <ClInclude Include="..\CryptoPP\ccm.h" />
-    <ClInclude Include="..\CryptoPP\channels.h" />
-    <ClInclude Include="..\CryptoPP\cmac.h" />
-    <ClInclude Include="..\CryptoPP\config.h" />
-    <ClInclude Include="..\CryptoPP\cpu.h" />
-    <ClInclude Include="..\CryptoPP\crc.h" />
-    <ClInclude Include="..\CryptoPP\cryptlib.h" />
-    <ClInclude Include="..\CryptoPP\default.h" />
-    <ClInclude Include="..\CryptoPP\des.h" />
-    <ClInclude Include="..\CryptoPP\dh.h" />
-    <ClInclude Include="..\CryptoPP\dh2.h" />
-    <ClInclude Include="..\CryptoPP\dmac.h" />
-    <ClInclude Include="..\CryptoPP\dsa.h" />
-    <ClInclude Include="..\CryptoPP\eax.h" />
-    <ClInclude Include="..\CryptoPP\ec2n.h" />
-    <ClInclude Include="..\CryptoPP\eccrypto.h" />
-    <ClInclude Include="..\CryptoPP\ecp.h" />
-    <ClInclude Include="..\CryptoPP\elgamal.h" />
-    <ClInclude Include="..\CryptoPP\emsa2.h" />
-    <ClInclude Include="..\CryptoPP\eprecomp.h" />
-    <ClInclude Include="..\CryptoPP\esign.h" />
-    <ClInclude Include="..\CryptoPP\files.h" />
-    <ClInclude Include="..\CryptoPP\filters.h" />
-    <ClInclude Include="..\CryptoPP\fips140.h" />
-    <ClInclude Include="..\CryptoPP\fltrimpl.h" />
-    <ClInclude Include="..\CryptoPP\gcm.h" />
-    <ClInclude Include="..\CryptoPP\gf256.h" />
-    <ClInclude Include="..\CryptoPP\gf2_32.h" />
-    <ClInclude Include="..\CryptoPP\gf2n.h" />
-    <ClInclude Include="..\CryptoPP\gfpcrypt.h" />
-    <ClInclude Include="..\CryptoPP\gzip.h" />
-    <ClInclude Include="..\CryptoPP\hex.h" />
-    <ClInclude Include="..\CryptoPP\hmac.h" />
-    <ClInclude Include="..\CryptoPP\hrtimer.h" />
-    <ClInclude Include="..\CryptoPP\integer.h" />
-    <ClInclude Include="..\CryptoPP\iterhash.h" />
-    <ClInclude Include="..\CryptoPP\lubyrack.h" />
-    <ClInclude Include="..\CryptoPP\luc.h" />
-    <ClInclude Include="..\CryptoPP\md2.h" />
-    <ClInclude Include="..\CryptoPP\md4.h" />
-    <ClInclude Include="..\CryptoPP\md5.h" />
-    <ClInclude Include="..\CryptoPP\mdc.h" />
-    <ClInclude Include="..\CryptoPP\misc.h" />
-    <ClInclude Include="..\CryptoPP\modarith.h" />
-    <ClInclude Include="..\CryptoPP\modes.h" />
-    <ClInclude Include="..\CryptoPP\modexppc.h" />
-    <ClInclude Include="..\CryptoPP\mqueue.h" />
-    <ClInclude Include="..\CryptoPP\mqv.h" />
-    <ClInclude Include="..\CryptoPP\nbtheory.h" />
-    <ClInclude Include="..\CryptoPP\network.h" />
-    <ClInclude Include="..\CryptoPP\nr.h" />
-    <ClInclude Include="..\CryptoPP\oaep.h" />
-    <ClInclude Include="..\CryptoPP\oids.h" />
-    <ClInclude Include="..\CryptoPP\osrng.h" />
-    <ClInclude Include="..\CryptoPP\pch.h" />
-    <ClInclude Include="..\CryptoPP\pkcspad.h" />
-    <ClInclude Include="..\CryptoPP\polynomi.h" />
-    <ClInclude Include="..\CryptoPP\pssr.h" />
-    <ClInclude Include="..\CryptoPP\pubkey.h" />
-    <ClInclude Include="..\CryptoPP\pwdbased.h" />
-    <ClInclude Include="..\CryptoPP\queue.h" />
-    <ClInclude Include="..\CryptoPP\rabin.h" />
-    <ClInclude Include="..\CryptoPP\randpool.h" />
-    <ClInclude Include="..\CryptoPP\rijndael.h" />
-    <ClInclude Include="..\CryptoPP\rng.h" />
-    <ClInclude Include="..\CryptoPP\rsa.h" />
-    <ClInclude Include="..\CryptoPP\rw.h" />
-    <ClInclude Include="..\CryptoPP\safer.h" />
-    <ClInclude Include="..\CryptoPP\seal.h" />
-    <ClInclude Include="..\CryptoPP\secblock.h" />
-    <ClInclude Include="..\CryptoPP\seckey.h" />
-    <ClInclude Include="..\CryptoPP\seed.h" />
-    <ClInclude Include="..\CryptoPP\sha.h" />
-    <ClInclude Include="..\CryptoPP\shacal2.h" />
-    <ClInclude Include="..\CryptoPP\simple.h" />
-    <ClInclude Include="..\CryptoPP\smartptr.h" />
-    <ClInclude Include="..\CryptoPP\socketft.h" />
-    <ClInclude Include="..\CryptoPP\square.h" />
-    <ClInclude Include="..\CryptoPP\stdcpp.h" />
-    <ClInclude Include="..\CryptoPP\strciphr.h" />
-    <ClInclude Include="..\CryptoPP\tea.h" />
-    <ClInclude Include="..\CryptoPP\tiger.h" />
-    <ClInclude Include="..\CryptoPP\trdlocal.h" />
-    <ClInclude Include="..\CryptoPP\trunhash.h" />
-    <ClInclude Include="..\CryptoPP\ttmac.h" />
-    <ClInclude Include="..\CryptoPP\vmac.h" />
-    <ClInclude Include="..\CryptoPP\wait.h" />
-    <ClInclude Include="..\CryptoPP\wake.h" />
-    <ClInclude Include="..\CryptoPP\winpipes.h" />
-    <ClInclude Include="..\CryptoPP\words.h" />
+    <ClInclude Include="..\lib\cryptopp\adler32.h" />
+    <ClInclude Include="..\lib\cryptopp\aes.h" />
+    <ClInclude Include="..\lib\cryptopp\algebra.h" />
+    <ClInclude Include="..\lib\cryptopp\algparam.h" />
+    <ClInclude Include="..\lib\cryptopp\arc4.h" />
+    <ClInclude Include="..\lib\cryptopp\argnames.h" />
+    <ClInclude Include="..\lib\cryptopp\asn.h" />
+    <ClInclude Include="..\lib\cryptopp\authenc.h" />
+    <ClInclude Include="..\lib\cryptopp\base32.h" />
+    <ClInclude Include="..\lib\cryptopp\base64.h" />
+    <ClInclude Include="..\lib\cryptopp\basecode.h" />
+    <ClInclude Include="..\lib\cryptopp\cbcmac.h" />
+    <ClInclude Include="..\lib\cryptopp\ccm.h" />
+    <ClInclude Include="..\lib\cryptopp\channels.h" />
+    <ClInclude Include="..\lib\cryptopp\cmac.h" />
+    <ClInclude Include="..\lib\cryptopp\config.h" />
+    <ClInclude Include="..\lib\cryptopp\cpu.h" />
+    <ClInclude Include="..\lib\cryptopp\crc.h" />
+    <ClInclude Include="..\lib\cryptopp\cryptlib.h" />
+    <ClInclude Include="..\lib\cryptopp\default.h" />
+    <ClInclude Include="..\lib\cryptopp\des.h" />
+    <ClInclude Include="..\lib\cryptopp\dh.h" />
+    <ClInclude Include="..\lib\cryptopp\dh2.h" />
+    <ClInclude Include="..\lib\cryptopp\dmac.h" />
+    <ClInclude Include="..\lib\cryptopp\dsa.h" />
+    <ClInclude Include="..\lib\cryptopp\eax.h" />
+    <ClInclude Include="..\lib\cryptopp\ec2n.h" />
+    <ClInclude Include="..\lib\cryptopp\eccrypto.h" />
+    <ClInclude Include="..\lib\cryptopp\ecp.h" />
+    <ClInclude Include="..\lib\cryptopp\elgamal.h" />
+    <ClInclude Include="..\lib\cryptopp\emsa2.h" />
+    <ClInclude Include="..\lib\cryptopp\eprecomp.h" />
+    <ClInclude Include="..\lib\cryptopp\esign.h" />
+    <ClInclude Include="..\lib\cryptopp\files.h" />
+    <ClInclude Include="..\lib\cryptopp\filters.h" />
+    <ClInclude Include="..\lib\cryptopp\fips140.h" />
+    <ClInclude Include="..\lib\cryptopp\fltrimpl.h" />
+    <ClInclude Include="..\lib\cryptopp\gcm.h" />
+    <ClInclude Include="..\lib\cryptopp\gf256.h" />
+    <ClInclude Include="..\lib\cryptopp\gf2_32.h" />
+    <ClInclude Include="..\lib\cryptopp\gf2n.h" />
+    <ClInclude Include="..\lib\cryptopp\gfpcrypt.h" />
+    <ClInclude Include="..\lib\cryptopp\gzip.h" />
+    <ClInclude Include="..\lib\cryptopp\hex.h" />
+    <ClInclude Include="..\lib\cryptopp\hmac.h" />
+    <ClInclude Include="..\lib\cryptopp\hrtimer.h" />
+    <ClInclude Include="..\lib\cryptopp\integer.h" />
+    <ClInclude Include="..\lib\cryptopp\iterhash.h" />
+    <ClInclude Include="..\lib\cryptopp\lubyrack.h" />
+    <ClInclude Include="..\lib\cryptopp\luc.h" />
+    <ClInclude Include="..\lib\cryptopp\md2.h" />
+    <ClInclude Include="..\lib\cryptopp\md4.h" />
+    <ClInclude Include="..\lib\cryptopp\md5.h" />
+    <ClInclude Include="..\lib\cryptopp\mdc.h" />
+    <ClInclude Include="..\lib\cryptopp\misc.h" />
+    <ClInclude Include="..\lib\cryptopp\modarith.h" />
+    <ClInclude Include="..\lib\cryptopp\modes.h" />
+    <ClInclude Include="..\lib\cryptopp\modexppc.h" />
+    <ClInclude Include="..\lib\cryptopp\mqueue.h" />
+    <ClInclude Include="..\lib\cryptopp\mqv.h" />
+    <ClInclude Include="..\lib\cryptopp\nbtheory.h" />
+    <ClInclude Include="..\lib\cryptopp\network.h" />
+    <ClInclude Include="..\lib\cryptopp\nr.h" />
+    <ClInclude Include="..\lib\cryptopp\oaep.h" />
+    <ClInclude Include="..\lib\cryptopp\oids.h" />
+    <ClInclude Include="..\lib\cryptopp\osrng.h" />
+    <ClInclude Include="..\lib\cryptopp\pch.h" />
+    <ClInclude Include="..\lib\cryptopp\pkcspad.h" />
+    <ClInclude Include="..\lib\cryptopp\polynomi.h" />
+    <ClInclude Include="..\lib\cryptopp\pssr.h" />
+    <ClInclude Include="..\lib\cryptopp\pubkey.h" />
+    <ClInclude Include="..\lib\cryptopp\pwdbased.h" />
+    <ClInclude Include="..\lib\cryptopp\queue.h" />
+    <ClInclude Include="..\lib\cryptopp\rabin.h" />
+    <ClInclude Include="..\lib\cryptopp\randpool.h" />
+    <ClInclude Include="..\lib\cryptopp\rijndael.h" />
+    <ClInclude Include="..\lib\cryptopp\rng.h" />
+    <ClInclude Include="..\lib\cryptopp\rsa.h" />
+    <ClInclude Include="..\lib\cryptopp\rw.h" />
+    <ClInclude Include="..\lib\cryptopp\safer.h" />
+    <ClInclude Include="..\lib\cryptopp\seal.h" />
+    <ClInclude Include="..\lib\cryptopp\secblock.h" />
+    <ClInclude Include="..\lib\cryptopp\seckey.h" />
+    <ClInclude Include="..\lib\cryptopp\seed.h" />
+    <ClInclude Include="..\lib\cryptopp\sha.h" />
+    <ClInclude Include="..\lib\cryptopp\shacal2.h" />
+    <ClInclude Include="..\lib\cryptopp\simple.h" />
+    <ClInclude Include="..\lib\cryptopp\smartptr.h" />
+    <ClInclude Include="..\lib\cryptopp\socketft.h" />
+    <ClInclude Include="..\lib\cryptopp\square.h" />
+    <ClInclude Include="..\lib\cryptopp\stdcpp.h" />
+    <ClInclude Include="..\lib\cryptopp\strciphr.h" />
+    <ClInclude Include="..\lib\cryptopp\tea.h" />
+    <ClInclude Include="..\lib\cryptopp\tiger.h" />
+    <ClInclude Include="..\lib\cryptopp\trdlocal.h" />
+    <ClInclude Include="..\lib\cryptopp\trunhash.h" />
+    <ClInclude Include="..\lib\cryptopp\ttmac.h" />
+    <ClInclude Include="..\lib\cryptopp\vmac.h" />
+    <ClInclude Include="..\lib\cryptopp\wait.h" />
+    <ClInclude Include="..\lib\cryptopp\wake.h" />
+    <ClInclude Include="..\lib\cryptopp\winpipes.h" />
+    <ClInclude Include="..\lib\cryptopp\words.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\CryptoPP\Doxyfile" />
-    <None Include="..\CryptoPP\GNUmakefile" />
+    <None Include="..\lib\cryptopp\Doxyfile" />
+    <None Include="..\lib\cryptopp\GNUmakefile" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\CryptoPP\License.txt" />
-    <Text Include="..\CryptoPP\Readme.txt" />
+    <Text Include="..\lib\cryptopp\License.txt" />
+    <Text Include="..\lib\cryptopp\Readme.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

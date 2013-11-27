@@ -73,26 +73,26 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\expat\ascii.h" />
-    <ClInclude Include="..\expat\asciitab.h" />
-    <ClInclude Include="..\expat\expat.h" />
-    <ClInclude Include="..\expat\expat_external.h" />
-    <ClInclude Include="..\expat\iasciitab.h" />
-    <ClInclude Include="..\expat\internal.h" />
-    <ClInclude Include="..\expat\latin1tab.h" />
-    <ClInclude Include="..\expat\nametab.h" />
-    <ClInclude Include="..\expat\utf8tab.h" />
-    <ClInclude Include="..\expat\winconfig.h" />
-    <ClInclude Include="..\expat\xmlrole.h" />
-    <ClInclude Include="..\expat\xmltok.h" />
-    <ClInclude Include="..\expat\xmltok_impl.h" />
+    <ClInclude Include="..\lib\expat\ascii.h" />
+    <ClInclude Include="..\lib\expat\asciitab.h" />
+    <ClInclude Include="..\lib\expat\expat.h" />
+    <ClInclude Include="..\lib\expat\expat_external.h" />
+    <ClInclude Include="..\lib\expat\iasciitab.h" />
+    <ClInclude Include="..\lib\expat\internal.h" />
+    <ClInclude Include="..\lib\expat\latin1tab.h" />
+    <ClInclude Include="..\lib\expat\nametab.h" />
+    <ClInclude Include="..\lib\expat\utf8tab.h" />
+    <ClInclude Include="..\lib\expat\winconfig.h" />
+    <ClInclude Include="..\lib\expat\xmlrole.h" />
+    <ClInclude Include="..\lib\expat\xmltok.h" />
+    <ClInclude Include="..\lib\expat\xmltok_impl.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\expat\xmlparse.c" />
-    <ClCompile Include="..\expat\xmlrole.c" />
-    <ClCompile Include="..\expat\xmltok.c" />
-    <ClCompile Include="..\expat\xmltok_impl.c" />
-    <ClCompile Include="..\expat\xmltok_ns.c" />
+    <ClCompile Include="..\lib\expat\xmlparse.c" />
+    <ClCompile Include="..\lib\expat\xmlrole.c" />
+    <ClCompile Include="..\lib\expat\xmltok.c" />
+    <ClCompile Include="..\lib\expat\xmltok_impl.c" />
+    <ClCompile Include="..\lib\expat\xmltok_ns.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

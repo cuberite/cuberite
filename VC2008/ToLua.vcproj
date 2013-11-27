@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../tolua++-1.0.93/include;../lua-5.1.4/src"
+				AdditionalIncludeDirectories="../lib/tolua++/include;../lib/lua/src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -105,7 +105,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../tolua++-1.0.93/include;../lua-5.1.4/src"
+				AdditionalIncludeDirectories="../lib/tolua++/include;../lib/lua/src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -168,7 +168,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../tolua++-1.0.93/include;../lua-5.1.4/src"
+				AdditionalIncludeDirectories="../lib/tolua++/include;../lib/lua/src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -229,7 +229,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../tolua++-1.0.93/include;../lua-5.1.4/src"
+				AdditionalIncludeDirectories="../lib/tolua++/include;../lib/lua/src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -276,31 +276,31 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\tolua++-1.0.93\src\bin\tolua.c"
+				RelativePath="..\lib\tolua++\src\bin\tolua.c"
 				>
 			</File>
 			<File
-				RelativePath="..\tolua++-1.0.93\src\lib\tolua_event.c"
+				RelativePath="..\lib\tolua++\src\lib\tolua_event.c"
 				>
 			</File>
 			<File
-				RelativePath="..\tolua++-1.0.93\src\lib\tolua_event.h"
+				RelativePath="..\lib\tolua++\src\lib\tolua_event.h"
 				>
 			</File>
 			<File
-				RelativePath="..\tolua++-1.0.93\src\lib\tolua_is.c"
+				RelativePath="..\lib\tolua++\src\lib\tolua_is.c"
 				>
 			</File>
 			<File
-				RelativePath="..\tolua++-1.0.93\src\lib\tolua_map.c"
+				RelativePath="..\lib\tolua++\src\lib\tolua_map.c"
 				>
 			</File>
 			<File
-				RelativePath="..\tolua++-1.0.93\src\lib\tolua_push.c"
+				RelativePath="..\lib\tolua++\src\lib\tolua_push.c"
 				>
 			</File>
 			<File
-				RelativePath="..\tolua++-1.0.93\src\lib\tolua_to.c"
+				RelativePath="..\lib\tolua++\src\lib\tolua_to.c"
 				>
 			</File>
 		</Filter>
