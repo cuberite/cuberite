@@ -59,8 +59,8 @@ ifeq ($(profile),1)
 # profile build - a release build with symbols and profiling engine built in
 ################
 
-CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
+CC_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG
+CXX_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG
 LNK_OPTIONS = -pthread -ggdb -O3 -pg
 
 BUILDDIR = build/profile/
@@ -71,8 +71,8 @@ else
 # Since C code is used only for supporting libraries (zlib, lua), it is still Ofast-optimized
 ################
 
-CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
-CXX_OPTIONS = -s -ggdb -g -D_DEBUG -O1
+CC_OPTIONS = -ggdb -g -D_DEBUG -O3
+CXX_OPTIONS = -ggdb -g -D_DEBUG -O1
 LNK_OPTIONS = -pthread -g -ggdb -O1
 
 BUILDDIR = build/debug/
