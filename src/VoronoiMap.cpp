@@ -11,7 +11,7 @@
 
 
 cVoronoiMap::cVoronoiMap(int a_Seed, int a_CellSize) :
-	m_Noise(a_Seed * 13 + 7),
+	m_Noise(a_Seed),
 	m_CellSize(a_CellSize)
 {
 }

@@ -267,7 +267,8 @@ void cBioGenVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap &
 		int AbsoluteZ = BaseZ + z;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			cChunkDef::SetBiome(a_BiomeMap, x, z, VoronoiBiome(BaseX + x, AbsoluteZ));
+			int VoronoiCellValue = m_Voronoi.GetValueAt(BaseX + x, AbsoluteZ) / 8;
+			cChunkDef::SetBiome(a_BiomeMap, x, z, m_Biomes[VoronoiCellValue % m_BiomesCount]);
 		}  // for x
 	}  // for z
 }
@@ -279,45 +280,8 @@ void cBioGenVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap &
 void cBioGenVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 {
 	super::InitializeBiomeGen(a_IniFile);
-	m_CellSize     = a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 64);
-	AString Biomes = a_IniFile.GetValueSet ("Generator", "VoronoiBiomes",   "");
-	InitializeBiomes(Biomes);
-}
-
-
-
-
-
-EMCSBiome cBioGenVoronoi::VoronoiBiome(int a_BlockX, int a_BlockZ)
-{
-	int CellX = a_BlockX / m_CellSize;
-	int CellZ = a_BlockZ / m_CellSize;
-	
-	// Note that Noise values need to be divided by 8 to gain a uniform modulo-2^n distribution
-	
-	// Get 5x5 neighboring cell seeds, compare distance to each. Return the biome in the minumim-distance cell
-	int MinDist = m_CellSize * m_CellSize * 16;  // There has to be a cell closer than this
-	EMCSBiome res = biPlains;  // Will be overriden
-	for (int x = CellX - 2; x <= CellX + 2; x++)
-	{
-		int BaseX = x * m_CellSize;
-		for (int z = CellZ - 2; z < CellZ + 2; z++)
-		{
-			int OffsetX = (m_Noise.IntNoise3DInt(x, 16 * x + 32 * z, z) / 8) % m_CellSize;
-			int OffsetZ = (m_Noise.IntNoise3DInt(x, 32 * x - 16 * z, z) / 8) % m_CellSize;
-			int SeedX = BaseX + OffsetX;
-			int SeedZ = z * m_CellSize + OffsetZ;
-			
-			int Dist = (SeedX - a_BlockX) * (SeedX - a_BlockX) + (SeedZ - a_BlockZ) * (SeedZ - a_BlockZ);
-			if (Dist < MinDist)
-			{
-				MinDist = Dist;
-				res = m_Biomes[(m_Noise.IntNoise3DInt(x, x - z + 1000, z) / 8) % m_BiomesCount];
-			}
-		}  // for z
-	}  // for x
-
-	return res;
+	m_Voronoi.SetCellSize(a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 64));
+	InitializeBiomes     (a_IniFile.GetValueSet ("Generator", "VoronoiBiomes",   ""));
 }
 
 
@@ -348,8 +312,8 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 		int AbsoluteZ = BaseZ + z;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			// Distort(BaseX + x, AbsoluteZ, DistX, DistZ);
-			cChunkDef::SetBiome(a_BiomeMap, x, z, VoronoiBiome(DistortX[x][z], DistortZ[x][z]));
+			int VoronoiCellValue = m_Voronoi.GetValueAt(DistortX[x][z], DistortZ[x][z]) / 8;
+			cChunkDef::SetBiome(a_BiomeMap, x, z, m_Biomes[VoronoiCellValue % m_BiomesCount]);
 		}  // for x
 	}  // for z
 }
@@ -360,10 +324,10 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 
 void cBioGenDistortedVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	// Do NOT call super::InitializeBiomeGen(), as it would try to read Voronoi params instead of DistortedVoronoi params
-	m_CellSize     = a_IniFile.GetValueSetI("Generator", "DistortedVoronoiCellSize", 96);
-	AString Biomes = a_IniFile.GetValueSet ("Generator", "DistortedVoronoiBiomes",   "");
-	InitializeBiomes(Biomes);
+	super::InitializeBiomeGen(a_IniFile);
+	m_CellSize = a_IniFile.GetValueSetI("Generator", "DistortedVoronoiCellSize", 96);
+	m_Voronoi.SetCellSize(m_CellSize);
+	InitializeBiomes(a_IniFile.GetValueSet("Generator", "DistortedVoronoiBiomes", ""));
 }
 
 

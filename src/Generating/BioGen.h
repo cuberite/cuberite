@@ -16,6 +16,7 @@ Interfaces to the various biome generators:
 
 #include "ComposableGenerator.h"
 #include "../Noise.h"
+#include "../VoronoiMap.h"
 
 
 
@@ -123,15 +124,13 @@ class cBioGenVoronoi :
 	
 public:
 	cBioGenVoronoi(int a_Seed) :
-		m_Noise(a_Seed)
+		m_Voronoi(a_Seed)
 	{
 	}
 	
 protected:
-	int m_CellSize;
+	cVoronoiMap m_Voronoi;
 	
-	cNoise m_Noise;
-
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
@@ -144,16 +143,28 @@ protected:
 
 
 class cBioGenDistortedVoronoi :
-	public cBioGenVoronoi
+	public cBiomeGenList
 {
-	typedef cBioGenVoronoi super;
+	typedef cBiomeGenList super;
+	
 public:
 	cBioGenDistortedVoronoi(int a_Seed) :
-		cBioGenVoronoi(a_Seed)
+		m_Noise(a_Seed),
+		m_Voronoi(a_Seed),
+		m_CellSize(0)
 	{
 	}
 
 protected:
+	/// Noise used for the distortion
+	cNoise m_Noise;
+	
+	/// The underlying Voronoi map of the biomes
+	cVoronoiMap m_Voronoi;
+	
+	/// Size of the Voronoi cells, also used for distortion amplitude
+	int m_CellSize;
+	
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
