@@ -74,7 +74,9 @@ else
 CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
 CXX_OPTIONS = -s -ggdb -g -D_DEBUG -O1
 LNK_OPTIONS = -pthread -g -ggdb -O1
+
 BUILDDIR = build/debug/
+
 endif
 endif
 
@@ -86,11 +88,9 @@ CXX_OPTIONS += -Wall
 ###################################################
 # Fix Crypto++ warnings in clang
 
-ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),0)
-CC_OPTIONS += -Wno-tautological-compare
-CXX_OPTIONS += -Wno-tautological-compare
-disableasm = 1
-disableofast = 1
+ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),1)
+CC_OPTIONS += -DCRYPTOPP_DISABLE_ASM
+CXX_OPTIONS += -DCRYPTOPP_DISABLE_ASM
 endif
 
 
@@ -126,22 +126,9 @@ endif
 
 
 ###################################################
-# Clang doesn't seem to support CryptoPP's assembly mode, disable  it for now (CryptoPP 5.6.2)
-
-ifeq ($(disableasm),1)
-	CC_OPTIONS += -DCRYPTOPP_DISABLE_ASM
-	CXX_OPTIONS += -DCRYPTOPP_DISABLE_ASM
-endif
-
-
-
-
-
-###################################################
 # INCLUDE directories for MCServer
 
-INCLUDE = -I.\
-		-Isrc\
+INCLUDE = -Isrc\
 		-Ilib\
 		-Ilib/jsoncpp/include
 

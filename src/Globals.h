@@ -118,7 +118,6 @@ typedef unsigned short     UInt16;
 	#include <dirent.h>
 	#include <errno.h>
 	#include <iostream>
-
 	#include <cstdio>
 	#include <cstring>
 	#include <pthread.h>
