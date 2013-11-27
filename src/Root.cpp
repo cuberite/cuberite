@@ -19,7 +19,7 @@
 #include "DeadlockDetect.h"
 #include "OSSupport/Timer.h"
 
-#include "lib/inifile/iniFile.h"
+#include "inifile/iniFile.h"
 
 #ifdef _WIN32
 	#include <psapi.h>

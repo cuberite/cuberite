@@ -34,7 +34,7 @@
 #include "MobSpawner.h"
 
 
-#include "lib/jsoncpp/include/json/json.h"
+#include "jsoncpp/include/json/json.h"
 
 
 

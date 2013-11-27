@@ -11,7 +11,7 @@
 
 #include "../OSSupport/ListenThread.h"
 #include "../OSSupport/SocketThreads.h"
-#include "lib/inifile/iniFile.h"
+#include "inifile/iniFile.h"
 
 
 

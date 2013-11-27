@@ -8,7 +8,7 @@
 #include "UI/SlotArea.h"
 #include "PluginLua.h"
 #include "Entities/Player.h"
-#include "lib/lua/src/lauxlib.h" // Needed for LUA_REFNIL
+#include "lua/src/lauxlib.h" // Needed for LUA_REFNIL
 
 
 

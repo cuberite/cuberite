@@ -16,7 +16,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "tolua_base.h"
 #include "ChunkDef.h"
-#include "../lib/inifile/iniFile.h"
+#include "inifile/iniFile.h"
 #include "OSSupport/File.h"
 #include "BlockID.h"
 #include "StringUtils.h"
