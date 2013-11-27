@@ -1046,7 +1046,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 		return;
 	}
 	
-	// TODO: Add damage to entities, add support for pickups, and implement block hardiness
+	// TODO: Add damage to entities and implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
