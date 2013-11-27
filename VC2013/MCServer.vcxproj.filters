@@ -10,73 +10,73 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Source Files\Mobs">
-      <UniqueIdentifier>{0c1dd2bf-04b0-4605-b963-b187e900b4a1}</UniqueIdentifier>
+      <UniqueIdentifier>{d3e4f61e-bc56-4454-8036-8a546cf8fb0b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entities">
-      <UniqueIdentifier>{5c101216-8e22-4ad4-a27d-1572a4d95947}</UniqueIdentifier>
+      <UniqueIdentifier>{520ca259-2c9e-482f-9690-1768c4d29939}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\UI">
-      <UniqueIdentifier>{eb7a158f-f532-4db5-9314-fca01f04a38e}</UniqueIdentifier>
+      <UniqueIdentifier>{21ab8bcf-53a0-4eec-b597-db45d6cd8635}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Simulator">
-      <UniqueIdentifier>{c378fbaa-2232-4123-a58d-84f2e2e32376}</UniqueIdentifier>
+      <UniqueIdentifier>{73debd14-b218-4313-9389-1a0e62dae8b7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\OSSupport">
-      <UniqueIdentifier>{be34fc66-075c-45f0-a292-e4ace73a5726}</UniqueIdentifier>
+      <UniqueIdentifier>{2cbd2a0f-6204-4ed6-a825-f9e81fe86d98}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\OSSupport\Android Specific">
-      <UniqueIdentifier>{8dcfacbc-454b-4530-af61-d9db5aebb5bd}</UniqueIdentifier>
+      <UniqueIdentifier>{b80f90c1-713e-4c86-ab50-78d7f5aa6c82}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Bindings">
-      <UniqueIdentifier>{3fa4b52a-1b33-4e8c-8e0c-5818dbd5de15}</UniqueIdentifier>
+      <UniqueIdentifier>{d29f7a59-d5d7-4b06-bd73-563007f3a15a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\External">
-      <UniqueIdentifier>{50cbaa98-dc12-4cc9-9ba6-4e08e885c924}</UniqueIdentifier>
+      <UniqueIdentifier>{c8e6ce30-56d9-42b7-8a5d-0af0f1b8c5c6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\WorldStorage">
-      <UniqueIdentifier>{889b7953-c303-448a-8cf9-ca624011d131}</UniqueIdentifier>
+      <UniqueIdentifier>{0aff46f9-2a5c-4e23-8227-6c7a318efd98}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Generating">
-      <UniqueIdentifier>{9313323e-633a-4c87-812c-0dda81b2a509}</UniqueIdentifier>
+      <UniqueIdentifier>{86cc1a62-5a4a-4b55-9919-c1944a2f17bc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Blocks">
-      <UniqueIdentifier>{61f1ea93-c0b0-4296-81fa-808116542dc8}</UniqueIdentifier>
+      <UniqueIdentifier>{6ae1cee3-6e6a-464e-806c-5dd353137bdd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Items">
-      <UniqueIdentifier>{61efdcbf-e2d5-477f-8d67-a81c5ab3d6e6}</UniqueIdentifier>
+      <UniqueIdentifier>{2e9149ad-0762-42b6-9041-e23f83934380}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Protocol">
-      <UniqueIdentifier>{86f6a355-fd04-4ba5-82b0-0fb57897da8d}</UniqueIdentifier>
+      <UniqueIdentifier>{43922b25-52e6-41e0-a534-0220c585fb64}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\SQLite">
-      <UniqueIdentifier>{dacfe6a2-94db-4257-8727-0f9a8c70fc8f}</UniqueIdentifier>
+      <UniqueIdentifier>{28ba3c86-6782-4b9c-8ad1-4815a9990f56}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\LuaExpat">
-      <UniqueIdentifier>{b41f78d8-61f8-4476-86cf-d08080418dcb}</UniqueIdentifier>
+      <UniqueIdentifier>{17718a17-83c9-4e37-9be9-a7974fae412c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\BlockEntities">
-      <UniqueIdentifier>{78f41ac0-8ed5-4951-8373-2aed18d9c741}</UniqueIdentifier>
+      <UniqueIdentifier>{5f9cb95f-1a51-4962-ad30-09c5e43dd9ae}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\HTTPServer">
-      <UniqueIdentifier>{fc1463dd-e130-49cb-96cf-ee6755cf2de1}</UniqueIdentifier>
+      <UniqueIdentifier>{ee51cab4-2a1d-4fb2-9f33-ff5f42ee5c2c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Config files">
-      <UniqueIdentifier>{a50ba11b-40c8-43ff-aa5b-aac2e4285df0}</UniqueIdentifier>
+      <UniqueIdentifier>{a4c0514f-61e0-4a3e-90af-aa92850a6cad}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins">
-      <UniqueIdentifier>{37df6f7f-93ff-4c4a-89cf-77bb6feb215f}</UniqueIdentifier>
+      <UniqueIdentifier>{cdc2d187-0019-4de2-8f76-d224bbda63ee}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Core">
-      <UniqueIdentifier>{3d8e534e-8cd7-4dc5-9626-a1ce9559c118}</UniqueIdentifier>
+      <UniqueIdentifier>{9960d29d-8cdd-48a7-8f72-6abb7882e0f8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\ChatLog">
-      <UniqueIdentifier>{4419315f-3ef3-490d-ba0a-df22565b9a02}</UniqueIdentifier>
+      <UniqueIdentifier>{39ac0d09-047a-43f4-8472-d99ba62834e5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Debuggers">
-      <UniqueIdentifier>{3491f495-c715-4a5b-845e-1638a4ef0127}</UniqueIdentifier>
+      <UniqueIdentifier>{7b6aed62-c48a-4c44-83ca-e459a16a6232}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\APIDump">
-      <UniqueIdentifier>{4bb6b059-2004-4795-a0e7-d401affb3063}</UniqueIdentifier>
+      <UniqueIdentifier>{4feccf69-36aa-4881-a844-7a6f8a9e8291}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -270,6 +270,9 @@
     <ClInclude Include="..\src\Vector3i.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\VoronoiMap.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\WebAdmin.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -379,6 +382,9 @@
       <Filter>Source Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Entities\Entity.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Entities\ExpOrb.h">
       <Filter>Source Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Entities\FallingBlock.h">
@@ -1246,6 +1252,9 @@
     <ClCompile Include="..\src\Vector3i.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\VoronoiMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\WebAdmin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1349,6 +1358,9 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Entities\Entity.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Entities\ExpOrb.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Entities\FallingBlock.cpp">

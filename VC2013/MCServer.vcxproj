@@ -85,7 +85,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../lib/zlib;../lib/jsoncpp/include;../lib/lua/src;../lib/tolua++/include;..;../lib/expat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../lib/jsoncpp/include;../lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -110,7 +110,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../lib/zlib;../lib/jsoncpp/include;../lib/lua/src;../lib/tolua++/include;..;../lib/expat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../lib/jsoncpp/include;../lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -136,7 +136,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../lib/zlib;../lib/jsoncpp/include;../lib/lua/src;../lib/tolua++/include;..;../lib/expat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../lib/jsoncpp/include;../lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -160,7 +160,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../lib/zlib;../lib/jsoncpp/include;../lib/lua/src;../lib/tolua++/include;..;../lib/expat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../lib/jsoncpp/include;../lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -245,6 +245,7 @@
     <ClInclude Include="..\src\Vector3d.h" />
     <ClInclude Include="..\src\Vector3f.h" />
     <ClInclude Include="..\src\Vector3i.h" />
+    <ClInclude Include="..\src\VoronoiMap.h" />
     <ClInclude Include="..\src\WebAdmin.h" />
     <ClInclude Include="..\src\World.h" />
     <ClInclude Include="..\src\Mobs\AggressiveMonster.h" />
@@ -282,6 +283,7 @@
     <ClInclude Include="..\src\Mobs\ZombiePigman.h" />
     <ClInclude Include="..\src\Entities\Boat.h" />
     <ClInclude Include="..\src\Entities\Entity.h" />
+    <ClInclude Include="..\src\Entities\ExpOrb.h" />
     <ClInclude Include="..\src\Entities\FallingBlock.h" />
     <ClInclude Include="..\src\Entities\Minecart.h" />
     <ClInclude Include="..\src\Entities\Pawn.h" />
@@ -659,6 +661,7 @@
     <ClCompile Include="..\src\Vector3d.cpp" />
     <ClCompile Include="..\src\Vector3f.cpp" />
     <ClCompile Include="..\src\Vector3i.cpp" />
+    <ClCompile Include="..\src\VoronoiMap.cpp" />
     <ClCompile Include="..\src\WebAdmin.cpp" />
     <ClCompile Include="..\src\World.cpp" />
     <ClCompile Include="..\src\Mobs\AggressiveMonster.cpp" />
@@ -694,6 +697,7 @@
     <ClCompile Include="..\src\Mobs\ZombiePigman.cpp" />
     <ClCompile Include="..\src\Entities\Boat.cpp" />
     <ClCompile Include="..\src\Entities\Entity.cpp" />
+    <ClCompile Include="..\src\Entities\ExpOrb.cpp" />
     <ClCompile Include="..\src\Entities\FallingBlock.cpp" />
     <ClCompile Include="..\src\Entities\Minecart.cpp" />
     <ClCompile Include="..\src\Entities\Pawn.cpp" />
