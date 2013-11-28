@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "ChunkExtract.h"
-#include "../../source/OSSupport/GZipFile.h"
+#include "../../src/OSSupport/GZipFile.h"
 
 
 
