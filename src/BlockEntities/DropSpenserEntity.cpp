@@ -8,6 +8,7 @@
 #include "DropSpenserEntity.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
+#include "json/json.h"
 
 
 
