@@ -1674,9 +1674,9 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
 	WakeUpSimulatorsInArea(
-		bx - ExplosionSizeInt, bx + ExplosionSizeInt + 1,
+		bx - ExplosionSizeInt - 1, bx + ExplosionSizeInt + 1,
 		MinY, MaxY,
-		bz - ExplosionSizeInt, bz + ExplosionSizeInt + 1
+		bz - ExplosionSizeInt - 1, bz + ExplosionSizeInt + 1
 	);
 }
 
