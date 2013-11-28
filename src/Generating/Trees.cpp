@@ -161,6 +161,9 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		case biMushroomIsland:
 		case biMushroomShore:
 		case biForestHills:
+		case biDeepOcean:
+		case biStoneBeach:
+		case biColdBeach:
 		{
 			// Apple or birch trees:
 			if (a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + 16 * a_Seq, a_BlockZ + 16 * a_Seq) < 0x5fffffff)
@@ -193,6 +196,7 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		
 		case biJungle:
 		case biJungleHills:
+		case biJungleEdge:
 		{
 			// Apple bushes, large jungle trees, small jungle trees
 			if (a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + 16 * a_Seq, a_BlockZ + 16 * a_Seq) < 0x6fffffff)
@@ -203,6 +207,52 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 			{
 				GetJungleTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			}
+			break;
+		}
+		
+		case biBirchForest:
+		case biBirchForestHills:
+		{
+			GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			break;
+		}
+		
+		case biRoofedForest:
+		case biColdTaiga:
+		case biColdTaigaHills:
+		case biMegaTaiga:
+		case biMegaTaigaHills:
+		case biExtremeHillsPlus:
+		case biSavanna:
+		case biSavannaPlateau:
+		case biMesa:
+		case biMesaPlateauF:
+		case biMesaPlateau:
+		case biSunflowerPlains:
+		case biDesertM:
+		case biExtremeHillsM:
+		case biFlowerForest:
+		case biTaigaM:
+		case biSwamplandM:
+		case biIcePlainsSpikes:
+		case biJungleM:
+		case biJungleEdgeM:
+		case biBirchForestM:
+		case biBirchForestHillsM:
+		case biRoofedForestM:
+		case biColdTaigaM:
+		case biMegaSpruceTaiga:
+		case biMegaSpruceTaigaHills:
+		case biExtremeHillsPlusM:
+		case biSavannaM:
+		case biSavannaPlateauM:
+		case biMesaBryce:
+		case biMesaPlateauFM:
+		case biMesaPlateauM:
+		{
+			// TODO: These need their special trees
+			GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			break;
 		}
 	}
 }
