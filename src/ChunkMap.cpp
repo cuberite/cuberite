@@ -1655,7 +1655,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					
 					default:
 					{
-						if (m_World->GetTickRandomNumber(4) == 4) // Around 25% chance of pickups
+						if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
 						{
 							cItems Drops;
 							cBlockHandler * Handler = BlockHandler(Block);
