@@ -21,7 +21,7 @@ Usually you'd want to keep both numbers the same.
 The numbers are "relative", not absolute maximum; overhangs of a slightly larger size are possible
 due to the way that noise is calculated.
 */
-const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[biNumBiomes] =
+const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 {
 	/* Biome              |   AmpX | AmpZ */
 	/* biOcean            */ { 1.5f,  1.5f},
@@ -46,8 +46,70 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[biNumBiomes
 	/* biForestHills      */ { 6.0f,  6.0f},
 	/* biTaigaHills       */ { 8.0f,  8.0f},
 	/* biExtremeHillsEdge */ { 7.0f,  7.0f},
-	/* biJungle           */ { 0.0f,  0.0f},
+	/* biJungle           */ { 4.0f,  4.0f},
 	/* biJungleHills      */ { 8.0f,  8.0f},
+	/* biJungleEdge       */ { 3.0f,  3.0f},  // 23
+	/* biDeepOcean        */ { 1.0f,  1.0f},  // 24
+	/* biStoneBeach       */ { 1.0f,  1.0f},  // 25
+	/* biColdBeach        */ { 1.0f,  1.0f},  // 26
+	/* biBirchForest      */ { 3.0f,  3.0f},  // 27
+	/* biBirchForestHills */ { 6.0f,  6.0f},  // 28
+	/* biRoofedForest     */ { 3.0f,  3.0f},  // 29
+	/* biColdTaiga        */ { 0.5f,  0.5f},  // 30
+	/* biColdTaigaHills   */ { 4.0f,  4.0f},  // 31
+	/* biMegaTaiga        */ { 1.0f,  1.0f},  // 32
+	/* biMegaTaigaHills   */ { 4.0f,  4.0f},  // 33
+	/* biExtremeHillsPlus */ {32.0f, 32.0f},  // 34  - anyone say extreme plus? Make it extreme plus, then :)
+	/* biSavanna          */ { 2.0f,  2.0f},  // 35
+	/* biSavannaPlateau   */ { 3.0f,  3.0f},  // 36
+	/* biMesa             */ { 3.0f,  3.0f},  // 37
+	/* biMesaPlateauF     */ { 3.0f,  3.0f},  // 38
+	/* biMesaPlateau      */ { 3.0f,  3.0f},  // 39
+	
+	// biomes 40 .. 128 are unused, 89 empty placeholders here:
+	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 40 .. 49
+	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 50 .. 59
+	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 60 .. 69
+	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 70 .. 79
+	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 80 .. 89
+	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 90 .. 99
+	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 100 .. 109
+	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 110 .. 119
+	{}, {}, {}, {}, {}, {}, {}, {}, {},      // 120 .. 128
+	
+	// Release 1.7 /* biome variants:
+	/* biSunflowerPlains      */ { 1.0f,  1.0f},  // 129
+	/* biDesertM              */ { 1.0f,  1.0f},  // 130
+	/* biExtremeHillsM        */ {16.0f, 16.0f},  // 131
+	/* biFlowerForest         */ { 4.0f,  4.0f},  // 132
+	/* biTaigaM               */ { 3.0f,  3.0f},  // 133
+	/* biSwamplandM           */ { 0.0f,  0.0f},  // 134
+	
+	// Biomes 135 .. 139 unused, 5 empty placeholders here:
+	{}, {}, {}, {}, {},                           // 135 .. 139
+
+	/* biIcePlainsSpikes      */ { 1.0f,  1.0f},  // 140
+	
+	// Biomes 141 .. 148 unused, 8 empty placeholders here:
+	{}, {}, {}, {}, {}, {}, {}, {},               // 141 .. 148
+
+	/* biJungleM              */ { 4.0f,  4.0f},  // 149
+	{},                                           // 150
+	/* biJungleEdgeM          */ { 3.0f,  3.0f},  // 151
+	{}, {}, {},                                   // 152 .. 154
+	/* biBirchForestM         */ { 3.0f,  3.0f},  // 155
+	/* biBirchForestHillsM    */ { 5.0f,  5.0f},  // 156
+	/* biRoofedForestM        */ { 2.0f,  2.0f},  // 157
+	/* biColdTaigaM           */ { 1.0f,  1.0f},  // 158
+	{},                                           // 159
+	/* biMegaSpruceTaiga      */ { 3.0f,  3.0f},  // 160
+	/* biMegaSpruceTaigaHills */ { 3.0f,  3.0f},  // 161
+	/* biExtremeHillsPlusM    */ {32.0f, 32.0f},  // 162
+	/* biSavannaM             */ { 2.0f,  2.0f},  // 163
+	/* biSavannaPlateauM      */ { 3.0f,  3.0f},  // 164
+	/* biMesaBryce            */ { 0.5f,  0.5f},  // 165
+	/* biMesaPlateauFM        */ { 3.0f,  3.0f},  // 166
+	/* biMesaPlateauM         */ { 3.0f,  3.0f},  // 167
 } ;
 
 
@@ -60,7 +122,8 @@ cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
 	m_OceanFloorSelect(a_Seed + 3000),
 	m_BiomeGen(a_BiomeGen),
 	m_UnderlyingHeiGen(a_Seed, a_BiomeGen),
-	m_HeightGen(m_UnderlyingHeiGen, 64)
+	m_HeightGen(m_UnderlyingHeiGen, 64),
+	m_IsInitialized(false)
 {
 	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)1,    (NOISE_DATATYPE)0.5);
 	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)0.5,  (NOISE_DATATYPE)1);
@@ -394,7 +457,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ)
 {
 	// Sum up how many biomes of each type there are in the neighborhood:
-	int BiomeCounts[biNumBiomes];
+	int BiomeCounts[256];
 	memset(BiomeCounts, 0, sizeof(BiomeCounts));
 	int Sum = 0;
 	for (int z = -8; z <= 8; z++)
@@ -409,10 +472,6 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 			int IdxX = FinalX / cChunkDef::Width;
 			int ModX = FinalX % cChunkDef::Width;
 			EMCSBiome Biome = cChunkDef::GetBiome(a_Neighbors[IdxX][IdxZ], ModX, ModZ);
-			if ((Biome < 0) || (Biome >= ARRAYCOUNT(BiomeCounts)))
-			{
-				continue;
-			}
 			int WeightX = 9 - abs(x);
 			BiomeCounts[Biome] += WeightX + WeightZ;
 			Sum += WeightX + WeightZ;
@@ -432,6 +491,19 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 	NOISE_DATATYPE AmpZ = 0;
 	for (unsigned int i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
 	{
+		if (BiomeCounts[i] <= 0)
+		{
+			continue;
+		}
+		
+		/*
+		// Sanity checks for biome parameters, enable them to check the biome param table in runtime (slow):
+		ASSERT(m_GenParam[i].m_DistortAmpX >= 0);
+		ASSERT(m_GenParam[i].m_DistortAmpX < 100);
+		ASSERT(m_GenParam[i].m_DistortAmpX >= 0);
+		ASSERT(m_GenParam[i].m_DistortAmpX < 100);
+		*/
+
 		AmpX += BiomeCounts[i] * m_GenParam[i].m_DistortAmpX;
 		AmpZ += BiomeCounts[i] * m_GenParam[i].m_DistortAmpZ;
 	}

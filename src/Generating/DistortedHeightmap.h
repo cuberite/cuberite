@@ -69,7 +69,7 @@ protected:
 		NOISE_DATATYPE m_DistortAmpX;
 		NOISE_DATATYPE m_DistortAmpZ;
 	} ;
-	static const sGenParam m_GenParam[biNumBiomes];
+	static const sGenParam m_GenParam[256];
 	
 	// Distortion amplitudes for each direction, before linear upscaling
 	NOISE_DATATYPE m_DistortAmpX[DIM_X * DIM_Z];

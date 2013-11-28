@@ -131,7 +131,7 @@ protected:
 		float m_HeightFreq3, m_HeightAmp3;
 		float m_BaseHeight;
 	} ;
-	static const sGenParam m_GenParam[biNumBiomes];
+	static const sGenParam m_GenParam[256];
 	
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
