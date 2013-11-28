@@ -48,6 +48,13 @@ public:
 	
 	/// Reads parameters from the ini file, prepares generator for use.
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) {}
+
+	/// Creates the correct BiomeGen descendant based on the ini file settings and the seed provided.
+	/// a_CacheOffByDefault gets set to whether the cache should be enabled by default
+	/// Used in BiomeVisualiser, too.
+	/// Implemented in BioGen.cpp!
+	static cBiomeGen * CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault);
+
 } ;
 
 

@@ -13,6 +13,72 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBiomeGen:
+
+cBiomeGen * cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
+{
+	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
+	if (BiomeGenName.empty())
+	{
+		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"MultiStepMap\".");
+		BiomeGenName = "MultiStepMap";
+	}
+	
+	cBiomeGen * res = NULL;
+	a_CacheOffByDefault = false;
+	if (NoCaseCompare(BiomeGenName, "constant") == 0)
+	{
+		res = new cBioGenConstant;
+		a_CacheOffByDefault = true;  // we're generating faster than a cache would retrieve data :)
+	}
+	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
+	{
+		res = new cBioGenCheckerboard;
+		a_CacheOffByDefault = true;  // we're (probably) generating faster than a cache would retrieve data
+	}
+	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
+	{
+		res = new cBioGenVoronoi(a_Seed);
+	}
+	else if (NoCaseCompare(BiomeGenName, "distortedvoronoi") == 0)
+	{
+		res = new cBioGenDistortedVoronoi(a_Seed);
+	}
+	else if (NoCaseCompare(BiomeGenName, "twolevel") == 0)
+	{
+		res = new cBioGenTwoLevel(a_Seed);
+	}
+	else
+	{
+		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
+		{
+			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
+		}
+		res = new cBioGenMultiStepMap(a_Seed);
+
+		/*
+		// Performance-testing:
+		LOGINFO("Measuring performance of cBioGenMultiStepMap...");
+		clock_t BeginTick = clock();
+		for (int x = 0; x < 5000; x++)
+		{
+			cChunkDef::BiomeMap Biomes;
+			res->GenBiomes(x * 5, x * 5, Biomes);
+		}
+		clock_t Duration = clock() - BeginTick;
+		LOGINFO("cBioGenMultiStepMap for 5000 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
+		//*/
+	}
+	res->InitializeBiomeGen(a_IniFile);
+	
+	return res;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBioGenConstant:
 
 void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)

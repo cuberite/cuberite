@@ -147,54 +147,8 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 
 void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 {
-	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
-	if (BiomeGenName.empty())
-	{
-		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"MultiStepMap\".");
-		BiomeGenName = "MultiStepMap";
-	}
-	
-	int Seed = m_ChunkGenerator.GetSeed();
 	bool CacheOffByDefault = false;
-	if (NoCaseCompare(BiomeGenName, "constant") == 0)
-	{
-		m_BiomeGen = new cBioGenConstant;
-		CacheOffByDefault = true;  // we're generating faster than a cache would retrieve data :)
-	}
-	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
-	{
-		m_BiomeGen = new cBioGenCheckerboard;
-		CacheOffByDefault = true;  // we're (probably) generating faster than a cache would retrieve data
-	}
-	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
-	{
-		m_BiomeGen = new cBioGenVoronoi(Seed);
-	}
-	else if (NoCaseCompare(BiomeGenName, "distortedvoronoi") == 0)
-	{
-		m_BiomeGen = new cBioGenDistortedVoronoi(Seed);
-	}
-	else
-	{
-		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
-		{
-			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
-		}
-		m_BiomeGen = new cBioGenMultiStepMap(Seed);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cBioGenMultiStepMap...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 5000; x++)
-		{
-			cChunkDef::BiomeMap Biomes;
-			m_BiomeGen->GenBiomes(x * 5, x * 5, Biomes);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("cBioGenMultiStepMap for 5000 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
-	}
+	m_BiomeGen = cBiomeGen::CreateBiomeGen(a_IniFile, m_ChunkGenerator.GetSeed(), CacheOffByDefault);
 	
 	// Add a cache, if requested:
 	int CacheSize = a_IniFile.GetValueSetI("Generator", "BiomeGenCacheSize", CacheOffByDefault ? 0 : 64);
@@ -211,7 +165,6 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		m_UnderlyingBiomeGen = m_BiomeGen;
 		m_BiomeGen = new cBioGenCache(m_UnderlyingBiomeGen, CacheSize);
 	}
-	m_BiomeGen->InitializeBiomeGen(a_IniFile);
 }
 
 
