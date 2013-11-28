@@ -361,12 +361,61 @@ void cDistortedHeightmap::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 						case biExtremeHillsEdge:
 						case biJungle:
 						case biJungleHills:
+						case biJungleEdge:
+						case biDeepOcean:
+						case biStoneBeach:
+						case biColdBeach:
+						case biBirchForest:
+						case biBirchForestHills:
+						case biRoofedForest:
+						case biColdTaiga:
+						case biColdTaigaHills:
+						case biExtremeHillsPlus:
+						case biSavanna:
+						case biSavannaPlateau:
+						case biSunflowerPlains:
+						case biExtremeHillsM:
+						case biFlowerForest:
+						case biTaigaM:
+						case biSwamplandM:
+						case biIcePlainsSpikes:
+						case biJungleM:
+						case biJungleEdgeM:
+						case biBirchForestM:
+						case biBirchForestHillsM:
+						case biRoofedForestM:
+						case biColdTaigaM:
+						case biExtremeHillsPlusM:
+						case biSavannaM:
+						case biSavannaPlateauM:
 						{
 							a_ChunkDesc.SetBlockType(x, y, z, (y == LastAir - 1) ? E_BLOCK_GRASS : E_BLOCK_DIRT);
 							break;
 						}
+						
+						case biMesa:
+						case biMesaPlateauF:
+						case biMesaPlateau:
+						case biMesaBryce:
+						case biMesaPlateauFM:
+						case biMesaPlateauM:
+						{
+							a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_HARDENED_CLAY, 1);
+							break;
+						}
+						
+						case biMegaTaiga:
+						case biMegaTaigaHills:
+						case biMegaSpruceTaiga:
+						case biMegaSpruceTaigaHills:
+						{
+							a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_DIRT, (y == LastAir - 1) ? E_META_DIRT_PODZOL : 0);
+							break;
+						}
+
 						case biDesertHills:
 						case biDesert:
+						case biDesertM:
 						case biBeach:
 						{
 							a_ChunkDesc.SetBlockType(x, y, z, (y < LastAir - 3) ? E_BLOCK_SANDSTONE : E_BLOCK_SAND);

@@ -402,6 +402,10 @@ enum
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Block metas:
 
+	E_META_DIRT_NORMAL    = 0,
+	E_META_DIRT_GRASSLESS = 1,
+	E_META_DIRT_PODZOL    = 2,
+	
 	// E_BLOCK_CHEST metas:
 	E_META_CHEST_FACING_ZM = 2,
 	E_META_CHEST_FACING_ZP = 3,

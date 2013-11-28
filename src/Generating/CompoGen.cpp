@@ -250,12 +250,61 @@ void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 					case biExtremeHillsEdge:
 					case biJungle:
 					case biJungleHills:
+					case biJungleEdge:
+					case biDeepOcean:
+					case biStoneBeach:
+					case biColdBeach:
+					case biBirchForest:
+					case biBirchForestHills:
+					case biRoofedForest:
+					case biColdTaiga:
+					case biColdTaigaHills:
+					case biExtremeHillsPlus:
+					case biSavanna:
+					case biSavannaPlateau:
+					case biSunflowerPlains:
+					case biExtremeHillsM:
+					case biFlowerForest:
+					case biTaigaM:
+					case biSwamplandM:
+					case biIcePlainsSpikes:
+					case biJungleM:
+					case biJungleEdgeM:
+					case biBirchForestM:
+					case biBirchForestHillsM:
+					case biRoofedForestM:
+					case biColdTaigaM:
+					case biExtremeHillsPlusM:
+					case biSavannaM:
+					case biSavannaPlateauM:
 					{
 						FillColumnGrass(x, z, Height, a_ChunkDesc.GetBlockTypes());
 						break;
 					}
+
+					case biMesa:
+					case biMesaPlateauF:
+					case biMesaPlateau:
+					case biMesaBryce:
+					case biMesaPlateauFM:
+					case biMesaPlateauM:
+					{
+						FillColumnClay(x, z, Height, a_ChunkDesc.GetBlockTypes());
+						break;
+					}
+					
+					case biMegaTaiga:
+					case biMegaTaigaHills:
+					case biMegaSpruceTaiga:
+					case biMegaSpruceTaigaHills:
+					{
+						FillColumnDirt(x, z, Height, a_ChunkDesc.GetBlockTypes());
+						break;
+					}
+
 					case biDesertHills:
 					case biDesert:
+					case biDesertM:
 					case biBeach:
 					{
 						FillColumnSand(x, z, Height, a_ChunkDesc.GetBlockTypes());
@@ -332,6 +381,47 @@ void cCompoGenBiomal::FillColumnGrass(int a_RelX, int a_RelZ, int a_Height, cChu
 	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
 	
 	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
+	}
+}
+
+
+
+
+
+void cCompoGenBiomal::FillColumnClay(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
+{
+	BLOCKTYPE Pattern[] =
+	{
+		E_BLOCK_HARDENED_CLAY,
+		E_BLOCK_HARDENED_CLAY,
+		E_BLOCK_HARDENED_CLAY,
+		E_BLOCK_HARDENED_CLAY,
+	} ;
+	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
+	
+	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
+	}
+}
+
+
+
+
+
+void cCompoGenBiomal::FillColumnDirt(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
+{
+	for (int y = 0; y < 4; y++)
+	{
+		if (a_Height - y < 0)
+		{
+			return;
+		}
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, a_Height - y, a_RelZ, E_BLOCK_DIRT);
+	}
+	for (int y = a_Height - 4; y > 0; y--)
 	{
 		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
 	}
