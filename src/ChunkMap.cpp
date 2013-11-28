@@ -1655,12 +1655,12 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					
 					default:
 					{
-						if (m_World->GetTickRandomNumber(10) == 5)
+						if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
 						{
 							cItems Drops;
 							cBlockHandler * Handler = BlockHandler(Block);
 
-							Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z));
+							Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
 							m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
 						}
 						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
@@ -1674,9 +1674,9 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
 	WakeUpSimulatorsInArea(
-		bx - ExplosionSizeInt, bx + ExplosionSizeInt + 1,
+		bx - ExplosionSizeInt - 1, bx + ExplosionSizeInt + 1,
 		MinY, MaxY,
-		bz - ExplosionSizeInt, bz + ExplosionSizeInt + 1
+		bz - ExplosionSizeInt - 1, bz + ExplosionSizeInt + 1
 	);
 }
 

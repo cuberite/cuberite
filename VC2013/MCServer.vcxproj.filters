@@ -1666,6 +1666,9 @@
     <ClCompile Include="..\src\HTTPServer\NameValueParser.cpp">
       <Filter>Source Files\HTTPServer</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\BlockEntities\BlockEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\MCServer\API.txt">

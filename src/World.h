@@ -635,6 +635,7 @@ private:
 	/// This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe)
 	MTRand m_TickRand;
 
+	bool m_bSpawnExplicitlySet;
 	double m_SpawnX;
 	double m_SpawnY;
 	double m_SpawnZ;
@@ -742,7 +743,10 @@ private:
 	/// Ticks all clients that are in this world
 	void TickClients(float a_Dt);
 
-	void UpdateSkyDarkness();
+	void UpdateSkyDarkness(void);
+
+	/// <summary>Generates a random spawnpoint on solid land by walking chunks and finding their biomes</summary>
+	void GenerateRandomSpawn(void);
 	
 	/// Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section)
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
