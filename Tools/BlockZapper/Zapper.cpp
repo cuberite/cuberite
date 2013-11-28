@@ -7,7 +7,7 @@
 
 #include "WorldStorage/FastNBT.h"
 #include "StringCompression.h"
-#include "zlib.h"
+#include "zlib/zlib.h"
 
 #include "Zapper.h"
 

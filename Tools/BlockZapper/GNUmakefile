@@ -100,8 +100,8 @@ endif
 #
 
 INCLUDE = -I.\
-		-I../../source\
-		-I../../zlib-1.2.7\
+		-I../../src\
+		-I../../lib\
 
 
 
@@ -114,16 +114,16 @@ INCLUDE = -I.\
 SOURCES := $(shell find . '(' -name '*.cpp' -o -name '*.c' ')')
 
 SHAREDSOURCES := \
-	source/Log.cpp \
-	source/MCLogger.cpp \
-	source/Noise.cpp \
-	source/StringCompression.cpp \
-	source/StringUtils.cpp \
-	source/OSSupport/CriticalSection.cpp \
-	source/OSSupport/File.cpp \
-	source/OSSupport/IsThread.cpp \
-	source/OSSupport/MakeDir.cpp \
-	source/WorldStorage/FastNBT.cpp
+	src/Log.cpp \
+	src/MCLogger.cpp \
+	src/Noise.cpp \
+	src/StringCompression.cpp \
+	src/StringUtils.cpp \
+	src/OSSupport/CriticalSection.cpp \
+	src/OSSupport/File.cpp \
+	src/OSSupport/IsThread.cpp \
+	src/OSSupport/MakeDir.cpp \
+	src/WorldStorage/FastNBT.cpp
 
 SHAREDSOURCES := $(filter-out %minigzip.c,$(SHAREDSOURCES))
 
@@ -142,8 +142,6 @@ BlockZapper : $(OBJECTS) $(SHAREDOBJECTS)
 clean : 
 		rm -rf $(BUILDDIR) BlockZapper
 
-install : MCServer
-		cp MCServer MCServer
 
 
 
@@ -175,7 +173,7 @@ $(BUILDDIR)%.o: %.cpp
 	@sed -e 's/.*://' -e 's/\\$$//' < $(patsubst %.o,%.d,$@).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(patsubst %.o,%.d,$@)
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
-$(BUILDDIR)source/%.o: ../../source/%.cpp
+$(BUILDDIR)src/%.o: ../../src/%.cpp
 	@mkdir -p $(dir $@)
 	$(CC) $(CXX_OPTIONS) -c $(INCLUDE) $< -o $@
 	@$(CC) $(CXX_OPTIONS) -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
