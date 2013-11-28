@@ -669,3 +669,194 @@ void cBioGenMultiStepMap::FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, co
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBioGenTwoLevel:
+
+cBioGenTwoLevel::cBioGenTwoLevel(int a_Seed) :
+	m_VoronoiLarge(a_Seed + 1000),
+	m_VoronoiSmall(a_Seed + 2000),
+	m_DistortX(a_Seed + 3000),
+	m_DistortZ(a_Seed + 4000),
+	m_Noise(a_Seed + 5000)
+{
+}
+
+
+
+
+
+void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
+	int BaseZ = cChunkDef::Width * a_ChunkZ;
+	int BaseX = cChunkDef::Width * a_ChunkX;
+	
+	// Distortions for linear interpolation:
+	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
+	{
+		int BlockX = BaseX + x * 4;
+		int BlockZ = BaseZ + z * 4;
+		float BlockXF = (float)(16 * BlockX) / 128;
+		float BlockZF = (float)(16 * BlockZ) / 128;
+		double NoiseX =  m_Noise.CubicNoise3D(BlockXF / 16, BlockZF / 16, 1000);
+		NoiseX += 0.5  * m_Noise.CubicNoise3D(BlockXF / 8,  BlockZF / 8,  2000);
+		NoiseX += 0.08 * m_Noise.CubicNoise3D(BlockXF,      BlockZF,      3000);
+		double NoiseZ  = m_Noise.CubicNoise3D(BlockXF / 16, BlockZF / 16, 4000);
+		NoiseZ += 0.5  * m_Noise.CubicNoise3D(BlockXF / 8,  BlockZF / 8,  5000);
+		NoiseZ += 0.08 * m_Noise.CubicNoise3D(BlockXF,      BlockZF,      6000);
+		
+		DistortX[4 * x][4 * z] = BlockX + (int)(64 * NoiseX);
+		DistortZ[4 * x][4 * z] = BlockZ + (int)(64 * NoiseZ);
+	}
+	
+	LinearUpscale2DArrayInPlace(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	LinearUpscale2DArrayInPlace(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	
+	// Apply distortion to each block coord, then query the voronoi maps for biome group and biome index and choose biome based on that:
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int BiomeGroup = m_VoronoiLarge.GetValueAt(DistortX[x][z], DistortZ[x][z]) / 7;
+			int MinDist1, MinDist2;
+			int BiomeIdx   = m_VoronoiSmall.GetValueAt(DistortX[x][z], DistortZ[x][z], MinDist1, MinDist2) / 11;
+			cChunkDef::SetBiome(a_BiomeMap, x, z, SelectBiome(BiomeGroup, BiomeIdx, (MinDist1 < MinDist2 / 4) ? 0 : 1));
+		}
+	}
+}
+
+
+
+
+
+EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, int a_BiomeIdx, int a_DistLevel)
+{
+	// TODO: Move this into settings
+	struct BiomeLevels
+	{
+		EMCSBiome InnerBiome;
+		EMCSBiome OuterBiome;
+	} ;
+	
+	static BiomeLevels bgOcean[] =
+	{
+		{ biOcean, biOcean, },
+		{ biOcean, biOcean, },
+		{ biOcean, biOcean, },
+		{ biOcean, biOcean, },
+		{ biOcean, biDeepOcean, },
+		{ biOcean, biDeepOcean, },
+		{ biDeepOcean, biDeepOcean, },
+		{ biDeepOcean, biDeepOcean, },
+		{ biDeepOcean, biDeepOcean, },
+		{ biDeepOcean, biDeepOcean, },
+		{ biMushroomIsland, biMushroomShore, }
+	} ;
+	static BiomeLevels bgFrozen[] =
+	{
+		{ biIcePlains,         biIcePlains, },
+		{ biIceMountains,      biIceMountains, },
+		{ biFrozenOcean,       biFrozenRiver, },
+		{ biColdTaiga,         biColdTaiga, },
+		{ biColdTaigaHills,    biColdTaigaHills, },
+		{ biColdTaigaM,        biColdTaigaM, },
+		{ biIcePlainsSpikes,   biIcePlainsSpikes, },
+		{ biExtremeHills,      biExtremeHillsEdge, },
+		{ biExtremeHillsPlus,  biExtremeHillsEdge, },
+		{ biExtremeHillsPlusM, biExtremeHillsPlusM, },
+	} ;
+	static BiomeLevels bgTemperate[] =
+	{
+		{ biBirchForestHills,  biBirchForest, },
+		{ biBirchForest,       biBirchForest, },
+		{ biBirchForestHillsM, biBirchForestM, },
+		{ biBirchForestM,      biBirchForestM, },
+		{ biForest,            biForestHills, },
+		{ biFlowerForest,      biFlowerForest, },
+		{ biRoofedForest,      biForest, },
+		{ biRoofedForest,      biRoofedForest, },
+		{ biRoofedForestM,     biForest, },
+		{ biPlains,            biPlains, },
+		{ biSunflowerPlains,   biSunflowerPlains, },
+		{ biSwampland,         biSwampland, },
+		{ biSwamplandM,        biSwamplandM, },
+	} ;
+	static BiomeLevels bgWarm[] =
+	{
+		{ biDesertHills,    biDesert, },
+		{ biDesert,         biDesert, },
+		{ biDesertM,        biDesertM, },
+		{ biSavannaPlateau, biSavanna, },
+		{ biSavanna,        biSavanna, },
+		{ biSavannaM,       biSavannaM, },
+	} ;
+	static BiomeLevels bgMesa[] =
+	{
+		{ biMesaPlateau,    biMesa, },
+		{ biMesaPlateauF,   biMesa, },
+		{ biMesaPlateauFM,  biMesa, },
+		{ biMesaPlateauM,   biMesa, },
+		{ biMesaBryce,      biMesaBryce, },
+		{ biSavanna,        biSavanna, },
+		{ biSavannaPlateau, biSavanna, },
+	} ;
+	static BiomeLevels bgConifers[] =
+	{
+		{ biTaiga,                biTaiga, },
+		{ biTaigaM,               biTaigaM, },
+		{ biMegaTaiga,            biMegaTaiga, },
+		{ biMegaSpruceTaiga,      biMegaSpruceTaiga, },
+		{ biMegaSpruceTaigaHills, biMegaSpruceTaiga, }
+	} ;
+	static BiomeLevels bgDenseTrees[] =
+	{
+		{ biJungleHills, biJungle, },
+		{ biJungle, biJungleEdge, },
+		{ biJungleM, biJungleEdgeM, },
+	} ;
+	static struct
+	{
+		BiomeLevels * Biomes;
+		size_t        Count;
+	} BiomeGroups[] =
+	{
+		{ bgOcean,      ARRAYCOUNT(bgOcean), },
+		{ bgOcean,      ARRAYCOUNT(bgOcean), },
+		{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
+		{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
+		{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
+		{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
+		{ bgConifers,   ARRAYCOUNT(bgConifers), },
+		{ bgConifers,   ARRAYCOUNT(bgConifers), },
+		{ bgWarm,       ARRAYCOUNT(bgWarm), },
+		{ bgWarm,       ARRAYCOUNT(bgWarm), },
+		{ bgMesa,       ARRAYCOUNT(bgMesa), },
+		{ bgDenseTrees, ARRAYCOUNT(bgDenseTrees), },
+	} ;
+	size_t Group = a_BiomeGroup % ARRAYCOUNT(BiomeGroups);
+	size_t Index = a_BiomeIdx % BiomeGroups[Group].Count;
+	return (a_DistLevel > 0) ? BiomeGroups[Group].Biomes[Index].InnerBiome : BiomeGroups[Group].Biomes[Index].OuterBiome;
+}
+
+
+
+
+
+void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
+{
+	// TODO: Read these from a file
+	m_VoronoiLarge.SetCellSize(1024);
+	m_VoronoiSmall.SetCellSize(128);
+	m_DistortX.AddOctave(0.01f,   16);
+	m_DistortX.AddOctave(0.005f,   8);
+	m_DistortX.AddOctave(0.0025f,  4);
+	m_DistortZ.AddOctave(0.01f,   16);
+	m_DistortZ.AddOctave(0.005f,   8);
+	m_DistortZ.AddOctave(0.0025f,  4);
+}
+
+
+
+

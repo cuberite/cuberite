@@ -84,6 +84,10 @@ void cBiomeViewWnd::InitBiomeView(void)
 	{
 		m_BiomeGen = new cBioGenDistortedVoronoi(Seed);
 	}
+	else if (NoCaseCompare(BiomeGenName, "twolevel") == 0)
+	{
+		m_BiomeGen = new cBioGenTwoLevel(Seed);
+	}
 	else
 	{
 		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)

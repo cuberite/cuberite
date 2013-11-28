@@ -239,3 +239,41 @@ protected:
 
 
 
+
+class cBioGenTwoLevel :
+	public cBiomeGen
+{
+	typedef cBiomeGen super;
+	
+public:
+	cBioGenTwoLevel(int a_Seed);
+	
+protected:
+	/// The Voronoi map that decides the groups of biomes
+	cVoronoiMap m_VoronoiLarge;
+	
+	/// The Voronoi map that decides biomes inside individual biome groups
+	cVoronoiMap m_VoronoiSmall;
+	
+	/// The noise used to distort the input X coord
+	cPerlinNoise m_DistortX;
+	
+	/// The noise used to distort the inupt Z coord
+	cPerlinNoise m_DistortZ;
+	
+	cNoise m_Noise;
+
+
+	// cBiomeGen overrides:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
+
+	/// Selects biome from the specified biome group, based on the specified index.
+	/// Note that both params may overflow
+	/// a_DistLevel is either 0 or 1; zero when it is at the edge of the small Voronoi cell, 1 near the center
+	EMCSBiome SelectBiome(int a_BiomeGroup, int a_BiomeIdx, int a_DistLevel);
+} ;
+
+
+
+
