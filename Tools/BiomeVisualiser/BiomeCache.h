@@ -17,7 +17,7 @@ While the area is being filled, requests for biomes may already come, such reque
 
 
 #include "BiomeSource.h"
-#include "../source/OSSupport/IsThread.h"
+#include "../src/OSSupport/IsThread.h"
 
 
 

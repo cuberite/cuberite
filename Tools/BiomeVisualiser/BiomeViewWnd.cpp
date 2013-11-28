@@ -7,7 +7,7 @@
 #include "BiomeViewWnd.h"
 #include "BiomeCache.h"
 #include "GeneratorBiomeSource.h"
-#include "../iniFile/iniFile.h"
+#include "iniFile/iniFile.h"
 
 
 
