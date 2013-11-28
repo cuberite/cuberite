@@ -56,75 +56,9 @@ void cBiomeViewWnd::InitBiomeView(void)
 {
 	cIniFile IniFile;
 	IniFile.ReadFile("world.ini");
-	AString BiomeGenName = IniFile.GetValueSet("Generator", "BiomeGen", "");
-	if (BiomeGenName.empty())
-	{
-		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"MultiStepMap\".");
-		BiomeGenName = "MultiStepMap";
-	}
-	
 	int Seed = IniFile.GetValueSetI("Generator", "Seed", 0);
-	
 	bool CacheOffByDefault = false;
-	if (NoCaseCompare(BiomeGenName, "constant") == 0)
-	{
-		m_BiomeGen = new cBioGenConstant;
-		CacheOffByDefault = true;  // we're generating faster than a cache would retrieve data :)
-	}
-	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
-	{
-		m_BiomeGen = new cBioGenCheckerboard;
-		CacheOffByDefault = true;  // we're (probably) generating faster than a cache would retrieve data
-	}
-	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
-	{
-		m_BiomeGen = new cBioGenVoronoi(Seed);
-	}
-	else if (NoCaseCompare(BiomeGenName, "distortedvoronoi") == 0)
-	{
-		m_BiomeGen = new cBioGenDistortedVoronoi(Seed);
-	}
-	else if (NoCaseCompare(BiomeGenName, "twolevel") == 0)
-	{
-		m_BiomeGen = new cBioGenTwoLevel(Seed);
-	}
-	else
-	{
-		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
-		{
-			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
-		}
-		m_BiomeGen = new cBioGenMultiStepMap(Seed);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cBioGenMultiStepMap...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 5000; x++)
-		{
-			cChunkDef::BiomeMap Biomes;
-			m_BiomeGen->GenBiomes(x * 5, x * 5, Biomes);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("cBioGenMultiStepMap for 5000 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
-	}
-	
-	// Add a cache, if requested:
-	int CacheSize = IniFile.GetValueSetI("Generator", "BiomeGenCacheSize", CacheOffByDefault ? 0 : 64);
-	if (CacheSize > 0)
-	{
-		if (CacheSize < 4)
-		{
-			LOGWARNING("Biomegen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d",
-				CacheSize, 4
-			);
-			CacheSize = 4;
-		}
-		LOGD("Using a cache for biomegen of size %d.", CacheSize);
-		m_BiomeGen = new cBioGenCache(m_BiomeGen, CacheSize);
-	}
-	m_BiomeGen->InitializeBiomeGen(IniFile);
+	m_BiomeGen = cBiomeGen::CreateBiomeGen(IniFile, Seed, CacheOffByDefault);
 	m_Renderer.SetSource(new cGeneratorBiomeSource(m_BiomeGen));
 	IniFile.WriteFile("world.ini");
 }
