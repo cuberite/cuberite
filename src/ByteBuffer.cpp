@@ -818,7 +818,7 @@ void cByteBuffer::AdvanceReadPos(int a_Count)
 	CHECK_THREAD;
 	CheckValid();
 	m_ReadPos += a_Count;
-	if (m_ReadPos > m_BufferSize)
+	if (m_ReadPos >= m_BufferSize)
 	{
 		m_ReadPos -= m_BufferSize;
 	}
