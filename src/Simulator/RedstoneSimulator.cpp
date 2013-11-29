@@ -169,6 +169,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			case E_BLOCK_BLOCK_OF_REDSTONE:		HandleRedstoneBlock(a_X, dataitr->y, a_Z);	break;
 			case E_BLOCK_LEVER: 				HandleRedstoneLever(a_X, dataitr->y, a_Z);	break;
 			case E_BLOCK_TNT:					HandleTNT(a_X, dataitr->y, a_Z);			break;
+			case E_BLOCK_TRAPDOOR:              HandleTrapdoor(a_X, dataitr->y, a_Z);       break;
 			case E_BLOCK_REDSTONE_WIRE:			HandleRedstoneWire(a_X, dataitr->y, a_Z);	break;
 
 			case E_BLOCK_REDSTONE_TORCH_OFF:
@@ -710,6 +711,22 @@ void cRedstoneSimulator::HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 			}
 			break;
 		}
+	}
+}
+
+
+
+
+
+void cRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
+	{
+		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x4);
+	}
+	else
+	{
+		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0xB); // Take into account that the fourth bit is needed for trapdoors too
 	}
 }
 
