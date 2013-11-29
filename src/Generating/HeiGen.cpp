@@ -270,7 +270,7 @@ const cHeiGenBiomal::sGenParam cHeiGenBiomal::m_GenParam[256] =
 	/* biExtremeHillsPlus    */ { 0.2f,   4.0f,  0.05f,    20.0f,  0.01f,   16.0f, 120},
 	/* biSavanna             */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},
 	/* biSavannaPlateau      */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},
-	/* biMesa                */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},
+	/* biMesa                */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  70},  // 165
 	/* biMesaPlateauF        */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},
 	/* biMesaPlateau         */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},
 	
@@ -314,7 +314,7 @@ const cHeiGenBiomal::sGenParam cHeiGenBiomal::m_GenParam[256] =
 	/* biExtremeHillsPlusM    */ { 0.2f,   4.0f,  0.05f,    20.0f,  0.01f,   16.0f, 120},  // 162
 	/* biSavannaM             */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},  // 163
 	/* biSavannaPlateauM      */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},  // 164
-	/* biMesaBryce            */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},  // 165
+	/* biMesaBryce            */ { 0.2f,   2.0f,  0.1f,     30.0f,  0.01f,    8.0f,  80},
 	/* biMesaPlateauFM        */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},  // 166
 	/* biMesaPlateauM         */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},  // 167
 } ;

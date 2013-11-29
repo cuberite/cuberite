@@ -124,6 +124,14 @@ static cDistortedHeightmap::sBlockInfo tbOFClay[] =
 	{ E_BLOCK_SAND, 0},
 } ;
 
+static cDistortedHeightmap::sBlockInfo tbOFRedSand[] =
+{
+	{ E_BLOCK_SAND,      E_META_SAND_RED},
+	{ E_BLOCK_SAND,      E_META_SAND_RED},
+	{ E_BLOCK_SAND,      E_META_SAND_RED},
+	{ E_BLOCK_SANDSTONE, 0},
+} ;
+
 
 
 
@@ -141,6 +149,7 @@ static cPattern patMycelium (tbMycelium,  ARRAYCOUNT(tbMycelium));
 
 static cPattern patOFSand   (tbOFSand,    ARRAYCOUNT(tbOFSand));
 static cPattern patOFClay   (tbOFClay,    ARRAYCOUNT(tbOFClay));
+static cPattern patOFRedSand(tbOFRedSand, ARRAYCOUNT(tbOFRedSand));
 
 
 
@@ -197,9 +206,9 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	/* biExtremeHillsPlus */ {32.0f, 32.0f},  // 34  - anyone say extreme plus? Make it extreme plus, then :)
 	/* biSavanna          */ { 2.0f,  2.0f},  // 35
 	/* biSavannaPlateau   */ { 3.0f,  3.0f},  // 36
-	/* biMesa             */ { 3.0f,  3.0f},  // 37
-	/* biMesaPlateauF     */ { 3.0f,  3.0f},  // 38
-	/* biMesaPlateau      */ { 3.0f,  3.0f},  // 39
+	/* biMesa             */ { 2.0f,  2.0f},  // 37
+	/* biMesaPlateauF     */ { 2.0f,  2.0f},  // 38
+	/* biMesaPlateau      */ { 2.0f,  2.0f},  // 39
 	
 	// biomes 40 .. 128 are unused, 89 empty placeholders here:
 	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 40 .. 49
@@ -243,8 +252,8 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	/* biSavannaM             */ { 2.0f,  2.0f},  // 163
 	/* biSavannaPlateauM      */ { 3.0f,  3.0f},  // 164
 	/* biMesaBryce            */ { 0.5f,  0.5f},  // 165
-	/* biMesaPlateauFM        */ { 3.0f,  3.0f},  // 166
-	/* biMesaPlateauM         */ { 3.0f,  3.0f},  // 167
+	/* biMesaPlateauFM        */ { 2.0f,  2.0f},  // 166
+	/* biMesaPlateauM         */ { 2.0f,  2.0f},  // 167
 } ;
 
 
@@ -269,17 +278,7 @@ cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
 	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)0.5,  (NOISE_DATATYPE)1);
 	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)0.25, (NOISE_DATATYPE)2);
 	
-	// TODO: Initialize the mesa pattern with a random selection of clay layers:
-	for (int i = 0; i < cChunkDef::Height; i++)
-	{
-		m_MesaPattern[i].BlockMeta = i % 16;
-		m_MesaPattern[i].BlockType = E_BLOCK_STAINED_CLAY;
-	}
-	for (int i = cChunkDef::Height; i < 2 * cChunkDef::Height; i++)
-	{
-		m_MesaPattern[i].BlockMeta = 0;
-		m_MesaPattern[i].BlockType = E_BLOCK_STONE;
-	}
+	InitMesaPattern(a_Seed);
 }
 
 
@@ -300,6 +299,89 @@ void cDistortedHeightmap::Initialize(cIniFile & a_IniFile)
 	m_FrequencyZ = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyZ", 10);
 
 	m_IsInitialized = true;
+}
+
+
+
+
+
+void cDistortedHeightmap::InitMesaPattern(int a_Seed)
+{
+	// Stone in the bottom half of the pattern:
+	for (int i = cChunkDef::Height; i < 2 * cChunkDef::Height; i++)
+	{
+		m_MesaPattern[i].BlockMeta = 0;
+		m_MesaPattern[i].BlockType = E_BLOCK_STONE;
+	}
+
+	// Stained and hardened clay in the top half of the pattern
+	// In a loop, choose whether to use one or two layers of stained clay, then choose a color and width for each layer
+	// Separate each group with another layer of hardened clay
+	cNoise PatternNoise((unsigned)a_Seed);
+	static NIBBLETYPE AllowedColors[] =
+	{
+		E_META_STAINED_CLAY_YELLOW,
+		E_META_STAINED_CLAY_YELLOW,
+		E_META_STAINED_CLAY_RED,
+		E_META_STAINED_CLAY_RED,
+		E_META_STAINED_CLAY_WHITE,
+		E_META_STAINED_CLAY_BROWN,
+		E_META_STAINED_CLAY_BROWN,
+		E_META_STAINED_CLAY_BROWN,
+		E_META_STAINED_CLAY_ORANGE,
+		E_META_STAINED_CLAY_ORANGE,
+		E_META_STAINED_CLAY_ORANGE,
+		E_META_STAINED_CLAY_ORANGE,
+		E_META_STAINED_CLAY_ORANGE,
+		E_META_STAINED_CLAY_ORANGE,
+		E_META_STAINED_CLAY_LIGHTGRAY,
+	} ;
+	static int LayerSizes[] =  // Adjust the chance so that thinner layers occur more commonly
+	{
+		1, 1, 1, 1, 1, 1,
+		2, 2, 2, 2,
+		3, 3,
+	} ;
+	int Idx = cChunkDef::Height - 1;
+	while (Idx >= 0)
+	{
+		// A layer group of 1 - 2 color stained clay:
+		int Random = PatternNoise.IntNoise1DInt(Idx) / 7;
+		int NumLayers = (Random % 2) + 1;
+		Random /= 2;
+		for (int Lay = 0; Lay < NumLayers; Lay++)
+		{
+			int NumBlocks = LayerSizes[(Random % ARRAYCOUNT(LayerSizes))];
+			NIBBLETYPE Color = AllowedColors[(Random / 4) % ARRAYCOUNT(AllowedColors)];
+			if (
+				((NumBlocks == 3) && (NumLayers == 2)) ||  // In two-layer mode disallow the 3-high layers:
+				(Color == E_META_STAINED_CLAY_WHITE))      // White stained clay can ever be only 1 block high
+			{
+				NumBlocks = 1;
+			}
+			NumBlocks = std::min(Idx + 1, NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
+			Random /= 32;
+			for (int Block = 0; Block < NumBlocks; Block++, Idx--)
+			{
+				m_MesaPattern[Idx].BlockMeta = Color;
+				m_MesaPattern[Idx].BlockType = E_BLOCK_STAINED_CLAY;
+			}  // for Block
+		}  // for Lay
+
+		// A layer of hardened clay in between the layer group:
+		int NumBlocks = (Random % 4) + 1;  // All heights the same probability
+		if ((NumLayers == 2) && (NumBlocks < 4))
+		{
+			// For two layers of stained clay, add an extra block of hardened clay:
+			NumBlocks++;
+		}
+		NumBlocks = std::min(Idx + 1, NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
+		for (int Block = 0; Block < NumBlocks; Block++, Idx--)
+		{
+			m_MesaPattern[Idx].BlockMeta = 0;
+			m_MesaPattern[Idx].BlockType = E_BLOCK_HARDENED_CLAY;
+		}  // for Block
+	}  // while (Idx >= 0)
 }
 
 
@@ -708,8 +790,8 @@ void cDistortedHeightmap::FillColumnMesa(cChunkDesc & a_ChunkDesc, int a_RelX, i
 	int Top = a_ChunkDesc.GetHeight(a_RelX, a_RelZ);
 	if (Top < m_SeaLevel)
 	{
-		// The terrain is below sealevel, handle as regular dirt terrain:
-		FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patDirt.Get());
+		// The terrain is below sealevel, handle as regular ocean:
+		FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patOFRedSand.Get());
 		return;
 	}
 
@@ -721,7 +803,7 @@ void cDistortedHeightmap::FillColumnMesa(cChunkDesc & a_ChunkDesc, int a_RelX, i
 		ClayFloor = Top - 1;
 	}
 	
-	if (Top - ClayFloor < 5)
+	if (Top - m_SeaLevel < 5)
 	{
 		// Simple case: top is red sand, then hardened clay down to ClayFloor, then stone:
 		a_ChunkDesc.SetBlockTypeMeta(a_RelX, Top, a_RelZ, E_BLOCK_SAND, E_META_SAND_RED);

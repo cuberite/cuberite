@@ -91,6 +91,9 @@ protected:
 	sBlockInfo m_MesaPattern[2 * cChunkDef::Height];
 	
 
+	/// Initializes m_MesaPattern with a reasonable pattern of stained clay / hardened clay, based on the seed
+	void InitMesaPattern(int a_Seed);
+	
 	/// Unless the LastChunk coords are equal to coords given, prepares the internal state (noise arrays, heightmap)
 	void PrepareState(int a_ChunkX, int a_ChunkZ);
 	
