@@ -28,6 +28,13 @@ class cDistortedHeightmap :
 	public cTerrainCompositionGen
 {
 public:
+	/// Structure used for storing block patterns for columns
+	struct sBlockInfo
+	{
+		BLOCKTYPE  BlockType;
+		NIBBLETYPE BlockMeta;
+	} ;
+
 	cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen);
 	
 protected:
@@ -46,6 +53,7 @@ protected:
 	cPerlinNoise m_NoiseDistortX;
 	cPerlinNoise m_NoiseDistortZ;
 	cNoise       m_OceanFloorSelect;  ///< Used for selecting between dirt and sand on the ocean floor
+	cNoise       m_MesaFloor;         ///< Used for the floor of the clay blocks in mesa biomes
 
 	int m_SeaLevel;
 	NOISE_DATATYPE m_FrequencyX;
@@ -78,6 +86,10 @@ protected:
 	/// True if Initialize() has been called. Used to initialize-once even with multiple init entrypoints (HeiGen / CompoGen)
 	bool m_IsInitialized;
 	
+	/// The vertical pattern to be used for mesa biomes. Seed-dependant.
+	/// One Height of pattern and one Height of stone to avoid checking pattern dimensions
+	sBlockInfo m_MesaPattern[2 * cChunkDef::Height];
+	
 
 	/// Unless the LastChunk coords are equal to coords given, prepares the internal state (noise arrays, heightmap)
 	void PrepareState(int a_ChunkX, int a_ChunkZ);
@@ -96,6 +108,19 @@ protected:
 	
 	/// Reads the settings from the ini file. Skips reading if already initialized
 	void Initialize(cIniFile & a_IniFile);
+	
+	/// Composes a single column in a_ChunkDesc. Chooses what to do based on the biome in that column
+	void ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ);
+	
+	/// Fills the specified column with the specified pattern; restarts the pattern when air is reached,
+	/// switches to ocean floor pattern if ocean is reached. Always adds bedrock at the very bottom.
+	void FillColumnPattern(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const sBlockInfo * a_Pattern);
+	
+	/// Fills the specified column with mesa pattern, based on the column height
+	void FillColumnMesa(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ);
+	
+	/// Returns the pattern to use for an ocean floor in the specified column
+	const sBlockInfo * ChooseOceanFloorPattern(int a_RelX, int a_RelZ);
 	
 	
 	// cTerrainHeightGen overrides:
