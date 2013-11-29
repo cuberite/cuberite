@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug profiled|Win32">
@@ -185,6 +185,7 @@
     <ResourceCompile Include="MCServer.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Blocks\BlockTrapdoor.h" />
     <ClInclude Include="resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
     <ClInclude Include="..\src\BlockArea.h" />
@@ -794,14 +795,9 @@
     <ClCompile Include="..\src\Generating\StructGen.cpp" />
     <ClCompile Include="..\src\Generating\Trees.cpp" />
     <ClCompile Include="..\src\Blocks\BlockBed.cpp" />
-    <ClCompile Include="..\src\Blocks\BlockButton.cpp" />
-    <ClCompile Include="..\src\Blocks\BlockComparator.cpp" />
     <ClCompile Include="..\src\blocks\BlockDoor.cpp" />
     <ClCompile Include="..\src\blocks\BlockHandler.cpp" />
-    <ClCompile Include="..\src\Blocks\BlockLever.cpp" />
     <ClCompile Include="..\src\blocks\BlockPiston.cpp" />
-    <ClCompile Include="..\src\blocks\BlockRedstone.cpp" />
-    <ClCompile Include="..\src\blocks\BlockRedstoneRepeater.cpp" />
     <ClCompile Include="..\src\items\ItemHandler.cpp" />
     <ClCompile Include="..\src\Protocol\ChunkDataSerializer.cpp" />
     <ClCompile Include="..\src\Protocol\Protocol125.cpp" />

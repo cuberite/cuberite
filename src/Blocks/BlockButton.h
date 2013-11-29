@@ -10,9 +10,23 @@ class cBlockButtonHandler :
 	public cBlockHandler
 {
 public:
-	cBlockButtonHandler(BLOCKTYPE a_BlockType);
+	cBlockButtonHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
+	{
+	}
+
 	
-	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	{
+		// Flip the ON bit on/off using the XOR bitwise operation
+		NIBBLETYPE Meta = (a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x08);
+
+		a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+		a_World->BroadcastSoundEffect("random.click", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+
+		// Queue a button reset (unpress)
+		a_World->QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, (a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07), m_BlockType == E_BLOCK_STONE_BUTTON ? 20 : 30);
+	}
 
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
@@ -51,10 +65,10 @@ public:
 	{
 		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_ZM: { return 0x4; }
-			case BLOCK_FACE_ZP: { return 0x3; }
-			case BLOCK_FACE_XM: { return 0x2; }
-			case BLOCK_FACE_XP: { return 0x1; }
+			case BLOCK_FACE_ZM: return 0x4;
+			case BLOCK_FACE_ZP: return 0x3;
+			case BLOCK_FACE_XM: return 0x2;
+			case BLOCK_FACE_XP: return 0x1;
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
