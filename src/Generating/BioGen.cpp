@@ -295,11 +295,12 @@ void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		int Base = cChunkDef::Width * a_ChunkZ + z;
+		int Base = (cChunkDef::Width * a_ChunkZ + z) / m_BiomeSize;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int Add = cChunkDef::Width * a_ChunkX + x;
-			a_BiomeMap[x + cChunkDef::Width * z] = m_Biomes[(Base / m_BiomeSize + Add / m_BiomeSize) % m_BiomesCount];
+			int BiomeIdx = (((Base + Add / m_BiomeSize) % m_BiomesCount) + m_BiomesCount) % m_BiomesCount;  // Need to add and modulo twice because of negative numbers
+			a_BiomeMap[x + cChunkDef::Width * z] = m_Biomes[BiomeIdx];
 		}
 	}
 }
