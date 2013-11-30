@@ -11,10 +11,29 @@ class cBlockRedstoneRepeaterHandler :
 	public cBlockHandler
 {
 public:
-	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType);
-	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
+	{
+	}
+
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		) override
+	{
+		a_BlockType = m_BlockType;
+		a_BlockMeta = RepeaterRotationToMetaData(a_Player->GetRotation());
+		return true;
+	}
 	
-	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+
+	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	{
+		a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, ((a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) + 0x04) & 0x0f));
+	}
 
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
@@ -34,14 +53,6 @@ public:
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
 	}
-	
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override;
 
 
 	virtual const char * GetStepSound(void) override

@@ -174,7 +174,7 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_NEW_LEAVES = 161, // Acacia and Dark Oak IDs in Minecraft 1.7.x
 	E_BLOCK_NEW_LOG = 162,
 	E_BLOCK_ACACIA_WOOD_STAIRS = 163,
-	E_BLOCK_DARK_OAK_WOOD_STAIRS = 164, /////////////////////////////////
+	E_BLOCK_DARK_OAK_WOOD_STAIRS = 164,
 	E_BLOCK_HAY_BALE = 170,
 	E_BLOCK_CARPET = 171,	
 	E_BLOCK_HARDENED_CLAY = 172,
@@ -187,8 +187,7 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_NUMBER_OF_TYPES,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 	
-	// Synonym or ID compatibility
-	
+	// Synonym or ID compatibility	
 	E_BLOCK_YELLOW_FLOWER = E_BLOCK_DANDELION,
 	E_BLOCK_RED_ROSE = E_BLOCK_FLOWER,
 	E_BLOCK_LOCKED_CHEST = E_BLOCK_STAINED_GLASS,

@@ -61,6 +61,7 @@
 #include "BlockSugarcane.h"
 #include "BlockTallGrass.h"
 #include "BlockTorch.h"
+#include "BlockTrapdoor.h"
 #include "BlockVine.h"
 #include "BlockWood.h"
 #include "BlockWorkbench.h"
@@ -193,6 +194,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SUGARCANE:             return new cBlockSugarcaneHandler       (a_BlockType);
 		case E_BLOCK_TALL_GRASS:            return new cBlockTallGrassHandler       (a_BlockType);
 		case E_BLOCK_TORCH:                 return new cBlockTorchHandler           (a_BlockType);
+		case E_BLOCK_TRAPDOOR:              return new cBlockTrapdoorHandler        (a_BlockType);
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);

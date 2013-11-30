@@ -12,9 +12,10 @@ class cBlockRedstoneHandler :
 	public cBlockHandler
 {
 public:
-	cBlockRedstoneHandler(BLOCKTYPE a_BlockType);
-
-	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	cBlockRedstoneHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
+	{
+	}
 	
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override

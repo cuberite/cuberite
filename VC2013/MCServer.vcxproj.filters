@@ -942,6 +942,9 @@
     <ClInclude Include="..\src\HTTPServer\NameValueParser.h">
       <Filter>Source Files\HTTPServer</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Blocks\BlockTrapdoor.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\webadmin\template.html">
@@ -1555,28 +1558,13 @@
     <ClCompile Include="..\src\Blocks\BlockBed.cpp">
       <Filter>Source Files\Blocks</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Blocks\BlockButton.cpp">
-      <Filter>Source Files\Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Blocks\BlockComparator.cpp">
-      <Filter>Source Files\Blocks</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\blocks\BlockDoor.cpp">
       <Filter>Source Files\Blocks</Filter>
     </ClCompile>
     <ClCompile Include="..\src\blocks\BlockHandler.cpp">
       <Filter>Source Files\Blocks</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Blocks\BlockLever.cpp">
-      <Filter>Source Files\Blocks</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\blocks\BlockPiston.cpp">
-      <Filter>Source Files\Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\blocks\BlockRedstone.cpp">
-      <Filter>Source Files\Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\blocks\BlockRedstoneRepeater.cpp">
       <Filter>Source Files\Blocks</Filter>
     </ClCompile>
     <ClCompile Include="..\src\items\ItemHandler.cpp">
@@ -1665,9 +1653,6 @@
     </ClCompile>
     <ClCompile Include="..\src\HTTPServer\NameValueParser.cpp">
       <Filter>Source Files\HTTPServer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\BlockEntities\BlockEntity.cpp">
-      <Filter>Source Files\BlockEntities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

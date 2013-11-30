@@ -93,6 +93,8 @@ private:
 	void HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/// <summary>Handles activator, detector, and powered rails</summary>
 	void HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
+	/// <summary>Handles trapdoors</summary>
+	void HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/* ===================== */
 
 	/* ====== Helper functions ====== */
@@ -109,6 +111,8 @@ private:
 	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/// <summary>Returns if a repeater is powered</summary>
 	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
+	/// <summary>Returns if a piston is powered</summary>
+	bool IsPistonPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
 
 	/// <summary>Returns if lever metadata marks it as emitting power</summary>
 	bool IsLeverOn(NIBBLETYPE a_BlockMeta);

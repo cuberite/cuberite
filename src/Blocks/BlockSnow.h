@@ -25,21 +25,37 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = a_World->GetBlockMeta(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
 
-		if ((Meta < 7) && (Meta != 0)) // Is height at maximum (7) or at mininum (0)? Don't do anything if so
+		BLOCKTYPE BlockBeforePlacement;
+		NIBBLETYPE MetaBeforePlacement;
+		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockBeforePlacement, MetaBeforePlacement);
+
+		if ((BlockBeforePlacement == E_BLOCK_SNOW) && (MetaBeforePlacement < 7))
 		{
-			Meta++;
+			// Only increment if:
+			//	A snow block was already there (not first time placement) AND
+			//	Height is smaller than 7, the maximum possible height
+			MetaBeforePlacement++;
 		}
 		
-		a_BlockMeta = Meta;
+		a_BlockMeta = MetaBeforePlacement;
 		return true;
 	}
 
 
-	virtual bool DoesIgnoreBuildCollision(void) override
+	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
 	{
-		return true;
+		if ((a_Player->GetEquippedItem().m_ItemType == E_BLOCK_SNOW) && (a_Meta < 7))
+		{
+			return true; // If a player is holding a (thin) snow block and it's size can be increased, return collision ignored
+		}
+
+		if (a_Meta == 0)
+		{
+			return true; // If at normal snowfall height (lowest), we ignore collision
+		}
+
+		return false;
 	}
 	
 
@@ -51,7 +67,19 @@ public:
 
 	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return (a_RelY > 0) && g_BlockIsSnowable[a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)];
+		if (a_RelY > 0)
+		{
+			BLOCKTYPE BlockBelow = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+			NIBBLETYPE MetaBelow = a_Chunk.GetMeta(a_RelX, a_RelY - 1, a_RelZ);
+			
+			if (g_BlockIsSnowable[BlockBelow] || ((BlockBelow == E_BLOCK_SNOW) && (MetaBelow == 7)))
+			{
+				// If block below is snowable, or it is a thin slow block and has a meta of 7 (full thin snow block), say yay
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	

@@ -891,14 +891,14 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	else
 	{
 		// Check if the block ignores build collision (water, grass etc.):
-		cBlockHandler * Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
-		if (Handler->DoesIgnoreBuildCollision())
+		if (
+			BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision() ||
+			BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(m_Player, ClickedBlockMeta)
+			)
 		{
-			Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 		}
-
-		BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
+		else
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			
@@ -908,7 +908,9 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 				return;
 			}
 			
-			BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+			NIBBLETYPE PlaceMeta;
+			BLOCKTYPE PlaceBlock;
+			World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
 
 			// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 			// No need to do combinability (dblslab) checks, client will do that here.
@@ -918,10 +920,13 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			}
 			else
 			{
-				if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
+				if (
+					!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision() &&
+					!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(m_Player, PlaceMeta)
+					)
 				{
 					// Tried to place a block *into* another?
-					// Happens when you place a block aiming at side of block like torch or stem
+					// Happens when you place a block aiming at side of block with a torch on it or stem beside it
 					return;
 				}
 			}

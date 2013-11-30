@@ -98,7 +98,10 @@ public:
 	*/
 	virtual bool DoesIgnoreBuildCollision(void);
 
-	/// Does this block drop if it gets destroyed by an unsuitable situation? Default: true
+	/// <summary>Similar to DoesIgnoreBuildCollision(void), but is used for cases where block meta/player item-in-hand is needed to determine collision (thin snow)</summary>
+	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) { return DoesIgnoreBuildCollision(); }
+
+	/// <summary>Returns if this block drops if it gets destroyed by an unsuitable situation. Default: true</summary>
 	virtual bool DoesDropOnUnsuitable(void);
 	
 	/** Called when one of the neighbors gets set; equivalent to MC block update. 
@@ -107,26 +110,30 @@ public:
 	*/
 	virtual void Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 	
-	/// Returns the meta for a block after rotating it counter-clockwise from the specified meta. Default: no change
+	/// <summary>Rotates a given block meta counter-clockwise. Default: no change</summary>
+	/// <returns>Block meta following rotation</returns>
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) { return a_Meta; }
 	
-	/// Returns the meta for a block after rotating it clockwise from the specified meta. Default: no change
+	/// <summary>Rotates a given block meta clockwise. Default: no change</summary>
+	/// <returns>Block meta following rotation</returns>
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) { return a_Meta; }
 	
-	/// Returns the meta for a block after mirroring it around the XY plane. Default: no change
+	/// <summary>Mirros a given block meta around the XY plane. Default: no change</summary>
+	/// <returns>Block meta following mirroring</returns>
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) { return a_Meta; }
 
-	/// Returns the meta for a block after mirroring it around the XZ plane. Default: no change
+	/// <summary>Mirros a given block meta around the XZ plane. Default: no change</summary>
+	/// <returns>Block meta following mirroring</returns>
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) { return a_Meta; }
 
-	/// Returns the meta for a block after mirroring it around the YZ plane. Default: no change
+	/// <summary>Mirros a given block meta around the YZ plane. Default: no change</summary>
+	/// <returns>Block meta following mirroring</returns>
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) { return a_Meta; }
-
-
-	/// Get the blockhandler for a specific block id
+	
+	/// <summary>Get the blockhandler for a specific block id</summary>
 	static cBlockHandler * GetBlockHandler(BLOCKTYPE a_BlockType);
 
-	/// Deletes all initialised block handlers
+	/// <summary>Deletes all initialised block handlers</summary>
 	static void Deinit();
 	
 protected:
