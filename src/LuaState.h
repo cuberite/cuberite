@@ -224,6 +224,22 @@ public:
 		return CallFunction(0);
 	}
 
+	/// Call any 3-param 0-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		return CallFunction(0);
+	}
+
 	/// Call any 1-param 1-return Lua function in a single line:
 	template<
 		typename FnT, typename ArgT1, typename RetT1

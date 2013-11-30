@@ -197,20 +197,21 @@ void cWorld::cTickThread::Execute(void)
 {
 	cTimer Timer;
 
-	long long msPerTick = 50;
-	long long LastTime = Timer.GetNowTime();
+	const Int64 msPerTick = 50;
+	Int64 LastTime = Timer.GetNowTime();
 
+	Int64 TickDuration = 50;
 	while (!m_ShouldTerminate)
 	{
-		long long NowTime = Timer.GetNowTime();
+		Int64 NowTime = Timer.GetNowTime();
 		float DeltaTime = (float)(NowTime - LastTime);
-		m_World.Tick(DeltaTime);
-		long long TickTime = Timer.GetNowTime() - NowTime;
+		m_World.Tick(DeltaTime, (int)TickDuration);
+		TickDuration = Timer.GetNowTime() - NowTime;
 		
-		if (TickTime < msPerTick)
+		if (TickDuration < msPerTick)
 		{
 			// Stretch tick time until it's at least msPerTick
-			cSleep::MilliSleep((unsigned int)(msPerTick - TickTime));
+			cSleep::MilliSleep((unsigned int)(msPerTick - TickDuration));
 		}
 
 		LastTime = NowTime;
@@ -660,10 +661,10 @@ void cWorld::Stop(void)
 
 
 
-void cWorld::Tick(float a_Dt)
+void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 {
 	// Call the plugins
-	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt);
+	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt, a_LastTickDurationMSec);
 	
 	// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
 	m_WorldAgeSecs  += (double)a_Dt / 1000.0;

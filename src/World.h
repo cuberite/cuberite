@@ -729,7 +729,7 @@ private:
 	cWorld(const AString & a_WorldName);
 	~cWorld();
 
-	void Tick(float a_Dt);
+	void Tick(float a_Dt, int a_LastTickDurationMSec);
 
 	/// Handles the weather in each tick
 	void TickWeather(float a_Dt);
