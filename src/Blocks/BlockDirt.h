@@ -44,7 +44,7 @@ public:
 			}
 		}
 		
-		// Grass spreads to adjacent blocks:
+		// Grass spreads to adjacent dirt blocks:
 		MTRand rand;
 		for (int i = 0; i < 2; i++)  // Pick two blocks to grow to
 		{
@@ -60,8 +60,9 @@ public:
 				continue;
 			}
 			bool IsValid = a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, DestBlock, DestMeta);
-			if (!IsValid || (DestBlock != E_BLOCK_DIRT))
+			if (!IsValid || (DestBlock != E_BLOCK_DIRT) || (DestMeta != E_META_DIRT_NORMAL))
 			{
+				// Not a regular dirt block, or in an unloaded chunk
 				continue;
 			}
 
