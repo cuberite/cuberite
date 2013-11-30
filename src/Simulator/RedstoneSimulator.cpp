@@ -76,6 +76,90 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	int BaseX = a_Chunk->GetPosX() * cChunkDef::Width;
 	int BaseZ = a_Chunk->GetPosZ() * cChunkDef::Width;
 
+	// Check to see if PoweredBlocks have invalid items (source is air or unpowered)
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
+	{
+		sPoweredBlocks & Change = *itr;
+
+		int RelX = Change.a_SourcePos.x - a_ChunkX * cChunkDef::Width;
+		int RelZ = Change.a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
+
+		BLOCKTYPE SourceBlockType;
+		NIBBLETYPE SourceBlockMeta;
+		if (!a_Chunk->UnboundedRelGetBlock(RelX, Change.a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta))
+		{
+			continue;
+		}
+
+		if (SourceBlockType != Change.a_SourceBlock)
+		{
+			itr = m_PoweredBlocks.erase(itr);
+			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock));
+		}
+		else if (
+			// Changeable sources
+			((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (SourceBlockMeta == 0)) ||
+			((SourceBlockType == E_BLOCK_LEVER) && !IsLeverOn(SourceBlockMeta)) ||
+			((SourceBlockType == E_BLOCK_DETECTOR_RAIL) && (SourceBlockMeta & 0x08) == 0x08) ||
+			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
+			)
+		{
+			itr = m_PoweredBlocks.erase(itr);
+			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock));
+		}
+		else
+		{
+			itr++;
+		}
+	}
+
+	// Check to see if LinkedPoweredBlocks have invalid items: source, block powered through, or power destination block has changed
+	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
+	{
+		sLinkedPoweredBlocks & Change = *itr;
+
+		int RelX = Change.a_SourcePos.x - a_ChunkX * cChunkDef::Width;
+		int RelZ = Change.a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
+		int MidRelX = Change.a_MiddlePos.x - a_ChunkX * cChunkDef::Width;
+		int MidRelZ = Change.a_MiddlePos.z - a_ChunkZ * cChunkDef::Width;
+
+		BLOCKTYPE SourceBlockType;
+		NIBBLETYPE SourceBlockMeta;
+		BLOCKTYPE MiddleBlockType;
+		if (
+			!a_Chunk->UnboundedRelGetBlock(RelX, Change.a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta) ||
+			!a_Chunk->UnboundedRelGetBlockType(MidRelX, Change.a_MiddlePos.y, MidRelZ, MiddleBlockType)
+			)
+		{
+			continue;
+		}
+
+		if (SourceBlockType != Change.a_SourceBlock)
+		{
+			itr = m_LinkedPoweredBlocks.erase(itr);
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock));
+		}
+		else if (MiddleBlockType != Change.a_MiddleBlock)
+		{
+			itr = m_LinkedPoweredBlocks.erase(itr);
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(Change.a_SourceBlock));
+		}
+		else if (
+			// Things that can send power through a block but which depends on meta
+			((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (SourceBlockMeta == 0)) ||
+			((SourceBlockType == E_BLOCK_LEVER) && !IsLeverOn(SourceBlockMeta)) ||
+			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
+			)
+		{
+			itr = m_LinkedPoweredBlocks.erase(itr);
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock));
+		}
+		else
+		{
+			itr++;
+		}
+	}
+
 	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
 	{
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(dataitr->x, dataitr->y, dataitr->z);
@@ -85,83 +169,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			continue;
 		}
 
-		// Check to see if PoweredBlocks have invalid items (source is air or unpowered)
-		for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
-		{
-			sPoweredBlocks & Change = *itr;
-
-			int RelX = Change.a_SourcePos.x - a_ChunkX * cChunkDef::Width;
-			int RelZ = Change.a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
-
-			BLOCKTYPE SourceBlockType;
-			NIBBLETYPE SourceBlockMeta;
-			a_Chunk->UnboundedRelGetBlock(RelX, Change.a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta);
-
-			if (SourceBlockType != Change.a_SourceBlock)
-			{
-				itr = m_PoweredBlocks.erase(itr);
-				LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock));
-			}
-			else if (
-				// Changeable sources
-				((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (SourceBlockMeta == 0)) ||
-				((SourceBlockType == E_BLOCK_LEVER) && !IsLeverOn(SourceBlockMeta)) ||
-				((SourceBlockType == E_BLOCK_DETECTOR_RAIL) && (SourceBlockMeta & 0x08) == 0x08) ||
-				(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
-				)
-			{
-				itr = m_PoweredBlocks.erase(itr);
-				LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock));
-			}
-			else
-			{
-				itr++;
-			}
-		}
-
-		// Check to see if LinkedPoweredBlocks have invalid items: source, block powered through, or power destination block has changed
-		for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
-		{
-			sLinkedPoweredBlocks & Change = *itr;
-			
-			int RelX = Change.a_SourcePos.x - a_ChunkX * cChunkDef::Width;
-			int RelZ = Change.a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
-			int MidRelX = Change.a_MiddlePos.x - a_ChunkX * cChunkDef::Width;
-			int MidRelZ = Change.a_MiddlePos.z - a_ChunkZ * cChunkDef::Width;
-
-			BLOCKTYPE SourceBlockType;
-			NIBBLETYPE SourceBlockMeta;
-			BLOCKTYPE MiddleBlockType;
-			a_Chunk->UnboundedRelGetBlock(RelX, Change.a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta);
-			a_Chunk->UnboundedRelGetBlockType(MidRelX, Change.a_MiddlePos.y, MidRelZ, MiddleBlockType);
-
-			if (SourceBlockType != Change.a_SourceBlock)
-			{
-				itr = m_LinkedPoweredBlocks.erase(itr);
-				LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock));
-			}
-			else if (MiddleBlockType != Change.a_MiddleBlock)
-			{
-				itr = m_LinkedPoweredBlocks.erase(itr);
-				LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(Change.a_SourceBlock));
-			}
-			else if (
-				// Things that can send power through a block but which depends on meta
-				((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (SourceBlockMeta == 0)) ||
-				((SourceBlockType == E_BLOCK_LEVER) && !IsLeverOn(SourceBlockMeta)) ||
-				(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
-				)
-			{
-				itr = m_LinkedPoweredBlocks.erase(itr);
-				LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock));
-			}
-			else
-			{
-				itr++;
-			}
-		}
-
-		// PoweredBlock list was fine, now to the actual handling
+		// PoweredBlock and LinkedPoweredBlock list was fine, now to the actual handling
 		int a_X = BaseX + dataitr->x;
 		int a_Z = BaseZ + dataitr->z;
 		switch (BlockType)
@@ -407,7 +415,9 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 
 				if (SurroundMeta > 1) // Wires of power 1 or 0 cannot transfer power TO ME, don't bother checking
 				{
-					if (SurroundMeta > MyMeta) // Does surrounding wire have a higher power level than self?
+					// Does surrounding wire have a higher power level than self?
+					// >= to fix a bug where wires bordering each other with the same power level will appear (in terms of meta) to power each other, when they aren't actually in the powered list
+					if (SurroundMeta >= MyMeta)
 					{
 						m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, SurroundMeta - 1);
 					}
