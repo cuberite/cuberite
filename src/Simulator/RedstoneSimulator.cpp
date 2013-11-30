@@ -848,6 +848,8 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 {
 	// Pistons cannot be powered through their front face; this function verifies that a source meets this requirement
 
+	int OldX = a_BlockX, OldY = a_BlockY, OldZ = a_BlockZ;
+
 	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
 	{
 		sPoweredBlocks & Change = *itr;
@@ -860,6 +862,10 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 		{
 			return true;
 		}
+
+		a_BlockX = OldX;
+		a_BlockY = OldY;
+		a_BlockZ = OldZ;
 	}
 
 	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
@@ -874,6 +880,10 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 		{
 			return true;
 		}
+
+		a_BlockX = OldX;
+		a_BlockY = OldY;
+		a_BlockZ = OldZ;
 	}
 	return false; // Source was in front of the piston's front face
 }
