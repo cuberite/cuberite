@@ -486,30 +486,21 @@ void cWorld::Start(void)
 		}
 	}  // switch (m_Dimension)
 
-	// Try to find the "SpawnPosition" key in the world configuration
-	// Set a boolean value if so
+	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
-	unsigned int NumSpawnPositionKeys = ((KeyNum != -1) ? (IniFile.GetNumValues(KeyNum)) : 0);
-
-	if (NumSpawnPositionKeys > 0)
-	{
-		for (unsigned int i = 0; i < NumSpawnPositionKeys; i++)
-		{
-			AString ValueName = IniFile.GetValueName(KeyNum, i);
-			if (
-				(ValueName.compare("X") == 0) ||
-				(ValueName.compare("Y") == 0) ||
-				(ValueName.compare("Z") == 0)
-				)
-			{
-				m_bSpawnExplicitlySet = true;
-				LOGD("Spawnpoint explicitly set!");
-			}
-		}
-	}
+	m_bSpawnExplicitlySet =
+	(
+		(KeyNum >= 0) &&
+		(
+			(IniFile.FindValue(KeyNum, "X") >= 0) ||
+			(IniFile.FindValue(KeyNum, "Y") >= 0) ||
+			(IniFile.FindValue(KeyNum, "Z") >= 0)
+		)
+	);
 
 	if (m_bSpawnExplicitlySet)
 	{
+		LOGD("Spawnpoint explicitly set!");
 		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);
 		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY);
 		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
