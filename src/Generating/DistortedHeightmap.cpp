@@ -639,6 +639,10 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 
 void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ)
 {
+	// Frequencies for the podzol floor selecting noise:
+	const NOISE_DATATYPE FrequencyX = 8;
+	const NOISE_DATATYPE FrequencyZ = 8;
+	
 	EMCSBiome Biome = a_ChunkDesc.GetBiome(a_RelX, a_RelZ);
 	switch (Biome)
 	{
@@ -695,7 +699,12 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biMegaSpruceTaiga:
 		case biMegaSpruceTaigaHills:
 		{
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patPodzol.Get());
+			// Select the pattern to use - podzol, grass or grassless dirt:
+			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
+			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
+			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
+			const sBlockInfo * Pattern = (Val < -0.9) ? patGrassLess.Get() : ((Val > 0) ? patPodzol.Get() : patGrass.Get());
+			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
 			return;
 		}
 
