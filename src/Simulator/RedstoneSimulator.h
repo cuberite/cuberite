@@ -111,6 +111,8 @@ private:
 	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/// <summary>Returns if a repeater is powered</summary>
 	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
+	/// <summary>Returns if a piston is powered</summary>
+	bool IsPistonPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
 
 	/// <summary>Returns if lever metadata marks it as emitting power</summary>
 	bool IsLeverOn(NIBBLETYPE a_BlockMeta);

@@ -566,7 +566,7 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 void cRedstoneSimulator::HandlePiston(int a_BlockX, int a_BlockY, int a_BlockZ)
 {	
 	cPiston Piston(&m_World);
-	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
+	if (IsPistonPowered(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x7)) // We only want the bottom three bits (4th controls extended-ness)
 	{
 		Piston.ExtendPiston(a_BlockX, a_BlockY, a_BlockZ);
 	}
@@ -774,7 +774,8 @@ bool cRedstoneSimulator::AreCoordsPowered(int a_BlockX, int a_BlockY, int a_Bloc
 
 bool cRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
-	// Check through powered blocks list
+	// Repeaters cannot be powered by any face except their back; verify that this is true for a source
+
 	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
 	{
 		sPoweredBlocks & Change = *itr;
@@ -807,7 +808,6 @@ bool cRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_Blo
 		}
 	}
 
-	// Check linked powered list, 'middle' blocks
 	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
 	{
 		sLinkedPoweredBlocks & Change = *itr;
@@ -839,6 +839,97 @@ bool cRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_Blo
 		}
 	}
 	return false; // Couldn't find power source behind repeater
+}
+
+
+
+
+bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+{
+	// Pistons cannot be powered through their front face; this function verifies that a source meets this requirement
+
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
+	{
+		sPoweredBlocks & Change = *itr;
+
+		if (!Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+
+		switch (a_Meta) // Pistons' metas are the directions they face; the source cannot be there
+		{
+			case BLOCK_FACE_YM:
+			{
+				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY - 1, a_BlockZ))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_YP:
+			{
+				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY + 1, a_BlockZ))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_ZM:
+			{
+				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_ZP:
+			{
+				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_XM:
+			{
+				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_XP:
+			{
+				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
+				break;
+			}
+		}
+	}
+
+	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
+	{
+		sLinkedPoweredBlocks & Change = *itr;
+
+		if (!Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+
+		switch (a_Meta)
+		{
+			case BLOCK_FACE_YM:
+			{
+				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY - 1, a_BlockZ))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_YP:
+			{
+				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY + 1, a_BlockZ))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_ZM:
+			{
+				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_ZP:
+			{
+				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_XM:
+			{
+				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
+				break;
+			}
+			case BLOCK_FACE_XP:
+			{
+				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
+				break;
+			}
+		}
+	}
+	return false; // Source was in front of the piston's front face
 }
 
 
