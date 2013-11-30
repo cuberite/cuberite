@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/26/13 22:11:10.
+** Generated automatically by tolua++-1.0.92 on 11/30/13 15:42:56.
 */
 
 #ifndef __cplusplus
@@ -16,7 +16,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "tolua_base.h"
 #include "ChunkDef.h"
-#include "inifile/iniFile.h"
+#include "../lib/inifile/iniFile.h"
 #include "OSSupport/File.h"
 #include "BlockID.h"
 #include "StringUtils.h"
@@ -3671,6 +3671,35 @@ static int tolua_AllToLua_ItemCategory_IsArmor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsArmor'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: IsBiomeNoDownfall */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_IsBiomeNoDownfall00
+static int tolua_AllToLua_IsBiomeNoDownfall00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  EMCSBiome a_Biome = ((EMCSBiome) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  IsBiomeNoDownfall(a_Biome);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsBiomeNoDownfall'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29971,10 +30000,35 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_LAST_DISC_PLUS_ONE",E_ITEM_LAST_DISC_PLUS_ONE);
   tolua_constant(tolua_S,"E_ITEM_LAST_DISC",E_ITEM_LAST_DISC);
   tolua_constant(tolua_S,"E_ITEM_LAST",E_ITEM_LAST);
+  tolua_constant(tolua_S,"E_META_BIG_FLOWER_SUNFLOWER",E_META_BIG_FLOWER_SUNFLOWER);
+  tolua_constant(tolua_S,"E_META_BIG_FLOWER_LILAC",E_META_BIG_FLOWER_LILAC);
+  tolua_constant(tolua_S,"E_META_BIG_FLOWER_DOUBLE_TALL_GRASS",E_META_BIG_FLOWER_DOUBLE_TALL_GRASS);
+  tolua_constant(tolua_S,"E_META_BIG_FLOWER_LARGE_FERN",E_META_BIG_FLOWER_LARGE_FERN);
+  tolua_constant(tolua_S,"E_META_BIG_FLOWER_ROSE_BUSH",E_META_BIG_FLOWER_ROSE_BUSH);
+  tolua_constant(tolua_S,"E_META_BIG_FLOWER_PEONY",E_META_BIG_FLOWER_PEONY);
+  tolua_constant(tolua_S,"E_META_CARPET_WHITE",E_META_CARPET_WHITE);
+  tolua_constant(tolua_S,"E_META_CARPET_ORANGE",E_META_CARPET_ORANGE);
+  tolua_constant(tolua_S,"E_META_CARPET_MAGENTA",E_META_CARPET_MAGENTA);
+  tolua_constant(tolua_S,"E_META_CARPET_LIGHTBLUE",E_META_CARPET_LIGHTBLUE);
+  tolua_constant(tolua_S,"E_META_CARPET_YELLOW",E_META_CARPET_YELLOW);
+  tolua_constant(tolua_S,"E_META_CARPET_LIGHTGREEN",E_META_CARPET_LIGHTGREEN);
+  tolua_constant(tolua_S,"E_META_CARPET_PINK",E_META_CARPET_PINK);
+  tolua_constant(tolua_S,"E_META_CARPET_GRAY",E_META_CARPET_GRAY);
+  tolua_constant(tolua_S,"E_META_CARPET_LIGHTGRAY",E_META_CARPET_LIGHTGRAY);
+  tolua_constant(tolua_S,"E_META_CARPET_CYAN",E_META_CARPET_CYAN);
+  tolua_constant(tolua_S,"E_META_CARPET_PURPLE",E_META_CARPET_PURPLE);
+  tolua_constant(tolua_S,"E_META_CARPET_BLUE",E_META_CARPET_BLUE);
+  tolua_constant(tolua_S,"E_META_CARPET_BROWN",E_META_CARPET_BROWN);
+  tolua_constant(tolua_S,"E_META_CARPET_GREEN",E_META_CARPET_GREEN);
+  tolua_constant(tolua_S,"E_META_CARPET_RED",E_META_CARPET_RED);
+  tolua_constant(tolua_S,"E_META_CARPET_BLACK",E_META_CARPET_BLACK);
   tolua_constant(tolua_S,"E_META_CHEST_FACING_ZM",E_META_CHEST_FACING_ZM);
   tolua_constant(tolua_S,"E_META_CHEST_FACING_ZP",E_META_CHEST_FACING_ZP);
   tolua_constant(tolua_S,"E_META_CHEST_FACING_XM",E_META_CHEST_FACING_XM);
   tolua_constant(tolua_S,"E_META_CHEST_FACING_XP",E_META_CHEST_FACING_XP);
+  tolua_constant(tolua_S,"E_META_DIRT_NORMAL",E_META_DIRT_NORMAL);
+  tolua_constant(tolua_S,"E_META_DIRT_GRASSLESS",E_META_DIRT_GRASSLESS);
+  tolua_constant(tolua_S,"E_META_DIRT_PODZOL",E_META_DIRT_PODZOL);
   tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_YM",E_META_DROPSPENSER_FACING_YM);
   tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_YP",E_META_DROPSPENSER_FACING_YP);
   tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_ZM",E_META_DROPSPENSER_FACING_ZM);
@@ -29989,6 +30043,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_DOUBLE_STONE_SLAB_STONE_BRICK",E_META_DOUBLE_STONE_SLAB_STONE_BRICK);
   tolua_constant(tolua_S,"E_META_DOUBLE_STONE_SLAB_NETHER_BRICK",E_META_DOUBLE_STONE_SLAB_NETHER_BRICK);
   tolua_constant(tolua_S,"E_META_DOUBLE_STONE_SLAB_STONE_SECRET",E_META_DOUBLE_STONE_SLAB_STONE_SECRET);
+  tolua_constant(tolua_S,"E_META_FLOWER_POPPY",E_META_FLOWER_POPPY);
+  tolua_constant(tolua_S,"E_META_FLOWER_BLUE_ORCHID",E_META_FLOWER_BLUE_ORCHID);
+  tolua_constant(tolua_S,"E_META_FLOWER_ALLIUM",E_META_FLOWER_ALLIUM);
+  tolua_constant(tolua_S,"E_META_FLOWER_RED_TULIP",E_META_FLOWER_RED_TULIP);
+  tolua_constant(tolua_S,"E_META_FLOWER_ORANGE_TULIP",E_META_FLOWER_ORANGE_TULIP);
+  tolua_constant(tolua_S,"E_META_FLOWER_WHITE_TULIP",E_META_FLOWER_WHITE_TULIP);
+  tolua_constant(tolua_S,"E_META_FLOWER_PINK_TULIP",E_META_FLOWER_PINK_TULIP);
+  tolua_constant(tolua_S,"E_META_FLOWER_OXEYE_DAISY",E_META_FLOWER_OXEYE_DAISY);
   tolua_constant(tolua_S,"E_META_HOPPER_FACING_YM",E_META_HOPPER_FACING_YM);
   tolua_constant(tolua_S,"E_META_HOPPER_UNATTACHED",E_META_HOPPER_UNATTACHED);
   tolua_constant(tolua_S,"E_META_HOPPER_FACING_ZM",E_META_HOPPER_FACING_ZM);
@@ -30003,10 +30065,26 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_LOG_CONIFER",E_META_LOG_CONIFER);
   tolua_constant(tolua_S,"E_META_LOG_BIRCH",E_META_LOG_BIRCH);
   tolua_constant(tolua_S,"E_META_LOG_JUNGLE",E_META_LOG_JUNGLE);
+  tolua_constant(tolua_S,"E_META_NEW_LEAVES_ACACIA_WOOD",E_META_NEW_LEAVES_ACACIA_WOOD);
+  tolua_constant(tolua_S,"E_META_NEW_LEAVES_DARK_OAK_WOOD",E_META_NEW_LEAVES_DARK_OAK_WOOD);
+  tolua_constant(tolua_S,"E_META_NEW_LOG_ACACIA_WOOD",E_META_NEW_LOG_ACACIA_WOOD);
+  tolua_constant(tolua_S,"E_META_NEW_LOG_DARK_OAK_WOOD",E_META_NEW_LOG_DARK_OAK_WOOD);
   tolua_constant(tolua_S,"E_META_PLANKS_APPLE",E_META_PLANKS_APPLE);
   tolua_constant(tolua_S,"E_META_PLANKS_CONIFER",E_META_PLANKS_CONIFER);
   tolua_constant(tolua_S,"E_META_PLANKS_BIRCH",E_META_PLANKS_BIRCH);
   tolua_constant(tolua_S,"E_META_PLANKS_JUNGLE",E_META_PLANKS_JUNGLE);
+  tolua_constant(tolua_S,"E_META_RAIL_ZM_ZP",E_META_RAIL_ZM_ZP);
+  tolua_constant(tolua_S,"E_META_RAIL_XM_XP",E_META_RAIL_XM_XP);
+  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_XP",E_META_RAIL_ASCEND_XP);
+  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_XM",E_META_RAIL_ASCEND_XM);
+  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_ZM",E_META_RAIL_ASCEND_ZM);
+  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_ZP",E_META_RAIL_ASCEND_ZP);
+  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZP_XP",E_META_RAIL_CURVED_ZP_XP);
+  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZP_XM",E_META_RAIL_CURVED_ZP_XM);
+  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZM_XM",E_META_RAIL_CURVED_ZM_XM);
+  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZM_XP",E_META_RAIL_CURVED_ZM_XP);
+  tolua_constant(tolua_S,"E_META_SAND_NORMAL",E_META_SAND_NORMAL);
+  tolua_constant(tolua_S,"E_META_SAND_RED",E_META_SAND_RED);
   tolua_constant(tolua_S,"E_META_SANDSTONE_NORMAL",E_META_SANDSTONE_NORMAL);
   tolua_constant(tolua_S,"E_META_SANDSTONE_ORNAMENT",E_META_SANDSTONE_ORNAMENT);
   tolua_constant(tolua_S,"E_META_SANDSTONE_SMOOTH",E_META_SANDSTONE_SMOOTH);
@@ -30017,6 +30095,62 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_SILVERFISH_EGG_STONE",E_META_SILVERFISH_EGG_STONE);
   tolua_constant(tolua_S,"E_META_SILVERFISH_EGG_COBBLESTONE",E_META_SILVERFISH_EGG_COBBLESTONE);
   tolua_constant(tolua_S,"E_META_SILVERFISH_EGG_STONE_BRICK",E_META_SILVERFISH_EGG_STONE_BRICK);
+  tolua_constant(tolua_S,"E_META_SNOW_LAYER_ONE",E_META_SNOW_LAYER_ONE);
+  tolua_constant(tolua_S,"E_META_SNOW_LAYER_TWO",E_META_SNOW_LAYER_TWO);
+  tolua_constant(tolua_S,"E_META_SNOW_LAYER_THREE",E_META_SNOW_LAYER_THREE);
+  tolua_constant(tolua_S,"E_META_SNOW_LAYER_FOUR",E_META_SNOW_LAYER_FOUR);
+  tolua_constant(tolua_S,"E_META_SNOW_LAYER_FIVE",E_META_SNOW_LAYER_FIVE);
+  tolua_constant(tolua_S,"E_META_SNOW_LAYER_SIX",E_META_SNOW_LAYER_SIX);
+  tolua_constant(tolua_S,"E_META_SNOW_LAYER_SEVEN",E_META_SNOW_LAYER_SEVEN);
+  tolua_constant(tolua_S,"E_META_SNOW_LAYER_EIGHT",E_META_SNOW_LAYER_EIGHT);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_WHITE",E_META_STAINED_CLAY_WHITE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_ORANGE",E_META_STAINED_CLAY_ORANGE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_MAGENTA",E_META_STAINED_CLAY_MAGENTA);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTBLUE",E_META_STAINED_CLAY_LIGHTBLUE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_YELLOW",E_META_STAINED_CLAY_YELLOW);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTGREEN",E_META_STAINED_CLAY_LIGHTGREEN);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_PINK",E_META_STAINED_CLAY_PINK);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_GRAY",E_META_STAINED_CLAY_GRAY);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTGRAY",E_META_STAINED_CLAY_LIGHTGRAY);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_CYAN",E_META_STAINED_CLAY_CYAN);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_PURPLE",E_META_STAINED_CLAY_PURPLE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BLUE",E_META_STAINED_CLAY_BLUE);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BROWN",E_META_STAINED_CLAY_BROWN);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_GREEN",E_META_STAINED_CLAY_GREEN);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_RED",E_META_STAINED_CLAY_RED);
+  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BLACK",E_META_STAINED_CLAY_BLACK);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_WHITE",E_META_STAINED_GLASS_WHITE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_ORANGE",E_META_STAINED_GLASS_ORANGE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_MAGENTA",E_META_STAINED_GLASS_MAGENTA);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_LIGHTBLUE",E_META_STAINED_GLASS_LIGHTBLUE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_YELLOW",E_META_STAINED_GLASS_YELLOW);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_LIGHTGREEN",E_META_STAINED_GLASS_LIGHTGREEN);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PINK",E_META_STAINED_GLASS_PINK);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_GRAY",E_META_STAINED_GLASS_GRAY);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_LIGHTGRAY",E_META_STAINED_GLASS_LIGHTGRAY);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_CYAN",E_META_STAINED_GLASS_CYAN);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PURPLE",E_META_STAINED_GLASS_PURPLE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_BLUE",E_META_STAINED_GLASS_BLUE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_BROWN",E_META_STAINED_GLASS_BROWN);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_GREEN",E_META_STAINED_GLASS_GREEN);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_RED",E_META_STAINED_GLASS_RED);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_BLACK",E_META_STAINED_GLASS_BLACK);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_WHITE",E_META_STAINED_GLASS_PANE_WHITE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_ORANGE",E_META_STAINED_GLASS_PANE_ORANGE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_MAGENTA",E_META_STAINED_GLASS_PANE_MAGENTA);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_LIGHTBLUE",E_META_STAINED_GLASS_PANE_LIGHTBLUE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_YELLOW",E_META_STAINED_GLASS_PANE_YELLOW);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_LIGHTGREEN",E_META_STAINED_GLASS_PANE_LIGHTGREEN);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_PINK",E_META_STAINED_GLASS_PANE_PINK);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_GRAY",E_META_STAINED_GLASS_PANE_GRAY);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_LIGHTGRAY",E_META_STAINED_GLASS_PANE_LIGHTGRAY);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_CYAN",E_META_STAINED_GLASS_PANE_CYAN);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_PURPLE",E_META_STAINED_GLASS_PANE_PURPLE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_BLUE",E_META_STAINED_GLASS_PANE_BLUE);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_BROWN",E_META_STAINED_GLASS_PANE_BROWN);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_GREEN",E_META_STAINED_GLASS_PANE_GREEN);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_RED",E_META_STAINED_GLASS_PANE_RED);
+  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_BLACK",E_META_STAINED_GLASS_PANE_BLACK);
   tolua_constant(tolua_S,"E_META_STONE_SLAB_STONE",E_META_STONE_SLAB_STONE);
   tolua_constant(tolua_S,"E_META_STONE_SLAB_SANDSTONE",E_META_STONE_SLAB_SANDSTONE);
   tolua_constant(tolua_S,"E_META_STONE_SLAB_PLANKS",E_META_STONE_SLAB_PLANKS);
@@ -30069,106 +30203,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_WOOL_GREEN",E_META_WOOL_GREEN);
   tolua_constant(tolua_S,"E_META_WOOL_RED",E_META_WOOL_RED);
   tolua_constant(tolua_S,"E_META_WOOL_BLACK",E_META_WOOL_BLACK);
-  tolua_constant(tolua_S,"E_META_CARPET_WHITE",E_META_CARPET_WHITE);
-  tolua_constant(tolua_S,"E_META_CARPET_ORANGE",E_META_CARPET_ORANGE);
-  tolua_constant(tolua_S,"E_META_CARPET_MAGENTA",E_META_CARPET_MAGENTA);
-  tolua_constant(tolua_S,"E_META_CARPET_LIGHTBLUE",E_META_CARPET_LIGHTBLUE);
-  tolua_constant(tolua_S,"E_META_CARPET_YELLOW",E_META_CARPET_YELLOW);
-  tolua_constant(tolua_S,"E_META_CARPET_LIGHTGREEN",E_META_CARPET_LIGHTGREEN);
-  tolua_constant(tolua_S,"E_META_CARPET_PINK",E_META_CARPET_PINK);
-  tolua_constant(tolua_S,"E_META_CARPET_GRAY",E_META_CARPET_GRAY);
-  tolua_constant(tolua_S,"E_META_CARPET_LIGHTGRAY",E_META_CARPET_LIGHTGRAY);
-  tolua_constant(tolua_S,"E_META_CARPET_CYAN",E_META_CARPET_CYAN);
-  tolua_constant(tolua_S,"E_META_CARPET_PURPLE",E_META_CARPET_PURPLE);
-  tolua_constant(tolua_S,"E_META_CARPET_BLUE",E_META_CARPET_BLUE);
-  tolua_constant(tolua_S,"E_META_CARPET_BROWN",E_META_CARPET_BROWN);
-  tolua_constant(tolua_S,"E_META_CARPET_GREEN",E_META_CARPET_GREEN);
-  tolua_constant(tolua_S,"E_META_CARPET_RED",E_META_CARPET_RED);
-  tolua_constant(tolua_S,"E_META_CARPET_BLACK",E_META_CARPET_BLACK);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_WHITE",E_META_STAINED_CLAY_WHITE);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_ORANGE",E_META_STAINED_CLAY_ORANGE);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_MAGENTA",E_META_STAINED_CLAY_MAGENTA);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTBLUE",E_META_STAINED_CLAY_LIGHTBLUE);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_YELLOW",E_META_STAINED_CLAY_YELLOW);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTGREEN",E_META_STAINED_CLAY_LIGHTGREEN);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_PINK",E_META_STAINED_CLAY_PINK);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_GRAY",E_META_STAINED_CLAY_GRAY);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_LIGHTGRAY",E_META_STAINED_CLAY_LIGHTGRAY);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_CYAN",E_META_STAINED_CLAY_CYAN);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_PURPLE",E_META_STAINED_CLAY_PURPLE);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BLUE",E_META_STAINED_CLAY_BLUE);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BROWN",E_META_STAINED_CLAY_BROWN);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_GREEN",E_META_STAINED_CLAY_GREEN);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_RED",E_META_STAINED_CLAY_RED);
-  tolua_constant(tolua_S,"E_META_STAINED_CLAY_BLACK",E_META_STAINED_CLAY_BLACK);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_WHITE",E_META_STAINED_GLASS_WHITE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_ORANGE",E_META_STAINED_GLASS_ORANGE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_MAGENTA",E_META_STAINED_GLASS_MAGENTA);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_LIGHTBLUE",E_META_STAINED_GLASS_LIGHTBLUE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_YELLOW",E_META_STAINED_GLASS_YELLOW);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_LIGHTGREEN",E_META_STAINED_GLASS_LIGHTGREEN);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PINK",E_META_STAINED_GLASS_PINK);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_GRAY",E_META_STAINED_GLASS_GRAY);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_LIGHTGRAY",E_META_STAINED_GLASS_LIGHTGRAY);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_CYAN",E_META_STAINED_GLASS_CYAN);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PURPLE",E_META_STAINED_GLASS_PURPLE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_BLUE",E_META_STAINED_GLASS_BLUE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_BROWN",E_META_STAINED_GLASS_BROWN);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_GREEN",E_META_STAINED_GLASS_GREEN);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_RED",E_META_STAINED_GLASS_RED);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_BLACK",E_META_STAINED_GLASS_BLACK);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_WHITE",E_META_STAINED_GLASS_PANE_WHITE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_ORANGE",E_META_STAINED_GLASS_PANE_ORANGE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_MAGENTA",E_META_STAINED_GLASS_PANE_MAGENTA);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_LIGHTBLUE",E_META_STAINED_GLASS_PANE_LIGHTBLUE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_YELLOW",E_META_STAINED_GLASS_PANE_YELLOW);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_LIGHTGREEN",E_META_STAINED_GLASS_PANE_LIGHTGREEN);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_PINK",E_META_STAINED_GLASS_PANE_PINK);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_GRAY",E_META_STAINED_GLASS_PANE_GRAY);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_LIGHTGRAY",E_META_STAINED_GLASS_PANE_LIGHTGRAY);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_CYAN",E_META_STAINED_GLASS_PANE_CYAN);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_PURPLE",E_META_STAINED_GLASS_PANE_PURPLE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_BLUE",E_META_STAINED_GLASS_PANE_BLUE);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_BROWN",E_META_STAINED_GLASS_PANE_BROWN);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_GREEN",E_META_STAINED_GLASS_PANE_GREEN);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_RED",E_META_STAINED_GLASS_PANE_RED);
-  tolua_constant(tolua_S,"E_META_STAINED_GLASS_PANE_BLACK",E_META_STAINED_GLASS_PANE_BLACK);
-  tolua_constant(tolua_S,"E_META_SNOW_LAYER_ONE",E_META_SNOW_LAYER_ONE);
-  tolua_constant(tolua_S,"E_META_SNOW_LAYER_TWO",E_META_SNOW_LAYER_TWO);
-  tolua_constant(tolua_S,"E_META_SNOW_LAYER_THREE",E_META_SNOW_LAYER_THREE);
-  tolua_constant(tolua_S,"E_META_SNOW_LAYER_FOUR",E_META_SNOW_LAYER_FOUR);
-  tolua_constant(tolua_S,"E_META_SNOW_LAYER_FIVE",E_META_SNOW_LAYER_FIVE);
-  tolua_constant(tolua_S,"E_META_SNOW_LAYER_SIX",E_META_SNOW_LAYER_SIX);
-  tolua_constant(tolua_S,"E_META_SNOW_LAYER_SEVEN",E_META_SNOW_LAYER_SEVEN);
-  tolua_constant(tolua_S,"E_META_SNOW_LAYER_EIGHT",E_META_SNOW_LAYER_EIGHT);
-  tolua_constant(tolua_S,"E_META_RAIL_ZM_ZP",E_META_RAIL_ZM_ZP);
-  tolua_constant(tolua_S,"E_META_RAIL_XM_XP",E_META_RAIL_XM_XP);
-  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_XP",E_META_RAIL_ASCEND_XP);
-  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_XM",E_META_RAIL_ASCEND_XM);
-  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_ZM",E_META_RAIL_ASCEND_ZM);
-  tolua_constant(tolua_S,"E_META_RAIL_ASCEND_ZP",E_META_RAIL_ASCEND_ZP);
-  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZP_XP",E_META_RAIL_CURVED_ZP_XP);
-  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZP_XM",E_META_RAIL_CURVED_ZP_XM);
-  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZM_XM",E_META_RAIL_CURVED_ZM_XM);
-  tolua_constant(tolua_S,"E_META_RAIL_CURVED_ZM_XP",E_META_RAIL_CURVED_ZM_XP);
-  tolua_constant(tolua_S,"E_META_NEW_LEAVES_ACACIA_WOOD",E_META_NEW_LEAVES_ACACIA_WOOD);
-  tolua_constant(tolua_S,"E_META_NEW_LEAVES_DARK_OAK_WOOD",E_META_NEW_LEAVES_DARK_OAK_WOOD);
-  tolua_constant(tolua_S,"E_META_NEW_LOG_ACACIA_WOOD",E_META_NEW_LOG_ACACIA_WOOD);
-  tolua_constant(tolua_S,"E_META_NEW_LOG_DARK_OAK_WOOD",E_META_NEW_LOG_DARK_OAK_WOOD);
-  tolua_constant(tolua_S,"E_META_FLOWER_POPPY",E_META_FLOWER_POPPY);
-  tolua_constant(tolua_S,"E_META_FLOWER_BLUE_ORCHID",E_META_FLOWER_BLUE_ORCHID);
-  tolua_constant(tolua_S,"E_META_FLOWER_ALLIUM",E_META_FLOWER_ALLIUM);
-  tolua_constant(tolua_S,"E_META_FLOWER_RED_TULIP",E_META_FLOWER_RED_TULIP);
-  tolua_constant(tolua_S,"E_META_FLOWER_ORANGE_TULIP",E_META_FLOWER_ORANGE_TULIP);
-  tolua_constant(tolua_S,"E_META_FLOWER_WHITE_TULIP",E_META_FLOWER_WHITE_TULIP);
-  tolua_constant(tolua_S,"E_META_FLOWER_PINK_TULIP",E_META_FLOWER_PINK_TULIP);
-  tolua_constant(tolua_S,"E_META_FLOWER_OXEYE_DAISY",E_META_FLOWER_OXEYE_DAISY);
-  tolua_constant(tolua_S,"E_META_BIG_FLOWER_SUNFLOWER",E_META_BIG_FLOWER_SUNFLOWER);
-  tolua_constant(tolua_S,"E_META_BIG_FLOWER_LILAC",E_META_BIG_FLOWER_LILAC);
-  tolua_constant(tolua_S,"E_META_BIG_FLOWER_DOUBLE_TALL_GRASS",E_META_BIG_FLOWER_DOUBLE_TALL_GRASS);
-  tolua_constant(tolua_S,"E_META_BIG_FLOWER_LARGE_FERN",E_META_BIG_FLOWER_LARGE_FERN);
-  tolua_constant(tolua_S,"E_META_BIG_FLOWER_ROSE_BUSH",E_META_BIG_FLOWER_ROSE_BUSH);
-  tolua_constant(tolua_S,"E_META_BIG_FLOWER_PEONY",E_META_BIG_FLOWER_PEONY);
   tolua_constant(tolua_S,"E_META_COAL_NORMAL",E_META_COAL_NORMAL);
   tolua_constant(tolua_S,"E_META_COAL_CHARCOAL",E_META_COAL_CHARCOAL);
   tolua_constant(tolua_S,"E_META_DYE_BLACK",E_META_DYE_BLACK);
@@ -30409,6 +30443,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsBoots",tolua_AllToLua_ItemCategory_IsBoots00);
    tolua_function(tolua_S,"IsArmor",tolua_AllToLua_ItemCategory_IsArmor00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"IsBiomeNoDownfall",tolua_AllToLua_IsBiomeNoDownfall00);
   tolua_function(tolua_S,"GetTime",tolua_AllToLua_GetTime00);
   tolua_function(tolua_S,"GetChar",tolua_AllToLua_GetChar00);
   tolua_cclass(tolua_S,"cChatColor","cChatColor","",NULL);
