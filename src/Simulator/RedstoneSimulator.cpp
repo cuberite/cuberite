@@ -854,38 +854,11 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 
 		if (!Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		switch (a_Meta) // Pistons' metas are the directions they face; the source cannot be there
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Meta); // Piston meta is based on what direction they face, so we can do this
+
+		if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			case BLOCK_FACE_YM:
-			{
-				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY - 1, a_BlockZ))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_YP:
-			{
-				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY + 1, a_BlockZ))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_ZM:
-			{
-				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_ZP:
-			{
-				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_XM:
-			{
-				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_XP:
-			{
-				if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
+			return true;
 		}
 	}
 
@@ -895,38 +868,11 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 
 		if (!Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		switch (a_Meta)
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
+
+		if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			case BLOCK_FACE_YM:
-			{
-				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY - 1, a_BlockZ))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_YP:
-			{
-				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY + 1, a_BlockZ))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_ZM:
-			{
-				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_ZP:
-			{
-				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_XM:
-			{
-				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
-			case BLOCK_FACE_XP:
-			{
-				if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
+			return true;
 		}
 	}
 	return false; // Source was in front of the piston's front face
