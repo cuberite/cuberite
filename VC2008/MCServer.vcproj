@@ -2332,6 +2332,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Blocks\BlockTrapdoor.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\blocks\BlockVine.h"
 					>
 				</File>
