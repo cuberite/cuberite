@@ -568,8 +568,11 @@ inline bool IsBiomeNoDownfall(EMCSBiome a_Biome)
 		{
 			return true;
 		}
+		default:
+		{
+			return false;
+		}
 	}
-	return false;
 }
 
 // tolua_end
