@@ -31,17 +31,19 @@ public:
 	}
 	
 
-	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		
 		if ((Meta & 0x08) != 0)
 		{
-			a_World->GrowTree(a_BlockX, a_BlockY, a_BlockZ);
+			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+			a_Chunk.GetWorld()->GrowTree(BlockX, a_RelY, BlockZ);
 		}
 		else
 		{
-			a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x08);
+			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x08);
 		}
 	}
 

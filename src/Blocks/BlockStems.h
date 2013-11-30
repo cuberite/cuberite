@@ -25,18 +25,20 @@ public:
 	}
 
 	
-	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		if (Meta >= 7)
 		{
 			// Grow the produce:
-			a_World->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, m_BlockType);
+			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+			a_Chunk.GetWorld()->GrowMelonPumpkin(BlockX, a_RelY, a_RelZ, m_BlockType);
 		}
 		else
 		{
 			// Grow the stem:
-			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta + 1);
+			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, Meta + 1);
 		}
 	}
 

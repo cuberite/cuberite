@@ -631,6 +631,23 @@ void cChunk::Tick(float a_Dt)
 
 
 
+void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
+{
+	unsigned Index = MakeIndex(a_RelX, a_RelY, a_RelZ);
+	if (Index == INDEX_OUT_OF_RANGE)
+	{
+		// An assert has already been made in MakeIndex()
+		return;
+	}
+	cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
+	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
+	Handler->OnUpdate(*this, a_RelX + m_PosX * Width, a_RelY, a_RelZ + m_PosZ * Width);
+}
+
+
+
+
+
 void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 {
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
@@ -777,7 +794,7 @@ void cChunk::TickBlocks(void)
 		unsigned int Index = MakeIndexNoCheck(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 		cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
 		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-		Handler->OnUpdate(m_World, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
+		Handler->OnUpdate(*this, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
 	}  // for i - tickblocks
 }
 

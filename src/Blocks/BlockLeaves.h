@@ -77,9 +77,9 @@ public:
 	}
 	
 	
-	virtual void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		if ((Meta & 0x04) != 0)
 		{
 			// Player-placed leaves, don't decay
@@ -93,12 +93,14 @@ public:
 		}
 
 		// Get the data around the leaves:
+		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 		cBlockArea Area;
 		if (!Area.Read(
-			a_World, 
-			a_BlockX - LEAVES_CHECK_DISTANCE, a_BlockX + LEAVES_CHECK_DISTANCE, 
-			a_BlockY - LEAVES_CHECK_DISTANCE, a_BlockY + LEAVES_CHECK_DISTANCE, 
-			a_BlockZ - LEAVES_CHECK_DISTANCE, a_BlockZ + LEAVES_CHECK_DISTANCE, 
+			a_Chunk.GetWorld(), 
+			BlockX - LEAVES_CHECK_DISTANCE, BlockX + LEAVES_CHECK_DISTANCE, 
+			a_RelY - LEAVES_CHECK_DISTANCE, a_RelY + LEAVES_CHECK_DISTANCE, 
+			BlockZ - LEAVES_CHECK_DISTANCE, BlockZ + LEAVES_CHECK_DISTANCE, 
 			cBlockArea::baTypes)
 		)
 		{
@@ -106,17 +108,16 @@ public:
 			return;
 		}
 
-		if (HasNearLog(Area, a_BlockX, a_BlockY, a_BlockZ))
+		if (HasNearLog(Area, BlockX, a_RelY, BlockZ))
 		{
 			// Wood found, the leaves stay; mark them as checked:
-			a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x8);
+			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x8);
 			return;
 		}
-		// Decay the leaves:
-		DropBlock(a_World, NULL, a_BlockX, a_BlockY, a_BlockZ);
 
-		a_World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
-		
+		// Decay the leaves:
+		DropBlock(a_Chunk.GetWorld(), NULL, BlockX, a_RelY, BlockZ);
+		a_Chunk.GetWorld()->DigBlock(BlockX, a_RelY, BlockZ);
 	}
 
 

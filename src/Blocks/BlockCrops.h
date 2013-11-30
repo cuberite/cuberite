@@ -75,11 +75,11 @@ public:
 	}	
 	
 	
-	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		NIBBLETYPE Light = a_World->GetBlockBlockLight(a_BlockX, a_BlockY, a_BlockZ);
-		NIBBLETYPE SkyLight = a_World->GetBlockSkyLight(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta     = a_Chunk.GetMeta      (a_RelX, a_RelY, a_RelZ);
+		NIBBLETYPE Light    = a_Chunk.GetBlockLight(a_RelX, a_RelY, a_RelZ);
+		NIBBLETYPE SkyLight = a_Chunk.GetSkyLight  (a_RelX, a_RelY, a_RelZ);
 
 		if (SkyLight > Light)
 		{
@@ -88,11 +88,11 @@ public:
 		
 		if ((Meta < 7) && (Light > 8))
 		{
-			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_CROPS, ++Meta);
+			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_CROPS, ++Meta);
 		}
 		else if (Light < 9)
 		{
-			a_World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+			a_Chunk.GetWorld()->DigBlock(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width);
 		}
 	}
 

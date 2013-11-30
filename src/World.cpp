@@ -2596,12 +2596,12 @@ void cWorld::TickQueuedBlocks(void)
 
 	for (std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); itr++)
 	{
-		BlockTickQueueItem *Block = (*itr);
+		BlockTickQueueItem * Block = (*itr);
 		Block->TicksToWait -= 1;
 		if (Block->TicksToWait <= 0)
 		{
 			// TODO: Handle the case when the chunk is already unloaded
-			BlockHandler(GetBlock(Block->X, Block->Y, Block->Z))->OnUpdate(this, Block->X, Block->Y, Block->Z);
+			m_ChunkMap->TickBlock(Block->X, Block->Y, Block->Z);
 			delete Block;	 // We don't have to remove it from the vector, this will happen automatically on the next tick
 		}
 		else

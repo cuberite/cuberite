@@ -73,9 +73,9 @@ public:
 	}
 	
 	
-	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		a_World->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 1);
+		a_Chunk.GetWorld()->GrowSugarcane(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
 	}
 	
 	

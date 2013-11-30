@@ -252,7 +252,7 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 
 
 
-void cBlockHandler::OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnUpdate(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 

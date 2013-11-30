@@ -134,6 +134,9 @@ public:
 	void SpawnMobs(cMobSpawner& a_MobSpawner);
 
 	void Tick(float a_Dt);
+	
+	/// Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks
+	void TickBlock(int a_RelX, int a_RelY, int a_RelZ);
 
 	int GetPosX(void) const { return m_PosX; }
 	int GetPosY(void) const { return m_PosY; }
@@ -457,9 +460,6 @@ private:
 	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
 	void GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
 	
-	/// Checks if a leaves block at the specified coords has a log up to 4 blocks away connected by other leaves blocks (false if no log)
-	bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);
-
 	/// Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients
 	void MoveEntityToNewChunk(cEntity * a_Entity);
 	

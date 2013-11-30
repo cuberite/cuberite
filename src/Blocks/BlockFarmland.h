@@ -28,12 +28,12 @@ public:
 	}
 
 
-	virtual void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		bool Found = false;
 		
-		int Biome = a_World->GetBiomeAt(a_BlockX, a_BlockZ);
-		if (a_World->IsWeatherWet() && (Biome != biDesert) && (Biome != biDesertHills))
+		EMCSBiome Biome = a_Chunk.GetBiomeAt(a_RelX, a_RelZ);
+		if (a_Chunk.GetWorld()->IsWeatherWet() && !IsBiomeNoDownfall(Biome))
 		{
 			// Rain hydrates farmland, too, except in Desert biomes.
 			Found = true;
@@ -42,10 +42,13 @@ public:
 		{
 			// Search for water in a close proximity:
 			// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
+			// TODO: Rewrite this to use the chunk and its neighbors directly
 			cBlockArea Area;
-			if (!Area.Read(a_World, a_BlockX - 4, a_BlockX + 4, a_BlockY, a_BlockY + 1, a_BlockZ - 4, a_BlockZ + 4))
+			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+			if (!Area.Read(a_Chunk.GetWorld(), BlockX - 4, BlockX + 4, a_RelY, a_RelY + 1, BlockZ - 4, BlockZ + 4))
 			{
-				// Too close to the world edge, cannot check surroudnings; don't tick at all
+				// Too close to the world edge, cannot check surroundings; don't tick at all
 				return;
 			}
 
@@ -64,14 +67,14 @@ public:
 			}  // for i - BlockTypes[]
 		}
 		
-		NIBBLETYPE BlockMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE BlockMeta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		
 		if (Found)
 		{
 			// Water was found, hydrate the block until hydration reaches 7:
 			if (BlockMeta < 7)
 			{
-				a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, ++BlockMeta);
+				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, ++BlockMeta);
 			}
 			return;
 		}
@@ -79,12 +82,12 @@ public:
 		// Water wasn't found, de-hydrate block:
 		if (BlockMeta > 0)
 		{
-			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FARMLAND, --BlockMeta);
+			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, --BlockMeta);
 			return;
 		}
 		
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		switch (a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))
+		switch (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ))
 		{
 			case E_BLOCK_CROPS:
 			case E_BLOCK_MELON_STEM:
@@ -95,7 +98,7 @@ public:
 			}
 			default:
 			{
-				a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DIRT, 0);
+				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
 				break;
 			}
 		}

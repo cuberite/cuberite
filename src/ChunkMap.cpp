@@ -2244,7 +2244,24 @@ void cChunkMap::Tick(float a_Dt)
 
 
 
-void cChunkMap::UnloadUnusedChunks()
+void cChunkMap::TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	cCSLock Lock(m_CSLayers);
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->TickBlock(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cChunkMap::UnloadUnusedChunks(void)
 {
 	cCSLock Lock(m_CSLayers);
 	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)

@@ -282,6 +282,9 @@ public:
 	void SpawnMobs(cMobSpawner& a_MobSpawner);
 
 	void Tick(float a_Dt);
+	
+	/// Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks
+	void TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	void UnloadUnusedChunks(void);
 	void SaveAllChunks(void);

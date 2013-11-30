@@ -22,8 +22,9 @@ class cBlockHandler
 public:
 	cBlockHandler(BLOCKTYPE a_BlockType);
 
-	/// Called when the block gets ticked either by a random tick or by a queued tick
-	virtual void OnUpdate(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// Called when the block gets ticked either by a random tick or by a queued tick.
+	/// Note that the coords are chunk-relative!
+	virtual void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
 
 	/** Called before a block is placed	into a world. 
 	The handler should return true to allow placement, false to refuse.
@@ -66,7 +67,7 @@ public:
 	/// Called if the user right clicks the block and the block is useable
 	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	
-	/// Called when the item is mined to convert it into pickups. Pickups may specify multiple items. Appends items to a_Pickups, preserves its original contents
+	/// <summary>Called when the item is mined to convert it into pickups. Pickups may specify multiple items. Appends items to a_Pickups, preserves its original contents</summary>
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 	
 	/// Handles the dropping of a block based on what ConvertToDrops() returns. This will not destroy the block. a_Digger is the entity causing the drop; it may be NULL
