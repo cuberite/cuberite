@@ -165,14 +165,17 @@ void cRoot::Start(void)
 		LOGD("Starting Authenticator...");
 		m_Authenticator.Start(IniFile);
 		
-		IniFile.WriteFile("settings.ini");
-
 		LOGD("Starting worlds...");
 		StartWorlds();
 		
-		LOGD("Starting deadlock detector...");
-		dd.Start();
+		if (IniFile.GetValueSetB("DeadlockDetect", "Enabled", true))
+		{
+			LOGD("Starting deadlock detector...");
+			dd.Start(IniFile.GetValueSetI("DeadlockDetect", "IntervalSec", 20));
+		}
 		
+		IniFile.WriteFile("settings.ini");
+
 		LOGD("Finalising startup...");
 		m_Server->Start();
 		

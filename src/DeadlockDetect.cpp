@@ -31,8 +31,10 @@ cDeadlockDetect::cDeadlockDetect(void) :
 
 
 
-bool cDeadlockDetect::Start(void)
+bool cDeadlockDetect::Start(int a_IntervalSec)
 {
+	m_IntervalSec = a_IntervalSec;
+	
 	// Read the initial world data:
 	class cFillIn :
 		public cWorldListCallback
@@ -115,7 +117,7 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 	if (itr->second.m_Age == a_Age)
 	{
 		itr->second.m_NumCyclesSame += 1;
-		if (itr->second.m_NumCyclesSame > NUM_CYCLES_LIMIT)
+		if (itr->second.m_NumCyclesSame > (1000 * m_IntervalSec) / CYCLE_MILLISECONDS)
 		{
 			DeadlockDetected();
 			return;

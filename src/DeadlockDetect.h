@@ -29,7 +29,7 @@ public:
 	cDeadlockDetect(void);
 	
 	/// Starts the detection. Hides cIsThread's Start, because we need some initialization
-	bool Start(void);
+	bool Start(int a_IntervalSec);
 	
 protected:
 	struct sWorldAge
@@ -45,6 +45,9 @@ protected:
 	typedef std::map<AString, sWorldAge> WorldAges;
 	
 	WorldAges m_WorldAges;
+	
+	/// Number of secods for which the ages must be the same for the detection to trigger
+	int m_IntervalSec;
 	
 	
 	// cIsThread overrides:
