@@ -2096,10 +2096,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Blocks\BlockButton.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Blocks\BlockButton.h"
 					>
 				</File>
@@ -2125,10 +2121,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Blocks\BlockCobWeb.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Blocks\BlockComparator.cpp"
 					>
 				</File>
 				<File
@@ -2232,10 +2224,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Blocks\BlockLever.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Blocks\BlockLever.h"
 					>
 				</File>
@@ -2284,19 +2272,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\blocks\BlockRedstone.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\blocks\BlockRedstone.h"
 					>
 				</File>
 				<File
 					RelativePath="..\src\blocks\BlockRedstoneOre.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\blocks\BlockRedstoneRepeater.cpp"
 					>
 				</File>
 				<File
@@ -2349,6 +2329,10 @@
 				</File>
 				<File
 					RelativePath="..\src\blocks\BlockTorch.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Blocks\BlockTrapdoor.h"
 					>
 				</File>
 				<File
