@@ -1150,7 +1150,6 @@ void cRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_B
 void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock)
 {
 	if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR) { return; } // Don't set air, fixes some bugs (wires powering themselves)
-	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) { return; } // Check for duplicates
 
 	sPoweredBlocks RC;
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
@@ -1171,7 +1170,6 @@ void cRedstoneSimulator::SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a
 	)
 {
 	if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR) { return; } // Don't set air, fixes some bugs (wires powering themselves)
-	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) { return; } // Check for duplicates
 	if (!IsViableMiddleBlock(m_World.GetBlock(a_MiddleX, a_MiddleY, a_MiddleZ))) { return; } // See if middle block is viable
 
 	sLinkedPoweredBlocks RC;
