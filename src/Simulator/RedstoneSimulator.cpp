@@ -94,7 +94,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		if (SourceBlockType != Change.a_SourceBlock)
 		{
 			itr = m_PoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock));
+			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
 		}
 		else if (
 			// Changeable sources
@@ -105,7 +105,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			)
 		{
 			itr = m_PoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock));
+			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
 		}
 		else
 		{
@@ -137,12 +137,12 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		if (SourceBlockType != Change.a_SourceBlock)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock));
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
 		}
 		else if (MiddleBlockType != Change.a_MiddleBlock)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(Change.a_SourceBlock));
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
 		}
 		else if (
 			// Things that can send power through a block but which depends on meta
@@ -152,7 +152,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock));
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
 		}
 		else
 		{
@@ -267,10 +267,10 @@ void cRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_B
 		}
 
 		// Torch still on, make all 4(X, Z) + 1(Y) sides powered
-		for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 		{
 			BLOCKTYPE Type = m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z);
-			if (i < ARRAYCOUNT(gCrossCoords) - 1) // Sides of torch, not top (top is last)
+			if (i + 1 < ARRAYCOUNT(gCrossCoords)) // Sides of torch, not top (top is last)
 			{
 				if (
 					((IsMechanism(Type)) || (Type == E_BLOCK_REDSTONE_WIRE)) && // Is it a mechanism or wire? Not block/other torch etc.
@@ -403,7 +403,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 		NIBBLETYPE MyMeta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		int TimesMetaSmaller = 0, TimesFoundAWire = 0;
 
-		for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through all directions to transfer or receive power
+		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through all directions to transfer or receive power
 		{
 			BLOCKTYPE SurroundType;
 			NIBBLETYPE SurroundMeta;
@@ -1146,7 +1146,7 @@ void cRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_B
 		{ 0,-1, 0 }
 	};
 
-	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through struct to power all directions
+	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through struct to power all directions
 	{
 		SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, a_SourceBlock);
 	}
@@ -1159,7 +1159,11 @@ void cRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_B
 
 void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock)
 {
-	if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR) { return; } // Don't set air, fixes some bugs (wires powering themselves)
+	if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+	{
+		// Don't set air, fixes some bugs (wires powering themselves)
+		return;
+	}
 
 	sPoweredBlocks RC;
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
@@ -1173,14 +1177,22 @@ void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_Block
 
 
 
-void cRedstoneSimulator::SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ,
+void cRedstoneSimulator::SetBlockLinkedPowered(
+	int a_BlockX,  int a_BlockY,  int a_BlockZ,
 	int a_MiddleX, int a_MiddleY, int a_MiddleZ,
 	int a_SourceX, int a_SourceY, int a_SourceZ,
 	BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddleBlock
-	)
+)
 {
-	if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR) { return; } // Don't set air, fixes some bugs (wires powering themselves)
-	if (!IsViableMiddleBlock(m_World.GetBlock(a_MiddleX, a_MiddleY, a_MiddleZ))) { return; } // See if middle block is viable
+	if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+	{
+		// Don't set air, fixes some bugs (wires powering themselves)
+		return;
+	}
+	if (!IsViableMiddleBlock(m_World.GetBlock(a_MiddleX, a_MiddleY, a_MiddleZ)))
+	{
+		return;
+	}
 
 	sLinkedPoweredBlocks RC;
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
