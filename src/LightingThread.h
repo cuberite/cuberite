@@ -156,9 +156,9 @@ protected:
 	)
 	{
 		ASSERT(a_SrcIdx >= 0);
-		ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));
+		ASSERT(a_SrcIdx < (int)ARRAYCOUNT(m_SkyLight));
 		ASSERT(a_DstIdx >= 0);
-		ASSERT(a_DstIdx < ARRAYCOUNT(m_BlockTypes));
+		ASSERT(a_DstIdx < (int)ARRAYCOUNT(m_BlockTypes));
 		
 		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + g_BlockSpreadLightFalloff[m_BlockTypes[a_DstIdx]])
 		{
