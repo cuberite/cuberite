@@ -21,6 +21,9 @@ return
 			{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
 			{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
 			{ Name = "BlockFace", Type = "number", Notes = "Face of the block upon which the player interacted. One of the BLOCK_FACE_ constants" },
+			{ Name = "CursorX", Type = "number", Notes = "X-coord of the mouse crosshair on the block" },
+			{ Name = "CursorY", Type = "number", Notes = "Y-coord of the mouse crosshair on the block" },
+			{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the mouse crosshair on the block" },
 		},
 		Returns = [[
 			If the function returns false or no value, MCServer calls other plugins' callbacks and finally sends
