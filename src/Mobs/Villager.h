@@ -7,6 +7,8 @@
 
 
 
+
+// tolua_begin
 class cVillager :
 	public cPassiveMonster
 {
@@ -24,19 +26,23 @@ public:
 		vtGeneric    = 5,
 		vtMax
 	} ;
-
+	// tolua_end
+	
 	cVillager(eVillagerType VillagerType);
 
 	CLASS_PROTODEF(cVillager);
 
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	
+	// tolua_begin
 	int GetVilType(void) const { return m_Type; }	
+	// tolua_end
 
 private:
 
 	int m_Type;
 
-} ;
+} ; // tolua_export
 
 
 

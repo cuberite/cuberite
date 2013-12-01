@@ -68,6 +68,21 @@ $cfile "UI/Window.h"
 $cfile "LuaWindow.h"
 $cfile "Mobs/Monster.h"
 
+// All the mobs:
+$cfile "Mobs/Bat.h"
+$cfile "Mobs/Creeper.h"
+$cfile "Mobs/Enderman.h"
+$cfile "Mobs/Ghast.h"
+$cfile "Mobs/Horse.h"
+$cfile "Mobs/Magmacube.h"
+$cfile "Mobs/Pig.h"
+$cfile "Mobs/Sheep.h"
+$cfile "Mobs/Skeleton.h"
+$cfile "Mobs/Slime.h"
+$cfile "Mobs/Villager.h"
+$cfile "Mobs/Witch.h"
+$cfile "Mobs/Wolf.h"
+$cfile "Mobs/Zombie.h"
 
 
 

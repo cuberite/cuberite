@@ -8,12 +8,14 @@
 
 
 
+// tolua_begin
 class cWolf :
 	public cPassiveAggressiveMonster
 {
 	typedef cPassiveAggressiveMonster super;
 	
 public:
+	// tolua_end
 	cWolf(void);
 
 	CLASS_PROTODEF(cWolf);
@@ -23,6 +25,7 @@ public:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();
 
+	// tolua_begin
 	// Get functions
 	bool    IsSitting     (void) const { return m_IsSitting; }
 	bool    IsTame        (void) const { return m_IsTame; }
@@ -38,6 +41,7 @@ public:
 	void SetIsAngry    (bool a_IsAngry)     { m_IsAngry = a_IsAngry; }
 	void SetOwner      (AString a_NewOwner) { m_OwnerName = a_NewOwner; }
 	void SetCollarColor(int a_CollarColor)  { m_CollarColor = a_CollarColor; }
+	// tolua_end
 
 protected:
 
@@ -47,7 +51,7 @@ protected:
 	bool    m_IsAngry;
 	AString m_OwnerName;
 	int     m_CollarColor;
-} ;
+} ; // tolua_export
 
 
 
