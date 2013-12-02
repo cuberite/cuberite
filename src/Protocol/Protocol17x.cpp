@@ -1158,7 +1158,6 @@ void cProtocol172::HandlePacketBlockPlace(UInt32 a_RemainingBytes)
 	HANDLE_READ(ReadByte,  Byte, CursorX);
 	HANDLE_READ(ReadByte,  Byte, CursorY);
 	HANDLE_READ(ReadByte,  Byte, CursorZ);
-	printf("Cursor: %i %i %i\n", CursorX, CursorY, CursorZ);
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
