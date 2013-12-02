@@ -1152,9 +1152,28 @@ void cProtocol172::HandlePacketBlockPlace(UInt32 a_RemainingBytes)
 	HANDLE_READ(ReadByte,  Byte, BlockY);
 	HANDLE_READ(ReadBEInt, int,  BlockZ);
 	HANDLE_READ(ReadByte,  Byte, Face);
+	HANDLE_READ(ReadBEShort, short, ItemID);
+
+	// Currently discarding extra info until it is decided what we do with it
+	if (ItemID != -1)
+	{
+		HANDLE_READ(ReadByte,  Byte, Count);
+		HANDLE_READ(ReadBEShort, short, ItemDamage);
+		HANDLE_READ(ReadBEShort, short, MetaLen);
+		if (MetaLen != -1)
+		{
+			while(MetaLen--)
+			{
+				HANDLE_READ(ReadByte,  Byte, MetaStuff);
+			}
+		}
+
+	}
+
 	HANDLE_READ(ReadByte,  Byte, CursorX);
 	HANDLE_READ(ReadByte,  Byte, CursorY);
 	HANDLE_READ(ReadByte,  Byte, CursorZ);
+	printf("Read %i %i %i %i %i %i %i\n", BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ);
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
