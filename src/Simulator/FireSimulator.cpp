@@ -94,7 +94,9 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 	for (cCoordWithIntList::iterator itr = Data.begin(); itr != Data.end();)
 	{
 		int idx = cChunkDef::MakeIndexNoCheck(itr->x, itr->y, itr->z);
+		int idb = cChunkDef::MakeIndexNoCheck(itr->x, itr->y - 1, itr->z);
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(idx);
+		BLOCKTYPE Burnee = a_Chunk->GetBlock(idb);
 
 		if (!IsAllowedBlock(BlockType))
 		{
@@ -135,7 +137,10 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 			itr = Data.erase(itr);
 			continue;
 		}
-		a_Chunk->SetMeta(idx, BlockMeta + 1);
+		if(Burnee != E_BLOCK_NETHERRACK)
+		{
+			a_Chunk->SetMeta(idx, BlockMeta + 1);
+		}
 		itr->Data = GetBurnStepTime(a_Chunk, itr->x, itr->y, itr->z);  // TODO: Add some randomness into this
 	}  // for itr - Data[]
 }
