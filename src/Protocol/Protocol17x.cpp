@@ -1152,6 +1152,9 @@ void cProtocol172::HandlePacketBlockPlace(UInt32 a_RemainingBytes)
 	HANDLE_READ(ReadByte,  Byte, BlockY);
 	HANDLE_READ(ReadBEInt, int,  BlockZ);
 	HANDLE_READ(ReadByte,  Byte, Face);
+	cItem Item;
+	ReadItem(Item);
+
 	HANDLE_READ(ReadByte,  Byte, CursorX);
 	HANDLE_READ(ReadByte,  Byte, CursorY);
 	HANDLE_READ(ReadByte,  Byte, CursorZ);
