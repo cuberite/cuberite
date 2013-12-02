@@ -887,6 +887,15 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	)
 	{
 		// Coordinates at CLICKED block, don't move them anywhere
+		if((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
+		{
+			++a_BlockY;
+		}
+		else if (!(ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_BOTTOM))
+		{
+			--a_BlockY;
+		}
+		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
 	}
 	else
 	{
