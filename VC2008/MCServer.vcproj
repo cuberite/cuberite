@@ -43,7 +43,7 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;../lib/jsoncpp/include&quot;;../lib"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;XML_STATIC;LUA_BUILD_AS_DLL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;XML_STATIC"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
