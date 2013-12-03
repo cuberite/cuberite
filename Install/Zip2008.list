@@ -1,4 +1,5 @@
 ..\MCServer\MCServer.exe
+..\MCServer\*.dll
 ..\MCServer\Plugins
 ..\MCServer\webadmin
 ..\MCServer\crafting.txt
