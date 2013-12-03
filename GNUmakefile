@@ -47,8 +47,8 @@ ifeq ($(release),1)
 # release build - fastest run-time, no gdb support
 ################
 
-CC_OPTIONS = -O3 -DNDEBUG
-CXX_OPTIONS = -O3 -DNDEBUG
+CC_OPTIONS = -O3 -DNDEBUG -DLUA_USE_DLOPEN
+CXX_OPTIONS = -O3 -DNDEBUG -DLUA_USE_DLOPEN
 LNK_OPTIONS = -pthread -O3
 
 BUILDDIR = build/release/
@@ -59,8 +59,8 @@ ifeq ($(profile),1)
 # profile build - a release build with symbols and profiling engine built in
 ################
 
-CC_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG
-CXX_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG
+CC_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG -DLUA_USE_DLOPEN
+CXX_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG -DLUA_USE_DLOPEN
 LNK_OPTIONS = -pthread -ggdb -O3 -pg
 
 BUILDDIR = build/profile/
@@ -71,8 +71,8 @@ else
 # Since C code is used only for supporting libraries (zlib, lua), it is still Ofast-optimized
 ################
 
-CC_OPTIONS = -ggdb -g -D_DEBUG -O3
-CXX_OPTIONS = -ggdb -g -D_DEBUG -O1
+CC_OPTIONS = -ggdb -g -D_DEBUG -O3 -DLUA_USE_DLOPEN
+CXX_OPTIONS = -ggdb -g -D_DEBUG -O1 -DLUA_USE_DLOPEN
 LNK_OPTIONS = -pthread -g -ggdb -O1
 
 BUILDDIR = build/debug/
@@ -106,6 +106,14 @@ ifeq ($(UNAME),Linux)
 else
 	LNK_LIBS = -lstdc++ -lltdl
 endif
+
+
+
+
+
+###################################################
+# Export all symbols from the executable, so that LuaRocks may bind to Lua routines:
+LNK_OPTIONS += -rdynamic
 
 
 
