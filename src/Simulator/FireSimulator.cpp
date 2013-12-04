@@ -94,9 +94,7 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 	for (cCoordWithIntList::iterator itr = Data.begin(); itr != Data.end();)
 	{
 		int idx = cChunkDef::MakeIndexNoCheck(itr->x, itr->y, itr->z);
-		int idb = cChunkDef::MakeIndexNoCheck(itr->x, itr->y - 1, itr->z);
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(idx);
-		BLOCKTYPE Burnee = a_Chunk->GetBlock(idb);
 
 		if (!IsAllowedBlock(BlockType))
 		{
@@ -137,7 +135,14 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 			itr = Data.erase(itr);
 			continue;
 		}
-		if(Burnee != E_BLOCK_NETHERRACK)
+
+		BLOCKTYPE Burnee = E_BLOCK_AIR;
+		if (itr->y > 0)
+		{
+			Burnee = a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z);
+		}
+
+		if(!DoesBurnForever(Burnee))
 		{
 			a_Chunk->SetMeta(idx, BlockMeta + 1);
 		}
@@ -181,7 +186,7 @@ bool cFireSimulator::IsFuel(BLOCKTYPE a_BlockType)
 
 
 
-bool cFireSimulator::IsForever(BLOCKTYPE a_BlockType)
+bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_NETHERRACK);
 }
@@ -230,7 +235,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 	if (a_RelY > 0)
 	{
 		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
-		if (IsForever(BlockBelow))
+		if (DoesBurnForever(BlockBelow))
 		{
 			// Is burning atop of netherrack, burn forever (re-check in 10 sec)
 			return 10000;
