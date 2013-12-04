@@ -161,8 +161,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_LuaStatic|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\CryptoPP"
+			IntermediateDirectory="$(ConfigurationName)\CryptoPP"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"

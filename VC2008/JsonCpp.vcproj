@@ -268,8 +268,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_LuaStatic|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\JsonCpp"
+			IntermediateDirectory="$(ConfigurationName)\JsonCpp"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>

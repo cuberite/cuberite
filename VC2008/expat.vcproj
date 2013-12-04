@@ -141,8 +141,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_LuaStatic|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\expat"
+			IntermediateDirectory="$(ConfigurationName)\expat"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>

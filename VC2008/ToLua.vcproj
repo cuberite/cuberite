@@ -268,8 +268,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_LuaStatic|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\ToLua"
+			IntermediateDirectory="$(ConfigurationName)\ToLua"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
