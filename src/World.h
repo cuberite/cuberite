@@ -129,6 +129,8 @@ public:
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 	
+	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }
+	
 	eDimension GetDimension(void) const { return m_Dimension; }
 
 	/// Returns the world height at the specified coords; waits for the chunk to get loaded / generated
@@ -654,6 +656,7 @@ private:
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
 	bool m_IsDeepSnowEnabled;
+	bool m_ShouldLavaSpawnFire;
 
 	// The cRedstone class simulates redstone and needs access to m_RSList
 	// friend class cRedstone;
