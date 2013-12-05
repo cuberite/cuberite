@@ -985,32 +985,46 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 
 static int tolua_cPluginManager_GetAllPlugins(lua_State * tolua_S)
 {
-	cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
+	cPluginManager * self = (cPluginManager *)tolua_tousertype(tolua_S, 1, 0);
 
 	const cPluginManager::PluginMap & AllPlugins = self->GetAllPlugins();
 
 	lua_newtable(tolua_S);
-	//lua_createtable(tolua_S, AllPlugins.size(), 0);
 	int newTable = lua_gettop(tolua_S);
 	int index = 1;
 	cPluginManager::PluginMap::const_iterator iter = AllPlugins.begin();
-	while(iter != AllPlugins.end())
+	while (iter != AllPlugins.end())
 	{
 		const cPlugin* Plugin = iter->second;
-		tolua_pushstring( tolua_S, iter->first.c_str() );
-		if( Plugin != NULL )
+		tolua_pushstring(tolua_S, iter->first.c_str());
+		if (Plugin != NULL)
 		{
-			tolua_pushusertype( tolua_S, (void*)Plugin, "const cPlugin" );
+			tolua_pushusertype(tolua_S, (void *)Plugin, "const cPlugin");
 		}
 		else
 		{
 			tolua_pushboolean(tolua_S, 0);
 		}
-		//lua_rawseti(tolua_S, newTable, index);
 		lua_rawset(tolua_S, -3);
 		++iter;
 		++index;
 	}
+	return 1;
+}
+
+
+
+
+
+static int tolua_cPluginManager_GetCurrentPlugin(lua_State * S)
+{
+	cPluginLua * Plugin = GetLuaPlugin(S);
+	if (Plugin == NULL)
+	{
+		// An error message has already been printed in GetLuaPlugin()
+		return 0;
+	}
+	tolua_pushusertype(S, Plugin, "cPluginLua");
 	return 1;
 }
 
@@ -2231,6 +2245,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachCommand",        tolua_cPluginManager_ForEachCommand);
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
+			tolua_function(tolua_S, "GetCurrentPlugin",      tolua_cPluginManager_GetCurrentPlugin);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");
