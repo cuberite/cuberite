@@ -136,13 +136,7 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 			continue;
 		}
 
-		BLOCKTYPE Burnee = E_BLOCK_AIR;
-		if (itr->y > 0)
-		{
-			Burnee = a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z);
-		}
-
-		if(!DoesBurnForever(Burnee))
+		if((itr->y > 0) && (!DoesBurnForever(a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z))))
 		{
 			a_Chunk->SetMeta(idx, BlockMeta + 1);
 		}
