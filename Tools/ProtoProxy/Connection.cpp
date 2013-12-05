@@ -260,6 +260,9 @@ void cConnection::Log(const char * a_Format, ...)
 	// Log to file:
 	cCSLock Lock(m_CSLog);
 	fputs(FullMsg.c_str(), m_LogFile);
+	#ifdef _DEBUG
+		fflush(m_LogFile);
+	#endif  // _DEBUG
 	
 	// Log to screen:
 	// std::cout << FullMsg;
@@ -2678,15 +2681,20 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 			case 1: Length = 2; break;  // short
 			case 2: Length = 4; break;  // int
 			case 3: Length = 4; break;  // float
-			case 4:  // string16
+			case 4:  // UTF-8 string with VarInt length
 			{
-				short Len = 0;
-				if (!a_Buffer.ReadBEShort(Len))
+				UInt32 Len;
+				int rs = a_Buffer.GetReadableSpace();
+				if (!a_Buffer.ReadVarInt(Len))
 				{
 					return false;
 				}
-				short NetLen = htons(Len);
-				a_Metadata.append((char *)&NetLen, 2);
+				rs = rs - a_Buffer.GetReadableSpace();
+				cByteBuffer LenBuf(8);
+				LenBuf.WriteVarInt(Len);
+				AString VarLen;
+				LenBuf.ReadAll(VarLen);
+				a_Metadata.append(VarLen);
 				Length = Len;
 				break;
 			}
@@ -2766,11 +2774,21 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 				pos += 4;
 				break;
 			}
-			case 4:  // string16
+			case 4:  // UTF-8 string with VarInt length
 			{
-				short Length = (a_Metadata[pos + 1] << 8) | a_Metadata[pos + 2];
-				Log("%sstring[%d] = \"%*s\"", Indent.c_str(), Index, Length, a_Metadata.c_str() + pos + 3);
-				pos += Length + 2;
+				cByteBuffer bb(10);
+				int RestLen = (int)a_Metadata.size() - pos - 1;
+				if (RestLen > 8)
+				{
+					RestLen = 8;
+				}
+				bb.Write(a_Metadata.data() + pos + 1, RestLen);
+				UInt32 Length;
+				int rs = bb.GetReadableSpace();
+				bb.ReadVarInt(Length);
+				rs = rs - bb.GetReadableSpace();
+				Log("%sstring[%d] = \"%*s\"", Indent.c_str(), Index, Length, a_Metadata.c_str() + pos + rs + 1);
+				pos += Length + rs + 2;
 				break;
 			}
 			case 5:
