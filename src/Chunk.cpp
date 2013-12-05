@@ -641,7 +641,7 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 	}
 	cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-	Handler->OnUpdate(*this, a_RelX + m_PosX * Width, a_RelY, a_RelZ + m_PosZ * Width);
+	Handler->OnUpdate(*this, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -794,7 +794,7 @@ void cChunk::TickBlocks(void)
 		unsigned int Index = MakeIndexNoCheck(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 		cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
 		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-		Handler->OnUpdate(*this, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
+		Handler->OnUpdate(*this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 	}  // for i - tickblocks
 }
 

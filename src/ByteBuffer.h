@@ -123,7 +123,7 @@ protected:
 	int    m_BufferSize;  // Total size of the ringbuffer
 	
 	#ifdef _DEBUG
-	unsigned long m_ThreadID;  // Thread that is currently accessing the object, checked via cSingleThreadAccessChecker
+	volatile unsigned long m_ThreadID;  // Thread that is currently accessing the object, checked via cSingleThreadAccessChecker
 	#endif  // _DEBUG
 	
 	int    m_DataStart;  // Where the data starts in the ringbuffer

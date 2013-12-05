@@ -1,5 +1,6 @@
 Debug/
 Debug profiled/
+Debug_LuaStatic/
 Release/
 Release profiled/
 *.user

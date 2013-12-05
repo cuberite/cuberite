@@ -26,7 +26,9 @@
 	(defined(_WIN32) && defined(__ARM__) && defined(_MSC_VER)) \
 )
 	#define IS_LITTLE_ENDIAN
-#elif defined (__ARMEB__)
+#elif ( \
+	defined (__ARMEB__) || defined(__sparc) \
+)
 	#define IS_BIG_ENDIAN
 #else
 	#error Cannot determine endianness of this platform

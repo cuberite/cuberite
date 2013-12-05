@@ -160,6 +160,74 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug_LuaStatic|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\CryptoPP"
+			IntermediateDirectory="$(ConfigurationName)\CryptoPP"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				EnableIntrinsicFunctions="true"
+				PreprocessorDefinitions="_DEBUG;_WINDOWS;USE_PRECOMPILED_HEADERS;WIN32"
+				RuntimeLibrary="1"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="pch.h"
+				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(PlatformName)\Output\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ProjectName)\$(ConfigurationName)"
@@ -459,6 +527,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -507,6 +584,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -571,6 +657,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -619,6 +714,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -687,6 +791,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -735,6 +848,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -799,6 +921,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -847,6 +978,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -907,6 +1047,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -979,6 +1128,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1035,6 +1193,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1083,6 +1250,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1155,6 +1331,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1203,6 +1388,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1260,6 +1454,16 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1329,6 +1533,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1389,6 +1602,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1438,6 +1660,16 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -1507,6 +1739,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1555,6 +1796,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1625,6 +1875,16 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					ExcludedFromBuild="true"
 					>
@@ -1677,6 +1937,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1741,6 +2010,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1797,6 +2075,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1845,6 +2132,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1913,6 +2209,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1961,6 +2266,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2025,6 +2339,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2073,6 +2396,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2137,6 +2469,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2185,6 +2526,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2249,6 +2599,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2297,6 +2656,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2355,6 +2723,16 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2424,6 +2802,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2472,6 +2859,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2536,6 +2932,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2584,6 +2989,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2648,6 +3062,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2696,6 +3119,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2760,6 +3192,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2808,6 +3249,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2872,6 +3322,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2920,6 +3379,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2984,6 +3452,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3032,6 +3509,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3089,6 +3575,16 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3158,6 +3654,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3206,6 +3711,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3274,6 +3788,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3322,6 +3845,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3386,6 +3918,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3434,6 +3975,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3498,6 +4048,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3546,6 +4105,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3610,6 +4178,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3658,6 +4235,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3722,6 +4308,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3778,6 +4373,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3826,6 +4430,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3894,6 +4507,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3942,6 +4564,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4006,6 +4637,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -4054,6 +4694,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4118,6 +4767,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -4166,6 +4824,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4230,6 +4897,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -4278,6 +4954,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4342,6 +5027,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -4390,6 +5084,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4454,6 +5157,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -4502,6 +5214,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4570,6 +5291,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -4618,6 +5348,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
