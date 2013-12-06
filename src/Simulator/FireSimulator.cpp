@@ -135,7 +135,11 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 			itr = Data.erase(itr);
 			continue;
 		}
-		a_Chunk->SetMeta(idx, BlockMeta + 1);
+
+		if((itr->y > 0) && (!DoesBurnForever(a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z))))
+		{
+			a_Chunk->SetMeta(idx, BlockMeta + 1);
+		}
 		itr->Data = GetBurnStepTime(a_Chunk, itr->x, itr->y, itr->z);  // TODO: Add some randomness into this
 	}  // for itr - Data[]
 }
@@ -176,7 +180,7 @@ bool cFireSimulator::IsFuel(BLOCKTYPE a_BlockType)
 
 
 
-bool cFireSimulator::IsForever(BLOCKTYPE a_BlockType)
+bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_NETHERRACK);
 }
@@ -225,7 +229,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 	if (a_RelY > 0)
 	{
 		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
-		if (IsForever(BlockBelow))
+		if (DoesBurnForever(BlockBelow))
 		{
 			// Is burning atop of netherrack, burn forever (re-check in 10 sec)
 			return 10000;

@@ -28,7 +28,7 @@ public:
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
 
 	static bool IsFuel   (BLOCKTYPE a_BlockType);
-	static bool IsForever(BLOCKTYPE a_BlockType);
+	static bool DoesBurnForever(BLOCKTYPE a_BlockType);
 
 protected:
 	/// Time (in msec) that a fire block takes to burn with a fuel block into the next step
