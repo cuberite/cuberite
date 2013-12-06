@@ -685,12 +685,10 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		int pX = a_BlockX;
 		int pY = a_BlockY;
 		int pZ = a_BlockZ;
-		AddFaceDirection(pX, pY, pZ, a_BlockFace);
 
+		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
 		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
-		
-		// 2013_01_05 _X: This looks weird
-		// Why do we ask the block "behind" the one being clicked if it is clicked through? Shouldn't we ask the primary block instead?
+
 		if (Handler->IsClickedThrough())
 		{
 			Handler->OnDigging(World, m_Player, pX, pY, pZ);
@@ -886,7 +884,10 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		)
 	)
 	{
-		// Coordinates at CLICKED block, don't move them anywhere
+		// Coordinates at clicked block, which was an eligible slab, and either top or bottom faces were clicked
+		// If clicked top face and slab occupies the top voxel, we want a slab to be placed above it (therefore increment Y)
+		// Else if clicked bottom face and slab occupies the bottom voxel, decrement Y for the same reason
+		// Don't touch coordinates if anything else because a dblslab opportunity is present
 		if((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
 		{
 			++a_BlockY;
