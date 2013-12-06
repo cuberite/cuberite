@@ -1276,7 +1276,7 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 		}
 		case 3:  // Leave bed
 		{
-			m_Player->GetWorld()->BroadcastPlayerAnimation(*m_Player, 3);
+			m_Player->GetWorld()->BroadcastPlayerAnimation(*m_Player, 2);
 			break;
 		}
 		case 4:  // Start sprinting
