@@ -572,7 +572,7 @@ void cPlayer::StartEating(void)
 	m_EatingFinishTick = m_World->GetWorldAge() + EATING_TICKS;
 	
 	// Send the packets:
-	m_World->BroadcastPlayerAnimation(*this, 5);
+	m_World->BroadcastPlayerAnimation(*this, 3);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
