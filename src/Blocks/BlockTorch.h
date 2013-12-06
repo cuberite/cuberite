@@ -55,8 +55,8 @@ public:
 	}
 	
 
-	static NIBBLETYPE DirectionToMetaData(char a_Direction)  // tolua_export
-	{  // tolua_export
+	static NIBBLETYPE DirectionToMetaData(char a_Direction)
+	{
 		switch (a_Direction)
 		{
 			case BLOCK_FACE_BOTTOM: ASSERT(!"Shouldn't be getting this face"); return 0;
@@ -72,7 +72,7 @@ public:
 			}
 		};
 		return 0x0;
-	}  // tolua_export
+	}
 	
 
 	static char MetaDataToDirection(NIBBLETYPE a_MetaData)  // tolua_export
