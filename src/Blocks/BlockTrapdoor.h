@@ -50,12 +50,10 @@ public:
 		a_BlockType = m_BlockType;
 		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
 
-		/* TODO: fix CursorY issues and uncomment this
 		if (a_CursorY > 7)
 		{
 			a_BlockMeta |= 0x8;
 		}
-		*/
 		return true;
 	}
 	
