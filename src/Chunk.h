@@ -149,7 +149,7 @@ public:
 	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta ); }
 	
 	/// Queues a block change till the specified world tick
-	void QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick);
+	void QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
 	
 	/// Queues block for ticking (m_ToTickQueue)
 	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
@@ -363,9 +363,10 @@ private:
 		BLOCKTYPE m_BlockType;
 		NIBBLETYPE m_BlockMeta;
 		Int64 m_Tick;
+		BLOCKTYPE m_PreviousType;
 		
-		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick) :
-			m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta), m_Tick(a_Tick)
+		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType) :
+			m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta), m_Tick(a_Tick), m_PreviousType(a_PreviousBlockType)
 		{
 		}
 	} ;

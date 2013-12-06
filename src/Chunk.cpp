@@ -701,9 +701,30 @@ void cChunk::ProcessQueuedSetBlocks(void)
 	{
 		if (itr->m_Tick <= CurrTick)
 		{
-			// Current world age is bigger than/equal to target world age - delay time reached
-			SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
-			itr = m_SetBlockQueue.erase(itr);
+			if (itr->m_PreviousType != E_BLOCK_AIR) // PreviousType defaults to -1 if not specified
+			{
+				if (GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == itr->m_PreviousType)
+				{
+					// Current world age is bigger than/equal to target world age - delay time reached AND
+					// Previous block type was the same as current block type (to prevent duplication)
+					// Since blocktypes were the same, we just need to set the meta
+					SetMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockMeta);
+					itr = m_SetBlockQueue.erase(itr);
+					LOGD("Successfully set queued block - previous and current types matched");
+				}
+				else
+				{
+					itr = m_SetBlockQueue.erase(itr);
+					LOGD("Failure setting queued block - previous and current blocktypes didn't match");
+				}
+			}
+			else
+			{
+				// Current world age is bigger than/equal to target world age - delay time reached
+				SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
+				itr = m_SetBlockQueue.erase(itr);
+				LOGD("Successfully set queued block - previous type ignored");
+			}
 		}
 		else
 		{
@@ -1410,9 +1431,9 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 
 
 
-void cChunk::QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick)
+void cChunk::QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
 {
-	m_SetBlockQueue.push_back(sSetBlockQueueItem(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta, a_Tick));
+	m_SetBlockQueue.push_back(sSetBlockQueueItem(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta, a_Tick, a_PreviousBlockType));
 }
 
 
