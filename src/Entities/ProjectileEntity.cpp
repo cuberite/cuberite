@@ -466,7 +466,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 	m_HitBlockPos = Vector3i(a_X, a_Y, a_Z);
 
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("random.bowhit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect("random.bowhit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 }
 
 
