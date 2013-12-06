@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/30/13 15:42:56.
+** Generated automatically by tolua++-1.0.92 on 12/06/13 23:06:37.
 */
 
 #ifndef __cplusplus
@@ -11803,6 +11803,38 @@ static int tolua_AllToLua_cWorld_IsDeepSnowEnabled00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: ShouldLavaSpawnFire of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_ShouldLavaSpawnFire00
+static int tolua_AllToLua_cWorld_ShouldLavaSpawnFire00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ShouldLavaSpawnFire'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->ShouldLavaSpawnFire();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ShouldLavaSpawnFire'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetDimension of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetDimension00
 static int tolua_AllToLua_cWorld_GetDimension00(lua_State* tolua_S)
@@ -12193,7 +12225,8 @@ static int tolua_AllToLua_cWorld_QueueSetBlock00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,8,&tolua_err)
+     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12206,11 +12239,12 @@ static int tolua_AllToLua_cWorld_QueueSetBlock00(lua_State* tolua_S)
   unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
   unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
   int a_TickDelay = ((int)  tolua_tonumber(tolua_S,7,0));
+  unsigned char a_PreviousBlockType = (( unsigned char)  tolua_tonumber(tolua_S,8,E_BLOCK_AIR));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'QueueSetBlock'", NULL);
 #endif
   {
-   self->QueueSetBlock(a_BlockX,a_BLockY,a_BlockZ,a_BlockType,a_BlockMeta,a_TickDelay);
+   self->QueueSetBlock(a_BlockX,a_BLockY,a_BlockZ,a_BlockType,a_BlockMeta,a_TickDelay,a_PreviousBlockType);
   }
  }
  return 0;
@@ -30765,6 +30799,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_COLLECTING_PICKUP",cPluginManager::HOOK_COLLECTING_PICKUP);
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
+   tolua_constant(tolua_S,"HOOK_ENTITY_ANIMATION",cPluginManager::HOOK_ENTITY_ANIMATION);
    tolua_constant(tolua_S,"HOOK_EXECUTE_COMMAND",cPluginManager::HOOK_EXECUTE_COMMAND);
    tolua_constant(tolua_S,"HOOK_EXPLODED",cPluginManager::HOOK_EXPLODED);
    tolua_constant(tolua_S,"HOOK_EXPLODING",cPluginManager::HOOK_EXPLODING);
@@ -30773,7 +30808,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_HOPPER_PUSHING_ITEM",cPluginManager::HOOK_HOPPER_PUSHING_ITEM);
    tolua_constant(tolua_S,"HOOK_KILLING",cPluginManager::HOOK_KILLING);
    tolua_constant(tolua_S,"HOOK_LOGIN",cPluginManager::HOOK_LOGIN);
-   tolua_constant(tolua_S,"HOOK_PLAYER_ANIMATION",cPluginManager::HOOK_PLAYER_ANIMATION);
    tolua_constant(tolua_S,"HOOK_PLAYER_BREAKING_BLOCK",cPluginManager::HOOK_PLAYER_BREAKING_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_BROKEN_BLOCK",cPluginManager::HOOK_PLAYER_BROKEN_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_EATING",cPluginManager::HOOK_PLAYER_EATING);
@@ -30855,6 +30889,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsGameModeAdventure",tolua_AllToLua_cWorld_IsGameModeAdventure00);
    tolua_function(tolua_S,"IsPVPEnabled",tolua_AllToLua_cWorld_IsPVPEnabled00);
    tolua_function(tolua_S,"IsDeepSnowEnabled",tolua_AllToLua_cWorld_IsDeepSnowEnabled00);
+   tolua_function(tolua_S,"ShouldLavaSpawnFire",tolua_AllToLua_cWorld_ShouldLavaSpawnFire00);
    tolua_function(tolua_S,"GetDimension",tolua_AllToLua_cWorld_GetDimension00);
    tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cWorld_GetHeight00);
    tolua_function(tolua_S,"BroadcastChat",tolua_AllToLua_cWorld_BroadcastChat00);

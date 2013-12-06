@@ -572,7 +572,7 @@ void cPlayer::StartEating(void)
 	m_EatingFinishTick = m_World->GetWorldAge() + EATING_TICKS;
 	
 	// Send the packets:
-	m_World->BroadcastPlayerAnimation(*this, 3);
+	m_World->BroadcastEntityAnimation(*this, 3);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -587,7 +587,7 @@ void cPlayer::FinishEating(void)
 	
 	// Send the packets:
 	m_ClientHandle->SendEntityStatus(*this, ENTITY_STATUS_EATING_ACCEPTED);
-	m_World->BroadcastPlayerAnimation(*this, 0);
+	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -616,7 +616,7 @@ void cPlayer::FinishEating(void)
 void cPlayer::AbortEating(void)
 {
 	m_EatingFinishTick = -1;
-	m_World->BroadcastPlayerAnimation(*this, 0);
+	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 }
 

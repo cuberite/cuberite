@@ -2668,7 +2668,7 @@ void cChunk::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cChunk::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
+void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
 	{
@@ -2676,7 +2676,7 @@ void cChunk::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation
 		{
 			continue;
 		}
-		(*itr)->SendPlayerAnimation(a_Player, a_Animation);
+		(*itr)->SendEntityAnimation(a_Entity, a_Animation);
 	}  // for itr - LoadedByClient[]
 }
 

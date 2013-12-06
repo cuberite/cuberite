@@ -1858,9 +1858,9 @@ void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastPlayerAnimation(a_Player, a_Animation, a_Exclude);
+	m_ChunkMap->BroadcastEntityAnimation(a_Entity, a_Animation, a_Exclude);
 }
 
 

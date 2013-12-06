@@ -573,16 +573,16 @@ void cChunkMap::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientH
 
 
 
-void cChunkMap::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_Player.GetChunkX(), ZERO_CHUNK_Y, a_Player.GetChunkZ());
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), ZERO_CHUNK_Y, a_Entity.GetChunkZ());
 	if (Chunk == NULL)
 	{
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastPlayerAnimation(a_Player, a_Animation, a_Exclude);
+	Chunk->BroadcastEntityAnimation(a_Entity, a_Animation, a_Exclude);
 }
 
 

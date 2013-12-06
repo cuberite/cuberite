@@ -489,10 +489,10 @@ void cProtocol172::SendPlayerAbilities(void)
 
 
 
-void cProtocol172::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
+void cProtocol172::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
 	cPacketizer Pkt(*this, 0x0b);  // Animation packet
-	Pkt.WriteVarInt(a_Player.GetUniqueID());
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteChar(a_Animation);
 }
 

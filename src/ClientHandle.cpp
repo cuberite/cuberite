@@ -1053,13 +1053,13 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 
 void cClientHandle::HandleAnimation(char a_Animation)
 {
-	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_Animation))
+	if (cPluginManager::Get()->CallHookEntityAnimation(*m_Player, a_Animation))
 	{
 		// Plugin disagrees, bail out
 		return;
 	}
 	
-	m_Player->GetWorld()->BroadcastPlayerAnimation(*m_Player, a_Animation, this);
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, a_Animation, this);
 }
 
 
@@ -1264,19 +1264,19 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 
 	switch (a_ActionID)
 	{
-		case 1:  // crouch
+		case 1:  // Crouch
 		{
 			m_Player->SetCrouch(true);
 			break;
 		}
-		case 2:  // uncrouch
+		case 2:  // Uncrouch
 		{
 			m_Player->SetCrouch(false);
 			break;
 		}
 		case 3:  // Leave bed
 		{
-			m_Player->GetWorld()->BroadcastPlayerAnimation(*m_Player, 2);
+			m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
 			break;
 		}
 		case 4:  // Start sprinting
@@ -1813,9 +1813,9 @@ void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
-void cClientHandle::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
+void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
-	m_Protocol->SendPlayerAnimation(a_Player, a_Animation);
+	m_Protocol->SendEntityAnimation(a_Entity, a_Animation);
 }
 
 

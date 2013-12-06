@@ -578,11 +578,11 @@ void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
-void cProtocol125::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
+void cProtocol125::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ANIMATION);
-	WriteInt (a_Player.GetUniqueID());
+	WriteInt (a_Entity.GetUniqueID());
 	WriteByte(a_Animation);
 	Flush();
 }

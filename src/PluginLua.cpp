@@ -550,14 +550,14 @@ bool cPluginLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const 
 
 
 
-bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
+bool cPluginLua::OnEntityAnimation(cEntity & a_Entity, int a_Animation)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_ANIMATION];
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_ENTITY_ANIMATION];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, a_Animation, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Entity, a_Animation, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -1287,11 +1287,11 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_COLLECTING_PICKUP:            return "OnCollectingPickup";
 		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:           return "OnCraftingNoRecipe";
 		case cPluginManager::HOOK_DISCONNECT:                   return "OnDisconnect";
+		case cPluginManager::HOOK_ENTITY_ANIMATION:             return "OnEntityAnimation";
 		case cPluginManager::HOOK_EXECUTE_COMMAND:              return "OnExecuteCommand";
 		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";
 		case cPluginManager::HOOK_KILLING:                      return "OnKilling";
 		case cPluginManager::HOOK_LOGIN:                        return "OnLogin";
-		case cPluginManager::HOOK_PLAYER_ANIMATION:             return "OnPlayerAnimation";
 		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK:        return "OnPlayerBreakingBlock";
 		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:          return "OnPlayerBrokenBlock";
 		case cPluginManager::HOOK_PLAYER_EATING:                return "OnPlayerEating";
