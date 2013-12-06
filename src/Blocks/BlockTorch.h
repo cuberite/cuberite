@@ -55,7 +55,7 @@ public:
 	}
 	
 
-	static NIBBLETYPE DirectionToMetaData(char a_Direction)
+	inline static NIBBLETYPE DirectionToMetaData(char a_Direction)
 	{
 		switch (a_Direction)
 		{
@@ -75,11 +75,11 @@ public:
 	}
 	
 
-	static char MetaDataToDirection(NIBBLETYPE a_MetaData)  // tolua_export
-	{  // tolua_export
+	inline static char MetaDataToDirection(NIBBLETYPE a_MetaData)
+	{
 		switch (a_MetaData)
 		{
-			case 0:                  return BLOCK_FACE_TOP;  // by default, the torches stand on the ground
+			case 0:                  return BLOCK_FACE_TOP;  // By default, the torches stand on the ground
 			case E_META_TORCH_FLOOR: return BLOCK_FACE_TOP;
 			case E_META_TORCH_EAST:  return BLOCK_FACE_EAST;
 			case E_META_TORCH_WEST:  return BLOCK_FACE_WEST;
@@ -92,7 +92,7 @@ public:
 			}
 		}
 		return 0;
-	}  // tolua_export
+	}
 
 
 	static bool IsAttachedTo(const Vector3i & a_TorchPos, char a_TorchMeta, const Vector3i & a_BlockPos)
