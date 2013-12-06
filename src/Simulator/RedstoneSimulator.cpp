@@ -1165,6 +1165,20 @@ void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_Block
 		return;
 	}
 
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr) // Check powered list
+	{
+		sPoweredBlocks & Change = *itr;
+
+		if (
+			Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
+			Change.a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
+			)
+		{
+			// Check for duplicates
+			return;
+		}
+	}
+
 	sPoweredBlocks RC;
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 	RC.a_SourcePos = Vector3i(a_SourceX, a_SourceY, a_SourceZ);
@@ -1192,6 +1206,21 @@ void cRedstoneSimulator::SetBlockLinkedPowered(
 	if (!IsViableMiddleBlock(m_World.GetBlock(a_MiddleX, a_MiddleY, a_MiddleZ)))
 	{
 		return;
+	}
+
+	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr) // Check linked powered list
+	{
+		sLinkedPoweredBlocks & Change = *itr;
+
+		if (
+			Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
+			Change.a_MiddlePos.Equals(Vector3i(a_MiddleX, a_MiddleY, a_MiddleZ)) &&
+			Change.a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
+			)
+		{
+			// Check for duplicates
+			return;
+		}
 	}
 
 	sLinkedPoweredBlocks RC;
