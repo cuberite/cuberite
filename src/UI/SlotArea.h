@@ -16,6 +16,7 @@ class cWindow;
 class cPlayer;
 class cChestEntity;
 class cDropSpenserEntity;
+class cEnderChestEntity;
 class cFurnaceEntity;
 class cCraftingRecipe;
 
@@ -281,6 +282,23 @@ protected:
 	cChestEntity * m_TopChest;
 	cChestEntity * m_BottomChest;
 } ;
+
+
+
+
+
+class cSlotAreaEnderChest :
+	public cSlotArea
+{
+public:
+	cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWindow & a_ParentWindow);
+
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+
+protected:
+	cEnderChestEntity * m_EnderChest;
+};
 
 
 

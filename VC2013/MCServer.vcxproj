@@ -224,6 +224,7 @@
     <ResourceCompile Include="MCServer.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\BlockEntities\EnderChestEntity.h" />
     <ClInclude Include="resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
     <ClInclude Include="..\src\BlockArea.h" />
@@ -615,6 +616,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Authenticator.cpp" />
     <ClCompile Include="..\src\BlockArea.cpp" />
+    <ClCompile Include="..\src\BlockEntities\EnderChestEntity.cpp" />
     <ClCompile Include="..\src\BlockID.cpp" />
     <ClCompile Include="..\src\BoundingBox.cpp" />
     <ClCompile Include="..\src\ByteBuffer.cpp" />

@@ -8,6 +8,7 @@
 #include "../Entities/Player.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DropSpenserEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../Items/ItemHandler.h"
 #include "Window.h"
@@ -550,6 +551,38 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaEnderChest:
+
+cSlotAreaEnderChest::cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWindow & a_ParentWindow) :
+	cSlotArea(27, a_ParentWindow),
+	m_EnderChest(a_EnderChest)
+{
+}
+
+
+
+
+
+const cItem * cSlotAreaEnderChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+{
+	// a_SlotNum ranges from 0 to 26, use that to index the chest entity's inventory directly:
+	return &(m_EnderChest->GetSlot(a_SlotNum));
+}
+
+
+
+
+
+void cSlotAreaEnderChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	m_EnderChest->SetSlot(a_SlotNum, a_Item);
 }
 
 

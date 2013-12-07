@@ -1301,6 +1301,7 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_CHEST:
 					case E_BLOCK_DISPENSER:
 					case E_BLOCK_DROPPER:
+					case E_BLOCK_ENDER_CHEST:
 					case E_BLOCK_LIT_FURNACE:
 					case E_BLOCK_FURNACE:
 					case E_BLOCK_HOPPER:
@@ -1413,6 +1414,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_CHEST:
 		case E_BLOCK_DISPENSER:
 		case E_BLOCK_DROPPER:
+		case E_BLOCK_ENDER_CHEST:
 		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
 		case E_BLOCK_HOPPER:
