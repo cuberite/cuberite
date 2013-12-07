@@ -113,7 +113,7 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 	AddDir(pistx, pisty, pistz, pistonMeta, -1);
 	// "pist" now at piston body, "ext" at future extension
 	
-	m_World->SetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8);
+	m_World->SetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8);
 	m_World->QueueSetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0), PISTON_TICK_DELAY);
 }
 
@@ -126,6 +126,7 @@ void cPiston::RetractPiston(int pistx, int pisty, int pistz)
 	BLOCKTYPE pistonBlock;
 	NIBBLETYPE pistonMeta;
 	m_World->GetBlockTypeMeta(pistx, pisty, pistz, pistonBlock, pistonMeta);
+
 	if (!IsExtended(pistonMeta))
 	{
 		// Already retracted, bail out

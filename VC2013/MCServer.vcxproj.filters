@@ -948,6 +948,9 @@
     <ClInclude Include="..\src\BlockEntities\EnderChestEntity.h">
       <Filter>Source Files\BlockEntities</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Blocks\BlockRedstoneLamp.h">
+      <Filter>Source Files\Blocks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\webadmin\template.html">

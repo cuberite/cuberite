@@ -225,6 +225,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\BlockEntities\EnderChestEntity.h" />
+    <ClInclude Include="..\src\Blocks\BlockRedstoneLamp.h" />
     <ClInclude Include="resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
     <ClInclude Include="..\src\BlockArea.h" />
