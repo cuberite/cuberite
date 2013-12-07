@@ -28,9 +28,9 @@ cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
 	m_WindowID((++m_WindowIDCounter) % 127),
 	m_WindowType(a_WindowType),
 	m_WindowTitle(a_WindowTitle),
-	m_Owner(NULL),
 	m_IsDestroyed(false),
-	m_ShouldDistributeToHotbarFirst(true)
+	m_ShouldDistributeToHotbarFirst(true),
+	m_Owner(NULL)
 {
 	if (a_WindowType == wtInventory)
 	{
