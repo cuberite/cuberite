@@ -1259,6 +1259,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			if (BlockMeta < 7)
 			{
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			return true;
 		}
@@ -1272,6 +1273,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			if (BlockMeta < 7)
 			{
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			return true;
 		}
@@ -1285,6 +1287,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			else
 			{
@@ -1306,6 +1309,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			if (BlockMeta < 7)
 			{
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			return true;
 		}
@@ -1319,6 +1323,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			else
 			{
@@ -1377,6 +1382,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					}
 				}  // switch (random spawn block type)
 				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
+				BroadcastSoundParticleEffect(2005, a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, 0);
 			}  // for i - 50 times
 			return true;
 		}
