@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/30/13 15:42:56.
+** Generated automatically by tolua++-1.0.92 on 12/07/13 14:15:49.
 */
 
 #ifndef __cplusplus
@@ -11803,6 +11803,38 @@ static int tolua_AllToLua_cWorld_IsDeepSnowEnabled00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: ShouldLavaSpawnFire of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_ShouldLavaSpawnFire00
+static int tolua_AllToLua_cWorld_ShouldLavaSpawnFire00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ShouldLavaSpawnFire'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->ShouldLavaSpawnFire();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ShouldLavaSpawnFire'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetDimension of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetDimension00
 static int tolua_AllToLua_cWorld_GetDimension00(lua_State* tolua_S)
@@ -12615,6 +12647,48 @@ static int tolua_AllToLua_cWorld_SpawnItemPickups01(lua_State* tolua_S)
  return 0;
 tolua_lerror:
  return tolua_AllToLua_cWorld_SpawnItemPickups00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SpawnFallingBlock of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SpawnFallingBlock00
+static int tolua_AllToLua_cWorld_SpawnFallingBlock00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
+  unsigned char BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SpawnFallingBlock'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->SpawnFallingBlock(a_X,a_Y,a_Z,BlockType,BlockMeta);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SpawnFallingBlock'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -30855,6 +30929,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsGameModeAdventure",tolua_AllToLua_cWorld_IsGameModeAdventure00);
    tolua_function(tolua_S,"IsPVPEnabled",tolua_AllToLua_cWorld_IsPVPEnabled00);
    tolua_function(tolua_S,"IsDeepSnowEnabled",tolua_AllToLua_cWorld_IsDeepSnowEnabled00);
+   tolua_function(tolua_S,"ShouldLavaSpawnFire",tolua_AllToLua_cWorld_ShouldLavaSpawnFire00);
    tolua_function(tolua_S,"GetDimension",tolua_AllToLua_cWorld_GetDimension00);
    tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cWorld_GetHeight00);
    tolua_function(tolua_S,"BroadcastChat",tolua_AllToLua_cWorld_BroadcastChat00);
@@ -30877,6 +30952,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetBlockMeta",tolua_AllToLua_cWorld_SetBlockMeta01);
    tolua_function(tolua_S,"SpawnItemPickups",tolua_AllToLua_cWorld_SpawnItemPickups00);
    tolua_function(tolua_S,"SpawnItemPickups",tolua_AllToLua_cWorld_SpawnItemPickups01);
+   tolua_function(tolua_S,"SpawnFallingBlock",tolua_AllToLua_cWorld_SpawnFallingBlock00);
    tolua_function(tolua_S,"SpawnExperienceOrb",tolua_AllToLua_cWorld_SpawnExperienceOrb00);
    tolua_function(tolua_S,"SpawnPrimedTNT",tolua_AllToLua_cWorld_SpawnPrimedTNT00);
    tolua_function(tolua_S,"DigBlock",tolua_AllToLua_cWorld_DigBlock00);
