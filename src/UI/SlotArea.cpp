@@ -446,7 +446,6 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 {
-	const cItem * ResultSlot = GetSlot(0, a_Player);
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 
 	// Get the current recipe:
