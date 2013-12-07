@@ -77,11 +77,11 @@ void cRoot::InputThread(void * a_Params)
 	
 	while (!(self.m_bStop || self.m_bRestart) && std::cin.good())
 	{
-		std::string Command;
+		AString Command;
 		std::getline(std::cin, Command);
 		if (!Command.empty())
-		{
-			self.ExecuteConsoleCommand(Command, Output);
+		{			
+			self.ExecuteConsoleCommand(TrimString(Command), Output);
 		}
 	}
 	
