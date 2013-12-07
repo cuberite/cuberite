@@ -376,7 +376,6 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 	
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		int AbsoluteZ = BaseZ + z;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int VoronoiCellValue = m_Voronoi.GetValueAt(DistortX[x][z], DistortZ[x][z]) / 8;
@@ -727,6 +726,7 @@ void cBioGenMultiStepMap::FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, co
 			{
 				case biRiver: cChunkDef::SetBiome(a_BiomeMap, x, z, biFrozenRiver); break;
 				case biOcean: cChunkDef::SetBiome(a_BiomeMap, x, z, biFrozenOcean); break;
+				default: break;
 			}
 		}  // for x
 		idx += 1;
