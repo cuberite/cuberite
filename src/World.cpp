@@ -14,6 +14,7 @@
 
 // Entities (except mobs):
 #include "Entities/ExpOrb.h"
+#include "Entities/FallingBlock.h"
 #include "Entities/Pickup.h"
 #include "Entities/Player.h"
 #include "Entities/TNTEntity.h"
@@ -1611,6 +1612,17 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		);
 		Pickup->Initialize(this);
 	}
+}
+
+
+
+
+
+int cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
+{
+	cFallingBlock * FallingBlock = new cFallingBlock(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
+	FallingBlock->Initialize(this);
+	return FallingBlock->GetUniqueID();
 }
 
 
