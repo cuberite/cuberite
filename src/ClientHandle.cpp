@@ -205,7 +205,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 {
 	if (m_State >= csAuthenticating)  // Don't log pings
 	{
-		LOG("Kicking user \"%s\" for \"%s\"", m_Username.c_str(), StripColorCodes(a_Reason).c_str());
+		LOGINFO("Kicking player %s for \"%s\"", m_Username.c_str(), StripColorCodes(a_Reason).c_str());
 	}
 	SendDisconnect(a_Reason);
 }

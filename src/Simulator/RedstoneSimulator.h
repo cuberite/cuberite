@@ -50,12 +50,20 @@ private:
 		BLOCKTYPE a_SourceBlock;
 		BLOCKTYPE a_MiddleBlock;
 	};
+
+	struct sSimulatedPlayerToggleableList
+	{
+		Vector3i a_BlockPos;
+		bool WasLastStatePowered;
+	};
 	
 	typedef std::vector <sPoweredBlocks> PoweredBlocksList;
 	typedef std::vector <sLinkedPoweredBlocks> LinkedBlocksList;
+	typedef std::vector <sSimulatedPlayerToggleableList> SimulatedPlayerToggleableList;
 
 	PoweredBlocksList m_PoweredBlocks;
 	LinkedBlocksList m_LinkedPoweredBlocks;
+	SimulatedPlayerToggleableList m_SimulatedPlayerToggleableBlocks;
 
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 
@@ -102,6 +110,8 @@ private:
 	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock);
 	/// <summary>Marks a block as being powered through another block</summary>
 	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock);
+	/// <summary>Marks a block as simulated, who should not be simulated further unless their power state changes, to accomodate a player manually toggling the block without triggering the simulator toggling it back</summary>
+	void SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool WasLastStatePowered);
 	/// <summary>Marks the second block in a direction as linked powered</summary>
 	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock);
 	/// <summary>Marks all blocks immediately surrounding a coordinate as powered</summary>
@@ -109,6 +119,8 @@ private:
 
 	/// <summary>Returns if a coordinate is powered or linked powered</summary>
 	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// <summary>Returns if a coordinate was marked as simulated (for blocks toggleable by players)</summary>
+	bool AreCoordsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool IsCurrentStatePowered);
 	/// <summary>Returns if a repeater is powered</summary>
 	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
 	/// <summary>Returns if a piston is powered</summary>

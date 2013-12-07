@@ -160,6 +160,29 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 	}
 
+	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end();)
+	{
+		sSimulatedPlayerToggleableList & Change = *itr;
+
+		int RelX = Change.a_BlockPos.x - a_ChunkX * cChunkDef::Width;
+		int RelZ = Change.a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
+
+		BLOCKTYPE SourceBlockType;
+		if (!a_Chunk->UnboundedRelGetBlockType(RelX, Change.a_BlockPos.y, RelZ, SourceBlockType))
+		{
+			continue;
+		}
+		else if (!IsAllowedBlock(SourceBlockType))
+		{
+			LOGD("cRedstoneSimulator: Erased block %s from toggleable simulated list due to power state change", ItemToFullString(SourceBlockType).c_str());
+			itr = m_SimulatedPlayerToggleableBlocks.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
+	}
+
 	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
 	{
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(dataitr->x, dataitr->y, dataitr->z);
@@ -314,7 +337,6 @@ void cRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_B
 		// Block torch on not powered, can be turned on again!
 		m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_ON, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
 	}
-	return;
 }
 
 
@@ -325,7 +347,6 @@ void cRedstoneSimulator::HandleRedstoneBlock(int a_BlockX, int a_BlockY, int a_B
 {
 	SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BLOCK_OF_REDSTONE);
 	SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BLOCK_OF_REDSTONE); // Set self as powered
-	return;
 }
 
 
@@ -345,7 +366,6 @@ void cRedstoneSimulator::HandleRedstoneLever(int a_BlockX, int a_BlockY, int a_B
 		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_LEVER);
 		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_LEVER);
 	}
-	return;
 }
 
 
@@ -497,7 +517,6 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 			}
 		}
 	}
-	return;
 }
 
 
@@ -556,7 +575,6 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 			m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
 		}
 	}
-	return;
 }
 
 
@@ -574,7 +592,6 @@ void cRedstoneSimulator::HandlePiston(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		Piston.RetractPiston(a_BlockX, a_BlockY, a_BlockZ);
 	}
-	return;
 }
 
 
@@ -598,7 +615,6 @@ void cRedstoneSimulator::HandleDropSpenser(int a_BlockX, int a_BlockY, int a_Blo
 	} DrSpSP (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ));
 
 	m_World.DoWithDropSpenserAt(a_BlockX, a_BlockY, a_BlockZ, DrSpSP);
-	return;
 }
 
 
@@ -621,7 +637,6 @@ void cRedstoneSimulator::HandleRedstoneLamp(int a_BlockX, int a_BlockY, int a_Bl
 			m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_LAMP_OFF, 0);
 		}
 	}
-	return;
 }
 
 
@@ -636,7 +651,6 @@ void cRedstoneSimulator::HandleTNT(int a_BlockX, int a_BlockY, int a_BlockZ)
 		m_World.SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 4);  // 4 seconds to boom
 		m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 	}
-	return;
 }
 
 
@@ -689,7 +703,6 @@ void cRedstoneSimulator::HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ)
 			}
 		}
 	}
-	return;
 }
 
 
@@ -732,11 +745,19 @@ void cRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ
 {
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
-		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x4);
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
+		{
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x4);
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
+		}		
 	}
 	else
 	{
-		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0xB); // Take into account that the fourth bit is needed for trapdoors too
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
+		{
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0xB); // Take into account that the fourth bit is needed for trapdoors too
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
+		}
 	}
 }
 
@@ -886,6 +907,31 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 		a_BlockZ = OldZ;
 	}
 	return false; // Source was in front of the piston's front face
+}
+
+
+
+
+
+bool cRedstoneSimulator::AreCoordsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool IsCurrentStatePowered)
+{
+	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
+	{
+		sSimulatedPlayerToggleableList & Change = *itr;
+
+		if (Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		{
+			if (Change.WasLastStatePowered != IsCurrentStatePowered) // Was the last power state different to the current?
+			{
+				return false; // It was, coordinates are no longer simulated
+			}
+			else
+			{
+				return true; // It wasn't, don't resimulate block, and allow players to toggle
+			}
+		}
+	}
+	return false; // Block wasn't even in the list, not simulated
 }
 
 
@@ -1124,7 +1170,6 @@ void cRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, i
 			break;
 		}
 	}
-	return;
 }
 
 
@@ -1150,7 +1195,6 @@ void cRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_B
 	{
 		SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, a_SourceBlock);
 	}
-	return;
 }
 
 
@@ -1184,7 +1228,6 @@ void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_Block
 	RC.a_SourcePos = Vector3i(a_SourceX, a_SourceY, a_SourceZ);
 	RC.a_SourceBlock = a_SourceBlock;
 	m_PoweredBlocks.push_back(RC);
-	return;
 }
 
 
@@ -1230,7 +1273,38 @@ void cRedstoneSimulator::SetBlockLinkedPowered(
 	RC.a_SourceBlock = a_SourceBlock;
 	RC.a_MiddleBlock = a_MiddleBlock;
 	m_LinkedPoweredBlocks.push_back(RC);
-	return;
+}
+
+
+
+
+
+void cRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool WasLastStatePowered)
+{
+	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
+	{
+		sSimulatedPlayerToggleableList & Change = *itr;
+
+		if (Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		{
+			if (Change.WasLastStatePowered != WasLastStatePowered)
+			{
+				// If power states different, erase the old listing in preparation to add new one
+				m_SimulatedPlayerToggleableBlocks.erase(itr);
+				break;
+			}
+			else
+			{
+				// If states the same, just ignore
+				return;
+			}
+		}
+	}
+
+	sSimulatedPlayerToggleableList RC;
+	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+	RC.WasLastStatePowered = WasLastStatePowered;
+	m_SimulatedPlayerToggleableBlocks.push_back(RC);
 }
 
 
