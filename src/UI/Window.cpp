@@ -201,6 +201,10 @@ void cWindow::Clicked(
 		case caRightPaintProgress: OnPaintProgress(a_Player, a_SlotNum); return;
 		case caLeftPaintEnd:       OnLeftPaintEnd (a_Player);            return;
 		case caRightPaintEnd:      OnRightPaintEnd(a_Player);            return;
+		default:
+		{
+			break;
+		}
 	}
 	
 	if (a_SlotNum < 0)
