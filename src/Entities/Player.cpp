@@ -572,7 +572,7 @@ void cPlayer::StartEating(void)
 	m_EatingFinishTick = m_World->GetWorldAge() + EATING_TICKS;
 	
 	// Send the packets:
-	m_World->BroadcastPlayerAnimation(*this, 5);
+	m_World->BroadcastEntityAnimation(*this, 3);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -587,7 +587,7 @@ void cPlayer::FinishEating(void)
 	
 	// Send the packets:
 	m_ClientHandle->SendEntityStatus(*this, ENTITY_STATUS_EATING_ACCEPTED);
-	m_World->BroadcastPlayerAnimation(*this, 0);
+	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -616,7 +616,7 @@ void cPlayer::FinishEating(void)
 void cPlayer::AbortEating(void)
 {
 	m_EatingFinishTick = -1;
-	m_World->BroadcastPlayerAnimation(*this, 0);
+	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -1328,7 +1328,7 @@ void cPlayer::TossItem(
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetRotation(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
 
 
@@ -1575,7 +1575,10 @@ void cPlayer::UseEquippedItem(void)
 		return;
 	}
 
-	GetInventory().DamageEquippedItem();
+	if (GetInventory().DamageEquippedItem())
+	{
+		m_World->BroadcastSoundEffect("random.break", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	}
 }
 
 

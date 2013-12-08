@@ -5,6 +5,10 @@
       <Configuration>Debug profiled</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_LuaStatic|Win32">
+      <Configuration>Debug_LuaStatic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -24,6 +28,11 @@
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v120</PlatformToolset>
@@ -46,6 +55,9 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -77,6 +89,11 @@
     <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+    <OutDir>$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
     <OutDir>$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
@@ -178,6 +195,28 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../lib/jsoncpp/include;../lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;XML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)\..\MCServer\$(ProjectName)_debug_luastatic.exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <Image Include="icon.ico" />
   </ItemGroup>
@@ -185,7 +224,8 @@
     <ResourceCompile Include="MCServer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Blocks\BlockTrapdoor.h" />
+    <ClInclude Include="..\src\BlockEntities\EnderChestEntity.h" />
+    <ClInclude Include="..\src\Blocks\BlockRedstoneLamp.h" />
     <ClInclude Include="resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
     <ClInclude Include="..\src\BlockArea.h" />
@@ -320,21 +360,22 @@
     <ClInclude Include="..\src\OSSupport\Timer.h" />
     <CustomBuild Include="..\Android\jni\ToJava.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <ClInclude Include="..\src\Bindings.h" />
     <ClInclude Include="..\src\LuaFunctions.h" />
-    <ClInclude Include="..\src\LuaState.h" />
-    <ClInclude Include="..\src\LuaWindow.h" />
-    <ClInclude Include="..\src\ManualBindings.h" />
-    <ClInclude Include="..\src\Plugin.h" />
-    <ClInclude Include="..\src\PluginLua.h" />
-    <ClInclude Include="..\src\PluginManager.h" />
+    <ClInclude Include="..\src\Bindings\LuaState.h" />
+    <ClInclude Include="..\src\Bindings\LuaWindow.h" />
+    <ClInclude Include="..\src\Bindings\ManualBindings.h" />
+    <ClInclude Include="..\src\Bindings\Plugin.h" />
+    <ClInclude Include="..\src\Bindings\PluginLua.h" />
+    <ClInclude Include="..\src\Bindings\PluginManager.h" />
     <ClInclude Include="..\src\tolua++.h" />
     <ClInclude Include="..\src\tolua_base.h" />
-    <ClInclude Include="..\src\WebPlugin.h" />
+    <ClInclude Include="..\src\Bindings\WebPlugin.h" />
     <ClInclude Include="..\lib\inifile\iniFile.h" />
     <ClInclude Include="..\lib\md5\md5.h" />
     <ClInclude Include="..\src\WorldStorage\FastNBT.h" />
@@ -415,6 +456,7 @@
     <ClInclude Include="..\src\blocks\BlockSugarcane.h" />
     <ClInclude Include="..\src\blocks\BlockTallGrass.h" />
     <ClInclude Include="..\src\blocks\BlockTorch.h" />
+    <ClInclude Include="..\src\Blocks\BlockTrapdoor.h" />
     <ClInclude Include="..\src\blocks\BlockVine.h" />
     <ClInclude Include="..\src\blocks\BlockWood.h" />
     <ClInclude Include="..\src\blocks\BlockWorkbench.h" />
@@ -481,12 +523,14 @@
     <None Include="..\webadmin\template.html" />
     <CustomBuild Include="..\Android\jni\Android.mk">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="..\Android\jni\Application.mk">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -497,6 +541,11 @@
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">cTorch.h;cStairs.h;cLadder.h;../lib/inifile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Bindings.cpp;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">GenerateBindings.cmd
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">cTorch.h;cStairs.h;cLadder.h;../lib/inifile/iniFile.h;BlockID.h;PacketID.h;Defines.h;LuaFunctions.h;cStringMap.h;cChatColor.h;cClientHandle.h;cEntity.h;cPawn.h;cPlayer.h;cPluginManager.h;cPlugin.h;cPlugin_NewLua.h;cPlugin_Lua.h;cServer.h;cWorld.h;cInventory.h;cItem.h;cWebAdmin.h;cWebPlugin.h;cWebPlugin_Lua.h;cPickup.h;cRoot.h;cTCPLink.h;Vector3f.h;Vector3d.h;Vector3i.h;Matrix4f.h;cCuboid.h;cMCLogger.h;cTracer.h;cGroup.h;BlockArea.h;packets/cPacket_Login.h;packets/cPacket_BlockDig.h;packets/cPacket_BlockPlace.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">Bindings.cpp;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GenerateBindings.cmd
 </Command>
@@ -568,6 +617,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Authenticator.cpp" />
     <ClCompile Include="..\src\BlockArea.cpp" />
+    <ClCompile Include="..\src\BlockEntities\EnderChestEntity.cpp" />
     <ClCompile Include="..\src\BlockID.cpp" />
     <ClCompile Include="..\src\BoundingBox.cpp" />
     <ClCompile Include="..\src\ByteBuffer.cpp" />
@@ -585,6 +635,7 @@
     <ClCompile Include="..\src\FurnaceRecipe.cpp" />
     <ClCompile Include="..\src\Globals.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -598,6 +649,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Level3</WarningLevel>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
+      </PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">Level3</WarningLevel>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level3</WarningLevel>
@@ -628,6 +682,13 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Default</BasicRuntimeChecks>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">true</IntrinsicFunctions>
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">Speed</FavorSizeOrSpeed>
+      <OmitFramePointers Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">true</OmitFramePointers>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">Default</BasicRuntimeChecks>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
+      </PrecompiledHeader>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
       <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Speed</FavorSizeOrSpeed>
@@ -646,6 +707,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">Level3</WarningLevel>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
+      </PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">Level3</WarningLevel>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level3</WarningLevel>
@@ -732,18 +796,22 @@
     <ClCompile Include="..\src\OSSupport\Timer.cpp" />
     <ClCompile Include="..\Android\jni\app-android.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Android\jni\ToJava.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\src\Bindings.cpp">
+    <ClCompile Include="..\src\Bindings\Bindings.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -752,17 +820,20 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\src\LuaState.cpp" />
-    <ClCompile Include="..\src\LuaWindow.cpp" />
-    <ClCompile Include="..\src\ManualBindings.cpp" />
-    <ClCompile Include="..\src\Plugin.cpp" />
-    <ClCompile Include="..\src\PluginLua.cpp" />
-    <ClCompile Include="..\src\PluginManager.cpp" />
-    <ClCompile Include="..\src\WebPlugin.cpp" />
+    <ClCompile Include="..\src\Bindings\LuaState.cpp" />
+    <ClCompile Include="..\src\Bindings\LuaWindow.cpp" />
+    <ClCompile Include="..\src\Bindings\ManualBindings.cpp" />
+    <ClCompile Include="..\src\Bindings\Plugin.cpp" />
+    <ClCompile Include="..\src\Bindings\PluginLua.cpp" />
+    <ClCompile Include="..\src\Bindings\PluginManager.cpp" />
+    <ClCompile Include="..\src\Bindings\WebPlugin.cpp" />
     <ClCompile Include="..\lib\inifile\iniFile.cpp" />
     <ClCompile Include="..\lib\md5\md5.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
       </PrecompiledHeader>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -810,6 +881,8 @@
     <ClCompile Include="..\lib\sqlite\lsqlite3.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
+      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
@@ -820,6 +893,8 @@
     <ClCompile Include="..\lib\sqlite\sqlite3.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
+      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">
@@ -829,6 +904,8 @@
     </ClCompile>
     <ClCompile Include="..\lib\luaexpat\lxplib.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_LuaStatic|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>

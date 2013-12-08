@@ -1259,6 +1259,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			if (BlockMeta < 7)
 			{
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			return true;
 		}
@@ -1272,6 +1273,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			if (BlockMeta < 7)
 			{
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			return true;
 		}
@@ -1285,6 +1287,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			else
 			{
@@ -1306,6 +1309,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			if (BlockMeta < 7)
 			{
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			return true;
 		}
@@ -1319,6 +1323,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			else
 			{
@@ -1377,6 +1382,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					}
 				}  // switch (random spawn block type)
 				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
+				BroadcastSoundParticleEffect(2005, a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, 0);
 			}  // for i - 50 times
 			return true;
 		}
@@ -1470,9 +1476,9 @@ void cWorld::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBB
 
 
 
-void cWorld::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay)
+void cWorld::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay, BLOCKTYPE a_PreviousBlockType)
 {
-	m_ChunkMap->QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, GetWorldAge() + a_TickDelay);
+	m_ChunkMap->QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, GetWorldAge() + a_TickDelay, a_PreviousBlockType);
 }
 
 
@@ -1585,6 +1591,12 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	a_FlyAwaySpeed /= 1000;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
+		if (!IsValidItem(itr->m_ItemType))
+		{
+			// Don't spawn pickup if item isn't even valid; should prevent client crashing too
+			continue;
+		}
+
 		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 		float SpeedY = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
@@ -1605,6 +1617,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
+		if (!IsValidItem(itr->m_ItemType))
+		{
+			continue;
+		}
+
 		cPickup * Pickup = new cPickup(
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, (float)a_SpeedX, (float)a_SpeedY, (float)a_SpeedZ
@@ -1858,9 +1875,9 @@ void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastPlayerAnimation(a_Player, a_Animation, a_Exclude);
+	m_ChunkMap->BroadcastEntityAnimation(a_Entity, a_Animation, a_Exclude);
 }
 
 

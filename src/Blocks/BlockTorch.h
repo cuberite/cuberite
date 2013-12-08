@@ -38,7 +38,8 @@ public:
 		else
 		{
 			// Not top or bottom faces, try to preserve whatever face was clicked
-			if (!TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
+			if (!CanBePlacedOn(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace))
 			{
 				// Torch couldn't be placed on whatever face was clicked, last ditch resort - find another face
 				a_BlockFace = FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ);
@@ -55,8 +56,8 @@ public:
 	}
 	
 
-	static NIBBLETYPE DirectionToMetaData(char a_Direction)  // tolua_export
-	{  // tolua_export
+	inline static NIBBLETYPE DirectionToMetaData(char a_Direction)
+	{
 		switch (a_Direction)
 		{
 			case BLOCK_FACE_BOTTOM: ASSERT(!"Shouldn't be getting this face"); return 0;
@@ -72,14 +73,14 @@ public:
 			}
 		};
 		return 0x0;
-	}  // tolua_export
+	}
 	
 
-	static char MetaDataToDirection(NIBBLETYPE a_MetaData)  // tolua_export
-	{  // tolua_export
+	inline static char MetaDataToDirection(NIBBLETYPE a_MetaData)
+	{
 		switch (a_MetaData)
 		{
-			case 0:                  return BLOCK_FACE_TOP;  // by default, the torches stand on the ground
+			case 0:                  return BLOCK_FACE_TOP;  // By default, the torches stand on the ground
 			case E_META_TORCH_FLOOR: return BLOCK_FACE_TOP;
 			case E_META_TORCH_EAST:  return BLOCK_FACE_EAST;
 			case E_META_TORCH_WEST:  return BLOCK_FACE_WEST;
@@ -92,26 +93,6 @@ public:
 			}
 		}
 		return 0;
-	}  // tolua_export
-
-
-	static bool IsAttachedTo(const Vector3i & a_TorchPos, char a_TorchMeta, const Vector3i & a_BlockPos)
-	{
-		switch (a_TorchMeta)
-		{
-			case 0x0:
-			case E_META_TORCH_FLOOR: return ((a_TorchPos - a_BlockPos).Equals(Vector3i(0, 1, 0)));
-			case E_META_TORCH_EAST:  return ((a_TorchPos - a_BlockPos).Equals(Vector3i(0, 0, -1)));
-			case E_META_TORCH_WEST:  return ((a_TorchPos - a_BlockPos).Equals(Vector3i(0, 0, 1)));
-			case E_META_TORCH_NORTH: return ((a_TorchPos - a_BlockPos).Equals(Vector3i(-1, 0, 0)));
-			case E_META_TORCH_SOUTH: return ((a_TorchPos - a_BlockPos).Equals(Vector3i(1, 0, 0)));
-			default:
-			{
-				ASSERT(!"Unhandled torch meta!");
-				break;
-			}
-		}
-		return false;
 	}
 
 
@@ -119,7 +100,7 @@ public:
 	{
 		if ( !g_BlockIsTorchPlaceable[a_BlockType] )
 		{
-			return (a_BlockFace == BLOCK_FACE_TOP);  // Allow placement only when torch upright
+			return (a_BlockFace == BLOCK_FACE_TOP);  // Allow placement only when torch upright (for glass, etc.); exceptions won't even be sent by client, no need to handle
 		}
 		else
 		{
@@ -128,22 +109,15 @@ public:
 	}
 	
 	
-	static bool TorchCanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
-	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
-		return CanBePlacedOn(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace);
-	}
-	
-	
 	/// Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure
 	static char FindSuitableFace(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		for (int i = 0; i <= 5; i++)
+		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++) // Loop through all directions
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, true);
 			BLOCKTYPE BlockInQuestion = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 
-			if (
+			if ( // If on a block that can only hold a torch if torch is standing on it, return that face
 				((BlockInQuestion == E_BLOCK_GLASS) ||
 				(BlockInQuestion == E_BLOCK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
@@ -155,10 +129,12 @@ public:
 			}
 			else if ((g_BlockIsTorchPlaceable[BlockInQuestion]) && (i != BLOCK_FACE_BOTTOM))
 			{
+				// Otherwise, if block in that direction is torch placeable and we haven't gotten to it via the bottom face, return that face
 				return i;
 			}
 			else
 			{
+				// Reset coords in preparation for next iteration
 				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, false);
 			}
 		}

@@ -489,10 +489,10 @@ void cProtocol172::SendPlayerAbilities(void)
 
 
 
-void cProtocol172::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
+void cProtocol172::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
 	cPacketizer Pkt(*this, 0x0b);  // Animation packet
-	Pkt.WriteVarInt(a_Player.GetUniqueID());
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteChar(a_Animation);
 }
 
@@ -664,7 +664,7 @@ void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	Pkt.WriteFPInt(a_FallingBlock.GetPosZ());
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
-	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 12));
+	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 16)); // Or 0x10
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedX() * 400));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedY() * 400));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedZ() * 400));
@@ -744,17 +744,13 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 
 void cProtocol172::SendTabCompletionResults(const AStringVector & a_Results)
 {
-	AString Results;
-	Results.reserve(500);  // Make a moderate reservation to avoid excessive reallocations
-	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
-	{
-		Results.append(*itr);
-		Results.push_back(0);
-	}
-	
 	cPacketizer Pkt(*this, 0x3a);  // Tab-Complete packet
 	Pkt.WriteVarInt(a_Results.size());
-	Pkt.WriteString(Results);
+
+	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
+	{
+		Pkt.WriteString(*itr);
+	}
 }
 
 

@@ -396,10 +396,10 @@ void cProtocolRecognizer::SendPlayerAbilities(void)
 
 
 
-void cProtocolRecognizer::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
+void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendPlayerAnimation(a_Player, a_Animation);
+	m_Protocol->SendEntityAnimation(a_Entity, a_Animation);
 }
 
 

@@ -36,6 +36,12 @@ public:
 	cBlockPistonHeadHandler(void);
 	
 	virtual void OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		// No pickups
+		// Also with 1.7, the item forms of these tecnical blocks have been removed, so giving someone this will crash their client...
+	}
 } ;
 
 

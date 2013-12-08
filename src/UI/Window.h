@@ -20,6 +20,7 @@ class cWindowOwner;
 class cClientHandle;
 class cChestEntity;
 class cDropSpenserEntity;
+class cEnderChestEntity;
 class cFurnaceEntity;
 class cHopperEntity;
 class cSlotArea;
@@ -278,6 +279,22 @@ protected:
 	cWorld * m_World;
 	int m_BlockX, m_BlockY, m_BlockZ;  // Position of the chest, for the window-close packet
 } ;
+
+
+
+
+
+class cEnderChestWindow :
+	public cWindow
+{
+public:
+	cEnderChestWindow(cEnderChestEntity * a_EnderChest);
+	~cEnderChestWindow();
+
+protected:
+	cWorld * m_World;
+	int m_BlockX, m_BlockY, m_BlockZ;  // Position of the enderchest, for the window-close packet
+};
 
 
 

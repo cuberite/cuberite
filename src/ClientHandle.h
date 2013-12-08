@@ -114,7 +114,7 @@ public:
 	void SendHealth              (void);
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
-	void SendPlayerAnimation     (const cPlayer & a_Player, char a_Animation);
+	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
 	void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline);
 	void SendPlayerMaxSpeed      (void);  ///< Informs the client of the maximum player speed (1.6.1+)
 	void SendPlayerMoveLook      (void);

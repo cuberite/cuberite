@@ -48,7 +48,7 @@ public:
 		cItems Pickups;
 		m_Contents.CopyToItems(Pickups);
 		m_Contents.Clear();
-		m_World->SpawnItemPickups(Pickups, m_PosX, m_PosY, m_PosZ);
+		m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5); // Spawn in centre of block
 	}
 	
 	// tolua_begin
