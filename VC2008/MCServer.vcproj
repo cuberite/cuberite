@@ -2923,6 +2923,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\BlockEntities\EnderChestEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\BlockEntities\EnderChestEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\BlockEntities\FurnaceEntity.cpp"
 					>
 				</File>

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/08/13 12:56:06.
+** Generated automatically by tolua++-1.0.92 on 12/08/13 18:11:12.
 */
 
 #ifndef __cplusplus
@@ -12487,7 +12487,8 @@ static int tolua_AllToLua_cWorld_QueueSetBlock00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,8,&tolua_err)
+     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12500,11 +12501,12 @@ static int tolua_AllToLua_cWorld_QueueSetBlock00(lua_State* tolua_S)
   unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
   unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
   int a_TickDelay = ((int)  tolua_tonumber(tolua_S,7,0));
+  unsigned char a_PreviousBlockType = (( unsigned char)  tolua_tonumber(tolua_S,8,E_BLOCK_AIR));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'QueueSetBlock'", NULL);
 #endif
   {
-   self->QueueSetBlock(a_BlockX,a_BLockY,a_BlockZ,a_BlockType,a_BlockMeta,a_TickDelay);
+   self->QueueSetBlock(a_BlockX,a_BLockY,a_BlockZ,a_BlockType,a_BlockMeta,a_TickDelay,a_PreviousBlockType);
   }
  }
  return 0;
@@ -29757,6 +29759,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_COLLECTING_PICKUP",cPluginManager::HOOK_COLLECTING_PICKUP);
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
+   tolua_constant(tolua_S,"HOOK_ENTITY_ANIMATION",cPluginManager::HOOK_ENTITY_ANIMATION);
    tolua_constant(tolua_S,"HOOK_EXECUTE_COMMAND",cPluginManager::HOOK_EXECUTE_COMMAND);
    tolua_constant(tolua_S,"HOOK_EXPLODED",cPluginManager::HOOK_EXPLODED);
    tolua_constant(tolua_S,"HOOK_EXPLODING",cPluginManager::HOOK_EXPLODING);
@@ -29765,7 +29768,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_HOPPER_PUSHING_ITEM",cPluginManager::HOOK_HOPPER_PUSHING_ITEM);
    tolua_constant(tolua_S,"HOOK_KILLING",cPluginManager::HOOK_KILLING);
    tolua_constant(tolua_S,"HOOK_LOGIN",cPluginManager::HOOK_LOGIN);
-   tolua_constant(tolua_S,"HOOK_PLAYER_ANIMATION",cPluginManager::HOOK_PLAYER_ANIMATION);
    tolua_constant(tolua_S,"HOOK_PLAYER_BREAKING_BLOCK",cPluginManager::HOOK_PLAYER_BREAKING_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_BROKEN_BLOCK",cPluginManager::HOOK_PLAYER_BROKEN_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_EATING",cPluginManager::HOOK_PLAYER_EATING);
