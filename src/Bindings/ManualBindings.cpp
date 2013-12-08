@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ManualBindings.h"
-#include "tolua++.h"
+#include "tolua++/include/tolua++.h"
 
 #include "Plugin.h"
 #include "PluginLua.h"

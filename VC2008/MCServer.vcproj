@@ -2010,10 +2010,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Bindings\tolua++.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Bindings\tolua_base.h"
 					>
 				</File>

@@ -11,7 +11,6 @@
 #include "../CommandOutput.h"
 
 #include "inifile/iniFile.h"
-#include "tolua++.h"
 #include "../Entities/Player.h"
 
 
