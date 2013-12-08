@@ -664,7 +664,7 @@ void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	Pkt.WriteFPInt(a_FallingBlock.GetPosZ());
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
-	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 12));
+	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 16)); // Or 0x10
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedX() * 400));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedY() * 400));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedZ() * 400));
