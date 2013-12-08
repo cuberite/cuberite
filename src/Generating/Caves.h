@@ -70,8 +70,8 @@ public:
 	cStructGenWormNestCaves(int a_Seed, int a_Size = 64, int a_Grid = 96, int a_MaxOffset = 128) :
 		m_Noise(a_Seed),
 		m_Size(a_Size),
-		m_Grid(a_Grid),
-		m_MaxOffset(a_MaxOffset)
+		m_MaxOffset(a_MaxOffset),
+		m_Grid(a_Grid)
 	{
 	}
 	
