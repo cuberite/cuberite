@@ -416,6 +416,22 @@ inline float GetSpecialSignf( float a_Val )
 
 
 // tolua_begin
+
+/// Normalizes an angle in degrees to the [-180, +180) range:
+inline double NormalizeAngleDegrees(const double a_Degrees)
+{
+	double Norm = fmod(a_Degrees + 180, 360);
+	if (Norm < 0)
+	{
+		Norm += 360;
+	}
+	return Norm - 180;
+}
+
+
+
+
+
 namespace ItemCategory
 {
 	inline bool IsPickaxe(short a_ItemID)

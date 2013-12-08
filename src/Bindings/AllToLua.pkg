@@ -1,0 +1,82 @@
+
+$#include "../Globals.h"
+
+$#include "tolua_base.h"
+
+// Typedefs from Globals.h, so that we don't have to process that file:
+typedef long long Int64;
+typedef int       Int32;
+typedef short     Int16;
+
+typedef unsigned long long UInt64;
+typedef unsigned int       UInt32;
+typedef unsigned short     UInt16;
+
+
+$cfile "../ChunkDef.h"
+
+$cfile "../../lib/inifile/iniFile.h"
+
+$cfile "../OSSupport/File.h"
+
+$cfile "LuaFunctions.h"
+$cfile "PluginManager.h"
+$cfile "Plugin.h"
+$cfile "PluginLua.h"
+$cfile "WebPlugin.h"
+$cfile "LuaWindow.h"
+
+$cfile "../BlockID.h"
+$cfile "../StringUtils.h"
+$cfile "../Defines.h"
+$cfile "../ChatColor.h"
+$cfile "../ClientHandle.h"
+$cfile "../Entities/Entity.h"
+$cfile "../Entities/Pawn.h"
+$cfile "../Entities/Player.h"
+$cfile "../Entities/Pickup.h"
+$cfile "../Entities/ProjectileEntity.h"
+$cfile "../Server.h"
+$cfile "../World.h"
+$cfile "../Inventory.h"
+$cfile "../Enchantments.h"
+$cfile "../Item.h"
+$cfile "../ItemGrid.h"
+$cfile "../BlockEntities/BlockEntity.h"
+$cfile "../BlockEntities/BlockEntityWithItems.h"
+$cfile "../BlockEntities/ChestEntity.h"
+$cfile "../BlockEntities/DropSpenserEntity.h"
+$cfile "../BlockEntities/DispenserEntity.h"
+$cfile "../BlockEntities/DropperEntity.h"
+$cfile "../BlockEntities/FurnaceEntity.h"
+$cfile "../BlockEntities/HopperEntity.h"
+$cfile "../BlockEntities/JukeboxEntity.h"
+$cfile "../BlockEntities/NoteEntity.h"
+$cfile "../BlockEntities/SignEntity.h"
+$cfile "../WebAdmin.h"
+$cfile "../Root.h"
+$cfile "../Vector3f.h"
+$cfile "../Vector3d.h"
+$cfile "../Vector3i.h"
+$cfile "../Matrix4f.h"
+$cfile "../Cuboid.h"
+$cfile "../BoundingBox.h"
+$cfile "../Tracer.h"
+$cfile "../Group.h"
+$cfile "../BlockArea.h"
+$cfile "../Generating/ChunkDesc.h"
+$cfile "../CraftingRecipes.h"
+$cfile "../UI/Window.h"
+$cfile "../Mobs/Monster.h"
+
+
+
+
+
+// Need to declare this class so that the usertype is properly registered in Bindings.cpp - 
+// it seems impossible to register a usertype in ManualBindings.cpp
+class cLineBlockTracer;
+
+
+
+

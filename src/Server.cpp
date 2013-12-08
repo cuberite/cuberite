@@ -10,7 +10,7 @@
 #include "Root.h"
 #include "World.h"
 #include "ChunkDef.h"
-#include "PluginManager.h"
+#include "Bindings/PluginManager.h"
 #include "GroupManager.h"
 #include "ChatColor.h"
 #include "Entities/Player.h"

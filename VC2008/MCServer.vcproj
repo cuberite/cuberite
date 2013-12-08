@@ -1851,7 +1851,7 @@
 				Name="Bindings"
 				>
 				<File
-					RelativePath="..\src\AllToLua.pkg"
+					RelativePath="..\src\Bindings\AllToLua.pkg"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -1910,11 +1910,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\MCServer\API.txt"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Bindings.cpp"
+					RelativePath="..\src\Bindings\Bindings.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -1958,75 +1954,75 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\Bindings.h"
+					RelativePath="..\src\Bindings\Bindings.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LuaFunctions.h"
+					RelativePath="..\src\Bindings\LuaFunctions.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LuaState.cpp"
+					RelativePath="..\src\Bindings\LuaState.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LuaState.h"
+					RelativePath="..\src\Bindings\LuaState.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LuaWindow.cpp"
+					RelativePath="..\src\Bindings\LuaWindow.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LuaWindow.h"
+					RelativePath="..\src\Bindings\LuaWindow.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ManualBindings.cpp"
+					RelativePath="..\src\Bindings\ManualBindings.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ManualBindings.h"
+					RelativePath="..\src\Bindings\ManualBindings.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Plugin.cpp"
+					RelativePath="..\src\Bindings\Plugin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Plugin.h"
+					RelativePath="..\src\Bindings\Plugin.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\PluginLua.cpp"
+					RelativePath="..\src\Bindings\PluginLua.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\PluginLua.h"
+					RelativePath="..\src\Bindings\PluginLua.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\PluginManager.cpp"
+					RelativePath="..\src\Bindings\PluginManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\PluginManager.h"
+					RelativePath="..\src\Bindings\PluginManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\tolua++.h"
+					RelativePath="..\src\Bindings\tolua++.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\tolua_base.h"
+					RelativePath="..\src\Bindings\tolua_base.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\WebPlugin.cpp"
+					RelativePath="..\src\Bindings\WebPlugin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\WebPlugin.h"
+					RelativePath="..\src\Bindings\WebPlugin.h"
 					>
 				</File>
 			</Filter>

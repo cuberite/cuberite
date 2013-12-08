@@ -27,7 +27,7 @@
 #include "MersenneTwister.h"
 #include "Entities/Player.h"
 #include "BlockArea.h"
-#include "PluginManager.h"
+#include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Simulator/FluidSimulator.h"
 #include "MobCensus.h"

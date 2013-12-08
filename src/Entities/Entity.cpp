@@ -10,7 +10,7 @@
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "../Simulator/FluidSimulator.h"
-#include "../PluginManager.h"
+#include "../Bindings/PluginManager.h"
 #include "../Tracer.h"
 #include "Minecart.h"
 
@@ -158,8 +158,7 @@ bool cEntity::Initialize(cWorld * a_World)
 
 void cEntity::WrapHeadYaw(void)
 {
-	while (m_HeadYaw > 180.f)  m_HeadYaw -= 360.f; // Wrap it
-	while (m_HeadYaw < -180.f) m_HeadYaw += 360.f;
+	m_HeadYaw = NormalizeAngleDegrees(m_HeadYaw);
 }
 
 
@@ -168,10 +167,8 @@ void cEntity::WrapHeadYaw(void)
 
 void cEntity::WrapRotation(void)
 {
-	while (m_Rot.x > 180.f)  m_Rot.x -= 360.f; // Wrap it
-	while (m_Rot.x < -180.f) m_Rot.x += 360.f;
-	while (m_Rot.y > 180.f)  m_Rot.y -= 360.f;
-	while (m_Rot.y < -180.f) m_Rot.y += 360.f;
+	m_Rot.x = NormalizeAngleDegrees(m_Rot.x);
+	m_Rot.y = NormalizeAngleDegrees(m_Rot.z);
 }
 
 

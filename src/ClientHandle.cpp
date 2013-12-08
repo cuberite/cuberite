@@ -4,7 +4,7 @@
 #include "Server.h"
 #include "World.h"
 #include "Entities/Pickup.h"
-#include "PluginManager.h"
+#include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
 #include "Inventory.h"
 #include "BlockEntities/ChestEntity.h"

@@ -2,10 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "WebAdmin.h"
-#include "WebPlugin.h"
+#include "Bindings/WebPlugin.h"
 
-#include "PluginManager.h"
-#include "Plugin.h"
+#include "Bindings/PluginManager.h"
+#include "Bindings/Plugin.h"
 
 #include "World.h"
 #include "Entities/Player.h"

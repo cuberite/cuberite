@@ -2077,6 +2077,7 @@ end
 					{ Params = "{{cItems|Pickups}}, X, Y, Z, SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Spawns the specified pickups at the position specified. All the pickups fly away from the spawn position using the specified speed." },
 				},
 				SpawnMob = { Params = "X, Y, Z, {{cMonster|MonsterType}}", Return = "EntityID", Notes = "Spawns the specified type of mob at the specified coords. Returns the EntityID of the creates entity, or -1 on failure. " },
+				SpawnFallingBlock = { Params = "X, Y, Z, BlockType, BlockMeta", Return = "EntityID", Notes = "Spawns an {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta" },
 				SpawnExperienceOrb = { Params = "X, Y, Z, Reward", Return = "EntityID", Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward" },
 				SpawnPrimedTNT = { Params = "X, Y, Z, FuseTimeSecs, InitialVelocityCoeff", Return = "", Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse time. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value." },
 				TryGetHeight = { Params = "BlockX, BlockZ", Return = "IsValid, Height", Notes = "Returns true and height of the highest non-air block if the chunk is loaded, or false otherwise." },

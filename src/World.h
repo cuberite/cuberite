@@ -355,6 +355,9 @@ public:
 	/// Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified:
 	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false);
 	
+	/// Spawns an falling block entity at the given position. It returns the UniqueID of the spawned falling block.
+	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
+
 	/// Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb.
 	int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward);
 

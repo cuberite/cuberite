@@ -5,7 +5,7 @@
 #include "../World.h"
 #include "inifile/iniFile.h"
 #include "../Root.h"
-#include "../PluginManager.h"
+#include "../Bindings/PluginManager.h"
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
 #include "Noise3DGenerator.h"

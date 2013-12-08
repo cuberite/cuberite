@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include "UI/Window.h"
-#include "ItemGrid.h"
+#include "../UI/Window.h"
+#include "../ItemGrid.h"
 
 
 

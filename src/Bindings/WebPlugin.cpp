@@ -2,9 +2,9 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "WebPlugin.h"
-#include "WebAdmin.h"
-#include "Server.h"
-#include "Root.h"
+#include "../WebAdmin.h"
+#include "../Server.h"
+#include "../Root.h"
 
 
 

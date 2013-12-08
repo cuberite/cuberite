@@ -4,7 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Root.h"
-#include "../PluginManager.h"
+#include "../Bindings/PluginManager.h"
 #include "BlockBed.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
@@ -48,7 +48,6 @@
 #include "BlockPumpkin.h"
 #include "BlockRail.h"
 #include "BlockRedstone.h"
-#include "BlockRedstoneLamp.h"
 #include "BlockRedstoneRepeater.h"
 #include "BlockRedstoneTorch.h"
 #include "BlockSand.h"
@@ -151,7 +150,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LADDER:                return new cBlockLadderHandler          (a_BlockType);
 		case E_BLOCK_LEVER:                 return new cBlockLeverHandler           (a_BlockType);
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
-		case E_BLOCK_LAVA:                  return new cBlockFluidHandler           (a_BlockType);
+		case E_BLOCK_LAVA:                  return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
 		case E_BLOCK_LOG:                   return new cBlockWoodHandler            (a_BlockType);
@@ -172,7 +171,6 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE:          return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE_GLOWING:  return new cBlockOreHandler             (a_BlockType);
-		case E_BLOCK_REDSTONE_LAMP_ON:      return new cBlockRedstoneLampHandler    (a_BlockType);
 		case E_BLOCK_REDSTONE_REPEATER_OFF: return new cBlockRedstoneRepeaterHandler(a_BlockType);
 		case E_BLOCK_REDSTONE_REPEATER_ON:  return new cBlockRedstoneRepeaterHandler(a_BlockType);
 		case E_BLOCK_REDSTONE_TORCH_OFF:    return new cBlockRedstoneTorchHandler   (a_BlockType);
@@ -187,6 +185,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_STATIONARY_LAVA:       return new cBlockLavaHandler            (a_BlockType);
+		case E_BLOCK_STATIONARY_WATER:      return new cBlockFluidHandler           (a_BlockType);
 		case E_BLOCK_STICKY_PISTON:         return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_STONE:                 return new cBlockStoneHandler           (a_BlockType);
 		case E_BLOCK_STONE_BRICK_STAIRS:    return new cBlockStairsHandler          (a_BlockType);

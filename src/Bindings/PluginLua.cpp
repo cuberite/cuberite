@@ -7,7 +7,7 @@
 
 #define LUA_USE_POSIX
 #include "PluginLua.h"
-#include "CommandOutput.h"
+#include "../CommandOutput.h"
 
 extern "C"
 {
