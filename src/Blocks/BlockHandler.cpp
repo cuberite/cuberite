@@ -150,7 +150,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LADDER:                return new cBlockLadderHandler          (a_BlockType);
 		case E_BLOCK_LEVER:                 return new cBlockLeverHandler           (a_BlockType);
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
-		case E_BLOCK_LAVA:                  return new cBlockFluidHandler           (a_BlockType);
+		case E_BLOCK_LAVA:                  return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
 		case E_BLOCK_LOG:                   return new cBlockWoodHandler            (a_BlockType);
@@ -185,7 +185,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_STATIONARY_LAVA:       return new cBlockLavaHandler            (a_BlockType);
-		case E_BLOCK_STATIONARY_WATER:      return new cBlockLavaHandler            (a_BlockType);
+		case E_BLOCK_STATIONARY_WATER:      return new cBlockFluidHandler           (a_BlockType);
 		case E_BLOCK_STICKY_PISTON:         return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_STONE:                 return new cBlockStoneHandler           (a_BlockType);
 		case E_BLOCK_STONE_BRICK_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
