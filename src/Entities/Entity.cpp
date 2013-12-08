@@ -168,7 +168,7 @@ void cEntity::WrapHeadYaw(void)
 void cEntity::WrapRotation(void)
 {
 	m_Rot.x = NormalizeAngleDegrees(m_Rot.x);
-	m_Rot.y = NormalizeAngleDegrees(m_Rot.z);
+	m_Rot.y = NormalizeAngleDegrees(m_Rot.y);
 }
 
 
