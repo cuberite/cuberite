@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/08/13 12:15:47.
+** Generated automatically by tolua++-1.0.92 on 12/08/13 12:56:06.
 */
 
 #ifndef __cplusplus
@@ -4294,6 +4294,35 @@ static int tolua_AllToLua_AddFaceDirection00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'AddFaceDirection'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NormalizeAngleDegrees */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_NormalizeAngleDegrees00
+static int tolua_AllToLua_NormalizeAngleDegrees00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const double a_Degrees = ((const double)  tolua_tonumber(tolua_S,1,0));
+  {
+   double tolua_ret = (double)  NormalizeAngleDegrees(a_Degrees);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'NormalizeAngleDegrees'.",&tolua_err);
  return 0;
 #endif
 }
@@ -30603,6 +30632,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_function(tolua_S,"IsValidBlock",tolua_AllToLua_IsValidBlock00);
   tolua_function(tolua_S,"IsValidItem",tolua_AllToLua_IsValidItem00);
   tolua_function(tolua_S,"AddFaceDirection",tolua_AllToLua_AddFaceDirection00);
+  tolua_function(tolua_S,"NormalizeAngleDegrees",tolua_AllToLua_NormalizeAngleDegrees00);
   tolua_module(tolua_S,"ItemCategory",0);
   tolua_beginmodule(tolua_S,"ItemCategory");
    tolua_function(tolua_S,"IsPickaxe",tolua_AllToLua_ItemCategory_IsPickaxe00);
