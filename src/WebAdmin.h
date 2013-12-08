@@ -6,7 +6,7 @@
 #pragma once
 
 #include "OSSupport/Socket.h"
-#include "LuaState.h"
+#include "Bindings/LuaState.h"
 #include "inifile/iniFile.h"
 #include "HTTPServer/HTTPServer.h"
 #include "HTTPServer/HTTPFormParser.h"

@@ -8,7 +8,7 @@
 #include "../UI/WindowOwner.h"
 #include "../World.h"
 #include "Pickup.h"
-#include "../PluginManager.h"
+#include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../GroupManager.h"
 #include "../Group.h"

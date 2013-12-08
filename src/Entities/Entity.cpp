@@ -10,7 +10,7 @@
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "../Simulator/FluidSimulator.h"
-#include "../PluginManager.h"
+#include "../Bindings/PluginManager.h"
 #include "../Tracer.h"
 #include "Minecart.h"
 

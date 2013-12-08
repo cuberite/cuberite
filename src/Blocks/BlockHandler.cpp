@@ -4,7 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Root.h"
-#include "../PluginManager.h"
+#include "../Bindings/PluginManager.h"
 #include "BlockBed.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"

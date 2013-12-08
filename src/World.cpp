@@ -36,12 +36,11 @@
 
 #include "MersenneTwister.h"
 #include "Generating/Trees.h"
-#include "PluginManager.h"
+#include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Vector3d.h"
 
 #include "Tracer.h"
-#include "tolua++.h"
 
 // DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
 #include "LineBlockTracer.h"

@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "CraftingRecipes.h"
 #include "Root.h"
-#include "PluginManager.h"
+#include "Bindings/PluginManager.h"
 
 
 

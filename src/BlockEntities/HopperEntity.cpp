@@ -7,7 +7,7 @@
 #include "HopperEntity.h"
 #include "../Chunk.h"
 #include "../Entities/Player.h"
-#include "../PluginManager.h"
+#include "../Bindings/PluginManager.h"
 #include "ChestEntity.h"
 #include "DropSpenserEntity.h"
 #include "FurnaceEntity.h"

@@ -5,9 +5,9 @@
 
 #include "Globals.h"
 #include "LuaWindow.h"
-#include "UI/SlotArea.h"
+#include "../UI/SlotArea.h"
 #include "PluginLua.h"
-#include "Entities/Player.h"
+#include "../Entities/Player.h"
 #include "lua/src/lauxlib.h" // Needed for LUA_REFNIL
 
 

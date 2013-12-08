@@ -10,7 +10,7 @@
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
-#include "PluginManager.h"
+#include "Bindings/PluginManager.h"
 #include "Entities/TNTEntity.h"
 #include "Blocks/BlockHandler.h"
 #include "MobCensus.h"

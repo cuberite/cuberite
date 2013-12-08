@@ -8,7 +8,7 @@
 #include "FurnaceRecipe.h"
 #include "GroupManager.h"
 #include "CraftingRecipes.h"
-#include "PluginManager.h"
+#include "Bindings/PluginManager.h"
 #include "MonsterConfig.h"
 #include "Entities/Player.h"
 #include "Blocks/BlockHandler.h"

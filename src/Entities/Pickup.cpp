@@ -12,7 +12,7 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../Server.h"
 #include "Player.h"
-#include "../PluginManager.h"
+#include "../Bindings/PluginManager.h"
 #include "../Item.h"
 #include "../Root.h"
 #include "../Chunk.h"
