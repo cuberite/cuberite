@@ -744,17 +744,13 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 
 void cProtocol172::SendTabCompletionResults(const AStringVector & a_Results)
 {
-	AString Results;
-	Results.reserve(500);  // Make a moderate reservation to avoid excessive reallocations
-	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
-	{
-		Results.append(*itr);
-		Results.push_back(0);
-	}
-	
 	cPacketizer Pkt(*this, 0x3a);  // Tab-Complete packet
 	Pkt.WriteVarInt(a_Results.size());
-	Pkt.WriteString(Results);
+
+	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
+	{
+		Pkt.WriteString(*itr);
+	}
 }
 
 
