@@ -7,9 +7,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\lib\tolua++\src\bin\tolua.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\lib\tolua++\src\lib\tolua_event.c">
       <Filter>Source Files</Filter>
     </ClCompile>

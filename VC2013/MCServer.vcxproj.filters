@@ -10,73 +10,73 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Source Files\Mobs">
-      <UniqueIdentifier>{52f3d533-108a-4cd8-8be2-19c799667e26}</UniqueIdentifier>
+      <UniqueIdentifier>{977716f7-b383-498a-950f-49afc6d551f6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entities">
-      <UniqueIdentifier>{727392f6-6dc8-4c0f-8380-2affc45d20d4}</UniqueIdentifier>
+      <UniqueIdentifier>{14ac2998-63d0-4bb3-97e3-1bd0007ffc74}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\UI">
-      <UniqueIdentifier>{169eedf6-1244-49d1-9a74-79002dee80a7}</UniqueIdentifier>
+      <UniqueIdentifier>{272cba2d-aa26-4c69-b6fa-94465078e351}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Simulator">
-      <UniqueIdentifier>{78798af4-7e8b-4f86-8175-c34995b71a7f}</UniqueIdentifier>
+      <UniqueIdentifier>{1fabcea5-dba3-4265-b691-5795c69c4471}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\OSSupport">
-      <UniqueIdentifier>{a9d6163b-75c5-47ef-8ebd-192c0053d987}</UniqueIdentifier>
+      <UniqueIdentifier>{c29beffd-33f6-44eb-8310-3e0462cdddf9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\OSSupport\Android Specific">
-      <UniqueIdentifier>{4e664e9b-8741-4701-9f32-60dcc29f6463}</UniqueIdentifier>
+      <UniqueIdentifier>{430cae6d-cfb2-49a2-9fb2-614fde244868}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Bindings">
-      <UniqueIdentifier>{5496fc08-0db0-4de0-adff-760fa67a8a78}</UniqueIdentifier>
+      <UniqueIdentifier>{87060076-8ef4-4535-88ee-7a609e4391ae}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\External">
-      <UniqueIdentifier>{0162bb1a-bed1-4e87-9ab7-c3da55911060}</UniqueIdentifier>
+      <UniqueIdentifier>{4e33e863-d055-4476-bb95-efd5ebc115d3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\WorldStorage">
-      <UniqueIdentifier>{82c6a5ba-3211-4c01-a643-9cdf2983630f}</UniqueIdentifier>
+      <UniqueIdentifier>{ae97007e-0940-4f87-9786-8ed1d201e52c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Generating">
-      <UniqueIdentifier>{fc99053a-c609-4646-ad85-9cbaccbcf1c5}</UniqueIdentifier>
+      <UniqueIdentifier>{99483c91-c76c-47c7-838d-ba25c2066c79}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Blocks">
-      <UniqueIdentifier>{83b41e57-43fe-4bfc-8ca5-d0d460834d59}</UniqueIdentifier>
+      <UniqueIdentifier>{51b8f5f3-83b3-4068-8825-503f19b42542}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Items">
-      <UniqueIdentifier>{d53d761d-7d28-41dd-9623-6b489fbba65a}</UniqueIdentifier>
+      <UniqueIdentifier>{959da118-757d-44c1-a4bd-d3345cfeb637}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Protocol">
-      <UniqueIdentifier>{d3534b5b-4684-4857-befa-b78b9198eed8}</UniqueIdentifier>
+      <UniqueIdentifier>{be413233-b7df-4ef1-9eb3-8aa1de96bf3e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\SQLite">
-      <UniqueIdentifier>{96831397-1e56-4d07-9a3f-d97b9caa3f64}</UniqueIdentifier>
+      <UniqueIdentifier>{224e8323-4bcc-4d7e-bdba-09fa22f42d66}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\LuaExpat">
-      <UniqueIdentifier>{6c6cceb3-545c-4698-a5c9-c01497e80022}</UniqueIdentifier>
+      <UniqueIdentifier>{f9ad84f7-9199-45d1-a609-128f60baa996}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\BlockEntities">
-      <UniqueIdentifier>{7491cc4f-d735-4546-8aad-24d11a7396b0}</UniqueIdentifier>
+      <UniqueIdentifier>{74088e2e-f7dc-478a-ae7f-bcfcb1a13dcc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\HTTPServer">
-      <UniqueIdentifier>{201c626a-b869-407a-9c2a-e06cf8c8e127}</UniqueIdentifier>
+      <UniqueIdentifier>{5e5eae6e-3154-4f85-868e-2682d072a5b2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Config files">
-      <UniqueIdentifier>{cd93064b-e465-4562-a09b-de2363d0fab4}</UniqueIdentifier>
+      <UniqueIdentifier>{124dfea0-3dcd-45c0-a196-ec9bd6e00b6a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins">
-      <UniqueIdentifier>{8947d9a2-b1dc-4c3e-8c27-05ca5260843d}</UniqueIdentifier>
+      <UniqueIdentifier>{bc156df0-b3f8-4bf2-a434-59e63f5eafcc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Core">
-      <UniqueIdentifier>{26e14e8c-ffde-4f83-b3a0-e0001d590e7a}</UniqueIdentifier>
+      <UniqueIdentifier>{2bbb71f4-860a-4fc4-b9d9-ac05f806fea1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\ChatLog">
-      <UniqueIdentifier>{44ae2ab1-5552-4e84-b8b5-f28a59af0c4f}</UniqueIdentifier>
+      <UniqueIdentifier>{05facd8b-76e8-4bc5-9135-831b49ac5c65}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Debuggers">
-      <UniqueIdentifier>{ac8a4c54-36f2-4505-a0dc-66f2817ccfa7}</UniqueIdentifier>
+      <UniqueIdentifier>{6b70646e-a784-4617-8b26-941de4f8fd20}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\APIDump">
-      <UniqueIdentifier>{3e58b3c7-097f-4688-a619-2771353180fe}</UniqueIdentifier>
+      <UniqueIdentifier>{a2b234d1-1013-47c0-8a44-f3b294d83d19}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -486,37 +486,34 @@
     <ClInclude Include="..\src\OSSupport\Timer.h">
       <Filter>Source Files\OSSupport</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Bindings.h">
+    <ClInclude Include="..\src\Bindings\Bindings.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LuaFunctions.h">
+    <ClInclude Include="..\src\Bindings\LuaFunctions.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LuaState.h">
+    <ClInclude Include="..\src\Bindings\LuaState.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LuaWindow.h">
+    <ClInclude Include="..\src\Bindings\LuaWindow.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ManualBindings.h">
+    <ClInclude Include="..\src\Bindings\ManualBindings.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Plugin.h">
+    <ClInclude Include="..\src\Bindings\Plugin.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\PluginLua.h">
+    <ClInclude Include="..\src\Bindings\PluginLua.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\PluginManager.h">
+    <ClInclude Include="..\src\Bindings\PluginManager.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\tolua++.h">
+    <ClInclude Include="..\src\Bindings\tolua_base.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\tolua_base.h">
-      <Filter>Source Files\Bindings</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\WebPlugin.h">
+    <ClInclude Include="..\src\Bindings\WebPlugin.h">
       <Filter>Source Files\Bindings</Filter>
     </ClInclude>
     <ClInclude Include="..\lib\inifile\iniFile.h">
@@ -909,6 +906,9 @@
     <ClInclude Include="..\src\BlockEntities\DropSpenserEntity.h">
       <Filter>Source Files\BlockEntities</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\BlockEntities\EnderChestEntity.h">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\BlockEntities\FurnaceEntity.h">
       <Filter>Source Files\BlockEntities</Filter>
     </ClInclude>
@@ -944,12 +944,6 @@
     </ClInclude>
     <ClInclude Include="..\src\HTTPServer\NameValueParser.h">
       <Filter>Source Files\HTTPServer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\BlockEntities\EnderChestEntity.h">
-      <Filter>Source Files\BlockEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Blocks\BlockRedstoneLamp.h">
-      <Filter>Source Files\Blocks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1471,28 +1465,28 @@
     <ClCompile Include="..\Android\jni\ToJava.cpp">
       <Filter>Source Files\OSSupport\Android Specific</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Bindings.cpp">
+    <ClCompile Include="..\src\Bindings\Bindings.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LuaState.cpp">
+    <ClCompile Include="..\src\Bindings\LuaState.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LuaWindow.cpp">
+    <ClCompile Include="..\src\Bindings\LuaWindow.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ManualBindings.cpp">
+    <ClCompile Include="..\src\Bindings\ManualBindings.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Plugin.cpp">
+    <ClCompile Include="..\src\Bindings\Plugin.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\PluginLua.cpp">
+    <ClCompile Include="..\src\Bindings\PluginLua.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\PluginManager.cpp">
+    <ClCompile Include="..\src\Bindings\PluginManager.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\WebPlugin.cpp">
+    <ClCompile Include="..\src\Bindings\WebPlugin.cpp">
       <Filter>Source Files\Bindings</Filter>
     </ClCompile>
     <ClCompile Include="..\lib\inifile\iniFile.cpp">
@@ -1624,6 +1618,9 @@
     <ClCompile Include="..\src\BlockEntities\DropSpenserEntity.cpp">
       <Filter>Source Files\BlockEntities</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\BlockEntities\EnderChestEntity.cpp">
+      <Filter>Source Files\BlockEntities</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\BlockEntities\FurnaceEntity.cpp">
       <Filter>Source Files\BlockEntities</Filter>
     </ClCompile>
@@ -1660,14 +1657,8 @@
     <ClCompile Include="..\src\HTTPServer\NameValueParser.cpp">
       <Filter>Source Files\HTTPServer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\BlockEntities\EnderChestEntity.cpp">
-      <Filter>Source Files\BlockEntities</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\MCServer\API.txt">
-      <Filter>Source Files\Bindings</Filter>
-    </Text>
     <Text Include="..\lib\sqlite\urls.txt">
       <Filter>Source Files\SQLite</Filter>
     </Text>
@@ -1688,7 +1679,7 @@
     <CustomBuild Include="..\Android\jni\ToJava.h">
       <Filter>Source Files\OSSupport\Android Specific</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\src\AllToLua.pkg">
+    <CustomBuild Include="..\src\Bindings\AllToLua.pkg">
       <Filter>Source Files\Bindings</Filter>
     </CustomBuild>
   </ItemGroup>
