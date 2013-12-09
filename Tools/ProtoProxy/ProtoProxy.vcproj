@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../..;../../source"
+				AdditionalIncludeDirectories="../../lib;../../src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -117,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../..;../../source"
+				AdditionalIncludeDirectories="../../lib;../../src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -225,45 +225,49 @@
 			Name="shared"
 			>
 			<File
-				RelativePath="..\..\source\ByteBuffer.cpp"
+				RelativePath="..\..\src\ByteBuffer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\ByteBuffer.h"
+				RelativePath="..\..\src\ByteBuffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\CriticalSection.cpp"
+				RelativePath="..\..\src\StringUtils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\CriticalSection.h"
+				RelativePath="..\..\src\StringUtils.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\source\OSSupport\IsThread.cpp"
+			<Filter
+				Name="OSSupport"
 				>
-			</File>
-			<File
-				RelativePath="..\..\source\OSSupport\IsThread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\source\StringUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\source\StringUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\source\OSSupport\Timer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\source\OSSupport\Timer.h"
-				>
-			</File>
+				<File
+					RelativePath="..\..\src\OSSupport\CriticalSection.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\OSSupport\CriticalSection.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\OSSupport\IsThread.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\OSSupport\IsThread.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\OSSupport\Timer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\OSSupport\Timer.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\ProtoProxy.txt"

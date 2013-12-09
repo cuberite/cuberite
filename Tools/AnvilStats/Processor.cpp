@@ -6,8 +6,8 @@
 #include "Globals.h"
 #include "Processor.h"
 #include "Callback.h"
-#include "../../source/WorldStorage/FastNBT.h"
-#include "zlib.h"
+#include "../../src/WorldStorage/FastNBT.h"
+#include "zlib/zlib.h"
 #include "Utils.h"
 
 
@@ -554,8 +554,8 @@ void cProcessor::PopulateFileQueue(const AString & a_WorldFolder)
 	{
 		Path.push_back(cFile::PathSeparator);
 	}
-	AStringList AllFiles = GetDirectoryContents(Path.c_str());
-	for (AStringList::iterator itr = AllFiles.begin(), end = AllFiles.end(); itr != end; ++itr)
+	AStringVector AllFiles = cFile::GetFolderContents(Path.c_str());
+	for (AStringVector::iterator itr = AllFiles.begin(), end = AllFiles.end(); itr != end; ++itr)
 	{
 		if (itr->rfind(".mca") != itr->length() - 4)
 		{

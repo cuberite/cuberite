@@ -160,6 +160,74 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug_LuaStatic|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\CryptoPP"
+			IntermediateDirectory="$(ConfigurationName)\CryptoPP"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				EnableIntrinsicFunctions="true"
+				PreprocessorDefinitions="_DEBUG;_WINDOWS;USE_PRECOMPILED_HEADERS;WIN32"
+				RuntimeLibrary="1"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="pch.h"
+				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(PlatformName)\Output\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ProjectName)\$(ConfigurationName)"
@@ -439,7 +507,7 @@
 			Filter=".cpp"
 			>
 			<File
-				RelativePath="..\CryptoPP\adler32.cpp"
+				RelativePath="..\lib\cryptopp\adler32.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -451,6 +519,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -495,7 +572,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\algebra.cpp"
+				RelativePath="..\lib\cryptopp\algebra.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -507,6 +584,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -551,7 +637,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\algparam.cpp"
+				RelativePath="..\lib\cryptopp\algparam.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -563,6 +649,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -607,7 +702,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\asn.cpp"
+				RelativePath="..\lib\cryptopp\asn.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -619,6 +714,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -663,11 +767,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\authenc.cpp"
+				RelativePath="..\lib\cryptopp\authenc.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\base32.cpp"
+				RelativePath="..\lib\cryptopp\base32.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -679,6 +783,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -723,7 +836,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\base64.cpp"
+				RelativePath="..\lib\cryptopp\base64.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -735,6 +848,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -779,7 +901,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\basecode.cpp"
+				RelativePath="..\lib\cryptopp\basecode.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -791,6 +913,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -835,7 +966,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\cbcmac.cpp"
+				RelativePath="..\lib\cryptopp\cbcmac.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -847,6 +978,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -891,11 +1031,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\ccm.cpp"
+				RelativePath="..\lib\cryptopp\ccm.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\channels.cpp"
+				RelativePath="..\lib\cryptopp\channels.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -907,6 +1047,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -951,15 +1100,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\cmac.cpp"
+				RelativePath="..\lib\cryptopp\cmac.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\cpu.cpp"
+				RelativePath="..\lib\cryptopp\cpu.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\crc.cpp"
+				RelativePath="..\lib\cryptopp\crc.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -971,6 +1120,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1015,7 +1173,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\cryptlib.cpp"
+				RelativePath="..\lib\cryptopp\cryptlib.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1027,6 +1185,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1071,7 +1238,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\default.cpp"
+				RelativePath="..\lib\cryptopp\default.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1083,6 +1250,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1127,15 +1303,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\des.cpp"
+				RelativePath="..\lib\cryptopp\des.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dessp.cpp"
+				RelativePath="..\lib\cryptopp\dessp.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dh.cpp"
+				RelativePath="..\lib\cryptopp\dh.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1147,6 +1323,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1191,7 +1376,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dh2.cpp"
+				RelativePath="..\lib\cryptopp\dh2.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1203,6 +1388,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1247,7 +1441,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dll.cpp"
+				RelativePath="..\lib\cryptopp\dll.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1269,6 +1463,16 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -1309,7 +1513,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dsa.cpp"
+				RelativePath="..\lib\cryptopp\dsa.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1321,6 +1525,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1365,11 +1578,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\eax.cpp"
+				RelativePath="..\lib\cryptopp\eax.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\ec2n.cpp"
+				RelativePath="..\lib\cryptopp\ec2n.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1381,6 +1594,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1425,7 +1647,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\eccrypto.cpp"
+				RelativePath="..\lib\cryptopp\eccrypto.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1447,175 +1669,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL-Import Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL-Import Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\CryptoPP\ecp.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL-Import Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL-Import Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\CryptoPP\elgamal.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL-Import Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL-Import Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\CryptoPP\emsa2.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\CryptoPP\eprecomp.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
+					Name="Debug_LuaStatic|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -1665,7 +1719,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\esign.cpp"
+				RelativePath="..\lib\cryptopp\ecp.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1677,6 +1731,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1721,7 +1784,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\files.cpp"
+				RelativePath="..\lib\cryptopp\elgamal.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1733,6 +1796,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1777,7 +1849,83 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\filters.cpp"
+				RelativePath="..\lib\cryptopp\emsa2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\lib\cryptopp\eprecomp.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="DLL-Import Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="DLL-Import Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\lib\cryptopp\esign.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1789,6 +1937,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1833,7 +1990,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\fips140.cpp"
+				RelativePath="..\lib\cryptopp\files.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1845,6 +2002,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1889,11 +2055,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\gcm.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\CryptoPP\gf256.cpp"
+				RelativePath="..\lib\cryptopp\filters.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1905,6 +2067,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1949,7 +2120,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\gf2_32.cpp"
+				RelativePath="..\lib\cryptopp\fips140.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1961,6 +2132,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2005,7 +2185,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\gf2n.cpp"
+				RelativePath="..\lib\cryptopp\gcm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\lib\cryptopp\gf256.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2017,6 +2201,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2061,7 +2254,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\gfpcrypt.cpp"
+				RelativePath="..\lib\cryptopp\gf2_32.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2073,6 +2266,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2117,7 +2319,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\hex.cpp"
+				RelativePath="..\lib\cryptopp\gf2n.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2129,6 +2331,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2173,7 +2384,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\hmac.cpp"
+				RelativePath="..\lib\cryptopp\gfpcrypt.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2185,6 +2396,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2229,7 +2449,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\hrtimer.cpp"
+				RelativePath="..\lib\cryptopp\hex.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2241,6 +2461,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2285,7 +2514,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\integer.cpp"
+				RelativePath="..\lib\cryptopp\hmac.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2297,6 +2526,145 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="DLL-Import Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="DLL-Import Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\lib\cryptopp\hrtimer.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="DLL-Import Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="DLL-Import Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\lib\cryptopp\integer.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2342,7 +2710,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\iterhash.cpp"
+				RelativePath="..\lib\cryptopp\iterhash.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2364,6 +2732,16 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -2404,7 +2782,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\luc.cpp"
+				RelativePath="..\lib\cryptopp\luc.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2416,6 +2794,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2460,7 +2847,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\md2.cpp"
+				RelativePath="..\lib\cryptopp\md2.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2472,6 +2859,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2516,7 +2912,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\md4.cpp"
+				RelativePath="..\lib\cryptopp\md4.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2528,6 +2924,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2572,7 +2977,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\md5.cpp"
+				RelativePath="..\lib\cryptopp\md5.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2584,6 +2989,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2628,7 +3042,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\misc.cpp"
+				RelativePath="..\lib\cryptopp\misc.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2640,6 +3054,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2684,7 +3107,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\modes.cpp"
+				RelativePath="..\lib\cryptopp\modes.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2696,6 +3119,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2740,7 +3172,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\mqueue.cpp"
+				RelativePath="..\lib\cryptopp\mqueue.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2752,6 +3184,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2796,7 +3237,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\mqv.cpp"
+				RelativePath="..\lib\cryptopp\mqv.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2808,6 +3249,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2852,7 +3302,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\nbtheory.cpp"
+				RelativePath="..\lib\cryptopp\nbtheory.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2864,6 +3314,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2908,7 +3367,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\network.cpp"
+				RelativePath="..\lib\cryptopp\network.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2920,6 +3379,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2964,7 +3432,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\oaep.cpp"
+				RelativePath="..\lib\cryptopp\oaep.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2976,6 +3444,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3020,7 +3497,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\osrng.cpp"
+				RelativePath="..\lib\cryptopp\osrng.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3032,6 +3509,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3076,7 +3562,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pch.cpp"
+				RelativePath="..\lib\cryptopp\pch.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3098,6 +3584,16 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
 					>
 					<Tool
@@ -3138,7 +3634,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pkcspad.cpp"
+				RelativePath="..\lib\cryptopp\pkcspad.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3150,6 +3646,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3194,7 +3699,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\polynomi.cpp"
+				RelativePath="..\lib\cryptopp\polynomi.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3206,6 +3711,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3250,11 +3764,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pssr.cpp"
+				RelativePath="..\lib\cryptopp\pssr.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pubkey.cpp"
+				RelativePath="..\lib\cryptopp\pubkey.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3266,6 +3780,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3310,7 +3833,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\queue.cpp"
+				RelativePath="..\lib\cryptopp\queue.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3322,6 +3845,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3366,7 +3898,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rabin.cpp"
+				RelativePath="..\lib\cryptopp\rabin.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3378,6 +3910,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3422,7 +3963,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\randpool.cpp"
+				RelativePath="..\lib\cryptopp\randpool.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3434,6 +3975,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3478,7 +4028,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rdtables.cpp"
+				RelativePath="..\lib\cryptopp\rdtables.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3490,6 +4040,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3534,7 +4093,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rijndael.cpp"
+				RelativePath="..\lib\cryptopp\rijndael.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3546,6 +4105,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3590,7 +4158,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rng.cpp"
+				RelativePath="..\lib\cryptopp\rng.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3602,6 +4170,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3646,7 +4223,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rsa.cpp"
+				RelativePath="..\lib\cryptopp\rsa.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3658,6 +4235,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3702,7 +4288,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rw.cpp"
+				RelativePath="..\lib\cryptopp\rw.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3714,6 +4300,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3758,7 +4353,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\safer.cpp"
+				RelativePath="..\lib\cryptopp\safer.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3770,6 +4365,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3814,7 +4418,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\seal.cpp"
+				RelativePath="..\lib\cryptopp\seal.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3826,6 +4430,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3870,11 +4483,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\seed.cpp"
+				RelativePath="..\lib\cryptopp\seed.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\sha.cpp"
+				RelativePath="..\lib\cryptopp\sha.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3886,6 +4499,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3930,7 +4552,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\shacal2.cpp"
+				RelativePath="..\lib\cryptopp\shacal2.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3942,6 +4564,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -3986,7 +4617,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\simple.cpp"
+				RelativePath="..\lib\cryptopp\simple.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3998,6 +4629,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4042,7 +4682,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\socketft.cpp"
+				RelativePath="..\lib\cryptopp\socketft.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4054,6 +4694,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4098,7 +4747,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\square.cpp"
+				RelativePath="..\lib\cryptopp\square.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4110,6 +4759,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4154,7 +4812,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\squaretb.cpp"
+				RelativePath="..\lib\cryptopp\squaretb.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4166,6 +4824,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4210,7 +4877,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\strciphr.cpp"
+				RelativePath="..\lib\cryptopp\strciphr.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4222,6 +4889,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4266,7 +4942,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\tea.cpp"
+				RelativePath="..\lib\cryptopp\tea.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4278,6 +4954,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4322,7 +5007,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\tiger.cpp"
+				RelativePath="..\lib\cryptopp\tiger.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4334,6 +5019,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4378,7 +5072,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\tigertab.cpp"
+				RelativePath="..\lib\cryptopp\tigertab.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4390,6 +5084,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4434,7 +5137,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\trdlocal.cpp"
+				RelativePath="..\lib\cryptopp\trdlocal.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4446,6 +5149,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4490,7 +5202,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\ttmac.cpp"
+				RelativePath="..\lib\cryptopp\ttmac.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4502,6 +5214,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4546,11 +5267,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\vmac.cpp"
+				RelativePath="..\lib\cryptopp\vmac.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\wait.cpp"
+				RelativePath="..\lib\cryptopp\wait.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4562,6 +5283,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4606,7 +5336,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\winpipes.cpp"
+				RelativePath="..\lib\cryptopp\winpipes.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -4618,6 +5348,15 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_LuaStatic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -4667,411 +5406,411 @@
 			Filter=".;.h"
 			>
 			<File
-				RelativePath="..\CryptoPP\adler32.h"
+				RelativePath="..\lib\cryptopp\adler32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\aes.h"
+				RelativePath="..\lib\cryptopp\aes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\algebra.h"
+				RelativePath="..\lib\cryptopp\algebra.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\algparam.h"
+				RelativePath="..\lib\cryptopp\algparam.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\arc4.h"
+				RelativePath="..\lib\cryptopp\arc4.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\argnames.h"
+				RelativePath="..\lib\cryptopp\argnames.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\asn.h"
+				RelativePath="..\lib\cryptopp\asn.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\authenc.h"
+				RelativePath="..\lib\cryptopp\authenc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\base32.h"
+				RelativePath="..\lib\cryptopp\base32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\base64.h"
+				RelativePath="..\lib\cryptopp\base64.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\basecode.h"
+				RelativePath="..\lib\cryptopp\basecode.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\cbcmac.h"
+				RelativePath="..\lib\cryptopp\cbcmac.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\ccm.h"
+				RelativePath="..\lib\cryptopp\ccm.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\channels.h"
+				RelativePath="..\lib\cryptopp\channels.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\cmac.h"
+				RelativePath="..\lib\cryptopp\cmac.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\config.h"
+				RelativePath="..\lib\cryptopp\config.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\cpu.h"
+				RelativePath="..\lib\cryptopp\cpu.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\crc.h"
+				RelativePath="..\lib\cryptopp\crc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\cryptlib.h"
+				RelativePath="..\lib\cryptopp\cryptlib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\default.h"
+				RelativePath="..\lib\cryptopp\default.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\des.h"
+				RelativePath="..\lib\cryptopp\des.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dh.h"
+				RelativePath="..\lib\cryptopp\dh.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dh2.h"
+				RelativePath="..\lib\cryptopp\dh2.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dmac.h"
+				RelativePath="..\lib\cryptopp\dmac.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\dsa.h"
+				RelativePath="..\lib\cryptopp\dsa.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\eax.h"
+				RelativePath="..\lib\cryptopp\eax.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\ec2n.h"
+				RelativePath="..\lib\cryptopp\ec2n.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\eccrypto.h"
+				RelativePath="..\lib\cryptopp\eccrypto.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\ecp.h"
+				RelativePath="..\lib\cryptopp\ecp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\elgamal.h"
+				RelativePath="..\lib\cryptopp\elgamal.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\emsa2.h"
+				RelativePath="..\lib\cryptopp\emsa2.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\eprecomp.h"
+				RelativePath="..\lib\cryptopp\eprecomp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\esign.h"
+				RelativePath="..\lib\cryptopp\esign.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\files.h"
+				RelativePath="..\lib\cryptopp\files.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\filters.h"
+				RelativePath="..\lib\cryptopp\filters.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\fips140.h"
+				RelativePath="..\lib\cryptopp\fips140.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\fltrimpl.h"
+				RelativePath="..\lib\cryptopp\fltrimpl.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\gcm.h"
+				RelativePath="..\lib\cryptopp\gcm.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\gf256.h"
+				RelativePath="..\lib\cryptopp\gf256.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\gf2_32.h"
+				RelativePath="..\lib\cryptopp\gf2_32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\gf2n.h"
+				RelativePath="..\lib\cryptopp\gf2n.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\gfpcrypt.h"
+				RelativePath="..\lib\cryptopp\gfpcrypt.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\gzip.h"
+				RelativePath="..\lib\cryptopp\gzip.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\hex.h"
+				RelativePath="..\lib\cryptopp\hex.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\hmac.h"
+				RelativePath="..\lib\cryptopp\hmac.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\hrtimer.h"
+				RelativePath="..\lib\cryptopp\hrtimer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\integer.h"
+				RelativePath="..\lib\cryptopp\integer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\iterhash.h"
+				RelativePath="..\lib\cryptopp\iterhash.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\lubyrack.h"
+				RelativePath="..\lib\cryptopp\lubyrack.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\luc.h"
+				RelativePath="..\lib\cryptopp\luc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\md2.h"
+				RelativePath="..\lib\cryptopp\md2.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\md4.h"
+				RelativePath="..\lib\cryptopp\md4.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\md5.h"
+				RelativePath="..\lib\cryptopp\md5.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\mdc.h"
+				RelativePath="..\lib\cryptopp\mdc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\misc.h"
+				RelativePath="..\lib\cryptopp\misc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\modarith.h"
+				RelativePath="..\lib\cryptopp\modarith.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\modes.h"
+				RelativePath="..\lib\cryptopp\modes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\modexppc.h"
+				RelativePath="..\lib\cryptopp\modexppc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\mqueue.h"
+				RelativePath="..\lib\cryptopp\mqueue.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\mqv.h"
+				RelativePath="..\lib\cryptopp\mqv.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\nbtheory.h"
+				RelativePath="..\lib\cryptopp\nbtheory.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\network.h"
+				RelativePath="..\lib\cryptopp\network.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\nr.h"
+				RelativePath="..\lib\cryptopp\nr.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\oaep.h"
+				RelativePath="..\lib\cryptopp\oaep.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\oids.h"
+				RelativePath="..\lib\cryptopp\oids.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\osrng.h"
+				RelativePath="..\lib\cryptopp\osrng.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pch.h"
+				RelativePath="..\lib\cryptopp\pch.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pkcspad.h"
+				RelativePath="..\lib\cryptopp\pkcspad.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\polynomi.h"
+				RelativePath="..\lib\cryptopp\polynomi.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pssr.h"
+				RelativePath="..\lib\cryptopp\pssr.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pubkey.h"
+				RelativePath="..\lib\cryptopp\pubkey.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\pwdbased.h"
+				RelativePath="..\lib\cryptopp\pwdbased.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\queue.h"
+				RelativePath="..\lib\cryptopp\queue.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rabin.h"
+				RelativePath="..\lib\cryptopp\rabin.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\randpool.h"
+				RelativePath="..\lib\cryptopp\randpool.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rijndael.h"
+				RelativePath="..\lib\cryptopp\rijndael.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rng.h"
+				RelativePath="..\lib\cryptopp\rng.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rsa.h"
+				RelativePath="..\lib\cryptopp\rsa.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\rw.h"
+				RelativePath="..\lib\cryptopp\rw.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\safer.h"
+				RelativePath="..\lib\cryptopp\safer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\seal.h"
+				RelativePath="..\lib\cryptopp\seal.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\secblock.h"
+				RelativePath="..\lib\cryptopp\secblock.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\seckey.h"
+				RelativePath="..\lib\cryptopp\seckey.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\seed.h"
+				RelativePath="..\lib\cryptopp\.\seed.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\sha.h"
+				RelativePath="..\lib\cryptopp\sha.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\shacal2.h"
+				RelativePath="..\lib\cryptopp\shacal2.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\simple.h"
+				RelativePath="..\lib\cryptopp\simple.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\smartptr.h"
+				RelativePath="..\lib\cryptopp\smartptr.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\socketft.h"
+				RelativePath="..\lib\cryptopp\socketft.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\square.h"
+				RelativePath="..\lib\cryptopp\square.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\stdcpp.h"
+				RelativePath="..\lib\cryptopp\.\stdcpp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\strciphr.h"
+				RelativePath="..\lib\cryptopp\strciphr.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\tea.h"
+				RelativePath="..\lib\cryptopp\tea.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\tiger.h"
+				RelativePath="..\lib\cryptopp\tiger.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\trdlocal.h"
+				RelativePath="..\lib\cryptopp\trdlocal.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\trunhash.h"
+				RelativePath="..\lib\cryptopp\trunhash.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\ttmac.h"
+				RelativePath="..\lib\cryptopp\ttmac.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\vmac.h"
+				RelativePath="..\lib\cryptopp\.\vmac.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\wait.h"
+				RelativePath="..\lib\cryptopp\wait.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\wake.h"
+				RelativePath="..\lib\cryptopp\wake.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\winpipes.h"
+				RelativePath="..\lib\cryptopp\winpipes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\words.h"
+				RelativePath="..\lib\cryptopp\words.h"
 				>
 			</File>
 		</Filter>
@@ -5079,19 +5818,19 @@
 			Name="Miscellaneous"
 			>
 			<File
-				RelativePath="..\CryptoPP\Doxyfile"
+				RelativePath="..\lib\cryptopp\Doxyfile"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\GNUmakefile"
+				RelativePath="..\lib\cryptopp\GNUmakefile"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\License.txt"
+				RelativePath="..\lib\cryptopp\.\License.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\Readme.txt"
+				RelativePath="..\lib\cryptopp\Readme.txt"
 				>
 			</File>
 		</Filter>

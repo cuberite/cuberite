@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../source;../../zlib-1.2.7"
+				AdditionalIncludeDirectories="../../src;../../lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -116,7 +116,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../source;../../zlib-1.2.7"
+				AdditionalIncludeDirectories="../../src;../../lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -222,70 +222,62 @@
 				Name="shared"
 				>
 				<File
-					RelativePath="..\..\source\Log.cpp"
+					RelativePath="..\..\src\Log.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\Log.h"
+					RelativePath="..\..\src\Log.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\MCLogger.cpp"
+					RelativePath="..\..\src\MCLogger.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\MCLogger.h"
+					RelativePath="..\..\src\MCLogger.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\StringCompression.cpp"
+					RelativePath="..\..\src\StringCompression.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\StringCompression.h"
+					RelativePath="..\..\src\StringCompression.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\StringUtils.cpp"
+					RelativePath="..\..\src\StringUtils.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\StringUtils.h"
+					RelativePath="..\..\src\StringUtils.h"
 					>
 				</File>
 				<Filter
 					Name="OSSupport"
 					>
 					<File
-						RelativePath="..\..\source\OSSupport\CriticalSection.cpp"
+						RelativePath="..\..\src\OSSupport\CriticalSection.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\CriticalSection.h"
+						RelativePath="..\..\src\OSSupport\CriticalSection.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\File.cpp"
+						RelativePath="..\..\src\OSSupport\File.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\File.h"
+						RelativePath="..\..\src\OSSupport\File.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\IsThread.cpp"
+						RelativePath="..\..\src\OSSupport\IsThread.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\IsThread.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\source\OSSupport\MakeDir.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\source\OSSupport\MakeDir.h"
+						RelativePath="..\..\src\OSSupport\IsThread.h"
 						>
 					</File>
 				</Filter>
@@ -293,11 +285,11 @@
 					Name="WorldStorage"
 					>
 					<File
-						RelativePath="..\..\source\WorldStorage\FastNBT.cpp"
+						RelativePath="..\..\src\WorldStorage\FastNBT.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\WorldStorage\FastNBT.h"
+						RelativePath="..\..\src\WorldStorage\FastNBT.h"
 						>
 					</File>
 				</Filter>

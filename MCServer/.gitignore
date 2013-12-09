@@ -1,9 +1,13 @@
 *.exe
+*.dll
+*.exp
+*.lib
 *.ini
 MCServer
 logs
 players
 world*
+API/
 API.txt
 API_wiki.txt
 *.dat
@@ -13,7 +17,13 @@ schematics
 *.pdb
 memdump*
 *.grab
+Galleries.cfg
+Galleries.example.cfg
+Galleries.sqlite
 ProtectionAreas.sqlite
 helgrind.log
+valgrind.log
 motd.txt
 *.deuser
+*.dmp
+*.xml

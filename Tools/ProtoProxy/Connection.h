@@ -10,7 +10,7 @@
 #pragma once
 
 #include "ByteBuffer.h"
-#include "../../source/OSSupport/Timer.h"
+#include "OSSupport/Timer.h"
 
 
 
@@ -71,14 +71,27 @@ protected:
 	Decryptor m_ServerDecryptor;
 	Encryptor m_ServerEncryptor;
 
-	Decryptor m_ClientDecryptor;
-	Encryptor m_ClientEncryptor;
-	
-	AString m_ClientEncryptionBuffer;  // Buffer for the data to be sent to the client once encryption is established
 	AString m_ServerEncryptionBuffer;  // Buffer for the data to be sent to the server once encryption is established
 	
 	/// Set to true when PACKET_PING is received from the client; will cause special parsing for server kick
 	bool m_HasClientPinged;
+	
+	/*
+	The protocol states can be one of:
+	-1: no initial handshake received yet
+	1: status
+	2: login
+	3: game
+	*/
+	/// State the to-server protocol is in (as defined by the initial handshake / login), -1 if no initial handshake received yet
+	int m_ServerProtocolState;
+	
+	/// State the to-client protocol is in (as defined by the initial handshake / login), -1 if no initial handshake received yet
+	int m_ClientProtocolState;
+	
+	/// True if the server connection has provided encryption keys
+	bool m_IsServerEncrypted;
+	
 
 	bool ConnectToServer(void);
 	
@@ -109,7 +122,18 @@ protected:
 	/// Decodes packets coming from the server, sends appropriate counterparts to the client; returns false if the connection is to be dropped
 	bool DecodeServersPackets(const char * a_Data, int a_Size);
 	
-	// Packet handling, client-side:
+	// Packet handling, client-side, initial:
+	bool HandleClientHandshake(void);
+	
+	// Packet handling, client-side, status:
+	bool HandleClientStatusPing(void);
+	bool HandleClientStatusRequest(void);
+	
+	// Packet handling, client-side, login:
+	bool HandleClientLoginEncryptionKeyResponse(void);
+	bool HandleClientLoginStart(void);
+
+	// Packet handling, client-side, game:
 	bool HandleClientAnimation(void);
 	bool HandleClientBlockDig(void);
 	bool HandleClientBlockPlace(void);
@@ -117,9 +141,7 @@ protected:
 	bool HandleClientClientStatuses(void);
 	bool HandleClientCreativeInventoryAction(void);
 	bool HandleClientDisconnect(void);
-	bool HandleClientEncryptionKeyResponse(void);
 	bool HandleClientEntityAction(void);
-	bool HandleClientHandshake(void);
 	bool HandleClientKeepAlive(void);
 	bool HandleClientLocaleAndView(void);
 	bool HandleClientPing(void);
@@ -135,8 +157,15 @@ protected:
 	bool HandleClientUseEntity(void);
 	bool HandleClientWindowClick(void);
 	bool HandleClientWindowClose(void);
+	
+	bool HandleClientUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar);
 
-	// Packet handling, server-side:
+	// Packet handling, server-side, login:
+	bool HandleServerLoginDisconnect(void);
+	bool HandleServerLoginEncryptionKeyRequest(void);
+	bool HandleServerLoginSuccess(void);
+
+	// Packet handling, server-side, game:
 	bool HandleServerAttachEntity(void);
 	bool HandleServerBlockAction(void);
 	bool HandleServerBlockChange(void);
@@ -145,8 +174,6 @@ protected:
 	bool HandleServerCollectPickup(void);
 	bool HandleServerCompass(void);
 	bool HandleServerDestroyEntities(void);
-	bool HandleServerEncryptionKeyRequest(void);
-	bool HandleServerEncryptionKeyResponse(void);
 	bool HandleServerEntity(void);
 	bool HandleServerEntityEquipment(void);
 	bool HandleServerEntityHeadLook(void);
@@ -158,7 +185,9 @@ protected:
 	bool HandleServerEntityStatus(void);
 	bool HandleServerEntityTeleport(void);
 	bool HandleServerEntityVelocity(void);
+	bool HandleServerExplosion(void);
 	bool HandleServerIncrementStatistic(void);
+	bool HandleServerJoinGame(void);
 	bool HandleServerKeepAlive(void);
 	bool HandleServerKick(void);
 	bool HandleServerLogin(void);
@@ -171,24 +200,32 @@ protected:
 	bool HandleServerPlayerListItem(void);
 	bool HandleServerPlayerPositionLook(void);
 	bool HandleServerPluginMessage(void);
+	bool HandleServerRespawn(void);
 	bool HandleServerSetExperience(void);
 	bool HandleServerSetSlot(void);
 	bool HandleServerSlotSelect(void);
 	bool HandleServerSoundEffect(void);
+	bool HandleServerSpawnExperienceOrbs(void);
 	bool HandleServerSpawnMob(void);
 	bool HandleServerSpawnNamedEntity(void);
 	bool HandleServerSpawnObjectVehicle(void);
 	bool HandleServerSpawnPainting(void);
 	bool HandleServerSpawnPickup(void);
+	bool HandleServerStatistics(void);
+	bool HandleServerStatusPing(void);
+	bool HandleServerStatusResponse(void);
 	bool HandleServerTabCompletion(void);
 	bool HandleServerTimeUpdate(void);
 	bool HandleServerUpdateHealth(void);
 	bool HandleServerUpdateSign(void);
 	bool HandleServerUpdateTileEntity(void);
+	bool HandleServerUseBed(void);
 	bool HandleServerWindowClose(void);
 	bool HandleServerWindowContents(void);
 	bool HandleServerWindowOpen(void);
 	
+	bool HandleServerUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar);
+
 	/// Parses the slot data in a_Buffer into item description; returns true if successful, false if not enough data
 	bool ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc);
 	

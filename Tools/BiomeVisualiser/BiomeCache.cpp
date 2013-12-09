@@ -258,6 +258,11 @@ void cBiomeCache::FilterOutItems(cItems & a_Items, int a_MinChunkX, int a_MaxChu
 
 void cBiomeCache::thrProcessQueueItem(void)
 {
+	if (m_Source == NULL)
+	{
+		return;
+	}
+	
 	cItem * Item = NULL;
 	{
 		cCSLock Lock(m_CS);

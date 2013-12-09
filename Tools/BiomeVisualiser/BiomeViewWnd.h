@@ -3,10 +3,23 @@
 
 // Declares the cBiomeViewWnd class representing the window that displays biomes
 
+
+
+
+
+#pragma once
+
 #include "WndProcThunk.h"
 #include "BiomeRenderer.h"
 #include "BiomeCache.h"
 #include "Pixmap.h"
+
+
+
+
+
+// fwd:
+class cBiomeGen;
 
 
 
@@ -26,8 +39,14 @@ protected:
 	cBiomeRenderer m_Renderer;
 	cPixmap        m_Pixmap;
 	
+	/// The generator that is to be visualised
+	cBiomeGen * m_BiomeGen;
+
 	bool  m_IsLButtonDown;
 	POINT m_MouseDown;
+	
+	
+	void InitBiomeView(void);
 	
 	LRESULT WndProc(HWND a_Wnd, UINT a_Msg, WPARAM wParam, LPARAM lParam);
 	

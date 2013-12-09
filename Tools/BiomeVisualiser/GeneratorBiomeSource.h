@@ -3,7 +3,7 @@
 
 // Declares the cGeneratorBiomeSource that adapts a cBiomeGen into a cBiomeSource
 
-#include "../source/Generating/BioGen.h"
+#include "../src/Generating/BioGen.h"
 #include "BiomeSource.h"
 
 

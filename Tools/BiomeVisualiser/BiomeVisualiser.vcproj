@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../source"
+				AdditionalIncludeDirectories="../../src;../../lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -119,7 +119,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../../source"
+				AdditionalIncludeDirectories="../../src;../../lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -199,7 +199,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../../source"
+				AdditionalIncludeDirectories="../../src;../../lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -269,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BiomeColors.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\BiomeRenderer.cpp"
 				>
 			</File>
@@ -320,19 +324,35 @@
 				Name="Shared"
 				>
 				<File
-					RelativePath="..\..\source\BlockID.cpp"
+					RelativePath="..\..\src\BlockID.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\BlockID.h"
+					RelativePath="..\..\src\BlockID.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\ChunkDef.h"
+					RelativePath="..\..\src\ChunkDef.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\Globals.cpp"
+					RelativePath="..\..\src\Enchantments.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\Enchantments.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\WorldStorage\FastNBT.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\WorldStorage\FastNBT.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\Globals.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -360,90 +380,94 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\source\Globals.h"
+					RelativePath="..\..\src\Globals.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\Log.cpp"
+					RelativePath="..\..\src\Item.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\Log.h"
+					RelativePath="..\..\src\Log.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\MCLogger.cpp"
+					RelativePath="..\..\src\Log.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\MCLogger.h"
+					RelativePath="..\..\src\MCLogger.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\Noise.cpp"
+					RelativePath="..\..\src\MCLogger.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\Noise.h"
+					RelativePath="..\..\src\Noise.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\Noise.inc"
+					RelativePath="..\..\src\Noise.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\StringUtils.cpp"
+					RelativePath="..\..\src\Noise.inc"
 					>
 				</File>
 				<File
-					RelativePath="..\..\source\StringUtils.h"
+					RelativePath="..\..\src\StringUtils.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\StringUtils.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\VoronoiMap.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\VoronoiMap.h"
 					>
 				</File>
 				<Filter
 					Name="OSSupport"
 					>
 					<File
-						RelativePath="..\..\source\OSSupport\CriticalSection.cpp"
+						RelativePath="..\..\src\OSSupport\CriticalSection.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\CriticalSection.h"
+						RelativePath="..\..\src\OSSupport\CriticalSection.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\Event.cpp"
+						RelativePath="..\..\src\OSSupport\Event.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\Event.h"
+						RelativePath="..\..\src\OSSupport\Event.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\File.cpp"
+						RelativePath="..\..\src\OSSupport\File.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\File.h"
+						RelativePath="..\..\src\OSSupport\File.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\IsThread.cpp"
+						RelativePath="..\..\src\OSSupport\IsThread.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\IsThread.h"
+						RelativePath="..\..\src\OSSupport\IsThread.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\OSSupport\MakeDir.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\source\OSSupport\MakeDir.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\source\OSSupport\Sleep.h"
+						RelativePath="..\..\src\OSSupport\Sleep.h"
 						>
 					</File>
 				</Filter>
@@ -451,15 +475,15 @@
 					Name="Generating"
 					>
 					<File
-						RelativePath="..\..\source\Generating\BioGen.cpp"
+						RelativePath="..\..\src\Generating\BioGen.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\Generating\BioGen.h"
+						RelativePath="..\..\src\Generating\BioGen.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\source\Generating\ComposableGenerator.h"
+						RelativePath="..\..\src\Generating\ComposableGenerator.h"
 						>
 					</File>
 				</Filter>
@@ -467,16 +491,20 @@
 					Name="iniFile"
 					>
 					<File
-						RelativePath="..\..\iniFile\iniFile.cpp"
+						RelativePath="..\..\lib\iniFile\iniFile.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\iniFile\iniFile.h"
+						RelativePath="..\..\lib\iniFile\iniFile.h"
 						>
 					</File>
 				</Filter>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath=".\BiomeColors.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

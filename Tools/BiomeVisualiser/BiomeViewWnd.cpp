@@ -7,7 +7,7 @@
 #include "BiomeViewWnd.h"
 #include "BiomeCache.h"
 #include "GeneratorBiomeSource.h"
-#include "../iniFile/iniFile.h"
+#include "iniFile/iniFile.h"
 
 
 
@@ -34,6 +34,8 @@ bool cBiomeViewWnd::Create(HWND a_ParentWnd, LPCTSTR a_Title)
 {
 	ASSERT(m_Wnd == NULL);
 	
+	InitBiomeView();
+	
 	// Create a regular STATIC window, then override its window procedure with our own. No need for obnoxious RegisterWindowClass() stuff.
 	m_Wnd = CreateWindow("STATIC", a_Title, WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 400, 300, a_ParentWnd, NULL, GetModuleHandle(NULL), NULL);
 	if (m_Wnd == NULL)
@@ -43,14 +45,23 @@ bool cBiomeViewWnd::Create(HWND a_ParentWnd, LPCTSTR a_Title)
 	}
 	SetWindowLongPtr(m_Wnd, GWLP_WNDPROC, m_Thunk);
 	
-	cIniFile IniFile;
-	cBiomeGen * BioGen = new cBioGenMultiStepMap(2);
-	BioGen->Initialize(IniFile);
-	m_Renderer.SetSource(new cGeneratorBiomeSource(BioGen));
-	
 	return true;
 }
 
+
+
+
+
+void cBiomeViewWnd::InitBiomeView(void)
+{
+	cIniFile IniFile;
+	IniFile.ReadFile("world.ini");
+	int Seed = IniFile.GetValueSetI("Generator", "Seed", 0);
+	bool CacheOffByDefault = false;
+	m_BiomeGen = cBiomeGen::CreateBiomeGen(IniFile, Seed, CacheOffByDefault);
+	m_Renderer.SetSource(new cGeneratorBiomeSource(m_BiomeGen));
+	IniFile.WriteFile("world.ini");
+}
 
 
 

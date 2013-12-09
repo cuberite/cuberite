@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\..\zlib-1.2.7&quot;"
+				AdditionalIncludeDirectories="&quot;..\..\lib&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;..\..\zlib-1.2.7&quot;"
+				AdditionalIncludeDirectories="&quot;..\..\lib&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -196,7 +196,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;..\..\zlib-1.2.7&quot;"
+				AdditionalIncludeDirectories="&quot;..\..\lib&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -374,27 +374,27 @@
 			Name="shared"
 			>
 			<File
-				RelativePath="..\..\source\OSSupport\CriticalSection.cpp"
+				RelativePath="..\..\src\OSSupport\CriticalSection.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\CriticalSection.h"
+				RelativePath="..\..\src\OSSupport\CriticalSection.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\Endianness.h"
+				RelativePath="..\..\src\Endianness.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\Event.cpp"
+				RelativePath="..\..\src\OSSupport\Event.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\Event.h"
+				RelativePath="..\..\src\OSSupport\Event.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\WorldStorage\FastNBT.cpp"
+				RelativePath="..\..\src\WorldStorage\FastNBT.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -422,39 +422,39 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\source\WorldStorage\FastNBT.h"
+				RelativePath="..\..\src\WorldStorage\FastNBT.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\File.cpp"
+				RelativePath="..\..\src\OSSupport\File.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\File.h"
+				RelativePath="..\..\src\OSSupport\File.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\GZipFile.cpp"
+				RelativePath="..\..\src\OSSupport\GZipFile.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\GZipFile.h"
+				RelativePath="..\..\src\OSSupport\GZipFile.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\IsThread.cpp"
+				RelativePath="..\..\src\OSSupport\IsThread.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\OSSupport\IsThread.h"
+				RelativePath="..\..\src\OSSupport\IsThread.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\StringUtils.cpp"
+				RelativePath="..\..\src\StringUtils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\StringUtils.h"
+				RelativePath="..\..\src\StringUtils.h"
 				>
 			</File>
 		</Filter>

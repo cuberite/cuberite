@@ -46,9 +46,11 @@ ifeq ($(release),1)
 ################
 # release build - fastest run-time, no gdb support
 ################
-CC_OPTIONS = -s -g -O3 -DNDEBUG
-CXX_OPTIONS = -s -g -O3 -DNDEBUG
+
+CC_OPTIONS = -O3 -DNDEBUG -DLUA_USE_DLOPEN
+CXX_OPTIONS = -O3 -DNDEBUG -DLUA_USE_DLOPEN
 LNK_OPTIONS = -pthread -O3
+
 BUILDDIR = build/release/
 
 else
@@ -56,42 +58,39 @@ ifeq ($(profile),1)
 ################
 # profile build - a release build with symbols and profiling engine built in
 ################
-CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-LNK_OPTIONS = -pthread -ggdb -O3 -pg
-BUILDDIR = build/profile/
 
-else
-ifeq ($(pedantic),1)
-################
-# pedantic build - basically a debug build with lots of warnings
-################
-CC_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-CXX_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-LNK_OPTIONS = -pthread -ggdb
-BUILDDIR = build/pedantic/
+CC_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG -DLUA_USE_DLOPEN
+CXX_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG -DLUA_USE_DLOPEN
+LNK_OPTIONS = -pthread -ggdb -O3 -pg
+
+BUILDDIR = build/profile/
 
 else
 ################
 # debug build - fully traceable by gdb in C++ code, slowest
-# Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
+# Since C code is used only for supporting libraries (zlib, lua), it is still Ofast-optimized
 ################
-CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
-CXX_OPTIONS = -s -ggdb -g -D_DEBUG
-LNK_OPTIONS = -pthread -g -ggdb
+
+CC_OPTIONS = -ggdb -g -D_DEBUG -O3 -DLUA_USE_DLOPEN
+CXX_OPTIONS = -ggdb -g -D_DEBUG -O1 -DLUA_USE_DLOPEN
+LNK_OPTIONS = -pthread -g -ggdb -O1
+
 BUILDDIR = build/debug/
-endif
+
 endif
 endif
 
+##################################################
+# Always be warning.
+
+CXX_OPTIONS += -Wall
 
 ###################################################
 # Fix Crypto++ warnings in clang
 
-ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),0)
-CC_OPTIONS += -Wno-tautological-compare
-CXX_OPTIONS += -Wno-tautological-compare
-disableasm = 1
+ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),1)
+CC_OPTIONS += -DCRYPTOPP_DISABLE_ASM
+CXX_OPTIONS += -DCRYPTOPP_DISABLE_ASM
 endif
 
 
@@ -103,10 +102,18 @@ endif
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
-	LNK_LIBS = -lstdc++ -ldl
+	LNK_LIBS = -lstdc++ -ldl -lm
 else
 	LNK_LIBS = -lstdc++ -lltdl
 endif
+
+
+
+
+
+###################################################
+# Export all symbols from the executable, so that LuaRocks may bind to Lua routines:
+LNK_OPTIONS += -rdynamic
 
 
 
@@ -127,35 +134,11 @@ endif
 
 
 ###################################################
-# Clang doesn't seem to support CryptoPP's assembly mode, disable  it for now (CryptoPP 5.6.2)
-
-ifeq ($(disableasm),1)
-	CC_OPTIONS += -DCRYPTOPP_DISABLE_ASM
-	CXX_OPTIONS += -DCRYPTOPP_DISABLE_ASM
-endif
-
-
-
-
-
-###################################################
 # INCLUDE directories for MCServer
-#
 
-INCLUDE = -I.\
-		-Isource\
-		-Isource/md5\
-		-IWebServer\
-		-Isource/items\
-		-Isource/blocks\
-		-Itolua++-1.0.93/src/lib\
-		-Ilua-5.1.4/src\
-		-Izlib-1.2.7\
-		-IiniFile\
-		-Itolua++-1.0.93/include\
-		-Ijsoncpp-src-0.5.0/include\
-		-Ijsoncpp-src-0.5.0/src/lib_json\
-		-Iexpat
+INCLUDE = -Isrc\
+		-Ilib\
+		-Ilib/jsoncpp/include
 
 
 
@@ -163,11 +146,8 @@ INCLUDE = -I.\
 
 ###################################################
 # Build MCServer
-#
 
-# 2012_11_08 _X: Removed: squirrel_3_0_1_stable 
-
-SOURCES := $(shell find CryptoPP lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source tolua++-1.0.93 iniFile WebServer expat '(' -name '*.cpp' -o -name '*.c' ')')
+SOURCES := $(shell find src lib '(' -name '*.cpp' -o -name '*.c' ')')
 SOURCES := $(filter-out %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp %StackWalker.cpp %example.c,$(SOURCES))
 OBJECTS := $(patsubst %.c,$(BUILDDIR)%.o,$(SOURCES))
 OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))

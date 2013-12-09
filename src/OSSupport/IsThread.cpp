@@ -1,0 +1,172 @@
+
+// IsThread.cpp
+
+// Implements the cIsThread class representing an OS-independent wrapper for a class that implements a thread.
+// This class will eventually suupersede the old cThread class
+
+#include "Globals.h"
+
+#include "IsThread.h"
+
+
+
+
+
+// When in MSVC, the debugger provides "thread naming" by catching special exceptions. Interface here:
+#if defined(_MSC_VER) && defined(_DEBUG)
+//
+// Usage: SetThreadName (-1, "MainThread");
+//
+
+static void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
+{
+	struct
+	{
+		DWORD dwType; // must be 0x1000
+		LPCSTR szName; // pointer to name (in user addr space)
+		DWORD dwThreadID; // thread ID (-1=caller thread)
+		DWORD dwFlags; // reserved for future use, must be zero
+	} info;
+	
+	info.dwType = 0x1000;
+	info.szName = szThreadName;
+	info.dwThreadID = dwThreadID;
+	info.dwFlags = 0;
+
+	__try
+	{
+		RaiseException(0x406D1388, 0, sizeof(info) / sizeof(DWORD), (DWORD *)&info);
+	}
+	__except(EXCEPTION_CONTINUE_EXECUTION)
+	{
+	}
+}
+#endif  // _MSC_VER && _DEBUG
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cIsThread:
+
+cIsThread::cIsThread(const AString & iThreadName) :
+	m_ThreadName(iThreadName),
+	m_ShouldTerminate(false),
+	m_Handle(NULL_HANDLE)
+{
+}
+
+
+
+
+
+cIsThread::~cIsThread()
+{
+	m_ShouldTerminate = true;
+	Wait();
+}
+
+
+
+
+
+bool cIsThread::Start(void)
+{
+	ASSERT(m_Handle == NULL_HANDLE);  // Has already started one thread?
+	#ifdef _WIN32
+		// Create the thread suspended, so that the mHandle variable is valid in the thread procedure
+		DWORD ThreadID = 0;
+		m_Handle = CreateThread(NULL, 0, thrExecute, this, CREATE_SUSPENDED, &ThreadID);
+		if (m_Handle == NULL)
+		{
+			LOGERROR("ERROR: Could not create thread \"%s\", GLE = %d!", m_ThreadName.c_str(), GetLastError());
+			return false;
+		}
+		ResumeThread(m_Handle);
+
+		#if defined(_DEBUG) && defined(_MSC_VER)
+			// Thread naming is available only in MSVC
+			if (!m_ThreadName.empty())
+			{
+				SetThreadName(ThreadID, m_ThreadName.c_str());
+			}
+		#endif  // _DEBUG and _MSC_VER
+		
+	#else  // _WIN32
+		if (pthread_create(&m_Handle, NULL, thrExecute, this))
+		{
+			LOGERROR("ERROR: Could not create thread \"%s\", !", m_ThreadName.c_str());
+			return false;
+		}
+	#endif  // else _WIN32
+
+	return true;
+}
+
+
+
+
+
+void cIsThread::Stop(void)
+{
+	if (m_Handle == NULL_HANDLE)
+	{
+		return;
+	}
+	m_ShouldTerminate = true;
+	Wait();
+}
+
+
+
+
+
+bool cIsThread::Wait(void)
+{
+	if (m_Handle == NULL)
+	{
+		return true;
+	}
+	
+	#ifdef LOGD  // ProtoProxy doesn't have LOGD
+		LOGD("Waiting for thread %s to finish", m_ThreadName.c_str());
+	#endif  // LOGD
+	
+	#ifdef _WIN32
+		int res = WaitForSingleObject(m_Handle, INFINITE);
+		m_Handle = NULL;
+		
+		#ifdef LOGD  // ProtoProxy doesn't have LOGD
+			LOGD("Thread %s finished", m_ThreadName.c_str());
+		#endif  // LOGD
+		
+		return (res == WAIT_OBJECT_0);
+	#else  // _WIN32
+		int res = pthread_join(m_Handle, NULL);
+		m_Handle = NULL;
+		
+		#ifdef LOGD  // ProtoProxy doesn't have LOGD
+			LOGD("Thread %s finished", m_ThreadName.c_str());
+		#endif  // LOGD
+		
+		return (res == 0);
+	#endif  // else _WIN32
+}
+
+
+
+
+
+unsigned long cIsThread::GetCurrentID(void)
+{
+	#ifdef _WIN32
+		return (unsigned long) GetCurrentThreadId();
+	#else
+		return (unsigned long) pthread_self();
+	#endif
+}
+
+
+
+

@@ -138,6 +138,7 @@ typedef unsigned short     UInt16;
 
 
 // CRT stuff:
+#include <sys/stat.h>
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
@@ -162,12 +163,12 @@ typedef unsigned short     UInt16;
 
 
 // Common headers (part 1, without macros):
-#include "../../source/StringUtils.h"
-#include "../../source/OSSupport/CriticalSection.h"
-#include "../../source/OSSupport/Semaphore.h"
-#include "../../source/OSSupport/Event.h"
-#include "../../source/OSSupport/IsThread.h"
-#include "../../source/OSSupport/File.h"
+#include "../../src/StringUtils.h"
+#include "../../src/OSSupport/CriticalSection.h"
+#include "../../src/OSSupport/Semaphore.h"
+#include "../../src/OSSupport/Event.h"
+#include "../../src/OSSupport/IsThread.h"
+#include "../../src/OSSupport/File.h"
 
 
 
@@ -220,8 +221,8 @@ public:
 
 
 // Common headers (part 2, with macros):
-#include "../../source/ChunkDef.h"
-#include "../../source/BlockID.h"
+#include "../../src/ChunkDef.h"
+#include "../../src/BlockID.h"
 
 
 
