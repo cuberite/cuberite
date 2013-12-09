@@ -376,9 +376,8 @@ void cBlockHandler::DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX
 		MicroZ = a_BlockZ + 0.5;
 
 		// Add random offset second (this causes pickups to spawn inside blocks most times, it's a little buggy)
-		//MicroX += (int)(r1.randInt(16) + r1.randInt(16) - 16);
-		//MicroY += (int)(r1.randInt(16) + r1.randInt(16) - 16);
-		//MicroZ += (int)(r1.randInt(16) + r1.randInt(16) - 16);
+		MicroX += r1.rand(1) - 0.5;
+		MicroZ += r1.rand(1) - 0.5;
 
 		a_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}
