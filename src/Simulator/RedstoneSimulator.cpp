@@ -420,6 +420,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 	}
 	else
 	{
+		NIBBLETYPE MetaToSet = 0;
 		NIBBLETYPE MyMeta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		int TimesMetaSmaller = 0, TimesFoundAWire = 0;
 
@@ -439,7 +440,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 					// >= to fix a bug where wires bordering each other with the same power level will appear (in terms of meta) to power each other, when they aren't actually in the powered list
 					if (SurroundMeta >= MyMeta)
 					{
-						m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, SurroundMeta - 1);
+						MetaToSet = SurroundMeta - 1; // To improve performance
 					}
 				}
 				
@@ -458,6 +459,10 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 			// therefore, self must be set to meta zero
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
 			return; // No need to process block power sets because self not powered
+		}
+		else
+		{
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MetaToSet);
 		}
 
 		SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE); // Power block beneath
