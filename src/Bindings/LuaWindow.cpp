@@ -1,4 +1,3 @@
-
 // LuaWindow.cpp
 
 // Implements the cLuaWindow class representing a virtual window that plugins may create and open for the player
@@ -35,6 +34,10 @@ cLuaWindow::cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_Slo
 		case cWindow::wtWorkbench:
 		{
 			m_SlotAreas.push_back(new cSlotAreaArmor(*this));
+			break;
+		}
+		default:
+		{
 			break;
 		}
 	}

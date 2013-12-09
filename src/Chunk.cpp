@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #ifndef _WIN32
@@ -908,8 +907,11 @@ void cChunk::ApplyWeatherToTop()
 			}
 			break;
 		}  // case (snowy biomes)
-		
 		// TODO: Rainy biomes should check for farmland and cauldrons
+		default:
+		{
+			break;
+		}
 	}  // switch (biome)
 }
 

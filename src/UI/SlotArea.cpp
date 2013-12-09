@@ -1,4 +1,3 @@
-
 // SlotArea.cpp
 
 // Implements the cSlotArea class and its descendants
@@ -64,6 +63,10 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		{
 			DblClicked(a_Player, a_SlotNum);
 			return;
+		}
+		default:
+		{
+			break;
 		}
 	}
 	
@@ -443,7 +446,6 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 {
-	const cItem * ResultSlot = GetSlot(0, a_Player);
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 
 	// Get the current recipe:

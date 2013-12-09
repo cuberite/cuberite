@@ -1,4 +1,3 @@
-
 #include "Globals.h"
 
 #include "FluidSimulator.h"
@@ -138,7 +137,7 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	*/
 
 	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);	//Current Block Meta so only lower points will be counted
-	int X = 0, Y = 0, Z = 0;									//Lowest Pos will be stored here
+	int X = 0, Z = 0;									//Lowest Pos will be stored here
 
 	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)		//check for upper block to flow because this also affects the flowing direction
 	{
@@ -167,14 +166,14 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 			{
 				LowestPoint = Meta;
 				X = Pos->x;
-				Y = Pos->y;
+				Pos->y; //Remove if no side effects
 				Z = Pos->z;
 			}
 		}else if(BlockID == E_BLOCK_AIR)
 		{
 			LowestPoint = 9;		//This always dominates
 			X = Pos->x;
-			Y = Pos->y;
+			Pos->y; //Remove if no side effects
 			Z = Pos->z;
 		
 		}

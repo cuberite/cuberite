@@ -28,9 +28,9 @@ cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
 	m_WindowID((++m_WindowIDCounter) % 127),
 	m_WindowType(a_WindowType),
 	m_WindowTitle(a_WindowTitle),
-	m_Owner(NULL),
 	m_IsDestroyed(false),
-	m_ShouldDistributeToHotbarFirst(true)
+	m_ShouldDistributeToHotbarFirst(true),
+	m_Owner(NULL)
 {
 	if (a_WindowType == wtInventory)
 	{
@@ -201,6 +201,10 @@ void cWindow::Clicked(
 		case caRightPaintProgress: OnPaintProgress(a_Player, a_SlotNum); return;
 		case caLeftPaintEnd:       OnLeftPaintEnd (a_Player);            return;
 		case caRightPaintEnd:      OnRightPaintEnd(a_Player);            return;
+		default:
+		{
+			break;
+		}
 	}
 	
 	if (a_SlotNum < 0)
