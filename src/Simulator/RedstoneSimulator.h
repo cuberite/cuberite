@@ -56,14 +56,23 @@ private:
 		Vector3i a_BlockPos;
 		bool WasLastStatePowered;
 	};
+
+	struct sRepeatersDelayList
+	{
+		Vector3i a_BlockPos;
+		short a_DelayTicks;
+		short a_ElapsedTicks;
+	};
 	
 	typedef std::vector <sPoweredBlocks> PoweredBlocksList;
 	typedef std::vector <sLinkedPoweredBlocks> LinkedBlocksList;
 	typedef std::vector <sSimulatedPlayerToggleableList> SimulatedPlayerToggleableList;
+	typedef std::vector <sRepeatersDelayList> RepeatersDelayList;
 
 	PoweredBlocksList m_PoweredBlocks;
 	LinkedBlocksList m_LinkedPoweredBlocks;
 	SimulatedPlayerToggleableList m_SimulatedPlayerToggleableBlocks;
+	RepeatersDelayList m_RepeatersDelayList;
 
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 
