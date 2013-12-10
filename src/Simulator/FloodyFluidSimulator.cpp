@@ -224,7 +224,14 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				ItemTypeToString(NewBlock).c_str()
 			);
 			a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
-			m_World.BroadcastSoundEffect("random.fizz", a_RelX * 8, a_RelY * 8, a_RelZ * 8, 0.5f, 1.5f);
+
+			int BaseX = a_NearChunk->GetPosX() * cChunkDef::Width;
+			int BaseZ = a_NearChunk->GetPosZ() * cChunkDef::Width;
+
+			BaseX += a_RelX;
+			BaseZ += a_RelZ;
+
+			a_NearChunk->BroadcastSoundEffect("random.fizz", BaseX * 8, a_RelY * 8, BaseZ * 8, 0.5f, 1.5f);
 			return;
 		}
 	}
@@ -238,7 +245,14 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				a_RelX, a_RelY, a_RelZ, ItemTypeToString(NewBlock).c_str()
 			);
 			a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
-			m_World.BroadcastSoundEffect("random.fizz", a_RelX * 8, a_RelY * 8, a_RelZ * 8, 0.5f, 1.5f);
+
+			int BaseX = a_NearChunk->GetPosX() * cChunkDef::Width;
+			int BaseZ = a_NearChunk->GetPosZ() * cChunkDef::Width;
+
+			BaseX += a_RelX;
+			BaseZ += a_RelZ;
+
+			a_NearChunk->BroadcastSoundEffect("random.fizz", BaseX * 8, a_RelY * 8, BaseZ * 8, 0.5f, 1.5f);
 			return;
 		}
 	}
