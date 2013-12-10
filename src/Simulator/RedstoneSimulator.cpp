@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "RedstoneSimulator.h"
@@ -543,6 +542,7 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 	{
 		if (!IsOn)
 		{
+			bool ShouldCreate = true;
 			// If repeater is not on already (and is POWERED), see if it is in repeater list, or has reached delay time
 			for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
 			{
@@ -551,7 +551,8 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 					if (itr->a_DelayTicks <= itr->a_ElapsedTicks) // Shouldn't need <=; just in case something happens
 					{
 						m_RepeatersDelayList.erase(itr);
-						goto powerrepeater; // Delay time reached, break straight out, and into the powering code
+						ShouldCreate = false;
+						break; // Delay time reached, break straight out, and into the powering code
 					}
 					else
 					{
@@ -561,15 +562,17 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 				}
 			}
 
-			// Self not in list, add self to list
-			sRepeatersDelayList RC;
-			RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
-			RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1; // Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
-			RC.a_ElapsedTicks = 0;
-			m_RepeatersDelayList.push_back(RC);
-			return;
-
-powerrepeater:
+			if (ShouldCreate)
+			{
+				// Self not in list, add self to list
+				sRepeatersDelayList RC;
+				RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+				RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1; // Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
+				RC.a_ElapsedTicks = 0;
+				m_RepeatersDelayList.push_back(RC);
+				return;
+			}
+			
 			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // Only set if not on; SetBlock otherwise server doesn't set it in time for SimulateChunk's invalidation
 		}
 		switch (a_Meta & 0x3) // We only want the direction (bottom) bits
