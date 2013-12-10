@@ -25,7 +25,7 @@ file(GLOB SOURCE
     "*.cpp"
 )
 
-list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp")
+list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")
 
 add_executable(../MCServer/MCServer ${SOURCE})
 
