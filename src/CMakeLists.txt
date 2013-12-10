@@ -6,10 +6,12 @@ include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
 add_subdirectory(OSSupport)
 add_subdirectory(HTTPServer)
 add_subdirectory(Bindings)
+add_subdirectory(Items)
+add_subdirectory(Blocks)
 
 set(SOURCE main Root MCLogger Authenticator StringUtils Server DeadlockDetect WebAdmin GroupManager CraftingRecipes FurnaceRecipe)
 set(SOURCE ${SOURCE} MonsterConfig)
 
-add_executable(MCServer ${SOURCE})
+add_executable(../MCServer/MCServer ${SOURCE})
 
-target_link_libraries(MCServer OSSupport HTTPServer iniFile Bindings)
+target_link_libraries(MCServer OSSupport HTTPServer iniFile Bindings Items)
