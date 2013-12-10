@@ -737,9 +737,11 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			FillColumnMesa(a_ChunkDesc, a_RelX, a_RelZ);
 			return;
 		}
-		
+		default:
+			ASSERT(!"Unhandled biome");
+			return;
 	}  // switch (Biome)
-	ASSERT(!"Unhandled biome");
+	ASSERT(!"Unexpected fallthrough");
 }
 
 
