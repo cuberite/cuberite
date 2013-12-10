@@ -630,7 +630,7 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 			// Self not in list, add self to list
 			sRepeatersDelayList RC;
 			RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
-			RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1;
+			RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2); // Repeaters power off slower than they power on, so no +1. Why? No idea.
 			RC.a_ElapsedTicks = 0;
 			m_RepeatersDelayList.push_back(RC);
 			return;
