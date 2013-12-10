@@ -4,4 +4,8 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-add_library(Entities Entity)
+file(GLOB SOURCE
+    "*.cpp"
+)
+
+add_library(Entities ${SOURCE})
