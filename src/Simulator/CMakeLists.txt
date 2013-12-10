@@ -4,4 +4,8 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-add_library(Simulator SimulatorManager SandSimulator FireSimulator RedstoneSimulator VaporizeFluidSimulator FloodyFluidSimulator)
+file(GLOB SOURCE
+    "*.cpp"
+)
+
+add_library(Simulator ${SOURCE})
