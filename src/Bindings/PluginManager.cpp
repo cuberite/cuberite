@@ -1209,6 +1209,27 @@ bool cPluginManager::CallHookWeatherChanging(cWorld & a_World, eWeather & a_NewW
 
 
 
+bool cPluginManager::CallHookWorldStarted(cWorld & a_World)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_WORLD_STARTED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnWorldStarted(a_World))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookWorldTick(cWorld & a_World, float a_Dt, int a_LastTickDurationMSec)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_WORLD_TICK);

@@ -274,6 +274,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 		case cMonster::mtWolf:
 		{
 			Reward = m_World->GetTickRandomNumber(2) + 1;
+			break;
 		}
 
 		// Monsters
@@ -291,25 +292,30 @@ void cMonster::KilledBy(cEntity * a_Killer)
 		case cMonster::mtMagmaCube:
 		{
 			Reward = 6 + (m_World->GetTickRandomNumber(2));
+			break;
 		}
 		case cMonster::mtBlaze:
 		{
 			Reward = 10;
+			break;
 		}
 
 		// Bosses
 		case cMonster::mtEnderDragon:
 		{
 			Reward = 12000;
+			break;
 		}
 		case cMonster::mtWither:
 		{
 			Reward = 50;
+			break;
 		}
 
 		default:
 		{
 			Reward = 0;
+			break;
 		}
 	}
 	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);

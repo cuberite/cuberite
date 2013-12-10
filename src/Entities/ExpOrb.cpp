@@ -40,21 +40,25 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 
 void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 4));
-	if (a_ClosestPlayer)
+	cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 5));
+	if (a_ClosestPlayer != NULL)
 	{
 		Vector3f a_PlayerPos(a_ClosestPlayer->GetPosition());
+		a_PlayerPos.y++;
 		Vector3f a_Distance(a_PlayerPos - GetPosition());
-		if (a_Distance.Length() < 0.1f)
+		double Distance(a_Distance.Length());
+		if (Distance < 0.1f)
 		{
+			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
 			a_ClosestPlayer->DeltaExperience(m_Reward);
-			a_ClosestPlayer->SendExperience();
 			Destroy(true);
 		}
-		a_Distance.y = 0;
 		a_Distance.Normalize();
-		a_Distance *= 3;
+        a_Distance *= ((float) (5.5 - Distance));
 		SetSpeedX( a_Distance.x );
+		SetSpeedY( a_Distance.y );
 		SetSpeedZ( a_Distance.z );
+		BroadcastMovementUpdate();
 	}
+	HandlePhysics(a_Dt, a_Chunk);
 }

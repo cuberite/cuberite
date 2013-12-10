@@ -47,8 +47,25 @@ cGroupManager::cGroupManager()
 	cIniFile IniFile;
 	if (!IniFile.ReadFile("groups.ini"))
 	{
-		LOGWARNING("groups.ini inaccessible, no groups are defined");
-		return;
+		LOGWARNING("Regenerating groups.ini, all groups will be reset");
+		IniFile.AddHeaderComment(" This is the MCServer permissions manager groups file");
+		IniFile.AddHeaderComment(" It stores all defined groups such as Administrators, Players, or Moderators");
+
+		IniFile.SetValue("Owner", "Permissions", "*", true);
+		IniFile.SetValue("Owner", "Color", "2", true);
+
+		IniFile.SetValue("Moderator", "Permissions", "core.time,core.item,core.teleport,core.ban,core.unban,core.save-all,core.toggledownfall");
+		IniFile.SetValue("Moderator", "Color", "2", true);
+		IniFile.SetValue("Moderator", "Inherits", "Player", true);
+
+		IniFile.SetValue("Player", "Permissions", "core.build", true);
+		IniFile.SetValue("Player", "Color", "f", true);
+		IniFile.SetValue("Player", "Inherits", "Default", true);
+
+		IniFile.SetValue("Default", "Permissions", "core.help,core.playerlist,core.pluginlist,core.spawn,core.listworlds,core.back,core.motd,core.gotoworld,core.coords,core.viewdistance", true);
+		IniFile.SetValue("Default", "Color", "f", true);
+
+		IniFile.WriteFile("groups.ini");
 	}
 
 	unsigned int NumKeys = IniFile.GetNumKeys();

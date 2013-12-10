@@ -7,6 +7,7 @@
 #include "DeadlockDetect.h"
 #include "Root.h"
 #include "World.h"
+# include <cstdlib>
 
 
 
@@ -137,11 +138,7 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 void cDeadlockDetect::DeadlockDetected(void)
 {
 	ASSERT(!"Deadlock detected");
-	
-	// TODO: Make a crashdump / coredump
-	
-	// Crash the server intentionally:
-	*((volatile int *)0) = 0;
+	abort();
 }
 
 

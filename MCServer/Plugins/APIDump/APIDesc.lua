@@ -1862,6 +1862,17 @@ end
 			},
 		},  -- cServer
 
+		cTNTEntity =
+		{
+			Desc = "This class manages a TNT entity.",
+			Functions =
+			{
+				GetCounterTime = { Return = "number", Notes = "Returns the time until the entity explodes." },
+				GetMaxFuseTime = { Return = "number", Notes = "Returns how long the fuse was." },
+			},
+			Inherits = "cEntity",
+		},
+		
 		cTracer =
 		{
 			Desc = [[

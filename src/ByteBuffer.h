@@ -42,6 +42,9 @@ public:
 	/// Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some data having been read already)
 	int  GetReadableSpace(void) const;
 	
+	/// Returns the current data start index. For debugging purposes.
+	int  GetDataStart(void) const { return m_DataStart; }
+	
 	/// Returns true if the specified amount of bytes are available for reading
 	bool CanReadBytes(int a_Count) const;
 
@@ -105,6 +108,9 @@ public:
 	
 	/// Reads all available data into a_Data
 	void ReadAll(AString & a_Data);
+	
+	/// Reads the specified number of bytes and writes it into the destinatio bytebuffer. Returns true on success.
+	bool ReadToByteBuffer(cByteBuffer & a_Dst, int a_NumBytes);
 	
 	/// Removes the bytes that have been read from the ringbuffer
 	void CommitRead(void);

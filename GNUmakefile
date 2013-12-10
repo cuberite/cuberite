@@ -88,7 +88,7 @@ CXX_OPTIONS += -Wall
 ###################################################
 # Fix Crypto++ warnings in clang
 
-ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang version"),1)
+ifeq ($(shell $(CXX) --version 2>&1 | grep -i -c "clang"),1)
 CC_OPTIONS += -DCRYPTOPP_DISABLE_ASM
 CXX_OPTIONS += -DCRYPTOPP_DISABLE_ASM
 endif
