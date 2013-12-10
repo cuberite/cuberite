@@ -4,4 +4,4 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-add_library(Bindings PluginManager LuaState WebPlugin)
+add_library(Generating ChunkGenerator)

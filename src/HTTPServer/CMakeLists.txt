@@ -4,4 +4,4 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-add_library(HTTPServer HTTPServer)
+add_library(HTTPServer HTTPServer HTTPConnection HTTPFormParser HTTPMessage MultipartParser)
