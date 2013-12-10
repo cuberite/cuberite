@@ -22,9 +22,10 @@ add_subdirectory(Entities)
 add_subdirectory(Simulator)
 
 file(GLOB SOURCE
-    "*.h"
     "*.cpp"
 )
+
+list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp")
 
 add_executable(../MCServer/MCServer ${SOURCE})
 

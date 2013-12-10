@@ -4,7 +4,6 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 file(GLOB SOURCE
-    "*.h"
     "*.cpp"
 )
 
