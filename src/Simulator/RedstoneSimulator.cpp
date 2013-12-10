@@ -285,7 +285,7 @@ void cRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_B
 		if (AreCoordsPowered(X, Y, Z))
 		{
 			// There was a match, torch goes off
-			m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_OFF, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
+			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_OFF, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
 			return;
 		}
 
@@ -335,7 +335,7 @@ void cRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_B
 		}
 
 		// Block torch on not powered, can be turned on again!
-		m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_ON, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
+		m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_ON, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
 	}
 }
 
@@ -420,6 +420,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 	}
 	else
 	{
+		NIBBLETYPE MetaToSet = 0;
 		NIBBLETYPE MyMeta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		int TimesMetaSmaller = 0, TimesFoundAWire = 0;
 
@@ -439,7 +440,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 					// >= to fix a bug where wires bordering each other with the same power level will appear (in terms of meta) to power each other, when they aren't actually in the powered list
 					if (SurroundMeta >= MyMeta)
 					{
-						m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, SurroundMeta - 1);
+						MetaToSet = SurroundMeta - 1; // To improve performance
 					}
 				}
 				
@@ -458,6 +459,10 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 			// therefore, self must be set to meta zero
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
 			return; // No need to process block power sets because self not powered
+		}
+		else
+		{
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MetaToSet);
 		}
 
 		SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE); // Power block beneath
@@ -538,6 +543,37 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 	{
 		if (!IsOn)
 		{
+			bool ShouldCreate = true;
+			// If repeater is not on already (and is POWERED), see if it is in repeater list, or has reached delay time
+			for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+			{
+				if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+				{
+					if (itr->a_DelayTicks <= itr->a_ElapsedTicks) // Shouldn't need <=; just in case something happens
+					{
+						m_RepeatersDelayList.erase(itr);
+						ShouldCreate = false;
+						break; // Delay time reached, break straight out, and into the powering code
+					}
+					else
+					{
+						itr->a_ElapsedTicks++; // Increment elapsed ticks and quit
+						return;
+					}
+				}
+			}
+
+			if (ShouldCreate)
+			{
+				// Self not in list, add self to list
+				sRepeatersDelayList RC;
+				RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+				RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1; // Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
+				RC.a_ElapsedTicks = 0;
+				m_RepeatersDelayList.push_back(RC);
+				return;
+			}
+			
 			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // Only set if not on; SetBlock otherwise server doesn't set it in time for SimulateChunk's invalidation
 		}
 		switch (a_Meta & 0x3) // We only want the direction (bottom) bits
@@ -572,7 +608,32 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 	{
 		if (IsOn)
 		{
-			m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
+			// If repeater is not off already (and is NOT POWERED), see if it is in repeater list, or has reached delay time
+			for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+			{
+				if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+				{
+					if (itr->a_DelayTicks <= itr->a_ElapsedTicks) // Shouldn't need <=; just in case something happens
+					{
+						m_RepeatersDelayList.erase(itr);
+						m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
+						return;
+					}
+					else
+					{
+						itr->a_ElapsedTicks++; // Increment elapsed ticks and quit
+						return;
+					}
+				}
+			}
+
+			// Self not in list, add self to list
+			sRepeatersDelayList RC;
+			RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+			RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1;
+			RC.a_ElapsedTicks = 0;
+			m_RepeatersDelayList.push_back(RC);
+			return;
 		}
 	}
 }

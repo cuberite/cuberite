@@ -1588,7 +1588,7 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool IsPlayerCreated)
 {
 	MTRand r1;
-	a_FlyAwaySpeed /= 1000;  // Pre-divide, so that we don't have to divide each time inside the loop
+	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
 		if (!IsValidItem(itr->m_ItemType))
@@ -1597,9 +1597,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			continue;
 		}
 
-		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
-		float SpeedY = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
-		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
+		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(10) - 5));
+		float SpeedY = (float)(a_FlyAwaySpeed * r1.randInt(50));
+		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(10) - 5));
 		
 		cPickup * Pickup = new cPickup(
 			a_BlockX, a_BlockY, a_BlockZ,

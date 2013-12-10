@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug profiled|Win32">
@@ -224,8 +224,6 @@
     <ResourceCompile Include="MCServer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\BlockEntities\EnderChestEntity.h" />
-    <ClInclude Include="..\src\Blocks\BlockRedstoneLamp.h" />
     <ClInclude Include="resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
     <ClInclude Include="..\src\BlockArea.h" />
@@ -365,16 +363,15 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
-    <ClInclude Include="..\src\Bindings.h" />
-    <ClInclude Include="..\src\LuaFunctions.h" />
+    <ClInclude Include="..\src\Bindings\Bindings.h" />
+    <ClInclude Include="..\src\Bindings\LuaFunctions.h" />
     <ClInclude Include="..\src\Bindings\LuaState.h" />
     <ClInclude Include="..\src\Bindings\LuaWindow.h" />
     <ClInclude Include="..\src\Bindings\ManualBindings.h" />
     <ClInclude Include="..\src\Bindings\Plugin.h" />
     <ClInclude Include="..\src\Bindings\PluginLua.h" />
     <ClInclude Include="..\src\Bindings\PluginManager.h" />
-    <ClInclude Include="..\src\tolua++.h" />
-    <ClInclude Include="..\src\tolua_base.h" />
+    <ClInclude Include="..\src\Bindings\tolua_base.h" />
     <ClInclude Include="..\src\Bindings\WebPlugin.h" />
     <ClInclude Include="..\lib\inifile\iniFile.h" />
     <ClInclude Include="..\lib\md5\md5.h" />
@@ -506,6 +503,7 @@
     <ClInclude Include="..\src\BlockEntities\DispenserEntity.h" />
     <ClInclude Include="..\src\BlockEntities\DropperEntity.h" />
     <ClInclude Include="..\src\BlockEntities\DropSpenserEntity.h" />
+    <ClInclude Include="..\src\BlockEntities\EnderChestEntity.h" />
     <ClInclude Include="..\src\BlockEntities\FurnaceEntity.h" />
     <ClInclude Include="..\src\BlockEntities\HopperEntity.h" />
     <ClInclude Include="..\src\BlockEntities\JukeboxEntity.h" />
@@ -535,7 +533,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release profiled|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
-    <CustomBuild Include="..\src\AllToLua.pkg">
+    <CustomBuild Include="..\src\Bindings\AllToLua.pkg">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">true</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug profiled|Win32'">GenerateBindings.cmd
 </Command>
@@ -617,7 +615,6 @@
   <ItemGroup>
     <ClCompile Include="..\src\Authenticator.cpp" />
     <ClCompile Include="..\src\BlockArea.cpp" />
-    <ClCompile Include="..\src\BlockEntities\EnderChestEntity.cpp" />
     <ClCompile Include="..\src\BlockID.cpp" />
     <ClCompile Include="..\src\BoundingBox.cpp" />
     <ClCompile Include="..\src\ByteBuffer.cpp" />
@@ -919,6 +916,7 @@
     <ClCompile Include="..\src\BlockEntities\DispenserEntity.cpp" />
     <ClCompile Include="..\src\BlockEntities\DropperEntity.cpp" />
     <ClCompile Include="..\src\BlockEntities\DropSpenserEntity.cpp" />
+    <ClCompile Include="..\src\BlockEntities\EnderChestEntity.cpp" />
     <ClCompile Include="..\src\BlockEntities\FurnaceEntity.cpp" />
     <ClCompile Include="..\src\BlockEntities\HopperEntity.cpp" />
     <ClCompile Include="..\src\BlockEntities\JukeboxEntity.cpp" />
@@ -933,7 +931,6 @@
     <ClCompile Include="..\src\HTTPServer\NameValueParser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\MCServer\API.txt" />
     <Text Include="..\lib\sqlite\urls.txt" />
     <Text Include="..\MCServer\crafting.txt" />
     <Text Include="..\MCServer\furnace.txt" />
