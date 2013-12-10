@@ -7,7 +7,7 @@ Symbols
 cloc-ignored.txt
 cloc.xml
 cloc.xsl
-*.ncb
+ *.ncb
 *.user
 *.suo
 /EveryNight.cmd
@@ -15,6 +15,7 @@ cloc.xsl
 
 # emacs stuff
 *.*~
+*~
 
 # world inside source
 ChunkWorx.ini
@@ -32,3 +33,11 @@ logs
 players
 world
 world_nether
+
+#cmake stuff
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+
+*.a
