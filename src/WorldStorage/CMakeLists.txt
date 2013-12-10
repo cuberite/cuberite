@@ -4,4 +4,8 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-add_library(WorldStorage WorldStorage)
+file(GLOB SOURCE
+    "*.cpp"
+)
+
+add_library(WorldStorage ${SOURCE})
