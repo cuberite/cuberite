@@ -67,9 +67,8 @@ public:
 			return 0;
 		}
 
-		int newY = Y + 1;
-
-		for (newY; newY < cChunkDef::Height; newY++)
+		
+		for (int newY = Y + 1; newY < cChunkDef::Height; newY++)
 		{
 			BLOCKTYPE Block = a_World->GetBlock(X, newY, Z);
 			if ((Block == E_BLOCK_AIR) || (Block == E_BLOCK_FIRE))
@@ -155,7 +154,7 @@ public:
 	{
 		Dir = 1; // Set assumed direction (will change if portal turns out to be facing the other direction)
 		bool FoundFrameXP = false, FoundFrameXM = false;
-		for (X1; ((a_World->GetBlock(X1, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X1, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X1++) // Check XP for obsidian blocks, exempting corners
+		for (; ((a_World->GetBlock(X1, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X1, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X1++) // Check XP for obsidian blocks, exempting corners
 		{
 			int Value = FindObsidianCeiling(X1, Y, Z, a_World, MaxY);
 			int ValueTwo = FindObsidianCeiling(X1, Y + 1, Z, a_World, MaxY); // For corners without obsidian
@@ -169,7 +168,7 @@ public:
 				return false; // Not valid slice, no portal can be formed
 			}
 		} XZP = X1 - 1; // Set boundary of frame interior, note that for some reason, the loop of X and the loop of Z go to different numbers, hence -1 here and -2 there
-		for (X2; ((a_World->GetBlock(X2, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X2, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X2--) // Go the other direction (XM)
+		for (; ((a_World->GetBlock(X2, Y, Z) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X2, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X2--) // Go the other direction (XM)
 		{
 			int Value = FindObsidianCeiling(X2, Y, Z, a_World, MaxY);
 			int ValueTwo = FindObsidianCeiling(X2, Y + 1, Z, a_World, MaxY);
@@ -191,7 +190,7 @@ public:
 	{
 		Dir = 2;
 		bool FoundFrameZP = false, FoundFrameZM = false;
-		for (Z1; ((a_World->GetBlock(X, Y, Z1) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X, Y + 1, Z1) == E_BLOCK_OBSIDIAN)); Z1++)
+		for (; ((a_World->GetBlock(X, Y, Z1) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X, Y + 1, Z1) == E_BLOCK_OBSIDIAN)); Z1++)
 		{
 			int Value = FindObsidianCeiling(X, Y, Z1, a_World, MaxY);
 			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z1, a_World, MaxY);
@@ -205,7 +204,7 @@ public:
 				return false;
 			}
 		} XZP = Z1 - 2;
-		for (Z2; ((a_World->GetBlock(X, Y, Z2) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X, Y + 1, Z2) == E_BLOCK_OBSIDIAN)); Z2--)
+		for (; ((a_World->GetBlock(X, Y, Z2) == E_BLOCK_OBSIDIAN) || (a_World->GetBlock(X, Y + 1, Z2) == E_BLOCK_OBSIDIAN)); Z2--)
 		{
 			int Value = FindObsidianCeiling(X, Y, Z2, a_World, MaxY);
 			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z2, a_World, MaxY);

@@ -124,7 +124,7 @@ void cIsThread::Stop(void)
 
 bool cIsThread::Wait(void)
 {
-	if (m_Handle == NULL)
+	if (m_Handle == NULL_HANDLE)
 	{
 		return true;
 	}
