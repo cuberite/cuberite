@@ -4,4 +4,8 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-add_library(Mobs Monster)
+file(GLOB SOURCE
+    "*.cpp"
+)
+
+add_library(Mobs ${SOURCE})
