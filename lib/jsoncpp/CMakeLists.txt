@@ -4,4 +4,10 @@ project (jsoncpp)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../../src/")
 
-add_library(jsoncpp src/lib_json/json_value.cpp)
+file(GLOB SOURCE
+    "src/lib_json/*.h"
+    "src/lib_json/*.cpp"
+)
+
+
+add_library(jsoncpp ${SOURCE})

@@ -21,10 +21,10 @@ add_subdirectory(Mobs)
 add_subdirectory(Entities)
 add_subdirectory(Simulator)
 
-set(SOURCE main Root MCLogger Authenticator StringUtils Server DeadlockDetect WebAdmin GroupManager)
-set(SOURCE ${SOURCE} CraftingRecipes FurnaceRecipe MonsterConfig World CommandOutput RCONServer)
-set(SOURCE ${SOURCE} Log ClientHandle ChatColor Group Enchantments MonsterConfig ChunkMap ChunkSender)
-set(SOURCE ${SOURCE} LightingThread MobCensus MobSpawner MobProximityCounter Noise)
+file(GLOB SOURCE
+    "*.h"
+    "*.cpp"
+)
 
 add_executable(../MCServer/MCServer ${SOURCE})
 
