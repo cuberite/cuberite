@@ -8,7 +8,6 @@ endif()
 include_directories ("${PROJECT_SOURCE_DIR}/../../src/")
 
 file(GLOB cryptopp_SRC
-    "*.h"
     "*.cpp"
 )
 
