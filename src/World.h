@@ -392,6 +392,7 @@ public:
 	
 	inline cFluidSimulator * GetWaterSimulator(void) { return m_WaterSimulator; }
 	inline cFluidSimulator * GetLavaSimulator (void) { return m_LavaSimulator; }
+	inline cRedstoneSimulator * GetRedstoneSimulator(void) { return m_RedstoneSimulator; }
 	
 	/// Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback & a_Callback);  // Exported in ManualBindings.cpp

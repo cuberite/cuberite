@@ -2160,12 +2160,12 @@ void cClientHandle::PacketBufferFull(void)
 
 
 
-void cClientHandle::PacketUnknown(unsigned char a_PacketType)
+void cClientHandle::PacketUnknown(UInt32 a_PacketType)
 {
-	LOGERROR("Unknown packet type 0x%02x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_IPString.c_str());
+	LOGERROR("Unknown packet type 0x%x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_IPString.c_str());
 
 	AString Reason;
-	Printf(Reason, "Unknown [C->S] PacketType: 0x%02x", a_PacketType);
+	Printf(Reason, "Unknown [C->S] PacketType: 0x%x", a_PacketType);
 	SendDisconnect(Reason);
 	Destroy();
 }

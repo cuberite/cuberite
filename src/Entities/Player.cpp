@@ -1393,7 +1393,12 @@ void cPlayer::LoadPermissionsFromDisk()
 	}
 	else
 	{
-		LOGWARN("Failed to read the users.ini file. The player will be added only to the Default group.");
+		LOGWARN("Regenerating users.ini, player %s will be added to the \"Default\" group", m_PlayerName.c_str());
+		IniFile.AddHeaderComment(" This is the file in which the group the player belongs to is stored");
+		IniFile.AddHeaderComment(" The format is: [PlayerName] | Groups=GroupName");
+
+		IniFile.SetValue(m_PlayerName, "Groups", "Default");
+		IniFile.WriteFile("users.ini");
 		AddToGroup("Default");
 	}
 	ResolvePermissions();
@@ -1410,7 +1415,7 @@ bool cPlayer::LoadFromDisk()
 	LOGINFO("Player %s has permissions:", m_PlayerName.c_str() );
 	for( PermissionMap::iterator itr = m_ResolvedPermissions.begin(); itr != m_ResolvedPermissions.end(); ++itr )
 	{
-		if( itr->second ) LOGINFO("%s", itr->first.c_str() );
+		if( itr->second ) LOG(" - %s", itr->first.c_str() );
 	}
 
 	AString SourceFile;

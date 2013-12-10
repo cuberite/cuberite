@@ -127,7 +127,11 @@ private:
 	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock);
 
 	/// <summary>Returns if a coordinate is powered or linked powered</summary>
-	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
+	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ) { return AreCoordsDirectlyPowered(a_BlockX, a_BlockY, a_BlockZ) || AreCoordsLinkedPowered(a_BlockX, a_BlockY, a_BlockZ); }
+	/// <summary>Returns if a coordinate is in the directly powered blocks list</summary>
+	bool AreCoordsDirectlyPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// <summary>Returns if a coordinate is in the indirectly powered blocks list</summary>
+	bool AreCoordsLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/// <summary>Returns if a coordinate was marked as simulated (for blocks toggleable by players)</summary>
 	bool AreCoordsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool IsCurrentStatePowered);
 	/// <summary>Returns if a repeater is powered</summary>
@@ -150,6 +154,9 @@ private:
 		switch (Block)
 		{
 			// Add SOLID but not viable middle blocks here
+			case E_BLOCK_PISTON:
+			case E_BLOCK_PISTON_EXTENSION:
+			case E_BLOCK_STICKY_PISTON:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			{
