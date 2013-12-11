@@ -150,6 +150,9 @@ private:
 		switch (Block)
 		{
 			// Add SOLID but not viable middle blocks here
+			case E_BLOCK_PISTON:
+			case E_BLOCK_PISTON_EXTENSION:
+			case E_BLOCK_STICKY_PISTON:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			{
