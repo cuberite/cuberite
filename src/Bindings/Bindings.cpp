@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/08/13 18:11:12.
+** Generated automatically by tolua++-1.0.92 on 12/11/13 12:34:21.
 */
 
 #ifndef __cplusplus
@@ -19926,6 +19926,41 @@ static int tolua_AllToLua_cRoot_GetWorld00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: CreateAndInitializeWorld of class  cRoot */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_CreateAndInitializeWorld00
+static int tolua_AllToLua_cRoot_CreateAndInitializeWorld00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cRoot* self = (cRoot*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_WorldName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CreateAndInitializeWorld'", NULL);
+#endif
+  {
+   cWorld* tolua_ret = (cWorld*)  self->CreateAndInitializeWorld(a_WorldName);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
+   tolua_pushcppstring(tolua_S,(const char*)a_WorldName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CreateAndInitializeWorld'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetPrimaryServerVersion of class  cRoot */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetPrimaryServerVersion00
 static int tolua_AllToLua_cRoot_GetPrimaryServerVersion00(lua_State* tolua_S)
@@ -29797,6 +29832,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_UPDATING_SIGN",cPluginManager::HOOK_UPDATING_SIGN);
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGED",cPluginManager::HOOK_WEATHER_CHANGED);
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGING",cPluginManager::HOOK_WEATHER_CHANGING);
+   tolua_constant(tolua_S,"HOOK_WORLD_STARTED",cPluginManager::HOOK_WORLD_STARTED);
    tolua_constant(tolua_S,"HOOK_WORLD_TICK",cPluginManager::HOOK_WORLD_TICK);
    tolua_constant(tolua_S,"HOOK_NUM_HOOKS",cPluginManager::HOOK_NUM_HOOKS);
    tolua_constant(tolua_S,"HOOK_MAX",cPluginManager::HOOK_MAX);
@@ -31348,6 +31384,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetServer",tolua_AllToLua_cRoot_GetServer00);
    tolua_function(tolua_S,"GetDefaultWorld",tolua_AllToLua_cRoot_GetDefaultWorld00);
    tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cRoot_GetWorld00);
+   tolua_function(tolua_S,"CreateAndInitializeWorld",tolua_AllToLua_cRoot_CreateAndInitializeWorld00);
    tolua_function(tolua_S,"GetPrimaryServerVersion",tolua_AllToLua_cRoot_GetPrimaryServerVersion00);
    tolua_function(tolua_S,"SetPrimaryServerVersion",tolua_AllToLua_cRoot_SetPrimaryServerVersion00);
    tolua_function(tolua_S,"GetGroupManager",tolua_AllToLua_cRoot_GetGroupManager00);

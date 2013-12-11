@@ -1143,6 +1143,21 @@ bool cPluginLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 
 
 
+bool cPluginLua::OnWorldStarted(cWorld & a_World)
+{
+	cCSLock Lock(m_CriticalSection);
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_WORLD_STARTED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_World);
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnWorldTick(cWorld & a_World, float a_Dt, int a_LastTickDurationMSec)
 {
 	cCSLock Lock(m_CriticalSection);

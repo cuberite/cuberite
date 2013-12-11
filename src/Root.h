@@ -42,6 +42,7 @@ public:
 	cServer * GetServer(void) { return m_Server; }						// tolua_export
 	cWorld *  GetDefaultWorld(void);										// tolua_export
 	cWorld *  GetWorld(const AString & a_WorldName);				// tolua_export
+	cWorld *  CreateAndInitializeWorld(const AString & a_WorldName); // tolua_export
 	
 	/// Calls the callback for each world; returns true if the callback didn't abort (return true)
 	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
