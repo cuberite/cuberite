@@ -309,6 +309,7 @@ cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName)
 	m_WorldsByName[a_WorldName] = NewWorld;
 	NewWorld->Start();
 	NewWorld->InitializeSpawn();
+	m_PluginManager->CallHookWorldStarted(*NewWorld);
 	return NewWorld;
 }
 
