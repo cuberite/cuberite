@@ -299,12 +299,30 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 
 
 
+cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName)
+{
+	if (m_WorldsByName[a_WorldName] != NULL)
+	{
+		return NULL;
+	}
+	cWorld* NewWorld = new cWorld(a_WorldName.c_str());
+	m_WorldsByName[a_WorldName] = NewWorld;
+	NewWorld->Start();
+	NewWorld->InitializeSpawn();
+	return NewWorld;
+}
+
+
+
+
+
 void cRoot::StartWorlds(void)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		itr->second->Start();
 		itr->second->InitializeSpawn();
+		m_PluginManager->CallHookWorldStarted(*itr->second);
 	}
 }
 
