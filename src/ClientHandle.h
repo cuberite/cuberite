@@ -160,7 +160,7 @@ public:
 	
 	// Calls that cProtocol descendants use to report state:
 	void PacketBufferFull(void);
-	void PacketUnknown(unsigned char a_PacketType);
+	void PacketUnknown(UInt32 a_PacketType);
 	void PacketError(unsigned char a_PacketType);
 
 	// Calls that cProtocol descendants use for handling packets:
