@@ -1335,6 +1335,7 @@ void cChunk::WakeUpSimulators(void)
 {
 	cSimulator * WaterSimulator = m_World->GetWaterSimulator();
 	cSimulator * LavaSimulator  = m_World->GetLavaSimulator();
+	cSimulator * RedstoneSimulator = m_World->GetRedstoneSimulator();
 	int BaseX = m_PosX * cChunkDef::Width;
 	int BaseZ = m_PosZ * cChunkDef::Width;
 	for (int x = 0; x < Width; x++)
@@ -1355,6 +1356,11 @@ void cChunk::WakeUpSimulators(void)
 					case E_BLOCK_LAVA:
 					{
 						LavaSimulator->AddBlock(BlockX, y, BlockZ, this);
+						break;
+					}
+					default:
+					{
+						RedstoneSimulator->AddBlock(BlockX, y, BlockZ, this); // Redstone simulator checks if valid redstone block already
 						break;
 					}
 				}  // switch (BlockType)
