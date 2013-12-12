@@ -1031,8 +1031,6 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 	
 	// Unknown packet type, report to the client:
 	m_Client->PacketUnknown(a_PacketType);
-	m_ReceivedData.SkipRead(a_RemainingBytes);
-	m_ReceivedData.CommitRead();
 }
 
 
@@ -1045,8 +1043,6 @@ void cProtocol172::HandlePacketStatusPing(UInt32 a_RemainingBytes)
 	if (a_RemainingBytes != 8)
 	{
 		m_Client->PacketError(0x01);
-		m_ReceivedData.SkipRead(a_RemainingBytes);
-		m_ReceivedData.CommitRead();
 		return;
 	}
 	Int64 Timestamp;
