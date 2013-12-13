@@ -1345,7 +1345,16 @@ void cChunk::WakeUpSimulators(void)
 			int BlockZ = z + BaseZ;
 			for (int y = GetHeight(x, z); y >= 0; y--)
 			{
-				switch (cChunkDef::GetBlock(m_BlockTypes, x, y, z))
+				BLOCKTYPE Block = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
+
+				// The redstone sim takes multiple blocks, use the inbuilt checker
+				if (RedstoneSimulator->IsAllowedBlock(Block))
+				{
+					RedstoneSimulator->AddBlock(BlockX, y, BlockZ, this);
+					continue;
+				}
+
+				switch (Block)
 				{
 					case E_BLOCK_WATER:
 					{
@@ -1359,7 +1368,6 @@ void cChunk::WakeUpSimulators(void)
 					}
 					default:
 					{
-						RedstoneSimulator->AddBlock(BlockX, y, BlockZ, this); // Redstone simulator checks if valid redstone block already
 						break;
 					}
 				}  // switch (BlockType)
