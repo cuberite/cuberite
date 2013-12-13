@@ -706,8 +706,7 @@ void cChunk::ProcessQueuedSetBlocks(void)
 				{
 					// Current world age is bigger than/equal to target world age - delay time reached AND
 					// Previous block type was the same as current block type (to prevent duplication)
-					// Since blocktypes were the same, we just need to set the meta
-					SetMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockMeta);
+					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta); // SetMeta doesn't send to client
 					itr = m_SetBlockQueue.erase(itr);
 					LOGD("Successfully set queued block - previous and current types matched");
 				}
@@ -1335,6 +1334,7 @@ void cChunk::WakeUpSimulators(void)
 {
 	cSimulator * WaterSimulator = m_World->GetWaterSimulator();
 	cSimulator * LavaSimulator  = m_World->GetLavaSimulator();
+	cSimulator * RedstoneSimulator = m_World->GetRedstoneSimulator();
 	int BaseX = m_PosX * cChunkDef::Width;
 	int BaseZ = m_PosZ * cChunkDef::Width;
 	for (int x = 0; x < Width; x++)
@@ -1345,7 +1345,16 @@ void cChunk::WakeUpSimulators(void)
 			int BlockZ = z + BaseZ;
 			for (int y = GetHeight(x, z); y >= 0; y--)
 			{
-				switch (cChunkDef::GetBlock(m_BlockTypes, x, y, z))
+				BLOCKTYPE Block = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
+
+				// The redstone sim takes multiple blocks, use the inbuilt checker
+				if (RedstoneSimulator->IsAllowedBlock(Block))
+				{
+					RedstoneSimulator->AddBlock(BlockX, y, BlockZ, this);
+					continue;
+				}
+
+				switch (Block)
 				{
 					case E_BLOCK_WATER:
 					{
@@ -1355,6 +1364,10 @@ void cChunk::WakeUpSimulators(void)
 					case E_BLOCK_LAVA:
 					{
 						LavaSimulator->AddBlock(BlockX, y, BlockZ, this);
+						break;
+					}
+					default:
+					{
 						break;
 					}
 				}  // switch (BlockType)
