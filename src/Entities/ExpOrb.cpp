@@ -41,7 +41,7 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 5));
-	if (a_ClosestPlayer)
+	if (a_ClosestPlayer != NULL)
 	{
 		Vector3f a_PlayerPos(a_ClosestPlayer->GetPosition());
 		a_PlayerPos.y++;
