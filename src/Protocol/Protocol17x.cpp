@@ -921,7 +921,6 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 {
-	LOGD("Received %d bytes of data", a_Size);
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
@@ -958,9 +957,6 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			return;
 		}
 
-		// DEBUG:
-		LOGD("Packet 0x%x, len %d (0x%x), start at %d", PacketType, PacketLen, PacketLen, PacketStart);
-		
 		HandlePacket(bb, PacketType);
 		
 		if (bb.GetReadableSpace() != 1)
