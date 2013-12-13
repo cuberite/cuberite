@@ -706,8 +706,7 @@ void cChunk::ProcessQueuedSetBlocks(void)
 				{
 					// Current world age is bigger than/equal to target world age - delay time reached AND
 					// Previous block type was the same as current block type (to prevent duplication)
-					// Since blocktypes were the same, we just need to set the meta
-					SetMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockMeta);
+					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta); // SetMeta doesn't send to client
 					itr = m_SetBlockQueue.erase(itr);
 					LOGD("Successfully set queued block - previous and current types matched");
 				}
