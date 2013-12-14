@@ -394,18 +394,18 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 		int x, y, z;
 	} gCrossCoords[] =
 	{
-		{ 1, 0,  0},
+		{ 1, 0,  0}, /* Wires on same level start */
 		{-1, 0,  0},
 		{ 0, 0,  1},
-		{ 0, 0, -1},
-		{ 1, 1,  0}, // From here to end, check for wire placed on sides of blocks
+		{ 0, 0, -1}, /* Wires on same level stop */
+		{ 1, 1,  0}, /* Wires one higher, surrounding self start */
 		{-1, 1,  0},
 		{ 0, 1,  1},
-		{ 0, 1, -1},
-		{ 1,-1,  0},
+		{ 0, 1, -1}, /* Wires one higher, surrounding self stop */
+		{ 1,-1,  0}, /* Wires one lower, surrounding self start */
 		{-1,-1,  0},
 		{ 0,-1,  1},
-		{ 0,-1, -1},
+		{ 0,-1, -1}, /* Wires one lower, surrounding self stop */
 	} ;
 
 	// Check to see if directly beside a power source
@@ -421,6 +421,21 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 
 		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through all directions to transfer or receive power
 		{
+			if ((i >= 4) && (i <= 7)) // If we are currently checking for wire surrounding ourself one block above...
+			{
+				if (g_BlockIsSolid[m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)]) // If there is something solid above us (wire cut off)...
+				{
+					continue; // We don't receive power from that wire
+				}
+			}
+			else if ((i >= 8) && (i <= 11)) // See above, but this is for wire below us
+			{
+				if (g_BlockIsSolid[m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y + 1, a_BlockZ + gCrossCoords[i].z)])
+				{
+					continue;
+				}
+			}
+
 			BLOCKTYPE SurroundType;
 			NIBBLETYPE SurroundMeta;
 			m_World.GetBlockTypeMeta(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, SurroundType, SurroundMeta);
@@ -483,37 +498,25 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 			}
 			case REDSTONE_X_POS:
 			{
-				if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) != E_BLOCK_REDSTONE_WIRE)
-				{
-					SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				}
+				SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
 				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XP, E_BLOCK_REDSTONE_WIRE);
 				break;
 			}
 			case REDSTONE_X_NEG:
 			{
-				if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) != E_BLOCK_REDSTONE_WIRE)
-				{
-					SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				}
+				SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
 				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XM, E_BLOCK_REDSTONE_WIRE);
 				break;
 			}
 			case REDSTONE_Z_POS:
 			{
-				if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) != E_BLOCK_REDSTONE_WIRE)
-				{
-					SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				}
+				SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
 				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_REDSTONE_WIRE);
 				break;
 			}
 			case REDSTONE_Z_NEG:
 			{
-				if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ - 1) != E_BLOCK_REDSTONE_WIRE)
-				{
-					SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				}
+				SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
 				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_REDSTONE_WIRE);
 				break;
 			}
@@ -1147,9 +1150,15 @@ void cRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_B
 
 void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock)
 {
-	if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+	BLOCKTYPE Block = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	if (Block == E_BLOCK_AIR)
 	{
 		// Don't set air, fixes some bugs (wires powering themselves)
+		return;
+	}
+	if ((Block == E_BLOCK_REDSTONE_WIRE) && (a_SourceBlock == E_BLOCK_REDSTONE_WIRE))
+	{
+		// Wires cannot power themselves normally, instead, the wire handler will manually set meta
 		return;
 	}
 
