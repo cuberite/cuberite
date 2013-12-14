@@ -77,7 +77,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	int BaseZ = a_Chunk->GetPosZ() * cChunkDef::Width;
 
 	// Check to see if PoweredBlocks have invalid items (source is air or unpowered)
-	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
 	{
 		int RelX = itr->a_SourcePos.x - a_ChunkX * cChunkDef::Width;
 		int RelZ = itr->a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
@@ -112,7 +112,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	}
 
 	// Check to see if LinkedPoweredBlocks have invalid items: source, block powered through, or power destination block has changed
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
+	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
 	{
 		int RelX = itr->a_SourcePos.x - a_ChunkX * cChunkDef::Width;
 		int RelZ = itr->a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
@@ -156,7 +156,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 	}
 
-	for (SimulatedPlayerToggleableList::const_iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end();)
+	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end();)
 	{
 		int RelX = itr->a_BlockPos.x - a_ChunkX * cChunkDef::Width;
 		int RelZ = itr->a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
@@ -168,7 +168,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 		else if (!IsAllowedBlock(SourceBlockType))
 		{
-			LOGD("cRedstoneSimulator: Erased block %s from toggleable simulated list due to power state change", ItemToFullString(SourceBlockType).c_str());
+			LOGD("cRedstoneSimulator: Erased block %s from toggleable simulated list as block is no longer redstone", ItemToFullString(SourceBlockType).c_str());
 			itr = m_SimulatedPlayerToggleableBlocks.erase(itr);
 		}
 		else
@@ -177,7 +177,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 	}
 
-	for (cRedstoneSimulatorChunkData::const_iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
+	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
 	{
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(dataitr->x, dataitr->y, dataitr->z);
 		if (!IsAllowedBlock(BlockType))
