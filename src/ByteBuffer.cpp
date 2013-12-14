@@ -773,6 +773,28 @@ void cByteBuffer::ReadAll(AString & a_Data)
 
 
 
+bool cByteBuffer::ReadToByteBuffer(cByteBuffer & a_Dst, int a_NumBytes)
+{
+	if (!a_Dst.CanWriteBytes(a_NumBytes) || !CanReadBytes(a_NumBytes))
+	{
+		// There's not enough source bytes or space in the dest BB
+		return false;
+	}
+	char buf[1024];
+	while (a_NumBytes > 0)
+	{
+		int num = (a_NumBytes > sizeof(buf)) ? sizeof(buf) : a_NumBytes;
+		VERIFY(ReadBuf(buf, num));
+		VERIFY(a_Dst.Write(buf, num));
+		a_NumBytes -= num;
+	}
+	return true;
+}
+
+
+
+
+
 void cByteBuffer::CommitRead(void)
 {
 	CHECK_THREAD;

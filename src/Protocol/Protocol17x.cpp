@@ -29,23 +29,23 @@ Implements the 1.7.x protocol classes:
 
 
 
-#define HANDLE_READ(Proc, Type, Var) \
+#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	m_ReceivedData.Proc(Var);
+	ByteBuf.Proc(Var);
 
 
 
 
 
-#define HANDLE_PACKET_READ(Proc, Type, Var) \
+#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
 	{ \
-		if (!m_ReceivedData.Proc(Var)) \
+		if (!ByteBuf.Proc(Var)) \
 		{ \
-			m_ReceivedData.CheckValid(); \
+			ByteBuf.CheckValid(); \
 			return false; \
 		} \
-		m_ReceivedData.CheckValid(); \
+		ByteBuf.CheckValid(); \
 	}
 
 
@@ -921,6 +921,7 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 {
+	LOGD("Received %d bytes of data", a_Size);
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
@@ -932,6 +933,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 	while (true)
 	{
 		UInt32 PacketLen;
+		int PacketStart = m_ReceivedData.GetDataStart();
 		if (!m_ReceivedData.ReadVarInt(PacketLen))
 		{
 			// Not enough data
@@ -942,35 +944,38 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			// The full packet hasn't been received yet
 			return;
 		}
+		cByteBuffer bb(PacketLen + 1);
+		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
+		m_ReceivedData.CommitRead();
+		
+		// Write one NUL extra, so that we can detect over-reads
+		bb.Write("\0", 1);
+		
 		UInt32 PacketType;
-		UInt32 Mark1 = m_ReceivedData.GetReadableSpace();
-		if (!m_ReceivedData.ReadVarInt(PacketType))
+		if (!bb.ReadVarInt(PacketType))
 		{
 			// Not enough data
 			return;
 		}
 
-		UInt32 NumBytesRead = Mark1 - m_ReceivedData.GetReadableSpace();
-		HandlePacket(PacketType, PacketLen - NumBytesRead);
+		// DEBUG:
+		LOGD("Packet 0x%x, len %d (0x%x), start at %d", PacketType, PacketLen, PacketLen, PacketStart);
 		
-		if (Mark1 - m_ReceivedData.GetReadableSpace() > PacketLen)
+		HandlePacket(bb, PacketType);
+		
+		if (bb.GetReadableSpace() != 1)
 		{
-			// Read more than packet length, report as error
+			// Read more or less than packet length, report as error
+			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
 		}
-
-		// Go to packet end in any case:
-		m_ReceivedData.ResetRead();
-		m_ReceivedData.ReadVarInt(PacketType);
-		m_ReceivedData.SkipRead(PacketLen);
-		m_ReceivedData.CommitRead();
 	}  // while (true)
 }
 
 
 
 
-void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	switch (m_State)
 	{
@@ -979,8 +984,8 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 			// Status
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketStatusRequest(a_RemainingBytes); return;
-				case 0x01: HandlePacketStatusPing   (a_RemainingBytes); return;
+				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return;
+				case 0x01: HandlePacketStatusPing   (a_ByteBuffer); return;
 			}
 			break;
 		}
@@ -990,8 +995,8 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 			// Login
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketLoginStart(a_RemainingBytes); return;
-				case 0x01: HandlePacketLoginEncryptionResponse(a_RemainingBytes); return;
+				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return;
+				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return;
 			}
 			break;
 		}
@@ -1001,29 +1006,29 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 			// Game
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketKeepAlive              (a_RemainingBytes); return;
-				case 0x01: HandlePacketChatMessage            (a_RemainingBytes); return;
-				case 0x02: HandlePacketUseEntity              (a_RemainingBytes); return;
-				case 0x03: HandlePacketPlayer                 (a_RemainingBytes); return;
-				case 0x04: HandlePacketPlayerPos              (a_RemainingBytes); return;
-				case 0x05: HandlePacketPlayerLook             (a_RemainingBytes); return;
-				case 0x06: HandlePacketPlayerPosLook          (a_RemainingBytes); return;
-				case 0x07: HandlePacketBlockDig               (a_RemainingBytes); return;
-				case 0x08: HandlePacketBlockPlace             (a_RemainingBytes); return;
-				case 0x09: HandlePacketSlotSelect             (a_RemainingBytes); return;
-				case 0x0a: HandlePacketAnimation              (a_RemainingBytes); return;
-				case 0x0b: HandlePacketEntityAction           (a_RemainingBytes); return;
-				case 0x0c: HandlePacketSteerVehicle           (a_RemainingBytes); return;
-				case 0x0d: HandlePacketWindowClose            (a_RemainingBytes); return;
-				case 0x0e: HandlePacketWindowClick            (a_RemainingBytes); return;
+				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return;
+				case 0x01: HandlePacketChatMessage            (a_ByteBuffer); return;
+				case 0x02: HandlePacketUseEntity              (a_ByteBuffer); return;
+				case 0x03: HandlePacketPlayer                 (a_ByteBuffer); return;
+				case 0x04: HandlePacketPlayerPos              (a_ByteBuffer); return;
+				case 0x05: HandlePacketPlayerLook             (a_ByteBuffer); return;
+				case 0x06: HandlePacketPlayerPosLook          (a_ByteBuffer); return;
+				case 0x07: HandlePacketBlockDig               (a_ByteBuffer); return;
+				case 0x08: HandlePacketBlockPlace             (a_ByteBuffer); return;
+				case 0x09: HandlePacketSlotSelect             (a_ByteBuffer); return;
+				case 0x0a: HandlePacketAnimation              (a_ByteBuffer); return;
+				case 0x0b: HandlePacketEntityAction           (a_ByteBuffer); return;
+				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return;
+				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return;
+				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return;
 				case 0x0f: // Confirm transaction - not used in MCS
-				case 0x10: HandlePacketCreativeInventoryAction(a_RemainingBytes); return;
-				case 0x12: HandlePacketUpdateSign             (a_RemainingBytes); return;
-				case 0x13: HandlePacketPlayerAbilities        (a_RemainingBytes); return;
-				case 0x14: HandlePacketTabComplete            (a_RemainingBytes); return;
-				case 0x15: HandlePacketClientSettings         (a_RemainingBytes); return;
-				case 0x16: HandlePacketClientStatus           (a_RemainingBytes); return;
-				case 0x17: HandlePacketPluginMessage          (a_RemainingBytes); return;
+				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return;
+				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return;
+				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return;
+				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return;
+				case 0x15: HandlePacketClientSettings         (a_ByteBuffer); return;
+				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return;
+				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return;
 			}
 			break;
 		}
@@ -1037,17 +1042,10 @@ void cProtocol172::HandlePacket(UInt32 a_PacketType, UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketStatusPing(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 {
-	ASSERT(a_RemainingBytes == 8);
-	if (a_RemainingBytes != 8)
-	{
-		m_Client->PacketError(0x01);
-		return;
-	}
 	Int64 Timestamp;
-	m_ReceivedData.ReadBEInt64(Timestamp);
-	m_ReceivedData.CommitRead();
+	a_ByteBuffer.ReadBEInt64(Timestamp);
 	
 	cPacketizer Pkt(*this, 0x01);  // Ping packet
 	Pkt.WriteInt64(Timestamp);
@@ -1057,12 +1055,8 @@ void cProtocol172::HandlePacketStatusPing(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketStatusRequest(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
-	// No more bytes in this packet
-	ASSERT(a_RemainingBytes == 0);
-	m_ReceivedData.CommitRead();
-	
 	// Send the response:
 	AString Response = "{\"version\":{\"name\":\"1.7.2\",\"protocol\":4},\"players\":{";
 	AppendPrintf(Response, "\"max\":%u,\"online\":%u,\"sample\":[]},",
@@ -1082,7 +1076,7 @@ void cProtocol172::HandlePacketStatusRequest(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketLoginEncryptionResponse(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {
 	// TODO: Add protocol encryption
 }
@@ -1091,10 +1085,10 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketLoginStart(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 {
 	AString Username;
-	m_ReceivedData.ReadVarUTF8String(Username);
+	a_ByteBuffer.ReadVarUTF8String(Username);
 	
 	// TODO: Protocol encryption should be set up here if not localhost / auth
 	
@@ -1113,10 +1107,10 @@ void cProtocol172::HandlePacketLoginStart(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketAnimation(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEInt, int,  EntityID);
-	HANDLE_READ(ReadByte,  Byte, Animation);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  EntityID);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Animation);
 	m_Client->HandleAnimation(Animation);
 }
 
@@ -1124,13 +1118,13 @@ void cProtocol172::HandlePacketAnimation(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketBlockDig(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadByte,  Byte, Status);
-	HANDLE_READ(ReadBEInt, int,  BlockX);
-	HANDLE_READ(ReadByte,  Byte, BlockY);
-	HANDLE_READ(ReadBEInt, int,  BlockZ);
-	HANDLE_READ(ReadByte,  Byte, Face);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Status);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockX);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, BlockY);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockZ);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
 	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, Face, Status);
 }
 
@@ -1138,18 +1132,18 @@ void cProtocol172::HandlePacketBlockDig(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketBlockPlace(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEInt, int,  BlockX);
-	HANDLE_READ(ReadByte,  Byte, BlockY);
-	HANDLE_READ(ReadBEInt, int,  BlockZ);
-	HANDLE_READ(ReadByte,  Byte, Face);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockX);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, BlockY);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockZ);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
 	cItem Item;
-	ReadItem(Item);
+	ReadItem(a_ByteBuffer, Item);
 
-	HANDLE_READ(ReadByte,  Byte, CursorX);
-	HANDLE_READ(ReadByte,  Byte, CursorY);
-	HANDLE_READ(ReadByte,  Byte, CursorZ);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorZ);
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
@@ -1157,9 +1151,9 @@ void cProtocol172::HandlePacketBlockPlace(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketChatMessage(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadVarUTF8String, AString, Message);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Message);
 	m_Client->HandleChat(Message);
 }
 
@@ -1167,14 +1161,14 @@ void cProtocol172::HandlePacketChatMessage(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketClientSettings(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadVarUTF8String, AString, Locale);
-	HANDLE_READ(ReadByte,          Byte,    ViewDistance);
-	HANDLE_READ(ReadByte,          Byte,    ChatFlags);
-	HANDLE_READ(ReadByte,          Byte,    Unused);
-	HANDLE_READ(ReadByte,          Byte,    Difficulty);
-	HANDLE_READ(ReadByte,          Byte,    ShowCape);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ViewDistance);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatFlags);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatColors);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    Difficulty);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ShowCape);
 	// TODO: handle in m_Client
 }
 
@@ -1182,9 +1176,9 @@ void cProtocol172::HandlePacketClientSettings(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketClientStatus(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadByte, Byte, ActionID);
+	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, ActionID);
 	switch (ActionID)
 	{
 		case 0:
@@ -1212,11 +1206,11 @@ void cProtocol172::HandlePacketClientStatus(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketCreativeInventoryAction(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEShort, short, SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
 	cItem Item;
-	if (!ReadItem(Item))
+	if (!ReadItem(a_ByteBuffer, Item))
 	{
 		return;
 	}
@@ -1227,11 +1221,11 @@ void cProtocol172::HandlePacketCreativeInventoryAction(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketEntityAction(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEInt, int,  PlayerID);
-	HANDLE_READ(ReadByte,  Byte, Action);
-	HANDLE_READ(ReadBEInt, int,  JumpBoost);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  PlayerID);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Action);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  JumpBoost);
 	m_Client->HandleEntityAction(PlayerID, Action);
 }
 
@@ -1239,9 +1233,9 @@ void cProtocol172::HandlePacketEntityAction(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketKeepAlive(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEInt, int, KeepAliveID);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int, KeepAliveID);
 	m_Client->HandleKeepAlive(KeepAliveID);
 }
 
@@ -1249,9 +1243,9 @@ void cProtocol172::HandlePacketKeepAlive(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketPlayer(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketPlayer(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBool, bool, IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, IsOnGround);
 	// TODO: m_Client->HandlePlayerOnGround(IsOnGround);
 }
 
@@ -1259,11 +1253,11 @@ void cProtocol172::HandlePacketPlayer(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketPlayerAbilities(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadByte,    Byte,  Flags);
-	HANDLE_READ(ReadBEFloat, float, FlyingSpeed);
-	HANDLE_READ(ReadBEFloat, float, WalkingSpeed);
+	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Flags);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, FlyingSpeed);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
 	// TODO: m_Client->HandlePlayerAbilities();
 }
 
@@ -1271,11 +1265,11 @@ void cProtocol172::HandlePacketPlayerAbilities(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketPlayerLook(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEFloat, float, Yaw);
-	HANDLE_READ(ReadBEFloat, float, Pitch);
-	HANDLE_READ(ReadBool,    bool,  IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
+	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  IsOnGround);
 	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround);
 }
 
@@ -1283,13 +1277,13 @@ void cProtocol172::HandlePacketPlayerLook(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketPlayerPos(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEDouble, double, PosX);
-	HANDLE_READ(ReadBEDouble, double, PosY);
-	HANDLE_READ(ReadBEDouble, double, Stance);
-	HANDLE_READ(ReadBEDouble, double, PosZ);
-	HANDLE_READ(ReadBool,     bool,   IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, Stance);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
+	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
 	m_Client->HandlePlayerPos(PosX, PosY, PosZ, Stance, IsOnGround);
 }
 
@@ -1297,15 +1291,15 @@ void cProtocol172::HandlePacketPlayerPos(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketPlayerPosLook(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEDouble, double, PosX);
-	HANDLE_READ(ReadBEDouble, double, PosY);
-	HANDLE_READ(ReadBEDouble, double, Stance);
-	HANDLE_READ(ReadBEDouble, double, PosZ);
-	HANDLE_READ(ReadBEFloat,  float,  Yaw);
-	HANDLE_READ(ReadBEFloat,  float,  Pitch);
-	HANDLE_READ(ReadBool,     bool,   IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, Stance);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Yaw);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
+	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
 	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Stance, Yaw, Pitch, IsOnGround);
 }
 
@@ -1313,12 +1307,12 @@ void cProtocol172::HandlePacketPlayerPosLook(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketPluginMessage(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadVarUTF8String, AString, Channel);
-	HANDLE_READ(ReadBEShort,       short,   Length);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
+	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   Length);
 	AString Data;
-	m_ReceivedData.ReadString(Data, Length);
+	a_ByteBuffer.ReadString(Data, Length);
 	// TODO: m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -1326,9 +1320,9 @@ void cProtocol172::HandlePacketPluginMessage(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketSlotSelect(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEShort, short, SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
 	m_Client->HandleSlotSelected(SlotNum);
 }
 
@@ -1336,12 +1330,12 @@ void cProtocol172::HandlePacketSlotSelect(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketSteerVehicle(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEFloat, float, Forward);
-	HANDLE_READ(ReadBEFloat, float, Sideways);
-	HANDLE_READ(ReadBool,    bool,  ShouldJump);
-	HANDLE_READ(ReadBool,    bool,  ShouldUnmount);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Forward);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Sideways);
+	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  ShouldJump);
+	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  ShouldUnmount);
 	if (ShouldUnmount)
 	{
 		m_Client->HandleUnmount();
@@ -1356,9 +1350,9 @@ void cProtocol172::HandlePacketSteerVehicle(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketTabComplete(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadVarUTF8String, AString, Text);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Text);
 	m_Client->HandleTabCompletion(Text);
 }
 
@@ -1366,15 +1360,15 @@ void cProtocol172::HandlePacketTabComplete(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketUpdateSign(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEInt,         int,     BlockX);
-	HANDLE_READ(ReadBEShort,       short,   BlockY);
-	HANDLE_READ(ReadBEInt,         int,     BlockZ);
-	HANDLE_READ(ReadVarUTF8String, AString, Line1);
-	HANDLE_READ(ReadVarUTF8String, AString, Line2);
-	HANDLE_READ(ReadVarUTF8String, AString, Line3);
-	HANDLE_READ(ReadVarUTF8String, AString, Line4);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt,         int,     BlockX);
+	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   BlockY);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt,         int,     BlockZ);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line1);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line2);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line3);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line4);
 	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
 }
 
@@ -1382,10 +1376,10 @@ void cProtocol172::HandlePacketUpdateSign(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketUseEntity(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadBEInt, int,  EntityID);
-	HANDLE_READ(ReadByte,  Byte, MouseButton);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  EntityID);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, MouseButton);
 	m_Client->HandleUseEntity(EntityID, (MouseButton == 1));
 }
 
@@ -1393,15 +1387,15 @@ void cProtocol172::HandlePacketUseEntity(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketWindowClick(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadChar,    char,  WindowID);
-	HANDLE_READ(ReadBEShort, short, SlotNum);
-	HANDLE_READ(ReadByte,    Byte,  Button);
-	HANDLE_READ(ReadBEShort, short, TransactionID);
-	HANDLE_READ(ReadByte,    Byte,  Mode);
+	HANDLE_READ(a_ByteBuffer, ReadChar,    char,  WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Button);
+	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, TransactionID);
+	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Mode);
 	cItem Item;
-	ReadItem(Item);
+	ReadItem(a_ByteBuffer, Item);
 
 	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
 	eClickAction Action;
@@ -1430,6 +1424,12 @@ void cProtocol172::HandlePacketWindowClick(UInt32 a_RemainingBytes)
 		case 0x0505: Action = (SlotNum != -999) ? caRightPaintProgress           : caUnknown;     break;
 		case 0x0506: Action = (SlotNum == -999) ? caRightPaintEnd                : caUnknown;     break;
 		case 0x0600: Action = caDblClick; break;
+		default:
+		{
+			LOGWARNING("Unhandled window click mode / button combination: %d (0x%x)", (Mode << 8) | Button, (Mode << 8) | Button);
+			Action = caUnknown;
+			break;
+		}
 	}
 
 	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
@@ -1439,9 +1439,9 @@ void cProtocol172::HandlePacketWindowClick(UInt32 a_RemainingBytes)
 
 
 
-void cProtocol172::HandlePacketWindowClose(UInt32 a_RemainingBytes)
+void cProtocol172::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(ReadChar, char, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadChar, char, WindowID);
 	m_Client->HandleWindowClose(WindowID);
 }
 
@@ -1488,9 +1488,9 @@ void cProtocol172::SendData(const char * a_Data, int a_Size)
 
 
 
-bool cProtocol172::ReadItem(cItem & a_Item)
+bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 {
-	HANDLE_PACKET_READ(ReadBEShort, short, ItemType);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemType);
 	if (ItemType == -1)
 	{
 		// The item is empty, no more data follows
@@ -1499,8 +1499,8 @@ bool cProtocol172::ReadItem(cItem & a_Item)
 	}
 	a_Item.m_ItemType = ItemType;
 	
-	HANDLE_PACKET_READ(ReadChar,    char,  ItemCount);
-	HANDLE_PACKET_READ(ReadBEShort, short, ItemDamage);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadChar,    char,  ItemCount);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemDamage);
 	a_Item.m_ItemCount  = ItemCount;
 	a_Item.m_ItemDamage = ItemDamage;
 	if (ItemCount <= 0)
@@ -1508,7 +1508,7 @@ bool cProtocol172::ReadItem(cItem & a_Item)
 		a_Item.Empty();
 	}
 
-	HANDLE_PACKET_READ(ReadBEShort, short, MetadataLength);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, MetadataLength);
 	if (MetadataLength <= 0)
 	{
 		return true;
@@ -1516,7 +1516,7 @@ bool cProtocol172::ReadItem(cItem & a_Item)
 	
 	// Read the metadata
 	AString Metadata;
-	if (!m_ReceivedData.ReadString(Metadata, MetadataLength))
+	if (!a_ByteBuffer.ReadString(Metadata, MetadataLength))
 	{
 		return false;
 	}
