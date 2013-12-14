@@ -276,7 +276,7 @@ void cRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_B
 		int X = a_BlockX; int Y = a_BlockY; int Z = a_BlockZ;
 		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ)), true); // Inverse true to get the block torch is on
 
-		if (AreCoordsPowered(X, Y, Z))
+		if (AreCoordsDirectlyPowered(X, Y, Z))
 		{
 			// There was a match, torch goes off
 			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_OFF, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
@@ -323,7 +323,7 @@ void cRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_B
 		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ)), true); // Inverse true to get the block torch is on
 
 		// See if off state torch can be turned on again
-		if (AreCoordsPowered(X, Y, Z))
+		if (AreCoordsDirectlyPowered(X, Y, Z))
 		{
 			return; // Something matches, torch still powered
 		}
@@ -410,7 +410,6 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
 		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 15); // Maximum power
-		SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE); // Power block beneath
 	}
 	else
 	{
@@ -458,9 +457,11 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 		{
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MetaToSet);
 		}
-
-		SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE); // Power block beneath
 	}
+
+	// Wire still powered, power blocks beneath
+	SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
+	SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YM, E_BLOCK_REDSTONE_WIRE);
 
 	if (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) != 0) // A powered wire
 	{
@@ -820,7 +821,7 @@ void cRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ
 
 
 
-bool cRedstoneSimulator::AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cRedstoneSimulator::AreCoordsDirectlyPowered(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr) // Check powered list
 	{
@@ -829,7 +830,15 @@ bool cRedstoneSimulator::AreCoordsPowered(int a_BlockX, int a_BlockY, int a_Bloc
 			return true;
 		}
 	}
+	return false;	
+}
 
+
+
+
+
+bool cRedstoneSimulator::AreCoordsLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
 	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr) // Check linked powered list
 	{
 		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
@@ -1174,24 +1183,27 @@ void cRedstoneSimulator::SetBlockLinkedPowered(
 
 void cRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool WasLastStatePowered)
 {
-	for (SimulatedPlayerToggleableList::const_iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
+	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
 	{
-		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			if (itr->WasLastStatePowered != WasLastStatePowered)
-			{
-				// If power states different, erase the old listing in preparation to add new one
-				m_SimulatedPlayerToggleableBlocks.erase(itr);
-				break;
-			}
-			else
-			{
-				// If states the same, just ignore
-				return;
-			}
+			continue;
+		}
+
+		if (itr->WasLastStatePowered != WasLastStatePowered)
+		{
+			// If power states different, update listing
+			itr->WasLastStatePowered = WasLastStatePowered;
+			return;
+		}
+		else
+		{
+			// If states the same, just ignore
+			return;
 		}
 	}
 
+	// We have arrive here; no block must be in list - add one
 	sSimulatedPlayerToggleableList RC;
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 	RC.WasLastStatePowered = WasLastStatePowered;
