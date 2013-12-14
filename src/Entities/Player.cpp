@@ -557,8 +557,12 @@ void cPlayer::FoodPoison(int a_NumTicks)
 	m_FoodPoisonedTicksRemaining = std::max(m_FoodPoisonedTicksRemaining, a_NumTicks);
 	if (!HasBeenFoodPoisoned)
 	{
-		// TODO: Send the poisoning indication to the client - how?
+		m_ClientHandle->SendRemoveEntityEffect(*this, E_EFFECT_HUNGER);
 		SendHealth();
+	}
+	else
+	{
+		m_ClientHandle->SendEntityEffect(*this, E_EFFECT_HUNGER, 0, 20);
 	}
 }
 
@@ -1703,6 +1707,10 @@ void cPlayer::HandleFood(void)
 	{
 		m_FoodPoisonedTicksRemaining--;
 		m_FoodExhaustionLevel += 0.025;  // 0.5 per second = 0.025 per tick
+	}
+	else
+	{
+		m_ClientHandle->SendRemoveEntityEffect(*this, E_EFFECT_HUNGER); // remove the "Hunger" effect.
 	}
 
 	// Apply food exhaustion that has accumulated:

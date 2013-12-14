@@ -1673,6 +1673,15 @@ void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cClientHandle::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+{
+	m_Protocol->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
+}
+
+
+
+
+
 void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	m_Protocol->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
@@ -1876,6 +1885,15 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 	);
 	
 	m_Protocol->SendPlayerSpawn(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
+{
+	m_Protocol->SendRemoveEntityEffect(a_Entity, a_EffectID);
 }
 
 

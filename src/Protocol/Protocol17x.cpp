@@ -236,6 +236,19 @@ void cProtocol172::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cProtocol172::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+{
+	cPacketizer Pkt(*this, 0x1D);  // Entity Effect packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_EffectID);
+	Pkt.WriteByte(a_Amplifier);
+	Pkt.WriteShort(a_Duration);
+}
+
+
+
+
+
 void cProtocol172::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
@@ -579,6 +592,17 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteByte((3 << 5) | 6);  // Metadata: float + index 6
 	Pkt.WriteFloat((float)a_Player.GetHealth());
 	Pkt.WriteByte(0x7f);  // Metadata: end
+}
+
+
+
+
+
+void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
+{
+	cPacketizer Pkt(*this, 0x1E);
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_EffectID);
 }
 
 
