@@ -112,6 +112,8 @@ private:
 	void HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
 	/// <summary>Handles trapdoors</summary>
 	void HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// <summary>Handles noteblocks</summary>
+	void HandleNoteBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/* ===================== */
 
 	/* ====== Helper functions ====== */
