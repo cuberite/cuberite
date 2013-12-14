@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/11/13 12:34:21.
+** Generated automatically by tolua++-1.0.92 on 12/14/13 16:22:45.
 */
 
 #ifndef __cplusplus
@@ -34,6 +34,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "../Entities/Player.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/ProjectileEntity.h"
+#include "../Entities/TNTEntity.h"
 #include "../Server.h"
 #include "../World.h"
 #include "../Inventory.h"
@@ -218,7 +219,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cHTTPServer::cCallbacks");
  tolua_usertype(tolua_S,"cLuaWindow");
- tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cHopperEntity");
  tolua_usertype(tolua_S,"std::vector<AString>");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
@@ -226,15 +227,16 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cGroup");
- tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cItem");
+ tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
- tolua_usertype(tolua_S,"cBoundingBox");
  tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cNoteEntity");
  tolua_usertype(tolua_S,"Vector3d");
+ tolua_usertype(tolua_S,"cNoteEntity");
+ tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
@@ -254,8 +256,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cDropperEntity");
  tolua_usertype(tolua_S,"cProjectileEntity");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
- tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cPlayer");
+ tolua_usertype(tolua_S,"cTNTEntity");
 }
 
 /* method: new of class  cIniFile */
@@ -11513,6 +11515,70 @@ static int tolua_AllToLua_cArrowEntity_SetIsCritical00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetIsCritical'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetCounterTime of class  cTNTEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cTNTEntity_GetCounterTime00
+static int tolua_AllToLua_cTNTEntity_GetCounterTime00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cTNTEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cTNTEntity* self = (const cTNTEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetCounterTime'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetCounterTime();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetCounterTime'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetMaxFuseTime of class  cTNTEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cTNTEntity_GetMaxFuseTime00
+static int tolua_AllToLua_cTNTEntity_GetMaxFuseTime00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cTNTEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cTNTEntity* self = (const cTNTEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxFuseTime'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetMaxFuseTime();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMaxFuseTime'.",&tolua_err);
  return 0;
 #endif
 }
@@ -30992,6 +31058,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cFireChargeEntity","cFireChargeEntity","cProjectileEntity",NULL);
   tolua_beginmodule(tolua_S,"cFireChargeEntity");
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cTNTEntity","cTNTEntity","cEntity",NULL);
+  tolua_beginmodule(tolua_S,"cTNTEntity");
+   tolua_function(tolua_S,"GetCounterTime",tolua_AllToLua_cTNTEntity_GetCounterTime00);
+   tolua_function(tolua_S,"GetMaxFuseTime",tolua_AllToLua_cTNTEntity_GetMaxFuseTime00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cServer","cServer","",NULL);
   tolua_beginmodule(tolua_S,"cServer");
