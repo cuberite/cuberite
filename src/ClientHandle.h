@@ -100,6 +100,7 @@ public:
 	void SendDestroyEntity       (const cEntity & a_Entity);
 	void SendDisconnect          (const AString & a_Reason);
 	void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendEntityEffect        (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
 	void SendEntityEquipment     (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook      (const cEntity & a_Entity);
 	void SendEntityLook          (const cEntity & a_Entity);
@@ -120,6 +121,7 @@ public:
 	void SendPlayerMoveLook      (void);
 	void SendPlayerPosition      (void);
 	void SendPlayerSpawn         (const cPlayer & a_Player);
+	void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID);
 	void SendRespawn             (void);
 	void SendExperience          (void);
 	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
