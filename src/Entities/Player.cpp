@@ -1415,7 +1415,7 @@ bool cPlayer::LoadFromDisk()
 	LOGINFO("Player %s has permissions:", m_PlayerName.c_str() );
 	for( PermissionMap::iterator itr = m_ResolvedPermissions.begin(); itr != m_ResolvedPermissions.end(); ++itr )
 	{
-		if( itr->second ) LOG("		%s", itr->first.c_str() );
+		if( itr->second ) LOG(" - %s", itr->first.c_str() );
 	}
 
 	AString SourceFile;
