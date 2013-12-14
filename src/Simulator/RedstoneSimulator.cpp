@@ -92,8 +92,8 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 
 		if (SourceBlockType != itr->a_SourceBlock)
 		{
-			itr = m_PoweredBlocks.erase(itr);
 			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
+			itr = m_PoweredBlocks.erase(itr);
 		}
 		else if (
 			// Changeable sources
@@ -103,8 +103,8 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
 			)
 		{
-			itr = m_PoweredBlocks.erase(itr);
 			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
+			itr = m_PoweredBlocks.erase(itr);
 		}
 		else
 		{
@@ -133,13 +133,13 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 
 		if (SourceBlockType != itr->a_SourceBlock)
 		{
-			itr = m_LinkedPoweredBlocks.erase(itr);
 			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
+			itr = m_LinkedPoweredBlocks.erase(itr);
 		}
 		else if (MiddleBlockType != itr->a_MiddleBlock)
 		{
-			itr = m_LinkedPoweredBlocks.erase(itr);
 			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
+			itr = m_LinkedPoweredBlocks.erase(itr);
 		}
 		else if (
 			// Things that can send power through a block but which depends on meta
@@ -148,8 +148,8 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
 			)
 		{
-			itr = m_LinkedPoweredBlocks.erase(itr);
 			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
+			itr = m_LinkedPoweredBlocks.erase(itr);
 		}
 		else
 		{
