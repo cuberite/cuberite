@@ -62,6 +62,7 @@ public:
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) = 0;
 	virtual void SendDisconnect          (const AString & a_Reason) = 0;
 	virtual void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
+	virtual void SendEntityEffect        (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) = 0;
 	virtual void SendEntityEquipment     (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendEntityHeadLook      (const cEntity & a_Entity) = 0;
 	virtual void SendEntityLook          (const cEntity & a_Entity) = 0;
@@ -85,6 +86,7 @@ public:
 	virtual void SendPlayerMoveLook      (void) = 0;
 	virtual void SendPlayerPosition      (void) = 0;
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) = 0;
+	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) = 0;
 	virtual void SendRespawn             (void) = 0;
 	virtual void SendExperience          (void) = 0;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) = 0;

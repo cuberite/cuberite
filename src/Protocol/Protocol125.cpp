@@ -43,6 +43,8 @@ enum
 	PACKET_HANDSHAKE                 = 0x02,
 	PACKET_CHAT                      = 0x03,
 	PACKET_UPDATE_TIME               = 0x04,
+	PACKET_ENTITY_EFFECT             = 0x1D,
+	PACKET_REMOVE_ENTITY_EFFECT      = 0x1E,
 	PACKET_ENTITY_EQUIPMENT          = 0x05,
 	PACKET_USE_ENTITY                = 0x07,
 	PACKET_UPDATE_HEALTH             = 0x08,
@@ -294,6 +296,21 @@ void cProtocol125::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 	UNUSED(a_BlockX);
 	UNUSED(a_BlockY);
 	UNUSED(a_BlockZ);
+}
+
+
+
+
+
+void cProtocol125::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte (PACKET_ENTITY_EFFECT);
+	WriteInt  (a_Entity.GetUniqueID());
+	WriteByte (a_EffectID);
+	WriteByte (a_Amplifier);
+	WriteShort(a_Duration);
+	Flush();
 }
 
 
@@ -671,6 +688,19 @@ void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 	WriteByte  ((char)((a_Player.GetRot().x / 360.f) * 256));
 	WriteByte  ((char)((a_Player.GetRot().y / 360.f) * 256));
 	WriteShort (HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte  (PACKET_REMOVE_ENTITY_EFFECT);
+	WriteInt   (a_Entity.GetUniqueID());
+	WriteByte  (a_EffectID);
 	Flush();
 }
 

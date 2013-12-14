@@ -47,6 +47,7 @@ public:
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) override;
 	virtual void SendDisconnect          (const AString & a_Reason) override;
 	virtual void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
+	virtual void SendEntityEffect        (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
 	virtual void SendEntityEquipment     (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityHeadLook      (const cEntity & a_Entity) override;
 	virtual void SendEntityLook          (const cEntity & a_Entity) override;
@@ -70,6 +71,7 @@ public:
 	virtual void SendPlayerMoveLook      (void) override;
 	virtual void SendPlayerPosition      (void) override;
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
+	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendRespawn             (void) override;
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
 	virtual void SendExperience          (void) override;
