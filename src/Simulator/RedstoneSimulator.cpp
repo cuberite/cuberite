@@ -50,7 +50,7 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 
 	// Check for duplicates:
 	cRedstoneSimulatorChunkData & ChunkData = a_Chunk->GetRedstoneSimulatorData();
-	for (cRedstoneSimulatorChunkData::iterator itr = ChunkData.begin(); itr != ChunkData.end(); ++itr)
+	for (cRedstoneSimulatorChunkData::const_iterator itr = ChunkData.begin(); itr != ChunkData.end(); ++itr)
 	{
 		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
 		{
@@ -77,24 +77,22 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	int BaseZ = a_Chunk->GetPosZ() * cChunkDef::Width;
 
 	// Check to see if PoweredBlocks have invalid items (source is air or unpowered)
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
 	{
-		sPoweredBlocks & Change = *itr;
-
-		int RelX = Change.a_SourcePos.x - a_ChunkX * cChunkDef::Width;
-		int RelZ = Change.a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
+		int RelX = itr->a_SourcePos.x - a_ChunkX * cChunkDef::Width;
+		int RelZ = itr->a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
 
 		BLOCKTYPE SourceBlockType;
 		NIBBLETYPE SourceBlockMeta;
-		if (!a_Chunk->UnboundedRelGetBlock(RelX, Change.a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta))
+		if (!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta))
 		{
 			continue;
 		}
 
-		if (SourceBlockType != Change.a_SourceBlock)
+		if (SourceBlockType != itr->a_SourceBlock)
 		{
 			itr = m_PoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
+			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
 		}
 		else if (
 			// Changeable sources
@@ -105,7 +103,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			)
 		{
 			itr = m_PoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
+			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
 		}
 		else
 		{
@@ -114,35 +112,33 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	}
 
 	// Check to see if LinkedPoweredBlocks have invalid items: source, block powered through, or power destination block has changed
-	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
 	{
-		sLinkedPoweredBlocks & Change = *itr;
-
-		int RelX = Change.a_SourcePos.x - a_ChunkX * cChunkDef::Width;
-		int RelZ = Change.a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
-		int MidRelX = Change.a_MiddlePos.x - a_ChunkX * cChunkDef::Width;
-		int MidRelZ = Change.a_MiddlePos.z - a_ChunkZ * cChunkDef::Width;
+		int RelX = itr->a_SourcePos.x - a_ChunkX * cChunkDef::Width;
+		int RelZ = itr->a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
+		int MidRelX = itr->a_MiddlePos.x - a_ChunkX * cChunkDef::Width;
+		int MidRelZ = itr->a_MiddlePos.z - a_ChunkZ * cChunkDef::Width;
 
 		BLOCKTYPE SourceBlockType;
 		NIBBLETYPE SourceBlockMeta;
 		BLOCKTYPE MiddleBlockType;
 		if (
-			!a_Chunk->UnboundedRelGetBlock(RelX, Change.a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta) ||
-			!a_Chunk->UnboundedRelGetBlockType(MidRelX, Change.a_MiddlePos.y, MidRelZ, MiddleBlockType)
+			!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta) ||
+			!a_Chunk->UnboundedRelGetBlockType(MidRelX, itr->a_MiddlePos.y, MidRelZ, MiddleBlockType)
 			)
 		{
 			continue;
 		}
 
-		if (SourceBlockType != Change.a_SourceBlock)
+		if (SourceBlockType != itr->a_SourceBlock)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
 		}
-		else if (MiddleBlockType != Change.a_MiddleBlock)
+		else if (MiddleBlockType != itr->a_MiddleBlock)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
 		}
 		else if (
 			// Things that can send power through a block but which depends on meta
@@ -152,7 +148,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			)
 		{
 			itr = m_LinkedPoweredBlocks.erase(itr);
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(Change.a_SourceBlock).c_str());
+			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
 		}
 		else
 		{
@@ -160,15 +156,13 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 	}
 
-	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end();)
+	for (SimulatedPlayerToggleableList::const_iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end();)
 	{
-		sSimulatedPlayerToggleableList & Change = *itr;
-
-		int RelX = Change.a_BlockPos.x - a_ChunkX * cChunkDef::Width;
-		int RelZ = Change.a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
+		int RelX = itr->a_BlockPos.x - a_ChunkX * cChunkDef::Width;
+		int RelZ = itr->a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
 
 		BLOCKTYPE SourceBlockType;
-		if (!a_Chunk->UnboundedRelGetBlockType(RelX, Change.a_BlockPos.y, RelZ, SourceBlockType))
+		if (!a_Chunk->UnboundedRelGetBlockType(RelX, itr->a_BlockPos.y, RelZ, SourceBlockType))
 		{
 			continue;
 		}
@@ -183,7 +177,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 	}
 
-	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
+	for (cRedstoneSimulatorChunkData::const_iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
 	{
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(dataitr->x, dataitr->y, dataitr->z);
 		if (!IsAllowedBlock(BlockType))
@@ -828,21 +822,17 @@ void cRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ
 
 bool cRedstoneSimulator::AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr) // Check powered list
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr) // Check powered list
 	{
-		sPoweredBlocks & Change = *itr;
-
-		if (Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			return true;
 		}
 	}
 
-	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr) // Check linked powered list
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr) // Check linked powered list
 	{
-		sLinkedPoweredBlocks & Change = *itr;
-
-		if (Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			return true;
 		}
@@ -858,64 +848,60 @@ bool cRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_Blo
 {
 	// Repeaters cannot be powered by any face except their back; verify that this is true for a source
 
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
 	{
-		sPoweredBlocks & Change = *itr;
-
-		if (!Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
 		switch (a_Meta)
 		{
 			case 0x0:
 			{
 				// Flip the coords to check the back of the repeater
-				if (Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
+				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
 				break;
 			}
 			case 0x1:
 			{
-				if (Change.a_SourcePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
+				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
 				break;
 			}
 			case 0x2:
 			{
-				if (Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
+				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
 				break;
 			}
 			case 0x3:
 			{
-				if (Change.a_SourcePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
+				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
 				break;
 			}
 		}
 	}
 
-	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
 	{
-		sLinkedPoweredBlocks & Change = *itr;
-
-		if (!Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
 		switch (a_Meta)
 		{
 			case 0x0:
 			{
-				if (Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
+				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
 				break;
 			}
 			case 0x1:
 			{
-				if (Change.a_MiddlePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
+				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
 				break;
 			}
 			case 0x2:
 			{
-				if (Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
+				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
 				break;
 			}
 			case 0x3:
 			{
-				if (Change.a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
+				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
 				break;
 			}
 		}
@@ -932,15 +918,13 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 
 	int OldX = a_BlockX, OldY = a_BlockY, OldZ = a_BlockZ;
 
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
 	{
-		sPoweredBlocks & Change = *itr;
-
-		if (!Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Meta); // Piston meta is based on what direction they face, so we can do this
 
-		if (!Change.a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		if (!itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			return true;
 		}
@@ -950,15 +934,13 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 		a_BlockZ = OldZ;
 	}
 
-	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
 	{
-		sLinkedPoweredBlocks & Change = *itr;
-
-		if (!Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
 
-		if (!Change.a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		if (!itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			return true;
 		}
@@ -976,13 +958,11 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 
 bool cRedstoneSimulator::AreCoordsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool IsCurrentStatePowered)
 {
-	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
+	for (SimulatedPlayerToggleableList::const_iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
 	{
-		sSimulatedPlayerToggleableList & Change = *itr;
-
-		if (Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			if (Change.WasLastStatePowered != IsCurrentStatePowered) // Was the last power state different to the current?
+			if (itr->WasLastStatePowered != IsCurrentStatePowered) // Was the last power state different to the current?
 			{
 				return false; // It was, coordinates are no longer simulated
 			}
@@ -1120,13 +1100,11 @@ void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_Block
 		return;
 	}
 
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr) // Check powered list
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr) // Check powered list
 	{
-		sPoweredBlocks & Change = *itr;
-
 		if (
-			Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
-			Change.a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
+			itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
+			itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
 			)
 		{
 			// Check for duplicates
@@ -1168,14 +1146,12 @@ void cRedstoneSimulator::SetBlockLinkedPowered(
 		return;
 	}
 
-	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr) // Check linked powered list
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr) // Check linked powered list
 	{
-		sLinkedPoweredBlocks & Change = *itr;
-
 		if (
-			Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
-			Change.a_MiddlePos.Equals(Vector3i(a_MiddleX, a_MiddleY, a_MiddleZ)) &&
-			Change.a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
+			itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
+			itr->a_MiddlePos.Equals(Vector3i(a_MiddleX, a_MiddleY, a_MiddleZ)) &&
+			itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
 			)
 		{
 			// Check for duplicates
@@ -1198,13 +1174,11 @@ void cRedstoneSimulator::SetBlockLinkedPowered(
 
 void cRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool WasLastStatePowered)
 {
-	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
+	for (SimulatedPlayerToggleableList::const_iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
 	{
-		sSimulatedPlayerToggleableList & Change = *itr;
-
-		if (Change.a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			if (Change.WasLastStatePowered != WasLastStatePowered)
+			if (itr->WasLastStatePowered != WasLastStatePowered)
 			{
 				// If power states different, erase the old listing in preparation to add new one
 				m_SimulatedPlayerToggleableBlocks.erase(itr);
