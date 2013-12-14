@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/14/13 16:22:45.
+** Generated automatically by tolua++-1.0.92 on 12/14/13 22:33:52.
 */
 
 #ifndef __cplusplus
@@ -8,7 +8,7 @@
 #endif
 #include "string.h"
 
-#include "tolua++/include/tolua++.h"
+#include "tolua++.h"
 
 /* Exported function */
 TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
@@ -35,6 +35,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "../Entities/Pickup.h"
 #include "../Entities/ProjectileEntity.h"
 #include "../Entities/TNTEntity.h"
+#include "../Entities/Effects.h"
 #include "../Server.h"
 #include "../World.h"
 #include "../Inventory.h"
@@ -31064,6 +31065,29 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetCounterTime",tolua_AllToLua_cTNTEntity_GetCounterTime00);
    tolua_function(tolua_S,"GetMaxFuseTime",tolua_AllToLua_cTNTEntity_GetMaxFuseTime00);
   tolua_endmodule(tolua_S);
+  tolua_constant(tolua_S,"E_EFFECT_SPEED",E_EFFECT_SPEED);
+  tolua_constant(tolua_S,"E_EFFECT_SLOWNESS",E_EFFECT_SLOWNESS);
+  tolua_constant(tolua_S,"E_EFFECT_HASTE",E_EFFECT_HASTE);
+  tolua_constant(tolua_S,"E_EFFECT_MINING_FATIGUE",E_EFFECT_MINING_FATIGUE);
+  tolua_constant(tolua_S,"E_EFFECT_STENGTH",E_EFFECT_STENGTH);
+  tolua_constant(tolua_S,"E_EFFECT_INSTANT_HEALTH",E_EFFECT_INSTANT_HEALTH);
+  tolua_constant(tolua_S,"E_EFFECT_INSTANT_DAMAGE",E_EFFECT_INSTANT_DAMAGE);
+  tolua_constant(tolua_S,"E_EFFECT_JUMP_BOOST",E_EFFECT_JUMP_BOOST);
+  tolua_constant(tolua_S,"E_EFFECT_NAUSEA",E_EFFECT_NAUSEA);
+  tolua_constant(tolua_S,"E_EFFECT_REGENERATION",E_EFFECT_REGENERATION);
+  tolua_constant(tolua_S,"E_EFFECT_RESISTANCE",E_EFFECT_RESISTANCE);
+  tolua_constant(tolua_S,"E_EFFECT_FIRE_RESISTANCE",E_EFFECT_FIRE_RESISTANCE);
+  tolua_constant(tolua_S,"E_EFFECT_WATER_BREATHING",E_EFFECT_WATER_BREATHING);
+  tolua_constant(tolua_S,"E_EFFECT_INVISIBILITY",E_EFFECT_INVISIBILITY);
+  tolua_constant(tolua_S,"E_EFFECT_BLINDNESS",E_EFFECT_BLINDNESS);
+  tolua_constant(tolua_S,"E_EFFECT_NIGHT_VISION",E_EFFECT_NIGHT_VISION);
+  tolua_constant(tolua_S,"E_EFFECT_HUNGER",E_EFFECT_HUNGER);
+  tolua_constant(tolua_S,"E_EFFECT_WEAKNESS",E_EFFECT_WEAKNESS);
+  tolua_constant(tolua_S,"E_EFFECT_POISON",E_EFFECT_POISON);
+  tolua_constant(tolua_S,"E_EFFECT_WITHER",E_EFFECT_WITHER);
+  tolua_constant(tolua_S,"E_EFFECT_HEALTH_BOOST",E_EFFECT_HEALTH_BOOST);
+  tolua_constant(tolua_S,"E_EFFECT_ABSORPTION",E_EFFECT_ABSORPTION);
+  tolua_constant(tolua_S,"E_EFFECT_SATURATION",E_EFFECT_SATURATION);
   tolua_cclass(tolua_S,"cServer","cServer","",NULL);
   tolua_beginmodule(tolua_S,"cServer");
    tolua_function(tolua_S,"GetDescription",tolua_AllToLua_cServer_GetDescription00);
