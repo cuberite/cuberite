@@ -35,7 +35,6 @@ namespace Json
 
 
 class cWorld;
-class cFurnaceEntity;
 class cClientHandle;
 class cServer;
 class MTRand;
@@ -44,6 +43,7 @@ class cChunkMap;
 class cChestEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
+class cNoteEntity;
 class cBlockArea;
 class cPawn;
 class cPickup;
@@ -58,6 +58,7 @@ typedef cItemCallback<cEntity>          cEntityCallback;
 typedef cItemCallback<cChestEntity>     cChestCallback;
 typedef cItemCallback<cDispenserEntity> cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
+typedef cItemCallback<cNoteEntity>      cNoteBlockCallback;
 
 
 
@@ -245,6 +246,9 @@ public:
 
 	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Lua-accessible
+
+	/// Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found
+	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);
 
 	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible

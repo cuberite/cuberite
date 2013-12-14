@@ -3,6 +3,7 @@
 
 #include "RedstoneSimulator.h"
 #include "../BlockEntities/DropSpenserEntity.h"
+#include "../BlockEntities/NoteEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
@@ -196,6 +197,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			case E_BLOCK_TNT:					HandleTNT(a_X, dataitr->y, a_Z);			break;
 			case E_BLOCK_TRAPDOOR:              HandleTrapdoor(a_X, dataitr->y, a_Z);       break;
 			case E_BLOCK_REDSTONE_WIRE:			HandleRedstoneWire(a_X, dataitr->y, a_Z);	break;
+			case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(a_X, dataitr->y, a_Z);      break;
 
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
@@ -459,12 +461,12 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 		}
 	}
 
-	// Wire still powered, power blocks beneath
-	SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-	SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YM, E_BLOCK_REDSTONE_WIRE);
-
 	if (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) != 0) // A powered wire
 	{
+		// Wire still powered, power blocks beneath
+		SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
+		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YM, E_BLOCK_REDSTONE_WIRE);
+
 		switch (GetWireDirection(a_BlockX, a_BlockY, a_BlockZ))
 		{
 			case REDSTONE_NONE:
@@ -812,6 +814,48 @@ void cRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
 		{
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0xB); // Take into account that the fourth bit is needed for trapdoors too
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
+		}
+	}
+}
+
+
+
+
+
+void cRedstoneSimulator::HandleNoteBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	bool m_bAreCoordsPowered = AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ);
+
+	if (m_bAreCoordsPowered)
+	{
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
+		{
+			class cSetPowerToNoteBlock :
+				public cNoteBlockCallback
+			{
+				bool m_IsPowered;
+			public:
+				cSetPowerToNoteBlock(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
+
+				virtual bool Item(cNoteEntity * a_NoteBlock) override
+				{
+					if (m_IsPowered)
+					{
+						a_NoteBlock->MakeSound();
+					}
+					return false;
+				}
+			} NoteBlockSP(m_bAreCoordsPowered);
+
+			m_World.DoWithNoteBlockAt(a_BlockX, a_BlockY, a_BlockZ, NoteBlockSP);
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
+		}
+	}
+	else
+	{
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
+		{
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}

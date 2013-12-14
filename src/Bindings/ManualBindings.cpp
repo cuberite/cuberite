@@ -18,6 +18,7 @@
 #include "../BlockEntities/DropperEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/HopperEntity.h"
+#include "../BlockEntities/NoteEntity.h"
 #include "md5/md5.h"
 #include "../LineBlockTracer.h"
 
@@ -2217,6 +2218,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithDropperAt",           tolua_DoWithXYZ<cWorld, cDropperEntity,     &cWorld::DoWithDropperAt>);
 			tolua_function(tolua_S, "DoWithEntityByID",          tolua_DoWithID< cWorld, cEntity,            &cWorld::DoWithEntityByID>);
 			tolua_function(tolua_S, "DoWithFurnaceAt",           tolua_DoWithXYZ<cWorld, cFurnaceEntity,     &cWorld::DoWithFurnaceAt>);
+			tolua_function(tolua_S, "DoWithNoteBlockAt",         tolua_DoWithXYZ<cWorld, cNoteEntity,        &cWorld::DoWithNoteBlockAt>);
 			tolua_function(tolua_S, "DoWithPlayer",              tolua_DoWith<   cWorld, cPlayer,            &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",       tolua_DoWith<   cWorld, cPlayer,            &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk", tolua_ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
