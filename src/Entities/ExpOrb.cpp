@@ -49,8 +49,8 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 		double Distance(a_Distance.Length());
 		if (Distance < 0.1f)
 		{
+			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
 			a_ClosestPlayer->DeltaExperience(m_Reward);
-			a_ClosestPlayer->SendExperience();
 			Destroy(true);
 		}
 		a_Distance.Normalize();
