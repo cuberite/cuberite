@@ -167,8 +167,8 @@ public:
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
-	/// "Shoots" the player in the given direction.
-	void ShootTo(Vector3d a_Direction); // tolua_export
+	/// Forces the player to move in the given direction.
+	void ForceSetSpeed(Vector3d a_Direction); // tolua_export
 
 	/// Tries to move to a new position, with attachment-related checks (y == -999)
 	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
