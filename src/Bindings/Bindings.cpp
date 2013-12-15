@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/14/13 22:33:52.
+** Generated automatically by tolua++-1.0.92 on 12/15/13 14:19:12.
 */
 
 #ifndef __cplusplus
@@ -10460,6 +10460,38 @@ static int tolua_AllToLua_cPlayer_IsEating00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsFlying of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsFlying00
+static int tolua_AllToLua_cPlayer_IsFlying00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsFlying'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsFlying();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsFlying'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Respawn of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_Respawn00
 static int tolua_AllToLua_cPlayer_Respawn00(lua_State* tolua_S)
@@ -10849,6 +10881,72 @@ static int tolua_AllToLua_cPlayer_SetSprint00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SetFlying of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetFlying00
+static int tolua_AllToLua_cPlayer_SetFlying00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  bool a_IsFlying = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetFlying'", NULL);
+#endif
+  {
+   self->SetFlying(a_IsFlying);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetFlying'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetCanFly of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetCanFly00
+static int tolua_AllToLua_cPlayer_SetCanFly00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  bool a_CanFly = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetCanFly'", NULL);
+#endif
+  {
+   self->SetCanFly(a_CanFly);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetCanFly'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: IsSwimming of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsSwimming00
 static int tolua_AllToLua_cPlayer_IsSwimming00(lua_State* tolua_S)
@@ -10908,6 +11006,38 @@ static int tolua_AllToLua_cPlayer_IsSubmerged00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsSubmerged'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CanFly of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_CanFly00
+static int tolua_AllToLua_cPlayer_CanFly00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CanFly'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->CanFly();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CanFly'.",&tolua_err);
  return 0;
 #endif
 }
@@ -30978,6 +31108,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddFoodExhaustion",tolua_AllToLua_cPlayer_AddFoodExhaustion00);
    tolua_function(tolua_S,"FoodPoison",tolua_AllToLua_cPlayer_FoodPoison00);
    tolua_function(tolua_S,"IsEating",tolua_AllToLua_cPlayer_IsEating00);
+   tolua_function(tolua_S,"IsFlying",tolua_AllToLua_cPlayer_IsFlying00);
    tolua_function(tolua_S,"Respawn",tolua_AllToLua_cPlayer_Respawn00);
    tolua_function(tolua_S,"SetVisible",tolua_AllToLua_cPlayer_SetVisible00);
    tolua_function(tolua_S,"IsVisible",tolua_AllToLua_cPlayer_IsVisible00);
@@ -30990,8 +31121,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetSprintingMaxSpeed",tolua_AllToLua_cPlayer_SetSprintingMaxSpeed00);
    tolua_function(tolua_S,"SetCrouch",tolua_AllToLua_cPlayer_SetCrouch00);
    tolua_function(tolua_S,"SetSprint",tolua_AllToLua_cPlayer_SetSprint00);
+   tolua_function(tolua_S,"SetFlying",tolua_AllToLua_cPlayer_SetFlying00);
+   tolua_function(tolua_S,"SetCanFly",tolua_AllToLua_cPlayer_SetCanFly00);
    tolua_function(tolua_S,"IsSwimming",tolua_AllToLua_cPlayer_IsSwimming00);
    tolua_function(tolua_S,"IsSubmerged",tolua_AllToLua_cPlayer_IsSubmerged00);
+   tolua_function(tolua_S,"CanFly",tolua_AllToLua_cPlayer_CanFly00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cPickup","cPickup","cEntity",tolua_collect_cPickup);
