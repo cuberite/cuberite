@@ -1286,7 +1286,25 @@ void cProtocol172::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Flags);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, FlyingSpeed);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
-	m_Client->HandlePlayerAbilities(Flags, FlyingSpeed, WalkingSpeed);
+
+	bool IsFlying, CanFly;
+	if ((Flags & 2) != 0)
+	{
+		IsFlying = true;
+	}
+	else
+	{
+		IsFlying = false;
+	}
+	if ((Flags & 4) != 0)
+	{
+		CanFly = true;
+	}
+	else
+	{
+		CanFly = false;
+	}
+	m_Client->HandlePlayerAbilities(CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
 }
 
 

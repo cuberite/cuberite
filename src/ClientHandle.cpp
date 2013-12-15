@@ -490,24 +490,10 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 
 
 
-void cClientHandle::HandlePlayerAbilities(int Flags, float FlyingSpeed, float WalkingSpeed)
+void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed)
 {
-	if ((Flags & 2) != 0)
-	{
-		m_Player->SetFlying(true);
-	}
-	else
-	{
-		m_Player->SetFlying(false);
-	}
-	if ((Flags & 4) != 0)
-	{
-		m_Player->SetCanFly(true);
-	}
-	else
-	{
-		m_Player->SetCanFly(false);
-	}
+	m_Player->SetCanFly(a_CanFly);
+	m_Player->SetFlying(a_IsFlying);
 }
 
 
