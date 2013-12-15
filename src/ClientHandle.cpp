@@ -1498,13 +1498,8 @@ void cClientHandle::Tick(float a_Dt)
 	}
 	
 	// If the chunk the player's in was just sent, spawn the player:
-	if (m_HasSentPlayerChunk && (m_State != csPlaying) && !IsDestroying())
+	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 	{
-		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
-		{
-			// Broadcast that this player has joined the game! Yay~
-			m_Player->GetWorld()->BroadcastChat(m_Username + " joined the game!", this);
-		}
 		m_Protocol->SendPlayerMoveLook();
 		m_State = csPlaying;
 	}
