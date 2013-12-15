@@ -1765,8 +1765,6 @@ void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 {
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-	
 	m_Protocol->SendEntityVelocity(a_Entity);
 }
 
