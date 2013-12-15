@@ -490,7 +490,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 
 	if (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) != 0) // A powered wire
 	{
-		for (size_t i = 0; i < 4; i++) // Look for repeaters immediately surrounding self and try to power them
+		for (size_t i = 0; i < 3; i++) // Look for repeaters immediately surrounding self and try to power them
 		{
 			if (m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z) == E_BLOCK_REDSTONE_REPEATER_OFF)
 			{
