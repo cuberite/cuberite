@@ -2384,10 +2384,11 @@ bool cConnection::HandleServerStatusResponse(void)
 	Log("  Response: %s", Response.c_str());
 	
 	// Modify the response to show that it's being proto-proxied:
-	size_t idx = Response.find("\"description\":\"");
+	const char DescSearch[] = "\"description\":{\"text\":\"";
+	size_t idx = Response.find(DescSearch);
 	if (idx != AString::npos)
 	{
-		Response.assign(Response.substr(0, idx + 15) + "ProtoProxy: " + Response.substr(idx + 15));
+		Response.assign(Response.substr(0, idx + sizeof(DescSearch) - 1) + "ProtoProxy: " + Response.substr(idx + sizeof(DescSearch) - 1));
 	}
 	cByteBuffer Packet(1000);
 	Packet.WriteVarInt(0);  // Packet type - status response
