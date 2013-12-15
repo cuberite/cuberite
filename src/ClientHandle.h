@@ -116,6 +116,7 @@ public:
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
+	void SendPlayerAbilities     (void);
 	void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline);
 	void SendPlayerMaxSpeed      (void);  ///< Informs the client of the maximum player speed (1.6.1+)
 	void SendPlayerMoveLook      (void);
@@ -175,6 +176,7 @@ public:
 	void HandleKeepAlive        (int a_KeepAliveID);
 	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	void HandlePing             (void);
+	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
 	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);

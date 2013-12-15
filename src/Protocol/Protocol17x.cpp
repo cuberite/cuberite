@@ -491,7 +491,15 @@ void cProtocol172::SendPlayerAbilities(void)
 	{
 		Flags |= 0x01;
 	}
-	// TODO: Other flags (god mode, flying, can fly
+	if (m_Client->GetPlayer()->IsFlying())
+	{
+		Flags |= 0x02;
+	}
+	if (m_Client->GetPlayer()->CanFly())
+	{
+		Flags |= 0x04;
+	}
+	// TODO: Other flags (god mode)
 	Pkt.WriteByte(Flags);
 	// TODO: Pkt.WriteFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
 	Pkt.WriteFloat(0.05f);
@@ -1278,7 +1286,25 @@ void cProtocol172::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Flags);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, FlyingSpeed);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
-	// TODO: m_Client->HandlePlayerAbilities();
+
+	bool IsFlying, CanFly;
+	if ((Flags & 2) != 0)
+	{
+		IsFlying = true;
+	}
+	else
+	{
+		IsFlying = false;
+	}
+	if ((Flags & 4) != 0)
+	{
+		CanFly = true;
+	}
+	else
+	{
+		CanFly = false;
+	}
+	m_Client->HandlePlayerAbilities(CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
 }
 
 
