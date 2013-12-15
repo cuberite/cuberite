@@ -445,6 +445,22 @@ void cChunkMap::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHa
 
 
 
+void cChunkMap::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), ZERO_CHUNK_Y, a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
+}
+
+
+
+
+
 void cChunkMap::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
@@ -583,6 +599,23 @@ void cChunkMap::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animat
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
 	Chunk->BroadcastEntityAnimation(a_Entity, a_Animation, a_Exclude);
+}
+
+
+
+
+
+void cChunkMap::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), ZERO_CHUNK_Y, a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastRemoveEntityEffect(a_Entity, a_EffectID, a_Exclude);
 }
 
 

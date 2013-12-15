@@ -2589,6 +2589,22 @@ void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandl
 
 
 
+void cChunk::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
 void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
@@ -2726,6 +2742,22 @@ void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation
 			continue;
 		}
 		(*itr)->SendEntityAnimation(a_Entity, a_Animation);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendRemoveEntityEffect(a_Entity, a_EffectID);
 	}  // for itr - LoadedByClient[]
 }
 
