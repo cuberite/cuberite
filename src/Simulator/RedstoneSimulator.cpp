@@ -82,10 +82,16 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	{
 		int RelX = itr->a_SourcePos.x - a_ChunkX * cChunkDef::Width;
 		int RelZ = itr->a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
+		int DestRelX = itr->a_BlockPos.x - a_ChunkX * cChunkDef::Width;
+		int DestRelZ = itr->a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
 
 		BLOCKTYPE SourceBlockType;
 		NIBBLETYPE SourceBlockMeta;
-		if (!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta))
+		BLOCKTYPE DestBlockType;
+		if (
+			!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta) ||
+			!a_Chunk->UnboundedRelGetBlockType(DestRelX, itr->a_SourcePos.y, DestRelZ, DestBlockType)
+			)
 		{
 			continue;
 		}
@@ -104,6 +110,12 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			)
 		{
 			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
+			itr = m_PoweredBlocks.erase(itr);
+		}
+		else if ((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (DestBlockType == E_BLOCK_REDSTONE_WIRE))
+		{
+			// It is simply not allowed that a wire powers another wire, presuming that data here is sane and a dest and source are beside each other
+			LOGD("cRedstoneSimulator: Erased redstone wire from powered blocks list because it's source was also wire");
 			itr = m_PoweredBlocks.erase(itr);
 		}
 		else
