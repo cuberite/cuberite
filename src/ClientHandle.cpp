@@ -490,6 +490,30 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 
 
 
+void cClientHandle::HandlePlayerAbilities(int Flags, float FlyingSpeed, float WalkingSpeed)
+{
+	if ((Flags & 2) != 0)
+	{
+		m_Player->SetFlying(true);
+	}
+	else
+	{
+		m_Player->SetFlying(false);
+	}
+	if ((Flags & 4) != 0)
+	{
+		m_Player->SetCanFly(true);
+	}
+	else
+	{
+		m_Player->SetCanFly(false);
+	}
+}
+
+
+
+
+
 void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
 {
 	if ((m_Player == NULL) || (m_State != csPlaying))
@@ -1825,6 +1849,15 @@ void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
 	m_Protocol->SendEntityAnimation(a_Entity, a_Animation);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerAbilities()
+{
+	m_Protocol->SendPlayerAbilities();
 }
 
 

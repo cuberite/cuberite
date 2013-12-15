@@ -63,6 +63,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_IsSprinting(false)
 	, m_IsSwimming(false)
 	, m_IsSubmerged(false)
+	, m_IsFlying(false)
+	, m_CanFly(false)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
@@ -745,6 +747,36 @@ void cPlayer::SetSprint(bool a_IsSprinting)
 	
 	m_IsSprinting = a_IsSprinting;
 	m_ClientHandle->SendPlayerMaxSpeed();
+}
+
+
+
+
+
+void cPlayer::SetCanFly(bool a_CanFly)
+{
+	if (a_CanFly == m_CanFly)
+	{
+		return;
+	}
+
+	m_CanFly = a_CanFly;
+	m_ClientHandle->SendPlayerAbilities();
+}
+
+
+
+
+
+void cPlayer::SetFlying(bool a_IsFlying)
+{
+	if (a_IsFlying == m_IsFlying)
+	{
+		return;
+	}
+
+	m_IsFlying = a_IsFlying;
+	m_ClientHandle->SendPlayerAbilities();
 }
 
 
