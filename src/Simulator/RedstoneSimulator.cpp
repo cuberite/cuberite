@@ -420,6 +420,18 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 		{ 0,-1, -1}, /* Wires one lower, surrounding self stop */
 	} ;
 
+	static const struct // Define which directions the wire will check for repeater prescence
+	{
+		int x, y, z;
+	} gSideCoords[] =
+	{
+		{ 1, 0, 0 },
+		{-1, 0, 0 },
+		{ 0, 0, 1 },
+		{ 0, 0,-1 },
+		{ 0, 1, 0 },
+	};
+
 	// Check to see if directly beside a power source
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
@@ -490,13 +502,14 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 
 	if (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) != 0) // A powered wire
 	{
-		for (size_t i = 0; i < 3; i++) // Look for repeaters immediately surrounding self and try to power them
+		for (size_t i = 0; i < ARRAYCOUNT(gSideCoords); i++) // Look for repeaters immediately surrounding self and try to power them
 		{
-			if (m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z) == E_BLOCK_REDSTONE_REPEATER_OFF)
+			if (m_World.GetBlock(a_BlockX + gSideCoords[i].x, a_BlockY + gSideCoords[i].y, a_BlockZ + gSideCoords[i].z) == E_BLOCK_REDSTONE_REPEATER_OFF)
 			{
-				SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
+				SetBlockPowered(a_BlockX + gSideCoords[i].x, a_BlockY + gSideCoords[i].y, a_BlockZ + gSideCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
 			}
 		}
+
 		// Wire still powered, power blocks beneath
 		SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
 		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YM, E_BLOCK_REDSTONE_WIRE);
