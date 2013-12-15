@@ -270,9 +270,6 @@ void cClientHandle::Authenticate(void)
 	m_Player->Initialize(World);
 	m_State = csAuthenticated;
 
-	// Broadcast this player's spawning to all other players in the same chunk
-	m_Player->GetWorld()->BroadcastSpawnEntity(*m_Player, this);
-
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
 
