@@ -1069,6 +1069,16 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 
 
+void cPlayer::ForceSetSpeed(Vector3d a_Direction)
+{
+	SetSpeed(a_Direction);
+	m_ClientHandle->SendEntityVelocity(*this);
+}
+
+
+
+
+
 void cPlayer::MoveTo( const Vector3d & a_NewPos )
 {
 	if ((a_NewPos.y < -990) && (GetPosY() > -100))
