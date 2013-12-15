@@ -1517,6 +1517,7 @@ bool cPlayer::LoadFromDisk()
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
 	m_LifetimeTotalXp     = (short) root.get("xpTotal", 0).asInt();
 	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
+	m_IsFlying            = root.get("isflying", 0).asBool();
 
 	//SetExperience(root.get("experience", 0).asInt());
 
@@ -1567,7 +1568,8 @@ bool cPlayer::SaveToDisk()
 	root["foodSaturation"] = m_FoodSaturationLevel;
 	root["foodTickTimer"]  = m_FoodTickTimer;
 	root["foodExhaustion"] = m_FoodExhaustionLevel;
-	root["world"] = GetWorld()->GetName();
+	root["world"]          = GetWorld()->GetName();
+	root["isflying"]       = IsFlying();
 
 	if (m_GameMode == GetWorld()->GetGameMode())
 	{
