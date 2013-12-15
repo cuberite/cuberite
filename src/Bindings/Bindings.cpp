@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/15/13 18:47:13.
+** Generated automatically by tolua++-1.0.92 on 12/15/13 20:25:06.
 */
 
 #ifndef __cplusplus
@@ -9395,9 +9395,9 @@ static int tolua_AllToLua_cPlayer_GetIP00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: ShootTo of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_ShootTo00
-static int tolua_AllToLua_cPlayer_ShootTo00(lua_State* tolua_S)
+/* method: ForceSetSpeed of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_ForceSetSpeed00
+static int tolua_AllToLua_cPlayer_ForceSetSpeed00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -9411,18 +9411,18 @@ static int tolua_AllToLua_cPlayer_ShootTo00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  Vector3d Vector = *((Vector3d*)  tolua_tousertype(tolua_S,2,0));
+  Vector3d a_Direction = *((Vector3d*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ShootTo'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ForceSetSpeed'", NULL);
 #endif
   {
-   self->ShootTo(Vector);
+   self->ForceSetSpeed(a_Direction);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'ShootTo'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'ForceSetSpeed'.",&tolua_err);
  return 0;
 #endif
 }
@@ -31109,7 +31109,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsGameModeSurvival",tolua_AllToLua_cPlayer_IsGameModeSurvival00);
    tolua_function(tolua_S,"IsGameModeAdventure",tolua_AllToLua_cPlayer_IsGameModeAdventure00);
    tolua_function(tolua_S,"GetIP",tolua_AllToLua_cPlayer_GetIP00);
-   tolua_function(tolua_S,"ShootTo",tolua_AllToLua_cPlayer_ShootTo00);
+   tolua_function(tolua_S,"ForceSetSpeed",tolua_AllToLua_cPlayer_ForceSetSpeed00);
    tolua_function(tolua_S,"MoveTo",tolua_AllToLua_cPlayer_MoveTo00);
    tolua_function(tolua_S,"GetWindow",tolua_AllToLua_cPlayer_GetWindow00);
    tolua_function(tolua_S,"CloseWindow",tolua_AllToLua_cPlayer_CloseWindow00);
