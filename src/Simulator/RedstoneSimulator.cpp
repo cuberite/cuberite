@@ -82,10 +82,16 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	{
 		int RelX = itr->a_SourcePos.x - a_ChunkX * cChunkDef::Width;
 		int RelZ = itr->a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
+		int DestRelX = itr->a_BlockPos.x - a_ChunkX * cChunkDef::Width;
+		int DestRelZ = itr->a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
 
 		BLOCKTYPE SourceBlockType;
 		NIBBLETYPE SourceBlockMeta;
-		if (!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta))
+		BLOCKTYPE DestBlockType;
+		if (
+			!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta) ||
+			!a_Chunk->UnboundedRelGetBlockType(DestRelX, itr->a_SourcePos.y, DestRelZ, DestBlockType)
+			)
 		{
 			continue;
 		}
@@ -104,6 +110,12 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			)
 		{
 			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
+			itr = m_PoweredBlocks.erase(itr);
+		}
+		else if ((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (DestBlockType == E_BLOCK_REDSTONE_WIRE))
+		{
+			// It is simply not allowed that a wire powers another wire, presuming that data here is sane and a dest and source are beside each other
+			LOGD("cRedstoneSimulator: Erased redstone wire from powered blocks list because it's source was also wire");
 			itr = m_PoweredBlocks.erase(itr);
 		}
 		else
@@ -408,6 +420,18 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 		{ 0,-1, -1}, /* Wires one lower, surrounding self stop */
 	} ;
 
+	static const struct // Define which directions the wire will check for repeater prescence
+	{
+		int x, y, z;
+	} gSideCoords[] =
+	{
+		{ 1, 0, 0 },
+		{-1, 0, 0 },
+		{ 0, 0, 1 },
+		{ 0, 0,-1 },
+		{ 0, 1, 0 },
+	};
+
 	// Check to see if directly beside a power source
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
@@ -478,6 +502,14 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 
 	if (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) != 0) // A powered wire
 	{
+		for (size_t i = 0; i < ARRAYCOUNT(gSideCoords); i++) // Look for repeaters immediately surrounding self and try to power them
+		{
+			if (m_World.GetBlock(a_BlockX + gSideCoords[i].x, a_BlockY + gSideCoords[i].y, a_BlockZ + gSideCoords[i].z) == E_BLOCK_REDSTONE_REPEATER_OFF)
+			{
+				SetBlockPowered(a_BlockX + gSideCoords[i].x, a_BlockY + gSideCoords[i].y, a_BlockZ + gSideCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
+			}
+		}
+
 		// Wire still powered, power blocks beneath
 		SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
 		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YM, E_BLOCK_REDSTONE_WIRE);
