@@ -27,7 +27,6 @@
 
 
 
-class cRedstone;
 class cFireSimulator;
 class cFluidSimulator;
 class cSandSimulator;
@@ -668,10 +667,6 @@ private:
 	bool m_bEnabledPVP;
 	bool m_IsDeepSnowEnabled;
 	bool m_ShouldLavaSpawnFire;
-
-	// The cRedstone class simulates redstone and needs access to m_RSList
-	// friend class cRedstone;
-	std::vector<int> m_RSList;
 	
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
 	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;	 // Second is for safely removing the objects from the queue

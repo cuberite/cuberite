@@ -29,7 +29,6 @@ class cExpOrb;
 class cPickup;
 class cPlayer;
 class cProtocol;
-class cRedstone;
 class cWindow;
 class cFallingBlock;
 class cItemHandler;

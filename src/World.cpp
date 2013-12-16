@@ -234,7 +234,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
-	m_RSList(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
 	m_TickThread(*this),
@@ -716,29 +715,6 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	}
 
 	TickMobs(a_Dt);
-
-	std::vector<int> m_RSList_copy(m_RSList);
-	
-	m_RSList.clear();
-
-	std::vector<int>::const_iterator cii;	// FIXME - Please rename this variable, WTF is cii??? Use human readable variable names or common abbreviations (i, idx, itr, iter)
-	for (cii = m_RSList_copy.begin(); cii != m_RSList_copy.end();)
-	{
-		int tempX = *cii; cii++;
-		int tempY = *cii; cii++;
-		int tempZ = *cii; cii++;
-		int state = *cii; cii++;
-		
-		if ((state == 11111) && ((int)GetBlock(tempX, tempY, tempZ) == E_BLOCK_REDSTONE_TORCH_OFF))
-		{
-			FastSetBlock(tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_ON, (int)GetBlockMeta(tempX, tempY, tempZ));
-		}
-		else if ((state == 00000) && ((int)GetBlock(tempX, tempY, tempZ) == E_BLOCK_REDSTONE_TORCH_ON))
-		{
-			FastSetBlock(tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_OFF, (int)GetBlockMeta(tempX, tempY, tempZ));
-		}
-	}
-	m_RSList_copy.erase(m_RSList_copy.begin(),m_RSList_copy.end());
 }
 
 
