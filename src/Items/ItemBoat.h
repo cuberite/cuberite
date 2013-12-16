@@ -62,7 +62,7 @@ public:
 		double y = Callbacks.Pos.y;
 		double z = Callbacks.Pos.z;
 		
-		if (x == 0 && y == 0 && z == 0)
+		if ((x == 0) && (y == 0) && (z == 0))
 		{
 			return false;
 		}
