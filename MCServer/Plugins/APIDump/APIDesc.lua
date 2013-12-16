@@ -2713,8 +2713,8 @@ end
 		"os",
 		"string",
 		"table",
-		"g_TrackedPages",
 		"g_Stats",
+		"g_TrackedPages",
 	},
 
 	IgnoreFunctions =
@@ -2745,6 +2745,15 @@ end
 		"WriteHtmlClass",
 		"WriteHtmlHook",
 		"WriteStats",
+	},
+	
+	IgnoreConstants =
+	{
+		"cChestEntity.__cBlockEntityWindowOwner__",
+		"cDropSpenserEntity.__cBlockEntityWindowOwner__",
+		"cFurnaceEntity.__cBlockEntityWindowOwner__",
+		"cHopperEntity.__cBlockEntityWindowOwner__",
+		"cLuaWindow.__cItemGrid__cListener__",
 	},
 	
 	IgnoreVariables =

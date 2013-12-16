@@ -700,6 +700,15 @@ function ReadDescriptions(a_API)
 			end
 		);
 		
+		-- Remove ignored constants:
+		local NewConstants = {};
+		for j, cn in ipairs(cls.Constants) do
+			if (not(IsFunctionIgnored(cls.Name, cn.Name))) then
+				table.insert(NewConstants, cn);
+			end
+		end  -- for j, cn
+		cls.Constants = NewConstants;
+		
 		-- Sort the constants:
 		table.sort(cls.Constants,
 			function(c1, c2)
@@ -707,7 +716,7 @@ function ReadDescriptions(a_API)
 			end
 		);
 		
-		-- Remove ignored functions:
+		-- Remove ignored member variables:
 		local NewVariables = {};
 		for j, var in ipairs(cls.Variables) do
 			if (not(IsVariableIgnored(cls.Name .. "." .. var.Name))) then
