@@ -41,8 +41,6 @@ public:
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
 	virtual ~cPlayer();
 
-	virtual bool Initialize(cWorld * a_World) override;
-
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;

@@ -79,7 +79,11 @@ public:
 	
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
+	/// Called while the client is being ticked from the world via its cPlayer object
 	void Tick(float a_Dt);
+	
+	/// Called while the client is being ticked from the cServer object
+	void ServerTick(float a_Dt);
 
 	void Destroy(void);
 	

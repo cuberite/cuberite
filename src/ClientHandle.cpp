@@ -1476,12 +1476,6 @@ void cClientHandle::Tick(float a_Dt)
 	}
 	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
 	
-	if (m_State == csAuthenticated)
-	{
-		StreamChunks();
-		m_State = csDownloadingWorld;
-	}
-	
 	m_TimeSinceLastPacket += a_Dt;
 	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
 	{
@@ -1530,6 +1524,49 @@ void cClientHandle::Tick(float a_Dt)
 	m_CurrentExplosionTick = (m_CurrentExplosionTick + 1) % ARRAYCOUNT(m_NumExplosionsPerTick);
 	m_RunningSumExplosions -= m_NumExplosionsPerTick[m_CurrentExplosionTick];
 	m_NumExplosionsPerTick[m_CurrentExplosionTick] = 0;
+}
+
+
+
+
+
+void cClientHandle::ServerTick(float a_Dt)
+{
+	// Handle clients that are waiting for final close while destroyed:
+	if (m_State == csDestroyedWaiting)
+	{
+		// Do not wait while the client is not in the world, simply cut them off.
+		m_State = csDestroyed;
+		return;
+	}
+	
+	// Process received network data:
+	AString IncomingData;
+	{
+		cCSLock Lock(m_CSIncomingData);
+		std::swap(IncomingData, m_IncomingData);
+	}
+	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	
+	if (m_State == csAuthenticated)
+	{
+		StreamChunks();
+
+		// Remove the client handle from the server, it will be ticked from its cPlayer object from now on
+		cRoot::Get()->GetServer()->ClientMovedToWorld(this);
+		
+		// Add the player to the world (start ticking from there):
+		m_State = csDownloadingWorld;
+		m_Player->GetWorld()->AddPlayer(m_Player);
+		return;
+	}
+	
+	m_TimeSinceLastPacket += a_Dt;
+	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
+	{
+		SendDisconnect("Nooooo!! You timed out! D: Come back!");
+		Destroy();
+	}
 }
 
 

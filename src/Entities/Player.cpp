@@ -137,28 +137,6 @@ cPlayer::~cPlayer(void)
 
 
 
-bool cPlayer::Initialize(cWorld * a_World)
-{
-	ASSERT(a_World != NULL);
-	
-	if (super::Initialize(a_World))
-	{
-		// Remove the client handle from the server, it will be ticked from this object from now on
-		if (m_ClientHandle != NULL)
-		{
-			cRoot::Get()->GetServer()->ClientMovedToWorld(m_ClientHandle);
-		}
-		
-		GetWorld()->AddPlayer(this);
-		return true;
-	}
-	return false;
-}
-
-
-
-
-
 void cPlayer::Destroyed()
 {
 	CloseWindow(false);
