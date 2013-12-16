@@ -197,6 +197,7 @@ public:
 	void AddSpeedY  (double a_AddSpeedY);
 	void AddSpeedZ  (double a_AddSpeedZ);
 	
+	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways);
 	void SteerVehicle(float a_Forward, float a_Sideways);
 
 	inline int  GetUniqueID(void) const { return m_UniqueID; }

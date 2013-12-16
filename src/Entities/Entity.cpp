@@ -1341,6 +1341,19 @@ void cEntity::AddSpeedZ(double a_AddSpeedZ)
 
 
 
+void cEntity::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
+{
+	Vector3d LookVector = m_Attachee->GetLookVector();
+	double AddSpeedX = LookVector.x * a_Forward + LookVector.z * a_Sideways;
+	double AddSpeedZ = LookVector.z * a_Forward - LookVector.x * a_Sideways;
+	SetSpeed(AddSpeedX, 0, AddSpeedZ);
+	BroadcastMovementUpdate();
+}
+
+
+
+
+
 void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 {
 	if (m_AttachedTo == NULL)
@@ -1349,10 +1362,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 	}
 	if ((a_Forward != 0) || (a_Sideways != 0))
 	{
-		Vector3d LookVector = GetLookVector();
-		double AddSpeedX = LookVector.x * a_Forward + LookVector.z * a_Sideways;
-		double AddSpeedZ = LookVector.z * a_Forward - LookVector.x * a_Sideways;
-		m_AttachedTo->AddSpeed(AddSpeedX, 0, AddSpeedZ);
+		m_AttachedTo->HandleSpeedFromAttachee(a_Forward, a_Sideways);
 	}
 }
 
