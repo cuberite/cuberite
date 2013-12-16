@@ -27,7 +27,8 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 	
 	cBoat(double a_X, double a_Y, double a_Z);
 } ;

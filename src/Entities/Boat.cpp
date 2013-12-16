@@ -39,6 +39,15 @@ void cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 
 	if (GetHealth() == 0)
 	{
+		if (TDI.Attacker != NULL)
+		{
+			if (TDI.Attacker->IsPlayer())
+			{
+				cItems Pickups;
+				Pickups.Add(cItem(E_ITEM_BOAT));
+				m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 0, 0, 0, true);
+			}
+		}
 		Destroy(true);
 	}
 }
@@ -76,12 +85,32 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cBoat::HandlePhysics(float a_Dt, cChunk & a_Chunk)
+void cBoat::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::HandlePhysics(a_Dt, a_Chunk);
+	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();
+	SetSpeed(GetSpeed() * 0.97); // Slowly decrease the speed.
+	if (IsBlockWater(m_World->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ())))
+	{
+		SetSpeedY(1);
+	}
 }
 
 
 
 
+
+void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
+{
+	if (GetSpeed().Length() > 7)
+	{
+		return;
+	}
+	
+	Vector3d ToAddSpeed(m_Attachee->GetLookVector() * (a_Sideways * 1.5));
+	ToAddSpeed.y = 0;
+
+	AddSpeed(ToAddSpeed);
+}
+
+	
