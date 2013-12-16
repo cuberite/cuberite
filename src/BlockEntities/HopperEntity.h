@@ -16,10 +16,10 @@
 
 
 
-class cHopperEntity :  // tolua_export
-	public cBlockEntityWindowOwner,
-	// tolua_begin
-	public cBlockEntityWithItems
+// tolua_begin
+class cHopperEntity :
+	public cBlockEntityWithItems,
+	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntityWithItems super;
 

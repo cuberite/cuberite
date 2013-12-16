@@ -33,10 +33,10 @@ Additionally, to forbid Lua from deleting this object while it is used by player
 cPlayer:OpenWindow check if the window is of this class, and if so, make a global Lua reference for this object.
 This reference needs to be unreferenced in the Destroy() function.
 */
-class cLuaWindow :  // tolua_export
-	public cItemGrid::cListener,
-	// tolua_begin
-	public cWindow
+// tolua_begin
+class cLuaWindow :
+	public cWindow,
+	public cItemGrid::cListener
 {
 	typedef cWindow super;
 	

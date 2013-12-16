@@ -21,10 +21,10 @@ class cNBTData;
 
 
 
-class cEnderChestEntity :  // tolua_export
-	public cBlockEntityWindowOwner,
-	// tolua_begin
-	public cBlockEntityWithItems
+// tolua_begin
+class cEnderChestEntity :
+	public cBlockEntityWithItems,
+	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntityWithItems super;
 	

@@ -29,10 +29,10 @@ class cServer;
 
 
 
-class cDropSpenserEntity :  // tolua_export
-	public cBlockEntityWindowOwner,
-	// tolua_begin
-	public cBlockEntityWithItems
+// tolua_begin
+class cDropSpenserEntity :
+	public cBlockEntityWithItems,
+	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntityWithItems super;
 
