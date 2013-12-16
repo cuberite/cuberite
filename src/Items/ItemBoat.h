@@ -67,7 +67,7 @@ public:
 			return false;
 		}
 
-		cBoat * Boat = new cBoat(x, y + 1, z);
+		cBoat * Boat = new cBoat(x + 0.5, y + 1, z + 0.5);
 		Boat->Initialize(a_World);
 
 		return true;
