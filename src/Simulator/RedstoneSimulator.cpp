@@ -90,7 +90,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		BLOCKTYPE DestBlockType;
 		if (
 			!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta) ||
-			!a_Chunk->UnboundedRelGetBlockType(DestRelX, itr->a_SourcePos.y, DestRelZ, DestBlockType)
+			!a_Chunk->UnboundedRelGetBlockType(DestRelX, itr->a_BlockPos.y, DestRelZ, DestBlockType)
 			)
 		{
 			continue;
