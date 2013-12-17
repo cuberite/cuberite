@@ -168,7 +168,7 @@ public:
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
 					HitFluid = true;
-					m_Pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
+					m_Pos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 					return true;
 				}
 				return false;
