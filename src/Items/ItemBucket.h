@@ -157,7 +157,7 @@ public:
 			public cBlockTracer::cCallbacks
 		{
 		public:
-			Vector3d Pos;
+			Vector3i m_Pos;
 			bool HitFluid;
 			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 			{
@@ -168,7 +168,7 @@ public:
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
 					HitFluid = true;
-					Pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
+					m_Pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 					return true;
 				}
 				return false;
@@ -187,7 +187,7 @@ public:
 		}
 
 
-		BlockPos.Set((int) Callbacks.Pos.x, (int) Callbacks.Pos.y, (int) Callbacks.Pos.z);
+		BlockPos.Set(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z);
 		return true;
 	}
 
