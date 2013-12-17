@@ -46,7 +46,10 @@ public:
 		}
 
 		Vector3i BlockPos;
-		GetBlockFromTrace(a_World, a_Player, BlockPos);
+		if (!GetBlockFromTrace(a_World, a_Player, BlockPos))
+		{
+			return false; // Nothing in range.
+		}
 
 		if (a_World->GetBlockMeta(BlockPos.x, BlockPos.y, BlockPos.z) != 0)
 		{
@@ -70,16 +73,18 @@ public:
 			return false;
 		}
 		
-		// Remove the bucket from the inventory
-		if (!a_Player->GetInventory().RemoveOneEquippedItem())
+		// Give new bucket, filled with fluid when the gamemode is not creative:
+		if (!a_Player->IsGameModeCreative())
 		{
-			LOG("Clicked with an empty bucket, but cannot remove one from the inventory? WTF?");
-			ASSERT(!"Inventory bucket mismatch");
-			return true;
+			// Remove the bucket from the inventory
+			if (!a_Player->GetInventory().RemoveOneEquippedItem())
+			{
+				LOG("Clicked with an empty bucket, but cannot remove one from the inventory? WTF?");
+				ASSERT(!"Inventory bucket mismatch");
+				return true;
+			}
+			a_Player->GetInventory().AddItem(cItem(NewItem), true, true);
 		}
-		
-		// Give new bucket, filled with fluid:
-		a_Player->GetInventory().AddItem(cItem(NewItem), true, true);
 
 		// Remove water / lava block
 		a_Player->GetWorld()->SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, E_BLOCK_AIR, 0);
@@ -153,14 +158,16 @@ public:
 		{
 		public:
 			Vector3d Pos;
+			bool HitFluid;
 			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 			{
 				if (a_BlockMeta != 0)  // Even if it was a water block it would not be a source.
 				{
 					return false;
 				}
-				if ((IsBlockWater(a_BlockType)) || (IsBlockLava(a_BlockType)))
+				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
+					HitFluid = true;
 					Pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 					return true;
 				}
@@ -173,6 +180,12 @@ public:
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
 		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
+
+		if (!Callbacks.HitFluid)
+		{
+			return false;
+		}
+
 
 		BlockPos.Set((int) Callbacks.Pos.x, (int) Callbacks.Pos.y, (int) Callbacks.Pos.z);
 		return true;
