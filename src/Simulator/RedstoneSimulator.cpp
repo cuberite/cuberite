@@ -562,109 +562,75 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 
 void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState)
 {
-	// We do this so that the repeater can continually update block power status (without being affected by it's own block type, which would happen if the block powering code was in an IF statement)
-	bool IsOn = false;
-	if (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON)
-	{
-		IsOn = true;
-	}
-
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	if (IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3))
+	// We do this so that the repeater can continually update block power status (without being affected by it's own block type, which would happen if the block powering code was in an IF statement)
+	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false);
+	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3);
+
+	if (IsSelfPowered && !IsOn) // Queue a power change if I am receiving power but not on
 	{
-		if (!IsOn)
+		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, 0, true);
+	}
+	else if (!IsSelfPowered && IsOn) // Queue a power change if I am not receiving power but on
+	{
+		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, 0, false);
+	}
+
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+	{
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			bool ShouldCreate = true;
-			// If repeater is not on already (and is POWERED), see if it is in repeater list, or has reached delay time
-			for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+			continue;
+		}
+
+		if (itr->a_ElapsedTicks >= itr->a_DelayTicks) // Has the elapsed ticks reached the target ticks?
+		{
+			if (itr->ShouldPowerOn)
 			{
-				if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+				m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta);
+
+				switch (a_Meta & 0x3) // We only want the direction (bottom) bits
 				{
-					if (itr->a_DelayTicks <= itr->a_ElapsedTicks) // Shouldn't need <=; just in case something happens
+					case 0x0:
 					{
-						m_RepeatersDelayList.erase(itr);
-						ShouldCreate = false;
-						break; // Delay time reached, break straight out, and into the powering code
+						SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
+						SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_REDSTONE_REPEATER_ON);
+						break;
 					}
-					else
+					case 0x1:
 					{
-						itr->a_ElapsedTicks++; // Increment elapsed ticks and quit
-						return;
+						SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
+						SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XP, E_BLOCK_REDSTONE_REPEATER_ON);
+						break;
+					}
+					case 0x2:
+					{
+						SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
+						SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_REDSTONE_REPEATER_ON);
+						break;
+					}
+					case 0x3:
+					{
+						SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
+						SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XM, E_BLOCK_REDSTONE_REPEATER_ON);
+						break;
 					}
 				}
-			}
 
-			if (ShouldCreate)
-			{
-				// Self not in list, add self to list
-				sRepeatersDelayList RC;
-				RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
-				RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1; // Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
-				RC.a_ElapsedTicks = 0;
-				m_RepeatersDelayList.push_back(RC);
+				m_RepeatersDelayList.erase(itr);
 				return;
 			}
-			
-			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // Only set if not on; SetBlock otherwise server doesn't set it in time for SimulateChunk's invalidation
-		}
-		switch (a_Meta & 0x3) // We only want the direction (bottom) bits
-		{
-			case 0x0:
+			else
 			{
-				SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_REDSTONE_REPEATER_ON);
-				break;
-			}
-			case 0x1:
-			{
-				SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XP, E_BLOCK_REDSTONE_REPEATER_ON);
-				break;
-			}
-			case 0x2:
-			{
-				SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_REDSTONE_REPEATER_ON);
-				break;
-			}
-			case 0x3:
-			{
-				SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XM, E_BLOCK_REDSTONE_REPEATER_ON);
-				break;
+				m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
+				m_RepeatersDelayList.erase(itr);
+				return;
 			}
 		}
-	}
-	else
-	{
-		if (IsOn)
+		else
 		{
-			// If repeater is not off already (and is NOT POWERED), see if it is in repeater list, or has reached delay time
-			for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
-			{
-				if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
-				{
-					if (itr->a_DelayTicks <= itr->a_ElapsedTicks) // Shouldn't need <=; just in case something happens
-					{
-						m_RepeatersDelayList.erase(itr);
-						m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
-						return;
-					}
-					else
-					{
-						itr->a_ElapsedTicks++; // Increment elapsed ticks and quit
-						return;
-					}
-				}
-			}
-
-			// Self not in list, add self to list
-			sRepeatersDelayList RC;
-			RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
-			RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2); // Repeaters power off slower than they power on, so no +1. Why? No idea.
-			RC.a_ElapsedTicks = 0;
-			m_RepeatersDelayList.push_back(RC);
+			itr->a_ElapsedTicks++;
 			return;
 		}
 	}
@@ -1293,6 +1259,30 @@ void cRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 	RC.WasLastStatePowered = WasLastStatePowered;
 	m_SimulatedPlayerToggleableBlocks.push_back(RC);
+}
+
+
+
+
+
+void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta, short a_ElapsedTicks, bool ShouldPowerOn)
+{
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+	{
+		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		{
+			return;
+		}
+	}
+
+	// Self not in list, add self to list
+	sRepeatersDelayList RC;
+	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+	RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1; // Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
+	RC.a_ElapsedTicks = 0;
+	RC.ShouldPowerOn = ShouldPowerOn;
+	m_RepeatersDelayList.push_back(RC);
+	return;
 }
 
 
