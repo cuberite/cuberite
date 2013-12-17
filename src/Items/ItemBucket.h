@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Blocks/BlockHandler.h"
+#include "../LineBlockTracer.h"
 
 
 
@@ -39,45 +40,34 @@ public:
 	
 	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
-		if (a_BlockFace < 0)
+		if (a_BlockFace > 0)
 		{
 			return false;
 		}
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		BLOCKTYPE ClickedBlock;
-		NIBBLETYPE ClickedMeta;
-		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedMeta);
-		LOGD("Bucket Clicked BlockType %d, meta %d", ClickedBlock, ClickedMeta);
-		if (ClickedMeta != 0)
+
+		Vector3i BlockPos;
+		GetBlockFromTrace(a_World, a_Player, BlockPos);
+
+		if (a_World->GetBlockMeta(BlockPos.x, BlockPos.y, BlockPos.z) != 0)
 		{
 			// Not a source block
 			return false;
 		}
-		
-		if (a_Player->GetGameMode() == gmCreative)
+
+		BLOCKTYPE Block = a_World->GetBlock(BlockPos.x, BlockPos.y, BlockPos.z);
+		ENUM_ITEM_ID NewItem;
+
+		if (IsBlockWater(Block))
 		{
-			// In creative mode don't modify the inventory, just remove the fluid:
-			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
-			return true;
+			NewItem = E_ITEM_WATER_BUCKET;
 		}
-		
-		ENUM_ITEM_ID NewItem = E_ITEM_EMPTY;
-		switch (ClickedBlock)
+		else if (IsBlockLava(Block))
 		{
-			case E_BLOCK_WATER:
-			case E_BLOCK_STATIONARY_WATER:
-			{
-				NewItem = E_ITEM_WATER_BUCKET;
-				break;
-			}
-			case E_BLOCK_LAVA:
-			case E_BLOCK_STATIONARY_LAVA:
-			{
-				NewItem = E_ITEM_LAVA_BUCKET;
-				break;
-			}
-			
-			default: return false;
+			NewItem = E_ITEM_LAVA_BUCKET;
+		}
+		else
+		{
+			return false;
 		}
 		
 		// Remove the bucket from the inventory
@@ -89,11 +79,10 @@ public:
 		}
 		
 		// Give new bucket, filled with fluid:
-		cItem Item(NewItem, 1);
-		a_Player->GetInventory().AddItem(Item, true, true);
+		a_Player->GetInventory().AddItem(cItem(NewItem), true, true);
 
 		// Remove water / lava block
-		a_Player->GetWorld()->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+		a_Player->GetWorld()->SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, E_BLOCK_AIR, 0);
 		return true;
 	}
 
@@ -154,6 +143,38 @@ public:
 
 		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FluidBlock, 0);
 		
+		return true;
+	}
+
+	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & BlockPos)
+	{
+		class cCallbacks :
+			public cBlockTracer::cCallbacks
+		{
+		public:
+			Vector3d Pos;
+			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+			{
+				if (a_BlockMeta != 0)  // Even if it was a water block it would not be a source.
+				{
+					return false;
+				}
+				if ((IsBlockWater(a_BlockType)) || (IsBlockLava(a_BlockType)))
+				{
+					Pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
+					return true;
+				}
+				return false;
+			}
+		} Callbacks;
+
+		cLineBlockTracer Tracer(*a_World, Callbacks);
+		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
+		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
+
+		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
+
+		BlockPos.Set((int) Callbacks.Pos.x, (int) Callbacks.Pos.y, (int) Callbacks.Pos.z);
 		return true;
 	}
 
