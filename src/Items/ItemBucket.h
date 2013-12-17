@@ -151,6 +151,7 @@ public:
 		return true;
 	}
 
+
 	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & BlockPos)
 	{
 		class cCallbacks :
@@ -158,7 +159,14 @@ public:
 		{
 		public:
 			Vector3i m_Pos;
-			bool HitFluid;
+			bool     m_HasHitFluid;
+			
+
+			cCallbacks(void) :
+				m_HasHitFluid(false)
+			{
+			}
+			
 			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 			{
 				if (a_BlockMeta != 0)  // Even if it was a water block it would not be a source.
@@ -167,8 +175,8 @@ public:
 				}
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
-					HitFluid = true;
-					m_Pos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+					m_HasHitFluid = true;
+					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
 					return true;
 				}
 				return false;
@@ -181,7 +189,7 @@ public:
 
 		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
 
-		if (!Callbacks.HitFluid)
+		if (!Callbacks.m_HasHitFluid)
 		{
 			return false;
 		}
