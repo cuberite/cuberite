@@ -562,7 +562,11 @@ void cProtocol172::SendPlayerMoveLook(void)
 {
 	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
 	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosX());
-	Pkt.WriteDouble(m_Client->GetPlayer()->GetStance());  // Protocol docs say this is PosY, but #323 says this is eye-pos
+	
+	// Protocol docs say this is PosY, but #323 says this is eye-pos
+	// Moreover, the "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteDouble(m_Client->GetPlayer()->GetStance() + 0.001);
+	
 	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosZ());
 	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetYaw());
 	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetPitch());
