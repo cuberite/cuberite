@@ -161,6 +161,9 @@ static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 // cBlockArea:
 
 cBlockArea::cBlockArea(void) :
+	m_OriginX(0),
+	m_OriginY(0),
+	m_OriginZ(0),
 	m_SizeX(0),
 	m_SizeY(0),
 	m_SizeZ(0),
@@ -190,6 +193,9 @@ void cBlockArea::Clear(void)
 	delete[] m_BlockMetas;    m_BlockMetas = NULL;
 	delete[] m_BlockLight;    m_BlockLight = NULL;
 	delete[] m_BlockSkyLight; m_BlockSkyLight = NULL;
+	m_OriginX = 0;
+	m_OriginY = 0;
+	m_OriginZ = 0;
 	m_SizeX = 0;
 	m_SizeY = 0;
 	m_SizeZ = 0;
