@@ -602,16 +602,16 @@ bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersi
 
 
 
-bool cPluginManager::CallHookEntityAnimation(cEntity & a_Entity, int a_Animation)
+bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_ENTITY_ANIMATION);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_ANIMATION);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnEntityAnimation(a_Entity, a_Animation))
+		if ((*itr)->OnPlayerAnimation(a_Player, a_Animation))
 		{
 			return true;
 		}

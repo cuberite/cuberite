@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/16/13 21:57:34.
+** Generated automatically by tolua++-1.0.92 on 12/18/13 16:09:11.
 */
 
 #ifndef __cplusplus
@@ -7439,6 +7439,41 @@ static int tolua_AllToLua_cEntity_AddSpeedZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'AddSpeedZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: HandleSpeedFromAttachee of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_HandleSpeedFromAttachee00
+static int tolua_AllToLua_cEntity_HandleSpeedFromAttachee00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  float a_Forward = ((float)  tolua_tonumber(tolua_S,2,0));
+  float a_Sideways = ((float)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'HandleSpeedFromAttachee'", NULL);
+#endif
+  {
+   self->HandleSpeedFromAttachee(a_Forward,a_Sideways);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'HandleSpeedFromAttachee'.",&tolua_err);
  return 0;
 #endif
 }
@@ -30110,7 +30145,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_COLLECTING_PICKUP",cPluginManager::HOOK_COLLECTING_PICKUP);
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
-   tolua_constant(tolua_S,"HOOK_ENTITY_ANIMATION",cPluginManager::HOOK_ENTITY_ANIMATION);
+   tolua_constant(tolua_S,"HOOK_PLAYER_ANIMATION",cPluginManager::HOOK_PLAYER_ANIMATION);
    tolua_constant(tolua_S,"HOOK_EXECUTE_COMMAND",cPluginManager::HOOK_EXECUTE_COMMAND);
    tolua_constant(tolua_S,"HOOK_EXPLODED",cPluginManager::HOOK_EXPLODED);
    tolua_constant(tolua_S,"HOOK_EXPLODING",cPluginManager::HOOK_EXPLODING);
@@ -31127,6 +31162,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddSpeedX",tolua_AllToLua_cEntity_AddSpeedX00);
    tolua_function(tolua_S,"AddSpeedY",tolua_AllToLua_cEntity_AddSpeedY00);
    tolua_function(tolua_S,"AddSpeedZ",tolua_AllToLua_cEntity_AddSpeedZ00);
+   tolua_function(tolua_S,"HandleSpeedFromAttachee",tolua_AllToLua_cEntity_HandleSpeedFromAttachee00);
    tolua_function(tolua_S,"SteerVehicle",tolua_AllToLua_cEntity_SteerVehicle00);
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cEntity_GetUniqueID00);
    tolua_function(tolua_S,"IsDestroyed",tolua_AllToLua_cEntity_IsDestroyed00);
