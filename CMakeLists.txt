@@ -11,6 +11,7 @@ add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
 add_subdirectory(lib/cryptopp/)
 add_subdirectory(lib/zlib/)
+add_subdirectory(lib/lua/)
 
 #TODo: set -Wall -Werror -Wextra
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS_BAK}")
