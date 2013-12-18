@@ -236,6 +236,19 @@ void cProtocol172::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cProtocol172::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+{
+	cPacketizer Pkt(*this, 0x1D);  // Entity Effect packet
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_EffectID);
+	Pkt.WriteByte(a_Amplifier);
+	Pkt.WriteShort(a_Duration);
+}
+
+
+
+
+
 void cProtocol172::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
@@ -478,7 +491,15 @@ void cProtocol172::SendPlayerAbilities(void)
 	{
 		Flags |= 0x01;
 	}
-	// TODO: Other flags (god mode, flying, can fly
+	if (m_Client->GetPlayer()->IsFlying())
+	{
+		Flags |= 0x02;
+	}
+	if (m_Client->GetPlayer()->CanFly())
+	{
+		Flags |= 0x04;
+	}
+	// TODO: Other flags (god mode)
 	Pkt.WriteByte(Flags);
 	// TODO: Pkt.WriteFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
 	Pkt.WriteFloat(0.05f);
@@ -541,7 +562,11 @@ void cProtocol172::SendPlayerMoveLook(void)
 {
 	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
 	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosX());
-	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosY());
+	
+	// Protocol docs say this is PosY, but #323 says this is eye-pos
+	// Moreover, the "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteDouble(m_Client->GetPlayer()->GetStance() + 0.001);
+	
 	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosZ());
 	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetYaw());
 	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetPitch());
@@ -579,6 +604,17 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteByte((3 << 5) | 6);  // Metadata: float + index 6
 	Pkt.WriteFloat((float)a_Player.GetHealth());
 	Pkt.WriteByte(0x7f);  // Metadata: end
+}
+
+
+
+
+
+void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
+{
+	cPacketizer Pkt(*this, 0x1E);
+	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_EffectID);
 }
 
 
@@ -921,7 +957,6 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 {
-	LOGD("Received %d bytes of data", a_Size);
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
@@ -958,9 +993,6 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			return;
 		}
 
-		// DEBUG:
-		LOGD("Packet 0x%x, len %d (0x%x), start at %d", PacketType, PacketLen, PacketLen, PacketStart);
-		
 		HandlePacket(bb, PacketType);
 		
 		if (bb.GetReadableSpace() != 1)
@@ -1258,7 +1290,25 @@ void cProtocol172::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Flags);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, FlyingSpeed);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
-	// TODO: m_Client->HandlePlayerAbilities();
+
+	bool IsFlying, CanFly;
+	if ((Flags & 2) != 0)
+	{
+		IsFlying = true;
+	}
+	else
+	{
+		IsFlying = false;
+	}
+	if ((Flags & 4) != 0)
+	{
+		CanFly = true;
+	}
+	else
+	{
+		CanFly = false;
+	}
+	m_Client->HandlePlayerAbilities(CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
 }
 
 

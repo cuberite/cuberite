@@ -40,6 +40,7 @@
 #include "BlockMelon.h"
 #include "BlockMushroom.h"
 #include "BlockMycelium.h"
+#include "BlockNetherWart.h"
 #include "BlockNote.h"
 #include "BlockOre.h"
 #include "BlockPiston.h"
@@ -160,6 +161,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_MYCELIUM:              return new cBlockMyceliumHandler        (a_BlockType);
 		case E_BLOCK_NETHER_BRICK_STAIRS:   return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_NETHER_PORTAL:         return new cBlockPortalHandler          (a_BlockType);
+		case E_BLOCK_NETHER_WART:           return new cBlockNetherWartHandler      (a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      (           );

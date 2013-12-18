@@ -216,6 +216,16 @@ void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cProtocolRecognizer::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	ASSERT(m_Protocol != NULL);
@@ -450,6 +460,16 @@ void cProtocolRecognizer::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendPlayerSpawn(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendRemoveEntityEffect(a_Entity, a_EffectID);
 }
 
 

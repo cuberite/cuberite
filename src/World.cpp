@@ -234,7 +234,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
-	m_RSList(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
 	m_TickThread(*this),
@@ -716,29 +715,6 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	}
 
 	TickMobs(a_Dt);
-
-	std::vector<int> m_RSList_copy(m_RSList);
-	
-	m_RSList.clear();
-
-	std::vector<int>::const_iterator cii;	// FIXME - Please rename this variable, WTF is cii??? Use human readable variable names or common abbreviations (i, idx, itr, iter)
-	for (cii = m_RSList_copy.begin(); cii != m_RSList_copy.end();)
-	{
-		int tempX = *cii; cii++;
-		int tempY = *cii; cii++;
-		int tempZ = *cii; cii++;
-		int state = *cii; cii++;
-		
-		if ((state == 11111) && ((int)GetBlock(tempX, tempY, tempZ) == E_BLOCK_REDSTONE_TORCH_OFF))
-		{
-			FastSetBlock(tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_ON, (int)GetBlockMeta(tempX, tempY, tempZ));
-		}
-		else if ((state == 00000) && ((int)GetBlock(tempX, tempY, tempZ) == E_BLOCK_REDSTONE_TORCH_ON))
-		{
-			FastSetBlock(tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_OFF, (int)GetBlockMeta(tempX, tempY, tempZ));
-		}
-	}
-	m_RSList_copy.erase(m_RSList_copy.begin(),m_RSList_copy.end());
 }
 
 
@@ -1123,6 +1099,15 @@ bool cWorld::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDrop
 bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithFurnaceAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithNoteBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -1804,6 +1789,15 @@ void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandl
 
 
 
+void cWorld::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration, a_Exclude);
+}
+
+
+
+
+
 void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastEntityEquipment(a_Entity, a_SlotNum, a_Item, a_Exclude);
@@ -1896,6 +1890,15 @@ void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline,
 		}
 		ch->SendPlayerListItem(a_Player, a_IsOnline);
 	}
+}
+
+
+
+
+
+void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastRemoveEntityEffect(a_Entity, a_EffectID, a_Exclude);
 }
 
 

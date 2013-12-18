@@ -62,6 +62,7 @@ private:
 		Vector3i a_BlockPos;
 		short a_DelayTicks;
 		short a_ElapsedTicks;
+		bool ShouldPowerOn;
 	};
 	
 	typedef std::vector <sPoweredBlocks> PoweredBlocksList;
@@ -112,6 +113,8 @@ private:
 	void HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
 	/// <summary>Handles trapdoors</summary>
 	void HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// <summary>Handles noteblocks</summary>
+	void HandleNoteBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/* ===================== */
 
 	/* ====== Helper functions ====== */
@@ -125,6 +128,8 @@ private:
 	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock);
 	/// <summary>Marks all blocks immediately surrounding a coordinate as powered</summary>
 	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock);
+	/// <summary>Queues a repeater to be powered or unpowered</summary>
+	void QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta, short a_ElapsedTicks, bool ShouldPowerOn);
 
 	/// <summary>Returns if a coordinate is powered or linked powered</summary>
 	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ) { return AreCoordsDirectlyPowered(a_BlockX, a_BlockY, a_BlockZ) || AreCoordsLinkedPowered(a_BlockX, a_BlockY, a_BlockZ); }

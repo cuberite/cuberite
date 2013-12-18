@@ -23,6 +23,7 @@
 #include "ItemLeaves.h"
 #include "ItemLighter.h"
 #include "ItemMinecart.h"
+#include "ItemNetherWart.h"
 #include "ItemPickaxe.h"
 #include "ItemThrowable.h"
 #include "ItemRedstoneDust.h"
@@ -101,6 +102,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FIREWORK_ROCKET:   return new cItemFireworkHandler();
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
 		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);

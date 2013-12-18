@@ -63,6 +63,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_IsSprinting(false)
 	, m_IsSwimming(false)
 	, m_IsSubmerged(false)
+	, m_IsFlying(false)
+	, m_CanFly(false)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
@@ -129,28 +131,6 @@ cPlayer::~cPlayer(void)
 	delete m_InventoryWindow;
 	
 	LOGD("Player %p deleted", this);
-}
-
-
-
-
-
-bool cPlayer::Initialize(cWorld * a_World)
-{
-	ASSERT(a_World != NULL);
-	
-	if (super::Initialize(a_World))
-	{
-		// Remove the client handle from the server, it will be ticked from this object from now on
-		if (m_ClientHandle != NULL)
-		{
-			cRoot::Get()->GetServer()->ClientMovedToWorld(m_ClientHandle);
-		}
-		
-		GetWorld()->AddPlayer(this);
-		return true;
-	}
-	return false;
 }
 
 
@@ -557,8 +537,12 @@ void cPlayer::FoodPoison(int a_NumTicks)
 	m_FoodPoisonedTicksRemaining = std::max(m_FoodPoisonedTicksRemaining, a_NumTicks);
 	if (!HasBeenFoodPoisoned)
 	{
-		// TODO: Send the poisoning indication to the client - how?
+		m_World->BroadcastRemoveEntityEffect(*this, E_EFFECT_HUNGER);
 		SendHealth();
+	}
+	else
+	{
+		m_World->BroadcastEntityEffect(*this, E_EFFECT_HUNGER, 0, 400); // Give the player the "Hunger" effect for 20 seconds.
 	}
 }
 
@@ -741,6 +725,36 @@ void cPlayer::SetSprint(bool a_IsSprinting)
 	
 	m_IsSprinting = a_IsSprinting;
 	m_ClientHandle->SendPlayerMaxSpeed();
+}
+
+
+
+
+
+void cPlayer::SetCanFly(bool a_CanFly)
+{
+	if (a_CanFly == m_CanFly)
+	{
+		return;
+	}
+
+	m_CanFly = a_CanFly;
+	m_ClientHandle->SendPlayerAbilities();
+}
+
+
+
+
+
+void cPlayer::SetFlying(bool a_IsFlying)
+{
+	if (a_IsFlying == m_IsFlying)
+	{
+		return;
+	}
+
+	m_IsFlying = a_IsFlying;
+	m_ClientHandle->SendPlayerAbilities();
 }
 
 
@@ -1028,6 +1042,16 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 	
 	return res * a_SpeedCoeff;
 }	
+
+
+
+
+
+void cPlayer::ForceSetSpeed(Vector3d a_Direction)
+{
+	SetSpeed(a_Direction);
+	m_ClientHandle->SendEntityVelocity(*this);
+}
 
 
 
@@ -1471,6 +1495,7 @@ bool cPlayer::LoadFromDisk()
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
 	m_LifetimeTotalXp     = (short) root.get("xpTotal", 0).asInt();
 	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
+	m_IsFlying            = root.get("isflying", 0).asBool();
 
 	//SetExperience(root.get("experience", 0).asInt());
 
@@ -1521,7 +1546,8 @@ bool cPlayer::SaveToDisk()
 	root["foodSaturation"] = m_FoodSaturationLevel;
 	root["foodTickTimer"]  = m_FoodTickTimer;
 	root["foodExhaustion"] = m_FoodExhaustionLevel;
-	root["world"] = GetWorld()->GetName();
+	root["world"]          = GetWorld()->GetName();
+	root["isflying"]       = IsFlying();
 
 	if (m_GameMode == GetWorld()->GetGameMode())
 	{
@@ -1703,6 +1729,10 @@ void cPlayer::HandleFood(void)
 	{
 		m_FoodPoisonedTicksRemaining--;
 		m_FoodExhaustionLevel += 0.025;  // 0.5 per second = 0.025 per tick
+	}
+	else
+	{
+		m_World->BroadcastRemoveEntityEffect(*this, E_EFFECT_HUNGER); // Remove the "Hunger" effect.
 	}
 
 	// Apply food exhaustion that has accumulated:

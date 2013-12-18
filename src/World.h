@@ -27,7 +27,6 @@
 
 
 
-class cRedstone;
 class cFireSimulator;
 class cFluidSimulator;
 class cSandSimulator;
@@ -42,6 +41,7 @@ class cChunkGenerator;  // The thread responsible for generating chunks
 class cChestEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
+class cNoteEntity;
 class cMobCensus;
 
 typedef std::list< cPlayer * > cPlayerList;
@@ -51,6 +51,7 @@ typedef cItemCallback<cEntity>          cEntityCallback;
 typedef cItemCallback<cChestEntity>     cChestCallback;
 typedef cItemCallback<cDispenserEntity> cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
+typedef cItemCallback<cNoteEntity>      cNoteBlockCallback;
 
 
 
@@ -151,6 +152,7 @@ public:
 	void BroadcastChunkData          (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity      (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityEffect       (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityHeadLook     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityLook         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
@@ -161,6 +163,7 @@ public:
 	void BroadcastEntityVelocity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	void BroadcastPlayerListItem     (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
+	void BroadcastRemoveEntityEffect (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export a_Src coords are Block * 8
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL); // tolua_export
 	void BroadcastSpawnEntity        (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
@@ -444,6 +447,9 @@ public:
 
 	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
+
+	/// Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found
+	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
 	
 	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Exported in ManualBindings.cpp
@@ -661,10 +667,6 @@ private:
 	bool m_bEnabledPVP;
 	bool m_IsDeepSnowEnabled;
 	bool m_ShouldLavaSpawnFire;
-
-	// The cRedstone class simulates redstone and needs access to m_RSList
-	// friend class cRedstone;
-	std::vector<int> m_RSList;
 	
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
 	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;	 // Second is for safely removing the objects from the queue

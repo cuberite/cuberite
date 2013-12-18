@@ -41,8 +41,6 @@ public:
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
 	virtual ~cPlayer();
 
-	virtual bool Initialize(cWorld * a_World) override;
-
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
@@ -167,6 +165,9 @@ public:
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
+	/// Forces the player to move in the given direction.
+	void ForceSetSpeed(Vector3d a_Direction); // tolua_export
+
 	/// Tries to move to a new position, with attachment-related checks (y == -999)
 	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
 
@@ -250,6 +251,8 @@ public:
 	/// Returns true if the player is currently in the process of eating the currently equipped item
 	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
 	
+	/// Returns true if the player is currently flying.
+	bool IsFlying(void) const { return m_IsFlying; }
 	// tolua_end
 	
 	/// Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet
@@ -319,12 +322,20 @@ public:
 	/// Starts or stops sprinting, sends the max speed update to the client, if needed
 	void SetSprint(bool a_IsSprinting);
 	
+	/// Flags the player as flying
+	void SetFlying(bool a_IsFlying);
+
+	/// If true the player can fly even when he's not in creative.
+	void SetCanFly(bool a_CanFly);
+
 	/// Returns whether the player is swimming or not
 	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
 
 	/// Return whether the player is under water or not
 	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
 
+	/// Returns wheter the player can fly or not.
+	virtual bool CanFly(void) const { return m_CanFly; }
 	// tolua_end
 
 	// cEntity overrides:
@@ -415,9 +426,11 @@ protected:
 	
 	bool m_IsCrouched;
 	bool m_IsSprinting;
-
+	bool m_IsFlying;
 	bool m_IsSwimming;
 	bool m_IsSubmerged;
+
+	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.
 
 	/// The world tick in which eating will be finished. -1 if not eating
 	Int64 m_EatingFinishTick;

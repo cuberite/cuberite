@@ -1567,12 +1567,14 @@ a_Player:OpenWindow(Window);
 				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
 				AddToGroup = { Params = "GroupName", Return = "", Notes = "Temporarily adds the player to the specified group. The assignment is lost when the player disconnects." },
 				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
+				CanFly = { Return = "bool", Notes = "Returns if the player is able to fly." },
 				CanUseCommand = { Params = "Command", Return = "bool", Notes = "Returns true if the player is allowed to use the specified command." },
 				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
 				CloseWindowIfID = { Params = "WindowID, [CanRefuse]", Return = "", Notes = "Closes the currently open UI window if its ID matches the given ID. If CanRefuse is true (default), the window may refuse the closing." },
 				DeltaExperience = { Params = "DeltaXP", Return = "", Notes = "Adds or removes XP from the current XP amount. Won't allow XP to go negative. Returns the new experience, -1 on error (XP overflow)." },
 				Feed = { Params = "AddFood, AddSaturation", Return = "bool", Notes = "Tries to add the specified amounts to food level and food saturation level (only positive amounts expected). Returns true if player was hungry and the food was consumed, false if too satiated." },
 				FoodPoison = { Params = "NumTicks", Return = "", Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two" },
+				ForceSetSpeed = { Params = "{{Vector3d|Direction}}", Notes = "Forces the player to move to the given direction." },
 				GetAirLevel = { Params = "", Return = "number", Notes = "Returns the air level (number of ticks of air left)." },
 				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
 				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player (based on the first group). Prefix player messages with this code." },
@@ -1605,6 +1607,7 @@ a_Player:OpenWindow(Window);
 				HasPermission = { Params = "PermissionString", Return = "bool", Notes = "Returns true if the player has the specified permission" },
 				Heal = { Params = "HitPoints", Return = "", Notes = "Heals the player by the specified amount of HPs. Only positive amounts are expected. Sends a health update to the client." },
 				IsEating = { Params = "", Return = "bool", Notes = "Returns true if the player is currently eating the item in their hand." },
+				IsFlying = { Return = "bool", Notes = "Returns true if the player is flying." },
 				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmAdventure gamemode, or has their gamemode unset and the world is a gmAdventure world." },
 				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmCreative gamemode, or has their gamemode unset and the world is a gmCreative world." },
 				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmSurvival gamemode, or has their gamemode unset and the world is a gmSurvival world." },
@@ -1621,8 +1624,10 @@ a_Player:OpenWindow(Window);
 				RemoveFromGroup = { Params = "GroupName", Return = "", Notes = "Temporarily removes the player from the specified group. This change is lost when the player disconnects." },
 				Respawn = { Params = "", Return = "", Notes = "Restores the health, extinguishes fire, makes visible and sends the Respawn packet." },
 				SendMessage = { Params = "MessageString", Return = "", Notes = "Sends the specified message to the player." },
+				SetCanFly = { Params = "CanFly", Notes = "Sets if the player can fly or not." },
 				SetCrouch = { Params = "IsCrouched", Return = "", Notes = "Sets the crouch state, broadcasts the change to other players." },
 				SetCurrentExperience = { Params = "XPAmount", Return = "", Notes = "Sets the current amount of experience (and indirectly, the XP level)." },
+				SetFlying = { Params = "IsFlying", Notes = "Sets if the player is flying or not." },
 				SetFoodExhaustionLevel = { Params = "ExhaustionLevel", Return = "", Notes = "Sets the food exhaustion to the specified level." },
 				SetFoodLevel = { Params = "FoodLevel", Return = "", Notes = "Sets the food level (number of half-drumsticks on-screen)" },
 				SetFoodPoisonedTicksRemaining = { Params = "FoodPoisonedTicksRemaining", Return = "", Notes = "Sets the number of ticks remaining for food poisoning. Doesn't send foodpoisoning effect to the client, use FoodPoison() for that." },
@@ -2708,8 +2713,8 @@ end
 		"os",
 		"string",
 		"table",
-		"g_TrackedPages",
 		"g_Stats",
+		"g_TrackedPages",
 	},
 
 	IgnoreFunctions =
@@ -2740,6 +2745,15 @@ end
 		"WriteHtmlClass",
 		"WriteHtmlHook",
 		"WriteStats",
+	},
+	
+	IgnoreConstants =
+	{
+		"cChestEntity.__cBlockEntityWindowOwner__",
+		"cDropSpenserEntity.__cBlockEntityWindowOwner__",
+		"cFurnaceEntity.__cBlockEntityWindowOwner__",
+		"cHopperEntity.__cBlockEntityWindowOwner__",
+		"cLuaWindow.__cItemGrid__cListener__",
 	},
 	
 	IgnoreVariables =

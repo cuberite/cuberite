@@ -21,10 +21,10 @@ class cServer;
 
 
 
-class cFurnaceEntity :  // tolua_export
-	public cBlockEntityWindowOwner,
-	// tolua_begin
-	public cBlockEntityWithItems
+// tolua_begin
+class cFurnaceEntity :
+	public cBlockEntityWithItems,
+	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntityWithItems super;
 	

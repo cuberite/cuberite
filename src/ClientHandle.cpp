@@ -270,9 +270,6 @@ void cClientHandle::Authenticate(void)
 	m_Player->Initialize(World);
 	m_State = csAuthenticated;
 
-	// Broadcast this player's spawning to all other players in the same chunk
-	m_Player->GetWorld()->BroadcastSpawnEntity(*m_Player, this);
-
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
 
@@ -484,6 +481,16 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 	}
 	
 	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, (a_SlotNum >= 0) ? caLeftClick : caLeftClickOutside, a_HeldItem);
+}
+
+
+
+
+
+void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed)
+{
+	m_Player->SetCanFly(a_CanFly);
+	m_Player->SetFlying(a_IsFlying);
 }
 
 
@@ -1053,7 +1060,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 
 void cClientHandle::HandleAnimation(char a_Animation)
 {
-	if (cPluginManager::Get()->CallHookEntityAnimation(*m_Player, a_Animation))
+	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_Animation))
 	{
 		// Plugin disagrees, bail out
 		return;
@@ -1469,12 +1476,6 @@ void cClientHandle::Tick(float a_Dt)
 	}
 	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
 	
-	if (m_State == csAuthenticated)
-	{
-		StreamChunks();
-		m_State = csDownloadingWorld;
-	}
-	
 	m_TimeSinceLastPacket += a_Dt;
 	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
 	{
@@ -1488,13 +1489,8 @@ void cClientHandle::Tick(float a_Dt)
 	}
 	
 	// If the chunk the player's in was just sent, spawn the player:
-	if (m_HasSentPlayerChunk && (m_State != csPlaying) && !IsDestroying())
+	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 	{
-		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
-		{
-			// Broadcast that this player has joined the game! Yay~
-			m_Player->GetWorld()->BroadcastChat(m_Username + " joined the game!", this);
-		}
 		m_Protocol->SendPlayerMoveLook();
 		m_State = csPlaying;
 	}
@@ -1528,6 +1524,49 @@ void cClientHandle::Tick(float a_Dt)
 	m_CurrentExplosionTick = (m_CurrentExplosionTick + 1) % ARRAYCOUNT(m_NumExplosionsPerTick);
 	m_RunningSumExplosions -= m_NumExplosionsPerTick[m_CurrentExplosionTick];
 	m_NumExplosionsPerTick[m_CurrentExplosionTick] = 0;
+}
+
+
+
+
+
+void cClientHandle::ServerTick(float a_Dt)
+{
+	// Handle clients that are waiting for final close while destroyed:
+	if (m_State == csDestroyedWaiting)
+	{
+		// Do not wait while the client is not in the world, simply cut them off.
+		m_State = csDestroyed;
+		return;
+	}
+	
+	// Process received network data:
+	AString IncomingData;
+	{
+		cCSLock Lock(m_CSIncomingData);
+		std::swap(IncomingData, m_IncomingData);
+	}
+	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	
+	if (m_State == csAuthenticated)
+	{
+		StreamChunks();
+
+		// Remove the client handle from the server, it will be ticked from its cPlayer object from now on
+		cRoot::Get()->GetServer()->ClientMovedToWorld(this);
+		
+		// Add the player to the world (start ticking from there):
+		m_State = csDownloadingWorld;
+		m_Player->GetWorld()->AddPlayer(m_Player);
+		return;
+	}
+	
+	m_TimeSinceLastPacket += a_Dt;
+	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
+	{
+		SendDisconnect("Nooooo!! You timed out! D: Come back!");
+		Destroy();
+	}
 }
 
 
@@ -1673,6 +1712,15 @@ void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cClientHandle::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+{
+	m_Protocol->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
+}
+
+
+
+
+
 void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	m_Protocol->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
@@ -1746,8 +1794,6 @@ void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 {
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-	
 	m_Protocol->SendEntityVelocity(a_Entity);
 }
 
@@ -1822,6 +1868,15 @@ void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animati
 
 
 
+void cClientHandle::SendPlayerAbilities()
+{
+	m_Protocol->SendPlayerAbilities();
+}
+
+
+
+
+
 void cClientHandle::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 {
 	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
@@ -1876,6 +1931,15 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 	);
 	
 	m_Protocol->SendPlayerSpawn(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
+{
+	m_Protocol->SendRemoveEntityEffect(a_Entity, a_EffectID);
 }
 
 

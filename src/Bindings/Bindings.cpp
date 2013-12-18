@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/14/13 16:22:45.
+** Generated automatically by tolua++-1.0.92 on 12/18/13 16:09:11.
 */
 
 #ifndef __cplusplus
@@ -8,7 +8,7 @@
 #endif
 #include "string.h"
 
-#include "tolua++/include/tolua++.h"
+#include "tolua++.h"
 
 /* Exported function */
 TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
@@ -35,6 +35,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "../Entities/Pickup.h"
 #include "../Entities/ProjectileEntity.h"
 #include "../Entities/TNTEntity.h"
+#include "../Entities/Effects.h"
 #include "../Server.h"
 #include "../World.h"
 #include "../Inventory.h"
@@ -219,45 +220,46 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cHTTPServer::cCallbacks");
  tolua_usertype(tolua_S,"cLuaWindow");
- tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cHopperEntity");
  tolua_usertype(tolua_S,"std::vector<AString>");
- tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"cBoundingBox");
+ tolua_usertype(tolua_S,"cItem");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"cArrowEntity");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
- tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"Vector3d");
+ tolua_usertype(tolua_S,"cTNTEntity");
  tolua_usertype(tolua_S,"cNoteEntity");
- tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cWebAdmin");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"cClientHandle");
- tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"cChatColor");
  tolua_usertype(tolua_S,"HTTPRequest");
- tolua_usertype(tolua_S,"cIniFile");
+ tolua_usertype(tolua_S,"cChatColor");
  tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cSignEntity");
+ tolua_usertype(tolua_S,"cDropperEntity");
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cThrownEggEntity");
  tolua_usertype(tolua_S,"cGroupManager");
+ tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
  tolua_usertype(tolua_S,"cPluginManager");
- tolua_usertype(tolua_S,"cDropperEntity");
  tolua_usertype(tolua_S,"cProjectileEntity");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
+ tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cPlayer");
- tolua_usertype(tolua_S,"cTNTEntity");
 }
 
 /* method: new of class  cIniFile */
@@ -3275,6 +3277,23 @@ static int tolua_AllToLua_cLuaWindow_GetContents00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'GetContents'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: __cItemGrid of class  cLuaWindow */
+#ifndef TOLUA_DISABLE_tolua_get_cLuaWindow___cItemGrid__cListener__
+static int tolua_get_cLuaWindow___cItemGrid__cListener__(lua_State* tolua_S)
+{
+  cLuaWindow* self = (cLuaWindow*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cItemGrid'",NULL);
+#endif
+#ifdef __cplusplus
+   tolua_pushusertype(tolua_S,(void*)static_cast<cItemGrid::cListener*>(self), "cItemGrid::cListener");
+#else
+   tolua_pushusertype(tolua_S,(void*)((cItemGrid::cListener*)self), "cItemGrid::cListener");
+#endif
+ return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -7425,6 +7444,41 @@ static int tolua_AllToLua_cEntity_AddSpeedZ00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: HandleSpeedFromAttachee of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_HandleSpeedFromAttachee00
+static int tolua_AllToLua_cEntity_HandleSpeedFromAttachee00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  float a_Forward = ((float)  tolua_tonumber(tolua_S,2,0));
+  float a_Sideways = ((float)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'HandleSpeedFromAttachee'", NULL);
+#endif
+  {
+   self->HandleSpeedFromAttachee(a_Forward,a_Sideways);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'HandleSpeedFromAttachee'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SteerVehicle of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SteerVehicle00
 static int tolua_AllToLua_cEntity_SteerVehicle00(lua_State* tolua_S)
@@ -9394,6 +9448,39 @@ static int tolua_AllToLua_cPlayer_GetIP00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: ForceSetSpeed of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_ForceSetSpeed00
+static int tolua_AllToLua_cPlayer_ForceSetSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  Vector3d a_Direction = *((Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ForceSetSpeed'", NULL);
+#endif
+  {
+   self->ForceSetSpeed(a_Direction);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ForceSetSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: MoveTo of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_MoveTo00
 static int tolua_AllToLua_cPlayer_MoveTo00(lua_State* tolua_S)
@@ -10459,6 +10546,38 @@ static int tolua_AllToLua_cPlayer_IsEating00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsFlying of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsFlying00
+static int tolua_AllToLua_cPlayer_IsFlying00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsFlying'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsFlying();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsFlying'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Respawn of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_Respawn00
 static int tolua_AllToLua_cPlayer_Respawn00(lua_State* tolua_S)
@@ -10848,6 +10967,72 @@ static int tolua_AllToLua_cPlayer_SetSprint00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SetFlying of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetFlying00
+static int tolua_AllToLua_cPlayer_SetFlying00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  bool a_IsFlying = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetFlying'", NULL);
+#endif
+  {
+   self->SetFlying(a_IsFlying);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetFlying'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetCanFly of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetCanFly00
+static int tolua_AllToLua_cPlayer_SetCanFly00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  bool a_CanFly = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetCanFly'", NULL);
+#endif
+  {
+   self->SetCanFly(a_CanFly);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetCanFly'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: IsSwimming of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsSwimming00
 static int tolua_AllToLua_cPlayer_IsSwimming00(lua_State* tolua_S)
@@ -10907,6 +11092,38 @@ static int tolua_AllToLua_cPlayer_IsSubmerged00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsSubmerged'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CanFly of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_CanFly00
+static int tolua_AllToLua_cPlayer_CanFly00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CanFly'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->CanFly();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CanFly'.",&tolua_err);
  return 0;
 #endif
 }
@@ -18627,6 +18844,23 @@ static int tolua_AllToLua_cBlockEntityWithItems_GetContents00(lua_State* tolua_S
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: __cBlockEntityWindowOwner__ of class  cChestEntity */
+#ifndef TOLUA_DISABLE_tolua_get_cChestEntity___cBlockEntityWindowOwner__
+static int tolua_get_cChestEntity___cBlockEntityWindowOwner__(lua_State* tolua_S)
+{
+  cChestEntity* self = (cChestEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cBlockEntityWindowOwner__'",NULL);
+#endif
+#ifdef __cplusplus
+   tolua_pushusertype(tolua_S,(void*)static_cast<cBlockEntityWindowOwner*>(self), "cBlockEntityWindowOwner");
+#else
+   tolua_pushusertype(tolua_S,(void*)((cBlockEntityWindowOwner*)self), "cBlockEntityWindowOwner");
+#endif
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: AddDropSpenserDir of class  cDropSpenserEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cDropSpenserEntity_AddDropSpenserDir00
 static int tolua_AllToLua_cDropSpenserEntity_AddDropSpenserDir00(lua_State* tolua_S)
@@ -18730,6 +18964,23 @@ static int tolua_AllToLua_cDropSpenserEntity_SetRedstonePower00(lua_State* tolua
  tolua_error(tolua_S,"#ferror in function 'SetRedstonePower'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: __cBlockEntityWindowOwner__ of class  cDropSpenserEntity */
+#ifndef TOLUA_DISABLE_tolua_get_cDropSpenserEntity___cBlockEntityWindowOwner__
+static int tolua_get_cDropSpenserEntity___cBlockEntityWindowOwner__(lua_State* tolua_S)
+{
+  cDropSpenserEntity* self = (cDropSpenserEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cBlockEntityWindowOwner__'",NULL);
+#endif
+#ifdef __cplusplus
+   tolua_pushusertype(tolua_S,(void*)static_cast<cBlockEntityWindowOwner*>(self), "cBlockEntityWindowOwner");
+#else
+   tolua_pushusertype(tolua_S,(void*)((cBlockEntityWindowOwner*)self), "cBlockEntityWindowOwner");
+#endif
+ return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -19053,6 +19304,40 @@ static int tolua_AllToLua_cFurnaceEntity_HasFuelTimeLeft00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'HasFuelTimeLeft'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: __cBlockEntityWindowOwner__ of class  cFurnaceEntity */
+#ifndef TOLUA_DISABLE_tolua_get_cFurnaceEntity___cBlockEntityWindowOwner__
+static int tolua_get_cFurnaceEntity___cBlockEntityWindowOwner__(lua_State* tolua_S)
+{
+  cFurnaceEntity* self = (cFurnaceEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cBlockEntityWindowOwner__'",NULL);
+#endif
+#ifdef __cplusplus
+   tolua_pushusertype(tolua_S,(void*)static_cast<cBlockEntityWindowOwner*>(self), "cBlockEntityWindowOwner");
+#else
+   tolua_pushusertype(tolua_S,(void*)((cBlockEntityWindowOwner*)self), "cBlockEntityWindowOwner");
+#endif
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: __cBlockEntityWindowOwner__ of class  cHopperEntity */
+#ifndef TOLUA_DISABLE_tolua_get_cHopperEntity___cBlockEntityWindowOwner__
+static int tolua_get_cHopperEntity___cBlockEntityWindowOwner__(lua_State* tolua_S)
+{
+  cHopperEntity* self = (cHopperEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cBlockEntityWindowOwner__'",NULL);
+#endif
+#ifdef __cplusplus
+   tolua_pushusertype(tolua_S,(void*)static_cast<cBlockEntityWindowOwner*>(self), "cBlockEntityWindowOwner");
+#else
+   tolua_pushusertype(tolua_S,(void*)((cBlockEntityWindowOwner*)self), "cBlockEntityWindowOwner");
+#endif
+ return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -29860,7 +30145,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_COLLECTING_PICKUP",cPluginManager::HOOK_COLLECTING_PICKUP);
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
-   tolua_constant(tolua_S,"HOOK_ENTITY_ANIMATION",cPluginManager::HOOK_ENTITY_ANIMATION);
+   tolua_constant(tolua_S,"HOOK_PLAYER_ANIMATION",cPluginManager::HOOK_PLAYER_ANIMATION);
    tolua_constant(tolua_S,"HOOK_EXECUTE_COMMAND",cPluginManager::HOOK_EXECUTE_COMMAND);
    tolua_constant(tolua_S,"HOOK_EXPLODED",cPluginManager::HOOK_EXPLODED);
    tolua_constant(tolua_S,"HOOK_EXPLODING",cPluginManager::HOOK_EXPLODING);
@@ -29946,6 +30231,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,".call",tolua_AllToLua_cLuaWindow_new00_local);
    tolua_function(tolua_S,"delete",tolua_AllToLua_cLuaWindow_delete00);
    tolua_function(tolua_S,"GetContents",tolua_AllToLua_cLuaWindow_GetContents00);
+   tolua_variable(tolua_S,"__cItemGrid__cListener__",tolua_get_cLuaWindow___cItemGrid__cListener__,NULL);
   tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"E_BLOCK_AIR",E_BLOCK_AIR);
   tolua_constant(tolua_S,"E_BLOCK_STONE",E_BLOCK_STONE);
@@ -30876,6 +31162,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddSpeedX",tolua_AllToLua_cEntity_AddSpeedX00);
    tolua_function(tolua_S,"AddSpeedY",tolua_AllToLua_cEntity_AddSpeedY00);
    tolua_function(tolua_S,"AddSpeedZ",tolua_AllToLua_cEntity_AddSpeedZ00);
+   tolua_function(tolua_S,"HandleSpeedFromAttachee",tolua_AllToLua_cEntity_HandleSpeedFromAttachee00);
    tolua_function(tolua_S,"SteerVehicle",tolua_AllToLua_cEntity_SteerVehicle00);
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cEntity_GetUniqueID00);
    tolua_function(tolua_S,"IsDestroyed",tolua_AllToLua_cEntity_IsDestroyed00);
@@ -30945,6 +31232,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsGameModeSurvival",tolua_AllToLua_cPlayer_IsGameModeSurvival00);
    tolua_function(tolua_S,"IsGameModeAdventure",tolua_AllToLua_cPlayer_IsGameModeAdventure00);
    tolua_function(tolua_S,"GetIP",tolua_AllToLua_cPlayer_GetIP00);
+   tolua_function(tolua_S,"ForceSetSpeed",tolua_AllToLua_cPlayer_ForceSetSpeed00);
    tolua_function(tolua_S,"MoveTo",tolua_AllToLua_cPlayer_MoveTo00);
    tolua_function(tolua_S,"GetWindow",tolua_AllToLua_cPlayer_GetWindow00);
    tolua_function(tolua_S,"CloseWindow",tolua_AllToLua_cPlayer_CloseWindow00);
@@ -30977,6 +31265,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddFoodExhaustion",tolua_AllToLua_cPlayer_AddFoodExhaustion00);
    tolua_function(tolua_S,"FoodPoison",tolua_AllToLua_cPlayer_FoodPoison00);
    tolua_function(tolua_S,"IsEating",tolua_AllToLua_cPlayer_IsEating00);
+   tolua_function(tolua_S,"IsFlying",tolua_AllToLua_cPlayer_IsFlying00);
    tolua_function(tolua_S,"Respawn",tolua_AllToLua_cPlayer_Respawn00);
    tolua_function(tolua_S,"SetVisible",tolua_AllToLua_cPlayer_SetVisible00);
    tolua_function(tolua_S,"IsVisible",tolua_AllToLua_cPlayer_IsVisible00);
@@ -30989,8 +31278,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetSprintingMaxSpeed",tolua_AllToLua_cPlayer_SetSprintingMaxSpeed00);
    tolua_function(tolua_S,"SetCrouch",tolua_AllToLua_cPlayer_SetCrouch00);
    tolua_function(tolua_S,"SetSprint",tolua_AllToLua_cPlayer_SetSprint00);
+   tolua_function(tolua_S,"SetFlying",tolua_AllToLua_cPlayer_SetFlying00);
+   tolua_function(tolua_S,"SetCanFly",tolua_AllToLua_cPlayer_SetCanFly00);
    tolua_function(tolua_S,"IsSwimming",tolua_AllToLua_cPlayer_IsSwimming00);
    tolua_function(tolua_S,"IsSubmerged",tolua_AllToLua_cPlayer_IsSubmerged00);
+   tolua_function(tolua_S,"CanFly",tolua_AllToLua_cPlayer_CanFly00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cPickup","cPickup","cEntity",tolua_collect_cPickup);
@@ -31064,6 +31356,29 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetCounterTime",tolua_AllToLua_cTNTEntity_GetCounterTime00);
    tolua_function(tolua_S,"GetMaxFuseTime",tolua_AllToLua_cTNTEntity_GetMaxFuseTime00);
   tolua_endmodule(tolua_S);
+  tolua_constant(tolua_S,"E_EFFECT_SPEED",E_EFFECT_SPEED);
+  tolua_constant(tolua_S,"E_EFFECT_SLOWNESS",E_EFFECT_SLOWNESS);
+  tolua_constant(tolua_S,"E_EFFECT_HASTE",E_EFFECT_HASTE);
+  tolua_constant(tolua_S,"E_EFFECT_MINING_FATIGUE",E_EFFECT_MINING_FATIGUE);
+  tolua_constant(tolua_S,"E_EFFECT_STENGTH",E_EFFECT_STENGTH);
+  tolua_constant(tolua_S,"E_EFFECT_INSTANT_HEALTH",E_EFFECT_INSTANT_HEALTH);
+  tolua_constant(tolua_S,"E_EFFECT_INSTANT_DAMAGE",E_EFFECT_INSTANT_DAMAGE);
+  tolua_constant(tolua_S,"E_EFFECT_JUMP_BOOST",E_EFFECT_JUMP_BOOST);
+  tolua_constant(tolua_S,"E_EFFECT_NAUSEA",E_EFFECT_NAUSEA);
+  tolua_constant(tolua_S,"E_EFFECT_REGENERATION",E_EFFECT_REGENERATION);
+  tolua_constant(tolua_S,"E_EFFECT_RESISTANCE",E_EFFECT_RESISTANCE);
+  tolua_constant(tolua_S,"E_EFFECT_FIRE_RESISTANCE",E_EFFECT_FIRE_RESISTANCE);
+  tolua_constant(tolua_S,"E_EFFECT_WATER_BREATHING",E_EFFECT_WATER_BREATHING);
+  tolua_constant(tolua_S,"E_EFFECT_INVISIBILITY",E_EFFECT_INVISIBILITY);
+  tolua_constant(tolua_S,"E_EFFECT_BLINDNESS",E_EFFECT_BLINDNESS);
+  tolua_constant(tolua_S,"E_EFFECT_NIGHT_VISION",E_EFFECT_NIGHT_VISION);
+  tolua_constant(tolua_S,"E_EFFECT_HUNGER",E_EFFECT_HUNGER);
+  tolua_constant(tolua_S,"E_EFFECT_WEAKNESS",E_EFFECT_WEAKNESS);
+  tolua_constant(tolua_S,"E_EFFECT_POISON",E_EFFECT_POISON);
+  tolua_constant(tolua_S,"E_EFFECT_WITHER",E_EFFECT_WITHER);
+  tolua_constant(tolua_S,"E_EFFECT_HEALTH_BOOST",E_EFFECT_HEALTH_BOOST);
+  tolua_constant(tolua_S,"E_EFFECT_ABSORPTION",E_EFFECT_ABSORPTION);
+  tolua_constant(tolua_S,"E_EFFECT_SATURATION",E_EFFECT_SATURATION);
   tolua_cclass(tolua_S,"cServer","cServer","",NULL);
   tolua_beginmodule(tolua_S,"cServer");
    tolua_function(tolua_S,"GetDescription",tolua_AllToLua_cServer_GetDescription00);
@@ -31357,6 +31672,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cChestEntity");
    tolua_constant(tolua_S,"ContentsHeight",cChestEntity::ContentsHeight);
    tolua_constant(tolua_S,"ContentsWidth",cChestEntity::ContentsWidth);
+   tolua_variable(tolua_S,"__cBlockEntityWindowOwner__",tolua_get_cChestEntity___cBlockEntityWindowOwner__,NULL);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cDropSpenserEntity","cDropSpenserEntity","cBlockEntityWithItems",NULL);
   tolua_beginmodule(tolua_S,"cDropSpenserEntity");
@@ -31365,6 +31681,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddDropSpenserDir",tolua_AllToLua_cDropSpenserEntity_AddDropSpenserDir00);
    tolua_function(tolua_S,"Activate",tolua_AllToLua_cDropSpenserEntity_Activate00);
    tolua_function(tolua_S,"SetRedstonePower",tolua_AllToLua_cDropSpenserEntity_SetRedstonePower00);
+   tolua_variable(tolua_S,"__cBlockEntityWindowOwner__",tolua_get_cDropSpenserEntity___cBlockEntityWindowOwner__,NULL);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cDispenserEntity","cDispenserEntity","cDropSpenserEntity",NULL);
   tolua_beginmodule(tolua_S,"cDispenserEntity");
@@ -31389,12 +31706,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetCookTimeLeft",tolua_AllToLua_cFurnaceEntity_GetCookTimeLeft00);
    tolua_function(tolua_S,"GetFuelBurnTimeLeft",tolua_AllToLua_cFurnaceEntity_GetFuelBurnTimeLeft00);
    tolua_function(tolua_S,"HasFuelTimeLeft",tolua_AllToLua_cFurnaceEntity_HasFuelTimeLeft00);
+   tolua_variable(tolua_S,"__cBlockEntityWindowOwner__",tolua_get_cFurnaceEntity___cBlockEntityWindowOwner__,NULL);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cHopperEntity","cHopperEntity","cBlockEntityWithItems",NULL);
   tolua_beginmodule(tolua_S,"cHopperEntity");
    tolua_constant(tolua_S,"ContentsHeight",cHopperEntity::ContentsHeight);
    tolua_constant(tolua_S,"ContentsWidth",cHopperEntity::ContentsWidth);
    tolua_constant(tolua_S,"TICKS_PER_TRANSFER",cHopperEntity::TICKS_PER_TRANSFER);
+   tolua_variable(tolua_S,"__cBlockEntityWindowOwner__",tolua_get_cHopperEntity___cBlockEntityWindowOwner__,NULL);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cJukeboxEntity","cJukeboxEntity","cBlockEntity",NULL);
   tolua_beginmodule(tolua_S,"cJukeboxEntity");

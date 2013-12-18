@@ -54,7 +54,7 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 			Destroy(true);
 		}
 		a_Distance.Normalize();
-        a_Distance *= ((float) (5.5 - Distance));
+		a_Distance *= ((float) (5.5 - Distance));
 		SetSpeedX( a_Distance.x );
 		SetSpeedY( a_Distance.y );
 		SetSpeedZ( a_Distance.z );

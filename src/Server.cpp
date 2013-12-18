@@ -402,7 +402,7 @@ void cServer::TickClients(float a_Dt)
 				itr = m_Clients.erase(itr);
 				continue;
 			}
-			(*itr)->Tick(a_Dt);
+			(*itr)->ServerTick(a_Dt);
 			++itr;
 		}  // for itr - m_Clients[]
 	}

@@ -29,7 +29,6 @@ class cExpOrb;
 class cPickup;
 class cPlayer;
 class cProtocol;
-class cRedstone;
 class cWindow;
 class cFallingBlock;
 class cItemHandler;
@@ -79,7 +78,11 @@ public:
 	
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
+	/// Called while the client is being ticked from the world via its cPlayer object
 	void Tick(float a_Dt);
+	
+	/// Called while the client is being ticked from the cServer object
+	void ServerTick(float a_Dt);
 
 	void Destroy(void);
 	
@@ -100,6 +103,7 @@ public:
 	void SendDestroyEntity       (const cEntity & a_Entity);
 	void SendDisconnect          (const AString & a_Reason);
 	void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendEntityEffect        (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
 	void SendEntityEquipment     (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook      (const cEntity & a_Entity);
 	void SendEntityLook          (const cEntity & a_Entity);
@@ -115,11 +119,13 @@ public:
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
+	void SendPlayerAbilities     (void);
 	void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline);
 	void SendPlayerMaxSpeed      (void);  ///< Informs the client of the maximum player speed (1.6.1+)
 	void SendPlayerMoveLook      (void);
 	void SendPlayerPosition      (void);
 	void SendPlayerSpawn         (const cPlayer & a_Player);
+	void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID);
 	void SendRespawn             (void);
 	void SendExperience          (void);
 	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
@@ -173,6 +179,7 @@ public:
 	void HandleKeepAlive        (int a_KeepAliveID);
 	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	void HandlePing             (void);
+	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
 	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
