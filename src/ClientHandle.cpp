@@ -998,7 +998,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	
 	// Not a command, broadcast as a simple message:
 	AString Msg;
-	Printf(Msg, "<%s%s%s> %s",
+	Printf(Msg, "%s<%s>%s %s",
 		m_Player->GetColor().c_str(),
 		m_Player->GetName().c_str(),
 		cChatColor::White.c_str(),
