@@ -2290,12 +2290,15 @@ void cClientHandle::SocketClosed(void)
 	
 	LOGD("Player %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 
-	if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected"))
+	if (m_Username != "") // Ignore client pings
 	{
-		AString DisconnectMessage;
-		Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
-		cRoot::Get()->BroadcastChat(DisconnectMessage);
-		LOGINFO("Player %s has left the game.", m_Username.c_str());
+		if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected"))
+		{
+			AString DisconnectMessage;
+			Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
+			cRoot::Get()->BroadcastChat(DisconnectMessage);
+			LOGINFO("Player %s has left the game.", m_Username.c_str());
+		}
 	}
 
 	Destroy();
