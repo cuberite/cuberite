@@ -124,9 +124,6 @@ typedef unsigned short     UInt16;
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
-#if !defined(ANDROID_NDK)
-	#include <tr1/memory>
-#endif
 #endif
 
 #if defined(ANDROID_NDK)
