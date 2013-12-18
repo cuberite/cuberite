@@ -1216,12 +1216,13 @@ void cClientHandle::HandleRespawn(void)
 
 void cClientHandle::HandleDisconnect(const AString & a_Reason)
 {
-	LOGD("Received d/c packet from \"%s\" with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
+	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
 	if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason))
 	{
 		AString DisconnectMessage;
-		Printf(DisconnectMessage, "%s disconnected: %s", m_Username.c_str(), a_Reason.c_str());
-		m_Player->GetWorld()->BroadcastChat(DisconnectMessage, this);
+		Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
+		cRoot::Get()->BroadcastChat(DisconnectMessage);
+		LOGINFO("Player %s has left the game.", m_Username.c_str());
 	}
 	m_HasSentDC = true;
 	Destroy();
@@ -2287,7 +2288,16 @@ void cClientHandle::SocketClosed(void)
 {
 	// The socket has been closed for any reason
 	
-	LOGD("Client \"%s\" @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
+	LOGD("Player %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
+
+	if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected"))
+	{
+		AString DisconnectMessage;
+		Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
+		cRoot::Get()->BroadcastChat(DisconnectMessage);
+		LOGINFO("Player %s has left the game.", m_Username.c_str());
+	}
+
 	Destroy();
 }
 
