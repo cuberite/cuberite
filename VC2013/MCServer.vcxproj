@@ -224,6 +224,7 @@
     <ResourceCompile Include="MCServer.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Entities\Floater.h" />
     <ClInclude Include="resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
     <ClInclude Include="..\src\BlockArea.h" />
@@ -628,6 +629,7 @@
     <ClCompile Include="..\src\Cuboid.cpp" />
     <ClCompile Include="..\src\DeadlockDetect.cpp" />
     <ClCompile Include="..\src\Enchantments.cpp" />
+    <ClCompile Include="..\src\Entities\Floater.cpp" />
     <ClCompile Include="..\src\FastRandom.cpp" />
     <ClCompile Include="..\src\FurnaceRecipe.cpp" />
     <ClCompile Include="..\src\Globals.cpp">
