@@ -3,7 +3,7 @@ compiler:
   - gcc
   - clang
 # Build MCServer
-script: make release=1 -j 2
+script: cmake . -DCMAKE_BUILD_TYPE=RELEASE && make -j 2
 
 # Notification Settings
 notifications:
