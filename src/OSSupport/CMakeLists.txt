@@ -8,3 +8,7 @@ file(GLOB SOURCE
 )
 
 add_library(OSSupport ${SOURCE})
+
+if(UNIX)
+	target_link_libraries(OSSupport pthread)
+endif()
