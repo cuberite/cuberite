@@ -2,5 +2,11 @@ language: cpp
 compiler:
   - gcc
   - clang
-# Change this to your needs
+# Build MCServer
 script: make release=1
+
+# Notification Settings
+notifications:
+  email:
+    on_success: change
+    on_failure: always
