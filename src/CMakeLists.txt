@@ -37,7 +37,6 @@ endforeach(folder)
 
 file(GLOB_RECURSE SOURCE
     "*.cpp"
-	"*.h"
 )
 
 
