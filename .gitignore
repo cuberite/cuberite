@@ -11,9 +11,11 @@ cloc.xsl
 *.user
 *.suo
 /EveryNight.cmd
-*.sublime-*
 
-# emacs stuff
+# IDE Stuff
+## Sublime Text
+*.sublime-*
+## emacs
 *.*~
 
 # world inside source
