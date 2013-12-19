@@ -2,7 +2,7 @@
 
 #include "Floater.h"
 #include "Player.h"
-#include "../Clienthandle.h"
+#include "../ClientHandle.h"
 
 cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_PlayerID) :
 	cEntity(etFloater, a_X, a_Y, a_Z, 0.98, 0.98),
