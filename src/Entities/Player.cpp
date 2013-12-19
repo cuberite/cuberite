@@ -1500,6 +1500,24 @@ bool cPlayer::LoadFromDisk()
 	//SetExperience(root.get("experience", 0).asInt());
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
+
+	if (m_GameMode == eGameMode_Creative)
+	{
+		m_CanFly = true;
+	}
+	else if (m_GameMode == eGameMode_NotSet)
+	{
+		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
+		if (World == NULL)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+
+		if (World->GetGameMode() == eGameMode_Creative)
+		{
+			m_CanFly = true;
+		}
+	}
 	
 	m_Inventory.LoadFromJson(root["inventory"]);
 
