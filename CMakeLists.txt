@@ -18,6 +18,7 @@ add_subdirectory(lib/tolua++/)
 add_subdirectory(lib/sqlite/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
+add_subdirectory(lib/md5/)
 
 #TODo: set -Wall -Werror -Wextra
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS_BAK}")
