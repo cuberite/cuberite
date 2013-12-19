@@ -4,4 +4,8 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-add_library(HTTPServer HTTPServer HTTPConnection HTTPFormParser HTTPMessage MultipartParser)
+file(GLOB SOURCE
+    "*.cpp"
+)
+
+add_library(HTTPServer ${SOURCE})
