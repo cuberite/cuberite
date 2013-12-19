@@ -264,9 +264,6 @@ void cClientHandle::Authenticate(void)
 	// Send experience
 	m_Player->SendExperience();
 	
-	// Send gamemode (1.6.1 movementSpeed):
-	SendGameMode(m_Player->GetGameMode());
-	
 	m_Player->Initialize(World);
 	m_State = csAuthenticated;
 
@@ -489,6 +486,9 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 
 void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed)
 {
+	UNUSED(FlyingSpeed); // Ignore the client values for these
+	UNUSED(WalkingSpeed);
+
 	m_Player->SetCanFly(a_CanFly);
 	m_Player->SetFlying(a_IsFlying);
 }
@@ -1065,7 +1065,29 @@ void cClientHandle::HandleAnimation(char a_Animation)
 		// Plugin disagrees, bail out
 		return;
 	}
-	
+
+	// Because the animation ID sent to servers by clients are different to those sent back, we need this
+	switch (a_Animation)
+	{
+		case 0: // No animation - wiki.vg doesn't say that client has something specific for it, so I suppose it will just become -1
+		case 1:
+		case 2:
+		case 3:
+		{
+			a_Animation--; // Offset by -1
+			break;
+		}
+		case 5: 
+		case 6:
+		case 7:
+		{
+			a_Animation -= 2; // Offset by -2
+			break;
+		}
+		default: // Anything else is the same
+			break;
+	}
+
 	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, a_Animation, this);
 }
 

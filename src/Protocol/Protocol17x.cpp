@@ -490,6 +490,7 @@ void cProtocol172::SendPlayerAbilities(void)
 	if (m_Client->GetPlayer()->IsGameModeCreative())
 	{
 		Flags |= 0x01;
+		Flags |= 0x08; // Godmode, used for creative
 	}
 	if (m_Client->GetPlayer()->IsFlying())
 	{
@@ -499,7 +500,6 @@ void cProtocol172::SendPlayerAbilities(void)
 	{
 		Flags |= 0x04;
 	}
-	// TODO: Other flags (god mode)
 	Pkt.WriteByte(Flags);
 	// TODO: Pkt.WriteFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
 	Pkt.WriteFloat(0.05f);
@@ -1291,23 +1291,16 @@ void cProtocol172::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, FlyingSpeed);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
 
-	bool IsFlying, CanFly;
+	bool IsFlying = false, CanFly = false;
 	if ((Flags & 2) != 0)
 	{
 		IsFlying = true;
-	}
-	else
-	{
-		IsFlying = false;
 	}
 	if ((Flags & 4) != 0)
 	{
 		CanFly = true;
 	}
-	else
-	{
-		CanFly = false;
-	}
+
 	m_Client->HandlePlayerAbilities(CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
 }
 

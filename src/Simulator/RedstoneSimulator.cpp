@@ -186,8 +186,32 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 		else
 		{
-			++itr;
+			itr++;
 		}
+	}
+
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end();)
+	{
+		int RelX = itr->a_BlockPos.x - a_ChunkX * cChunkDef::Width;
+		int RelZ = itr->a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
+
+		BLOCKTYPE SourceBlockType;
+		if (!a_Chunk->UnboundedRelGetBlockType(RelX, itr->a_BlockPos.y, RelZ, SourceBlockType))
+		{
+			continue;
+		}
+
+		if ((SourceBlockType != E_BLOCK_REDSTONE_REPEATER_ON) && (SourceBlockType != E_BLOCK_REDSTONE_REPEATER_OFF))
+		{
+			itr = m_RepeatersDelayList.erase(itr);
+			continue;
+		}
+		else if (itr->a_ElapsedTicks < itr->a_DelayTicks)
+		{
+			itr->a_ElapsedTicks++;
+		}
+
+		itr++;
 	}
 
 	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
@@ -564,9 +588,8 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 {
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	// We do this so that the repeater can continually update block power status (without being affected by it's own block type, which would happen if the block powering code was in an IF statement)
-	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false);
-	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3);
+	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false); // Cache if repeater is on
+	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is pwoered
 
 	if (IsSelfPowered && !IsOn) // Queue a power change if I am receiving power but not on
 	{
@@ -618,21 +641,19 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 					}
 				}
 
-				m_RepeatersDelayList.erase(itr);
+				// Removal of the data entry will be handled in SimChunk - we still want to continue trying to power blocks, even if our delay time has reached
+				// Otherwise, the power state of blocks in front won't update after we have powered on
 				return;
 			}
 			else
 			{
 				m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
-				m_RepeatersDelayList.erase(itr);
+				m_RepeatersDelayList.erase(itr); // We can remove off repeaters which don't need further updating
 				return;
 			}
 		}
-		else
-		{
-			itr->a_ElapsedTicks++;
-			return;
-		}
+
+		// Tick incrementing handled in SimChunk
 	}
 }
 
@@ -1271,6 +1292,15 @@ void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, in
 	{
 		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
+			if (ShouldPowerOn == itr->ShouldPowerOn) // We are queued already for the same thing, don't replace entry
+			{
+				return;
+			}
+
+			// Already in here (normal to allow repeater to continue on powering and updating blocks in front) - just update info and quit
+			itr->a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1;
+			itr->a_ElapsedTicks = 0;
+			itr->ShouldPowerOn = ShouldPowerOn;
 			return;
 		}
 	}

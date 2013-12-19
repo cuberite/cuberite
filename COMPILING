@@ -5,3 +5,4 @@ To compile MCServer on *nix, you need a GNUmake-compatible make that reads GNUma
 Run "make" to build a debug version (slow, but gives more info on crash)
 Run "make release=1" to build a release version (fast, less info on crash)
 Add addm32=1 to compile in 32-bit mode on 64-bit systems.
+Add `-j 4` to use 4 threads and speed up compilation on multi-core devices.

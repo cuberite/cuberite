@@ -253,6 +253,14 @@ public:
 	
 	/// Returns true if the player is currently flying.
 	bool IsFlying(void) const { return m_IsFlying; }
+
+	/// returns true if the player has thrown out a floater.
+	bool IsFishing(void) const { return m_IsFishing; }
+
+	void SetIsFishing(bool a_IsFishing, int a_FloaterID = -1) { m_IsFishing = a_IsFishing; m_FloaterID = a_FloaterID; }
+
+	int GetFloaterID(void) const { return m_FloaterID; }
+
 	// tolua_end
 	
 	/// Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet
@@ -429,6 +437,7 @@ protected:
 	bool m_IsFlying;
 	bool m_IsSwimming;
 	bool m_IsSubmerged;
+	bool m_IsFishing;
 
 	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.
 
@@ -445,6 +454,7 @@ protected:
 	bool m_IsChargingBow;
 	int  m_BowCharge;
 
+	int m_FloaterID;
 
 	virtual void Destroyed(void);
 
