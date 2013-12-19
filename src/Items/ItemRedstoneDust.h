@@ -27,6 +27,11 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
+		if (!g_BlockIsTorchPlaceable[a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)]) // Some solid blocks, such as cocoa beans, are not suitable for dust
+		{
+			return false;
+		}
+
 		a_BlockType = E_BLOCK_REDSTONE_WIRE;
 		a_BlockMeta = 0;
 		return true;
