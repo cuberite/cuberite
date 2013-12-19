@@ -945,6 +945,9 @@
     <ClInclude Include="..\src\HTTPServer\NameValueParser.h">
       <Filter>Source Files\HTTPServer</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Entities\Floater.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\webadmin\template.html">
@@ -1656,6 +1659,9 @@
     </ClCompile>
     <ClCompile Include="..\src\HTTPServer\NameValueParser.cpp">
       <Filter>Source Files\HTTPServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Entities\Floater.cpp">
+      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

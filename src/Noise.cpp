@@ -500,10 +500,10 @@ NOISE_DATATYPE cNoise::CubicNoise2D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) cons
 	
 	const NOISE_DATATYPE points[4][4] =
 	{
-		IntNoise2D(BaseX - 1, BaseY - 1), IntNoise2D(BaseX, BaseY - 1), IntNoise2D(BaseX + 1, BaseY - 1), IntNoise2D(BaseX + 2, BaseY - 1),
-		IntNoise2D(BaseX - 1, BaseY),     IntNoise2D(BaseX, BaseY),     IntNoise2D(BaseX + 1, BaseY),     IntNoise2D(BaseX + 2, BaseY),
-		IntNoise2D(BaseX - 1, BaseY + 1), IntNoise2D(BaseX, BaseY + 1), IntNoise2D(BaseX + 1, BaseY + 1), IntNoise2D(BaseX + 2, BaseY + 1),
-		IntNoise2D(BaseX - 1, BaseY + 2), IntNoise2D(BaseX, BaseY + 2), IntNoise2D(BaseX + 1, BaseY + 2), IntNoise2D(BaseX + 2, BaseY + 2),
+		{ IntNoise2D(BaseX - 1, BaseY - 1), IntNoise2D(BaseX, BaseY - 1), IntNoise2D(BaseX + 1, BaseY - 1), IntNoise2D(BaseX + 2, BaseY - 1), },
+		{ IntNoise2D(BaseX - 1, BaseY),     IntNoise2D(BaseX, BaseY),     IntNoise2D(BaseX + 1, BaseY),     IntNoise2D(BaseX + 2, BaseY),     },
+		{ IntNoise2D(BaseX - 1, BaseY + 1), IntNoise2D(BaseX, BaseY + 1), IntNoise2D(BaseX + 1, BaseY + 1), IntNoise2D(BaseX + 2, BaseY + 1), },
+		{ IntNoise2D(BaseX - 1, BaseY + 2), IntNoise2D(BaseX, BaseY + 2), IntNoise2D(BaseX + 1, BaseY + 2), IntNoise2D(BaseX + 2, BaseY + 2), },
 	};
 
 	const NOISE_DATATYPE FracX = a_X - BaseX;
@@ -528,10 +528,10 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 	const int	BaseZ = FAST_FLOOR(a_Z);
 	
 	const NOISE_DATATYPE points1[4][4] = { 
-		IntNoise3D(BaseX - 1, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ - 1),
-		IntNoise3D(BaseX - 1, BaseY,     BaseZ - 1), IntNoise3D(BaseX, BaseY,     BaseZ - 1), IntNoise3D(BaseX + 1, BaseY,     BaseZ - 1), IntNoise3D(BaseX + 2, BaseY,     BaseZ - 1),
-		IntNoise3D(BaseX - 1, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY + 1, BaseZ - 1),
-		IntNoise3D(BaseX - 1, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ - 1),
+		{ IntNoise3D(BaseX - 1, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ - 1), },
+		{ IntNoise3D(BaseX - 1, BaseY,     BaseZ - 1), IntNoise3D(BaseX, BaseY,     BaseZ - 1), IntNoise3D(BaseX + 1, BaseY,     BaseZ - 1), IntNoise3D(BaseX + 2, BaseY,     BaseZ - 1), },
+		{ IntNoise3D(BaseX - 1, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY + 1, BaseZ - 1), },
+		{ IntNoise3D(BaseX - 1, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ - 1), },
 	};
 
 	const NOISE_DATATYPE	FracX = (a_X) - BaseX;
@@ -541,10 +541,10 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 	const NOISE_DATATYPE x1interp4 = CubicInterpolate( points1[3][0], points1[3][1], points1[3][2], points1[3][3], FracX );
 
 	const NOISE_DATATYPE points2[4][4] = { 
-		IntNoise3D( BaseX-1, BaseY-1, BaseZ ), IntNoise3D( BaseX, BaseY-1, BaseZ ),	IntNoise3D( BaseX+1, BaseY-1, BaseZ ), IntNoise3D( BaseX+2, BaseY-1, BaseZ ),
-		IntNoise3D( BaseX-1, BaseY,	  BaseZ ), IntNoise3D( BaseX, BaseY,   BaseZ ),	IntNoise3D( BaseX+1, BaseY,   BaseZ ), IntNoise3D( BaseX+2, BaseY,   BaseZ ),
-		IntNoise3D( BaseX-1, BaseY+1, BaseZ ), IntNoise3D( BaseX, BaseY+1, BaseZ ),	IntNoise3D( BaseX+1, BaseY+1, BaseZ ), IntNoise3D( BaseX+2, BaseY+1, BaseZ ),
-		IntNoise3D( BaseX-1, BaseY+2, BaseZ ), IntNoise3D( BaseX, BaseY+2, BaseZ ),	IntNoise3D( BaseX+1, BaseY+2, BaseZ ), IntNoise3D( BaseX+2, BaseY+2, BaseZ ),
+		{ IntNoise3D( BaseX-1, BaseY-1, BaseZ ), IntNoise3D( BaseX, BaseY-1, BaseZ ),	IntNoise3D( BaseX+1, BaseY-1, BaseZ ), IntNoise3D( BaseX+2, BaseY-1, BaseZ ), },
+		{ IntNoise3D( BaseX-1, BaseY,	  BaseZ ), IntNoise3D( BaseX, BaseY,   BaseZ ),	IntNoise3D( BaseX+1, BaseY,   BaseZ ), IntNoise3D( BaseX+2, BaseY,   BaseZ ), },
+		{ IntNoise3D( BaseX-1, BaseY+1, BaseZ ), IntNoise3D( BaseX, BaseY+1, BaseZ ),	IntNoise3D( BaseX+1, BaseY+1, BaseZ ), IntNoise3D( BaseX+2, BaseY+1, BaseZ ), },
+		{ IntNoise3D( BaseX-1, BaseY+2, BaseZ ), IntNoise3D( BaseX, BaseY+2, BaseZ ),	IntNoise3D( BaseX+1, BaseY+2, BaseZ ), IntNoise3D( BaseX+2, BaseY+2, BaseZ ), },
 	};
 
 	const NOISE_DATATYPE x2interp1 = CubicInterpolate( points2[0][0], points2[0][1], points2[0][2], points2[0][3], FracX );
@@ -553,10 +553,10 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 	const NOISE_DATATYPE x2interp4 = CubicInterpolate( points2[3][0], points2[3][1], points2[3][2], points2[3][3], FracX );
 
 	const NOISE_DATATYPE points3[4][4] = { 
-		IntNoise3D( BaseX-1, BaseY-1, BaseZ+1 ), IntNoise3D( BaseX, BaseY-1, BaseZ+1 ),	IntNoise3D( BaseX+1, BaseY-1, BaseZ+1 ), IntNoise3D( BaseX+2, BaseY-1, BaseZ+1 ),
-		IntNoise3D( BaseX-1, BaseY,	  BaseZ+1 ), IntNoise3D( BaseX, BaseY,   BaseZ+1 ),	IntNoise3D( BaseX+1, BaseY,   BaseZ+1 ), IntNoise3D( BaseX+2, BaseY,   BaseZ+1 ),
-		IntNoise3D( BaseX-1, BaseY+1, BaseZ+1 ), IntNoise3D( BaseX, BaseY+1, BaseZ+1 ),	IntNoise3D( BaseX+1, BaseY+1, BaseZ+1 ), IntNoise3D( BaseX+2, BaseY+1, BaseZ+1 ),
-		IntNoise3D( BaseX-1, BaseY+2, BaseZ+1 ), IntNoise3D( BaseX, BaseY+2, BaseZ+1 ),	IntNoise3D( BaseX+1, BaseY+2, BaseZ+1 ), IntNoise3D( BaseX+2, BaseY+2, BaseZ+1 ),
+		{ IntNoise3D( BaseX-1, BaseY-1, BaseZ+1 ), IntNoise3D( BaseX, BaseY-1, BaseZ+1 ),	IntNoise3D( BaseX+1, BaseY-1, BaseZ+1 ), IntNoise3D( BaseX+2, BaseY-1, BaseZ + 1), },
+		{ IntNoise3D( BaseX-1, BaseY,	  BaseZ+1 ), IntNoise3D( BaseX, BaseY,   BaseZ+1 ),	IntNoise3D( BaseX+1, BaseY,   BaseZ+1 ), IntNoise3D( BaseX+2, BaseY,   BaseZ + 1), },
+		{ IntNoise3D( BaseX-1, BaseY+1, BaseZ+1 ), IntNoise3D( BaseX, BaseY+1, BaseZ+1 ),	IntNoise3D( BaseX+1, BaseY+1, BaseZ+1 ), IntNoise3D( BaseX+2, BaseY+1, BaseZ + 1), },
+		{ IntNoise3D( BaseX-1, BaseY+2, BaseZ+1 ), IntNoise3D( BaseX, BaseY+2, BaseZ+1 ),	IntNoise3D( BaseX+1, BaseY+2, BaseZ+1 ), IntNoise3D( BaseX+2, BaseY+2, BaseZ + 1), },
 	};
 
 	const NOISE_DATATYPE x3interp1 = CubicInterpolate( points3[0][0], points3[0][1], points3[0][2], points3[0][3], FracX );
@@ -565,10 +565,10 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 	const NOISE_DATATYPE x3interp4 = CubicInterpolate( points3[3][0], points3[3][1], points3[3][2], points3[3][3], FracX );
 
 	const NOISE_DATATYPE points4[4][4] = { 
-		IntNoise3D( BaseX-1, BaseY-1, BaseZ+2 ), IntNoise3D( BaseX, BaseY-1, BaseZ+2 ),	IntNoise3D( BaseX+1, BaseY-1, BaseZ+2 ), IntNoise3D( BaseX+2, BaseY-1, BaseZ+2 ),
-		IntNoise3D( BaseX-1, BaseY,	  BaseZ+2 ), IntNoise3D( BaseX, BaseY,   BaseZ+2 ),	IntNoise3D( BaseX+1, BaseY,   BaseZ+2 ), IntNoise3D( BaseX+2, BaseY,   BaseZ+2 ),
-		IntNoise3D( BaseX-1, BaseY+1, BaseZ+2 ), IntNoise3D( BaseX, BaseY+1, BaseZ+2 ),	IntNoise3D( BaseX+1, BaseY+1, BaseZ+2 ), IntNoise3D( BaseX+2, BaseY+1, BaseZ+2 ),
-		IntNoise3D( BaseX-1, BaseY+2, BaseZ+2 ), IntNoise3D( BaseX, BaseY+2, BaseZ+2 ),	IntNoise3D( BaseX+1, BaseY+2, BaseZ+2 ), IntNoise3D( BaseX+2, BaseY+2, BaseZ+2 ),
+		{ IntNoise3D( BaseX-1, BaseY-1, BaseZ+2 ), IntNoise3D( BaseX, BaseY-1, BaseZ+2 ),	IntNoise3D( BaseX+1, BaseY-1, BaseZ+2 ), IntNoise3D( BaseX+2, BaseY-1, BaseZ+2 ), },
+		{ IntNoise3D( BaseX-1, BaseY,	  BaseZ+2 ), IntNoise3D( BaseX, BaseY,   BaseZ+2 ),	IntNoise3D( BaseX+1, BaseY,   BaseZ+2 ), IntNoise3D( BaseX+2, BaseY,   BaseZ+2 ), },
+		{ IntNoise3D( BaseX-1, BaseY+1, BaseZ+2 ), IntNoise3D( BaseX, BaseY+1, BaseZ+2 ),	IntNoise3D( BaseX+1, BaseY+1, BaseZ+2 ), IntNoise3D( BaseX+2, BaseY+1, BaseZ+2 ), },
+		{ IntNoise3D( BaseX-1, BaseY+2, BaseZ+2 ), IntNoise3D( BaseX, BaseY+2, BaseZ+2 ),	IntNoise3D( BaseX+1, BaseY+2, BaseZ+2 ), IntNoise3D( BaseX+2, BaseY+2, BaseZ+2 ), },
 	};
 
 	const NOISE_DATATYPE x4interp1 = CubicInterpolate( points4[0][0], points4[0][1], points4[0][2], points4[0][3], FracX );

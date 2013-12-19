@@ -80,7 +80,7 @@ public:
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
 			if ((g_BlockOneHitDig[AboveDest] || g_BlockTransparent[AboveDest]) && !IsBlockWater(AboveDest))
 			{
-				Chunk->FastSetBlock(a_RelX + OfsX, a_RelY + OfsY, a_RelZ + OfsZ, E_BLOCK_GRASS, 0);
+				Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
 			}
 		}  // for i - repeat twice
 	}
