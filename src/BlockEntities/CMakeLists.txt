@@ -8,4 +8,4 @@ file(GLOB SOURCE
     "*.cpp"
 )
 
-add_library(Blocks ${SOURCE})
+add_library(BlockEntities ${SOURCE})

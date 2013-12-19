@@ -21,6 +21,7 @@ add_subdirectory(Mobs)
 add_subdirectory(Entities)
 add_subdirectory(Simulator)
 add_subdirectory(UI)
+add_subdirectory(BlockEntities)
 
 
 file(GLOB SOURCE
@@ -33,4 +34,4 @@ add_executable(../MCServer/MCServer ${SOURCE})
 
 target_link_libraries(../MCServer/MCServer OSSupport HTTPServer iniFile Bindings Items Blocks)
 target_link_libraries(../MCServer/MCServer Protocol Generating WorldStorage jsoncpp cryptopp)
-target_link_libraries(../MCServer/MCServer Mobs Entities Simulator UI zlib lua)
+target_link_libraries(../MCServer/MCServer Mobs Entities Simulator UI zlib lua BlockEntities)
