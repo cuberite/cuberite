@@ -13,4 +13,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/virtual_method_hooks.lua ${CMAKE_CURRENT_SOURCE_DIR}/AllToLua.pkg tolua
    )
 
-add_library(Bindings PluginManager LuaState WebPlugin Bindings)
+#add cpp files here
+add_library(Bindings PluginManager LuaState WebPlugin Bindings ManualBindings LuaWindow Plugin PluginLua WebPlugin)
+
+target_link_libraries(Bindings lua sqlite)
