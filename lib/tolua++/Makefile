@@ -109,6 +109,20 @@ tolua/fast:
 	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/build
 .PHONY : tolua/fast
 
+# Convenience name for target.
+lib/tolua++/CMakeFiles/tolualib.dir/rule:
+	cd /home/tycho/MCServer && $(MAKE) -f CMakeFiles/Makefile2 lib/tolua++/CMakeFiles/tolualib.dir/rule
+.PHONY : lib/tolua++/CMakeFiles/tolualib.dir/rule
+
+# Convenience name for target.
+tolualib: lib/tolua++/CMakeFiles/tolualib.dir/rule
+.PHONY : tolualib
+
+# fast build rule for target.
+tolualib/fast:
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/build
+.PHONY : tolualib/fast
+
 src/bin/tolua.o: src/bin/tolua.c.o
 .PHONY : src/bin/tolua.o
 
@@ -162,7 +176,7 @@ src/lib/tolua_event.o: src/lib/tolua_event.c.o
 
 # target to build an object file
 src/lib/tolua_event.c.o:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_event.c.o
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_event.c.o
 .PHONY : src/lib/tolua_event.c.o
 
 src/lib/tolua_event.i: src/lib/tolua_event.c.i
@@ -170,7 +184,7 @@ src/lib/tolua_event.i: src/lib/tolua_event.c.i
 
 # target to preprocess a source file
 src/lib/tolua_event.c.i:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_event.c.i
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_event.c.i
 .PHONY : src/lib/tolua_event.c.i
 
 src/lib/tolua_event.s: src/lib/tolua_event.c.s
@@ -178,7 +192,7 @@ src/lib/tolua_event.s: src/lib/tolua_event.c.s
 
 # target to generate assembly for a file
 src/lib/tolua_event.c.s:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_event.c.s
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_event.c.s
 .PHONY : src/lib/tolua_event.c.s
 
 src/lib/tolua_is.o: src/lib/tolua_is.c.o
@@ -186,7 +200,7 @@ src/lib/tolua_is.o: src/lib/tolua_is.c.o
 
 # target to build an object file
 src/lib/tolua_is.c.o:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_is.c.o
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_is.c.o
 .PHONY : src/lib/tolua_is.c.o
 
 src/lib/tolua_is.i: src/lib/tolua_is.c.i
@@ -194,7 +208,7 @@ src/lib/tolua_is.i: src/lib/tolua_is.c.i
 
 # target to preprocess a source file
 src/lib/tolua_is.c.i:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_is.c.i
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_is.c.i
 .PHONY : src/lib/tolua_is.c.i
 
 src/lib/tolua_is.s: src/lib/tolua_is.c.s
@@ -202,7 +216,7 @@ src/lib/tolua_is.s: src/lib/tolua_is.c.s
 
 # target to generate assembly for a file
 src/lib/tolua_is.c.s:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_is.c.s
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_is.c.s
 .PHONY : src/lib/tolua_is.c.s
 
 src/lib/tolua_map.o: src/lib/tolua_map.c.o
@@ -210,7 +224,7 @@ src/lib/tolua_map.o: src/lib/tolua_map.c.o
 
 # target to build an object file
 src/lib/tolua_map.c.o:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_map.c.o
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_map.c.o
 .PHONY : src/lib/tolua_map.c.o
 
 src/lib/tolua_map.i: src/lib/tolua_map.c.i
@@ -218,7 +232,7 @@ src/lib/tolua_map.i: src/lib/tolua_map.c.i
 
 # target to preprocess a source file
 src/lib/tolua_map.c.i:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_map.c.i
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_map.c.i
 .PHONY : src/lib/tolua_map.c.i
 
 src/lib/tolua_map.s: src/lib/tolua_map.c.s
@@ -226,7 +240,7 @@ src/lib/tolua_map.s: src/lib/tolua_map.c.s
 
 # target to generate assembly for a file
 src/lib/tolua_map.c.s:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_map.c.s
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_map.c.s
 .PHONY : src/lib/tolua_map.c.s
 
 src/lib/tolua_push.o: src/lib/tolua_push.c.o
@@ -234,7 +248,7 @@ src/lib/tolua_push.o: src/lib/tolua_push.c.o
 
 # target to build an object file
 src/lib/tolua_push.c.o:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_push.c.o
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_push.c.o
 .PHONY : src/lib/tolua_push.c.o
 
 src/lib/tolua_push.i: src/lib/tolua_push.c.i
@@ -242,7 +256,7 @@ src/lib/tolua_push.i: src/lib/tolua_push.c.i
 
 # target to preprocess a source file
 src/lib/tolua_push.c.i:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_push.c.i
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_push.c.i
 .PHONY : src/lib/tolua_push.c.i
 
 src/lib/tolua_push.s: src/lib/tolua_push.c.s
@@ -250,7 +264,7 @@ src/lib/tolua_push.s: src/lib/tolua_push.c.s
 
 # target to generate assembly for a file
 src/lib/tolua_push.c.s:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_push.c.s
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_push.c.s
 .PHONY : src/lib/tolua_push.c.s
 
 src/lib/tolua_to.o: src/lib/tolua_to.c.o
@@ -258,7 +272,7 @@ src/lib/tolua_to.o: src/lib/tolua_to.c.o
 
 # target to build an object file
 src/lib/tolua_to.c.o:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_to.c.o
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_to.c.o
 .PHONY : src/lib/tolua_to.c.o
 
 src/lib/tolua_to.i: src/lib/tolua_to.c.i
@@ -266,7 +280,7 @@ src/lib/tolua_to.i: src/lib/tolua_to.c.i
 
 # target to preprocess a source file
 src/lib/tolua_to.c.i:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_to.c.i
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_to.c.i
 .PHONY : src/lib/tolua_to.c.i
 
 src/lib/tolua_to.s: src/lib/tolua_to.c.s
@@ -274,7 +288,7 @@ src/lib/tolua_to.s: src/lib/tolua_to.c.s
 
 # target to generate assembly for a file
 src/lib/tolua_to.c.s:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolua.dir/build.make lib/tolua++/CMakeFiles/tolua.dir/src/lib/tolua_to.c.s
+	cd /home/tycho/MCServer && $(MAKE) -f lib/tolua++/CMakeFiles/tolualib.dir/build.make lib/tolua++/CMakeFiles/tolualib.dir/src/lib/tolua_to.c.s
 .PHONY : src/lib/tolua_to.c.s
 
 # Help Target
@@ -286,6 +300,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... tolua"
+	@echo "... tolualib"
 	@echo "... src/bin/tolua.o"
 	@echo "... src/bin/tolua.i"
 	@echo "... src/bin/tolua.s"

@@ -6,12 +6,16 @@ include_directories ("${PROJECT_SOURCE_DIR}/../../src/")
 include_directories ("${PROJECT_SOURCE_DIR}/include/")
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-file(GLOB SOURCE
-    "src/bin/*.c"
-	"src/lib/*.c"
+file(GLOB LIB_SOURCE
+    "src/lib/*.c"
 )
 
-add_executable(tolua ${SOURCE})
+file(GLOB BIN_SOURCE
+    "src/bin/*.c"
+)
+
+add_executable(tolua ${BIN_SOURCE})
+add_library(tolualib ${LIB_SOURCE})
 
 #m is the standard math librarys
-target_link_libraries(tolua lua m)
+target_link_libraries(tolua lua m tolualib)

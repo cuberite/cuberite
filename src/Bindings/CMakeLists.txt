@@ -16,4 +16,4 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 #add cpp files here
 add_library(Bindings PluginManager LuaState WebPlugin Bindings ManualBindings LuaWindow Plugin PluginLua WebPlugin)
 
-target_link_libraries(Bindings lua sqlite)
+target_link_libraries(Bindings lua sqlite tolualib)
