@@ -9,24 +9,39 @@ endif()
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
 
-add_subdirectory(OSSupport)
-add_subdirectory(HTTPServer)
-add_subdirectory(Bindings)
-add_subdirectory(Items)
-add_subdirectory(Blocks)
-add_subdirectory(Protocol)
-add_subdirectory(Generating)
-add_subdirectory(WorldStorage)
-add_subdirectory(Mobs)
-add_subdirectory(Entities)
-add_subdirectory(Simulator)
-add_subdirectory(UI)
-add_subdirectory(BlockEntities)
+set(FOLDERS OSSupport HTTPServer Bindings Items Blocks Protocol Generating) 
+set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities)
 
+if(NOT WIN32)
+
+foreach(folder ${FOLDERS})
+	add_subdirectory(${folder})
+endforeach(folder)
 
 file(GLOB SOURCE
     "*.cpp"
 )
+else()
+
+function(includefolder PATH)
+    FILE(GLOB FOLDER_FILES
+		"${PATH}/*.cpp"
+		"${PATH}/*.h"
+	)
+	source_group("Source Files\\${PATH}" FILES ${FOLDER_FILES}) 
+endfunction(includefolder) 
+
+foreach(folder ${FOLDERS})
+	includefolder(${folder})
+endforeach(folder)
+
+file(GLOB_RECURSE SOURCE
+    "*.cpp"
+	"*.h"
+)
+
+
+endif()
 
 list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")
 

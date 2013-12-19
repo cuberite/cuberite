@@ -50,3 +50,10 @@ install_mainfest.txt
 src/MCServer
 lib/tolua++/tolua
 src/Bindings/Bindings.*
+
+#win32 cmake stuff
+*.vcxproj
+*.vcxproj.filters
+*.opensdf
+*.sdf
+*.sln
