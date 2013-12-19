@@ -33,7 +33,7 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_World->GetTickRandomNumber(100) == 0)
 		{
-			SetSpeedY(-1);
+			SetPosY(GetPosY() - 1);
 			m_CanPickupItem = true;
 			m_PickupCountDown = 20;
 			LOGD("Floater %i can be picked up", GetUniqueID());
