@@ -28,7 +28,8 @@ function(includefolder PATH)
 		"${PATH}/*.cpp"
 		"${PATH}/*.h"
 	)
-	source_group("Source Files\\${PATH}" FILES ${FOLDER_FILES}) 
+	source_group("${PATH}" FILES ${FOLDER_FILES}) 
+
 endfunction(includefolder) 
 
 foreach(folder ${FOLDERS})
@@ -40,14 +41,23 @@ file(GLOB_RECURSE SOURCE
 	"*.h"
 )
 
+include_directories("${PROJECT_SOURCE_DIR}")
+
+source_group("" FILES ${SOURCE}) 
 
 endif()
 
 list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")
 
-add_executable(../MCServer/MCServer ${SOURCE})
+if(UNIX)
+	set(EXECUTABLE ../MCServer/MCServer)
+else()
+	set(EXECUTABLE MCServer)
+endif()
 
-target_link_libraries(../MCServer/MCServer OSSupport HTTPServer iniFile Bindings Items Blocks)
-target_link_libraries(../MCServer/MCServer Protocol Generating WorldStorage jsoncpp cryptopp)
-target_link_libraries(../MCServer/MCServer Mobs Entities Simulator UI zlib lua BlockEntities)
-target_link_libraries(../MCServer/MCServer md5 luaexpat)
+add_executable(${EXECUTABLE} ${SOURCE})
+
+target_link_libraries(${EXECUTABLE} OSSupport HTTPServer iniFile Bindings Items Blocks)
+target_link_libraries(${EXECUTABLE} Protocol Generating WorldStorage jsoncpp cryptopp)
+target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI zlib lua BlockEntities)
+target_link_libraries(${EXECUTABLE} md5 luaexpat)
