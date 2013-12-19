@@ -1,6 +1,10 @@
+
 Code Stuff
 ----------
 
+ * Because some devs use MSVC2008, we use C++03 - no C++11 magic for now at least :(
+ * Use the provided wrappers for OS stuff:
+  - Threading is done by inheriting from cIsThread, thread synchronization through cCriticalSection, cSemaphore and cEvent, file access and filesystem operations through the cFile class, high-precision timers through cTimer, high-precision sleep through cSleep
  * No magic numbers, use named constants:
   - E_ITEM_XXX, E_BLOCK_XXX and E_META_XXX for items and blocks
   - E_ENTITY_TYPE_XXX for mob types
