@@ -41,6 +41,8 @@ file(GLOB_RECURSE SOURCE
 	"*.h"
 )
 
+include_directories("${PROJECT_SOURCE_DIR}")
+
 source_group("" FILES ${SOURCE}) 
 
 endif()
