@@ -1,4 +1,3 @@
-
 -- main.lua
 
 -- Implements the plugin entrypoint (in this case the entire plugin)
@@ -233,8 +232,9 @@ end
 function DumpAPIHtml()
 	LOG("Moving static files.");
 	
-	for i in cFile:GetFolderContents("Static") do
-		cFile:Copy("Static/" .. i, "API/" .. i);	
+	local localFolder = g_Plugin:GetLocalFolder();
+	for k, v in cFile:GetFolderContents("Static") do
+		cFile:Copy(localFolder .. "/Static/" .. v, localFolder .. "/API/" .. v);	
 	end
 	
 	LOG("Dumping all available functions and constants to API subfolder...");
