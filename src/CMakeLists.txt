@@ -43,16 +43,25 @@ file(GLOB_RECURSE SOURCE
 
 include_directories("${PROJECT_SOURCE_DIR}")
 
-ADD_CUSTOM_COMMAND(
-#add any new generated bindings here
-   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_BINARY_DIR}/Bindings/Bindings.h
-#command execuded to regerate bindings
-   COMMAND tolua -L virtual_method_hooks.lua -o Bindings/Bindings.cpp -H Bindings/Bindings.h AllToLua.pkg
-#add any new generation dependencies here
-   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg tolua
-   )
-
 source_group("" FILES ${SOURCE}) 
+
+#precompiledheaders
+
+file(GLOB_RECURSE HEADERS
+	"*.h"
+)
+
+foreach(header ${HEADERS})
+	set(FLAGS "/Yu ${header} /Yc ${header}")
+	set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}         ${FLAGS}")
+	set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}           ${FLAGS}")
+	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   ${FLAGS}")
+	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     ${FLAGS}")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FLAGS}")
+	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   ${FLAGS}")
+	set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_PROFILE} ${FLAGS}")
+	set(CMAKE_C_FLAGS_PROFILE   "${CMAKE_C_FLAGS_PROFILE}   ${FLAGS}")
+endforeach()
 
 endif()
 
@@ -66,7 +75,9 @@ endif()
 
 add_executable(${EXECUTABLE} ${SOURCE})
 
-target_link_libraries(${EXECUTABLE} OSSupport HTTPServer iniFile Bindings Items Blocks)
-target_link_libraries(${EXECUTABLE} Protocol Generating WorldStorage jsoncpp cryptopp)
-target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI zlib lua BlockEntities)
-target_link_libraries(${EXECUTABLE} md5 luaexpat)
+if(NOT WIN32)
+target_link_libraries(${EXECUTABLE} OSSupport HTTPServer Bindings Items Blocks)
+target_link_libraries(${EXECUTABLE} Protocol Generating WorldStorage)
+target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI BlockEntities)
+endif()
+target_link_libraries(${EXECUTABLE} md5 luaexpat iniFile jsoncpp cryptopp zlib lua)
