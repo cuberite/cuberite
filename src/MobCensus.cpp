@@ -19,7 +19,6 @@ void cMobCensus::CollectMob(cMonster & a_Monster, cChunk & a_Chunk, double a_Dis
 
 bool cMobCensus::IsCapped(cMonster::eFamily a_MobFamily)
 {
-	bool toReturn = true;
 	const int ratio = 319; // this should be 256 as we are only supposed to take account from chunks that are in 17x17 from a player
 	// but for now, we use all chunks loaded by players. that means 19 x 19 chunks. That's why we use 256 * (19*19) / (17*17) = 319
 	// MG TODO : code the correct count	
@@ -42,9 +41,12 @@ int cMobCensus::GetCapMultiplier(cMonster::eFamily a_MobFamily)
 		case cMonster::mfPassive: return 11;
 		case cMonster::mfAmbient: return 16;
 		case cMonster::mfWater:   return 5;
+		default:
+		{
+			ASSERT(!"Unhandled mob family");
+			return -1;
+		}
 	}
-	ASSERT(!"Unhandled mob family");
-	return -1;
 }
 
 

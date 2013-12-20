@@ -188,7 +188,7 @@ void cProtocol132::DataReceived(const char * a_Data, int a_Size)
 		byte Decrypted[512];
 		while (a_Size > 0)
 		{
-			int NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
+			int NumBytes = (a_Size > (int)sizeof(Decrypted)) ? (int)sizeof(Decrypted) : a_Size;
 			m_Decryptor.ProcessData(Decrypted, (byte *)a_Data, NumBytes);
 			super::DataReceived((const char *)Decrypted, NumBytes);
 			a_Size -= NumBytes;
@@ -705,7 +705,7 @@ void cProtocol132::Flush(void)
 		byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
-			int NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
+			int NumBytes = (a_Size > (int)sizeof(Encrypted)) ? (int)sizeof(Encrypted) : a_Size;
 			m_Encryptor.ProcessData(Encrypted, (byte *)a_Data, NumBytes);
 			super::SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;
