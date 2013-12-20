@@ -18,4 +18,8 @@ add_executable(tolua ${BIN_SOURCE})
 add_library(tolualib ${LIB_SOURCE})
 
 #m is the standard math librarys
-target_link_libraries(tolua lua m tolualib)
+if(UNIX)
+target_link_libraries(m)
+endif()
+
+target_link_libraries(tolua lua tolualib)
