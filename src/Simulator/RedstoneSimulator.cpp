@@ -228,12 +228,13 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		int a_Z = BaseZ + dataitr->z;
 		switch (BlockType)
 		{
-			case E_BLOCK_BLOCK_OF_REDSTONE:		HandleRedstoneBlock(a_X, dataitr->y, a_Z);	break;
-			case E_BLOCK_LEVER: 				HandleRedstoneLever(a_X, dataitr->y, a_Z);	break;
-			case E_BLOCK_TNT:					HandleTNT(a_X, dataitr->y, a_Z);			break;
+			case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(a_X, dataitr->y, a_Z);	break;
+			case E_BLOCK_LEVER:                 HandleRedstoneLever(a_X, dataitr->y, a_Z);	break;
+			case E_BLOCK_TNT:                   HandleTNT(a_X, dataitr->y, a_Z);			break;
 			case E_BLOCK_TRAPDOOR:              HandleTrapdoor(a_X, dataitr->y, a_Z);       break;
-			case E_BLOCK_REDSTONE_WIRE:			HandleRedstoneWire(a_X, dataitr->y, a_Z);	break;
+			case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(a_X, dataitr->y, a_Z);	break;
 			case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(a_X, dataitr->y, a_Z);      break;
+			case E_BLOCK_DAYLIGHT_SENSOR:       HandleDaylightSensor(a_X, dataitr->y, a_Z); break;
 
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
@@ -611,7 +612,10 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 		{
 			if (itr->ShouldPowerOn)
 			{
-				m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta);
+				if (!IsOn)
+				{
+					m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // For performance
+				}
 
 				switch (a_Meta & 0x3) // We only want the direction (bottom) bits
 				{
@@ -647,7 +651,10 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 			}
 			else
 			{
-				m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
+				if (IsOn)
+				{
+					m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
+				}
 				m_RepeatersDelayList.erase(itr); // We can remove off repeaters which don't need further updating
 				return;
 			}
@@ -814,6 +821,7 @@ void cRedstoneSimulator::HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 			}
 			break;
 		}
+		default: LOGD("Unhandled type of rail in %s", __FUNCTION__);
 	}
 }
 
@@ -880,6 +888,18 @@ void cRedstoneSimulator::HandleNoteBlock(int a_BlockX, int a_BlockY, int a_Block
 		{
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
+	}
+}
+
+
+
+
+
+void cRedstoneSimulator::HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	if (m_World.GetBlockSkyLight(a_BlockX, a_BlockY + 1, a_BlockZ) > 10)
+	{
+		SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DAYLIGHT_SENSOR);
 	}
 }
 
@@ -1298,7 +1318,7 @@ void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, in
 			}
 
 			// Already in here (normal to allow repeater to continue on powering and updating blocks in front) - just update info and quit
-			itr->a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1;
+			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2; // See below for description
 			itr->a_ElapsedTicks = 0;
 			itr->ShouldPowerOn = ShouldPowerOn;
 			return;
@@ -1308,7 +1328,12 @@ void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, in
 	// Self not in list, add self to list
 	sRepeatersDelayList RC;
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
-	RC.a_DelayTicks = ((a_Meta & 0xC) >> 0x2) + 1; // Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
+	
+	// Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
+	// * 2 because apparently, MCS ticks are way faster than vanilla ticks, so repeater aren't noticeably delayed
+	RC.a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2;
+
+
 	RC.a_ElapsedTicks = 0;
 	RC.ShouldPowerOn = ShouldPowerOn;
 	m_RepeatersDelayList.push_back(RC);
