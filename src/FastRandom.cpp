@@ -108,7 +108,7 @@ int cFastRandom::NextInt(int a_Range)
 	int Counter = m_Counter++;
 	
 	// Use a_Range, m_Counter and m_Seed as inputs to the pseudorandom function:
-	int n = a_Range + m_Counter * 57 + m_Seed * 57 * 57;
+	int n = a_Range + Counter * 57 + m_Seed * 57 * 57;
 	n = (n << 13) ^ n;
 	n = ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff);
 	return ((n / 11) % a_Range);
@@ -127,7 +127,7 @@ int cFastRandom::NextInt(int a_Range, int a_Salt)
 	int Counter = m_Counter++;
 	
 	// Use a_Range, a_Salt, m_Counter and m_Seed as inputs to the pseudorandom function:
-	int n = a_Range + m_Counter * 57 + m_Seed * 57 * 57 + a_Salt * 57 * 57 * 57;
+	int n = a_Range + Counter * 57 + m_Seed * 57 * 57 + a_Salt * 57 * 57 * 57;
 	n = (n << 13) ^ n;
 	n = ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff);
 	return ((n / 11) % a_Range);
@@ -143,7 +143,7 @@ float cFastRandom::NextFloat(float a_Range)
 	int Counter = m_Counter++;
 	
 	// Use a_Range, a_Salt, m_Counter and m_Seed as inputs to the pseudorandom function:
-	int n = (int)a_Range + m_Counter * 57 + m_Seed * 57 * 57;
+	int n = (int)a_Range + Counter * 57 + m_Seed * 57 * 57;
 	n = (n << 13) ^ n;
 	n = ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff);
 	
@@ -161,7 +161,7 @@ float cFastRandom::NextFloat(float a_Range, int a_Salt)
 	int Counter = m_Counter++;
 	
 	// Use a_Range, a_Salt, m_Counter and m_Seed as inputs to the pseudorandom function:
-	int n = (int)a_Range + m_Counter * 57 + m_Seed * 57 * 57 + a_Salt * 57 * 57 * 57;
+	int n = (int)a_Range + Counter * 57 + m_Seed * 57 * 57 + a_Salt * 57 * 57 * 57;
 	n = (n << 13) ^ n;
 	n = ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff);
 	
