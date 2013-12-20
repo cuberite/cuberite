@@ -574,7 +574,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			} ;
 
 			bool IsNoAirSurrounding = true;
-			for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+			for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 			{
 				if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
 				{

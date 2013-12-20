@@ -467,7 +467,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 	cChunkDef::HeightMap HeightMap;
 	m_HeiGen.GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
 	HEIGHTTYPE MinHeight = HeightMap[0];
-	for (int i = 1; i < ARRAYCOUNT(HeightMap); i++)
+	for (size_t i = 1; i < ARRAYCOUNT(HeightMap); i++)
 	{
 		if (HeightMap[i] < MinHeight)
 		{
@@ -646,7 +646,7 @@ void cStructGenDirectOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
 bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
 {
 	cChunkDef::BiomeMap & Biomes = a_ChunkDesc.GetBiomeMap();
-	for (int i = 0; i < ARRAYCOUNT(Biomes); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 	{
 		switch (Biomes[i])
 		{
@@ -654,6 +654,10 @@ bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
 			case biExtremeHillsEdge:
 			{
 				return true;
+			}
+			default:
+			{
+				break;
 			}
 		}
 	}  // for i

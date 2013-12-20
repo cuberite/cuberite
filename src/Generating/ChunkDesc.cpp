@@ -371,7 +371,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
 {
 	HEIGHTTYPE MaxHeight = m_HeightMap[0];
-	for (unsigned int i = 1; i < ARRAYCOUNT(m_HeightMap); i++)
+	for (size_t i = 1; i < ARRAYCOUNT(m_HeightMap); i++)
 	{
 		if (m_HeightMap[i] > MaxHeight)
 		{
@@ -565,7 +565,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 {
 	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();
-	for (unsigned int i = 0; i < ARRAYCOUNT(a_DestMetas); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(a_DestMetas); i++)
 	{
 		a_DestMetas[i] = AreaMetas[2 * i] | (AreaMetas[2 * i + 1] << 4);
 	}

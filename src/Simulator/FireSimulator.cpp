@@ -241,7 +241,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		IsBlockBelowSolid = g_BlockIsSolid[BlockBelow];
 	}
 	
-	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 	{
 		BLOCKTYPE  BlockType;
 		NIBBLETYPE BlockMeta;
@@ -317,7 +317,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	for (int i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
 		BLOCKTYPE  BlockType;
 		NIBBLETYPE BlockMeta;
@@ -358,7 +358,7 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 		return false;
 	}
 	
-	for (int i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
 		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
 		{

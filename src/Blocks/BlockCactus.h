@@ -48,7 +48,7 @@ public:
 			{ 0, -1},
 			{ 0,  1},
 		} ;
-		for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;

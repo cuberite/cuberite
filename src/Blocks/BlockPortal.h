@@ -61,7 +61,7 @@ public:
 					{-1, 0,  0},
 				} ;
 
-				for (int i = 0; i < ARRAYCOUNT(PortalCheck); i++)
+				for (size_t i = 0; i < ARRAYCOUNT(PortalCheck); i++)
 				{
 					BLOCKTYPE Block;
 					a_Chunk.UnboundedRelGetBlockType(a_RelX + PortalCheck[i].x, a_RelY + PortalCheck[i].y, a_RelZ + PortalCheck[i].z, Block);
@@ -86,7 +86,7 @@ public:
 					{ 0, 0,  1},
 				} ;
 
-				for (int i = 0; i < ARRAYCOUNT(PortalCheck); i++)
+				for (size_t i = 0; i < ARRAYCOUNT(PortalCheck); i++)
 				{
 					BLOCKTYPE Block;
 					a_Chunk.UnboundedRelGetBlockType(a_RelX + PortalCheck[i].x, a_RelY + PortalCheck[i].y, a_RelZ + PortalCheck[i].z, Block);

@@ -2397,7 +2397,7 @@ cChunkMap::cChunkLayer::cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Pa
 
 cChunkMap::cChunkLayer::~cChunkLayer()
 {
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
 		delete m_Chunks[i];
 		m_Chunks[i] = NULL;  // // Must zero out, because further chunk deletions query the chunkmap for entities and that would touch deleted data
@@ -2457,7 +2457,7 @@ cChunk * cChunkMap::cChunkLayer::FindChunk(int a_ChunkX, int a_ChunkZ)
 
 void cChunkMap::cChunkLayer::CollectMobCensus(cMobCensus& a_ToFill)
 {
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		// We do count every Mobs in the world. But we are assuming that every chunk not loaded by any client
 		// doesn't affect us. Normally they should not have mobs because every "too far" mobs despawn
@@ -2476,7 +2476,7 @@ void cChunkMap::cChunkLayer::CollectMobCensus(cMobCensus& a_ToFill)
 
 void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner& a_MobSpawner)
 {
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		// We only spawn close to players
 		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->HasAnyClients())
@@ -2490,7 +2490,7 @@ void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 void cChunkMap::cChunkLayer::Tick(float a_Dt)
 {
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		// Only tick chunks that are valid and have clients:
 		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->HasAnyClients())
@@ -2506,7 +2506,7 @@ void cChunkMap::cChunkLayer::Tick(float a_Dt)
 
 void cChunkMap::cChunkLayer::RemoveClient(cClientHandle * a_Client)
 {
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		if (m_Chunks[i] != NULL)
 		{
@@ -2522,7 +2522,7 @@ void cChunkMap::cChunkLayer::RemoveClient(cClientHandle * a_Client)
 bool cChunkMap::cChunkLayer::ForEachEntity(cEntityCallback & a_Callback)
 {
 	// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid())
 		{
@@ -2542,7 +2542,7 @@ bool cChunkMap::cChunkLayer::ForEachEntity(cEntityCallback & a_Callback)
 bool cChunkMap::cChunkLayer::DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn)
 {
 	// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found.
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid())
 		{
@@ -2561,7 +2561,7 @@ bool cChunkMap::cChunkLayer::DoWithEntityByID(int a_EntityID, cEntityCallback & 
 
 bool cChunkMap::cChunkLayer::HasEntity(int a_EntityID)
 {
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid())
 		{
@@ -2581,7 +2581,7 @@ bool cChunkMap::cChunkLayer::HasEntity(int a_EntityID)
 int cChunkMap::cChunkLayer::GetNumChunksLoaded(void) const
 {
 	int NumChunks = 0;
-	for ( int i = 0; i < ARRAYCOUNT(m_Chunks); ++i )
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
 		if (m_Chunks[i] != NULL)
 		{
@@ -2599,7 +2599,7 @@ void cChunkMap::cChunkLayer::GetChunkStats(int & a_NumChunksValid, int & a_NumCh
 {
 	int NumValid = 0;
 	int NumDirty = 0;
-	for ( int i = 0; i < ARRAYCOUNT(m_Chunks); ++i )
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
 		if (m_Chunks[i] == NULL)
 		{
@@ -2622,7 +2622,7 @@ void cChunkMap::cChunkLayer::GetChunkStats(int & a_NumChunksValid, int & a_NumCh
 void cChunkMap::cChunkLayer::Save(void)
 {
 	cWorld * World = m_Parent->GetWorld();
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
 		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->IsDirty())
 		{
@@ -2637,7 +2637,7 @@ void cChunkMap::cChunkLayer::Save(void)
 
 void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 {
-	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		if (
 			(m_Chunks[i] != NULL) &&   // Is valid

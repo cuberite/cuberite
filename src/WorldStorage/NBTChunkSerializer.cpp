@@ -432,7 +432,7 @@ bool cNBTChunkSerializer::LightIsValid(bool a_IsLightValid)
 void cNBTChunkSerializer::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 {
 	memcpy(m_Biomes, a_BiomeMap, sizeof(m_Biomes));
-	for (int i = 0; i < ARRAYCOUNT(m_Biomes); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Biomes); i++)
 	{
 		if ((*a_BiomeMap)[i] < 255)
 		{

@@ -89,7 +89,7 @@ public:
 			{ 1,  0, 8},  // east,  XP
 		} ;
 		int res = 0;
-		for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
 			BLOCKTYPE  BlockType;
 			NIBBLETYPE BlockMeta;

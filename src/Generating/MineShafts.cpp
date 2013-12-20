@@ -1035,7 +1035,7 @@ void cMineShaftCrossing::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 		{ 5, 5,  2, dirXP},
 		{ 2, 5,  5, dirZP},
 	} ;
-	for (unsigned int i = 0; i < ARRAYCOUNT(Exits); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Exits); i++)
 	{
 		if (m_BoundingBox.p1.y + Exits[i].y >= m_BoundingBox.p2.y)
 		{

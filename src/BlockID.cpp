@@ -353,7 +353,7 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 		{biMesaPlateauM,         "MesaPlateauM"},
 	} ;
 	
-	for (int i = 0; i < ARRAYCOUNT(BiomeMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(BiomeMap); i++)
 	{
 		if (NoCaseCompare(BiomeMap[i].m_String, a_BiomeString) == 0)
 		{
@@ -403,7 +403,7 @@ int StringToMobType(const AString & a_MobString)
 		{cMonster::mtIronGolem,    "IronGolem"}, 
 		{cMonster::mtVillager,     "Villager"},
 	};
-	for (int i = 0; i < ARRAYCOUNT(MobMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(MobMap); i++)
 	{
 		if (NoCaseCompare(MobMap[i].m_String, a_MobString) == 0)
 		{
@@ -442,7 +442,7 @@ eDimension StringToDimension(const AString & a_DimensionString)
 		{ dimEnd,       "End"},
 		{ dimEnd,       "Sky"},  // Old name for End
 	} ;
-	for (int i = 0; i < ARRAYCOUNT(DimensionMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(DimensionMap); i++)
 	{
 		if (NoCaseCompare(DimensionMap[i].m_String, a_DimensionString) == 0)
 		{
@@ -549,7 +549,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtFireContact,   "dtInFire"},
 		{ dtAdmin,         "dtPlugin"},
 	} ;
-	for (int i = 0; i < ARRAYCOUNT(DamageTypeMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(DamageTypeMap); i++)
 	{
 		if (NoCaseCompare(DamageTypeMap[i].m_String, a_DamageTypeString) == 0)
 		{
@@ -594,14 +594,14 @@ public:
 		memset(g_BlockIsTorchPlaceable,    0x00, sizeof(g_BlockIsTorchPlaceable));
 		
 		// Setting bools to true must be done manually, see http://forum.mc-server.org/showthread.php?tid=629&pid=5415#pid5415
-		for (int i = 0; i < ARRAYCOUNT(g_BlockIsSnowable); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(g_BlockIsSnowable); i++)
 		{
 			g_BlockIsSnowable[i] = true;
 		}
 		memset(g_BlockRequiresSpecialTool, 0x00, sizeof(g_BlockRequiresSpecialTool));  // Set all blocks to false
 		
 		// Setting bools to true must be done manually, see http://forum.mc-server.org/showthread.php?tid=629&pid=5415#pid5415
-		for (int i = 0; i < ARRAYCOUNT(g_BlockIsSolid); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(g_BlockIsSolid); i++)
 		{
 			g_BlockIsSolid[i] = true;
 		}

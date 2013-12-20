@@ -571,7 +571,7 @@ void cMonster::SetSightDistance(float sd)
 AString cMonster::MobTypeToString(cMonster::eType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
-	for (int i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
 	{
 		if (g_MobTypeNames[i].m_Type == a_MobType)
 		{
