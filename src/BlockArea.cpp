@@ -131,7 +131,7 @@ static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 		case E_BLOCK_STATIONARY_LAVA:
 		{
 			a_DstType = a_SrcType;
-			a_DstMeta = a_DstMeta;
+			a_DstMeta = a_SrcMeta;
 			return;
 		}
 	}
@@ -820,7 +820,6 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 	int sx = (a_RelX1 < a_RelX2) ? 1 : -1;
 	int sy = (a_RelY1 < a_RelY2) ? 1 : -1;
 	int sz = (a_RelZ1 < a_RelZ2) ? 1 : -1;
-	int err = dx - dz;
 
 	if (dx >= std::max(dy, dz))  // x dominant
 	{
