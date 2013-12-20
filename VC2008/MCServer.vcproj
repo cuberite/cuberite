@@ -1359,6 +1359,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Entities\Floater.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Entities\Floater.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Entities\Minecart.cpp"
 					>
 				</File>
@@ -2564,6 +2572,10 @@
 				</File>
 				<File
 					RelativePath="..\src\items\ItemDye.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Items\ItemFishingRod.h"
 					>
 				</File>
 				<File

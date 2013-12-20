@@ -65,6 +65,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_IsSubmerged(false)
 	, m_IsFlying(false)
 	, m_CanFly(false)
+	, m_IsFishing(false)
+	, m_FloaterID(-1)
 	, m_EatingFinishTick(-1)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
@@ -1500,6 +1502,24 @@ bool cPlayer::LoadFromDisk()
 	//SetExperience(root.get("experience", 0).asInt());
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
+
+	if (m_GameMode == eGameMode_Creative)
+	{
+		m_CanFly = true;
+	}
+	else if (m_GameMode == eGameMode_NotSet)
+	{
+		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
+		if (World == NULL)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+
+		if (World->GetGameMode() == eGameMode_Creative)
+		{
+			m_CanFly = true;
+		}
+	}
 	
 	m_Inventory.LoadFromJson(root["inventory"]);
 
