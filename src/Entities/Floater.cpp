@@ -36,7 +36,7 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 	HandlePhysics(a_Dt, a_Chunk);
 	if (IsBlockWater(m_World->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ())))
 	{
-		if (m_World->GetTickRandomNumber(100) == 0)
+		if ((!m_CanPickupItem) && (m_World->GetTickRandomNumber(100) == 0))
 		{
 			SetPosY(GetPosY() - 1);
 			m_CanPickupItem = true;
@@ -45,7 +45,7 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			SetSpeedY(1);
+			SetSpeedY(0.7);
 		}
 	}
 	SetSpeedX(GetSpeedX() * 0.95);
