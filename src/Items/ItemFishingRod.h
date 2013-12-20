@@ -63,7 +63,7 @@ public:
 				Drops.Add(cItem(E_ITEM_RAW_FISH));
 				Vector3d FloaterPos(Callbacks.GetPos());
 				Vector3d FlyDirection(a_Player->GetPosition() - FloaterPos);
-				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.y, FlyDirection.z);
+				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.Length() / (FlyDirection.y * 2), FlyDirection.z);
 				// TODO: More types of pickups.
 			}
 		}
