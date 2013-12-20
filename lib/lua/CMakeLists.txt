@@ -14,4 +14,6 @@ else()
 add_library(lua SHARED ${SOURCE})
 endif()
 
+if(UNIX)
 target_link_libraries(lua m)
+endif()

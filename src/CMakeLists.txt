@@ -43,6 +43,15 @@ file(GLOB_RECURSE SOURCE
 
 include_directories("${PROJECT_SOURCE_DIR}")
 
+ADD_CUSTOM_COMMAND(
+#add any new generated bindings here
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_BINARY_DIR}/Bindings/Bindings.h
+#command execuded to regerate bindings
+   COMMAND tolua -L virtual_method_hooks.lua -o Bindings/Bindings.cpp -H Bindings/Bindings.h AllToLua.pkg
+#add any new generation dependencies here
+   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg tolua
+   )
+
 source_group("" FILES ${SOURCE}) 
 
 endif()
