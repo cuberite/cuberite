@@ -10,3 +10,4 @@ file(GLOB SOURCE
 
 add_library(lua ${SOURCE})
 
+target_link_libraries(lua m)
