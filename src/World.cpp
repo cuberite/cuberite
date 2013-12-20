@@ -229,16 +229,16 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
+	m_IsSpawnExplicitlySet(false),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
+	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
-	m_TickThread(*this),
-	m_SkyDarkness(0),
-	m_bSpawnExplicitlySet(false)
+	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -329,7 +329,7 @@ void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::InitializeSpawn(void)
 {
-	if (!m_bSpawnExplicitlySet) // Check if spawn position was already explicitly set or not
+	if (!m_IsSpawnExplicitlySet) // Check if spawn position was already explicitly set or not
 	{
 		GenerateRandomSpawn(); // Generate random solid-land coordinate and then write it to the world configuration
 
@@ -487,7 +487,7 @@ void cWorld::Start(void)
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
-	m_bSpawnExplicitlySet =
+	m_IsSpawnExplicitlySet =
 	(
 		(KeyNum >= 0) &&
 		(
@@ -497,7 +497,7 @@ void cWorld::Start(void)
 		)
 	);
 
-	if (m_bSpawnExplicitlySet)
+	if (m_IsSpawnExplicitlySet)
 	{
 		LOGD("Spawnpoint explicitly set!");
 		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);

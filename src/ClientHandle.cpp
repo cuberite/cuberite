@@ -77,27 +77,26 @@ int cClientHandle::s_ClientCount = 0;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
-cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
-	: m_ViewDistance(a_ViewDistance)
-	, m_IPString(a_Socket->GetIPString())
-	, m_OutgoingData(64 KiB)
-	, m_Player(NULL)
-	, m_HasSentDC(false)
-	, m_TimeSinceLastPacket(0)
-	, m_bKeepThreadGoing(true)
-	, m_Ping(1000)
-	, m_PingID(1)
-	, m_TicksSinceDestruction(0)
-	, m_State(csConnected)
-	, m_LastStreamedChunkX(0x7fffffff)  // bogus chunk coords to force streaming upon login
-	, m_LastStreamedChunkZ(0x7fffffff)
-	, m_ShouldCheckDownloaded(false)
-	, m_UniqueID(0)
-	, m_BlockDigAnimStage(-1)
-	, m_HasStartedDigging(false)
-	, m_CurrentExplosionTick(0)
-	, m_RunningSumExplosions(0)
-	, m_HasSentPlayerChunk(false)
+cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
+	m_ViewDistance(a_ViewDistance),
+	m_IPString(a_Socket->GetIPString()),
+	m_OutgoingData(64 KiB),
+	m_Player(NULL),
+	m_HasSentDC(false),
+	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
+	m_LastStreamedChunkZ(0x7fffffff),
+	m_TimeSinceLastPacket(0),
+	m_Ping(1000),
+	m_PingID(1),
+	m_BlockDigAnimStage(-1),
+	m_HasStartedDigging(false),
+	m_TicksSinceDestruction(0),
+	m_State(csConnected),
+	m_ShouldCheckDownloaded(false),
+	m_CurrentExplosionTick(0),
+	m_RunningSumExplosions(0),
+	m_UniqueID(0),
+	m_HasSentPlayerChunk(false)
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	

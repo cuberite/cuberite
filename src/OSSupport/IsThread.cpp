@@ -51,8 +51,8 @@ static void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
 // cIsThread:
 
 cIsThread::cIsThread(const AString & iThreadName) :
-	m_ThreadName(iThreadName),
 	m_ShouldTerminate(false),
+	m_ThreadName(iThreadName),
 	m_Handle(NULL_HANDLE)
 {
 }
@@ -144,7 +144,7 @@ bool cIsThread::Wait(void)
 		return (res == WAIT_OBJECT_0);
 	#else  // _WIN32
 		int res = pthread_join(m_Handle, NULL);
-		m_Handle = NULL;
+		m_Handle = NULL_HANDLE;
 		
 		#ifdef LOGD  // ProtoProxy doesn't have LOGD
 			LOGD("Thread %s finished", m_ThreadName.c_str());
