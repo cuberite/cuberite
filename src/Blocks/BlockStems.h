@@ -32,7 +32,7 @@ public:
 			// Grow the produce:
 			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-			a_Chunk.GetWorld()->GrowMelonPumpkin(BlockX, a_RelY, a_RelZ, m_BlockType);
+			a_Chunk.GetWorld()->GrowMelonPumpkin(BlockX, a_RelY, BlockZ, m_BlockType);
 		}
 		else
 		{

@@ -39,7 +39,7 @@ public:
 	void DoTest2(void)
 	{
 		float In[3 * 3 * 3];
-		for (int i = 0; i < ARRAYCOUNT(In); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(In); i++)
 		{
 			In[i] = (float)(i % 5);
 		}

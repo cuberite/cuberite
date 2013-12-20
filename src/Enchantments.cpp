@@ -181,7 +181,7 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 		{ enchLuckOfTheSea,         "LuckOfTheSea"},
 		{ enchLure,                 "Lure"},
 	} ;
-	for (int i = 0; i < ARRAYCOUNT(EnchantmentNames); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(EnchantmentNames); i++)
 	{
 		if (NoCaseCompare(EnchantmentNames[i].m_Name, a_EnchantmentName) == 0)
 		{

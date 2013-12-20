@@ -275,7 +275,7 @@ void cChunkSender::Entity(cEntity * a_Entity)
 
 void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 {
-	for (int i = 0; i < ARRAYCOUNT(m_BiomeMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_BiomeMap); i++)
 	{
 		if ((*a_BiomeMap)[i] < 255)
 		{

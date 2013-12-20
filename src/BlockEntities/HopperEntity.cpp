@@ -290,7 +290,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		{0, 1},
 		{0, -1},
 	} ;
-	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
 		int x = m_RelX + Coords[i].x;
 		int z = m_RelZ + Coords[i].z;
@@ -447,7 +447,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		{0, 1},
 		{0, -1},
 	} ;
-	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
 		int x = m_RelX + Coords[i].x;
 		int z = m_RelZ + Coords[i].z;

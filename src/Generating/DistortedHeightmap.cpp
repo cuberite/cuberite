@@ -612,7 +612,7 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 	// For each biome type that has a nonzero count, calc its amps and add it:
 	NOISE_DATATYPE AmpX = 0;
 	NOISE_DATATYPE AmpZ = 0;
-	for (unsigned int i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
 	{
 		if (BiomeCounts[i] <= 0)
 		{

@@ -18,7 +18,7 @@
 
 void cHeiGenFlat::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
 {
-	for (int i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
 	{
 		a_HeightMap[i] = m_Height;
 	}
@@ -421,7 +421,7 @@ NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, 
 		NOISE_DATATYPE Height = 0;
 		int BlockX = a_ChunkX * cChunkDef::Width + a_RelX;
 		int BlockZ = a_ChunkZ * cChunkDef::Width + a_RelZ;
-		for (int i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
 		{
 			if (BiomeCounts[i] == 0)
 			{

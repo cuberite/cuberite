@@ -83,7 +83,7 @@ cBiomeGen * cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a
 
 void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	for (int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
 		a_BiomeMap[i] = m_Biome;
 	}
@@ -277,7 +277,7 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 		biJungleHills,
 	} ;
 	m_Biomes.reserve(ARRAYCOUNT(Biomes));
-	for (int i = 0; i < ARRAYCOUNT(Biomes); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 	{
 		m_Biomes.push_back(Biomes[i]);
 	}
@@ -655,7 +655,7 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 	LinearUpscale2DArrayInPlace(HumidityMap,    17, 17, 8, 8);
 	
 	// Re-map into integral values in [0 .. 255] range:
-	for (int idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
+	for (size_t idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
 	{
 		a_TemperatureMap[idx] = std::max(0, std::min(255, (int)(128 + TemperatureMap[idx] * 128)));
 		a_HumidityMap[idx]    = std::max(0, std::min(255, (int)(128 + HumidityMap[idx]    * 128)));

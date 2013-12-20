@@ -58,6 +58,14 @@ public:
 	
 protected:
 
+	enum
+	{
+		// Offsets to individual components in the joined blockdata array
+		MetaOffset     = cChunkDef::NumBlocks,
+		LightOffset    = MetaOffset  + cChunkDef::NumBlocks / 2,
+		SkyLightOffset = LightOffset + cChunkDef::NumBlocks / 2,
+	} ;
+	
 	struct sChunkHeader;
 	typedef std::vector<sChunkHeader *> sChunkHeaders;
 	

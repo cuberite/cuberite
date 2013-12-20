@@ -65,10 +65,10 @@ void cBlockDoorHandler::OnPlacedByPlayer(
 {
 	NIBBLETYPE a_TopBlockMeta = 8;
 	if (
-		(a_BlockMeta == 0) && (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ - 1) == m_BlockType) ||
-		(a_BlockMeta == 1) && (a_World->GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == m_BlockType) ||
-		(a_BlockMeta == 2) && (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == m_BlockType) ||
-		(a_BlockMeta == 3) && (a_World->GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == m_BlockType)
+		((a_BlockMeta == 0) && (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ - 1) == m_BlockType)) ||
+		((a_BlockMeta == 1) && (a_World->GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == m_BlockType)) ||
+		((a_BlockMeta == 2) && (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == m_BlockType)) ||
+		((a_BlockMeta == 3) && (a_World->GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == m_BlockType))
 	)
 	{
 		a_TopBlockMeta = 9;

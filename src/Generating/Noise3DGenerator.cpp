@@ -30,7 +30,7 @@ public:
 	void DoTest1(void)
 	{
 		float In[3 * 3 * 3];
-		for (int i = 0; i < ARRAYCOUNT(In); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(In); i++)
 		{
 			In[i] = (float)(i % 5);
 		}
@@ -44,7 +44,7 @@ public:
 	void DoTest2(void)
 	{
 		float In[3 * 3];
-		for (int i = 0; i < ARRAYCOUNT(In); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(In); i++)
 		{
 			In[i] = (float)(i % 5);
 		}
@@ -170,7 +170,7 @@ void cNoise3DGenerator::Initialize(cWorld * a_World, cIniFile & a_IniFile)
 
 void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	for (unsigned int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
 		a_BiomeMap[i] = biExtremeHills;
 	}
@@ -236,7 +236,7 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	// Precalculate a "height" array:
 	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
 	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 25, EndX / 25, StartZ / 25, EndZ / 25);
-	for (unsigned int i = 0; i < ARRAYCOUNT(Height); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Height); i++)
 	{
 		Height[i] = abs(Height[i]) * m_HeightAmplification + 1;
 	}

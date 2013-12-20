@@ -137,7 +137,7 @@ void cDelayedFluidSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_Chunk
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
 	
 	// Simulate all the blocks in the scheduled slot:
-	for (int i = 0; i < ARRAYCOUNT(Slot.m_Blocks); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Slot.m_Blocks); i++)
 	{
 		cCoordWithIntVector & Blocks = Slot.m_Blocks[i];
 		if (Blocks.empty())

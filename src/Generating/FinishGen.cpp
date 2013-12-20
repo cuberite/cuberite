@@ -271,7 +271,7 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 int cFinishGenSingleBiomeSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
 {
 	int res = 0;
-	for (int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
 		if (a_BiomeMap[i] == m_Biome)
 		{
@@ -469,7 +469,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 					{0, -1, 0}
 				} ;
 				BLOCKTYPE BlockToSet = a_StationaryFluid;  // By default, don't simulate this block
-				for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 				{
 					if ((y == 0) && (Coords[i].y < 0))
 					{
@@ -635,7 +635,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 		{ 0,  0,  1},
 	} ;
 	int NumAirNeighbors = 0;
-	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
 		switch (a_ChunkDesc.GetBlockType(x + Coords[i].x, y + Coords[i].y, z + Coords[i].z))
 		{

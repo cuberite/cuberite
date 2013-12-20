@@ -151,7 +151,7 @@ void cEndGen::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_
 {
 	if (IsChunkOutsideRange(a_ChunkX, a_ChunkZ))
 	{
-		for (unsigned int i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
 		{
 			a_HeightMap[i] = 0;
 		}

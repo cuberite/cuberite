@@ -469,7 +469,7 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap 
 		return NULL;
 	}
 	const unsigned char * VanillaBiomeData = (const unsigned char *)(a_NBT.GetData(a_TagIdx));
-	for (int i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
 	{
 		if ((VanillaBiomeData)[i] == 0xff)
 		{
@@ -497,7 +497,7 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_Bio
 		return NULL;
 	}
 	const int * BiomeData = (const int *)(a_NBT.GetData(a_TagIdx));
-	for (int i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
 	{
 		(*a_BiomeMap)[i] = (EMCSBiome)(ntohl(BiomeData[i]));
 		if ((*a_BiomeMap)[i] == 0xff)
@@ -1538,7 +1538,7 @@ unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const
 	
 	// Doesn't fit, append to the end of file (we're wasting a lot of space, TODO: fix this later)
 	unsigned MaxLocation = 2 << 8;  // Minimum sector is #2 - after the headers
-	for (int i = 0; i < ARRAYCOUNT(m_Header); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_Header); i++)
 	{
 		ChunkLocation = ntohl(m_Header[i]);
 		ChunkLocation = ChunkLocation + ((ChunkLocation & 0xff) << 8);  // Add the number of sectors used; don't care about the 4th byte

@@ -39,7 +39,7 @@ public:
 	} ;
 	
 	cHTTPConnection(cHTTPServer & a_HTTPServer);
-	~cHTTPConnection();
+	virtual ~cHTTPConnection();
 	
 	/// Sends HTTP status code together with a_Reason (used for HTTP errors)
 	void SendStatusAndReason(int a_StatusCode, const AString & a_Reason);

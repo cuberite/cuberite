@@ -633,11 +633,6 @@ void cChunk::Tick(float a_Dt)
 void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
 	unsigned Index = MakeIndex(a_RelX, a_RelY, a_RelZ);
-	if (Index == INDEX_OUT_OF_RANGE)
-	{
-		// An assert has already been made in MakeIndex()
-		return;
-	}
 	cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 	Handler->OnUpdate(*this, a_RelX, a_RelY, a_RelZ);
@@ -1492,7 +1487,7 @@ void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 		{ 0,  0,  1},
 		{ 0,  0, -1},
 	} ;
-	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
 		UnboundedQueueTickBlock(a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z);
 	}  // for i - Coords[]

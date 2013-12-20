@@ -143,7 +143,7 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 			Vector3i( 0, 0,  1),
 			Vector3i( 0, 0, -1),
 		} ;
-		for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
 			if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
 			{
@@ -309,7 +309,7 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 	} ;
 	
 	int NumNeeded = m_NumNeighborsForSource;
-	for (int i = 0; i < ARRAYCOUNT(NeighborCoords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(NeighborCoords); i++)
 	{
 		int x = a_RelX + NeighborCoords[i].x;
 		int y = a_RelY + NeighborCoords[i].y;

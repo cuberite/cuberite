@@ -30,7 +30,7 @@ public:
 			Vector3d(1.999, 0, 1.5), Vector3d(1.999, 4, 1.5),  // Should intersect at 0.25, face 0 (YM)
 			Vector3d(2.001, 0, 1.5), Vector3d(2.001, 4, 1.5),  // Should not intersect
 		} ;
-		for (int i = 0; i < ARRAYCOUNT(LineDefs) / 2; i++)
+		for (size_t i = 0; i < ARRAYCOUNT(LineDefs) / 2; i++)
 		{
 			double LineCoeff;
 			char Face;
