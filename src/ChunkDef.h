@@ -152,17 +152,16 @@ enum EMCSBiome
 class cChunkDef
 {
 public:
-	static const int Width = 16;
-	static const int Height = 256;
-	static const int NumBlocks = Width * Height * Width;
-	static const int BlockDataSize = NumBlocks * 2 + (NumBlocks / 2); // 2.5 * numblocks
-	
-	// Offsets to individual components in the joined blockdata array
-	static const int MetaOffset     = NumBlocks;
-	static const int LightOffset    = MetaOffset + NumBlocks / 2;
-	static const int SkyLightOffset = LightOffset + NumBlocks / 2;
-
-	static const unsigned int INDEX_OUT_OF_RANGE = 0xffffffff;
+	enum
+	{
+		// Chunk dimensions:
+		Width = 16,
+		Height = 256,
+		NumBlocks = Width * Height * Width,
+		
+		/// If the data is collected into a single buffer, how large it needs to be:
+		BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2),  // 2.5 * numblocks
+	} ;
 
 	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
@@ -216,8 +215,9 @@ public:
 		{
 			return MakeIndexNoCheck(x, y, z);
 		}
+		LOGERROR("cChunkDef::MakeIndex(): coords out of range: {%d, %d, %d}; returning fake index 0", x, y, z);
 		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
-		return INDEX_OUT_OF_RANGE;
+		return 0;
 	}
 
 

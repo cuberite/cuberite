@@ -871,9 +871,9 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 	}
 
 	BLOCKTYPE *  BlockData  = (BLOCKTYPE *)UncompressedData.data();
-	NIBBLETYPE * MetaData   = (NIBBLETYPE *)(BlockData + cChunkDef::MetaOffset);
-	NIBBLETYPE * BlockLight = (NIBBLETYPE *)(BlockData + cChunkDef::LightOffset);
-	NIBBLETYPE * SkyLight   = (NIBBLETYPE *)(BlockData + cChunkDef::SkyLightOffset);
+	NIBBLETYPE * MetaData   = (NIBBLETYPE *)(BlockData + MetaOffset);
+	NIBBLETYPE * BlockLight = (NIBBLETYPE *)(BlockData + LightOffset);
+	NIBBLETYPE * SkyLight   = (NIBBLETYPE *)(BlockData + SkyLightOffset);
 	
 	a_World->SetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
