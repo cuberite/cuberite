@@ -647,7 +647,7 @@ private:
 	/// This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe)
 	MTRand m_TickRand;
 
-	bool m_bSpawnExplicitlySet;
+	bool m_IsSpawnExplicitlySet;
 	double m_SpawnX;
 	double m_SpawnY;
 	double m_SpawnZ;

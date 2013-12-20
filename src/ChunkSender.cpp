@@ -35,8 +35,8 @@ void cNotifyChunkSender::Call(int a_ChunkX, int a_ChunkZ)
 cChunkSender::cChunkSender(void) :
 	super("ChunkSender"),
 	m_World(NULL),
-	m_Notify(NULL),
-	m_RemoveCount(0)
+	m_RemoveCount(0),
+	m_Notify(NULL)
 {
 	m_Notify.SetChunkSender(this);
 }
