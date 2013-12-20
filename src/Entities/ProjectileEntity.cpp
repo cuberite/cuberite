@@ -420,9 +420,9 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	m_DamageCoeff(2),
 	m_IsCritical((a_Force >= 1)),
 	m_Timer(0),
+	m_HitGroundTimer(0),
 	m_bIsCollected(false),
-	m_HitBlockPos(0, 0, 0),
-	m_HitGroundTimer(0)
+	m_HitBlockPos(0, 0, 0)
 {
 }
 

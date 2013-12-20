@@ -51,13 +51,13 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_TicksSinceLastBurnDamage(0)
 	, m_TicksSinceLastLavaDamage(0)
 	, m_TicksSinceLastFireDamage(0)
-	, m_TicksSinceLastVoidDamage(0)
 	, m_TicksLeftBurning(0)
+	, m_TicksSinceLastVoidDamage(0)
 	, m_HeadYaw( 0.0 )
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
-	, m_Mass (0.001) //Default 1g
 	, m_WaterSpeed(0, 0, 0)
+	, m_Mass (0.001)  // Default 1g
 	, m_Width(a_Width)
 	, m_Height(a_Height)
 {

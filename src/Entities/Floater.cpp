@@ -1,14 +1,19 @@
+
 #include "Globals.h"
 
 #include "Floater.h"
 #include "Player.h"
 #include "../ClientHandle.h"
 
+
+
+
+
 cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_PlayerID) :
 	cEntity(etFloater, a_X, a_Y, a_Z, 0.98, 0.98),
+	m_PickupCountDown(0),
 	m_PlayerID(a_PlayerID),
-	m_CanPickupItem(false),
-	m_PickupCountDown(0)
+	m_CanPickupItem(false)
 {
 	SetSpeed(a_Speed);
 }
@@ -56,3 +61,7 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	BroadcastMovementUpdate();
 }
+
+
+
+
