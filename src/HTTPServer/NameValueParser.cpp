@@ -97,15 +97,17 @@ void cNameValueParser::Parse(const char * a_Data, int a_Size)
 {
 	ASSERT(m_State != psFinished);  // Calling Parse() after Finish() is wrong!
 	
-	if ((m_State == psInvalid) || (m_State == psFinished))
-	{
-		return;
-	}
 	int Last = 0;
 	for (int i = 0; i < a_Size;)
 	{
 		switch (m_State)
 		{
+			case psInvalid:
+			case psFinished:
+			{
+				return;
+			}
+			
 			case psKeySpace:
 			{
 				// Skip whitespace until a non-whitespace is found, then start the key:

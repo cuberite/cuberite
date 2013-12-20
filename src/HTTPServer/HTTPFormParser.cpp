@@ -109,6 +109,11 @@ bool cHTTPFormParser::Finish(void)
 			ParseFormUrlEncoded();
 			break;
 		}
+		default:
+		{
+			// Nothing needed for other formats
+			break;
+		}
 	}
 	return (m_IsValid && m_IncomingData.empty());
 }

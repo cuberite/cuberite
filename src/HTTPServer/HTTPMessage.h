@@ -32,6 +32,9 @@ public:
 	
 	cHTTPMessage(eKind a_Kind);
 
+	// Force a virtual destructor in all descendants
+	virtual ~cHTTPMessage() {};
+	
 	/// Adds a header into the internal map of headers. Recognizes special headers: Content-Type and Content-Length
 	void AddHeader(const AString & a_Key, const AString & a_Value);
 	
