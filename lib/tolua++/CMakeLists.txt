@@ -19,8 +19,8 @@ add_library(tolualib ${LIB_SOURCE})
 
 #m is the standard math librarys
 if(UNIX)
-add_library(math STATIC IMPORTED)
-target_link_libraries(tolua math)
+find_library(M_LIB m)
+target_link_libraries(${M_LIB})
 endif()
 
 target_link_libraries(tolua lua tolualib)
