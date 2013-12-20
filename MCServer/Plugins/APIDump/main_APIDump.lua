@@ -233,8 +233,8 @@ function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 	
 	LOG("Moving static files..");
-	local localFolder = ipairs(g_Plugin:GetLocalFolder());
-	for k, v in cFile:GetFolderContents("Static") do
+	local localFolder = g_Plugin:GetLocalFolder();
+	for k, v in cFile:GetFolderContents(localFolder .. "/Static") do
 		cFile:Copy(localFolder .. "/Static/" .. v, "API/" .. v);	
 	end
 
