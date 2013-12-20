@@ -69,7 +69,7 @@ public:
 		}
 		else
 		{
-			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 7, a_Player->GetUniqueID());
+			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID());
 			Floater->Initialize(a_World);
 			a_Player->SetIsFishing(true, Floater->GetUniqueID());
 		}
