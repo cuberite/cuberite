@@ -231,6 +231,12 @@ end
 
 
 function DumpAPIHtml()
+	LOG("Moving static files.");
+	
+	for i in cFile:GetFolderContents("Static") do
+		cFile:Copy("Static/" .. i, "API/" .. i);	
+	end
+	
 	LOG("Dumping all available functions and constants to API subfolder...");
 
 	LOG("Creating API tables...");
