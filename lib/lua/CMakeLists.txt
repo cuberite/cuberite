@@ -8,6 +8,10 @@ file(GLOB SOURCE
 	"src/*.c"
 )
 
+if(${STATIC_LUA})
 add_library(lua ${SOURCE})
+else()
+add_library(lua SHARED ${SOURCE})
+endif()
 
 target_link_libraries(lua m)
