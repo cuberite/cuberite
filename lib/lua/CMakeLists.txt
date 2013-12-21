@@ -15,5 +15,5 @@ add_library(lua SHARED ${SOURCE})
 endif()
 
 if(UNIX)
-target_link_libraries(lua m)
+target_link_libraries(lua m dl)
 endif()
