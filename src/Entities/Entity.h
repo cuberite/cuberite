@@ -351,10 +351,10 @@ public:
 	// tolua_end
 	
 	/// Called when the specified player right-clicks this entity
-	virtual void OnRightClicked(cPlayer & a_Player) {};
+	virtual void OnRightClicked(cPlayer &) {};
 
 	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) {}
+	virtual void GetDrops(cItems & /*a_Drops*/, cEntity * /*a_Killer*/ = NULL) {}
 
 protected:
 	static cCriticalSection m_CSCount;
@@ -420,11 +420,11 @@ protected:
 	void Dereference( cEntity*& a_EntityPtr );
 	
 private:
-	// Measured in degrees (MAX 360°)
+	// Measured in degrees (MAX 360Â°)
 	double   m_HeadYaw;
 	// Measured in meter/second (m/s)
 	Vector3d m_Speed;
-	// Measured in degrees (MAX 360°)
+	// Measured in degrees (MAX 360Â°)
 	Vector3d m_Rot;
 	
 	/// Position of the entity's XZ center and Y bottom
