@@ -7,7 +7,7 @@ Symbols
 cloc-ignored.txt
 cloc.xml
 cloc.xsl
- *.ncb
+*.ncb
 *.user
 *.suo
 /EveryNight.cmd
