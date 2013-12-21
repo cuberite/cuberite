@@ -14,11 +14,11 @@ macro(add_flags FLAGS)
 endmacro()
 
 SET(CMAKE_CXX_FLAGS_PROFILE
-    "${CMAKE_CXX_FLAGS_DEBUG} -pg"
+    "${CMAKE_CXX_FLAGS_DEBUG} -pg -DNDEBUG"
     CACHE STRING "Flags used by the C++ compiler during profile builds."
     FORCE )
 SET(CMAKE_C_FLAGS_PROFILE
-    "${CMAKE_C_FLAGS_DEBUG} -pg"
+    "${CMAKE_C_FLAGS_DEBUG} -pg -DNDEBUG"
     CACHE STRING "Flags used by the C compiler during profile builds."
     FORCE )
 SET(CMAKE_EXE_LINKER_FLAGS_PROFILE
@@ -35,9 +35,20 @@ MARK_AS_ADVANCED(
     CMAKE_EXE_LINKER_FLAGS_PROFILE
     CMAKE_SHARED_LINKER_FLAGS_PROFILE )
 
+if(UNIX)
+set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -DNDEBUG")
+set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_DEBUG")
+set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -D_DEBUG")
+endif()
+
 if(WIN32)
 	add_flags("/MP")
+else()
+	add_flags("-pthread")
 endif()
+
+
 
 set(CMAKE_CXX_FLAGS_RELEASE_BAK "${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_RELEASE_BAK   "${CMAKE_C_FLAGS_RELEASE}")
@@ -53,6 +64,12 @@ endif()
 
 set(CMAKE_BUILD_TYPE_BAK ${CMAKE_BUILD_TYPE})
 set(CMAKE_BUILD_TYPE "Release")
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	add_definitions(-DCRYPTOPP_DISABLE_ASM)
+endif()
+
+add_definitions(-DLUA_USE_DLOPEN)
 
 add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
