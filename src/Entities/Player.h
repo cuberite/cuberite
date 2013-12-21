@@ -466,6 +466,9 @@ protected:
 	
 	/// Called in each tick to handle food-related processing
 	void HandleFood(void);
+
+	/// Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item.
+	void HandleFloater(void);
 	
 	/// Called in each tick to handle air-related processing i.e. drowning
 	void HandleAir();

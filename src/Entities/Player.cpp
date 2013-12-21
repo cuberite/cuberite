@@ -240,6 +240,11 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		HandleFood();
 	}
 	
+	if (m_IsFishing)
+	{
+		HandleFloater();
+	}
+
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
 	cTimer t1;
 	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime())
@@ -1775,6 +1780,30 @@ void cPlayer::HandleFood(void)
 	{
 		SendHealth();
 	}
+}
+
+
+
+
+
+void cPlayer::HandleFloater()
+{
+	if (GetEquippedItem().m_ItemType == E_ITEM_FISHING_ROD)
+	{
+		return;
+	}
+	class cFloaterCallback :
+		public cEntityCallback
+	{
+	public:
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			a_Entity->Destroy(true);
+			return true;
+		}
+	} Callback;
+	m_World->DoWithEntityByID(m_FloaterID, Callback);
+	SetIsFishing(false);
 }
 
 
