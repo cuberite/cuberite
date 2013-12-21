@@ -44,6 +44,7 @@ Makefile
 
 *.a
 *.d
+*.so
 CMakeCache.txt
 CMakeFiles
 Makefile
