@@ -1,17 +1,20 @@
 @echo off
 :: Nightbbuild2008.cmd
 :: This script is run every night to produce a new version of MCServer, backup its PDB files and upload the packages to web.
-:: These sub-scripts are used:
-::  - UploadVersion.ftp FTP command template for uploading the version to the web
 :: When run without parameters, this script pauses at the end and waits for a keypress.
 :: To run in an automated scheduler, add any parameter to disable waiting for a keystroke
+::
+:: The sript creates a symbol store (a database of PDB files) that can be used as a single entry in MSVC's symbol path,
+:: then any executable / crashdump built by this script can be debugged and its symbols will be found automatically by MSVC,
+:: without the users needing to specify the build version or anything.
+:: In order to support pruning the symstore, a per-month store is created, so that old months can be removed when no longer needed.
 ::
 :: This script expects a few tools on specific paths, you can pass the correct paths for your system as env vars "zip" and "vc"
 :: This script assumes that "git", "symstore" and "touch" are available on PATH.
 :: git comes from msysgit
 :: symstore comes from Microsoft's Debugging Tools for Windows
 :: touch comes from unxtools
-:: This script is locale-dependent
+:: This script is locale-dependent, because it parses the output of "time" and "date" shell commands
 
 
 :: 7-zip executable (by default it should be on PATH):
@@ -45,9 +48,9 @@ echo Performing nightbuild of MC-Server
 set DONOTPAUSE=y
 
 :: Update the sources to the latest revision:
-del src\Bindings.cpp
-del src\Bindings.h
-git checkout -- src\Bindings.*
+del src\Bindings\Bindings.cpp
+del src\Bindings\Bindings.h
+git checkout -- src\Bindings\Bindings.*
 git pull
 if errorlevel 1 goto haderror
 
