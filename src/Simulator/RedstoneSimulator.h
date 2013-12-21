@@ -115,6 +115,8 @@ private:
 	void HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/// <summary>Handles noteblocks</summary>
 	void HandleNoteBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// <summary>Handles noteblocks</summary>
+	void HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/* ===================== */
 
 	/* ====== Helper functions ====== */
@@ -164,13 +166,11 @@ private:
 			case E_BLOCK_STICKY_PISTON:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_DAYLIGHT_SENSOR:
 			{
 				return false;
 			}
-			default:
-			{
-				return true;
-			}
+			default: return true;
 		}
 	}
 
@@ -208,6 +208,7 @@ private:
 	{
 		switch (Block)
 		{
+			case E_BLOCK_DAYLIGHT_SENSOR:
 			case E_BLOCK_WOODEN_BUTTON:
 			case E_BLOCK_STONE_BUTTON:
 			case E_BLOCK_REDSTONE_WIRE:
