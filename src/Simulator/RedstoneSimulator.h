@@ -19,7 +19,7 @@ public:
 	cRedstoneSimulator(cWorld & a_World);
 	~cRedstoneSimulator();
 
-	virtual void Simulate(float a_Dt) override {}; // Not used in this simulator
+	virtual void Simulate(float /*a_Dt*/) override {}; // Not used in this simulator
 	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override { return IsRedstone(a_BlockType); }
 
