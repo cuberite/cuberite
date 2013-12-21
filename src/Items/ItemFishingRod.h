@@ -65,11 +65,117 @@ public:
 			if (Callbacks.CanPickup())
 			{
 				cItems Drops;
-				Drops.Add(cItem(E_ITEM_RAW_FISH));
+				int ItemCategory(a_World->GetTickRandomNumber(99));
+				if (ItemCategory <= 4) // Treasures 5%
+				{
+					int Treasure(a_World->GetTickRandomNumber(5));
+					switch (Treasure)
+					{
+						case 0:
+						{
+							Drops.Add(cItem(E_ITEM_BOW)); // TODO: Enchantments
+							break;
+						}
+						case 1:
+						{
+							Drops.Add(cItem(E_ITEM_BOOK)); // TODO: Enchanted book
+							break;
+						}
+						case 2:
+						{
+							Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, a_World->GetTickRandomNumber(50))); // Fishing rod with durability. TODO: Enchantments on it
+							break;
+						}
+						case 3:
+						{
+							Drops.Add(cItem(E_ITEM_NAME_TAG));
+							break;
+						}
+						case 4:
+						{
+							Drops.Add(cItem(E_ITEM_SADDLE));
+							break;
+						}
+						case 5:
+						{
+							Drops.Add(cItem(E_BLOCK_LILY_PAD));
+							break;
+						}
+					}
+				}
+				else if (ItemCategory <= 14)  // Junk 10%
+				{
+					int Junk(a_World->GetTickRandomNumber(70));
+					if (Junk <= 1)
+					{
+						Drops.Add(cItem(E_ITEM_DYE, 10, 0));
+					}
+					else if (Junk <= 4)
+					{
+						Drops.Add(cItem(E_ITEM_BOW, 1, a_World->GetTickRandomNumber(64)));
+					}
+					else if (Junk <= 9)
+					{
+						Drops.Add(cItem(E_ITEM_STICK));
+					}
+					else if (Junk <= 14)
+					{
+						Drops.Add(cItem(E_ITEM_STRING));
+					}
+					else if (Junk <= 22)
+					{
+						Drops.Add(cItem(E_ITEM_BOWL));
+					}
+					else if (Junk <= 30)
+					{
+						Drops.Add(cItem(E_ITEM_LEATHER));
+					}
+					else if (Junk <= 38)
+					{
+						Drops.Add(cItem(E_ITEM_LEATHER_BOOTS));
+					}
+					else if (Junk <= 46)
+					{
+						Drops.Add(cItem(E_ITEM_ROTTEN_FLESH));
+					}
+					else if (Junk <= 54)
+					{
+						Drops.Add(cItem(E_ITEM_POTIONS));
+					}
+					else if (Junk <= 62)
+					{
+						Drops.Add(cItem(E_ITEM_BONE));
+					}
+					else if (Junk <= 70)
+					{
+						Drops.Add(cItem(E_BLOCK_TRIPWIRE_HOOK));
+					}
+				}
+				else  // Fish
+				{
+					int FishType(a_World->GetTickRandomNumber(99));
+					if (FishType <= 1)  // Clownfish has a 2% chance of spawning
+					{
+						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
+					} 
+					else if (FishType <= 12)  // Pufferfish has a 13% chance of spawning
+					{
+						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
+					}
+					else if (FishType <= 24)
+					{
+						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_SALMON));
+					}
+					else
+					{
+						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_FISH));
+					}
+				}
+
+				
 				Vector3d FloaterPos(Callbacks.GetPos());
 				Vector3d FlyDirection(a_Player->GetPosition() - FloaterPos);
 				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.Length() / (FlyDirection.y * 2), FlyDirection.z);
-				// TODO: More types of pickups.
 			}
 		}
 		else
