@@ -95,7 +95,7 @@ public:
 	
 	// tolua_end
 	
-	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned) {m_FuelBurnTime = a_FuelBurnTime; m_TimeBurned = 0; }
+	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned) {m_FuelBurnTime = a_FuelBurnTime; m_TimeBurned = a_TimeBurned; }
 	void SetCookTimes(int a_NeedCookTime, int a_TimeCooked) {m_NeedCookTime = a_NeedCookTime; m_TimeCooked = a_TimeCooked; }
 	
 protected:
