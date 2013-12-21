@@ -35,7 +35,7 @@ class cNullCommandOutputCallback :
 	public cCommandOutputCallback
 {
 	// cCommandOutputCallback overrides:
-	virtual void Out(const AString & a_Text) override
+	virtual void Out(const AString & /*a_Text*/) override
 	{
 		// Do nothing
 	}
