@@ -42,12 +42,6 @@ class cClientHandle :  // tolua_export
 	public cSocketThreads::cCallback
 {											// tolua_export
 public:
-	enum ENUM_PRIORITY
-	{
-		E_PRIORITY_LOW,
-		E_PRIORITY_NORMAL
-	};
-
 	static const int MAXBLOCKCHANGEINTERACTIONS = 20; // 5 didn't help, 10 still doesn't work in Creative, 20 seems to have done the trick
 	
 #if defined(ANDROID_NDK)
@@ -219,7 +213,6 @@ private:
 	
 	AString m_IPString;
 
-	int     m_ProtocolVersion;
 	AString m_Username;
 	AString m_Password;
 
@@ -291,8 +284,6 @@ private:
 	/// m_State needs to be locked in the Destroy() function so that the destruction code doesn't run twice on two different threads
 	cCriticalSection m_CSDestroyingState;
 
-	bool m_bKeepThreadGoing;
-	
 	/// If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded()
 	bool m_ShouldCheckDownloaded;
 

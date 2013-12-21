@@ -662,6 +662,7 @@ public:
 		g_BlockTransparent[E_BLOCK_CROPS]                 = true;
 		g_BlockTransparent[E_BLOCK_DANDELION]             = true;
 		g_BlockTransparent[E_BLOCK_DETECTOR_RAIL]         = true;
+		g_BlockTransparent[E_BLOCK_ENDER_CHEST]           = true;
 		g_BlockTransparent[E_BLOCK_FENCE]                 = true;
 		g_BlockTransparent[E_BLOCK_FENCE_GATE]            = true;
 		g_BlockTransparent[E_BLOCK_FIRE]                  = true;
@@ -691,12 +692,14 @@ public:
 		g_BlockTransparent[E_BLOCK_STAINED_GLASS_PANE]    = true;
 		g_BlockTransparent[E_BLOCK_STATIONARY_LAVA]       = true;
 		g_BlockTransparent[E_BLOCK_STATIONARY_WATER]      = true;
+		g_BlockTransparent[E_BLOCK_STONE_BUTTON]          = true;
 		g_BlockTransparent[E_BLOCK_STONE_PRESSURE_PLATE]  = true;
 		g_BlockTransparent[E_BLOCK_TALL_GRASS]            = true;
 		g_BlockTransparent[E_BLOCK_TORCH]                 = true;
 		g_BlockTransparent[E_BLOCK_VINES]                 = true;
 		g_BlockTransparent[E_BLOCK_WALLSIGN]              = true;
 		g_BlockTransparent[E_BLOCK_WATER]                 = true;
+		g_BlockTransparent[E_BLOCK_WOODEN_BUTTON]         = true;
 		g_BlockTransparent[E_BLOCK_WOODEN_DOOR]           = true;
 		g_BlockTransparent[E_BLOCK_WOODEN_PRESSURE_PLATE] = true;
 

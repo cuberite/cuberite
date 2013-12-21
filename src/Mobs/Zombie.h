@@ -12,19 +12,20 @@ class cZombie :
 	typedef cAggressiveMonster super;
 	
 public:
-	cZombie(bool IsVillagerZombie);
+	cZombie(bool a_IsVillagerZombie);
 
 	CLASS_PROTODEF(cZombie);
 	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void MoveToPosition(const Vector3f & a_Position) override;
 
-	bool IsVillagerZombie(void) const {return m_bIsVillagerZombie; }
-	bool IsConverting(void) const {return m_bIsConverting; }
+	bool IsVillagerZombie(void) const {return m_IsVillagerZombie; }
+	bool IsConverting    (void) const {return m_IsConverting; }
 
 private:
 
-	bool m_bIsVillagerZombie, m_bIsConverting;
+	bool m_IsVillagerZombie;
+	bool m_IsConverting;
 
 } ;
 

@@ -407,9 +407,6 @@ protected:
 
 	float m_TimeLastPickupCheck;
 
-	void ResolvePermissions();
-
-	void ResolveGroups();
 	char m_Color;
 
 	float m_LastBlockActionTime;
@@ -417,6 +414,7 @@ protected:
 	eGameMode m_GameMode;
 	std::string m_IP;
 	
+	/// The item being dragged by the cursor while in a UI window
 	cItem m_DraggingItem;
 
 	long long m_LastPlayerListTime;
@@ -455,6 +453,11 @@ protected:
 	int  m_BowCharge;
 
 	int m_FloaterID;
+
+
+
+	void ResolvePermissions(void);
+	void ResolveGroups(void);
 
 	virtual void Destroyed(void);
 

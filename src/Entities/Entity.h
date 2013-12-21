@@ -387,7 +387,7 @@ protected:
 	double m_LastPosX, m_LastPosY, m_LastPosZ;
 
 	// This variables keep track of the last time a packet was sent
-	Int64 m_TimeLastTeleportPacket,m_TimeLastMoveReltPacket,m_TimeLastSpeedPacket;  // In ticks
+	Int64 m_TimeLastTeleportPacket, m_TimeLastMoveReltPacket, m_TimeLastSpeedPacket;  // In ticks
 
 	bool m_IsInitialized;  // Is set to true when it's initialized, until it's destroyed (Initialize() till Destroy() )
 

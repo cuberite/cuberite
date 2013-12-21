@@ -161,7 +161,7 @@ protected:
 	
 	cEntity * m_Target;
 	float m_AttackRate;
-	float idle_interval;
+	float m_IdleInterval;
 
 	Vector3f m_Destination;
 	bool m_bMovingToDestination;

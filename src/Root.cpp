@@ -39,19 +39,20 @@ cRoot* cRoot::s_Root = NULL;
 
 
 
-cRoot::cRoot()
-	: m_Server( NULL )
-	, m_MonsterConfig( NULL )
-	, m_GroupManager( NULL )
-	, m_CraftingRecipes(NULL)
-	, m_FurnaceRecipe( NULL )
-	, m_WebAdmin( NULL )
-	, m_PluginManager( NULL )
-	, m_Log( NULL )
-	, m_bStop( false )
-	, m_bRestart( false )
-	, m_InputThread( NULL )
-	, m_pDefaultWorld( NULL )
+cRoot::cRoot(void) :
+	m_PrimaryServerVersion(cProtocolRecognizer::PROTO_VERSION_LATEST),
+	m_pDefaultWorld(NULL),
+	m_InputThread(NULL),
+	m_Server(NULL),
+	m_MonsterConfig(NULL),
+	m_GroupManager(NULL),
+	m_CraftingRecipes(NULL),
+	m_FurnaceRecipe(NULL),
+	m_WebAdmin(NULL),
+	m_PluginManager(NULL),
+	m_Log(NULL),
+	m_bStop(false),
+	m_bRestart(false)
 {
 	s_Root = this;
 }
@@ -552,22 +553,25 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 {
 	class cCallback : public cPlayerListCallback
 	{
-		unsigned int BestRating;
-		unsigned int NameLength;
-		const AString PlayerName;
+		unsigned      m_BestRating;
+		unsigned      m_NameLength;
+		const AString m_PlayerName;
 
 		cPlayerListCallback & m_Callback;
 		virtual bool Item (cPlayer * a_pPlayer)
 		{
-			unsigned int Rating = RateCompareString (PlayerName, a_pPlayer->GetName());
-			if (Rating > 0 && Rating >= BestRating)
+			unsigned int Rating = RateCompareString (m_PlayerName, a_pPlayer->GetName());
+			if ((Rating > 0) && (Rating >= m_BestRating))
 			{
-				BestMatch = a_pPlayer;
-				if( Rating > BestRating ) NumMatches = 0;
-				BestRating = Rating;
-				++NumMatches;
+				m_BestMatch = a_pPlayer;
+				if (Rating > m_BestRating)
+				{
+					m_NumMatches = 0;
+				}
+				m_BestRating = Rating;
+				++m_NumMatches;
 			}
-			if (Rating == NameLength) // Perfect match
+			if (Rating == m_NameLength) // Perfect match
 			{
 				return true;
 			}
@@ -575,23 +579,23 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 		}
 
 	public:
-		cCallback (const AString & a_PlayerName, cPlayerListCallback & a_Callback) 
-			: m_Callback( a_Callback )
-			, BestMatch( NULL )
-			, BestRating( 0 )
-			, NumMatches( 0 )
-			, NameLength( a_PlayerName.length() )
-			, PlayerName( a_PlayerName )
+		cCallback (const AString & a_PlayerName, cPlayerListCallback & a_Callback) :
+			m_Callback(a_Callback),
+			m_BestRating(0),
+			m_NameLength(a_PlayerName.length()),
+			m_PlayerName(a_PlayerName),
+			m_BestMatch(NULL),
+			m_NumMatches(0)
 		{}
 
-		cPlayer * BestMatch;
-		unsigned int NumMatches;
+		cPlayer * m_BestMatch;
+		unsigned  m_NumMatches;
 	} Callback (a_PlayerName, a_Callback);
 	ForEachPlayer( Callback );
 
-	if (Callback.NumMatches == 1)
+	if (Callback.m_NumMatches == 1)
 	{
-		return a_Callback.Item (Callback.BestMatch);
+		return a_Callback.Item(Callback.m_BestMatch);
 	}
 	return false;
 }

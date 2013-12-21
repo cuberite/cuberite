@@ -29,6 +29,11 @@ public:
 
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
 	{
+		if (a_Dir != BLOCK_FACE_NONE)
+		{
+			return false;
+		}
+
 		if (a_Player->IsFishing())
 		{
 			class cFloaterCallback :
@@ -63,13 +68,13 @@ public:
 				Drops.Add(cItem(E_ITEM_RAW_FISH));
 				Vector3d FloaterPos(Callbacks.GetPos());
 				Vector3d FlyDirection(a_Player->GetPosition() - FloaterPos);
-				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.y, FlyDirection.z);
+				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.Length() / (FlyDirection.y * 2), FlyDirection.z);
 				// TODO: More types of pickups.
 			}
 		}
 		else
 		{
-			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 7, a_Player->GetUniqueID());
+			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID());
 			Floater->Initialize(a_World);
 			a_Player->SetIsFishing(true, Floater->GetUniqueID());
 		}

@@ -63,26 +63,27 @@ cChunk::cChunk(
 	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 	cChunkMap * a_ChunkMap, cWorld * a_World,
 	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP
-)
-	: m_PosX( a_ChunkX )
-	, m_PosY( a_ChunkY )
-	, m_PosZ( a_ChunkZ )
-	, m_BlockTickX( 0 )
-	, m_BlockTickY( 0 )
-	, m_BlockTickZ( 0 )
-	, m_World( a_World )
-	, m_ChunkMap(a_ChunkMap)
-	, m_IsValid(false)
-	, m_IsLightValid(false)
-	, m_IsDirty(false)
-	, m_IsSaving(false)
-	, m_StayCount(0)
-	, m_NeighborXM(a_NeighborXM)
-	, m_NeighborXP(a_NeighborXP)
-	, m_NeighborZM(a_NeighborZM)
-	, m_NeighborZP(a_NeighborZP)
-	, m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData())
-	, m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData())
+) :
+	m_IsValid(false),
+	m_IsLightValid(false),
+	m_IsDirty(false),
+	m_IsSaving(false),
+	m_HasLoadFailed(false),
+	m_StayCount(0),
+	m_PosX(a_ChunkX),
+	m_PosY(a_ChunkY),
+	m_PosZ(a_ChunkZ),
+	m_World(a_World),
+	m_ChunkMap(a_ChunkMap),
+	m_BlockTickX(0),
+	m_BlockTickY(0),
+	m_BlockTickZ(0),
+	m_NeighborXM(a_NeighborXM),
+	m_NeighborXP(a_NeighborXP),
+	m_NeighborZM(a_NeighborZM),
+	m_NeighborZP(a_NeighborZP),
+	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
+	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData())
 {
 	if (a_NeighborXM != NULL)
 	{

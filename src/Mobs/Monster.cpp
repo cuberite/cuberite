@@ -68,9 +68,12 @@ static const struct
 
 cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
 	: super(etMonster, a_Width, a_Height)
+	, m_EMState(IDLE)
+	, m_EMPersonality(AGGRESSIVE)
+	, m_SightDistance(25)
 	, m_Target(NULL)
 	, m_AttackRate(3)
-	, idle_interval(0)
+	, m_IdleInterval(0)
 	, m_bMovingToDestination(false)
 	, m_DestinationTime( 0 )
 	, m_DestroyTimer( 0 )
@@ -78,10 +81,7 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_MobType(a_MobType)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
-	, m_EMState(IDLE)
-	, m_SightDistance(25)
 	, m_SeePlayerInterval (0)
-	, m_EMPersonality(AGGRESSIVE)
 	, m_AttackDamage(1.0f)
 	, m_AttackRange(2.0f)
 	, m_AttackInterval(0)
@@ -435,13 +435,13 @@ void cMonster::EventLosePlayer(void)
 // What to do if in Idle State
 void cMonster::InStateIdle(float a_Dt)
 {
-	idle_interval += a_Dt;
-	if (idle_interval > 1)
+	m_IdleInterval += a_Dt;
+	if (m_IdleInterval > 1)
 	{
 		// at this interval the results are predictable
 		int rem = m_World->GetTickRandomNumber(6) + 1;
 		// LOGD("Moving: int: %3.3f rem: %i",idle_interval,rem);
-		idle_interval -= 1;		// So nothing gets dropped when the server hangs for a few seconds
+		m_IdleInterval -= 1;		// So nothing gets dropped when the server hangs for a few seconds
 		Vector3f Dist;
 		Dist.x = (float)(m_World->GetTickRandomNumber(10) - 5);
 		Dist.z = (float)(m_World->GetTickRandomNumber(10) - 5);
