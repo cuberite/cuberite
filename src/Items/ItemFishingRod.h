@@ -65,10 +65,10 @@ public:
 			if (Callbacks.CanPickup())
 			{
 				cItems Drops;
-				int ItemCategory(a_World->GetTickRandomNumber(99));
+				int ItemCategory = a_World->GetTickRandomNumber(99);
 				if (ItemCategory <= 4) // Treasures 5%
 				{
-					int Treasure(a_World->GetTickRandomNumber(5));
+					int Treasure = a_World->GetTickRandomNumber(5);
 					switch (Treasure)
 					{
 						case 0:
@@ -105,7 +105,7 @@ public:
 				}
 				else if (ItemCategory <= 14)  // Junk 10%
 				{
-					int Junk(a_World->GetTickRandomNumber(70));
+					int Junk = a_World->GetTickRandomNumber(70);
 					if (Junk <= 1)
 					{
 						Drops.Add(cItem(E_ITEM_DYE, 10, 0));
@@ -153,7 +153,7 @@ public:
 				}
 				else  // Fish
 				{
-					int FishType(a_World->GetTickRandomNumber(99));
+					int FishType = a_World->GetTickRandomNumber(99);
 					if (FishType <= 1)  // Clownfish has a 2% chance of spawning
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
@@ -173,8 +173,8 @@ public:
 				}
 
 				
-				Vector3d FloaterPos(Callbacks.GetPos());
-				Vector3d FlyDirection(a_Player->GetEyePosition() - FloaterPos);
+				Vector3d FloaterPos = Callbacks.GetPos();
+				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
 				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.y + 1, FlyDirection.z);
 			}
 		}
