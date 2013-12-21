@@ -34,7 +34,7 @@ void cFloater::SpawnOn(cClientHandle & a_Client)
 void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	HandlePhysics(a_Dt, a_Chunk);
-	if (IsBlockWater(m_World->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ())))
+	if (IsBlockWater(m_World->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ())) && m_World->GetBlockMeta((int) GetPosX(), (int) GetPosY(), (int) GetPosZ()) != 0)
 	{
 		if ((!m_CanPickupItem) && (m_World->GetTickRandomNumber(100) == 0))
 		{
