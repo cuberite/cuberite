@@ -8,7 +8,7 @@ Release Mode
 
 Release mode is preferred for almost all cases, it has much better speed and less console spam. However, if you are developing MCServer actively, debug mode might be better.
 
-    cmake . && make
+    cmake . -DCMAKE_BUILD_TYPE=RELEASE && make
     
 Debug Mode
 ----------
@@ -22,6 +22,6 @@ Debug mode is useful if you want more debugging information about MCServer as it
 
 This is useful if you want to compile MCServer to use on another 32-bit machine. It can be used with debug or release mode. To use 32 bit mode, simply add:
 
-    -DFORCE-32=1
+    -DFORCE_32=1
     
 to your cmake command and 32 bit will be forced.
