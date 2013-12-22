@@ -11,6 +11,10 @@
 	#include <dbghelp.h>
 #endif  // _MSC_VER
 
+// Here, we have some ALL CAPS variables, to give the impression that this is deeeep, gritty programming :P
+bool g_TERMINATE_EVENT_RAISED = false; // If something has told the server to stop; checked periodically in cRoot
+bool g_SERVER_TERMINATED = false; // Set to true when the server terminates, so our CTRL handler can then tell Windows to close the console
+
 
 
 
@@ -33,14 +37,21 @@
 
 
 
-
-void ShowCrashReport(int) 
+void NonCtrlHandler(int a_Signal) 
 {
-	std::signal(SIGSEGV, SIG_DFL);
+	LOGD("Terminate event raised from std::signal");
+	g_TERMINATE_EVENT_RAISED = true;
 
-	printf("\n\nMCServer has crashed!\n");
-
-	exit(-1);
+	switch (a_Signal)
+	{
+		case SIGSEGV:
+		{
+			std::signal(SIGSEGV, SIG_DFL);
+			LOGWARN("Segmentation fault; MCServer has crashed :(");
+			exit(EXIT_FAILURE);
+		}
+		default: break;
+	}
 }
 
 
@@ -111,13 +122,33 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 
 
 
+#ifdef _WIN32
+// Handle CTRL events in windows, including console window close
+BOOL CtrlHandler(DWORD fdwCtrlType)
+{
+	g_TERMINATE_EVENT_RAISED = true;
+	LOGD("Terminate event raised from the Windows CtrlHandler");
+
+	if (fdwCtrlType == CTRL_CLOSE_EVENT)
+	{
+		while (!g_SERVER_TERMINATED) { cSleep::MilliSleep(100); } // Delay as much as possible to try to get the server to shut down cleanly
+	}
+
+	return TRUE;
+}
+#endif
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // main:
 
 int main( int argc, char **argv )
 {
-	(void)argc;
-	(void)argv;
+	UNUSED(argc);
+	UNUSED(argv);
 	
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	InitLeakFinder();
@@ -149,6 +180,13 @@ int main( int argc, char **argv )
 	}
 	#endif  // _WIN32 && !_WIN64
 	// End of dump-file magic
+
+	#ifdef _WIN32
+	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
+	{
+		LOGERROR("Could not install the Windows CTRL handler!");
+	}
+	#endif
 	
 	#if defined(_DEBUG) && defined(_MSC_VER)
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
@@ -160,7 +198,9 @@ int main( int argc, char **argv )
 	#endif  // _DEBUG && _MSC_VER
 
 	#ifndef _DEBUG
-	std::signal(SIGSEGV, ShowCrashReport);
+	std::signal(SIGSEGV, NonCtrlHandler);
+	std::signal(SIGTERM, NonCtrlHandler);
+	std::signal(SIGINT, NonCtrlHandler);
 	#endif
 
 	// DEBUG: test the dumpfile creation:
@@ -188,8 +228,10 @@ int main( int argc, char **argv )
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	DeinitLeakFinder();
 	#endif
-	
-	return 0;
+
+	g_SERVER_TERMINATED = true;
+
+	return EXIT_SUCCESS;
 }
 
 
