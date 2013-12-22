@@ -773,7 +773,7 @@ void cByteBuffer::ReadAll(AString & a_Data)
 
 
 
-bool cByteBuffer::ReadToByteBuffer(cByteBuffer & a_Dst, int a_NumBytes)
+bool cByteBuffer::ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes)
 {
 	if (!a_Dst.CanWriteBytes(a_NumBytes) || !CanReadBytes(a_NumBytes))
 	{
@@ -781,9 +781,9 @@ bool cByteBuffer::ReadToByteBuffer(cByteBuffer & a_Dst, int a_NumBytes)
 		return false;
 	}
 	char buf[1024];
-	while (a_NumBytes > 0)
+	while (a_NumBytes > static_cast<size_t>(0))
 	{
-		int num = (a_NumBytes > sizeof(buf)) ? sizeof(buf) : a_NumBytes;
+		size_t num = (a_NumBytes > sizeof(buf)) ? sizeof(buf) : a_NumBytes;
 		VERIFY(ReadBuf(buf, num));
 		VERIFY(a_Dst.Write(buf, num));
 		a_NumBytes -= num;
