@@ -247,6 +247,9 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		m_World->SendPlayerList(this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
+
+	if (IsFlying())
+		m_LastGroundHeight = (float)GetPosY();
 }
 
 
@@ -447,10 +450,19 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		if (m_LastJumpHeight > m_LastGroundHeight) Damage++;
 		m_LastJumpHeight = (float)GetPosY();
 
-		if ((Damage > 0) && (!IsGameModeCreative()))
+		if (Damage > 0)
 		{
-			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
-		}
+			if (!IsGameModeCreative())
+			{
+				TakeDamage(dtFalling, NULL, Damage, Damage, 0);
+			}
+			
+			GetWorld()->BroadcastSoundParticleEffect(
+				2006,
+				(int)GetPosX(), (int)GetPosY() - 1, (int)GetPosZ(),
+				Damage // Used as particle effect speed modifier
+				);
+		}		
 
 		m_LastGroundHeight = (float)GetPosY();
 	}
@@ -974,6 +986,9 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
+
+	SetFlying(false);
+	SetCanFly(false);
 }
 
 
