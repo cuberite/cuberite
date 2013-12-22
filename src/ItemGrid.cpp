@@ -580,11 +580,11 @@ bool cItemGrid::DamageItem(int a_X, int a_Y, short a_Amount)
 
 
 
-void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, int a_CountLootProbabs, int a_NumSlots, int a_Seed)
+void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, size_t a_CountLootProbabs, int a_NumSlots, int a_Seed)
 {
 	// Calculate the total weight:
 	int TotalProbab = 1;
-	for (int i = 0; i < a_CountLootProbabs; i++)
+	for (size_t i = 0; i < a_CountLootProbabs; i++)
 	{
 		TotalProbab += a_LootProbabs[i].m_Weight;
 	}
@@ -597,7 +597,7 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, i
 		int LootRnd = Rnd % TotalProbab;
 		Rnd >>= 8;
 		cItem CurrentLoot = cItem(E_ITEM_BOOK, 1, 0);  // TODO: enchantment
-		for (int j = 0; j < a_CountLootProbabs; j++)
+		for (size_t j = 0; j < a_CountLootProbabs; j++)
 		{
 			LootRnd -= a_LootProbabs[i].m_Weight;
 			if (LootRnd < 0)
