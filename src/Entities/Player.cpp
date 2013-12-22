@@ -240,12 +240,22 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		HandleFood();
 	}
 	
+	if (m_IsFishing)
+	{
+		HandleFloater();
+	}
+
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
 	cTimer t1;
 	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
 		m_World->SendPlayerList(this);
 		m_LastPlayerListTime = t1.GetNowTime();
+	}
+
+	if (IsFlying())
+	{
+		m_LastGroundHeight = (float)GetPosY();
 	}
 }
 
@@ -447,10 +457,16 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		if (m_LastJumpHeight > m_LastGroundHeight) Damage++;
 		m_LastJumpHeight = (float)GetPosY();
 
-		if ((Damage > 0) && (!IsGameModeCreative()))
+		if (Damage > 0)
 		{
-			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
-		}
+			if (!IsGameModeCreative())
+			{
+				TakeDamage(dtFalling, NULL, Damage, Damage, 0);
+			}
+			
+			// Mojang uses floor() to get X and Z positions, instead of just casting it to an (int)
+			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
+		}		
 
 		m_LastGroundHeight = (float)GetPosY();
 	}
@@ -804,6 +820,22 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	m_Inventory.Clear();
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
+
+	if (a_Killer == NULL)
+	{
+		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by environmental damage", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str()));
+	}
+	else if (a_Killer->IsPlayer())
+	{
+		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by %s", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
+	}
+	else
+	{
+		AString KillerClass = a_Killer->GetClass();
+		KillerClass.erase(KillerClass.begin()); // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
+
+		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by a %s", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str(), KillerClass.c_str()));
+	}
 }
 
 
@@ -974,6 +1006,12 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
+
+	if (!IsGameModeCreative())
+	{
+		SetFlying(false);
+		SetCanFly(false);
+	}
 }
 
 
@@ -1289,7 +1327,7 @@ AString cPlayer::GetColor(void) const
 {
 	if ( m_Color != '-' )
 	{
-		return cChatColor::MakeColor( m_Color );
+		return cChatColor::Color + m_Color;
 	}
 
 	if ( m_Groups.size() < 1 )
@@ -1775,6 +1813,30 @@ void cPlayer::HandleFood(void)
 	{
 		SendHealth();
 	}
+}
+
+
+
+
+
+void cPlayer::HandleFloater()
+{
+	if (GetEquippedItem().m_ItemType == E_ITEM_FISHING_ROD)
+	{
+		return;
+	}
+	class cFloaterCallback :
+		public cEntityCallback
+	{
+	public:
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			a_Entity->Destroy(true);
+			return true;
+		}
+	} Callback;
+	m_World->DoWithEntityByID(m_FloaterID, Callback);
+	SetIsFishing(false);
 }
 
 

@@ -8,6 +8,7 @@
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
 #include "../Piston.h"
+#include "../Tracer.h"
 
 
 
@@ -106,21 +107,47 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (SourceBlockMeta == 0)) ||
 			((SourceBlockType == E_BLOCK_LEVER) && !IsLeverOn(SourceBlockMeta)) ||
 			((SourceBlockType == E_BLOCK_DETECTOR_RAIL) && (SourceBlockMeta & 0x08) == 0x08) ||
-			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
+			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta))) ||
+			(((SourceBlockType == E_BLOCK_STONE_PRESSURE_PLATE) || (SourceBlockType == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (SourceBlockMeta == 0))
 			)
 		{
 			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
 			itr = m_PoweredBlocks.erase(itr);
 		}
+		else if (SourceBlockType == E_BLOCK_DAYLIGHT_SENSOR)
+		{
+			if (!a_Chunk->IsLightValid())
+			{
+				m_World.QueueLightChunk(a_ChunkX, a_ChunkZ);
+				++itr;
+				continue;
+			}
+			else
+			{
+				NIBBLETYPE SkyLight;
+				a_Chunk->UnboundedRelGetBlockSkyLight(RelX, itr->a_SourcePos.y + 1, RelZ, SkyLight);
+
+				if (a_Chunk->GetTimeAlteredLight(SkyLight) <= 8) // Could use SkyLight - m_World.GetSkyDarkness();
+				{
+					LOGD("cRedstoneSimulator: Erased daylight sensor from powered blocks list due to insufficient light level");
+					itr = m_PoweredBlocks.erase(itr);
+				}
+				else
+				{
+					++itr;
+					continue;
+				}
+			}
+		}
 		else if ((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (DestBlockType == E_BLOCK_REDSTONE_WIRE))
 		{
 			// It is simply not allowed that a wire powers another wire, presuming that data here is sane and a dest and source are beside each other
-			LOGD("cRedstoneSimulator: Erased redstone wire from powered blocks list because it's source was also wire");
+			LOGD("cRedstoneSimulator: Erased redstone wire from powered blocks list because its source was also wire");
 			itr = m_PoweredBlocks.erase(itr);
 		}
 		else
 		{
-			itr++;
+			++itr;
 		}
 	}
 
@@ -165,7 +192,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 		else
 		{
-			itr++;
+			++itr;
 		}
 	}
 
@@ -186,7 +213,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 		else
 		{
-			itr++;
+			++itr;
 		}
 	}
 
@@ -206,12 +233,8 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			itr = m_RepeatersDelayList.erase(itr);
 			continue;
 		}
-		else if (itr->a_ElapsedTicks < itr->a_DelayTicks)
-		{
-			itr->a_ElapsedTicks++;
-		}
 
-		itr++;
+		++itr;
 	}
 
 	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
@@ -283,6 +306,12 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			case E_BLOCK_POWERED_RAIL:
 			{
 				HandleRail(a_X, dataitr->y, a_Z, BlockType);
+				break;
+			}
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+			{
+				HandlePressurePlate(a_X, dataitr->y, a_Z, BlockType);
 				break;
 			}
 		}
@@ -601,7 +630,7 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, 0, false);
 	}
 
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); ++itr)
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
@@ -659,8 +688,14 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 				return;
 			}
 		}
-
-		// Tick incrementing handled in SimChunk
+		else
+		{
+			// Apparently, incrementing ticks only works reliably here, and not in SimChunk;
+			// With a world with lots of redstone, the repeaters simply do not delay
+			// I am confounded to say why. Perhaps optimisation failure.
+			LOGD("Incremented a repeater @ %i %i %i | Elapsed ticks: %i | Target delay: %i", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z, itr->a_ElapsedTicks, itr->a_DelayTicks);
+			itr->a_ElapsedTicks++;
+		}
 	}
 }
 
@@ -897,9 +932,112 @@ void cRedstoneSimulator::HandleNoteBlock(int a_BlockX, int a_BlockY, int a_Block
 
 void cRedstoneSimulator::HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	if (m_World.GetBlockSkyLight(a_BlockX, a_BlockY + 1, a_BlockZ) > 10)
+	int a_ChunkX, a_ChunkZ;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, a_ChunkX, a_ChunkZ);
+
+	if (!m_World.IsChunkLighted(a_ChunkX, a_ChunkZ))
 	{
-		SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DAYLIGHT_SENSOR);
+		m_World.QueueLightChunk(a_ChunkX, a_ChunkZ);
+	}
+	else
+	{
+		NIBBLETYPE SkyLight = m_World.GetBlockSkyLight(a_BlockX, a_BlockY + 1, a_BlockZ) - m_World.GetSkyDarkness();
+		if (SkyLight > 8)
+		{
+			SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DAYLIGHT_SENSOR);
+		}
+	}
+}
+
+
+
+
+
+void cRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType)
+{
+	switch (a_MyType)
+	{
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		{
+			// MCS feature - stone pressure plates can only be triggered by players :D
+			cPlayer * a_Player = m_World.FindClosestPlayer(Vector3f(a_BlockX + 0.5f, (float)a_BlockY, a_BlockZ + 0.5f), 0.5f);
+
+			if (a_Player != NULL)
+			{
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x1);
+				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_STONE_PRESSURE_PLATE);
+			}
+			else
+			{
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
+			}
+			break;
+		}
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		{
+			class cWoodenPressurePlateCallback :
+				public cEntityCallback
+			{
+			public:
+				cWoodenPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+					m_X(a_BlockX),
+					m_Y(a_BlockY),
+					m_Z(a_BlockZ),
+					m_World(a_World),
+					m_Entity(NULL)
+				{
+				}
+
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					cTracer LineOfSight(m_World);
+
+					Vector3f EntityPos = a_Entity->GetPosition();
+					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+					float Distance = (EntityPos - BlockPos).Length();
+
+					if (Distance < 0.5)
+					{
+						if (!LineOfSight.Trace(BlockPos, (EntityPos - BlockPos), (int)(EntityPos - BlockPos).Length()))
+						{
+							m_Entity = a_Entity;
+							return true; // Break out, we only need to know for wooden plates that at least one entity is on top
+						}
+					}
+					return false;
+				}
+
+				bool FoundEntity(void) const
+				{
+					return m_Entity != NULL;
+				}
+
+			protected:
+				cEntity * m_Entity;
+				cWorld * m_World;
+
+				int m_X;
+				int m_Y;
+				int m_Z;
+			} ;
+
+			cWoodenPressurePlateCallback WoodenPressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ, &m_World);
+			m_World.ForEachEntity(WoodenPressurePlateCallback);
+
+			if (WoodenPressurePlateCallback.FoundEntity())
+			{
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x1);
+				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_WOODEN_PRESSURE_PLATE);
+			}
+			else
+			{
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
+			}
+			break;
+		}
+		default:
+			LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(a_MyType).c_str());
+			break;
 	}
 }
 
@@ -1308,7 +1446,7 @@ void cRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a
 
 void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta, short a_ElapsedTicks, bool ShouldPowerOn)
 {
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); ++itr)
 	{
 		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
@@ -1318,7 +1456,7 @@ void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, in
 			}
 
 			// Already in here (normal to allow repeater to continue on powering and updating blocks in front) - just update info and quit
-			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2; // See below for description
+			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + (ShouldPowerOn ? 1 : 0)) * 2; // See below for description
 			itr->a_ElapsedTicks = 0;
 			itr->ShouldPowerOn = ShouldPowerOn;
 			return;
@@ -1331,7 +1469,8 @@ void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, in
 	
 	// Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
 	// * 2 because apparently, MCS ticks are way faster than vanilla ticks, so repeater aren't noticeably delayed
-	RC.a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2;
+	// We don't +1 when powering off because everything seems to already delay a tick when powering off, why? No idea :P
+	RC.a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + (ShouldPowerOn ? 1 : 0)) * 2;
 
 
 	RC.a_ElapsedTicks = 0;

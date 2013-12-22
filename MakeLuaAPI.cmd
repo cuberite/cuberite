@@ -38,7 +38,7 @@ cd ..
 
 :: Upload the API to the web:
 
-ncftpput -p %ftppass% -u %ftpuser% -T temp_ %ftpsite% /LuaAPI MCServer/API/*.*
+ncftpput -p %ftppass% -u %ftpuser% -T temp_ -R %ftpsite% /LuaAPI MCServer/API/*.*
 if errorlevel 1 goto haderror
 echo Upload finished.
 

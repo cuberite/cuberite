@@ -1,17 +1,8 @@
 
 :: AllToLua.bat
-
 :: This scripts updates the automatically-generates Lua bindings in Bindings.cpp / Bindings.h
-
-
-
-
-
-:: If there was a Git conflict, resolve it by resetting to HEAD; we're regenerating the files from scratch anyway
-git checkout --ours Bindings.cpp
-git add -u Bindings.cpp
-git checkout --ours Bindings.h
-git add -u Bindings.h
+:: When called without any parameters, it will pause for a keypress at the end
+:: Call with any parameter to disable the wait (for buildserver use)
 
 
 
@@ -23,5 +14,9 @@ git add -u Bindings.h
 
 
 
-
+: Wait for keypress, if no param given:
 if %ALLTOLUA_WAIT%N == N pause
+
+
+
+

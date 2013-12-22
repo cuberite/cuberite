@@ -36,6 +36,7 @@ Implements the 1.5.x protocol classes:
 enum
 {
 	PACKET_WINDOW_OPEN = 0x64,
+	PACKET_PARTICLE_EFFECT = 0x3F,
 } ;
 
 
@@ -69,6 +70,26 @@ void cProtocol150::SendWindowOpen(const cWindow & a_Window)
 	WriteString(a_Window.GetWindowTitle());
 	WriteByte  (a_Window.GetNumNonInventorySlots());
 	WriteByte  (1);  // Use title
+	Flush();
+}
+
+
+
+
+
+void cProtocol150::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_PARTICLE_EFFECT);
+	WriteString(a_ParticleName);
+	WriteFloat(a_SrcX);
+	WriteFloat(a_SrcY);
+	WriteFloat(a_SrcZ);
+	WriteFloat(a_OffsetX);
+	WriteFloat(a_OffsetY);
+	WriteFloat(a_OffsetZ);
+	WriteFloat(a_ParticleData);
+	WriteInt(a_ParticleAmmount);
 	Flush();
 }
 

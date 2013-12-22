@@ -6,9 +6,14 @@
 #include "Globals.h"
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
-#include "../World.h"
+#include "FastNBT.h"
 #include "zlib/zlib.h"
+#include "../World.h"
 #include "../BlockID.h"
+#include "../Item.h"
+#include "../ItemGrid.h"
+#include "../StringCompression.h"
+
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
@@ -17,11 +22,11 @@
 #include "../BlockEntities/JukeboxEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
-#include "../Item.h"
-#include "../ItemGrid.h"
-#include "../StringCompression.h"
-#include "FastNBT.h"
+
+
 #include "../Mobs/Monster.h"
+#include "../Mobs/IncludeAllMonsters.h"
+
 #include "../Entities/Boat.h"
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Minecart.h"
@@ -984,6 +989,122 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadThrownEnderpearlFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "Bat", a_IDTagLength) == 0)
+	{
+		LoadBatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Blaze", a_IDTagLength) == 0)
+	{
+		LoadBlazeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "CaveSpider", a_IDTagLength) == 0)
+	{
+		LoadCaveSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Chicken", a_IDTagLength) == 0)
+	{
+		LoadChickenFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Cow", a_IDTagLength) == 0)
+	{
+		LoadCowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Creeper", a_IDTagLength) == 0)
+	{
+		LoadCreeperFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "EnderDragon", a_IDTagLength) == 0)
+	{
+		LoadEnderDragonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Enderman", a_IDTagLength) == 0)
+	{
+		LoadEndermanFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Ghast", a_IDTagLength) == 0)
+	{
+		LoadGhastFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Giant", a_IDTagLength) == 0)
+	{
+		LoadGiantFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Horse", a_IDTagLength) == 0)
+	{
+		LoadHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "VillagerGolem", a_IDTagLength) == 0)
+	{
+		LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "LavaSlime", a_IDTagLength) == 0)
+	{
+		LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "MushroomCow", a_IDTagLength) == 0)
+	{
+		LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Ozelot", a_IDTagLength) == 0)
+	{
+		LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Pig", a_IDTagLength) == 0)
+	{
+		LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Sheep", a_IDTagLength) == 0)
+	{
+		LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Silverfish", a_IDTagLength) == 0)
+	{
+		LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Skeleton", a_IDTagLength) == 0)
+	{
+		LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Slime", a_IDTagLength) == 0)
+	{
+		LoadSlimeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "SnowMan", a_IDTagLength) == 0)
+	{
+		LoadSnowGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Spider", a_IDTagLength) == 0)
+	{
+		LoadSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Squid", a_IDTagLength) == 0)
+	{
+		LoadSquidFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Villager", a_IDTagLength) == 0)
+	{
+		LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Witch", a_IDTagLength) == 0)
+	{
+		LoadWitchFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Wither", a_IDTagLength) == 0)
+	{
+		LoadWitherFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Wolf", a_IDTagLength) == 0)
+	{
+		LoadWolfFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Zombie", a_IDTagLength) == 0)
+	{
+		LoadZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "PigZombie", a_IDTagLength) == 0)
+	{
+		LoadPigZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	// TODO: other entities
 }
 
@@ -1007,7 +1128,20 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 
 void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	// TODO
+	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "TileID");
+	int MetaIdx = a_NBT.FindChildByName(a_TagIdx, "Data");
+
+	if ((TypeIdx < 0) || (MetaIdx < 0)) { return; }
+
+	int Type = a_NBT.GetInt(TypeIdx);
+	NIBBLETYPE Meta = (NIBBLETYPE)a_NBT.GetByte(MetaIdx);
+
+	std::auto_ptr<cFallingBlock> FallingBlock(new cFallingBlock(Vector3i(0, 0, 0), Type, Meta));
+	if (!LoadEntityBaseFromNBT(*FallingBlock.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	a_Entities.push_back(FallingBlock.release());
 }
 
 
@@ -1248,6 +1382,488 @@ void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cPar
 	
 	// Store the new enderpearl in the entities list:
 	a_Entities.push_back(Enderpearl.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadBatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cBat> Monster(new cBat());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cBlaze> Monster(new cBlaze());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cCavespider> Monster(new cCavespider());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cChicken> Monster(new cChicken());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadCowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cCow> Monster(new cCow());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadCreeperFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cCreeper> Monster(new cCreeper());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadEnderDragonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cEnderDragon> Monster(new cEnderDragon());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadEndermanFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cEnderman> Monster(new cEnderman());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadGhastFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cGhast> Monster(new cGhast());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cGiant> Monster(new cGiant());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Type");
+	int ColorIdx = a_NBT.FindChildByName(a_TagIdx, "Color");
+	int StyleIdx = a_NBT.FindChildByName(a_TagIdx, "Style");
+
+	if ((TypeIdx < 0) || (ColorIdx < 0) || (StyleIdx < 0)) { return; }
+
+	int Type = a_NBT.GetInt(TypeIdx);
+	int Color = a_NBT.GetInt(ColorIdx);
+	int Style = a_NBT.GetInt(StyleIdx);
+
+	std::auto_ptr<cHorse> Monster(new cHorse(Type, Color, Style, 1));
+
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadIronGolemFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cIronGolem> Monster(new cIronGolem());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int SizeIdx = a_NBT.FindChildByName(a_TagIdx, "Size");
+
+	if (SizeIdx < 0) { return; }
+
+	int Size = a_NBT.GetInt(SizeIdx);
+
+	std::auto_ptr<cMagmaCube> Monster(new cMagmaCube(Size));
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadMooshroomFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cMooshroom> Monster(new cMooshroom());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cOcelot> Monster(new cOcelot());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cPig> Monster(new cPig());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int ColorIdx = a_NBT.FindChildByName(a_TagIdx, "Color");
+
+	if (ColorIdx < 0) { return; }
+
+	int Color = (int)a_NBT.GetByte(ColorIdx);
+
+	std::auto_ptr<cSheep> Monster(new cSheep(Color));
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadSilverfishFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cSilverfish> Monster(new cSilverfish());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "SkeletonType");
+
+	if (TypeIdx < 0) { return; }
+
+	bool Type = ((a_NBT.GetByte(TypeIdx) == 1) ? true : false);
+
+	std::auto_ptr<cSkeleton> Monster(new cSkeleton(Type));
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadSlimeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int SizeIdx = a_NBT.FindChildByName(a_TagIdx, "Size");
+
+	if (SizeIdx < 0) { return; }
+
+	int Size = a_NBT.GetInt(SizeIdx);
+
+	std::auto_ptr<cSlime> Monster(new cSlime(Size));
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadSnowGolemFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cSnowGolem> Monster(new cSnowGolem());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cSpider> Monster(new cSpider());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadSquidFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cSquid> Monster(new cSquid());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Profession");
+
+	if (TypeIdx < 0) { return; }
+
+	int Type = a_NBT.GetInt(TypeIdx);
+
+	std::auto_ptr<cVillager> Monster(new cVillager(cVillager::eVillagerType(Type)));
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadWitchFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cWitch> Monster(new cWitch());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cWither> Monster(new cWither());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cWolf> Monster(new cWolf());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int IsVillagerIdx = a_NBT.FindChildByName(a_TagIdx, "IsVillager");
+
+	if (IsVillagerIdx < 0) { return; }
+
+	bool IsVillagerZombie = ((a_NBT.GetByte(IsVillagerIdx) == 1) ? true : false);
+
+	std::auto_ptr<cZombie> Monster(new cZombie(IsVillagerZombie));
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cZombiePigman> Monster(new cZombiePigman());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
 }
 
 

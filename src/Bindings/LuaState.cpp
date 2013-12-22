@@ -18,7 +18,7 @@ extern "C"
 // fwd: SQLite/lsqlite3.c
 extern "C"
 {
-	LUALIB_API int luaopen_lsqlite3(lua_State * L);
+	int luaopen_lsqlite3(lua_State * L);
 }
 
 // fwd: LuaExpat/lxplib.c:
@@ -309,7 +309,7 @@ void cLuaState::Push(const AStringVector & a_Vector)
 {
 	ASSERT(IsValid());
 
-	lua_createtable(m_LuaState, a_Vector.size(), 0);
+	lua_createtable(m_LuaState, (int)a_Vector.size(), 0);
 	int newTable = lua_gettop(m_LuaState);
 	int index = 1;
 	for (AStringVector::const_iterator itr = a_Vector.begin(), end = a_Vector.end(); itr != end; ++itr, ++index)

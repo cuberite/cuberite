@@ -26,6 +26,23 @@ if %vc%a == a set vc="vcbuild.exe"
 
 
 
+:: Check that the required environment vars are available:
+if "a%ftppass%" == "a" (
+	echo You need to set FTP password in the ftppass environment variable to upload the files
+	goto haderror
+)
+if "a%ftpuser%" == "a" (
+	echo You need to set FTP username in the ftpuser environment variable to upload the files
+	goto haderror
+)
+if "a%ftpsite%" == "a" (
+	echo You need to set FTP server in the ftpsite environment variable to upload the files
+	goto haderror
+)
+
+
+
+
 :: Get the date and time into vars:
 For /f "tokens=2-4 delims=/. " %%a in ('date /t') do (
 	set MYYEAR=%%c
@@ -33,11 +50,6 @@ For /f "tokens=2-4 delims=/. " %%a in ('date /t') do (
 	set MYDAY=%%a
 )
 For /f "tokens=1-2 delims=/:" %%a in ('time /t') do (set MYTIME=%%a_%%b)
-
-echo MYYEAR = %MYYEAR%
-echo MYMONTH = %MYMONTH%
-echo MYDAY = %MYDAY%
-echo MYTIME = %MYTIME%
 
 echo Performing nightbuild of MC-Server
 
@@ -48,9 +60,6 @@ echo Performing nightbuild of MC-Server
 set DONOTPAUSE=y
 
 :: Update the sources to the latest revision:
-del src\Bindings\Bindings.cpp
-del src\Bindings\Bindings.h
-git checkout -- src\Bindings\Bindings.*
 git pull
 if errorlevel 1 goto haderror
 
@@ -72,7 +81,9 @@ if errorlevel 1 goto haderror
 
 
 :: Test if the version is already present, using a "tagfile" that we create upon successful build
-set TAGFILE=Install\built_%COMMITID%.tag
+set TAGFOLDER=Install\%MYYEAR%_%MYMONTH%\
+set TAGFILE=%TAGFOLDER%built_%COMMITID%.tag
+echo Tag file: %TAGFILE%
 if exist %TAGFILE% (
 	echo Latest version already present, bailing out
 	goto end
@@ -81,13 +92,13 @@ if exist %TAGFILE% (
 
 
 :: Update the Bindings:
-del src\Bindings.cpp
-del src\Bindings.h
 echo Updating Lua bindings
+del src\Bindings\Bindings.cpp
+del src\Bindings\Bindings.h
 set ALLTOLUA_WAIT=N
-cd src
+cd src\Bindings
 call AllToLua.bat
-cd ..
+cd ..\..
 
 
 
@@ -126,18 +137,6 @@ if errorlevel 1 goto haderror
 
 :: upload to the FTP:
 :upload
-if "a%ftppass%" == "a" (
-	echo You need to set FTP password in the ftppass environment variable to upload the files
-	goto end
-)
-if "a%ftpuser%" == "a" (
-	echo You need to set FTP username in the ftpuser environment variable to upload the files
-	goto end
-)
-if "a%ftpsite%" == "a" (
-	echo You need to set FTP server in the ftpsite environment variable to upload the files
-	goto end
-)
 ncftpput -p %ftppass% -u %ftpuser% -T temp_ %ftpsite% / Install\MCServer_Win_%FILESUFFIX%.7z
 if errorlevel 1 goto haderror
 ncftpput -p %ftppass% -u %ftpuser% -T temp_ %ftpsite% /PDBs Install\PDBs_%FILESUFFIX%.7z
@@ -148,6 +147,7 @@ echo Upload finished.
 
 
 :: Create the tagfile so that we know that this CommitID has been built already
+mkdir %TAGFOLDER%
 touch %TAGFILE%
 
 

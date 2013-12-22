@@ -11,7 +11,7 @@
 #include <assert.h>
 
 #include "OSSupport/CriticalSection.h"
-#include "OSSupport/MakeDir.h"
+#include "OSSupport/File.h"
 #include "ToJava.h"
 
 #include "Root.h"
@@ -84,7 +84,7 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeOnCreate( JNIEnv*  env,
 	//__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "Logging from C++!");
 	g_CriticalSection.Unlock();
 	
-	mkdir("/sdcard/mcserver", S_IRWXU | S_IRWXG | S_IRWXO);
+	cFile::CreateFolder("/sdcard/mcserver");
 
 	pRoot = new cRoot();
 	pRoot->Start();
@@ -105,7 +105,7 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeCleanUp( JNIEnv*  env, 
 	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "pRoot: %p", pRoot);
 	if( pRoot != NULL )
 	{
-		pRoot->ExecuteConsoleCommand("stop");
+		pRoot->QueueExecuteConsoleCommand("stop");
 	}
 }
 
@@ -124,7 +124,7 @@ extern "C" jint Java_com_mcserver_MCServerActivity_NativeGetWebAdminPort( JNIEnv
 {
 	if( pRoot != NULL && pRoot->GetWebAdmin() != NULL )
 	{
-		return pRoot->GetWebAdmin()->GetPort();
+		return atoi(pRoot->GetWebAdmin()->GetIPv4Ports().c_str());
 	}
 	return 0;
 }

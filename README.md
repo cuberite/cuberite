@@ -14,7 +14,7 @@ After you've cloned the repository, you probably want to pull down the submodule
 
 Compilation instructions are available in the COMPILING file.
 
-Linux builds can be downloaded from [the Berboe CI server](http://ci.berboe.co.uk) and windows from xoft's [nightly build service](http://mc-server.xoft.cz).
+Linux builds can be downloaded from [Bearbin's CI Service](http://ci.bearbin.net) and Windows builds from xoft's [nightly build service](http://mc-server.xoft.cz).
 
 After you've extracted the files, simply run the MCServer executable.
 

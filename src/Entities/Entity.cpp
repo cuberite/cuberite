@@ -13,6 +13,7 @@
 #include "../Bindings/PluginManager.h"
 #include "../Tracer.h"
 #include "Minecart.h"
+#include "Player.h"
 
 
 
@@ -239,10 +240,14 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	TDI.Attacker = a_Attacker;
 	TDI.RawDamage = a_RawDamage;
 	TDI.FinalDamage = a_FinalDamage;
-	Vector3d Heading;
-	Heading.x = sin(GetRotation());
-	Heading.y = 0.4;  // TODO: adjust the amount of "up" knockback when testing
-	Heading.z = cos(GetRotation());
+	
+	Vector3d Heading(0, 0, 0);
+	if (a_Attacker != NULL)
+	{
+		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 10 : 8);
+	}
+	Heading.y = 2;
+
 	TDI.Knockback = Heading * a_KnockbackAmount;
 	DoTakeDamage(TDI);
 }
@@ -297,6 +302,16 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return;
 	}
 
+	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
+	{
+		// IsOnGround() only is false if the player is moving downwards
+		if (!((cPlayer *)a_TDI.Attacker)->IsOnGround()) // TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+		{
+			a_TDI.FinalDamage += 2;
+			m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
+		}
+	}
+
 	m_Health -= (short)a_TDI.FinalDamage;
 	
 	// TODO: Apply damage to armor
@@ -305,6 +320,8 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		m_Health = 0;
 	}
+
+	AddSpeed(a_TDI.Knockback * 2);
 
 	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_HURT);
 

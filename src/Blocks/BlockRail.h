@@ -43,6 +43,40 @@ public:
 	}
 
 
+	virtual void OnPlaced(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	{
+		super::OnPlaced(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+
+		// Alert diagonal rails
+		OnNeighborChanged(a_World, a_BlockX + 1, a_BlockY + 1, a_BlockZ);
+		OnNeighborChanged(a_World, a_BlockX - 1, a_BlockY + 1, a_BlockZ);
+		OnNeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ + 1);
+		OnNeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ - 1);
+
+		OnNeighborChanged(a_World, a_BlockX + 1, a_BlockY - 1, a_BlockZ);
+		OnNeighborChanged(a_World, a_BlockX - 1, a_BlockY - 1, a_BlockZ);
+		OnNeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ + 1);
+		OnNeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ - 1);
+	}
+
+
+	virtual void OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	{
+		super::OnDestroyed(a_World, a_BlockX, a_BlockY, a_BlockZ);
+
+		// Alert diagonal rails
+		OnNeighborChanged(a_World, a_BlockX + 1, a_BlockY + 1, a_BlockZ);
+		OnNeighborChanged(a_World, a_BlockX - 1, a_BlockY + 1, a_BlockZ);
+		OnNeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ + 1);
+		OnNeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ - 1);
+
+		OnNeighborChanged(a_World, a_BlockX + 1, a_BlockY - 1, a_BlockZ);
+		OnNeighborChanged(a_World, a_BlockX - 1, a_BlockY - 1, a_BlockZ);
+		OnNeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ + 1);
+		OnNeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ - 1);
+	}
+
+
 	virtual void OnNeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);

@@ -608,6 +608,15 @@ void cProtocol125::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 
 
 
+void cProtocol125::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+{
+	// Not supported by this protocol version
+}
+
+
+
+
+
 void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 {
 	cCSLock Lock(m_CSPacket);

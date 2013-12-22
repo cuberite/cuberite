@@ -301,10 +301,10 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 		LOGWARNING("%s: MaxBlockY less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxBlockY = 0;
 	}
-	else if (a_MaxBlockY >= cChunkDef::Height)
+	else if (a_MaxBlockY > cChunkDef::Height)
 	{
 		LOGWARNING("%s: MaxBlockY more than chunk height, adjusting to chunk height", __FUNCTION__);
-		a_MaxBlockY = cChunkDef::Height - 1;
+		a_MaxBlockY = cChunkDef::Height;
 	}
 	
 	// Allocate the needed memory:
@@ -349,10 +349,10 @@ bool cBlockArea::Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a
 		LOGWARNING("%s: MinBlockY less than zero, adjusting to zero", __FUNCTION__);
 		a_MinBlockY = 0;
 	}
-	else if (a_MinBlockY >= cChunkDef::Height - m_SizeY)
+	else if (a_MinBlockY > cChunkDef::Height - m_SizeY)
 	{
 		LOGWARNING("%s: MinBlockY + m_SizeY more than chunk height, adjusting to chunk height", __FUNCTION__);
-		a_MinBlockY = cChunkDef::Height - m_SizeY - 1;
+		a_MinBlockY = cChunkDef::Height - m_SizeY;
 	}
 
 	return a_World->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);

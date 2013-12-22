@@ -521,6 +521,24 @@ void cProtocol172::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 
 
 
+void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+{
+	cPacketizer Pkt(*this, 0x2A);
+	Pkt.WriteString(a_ParticleName);
+	Pkt.WriteFloat(a_SrcX);
+	Pkt.WriteFloat(a_SrcY);
+	Pkt.WriteFloat(a_SrcZ);
+	Pkt.WriteFloat(a_OffsetX);
+	Pkt.WriteFloat(a_OffsetY);
+	Pkt.WriteFloat(a_OffsetZ);
+	Pkt.WriteFloat(a_ParticleData);
+	Pkt.WriteInt(a_ParticleAmmount);
+}
+
+
+
+
+
 void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 {
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
