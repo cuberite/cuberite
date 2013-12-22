@@ -189,7 +189,7 @@ void cLightingThread::ChunkReady(int a_ChunkX, int a_ChunkZ)
 		{
 			if (
 				(itr->x - a_ChunkX >= -1) && (itr->x - a_ChunkX <= 1) &&
-				(itr->x - a_ChunkX >= -1) && (itr->x - a_ChunkX <= 1)
+				(itr->z - a_ChunkZ >= -1) && (itr->z - a_ChunkZ <= 1)
 			)
 			{
 				// It is a neighbor
