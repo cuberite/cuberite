@@ -529,6 +529,7 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 			
 			/*
 			NIBBLETYPE SkyLight = 0;
+
 			NIBBLETYPE BlockLight = 0;
 			*/
 
@@ -2894,6 +2895,14 @@ NIBBLETYPE cChunk::GetTimeAlteredLight(NIBBLETYPE a_Skylight) const
 	// Because NIBBLETYPE is unsigned, we clamp it to 0 .. 15 by checking for values above 15
 	return (a_Skylight < 16)? a_Skylight : 0;
 }
+
+
+
+
+
+#if !C_CHUNK_USE_INLINE
+# include "cChunk.inl.h"
+#endif
 
 
 
