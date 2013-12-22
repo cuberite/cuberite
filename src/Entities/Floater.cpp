@@ -59,7 +59,22 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 				m_ParticlePos = (m_ParticlePos + (GetPosition() - m_ParticlePos) / 6);
 				m_World->BroadcastParticleEffect("splash", (float) m_ParticlePos.x, (float) m_ParticlePos.y, (float) m_ParticlePos.z, 0, 0, 0, 0, 15);
 			}
+			
 			m_CountDownTime--;
+			if (m_World->GetHeight((int) GetPosX(), (int) GetPosZ()) == (int) GetPosY())
+			{
+				if (m_World->IsWeatherWet() && m_World->GetTickRandomNumber(3) == 0) // 25% chance of an extra countdown when being rained on.
+				{
+					m_CountDownTime--;
+				}
+			}
+			else // if the floater is underground it has a 50% chance of not decreasing the countdown.
+			{
+				if (m_World->GetTickRandomNumber(1) == 0)
+				{
+					m_CountDownTime++;
+				}
+			}
 		}
 		SetSpeedY(0.7);
 	}
