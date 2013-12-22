@@ -16,7 +16,6 @@
 
 #include "../ChunkDef.h"
 #include "../OSSupport/IsThread.h"
-#include "../OSSupport/Queue.h"
 
 
 
@@ -94,7 +93,7 @@ protected:
 		sChunkLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate) : m_ChunkX(a_ChunkX), m_ChunkY(a_ChunkY), m_ChunkZ(a_ChunkZ), m_Generate(a_Generate) {}
 	} ;
 	
-	typedef cQueue<sChunkLoad> sChunkLoadQueue;
+	typedef std::list<sChunkLoad> sChunkLoadQueue;
 	
 	cWorld * m_World;
 	AString  m_StorageSchemaName;
