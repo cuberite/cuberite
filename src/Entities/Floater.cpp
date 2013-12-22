@@ -52,12 +52,12 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 			{
 				LOGD("Started producing particles for floater %i", GetUniqueID());
 				m_ParticlePos.Set(GetPosX() + (-4 + m_World->GetTickRandomNumber(8)), GetPosY(), GetPosZ() + (-4 + m_World->GetTickRandomNumber(8)));
-				m_World->BroadcastParticleEffect("splash", m_ParticlePos.x, m_ParticlePos.y, m_ParticlePos.z, 0, 0, 0, 0, 15);
+				m_World->BroadcastParticleEffect("splash", (float) m_ParticlePos.x, (float) m_ParticlePos.y, (float) m_ParticlePos.z, 0, 0, 0, 0, 15);
 			}
 			else if (m_CountDownTime < 20)
 			{
 				m_ParticlePos = (m_ParticlePos + (GetPosition() - m_ParticlePos) / 6);
-				m_World->BroadcastParticleEffect("splash", m_ParticlePos.x, m_ParticlePos.y, m_ParticlePos.z, 0, 0, 0, 0, 15);
+				m_World->BroadcastParticleEffect("splash", (float) m_ParticlePos.x, (float) m_ParticlePos.y, (float) m_ParticlePos.z, 0, 0, 0, 0, 15);
 			}
 			m_CountDownTime--;
 		}
