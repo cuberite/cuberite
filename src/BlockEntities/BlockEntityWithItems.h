@@ -73,6 +73,7 @@ protected:
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	{
+		UNUSED(a_SlotNum);
 		ASSERT(a_Grid == &m_Contents);
 		if (m_World != NULL)
 		{

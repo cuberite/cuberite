@@ -105,7 +105,7 @@ public:
 
 
 	cWebAdmin(void);
-	~cWebAdmin();
+	virtual ~cWebAdmin();
 
 	/// Initializes the object. Returns true if successfully initialized and ready to start
 	bool Init(void);
@@ -169,9 +169,16 @@ protected:
 		virtual void OnBody(const char * a_Data, int a_Size) override;
 
 		// cHTTPFormParser::cCallbacks overrides. Files are ignored:
-		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) override {}
-		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, int a_Size) override {}
-		virtual void OnFileEnd(cHTTPFormParser & a_Parser) override {}
+		virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) override 
+		{
+			UNUSED(a_FileName);
+		}
+		virtual void OnFileData(cHTTPFormParser &, const char * a_Data, int a_Size) override 
+		{
+			UNUSED(a_Data);
+			UNUSED(a_Size);
+		}
+		virtual void OnFileEnd(cHTTPFormParser &) override {}
 	} ;
 
 

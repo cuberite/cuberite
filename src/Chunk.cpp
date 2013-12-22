@@ -527,9 +527,9 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 			// MG TODO : check that "Level" really means Y
 			
-			NIBBLETYPE SkyLight = 0;
+			/*NIBBLETYPE SkyLight = 0;
 
-			NIBBLETYPE BlockLight = 0;
+			NIBBLETYPE BlockLight = 0;*/
 
 			if (IsLightValid())
 			{
@@ -2323,7 +2323,6 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 
 void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 	a_BlockType = cChunkDef::GetBlock (m_BlockTypes, a_RelX, a_RelY, a_RelZ);
 	a_BlockMeta = cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ);
 }

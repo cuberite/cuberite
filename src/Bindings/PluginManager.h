@@ -273,7 +273,7 @@ private:
 	bool m_bReloadPlugins;
 
 	cPluginManager();
-	~cPluginManager();
+	virtual ~cPluginManager();
 
 	/// Reloads all plugins, defaulting to settings.ini for settings location
 	void ReloadPluginsNow(void);

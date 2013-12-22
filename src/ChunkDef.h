@@ -180,8 +180,9 @@ public:
 
 
 	/// Converts absolute block coords into relative (chunk + block) coords:
-	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ )
+	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int& a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ )
 	{
+		UNUSED(a_Y);
 		BlockToChunk(a_X, a_Z, a_ChunkX, a_ChunkZ);
 
 		a_X = a_X - a_ChunkX * Width;

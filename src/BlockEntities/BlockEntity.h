@@ -87,7 +87,12 @@ public:
 	virtual void SendTo(cClientHandle & a_Client) = 0;
 	
 	/// Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing.
-	virtual bool Tick(float a_Dt, cChunk & a_Chunk) { return false; }
+	virtual bool Tick(float a_Dt, cChunk & a_Chunk)
+	{
+		UNUSED(a_Dt);
+		UNUSED(a_Chunk); 
+		return false;
+	}
 
 protected:
 	/// Position in absolute block coordinates

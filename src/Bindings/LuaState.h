@@ -246,6 +246,7 @@ public:
 	>
 	bool Call(FnT a_FnName, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -265,6 +266,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -285,6 +287,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -306,6 +309,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -328,6 +332,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -351,6 +356,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -376,6 +382,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -402,6 +409,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -429,6 +437,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -457,6 +466,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -486,6 +496,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, ArgT10 a_Arg10, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -515,6 +526,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -536,6 +548,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -559,6 +572,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -583,6 +597,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -608,6 +623,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -635,6 +651,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -663,6 +680,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -692,6 +710,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -722,6 +741,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -753,6 +773,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3, RetT4 & a_Ret4, RetT5 & a_Ret5)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;

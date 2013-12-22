@@ -38,6 +38,7 @@ class cNullCommandOutputCallback :
 	virtual void Out(const AString & a_Text) override
 	{
 		// Do nothing
+		UNUSED(a_Text);
 	}
 } ;
 
