@@ -22,7 +22,7 @@ public:
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);
 	~cFireSimulator();
 
-	virtual void Simulate(float /*a_Dt*/) override {}  // not used
+	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;

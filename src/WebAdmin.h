@@ -169,8 +169,15 @@ protected:
 		virtual void OnBody(const char * a_Data, int a_Size) override;
 
 		// cHTTPFormParser::cCallbacks overrides. Files are ignored:
-		virtual void OnFileStart(cHTTPFormParser &, const AString & /*a_FileName*/) override {}
-		virtual void OnFileData(cHTTPFormParser &, const char * /*a_Data*/, int /*a_Size*/) override {}
+		virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) override 
+		{
+			UNUSED(a_FileName);
+		}
+		virtual void OnFileData(cHTTPFormParser &, const char * a_Data, int a_Size) override 
+		{
+			UNUSED(a_Data);
+			UNUSED(a_Size);
+		}
 		virtual void OnFileEnd(cHTTPFormParser &) override {}
 	} ;
 

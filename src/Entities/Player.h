@@ -45,7 +45,7 @@ public:
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual void HandlePhysics(float /*a_Dt*/, cChunk &) override { };
+	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); };
 
 	/// Returns the curently equipped weapon; empty item if none
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }

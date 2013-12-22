@@ -52,7 +52,11 @@ public:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace);
 	
 	/// Called by the physics blocktracer when the entity hits another entity
-	virtual void OnHitEntity(cEntity & /*a_EntityHit*/, const Vector3d & /*a_HitPos*/) {}
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) 
+	{
+		UNUSED(a_EntityHit);
+		UNUSED(a_HitPos);
+	}
 	
 	/// Called by Chunk when the projectile is eligible for player collection
 	virtual void CollectedBy(cPlayer * a_Dest);

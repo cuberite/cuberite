@@ -733,54 +733,6 @@ src/ltm.c.s:
 	cd /home/tycho/MCServer && $(MAKE) -f lib/lua/CMakeFiles/lua.dir/build.make lib/lua/CMakeFiles/lua.dir/src/ltm.c.s
 .PHONY : src/ltm.c.s
 
-src/lua.o: src/lua.c.o
-.PHONY : src/lua.o
-
-# target to build an object file
-src/lua.c.o:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/lua/CMakeFiles/lua.dir/build.make lib/lua/CMakeFiles/lua.dir/src/lua.c.o
-.PHONY : src/lua.c.o
-
-src/lua.i: src/lua.c.i
-.PHONY : src/lua.i
-
-# target to preprocess a source file
-src/lua.c.i:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/lua/CMakeFiles/lua.dir/build.make lib/lua/CMakeFiles/lua.dir/src/lua.c.i
-.PHONY : src/lua.c.i
-
-src/lua.s: src/lua.c.s
-.PHONY : src/lua.s
-
-# target to generate assembly for a file
-src/lua.c.s:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/lua/CMakeFiles/lua.dir/build.make lib/lua/CMakeFiles/lua.dir/src/lua.c.s
-.PHONY : src/lua.c.s
-
-src/luac.o: src/luac.c.o
-.PHONY : src/luac.o
-
-# target to build an object file
-src/luac.c.o:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/lua/CMakeFiles/lua.dir/build.make lib/lua/CMakeFiles/lua.dir/src/luac.c.o
-.PHONY : src/luac.c.o
-
-src/luac.i: src/luac.c.i
-.PHONY : src/luac.i
-
-# target to preprocess a source file
-src/luac.c.i:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/lua/CMakeFiles/lua.dir/build.make lib/lua/CMakeFiles/lua.dir/src/luac.c.i
-.PHONY : src/luac.c.i
-
-src/luac.s: src/luac.c.s
-.PHONY : src/luac.s
-
-# target to generate assembly for a file
-src/luac.c.s:
-	cd /home/tycho/MCServer && $(MAKE) -f lib/lua/CMakeFiles/lua.dir/build.make lib/lua/CMakeFiles/lua.dir/src/luac.c.s
-.PHONY : src/luac.c.s
-
 src/lundump.o: src/lundump.c.o
 .PHONY : src/lundump.o
 
@@ -964,12 +916,6 @@ help:
 	@echo "... src/ltm.o"
 	@echo "... src/ltm.i"
 	@echo "... src/ltm.s"
-	@echo "... src/lua.o"
-	@echo "... src/lua.i"
-	@echo "... src/lua.s"
-	@echo "... src/luac.o"
-	@echo "... src/luac.i"
-	@echo "... src/luac.s"
 	@echo "... src/lundump.o"
 	@echo "... src/lundump.i"
 	@echo "... src/lundump.s"

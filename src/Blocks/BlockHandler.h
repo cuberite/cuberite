@@ -99,7 +99,11 @@ public:
 	virtual bool DoesIgnoreBuildCollision(void);
 
 	/// <summary>Similar to DoesIgnoreBuildCollision(void), but is used for cases where block meta/player item-in-hand is needed to determine collision (thin snow)</summary>
-	virtual bool DoesIgnoreBuildCollision(cPlayer *, NIBBLETYPE /*a_Meta*/) { return DoesIgnoreBuildCollision(); }
+	virtual bool DoesIgnoreBuildCollision(cPlayer *, NIBBLETYPE a_Meta) 
+	{ 
+		UNUSED(a_Meta);
+		return DoesIgnoreBuildCollision(); 
+	}
 
 	/// <summary>Returns if this block drops if it gets destroyed by an unsuitable situation. Default: true</summary>
 	virtual bool DoesDropOnUnsuitable(void);
