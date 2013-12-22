@@ -907,8 +907,7 @@ void cRedstoneSimulator::HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_
 		}
 	}
 
-	LOG("%i", m_World.GetSkyDarkness());
-	if (m_World.GetSkyDarkness() > 10)
+	if (m_World.GetSkyDarkness() < 8)
 	{
 		SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DAYLIGHT_SENSOR);
 	}
