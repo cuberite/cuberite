@@ -25,7 +25,13 @@ public:
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
 	
 	/// Called when the client sends the SHOOT status in the lclk packet
-	virtual void OnItemShoot(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) {}
+	virtual void OnItemShoot(cPlayer *, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) 
+	{
+		UNUSED(a_BlockX);
+		UNUSED(a_BlockY);
+		UNUSED(a_BlockZ);
+		UNUSED(a_BlockFace);
+	}
 	
 	/// Called while the player diggs a block using this item
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
