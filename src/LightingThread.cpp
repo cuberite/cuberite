@@ -495,6 +495,7 @@ void cLightingThread::CalcLightStep(
 	int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 )
 {
+	UNUSED(a_IsSeedIn);
 	int NumSeedsOut = 0;
 	for (int i = 0; i < a_NumSeedsIn; i++)
 	{
