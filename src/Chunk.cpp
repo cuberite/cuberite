@@ -2900,10 +2900,6 @@ NIBBLETYPE cChunk::GetTimeAlteredLight(NIBBLETYPE a_Skylight) const
 
 
 
-#if !C_CHUNK_USE_INLINE
-# include "cChunk.inl.h"
-#endif
-
 
 
 
