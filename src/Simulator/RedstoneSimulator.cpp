@@ -899,18 +899,20 @@ void cRedstoneSimulator::HandleNoteBlock(int a_BlockX, int a_BlockY, int a_Block
 
 void cRedstoneSimulator::HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	for (int Y = a_BlockY + 1; Y < cChunkDef::Height; Y++)
-	{
-		if (!g_BlockTransparent[m_World.GetBlock(a_BlockX, Y, a_BlockZ)])
-		{
-			return;
-		}
-	}
+	int a_ChunkX, a_ChunkZ;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, a_ChunkX, a_ChunkZ);
 
-	NIBBLETYPE SkyLight = m_World.GetBlockSkyLight(a_BlockX, a_BlockY + 1, a_BlockZ) - m_World.GetSkyDarkness();
-	if (SkyLight > 8)
+	if (!m_World.IsChunkLighted(a_ChunkX, a_ChunkZ))
 	{
-		SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DAYLIGHT_SENSOR);
+		m_World.QueueLightChunk(a_ChunkX, a_ChunkZ);
+	}
+	else
+	{
+		NIBBLETYPE SkyLight = m_World.GetBlockSkyLight(a_BlockX, a_BlockY + 1, a_BlockZ) - m_World.GetSkyDarkness();
+		if (SkyLight > 8)
+		{
+			SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DAYLIGHT_SENSOR);
+		}
 	}
 }
 
