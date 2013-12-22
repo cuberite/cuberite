@@ -1409,6 +1409,7 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 
 void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 {
+	UNUSED(a_World);
 	ASSERT(m_Player != NULL);
 	
 	if (a_SendRespawnPacket)
