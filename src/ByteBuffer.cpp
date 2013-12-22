@@ -781,7 +781,8 @@ bool cByteBuffer::ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes)
 		return false;
 	}
 	char buf[1024];
-	while (a_NumBytes > static_cast<size_t>(0))
+	// > 0 without generating warnings about unsigned comparisons where size_t is unsigned
+	while (a_NumBytes != 0)
 	{
 		size_t num = (a_NumBytes > sizeof(buf)) ? sizeof(buf) : a_NumBytes;
 		VERIFY(ReadBuf(buf, num));
