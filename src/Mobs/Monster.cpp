@@ -739,6 +739,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtChicken:       toReturn = new cChicken();                  break;
 		case mtCow:           toReturn = new cCow();                      break;
 		case mtCreeper:       toReturn = new cCreeper();                  break;
+		case mtEnderDragon:   toReturn = new cEnderDragon();              break;
 		case mtEnderman:      toReturn = new cEnderman();                 break;
 		case mtGhast:         toReturn = new cGhast();                    break;
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
@@ -746,6 +747,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtPig:           toReturn = new cPig();                      break;
 		case mtSheep:         toReturn = new cSheep (Random.NextInt(15)); break; // Colour parameter
 		case mtSilverfish:    toReturn = new cSilverfish();               break;
+		case mtSnowGolem:     toReturn = new cSnowGolem();                break;
 		case mtSpider:        toReturn = new cSpider();                   break;
 		case mtSquid:         toReturn = new cSquid();                    break;
 		case mtWitch:         toReturn = new cWitch();                    break;
