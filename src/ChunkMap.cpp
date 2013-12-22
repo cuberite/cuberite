@@ -605,6 +605,25 @@ void cChunkMap::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animat
 
 
 
+void cChunkMap::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	int ChunkX, ChunkZ;
+
+	cChunkDef::BlockToChunk(a_SrcX, a_SrcZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount, a_Exclude);
+}
+
+
+
+
+
 void cChunkMap::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);

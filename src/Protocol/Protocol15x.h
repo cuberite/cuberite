@@ -28,8 +28,9 @@ class cProtocol150 :
 public:
 	cProtocol150(cClientHandle * a_Client);
 	
-	virtual void SendWindowOpen(const cWindow & a_Window) override;
-	
+	virtual void SendWindowOpen          (const cWindow & a_Window) override;
+	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
+
 	virtual int ParseWindowClick(void);
 } ;
 
