@@ -610,7 +610,7 @@ void cChunkMap::BroadcastParticleEffect(const AString & a_ParticleName, float a_
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(a_SrcX, a_SrcZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk((int) a_SrcX, (int) a_SrcZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if (Chunk == NULL)
 	{
