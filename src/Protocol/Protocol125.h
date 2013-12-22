@@ -54,6 +54,7 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override {}  // This protocol doesn't support such message
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;

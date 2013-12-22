@@ -180,7 +180,7 @@ public:
 		}
 		else
 		{
-			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID());
+			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), 100 + a_World->GetTickRandomNumber(800));  // TODO: for each lure level do 100 ticks less.
 			Floater->Initialize(a_World);
 			a_Player->SetIsFishing(true, Floater->GetUniqueID());
 		}
