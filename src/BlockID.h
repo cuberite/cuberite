@@ -833,14 +833,17 @@ enum eExplosionSource
 {
 	esOther,
 	esPrimedTNT,
-	esCreeper,
+	esMonster,
 	esBed,
 	esEnderCrystal,
 	esGhastFireball,
 	esWitherSkullBlack,
 	esWitherSkullBlue,
 	esWitherBirth,
-	esPlugin
+	esPlugin,
+	
+	// Obsolete constants, kept for compatibility, will be removed after some time:
+	esCreeper = esMonster,
 } ;
 
 // tolua_end

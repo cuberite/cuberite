@@ -142,18 +142,50 @@ protected:
 	
 	void LoadBoatFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFallingBlockFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPickupFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+
 	void LoadMinecartRFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartCFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartFFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartTFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartHFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadPickupFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+
 	void LoadArrowFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSnowballFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadEggFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFireballFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFireChargeFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+
+	void LoadBatFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadBlazeFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadCaveSpiderFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadChickenFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadCowFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadCreeperFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadEnderDragonFromNBT     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadEndermanFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadGhastFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadGiantFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadHorseFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadIronGolemFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMagmaCubeFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMooshroomFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadOcelotFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPigFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSheepFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSilverfishFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSkeletonFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSlimeFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSnowGolemFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSpiderFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSquidFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadVillagerFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadWitchFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadWitherFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadWolfFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadZombieFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPigZombieFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads entity common data from the NBT compound; returns true if successful
 	bool LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx);

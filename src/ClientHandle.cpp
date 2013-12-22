@@ -1872,6 +1872,15 @@ void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cI
 
 
 
+void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+{
+	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
+}
+
+
+
+
+
 void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	m_Protocol->SendPickupSpawn(a_Pickup);

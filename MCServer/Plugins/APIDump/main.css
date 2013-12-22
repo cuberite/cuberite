@@ -30,6 +30,11 @@ pre
 {
 	border: 1px solid #ccc;
 	background-color: #eee;
+	-moz-tab-size:    2;
+	-o-tab-size:      2;
+	-webkit-tab-size: 2;
+	-ms-tab-size:     2;
+	tab-size:         2;
 }
 
 body
@@ -44,6 +49,12 @@ body
 }
 
 header
+{
+	text-align: center;
+	font-family: Segoe UI Light, Helvetica;
+}
+
+footer
 {
 	text-align: center;
 	font-family: Segoe UI Light, Helvetica;

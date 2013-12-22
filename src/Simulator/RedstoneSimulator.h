@@ -89,6 +89,10 @@ private:
 	void HandleRedstoneLever(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/// <summary>Handles buttons</summary>
 	void HandleRedstoneButton(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
+	/// <summary>Handles daylight sensors</summary>
+	void HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// <summary>Handles pressure plates</summary>
+	void HandlePressurePlate(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
 	/* ==================== */
 
 	/* ====== CARRIERS ====== */
@@ -115,8 +119,6 @@ private:
 	void HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/// <summary>Handles noteblocks</summary>
 	void HandleNoteBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
-	/// <summary>Handles noteblocks</summary>
-	void HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/* ===================== */
 
 	/* ====== Helper functions ====== */

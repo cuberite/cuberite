@@ -1,4 +1,5 @@
 local Carpets = {}
+local PLUGIN
 
 function Initialize( Plugin )
 	Plugin:SetName( "MagicCarpet" )
@@ -9,7 +10,9 @@ function Initialize( Plugin )
 	
 	local PluginManager = cPluginManager:Get()
 	PluginManager:BindCommand("/mc", "magiccarpet", HandleCarpetCommand, " - Spawns a magical carpet");
-
+	
+	PLUGIN = Plugin
+	
 	LOG( "Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true
 end

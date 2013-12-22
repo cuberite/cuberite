@@ -27,6 +27,7 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
 	cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
 	cPluginManager.AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+	cPluginManager.AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
 
 	PM = cRoot:Get():GetPluginManager();
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
@@ -518,6 +519,14 @@ end
 function OnPlayerRightClickingEntity(a_Player, a_Entity)
 	LOG("Player " .. a_Player:GetName() .. " right-clicking entity ID " .. a_Entity:GetUniqueID() .. ", a " .. a_Entity:GetClass());
 	return false;
+end
+
+
+
+
+
+function OnPluginsLoaded()
+	LOG("All plugins loaded");
 end
 
 

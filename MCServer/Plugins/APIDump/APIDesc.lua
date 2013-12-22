@@ -1,4 +1,3 @@
-
 -- APIDesc.lua
 
 -- Contains the API objects' descriptions
@@ -308,18 +307,15 @@ g_APIDesc =
 				A wrapper class for constants representing colors or effects.
 			]],
 
-			Functions =
-			{
-				MakeColor = { Params = "ColorCodeConstant", Return = "string", Notes = "Creates the complete color-code-sequence from the color or effect constant" },
-			},
+			Functions = {},
 			Constants =
 			{
 				Black         = { Notes = "" },
 				Blue          = { Notes = "" },
 				Bold          = { Notes = "" },
-				Color         = { Notes = "The first character of the color-code-sequence, §" },
+				Color         = { Notes = "The first character of the color-code-sequence, ï¿½" },
 				DarkPurple    = { Notes = "" },
-				Delimiter     = { Notes = "The first character of the color-code-sequence, §" },
+				Delimiter     = { Notes = "The first character of the color-code-sequence, ï¿½" },
 				Gold          = { Notes = "" },
 				Gray          = { Notes = "" },
 				Green         = { Notes = "" },
@@ -2764,6 +2760,8 @@ end
 	ExtraPages =
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
+		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
+		{ FileName = "SettingUpDecoda.html", Title = "Setting up the Decoda Lua IDE" },
 		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
 	}
 } ;

@@ -118,7 +118,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	int KeyNum = a_SettingsIni.FindKey("Plugins");
 
 	// If it does, how many plugins are there?
-	unsigned int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
+	int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
 
 	if (KeyNum == -1)
 	{
@@ -126,7 +126,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	}
 	else if (NumPlugins > 0)
 	{
-		for(unsigned int i = 0; i < NumPlugins; i++)
+		for (int i = 0; i < NumPlugins; i++)
 		{
 			AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
 			if (ValueName.compare("Plugin") == 0)
@@ -136,7 +136,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 				{
 					if (m_Plugins.find(PluginFile) != m_Plugins.end())
 					{
-						LoadPlugin( PluginFile );
+						LoadPlugin(PluginFile);
 					}
 				}
 			}
@@ -155,6 +155,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	{
 		LOG("-- Loaded 1 Plugin --");
 	}
+	CallHookPluginsLoaded();
 }
 
 
@@ -981,6 +982,25 @@ bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, i
 		}
 	}
 	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPluginsLoaded(void)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLUGINS_LOADED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	bool res = false;
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		res = !(*itr)->OnPluginsLoaded() || res;
+	}
+	return res;
 }
 
 

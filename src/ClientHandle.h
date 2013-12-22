@@ -113,6 +113,7 @@ public:
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
+	void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount);
 	void SendPlayerAbilities     (void);
 	void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline);
 	void SendPlayerMaxSpeed      (void);  ///< Informs the client of the maximum player speed (1.6.1+)

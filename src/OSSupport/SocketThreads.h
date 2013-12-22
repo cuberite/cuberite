@@ -61,6 +61,9 @@ public:
 	class cCallback
 	{
 	public:
+		// Force a virtual destructor in all subclasses:
+		virtual ~cCallback() {}
+		
 		/// Called when data is received from the remote party
 		virtual void DataReceived(const char * a_Data, int a_Size) = 0;
 		
