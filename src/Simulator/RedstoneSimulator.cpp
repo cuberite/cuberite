@@ -206,10 +206,6 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			itr = m_RepeatersDelayList.erase(itr);
 			continue;
 		}
-		else if (itr->a_ElapsedTicks < itr->a_DelayTicks)
-		{
-			itr->a_ElapsedTicks++;
-		}
 
 		itr++;
 	}
@@ -659,8 +655,14 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 				return;
 			}
 		}
-
-		// Tick incrementing handled in SimChunk
+		else
+		{
+			// Apparently, incrementing ticks only works reliably here, and not in SimChunk;
+			// With a world with lots of redstone, the repeaters simply do not delay
+			// I am confounded to say why. Perhaps optimisation failure.
+			LOGD("Incremented a repeater @ %i %i %i | Elapsed ticks: %i | Target delay: %i", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z, itr->a_ElapsedTicks, itr->a_DelayTicks);
+			itr->a_ElapsedTicks++;
+		}
 	}
 }
 
@@ -897,7 +899,16 @@ void cRedstoneSimulator::HandleNoteBlock(int a_BlockX, int a_BlockY, int a_Block
 
 void cRedstoneSimulator::HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	if (m_World.GetBlockSkyLight(a_BlockX, a_BlockY + 1, a_BlockZ) > 10)
+	for (int Y = a_BlockY + 1; Y < 10; Y++)
+	{
+		if (!g_BlockTransparent[m_World.GetBlock(a_BlockX, Y, a_BlockZ)])
+		{
+			return;
+		}
+	}
+
+	LOG("%i", m_World.GetSkyDarkness());
+	if (m_World.GetSkyDarkness() > 10)
 	{
 		SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DAYLIGHT_SENSOR);
 	}
@@ -1318,7 +1329,7 @@ void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, in
 			}
 
 			// Already in here (normal to allow repeater to continue on powering and updating blocks in front) - just update info and quit
-			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2; // See below for description
+			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + (ShouldPowerOn ? 1 : 0)) * 2; // See below for description
 			itr->a_ElapsedTicks = 0;
 			itr->ShouldPowerOn = ShouldPowerOn;
 			return;
@@ -1331,7 +1342,8 @@ void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, in
 	
 	// Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
 	// * 2 because apparently, MCS ticks are way faster than vanilla ticks, so repeater aren't noticeably delayed
-	RC.a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2;
+	// We don't +1 when powering off because everything seems to already delay a tick when powering off, why? No idea :P
+	RC.a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + (ShouldPowerOn ? 1 : 0)) * 2;
 
 
 	RC.a_ElapsedTicks = 0;
