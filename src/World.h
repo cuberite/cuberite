@@ -420,7 +420,7 @@ public:
 	a_SourceData exact type depends on the a_Source:
 	| esOther | void * |
 	| esPrimedTNT | cTNTEntity * |
-	| esCreeper | cCreeper * |
+	| esMonster | cMonster * |
 	| esBed | cVector3i * |
 	| esEnderCrystal | Vector3i * |
 	| esGhastFireball | cGhastFireball * |
