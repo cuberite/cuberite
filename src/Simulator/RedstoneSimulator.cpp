@@ -112,10 +112,35 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
 			itr = m_PoweredBlocks.erase(itr);
 		}
+		else if (SourceBlockType == E_BLOCK_DAYLIGHT_SENSOR)
+		{
+			if (!a_Chunk->IsLightValid())
+			{
+				m_World.QueueLightChunk(a_ChunkX, a_ChunkZ);
+				itr++;
+				continue;
+			}
+			else
+			{
+				NIBBLETYPE SkyLight;
+				a_Chunk->UnboundedRelGetBlockSkyLight(RelX, itr->a_SourcePos.y + 1, RelZ, SkyLight);
+
+				if (a_Chunk->GetTimeAlteredLight(SkyLight) <= 8) // Could use SkyLight - m_World.GetSkyDarkness();
+				{
+					LOGD("cRedstoneSimulator: Erased daylight sensor from powered blocks list due to insufficient light level");
+					itr = m_PoweredBlocks.erase(itr);
+				}
+				else
+				{
+					itr++;
+					continue;
+				}
+			}
+		}
 		else if ((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (DestBlockType == E_BLOCK_REDSTONE_WIRE))
 		{
 			// It is simply not allowed that a wire powers another wire, presuming that data here is sane and a dest and source are beside each other
-			LOGD("cRedstoneSimulator: Erased redstone wire from powered blocks list because it's source was also wire");
+			LOGD("cRedstoneSimulator: Erased redstone wire from powered blocks list because its source was also wire");
 			itr = m_PoweredBlocks.erase(itr);
 		}
 		else
@@ -283,7 +308,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			}
 		}
 
-		++dataitr;
+		dataitr++;
 	}
 }
 
