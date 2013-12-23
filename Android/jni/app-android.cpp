@@ -11,8 +11,9 @@
 #include <assert.h>
 
 #include "OSSupport/CriticalSection.h"
-#include "OSSupport/MakeDir.h"
+#include "OSSupport/File.h"
 #include "ToJava.h"
+#include "inifile/iniFile.h"
 
 #include "Root.h"
 #include "WebAdmin.h"
@@ -84,7 +85,7 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeOnCreate( JNIEnv*  env,
 	//__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "Logging from C++!");
 	g_CriticalSection.Unlock();
 	
-	mkdir("/sdcard/mcserver", S_IRWXU | S_IRWXG | S_IRWXO);
+	cFile::CreateFolder("/sdcard/mcserver");
 
 	pRoot = new cRoot();
 	pRoot->Start();
@@ -105,7 +106,7 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeCleanUp( JNIEnv*  env, 
 	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "pRoot: %p", pRoot);
 	if( pRoot != NULL )
 	{
-		pRoot->ExecuteConsoleCommand("stop");
+		pRoot->QueueExecuteConsoleCommand("stop");
 	}
 }
 
@@ -122,9 +123,10 @@ extern "C" jboolean Java_com_mcserver_MCServerActivity_NativeIsServerRunning( JN
 
 extern "C" jint Java_com_mcserver_MCServerActivity_NativeGetWebAdminPort( JNIEnv* env, jobject thiz )
 {
-	if( pRoot != NULL && pRoot->GetWebAdmin() != NULL )
+	cIniFile IniFile;
+	if (IniFile.ReadFile("/sdcard/mcserver/webadmin.ini"))
 	{
-		return pRoot->GetWebAdmin()->GetPort();
+		return IniFile.GetValueI("WebAdmin", "Port");
 	}
 	return 0;
 }
