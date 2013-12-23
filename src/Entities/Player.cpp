@@ -457,11 +457,8 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 			}
 			
-			GetWorld()->BroadcastSoundParticleEffect(
-				2006,
-				(int)GetPosX(), (int)GetPosY() - 1, (int)GetPosZ(),
-				Damage // Used as particle effect speed modifier
-				);
+			// Apparently, Mojang changed player positions to always be rounded up. Normally, it doesn't affect much, but we need effect positions to be precise, so ceil()
+			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
 		}		
 
 		m_LastGroundHeight = (float)GetPosY();
