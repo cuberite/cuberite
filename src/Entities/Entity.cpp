@@ -304,7 +304,7 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
 	{
-		// IsOnGround() only is true if the player is moving downwards
+		// IsOnGround() only is false if the player is moving downwards
 		if (!((cPlayer *)a_TDI.Attacker)->IsOnGround()) // TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
 		{
 			a_TDI.FinalDamage + 2;
