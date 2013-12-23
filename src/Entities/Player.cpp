@@ -987,8 +987,11 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
 
-	SetFlying(false);
-	SetCanFly(false);
+	if (a_GameMode != gmCreative)
+	{
+		SetFlying(false);
+		SetCanFly(false);
+	}
 }
 
 
