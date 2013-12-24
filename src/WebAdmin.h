@@ -132,6 +132,9 @@ public:
 	/// Escapes text passed into it, so it can be embedded into html.
 	static AString GetHTMLEscapedString(const AString & a_Input);
 
+	AString GetIPv4Ports(void) const { return m_PortsIPv4; }
+	AString GetIPv6Ports(void) const { return m_PortsIPv6; }
+
 	// tolua_end
 
 	/// Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style)
@@ -179,6 +182,9 @@ protected:
 	cIniFile   m_IniFile;
 
 	PluginList m_Plugins;
+
+	AString m_PortsIPv4;
+	AString m_PortsIPv6;
 
 	/// The Lua template script to provide templates:
 	cLuaState m_TemplateScript;
