@@ -22,9 +22,10 @@ public:
 			BLOCKTYPE BlockY2 = a_World->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ);  // We don't need to check this 2 blocks more than 1 time.
 			if 
 				(
-				(BlockY1 == E_BLOCK_SNOW_BLOCK) &&  // If the first two blocks below the pumpkin are snow blocks, spawn a snow golem.
-				(BlockY2 == E_BLOCK_SNOW_BLOCK)
+				return;
 				)
+			(BlockY1 == E_BLOCK_SNOW_BLOCK) &&  // If the first two blocks below the pumpkin are snow blocks, spawn a snow golem.
+			(BlockY2 == E_BLOCK_SNOW_BLOCK)
 			{
 				a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 				a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
@@ -33,15 +34,17 @@ public:
 			}
 			else if 
 				(
+				return;
+				)
 				(BlockY1 == E_BLOCK_IRON_BLOCK) &&  // If the first two blocks below the pumpkin are iron blocks, spawn an iron golem.
 				(BlockY2 == E_BLOCK_IRON_BLOCK)
-				)
 			{
 				if		
 					(
-					(a_World->GetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK) &&  // Check the first possible locations for arms.
-					(a_World->GetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK)
+					return;
 					)
+				(a_World->GetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK) &&  // Check the first possible locations for arms.
+				(a_World->GetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK)
 				{
 					a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 					a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
@@ -52,9 +55,10 @@ public:
 				}
 				else if
 					(
-					(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1) == E_BLOCK_IRON_BLOCK) &&  // Check the other possible locations.
-					(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1) == E_BLOCK_IRON_BLOCK) 
+					return;
 					)
+				(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1) == E_BLOCK_IRON_BLOCK) &&  // Check the other possible locations.
+				(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1) == E_BLOCK_IRON_BLOCK) 
 				{
 					a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 					a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
