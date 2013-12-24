@@ -8,6 +8,7 @@
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
 #include "../Piston.h"
+#include "../Tracer.h"
 
 
 
@@ -106,7 +107,8 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (SourceBlockMeta == 0)) ||
 			((SourceBlockType == E_BLOCK_LEVER) && !IsLeverOn(SourceBlockMeta)) ||
 			((SourceBlockType == E_BLOCK_DETECTOR_RAIL) && (SourceBlockMeta & 0x08) == 0x08) ||
-			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
+			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta))) ||
+			(((SourceBlockType == E_BLOCK_STONE_PRESSURE_PLATE) || (SourceBlockType == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (SourceBlockMeta == 0))
 			)
 		{
 			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
@@ -304,6 +306,12 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			case E_BLOCK_POWERED_RAIL:
 			{
 				HandleRail(a_X, dataitr->y, a_Z, BlockType);
+				break;
+			}
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+			{
+				HandlePressurePlate(a_X, dataitr->y, a_Z, BlockType);
 				break;
 			}
 		}
@@ -938,6 +946,98 @@ void cRedstoneSimulator::HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_
 		{
 			SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DAYLIGHT_SENSOR);
 		}
+	}
+}
+
+
+
+
+
+void cRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType)
+{
+	switch (a_MyType)
+	{
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		{
+			// MCS feature - stone pressure plates can only be triggered by players :D
+			cPlayer * a_Player = m_World.FindClosestPlayer(Vector3f(a_BlockX + 0.5f, (float)a_BlockY, a_BlockZ + 0.5f), 0.5f);
+
+			if (a_Player != NULL)
+			{
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x1);
+				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_STONE_PRESSURE_PLATE);
+			}
+			else
+			{
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
+			}
+			break;
+		}
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		{
+			class cWoodenPressurePlateCallback :
+				public cEntityCallback
+			{
+			public:
+				cWoodenPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+					m_X(a_BlockX),
+					m_Y(a_BlockY),
+					m_Z(a_BlockZ),
+					m_World(a_World),
+					m_Entity(NULL)
+				{
+				}
+
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					cTracer LineOfSight(m_World);
+
+					Vector3f EntityPos = a_Entity->GetPosition();
+					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+					float Distance = (EntityPos - BlockPos).Length();
+
+					if (Distance < 0.5)
+					{
+						if (!LineOfSight.Trace(BlockPos, (EntityPos - BlockPos), (int)(EntityPos - BlockPos).Length()))
+						{
+							m_Entity = a_Entity;
+							return true; // Break out, we only need to know for wooden plates that at least one entity is on top
+						}
+					}
+					return false;
+				}
+
+				bool FoundEntity(void) const
+				{
+					return m_Entity != NULL;
+				}
+
+			protected:
+				cEntity * m_Entity;
+				cWorld * m_World;
+
+				int m_X;
+				int m_Y;
+				int m_Z;
+			} ;
+
+			cWoodenPressurePlateCallback WoodenPressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ, &m_World);
+			m_World.ForEachEntity(WoodenPressurePlateCallback);
+
+			if (WoodenPressurePlateCallback.FoundEntity())
+			{
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x1);
+				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_WOODEN_PRESSURE_PLATE);
+			}
+			else
+			{
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
+			}
+			break;
+		}
+		default:
+			LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(a_MyType).c_str());
+			break;
 	}
 }
 
