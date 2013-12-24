@@ -28,7 +28,7 @@ const std::string cChatColor::Underlined  = cChatColor::Color + "n";
 const std::string cChatColor::Italic      = cChatColor::Color + "o";
 const std::string cChatColor::Plain       = cChatColor::Color + "r";
 
-const std::string cChatColor::MakeColor( std::string a_Color )
+const std::string cChatColor::MakeColor( const AString & a_Color )
 {
 	return a_Color;
 }
