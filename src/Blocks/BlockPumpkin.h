@@ -18,8 +18,8 @@ public:
 	{
 		if (a_BlockY > 1)  // Make sure server won't check for inexistent blocks (below y=0).
 		{
-			int BlockY1 = a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
-			int BlockY2 = a_World->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ);  // We don't need to check this 2 blocks more than 1 time.
+			BLOCKTYPE BlockY1 = a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
+			BLOCKTYPE BlockY2 = a_World->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ);  // We don't need to check this 2 blocks more than 1 time.
 			if 
 				(
 				(BlockY1 == E_BLOCK_SNOW_BLOCK) &&  // If the first two blocks below the pumpkin are snow blocks, spawn a snow golem.
