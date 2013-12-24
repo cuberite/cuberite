@@ -77,13 +77,13 @@ cGroupManager::cGroupManager()
 		LOGD("Loading group: %s", KeyName.c_str() );
 
 		Group->SetName( KeyName );
-		char Color = IniFile.GetValue( KeyName, "Color", "-" )[0];
+		AString Color = IniFile.GetValue( KeyName, "Color", "-" )[0];
 		if( Color != '-' )
-			Group->SetColor( cChatColor::MakeColor(Color) );
+			Group->SetColor( cChatColor::Color + Color );
 		else
 			Group->SetColor( cChatColor::White );
 
-		std::string Commands = IniFile.GetValue( KeyName, "Commands", "" );
+		AString Commands = IniFile.GetValue( KeyName, "Commands", "" );
 		if( Commands.size() > 0 )
 		{
 			AStringVector Split = StringSplit( Commands, "," );
@@ -93,7 +93,7 @@ cGroupManager::cGroupManager()
 			}
 		}
 
-		std::string Permissions = IniFile.GetValue( KeyName, "Permissions", "" );
+		AString Permissions = IniFile.GetValue( KeyName, "Permissions", "" );
 		if( Permissions.size() > 0 )
 		{
 			AStringVector Split = StringSplit( Permissions, "," );
