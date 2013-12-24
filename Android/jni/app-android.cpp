@@ -13,7 +13,6 @@
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/File.h"
 #include "ToJava.h"
-#include "inifile/iniFile.h"
 
 #include "Root.h"
 #include "WebAdmin.h"
