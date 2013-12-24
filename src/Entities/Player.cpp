@@ -457,7 +457,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 			}
 			
-			// Apparently, Mojang changed player positions to always be rounded up. Normally, it doesn't affect much, but we need effect positions to be precise, so ceil()
+			// Mojang uses floor() to get X and Z positions, instead of just casting it to an (int)
 			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
 		}		
 

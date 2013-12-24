@@ -129,7 +129,7 @@ BOOL CtrlHandler(DWORD fdwCtrlType)
 	g_TERMINATE_EVENT_RAISED = true;
 	LOGD("Terminate event raised from the Windows CtrlHandler");
 
-	if (fdwCtrlType == CTRL_CLOSE_EVENT) // Console windows closed via 'x' button, Windows will try to close immediately, therefore...
+	if (fdwCtrlType == CTRL_CLOSE_EVENT) // Console window closed via 'x' button, Windows will try to close immediately, therefore...
 	{
 		while (!g_SERVER_TERMINATED) { cSleep::MilliSleep(100); } // Delay as much as possible to try to get the server to shut down cleanly
 	}
