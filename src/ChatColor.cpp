@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ChatColor.h"
@@ -29,9 +28,9 @@ const std::string cChatColor::Underlined  = cChatColor::Color + "n";
 const std::string cChatColor::Italic      = cChatColor::Color + "o";
 const std::string cChatColor::Plain       = cChatColor::Color + "r";
 
-const std::string cChatColor::MakeColor( char a_Color )
+const std::string cChatColor::MakeColor( std::string a_Color )
 {
-	return cChatColor::Color + a_Color;
+	return a_Color;
 }
 
 
