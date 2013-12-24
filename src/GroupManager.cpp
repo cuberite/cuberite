@@ -77,7 +77,7 @@ cGroupManager::cGroupManager()
 		LOGD("Loading group: %s", KeyName.c_str() );
 
 		Group->SetName( KeyName );
-		AString Color = IniFile.GetValue( KeyName, "Color", "-" )[0];
+		char Color = IniFile.GetValue( KeyName, "Color", "-" )[0];
 		if( Color != '-' )
 			Group->SetColor( cChatColor::Color + Color );
 		else
