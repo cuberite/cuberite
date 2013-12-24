@@ -1294,7 +1294,7 @@ AString cPlayer::GetColor(void) const
 {
 	if ( m_Color != '-' )
 	{
-		return cChatColor::MakeColor( m_Color );
+		return cChatColor::Color + m_Color;
 	}
 
 	if ( m_Groups.size() < 1 )
