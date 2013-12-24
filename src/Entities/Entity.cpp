@@ -246,7 +246,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	{
 		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 10 : 8);
 	}
-	Heading.y += 3;
+	Heading.y = 2;
 
 	TDI.Knockback = Heading * a_KnockbackAmount;
 	DoTakeDamage(TDI);
@@ -307,7 +307,7 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		// IsOnGround() only is false if the player is moving downwards
 		if (!((cPlayer *)a_TDI.Attacker)->IsOnGround()) // TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
 		{
-			a_TDI.FinalDamage + 2;
+			a_TDI.FinalDamage += 2;
 			m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
 		}
 	}
@@ -321,7 +321,7 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_Health = 0;
 	}
 
-	AddSpeed(a_TDI.Knockback * 3);
+	AddSpeed(a_TDI.Knockback * 2);
 
 	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_HURT);
 
