@@ -123,10 +123,9 @@ extern "C" jboolean Java_com_mcserver_MCServerActivity_NativeIsServerRunning( JN
 
 extern "C" jint Java_com_mcserver_MCServerActivity_NativeGetWebAdminPort( JNIEnv* env, jobject thiz )
 {
-	cIniFile IniFile;
-	if (IniFile.ReadFile("/sdcard/mcserver/webadmin.ini"))
+	if( pRoot != NULL && pRoot->GetWebAdmin() != NULL )
 	{
-		return IniFile.GetValueI("WebAdmin", "Port");
+		return atoi(pRoot->GetWebAdmin()->GetIPv4Ports().c_str());
 	}
 	return 0;
 }
