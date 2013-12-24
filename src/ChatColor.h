@@ -37,7 +37,6 @@ public:
 	static const std::string Italic;
 	static const std::string Plain;
 
-	static const std::string MakeColor( const AString & a_Color );
 };
 
 // tolua_end
