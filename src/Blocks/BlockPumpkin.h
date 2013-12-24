@@ -31,10 +31,10 @@ public:
 			}
 			if 
 				(
-				a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK &&
-				a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1) == E_BLOCK_IRON_BLOCK &&
-				a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1) == E_BLOCK_IRON_BLOCK &&
-				a_World->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ) == E_BLOCK_IRON_BLOCK
+				(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK) &&
+				(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1) == E_BLOCK_IRON_BLOCK) &&
+				(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1) == E_BLOCK_IRON_BLOCK) &&
+				(a_World->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ) == E_BLOCK_IRON_BLOCK)
 				)
 			{
 				a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
@@ -46,10 +46,10 @@ public:
 			}
 			else if
 				(
-				a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK &&
-				a_World->GetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK &&
-				a_World->GetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK &&
-				a_World->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ) == E_BLOCK_IRON_BLOCK
+				(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK) &&
+				(a_World->GetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK) &&
+				(a_World->GetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK) &&
+				(a_World->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ) == E_BLOCK_IRON_BLOCK)
 				)
 			{
 				a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
