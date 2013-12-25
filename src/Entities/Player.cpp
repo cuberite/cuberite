@@ -249,7 +249,9 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 
 	if (IsFlying())
+	{
 		m_LastGroundHeight = (float)GetPosY();
+	}
 }
 
 
