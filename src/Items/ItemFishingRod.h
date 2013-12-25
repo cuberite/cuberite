@@ -15,6 +15,61 @@
 
 
 
+/////////////////////////////////////////////////////////////////////////////////////
+// cFloaterCallback
+class cFloaterCallback :
+	public cEntityCallback
+{
+public:
+	cFloaterCallback(void) : 
+		m_CanPickup(false),
+		m_AttachedMobID(-1)
+	{
+	}
+
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		m_CanPickup = ((cFloater *)a_Entity)->CanPickup();
+		m_Pos = Vector3d(a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ());
+		m_AttachedMobID = ((cFloater *)a_Entity)->GetAttachedMobID();
+		a_Entity->Destroy(true);
+		return true;
+	}
+
+	bool CanPickup(void)       const { return m_CanPickup; }
+	bool IsAttached(void)      const { return (m_AttachedMobID != -1); }
+	int GetAttachedMobID(void) const { return m_AttachedMobID; }
+	Vector3d GetPos(void)      const { return m_Pos; }
+
+protected:
+	bool m_CanPickup;
+	int m_AttachedMobID;
+	Vector3d m_Pos;
+} ;
+
+////////////////////////////////////////////////////////////////////////////
+// cSweepEntityCallback
+class cSweepEntityCallback :
+	public cEntityCallback
+{
+public:
+	cSweepEntityCallback(Vector3d a_PlayerPos) :
+	  m_PlayerPos(a_PlayerPos)
+	{
+	}
+
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		Vector3d Speed = m_PlayerPos - a_Entity->GetPosition();
+		a_Entity->AddSpeed(Speed);
+		return true;
+	}
+
+protected:
+	Vector3d m_PlayerPos;
+} ;
+
+
 
 class cItemFishingRodHandler :
 	public cItemHandler
@@ -36,33 +91,16 @@ public:
 
 		if (a_Player->IsFishing())
 		{
-			class cFloaterCallback :
-				public cEntityCallback
-			{
-			public:
-				cFloaterCallback(void) : 
-					m_CanPickup(false) 
-				{
-				}
-
-				bool CanPickup(void) const { return m_CanPickup; }
-				Vector3d GetPos(void) const { return m_Pos; }
-
-				virtual bool Item(cEntity * a_Entity) override
-				{
-					m_CanPickup = ((cFloater *)a_Entity)->CanPickup();
-					m_Pos = Vector3d(a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ());
-					a_Entity->Destroy(true);
-					return true;
-				}
-			protected:
-				bool m_CanPickup;
-				Vector3d m_Pos;
-			} Callbacks;
-			a_World->DoWithEntityByID(a_Player->GetFloaterID(), Callbacks);
+			cFloaterCallback FloaterInfo;
+			a_World->DoWithEntityByID(a_Player->GetFloaterID(), FloaterInfo);
 			a_Player->SetIsFishing(false);
 
-			if (Callbacks.CanPickup())
+			if (FloaterInfo.IsAttached())
+			{
+				cSweepEntityCallback SweepEntity(a_Player->GetPosition());
+				a_World->DoWithEntityByID(FloaterInfo.GetAttachedMobID(), SweepEntity);
+			}
+			else if (FloaterInfo.CanPickup())
 			{
 				cItems Drops;
 				int ItemCategory = a_World->GetTickRandomNumber(99);
@@ -173,7 +211,7 @@ public:
 				}
 
 				
-				Vector3d FloaterPos = Callbacks.GetPos();
+				Vector3d FloaterPos = FloaterInfo.GetPos();
 				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
 				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.y + 1, FlyDirection.z);
 			}
