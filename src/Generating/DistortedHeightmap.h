@@ -125,6 +125,7 @@ protected:
 	/// Returns the pattern to use for an ocean floor in the specified column
 	const sBlockInfo * ChooseOceanFloorPattern(int a_RelX, int a_RelZ);
 	
+	
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
