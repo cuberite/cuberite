@@ -642,9 +642,10 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtEnderman:     return mfHostile;
 		case mtGhast:        return mfHostile;
 		case mtHorse:        return mfPassive;
+		case mtIronGolem:    return mfPassive;
 		case mtMagmaCube:    return mfHostile;
 		case mtMooshroom:    return mfHostile;
-		case mtOcelot:       return mfHostile;
+		case mtOcelot:       return mfPassive;
 		case mtPig:          return mfPassive;
 		case mtSheep:        return mfPassive;
 		case mtSilverfish:   return mfHostile;
