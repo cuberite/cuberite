@@ -19,13 +19,22 @@ public:
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	bool CanPickup(void) const { return m_CanPickupItem; }
+	bool CanPickup(void)       const { return m_CanPickupItem; }
+	int GetOwnerID(void)       const { return m_PlayerID; }
+	int GetAttachedMobID(void) const { return m_AttachedMobID; }
 
 protected:
-	Vector3d m_Speed;
+	// Position
 	Vector3d m_ParticlePos;
-	int m_PickupCountDown;
-	int m_PlayerID;
-	int m_CountDownTime;
+
+	// Bool needed to check if you can get a fish.
 	bool m_CanPickupItem;
+
+	// Countdown times
+	int m_PickupCountDown;
+	int m_CountDownTime;
+
+	// Entity IDs
+	int m_PlayerID;
+	int m_AttachedMobID;
 } ;
