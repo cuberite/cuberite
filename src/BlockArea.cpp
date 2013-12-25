@@ -301,10 +301,10 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 		LOGWARNING("%s: MaxBlockY less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxBlockY = 0;
 	}
-	else if (a_MaxBlockY >= cChunkDef::Height)
+	else if (a_MaxBlockY > cChunkDef::Height)
 	{
 		LOGWARNING("%s: MaxBlockY more than chunk height, adjusting to chunk height", __FUNCTION__);
-		a_MaxBlockY = cChunkDef::Height - 1;
+		a_MaxBlockY = cChunkDef::Height;
 	}
 	
 	// Allocate the needed memory:
