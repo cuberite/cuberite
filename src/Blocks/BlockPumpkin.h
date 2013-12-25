@@ -16,9 +16,7 @@ public:
 	
 	virtual void OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
-	virtual void OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
-	{
-		if (!a_BlockY > 1)  // Make sure server won't check for inexistent blocks (below y=0).
+		if (a_BlockY < 2)  // Make sure server won't check for inexistent blocks (below y=0).
 		{
 			return;
 		}
@@ -52,7 +50,6 @@ public:
 				a_World->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtIronGolem); 
 			}
 		}
-	}
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
