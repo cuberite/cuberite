@@ -40,8 +40,10 @@ static const struct
 	{cMonster::mtCow,          "cow"},
 	{cMonster::mtCreeper,      "creeper"},
 	{cMonster::mtEnderman,     "enderman"},
+	{cMonster::mtEnderDragon,  "enderdragon"},
 	{cMonster::mtGhast,        "ghast"},
 	{cMonster::mtHorse,        "horse"},
+	{cMonster::mtIronGolem,    "irongolem"},
 	{cMonster::mtMagmaCube,    "magmacube"},
 	{cMonster::mtMooshroom,    "mooshroom"},
 	{cMonster::mtOcelot,       "ocelot"},
@@ -49,11 +51,13 @@ static const struct
 	{cMonster::mtSheep,        "sheep"},
 	{cMonster::mtSilverfish,   "silverfish"},
 	{cMonster::mtSkeleton,     "skeleton"},
+	{cMonster::mtSnowGolem,    "snowgolem"},
 	{cMonster::mtSlime,        "slime"},
 	{cMonster::mtSpider,       "spider"},
 	{cMonster::mtSquid,        "squid"},
 	{cMonster::mtVillager,     "villager"},
 	{cMonster::mtWitch,        "witch"},
+	{cMonster::mtWither,       "wither"},
 	{cMonster::mtWolf,         "wolf"},
 	{cMonster::mtZombie,       "zombie"},
 	{cMonster::mtZombiePigman, "zombiepigman"},
@@ -743,6 +747,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtEnderDragon:   toReturn = new cEnderDragon();              break;
 		case mtEnderman:      toReturn = new cEnderman();                 break;
 		case mtGhast:         toReturn = new cGhast();                    break;
+		case mtIronGolem:     toReturn = new cIronGolem();                break;
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
 		case mtOcelot:        toReturn = new cOcelot();                   break;
 		case mtPig:           toReturn = new cPig();                      break;
@@ -752,6 +757,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtSpider:        toReturn = new cSpider();                   break;
 		case mtSquid:         toReturn = new cSquid();                    break;
 		case mtWitch:         toReturn = new cWitch();                    break;
+		case mtWither:	      toReturn = new cWither();                   break;
 		case mtWolf:          toReturn = new cWolf();                     break;
 		case mtZombie:        toReturn = new cZombie(false);              break; // TODO: Infected zombie parameter
 		case mtZombiePigman:  toReturn = new cZombiePigman();             break;
