@@ -130,7 +130,7 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 	HandlePhysics(a_Dt, a_Chunk);
 	if (IsBlockWater(m_World->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ())) && m_World->GetBlockMeta((int) GetPosX(), (int) GetPosY(), (int) GetPosZ()) == 0)
 	{
-		if (!m_CanPickupItem && m_AttachedMobID == -1) // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
+		if ((!m_CanPickupItem) && (m_AttachedMobID == -1)) // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
 			if (m_CountDownTime <= 0)
 			{
@@ -182,7 +182,7 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (GetSpeed().Length() > 4 && m_AttachedMobID == -1)
+	if ((GetSpeed().Length() > 4) && (m_AttachedMobID == -1))
 	{
 		cFloaterEntityCollisionCallback Callback(this, GetPosition(), GetPosition() + GetSpeed() / 20);
 		
