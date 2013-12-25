@@ -104,9 +104,9 @@ static cDistortedHeightmap::sBlockInfo tbMycelium[] =
 static cDistortedHeightmap::sBlockInfo tbGravel[] =
 {
 	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_DIRT,   0},
-	{E_BLOCK_DIRT,   0},
-	{E_BLOCK_DIRT,   0},
+	{E_BLOCK_GRAVEL, 0},
+	{E_BLOCK_GRAVEL, 0},
+	{E_BLOCK_STONE,  0},
 } ;
 
 static cDistortedHeightmap::sBlockInfo tbStone[] =
