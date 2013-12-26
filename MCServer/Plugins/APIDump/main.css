@@ -49,6 +49,12 @@ header
 	font-family: Segoe UI Light, Helvetica;
 }
 
+footer
+{
+	text-align: center;
+	font-family: Segoe UI Light, Helvetica;
+}
+
 #content
 {
 	padding: 0px 25px 25px 25px;
