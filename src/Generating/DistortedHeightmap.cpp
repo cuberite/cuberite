@@ -101,7 +101,21 @@ static cDistortedHeightmap::sBlockInfo tbMycelium[] =
 	{E_BLOCK_DIRT,     0},
 } ;
 
+static cDistortedHeightmap::sBlockInfo tbGravel[] =
+{
+	{E_BLOCK_GRAVEL, 0},
+	{E_BLOCK_GRAVEL, 0},
+	{E_BLOCK_GRAVEL, 0},
+	{E_BLOCK_STONE,  0},
+} ;
 
+static cDistortedHeightmap::sBlockInfo tbStone[] =
+{
+	{E_BLOCK_STONE,   0},
+	{E_BLOCK_STONE,   0},
+	{E_BLOCK_STONE,   0},
+	{E_BLOCK_STONE,   0},
+} ;
 
 
 
@@ -146,6 +160,8 @@ static cPattern patDirt     (tbDirt,      ARRAYCOUNT(tbDirt));
 static cPattern patPodzol   (tbPodzol,    ARRAYCOUNT(tbPodzol));
 static cPattern patGrassLess(tbGrassLess, ARRAYCOUNT(tbGrassLess));
 static cPattern patMycelium (tbMycelium,  ARRAYCOUNT(tbMycelium));
+static cPattern patGravel   (tbGravel,    ARRAYCOUNT(tbGravel));
+static cPattern patStone    (tbStone,     ARRAYCOUNT(tbStone));
 
 static cPattern patOFSand   (tbOFSand,    ARRAYCOUNT(tbOFSand));
 static cPattern patOFClay   (tbOFClay,    ARRAYCOUNT(tbOFClay));
@@ -648,7 +664,6 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 	{
 		case biOcean:
 		case biPlains:
-		case biExtremeHills:
 		case biForest:
 		case biTaiga:
 		case biSwampland:
@@ -671,11 +686,9 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biRoofedForest:
 		case biColdTaiga:
 		case biColdTaigaHills:
-		case biExtremeHillsPlus:
 		case biSavanna:
 		case biSavannaPlateau:
 		case biSunflowerPlains:
-		case biExtremeHillsM:
 		case biFlowerForest:
 		case biTaigaM:
 		case biSwamplandM:
@@ -686,7 +699,6 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biBirchForestHillsM:
 		case biRoofedForestM:
 		case biColdTaigaM:
-		case biExtremeHillsPlusM:
 		case biSavannaM:
 		case biSavannaPlateauM:
 		{
@@ -735,6 +747,30 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			// instead, they provide a "from bottom" pattern with varying base height,
 			// usually 4 blocks below the ocean level
 			FillColumnMesa(a_ChunkDesc, a_RelX, a_RelZ);
+			return;
+		}
+
+		case biExtremeHillsPlus:
+		case biExtremeHills:
+		{
+			// Select the pattern to use - stone or grass:
+			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
+			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
+			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
+			const sBlockInfo * Pattern = (Val < -0.1) ? patStone.Get() : patGrass.Get();
+			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
+			return;
+		}
+
+		case biExtremeHillsPlusM:
+		case biExtremeHillsM:
+		{
+			// Select the pattern to use - gravel, stone or grass:
+			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
+			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
+			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
+			const sBlockInfo * Pattern = (Val < -0.9) ? patStone.Get() : ((Val > 0) ? patGravel.Get() : patGrass.Get());
+			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
 			return;
 		}
 		default:
