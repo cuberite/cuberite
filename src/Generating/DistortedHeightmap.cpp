@@ -753,7 +753,7 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biExtremeHillsPlus:
 		case biExtremeHills:
 		{
-			// Select the pattern to use - gravel or grass:
+			// Select the pattern to use - stone or grass:
 			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
 			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
@@ -765,19 +765,11 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biExtremeHillsPlusM:
 		case biExtremeHillsM:
 		{
-			// Select the pattern to use - gravel or grass:
+			// Select the pattern to use - gravel, stone or grass:
 			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
 			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern;
-			if (Val <= 0.0)
-			{
-				Pattern = (Val < -0.3) ? patGravel.Get() : patGrass.Get();
-			}
-			else
-			{
-				Pattern = (Val < 0.3) ? patStone.Get() : patGrass.Get();
-			}
+			const sBlockInfo * Pattern = (Val < -0.9) ? patStone.Get() : ((Val > 0) ? patGravel.Get() : patGrass.Get());
 			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
 			return;
 		}
