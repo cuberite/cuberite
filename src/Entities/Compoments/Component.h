@@ -28,7 +28,8 @@ public:
 	virtual void OnTakeDamage(TakeDamageInfo & a_TDI){}
 	virtual void OnRightClicked(){}
 	virtual void OnKilled(cEntity * a_Killer = NULL){}
-	//virtual void OnDestroy(){}
+	// virtual void OnPickup(){}
+	// virtual void OnDestroy(){}
 
 	// Logic
 	virtual void OnAttackEntity(cEntity * a_Entity){}
