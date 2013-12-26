@@ -22,12 +22,15 @@
 #include "inifile/iniFile.h"
 
 #ifdef _WIN32
+	#include "conio.h"
 	#include <psapi.h>
 #elif defined(__linux__)
 	#include <fstream>
 #elif defined(__APPLE__)
 	#include <mach/mach.h>
 #endif
+
+extern bool g_TERMINATE_EVENT_RAISED;
 
 
 
@@ -76,7 +79,7 @@ void cRoot::InputThread(void * a_Params)
 
 	cLogCommandOutputCallback Output;
 	
-	while (!(self.m_bStop || self.m_bRestart) && std::cin.good())
+	while (!self.m_bStop && !self.m_bRestart && !g_TERMINATE_EVENT_RAISED && std::cin.good())
 	{
 		AString Command;
 		std::getline(std::cin, Command);
@@ -85,10 +88,10 @@ void cRoot::InputThread(void * a_Params)
 			self.ExecuteConsoleCommand(TrimString(Command), Output);
 		}
 	}
-	
-	if (!(self.m_bStop || self.m_bRestart))
+
+	if (g_TERMINATE_EVENT_RAISED || !std::cin.good())
 	{
-		// We have come here because the std::cin has received an EOF and the server is still running; stop the server:
+		// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running; stop the server:
 		self.m_bStop = true;
 	}
 }
@@ -99,6 +102,12 @@ void cRoot::InputThread(void * a_Params)
 
 void cRoot::Start(void)
 {
+	#ifdef _WIN32
+	HWND hwnd = GetConsoleWindow();
+	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
+	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED); // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
+	#endif
+
 	cDeadlockDetect dd;
 	delete m_Log;
 	m_Log = new cMCLogger();
@@ -192,10 +201,18 @@ void cRoot::Start(void)
 		finishmseconds -= mseconds;
 
 		LOG("Startup complete, took %i ms!", finishmseconds);
+		#ifdef _WIN32
+		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED); // Re-enable close button
+		#endif
 
-		while (!m_bStop && !m_bRestart)  // These are modified by external threads
+		while (!m_bStop && !m_bRestart && !g_TERMINATE_EVENT_RAISED)  // These are modified by external threads
 		{
 			cSleep::MilliSleep(1000);
+		}
+
+		if (g_TERMINATE_EVENT_RAISED)
+		{
+			m_bStop = true;
 		}
 
 		#if !defined(ANDROID_NDK)
@@ -222,7 +239,7 @@ void cRoot::Start(void)
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
 		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
 		LOGD("Forgetting groups...");
-		delete m_GroupManager; m_GroupManager = 0;
+		delete m_GroupManager; m_GroupManager = NULL;
 		LOGD("Unloading worlds...");
 		UnloadWorlds();
 		
@@ -233,12 +250,11 @@ void cRoot::Start(void)
 		cBlockHandler::Deinit();
 
 		LOG("Cleaning up...");
-		//delete HeartBeat; HeartBeat = 0;
-		delete m_Server; m_Server = 0;
+		delete m_Server; m_Server = NULL;
 		LOG("Shutdown successful!");
 	}
 
-	delete m_Log; m_Log = 0;
+	delete m_Log; m_Log = NULL;
 }
 
 
