@@ -119,7 +119,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			if (!a_Chunk->IsLightValid())
 			{
 				m_World.QueueLightChunk(a_ChunkX, a_ChunkZ);
-				itr++;
+				++itr;
 				continue;
 			}
 			else
@@ -134,7 +134,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 				}
 				else
 				{
-					itr++;
+					++itr;
 					continue;
 				}
 			}
@@ -147,7 +147,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 		else
 		{
-			itr++;
+			++itr;
 		}
 	}
 
@@ -192,7 +192,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 		else
 		{
-			itr++;
+			++itr;
 		}
 	}
 
@@ -213,7 +213,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		}
 		else
 		{
-			itr++;
+			++itr;
 		}
 	}
 
@@ -234,7 +234,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			continue;
 		}
 
-		itr++;
+		++itr;
 	}
 
 	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
@@ -316,7 +316,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			}
 		}
 
-		dataitr++;
+		++dataitr;
 	}
 }
 
@@ -630,7 +630,7 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, 0, false);
 	}
 
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); ++itr)
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
@@ -1446,7 +1446,7 @@ void cRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a
 
 void cRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta, short a_ElapsedTicks, bool ShouldPowerOn)
 {
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); itr++)
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); ++itr)
 	{
 		if (itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
