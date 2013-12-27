@@ -2761,6 +2761,7 @@ end
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
 		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
+		{ FileName = "SettingUpDecoda.html", Title = "Setting up the Decoda Lua IDE" },
 		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
 	}
 } ;
