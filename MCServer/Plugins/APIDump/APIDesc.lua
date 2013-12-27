@@ -2760,6 +2760,7 @@ end
 	ExtraPages =
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
+		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
 		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
 	}
 } ;
