@@ -83,7 +83,12 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_definitions(-DCRYPTOPP_DISABLE_ASM)
 endif()
 
-add_definitions(-DLUA_BUILD_AS_DLL)
+# Under Windows, we need Lua as DLL; on *nix we need it linked statically:
+if (WIN32)
+	add_definitions(-DLUA_BUILD_AS_DLL)
+endif()
+
+# The Expat library is linked in statically, make the source files aware of that:
 add_definitions(-DXML_STATIC)
 
 add_subdirectory(lib/inifile/)
