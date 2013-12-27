@@ -73,10 +73,10 @@
  *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **********************************************************************/
-#include <windows.h>
+
+#include "Globals.h"
+
 #include <tchar.h>
-#include <stdio.h>
-#include <stdlib.h>
 #pragma comment(lib, "version.lib")  // for "VerQueryValue"
 #pragma warning(disable:4826)
 

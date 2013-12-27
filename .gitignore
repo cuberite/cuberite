@@ -57,7 +57,44 @@ MCServer.dir/
 
 #win32 cmake stuff
 *.vcxproj
+*.vcproj
 *.vcxproj.filters
 *.opensdf
 *.sdf
 *.sln
+
+#cmake output folders
+ZERO_CHECK.dir/
+lib/cryptopp/Debug/
+lib/cryptopp/Release/
+lib/cryptopp/cryptopp.dir/
+lib/expat/Debug/
+lib/expat/Release/
+lib/expat/expat.dir/
+lib/inifile/Debug/
+lib/inifile/Release/
+lib/inifile/inifile.dir/
+lib/jsoncpp/Debug/
+lib/jsoncpp/Release/
+lib/jsoncpp/jsoncpp.dir/
+lib/lua/Debug/
+lib/lua/Release/
+lib/lua/lua.dir/
+lib/luaexpat/Debug/
+lib/luaexpat/Release/
+lib/luaexpat/luaexpat.dir/
+lib/md5/Debug/
+lib/md5/Release/
+lib/md5/md5.dir/
+lib/sqlite/Debug/
+lib/sqlite/Release/
+lib/sqlite/sqlite.dir/
+lib/tolua++/Debug/
+lib/tolua++/Release/
+lib/tolua++/tolua.dir/
+lib/tolua++/tolualib.dir/
+lib/zlib/Debug/
+lib/zlib/Release/
+lib/zlib/zlib.dir/
+src/Debug/
+src/Release/

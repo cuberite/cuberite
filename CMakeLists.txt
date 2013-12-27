@@ -83,7 +83,13 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_definitions(-DCRYPTOPP_DISABLE_ASM)
 endif()
 
-add_definitions(-DLUA_USE_DLOPEN)
+# Under Windows, we need Lua as DLL; on *nix we need it linked statically:
+if (WIN32)
+	add_definitions(-DLUA_BUILD_AS_DLL)
+endif()
+
+# The Expat library is linked in statically, make the source files aware of that:
+add_definitions(-DXML_STATIC)
 
 add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
@@ -106,10 +112,13 @@ else()
 	add_flags("/Wall")
 endif()
 set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE_BAK}")
-set(CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS}         -rdynamic")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG}   -rdynamic")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -rdynamic")
-set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS_PROFILE} -rdynamic")
+
+if (NOT WIN32)
+	set(CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS}         -rdynamic")
+	set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG}   -rdynamic")
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -rdynamic")
+	set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS_PROFILE} -rdynamic")
+endif()
 
 add_subdirectory (src) 
 
