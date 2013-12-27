@@ -998,7 +998,13 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI, a_ClassMenu)
 		<h1>]], a_ClassAPI.Name, [[</h1>
 		<hr />
 		</header>
-		<table><tr><td style="vertical-align: top;">Quick navigation:
+		<table><tr><td style="vertical-align: top;">
+		Index:<br />
+		<a href='index.html#articles'>Articles</a><br />
+		<a href='index.html#classes'>Classes</a><br />
+		<a href='index.html#hooks'>Hooks</a><br />
+		<br />
+		Quick navigation:<br />
 	]]);
 	cf:write(a_ClassMenu);
 	cf:write([[
@@ -1131,7 +1137,13 @@ function WriteHtmlHook(a_Hook, a_HookNav)
 		<h1>]], a_Hook.Name, [[</h1>
 		<hr />
 		</header>
-		<table><tr><td style="vertical-align: top;">Quick navigation:
+		<table><tr><td style="vertical-align: top;">
+		Index:<br />
+		<a href='index.html#articles'>Articles</a><br />
+		<a href='index.html#classes'>Classes</a><br />
+		<a href='index.html#hooks'>Hooks</a><br />
+		<br />
+		Quick navigation:<br />
 	]]);
 	f:write(a_HookNav);
 	f:write([[
