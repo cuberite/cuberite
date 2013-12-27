@@ -23,6 +23,8 @@ public:
 	virtual void OnCollisionWithBlock(Vector3i & a_Position, BLOCKTYPE a_Block){}
 	virtual void OnStartedBurning(){}
 	virtual void OnFinishedBurning(){}
+	virtual void OnStartedDrowning(){}
+	virtual void OnFinishedDrowning(){}
 
 	// Reactions
 	virtual void OnTakeDamage(TakeDamageInfo & a_TDI){}
