@@ -26,5 +26,5 @@ else()
 endif()
 
 if (UNIX)
-	target_link_libraries(m dl)
+	target_link_libraries(lua m dl)
 endif()
