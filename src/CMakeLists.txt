@@ -49,9 +49,15 @@ else ()
 	source_group("" FILES ${SOURCE})
 
 	# Precompiled headers (1st part)
-	SET(PrecompiledBinary "$(IntDir)/Globals.pch")
 	SET_SOURCE_FILES_PROPERTIES(
-		Globals.cpp PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\" /Fp\"${PrecompiledBinary}\""
+		Globals.cpp PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
+	)
+	# CMake cannot "remove" the precompiled header flags, so we use a dummy precompiled header compatible with just this one file:
+	SET_SOURCE_FILES_PROPERTIES(
+		Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS "/Yc\"string.h\" /Fp\"$(IntDir)/Bindings.pch\""
+	)
+	SET_SOURCE_FILES_PROPERTIES(
+		"StackWalker.cpp LeakFinder.h" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
 	)
 endif()
 
@@ -66,10 +72,11 @@ endif ()
 add_executable(${EXECUTABLE} ${SOURCE})
 
 
+# Precompiled headers (2nd part)
 if (WIN32)
 	SET_TARGET_PROPERTIES(
-		${EXECUTABLE} PROPERTIES COMPILE_FLAGS "/Yu\"Globals.h\" /FI\"${PrecompiledBinary}\" /Fp\"${PrecompiledBinary}\""
-		OBJECT_DEPENDS "${PrecompiledBinary}"
+		${EXECUTABLE} PROPERTIES COMPILE_FLAGS "/Yu\"Globals.h\""
+		OBJECT_DEPENDS "$(IntDir)/$(TargetName.pch)"
 	)
 endif ()
 
@@ -79,4 +86,7 @@ if (NOT WIN32)
 	target_link_libraries(${EXECUTABLE} Protocol Generating WorldStorage)
 	target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI BlockEntities)
 endif ()
-target_link_libraries(${EXECUTABLE} md5 luaexpat iniFile jsoncpp cryptopp zlib lua)
+if (WIN32)
+	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
+endif()
+target_link_libraries(${EXECUTABLE} md5 luaexpat iniFile jsoncpp cryptopp zlib lua sqlite)
