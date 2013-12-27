@@ -229,6 +229,32 @@ end
 
 
 
+local function WriteArticles(f)
+	f:write([[
+		<a name="articles"><h2>Articles</h2></a>
+		<p>The following articles provide various extra information on plugin development</p>
+		<ul>
+	]]);
+	for i, extra in ipairs(g_APIDesc.ExtraPages) do
+		local SrcFileName = g_PluginFolder .. "/" .. extra.FileName;
+		if (cFile:Exists(SrcFileName)) then
+			local DstFileName = "API/" .. extra.FileName;
+			if (cFile:Exists(DstFileName)) then
+				cFile:Delete(DstFileName);
+			end
+			cFile:Copy(SrcFileName, DstFileName);
+			f:write("<li><a href=\"" .. extra.FileName .. "\">" .. extra.Title .. "</a></li>\n");
+		else
+			f:write("<li>" .. extra.Title .. " <i>(file is missing)</i></li>\n");
+		end
+	end
+	f:write("</ul><hr />");
+end
+
+
+
+
+
 function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 	
@@ -308,12 +334,17 @@ function DumpAPIHtml()
 		</header>
 		<p>The API reference is divided into the following sections:</p>
 		<ul>
+		<li><a href="#articles">Articles</a></li>
 		<li><a href="#classes">Class index</a></li>
 		<li><a href="#hooks">Hooks</a></li>
-		<li><a href="#extra">Extra pages</a></li>
 		<li><a href="#docstats">Documentation statistics</a></li>
 		</ul>
 		<hr />
+	]]);
+	
+	WriteArticles(f);
+	
+	f:write([[
 		<a name="classes"><h2>Class index</h2></a>
 		<p>The following classes are available in the MCServer Lua scripting language:
 		<ul>
@@ -325,6 +356,9 @@ function DumpAPIHtml()
 	f:write([[
 		</ul></p>
 		<hr />
+	]]);
+	
+	f:write([[
 		<a name="hooks"><h2>Hooks</h2></a>
 		<p>
 		A plugin can register to be called whenever an "interesting event" occurs. It does so by calling
@@ -352,30 +386,11 @@ function DumpAPIHtml()
 			WriteHtmlHook(hook);
 		end
 	end
-	f:write([[			</table>
-	
+	f:write([[
+			</table>
 			<hr />
-			<a name="extra"><h2>Extra pages</h2></a>
-			
-			<p>The following pages provide various extra information</p>
-			
-			<ul>
-]]);
-	for i, extra in ipairs(g_APIDesc.ExtraPages) do
-		local SrcFileName = g_PluginFolder .. "/" .. extra.FileName;
-		if (cFile:Exists(SrcFileName)) then
-			local DstFileName = "API/" .. extra.FileName;
-			if (cFile:Exists(DstFileName)) then
-				cFile:Delete(DstFileName);
-			end
-			cFile:Copy(SrcFileName, DstFileName);
-			f:write("				<li><a href=\"" .. extra.FileName .. "\">" .. extra.Title .. "</a></li>\n");
-		else
-			f:write("				<li>" .. extra.Title .. " <i>(file is missing)</i></li>\n");
-		end
-	end
-	f:write("</ul>");
-
+	]]);
+	
 	-- Copy the static files to the output folder (overwrite any existing):
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/main.css", "API/main.css");
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/prettify.js", "API/prettify.js");
