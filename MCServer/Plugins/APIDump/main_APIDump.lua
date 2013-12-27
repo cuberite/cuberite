@@ -255,7 +255,7 @@ end
 
 
 
-local function WriteClasses(f, a_API)
+local function WriteClasses(f, a_API, a_ClassMenu)
 	f:write([[
 		<a name="classes"><h2>Class index</h2></a>
 		<p>The following classes are available in the MCServer Lua scripting language:
@@ -263,7 +263,7 @@ local function WriteClasses(f, a_API)
 	]]);
 	for i, cls in ipairs(a_API) do
 		f:write("<li><a href=\"", cls.Name, ".html\">", cls.Name, "</a></li>\n");
-		WriteHtmlClass(cls, a_API);
+		WriteHtmlClass(cls, a_API, a_ClassMenu);
 	end
 	f:write([[
 		</ul></p>
@@ -378,7 +378,19 @@ function DumpAPIHtml()
 		LOGINFO("Cannot output HTML API: " .. err);
 		return;
 	end
+
+	-- Create a class menu that will be inserted into each class file for faster navigation (#403)
+	local ClassMenuTab = {};
+	for idx, cls in ipairs(API) do
+		table.insert(ClassMenuTab, "<a href='");
+		table.insert(ClassMenuTab, cls.Name);
+		table.insert(ClassMenuTab, ".html'>");
+		table.insert(ClassMenuTab, cls.Name);
+		table.insert(ClassMenuTab, "</a><br />");
+	end
+	local ClassMenu = table.concat(ClassMenuTab, "");
 	
+	-- Write the HTML file:
 	f:write([[<!DOCTYPE html>
 		<html>
 		<head>
@@ -402,7 +414,7 @@ function DumpAPIHtml()
 	]]);
 	
 	WriteArticles(f);
-	WriteClasses(f, API);
+	WriteClasses(f, API, ClassMenu);
 	WriteHooks(f, Hooks, UndocumentedHooks);
 	
 	-- Copy the static files to the output folder (overwrite any existing):
@@ -860,7 +872,7 @@ end
 
 
 
-function WriteHtmlClass(a_ClassAPI, a_AllAPI)
+function WriteHtmlClass(a_ClassAPI, a_AllAPI, a_ClassMenu)
 	local cf, err = io.open("API/" .. a_ClassAPI.Name .. ".html", "w");
 	if (cf == nil) then
 		return;
@@ -975,7 +987,11 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		<h1>]], a_ClassAPI.Name, [[</h1>
 		<hr />
 		</header>
-		<h1>Contents</h1>
+		<table><tr><td style="vertical-align: top;">Quick navigation:
+	]]);
+	cf:write(a_ClassMenu);
+	cf:write([[
+		</td><td style="vertical-align: top;"><h1>Contents</h1>
 		<p><ul>
 	]]);
 	
@@ -1073,7 +1089,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 	end
 
-	cf:write([[</div><script>prettyPrint();</script></body></html>]]);
+	cf:write([[</td></tr></table></div><script>prettyPrint();</script></body></html>]]);
 	cf:close();
 end
 
