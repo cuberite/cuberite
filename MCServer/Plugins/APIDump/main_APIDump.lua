@@ -255,6 +255,65 @@ end
 
 
 
+local function WriteClasses(f, a_API)
+	f:write([[
+		<a name="classes"><h2>Class index</h2></a>
+		<p>The following classes are available in the MCServer Lua scripting language:
+		<ul>
+	]]);
+	for i, cls in ipairs(a_API) do
+		f:write("<li><a href=\"", cls.Name, ".html\">", cls.Name, "</a></li>\n");
+		WriteHtmlClass(cls, a_API);
+	end
+	f:write([[
+		</ul></p>
+		<hr />
+	]]);
+end
+
+
+
+
+
+local function WriteHooks(f, a_Hooks, a_UndocumentedHooks)
+	f:write([[
+		<a name="hooks"><h2>Hooks</h2></a>
+		<p>
+		A plugin can register to be called whenever an "interesting event" occurs. It does so by calling
+		<a href="cPluginManager.html">cPluginManager</a>'s AddHook() function and implementing a callback
+		function to handle the event.</p>
+		<p>
+		A plugin can decide whether it will let the event pass through to the rest of the plugins, or hide it
+		from them. This is determined by the return value from the hook callback function. If the function
+		returns false or no value, the event is propagated further. If the function returns true, the processing
+		is	stopped, no other plugin receives the notification (and possibly MCServer disables the default
+		behavior for the event). See each hook's details to see the exact behavior.</p>
+		<table>
+		<tr>
+		<th>Hook name</th>
+		<th>Called when</th>
+		</tr>
+	]]);
+	for i, hook in ipairs(a_Hooks) do
+		if (hook.DefaultFnName == nil) then
+			-- The hook is not documented yet
+			f:write("				<tr>\n					<td>" .. hook.Name .. "</td>\n					<td><i>(No documentation yet)</i></td>\n 				</tr>\n");
+			table.insert(a_UndocumentedHooks, hook.Name);
+		else
+			f:write("				<tr>\n					<td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td>\n					<td>" .. LinkifyString(hook.CalledWhen, hook.Name) .. "</td>\n				</tr>\n");
+			WriteHtmlHook(hook);
+		end
+	end
+	f:write([[
+			</table>
+			<hr />
+	]]);
+end
+
+
+
+
+
 function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 	
@@ -343,53 +402,8 @@ function DumpAPIHtml()
 	]]);
 	
 	WriteArticles(f);
-	
-	f:write([[
-		<a name="classes"><h2>Class index</h2></a>
-		<p>The following classes are available in the MCServer Lua scripting language:
-		<ul>
-	]]);
-	for i, cls in ipairs(API) do
-		f:write("<li><a href=\"", cls.Name, ".html\">", cls.Name, "</a></li>\n");
-		WriteHtmlClass(cls, API);
-	end
-	f:write([[
-		</ul></p>
-		<hr />
-	]]);
-	
-	f:write([[
-		<a name="hooks"><h2>Hooks</h2></a>
-		<p>
-		A plugin can register to be called whenever an "interesting event" occurs. It does so by calling
-		<a href="cPluginManager.html">cPluginManager</a>'s AddHook() function and implementing a callback
-		function to handle the event.</p>
-		<p>
-		A plugin can decide whether it will let the event pass through to the rest of the plugins, or hide it
-		from them. This is determined by the return value from the hook callback function. If the function
-		returns false or no value, the event is propagated further. If the function returns true, the processing
-		is	stopped, no other plugin receives the notification (and possibly MCServer disables the default
-		behavior for the event). See each hook's details to see the exact behavior.</p>
-		<table>
-		<tr>
-		<th>Hook name</th>
-		<th>Called when</th>
-		</tr>
-	]]);
-	for i, hook in ipairs(Hooks) do
-		if (hook.DefaultFnName == nil) then
-			-- The hook is not documented yet
-			f:write("				<tr>\n					<td>" .. hook.Name .. "</td>\n					<td><i>(No documentation yet)</i></td>\n 				</tr>\n");
-			table.insert(UndocumentedHooks, hook.Name);
-		else
-			f:write("				<tr>\n					<td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td>\n					<td>" .. LinkifyString(hook.CalledWhen, hook.Name) .. "</td>\n				</tr>\n");
-			WriteHtmlHook(hook);
-		end
-	end
-	f:write([[
-			</table>
-			<hr />
-	]]);
+	WriteClasses(f, API);
+	WriteHooks(f, Hooks, UndocumentedHooks);
 	
 	-- Copy the static files to the output folder (overwrite any existing):
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/main.css", "API/main.css");
