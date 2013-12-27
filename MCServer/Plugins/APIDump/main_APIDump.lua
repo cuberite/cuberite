@@ -275,7 +275,7 @@ end
 
 
 
-local function WriteHooks(f, a_Hooks, a_UndocumentedHooks)
+local function WriteHooks(f, a_Hooks, a_UndocumentedHooks, a_HookNav)
 	f:write([[
 		<a name="hooks"><h2>Hooks</h2></a>
 		<p>
@@ -301,7 +301,7 @@ local function WriteHooks(f, a_Hooks, a_UndocumentedHooks)
 			table.insert(a_UndocumentedHooks, hook.Name);
 		else
 			f:write("				<tr>\n					<td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td>\n					<td>" .. LinkifyString(hook.CalledWhen, hook.Name) .. "</td>\n				</tr>\n");
-			WriteHtmlHook(hook);
+			WriteHtmlHook(hook, a_HookNav);
 		end
 	end
 	f:write([[
@@ -379,7 +379,7 @@ function DumpAPIHtml()
 		return;
 	end
 
-	-- Create a class menu that will be inserted into each class file for faster navigation (#403)
+	-- Create a class navigation menu that will be inserted into each class file for faster navigation (#403)
 	local ClassMenuTab = {};
 	for idx, cls in ipairs(API) do
 		table.insert(ClassMenuTab, "<a href='");
@@ -389,6 +389,17 @@ function DumpAPIHtml()
 		table.insert(ClassMenuTab, "</a><br />");
 	end
 	local ClassMenu = table.concat(ClassMenuTab, "");
+	
+	-- Create a hook navigation menu that will be inserted into each hook file for faster navigation(#403)
+	local HookNavTab = {};
+	for idx, hook in ipairs(Hooks) do
+		table.insert(HookNavTab, "<a href='");
+		table.insert(HookNavTab, hook.DefaultFnName);
+		table.insert(HookNavTab, ".html'>");
+		table.insert(HookNavTab, (hook.Name:gsub("^HOOK_", "")));  -- remove the "HOOK_" part of the name
+		table.insert(HookNavTab, "</a><br />");
+	end
+	local HookNav = table.concat(HookNavTab, "");
 	
 	-- Write the HTML file:
 	f:write([[<!DOCTYPE html>
@@ -415,7 +426,7 @@ function DumpAPIHtml()
 	
 	WriteArticles(f);
 	WriteClasses(f, API, ClassMenu);
-	WriteHooks(f, Hooks, UndocumentedHooks);
+	WriteHooks(f, Hooks, UndocumentedHooks, HookNav);
 	
 	-- Copy the static files to the output folder (overwrite any existing):
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/main.css", "API/main.css");
@@ -1097,7 +1108,7 @@ end
 
 
 
-function WriteHtmlHook(a_Hook)
+function WriteHtmlHook(a_Hook, a_HookNav)
 	local fnam = "API/" .. a_Hook.DefaultFnName .. ".html";
 	local f, error = io.open(fnam, "w");
 	if (f == nil) then
@@ -1120,7 +1131,11 @@ function WriteHtmlHook(a_Hook)
 		<h1>]], a_Hook.Name, [[</h1>
 		<hr />
 		</header>
-		<p>
+		<table><tr><td style="vertical-align: top;">Quick navigation:
+	]]);
+	f:write(a_HookNav);
+	f:write([[
+		</td><td style="vertical-align: top;"><p>
 	]]);
 	f:write(LinkifyString(a_Hook.Desc, HookName));
 	f:write("</p>\n<hr /><h1>Callback function</h1>\n<p>The default name for the callback function is ");
@@ -1150,7 +1165,7 @@ function WriteHtmlHook(a_Hook)
 		f:write("<p>", (example.Desc or "<i>missing Desc</i>"), "</p>\n");
 		f:write("<pre class=\"prettyprint lang-lua\">", (example.Code or "<i>missing Code</i>"), "\n</pre>\n\n");
 	end
-	f:write([[</div><script>prettyPrint();</script></body></html>]]);
+	f:write([[</td></tr></table></div><script>prettyPrint();</script></body></html>]]);
 	f:close();
 end
 
