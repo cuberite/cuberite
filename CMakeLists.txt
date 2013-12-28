@@ -1,5 +1,51 @@
 
 cmake_minimum_required (VERSION 2.6)
+
+SET(CMAKE_CXX_FLAGS_DEBUGPROFILE
+    "${CMAKE_CXX_FLAGS_DEBUG} -pg -D_DEBUG"
+    CACHE STRING "Flags used by the C++ compiler during profile builds."
+    FORCE )
+SET(CMAKE_C_FLAGS_DEBUGPROFILE
+    "${CMAKE_C_FLAGS_DEBUG} -pg -D_DEBUG"
+    CACHE STRING "Flags used by the C compiler during profile builds."
+    FORCE )
+SET(CMAKE_EXE_LINKER_FLAGS_DEBUGPROFILE
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -pg"
+    CACHE STRING "Flags used for linking binaries during profile builds."
+    FORCE )
+SET(CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -pg"
+    CACHE STRING "Flags used by the shared libraries linker during profile builds."
+    FORCE )
+MARK_AS_ADVANCED(
+    CMAKE_CXX_FLAGS_DEBUGPROFILE
+    CMAKE_C_FLAGS_DEBUGPROFILE
+    CMAKE_EXE_LINKER_FLAGS_DEBUGPROFILE
+    CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE )
+
+SET(CMAKE_CXX_FLAGS_RELEASEPROFILE
+    "${CMAKE_CXX_FLAGS_DEBUG} -pg -DNDEBUG"
+    CACHE STRING "Flags used by the C++ compiler during profile builds."
+    FORCE )
+SET(CMAKE_C_FLAGS_RELEASEPROFILE
+    "${CMAKE_C_FLAGS_DEBUG} -pg -DNDEBUG"
+    CACHE STRING "Flags used by the C compiler during profile builds."
+    FORCE )
+SET(CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -pg"
+    CACHE STRING "Flags used for linking binaries during profile builds."
+    FORCE )
+SET(CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -pg"
+    CACHE STRING "Flags used by the shared libraries linker during profile builds."
+    FORCE )
+MARK_AS_ADVANCED(
+    CMAKE_CXX_FLAGS_RELEASEPROFILE
+    CMAKE_C_FLAGS_RELEASEPROFILE
+    CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
+    CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE )
+
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;DebugProfile;ReleaseProfile" CACHE STRING "" FORCE)
 project (MCServer)
 
 macro(add_flags FLAGS)
@@ -12,28 +58,6 @@ macro(add_flags FLAGS)
 	set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_PROFILE} ${FLAGS}")
 	set(CMAKE_C_FLAGS_PROFILE   "${CMAKE_C_FLAGS_PROFILE}   ${FLAGS}")
 endmacro()
-
-SET(CMAKE_CXX_FLAGS_PROFILE
-    "${CMAKE_CXX_FLAGS_DEBUG} -pg -DNDEBUG"
-    CACHE STRING "Flags used by the C++ compiler during profile builds."
-    FORCE )
-SET(CMAKE_C_FLAGS_PROFILE
-    "${CMAKE_C_FLAGS_DEBUG} -pg -DNDEBUG"
-    CACHE STRING "Flags used by the C compiler during profile builds."
-    FORCE )
-SET(CMAKE_EXE_LINKER_FLAGS_PROFILE
-    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -pg"
-    CACHE STRING "Flags used for linking binaries during profile builds."
-    FORCE )
-SET(CMAKE_SHARED_LINKER_FLAGS_PROFILE
-    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -pg"
-    CACHE STRING "Flags used by the shared libraries linker during profile builds."
-    FORCE )
-MARK_AS_ADVANCED(
-    CMAKE_CXX_FLAGS_PROFILE
-    CMAKE_C_FLAGS_PROFILE
-    CMAKE_EXE_LINKER_FLAGS_PROFILE
-    CMAKE_SHARED_LINKER_FLAGS_PROFILE )
 
 # Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
 if (NOT MSVC)
