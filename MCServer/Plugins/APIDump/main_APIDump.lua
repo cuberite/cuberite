@@ -229,14 +229,99 @@ end
 
 
 
+local function WriteArticles(f)
+	f:write([[
+		<a name="articles"><h2>Articles</h2></a>
+		<p>The following articles provide various extra information on plugin development</p>
+		<ul>
+	]]);
+	for i, extra in ipairs(g_APIDesc.ExtraPages) do
+		local SrcFileName = g_PluginFolder .. "/" .. extra.FileName;
+		if (cFile:Exists(SrcFileName)) then
+			local DstFileName = "API/" .. extra.FileName;
+			if (cFile:Exists(DstFileName)) then
+				cFile:Delete(DstFileName);
+			end
+			cFile:Copy(SrcFileName, DstFileName);
+			f:write("<li><a href=\"" .. extra.FileName .. "\">" .. extra.Title .. "</a></li>\n");
+		else
+			f:write("<li>" .. extra.Title .. " <i>(file is missing)</i></li>\n");
+		end
+	end
+	f:write("</ul><hr />");
+end
+
+
+
+
+
+local function WriteClasses(f, a_API, a_ClassMenu)
+	f:write([[
+		<a name="classes"><h2>Class index</h2></a>
+		<p>The following classes are available in the MCServer Lua scripting language:
+		<ul>
+	]]);
+	for i, cls in ipairs(a_API) do
+		f:write("<li><a href=\"", cls.Name, ".html\">", cls.Name, "</a></li>\n");
+		WriteHtmlClass(cls, a_API, a_ClassMenu);
+	end
+	f:write([[
+		</ul></p>
+		<hr />
+	]]);
+end
+
+
+
+
+
+local function WriteHooks(f, a_Hooks, a_UndocumentedHooks, a_HookNav)
+	f:write([[
+		<a name="hooks"><h2>Hooks</h2></a>
+		<p>
+		A plugin can register to be called whenever an "interesting event" occurs. It does so by calling
+		<a href="cPluginManager.html">cPluginManager</a>'s AddHook() function and implementing a callback
+		function to handle the event.</p>
+		<p>
+		A plugin can decide whether it will let the event pass through to the rest of the plugins, or hide it
+		from them. This is determined by the return value from the hook callback function. If the function
+		returns false or no value, the event is propagated further. If the function returns true, the processing
+		is	stopped, no other plugin receives the notification (and possibly MCServer disables the default
+		behavior for the event). See each hook's details to see the exact behavior.</p>
+		<table>
+		<tr>
+		<th>Hook name</th>
+		<th>Called when</th>
+		</tr>
+	]]);
+	for i, hook in ipairs(a_Hooks) do
+		if (hook.DefaultFnName == nil) then
+			-- The hook is not documented yet
+			f:write("				<tr>\n					<td>" .. hook.Name .. "</td>\n					<td><i>(No documentation yet)</i></td>\n 				</tr>\n");
+			table.insert(a_UndocumentedHooks, hook.Name);
+		else
+			f:write("				<tr>\n					<td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td>\n					<td>" .. LinkifyString(hook.CalledWhen, hook.Name) .. "</td>\n				</tr>\n");
+			WriteHtmlHook(hook, a_HookNav);
+		end
+	end
+	f:write([[
+			</table>
+			<hr />
+	]]);
+end
+
+
+
+
+
 function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 	
-	LOG("Moving static files..");
+	LOG("Copying static files..");
 	cFile:CreateFolder("API/Static");
 	local localFolder = g_Plugin:GetLocalFolder();
-	for k, v in cFile:GetFolderContents(localFolder .. "/Static") do
-		cFile:Copy(localFolder .. "/Static/" .. v, "API/Static/" .. v);	
+	for idx, fnam in ipairs(cFile:GetFolderContents(localFolder .. "/Static")) do
+		cFile:Copy(localFolder .. "/Static/" .. fnam, "API/Static/" .. fnam);
 	end
 
 	LOG("Creating API tables...");
@@ -293,7 +378,30 @@ function DumpAPIHtml()
 		LOGINFO("Cannot output HTML API: " .. err);
 		return;
 	end
+
+	-- Create a class navigation menu that will be inserted into each class file for faster navigation (#403)
+	local ClassMenuTab = {};
+	for idx, cls in ipairs(API) do
+		table.insert(ClassMenuTab, "<a href='");
+		table.insert(ClassMenuTab, cls.Name);
+		table.insert(ClassMenuTab, ".html'>");
+		table.insert(ClassMenuTab, cls.Name);
+		table.insert(ClassMenuTab, "</a><br />");
+	end
+	local ClassMenu = table.concat(ClassMenuTab, "");
 	
+	-- Create a hook navigation menu that will be inserted into each hook file for faster navigation(#403)
+	local HookNavTab = {};
+	for idx, hook in ipairs(Hooks) do
+		table.insert(HookNavTab, "<a href='");
+		table.insert(HookNavTab, hook.DefaultFnName);
+		table.insert(HookNavTab, ".html'>");
+		table.insert(HookNavTab, (hook.Name:gsub("^HOOK_", "")));  -- remove the "HOOK_" part of the name
+		table.insert(HookNavTab, "</a><br />");
+	end
+	local HookNav = table.concat(HookNavTab, "");
+	
+	-- Write the HTML file:
 	f:write([[<!DOCTYPE html>
 		<html>
 		<head>
@@ -308,74 +416,18 @@ function DumpAPIHtml()
 		</header>
 		<p>The API reference is divided into the following sections:</p>
 		<ul>
+		<li><a href="#articles">Articles</a></li>
 		<li><a href="#classes">Class index</a></li>
 		<li><a href="#hooks">Hooks</a></li>
-		<li><a href="#extra">Extra pages</a></li>
 		<li><a href="#docstats">Documentation statistics</a></li>
 		</ul>
 		<hr />
-		<a name="classes"><h2>Class index</h2></a>
-		<p>The following classes are available in the MCServer Lua scripting language:
-		<ul>
 	]]);
-	for i, cls in ipairs(API) do
-		f:write("<li><a href=\"", cls.Name, ".html\">", cls.Name, "</a></li>\n");
-		WriteHtmlClass(cls, API);
-	end
-	f:write([[
-		</ul></p>
-		<hr />
-		<a name="hooks"><h2>Hooks</h2></a>
-		<p>
-		A plugin can register to be called whenever an "interesting event" occurs. It does so by calling
-		<a href="cPluginManager.html">cPluginManager</a>'s AddHook() function and implementing a callback
-		function to handle the event.</p>
-		<p>
-		A plugin can decide whether it will let the event pass through to the rest of the plugins, or hide it
-		from them. This is determined by the return value from the hook callback function. If the function
-		returns false or no value, the event is propagated further. If the function returns true, the processing
-		is	stopped, no other plugin receives the notification (and possibly MCServer disables the default
-		behavior for the event). See each hook's details to see the exact behavior.</p>
-		<table>
-		<tr>
-		<th>Hook name</th>
-		<th>Called when</th>
-		</tr>
-	]]);
-	for i, hook in ipairs(Hooks) do
-		if (hook.DefaultFnName == nil) then
-			-- The hook is not documented yet
-			f:write("				<tr>\n					<td>" .. hook.Name .. "</td>\n					<td><i>(No documentation yet)</i></td>\n 				</tr>\n");
-			table.insert(UndocumentedHooks, hook.Name);
-		else
-			f:write("				<tr>\n					<td><a href=\"" .. hook.DefaultFnName .. ".html\">" .. hook.Name .. "</a></td>\n					<td>" .. LinkifyString(hook.CalledWhen, hook.Name) .. "</td>\n				</tr>\n");
-			WriteHtmlHook(hook);
-		end
-	end
-	f:write([[			</table>
 	
-			<hr />
-			<a name="extra"><h2>Extra pages</h2></a>
-			
-			<p>The following pages provide various extra information</p>
-			
-			<ul>
-]]);
-	for i, extra in ipairs(g_APIDesc.ExtraPages) do
-		local SrcFileName = g_PluginFolder .. "/" .. extra.FileName;
-		if (cFile:Exists(SrcFileName)) then
-			local DstFileName = "API/" .. extra.FileName;
-			if (cFile:Exists(DstFileName)) then
-				cFile:Delete(DstFileName);
-			end
-			cFile:Copy(SrcFileName, DstFileName);
-			f:write("				<li><a href=\"" .. extra.FileName .. "\">" .. extra.Title .. "</a></li>\n");
-		else
-			f:write("				<li>" .. extra.Title .. " <i>(file is missing)</i></li>\n");
-		end
-	end
-	f:write("</ul>");
-
+	WriteArticles(f);
+	WriteClasses(f, API, ClassMenu);
+	WriteHooks(f, Hooks, UndocumentedHooks, HookNav);
+	
 	-- Copy the static files to the output folder (overwrite any existing):
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/main.css", "API/main.css");
 	cFile:Copy(g_Plugin:GetLocalFolder() .. "/prettify.js", "API/prettify.js");
@@ -831,7 +883,7 @@ end
 
 
 
-function WriteHtmlClass(a_ClassAPI, a_AllAPI)
+function WriteHtmlClass(a_ClassAPI, a_AllAPI, a_ClassMenu)
 	local cf, err = io.open("API/" .. a_ClassAPI.Name .. ".html", "w");
 	if (cf == nil) then
 		return;
@@ -946,7 +998,17 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		<h1>]], a_ClassAPI.Name, [[</h1>
 		<hr />
 		</header>
-		<h1>Contents</h1>
+		<table><tr><td style="vertical-align: top;">
+		Index:<br />
+		<a href='index.html#articles'>Articles</a><br />
+		<a href='index.html#classes'>Classes</a><br />
+		<a href='index.html#hooks'>Hooks</a><br />
+		<br />
+		Quick navigation:<br />
+	]]);
+	cf:write(a_ClassMenu);
+	cf:write([[
+		</td><td style="vertical-align: top;"><h1>Contents</h1>
 		<p><ul>
 	]]);
 	
@@ -1044,7 +1106,7 @@ function WriteHtmlClass(a_ClassAPI, a_AllAPI)
 		end
 	end
 
-	cf:write([[</div><script>prettyPrint();</script></body></html>]]);
+	cf:write([[</td></tr></table></div><script>prettyPrint();</script></body></html>]]);
 	cf:close();
 end
 
@@ -1052,7 +1114,7 @@ end
 
 
 
-function WriteHtmlHook(a_Hook)
+function WriteHtmlHook(a_Hook, a_HookNav)
 	local fnam = "API/" .. a_Hook.DefaultFnName .. ".html";
 	local f, error = io.open(fnam, "w");
 	if (f == nil) then
@@ -1075,7 +1137,17 @@ function WriteHtmlHook(a_Hook)
 		<h1>]], a_Hook.Name, [[</h1>
 		<hr />
 		</header>
-		<p>
+		<table><tr><td style="vertical-align: top;">
+		Index:<br />
+		<a href='index.html#articles'>Articles</a><br />
+		<a href='index.html#classes'>Classes</a><br />
+		<a href='index.html#hooks'>Hooks</a><br />
+		<br />
+		Quick navigation:<br />
+	]]);
+	f:write(a_HookNav);
+	f:write([[
+		</td><td style="vertical-align: top;"><p>
 	]]);
 	f:write(LinkifyString(a_Hook.Desc, HookName));
 	f:write("</p>\n<hr /><h1>Callback function</h1>\n<p>The default name for the callback function is ");
@@ -1105,7 +1177,7 @@ function WriteHtmlHook(a_Hook)
 		f:write("<p>", (example.Desc or "<i>missing Desc</i>"), "</p>\n");
 		f:write("<pre class=\"prettyprint lang-lua\">", (example.Code or "<i>missing Code</i>"), "\n</pre>\n\n");
 	end
-	f:write([[</div><script>prettyPrint();</script></body></html>]]);
+	f:write([[</td></tr></table></div><script>prettyPrint();</script></body></html>]]);
 	f:close();
 end
 
