@@ -910,6 +910,24 @@ bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
+bool cPluginLua::OnPluginsLoaded(void)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLUGINS_LOADED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		bool ret = false;
+		m_LuaState.Call((int)(**itr), cLuaState::Return, ret);
+		res = res || ret;
+	}
+	return res;
+}
+
+
+
+
+
 bool cPluginLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);

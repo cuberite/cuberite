@@ -240,6 +240,25 @@ public:
 		return CallFunction(0);
 	}
 
+	/// Call any 0-param 1-return Lua function in a single line:
+	template<
+		typename FnT, typename RetT1
+	>
+	bool Call(FnT a_FnName, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
+
 	/// Call any 1-param 1-return Lua function in a single line:
 	template<
 		typename FnT, typename ArgT1, typename RetT1
