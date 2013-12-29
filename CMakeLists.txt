@@ -152,7 +152,7 @@ add_subdirectory(lib/md5/)
 # the important warnings will be turned on using #pragma in Globals.h
 if (NOT MSVC)
 	#TODO: set -Wall -Werror -Wextra
-	add_flags("-Wall -Wextra")
+	add_flags_cxx("-Wall -Wextra")
 endif()
 
 if (NOT WIN32)
