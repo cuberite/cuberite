@@ -216,7 +216,14 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 			GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			break;
 		}
-		
+
+		case biBirchForestM:
+		case biBirchForestHillsM:
+		{
+			GetTallBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			break;
+		}
+
 		case biRoofedForest:
 		case biColdTaiga:
 		case biColdTaigaHills:
@@ -237,8 +244,6 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		case biIcePlainsSpikes:
 		case biJungleM:
 		case biJungleEdgeM:
-		case biBirchForestM:
-		case biBirchForestHillsM:
 		case biRoofedForestM:
 		case biColdTaigaM:
 		case biMegaSpruceTaiga:
@@ -342,6 +347,44 @@ void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 void GetBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	int Height = 5 + (a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) % 3);
+	
+	// Prealloc, so that we don't realloc too often later:
+	a_LogBlocks.reserve(Height);
+	a_OtherBlocks.reserve(80);
+	
+	// The entire trunk, out of logs:
+	for (int i = Height - 1; i >= 0; --i)
+	{
+		a_LogBlocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ, E_BLOCK_LOG, E_META_LOG_BIRCH));
+	}
+	int h = a_BlockY + Height;
+	
+	// Top layer - just the Plus:
+	PushCoordBlocks(a_BlockX, h, a_BlockZ, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
+	a_OtherBlocks.push_back(sSetBlock(a_BlockX, h, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH));  // There's no log at this layer
+	h--;
+	
+	// Second layer - log, Plus and maybe Corners:
+	PushCoordBlocks (a_BlockX, h, a_BlockZ, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
+	PushCornerBlocks(a_BlockX, h, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 1, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
+	h--;
+	
+	// Third and fourth layers - BigO2 and maybe 2*Corners:
+	for (int Row = 0; Row < 2; Row++)
+	{
+		PushCoordBlocks (a_BlockX, h, a_BlockZ, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
+		PushCornerBlocks(a_BlockX, h, a_BlockZ, a_Seq, a_Noise, 0x3fffffff + Row * 0x10000000, a_OtherBlocks, 2, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
+		h--;
+	}  // for Row - 2*
+}
+
+
+
+
+
+void GetTallBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+{
+	int Height = 9 + (a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) % 3);
 	
 	// Prealloc, so that we don't realloc too often later:
 	a_LogBlocks.reserve(Height);
