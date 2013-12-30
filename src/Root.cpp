@@ -596,10 +596,10 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 
 	public:
 		cCallback (const AString & a_PlayerName, cPlayerListCallback & a_Callback) :
-			m_Callback(a_Callback),
 			m_BestRating(0),
 			m_NameLength(a_PlayerName.length()),
 			m_PlayerName(a_PlayerName),
+			m_Callback(a_Callback),
 			m_BestMatch(NULL),
 			m_NumMatches(0)
 		{}

@@ -35,6 +35,8 @@ class cServer										// tolua_export
 	: public cListenThread::cCallback
 {													// tolua_export
 public:												// tolua_export
+
+	virtual ~cServer() {}
 	bool InitServer(cIniFile & a_SettingsIni);
 
 	// tolua_begin
