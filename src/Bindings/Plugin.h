@@ -68,6 +68,8 @@ public:
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) = 0;
+	virtual bool OnPlayerFished             (cPlayer & a_Player, cItems & a_Reward) = 0;
+	virtual bool OnPlayerFishing            (cPlayer & a_Player, cItems & a_Reward) = 0;
 	virtual bool OnPlayerJoined             (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status) = 0;
 	virtual bool OnPlayerMoved              (cPlayer & a_Player) = 0;

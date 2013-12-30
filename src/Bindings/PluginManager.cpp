@@ -694,6 +694,48 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, cItems a_Reward)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_FISHED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerFished(a_Player, a_Reward))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_FISHING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerFishing(a_Player, a_Reward))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_JOINED);
