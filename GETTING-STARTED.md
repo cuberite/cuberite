@@ -18,6 +18,8 @@ Useful Resources
 
  * [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki)
  * [Minecraft Protocol Wiki](http://wiki.vg)
+ * [Lua API Documentation](http://mc-server.xoft.cz/LuaAPI)
+ * [VS2008 Download](http://stackoverflow.com/questions/15318560/visual-c-2008-express-download-link-dead)
 
 Setting up a Dev Environment
 ============================
