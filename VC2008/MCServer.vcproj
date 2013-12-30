@@ -495,10 +495,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\Chunk.inl.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\ChunkDef.h"
 				>
 			</File>
