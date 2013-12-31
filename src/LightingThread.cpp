@@ -189,7 +189,7 @@ void cLightingThread::ChunkReady(int a_ChunkX, int a_ChunkZ)
 		{
 			if (
 				(itr->x - a_ChunkX >= -1) && (itr->x - a_ChunkX <= 1) &&
-				(itr->x - a_ChunkX >= -1) && (itr->x - a_ChunkX <= 1)
+				(itr->z - a_ChunkZ >= -1) && (itr->z - a_ChunkZ <= 1)
 			)
 			{
 				// It is a neighbor
@@ -495,6 +495,7 @@ void cLightingThread::CalcLightStep(
 	int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 )
 {
+	UNUSED(a_IsSeedIn);
 	int NumSeedsOut = 0;
 	for (int i = 0; i < a_NumSeedsIn; i++)
 	{
