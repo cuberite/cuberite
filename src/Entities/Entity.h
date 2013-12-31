@@ -424,11 +424,13 @@ protected:
 	void Dereference( cEntity*& a_EntityPtr );
 	
 private:
-	// Measured in degrees (MAX 360 degrees)
+	// Measured in degrees, [-180, +180)
 	double   m_HeadYaw;
+	
 	// Measured in meter/second (m/s)
 	Vector3d m_Speed;
-	// Measured in degrees (MAX 360 degrees)
+	
+	// Measured in degrees, [-180, +180)
 	Vector3d m_Rot;
 	
 	/// Position of the entity's XZ center and Y bottom

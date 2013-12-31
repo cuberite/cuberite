@@ -28,6 +28,8 @@ template<typename Combinator> void InternalMergeBlocks(
 	Combinator a_Combinator
 )
 {
+	UNUSED(a_SrcSizeY);
+	UNUSED(a_DstSizeY);
 	for (int y = 0; y < a_SizeY; y++)
 	{
 		int SrcBaseY = (y + a_SrcOffY) * a_SrcSizeX * a_SrcSizeZ;

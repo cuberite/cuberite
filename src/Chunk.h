@@ -12,19 +12,6 @@
 
 
 
-#define C_CHUNK_USE_INLINE 1
-
-// Do not touch
-#if C_CHUNK_USE_INLINE
-	#define __C_CHUNK_INLINE__ inline
-#else
-	#define __C_CHUNK_INLINE__
-#endif
-
-
-
-
-
 namespace Json
 {
 	class Value;
@@ -436,8 +423,6 @@ private:
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (cBlockEntity * a_BlockEntity);
 
-	void SpreadLightOfBlock(NIBBLETYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
-
 	/// Creates a block entity for each block that needs a block entity and doesn't have one in the list
 	void CreateBlockEntities(void);
 	
@@ -478,14 +463,6 @@ private:
 typedef cChunk * cChunkPtr;
 
 typedef std::list<cChunkPtr> cChunkPtrList;
-
-
-
-
-
-#if C_CHUNK_USE_INLINE
-	#include "Chunk.inl.h"
-#endif
 
 
 

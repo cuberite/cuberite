@@ -723,6 +723,7 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 
 void cWorld::TickWeather(float a_Dt)
 {
+	UNUSED(a_Dt);
 	// There are no weather changes anywhere but in the Overworld:
 	if (GetDimension() != dimOverworld)
 	{
@@ -794,7 +795,7 @@ void cWorld::TickMobs(float a_Dt)
 			cMonster::mfAmbient,
 			cMonster::mfWater,
 		} ;
-		for (int i = 0; i < ARRAYCOUNT(AllFamilies); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(AllFamilies); i++)
 		{
 			cMonster::eFamily Family = AllFamilies[i];
 			int SpawnDelay = cMonster::GetSpawnDelay(Family);
@@ -1643,6 +1644,7 @@ int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 
 void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec, double a_InitialVelocityCoeff)
 {
+	UNUSED(a_InitialVelocityCoeff);
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTimeInSec);
 	TNT->Initialize(this);
 	// TODO: Add a bit of speed in horiz and vert axes, based on the a_InitialVelocityCoeff

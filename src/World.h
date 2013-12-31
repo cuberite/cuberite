@@ -78,6 +78,7 @@ public:
 	class cTask
 	{
 	public:
+		virtual ~cTask(){};
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
