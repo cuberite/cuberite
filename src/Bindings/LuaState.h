@@ -165,6 +165,7 @@ public:
 	void Push(cMonster * a_Monster);
 	void Push(cItem * a_Item);
 	void Push(cItems * a_Items);
+	void Push(const cItems & a_Items);
 	void Push(cClientHandle * a_ClientHandle);
 	void Push(cPickup * a_Pickup);
 	void Push(cChunkDesc * a_ChunkDesc);

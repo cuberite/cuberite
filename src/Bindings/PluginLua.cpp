@@ -630,6 +630,46 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FISHED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_Reward, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FISHING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_Reward, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerJoined(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
