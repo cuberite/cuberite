@@ -694,7 +694,7 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, cItems a_Reward)
+bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems a_Reward)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_FISHED);
 	if (Plugins == m_Hooks.end())
@@ -715,7 +715,7 @@ bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, cItems a_Reward)
 
 
 
-bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
+bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, const cItems a_Reward)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_FISHING);
 	if (Plugins == m_Hooks.end())

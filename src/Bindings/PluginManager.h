@@ -170,8 +170,8 @@ public:																	// tolua_export
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerEating             (cPlayer & a_Player);
-	bool CallHookPlayerFished             (cPlayer & a_Player, cItems a_Reward);
-	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
+	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems a_Reward);
+	bool CallHookPlayerFishing            (cPlayer & a_Player, const cItems a_Reward);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
 	bool CallHookPlayerMoving             (cPlayer & a_Player);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
