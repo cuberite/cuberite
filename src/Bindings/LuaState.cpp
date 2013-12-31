@@ -468,6 +468,18 @@ void cLuaState::Push(cItems * a_Items)
 
 
 
+void cLuaState::Push(const cItems & a_Items)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)&a_Items, "cItems");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(cClientHandle * a_Client)
 {
 	ASSERT(IsValid());

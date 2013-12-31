@@ -35,20 +35,29 @@ MARK_AS_ADVANCED(
     CMAKE_EXE_LINKER_FLAGS_PROFILE
     CMAKE_SHARED_LINKER_FLAGS_PROFILE )
 
-if(UNIX)
-set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -DNDEBUG")
-set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_DEBUG")
-set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -D_DEBUG")
+# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
+if (NOT MSVC)
+	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG")
+	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -D_DEBUG")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
+	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -DNDEBUG")
 endif()
 
-if(WIN32)
+if(MSVC)
+	# Make build use multiple threads under MSVC:
 	add_flags("/MP")
+elseif(APPLE)
+	#on os x clang adds pthread for us but we need to add it for gcc
+	if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		add_flags("-pthread")
+	endif()
 else()
+	# Let gcc / clang know that we're compiling a multi-threaded app:
 	add_flags("-pthread")
 endif()
 
-if(FORCE_32)
+# Allow for a forced 32-bit build under 32-bit OS:
+if (FORCE_32)
 	add_flags(-m32)
 	set(CMAKE_EXE_LINKER_FLAGS            "${CMAKE_EXE_LINKER_FLAGS}            -m32")
 	set(CMAKE_EXE_LINKER_FLAGS_DEBUG      "${CMAKE_EXE_LINKER_FLAGS_DEBUG}      -m32")
@@ -64,21 +73,21 @@ if(FORCE_32)
 	set(CMAKE_MODULE_LINKER_FLAGS_PROFILE "${CMAKE_MODULE_LINKER_FLAGS_PROFILE} -m32")
 endif()
 
-set(CMAKE_CXX_FLAGS_RELEASE_BAK "${CMAKE_CXX_FLAGS_RELEASE}")
-set(CMAKE_C_FLAGS_RELEASE_BAK   "${CMAKE_C_FLAGS_RELEASE}")
-if (UNIX)
+# Set lower warnings-level for the libraries:
+if (MSVC)
+	# Remove /W3 from command line -- cannot just cancel it later with /w like in unix, MSVC produces a D9025 warning (option1 overriden by option2)
+	string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+	string(REPLACE "/W3" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
+	string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
+	string(REPLACE "/W3" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
+else()
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -w")
 	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -w")
-else()
-	#remove /W3 from command line -- cannot just cancel it later with /w like in unix because of D9025
-	#only remove frome relase as we force release
-	string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-	string(REPLACE "/W3" "" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -w")
+	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -w")
 endif()
 
-set(CMAKE_BUILD_TYPE_BAK ${CMAKE_BUILD_TYPE})
-set(CMAKE_BUILD_TYPE "Release")
-
+# Under clang, we need to disable ASM support in CryptoPP:
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_definitions(-DCRYPTOPP_DISABLE_ASM)
 endif()
@@ -91,6 +100,7 @@ endif()
 # The Expat library is linked in statically, make the source files aware of that:
 add_definitions(-DXML_STATIC)
 
+# Include all the libraries:
 add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
 add_subdirectory(lib/cryptopp/)
@@ -102,22 +112,11 @@ add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/md5/)
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE_BAK}")
-set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE_BAK}")
-
-#TODo: set -Wall -Werror -Wextra
-if(UNIX)
+# Re-add the maximum warning level:
+# We do not do that for MSVC since MSVC produces an awful lot of warnings for its own STL headers;
+# the important warnings will be turned on using #pragma in Globals.h
+if (NOT MSVC)
 	add_flags("-Wall -Wextra")
-else()
-	add_flags("/Wall")
-endif()
-set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE_BAK}")
-
-if (NOT WIN32)
-	set(CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS}         -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG}   -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS_PROFILE} -rdynamic")
 endif()
 
 add_subdirectory (src) 
