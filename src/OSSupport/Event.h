@@ -20,10 +20,10 @@ class cEvent
 {
 public:
 	cEvent(void);
-	virtual ~cEvent();
+	~cEvent();
 
-	virtual void Wait(void);
-	virtual void Set (void);
+	void Wait(void);
+	void Set (void);
 	
 private:
 

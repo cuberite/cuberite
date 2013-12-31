@@ -22,6 +22,7 @@ In the descending class' constructor call the Start() method to start the thread
 
 
 
+
 class cIsThread
 {
 protected:
