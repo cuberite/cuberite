@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "LuaState.h"
+#include "../Root.h"
 
 extern "C"
 {
@@ -91,6 +92,13 @@ void cLuaState::Create(void)
 		LOGWARNING("%s: Trying to create an already-existing LuaState, ignoring.", __FUNCTION__);
 		return;
 	}
+	
+	// DEBUG
+	// This is used for #399
+	int BeforeVirt = cRoot::Get()->GetVirtualRAMUsage();
+	int BeforePhys = cRoot::Get()->GetPhysicalRAMUsage();
+	LOGINFO("Memory before creating a Lua context: Virt %d KiB, Phys %d KiB", BeforeVirt, BeforePhys);
+	
 	m_LuaState = lua_open();
 	luaL_openlibs(m_LuaState);
 	tolua_AllToLua_open(m_LuaState);
@@ -98,6 +106,13 @@ void cLuaState::Create(void)
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
 	m_IsOwned = true;
+
+	// DEBUG
+	// This is used for #399
+	int AfterVirt = cRoot::Get()->GetVirtualRAMUsage();
+	int AfterPhys = cRoot::Get()->GetPhysicalRAMUsage();
+	LOGINFO("Memory after creating a Lua context: Virt %d KiB, Phys %d KiB", AfterVirt, AfterPhys);
+	LOGINFO("Difference: Virt %d KiB, Phys %d KiB", AfterVirt - BeforeVirt, AfterPhys - BeforePhys);
 }
 
 

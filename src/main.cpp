@@ -3,6 +3,8 @@
 
 #include "Root.h"
 
+#include "Bindings/LuaState.h"
+
 #include <exception> //std::exception
 #include <csignal>   //std::signal
 #include <stdlib.h>  //exit()
@@ -149,6 +151,26 @@ int main( int argc, char **argv )
 {
 	UNUSED(argc);
 	UNUSED(argv);
+	
+	new cMCLogger();
+	
+	cLuaState LuaStates[10] =
+	{
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+		cLuaState("mem-eval"),
+	};
+	for (size_t i = 0; i < ARRAYCOUNT(LuaStates); i++)
+	{
+		LuaStates[i].Create();
+	}
 	
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	InitLeakFinder();
