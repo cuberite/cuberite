@@ -650,7 +650,7 @@ bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
 
 
 
-bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, const cItems & a_Reward)
+bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
