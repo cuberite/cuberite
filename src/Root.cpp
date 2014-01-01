@@ -701,9 +701,9 @@ int cRoot::GetPhysicalRAMUsage(void)
 		{
 			AString Line;
 			std::getline(StatFile, Line);
-			if (strncmp(Line.c_str(), "VmRSS:", 7) == 0)
+			if (strncmp(Line.c_str(), "VmRSS:", 6) == 0)
 			{
-				int res = atoi(Line.c_str() + 8);
+				int res = atoi(Line.c_str() + 7);
 				return (res == 0) ? -1 : res;  // If parsing failed, return -1
 			}
 		}
