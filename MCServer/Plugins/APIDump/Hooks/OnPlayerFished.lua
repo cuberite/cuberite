@@ -5,7 +5,7 @@ return
 		CalledWhen = "A player gets a reward from fishing.",
 		DefaultFnName = "OnPlayerFished", -- also used as pagename
 		Desc = [[
-			This hook gets called when a player already has his reward from fishing.
+			This hook gets called after a player reels in the fishing rod. This is a notification-only hook, the reward has already been decided. If a plugin needs to modify the reward, use the {{OnPlayerFishing|HOOK_PLAYER_FISHING}} hook.
 		]],
 		Params =
 		{
