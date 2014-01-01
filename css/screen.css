@@ -1,0 +1,657 @@
+html, body, form,
+h1, h2, h3, h4, h5, h6,
+p, img, a
+{
+	margin:0;
+	padding:0;
+	outline:0;
+	border:0;
+}
+
+/* EDIT THE PRIMARY COLOR HERE!! */
+h3, a, .tagline p a, UL.clean LI a:hover, UL.large LI a:hover span
+{
+	color:#b86443;
+}
+
+body
+{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:0.9em;
+	/*letter-spacing:-0.01em;*/
+	color:#333;
+	background:url(../images/bg_top_outer.jpg) repeat-x top;
+}	
+
+h1, h2, h3, h4, h5, h6 {  padding:8px 0; }
+h1 { font-size:2.4em; color:#333; }
+h2 { font-size:2.2em; color:#333; }
+h3 { font-size:1.6em; }
+h4 { font-size:1.5em; color:#777; }
+h5 { font-size:1.4em; color:#333; }
+h6 { font-size:1.2em; color:#333; letter-spacing:-0.02em; }
+
+hr
+{
+	color:#fff;
+	background-color:#fff;
+	border:1px dotted #ccc;
+	border-style:none none dotted; 
+}
+
+p
+{
+	padding:8px 0;
+	line-height:140%;
+}	
+LI
+{
+	padding:3px 0;
+}
+a
+{
+	text-decoration:none;
+}
+a:hover
+{
+	color:#333;
+}
+
+
+.line
+{
+	border-bottom:1px dotted #ccc;
+}
+
+.pod
+{
+	padding:0 0 20px 0;
+}
+
+
+/* If nested UL's used in something such as a category list */
+/* Does not work in IE6 but everything modern. */
+.pod UL LI > UL
+{
+	margin:0;
+	padding:3px 0 3px 20px;
+}
+.pod UL
+{
+	margin:0;
+	padding:0;
+}
+
+.pod UL LI
+{
+	list-style-type:none;
+	margin:0;
+	padding:3px 0;
+}
+
+.alternate, .hidden
+{
+	display:none;
+}
+
+.contentwidth
+{
+	width:940px;
+	margin:0 auto;
+}
+
+.left
+{
+	float:left;
+}
+.right
+{
+	float:right;
+}
+
+img.border-thin
+{
+	padding:1px;
+	border:1px solid #ededee;
+}
+img.border-thick
+{
+	padding:1px;
+	border:4px solid #ededed;
+}
+img.left
+{
+	float:left;
+	margin:0 10px 10px 0;
+}
+img.right
+{
+	float:right;
+	margin:0 0 10px 10px;
+}
+img.center
+{
+	display:block;
+	margin:0 auto;
+}
+
+
+
+.main
+{
+	background:url(../images/bg_top_inner.jpg) repeat-x top;
+	padding-bottom:20px;
+}
+
+
+.logo
+{
+	padding:40px 0 20px 0;
+}
+.logo h1
+{
+	margin:0;
+	padding:0;
+	text-align:center;
+	font-weight:normal;
+	font-size:3em;
+}
+.logo h1 a
+{
+	/* text-decoration:none; */
+	color:#fff;
+	padding:18px 30px 15px 30px;
+	line-height:80px;
+	background:#333333 url(../images/logo_cutout.gif) no-repeat bottom right;
+}
+.logo h1 a:hover
+{
+	color:#ccc;
+}
+
+
+.menu
+{
+	padding:20px 0;
+	text-align:center;
+}
+.menu UL
+{
+	margin:0 auto;
+	padding:2px 0 0 0;
+	border-top:1px dotted #afafaf;
+	border-bottom:1px dotted #afafaf;
+	text-align:center;
+	width:60%
+}
+.menu UL LI
+{
+	list-style-type:none;
+	display:inline;
+}
+.menu UL LI a
+{
+	padding:0 20px;
+	line-height:40px;
+	color:#afafaf;
+	text-transform:uppercase;
+	font-weight:bold;
+}
+.menu UL LI a:hover,
+.menu UL LI a.active
+{
+	color:#333;
+}
+
+UL.sub-menu
+{
+	margin:0;
+	padding:0;
+}
+UL.sub-menu LI
+{
+	margin:0;
+	padding:0;
+	list-style-type:none;
+	display:inline;
+}
+UL.sub-menu LI a
+{
+	padding:5px 10px 0 0;
+	font-size:75%;
+}
+UL.sub-menu LI a.active
+{
+	color:#333;
+}
+UL.footer-menu
+{
+	margin:0;
+	padding:0;
+}
+UL.footer-menu LI
+{
+	display:inline;
+	text-align:center;
+}
+UL.footer-menu LI a
+{
+	padding:0 5px;
+	font-size:95%;
+}
+
+.tagline
+{
+	padding:20px 0;
+}
+.tagline p
+{
+	text-align:center;
+	font-size:3em;
+	color:#afafaf;
+	line-height:1.1em;
+	letter-spacing:-0.04em;
+	background:#fff; /* Only needed if you fade in the tagline with jquery, IE leaves a jagged look */
+}
+.tagline p a:hover
+{
+	color:#333;
+}
+
+p.tags a
+{
+	background:#eee;
+	padding:1px 6px;
+	border-left:2px solid #ddd;
+}
+
+
+UL.clean
+{
+	margin:0;
+	padding:0;
+	border-top:1px solid #ccc;
+}
+UL.clean LI
+{
+	margin:0;
+	padding:0;
+	list-style-type:none;
+	display:inline;
+}
+UL.clean LI a
+{
+	color:#333;
+	display:block;
+	border-bottom:1px solid #ccc;
+	padding:6px 10px;
+	font-size:90%;
+}
+UL.clean LI a.highlight
+{
+	background:#f0f0f0;
+}
+UL.clean LI a span
+{
+	margin-right:10px;
+}
+.column
+{
+	float:left;
+	margin-right:40px;
+	padding:20px 0;
+}
+.last
+{
+	margin:0;
+}
+.column180
+{
+	width:180px;
+}
+.column300
+{
+	width:300px;
+}
+.column600
+{
+	width:600px;
+}
+.column450 /* 2 col layout */
+{
+	width:450px;
+}
+.column205 /* 4 col layout */
+{
+	width:205px;
+}
+.column280 /* 300 + 280 + 280 layout */
+{
+	width:280px;
+}
+
+.post
+{
+
+}
+.post .commentslink
+{
+	padding-top:20px;
+}
+.post .meta
+{
+	padding:3px 10px;
+	font-size:75%;
+	background:#efefef;
+}
+.post .date
+{
+	padding-right:10px;
+	font-weight:bold;
+}
+
+a.rss
+{
+	background:url(../images/icon_rss.gif) no-repeat bottom right;
+	height:24px;
+	width:15px;
+}
+
+UL.social
+{
+	margin:0;
+	padding:0;
+}
+UL.social LI
+{
+	margin:0;
+	padding:0;
+	list-style-type:none;
+	display:inline;
+}
+UL.social LI a
+{
+	display:block;
+	float:left;
+	width:32px;
+	height:32px;
+	padding:0 15px 20px 0;
+}
+
+/* Social Media Icon Image URLs */
+UL.social LI a.twitter { background:url(../images/icon_sm_twitter_off.jpg) no-repeat; }
+UL.social LI a.linkedin { background:url(../images/icon_sm_linkedin_off.jpg) no-repeat; }
+UL.social LI a.flickr { background:url(../images/icon_sm_flickr_off.jpg) no-repeat; }
+UL.social LI a.facebook { background:url(../images/icon_sm_facebook_off.jpg) no-repeat; }
+UL.social LI a.digg { background:url(../images/icon_sm_digg_off.jpg) no-repeat; }
+UL.social LI a.delicious { background:url(../images/icon_sm_delicious_off.jpg) no-repeat; }
+
+/* Used for Over state of link */
+UL.social LI a.twitter:hover { background:url(../images/icon_sm_twitter_on.jpg) no-repeat; }
+UL.social LI a.linkedin:hover { background:url(../images/icon_sm_linkedin_on.jpg) no-repeat; }
+UL.social LI a.flickr:hover { background:url(../images/icon_sm_flickr_on.jpg) no-repeat; }
+UL.social LI a.facebook:hover { background:url(../images/icon_sm_facebook_on.jpg) no-repeat; }
+UL.social LI a.digg:hover { background:url(../images/icon_sm_digg_on.jpg) no-repeat; }
+UL.social LI a.delicious:hover { background:url(../images/icon_sm_delicious_on.jpg) no-repeat; }
+
+
+UL.large
+{
+	margin:0;
+	padding:0;
+}
+UL.large LI
+{
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+UL.large LI a
+{
+	padding:20px 0 20px 80px;
+	display:block;
+	color:#afafaf;
+	font-size:110%;
+}
+UL.large LI a.information { background:url(../images/icon_bullet_information.jpg) no-repeat left center; }
+UL.large LI a.check { background:url(../images/icon_bullet_check.jpg) no-repeat left center; }
+UL.large LI a.person { background:url(../images/icon_bullet_person.jpg) no-repeat left center; }
+UL.large LI a.windows { background:url(../images/windows.png) no-repeat left center; }
+UL.large LI a.source { background:url(../images/source.png) no-repeat left center; }
+UL.large LI a.linux32 { background:url(../images/linux.png) no-repeat left center; }
+UL.large LI a.linux64 { background:url(../images/linux.png) no-repeat left center; }
+UL.large LI a.mac { background:url(../images/apple.png) no-repeat left center; }
+UL.large LI a.raspi { background:url(../images/raspi.png) no-repeat left center; }
+UL.large LI a:hover
+{
+	color:#333;
+}
+UL.large LI a:hover span.heading
+{
+	color:#333;
+}
+UL.large span
+{
+	display:block;
+}
+UL.large span.heading
+{
+	font-size:1.4em;
+	font-weight:bold;
+	color:#333;
+}
+
+.footer-outer
+{
+	background:#f0f0f0;
+	border-top:1px solid #f0f0f0;
+}
+.footer .contentwidth
+{
+	/*background:url(../images/bg_bottom_inner.gif) repeat-x top;*/
+	padding:20px 0 20px 0;
+}
+.footer
+{
+	background:#f0f0f0 url(../images/bg_bottom_outer.gif) repeat-x top;
+	text-align:center;
+	color:#afafaf;
+	font-size:80%;
+}
+
+
+#message
+{
+	color:#990000;
+	font-weight:bold;
+}
+
+.standardForm
+{
+	margin-bottom:15px;
+}
+.standardForm .textbox, .standardForm .textarea
+{
+	width:500px;
+	padding:7px;
+	font-size:110%;
+	font-weight:bold;
+}
+.standardForm .textbox, .standardForm .textarea,  .standardForm .submit
+{
+	border:3px solid #eee;
+	background:#fefefe;
+}
+.standardForm .field
+{
+	padding:5px 0;
+}
+.standardForm label
+{
+	font-weight:bold;
+	display:block;
+}
+.standardForm .textbox
+{
+	display:block;
+}
+.standardForm .textarea
+{
+	height:90px;
+}
+.standardForm .submit
+{
+	font-weight:bold;
+	background:#ccc;
+	padding:5px;
+	color:#fff;
+}
+
+
+
+
+/* clearfix start */ 
+.clearfix:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+.clearfix {
+    display: inline-block;
+}
+html[xmlns] .clearfix {
+    display: block;
+}
+* html .clearfix {
+    height: 1%;
+}
+/* clearfix end */ 
+
+
+/**
+ * jQuery lightBox plugin CSS
+ * This jQuery plugin was inspired and based on Lightbox 2 by Lokesh Dhakar (http://www.huddletogether.com/projects/lightbox2/)
+ * and adapted to me for use like a plugin from jQuery.
+ * @name jquery-lightbox-0.5.css
+ * @author Leandro Vieira Pinho - http://leandrovieira.com
+ * @version 0.5
+ * @date April 11, 2008
+ * @category jQuery plugin
+ * @copyright (c) 2008 Leandro Vieira Pinho (leandrovieira.com)
+ * @license CC Attribution-No Derivative Works 2.5 Brazil - http://creativecommons.org/licenses/by-nd/2.5/br/deed.en_US
+ * @example Visit http://leandrovieira.com/projects/jquery/lightbox/ for more informations about this jQuery plugin
+ */
+#jquery-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 90;
+	width: 100%;
+	height: 500px;
+}
+#jquery-lightbox {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 100;
+	text-align: center;
+	line-height: 0;
+}
+#jquery-lightbox a img { border: none; }
+#lightbox-container-image-box {
+	position: relative;
+	background-color: #fff;
+	width: 250px;
+	height: 250px;
+	margin: 0 auto;
+}
+#lightbox-container-image { padding: 10px; }
+#lightbox-loading {
+	position: absolute;
+	top: 40%;
+	left: 0%;
+	height: 25%;
+	width: 100%;
+	text-align: center;
+	line-height: 0;
+}
+#lightbox-nav {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	z-index: 10;
+}
+#lightbox-container-image-box > #lightbox-nav { left: 0; }
+#lightbox-nav a { outline: none;}
+#lightbox-nav-btnPrev, #lightbox-nav-btnNext {
+	width: 49%;
+	height: 100%;
+	display: block;
+}
+#lightbox-nav-btnPrev { 
+	left: 0; 
+	float: left;
+}
+#lightbox-nav-btnNext { 
+	right: 0; 
+	float: right;
+}
+#lightbox-container-image-data-box {
+	font: 10px Verdana, Helvetica, sans-serif;
+	background-color: #fff;
+	margin: 0 auto;
+	line-height: 1.4em;
+	overflow: auto;
+	width: 100%;
+	padding: 0 10px 0;
+}
+#lightbox-container-image-data {
+	padding: 0 10px; 
+	color: #666; 
+}
+#lightbox-container-image-data #lightbox-image-details { 
+	width: 70%; 
+	float: left; 
+	text-align: left; 
+}	
+#lightbox-image-details-caption { font-weight: bold; }
+#lightbox-image-details-currentNumber {
+	display: block; 
+	clear: left; 
+	padding-bottom: 1.0em;	
+}			
+#lightbox-secNav-btnClose {
+	width: 66px; 
+	float: right;
+	padding-bottom: 0.7em;	
+}
+
+#gallery {
+		background-color: #444;
+		padding: 10px;
+		width: 520px;
+	}
+#gallery ul { list-style: none; }
+#gallery ul li { display: inline; }
+#gallery ul img {
+	border: 5px solid #3e3e3e;
+	border-width: 5px 5px 20px;
+}
+#gallery ul a:hover img {
+	border: 5px solid #fff;
+	border-width: 5px 5px 20px;
+	color: #fff;
+}
+#gallery ul a:hover { color: #fff; }
+
+.sourcebox {
+	width: 540px;
+	margin-left: 200px !important;
+	margin-right: 200px !important;
+}
