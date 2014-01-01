@@ -5,7 +5,7 @@ return
 		CalledWhen = "A player is about to get a reward from fishing.",
 		DefaultFnName = "OnPlayerFishing", -- also used as pagename
 		Desc = [[
-			This hook gets called when a player right clicks with a fishing rod while the floater is under water.
+			This hook gets called when a player right clicks with a fishing rod while the floater is under water. The reward is already descided, but the plugin may change it.
 		]],
 		Params =
 		{
