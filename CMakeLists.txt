@@ -46,6 +46,11 @@ endif()
 if(MSVC)
 	# Make build use multiple threads under MSVC:
 	add_flags("/MP")
+elseif(APPLE)
+	#on os x clang adds pthread for us but we need to add it for gcc
+	if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		add_flags("-pthread")
+	endif()
 else()
 	# Let gcc / clang know that we're compiling a multi-threaded app:
 	add_flags("-pthread")
@@ -111,17 +116,8 @@ add_subdirectory(lib/md5/)
 # We do not do that for MSVC since MSVC produces an awful lot of warnings for its own STL headers;
 # the important warnings will be turned on using #pragma in Globals.h
 if (NOT MSVC)
-	#TODO: set -Wall -Werror -Wextra
 	add_flags("-Wall -Wextra")
 endif()
-
-if (NOT WIN32)
-	set(CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS}         -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG}   -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS_PROFILE} -rdynamic")
-endif()
-
 
 add_subdirectory (src) 
 
