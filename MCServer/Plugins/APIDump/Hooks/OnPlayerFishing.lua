@@ -10,7 +10,7 @@ return
 		Params =
 		{
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who pulled the fish in." },
-			{ Name = "Reward", Type = "{{cItems}}", Notes = "The reward the player gets. It can be a fish, tressure and junk." },
+			{ Name = "Reward", Type = "{{cItems}}", Notes = "The reward the player gets. It can be a fish, treasure and junk." },
 		},
 		Returns = [[
 			If the function returns false or no value, the next plugin's callback is called. Afterwards, the
@@ -18,4 +18,4 @@ return
 			callback is called for this event and the player doesn't get his reward.
 		]],
 	}, -- HOOK_PLAYER_FISHING
-}	
+};
