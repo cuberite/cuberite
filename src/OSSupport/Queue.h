@@ -1,34 +1,55 @@
 
+// Queue.h
+
+// Implements the cQueue class representing a thread safe queue
+
 #pragma once
 
 #include <list>
 
-//this empty struct allows function inlining
+/*
+Usage:
+To use the callback functions Delete and Combine create a class with the two
+methods and pass it as a second template parameter to cQueue. The class does
+not need to inherit cQueueFuncs but you do so to document the classes purpose.
+The second template parmeter is optional if not overriding the callback
+functions
+*/
+
+// this empty struct allows for the callback functions to be inlined
 template<class T>
 struct cQueueFuncs 
 {
 	public:
+		// Called when an Item is deleted form the queue without being returned
 		static void Delete(T) {};
-		static void Combine(T&, const T) {};
+		// Called when an Item is inserted with EnqueueItemIfNotPresent and
+		// there is another equal value already inserted
+		static void Combine(T& a_existing, const T a_new) {};
 };
 
 template<class ItemType, class Funcs = cQueueFuncs<ItemType> >
 class cQueue
 {
-
+// internal typedef for a List of Items
 typedef typename std::list<ItemType> ListType;
-//magic typedef to persuade clang that the iterator is a type
+// magic typedef to persuade clang that the iterator is a type
 typedef typename ListType::iterator iterator;
 public:
 	cQueue() {}
 	~cQueue() {}
 
+	// Enqueues an item to the queue, may block if other threads are accessing
+	// the queue.
 	void     EnqueueItem(ItemType a_item) 
 	{
 		cCSLock Lock(m_CS);
 		m_contents.push_back(a_item);
 		m_evtAdded.Set();
 	}
+
+	// Enqueues an item to the queue if not already present as determined with
+	// operator ==. Will block other threads from accessing the queue.
 	void     EnqueueItemIfNotPresent(ItemType a_item)
 	{
 		cCSLock Lock(m_CS);
@@ -44,6 +65,11 @@ public:
 		m_contents.push_back(a_item);
 		m_evtAdded.Set();
 	}
+
+	// Dequeues an Item from the queue if any are present, provides no
+	// guarantees about success if the list is empty but an item is enqueued at
+	// the same time. Returns true if successful. Value of item is undefined if
+	// Dequeuing was unsuccessful.
 	bool     TryDequeueItem(ItemType& item)
 	{
 		cCSLock Lock(m_CS);
@@ -53,6 +79,8 @@ public:
 		m_evtRemoved.Set();
 		return true;
 	}
+
+	// Dequeues an Item from the Queue, blocking until an Item is Available.
 	ItemType DequeueItem()
 	{
 		cCSLock Lock(m_CS);
@@ -66,12 +94,17 @@ public:
 		m_evtRemoved.Set();
 		return item;
 	}
+
+	// Blocks Until the queue is Empty, Has a slight race condition which may
+	// cause it to miss the queue being empty.
 	void BlockTillEmpty() {
-		//There is a very slight race condition here if the load completes between the check
-		//and the wait.
+		// There is a very slight race condition here if the load completes between the check
+		// and the wait.
 		while(!(Size() == 0)){m_evtRemoved.Wait();}
 	}
-	//can all be inlined when delete is a noop
+
+	// Removes all Items from the Queue, calling Delete on each of them.
+	// can all be inlined when delete is a noop
 	void     Clear()
 	{
 		cCSLock Lock(m_CS);
@@ -82,11 +115,16 @@ public:
 			m_contents.pop_front();
 		}
 	}
+
+	// Returns the Size at time of being called
+	// Do not use to detirmine weather to call DequeueItem, use TryDequeue instead
 	size_t   Size()
 	{
 		cCSLock Lock(m_CS);
 		return m_contents.size();
 	}
+
+	// Removes an Item from the queue
 	bool     Remove(ItemType item)
 	{
 		cCSLock Lock(m_CS);
