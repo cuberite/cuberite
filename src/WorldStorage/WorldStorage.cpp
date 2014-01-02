@@ -103,8 +103,7 @@ void cWorldStorage::WaitForFinish(void)
 	
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
-	m_Event.Set();
-	m_evtRemoved.Set();  // Wake up anybody waiting in the WaitForQueuesEmpty() method
+	m_Event.Set(); // Wake up the thread if waiting
 	super::Wait();
 	LOG("World storage thread finished");
 }
@@ -127,7 +126,6 @@ void cWorldStorage::WaitForSaveQueueEmpty(void)
 
 size_t cWorldStorage::GetLoadQueueLength(void)
 {
-	cCSLock Lock(m_CSQueues);
 	return m_LoadQueue.Size();
 }
 
@@ -137,7 +135,6 @@ size_t cWorldStorage::GetLoadQueueLength(void)
 
 size_t cWorldStorage::GetSaveQueueLength(void)
 {
-	cCSLock Lock(m_CSQueues);
 	return m_SaveQueue.Size();
 }
 
@@ -147,6 +144,7 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate)
 {
+	m_Event.Set();
 	m_LoadQueue.EnqueueItemIfNotPresent(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
 }
 
@@ -156,6 +154,7 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, boo
 
 void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
+	m_Event.Set();
 	m_SaveQueue.EnqueueItemIfNotPresent(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 }
 
@@ -175,18 +174,6 @@ void cWorldStorage::QueueSavedMessage(void)
 
 void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	/*cCSLock Lock(m_CSQueues);
-	for (sChunkLoadQueue::iterator itr = m_LoadQueue.begin(); itr != m_LoadQueue.end(); ++itr)
-	{
-		if ((itr->m_ChunkX != a_ChunkX) || (itr->m_ChunkY != a_ChunkY) || (itr->m_ChunkZ != a_ChunkZ))
-		{
-			continue;
-		}
-		m_LoadQueue.erase(itr);
-		Lock.Unlock();
-		m_evtRemoved.Set();
-		return;
-	}  // for itr - m_LoadQueue[]*/
 	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ,true));
 }
 
@@ -245,7 +232,6 @@ void cWorldStorage::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		m_Event.Wait();
-		
 		// Process both queues until they are empty again:
 		bool Success;
 		do
@@ -258,7 +244,6 @@ void cWorldStorage::Execute(void)
 			
 			Success = LoadOneChunk();
 			Success |= SaveOneChunk();
-			m_evtRemoved.Set();
 		} while (Success);
 	}
 }

@@ -116,14 +116,9 @@ protected:
 	
 	cWorld * m_World;
 	AString  m_StorageSchemaName;
-	
-	// Both queues are locked by the same CS
-	cCriticalSection m_CSQueues;
+
 	sChunkLoadQueue  m_LoadQueue;
 	cChunkCoordsQueue m_SaveQueue;
-	
-	cEvent m_Event;       // Set when there's any addition to the queues
-	cEvent m_evtRemoved;  // Set when an item has been removed from the queue, either by the worker thread or the Unqueue methods
 	
 	/// All the storage schemas (all used for loading)
 	cWSSchemaList m_Schemas;
@@ -135,6 +130,8 @@ protected:
 	
 	virtual void Execute(void) override;
 	
+	cEvent m_Event;       // Set when there's any addition to the queues
+
 	/// Loads one chunk from the queue (if any queued); returns true if there are more chunks in the load queue
 	bool LoadOneChunk(void);
 	
