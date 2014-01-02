@@ -13,7 +13,6 @@
 #include "../Generating/ChunkGenerator.h"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
-#include "../OSSupport/Promise.h"
 
 
 
@@ -100,7 +99,7 @@ void cWorldStorage::WaitForFinish(void)
 	}
 	
 	// Wait for the saving to finish:
-	WaitForQueuesEmpty();
+	WaitForSaveQueueEmpty();
 	
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
@@ -114,21 +113,15 @@ void cWorldStorage::WaitForFinish(void)
 
 
 
-void cWorldStorage::WaitForQueuesEmpty(void)
+void cWorldStorage::WaitForLoadQueueEmpty(void)
 {
-
-	cPromise * LoadPromise = m_LoadQueue.BlockTillEmpty();
-	cPromise * SavePromise = m_SaveQueue.BlockTillEmpty();
-	cPromise * QueuePromise = LoadPromise->WaitFor(SavePromise);
-	cPromise * CancelPromise = QueuePromise->CancelOn(m_ShouldTerminate);
-	CancelPromise->Wait();
-	delete CancelPromise;
-	delete QueuePromise;
-	delete SavePromise;
-	delete LoadPromise;
+	m_LoadQueue.BlockTillEmpty();
 }
 
-
+void cWorldStorage::WaitForSaveQueueEmpty(void)
+{
+	m_SaveQueue.BlockTillEmpty();
+}
 
 
 

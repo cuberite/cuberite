@@ -79,7 +79,8 @@ public:
 	bool Start(cWorld * a_World, const AString & a_StorageSchemaName);  // Hide the cIsThread's Start() method, we need to provide args
 	void Stop(void);  // Hide the cIsThread's Stop() method, we need to signal the event
 	void WaitForFinish(void);
-	void WaitForQueuesEmpty(void);
+	void WaitForLoadQueueEmpty(void);
+	void WaitForSaveQueueEmpty(void);
 	
 	size_t GetLoadQueueLength(void);
 	size_t GetSaveQueueLength(void);

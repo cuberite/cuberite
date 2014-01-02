@@ -367,10 +367,13 @@ void cWorld::InitializeSpawn(void)
 		cWorldLoadProgress Progress(this);
 		
 		// Wait for the loader to finish loading
-		m_Storage.WaitForQueuesEmpty();
+		m_Storage.WaitForLoadQueueEmpty();
 		
 		// Wait for the generator to finish generating
 		m_Generator.WaitForQueueEmpty();
+
+		// Wait for the loader to finish saving
+		m_Storage.WaitForSaveQueueEmpty();
 		
 		Progress.Stop();
 	}

@@ -3,8 +3,6 @@
 
 #include <list>
 
-#include "../OSSupport/Promise.h"
-
 //this empty struct allows function inlining
 template<class T>
 struct cQueueFuncs 
@@ -52,6 +50,7 @@ public:
 		if (m_contents.size() == 0) return false;
 		item = m_contents.front();
 		m_contents.pop_front();
+		m_evtRemoved.Set();
 		return true;
 	}
 	ItemType DequeueItem()
@@ -62,10 +61,15 @@ public:
 			cCSUnlock Unlock(m_CS);
 			m_evtAdded.Wait();
 		}
-		return m_contents.pop_front();
+		ItemType item = m_contents.front();
+		m_contents.pop_front();
+		m_evtRemoved.Set();
+		return item;
 	}
-	cPromise* BlockTillEmpty() {
-		return new cEmptyQueuePromise(this);
+	void BlockTillEmpty() {
+		//There is a very slight race condition here if the load completes between the check
+		//and the wait.
+		while(!(Size() == 0)){m_evtRemoved.Wait();}
 	}
 	//can all be inlined when delete is a noop
 	void     Clear()
@@ -87,18 +91,12 @@ public:
 	{
 		cCSLock Lock(m_CS);
 		m_contents.remove(item);
+		m_evtRemoved.Set();
 	}
 
 private:
 	ListType m_contents;
 	cCriticalSection m_CS;
 	cEvent m_evtAdded;
-
-	class cEmptyQueuePromise : public cPromise {
-	public:
-		cEmptyQueuePromise(cQueue* a_Queue) : cPromise(), m_Queue(a_Queue)  {}
-		virtual bool IsCompleted() {return m_Queue->Size() != 0;}
-	private:
-		cQueue* m_Queue;
-	};
+	cEvent m_evtRemoved;
 };
