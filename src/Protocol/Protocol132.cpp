@@ -886,15 +886,15 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 	time_t CurTime = time(NULL);
 	CryptoPP::RandomPool rng;
 	rng.Put((const byte *)&CurTime, sizeof(CurTime));
-	byte DecryptedNonce[MAX_ENC_LEN];
-	DecodingResult res = rsaDecryptor.Decrypt(rng, (const byte *)a_EncNonce.data(), a_EncNonce.size(), DecryptedNonce);
+	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+	DecodingResult res = rsaDecryptor.Decrypt(rng, (const byte *)a_EncNonce.data(), a_EncNonce.size(), (byte *)DecryptedNonce);
 	if (!res.isValidCoding || (res.messageLength != 4))
 	{
 		LOGD("Bad nonce length");
 		m_Client->Kick("Hacked client");
 		return;
 	}
-	if (ntohl(*((int *)DecryptedNonce)) != (unsigned)(uintptr_t)this)
+	if (ntohl(DecryptedNonce[0]) != (unsigned)(uintptr_t)this)
 	{
 		LOGD("Bad nonce value");
 		m_Client->Kick("Hacked client");

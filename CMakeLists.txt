@@ -112,11 +112,15 @@ add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/md5/)
 
-# Re-add the maximum warning level:
+# Remove disabling the maximum warning level:
+# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
 # We do not do that for MSVC since MSVC produces an awful lot of warnings for its own STL headers;
 # the important warnings will be turned on using #pragma in Globals.h
 if (NOT MSVC)
-	add_flags("-Wall -Wextra")
+	string(REPLACE "-w" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+	string(REPLACE "-w" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
+	string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
+	string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
 endif()
 
 add_subdirectory (src) 
