@@ -14,7 +14,7 @@ set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities)
 
 
 
-if (NOT WIN32)
+if (NOT MSVC)
 	foreach(folder ${FOLDERS})
 		add_subdirectory(${folder})
 	endforeach(folder)
@@ -62,18 +62,25 @@ else ()
 endif()
 
 
-if (UNIX)
-	set(EXECUTABLE ../MCServer/MCServer)
-else ()
-	set(EXECUTABLE MCServer)
-endif ()
-
+set(EXECUTABLE MCServer)
 
 add_executable(${EXECUTABLE} ${SOURCE})
 
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/MCServer)
+
+if (MSVC)
+	# MSVC generator adds a "Debug" or "Release" postfixes to the EXECUTABLE_OUTPUT_PATH, we need to cancel them:
+	SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES PREFIX "../")
+	SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES IMPORT_PREFIX "../")
+endif()
+
+
+# Make the debug executable have a "_debug" suffix
+SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES DEBUG_POSTFIX "_debug")
+
 
 # Precompiled headers (2nd part)
-if (WIN32)
+if (MSVC)
 	SET_TARGET_PROPERTIES(
 		${EXECUTABLE} PROPERTIES COMPILE_FLAGS "/Yu\"Globals.h\""
 		OBJECT_DEPENDS "$(IntDir)/$(TargetName.pch)"
@@ -81,7 +88,7 @@ if (WIN32)
 endif ()
 
 
-if (NOT WIN32)
+if (NOT MSVC)
 	target_link_libraries(${EXECUTABLE} OSSupport HTTPServer Bindings Items Blocks)
 	target_link_libraries(${EXECUTABLE} Protocol Generating WorldStorage)
 	target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI BlockEntities)
