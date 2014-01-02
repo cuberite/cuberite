@@ -764,3 +764,33 @@ AString Base64Decode(const AString & a_Base64String)
 
 
 
+
+short GetBEShort(const char * a_Mem)
+{
+	return (((short)a_Mem[0]) << 8) | a_Mem[1];
+}
+
+
+
+
+
+int GetBEInt(const char * a_Mem)
+{
+	return (((int)a_Mem[0]) << 24) | (((int)a_Mem[1]) << 16) | (((int)a_Mem[2]) << 8) | a_Mem[3];
+}
+
+
+
+
+
+void SetBEInt(char * a_Mem, Int32 a_Value)
+{
+	a_Mem[0] = a_Value >> 24;
+	a_Mem[1] = (a_Value >> 16) & 0xff;
+	a_Mem[2] = (a_Value >> 8) & 0xff;
+	a_Mem[3] = a_Value & 0xff;
+}
+
+
+
+

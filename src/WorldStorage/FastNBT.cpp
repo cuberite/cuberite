@@ -80,7 +80,7 @@ bool cParsedNBT::ReadString(int & a_StringStart, int & a_StringLen)
 {
 	NEEDBYTES(2);
 	a_StringStart = m_Pos + 2;
-	a_StringLen = ntohs(*((short *)(m_Data + m_Pos)));
+	a_StringLen = GetBEShort(m_Data + m_Pos);
 	if (a_StringLen < 0)
 	{
 		// Invalid string length
@@ -135,7 +135,7 @@ bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 	
 	// Read the count:
 	NEEDBYTES(4);
-	int Count = ntohl(*((int *)(m_Data + m_Pos)));
+	int Count = GetBEInt(m_Data + m_Pos);
 	m_Pos += 4;
 	if (Count < 0)
 	{
@@ -197,7 +197,7 @@ bool cParsedNBT::ReadTag(void)
 		case TAG_ByteArray:
 		{
 			NEEDBYTES(4);
-			int len = ntohl(*((int *)(m_Data + m_Pos)));
+			int len = GetBEInt(m_Data + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
@@ -229,7 +229,7 @@ bool cParsedNBT::ReadTag(void)
 		case TAG_IntArray:
 		{
 			NEEDBYTES(4);
-			int len = ntohl(*((int *)(m_Data + m_Pos)));
+			int len = GetBEInt(m_Data + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
@@ -401,7 +401,7 @@ void cFastNBTWriter::EndList(void)
 	ASSERT(m_Stack[m_CurrentStack].m_Type == TAG_List);
 	
 	// Update the list count:
-	*((int *)(m_Result.c_str() + m_Stack[m_CurrentStack].m_Pos)) = htonl(m_Stack[m_CurrentStack].m_Count);
+	SetBEInt((char *)(m_Result.c_str() + m_Stack[m_CurrentStack].m_Pos), m_Stack[m_CurrentStack].m_Count);
 
 	--m_CurrentStack;
 }
