@@ -134,8 +134,8 @@ public:
 	bool     Remove(ItemType item)
 	{
 		cCSLock Lock(m_CS);
-		m_contents.remove(item);
 		m_evtRemoved.Set();
+		return m_contents.remove(item);
 	}
 
 private:
