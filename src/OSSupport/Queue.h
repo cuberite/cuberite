@@ -134,8 +134,15 @@ public:
 	bool     Remove(ItemType item)
 	{
 		cCSLock Lock(m_CS);
-		m_evtRemoved.Set();
-		return m_contents.remove(item);
+		for (iterator itr = m_contents.begin(); itr != m_contents.end(); ++itr)
+		{
+			if((*itr) == a_item) {
+				m_contents.erase(itr);
+				m_evtRemoved.Set();
+				return true;
+			}
+		}
+		return false;
 	}
 
 private:
