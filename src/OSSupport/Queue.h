@@ -5,15 +5,18 @@
 
 #pragma once
 
-#include <list>
-
 /*
+Items can be added multiple times to a queue, there are two functions for
+adding, EnqueueItem() and EnqueueItemIfNotPresent(). The first one always
+enqueues the specified item, the second one checks if the item is already
+present and only queues it if it isn't.
+
 Usage:
-To use the callback functions Delete and Combine create a class with the two
-methods and pass it as a second template parameter to cQueue. The class does
-not need to inherit cQueueFuncs but you do so to document the classes purpose.
-The second template parmeter is optional if not overriding the callback
-functions
+To create a queue of type T, instantiate a cQueue<T> object. You can also
+modify the behavior of the queue when deleting items and when adding items
+that are already in the queue by providing a second parameter, a class that
+implements the functions Delete() and Combine(). An example is given in
+cQueueFuncs and is used as the default behavior.
 */
 
 // this empty struct allows for the callback functions to be inlined
@@ -25,7 +28,7 @@ struct cQueueFuncs
 		static void Delete(T) {};
 		// Called when an Item is inserted with EnqueueItemIfNotPresent and
 		// there is another equal value already inserted
-		static void Combine(T& a_existing, const T a_new) {};
+		static void Combine(T& a_existing, const T& a_new) {};
 };
 
 template<class ItemType, class Funcs = cQueueFuncs<ItemType> >
@@ -73,7 +76,10 @@ public:
 	bool     TryDequeueItem(ItemType& item)
 	{
 		cCSLock Lock(m_CS);
-		if (m_contents.size() == 0) return false;
+		if (m_contents.size() == 0) 
+		{
+			return false; 
+		}
 		item = m_contents.front();
 		m_contents.pop_front();
 		m_evtRemoved.Set();
