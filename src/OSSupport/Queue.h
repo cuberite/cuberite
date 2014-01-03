@@ -131,7 +131,7 @@ public:
 	}
 
 	// Removes an Item from the queue
-	bool     Remove(ItemType item)
+	bool     Remove(ItemType a_item)
 	{
 		cCSLock Lock(m_CS);
 		for (iterator itr = m_contents.begin(); itr != m_contents.end(); ++itr)
