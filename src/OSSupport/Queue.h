@@ -69,10 +69,8 @@ public:
 		m_evtAdded.Set();
 	}
 
-	// Dequeues an Item from the queue if any are present, provides no
-	// guarantees about success if the list is empty but an item is enqueued at
-	// the same time. Returns true if successful. Value of item is undefined if
-	// Dequeuing was unsuccessful.
+	// Dequeues an Item from the queue if any are present. Returns true if
+	// successful. Value of item is undefined if Dequeuing was unsuccessful.
 	bool     TryDequeueItem(ItemType& item)
 	{
 		cCSLock Lock(m_CS);
