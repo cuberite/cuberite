@@ -53,12 +53,17 @@ lfs = require("lfs");
 local function ForumizeString(a_Str)
 	assert(type(a_Str) == "string");
 	
-	-- Replace line ends with {%p} when multiple and space when single, so that manual word-wrap in the Info.lua file is fixed
+	-- Replace multiple line ends with {%p} and single line ends with a space,
+	-- so that manual word-wrap in the Info.lua file doesn't wrap in the forum
 	a_Str = a_Str:gsub("\n\n", "{%%p}");
 	a_Str = a_Str:gsub("\n", " ");
 	
 	-- Replace the generic formatting:
 	a_Str = a_Str:gsub("{%%p}", "\n\n");
+	a_Str = a_Str:gsub("{%%b}", "[b]"):gsub("{%%/b}", "[/b]");
+	a_Str = a_Str:gsub("{%%i}", "[i]"):gsub("{%%/i}", "[/i]");
+	a_Str = a_Str:gsub("{%%list}", "[list]"):gsub("{%%/list}", "[/list]");
+	a_Str = a_Str:gsub("{%%li}", "[*]"):gsub("{%%/li}", "");
 	-- TODO: Other formatting
 	
 	return a_Str;
