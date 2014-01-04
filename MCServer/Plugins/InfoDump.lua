@@ -48,6 +48,26 @@ lfs = require("lfs");
 
 
 
+--- Replaces generic formatting with forum-specific formatting
+-- Also removes the single line-ends
+local function ForumizeString(a_Str)
+	assert(type(a_Str) == "string");
+	
+	-- Replace line ends with {%p} when multiple and space when single, so that manual word-wrap in the Info.lua file is fixed
+	a_Str = a_Str:gsub("\n\n", "{%%p}");
+	a_Str = a_Str:gsub("\n", " ");
+	
+	-- Replace the generic formatting:
+	a_Str = a_Str:gsub("{%%p}", "\n\n");
+	-- TODO: Other formatting
+	
+	return a_Str;
+end
+
+
+
+
+
 --- Returns an array-table of all commands that are in the specified category
 -- Each item is a table {Command = "/command string", Info = {<command info in PluginInfo>}}
 local function GetCategoryCommands(a_PluginInfo, a_CategoryName)
@@ -154,7 +174,7 @@ local function WriteCommandsCategoryForum(a_Category, f)
 	if (CategoryName == "") then
 		CategoryName = "General";
 	end
-	f:write("\n[size=Large]", CategoryName, "[/size]\n");
+	f:write("\n[size=Large]", a_Category.DisplayName or CategoryName, "[/size]\n");
 	
 	-- Write description:
 	if (a_Category.Description ~= "") then
@@ -190,9 +210,34 @@ local function DumpCommandsForum(a_PluginInfo, f)
 		end
 	);
 	
+	if (#Categories == 0) then
+		return;
+	end
+	
+	f:write("\n[size=X-Large]Commands[/size]\n");
+
 	-- Dump per-category commands:
 	for idx, cat in ipairs(Categories) do
 		WriteCommandsCategoryForum(cat, f);
+	end
+end
+
+
+
+
+
+local function DumpAdditionalInfoForum(a_PluginInfo, f)
+	local AInfo = a_PluginInfo.AdditionalInfo;
+	if ((AInfo == nil) or (type(AInfo) ~= "table")) then
+		-- There is no AdditionalInfo in a_PluginInfo
+		return;
+	end
+	
+	for idx, info in ipairs(a_PluginInfo.AdditionalInfo) do
+		if ((info.Title ~= nil) and (info.Contents ~= nil)) then
+			f:write("\n[size=X-Large]", ForumizeString(info.Title), "[/size]\n");
+			f:write(ForumizeString(info.Contents), "\n");
+		end
 	end
 end
 
@@ -210,10 +255,8 @@ local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
 
 	-- Write the description:
 	f:write(a_PluginInfo.Description);
-	
+	DumpAdditionalInfoForum(a_PluginInfo, f);
 	DumpCommandsForum(a_PluginInfo, f);
-	
-	-- TODO: Write the AdditionalInfo
 
 	f:close();
 end
