@@ -9,3 +9,5 @@ file(GLOB SOURCE
 )
 
 add_library(WorldStorage ${SOURCE})
+
+target_link_libraries(WorldStorage OSSupport)
