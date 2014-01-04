@@ -186,7 +186,7 @@ local function WriteCommandDetailedHelpForum(a_CmdString, a_DetailedHelp, f)
 	
 	f:write("The following parameter combinations are recognized:\n");
 	for idx, combination in ipairs(a_DetailedHelp) do
-		f:write("[color=blue]", a_CmdString, "[/color] [color=green]", combination.Params, "[/color] - ", combination.Help);
+		f:write("[color=blue]", a_CmdString, "[/color] [color=green]", combination.Params, "[/color] - ", ForumizeString(combination.Help));
 		if (combination.Permission ~= nil) then
 			f:write(" (Requires permission '[color=red]", combination.Permission, "[/color]')");
 		end
@@ -205,17 +205,17 @@ local function WriteCommandsCategoryForum(a_Category, f)
 	if (CategoryName == "") then
 		CategoryName = "General";
 	end
-	f:write("\n[size=Large]", a_Category.DisplayName or CategoryName, "[/size]\n");
+	f:write("\n[size=Large]", ForumizeString(a_Category.DisplayName or CategoryName), "[/size]\n");
 	
 	-- Write description:
 	if (a_Category.Description ~= "") then
-		f:write(a_Category.Description, "\n");
+		f:write(ForumizeString(a_Category.Description), "\n");
 	end
 	
 	-- Write commands:
 	f:write("\n[list]");
 	for idx2, cmd in ipairs(a_Category.Commands) do
-		f:write("\n[b]", cmd.CommandString, "[/b] - ", (cmd.Info.HelpString or "UNDOCUMENTED"), "\n");
+		f:write("\n[b]", cmd.CommandString, "[/b] - ", ForumizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "\n");
 		if (cmd.Info.Permission ~= nil) then
 			f:write("Permission required: [color=red]", cmd.Info.Permission, "[/color]\n");
 		end
@@ -288,7 +288,7 @@ local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
 	end
 
 	-- Write the description:
-	f:write(a_PluginInfo.Description);
+	f:write(ForumizeString(a_PluginInfo.Description), "\n");
 	DumpAdditionalInfoForum(a_PluginInfo, f);
 	DumpCommandsForum(a_PluginInfo, f);
 
