@@ -31,3 +31,7 @@ For other stuff, including plugins and discussion, check the [forums](http://for
 Earn bitcoins for commits or donate to reward the MCServer developers: [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
 
 Travis CI: [![Build Status](https://travis-ci.org/mc-server/MCServer.png?branch=master)](https://travis-ci.org/mc-server/MCServer)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/mc-server/mcserver/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
