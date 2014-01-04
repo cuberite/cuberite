@@ -173,6 +173,32 @@ end
 
 
 
+--- Writes the specified command detailed help array to the output file, in the forum dump format
+local function WriteCommandDetailedHelpForum(a_CmdString, a_DetailedHelp, f)
+	assert(type(a_CmdString) == "string");
+	assert(type(a_DetailedHelp) == "table");
+	assert(f ~= nil);
+	
+	if (#a_DetailedHelp == 0) then
+		-- No explicit parameter combinations to write
+		return;
+	end
+	
+	f:write("The following parameter combinations are recognized:\n");
+	for idx, combination in ipairs(a_DetailedHelp) do
+		f:write("[color=blue]", a_CmdString, "[/color] [color=green]", combination.Params, "[/color] - ", combination.Help);
+		if (combination.Permission ~= nil) then
+			f:write(" (Requires permission '[color=red]", combination.Permission, "[/color]')");
+		end
+		f:write("\n");
+	end
+end
+
+
+
+
+
+--- Writes all commands in the specified category to the output file, in the forum dump format
 local function WriteCommandsCategoryForum(a_Category, f)
 	-- Write category name:
 	local CategoryName = a_Category.Name;
@@ -189,12 +215,15 @@ local function WriteCommandsCategoryForum(a_Category, f)
 	-- Write commands:
 	f:write("\n[list]");
 	for idx2, cmd in ipairs(a_Category.Commands) do
-		f:write("\nCommand: [b]", cmd.CommandString, "[/b] - ", (cmd.Info.HelpString or "UNDOCUMENTED"), "\n");
+		f:write("\n[b]", cmd.CommandString, "[/b] - ", (cmd.Info.HelpString or "UNDOCUMENTED"), "\n");
 		if (cmd.Info.Permission ~= nil) then
-			f:write("Permission required: ", cmd.Info.Permission, "\n");
+			f:write("Permission required: [color=red]", cmd.Info.Permission, "[/color]\n");
 		end
 		if (cmd.Info.DetailedDescription ~= nil) then
 			f:write(cmd.Info.DetailedDescription);
+		end
+		if (cmd.Info.DetailedHelp ~= nil) then
+			WriteCommandDetailedHelpForum(cmd.CommandString, cmd.Info.DetailedHelp, f);
 		end
 	end
 	f:write("[/list]\n\n")
