@@ -28,7 +28,7 @@ MCServer is licensed under the Apache license V2, and we welcome anybody to fork
 Other Stuff
 -----------
 
-For other stuff, including plugins and discussion, check the [forums](http://forum.mc-server.org) and [wiki](http://mc-server.org/wiki/).
+For other stuff, including plugins and discussion, check the [forums](http://forum.mc-server.org) and [wiki](http://wiki.mc-server.org/).
 
 Earn bitcoins for commits or donate to reward the MCServer developers: [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
 
