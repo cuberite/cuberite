@@ -11,9 +11,24 @@
 
 #include "OSSupport/SocketThreads.h"
 #include "OSSupport/ListenThread.h"
+
+#include "RCONServer.h"
+
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4231)
+	#pragma warning(disable:4189)
+	#pragma warning(disable:4702)
+#endif
+
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
-#include "RCONServer.h"
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 
 
