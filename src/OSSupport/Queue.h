@@ -19,123 +19,139 @@ implements the functions Delete() and Combine(). An example is given in
 cQueueFuncs and is used as the default behavior.
 */
 
-// this empty struct allows for the callback functions to be inlined
+/// This empty struct allows for the callback functions to be inlined
 template<class T>
 struct cQueueFuncs 
 {
-	public:
-		// Called when an Item is deleted form the queue without being returned
-		static void Delete(T) {};
-		// Called when an Item is inserted with EnqueueItemIfNotPresent and
-		// there is another equal value already inserted
-		static void Combine(T& a_existing, const T& a_new) {};
+public:
+
+	/// Called when an Item is deleted from the queue without being returned
+	static void Delete(T) {};
+	
+	/// Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted
+	static void Combine(T & a_existing, const T & a_new) {};
 };
 
-template<class ItemType, class Funcs = cQueueFuncs<ItemType> >
+
+
+
+
+template <class ItemType, class Funcs = cQueueFuncs<ItemType> >
 class cQueue
 {
-// internal typedef for a List of Items
-typedef typename std::list<ItemType> ListType;
-// magic typedef to persuade clang that the iterator is a type
-typedef typename ListType::iterator iterator;
+	// The actual storage type for the queue
+	typedef typename std::list<ItemType> QueueType;
+	
+	// Make iterator an alias for the QueueType's iterator
+	typedef typename QueueType::iterator iterator;
+	
 public:
 	cQueue() {}
 	~cQueue() {}
 
-	// Enqueues an item to the queue, may block if other threads are accessing
-	// the queue.
-	void     EnqueueItem(ItemType a_item) 
+
+	/// Enqueues an item to the queue, may block if other threads are accessing the queue.
+	void EnqueueItem(ItemType a_Item)
 	{
 		cCSLock Lock(m_CS);
-		m_contents.push_back(a_item);
+		m_Contents.push_back(a_Item);
 		m_evtAdded.Set();
 	}
 
-	// Enqueues an item to the queue if not already present as determined with
-	// operator ==. Will block other threads from accessing the queue.
-	void     EnqueueItemIfNotPresent(ItemType a_item)
+
+	/// Enqueues an item in the queue if not already present (as determined by operator ==). Blocks other threads from accessing the queue.
+	void EnqueueItemIfNotPresent(ItemType a_Item)
 	{
 		cCSLock Lock(m_CS);
 
-		for (iterator itr = m_contents.begin(); itr != m_contents.end(); ++itr)
+		for (iterator itr = m_Contents.begin(); itr != m_Contents.end(); ++itr)
 		{
-			if((*itr) == a_item) {
-				Funcs funcTable;
-				funcTable.Combine(*itr,a_item);
+			if ((*itr) == a_Item)
+			{
+				Funcs::Combine(*itr, a_Item);
 				return;
 			}
 		}
-		m_contents.push_back(a_item);
+		m_Contents.push_back(a_Item);
 		m_evtAdded.Set();
 	}
 
-	// Dequeues an Item from the queue if any are present. Returns true if
-	// successful. Value of item is undefined if Dequeuing was unsuccessful.
-	bool     TryDequeueItem(ItemType& item)
+
+	/// Dequeues an item from the queue if any are present.
+	/// Returns true if successful. Value of item is undefined if dequeuing was unsuccessful.
+	bool TryDequeueItem(ItemType & item)
 	{
 		cCSLock Lock(m_CS);
-		if (m_contents.size() == 0) 
+		if (m_Contents.size() == 0)
 		{
 			return false; 
 		}
-		item = m_contents.front();
-		m_contents.pop_front();
+		item = m_Contents.front();
+		m_Contents.pop_front();
 		m_evtRemoved.Set();
 		return true;
 	}
 
-	// Dequeues an Item from the Queue, blocking until an Item is Available.
-	ItemType DequeueItem()
+
+	/// Dequeues an item from the queue, blocking until an item is available.
+	ItemType DequeueItem(void)
 	{
 		cCSLock Lock(m_CS);
-		while (m_contents.size() == 0) 
+		while (m_Contents.size() == 0)
 		{
-			cCSUnlock Unlock(m_CS);
+			cCSUnlock Unlock(Lock);
 			m_evtAdded.Wait();
 		}
-		ItemType item = m_contents.front();
-		m_contents.pop_front();
+		ItemType item = m_Contents.front();
+		m_Contents.pop_front();
 		m_evtRemoved.Set();
 		return item;
 	}
 
-	// Blocks Until the queue is Empty, Has a slight race condition which may
-	// cause it to miss the queue being empty.
-	void BlockTillEmpty() {
-		// There is a very slight race condition here if the load completes between the check
-		// and the wait.
-		while(!(Size() == 0)){m_evtRemoved.Wait();}
-	}
 
-	// Removes all Items from the Queue, calling Delete on each of them.
-	// can all be inlined when delete is a noop
-	void     Clear()
+	/// Blocks until the queue is empty.
+	void BlockTillEmpty(void)
 	{
 		cCSLock Lock(m_CS);
-		Funcs funcTable;
-		while (!m_contents.empty())
+		while (!m_Contents.empty())
 		{
-			funcTable.Delete(m_contents.front());
-			m_contents.pop_front();
+			cCSUnlock Unlock(Lock);
+			m_evtRemoved.Wait();
 		}
 	}
 
-	// Returns the Size at time of being called
-	// Do not use to detirmine weather to call DequeueItem, use TryDequeue instead
-	size_t   Size()
+
+	/// Removes all Items from the Queue, calling Delete on each of them.
+	void Clear(void)
 	{
 		cCSLock Lock(m_CS);
-		return m_contents.size();
+		while (!m_Contents.empty())
+		{
+			Funcs::Delete(m_Contents.front());
+			m_Contents.pop_front();
+		}
 	}
 
-	// Removes an Item from the queue
-	bool     Remove(ItemType a_item)
+
+	/// Returns the size at time of being called.
+	/// Do not use to determine whether to call DequeueItem(), use TryDequeueItem() instead
+	size_t Size(void)
 	{
 		cCSLock Lock(m_CS);
-		for (iterator itr = m_contents.begin(); itr != m_contents.end(); ++itr)
+		return m_Contents.size();
+	}
+
+
+	/// Removes the item from the queue. If there are multiple such items, only the first one is removed.
+	/// Returns true if the item has been removed, false if no such item found.
+	bool Remove(ItemType a_Item)
+	{
+		cCSLock Lock(m_CS);
+		for (iterator itr = m_Contents.begin(); itr != m_Contents.end(); ++itr)
 		{
-			if((*itr) == a_item) {
-				m_contents.erase(itr);
+			if ((*itr) == a_Item)
+			{
+				m_Contents.erase(itr);
 				m_evtRemoved.Set();
 				return true;
 			}
@@ -144,8 +160,19 @@ public:
 	}
 
 private:
-	ListType m_contents;
+	/// The contents of the queue
+	QueueType m_Contents;
+	
+	/// Mutex that protects access to the queue contents
 	cCriticalSection m_CS;
+	
+	/// Event that is signalled when an item is added
 	cEvent m_evtAdded;
+	
+	/// Event that is signalled when an item is removed (both dequeued or erased)
 	cEvent m_evtRemoved;
 };
+
+
+
+

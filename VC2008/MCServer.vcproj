@@ -1579,6 +1579,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\OSSupport\Queue.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\OSSupport\Semaphore.cpp"
 					>
 				</File>
