@@ -204,7 +204,7 @@ typedef unsigned short     UInt16;
 #ifdef  _DEBUG
 	#define ASSERT( x ) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), assert(0), 0 ) )
 #else
-	#define ASSERT(x) ((void)0)
+	#define ASSERT(x) ((void)(x))
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
