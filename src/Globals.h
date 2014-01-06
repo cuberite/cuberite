@@ -22,11 +22,13 @@
 	#pragma warning(3 : 4245) // Conversion from 'type1' to 'type2', signed/unsigned mismatch
 	#pragma warning(3 : 4389) // Signed/unsigned mismatch
 	#pragma warning(3 : 4701) // Potentially unitialized local variable used
-	#pragma warning(3 : 4244) // Conversion from 'type1' to 'type2', possible loss of data
 	#pragma warning(3 : 4310) // Cast truncates constant value
 	#pragma warning(3 : 4505) // Unreferenced local function has been removed
 	#pragma warning(3 : 4127) // Conditional expression is constant
 	#pragma warning(3 : 4706) // Assignment within conditional expression
+	
+	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
+	// #pragma warning(3 : 4244) // Conversion from 'type1' to 'type2', possible loss of data
 
 	#define OBSOLETE __declspec(deprecated)
 
