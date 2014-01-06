@@ -53,8 +53,24 @@ lfs = require("lfs");
 local function ForumizeString(a_Str)
 	assert(type(a_Str) == "string");
 	
+	-- Remove the indentation, unless in the code tag:
+	-- Only one code or /code tag per line is supported!
+	local IsInCode = false;
+	local function RemoveIndentIfNotInCode(s)
+		if (IsInCode) then
+			-- we're in code section, check if this line terminates it
+			IsInCode = (s:find("{%%/code}") ~= nil);
+			return s .. "\n";
+		else
+			-- we're not in code section, check if this line starts it
+			IsInCode = (s:find("{%%code}") ~= nil);
+			return s:gsub("^%s*", "") .. "\n";
+		end
+	end
+	a_Str = a_Str:gsub("(.-)\n", RemoveIndentIfNotInCode);
+	
 	-- Replace multiple line ends with {%p} and single line ends with a space,
-	-- so that manual word-wrap in the Info.lua file doesn't wrap in the forum
+	-- so that manual word-wrap in the Info.lua file doesn't wrap in the forum.
 	a_Str = a_Str:gsub("\n\n", "{%%p}");
 	a_Str = a_Str:gsub("\n", " ");
 	
@@ -146,19 +162,22 @@ end
 
 
 --- Writes the specified command detailed help array to the output file, in the forum dump format
-local function WriteCommandDetailedHelpForum(a_CmdString, a_DetailedHelp, f)
+local function WriteCommandParameterCombinationsForum(a_CmdString, a_ParameterCombinations, f)
 	assert(type(a_CmdString) == "string");
-	assert(type(a_DetailedHelp) == "table");
+	assert(type(a_ParameterCombinations) == "table");
 	assert(f ~= nil);
 	
-	if (#a_DetailedHelp == 0) then
+	if (#a_ParameterCombinations == 0) then
 		-- No explicit parameter combinations to write
 		return;
 	end
 	
 	f:write("The following parameter combinations are recognized:\n");
-	for idx, combination in ipairs(a_DetailedHelp) do
-		f:write("[color=blue]", a_CmdString, "[/color] [color=green]", combination.Params, "[/color] - ", ForumizeString(combination.Help));
+	for idx, combination in ipairs(a_ParameterCombinations) do
+		f:write("[color=blue]", a_CmdString, "[/color] [color=green]", combination.Params, "[/color]");
+		if (combination.Help ~= nil) then
+			f:write(" - ", ForumizeString(combination.Help));
+		end
 		if (combination.Permission ~= nil) then
 			f:write(" (Requires permission '[color=red]", combination.Permission, "[/color]')");
 		end
@@ -194,8 +213,8 @@ local function WriteCommandsCategoryForum(a_Category, f)
 		if (cmd.Info.DetailedDescription ~= nil) then
 			f:write(cmd.Info.DetailedDescription);
 		end
-		if (cmd.Info.DetailedHelp ~= nil) then
-			WriteCommandDetailedHelpForum(cmd.CommandString, cmd.Info.DetailedHelp, f);
+		if (cmd.Info.ParameterCombinations ~= nil) then
+			WriteCommandParameterCombinationsForum(cmd.CommandString, cmd.Info.ParameterCombinations, f);
 		end
 	end
 	f:write("[/list]\n\n")
