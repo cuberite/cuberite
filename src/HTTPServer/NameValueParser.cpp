@@ -253,7 +253,6 @@ void cNameValueParser::Parse(const char * a_Data, int a_Size)
 						m_State = psValueRaw;
 						break;
 					}
-					i++;
 				}  // while (i < a_Size)
 				break;
 			}  // case psEqual

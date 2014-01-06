@@ -57,7 +57,7 @@ void cHTTPConnection::SendNeedAuth(const AString & a_Realm)
 
 void cHTTPConnection::Send(const cHTTPResponse & a_Response)
 {
-	ASSERT(m_State = wcsRecvIdle);
+	ASSERT(m_State == wcsRecvIdle);
 	a_Response.AppendToData(m_OutgoingData);
 	m_State = wcsSendingResp;
 	m_HTTPServer.NotifyConnectionWrite(*this);

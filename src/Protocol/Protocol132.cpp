@@ -877,7 +877,7 @@ void cProtocol132::SendCompass(const cWorld & a_World)
 void cProtocol132::SendEncryptionKeyRequest(void)
 {
 	cCSLock Lock(m_CSPacket);
-	WriteByte((char)0xfd);
+	WriteByte(0xfd);
 	WriteString(cRoot::Get()->GetServer()->GetServerID());
 	WriteShort((short)m_ServerPublicKey.size());
 	SendData(m_ServerPublicKey.data(), m_ServerPublicKey.size());
@@ -925,7 +925,7 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 	{
 		// Send encryption key response:
 		cCSLock Lock(m_CSPacket);
-		WriteByte((char)0xfc);
+		WriteByte(0xfc);
 		WriteShort(0);
 		WriteShort(0);
 		Flush();
