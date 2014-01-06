@@ -16,8 +16,22 @@ Declares the 1.7.x protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4231)
+	#pragma warning(disable:4189)
+	#pragma warning(disable:4702)
+#endif
+
 #include "cryptopp/modes.h"
 #include "cryptopp/aes.h"
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 
 
