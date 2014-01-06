@@ -66,7 +66,7 @@ set(EXECUTABLE MCServer)
 
 add_executable(${EXECUTABLE} ${SOURCE})
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/MCServer)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
 
 if (MSVC)
 	# MSVC generator adds a "Debug" or "Release" postfixes to the EXECUTABLE_OUTPUT_PATH, we need to cancel them:
