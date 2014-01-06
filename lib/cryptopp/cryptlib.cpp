@@ -4,12 +4,6 @@
 
 #ifndef CRYPTOPP_IMPORTS
 
-
-#ifdef _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable:4702)
-#endif
-
 #include "cryptlib.h"
 #include "misc.h"
 #include "filters.h"
@@ -830,9 +824,5 @@ void AuthenticatedKeyAgreementDomain::GenerateEphemeralKeyPair(RandomNumberGener
 }
 
 NAMESPACE_END
-
-#ifdef _MSC_VER
-	#pragma warning(pop)
-#endif
 
 #endif

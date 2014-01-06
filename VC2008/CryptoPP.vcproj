@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="CryptoPP"
 	ProjectGUID="{3423EC9A-52E4-4A4D-9753-EDEBC38785EF}"
 	RootNamespace="cryptlib"
@@ -60,6 +60,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4702"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
