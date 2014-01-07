@@ -1030,6 +1030,27 @@ bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, i
 
 
 
+bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLUGIN_MESSAGE);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPluginMessage(a_Client, a_Channel, a_Message))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPluginsLoaded(void)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLUGINS_LOADED);

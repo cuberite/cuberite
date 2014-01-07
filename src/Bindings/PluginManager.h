@@ -96,6 +96,7 @@ public:																	// tolua_export
 		HOOK_PLAYER_USED_ITEM,
 		HOOK_PLAYER_USING_BLOCK,
 		HOOK_PLAYER_USING_ITEM,
+		HOOK_PLUGIN_MESSAGE,
 		HOOK_PLUGINS_LOADED,
 		HOOK_POST_CRAFTING,
 		HOOK_PRE_CRAFTING,
@@ -186,6 +187,7 @@ public:																	// tolua_export
 	bool CallHookPlayerUsedItem           (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPlayerUsingBlock         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerUsingItem          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
+	bool CallHookPluginMessage            (cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message);
 	bool CallHookPluginsLoaded            (void);
 	bool CallHookPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);

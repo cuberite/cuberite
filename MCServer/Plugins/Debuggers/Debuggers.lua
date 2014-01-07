@@ -19,15 +19,16 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
 	--]]
 	
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
-	cPluginManager.AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
-	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick);
-	cPluginManager.AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
-	cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
-	cPluginManager.AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
-	cPluginManager.AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
+	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
+	cPluginManager:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
+	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
+	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
+	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 
 	PM = cRoot:Get():GetPluginManager();
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
@@ -541,7 +542,6 @@ function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
 	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
 	if (BlockEntity ~= nil) then
-		LOG("Setting sign lines...");
 		local SignEntity = tolua.cast(BlockEntity, "cSignEntity");
 		SignEntity:SetLines("Chunk:", tonumber(a_ChunkX) .. ", " .. tonumber(a_ChunkZ), "", "(Debuggers)");
 	end
@@ -964,21 +964,10 @@ end
 
 
 
--- Test the hook adding formats in #121 and #401
-local function DoNothing()
+function OnPluginMessage(a_Client, a_Channel, a_Message)
+	LOGINFO("Received a plugin message from client " .. a_Client:GetUsername() .. ": channel '" .. a_Channel .. "', message '" .. a_Message .. "'");
 end
 
-LOG("Trying cPluginManager:AddHook()");
-cPluginManager:AddHook(cPluginManager.HOOK_CHAT, DoNothing);
 
-LOG("Trying cPluginManager.AddHook()");
-cPluginManager.AddHook(cPluginManager.HOOK_CHAT, DoNothing);
 
-LOG("Trying cPluginManager:Get():AddHook()");
-cPluginManager:Get():AddHook(cPluginManager.HOOK_CHAT, DoNothing);
 
-LOG("Trying cPluginManager:Get():AddHook(Plugin, Hook)");
-cPluginManager:Get():AddHook(cPluginManager:GetCurrentPlugin(), cPluginManager.HOOK_CHAT);
-
-LOG("Trying cPluginManager.AddHook(Plugin, Hook)");
-cPluginManager.AddHook(cPluginManager:GetCurrentPlugin(), cPluginManager.HOOK_CHAT);

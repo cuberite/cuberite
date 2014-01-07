@@ -1376,7 +1376,7 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   Length);
 	AString Data;
 	a_ByteBuffer.ReadString(Data, Length);
-	// TODO: m_Client->HandlePluginMessage(Channel, Data);
+	m_Client->HandlePluginMessage(Channel, Data);
 }
 
 
