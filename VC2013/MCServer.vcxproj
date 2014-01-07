@@ -224,7 +224,6 @@
     <ResourceCompile Include="MCServer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Entities\Floater.h" />
     <ClInclude Include="resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
     <ClInclude Include="..\src\BlockArea.h" />
@@ -234,7 +233,6 @@
     <ClInclude Include="..\src\ByteBuffer.h" />
     <ClInclude Include="..\src\ChatColor.h" />
     <ClInclude Include="..\src\Chunk.h" />
-    <ClInclude Include="..\src\Chunk.inl.h" />
     <ClInclude Include="..\src\ChunkDef.h" />
     <ClInclude Include="..\src\ChunkMap.h" />
     <ClInclude Include="..\src\ChunkSender.h" />
@@ -325,6 +323,7 @@
     <ClInclude Include="..\src\Entities\Entity.h" />
     <ClInclude Include="..\src\Entities\ExpOrb.h" />
     <ClInclude Include="..\src\Entities\FallingBlock.h" />
+    <ClInclude Include="..\src\Entities\Floater.h" />
     <ClInclude Include="..\src\Entities\Minecart.h" />
     <ClInclude Include="..\src\Entities\Pawn.h" />
     <ClInclude Include="..\src\Entities\Pickup.h" />
@@ -351,6 +350,7 @@
     <ClInclude Include="..\src\OSSupport\GZipFile.h" />
     <ClInclude Include="..\src\OSSupport\IsThread.h" />
     <ClInclude Include="..\src\OSSupport\ListenThread.h" />
+    <ClInclude Include="..\src\OSSupport\Queue.h" />
     <ClInclude Include="..\src\OSSupport\Semaphore.h" />
     <ClInclude Include="..\src\OSSupport\Sleep.h" />
     <ClInclude Include="..\src\OSSupport\Socket.h" />
@@ -468,6 +468,7 @@
     <ClInclude Include="..\src\Items\ItemComparator.h" />
     <ClInclude Include="..\src\items\ItemDoor.h" />
     <ClInclude Include="..\src\items\ItemDye.h" />
+    <ClInclude Include="..\src\Items\ItemFishingRod.h" />
     <ClInclude Include="..\src\Items\ItemFlowerPot.h" />
     <ClInclude Include="..\src\items\ItemFood.h" />
     <ClInclude Include="..\src\items\ItemHandler.h" />
@@ -629,7 +630,6 @@
     <ClCompile Include="..\src\Cuboid.cpp" />
     <ClCompile Include="..\src\DeadlockDetect.cpp" />
     <ClCompile Include="..\src\Enchantments.cpp" />
-    <ClCompile Include="..\src\Entities\Floater.cpp" />
     <ClCompile Include="..\src\FastRandom.cpp" />
     <ClCompile Include="..\src\FurnaceRecipe.cpp" />
     <ClCompile Include="..\src\Globals.cpp">
@@ -763,6 +763,7 @@
     <ClCompile Include="..\src\Entities\Entity.cpp" />
     <ClCompile Include="..\src\Entities\ExpOrb.cpp" />
     <ClCompile Include="..\src\Entities\FallingBlock.cpp" />
+    <ClCompile Include="..\src\Entities\Floater.cpp" />
     <ClCompile Include="..\src\Entities\Minecart.cpp" />
     <ClCompile Include="..\src\Entities\Pawn.cpp" />
     <ClCompile Include="..\src\Entities\Pickup.cpp" />
