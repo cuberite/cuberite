@@ -72,6 +72,7 @@ public:
 	virtual void SendEntityStatus        (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendEntityVelocity      (const cEntity & a_Entity) override;
 	virtual void SendExplosion           (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
+	virtual void SendFavicon			 (void);
 	virtual void SendGameMode            (eGameMode a_GameMode) override;
 	virtual void SendHealth              (void) override;
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;

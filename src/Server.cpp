@@ -203,6 +203,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
+	if (cFile::Exists("favicon.png")) m_Favicon = Base64Encode(cFile::ReadWholeFile("favicon.png"));
+
 	if (m_bIsConnected)
 	{
 		LOGERROR("ERROR: Trying to initialize server while server is already running!");
@@ -283,6 +285,15 @@ int cServer::GetNumPlayers(void)
 {
 	cCSLock Lock(m_CSPlayerCount);
 	return m_PlayerCount;
+}
+
+
+
+
+
+AString cServer::GetFaviconData(void)
+{
+	return m_Favicon;
 }
 
 

@@ -383,6 +383,16 @@ void cProtocol172::SendExplosion(double a_BlockX, double a_BlockY, double a_Bloc
 
 
 
+void cProtocol172::SendFavicon(void)
+{
+	cPacketizer Pkt(*this, 0x0); // Favicon packet
+	Pkt.WriteString(cRoot::Get()->GetServer()->GetFaviconData());
+}
+
+
+
+
+
 void cProtocol172::SendGameMode(eGameMode a_GameMode)
 {
 	cPacketizer Pkt(*this, 0x2b);  // Change Game State packet
@@ -1115,6 +1125,9 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	);
 	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"}",
 		cRoot::Get()->GetServer()->GetDescription().c_str()
+	);
+	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+		cRoot::Get()->GetServer()->GetFaviconData()
 	);
 	Response.append("}");
 	
