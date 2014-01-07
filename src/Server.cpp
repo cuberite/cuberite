@@ -294,7 +294,7 @@ int cServer::GetNumPlayers(void)
 
 
 
-AString cServer::GetFaviconData(void)
+const AString & cServer::GetFaviconData(void) const
 {
 	return m_FaviconData;
 }

@@ -107,7 +107,7 @@ public:												// tolua_export
 	/// Notifies the server that a player is being destroyed; the server uses this to adjust the number of players
 	void PlayerDestroying(const cPlayer * a_Player);
 
-	AString GetFaviconData(void);
+	const AString & GetFaviconData(void) const;
 	
 	CryptoPP::RSA::PrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	CryptoPP::RSA::PublicKey  & GetPublicKey (void) { return m_PublicKey; }
