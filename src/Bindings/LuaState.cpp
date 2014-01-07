@@ -297,7 +297,7 @@ void cLuaState::Push(const AString & a_String)
 {
 	ASSERT(IsValid());
 
-	tolua_pushcppstring(m_LuaState, a_String);
+	lua_pushlstring(m_LuaState, a_String.data(), a_String.size());
 	m_NumCurrentFunctionArgs += 1;
 }
 
