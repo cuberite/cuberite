@@ -216,7 +216,7 @@ void cLightingThread::ChunkReady(int a_ChunkX, int a_ChunkZ)
 
 void cLightingThread::Execute(void)
 {
-	while (true)
+	for (;;)
 	{
 		{
 			cCSLock Lock(m_CS);

@@ -991,7 +991,7 @@ bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
 
 int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 {
-	while (true)
+	for (;;)
 	{
 		cCSLock Lock(m_CSLayers);
 		int ChunkX, ChunkZ, BlockY = 0;

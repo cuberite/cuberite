@@ -491,7 +491,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 		return;
 	}
 	cItem * PlayerSlots = GetPlayerSlots(a_Player) + 1;
-	do
+	for (;;)
 	{
 		// Try distributing the result. If it fails, bail out:
 		cItem ResultCopy(Result);
@@ -517,7 +517,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 			// The recipe has changed, bail out
 			return;
 		}
-	} while (true);
+	}
 }
 
 

@@ -74,7 +74,7 @@ int CompressStringGZIP(const char * a_Data, int a_Length, AString & a_Compressed
 		return res;
 	}
 	
-	while (true)
+	for (;;)
 	{
 		res = deflate(&strm, Z_FINISH);
 		switch (res)
@@ -137,7 +137,7 @@ extern int UncompressStringGZIP(const char * a_Data, int a_Length, AString & a_U
 		return res;
 	}
 	
-	while (true)
+	for (;;)
 	{
 		res = inflate(&strm, Z_FINISH);
 		switch (res)

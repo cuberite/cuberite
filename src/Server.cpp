@@ -493,7 +493,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	
 	if (split[0].compare("killmem") == 0)
 	{
-		while (true)
+		for (;;)
 		{
 			new char[100 * 1024 * 1024];  // Allocate and leak 100 MiB in a loop -> fill memory and kill MCS
 		}

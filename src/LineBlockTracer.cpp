@@ -196,7 +196,7 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 	ASSERT((m_CurrentY >= 0) && (m_CurrentY < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
 	
 	// This is the actual line tracing loop.
-	while (true)
+	for (;;)
 	{
 		// Report the current block through the callbacks:
 		if (a_Chunk == NULL)

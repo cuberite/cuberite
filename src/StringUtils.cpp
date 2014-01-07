@@ -612,7 +612,7 @@ AString StripColorCodes(const AString & a_Message)
 {
 	AString res(a_Message);
 	size_t idx = 0;
-	while (true)
+	for (;;)
 	{
 		idx = res.find("\xc2\xa7", idx);
 		if (idx == AString::npos)

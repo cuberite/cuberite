@@ -156,7 +156,7 @@ void cMultipartParser::Parse(const char * a_Data, int a_Size)
 	
 	// Append to buffer, then parse it:
 	m_IncomingData.append(a_Data, a_Size);
-	while (true)
+	for (;;)
 	{
 		if (m_EnvelopeParser.IsInHeaders())
 		{
