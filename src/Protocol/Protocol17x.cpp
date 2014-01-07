@@ -983,7 +983,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 	}
 	
 	// Handle all complete packets:
-	while (true)
+	for (;;)
 	{
 		UInt32 PacketLen;
 		if (!m_ReceivedData.ReadVarInt(PacketLen))

@@ -828,7 +828,7 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 		int yd = dy - dx / 2;
 		int zd = dz - dx / 2;
 
-		while (true)
+		for (;;)
 		{
 			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
 
@@ -860,7 +860,7 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 		int xd = dx - dy / 2;
 		int zd = dz - dy / 2;
 
-		while (true)
+		for (;;)
 		{
 			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
 
@@ -894,7 +894,7 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 		int xd = dx - dz / 2;
 		int yd = dy - dz / 2;
 
-		while (true)
+		for (;;)
 		{
 			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
 

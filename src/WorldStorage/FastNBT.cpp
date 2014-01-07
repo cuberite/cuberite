@@ -16,9 +16,12 @@
 	#define NBT_RESERVE_SIZE 200
 #endif  // NBT_RESERVE_SIZE
 
-#define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while (0)
-
-
+#ifdef _MSC_VER
+	// Dodge a C4127 (conditional expression is constant) for this specific macro usage
+	#define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while ((false, false))
+#else
+	#define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while (false)
+#endif
 
 
 
@@ -99,7 +102,7 @@ bool cParsedNBT::ReadCompound(void)
 	// Reads the latest tag as a compound
 	int ParentIdx = m_Tags.size() - 1;
 	int PrevSibling = -1;
-	while (true)
+	for (;;)
 	{
 		NEEDBYTES(1);
 		eTagType TagType = (eTagType)(m_Data[m_Pos]);
@@ -276,7 +279,7 @@ int cParsedNBT::FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLen
 	for (int Child = m_Tags[a_Tag].m_FirstChild; Child != -1; Child = m_Tags[Child].m_NextSibling)
 	{
 		if (
-			(m_Tags[Child].m_NameLength == a_NameLength) &&
+			(m_Tags[Child].m_NameLength == (int)a_NameLength) &&
 			(memcmp(m_Data + m_Tags[Child].m_NameStart, a_Name, a_NameLength) == 0)
 		)
 		{

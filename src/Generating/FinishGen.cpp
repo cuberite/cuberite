@@ -528,7 +528,7 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 	bool IsWater = (a_Fluid == E_BLOCK_WATER);
 	AString SectionName = IsWater ? "WaterSprings" : "LavaSprings";
 	AString DefaultHeightDistribution;
-	int DefaultChance;
+	int DefaultChance = 0;
 	switch (a_World.GetDimension())
 	{
 		case dimNether:

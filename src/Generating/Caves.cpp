@@ -285,7 +285,7 @@ bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints &
 void cCaveTunnel::Smooth(void)
 {
 	cCaveDefPoints Pts;
-	while (true)
+	for (;;)
 	{
 		if (!RefineDefPoints(m_Points, Pts))
 		{
@@ -331,7 +331,7 @@ void cCaveTunnel::FinishLinear(void)
 			int yd = dy - dx / 2;
 			int zd = dz - dx / 2;
 
-			while (true)
+			for (;;)
 			{
 				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
 
@@ -363,7 +363,7 @@ void cCaveTunnel::FinishLinear(void)
 			int xd = dx - dy / 2;
 			int zd = dz - dy / 2;
 
-			while (true)
+			for (;;)
 			{
 				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
 
@@ -397,7 +397,7 @@ void cCaveTunnel::FinishLinear(void)
 			int xd = dx - dz / 2;
 			int yd = dy - dz / 2;
 
-			while (true)
+			for (;;)
 			{
 				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
 

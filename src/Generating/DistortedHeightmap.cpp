@@ -774,10 +774,11 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			return;
 		}
 		default:
+		{
 			ASSERT(!"Unhandled biome");
 			return;
+		}
 	}  // switch (Biome)
-	ASSERT(!"Unexpected fallthrough");
 }
 
 
