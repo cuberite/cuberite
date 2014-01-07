@@ -1164,7 +1164,6 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 	}
 	else if (tolua_isusertable(S, 1, "cPluginManager", 0, &err))
 	{
-		LOGD("AddHook recommended style");
 		// Style 1, use the global PlgMgr, but increment ParamIdx
 		ParamIdx++;
 	}
