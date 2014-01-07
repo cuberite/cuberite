@@ -765,6 +765,54 @@ AString Base64Decode(const AString & a_Base64String)
 
 
 
+AString Base64Encode(const AString & a_Input)
+{
+	static const char BASE64[64] = {
+		'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+		'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
+		'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
+		'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'
+	};
+
+	std::string output;
+	output.resize(((a_Input.size() + 2) / 3) * 4);
+
+	size_t output_index = 0;
+	size_t size_full24 = (a_Input.size() / 3) * 3;
+
+	for (size_t i = 0; i < size_full24; i += 3)
+	{
+		output[output_index++] = BASE64[(unsigned char)a_Input[i] >> 2];
+		output[output_index++] = BASE64[((unsigned char)a_Input[i] << 4 | (unsigned char)a_Input[i + 1] >> 4) & 63];
+		output[output_index++] = BASE64[((unsigned char)a_Input[i + 1] << 2 | (unsigned char)a_Input[i + 2] >> 6) & 63];
+		output[output_index++] = BASE64[(unsigned char)a_Input[i + 2] & 63];
+	}
+
+	if (size_full24 < a_Input.size())
+	{
+		output[output_index++] = BASE64[(unsigned char)a_Input[size_full24] >> 2];
+		if (size_full24 + 1 == a_Input.size())
+		{
+			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24] << 4) & 63];
+			output[output_index++] = '=';
+		}
+		else
+		{
+			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24] << 4 | (unsigned char)a_Input[size_full24 + 1] >> 4) & 63];
+			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24 + 1] << 2) & 63];
+		}
+
+		output[output_index++] = '=';
+	}
+	assert(output_index == output.size());
+
+	return output;
+}
+
+
+
+
+
 short GetBEShort(const char * a_Mem)
 {
 	return (((short)a_Mem[0]) << 8) | a_Mem[1];

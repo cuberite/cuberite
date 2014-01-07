@@ -81,6 +81,9 @@ extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, 
 /// Decodes a Base64-encoded string into the raw data
 extern AString Base64Decode(const AString & a_Base64String);
 
+/// Encodes a string into Base64
+extern AString Base64Encode(const AString & a_Input);
+
 /// Reads two bytes from the specified memory location and interprets them as BigEndian short
 extern short GetBEShort(const char * a_Mem);
 
