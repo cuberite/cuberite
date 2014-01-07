@@ -203,7 +203,10 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
-	if (cFile::Exists("favicon.png")) m_Favicon = Base64Encode(cFile::ReadWholeFile("favicon.png"));
+	if (cFile::Exists("favicon.png"))
+	{
+		m_FaviconData = Base64Encode(cFile::ReadWholeFile("favicon.png"));
+	}
 
 	if (m_bIsConnected)
 	{

@@ -185,7 +185,7 @@ private:
 	cRCONServer m_RCONServer;
 	
 	AString m_Description;
-	AString m_Favicon;
+	AString m_FaviconData;
 	int m_MaxPlayers;
 	bool m_bIsHardcore;
 	
