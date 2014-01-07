@@ -26,5 +26,5 @@ else()
 endif()
 
 if (UNIX)
-	target_link_libraries(lua m dl)
+	target_link_libraries(lua m ${DYNAMIC_LOADER})
 endif()

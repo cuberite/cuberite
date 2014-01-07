@@ -97,6 +97,17 @@ if (WIN32)
 	add_definitions(-DLUA_BUILD_AS_DLL)
 endif()
 
+#On Unix we use two dynamic loading libraries dl and ltdl.
+#Preference is for dl on unknown systems as it is specified in POSIX
+#the dynamic loader is used by lua and sqllite.
+if (UNIX)
+	if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+		set(DYNAMIC_LOADER ltdl)
+	else()
+		set(DYNAMIC_LOADER dl)
+	endif()
+endif()
+
 # The Expat library is linked in statically, make the source files aware of that:
 add_definitions(-DXML_STATIC)
 
