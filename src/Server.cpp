@@ -203,6 +203,9 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
+	cFile f;
+	m_Base64FaviconData = Base64Encode(f.ReadWholeFile("favicon.png"));
+
 	if (m_bIsConnected)
 	{
 		LOGERROR("ERROR: Trying to initialize server while server is already running!");

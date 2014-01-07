@@ -759,7 +759,8 @@ AString Base64Decode(const AString & a_Base64String)
 		}
 	}
 	res.resize(o >> 3);
-	return res;}
+	return res;
+}
 
 
 
@@ -774,7 +775,7 @@ AString Base64Encode(const AString & a_Input)
 		'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'
 	};
 
-	std::string output;
+	AString output;
 	output.resize(((a_Input.size() + 2) / 3) * 4);
 
 	size_t output_index = 0;
@@ -804,7 +805,7 @@ AString Base64Encode(const AString & a_Input)
 
 		output[output_index++] = '=';
 	}
-	assert(output_index == output.size());
+	ASSERT(output_index == output.size());
 
 	return output;
 }
