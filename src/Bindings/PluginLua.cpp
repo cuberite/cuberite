@@ -90,6 +90,8 @@ bool cPluginLua::Initialize(void)
 
 	// Load all files for this plugin, and execute them
 	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
+
+	int numFiles = 0;
 	for (AStringVector::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
 	{
 		if (itr->rfind(".lua") == AString::npos)
@@ -101,8 +103,18 @@ bool cPluginLua::Initialize(void)
 		{
 			Close();
 			return false;
+		} else 
+		{
+			numFiles++;
 		}
 	}  // for itr - Files[]
+
+	if (numFiles == 0) // no lua files found
+	{
+		LOGWARNING("No lua files found: plugin %s is missing.", GetName().c_str());
+		Close();
+		return false;
+	}
 
 	// Call intialize function
 	bool res = false;
