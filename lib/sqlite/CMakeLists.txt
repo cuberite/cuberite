@@ -21,5 +21,5 @@ endif()
 add_library(sqlite ${SOURCE})
 
 if (UNIX)
-	target_link_libraries(sqlite dl)
+	target_link_libraries(sqlite ${DYNAMIC_LOADER})
 endif()
