@@ -70,8 +70,8 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 		if (a_Player->GetWindow() != Window)
 		{
 			a_Player->OpenWindow(Window);
-			BroadcastProgress(PROGRESSBAR_FUEL,     m_LastProgressFuel);
-			BroadcastProgress(PROGRESSBAR_SMELTING, m_LastProgressCook);
+			BroadcastProgress(PROGRESSBAR_FUEL,     (short)m_LastProgressFuel);
+			BroadcastProgress(PROGRESSBAR_SMELTING, (short)m_LastProgressCook);
 		}
 	}
 }
@@ -445,14 +445,14 @@ void cFurnaceEntity::UpdateProgressBars(void)
 	int CurFuel = (m_FuelBurnTime > 0) ? (200 - 200 * m_TimeBurned / m_FuelBurnTime) : 0;
 	if ((CurFuel / 8) != (m_LastProgressFuel / 8))
 	{
-		BroadcastProgress(PROGRESSBAR_FUEL, CurFuel);
+		BroadcastProgress(PROGRESSBAR_FUEL, (short)CurFuel);
 		m_LastProgressFuel = CurFuel;
 	}
 	
 	int CurCook = (m_NeedCookTime > 0) ? (200 * m_TimeCooked / m_NeedCookTime) : 0;
 	if ((CurCook / 8) != (m_LastProgressCook / 8))
 	{
-		BroadcastProgress(PROGRESSBAR_SMELTING, CurCook);
+		BroadcastProgress(PROGRESSBAR_SMELTING, (short)CurCook);
 		m_LastProgressCook = CurCook;
 	}
 }

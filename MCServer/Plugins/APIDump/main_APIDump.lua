@@ -1177,7 +1177,7 @@ function WriteHtmlHook(a_Hook, a_HookNav)
 	f:write("</table>\n<p>" .. (a_Hook.Returns or "") .. "</p>\n\n");
 	f:write([[<hr /><h1>Code examples</h1><h2>Registering the callback</h2>]]);
 	f:write("<pre class=\"prettyprint lang-lua\">\n");
-	f:write([[cPluginManager.AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);]]);
+	f:write([[cPluginManager:AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);]]);
 	f:write("</pre>\n\n");
 	local Examples = a_Hook.CodeExamples or {};
 	for i, example in ipairs(Examples) do

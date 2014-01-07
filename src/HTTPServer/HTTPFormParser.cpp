@@ -133,7 +133,6 @@ bool cHTTPFormParser::HasFormData(const cHTTPRequest & a_Request)
 			(a_Request.GetURL().find('?') != AString::npos)
 		)
 	);
-	return false;
 }
 
 

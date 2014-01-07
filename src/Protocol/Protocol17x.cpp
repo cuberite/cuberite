@@ -986,7 +986,6 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 	while (true)
 	{
 		UInt32 PacketLen;
-		int PacketStart = m_ReceivedData.GetDataStart();
 		if (!m_ReceivedData.ReadVarInt(PacketLen))
 		{
 			// Not enough data

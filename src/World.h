@@ -146,7 +146,7 @@ public:
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle);
-	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);
+	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 	void BroadcastChat               (const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export

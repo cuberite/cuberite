@@ -117,10 +117,16 @@ void cWorldStorage::WaitForLoadQueueEmpty(void)
 	m_LoadQueue.BlockTillEmpty();
 }
 
+
+
+
+
 void cWorldStorage::WaitForSaveQueueEmpty(void)
 {
 	m_SaveQueue.BlockTillEmpty();
 }
+
+
 
 
 
@@ -144,8 +150,8 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate)
 {
-	m_Event.Set();
 	m_LoadQueue.EnqueueItemIfNotPresent(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
+	m_Event.Set();
 }
 
 
@@ -154,8 +160,8 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, boo
 
 void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	m_Event.Set();
 	m_SaveQueue.EnqueueItemIfNotPresent(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+	m_Event.Set();
 }
 
 
@@ -166,6 +172,7 @@ void cWorldStorage::QueueSavedMessage(void)
 {
 	// Pushes a special coord pair into the queue, signalizing a message instead
 	m_SaveQueue.EnqueueItem(cChunkCoords(0, CHUNK_Y_MESSAGE, 0));
+	m_Event.Set();
 }
 
 

@@ -112,7 +112,7 @@ int cProtocol150::ParseWindowClick(void)
 	}
 	
 	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
-	eClickAction Action;
+	eClickAction Action = caUnknown;
 	switch ((Mode << 8) | Button)
 	{
 		case 0x0000: Action = (SlotNum != -999) ? caLeftClick  : caLeftClickOutside;  break;

@@ -246,7 +246,7 @@ void cItems::Delete(int a_Idx)
 
 
 
-void cItems::Set(int a_Idx, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemDamage)
+void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage)
 {
 	if ((a_Idx < 0) || (a_Idx >= (int)size()))
 	{

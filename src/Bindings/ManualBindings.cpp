@@ -1137,16 +1137,17 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 {
 	/*
 	Function signatures:
-	cPluginManager.AddHook(HOOK_TYPE, CallbackFunction)        -- (1) recommended
-	cPluginManager:Get():AddHook(HOOK_TYPE, CallbackFunction)  -- (2) accepted silently
-	cPluginManager:Get():AddHook(Plugin, HOOK_TYPE)            -- (3) old style (#121), accepted but complained about
-	cPluginManager.AddHook(Plugin, HOOK_TYPE)                  -- (4) old style (#121) mangled, accepted but complained about
+	cPluginManager:AddHook(HOOK_TYPE, CallbackFunction)        -- (1) recommended
+	cPluginManager.AddHook(HOOK_TYPE, CallbackFunction)        -- (2) accepted silently (#401 deprecates this)
+	cPluginManager:Get():AddHook(HOOK_TYPE, CallbackFunction)  -- (3) accepted silently
+	cPluginManager:Get():AddHook(Plugin, HOOK_TYPE)            -- (4) old style (#121), accepted but complained about in the console
+	cPluginManager.AddHook(Plugin, HOOK_TYPE)                  -- (5) old style (#121) mangled, accepted but complained about in the console
 	*/
 	
 	cLuaState S(tolua_S);
 	cPluginManager * PlgMgr = cPluginManager::Get();
 
-	// If the first param is a cPluginManager, use it instead of the global one:
+	// If the first param is a cPluginManager instance, use it instead of the global one:
 	int ParamIdx = 1;
 	tolua_Error err;
 	if (tolua_isusertype(S, 1, "cPluginManager", 0, &err))
@@ -1160,6 +1161,12 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 			PlgMgr = cPluginManager::Get();
 		}
 		ParamIdx += 1;
+	}
+	else if (tolua_isusertable(S, 1, "cPluginManager", 0, &err))
+	{
+		LOGD("AddHook recommended style");
+		// Style 1, use the global PlgMgr, but increment ParamIdx
+		ParamIdx++;
 	}
 	
 	if (lua_isnumber(S, ParamIdx) && lua_isfunction(S, ParamIdx + 1))
@@ -1177,7 +1184,7 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 	
 	AString ParamDesc;
 	Printf(ParamDesc, "%s, %s, %s", S.GetTypeText(1).c_str(), S.GetTypeText(2).c_str(), S.GetTypeText(3).c_str());
-	LOGWARNING("cPluginManager.AddHook(): bad parameters. Expected HOOK_TYPE and CallbackFunction, got %s. Hook not added.", ParamDesc.c_str());
+	LOGWARNING("cPluginManager:AddHook(): bad parameters. Expected HOOK_TYPE and CallbackFunction, got %s. Hook not added.", ParamDesc.c_str());
 	S.LogStackTrace();
 	return 0;
 }

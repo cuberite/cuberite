@@ -963,3 +963,22 @@ end
 
 
 
+
+-- Test the hook adding formats in #121 and #401
+local function DoNothing()
+end
+
+LOG("Trying cPluginManager:AddHook()");
+cPluginManager:AddHook(cPluginManager.HOOK_CHAT, DoNothing);
+
+LOG("Trying cPluginManager.AddHook()");
+cPluginManager.AddHook(cPluginManager.HOOK_CHAT, DoNothing);
+
+LOG("Trying cPluginManager:Get():AddHook()");
+cPluginManager:Get():AddHook(cPluginManager.HOOK_CHAT, DoNothing);
+
+LOG("Trying cPluginManager:Get():AddHook(Plugin, Hook)");
+cPluginManager:Get():AddHook(cPluginManager:GetCurrentPlugin(), cPluginManager.HOOK_CHAT);
+
+LOG("Trying cPluginManager.AddHook(Plugin, Hook)");
+cPluginManager.AddHook(cPluginManager:GetCurrentPlugin(), cPluginManager.HOOK_CHAT);

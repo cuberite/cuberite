@@ -5,7 +5,6 @@
 
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
-#include "cryptopp/randpool.h"
 #include "Protocol132.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -19,8 +18,20 @@
 #include "../WorldStorage/FastNBT.h"
 #include "../StringCompression.h"
 
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4231)
+	#pragma warning(disable:4189)
+	#pragma warning(disable:4702)
+#endif
 
+#include "cryptopp/randpool.h"
 
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 
 #define HANDLE_PACKET_READ(Proc, Type, Var) \
@@ -866,7 +877,7 @@ void cProtocol132::SendCompass(const cWorld & a_World)
 void cProtocol132::SendEncryptionKeyRequest(void)
 {
 	cCSLock Lock(m_CSPacket);
-	WriteByte((char)0xfd);
+	WriteByte(0xfd);
 	WriteString(cRoot::Get()->GetServer()->GetServerID());
 	WriteShort((short)m_ServerPublicKey.size());
 	SendData(m_ServerPublicKey.data(), m_ServerPublicKey.size());
@@ -914,7 +925,7 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 	{
 		// Send encryption key response:
 		cCSLock Lock(m_CSPacket);
-		WriteByte((char)0xfc);
+		WriteByte(0xfc);
 		WriteShort(0);
 		WriteShort(0);
 		Flush();
