@@ -63,8 +63,11 @@ public:												// tolua_export
 	int  GetNumPlayers(void);
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
-	// Hardcore mode or not:
-	bool IsHardcore(void) const {return m_bIsHardcore; }
+	/* Returns if server is in hardcore mode */
+	bool IsHardcore(void) const { return m_bIsHardcore; }
+
+	/* Gets base64 encoded favicon data (obtained from the file favicon.png) */
+	AString GetBase64FaviconData(void) const { return m_Base64FaviconData; }
 
 	// tolua_end
 
@@ -185,6 +188,7 @@ private:
 	AString m_Description;
 	int m_MaxPlayers;
 	bool m_bIsHardcore;
+	AString m_Base64FaviconData;
 	
 	cTickThread m_TickThread;
 	cEvent m_RestartEvent;

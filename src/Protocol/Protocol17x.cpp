@@ -1112,8 +1112,11 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		cRoot::Get()->GetServer()->GetMaxPlayers(),
 		cRoot::Get()->GetServer()->GetNumPlayers()
 	);
-	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"}",
+	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
 		cRoot::Get()->GetServer()->GetDescription().c_str()
+	);
+	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+		cRoot::Get()->GetServer()->GetBase64FaviconData().c_str()
 	);
 	Response.append("}");
 	
