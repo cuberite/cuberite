@@ -47,15 +47,13 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 	#endif  // _MSC_VER
 	
 	// Allocate a buffer and printf into it:
-	str.resize(len + 1);
-	// HACK: we're accessing AString's internal buffer in a way that is NOT guaranteed to always work. But it works on all STL implementations tested.
-	// I can't think of any other way that is safe, doesn't allocate twice as much space as needed and doesn't use C++11 features like the move constructor
+	std::vector<char> Buffer(len + 1);
 	#ifdef _MSC_VER
-	vsprintf_s((char *)str.data(), len + 1, format, args);
+	vsprintf_s((char *)&(Buffer.front()), Buffer.size(), format, args);
 	#else  // _MSC_VER
-	vsnprintf((char *)str.data(), len + 1, format, args);
+	vsnprintf((char *)&(Buffer.front()), Buffer.size(), format, args);
 	#endif  // else _MSC_VER
-	str.resize(len);
+	str.append(&(Buffer.front()), Buffer.size() - 1);
 	return str;
 }
 
