@@ -103,13 +103,14 @@ bool cPluginLua::Initialize(void)
 		{
 			Close();
 			return false;
-		} else 
+		} 
+		else 
 		{
 			numFiles++;
 		}
 	}  // for itr - Files[]
 
-	if (numFiles == 0) // no lua files found
+	if (numFiles == 0)
 	{
 		LOGWARNING("No lua files found: plugin %s is missing.", GetName().c_str());
 		Close();
