@@ -2390,12 +2390,12 @@ bool cConnection::HandleServerStatusResponse(void)
 	{
 		Response.assign(Response.substr(0, idx + sizeof(DescSearch) - 1) + "ProtoProxy: " + Response.substr(idx + sizeof(DescSearch) - 1));
 	}
-	cByteBuffer Packet(1000);
+	cByteBuffer Packet(Response.size() + 50);
 	Packet.WriteVarInt(0);  // Packet type - status response
 	Packet.WriteVarUTF8String(Response);
 	AString Pkt;
 	Packet.ReadAll(Pkt);
-	cByteBuffer ToClient(1000);
+	cByteBuffer ToClient(Response.size() + 50);
 	ToClient.WriteVarUTF8String(Pkt);
 	CLIENTSEND(ToClient);
 	return true;
