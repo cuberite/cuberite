@@ -589,7 +589,17 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			for (int y = 0; y < SEGMENT_HEIGHT; y++)
 			{
 				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
-				a_ChunkDesc.SetBlockType(x, y + Segment, z, (Val < m_Threshold) ? E_BLOCK_NETHERRACK : E_BLOCK_AIR);
+				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(BaseX * cChunkDef::Width + x)) / 8;
+				NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(BaseZ * cChunkDef::Width + z)) / 8;
+				NOISE_DATATYPE CompBlock = m_Noise1.CubicNoise3D(NoiseX, (float) y, NoiseY);
+				if (CompBlock < -0.5)
+				{
+					a_ChunkDesc.SetBlockType(x, y + Segment, z, (Val < m_Threshold) ? E_BLOCK_SOULSAND : E_BLOCK_AIR);
+				}
+				else
+				{
+					a_ChunkDesc.SetBlockType(x, y + Segment, z, (Val < m_Threshold) ? E_BLOCK_NETHERRACK : E_BLOCK_AIR);
+				}
 			}
 		}
 		
