@@ -1484,17 +1484,16 @@ bool cConnection::HandleServerEntityProperties(void)
 		HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Key);
 		HANDLE_SERVER_PACKET_READ(ReadBEDouble,        double,  Value);
 		Log(" \"%s\" = %f", Key.c_str(), Value);
-	}  // for i
-	
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ListLength);
-	Log("  ListLength = %d", ListLength);
-	for (int i = 0; i < ListLength; i++)
-	{
-		HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDHi);
-		HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDLo);
-		HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, DblVal);
-		HANDLE_SERVER_PACKET_READ(ReadByte,     Byte,   ByteVal);
-		Log("  [%d] = {0x%08llx%08llx, %f, %i}", i, UUIDHi, UUIDLo, DblVal, ByteVal);
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ListLength);
+		Log("    ListLength = %d", ListLength);
+		for (int j = 0; j < ListLength; j++)
+		{
+			HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDHi);
+			HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDLo);
+			HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, DblVal);
+			HANDLE_SERVER_PACKET_READ(ReadByte,     Byte,   ByteVal);
+			Log("    [%d] = {0x%08llx%08llx, %f, %i}", j, UUIDHi, UUIDLo, DblVal, ByteVal);
+		}  // for j
 	}  // for i
 	COPY_TO_CLIENT();
 	return true;
