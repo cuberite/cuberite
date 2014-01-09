@@ -25,6 +25,15 @@ else()
 	add_library(lua ${SOURCE})
 endif()
 
+# Tell Lua what dynamic loader to use (for LuaRocks):
+if (UNIX)
+	if (APPLE)
+		add_definitions(-DLUA_USE_MACOSX)
+	else()
+		add_definitions(-DLUA_USE_LINUX)
+	endif ()
+endif()
+
 if (UNIX)
 	target_link_libraries(lua m ${DYNAMIC_LOADER})
 endif()
