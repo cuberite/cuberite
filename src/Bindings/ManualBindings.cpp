@@ -1904,6 +1904,35 @@ static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 
 
 
+static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cClientHandle") ||
+		!S.CheckParamString(2, 3) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	cClientHandle * Client = (cClientHandle *)tolua_tousertype(L, 1, NULL);
+	if (Client == NULL)
+	{
+		LOGWARNING("ClientHandle is nil in cClientHandle:SendPluginMessage()");
+		S.LogStackTrace();
+		return 0;
+	}
+	AString Channel, Message;
+	Channel.assign(lua_tostring(L, 2), lua_strlen(L, 2));
+	Message.assign(lua_tostring(L, 3), lua_strlen(L, 3));
+	Client->SendPluginMessage(Channel, Message);
+	return 0;
+}
+
+
+
+
+
 static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 {
 	tolua_Error tolua_err;
@@ -2292,6 +2321,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cClientHandle");
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
+			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItemGrid");
