@@ -104,6 +104,12 @@ public:
 	
 	/// Reads parameters from the ini file, prepares generator for use.
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) {}
+	
+	/** Creates the correct TerrainCompositionGen descendant based on the ini file settings and the seed provided.
+	a_BiomeGen is the underlying biome generator, some composition generators may depend on it to generate more biomes
+	a_HeightGen is the underlying height generator, some composition generators may depend on it providing additional values
+	*/
+	static cTerrainCompositionGen * CreateCompositionGen(cIniFile & a_IniFile, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_Seed);
 } ;
 
 
