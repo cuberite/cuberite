@@ -120,6 +120,7 @@ public:
 	void SendPlayerMoveLook      (void);
 	void SendPlayerPosition      (void);
 	void SendPlayerSpawn         (const cPlayer & a_Player);
+	void SendPluginMessage       (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID);
 	void SendRespawn             (void);
 	void SendExperience          (void);

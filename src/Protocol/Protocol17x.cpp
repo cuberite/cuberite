@@ -628,6 +628,18 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
+void cProtocol172::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	cPacketizer Pkt(*this, 0x17);
+	Pkt.WriteString(a_Channel);
+	Pkt.WriteShort((short)a_Message.size());
+	Pkt.WriteBuf(a_Message.data(), a_Message.size());
+}
+
+
+
+
+
 void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	cPacketizer Pkt(*this, 0x1E);

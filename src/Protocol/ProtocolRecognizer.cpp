@@ -476,6 +476,16 @@ void cProtocolRecognizer::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
+void cProtocolRecognizer::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPluginMessage(a_Channel, a_Message);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	ASSERT(m_Protocol != NULL);

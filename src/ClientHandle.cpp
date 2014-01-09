@@ -1978,6 +1978,15 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
+void cClientHandle::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	m_Protocol->SendPluginMessage(a_Channel, a_Message);
+}
+
+
+
+
+
 void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	m_Protocol->SendRemoveEntityEffect(a_Entity, a_EffectID);
