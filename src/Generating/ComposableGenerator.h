@@ -50,7 +50,7 @@ public:
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) {}
 
 	/// Creates the correct BiomeGen descendant based on the ini file settings and the seed provided.
-	/// a_CacheOffByDefault gets set to whether the cache should be enabled by default
+	/// a_CacheOffByDefault gets set to whether the cache should be disabled by default
 	/// Used in BiomeVisualiser, too.
 	/// Implemented in BioGen.cpp!
 	static cBiomeGen * CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault);
@@ -77,6 +77,13 @@ public:
 	
 	/// Reads parameters from the ini file, prepares generator for use.
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) {}
+	
+	/** Creates the correct TerrainHeightGen descendant based on the ini file settings and the seed provided.
+	a_BiomeGen is the underlying biome generator, some height generators may depend on it to generate more biomes
+	a_CacheOffByDefault gets set to whether the cache should be disabled by default
+	Implemented in HeiGen.cpp!
+	*/
+	static cTerrainHeightGen * CreateHeightGen(cIniFile & a_IniFile, cBiomeGen & a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault);
 } ;
 
 

@@ -173,60 +173,8 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 
 void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 {
-	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
-	if (HeightGenName.empty())
-	{
-		LOGWARN("[Generator] HeightGen value not set in world.ini, using \"Biomal\".");
-		HeightGenName = "Biomal";
-	}
-	
-	int Seed = m_ChunkGenerator.GetSeed();
 	bool CacheOffByDefault = false;
-	if (NoCaseCompare(HeightGenName, "flat") == 0)
-	{
-		m_HeightGen = new cHeiGenFlat;
-		CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
-	}
-	else if (NoCaseCompare(HeightGenName, "classic") == 0)
-	{
-		m_HeightGen = new cHeiGenClassic(Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
-	{
-		m_HeightGen = new cDistortedHeightmap(Seed, *m_BiomeGen);
-	}
-	else if (NoCaseCompare(HeightGenName, "End") == 0)
-	{
-		m_HeightGen = new cEndGen(Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
-	{
-		m_HeightGen = new cNoise3DComposable(Seed);
-	}
-	else  // "biomal" or <not found>
-	{
-		if (NoCaseCompare(HeightGenName, "biomal") != 0)
-		{
-			LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
-		}
-		m_HeightGen = new cHeiGenBiomal(Seed, *m_BiomeGen);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cHeiGenBiomal...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 500; x++)
-		{
-			cChunkDef::HeightMap Heights;
-			m_HeightGen->GenHeightMap(x * 5, x * 5, Heights);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("HeightGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
-	}
-	
-	// Read the settings:
-	m_HeightGen->InitializeHeightGen(a_IniFile);
+	m_HeightGen = cTerrainHeightGen::CreateHeightGen(a_IniFile, *m_BiomeGen, m_ChunkGenerator.GetSeed(), CacheOffByDefault);	
 	
 	// Add a cache, if requested:
 	int CacheSize = a_IniFile.GetValueSetI("Generator", "HeightGenCacheSize", CacheOffByDefault ? 0 : 64);
