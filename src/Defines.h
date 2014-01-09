@@ -563,34 +563,6 @@ namespace ItemCategory
 	}
 }
 
-
-
-
-
-/// Returns true if the biome has no downfall - deserts and savannas
-inline bool IsBiomeNoDownfall(EMCSBiome a_Biome)
-{
-	switch (a_Biome)
-	{
-		case biDesert:
-		case biDesertHills:
-		case biDesertM:
-		case biSavanna:
-		case biSavannaM:
-		case biSavannaPlateau:
-		case biSavannaPlateauM:
-		case biNether:
-		case biEnd:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
 // tolua_end
 
 

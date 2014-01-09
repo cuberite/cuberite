@@ -233,6 +233,7 @@ public:
 
 // Common headers (part 2, with macros):
 #include "ChunkDef.h"
+#include "BiomeDef.h"
 #include "BlockID.h"
 #include "Entities/Effects.h"
 

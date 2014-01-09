@@ -14,6 +14,7 @@ typedef unsigned short     UInt16;
 
 
 $cfile "../ChunkDef.h"
+$cfile "../BiomeDef.h"
 
 $cfile "../../lib/inifile/iniFile.h"
 

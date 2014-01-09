@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="MCServer"
 	ProjectGUID="{32012054-0C96-4C43-AB27-174FF8E72D66}"
 	RootNamespace="MCServer"
@@ -440,6 +440,10 @@
 			</File>
 			<File
 				RelativePath="..\src\Authenticator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\BiomeDef.h"
 				>
 			</File>
 			<File
