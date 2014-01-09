@@ -966,6 +966,23 @@ end
 
 function OnPluginMessage(a_Client, a_Channel, a_Message)
 	LOGINFO("Received a plugin message from client " .. a_Client:GetUsername() .. ": channel '" .. a_Channel .. "', message '" .. a_Message .. "'");
+	
+	if (a_Channel == "REGISTER") then
+		if (a_Message:find("WECUI")) then
+			-- The client has WorldEditCUI mod installed, test the comm by sending a few WECUI messages:
+			--[[
+			WECUI messages have the following generic format:
+			<shape>|<params>
+			If shape is p (cuboid selection), the params are sent individually for each corner click and have the following format:
+			<point-index>|<x>|<y>|<z>|<volume>
+			point-index is 0 or 1 (lclk / rclk)
+			volume is the 3D volume of the current cuboid selected (all three coords' deltas multiplied), including the edge blocks; -1 if N/A
+			--]]
+			-- Select a 51 * 51 * 51 block cuboid:
+			a_Client:SendPluginMessage("WECUI", "p|0|50|50|50|-1");
+			a_Client:SendPluginMessage("WECUI", "p|1|100|100|100|132651");  -- 132651 = 51 * 51 * 51
+		end
+	end
 end
 
 
