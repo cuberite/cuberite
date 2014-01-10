@@ -636,6 +636,27 @@ private:
 		virtual void Execute(void) override;
 	} ;
 	
+	
+	/** Implementation of the callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
+	class cChunkGeneratorCallbacks :
+		public cChunkGenerator::cChunkSink,
+		public cChunkGenerator::cPluginInterface
+	{
+		cWorld * m_World;
+		
+		// cChunkSink overrides:
+		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) override;
+		virtual bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) override;
+		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) override;
+		
+		// cPluginInterface overrides:
+		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) override;
+		virtual void CallHookChunkGenerated (cChunkDesc & a_ChunkDesc) override;
+		
+	public:
+		cChunkGeneratorCallbacks(cWorld & a_World);
+	} ;
+	
 
 	AString m_WorldName;
 	AString m_IniFileName;
@@ -713,6 +734,9 @@ private:
 	sSetBlockList    m_FastSetBlockQueue;
 
 	cChunkGenerator  m_Generator;
+	
+	/** The callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
+	cChunkGeneratorCallbacks m_GeneratorCallbacks;
 	
 	cChunkSender     m_ChunkSender;
 	cLightingThread  m_Lighting;

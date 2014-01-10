@@ -150,10 +150,8 @@ cNoise3DGenerator::~cNoise3DGenerator()
 
 
 
-void cNoise3DGenerator::Initialize(cWorld * a_World, cIniFile & a_IniFile)
+void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 {
-	m_World = a_World;
-
 	// Params:
 	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
 	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0);

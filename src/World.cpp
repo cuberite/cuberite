@@ -10,6 +10,7 @@
 #include "Root.h"
 #include "inifile/iniFile.h"
 #include "ChunkMap.h"
+#include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
 
 // Entities (except mobs):
@@ -238,6 +239,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_GeneratorCallbacks(*this),
 	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
@@ -583,7 +585,7 @@ void cWorld::Start(void)
 
 	m_Lighting.Start(this);
 	m_Storage.Start(this, m_StorageSchema);
-	m_Generator.Start(this, IniFile);
+	m_Generator.Start(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
 	m_ChunkSender.Start(this);
 	m_TickThread.Start();
 
@@ -2837,6 +2839,80 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 {
 	a_World.SaveAllChunks();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cChunkGeneratorCallbacks:
+
+cWorld::cChunkGeneratorCallbacks::cChunkGeneratorCallbacks(cWorld & a_World) :
+	m_World(&a_World)
+{
+}
+
+
+
+
+
+void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc)
+{
+	cChunkDef::BlockNibbles BlockMetas;
+	a_ChunkDesc.CompressBlockMetas(BlockMetas);
+
+	m_World->SetChunkData(
+		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
+		a_ChunkDesc.GetBlockTypes(), BlockMetas,
+		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
+		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
+		a_ChunkDesc.GetEntities(), a_ChunkDesc.GetBlockEntities(),
+		true
+	);
+
+	// Save the chunk right after generating, so that we don't have to generate it again on next run
+	m_World->GetStorage().QueueSaveChunk(a_ChunkDesc.GetChunkX(), 0, a_ChunkDesc.GetChunkZ());
+}
+
+
+
+
+
+bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(int a_ChunkX, int a_ChunkZ)
+{
+	return m_World->IsChunkValid(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
+{
+	return m_World->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_ChunkDesc)
+{
+	cPluginManager::Get()->CallHookChunkGenerating(
+		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
+	);
+}
+
+
+
+
+
+void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_ChunkDesc)
+{
+	cPluginManager::Get()->CallHookChunkGenerated(
+		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
+	);
 }
 
 
