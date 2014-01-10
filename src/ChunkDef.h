@@ -610,8 +610,10 @@ public:
 
 // Illegal in C++03: typedef std::list< cCoordWithData<X> > cCoordWithDataList<X>;
 typedef cCoordWithData<int>        cCoordWithInt;
+typedef cCoordWithData<BLOCKTYPE>  cCoordWithBlock;
 typedef std::list<cCoordWithInt>   cCoordWithIntList;
 typedef std::vector<cCoordWithInt> cCoordWithIntVector;
+typedef std::vector<cCoordWithBlock> cCoordWithBlockVector;
 
 
 
