@@ -40,6 +40,51 @@ static inline bool IsWater(BLOCKTYPE a_BlockType)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFinishGenNetherSprinkleFoliage:
+
+void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	double ChunkX = a_ChunkDesc.GetChunkX() + 0.5; // We can't devide through 0 so lets add 0.5 to all the chunk coordinates.
+	double ChunkZ = a_ChunkDesc.GetChunkZ() + 0.5;
+
+	for (int z = 0; z < cChunkDef::Width; z++) 
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			for (int y = 1; y < cChunkDef::Height; y++)
+			{
+				if (!g_BlockIsSolid[a_ChunkDesc.GetBlockType(x, y - 1, z)])  // Only place on solid blocks
+				{
+					continue;
+				}
+				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
+				{
+					continue;
+				}
+
+				NOISE_DATATYPE Val = m_Noise.CubicNoise1D((float) ((ChunkX * x) * (ChunkZ * z) * y));
+				if (Val < -0.98)
+				{
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_BROWN_MUSHROOM);
+				}
+				else if (Val < -0.96)
+				{
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_RED_MUSHROOM);
+				}
+				else if (Val < -0.94)
+				{
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_FIRE);
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
 bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)

@@ -47,6 +47,27 @@ protected:
 
 
 
+class cFinishGenNetherSprinkleFoliage :
+	public cFinishGen
+{
+public:
+	cFinishGenNetherSprinkleFoliage(int a_Seed) : 
+		m_Noise(a_Seed),
+		m_Seed(a_Seed) 
+	{
+	}
+
+protected:
+	cNoise m_Noise;
+	int    m_Seed;
+
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+} ;
+
+
+
+
+
 class cFinishGenSprinkleFoliage :
 	public cFinishGen
 {
@@ -117,6 +138,7 @@ public:
 	{
 	}
 	
+	int GetLevel(void) const { return m_Level; }
 protected:
 	int m_Level;
 	
