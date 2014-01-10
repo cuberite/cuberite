@@ -384,15 +384,7 @@ bool cIniFile::SetValue(const AString & keyname, const AString & valuename, cons
 	}
 	else
 	{
-		if (!create)
-		{
-			keys[keyID].values[valueID] = value;
-		}
-		else
-		{
-			keys[keyID].names.resize(keys[keyID].names.size() + 1, valuename);
-			keys[keyID].values.resize(keys[keyID].values.size() + 1, value);
-		}
+		keys[keyID].values[valueID] = value;
 	}
 
 	return true;
