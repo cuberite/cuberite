@@ -25,6 +25,11 @@ else()
 	add_library(lua ${SOURCE})
 endif()
 
+# Tell Lua what dynamic loader to use (for LuaRocks):
+if (UNIX)
+	add_definitions(-DLUA_USE_DLOPEN)
+endif()
+
 if (UNIX)
 	target_link_libraries(lua m ${DYNAMIC_LOADER})
 endif()
