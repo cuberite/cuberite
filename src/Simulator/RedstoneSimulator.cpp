@@ -222,7 +222,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	int BaseX = a_Chunk->GetPosX() * cChunkDef::Width;
 	int BaseZ = a_Chunk->GetPosZ() * cChunkDef::Width;
 
-	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
+	for (cRedstoneSimulatorChunkData::const_iterator dataitr = ChunkData.begin(); dataitr != ChunkData.end(); ++dataitr)
 	{
 		int a_X = BaseX + dataitr->x;
 		int a_Z = BaseZ + dataitr->z;
@@ -292,8 +292,6 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 				break;
 			}
 		}
-
-		++dataitr;
 	}
 }
 
@@ -759,48 +757,20 @@ void cRedstoneSimulator::HandleTNT(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cRedstoneSimulator::HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	if ((m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x08) == 0x08)
+	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
-		// Block position is located at top half of door
-		// Is Y - 1 both within world boundaries, a door block, and the bottom half of a door?
-		// The bottom half stores the open/closed information
-		if (
-			(a_BlockY - 1 >= 0) &&
-			((m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_DOOR) || (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_IRON_DOOR)) &&
-			(m_World.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ & 0x08) == 0)
-			)
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
 		{
-			if ((m_World.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ) & 0x04) == 0) // Closed door?
-			{
-				if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) // Powered? If so, toggle open
-				{
-					cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
-				}
-			}
-			else // Opened door
-			{
-				if (!AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) // Unpowered? Close if so
-				{
-					cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
-				}
-			}
+			cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
 		}
 	}
 	else
 	{
-		if ((m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x04) == 0) // Closed door?
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
 		{
-			if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) // Powered? If so, toggle open
-			{
-				cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
-			}
-		}
-		else // Opened door
-		{
-			if (!AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) // Unpowered? Close if so
-			{
-				cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
-			}
+			cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}
 }
