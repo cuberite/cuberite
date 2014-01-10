@@ -48,9 +48,13 @@ protected:
 	
 	void InitBiomeView(void);
 	
+	void SetZoom(int a_NewZoom);
+	void Redraw(void);
+	
 	LRESULT WndProc(HWND a_Wnd, UINT a_Msg, WPARAM wParam, LPARAM lParam);
 	
 	// Message handlers:
+	LRESULT OnChar       (WPARAM wParam, LPARAM lParam);
 	LRESULT OnClose      (void);
 	LRESULT OnCommand    (WPARAM wParam, LPARAM lParam);
 	LRESULT OnLButtonDown(WPARAM wParam, LPARAM lParam);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="BiomeVisualiser"
 	ProjectGUID="{6DF3D88B-AD47-45B6-B831-1BDE74F86B5C}"
 	RootNamespace="BiomeVisualiser"
@@ -273,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BiomeColors.h"
+				>
+			</File>
+			<File
 				RelativePath=".\BiomeRenderer.cpp"
 				>
 			</File>
@@ -501,10 +505,6 @@
 				</Filter>
 			</Filter>
 		</Filter>
-		<File
-			RelativePath=".\BiomeColors.h"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
