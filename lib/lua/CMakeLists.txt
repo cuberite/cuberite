@@ -27,11 +27,7 @@ endif()
 
 # Tell Lua what dynamic loader to use (for LuaRocks):
 if (UNIX)
-	if (APPLE)
-		add_definitions(-DLUA_USE_MACOSX)
-	else()
-		add_definitions(-DLUA_USE_LINUX)
-	endif ()
+	add_definitions(-DLUA_USE_DLOPEN)
 endif()
 
 if (UNIX)
