@@ -3,7 +3,8 @@
 
 // Implements biome helper functions
 
-
+#include "BiomeDef.h"
+#include "Globals.h"
 
 
 EMCSBiome StringToBiome(const AString & a_BiomeString)

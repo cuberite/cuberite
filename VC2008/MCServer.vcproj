@@ -443,6 +443,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\BiomeDef.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\BiomeDef.h"
 				>
 			</File>
