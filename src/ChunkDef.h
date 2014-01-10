@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Vector3i.h"
+#include "BiomeDef.h"
 
 
 
@@ -37,8 +38,6 @@ class cBlockEntity;
 
 typedef std::list<cEntity *>        cEntityList;
 typedef std::list<cBlockEntity *>   cBlockEntityList;
-
-enum EMCSBiome;
 
 
 
