@@ -594,7 +594,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 				{
 					NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(BaseX + x)) / 8;
 					NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(BaseZ + z)) / 8;
-					NOISE_DATATYPE CompBlock = m_Noise1.CubicNoise3D(NoiseX, (float) y / 2, NoiseY);
+					NOISE_DATATYPE CompBlock = m_Noise1.CubicNoise3D(NoiseX, (float) (y + Segment) / 2, NoiseY);
 					if (CompBlock < -0.5)
 					{
 						Block = E_BLOCK_SOULSAND;
