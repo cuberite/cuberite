@@ -72,6 +72,7 @@ cTerrainHeightGen * cTerrainHeightGen::CreateHeightGen(cIniFile &a_IniFile, cBio
 	{
 		// No match found, force-set the default and retry
 		LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
+		a_IniFile.DeleteValue("Generator", "HeightGen");
 		a_IniFile.SetValue("Generator", "HeightGen", "Biomal");
 		return CreateHeightGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
 	}
