@@ -509,6 +509,7 @@ void cCaveTunnel::ProcessChunk(
 						case E_BLOCK_GRAVEL:
 						case E_BLOCK_SAND:
 						case E_BLOCK_SANDSTONE:
+						case E_BLOCK_SOULSAND:
 						case E_BLOCK_NETHERRACK:
 						case E_BLOCK_COAL_ORE:
 						case E_BLOCK_IRON_ORE:
