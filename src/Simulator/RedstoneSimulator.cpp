@@ -52,18 +52,18 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 	// Every time a block is changed (AddBlock called), we want to go through all lists and check to see if the coordiantes stored within are still valid
 	// Checking only when a block is changed, as opposed to every tick, also improves performance
 
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
 	{
 		if (!itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			++itr;
 			continue;
 		}
 
 		if (!IsPotentialSource(Block))
 		{
 			LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list as it no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			itr = m_PoweredBlocks.erase(itr);
+			m_PoweredBlocks.erase(itr);
+			break;
 		}
 		else if (
 			// Changeable sources
@@ -75,14 +75,15 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 			)
 		{
 			LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			itr = m_PoweredBlocks.erase(itr);
+			m_PoweredBlocks.erase(itr);
+			break;
 		}
 		else if (Block == E_BLOCK_DAYLIGHT_SENSOR)
 		{
 			if (!a_Chunk->IsLightValid())
 			{
 				m_World.QueueLightChunk(a_Chunk->GetPosX(), a_Chunk->GetPosZ());
-				++itr;
+				break;
 			}
 			else
 			{
@@ -92,28 +93,22 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 				if (a_Chunk->GetTimeAlteredLight(SkyLight) <= 8) // Could use SkyLight - m_World.GetSkyDarkness();
 				{
 					LOGD("cRedstoneSimulator: Erased daylight sensor from powered blocks list due to insufficient light level");
-					itr = m_PoweredBlocks.erase(itr);
-				}
-				else
-				{
-					++itr;
+					m_PoweredBlocks.erase(itr);
+					break;
 				}
 			}
 		}
-		else
-		{
-			++itr;
-		}
 	}
 
-	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
+	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
 	{
 		if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			if (!IsPotentialSource(Block))
 			{
 				LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				itr = m_LinkedPoweredBlocks.erase(itr);
+				m_LinkedPoweredBlocks.erase(itr);
+				break;
 			}
 			else if (
 				// Things that can send power through a block but which depends on meta
@@ -123,11 +118,8 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 				)
 			{
 				LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				itr = m_LinkedPoweredBlocks.erase(itr);
-			}
-			else
-			{
-				++itr;
+				m_LinkedPoweredBlocks.erase(itr);
+				break;
 			}
 		}
 		else if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
@@ -135,16 +127,9 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 			if (!IsViableMiddleBlock(Block))
 			{
 				LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer powered through a valid middle block", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				itr = m_LinkedPoweredBlocks.erase(itr);
+				m_LinkedPoweredBlocks.erase(itr);
+				break;
 			}
-			else
-			{
-				++itr;
-			}
-		}
-		else
-		{
-			++itr;
 		}
 	}
 
@@ -158,7 +143,7 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 		if (!IsAllowedBlock(Block))
 		{
 			LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from toggleable simulated list as it is no longer redstone", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			itr = m_SimulatedPlayerToggleableBlocks.erase(itr);
+			m_SimulatedPlayerToggleableBlocks.erase(itr);
 			break;
 		}
 	}
@@ -172,7 +157,7 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 
 		if ((Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF))
 		{
-			itr = m_RepeatersDelayList.erase(itr);
+			m_RepeatersDelayList.erase(itr);
 			break;
 		}
 	}
