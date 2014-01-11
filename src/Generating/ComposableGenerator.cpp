@@ -90,7 +90,8 @@ cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile &
 	}
 	else
 	{
-		LOGWARN("Unknown CompositionGen \"%s\", using \"biomal\" instead.", CompoGenName.c_str());
+		LOGWARN("Unknown CompositionGen \"%s\", using \"Biomal\" instead.", CompoGenName.c_str());
+		a_IniFile.DeleteValue("Generator", "CompositionGen");
 		a_IniFile.SetValue("Generator", "CompositionGen", "Biomal");
 		return CreateCompositionGen(a_IniFile, a_BiomeGen, a_HeightGen, a_Seed);
 	}

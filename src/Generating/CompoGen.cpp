@@ -589,7 +589,22 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			for (int y = 0; y < SEGMENT_HEIGHT; y++)
 			{
 				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
-				a_ChunkDesc.SetBlockType(x, y + Segment, z, (Val < m_Threshold) ? E_BLOCK_NETHERRACK : E_BLOCK_AIR);
+				BLOCKTYPE Block = E_BLOCK_AIR;
+				if (Val < m_Threshold)  // Don't calculate if the block should be Netherrack or Soulsand when it's already decided that it's air.
+				{
+					NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(BaseX + x)) / 8;
+					NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(BaseZ + z)) / 8;
+					NOISE_DATATYPE CompBlock = m_Noise1.CubicNoise3D(NoiseX, (float) (y + Segment) / 2, NoiseY);
+					if (CompBlock < -0.5)
+					{
+						Block = E_BLOCK_SOULSAND;
+					}
+					else
+					{
+						Block = E_BLOCK_NETHERRACK;
+					}
+				}
+				a_ChunkDesc.SetBlockType(x, y + Segment, z, Block);
 			}
 		}
 		
