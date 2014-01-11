@@ -41,8 +41,8 @@ extern bool g_BlockRequiresSpecialTool[256];
 /// Is this block solid (player cannot walk through)?
 extern bool g_BlockIsSolid[256];
 
-/// Can torches be placed on this block?
-extern bool g_BlockIsTorchPlaceable[256];
+/// Does this block fully occupy it's voxel - is it a 'full' block?
+extern bool g_BlockFullyOccupiesVoxel[256];
 
 /// Experience Orb setup
 enum

@@ -909,7 +909,7 @@ extern bool       g_BlockPistonBreakable[256];
 extern bool       g_BlockIsSnowable[256];
 extern bool       g_BlockRequiresSpecialTool[256];
 extern bool       g_BlockIsSolid[256];
-extern bool       g_BlockIsTorchPlaceable[256];
+extern bool       g_BlockFullyOccupiesVoxel[256];
 
 
 
