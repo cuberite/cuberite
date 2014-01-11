@@ -991,7 +991,6 @@ static int tolua_cPluginManager_GetAllPlugins(lua_State * tolua_S)
 	const cPluginManager::PluginMap & AllPlugins = self->GetAllPlugins();
 
 	lua_newtable(tolua_S);
-	int newTable = lua_gettop(tolua_S);
 	int index = 1;
 	cPluginManager::PluginMap::const_iterator iter = AllPlugins.begin();
 	while (iter != AllPlugins.end())
@@ -1883,7 +1882,6 @@ static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 	const cWebPlugin::TabNameList & TabNames = self->GetTabNames();
 
 	lua_newtable(tolua_S);
-	int newTable = lua_gettop(tolua_S);
 	int index = 1;
 	cWebPlugin::TabNameList::const_iterator iter = TabNames.begin();
 	while(iter != TabNames.end())
