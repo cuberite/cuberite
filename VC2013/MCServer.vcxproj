@@ -234,6 +234,8 @@
     <ClInclude Include="..\src\ChatColor.h" />
     <ClInclude Include="..\src\Chunk.h" />
     <ClInclude Include="..\src\ChunkDef.h" />
+    <ClInclude Include="..\src\BiomeDef.h" />
+    <ClInclude Include="..\src\BiomeDef.cpp" />
     <ClInclude Include="..\src\ChunkMap.h" />
     <ClInclude Include="..\src\ChunkSender.h" />
     <ClInclude Include="..\src\ClientHandle.h" />
