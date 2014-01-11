@@ -158,25 +158,7 @@ private:
 
 	/* ====== Misc Functions ====== */
 	/** Returns if a block is viable to be the MiddleBlock of a SetLinkedPowered operation */
-	inline static bool IsViableMiddleBlock(BLOCKTYPE Block)
-	{
-		if (!g_BlockIsSolid[Block]) { return false; }
-
-		switch (Block)
-		{
-			// Add SOLID but not viable middle blocks here
-			case E_BLOCK_PISTON:
-			case E_BLOCK_PISTON_EXTENSION:
-			case E_BLOCK_STICKY_PISTON:
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			case E_BLOCK_DAYLIGHT_SENSOR:
-			{
-				return false;
-			}
-			default: return true;
-		}
-	}
+	inline static bool IsViableMiddleBlock(BLOCKTYPE Block) { return g_BlockFullyOccupiesVoxel[Block]; }
 
 	/** Returns if a block is a mechanism (something that accepts power and does something) */
 	inline static bool IsMechanism(BLOCKTYPE Block)
