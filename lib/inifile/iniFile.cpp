@@ -137,7 +137,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			{
 				valuename = line.substr(0, pLeft);
 				value = line.substr(pLeft + 1);
-				SetValue(keyname, valuename, value);
+				AddValue(keyname, valuename, value);
 				break;
 			}
 
