@@ -228,6 +228,9 @@ bool cLuaState::PushFunction(const char * a_FunctionName)
 		return false;
 	}
 	
+	// Push the error handler for lua_pcall()
+	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
+	
 	lua_getglobal(m_LuaState, a_FunctionName);
 	if (!lua_isfunction(m_LuaState, -1))
 	{
@@ -249,6 +252,9 @@ bool cLuaState::PushFunction(int a_FnRef)
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
 	
+	// Push the error handler for lua_pcall()
+	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
+	
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // same as lua_getref()
 	if (!lua_isfunction(m_LuaState, -1))
 	{
@@ -268,6 +274,9 @@ bool cLuaState::PushFunction(const cTableRef & a_TableRef)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
+	
+	// Push the error handler for lua_pcall()
+	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
 	
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_TableRef.GetTableRef());  // Get the table ref
 	if (!lua_istable(m_LuaState, -1))
@@ -731,11 +740,13 @@ void cLuaState::GetReturn(int a_StackPos, double & a_ReturnedVal)
 bool cLuaState::CallFunction(int a_NumResults)
 {
 	ASSERT (m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
-	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 1));
+	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 1));  // The function to call
+	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 2));  // The error handler
 	
-	int s = lua_pcall(m_LuaState, m_NumCurrentFunctionArgs, a_NumResults, 0);
-	if (ReportErrors(s))
+	int s = lua_pcall(m_LuaState, m_NumCurrentFunctionArgs, a_NumResults, -m_NumCurrentFunctionArgs - 2);
+	if (s != 0)
 	{
+		// The error has already been printed together with the stacktrace
 		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), m_CurrentFunctionName.c_str());
 		m_NumCurrentFunctionArgs = -1;
 		m_CurrentFunctionName.clear();
@@ -1007,6 +1018,17 @@ AString cLuaState::GetTypeText(int a_StackPos)
 		case LUA_TTHREAD:        return "TTHREAD";
 	}
 	return Printf("Unknown (%d)", Type);
+}
+
+
+
+
+
+int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
+{
+	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
+	LogStackTrace(a_LuaState);
+	return 1;  // We left the error message on the stack as the return value
 }
 
 

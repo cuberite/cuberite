@@ -889,6 +889,8 @@ protected:
 	*/
 	bool CallFunction(int a_NumReturnValues);
 	
+	/** Used as the error reporting function for function calls */
+	static int ReportFnCallErrors(lua_State * a_LuaState);
 } ;
 
 
