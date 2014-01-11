@@ -157,9 +157,9 @@ cComposableGenerator::~cComposableGenerator()
 
 
 
-void cComposableGenerator::Initialize(cWorld * a_World, cIniFile & a_IniFile)
+void cComposableGenerator::Initialize(cIniFile & a_IniFile)
 {
-	super::Initialize(a_World, a_IniFile);
+	super::Initialize(a_IniFile);
 	
 	InitBiomeGen(a_IniFile);
 	InitHeightGen(a_IniFile);
@@ -369,13 +369,14 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 	int Seed = m_ChunkGenerator.GetSeed();
 	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava,DeadBushes,PreSimulator");
 
+	eDimension Dimension = StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld"));
 	AStringVector Str = StringSplitAndTrim(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
 		// Finishers, alpha-sorted:
 		if (NoCaseCompare(*itr, "BottomLava") == 0)
 		{
-			int DefaultBottomLavaLevel = (m_World->GetDimension() == dimNether) ? 30 : 10;
+			int DefaultBottomLavaLevel = (Dimension == dimNether) ? 30 : 10;
 			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", DefaultBottomLavaLevel);
 			m_FinishGens.push_back(new cFinishGenBottomLava(BottomLavaLevel));
 		}
@@ -389,7 +390,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "LavaSprings") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenFluidSprings(Seed, E_BLOCK_LAVA, a_IniFile, *m_World));
+			m_FinishGens.push_back(new cFinishGenFluidSprings(Seed, E_BLOCK_LAVA, a_IniFile, Dimension));
 		}
 		else if (NoCaseCompare(*itr, "Lilypads") == 0)
 		{
@@ -409,7 +410,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "WaterSprings") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenFluidSprings(Seed, E_BLOCK_WATER, a_IniFile, *m_World));
+			m_FinishGens.push_back(new cFinishGenFluidSprings(Seed, E_BLOCK_WATER, a_IniFile, Dimension));
 		}
 	}  // for itr - Str[]
 }
