@@ -85,7 +85,7 @@ public:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 protected:
 
-	const cItem & m_Content;
+	cItem m_Content;
 	int m_Height; 
 } ;
 
