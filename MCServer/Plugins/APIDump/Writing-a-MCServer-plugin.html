@@ -84,7 +84,7 @@ end
 			To register a hook, insert the following code template into the "-- Hooks" area in the previous code example.
 			</p>
 			<pre class="prettyprint lang-lua">
-cPluginManager.AddHook(cPluginManager.HOOK_NAME_HERE, FunctionNameToBeCalled)
+cPluginManager:AddHook(cPluginManager.HOOK_NAME_HERE, FunctionNameToBeCalled)
 			</pre>
 			<p>
 			What does this code do?
@@ -102,7 +102,7 @@ function Initialize(Plugin)
 	Plugin:SetName("DerpyPlugin")
 	Plugin:SetVersion(1)
 
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
 
 	local PluginManager = cPluginManager:Get()
 	-- Command bindings
@@ -200,7 +200,7 @@ function Initialize(Plugin)
 	local PluginManager = cPluginManager:Get()
 	PluginManager:BindCommand("/explode", "derpyplugin.explode", Explode, " ~ Explode a player");
 
-	cPluginManager.AddHook(cPluginManager.HOOK_COLLECTING_PICKUP, OnCollectingPickup)
+	cPluginManager:AddHook(cPluginManager.HOOK_COLLECTING_PICKUP, OnCollectingPickup)
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	return true

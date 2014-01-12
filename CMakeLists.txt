@@ -36,6 +36,11 @@ endif()
 if(MSVC)
 	# Make build use multiple threads under MSVC:
 	add_flags_cxx("/MP")
+elseif(APPLE)
+	#on os x clang adds pthread for us but we need to add it for gcc
+	if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		add_flags_cxx("-pthread")
+	endif()
 else()
 	# Let gcc / clang know that we're compiling a multi-threaded app:
 	add_flags_cxx("-pthread")
@@ -69,6 +74,17 @@ endif()
 # Under Windows, we need Lua as DLL; on *nix we need it linked statically:
 if (WIN32)
 	add_definitions(-DLUA_BUILD_AS_DLL)
+endif()
+
+# On Unix we use two dynamic loading libraries dl and ltdl.
+# Preference is for dl on unknown systems as it is specified in POSIX
+# the dynamic loader is used by lua and sqllite.
+if (UNIX)
+	if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+		set(DYNAMIC_LOADER ltdl)
+	else()
+		set(DYNAMIC_LOADER dl)
+	endif()
 endif()
 
 # The Expat library is linked in statically, make the source files aware of that:
@@ -147,21 +163,16 @@ add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/md5/)
 
-# Re-add the maximum warning level:
+# Remove disabling the maximum warning level:
+# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
 # We do not do that for MSVC since MSVC produces an awful lot of warnings for its own STL headers;
-# the important warnings will be turned on using #pragma in Globals.h
+# the important warnings are turned on using #pragma in Globals.h
 if (NOT MSVC)
-	#TODO: set -Wall -Werror -Wextra
-	add_flags_cxx("-Wall -Wextra")
+	string(REPLACE "-w" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+	string(REPLACE "-w" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
+	string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
+	string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
 endif()
-
-if (NOT WIN32)
-	set(CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS}         -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG}   -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -rdynamic")
-	set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS_PROFILE} -rdynamic")
-endif()
-
 
 add_subdirectory (src) 
 

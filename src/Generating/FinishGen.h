@@ -164,7 +164,7 @@ class cFinishGenFluidSprings :
 	public cFinishGen
 {
 public:
-	cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, const cWorld & a_World);
+	cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension);
 	
 protected:
 

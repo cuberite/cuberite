@@ -876,9 +876,6 @@ extern AString ItemTypeToString(short a_ItemType);
 /// Translates a full item into a fully-specified string (including meta and count). If the ItemType is not recognized, the ItemType number is output into the string.
 extern AString ItemToFullString(const cItem & a_Item);
 
-/// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns -1 on failure.
-extern EMCSBiome StringToBiome(const AString & a_BiomeString);
-
 /// Translates a mob string ("ocelot") to mobtype (E_ENTITY_TYPE_OCELOT)
 extern int StringToMobType(const AString & a_MobString);
 

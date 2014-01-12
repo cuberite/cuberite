@@ -87,6 +87,7 @@ public:
 	virtual void SendPlayerMoveLook      (void) = 0;
 	virtual void SendPlayerPosition      (void) = 0;
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) = 0;
+	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) = 0;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) = 0;
 	virtual void SendRespawn             (void) = 0;
 	virtual void SendExperience          (void) = 0;

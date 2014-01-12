@@ -14,9 +14,14 @@ public:
 	void Lock(void);
 	void Unlock(void);
 	
+	// IsLocked/IsLockedByCurrentThread are only used in ASSERT statements, but because of the changes with ASSERT they must always be defined
+	// The fake versions (in Release) will not effect the program in any way
 	#ifdef _DEBUG
 	bool IsLocked(void);
 	bool IsLockedByCurrentThread(void);
+	#else
+	bool IsLocked(void) { return false; }
+	bool IsLockedByCurrentThread(void) { return false; }
 	#endif  // _DEBUG
 	
 private:

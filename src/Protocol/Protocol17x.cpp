@@ -628,6 +628,18 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
+void cProtocol172::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	cPacketizer Pkt(*this, 0x3f);
+	Pkt.WriteString(a_Channel);
+	Pkt.WriteShort((short)a_Message.size());
+	Pkt.WriteBuf(a_Message.data(), a_Message.size());
+}
+
+
+
+
+
 void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	cPacketizer Pkt(*this, 0x1E);
@@ -983,10 +995,9 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 	}
 	
 	// Handle all complete packets:
-	while (true)
+	for (;;)
 	{
 		UInt32 PacketLen;
-		int PacketStart = m_ReceivedData.GetDataStart();
 		if (!m_ReceivedData.ReadVarInt(PacketLen))
 		{
 			// Not enough data
@@ -1113,8 +1124,11 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		cRoot::Get()->GetServer()->GetMaxPlayers(),
 		cRoot::Get()->GetServer()->GetNumPlayers()
 	);
-	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"}",
+	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
 		cRoot::Get()->GetServer()->GetDescription().c_str()
+	);
+	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+		cRoot::Get()->GetServer()->GetFaviconData().c_str()
 	);
 	Response.append("}");
 	
@@ -1374,7 +1388,7 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   Length);
 	AString Data;
 	a_ByteBuffer.ReadString(Data, Length);
-	// TODO: m_Client->HandlePluginMessage(Channel, Data);
+	m_Client->HandlePluginMessage(Channel, Data);
 }
 
 

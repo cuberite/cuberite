@@ -704,6 +704,20 @@ void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
+void cProtocol125::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_PLUGIN_MESSAGE);
+	WriteString(a_Channel);
+	WriteShort((short)a_Message.size());
+	SendData(a_Message.data(), a_Message.size());
+	Flush();
+}
+
+
+
+
+
 void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	cCSLock Lock(m_CSPacket);

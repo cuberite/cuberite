@@ -163,6 +163,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\lib\tolua++\src\bin\tolua.c" />
     <ClCompile Include="..\lib\tolua++\src\lib\tolua_event.c" />
     <ClCompile Include="..\lib\tolua++\src\lib\tolua_is.c" />
     <ClCompile Include="..\lib\tolua++\src\lib\tolua_map.c" />

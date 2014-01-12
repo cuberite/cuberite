@@ -78,6 +78,7 @@ public:
 	class cTask
 	{
 	public:
+		virtual ~cTask(){};
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
@@ -145,7 +146,7 @@ public:
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle);
-	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);
+	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 	void BroadcastChat               (const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export
@@ -635,6 +636,27 @@ private:
 		virtual void Execute(void) override;
 	} ;
 	
+	
+	/** Implementation of the callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
+	class cChunkGeneratorCallbacks :
+		public cChunkGenerator::cChunkSink,
+		public cChunkGenerator::cPluginInterface
+	{
+		cWorld * m_World;
+		
+		// cChunkSink overrides:
+		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) override;
+		virtual bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) override;
+		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) override;
+		
+		// cPluginInterface overrides:
+		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) override;
+		virtual void CallHookChunkGenerated (cChunkDesc & a_ChunkDesc) override;
+		
+	public:
+		cChunkGeneratorCallbacks(cWorld & a_World);
+	} ;
+	
 
 	AString m_WorldName;
 	AString m_IniFileName;
@@ -712,6 +734,9 @@ private:
 	sSetBlockList    m_FastSetBlockQueue;
 
 	cChunkGenerator  m_Generator;
+	
+	/** The callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
+	cChunkGeneratorCallbacks m_GeneratorCallbacks;
 	
 	cChunkSender     m_ChunkSender;
 	cLightingThread  m_Lighting;

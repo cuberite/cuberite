@@ -56,7 +56,6 @@ public:
 			case E_ITEM_SEEDS:         a_BlockType = E_BLOCK_CROPS;        return true;
 			default:                   a_BlockType = E_BLOCK_AIR;          return true;
 		}
-		return false;
 	}
 } ;
 

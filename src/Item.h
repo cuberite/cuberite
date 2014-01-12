@@ -181,9 +181,9 @@ public:
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
 	int     Size  (void) {return size(); }
-	void    Set   (int a_Idx, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemDamage);
+	void    Set   (int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage);
 
-	void    Add   (ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemDamage)
+	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)
 	{
 		push_back(cItem(a_ItemType, a_ItemCount, a_ItemDamage));
 	}

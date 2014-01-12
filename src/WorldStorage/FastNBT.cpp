@@ -16,9 +16,12 @@
 	#define NBT_RESERVE_SIZE 200
 #endif  // NBT_RESERVE_SIZE
 
-#define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while (0)
-
-
+#ifdef _MSC_VER
+	// Dodge a C4127 (conditional expression is constant) for this specific macro usage
+	#define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while ((false, false))
+#else
+	#define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while (false)
+#endif
 
 
 
@@ -80,7 +83,7 @@ bool cParsedNBT::ReadString(int & a_StringStart, int & a_StringLen)
 {
 	NEEDBYTES(2);
 	a_StringStart = m_Pos + 2;
-	a_StringLen = ntohs(*((short *)(m_Data + m_Pos)));
+	a_StringLen = GetBEShort(m_Data + m_Pos);
 	if (a_StringLen < 0)
 	{
 		// Invalid string length
@@ -99,7 +102,7 @@ bool cParsedNBT::ReadCompound(void)
 	// Reads the latest tag as a compound
 	int ParentIdx = m_Tags.size() - 1;
 	int PrevSibling = -1;
-	while (true)
+	for (;;)
 	{
 		NEEDBYTES(1);
 		eTagType TagType = (eTagType)(m_Data[m_Pos]);
@@ -135,7 +138,7 @@ bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 	
 	// Read the count:
 	NEEDBYTES(4);
-	int Count = ntohl(*((int *)(m_Data + m_Pos)));
+	int Count = GetBEInt(m_Data + m_Pos);
 	m_Pos += 4;
 	if (Count < 0)
 	{
@@ -197,7 +200,7 @@ bool cParsedNBT::ReadTag(void)
 		case TAG_ByteArray:
 		{
 			NEEDBYTES(4);
-			int len = ntohl(*((int *)(m_Data + m_Pos)));
+			int len = GetBEInt(m_Data + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
@@ -229,7 +232,7 @@ bool cParsedNBT::ReadTag(void)
 		case TAG_IntArray:
 		{
 			NEEDBYTES(4);
-			int len = ntohl(*((int *)(m_Data + m_Pos)));
+			int len = GetBEInt(m_Data + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
@@ -276,7 +279,7 @@ int cParsedNBT::FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLen
 	for (int Child = m_Tags[a_Tag].m_FirstChild; Child != -1; Child = m_Tags[Child].m_NextSibling)
 	{
 		if (
-			(m_Tags[Child].m_NameLength == a_NameLength) &&
+			(m_Tags[Child].m_NameLength == (int)a_NameLength) &&
 			(memcmp(m_Data + m_Tags[Child].m_NameStart, a_Name, a_NameLength) == 0)
 		)
 		{
@@ -401,7 +404,7 @@ void cFastNBTWriter::EndList(void)
 	ASSERT(m_Stack[m_CurrentStack].m_Type == TAG_List);
 	
 	// Update the list count:
-	*((int *)(m_Result.c_str() + m_Stack[m_CurrentStack].m_Pos)) = htonl(m_Stack[m_CurrentStack].m_Count);
+	SetBEInt((char *)(m_Result.c_str() + m_Stack[m_CurrentStack].m_Pos), m_Stack[m_CurrentStack].m_Count);
 
 	--m_CurrentStack;
 }

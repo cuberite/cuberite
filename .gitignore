@@ -19,6 +19,7 @@ cloc.xsl
 ## emacs
 *.*~
 *~
+*.orig
 
 # world inside source
 ChunkWorx.ini

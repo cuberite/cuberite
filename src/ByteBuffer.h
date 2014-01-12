@@ -110,7 +110,7 @@ public:
 	void ReadAll(AString & a_Data);
 	
 	/// Reads the specified number of bytes and writes it into the destinatio bytebuffer. Returns true on success.
-	bool ReadToByteBuffer(cByteBuffer & a_Dst, int a_NumBytes);
+	bool ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes);
 	
 	/// Removes the bytes that have been read from the ringbuffer
 	void CommitRead(void);

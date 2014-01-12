@@ -9,9 +9,11 @@
 
 #pragma once
 
+#include "../Bindings/PluginManager.h"
 #include "../Entities/Floater.h"
 #include "../Entities/Entity.h"
 #include "../Item.h"
+#include "../Root.h"
 
 
 
@@ -210,10 +212,14 @@ public:
 					}
 				}
 
-				
+				if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(*a_Player, Drops))
+				{
+					return true;
+				}
 				Vector3d FloaterPos = FloaterInfo.GetPos();
 				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
 				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.y + 1, FlyDirection.z);
+				cRoot::Get()->GetPluginManager()->CallHookPlayerFished(*a_Player, Drops);
 			}
 		}
 		else

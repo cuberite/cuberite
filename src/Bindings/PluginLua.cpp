@@ -90,6 +90,8 @@ bool cPluginLua::Initialize(void)
 
 	// Load all files for this plugin, and execute them
 	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
+
+	int numFiles = 0;
 	for (AStringVector::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
 	{
 		if (itr->rfind(".lua") == AString::npos)
@@ -101,8 +103,19 @@ bool cPluginLua::Initialize(void)
 		{
 			Close();
 			return false;
+		} 
+		else 
+		{
+			numFiles++;
 		}
 	}  // for itr - Files[]
+
+	if (numFiles == 0)
+	{
+		LOGWARNING("No lua files found: plugin %s is missing.", GetName().c_str());
+		Close();
+		return false;
+	}
 
 	// Call intialize function
 	bool res = false;
@@ -630,6 +643,46 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FISHED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_Reward, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FISHING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_Reward, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerJoined(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -904,6 +957,44 @@ bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_Block
 		}
 	}
 	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLUGIN_MESSAGE];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Client, a_Channel, a_Message);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPluginsLoaded(void)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLUGINS_LOADED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		bool ret = false;
+		m_LuaState.Call((int)(**itr), cLuaState::Return, ret);
+		res = res || ret;
+	}
+	return res;
 }
 
 
@@ -1324,6 +1415,8 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_USED_ITEM:             return "OnPlayerUsedItem";
 		case cPluginManager::HOOK_PLAYER_USING_BLOCK:           return "OnPlayerUsingBlock";
 		case cPluginManager::HOOK_PLAYER_USING_ITEM:            return "OnPlayerUsingItem";
+		case cPluginManager::HOOK_PLUGIN_MESSAGE:               return "OnPluginMessage";
+		case cPluginManager::HOOK_PLUGINS_LOADED:               return "OnPluginsLoaded";
 		case cPluginManager::HOOK_POST_CRAFTING:                return "OnPostCrafting";
 		case cPluginManager::HOOK_PRE_CRAFTING:                 return "OnPreCrafting";
 		case cPluginManager::HOOK_SPAWNED_ENTITY:               return "OnSpawnedEntity";
@@ -1337,8 +1430,17 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_WEATHER_CHANGED:              return "OnWeatherChanged";
 		case cPluginManager::HOOK_WEATHER_CHANGING:             return "OnWeatherChanging";
 		case cPluginManager::HOOK_WORLD_TICK:                   return "OnWorldTick";
-		default: return NULL;
+		
+		case cPluginManager::HOOK_NUM_HOOKS:
+		{
+			// Satisfy a warning that all enum values should be used in a switch
+			// but don't want a default branch, so that we catch new hooks missing from this list.
+			break;
+		}
 	}  // switch (a_Hook)
+	LOGWARNING("Requested name of an unknown hook type function: %d (max is %d)", a_HookType, cPluginManager::HOOK_MAX);
+	ASSERT(!"Unknown hook requested!");
+	return NULL;
 }
 
 

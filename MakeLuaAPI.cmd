@@ -29,6 +29,7 @@ if "a%ftpsite%" == "a" (
 :: Create the API documentation by running the server and stopping it right after it starts:
 
 cd MCServer
+copy /Y settings_apidump.ini settings.ini
 echo stop | MCServer
 cd ..
 

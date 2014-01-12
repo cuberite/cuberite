@@ -2,13 +2,11 @@
 #include "Globals.h"
 
 #include "ChunkGenerator.h"
-#include "../World.h"
 #include "inifile/iniFile.h"
-#include "../Root.h"
-#include "../Bindings/PluginManager.h"
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
 #include "Noise3DGenerator.h"
+#include "../MersenneTwister.h"
 
 
 
@@ -29,8 +27,9 @@ const unsigned int QUEUE_SKIP_LIMIT = 500;
 
 cChunkGenerator::cChunkGenerator(void) :
 	super("cChunkGenerator"),
-	m_World(NULL),
-	m_Generator(NULL)
+	m_Generator(NULL),
+	m_PluginInterface(NULL),
+	m_ChunkSink(NULL)
 {
 }
 
@@ -47,10 +46,12 @@ cChunkGenerator::~cChunkGenerator()
 
 
 
-bool cChunkGenerator::Start(cWorld * a_World, cIniFile & a_IniFile)
+bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile)
 {
+	m_PluginInterface = &a_PluginInterface;
+	m_ChunkSink = &a_ChunkSink;
+
 	MTRand rnd;
-	m_World = a_World;
 	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", rnd.randInt());
 	AString GeneratorName = a_IniFile.GetValueSet("Generator", "Generator", "Composable");
 
@@ -73,7 +74,7 @@ bool cChunkGenerator::Start(cWorld * a_World, cIniFile & a_IniFile)
 		return false;
 	}
 
-	m_Generator->Initialize(a_World, a_IniFile);
+	m_Generator->Initialize(a_IniFile);
 
 	return super::Start();
 }
@@ -237,14 +238,14 @@ void cChunkGenerator::Execute(void)
 		}
 
 		// Hack for regenerating chunks: if Y != 0, the chunk is considered invalid, even if it has its data set
-		if ((coords.m_ChunkY == 0) && m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkZ))
+		if ((coords.m_ChunkY == 0) && m_ChunkSink->IsChunkValid(coords.m_ChunkX, coords.m_ChunkZ))
 		{
 			LOGD("Chunk [%d, %d] already generated, skipping generation", coords.m_ChunkX, coords.m_ChunkZ);
 			// Already generated, ignore request
 			continue;
 		}
 
-		if (SkipEnabled && !m_World->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkZ))
+		if (SkipEnabled && !m_ChunkSink->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkZ))
 		{
 			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
 			continue;
@@ -252,9 +253,6 @@ void cChunkGenerator::Execute(void)
 
 		LOGD("Generating chunk [%d, %d, %d]", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 		DoGenerate(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
-
-		// Save the chunk right after generating, so that we don't have to generate it again on next run
-		m_World->GetStorage().QueueSaveChunk(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 
 		NumChunksGenerated++;
 	}  // while (!bStop)
@@ -265,27 +263,20 @@ void cChunkGenerator::Execute(void)
 
 void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
+	ASSERT(m_PluginInterface != NULL);
+	ASSERT(m_ChunkSink != NULL);
+	
 	cChunkDesc ChunkDesc(a_ChunkX, a_ChunkZ);
-	cRoot::Get()->GetPluginManager()->CallHookChunkGenerating(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
+	m_PluginInterface->CallHookChunkGenerating(ChunkDesc);
 	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc);
-	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
+	m_PluginInterface->CallHookChunkGenerated(ChunkDesc);
 
 	#ifdef _DEBUG
 	// Verify that the generator has produced valid data:
 	ChunkDesc.VerifyHeightmap();
 	#endif
 
-	cChunkDef::BlockNibbles BlockMetas;
-	ChunkDesc.CompressBlockMetas(BlockMetas);
-
-	m_World->SetChunkData(
-		a_ChunkX, a_ChunkZ,
-		ChunkDesc.GetBlockTypes(), BlockMetas,
-		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
-		&ChunkDesc.GetHeightMap(), &ChunkDesc.GetBiomeMap(),
-		ChunkDesc.GetEntities(), ChunkDesc.GetBlockEntities(),
-		true
-	);
+	m_ChunkSink->OnChunkGenerated(ChunkDesc);
 }
 
 
@@ -304,9 +295,8 @@ cChunkGenerator::cGenerator::cGenerator(cChunkGenerator & a_ChunkGenerator) :
 
 
 
-void cChunkGenerator::cGenerator::Initialize(cWorld * a_World, cIniFile & a_IniFile)
+void cChunkGenerator::cGenerator::Initialize(cIniFile & a_IniFile)
 {
-	m_World = a_World;
 	UNUSED(a_IniFile);
 }
 
@@ -319,7 +309,7 @@ EMCSBiome cChunkGenerator::cGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ)
 	cChunkDef::BiomeMap Biomes;
 	int Y = 0;
 	int ChunkX, ChunkZ;
-	cWorld::AbsoluteToRelative(a_BlockX, Y, a_BlockZ, ChunkX, Y, ChunkZ);
+	cChunkDef::AbsoluteToRelative(a_BlockX, Y, a_BlockZ, ChunkX, ChunkZ);
 	GenerateBiomes(ChunkX, ChunkZ, Biomes);
 	return cChunkDef::GetBiome(Biomes, a_BlockX, a_BlockZ);
 }

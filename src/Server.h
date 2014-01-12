@@ -11,9 +11,24 @@
 
 #include "OSSupport/SocketThreads.h"
 #include "OSSupport/ListenThread.h"
+
+#include "RCONServer.h"
+
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4231)
+	#pragma warning(disable:4189)
+	#pragma warning(disable:4702)
+#endif
+
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
-#include "RCONServer.h"
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 
 
@@ -35,6 +50,8 @@ class cServer										// tolua_export
 	: public cListenThread::cCallback
 {													// tolua_export
 public:												// tolua_export
+
+	virtual ~cServer() {}
 	bool InitServer(cIniFile & a_SettingsIni);
 
 	// tolua_begin
@@ -89,6 +106,9 @@ public:												// tolua_export
 	
 	/// Notifies the server that a player is being destroyed; the server uses this to adjust the number of players
 	void PlayerDestroying(const cPlayer * a_Player);
+
+	/* Returns base64 encoded favicon data (obtained from favicon.png) */
+	const AString & GetFaviconData(void) const { return m_FaviconData; }
 	
 	CryptoPP::RSA::PrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	CryptoPP::RSA::PublicKey  & GetPublicKey (void) { return m_PublicKey; }
@@ -166,6 +186,7 @@ private:
 	cRCONServer m_RCONServer;
 	
 	AString m_Description;
+	AString m_FaviconData;
 	int m_MaxPlayers;
 	bool m_bIsHardcore;
 	

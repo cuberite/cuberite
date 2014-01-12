@@ -1,7 +1,7 @@
 -- Global variables
 PLUGIN = {}	-- Reference to own plugin object
 CHEST_WIDTH = 9
-HANDY_VERSION = 1
+HANDY_VERSION = 2
 --[[
 
 Handy is a plugin for other plugins. It contain no commands, no hooks, but functions to ease plugins developers' life.

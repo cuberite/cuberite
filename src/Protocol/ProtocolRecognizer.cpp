@@ -198,7 +198,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	else
 	{
 		// This is used when the client sends a server-ping, respond with the default packet:
-		WriteByte  ((char)0xff);  // PACKET_DISCONNECT
+		WriteByte  (0xff);  // PACKET_DISCONNECT
 		WriteString(a_Reason);
 	}
 }
@@ -470,6 +470,16 @@ void cProtocolRecognizer::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendPlayerSpawn(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPluginMessage(a_Channel, a_Message);
 }
 
 

@@ -321,6 +321,7 @@ function DumpAPIHtml()
 	cFile:CreateFolder("API/Static");
 	local localFolder = g_Plugin:GetLocalFolder();
 	for idx, fnam in ipairs(cFile:GetFolderContents(localFolder .. "/Static")) do
+		cFile:Delete("API/Static/" .. fnam);
 		cFile:Copy(localFolder .. "/Static/" .. fnam, "API/Static/" .. fnam);
 	end
 
@@ -428,11 +429,18 @@ function DumpAPIHtml()
 	WriteClasses(f, API, ClassMenu);
 	WriteHooks(f, Hooks, UndocumentedHooks, HookNav);
 	
-	-- Copy the static files to the output folder (overwrite any existing):
-	cFile:Copy(g_Plugin:GetLocalFolder() .. "/main.css", "API/main.css");
-	cFile:Copy(g_Plugin:GetLocalFolder() .. "/prettify.js", "API/prettify.js");
-	cFile:Copy(g_Plugin:GetLocalFolder() .. "/prettify.css", "API/prettify.css");
-	cFile:Copy(g_Plugin:GetLocalFolder() .. "/lang-lua.js", "API/lang-lua.js");
+	-- Copy the static files to the output folder:
+	local StaticFiles =
+	{
+		"main.css",
+		"prettify.js",
+		"prettify.css",
+		"lang-lua.js",
+	};
+	for idx, fnam in ipairs(StaticFiles) do
+		cFile:Delete("API/" .. fnam);
+		cFile:Copy(g_Plugin:GetLocalFolder() .. "/" .. fnam, "API/" .. fnam);
+	end
 	
 	-- List the documentation problems:
 	LOG("Listing leftovers...");
@@ -1169,7 +1177,7 @@ function WriteHtmlHook(a_Hook, a_HookNav)
 	f:write("</table>\n<p>" .. (a_Hook.Returns or "") .. "</p>\n\n");
 	f:write([[<hr /><h1>Code examples</h1><h2>Registering the callback</h2>]]);
 	f:write("<pre class=\"prettyprint lang-lua\">\n");
-	f:write([[cPluginManager.AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);]]);
+	f:write([[cPluginManager:AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);]]);
 	f:write("</pre>\n\n");
 	local Examples = a_Hook.CodeExamples or {};
 	for i, example in ipairs(Examples) do

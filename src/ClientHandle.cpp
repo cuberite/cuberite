@@ -543,6 +543,15 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 
 
+void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
+}
+
+
+
+
+
 void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
 	LOGD("HandleLeftClick: {%i, %i, %i}; Face: %i; Stat: %i",
@@ -1409,6 +1418,7 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 
 void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 {
+	UNUSED(a_World);
 	ASSERT(m_Player != NULL);
 	
 	if (a_SendRespawnPacket)
@@ -1962,6 +1972,15 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 	);
 	
 	m_Protocol->SendPlayerSpawn(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	m_Protocol->SendPluginMessage(a_Channel, a_Message);
 }
 
 

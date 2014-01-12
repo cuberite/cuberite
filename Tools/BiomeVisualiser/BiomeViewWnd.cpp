@@ -67,19 +67,69 @@ void cBiomeViewWnd::InitBiomeView(void)
 
 
 
+void cBiomeViewWnd::SetZoom(int a_NewZoom)
+{
+	m_Renderer.SetZoom(a_NewZoom);
+	Redraw();
+}
+
+
+
+
+
+void cBiomeViewWnd::Redraw(void)
+{
+	if (m_Renderer.Render(m_Pixmap))
+	{
+		SetTimer(m_Wnd, TIMER_RERENDER, 200, NULL);
+	}
+	InvalidateRect(m_Wnd, NULL, FALSE);
+}
+
+
+
+
+
 LRESULT cBiomeViewWnd::WndProc(HWND a_Wnd, UINT a_Msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (a_Msg)
 	{
-		case WM_CLOSE:       return OnClose();
-		case WM_COMMAND:     return OnCommand(wParam, lParam);
+		case WM_CHAR:        return OnChar       (wParam, lParam);
+		case WM_CLOSE:       return OnClose      ();
+		case WM_COMMAND:     return OnCommand    (wParam, lParam);
 		case WM_LBUTTONDOWN: return OnLButtonDown(wParam, lParam);
 		case WM_LBUTTONUP:   return OnLButtonUp  (wParam, lParam);
 		case WM_MOUSEMOVE:   return OnMouseMove  (wParam, lParam);
-		case WM_PAINT:       return OnPaint();
-		case WM_TIMER:       return OnTimer(wParam);
+		case WM_PAINT:       return OnPaint      ();
+		case WM_TIMER:       return OnTimer      (wParam);
 	}
 	return ::DefWindowProc(a_Wnd, a_Msg, wParam, lParam);
+}
+
+
+
+
+
+LRESULT cBiomeViewWnd::OnChar(WPARAM wParam, LPARAM lParam)
+{
+	switch (wParam)
+	{
+		case '1': SetZoom(1); break;
+		case '2': SetZoom(2); break;
+		case '3': SetZoom(3); break;
+		case '4': SetZoom(4); break;
+		case '5': SetZoom(5); break;
+		case '6': SetZoom(6); break;
+		case '7': SetZoom(7); break;
+		case '8': SetZoom(8); break;
+		case 27:
+		{
+			// Esc pressed, exit
+			PostQuitMessage(0);
+			break;
+		}
+	}
+	return 0;
 }
 
 
@@ -126,12 +176,8 @@ LRESULT cBiomeViewWnd::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	POINT pnt;
 	GetCursorPos(&pnt);
 	m_Renderer.MoveViewBy(pnt.x - m_MouseDown.x, pnt.y - m_MouseDown.y);
-	if (m_Renderer.Render(m_Pixmap))
-	{
-		SetTimer(m_Wnd, TIMER_RERENDER, 200, NULL);
-	}
 	m_MouseDown = pnt;
-	InvalidateRect(m_Wnd, NULL, FALSE);
+	Redraw();
 	return 0;
 }
 

@@ -10,73 +10,73 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Source Files\Mobs">
-      <UniqueIdentifier>{977716f7-b383-498a-950f-49afc6d551f6}</UniqueIdentifier>
+      <UniqueIdentifier>{813698c3-b2c1-4f3d-a89c-7ac6239fff97}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entities">
-      <UniqueIdentifier>{14ac2998-63d0-4bb3-97e3-1bd0007ffc74}</UniqueIdentifier>
+      <UniqueIdentifier>{b120a538-d8b9-4576-8675-36cf01fd69fc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\UI">
-      <UniqueIdentifier>{272cba2d-aa26-4c69-b6fa-94465078e351}</UniqueIdentifier>
+      <UniqueIdentifier>{85037cf1-81a5-47c7-8c2e-899ea706b8e7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Simulator">
-      <UniqueIdentifier>{1fabcea5-dba3-4265-b691-5795c69c4471}</UniqueIdentifier>
+      <UniqueIdentifier>{46c9cb22-7c7f-4589-b9b2-1fc79d2bdbdf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\OSSupport">
-      <UniqueIdentifier>{c29beffd-33f6-44eb-8310-3e0462cdddf9}</UniqueIdentifier>
+      <UniqueIdentifier>{f12178cb-2ecb-4e48-9a8d-ba3e2e73cfbc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\OSSupport\Android Specific">
-      <UniqueIdentifier>{430cae6d-cfb2-49a2-9fb2-614fde244868}</UniqueIdentifier>
+      <UniqueIdentifier>{488bc224-735f-405c-83de-870373cb52cb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Bindings">
-      <UniqueIdentifier>{87060076-8ef4-4535-88ee-7a609e4391ae}</UniqueIdentifier>
+      <UniqueIdentifier>{41c0d7c9-43b5-4d17-b50e-3c8ac3aa2905}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\External">
-      <UniqueIdentifier>{4e33e863-d055-4476-bb95-efd5ebc115d3}</UniqueIdentifier>
+      <UniqueIdentifier>{2c71a15a-8c65-4be7-bdfb-e083f4841c4a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\WorldStorage">
-      <UniqueIdentifier>{ae97007e-0940-4f87-9786-8ed1d201e52c}</UniqueIdentifier>
+      <UniqueIdentifier>{2227f719-f0ac-444e-af14-230853017c45}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Generating">
-      <UniqueIdentifier>{99483c91-c76c-47c7-838d-ba25c2066c79}</UniqueIdentifier>
+      <UniqueIdentifier>{eb070b55-ba10-4bce-ba06-5d785a055e54}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Blocks">
-      <UniqueIdentifier>{51b8f5f3-83b3-4068-8825-503f19b42542}</UniqueIdentifier>
+      <UniqueIdentifier>{779dac55-c718-4fe1-8b67-547d431b9ebc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Items">
-      <UniqueIdentifier>{959da118-757d-44c1-a4bd-d3345cfeb637}</UniqueIdentifier>
+      <UniqueIdentifier>{89847a5d-608a-4137-a766-1557276b4fcf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Protocol">
-      <UniqueIdentifier>{be413233-b7df-4ef1-9eb3-8aa1de96bf3e}</UniqueIdentifier>
+      <UniqueIdentifier>{e159d08d-daec-46de-9b60-9f8e660da91d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\SQLite">
-      <UniqueIdentifier>{224e8323-4bcc-4d7e-bdba-09fa22f42d66}</UniqueIdentifier>
+      <UniqueIdentifier>{0278092b-abe5-4276-81cf-59e4079e5bc7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\LuaExpat">
-      <UniqueIdentifier>{f9ad84f7-9199-45d1-a609-128f60baa996}</UniqueIdentifier>
+      <UniqueIdentifier>{e4879cf2-e769-4e1d-8905-0f6c40ee5bc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\BlockEntities">
-      <UniqueIdentifier>{74088e2e-f7dc-478a-ae7f-bcfcb1a13dcc}</UniqueIdentifier>
+      <UniqueIdentifier>{d641a9d4-f5dc-4808-bee6-194306505244}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\HTTPServer">
-      <UniqueIdentifier>{5e5eae6e-3154-4f85-868e-2682d072a5b2}</UniqueIdentifier>
+      <UniqueIdentifier>{a1e39415-2aca-4779-a558-2567a9de304f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Config files">
-      <UniqueIdentifier>{124dfea0-3dcd-45c0-a196-ec9bd6e00b6a}</UniqueIdentifier>
+      <UniqueIdentifier>{eb5f3060-03ed-4548-8bde-340454d3d23a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins">
-      <UniqueIdentifier>{bc156df0-b3f8-4bf2-a434-59e63f5eafcc}</UniqueIdentifier>
+      <UniqueIdentifier>{7c681450-041a-4846-acf6-951c1f4e32a4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Core">
-      <UniqueIdentifier>{2bbb71f4-860a-4fc4-b9d9-ac05f806fea1}</UniqueIdentifier>
+      <UniqueIdentifier>{e961964c-9fb7-4513-89fa-05e0b760e0f1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\ChatLog">
-      <UniqueIdentifier>{05facd8b-76e8-4bc5-9135-831b49ac5c65}</UniqueIdentifier>
+      <UniqueIdentifier>{70696c83-2307-43c6-8851-81aa3baa8523}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Debuggers">
-      <UniqueIdentifier>{6b70646e-a784-4617-8b26-941de4f8fd20}</UniqueIdentifier>
+      <UniqueIdentifier>{d3b692db-0684-4b89-9d38-2e5af12e9a6e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\APIDump">
-      <UniqueIdentifier>{a2b234d1-1013-47c0-8a44-f3b294d83d19}</UniqueIdentifier>
+      <UniqueIdentifier>{6eee304c-f055-4758-a248-a125e1af7e73}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -115,9 +115,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Chunk.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Chunk.inl.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ChunkDef.h">
@@ -390,6 +387,9 @@
     <ClInclude Include="..\src\Entities\FallingBlock.h">
       <Filter>Source Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Entities\Floater.h">
+      <Filter>Source Files\Entities</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Entities\Minecart.h">
       <Filter>Source Files\Entities</Filter>
     </ClInclude>
@@ -466,6 +466,9 @@
       <Filter>Source Files\OSSupport</Filter>
     </ClInclude>
     <ClInclude Include="..\src\OSSupport\ListenThread.h">
+      <Filter>Source Files\OSSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\OSSupport\Queue.h">
       <Filter>Source Files\OSSupport</Filter>
     </ClInclude>
     <ClInclude Include="..\src\OSSupport\Semaphore.h">
@@ -798,6 +801,9 @@
     <ClInclude Include="..\src\items\ItemDye.h">
       <Filter>Source Files\Items</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Items\ItemFishingRod.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Items\ItemFlowerPot.h">
       <Filter>Source Files\Items</Filter>
     </ClInclude>
@@ -944,9 +950,6 @@
     </ClInclude>
     <ClInclude Include="..\src\HTTPServer\NameValueParser.h">
       <Filter>Source Files\HTTPServer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Entities\Floater.h">
-      <Filter>Source Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1372,6 +1375,9 @@
     <ClCompile Include="..\src\Entities\FallingBlock.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Entities\Floater.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\Entities\Minecart.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
@@ -1659,9 +1665,6 @@
     </ClCompile>
     <ClCompile Include="..\src\HTTPServer\NameValueParser.cpp">
       <Filter>Source Files\HTTPServer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Entities\Floater.cpp">
-      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

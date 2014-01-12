@@ -16,8 +16,22 @@ Declares the 1.7.x protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4231)
+	#pragma warning(disable:4189)
+	#pragma warning(disable:4702)
+#endif
+
 #include "cryptopp/modes.h"
 #include "cryptopp/aes.h"
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 
 
@@ -72,6 +86,7 @@ public:
 	virtual void SendPlayerMoveLook      (void) override;
 	virtual void SendPlayerPosition      (void) override;
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
+	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendRespawn             (void) override;
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8

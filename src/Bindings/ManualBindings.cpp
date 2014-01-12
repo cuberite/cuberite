@@ -991,7 +991,6 @@ static int tolua_cPluginManager_GetAllPlugins(lua_State * tolua_S)
 	const cPluginManager::PluginMap & AllPlugins = self->GetAllPlugins();
 
 	lua_newtable(tolua_S);
-	int newTable = lua_gettop(tolua_S);
 	int index = 1;
 	cPluginManager::PluginMap::const_iterator iter = AllPlugins.begin();
 	while (iter != AllPlugins.end())
@@ -1137,16 +1136,17 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 {
 	/*
 	Function signatures:
-	cPluginManager.AddHook(HOOK_TYPE, CallbackFunction)        -- (1) recommended
-	cPluginManager:Get():AddHook(HOOK_TYPE, CallbackFunction)  -- (2) accepted silently
-	cPluginManager:Get():AddHook(Plugin, HOOK_TYPE)            -- (3) old style (#121), accepted but complained about
-	cPluginManager.AddHook(Plugin, HOOK_TYPE)                  -- (4) old style (#121) mangled, accepted but complained about
+	cPluginManager:AddHook(HOOK_TYPE, CallbackFunction)        -- (1) recommended
+	cPluginManager.AddHook(HOOK_TYPE, CallbackFunction)        -- (2) accepted silently (#401 deprecates this)
+	cPluginManager:Get():AddHook(HOOK_TYPE, CallbackFunction)  -- (3) accepted silently
+	cPluginManager:Get():AddHook(Plugin, HOOK_TYPE)            -- (4) old style (#121), accepted but complained about in the console
+	cPluginManager.AddHook(Plugin, HOOK_TYPE)                  -- (5) old style (#121) mangled, accepted but complained about in the console
 	*/
 	
 	cLuaState S(tolua_S);
 	cPluginManager * PlgMgr = cPluginManager::Get();
 
-	// If the first param is a cPluginManager, use it instead of the global one:
+	// If the first param is a cPluginManager instance, use it instead of the global one:
 	int ParamIdx = 1;
 	tolua_Error err;
 	if (tolua_isusertype(S, 1, "cPluginManager", 0, &err))
@@ -1160,6 +1160,11 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 			PlgMgr = cPluginManager::Get();
 		}
 		ParamIdx += 1;
+	}
+	else if (tolua_isusertable(S, 1, "cPluginManager", 0, &err))
+	{
+		// Style 1, use the global PlgMgr, but increment ParamIdx
+		ParamIdx++;
 	}
 	
 	if (lua_isnumber(S, ParamIdx) && lua_isfunction(S, ParamIdx + 1))
@@ -1177,7 +1182,7 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 	
 	AString ParamDesc;
 	Printf(ParamDesc, "%s, %s, %s", S.GetTypeText(1).c_str(), S.GetTypeText(2).c_str(), S.GetTypeText(3).c_str());
-	LOGWARNING("cPluginManager.AddHook(): bad parameters. Expected HOOK_TYPE and CallbackFunction, got %s. Hook not added.", ParamDesc.c_str());
+	LOGWARNING("cPluginManager:AddHook(): bad parameters. Expected HOOK_TYPE and CallbackFunction, got %s. Hook not added.", ParamDesc.c_str());
 	S.LogStackTrace();
 	return 0;
 }
@@ -1877,7 +1882,6 @@ static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 	const cWebPlugin::TabNameList & TabNames = self->GetTabNames();
 
 	lua_newtable(tolua_S);
-	int newTable = lua_gettop(tolua_S);
 	int index = 1;
 	cWebPlugin::TabNameList::const_iterator iter = TabNames.begin();
 	while(iter != TabNames.end())
@@ -1892,6 +1896,35 @@ static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 		++index;
 	}
 	return 1;
+}
+
+
+
+
+
+static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cClientHandle") ||
+		!S.CheckParamString(2, 3) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	cClientHandle * Client = (cClientHandle *)tolua_tousertype(L, 1, NULL);
+	if (Client == NULL)
+	{
+		LOGWARNING("ClientHandle is nil in cClientHandle:SendPluginMessage()");
+		S.LogStackTrace();
+		return 0;
+	}
+	AString Channel, Message;
+	Channel.assign(lua_tostring(L, 2), lua_strlen(L, 2));
+	Message.assign(lua_tostring(L, 3), lua_strlen(L, 3));
+	Client->SendPluginMessage(Channel, Message);
+	return 0;
 }
 
 
@@ -1947,118 +1980,72 @@ public:
 	
 	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
-		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNextBlock"))
+		bool res = false;
+		if (!m_LuaState.Call(
+			cLuaState::cTableRef(m_TableRef, "OnNextBlock"),
+			a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_EntryFace,
+			cLuaState::Return, res
+		))
 		{
 			// No such function in the table, skip the callback
 			return false;
 		}
-		m_LuaState.Push(a_BlockX);
-		m_LuaState.Push(a_BlockY);
-		m_LuaState.Push(a_BlockZ);
-		m_LuaState.Push(a_BlockType);
-		m_LuaState.Push(a_BlockMeta);
-		m_LuaState.Push(a_EntryFace);
-		if (!m_LuaState.CallFunction(1))
-		{
-			return false;
-		}
-		bool res = false;
-		if (lua_isboolean(m_LuaState, -1))
-		{
-			res = (lua_toboolean(m_LuaState, -1) != 0);
-		}
-		lua_pop(m_LuaState, 1);
 		return res;
 	}
 	
 	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) override
 	{
-		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNextBlockNoData"))
+		bool res = false;
+		if (!m_LuaState.Call(
+			cLuaState::cTableRef(m_TableRef, "OnNextBlockNoData"),
+			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
+			cLuaState::Return, res
+		))
 		{
 			// No such function in the table, skip the callback
 			return false;
 		}
-		m_LuaState.Push(a_BlockX);
-		m_LuaState.Push(a_BlockY);
-		m_LuaState.Push(a_BlockZ);
-		m_LuaState.Push(a_EntryFace);
-		if (!m_LuaState.CallFunction(1))
-		{
-			return false;
-		}
-		bool res = false;
-		if (lua_isboolean(m_LuaState, -1))
-		{
-			res = (lua_toboolean(m_LuaState, -1) != 0);
-		}
-		lua_pop(m_LuaState, 1);
 		return res;
 	}
 	
 	virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
 	{
-		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnOutOfWorld"))
+		bool res = false;
+		if (!m_LuaState.Call(
+			cLuaState::cTableRef(m_TableRef, "OnOutOfWorld"),
+			a_BlockX, a_BlockY, a_BlockZ,
+			cLuaState::Return, res
+		))
 		{
 			// No such function in the table, skip the callback
 			return false;
 		}
-		m_LuaState.Push(a_BlockX);
-		m_LuaState.Push(a_BlockY);
-		m_LuaState.Push(a_BlockZ);
-		if (!m_LuaState.CallFunction(1))
-		{
-			return false;
-		}
-		bool res = false;
-		if (lua_isboolean(m_LuaState, -1))
-		{
-			res = (lua_toboolean(m_LuaState, -1) != 0);
-		}
-		lua_pop(m_LuaState, 1);
 		return res;
 	}
 	
 	virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
 	{
-		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnIntoWorld"))
+		bool res = false;
+		if (!m_LuaState.Call(
+			cLuaState::cTableRef(m_TableRef, "OnIntoWorld"),
+			a_BlockX, a_BlockY, a_BlockZ,
+			cLuaState::Return, res
+		))
 		{
 			// No such function in the table, skip the callback
 			return false;
 		}
-		m_LuaState.Push(a_BlockX);
-		m_LuaState.Push(a_BlockY);
-		m_LuaState.Push(a_BlockZ);
-		if (!m_LuaState.CallFunction(1))
-		{
-			return false;
-		}
-		bool res = false;
-		if (lua_isboolean(m_LuaState, -1))
-		{
-			res = (lua_toboolean(m_LuaState, -1) != 0);
-		}
-		lua_pop(m_LuaState, 1);
 		return res;
 	}
 	
 	virtual void OnNoMoreHits(void) override
 	{
-		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNoMoreHits"))
-		{
-			// No such function in the table, skip the callback
-			return;
-		}
-		m_LuaState.CallFunction(0);
+		m_LuaState.Call(cLuaState::cTableRef(m_TableRef, "OnNoMoreHits"));
 	}
 	
 	virtual void OnNoChunk(void) override
 	{
-		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNoChunk"))
-		{
-			// No such function in the table, skip the callback
-			return;
-		}
-		m_LuaState.CallFunction(0);
+		m_LuaState.Call(cLuaState::cTableRef(m_TableRef, "OnNoChunk"));
 	}
 
 protected:
@@ -2286,6 +2273,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cClientHandle");
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
+			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItemGrid");

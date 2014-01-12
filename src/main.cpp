@@ -50,6 +50,11 @@ void NonCtrlHandler(int a_Signal)
 			LOGWARN("Segmentation fault; MCServer has crashed :(");
 			exit(EXIT_FAILURE);
 		}
+		case SIGTERM:
+		{
+			std::signal(SIGTERM, SIG_IGN); // Server is shutting down, wait for it...
+			break;
+		}
 		default: break;
 	}
 }

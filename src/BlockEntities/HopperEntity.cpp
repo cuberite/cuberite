@@ -488,7 +488,6 @@ bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, int a_BlockX, int a_Blo
 		// Feed the fuel slot of the furnace
 		return MoveItemsToSlot(*Furnace, cFurnaceEntity::fsFuel);
 	}
-	return false;
 }
 
 

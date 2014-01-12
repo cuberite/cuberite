@@ -20,8 +20,8 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to 0
-		// TODO: More drops?
-		a_Pickups.push_back(cItem(E_ITEM_GLOWSTONE_DUST, 1, 0));
+		MTRand r1;
+		a_Pickups.push_back(cItem(E_ITEM_GLOWSTONE_DUST, (char)(2 + r1.randInt(2)), 0));
 	}
 } ;
 

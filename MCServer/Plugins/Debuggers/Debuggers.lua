@@ -19,14 +19,16 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
 	--]]
 	
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
-	cPluginManager.AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
-	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick);
-	cPluginManager.AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
-	cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
-	cPluginManager.AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
+	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
+	cPluginManager:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
+	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
+	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
+	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 
 	PM = cRoot:Get():GetPluginManager();
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
@@ -524,6 +526,14 @@ end
 
 
 
+function OnPluginsLoaded()
+	LOG("All plugins loaded");
+end
+
+
+
+
+
 function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	-- Get the topmost block coord:
 	local Height = a_ChunkDesc:GetHeight(0, 0);
@@ -532,7 +542,6 @@ function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
 	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
 	if (BlockEntity ~= nil) then
-		LOG("Setting sign lines...");
 		local SignEntity = tolua.cast(BlockEntity, "cSignEntity");
 		SignEntity:SetLines("Chunk:", tonumber(a_ChunkX) .. ", " .. tonumber(a_ChunkZ), "", "(Debuggers)");
 	end
@@ -949,6 +958,31 @@ end
 function HandleRequest_Debuggers(a_Request)
 	local FolderContents = cFile:GetFolderContents("./");
 	return "<p>The following objects have been returned by cFile:GetFolderContents():<ul><li>" .. table.concat(FolderContents, "</li><li>") .. "</li></ul></p>";
+end
+
+
+
+
+
+function OnPluginMessage(a_Client, a_Channel, a_Message)
+	LOGINFO("Received a plugin message from client " .. a_Client:GetUsername() .. ": channel '" .. a_Channel .. "', message '" .. a_Message .. "'");
+	
+	if (a_Channel == "REGISTER") then
+		if (a_Message:find("WECUI")) then
+			-- The client has WorldEditCUI mod installed, test the comm by sending a few WECUI messages:
+			--[[
+			WECUI messages have the following generic format:
+			<shape>|<params>
+			If shape is p (cuboid selection), the params are sent individually for each corner click and have the following format:
+			<point-index>|<x>|<y>|<z>|<volume>
+			point-index is 0 or 1 (lclk / rclk)
+			volume is the 3D volume of the current cuboid selected (all three coords' deltas multiplied), including the edge blocks; -1 if N/A
+			--]]
+			-- Select a 51 * 51 * 51 block cuboid:
+			a_Client:SendPluginMessage("WECUI", "p|0|50|50|50|-1");
+			a_Client:SendPluginMessage("WECUI", "p|1|100|100|100|132651");  -- 132651 = 51 * 51 * 51
+		end
+	end
 end
 
 

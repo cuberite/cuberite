@@ -173,6 +173,7 @@ void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
 
 void cServer::PlayerCreated(const cPlayer * a_Player)
 {
+	UNUSED(a_Player);
 	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
 	cCSLock Lock(m_CSPlayerCountDiff);
 	m_PlayerCountDiff += 1;
@@ -184,6 +185,7 @@ void cServer::PlayerCreated(const cPlayer * a_Player)
 
 void cServer::PlayerDestroying(const cPlayer * a_Player)
 {
+	UNUSED(a_Player);
 	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
 	cCSLock Lock(m_CSPlayerCountDiff);
 	m_PlayerCountDiff -= 1;
@@ -200,6 +202,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_bIsHardcore = a_SettingsIni.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
+
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile("favicon.png")); // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{
@@ -491,7 +495,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	
 	if (split[0].compare("killmem") == 0)
 	{
-		while (true)
+		for (;;)
 		{
 			new char[100 * 1024 * 1024];  // Allocate and leak 100 MiB in a loop -> fill memory and kill MCS
 		}
@@ -514,6 +518,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 
 void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
 {
+	UNUSED(a_Split);
 	typedef std::pair<AString, AString> AStringPair;
 	typedef std::vector<AStringPair> AStringPairs;
 	
@@ -525,6 +530,8 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 		
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
+		UNUSED(a_Plugin);
+		UNUSED(a_Permission);
 			if (!a_HelpString.empty())
 			{
 				m_Commands.push_back(AStringPair(a_Command, a_HelpString));

@@ -1,8 +1,6 @@
 
 $#include "../Globals.h"
 
-$#include "tolua_base.h"
-
 // Typedefs from Globals.h, so that we don't have to process that file:
 typedef long long Int64;
 typedef int       Int32;
@@ -14,6 +12,7 @@ typedef unsigned short     UInt16;
 
 
 $cfile "../ChunkDef.h"
+$cfile "../BiomeDef.h"
 
 $cfile "../../lib/inifile/iniFile.h"
 

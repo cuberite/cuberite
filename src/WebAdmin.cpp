@@ -305,6 +305,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 
 void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
+	UNUSED(a_Request);
 	static const char LoginForm[] = \
 	"<h1>MCServer WebAdmin</h1>" \
 	"<center>" \
@@ -450,6 +451,7 @@ AString cWebAdmin::GetBaseURL(const AStringVector & a_URLSplit)
 
 void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
+	UNUSED(a_Connection);
 	const AString & URL = a_Request.GetURL();
 	if (
 		(strncmp(URL.c_str(), "/webadmin", 9) == 0) ||
@@ -473,6 +475,7 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 
 void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size)
 {
+	UNUSED(a_Connection);
 	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
 	if (Data == NULL)
 	{

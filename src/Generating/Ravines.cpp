@@ -381,7 +381,7 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 		int R = itr->m_Radius;
 		int T = itr->m_Top;
 		int B = itr->m_Bottom;
-		while (true)
+		for (;;)
 		{
 			m_Points.push_back(cRavDefPoint(PrevX, PrevZ, R, T, B));
 			if ((PrevX == x1) && (PrevZ == z1))

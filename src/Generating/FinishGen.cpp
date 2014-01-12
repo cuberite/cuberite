@@ -520,7 +520,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenFluidSprings:
 
-cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, const cWorld & a_World) :
+cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension) :
 	m_Noise(a_Seed + a_Fluid * 100),  // Need to take fluid into account, otherwise water and lava springs generate next to each other
 	m_HeightDistribution(255),
 	m_Fluid(a_Fluid)
@@ -528,8 +528,8 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 	bool IsWater = (a_Fluid == E_BLOCK_WATER);
 	AString SectionName = IsWater ? "WaterSprings" : "LavaSprings";
 	AString DefaultHeightDistribution;
-	int DefaultChance;
-	switch (a_World.GetDimension())
+	int DefaultChance = 0;
+	switch (a_Dimension)
 	{
 		case dimNether:
 		{
