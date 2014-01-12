@@ -27,6 +27,16 @@ if (NOT MSVC)
 
 else ()
 
+	# Generate the Bindings if they don't exist:
+	if (NOT EXISTS "${PROJECT_SOURCE_DIR}/Bindings/Bindings.cpp")
+		message("Bindings.cpp not found, generating now")
+		set(tolua_executable ${PROJECT_SOURCE_DIR}/Bindings/tolua++.exe)
+		execute_process(
+			COMMAND ${tolua_executable} -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Bindings
+		)
+	endif()
+
 	function(includefolder PATH)
 		FILE(GLOB FOLDER_FILES
 			"${PATH}/*.cpp"
