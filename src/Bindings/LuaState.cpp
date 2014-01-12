@@ -228,6 +228,9 @@ bool cLuaState::PushFunction(const char * a_FunctionName)
 		return false;
 	}
 	
+	// Push the error handler for lua_pcall()
+	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
+	
 	lua_getglobal(m_LuaState, a_FunctionName);
 	if (!lua_isfunction(m_LuaState, -1))
 	{
@@ -249,6 +252,9 @@ bool cLuaState::PushFunction(int a_FnRef)
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
 	
+	// Push the error handler for lua_pcall()
+	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
+	
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // same as lua_getref()
 	if (!lua_isfunction(m_LuaState, -1))
 	{
@@ -264,27 +270,29 @@ bool cLuaState::PushFunction(int a_FnRef)
 
 
 
-bool cLuaState::PushFunctionFromRefTable(cRef & a_TableRef, const char * a_FnName)
+bool cLuaState::PushFunction(const cTableRef & a_TableRef)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
-
-	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_TableRef);  // Get the table ref
+	
+	// Push the error handler for lua_pcall()
+	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
+	
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_TableRef.GetTableRef());  // Get the table ref
 	if (!lua_istable(m_LuaState, -1))
 	{
 		// Not a table, bail out
 		lua_pop(m_LuaState, 1);
 		return false;
 	}
-	lua_getfield(m_LuaState, -1, a_FnName);
+	lua_getfield(m_LuaState, -1, a_TableRef.GetFnName());
 	if (lua_isnil(m_LuaState, -1) || !lua_isfunction(m_LuaState, -1))
 	{
 		// Not a valid function, bail out
 		lua_pop(m_LuaState, 2);
 		return false;
 	}
-	lua_remove(m_LuaState, -2);  // Remove the table ref from the stack
-	m_CurrentFunctionName = "<table_callback>";
+	Printf(m_CurrentFunctionName, "<table-callback %s>", a_TableRef.GetFnName());
 	m_NumCurrentFunctionArgs = 0;
 	return true;
 }
@@ -732,11 +740,13 @@ void cLuaState::GetReturn(int a_StackPos, double & a_ReturnedVal)
 bool cLuaState::CallFunction(int a_NumResults)
 {
 	ASSERT (m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
-	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 1));
+	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 1));  // The function to call
+	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 2));  // The error handler
 	
-	int s = lua_pcall(m_LuaState, m_NumCurrentFunctionArgs, a_NumResults, 0);
-	if (ReportErrors(s))
+	int s = lua_pcall(m_LuaState, m_NumCurrentFunctionArgs, a_NumResults, -m_NumCurrentFunctionArgs - 2);
+	if (s != 0)
 	{
+		// The error has already been printed together with the stacktrace
 		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), m_CurrentFunctionName.c_str());
 		m_NumCurrentFunctionArgs = -1;
 		m_CurrentFunctionName.clear();
@@ -964,15 +974,24 @@ bool cLuaState::ReportErrors(lua_State * a_LuaState, int a_Status)
 
 void cLuaState::LogStackTrace(void)
 {
+	LogStackTrace(m_LuaState);
+}
+
+
+
+
+
+void cLuaState::LogStackTrace(lua_State * a_LuaState)
+{
 	LOGWARNING("Stack trace:");
 	lua_Debug entry;
 	int depth = 0;
-	while (lua_getstack(m_LuaState, depth, &entry))
+	while (lua_getstack(a_LuaState, depth, &entry))
 	{
-		int status = lua_getinfo(m_LuaState, "Sln", &entry);
+		int status = lua_getinfo(a_LuaState, "Sln", &entry);
 		assert(status);
 
-		LOGWARNING("  %s(%d): %s", entry.short_src, entry.currentline, entry.name ? entry.name : "?");
+		LOGWARNING("  %s(%d): %s", entry.short_src, entry.currentline, entry.name ? entry.name : "(no name)");
 		depth++;
 	}
 	LOGWARNING("Stack trace end");
@@ -999,6 +1018,17 @@ AString cLuaState::GetTypeText(int a_StackPos)
 		case LUA_TTHREAD:        return "TTHREAD";
 	}
 	return Printf("Unknown (%d)", Type);
+}
+
+
+
+
+
+int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
+{
+	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
+	LogStackTrace(a_LuaState);
+	return 1;  // We left the error message on the stack as the return value
 }
 
 

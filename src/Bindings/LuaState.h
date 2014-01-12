@@ -85,6 +85,23 @@ public:
 	} ;
 	
 	
+	/** Used for calling functions stored in a reference-stored table */
+	class cTableRef
+	{
+		int m_TableRef;
+		const char * m_FnName;
+	public:
+		cTableRef(int a_TableRef, const char * a_FnName) :
+			m_TableRef(a_TableRef),
+			m_FnName(a_FnName)
+		{
+		}
+		
+		int GetTableRef(void) const { return m_TableRef; }
+		const char * GetFnName(void) const { return m_FnName; }
+	} ;
+	
+	
 	/// A dummy class that's used only to delimit function args from return values for cLuaState::Call()
 	class cRet
 	{
@@ -133,24 +150,6 @@ public:
 	/// Returns true if a_FunctionName is a valid Lua function that can be called
 	bool HasFunction(const char * a_FunctionName);
 	
-	/** Pushes the function of the specified name onto the stack.
-	Returns true if successful. Logs a warning on failure (incl. m_SubsystemName)
-	*/
-	bool PushFunction(const char * a_FunctionName);
-	
-	/** Pushes a function that has been saved into the global registry, identified by a_FnRef.
-	Returns true if successful. Logs a warning on failure
-	*/
-	bool PushFunction(int a_FnRef);
-	
-	/** Pushes a function that is stored in a table ref.
-	Returns true if successful, false on failure. Doesn't log failure.
-	*/
-	bool PushFunctionFromRefTable(cRef & a_TableRef, const char * a_FnName);
-	
-	/// Pushes a usertype of the specified class type onto the stack
-	void PushUserType(void * a_Object, const char * a_Type);
-
 	// Push a value onto the stack
 	void Push(const AString & a_String);
 	void Push(const AStringVector & a_Vector);
@@ -183,7 +182,7 @@ public:
 	void Push(void * a_Ptr);
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cBlockEntity * a_BlockEntity);
-	
+
 	/// Call any 0-param 0-return Lua function in a single line:
 	template <typename FnT>
 	bool Call(FnT a_FnName)
@@ -802,25 +801,6 @@ public:
 	}
 
 
-	/// Retrieve value returned at a_StackPos, if it is a valid bool. If not, a_ReturnedVal is unchanged
-	void GetReturn(int a_StackPos, bool & a_ReturnedVal);
-	
-	/// Retrieve value returned at a_StackPos, if it is a valid string. If not, a_ReturnedVal is unchanged
-	void GetReturn(int a_StackPos, AString & a_ReturnedVal);
-	
-	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
-	void GetReturn(int a_StackPos, int & a_ReturnedVal);
-	
-	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
-	void GetReturn(int a_StackPos, double & a_ReturnedVal);
-	
-	/**
-	Calls the function that has been pushed onto the stack by PushFunction(),
-	with arguments pushed by PushXXX().
-	Returns true if successful, logs a warning on failure.
-	*/
-	bool CallFunction(int a_NumReturnValues);
-	
 	/// Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions
 	bool CheckParamUserTable(int a_StartParam, const char * a_UserTable, int a_EndParam = -1);
 	
@@ -848,6 +828,9 @@ public:
 	/// Logs all items in the current stack trace to the server console
 	void LogStackTrace(void);
 	
+	/// Logs all items in the current stack trace to the server console
+	static void LogStackTrace(lua_State * a_LuaState);
+	
 	/// Returns the type of the item on the specified position in the stack
 	AString GetTypeText(int a_StackPos);
 	
@@ -867,6 +850,47 @@ protected:
 	
 	/// Number of arguments currently pushed (for the Push / Call chain)
 	int m_NumCurrentFunctionArgs;
+
+
+	/** Pushes the function of the specified name onto the stack.
+	Returns true if successful. Logs a warning on failure (incl. m_SubsystemName)
+	*/
+	bool PushFunction(const char * a_FunctionName);
+	
+	/** Pushes a function that has been saved into the global registry, identified by a_FnRef.
+	Returns true if successful. Logs a warning on failure
+	*/
+	bool PushFunction(int a_FnRef);
+	
+	/** Pushes a function that is stored in a referenced table by name
+	Returns true if successful. Logs a warning on failure
+	*/
+	bool PushFunction(const cTableRef & a_TableRef);
+	
+	/// Pushes a usertype of the specified class type onto the stack
+	void PushUserType(void * a_Object, const char * a_Type);
+
+	/// Retrieve value returned at a_StackPos, if it is a valid bool. If not, a_ReturnedVal is unchanged
+	void GetReturn(int a_StackPos, bool & a_ReturnedVal);
+	
+	/// Retrieve value returned at a_StackPos, if it is a valid string. If not, a_ReturnedVal is unchanged
+	void GetReturn(int a_StackPos, AString & a_ReturnedVal);
+	
+	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
+	void GetReturn(int a_StackPos, int & a_ReturnedVal);
+	
+	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
+	void GetReturn(int a_StackPos, double & a_ReturnedVal);
+	
+	/**
+	Calls the function that has been pushed onto the stack by PushFunction(),
+	with arguments pushed by PushXXX().
+	Returns true if successful, logs a warning on failure.
+	*/
+	bool CallFunction(int a_NumReturnValues);
+	
+	/** Used as the error reporting function for function calls */
+	static int ReportFnCallErrors(lua_State * a_LuaState);
 } ;
 
 

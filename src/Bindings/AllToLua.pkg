@@ -1,8 +1,6 @@
 
 $#include "../Globals.h"
 
-$#include "tolua_base.h"
-
 // Typedefs from Globals.h, so that we don't have to process that file:
 typedef long long Int64;
 typedef int       Int32;
