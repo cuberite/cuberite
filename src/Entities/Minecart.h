@@ -69,15 +69,15 @@ protected:
 
 
 
-class cEmptyMinecart :
+class cRideableMinecart :
 	public cMinecart
 {
 	typedef cMinecart super;
 	
 public:
-	CLASS_PROTODEF(cEmptyMinecart);
+	CLASS_PROTODEF(cRideableMinecart);
 	
-	cEmptyMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height);
+	cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height);
 
 	cItem GetContent(void)   const {return m_Content;}
 	int GetBlockHeight(void) const {return m_Height;}

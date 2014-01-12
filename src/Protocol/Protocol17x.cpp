@@ -1784,20 +1784,20 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			
 			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpNone)
 			{
-				cEmptyMinecart EmptyMinecart = ((cEmptyMinecart &)a_Entity);
-				if (!EmptyMinecart.GetContent().IsEmpty())
+				cRideableMinecart & RideableMinecart = ((cRideableMinecart &)a_Entity);
+				if (!RideableMinecart.GetContent().IsEmpty())
 				{
 					WriteByte(0x54);
-					int Content = EmptyMinecart.GetContent().m_ItemType;
-					Content |= EmptyMinecart.GetContent().m_ItemDamage << 8;
+					int Content = RideableMinecart.GetContent().m_ItemType;
+					Content |= RideableMinecart.GetContent().m_ItemDamage << 8;
 					WriteInt(Content);
 					WriteByte(0x55);
-					WriteInt(EmptyMinecart.GetBlockHeight());
+					WriteInt(RideableMinecart.GetBlockHeight());
 					WriteByte(0x56);
 					WriteByte(1);
 				}
 			}
-			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
+			else if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
 			{
 				WriteByte(0x10);
 				WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0);

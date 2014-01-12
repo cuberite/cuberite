@@ -364,7 +364,7 @@ public:
 	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
 
 	/// Spawns an minecart at the given coordinates.
-	int SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, cItem a_Content = cItem(), int a_BlockHeight = 1);
+	int SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
 
 	/// Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb.
 	int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward);

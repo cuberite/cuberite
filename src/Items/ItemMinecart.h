@@ -60,7 +60,7 @@ public:
 		cMinecart * Minecart = NULL;
 		switch (m_ItemType)
 		{
-			case E_ITEM_MINECART:             Minecart = new cEmptyMinecart        (x, y, z, cItem(), 1); break;
+			case E_ITEM_MINECART:             Minecart = new cRideableMinecart     (x, y, z, cItem(), 1); break;
 			case E_ITEM_CHEST_MINECART:       Minecart = new cMinecartWithChest    (x, y, z); break;
 			case E_ITEM_FURNACE_MINECART:     Minecart = new cMinecartWithFurnace  (x, y, z); break;
 			case E_ITEM_MINECART_WITH_TNT:    Minecart = new cMinecartWithTNT      (x, y, z); break;
