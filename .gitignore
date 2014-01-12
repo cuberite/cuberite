@@ -64,6 +64,7 @@ MCServer.dir/
 *.opensdf
 *.sdf
 *.sln
+*.idb
 
 #cmake output folders
 ZERO_CHECK.dir/
