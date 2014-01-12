@@ -218,13 +218,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Image Include="icon.ico" />
+    <Image Include="..\src\Resources\icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MCServer.rc" />
+    <ResourceCompile Include="..\src\Resources\MCServer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource_MCServer.h" />
+    <ClInclude Include="..\src\Resources\resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
     <ClInclude Include="..\src\BlockArea.h" />
     <ClInclude Include="..\src\BlockID.h" />

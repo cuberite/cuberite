@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MCServer"
 	ProjectGUID="{32012054-0C96-4C43-AB27-174FF8E72D66}"
 	RootNamespace="MCServer"
@@ -413,15 +413,15 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\icon.ico"
+				RelativePath="..\src\Resources\icon.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\MCServer.rc"
+				RelativePath="..\src\Resources\MCServer.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\resource_MCServer.h"
+				RelativePath="..\src\Resources\resource_MCServer.h"
 				>
 			</File>
 			<File
