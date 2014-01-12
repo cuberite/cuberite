@@ -321,7 +321,10 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_Health = 0;
 	}
 
-	AddSpeed(a_TDI.Knockback * 2);
+	if (IsMob() || IsPlayer()) // Knockback for only players and mobs
+	{
+		AddSpeed(a_TDI.Knockback * 2);
+	}
 
 	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_HURT);
 

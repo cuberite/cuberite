@@ -53,15 +53,16 @@ public:
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
 	
 	int LastDamage(void) const { return m_LastDamage; }
-	void HandleRailPhysics(float a_Dt, cChunk & a_Chunk);
 	ePayload GetPayload(void) const { return m_Payload; }
 	
 protected:
 	ePayload m_Payload;
+	int m_LastDamage;
 	
 	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
-
-	int m_LastDamage;
+	void HandleRailPhysics(NIBBLETYPE a_RailMeta);
+	void HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta);
+	void SnapToRail(NIBBLETYPE a_RailMeta);
 
 } ;
 
