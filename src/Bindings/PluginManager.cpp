@@ -169,9 +169,9 @@ void cPluginManager::InsertDefaultPlugins(cIniFile & a_SettingsIni)
 	a_SettingsIni.AddKeyComment("Plugins", " Plugin=HookNotify");
 	a_SettingsIni.AddKeyComment("Plugins", " Plugin=ChunkWorx");
 	a_SettingsIni.AddKeyComment("Plugins", " Plugin=APIDump");
-	a_SettingsIni.SetValue("Plugins", "Plugin", "Core");
-	a_SettingsIni.SetValue("Plugins", "Plugin", "TransAPI");
-	a_SettingsIni.SetValue("Plugins", "Plugin", "ChatLog");
+	a_SettingsIni.AddValue("Plugins", "Plugin", "Core");
+	a_SettingsIni.AddValue("Plugins", "Plugin", "TransAPI");
+	a_SettingsIni.AddValue("Plugins", "Plugin", "ChatLog");
 }
 
 
