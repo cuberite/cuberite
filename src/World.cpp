@@ -1648,23 +1648,23 @@ int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 
 
 
-int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType)
+int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, cItem a_Content, int a_BlockHeight)
 {
 	cMinecart * Minecart;
 	switch (a_MinecartType)
 	{
-		case E_ITEM_MINECART:             Minecart = new cEmptyMinecart        (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART:             Minecart = new cEmptyMinecart        (a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
 		case E_ITEM_CHEST_MINECART:       Minecart = new cMinecartWithChest    (a_X, a_Y, a_Z); break;
 		case E_ITEM_FURNACE_MINECART:     Minecart = new cMinecartWithFurnace  (a_X, a_Y, a_Z); break;
 		case E_ITEM_MINECART_WITH_TNT:    Minecart = new cMinecartWithTNT      (a_X, a_Y, a_Z); break;
 		case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (a_X, a_Y, a_Z); break;
 		default:
 		{
-			ASSERT(!"Unhandled minecart item");
 			return -1;
 		}
 	}  // switch (a_MinecartType)
 	Minecart->Initialize(this);
+	return Minecart->GetUniqueID();
 }
 
 

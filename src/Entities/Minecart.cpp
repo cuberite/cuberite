@@ -413,8 +413,10 @@ void cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cEmptyMinecart:
 
-cEmptyMinecart::cEmptyMinecart(double a_X, double a_Y, double a_Z) :
-	super(mpNone, a_X, a_Y, a_Z)
+cEmptyMinecart::cEmptyMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height) :
+	super(mpNone, a_X, a_Y, a_Z),
+	m_Content(a_Content),
+	m_Height(a_Height)
 {
 }
 

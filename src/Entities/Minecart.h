@@ -77,10 +77,16 @@ class cEmptyMinecart :
 public:
 	CLASS_PROTODEF(cEmptyMinecart);
 	
-	cEmptyMinecart(double a_X, double a_Y, double a_Z);
+	cEmptyMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height);
 
+	cItem GetContent(void)   const {return m_Content;}
+	int GetBlockHeight(void) const {return m_Height;}
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
+protected:
+
+	const cItem & m_Content;
+	int m_Height; 
 } ;
 
 

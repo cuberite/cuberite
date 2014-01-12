@@ -1781,7 +1781,22 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteInt(1); // Shaking direction, doesn't seem to affect anything
 			WriteByte(0x73);
 			WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
-
+			
+			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpNone)
+			{
+				cEmptyMinecart EmptyMinecart = ((cEmptyMinecart &)a_Entity);
+				if (!EmptyMinecart.GetContent().IsEmpty())
+				{
+					WriteByte(0x54);
+					int Content = EmptyMinecart.GetContent().m_ItemType;
+					Content |= EmptyMinecart.GetContent().m_ItemDamage << 8;
+					WriteInt(Content);
+					WriteByte(0x55);
+					WriteInt(EmptyMinecart.GetBlockHeight());
+					WriteByte(0x56);
+					WriteByte(1);
+				}
+			}
 			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
 			{
 				WriteByte(0x10);
