@@ -226,6 +226,7 @@
   <ItemGroup>
     <ClInclude Include="resource_MCServer.h" />
     <ClInclude Include="..\src\Authenticator.h" />
+    <ClInclude Include="..\src\BiomeDef.h" />
     <ClInclude Include="..\src\BlockArea.h" />
     <ClInclude Include="..\src\BlockID.h" />
     <ClInclude Include="..\src\BlockTracer.h" />
@@ -234,8 +235,6 @@
     <ClInclude Include="..\src\ChatColor.h" />
     <ClInclude Include="..\src\Chunk.h" />
     <ClInclude Include="..\src\ChunkDef.h" />
-    <ClInclude Include="..\src\BiomeDef.h" />
-    <ClInclude Include="..\src\BiomeDef.cpp" />
     <ClInclude Include="..\src\ChunkMap.h" />
     <ClInclude Include="..\src\ChunkSender.h" />
     <ClInclude Include="..\src\ClientHandle.h" />
@@ -374,7 +373,6 @@
     <ClInclude Include="..\src\Bindings\Plugin.h" />
     <ClInclude Include="..\src\Bindings\PluginLua.h" />
     <ClInclude Include="..\src\Bindings\PluginManager.h" />
-    <ClInclude Include="..\src\Bindings\tolua_base.h" />
     <ClInclude Include="..\src\Bindings\WebPlugin.h" />
     <ClInclude Include="..\lib\inifile\iniFile.h" />
     <ClInclude Include="..\lib\md5\md5.h" />
@@ -618,6 +616,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Authenticator.cpp" />
+    <ClCompile Include="..\src\BiomeDef.cpp" />
     <ClCompile Include="..\src\BlockArea.cpp" />
     <ClCompile Include="..\src\BlockID.cpp" />
     <ClCompile Include="..\src\BoundingBox.cpp" />
