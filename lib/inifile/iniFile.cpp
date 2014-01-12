@@ -137,7 +137,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			{
 				valuename = line.substr(0, pLeft);
 				value = line.substr(pLeft + 1);
-				SetValue(keyname, valuename, value);
+				AddValue(keyname, valuename, value);
 				break;
 			}
 
@@ -344,55 +344,79 @@ AString cIniFile::GetValueName(const AString & keyname, const int valueID) const
 
 
 
-bool cIniFile::SetValue(const int keyID, const int valueID, const AString & value)
+void cIniFile::AddValue(const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value)
 {
-	if ((keyID < (int)keys.size()) && (valueID < (int)keys[keyID].names.size()))
+	int keyID = FindKey(a_KeyName);
+	if (keyID == noID)
 	{
-		keys[keyID].values[valueID] = value;
+		keyID = int(AddKeyName(a_KeyName));
 	}
-	return false;
+
+	keys[keyID].names.push_back(a_ValueName);
+	keys[keyID].values.push_back(a_Value);
 }
 
 
 
 
 
-bool cIniFile::SetValue(const AString & keyname, const AString & valuename, const AString & value, bool const create)
+void cIniFile::AddValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value)
 {
-	int keyID = FindKey(keyname);
+	AddValue(a_KeyName, a_ValueName, Printf("%d", a_Value));
+}
+
+
+
+
+
+void cIniFile::AddValueF(const AString & a_KeyName, const AString & a_ValueName, const double a_Value)
+{
+	AddValue(a_KeyName, a_ValueName, Printf("%f", a_Value));
+}
+
+
+
+
+
+bool cIniFile::SetValue(const int keyID, const int valueID, const AString & value)
+{
+	if (((size_t)keyID >= keys.size()) || ((size_t)valueID >= keys[keyID].names.size()))
+	{
+		return false;
+	}
+	keys[keyID].values[valueID] = value;
+	return true;
+}
+
+
+
+
+
+bool cIniFile::SetValue(const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists)
+{
+	int keyID = FindKey(a_KeyName);
 	if (keyID == noID)
 	{
-		if (create)
-		{
-			keyID = int(AddKeyName(keyname));
-		}
-		else
+		if (!a_CreateIfNotExists)
 		{
 			return false;
 		}
+		keyID = AddKeyName(a_KeyName);
 	}
 
-	int valueID = FindValue(int(keyID), valuename);
+	int valueID = FindValue(keyID, a_ValueName);
 	if (valueID == noID)
 	{
-		if (!create)
+		if (!a_CreateIfNotExists)
 		{
 			return false;
 		}
-		keys[keyID].names.resize(keys[keyID].names.size() + 1, valuename);
-		keys[keyID].values.resize(keys[keyID].values.size() + 1, value);
+		keys[keyID].names.push_back(a_ValueName);
+		keys[keyID].values.push_back(a_Value);
 	}
 	else
 	{
-		if (!create)
-		{
-			keys[keyID].values[valueID] = value;
-		}
-		else
-		{
-			keys[keyID].names.resize(keys[keyID].names.size() + 1, valuename);
-			keys[keyID].values.resize(keys[keyID].values.size() + 1, value);
-		}
+		keys[keyID].values[valueID] = a_Value;
 	}
 
 	return true;
@@ -402,37 +426,32 @@ bool cIniFile::SetValue(const AString & keyname, const AString & valuename, cons
 
 
 
-bool cIniFile::SetValueI(const AString & keyname, const AString & valuename, const int value, bool const create)
+bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists)
 {
-	AString Data;
-	Printf(Data, "%d", value);
-	return SetValue(keyname, valuename, Data, create);
+	return SetValue(a_KeyName, a_ValueName, Printf("%d", a_Value), a_CreateIfNotExists);
 }
 
 
 
 
 
-bool cIniFile::SetValueF(const AString & keyname, const AString & valuename, double const value, bool const create)
+bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName, double const a_Value, const bool a_CreateIfNotExists)
 {
-	AString Data;
-	Printf(Data, "%f", value);
-	return SetValue(keyname, valuename, Data, create);
+	return SetValue(a_KeyName, a_ValueName, Printf("%f", a_Value), a_CreateIfNotExists);
 }
 
 
 
 
 
-bool cIniFile::SetValueV(const AString & keyname, const AString & valuename, char * format, ...)
+bool cIniFile::SetValueV(const AString & a_KeyName, const AString & a_ValueName, const char * a_Format, ...)
 {
 	va_list args;
-	va_start(args, format);
-
+	va_start(args, a_Format);
 	AString Data;
-	AppendVPrintf(Data, format, args);
+	AppendVPrintf(Data, a_Format, args);
 	va_end(args);
-	return SetValue(keyname, valuename, Data);
+	return SetValue(a_KeyName, a_ValueName, Data);
 }
 
 
