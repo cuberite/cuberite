@@ -16,6 +16,7 @@
 // Entities (except mobs):
 #include "Entities/ExpOrb.h"
 #include "Entities/FallingBlock.h"
+#include "Entities/Minecart.h"
 #include "Entities/Pickup.h"
 #include "Entities/Player.h"
 #include "Entities/TNTEntity.h"
@@ -1641,6 +1642,29 @@ int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
 	ExpOrb->Initialize(this);
 	return ExpOrb->GetUniqueID();
+}
+
+
+
+
+
+int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType)
+{
+	cMinecart * Minecart;
+	switch (a_MinecartType)
+	{
+		case E_ITEM_MINECART:             Minecart = new cEmptyMinecart        (a_X, a_Y, a_Z); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = new cMinecartWithChest    (a_X, a_Y, a_Z); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = new cMinecartWithFurnace  (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = new cMinecartWithTNT      (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (a_X, a_Y, a_Z); break;
+		default:
+		{
+			ASSERT(!"Unhandled minecart item");
+			return -1;
+		}
+	}  // switch (a_MinecartType)
+	Minecart->Initialize(this);
 }
 
 
