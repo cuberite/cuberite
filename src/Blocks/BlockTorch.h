@@ -98,7 +98,7 @@ public:
 
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, char a_BlockFace)
 	{
-		if ( !g_BlockIsTorchPlaceable[a_BlockType] )
+		if ( !g_BlockFullyOccupiesVoxel[a_BlockType] )
 		{
 			return (a_BlockFace == BLOCK_FACE_TOP);  // Allow placement only when torch upright (for glass, etc.); exceptions won't even be sent by client, no need to handle
 		}
@@ -127,7 +127,7 @@ public:
 			{
 				return i;
 			}
-			else if ((g_BlockIsTorchPlaceable[BlockInQuestion]) && (i != BLOCK_FACE_BOTTOM))
+			else if ((g_BlockFullyOccupiesVoxel[BlockInQuestion]) && (i != BLOCK_FACE_BOTTOM))
 			{
 				// Otherwise, if block in that direction is torch placeable and we haven't gotten to it via the bottom face, return that face
 				return i;
@@ -161,7 +161,7 @@ public:
 			// No need to check for upright orientation, it was done when the torch was placed
 			return true;
 		}
-		else if ( !g_BlockIsTorchPlaceable[BlockInQuestion] )
+		else if ( !g_BlockFullyOccupiesVoxel[BlockInQuestion] )
 		{
 			return false;
 		}

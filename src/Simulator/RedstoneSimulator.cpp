@@ -44,83 +44,46 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 
 	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
+	
+	BLOCKTYPE Block;
+	NIBBLETYPE Meta;
+	a_Chunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
 
-	if (!IsAllowedBlock(a_Chunk->GetBlock(RelX, a_BlockY, RelZ)))
+	// Every time a block is changed (AddBlock called), we want to go through all lists and check to see if the coordiantes stored within are still valid
+	// Checking only when a block is changed, as opposed to every tick, also improves performance
+
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
 	{
-		return;
-	}
-
-	// Check for duplicates:
-	cRedstoneSimulatorChunkData & ChunkData = a_Chunk->GetRedstoneSimulatorData();
-	for (cRedstoneSimulatorChunkData::const_iterator itr = ChunkData.begin(); itr != ChunkData.end(); ++itr)
-	{
-		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
-		{
-			return;
-		}
-	}
-
-	ChunkData.push_back(cCoordWithInt(RelX, a_BlockY, RelZ));
-}
-
-
-
-
-
-void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
-{
-	cRedstoneSimulatorChunkData & ChunkData = a_Chunk->GetRedstoneSimulatorData();
-	if (ChunkData.empty())
-	{
-		return;
-	}
-
-	int BaseX = a_Chunk->GetPosX() * cChunkDef::Width;
-	int BaseZ = a_Chunk->GetPosZ() * cChunkDef::Width;
-
-	// Check to see if PoweredBlocks have invalid items (source is air or unpowered)
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end();)
-	{
-		int RelX = itr->a_SourcePos.x - a_ChunkX * cChunkDef::Width;
-		int RelZ = itr->a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
-		int DestRelX = itr->a_BlockPos.x - a_ChunkX * cChunkDef::Width;
-		int DestRelZ = itr->a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
-
-		BLOCKTYPE SourceBlockType;
-		NIBBLETYPE SourceBlockMeta;
-		BLOCKTYPE DestBlockType;
-		if (
-			!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta) ||
-			!a_Chunk->UnboundedRelGetBlockType(DestRelX, itr->a_BlockPos.y, DestRelZ, DestBlockType)
-			)
+		if (!itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			continue;
 		}
 
-		if (SourceBlockType != itr->a_SourceBlock)
+		if (!IsPotentialSource(Block))
 		{
-			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past block type mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
-			itr = m_PoweredBlocks.erase(itr);
+			LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list as it no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
+			m_PoweredBlocks.erase(itr);
+			break;
 		}
 		else if (
 			// Changeable sources
-			((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (SourceBlockMeta == 0)) ||
-			((SourceBlockType == E_BLOCK_LEVER) && !IsLeverOn(SourceBlockMeta)) ||
-			((SourceBlockType == E_BLOCK_DETECTOR_RAIL) && (SourceBlockMeta & 0x08) == 0x08) ||
-			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta))) ||
-			(((SourceBlockType == E_BLOCK_STONE_PRESSURE_PLATE) || (SourceBlockType == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (SourceBlockMeta == 0))
+			((Block == E_BLOCK_REDSTONE_WIRE) && (Meta == 0)) ||
+			((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
+			((Block == E_BLOCK_DETECTOR_RAIL) && (Meta & 0x08) == 0x08) ||
+			(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta))) ||
+			(((Block == E_BLOCK_STONE_PRESSURE_PLATE) || (Block == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (Meta == 0))
 			)
 		{
-			LOGD("cRedstoneSimulator: Erased block %s from powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
-			itr = m_PoweredBlocks.erase(itr);
+			LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
+			m_PoweredBlocks.erase(itr);
+			break;
 		}
-		else if (SourceBlockType == E_BLOCK_DAYLIGHT_SENSOR)
+		else if (Block == E_BLOCK_DAYLIGHT_SENSOR)
 		{
 			if (!a_Chunk->IsLightValid())
 			{
-				m_World.QueueLightChunk(a_ChunkX, a_ChunkZ);
-				++itr;
-				continue;
+				m_World.QueueLightChunk(a_Chunk->GetPosX(), a_Chunk->GetPosZ());
+				break;
 			}
 			else
 			{
@@ -130,126 +93,125 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 				if (a_Chunk->GetTimeAlteredLight(SkyLight) <= 8) // Could use SkyLight - m_World.GetSkyDarkness();
 				{
 					LOGD("cRedstoneSimulator: Erased daylight sensor from powered blocks list due to insufficient light level");
-					itr = m_PoweredBlocks.erase(itr);
-				}
-				else
-				{
-					++itr;
-					continue;
+					m_PoweredBlocks.erase(itr);
+					break;
 				}
 			}
 		}
-		else if ((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (DestBlockType == E_BLOCK_REDSTONE_WIRE))
+	}
+
+	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
+	{
+		if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			// It is simply not allowed that a wire powers another wire, presuming that data here is sane and a dest and source are beside each other
-			LOGD("cRedstoneSimulator: Erased redstone wire from powered blocks list because its source was also wire");
-			itr = m_PoweredBlocks.erase(itr);
+			if (!IsPotentialSource(Block))
+			{
+				LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
+				m_LinkedPoweredBlocks.erase(itr);
+				break;
+			}
+			else if (
+				// Things that can send power through a block but which depends on meta
+				((Block == E_BLOCK_REDSTONE_WIRE) && (Meta == 0)) ||
+				((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
+				(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta)))
+				)
+			{
+				LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
+				m_LinkedPoweredBlocks.erase(itr);
+				break;
+			}
 		}
-		else
+		else if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			++itr;
+			if (!IsViableMiddleBlock(Block))
+			{
+				LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer powered through a valid middle block", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
+				m_LinkedPoweredBlocks.erase(itr);
+				break;
+			}
 		}
 	}
 
-	// Check to see if LinkedPoweredBlocks have invalid items: source, block powered through, or power destination block has changed
-	for (LinkedBlocksList::iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end();)
+	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end(); ++itr)
 	{
-		int RelX = itr->a_SourcePos.x - a_ChunkX * cChunkDef::Width;
-		int RelZ = itr->a_SourcePos.z - a_ChunkZ * cChunkDef::Width;
-		int MidRelX = itr->a_MiddlePos.x - a_ChunkX * cChunkDef::Width;
-		int MidRelZ = itr->a_MiddlePos.z - a_ChunkZ * cChunkDef::Width;
-
-		BLOCKTYPE SourceBlockType;
-		NIBBLETYPE SourceBlockMeta;
-		BLOCKTYPE MiddleBlockType;
-		if (
-			!a_Chunk->UnboundedRelGetBlock(RelX, itr->a_SourcePos.y, RelZ, SourceBlockType, SourceBlockMeta) ||
-			!a_Chunk->UnboundedRelGetBlockType(MidRelX, itr->a_MiddlePos.y, MidRelZ, MiddleBlockType)
-			)
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			continue;
 		}
 
-		if (SourceBlockType != itr->a_SourceBlock)
+		if (!IsAllowedBlock(Block))
 		{
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past block type mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
-			itr = m_LinkedPoweredBlocks.erase(itr);
-		}
-		else if (MiddleBlockType != itr->a_MiddleBlock)
-		{
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past middle block mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
-			itr = m_LinkedPoweredBlocks.erase(itr);
-		}
-		else if (
-			// Things that can send power through a block but which depends on meta
-			((SourceBlockType == E_BLOCK_REDSTONE_WIRE) && (SourceBlockMeta == 0)) ||
-			((SourceBlockType == E_BLOCK_LEVER) && !IsLeverOn(SourceBlockMeta)) ||
-			(((SourceBlockType == E_BLOCK_STONE_BUTTON) || (SourceBlockType == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(SourceBlockMeta)))
-			)
-		{
-			LOGD("cRedstoneSimulator: Erased block %s from linked powered blocks list due to present/past metadata mismatch", ItemToFullString(itr->a_SourceBlock).c_str());
-			itr = m_LinkedPoweredBlocks.erase(itr);
-		}
-		else
-		{
-			++itr;
+			LOGD("cRedstoneSimulator: Erased block @ {%i, %i, %i} from toggleable simulated list as it is no longer redstone", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
+			m_SimulatedPlayerToggleableBlocks.erase(itr);
+			break;
 		}
 	}
 
-	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks.begin(); itr != m_SimulatedPlayerToggleableBlocks.end();)
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end(); ++itr)
 	{
-		int RelX = itr->a_BlockPos.x - a_ChunkX * cChunkDef::Width;
-		int RelZ = itr->a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
-
-		BLOCKTYPE SourceBlockType;
-		if (!a_Chunk->UnboundedRelGetBlockType(RelX, itr->a_BlockPos.y, RelZ, SourceBlockType))
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			continue;
 		}
-		else if (!IsAllowedBlock(SourceBlockType))
+
+		if ((Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF))
 		{
-			LOGD("cRedstoneSimulator: Erased block %s from toggleable simulated list as block is no longer redstone", ItemToFullString(SourceBlockType).c_str());
-			itr = m_SimulatedPlayerToggleableBlocks.erase(itr);
-		}
-		else
-		{
-			++itr;
+			m_RepeatersDelayList.erase(itr);
+			break;
 		}
 	}
 
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList.begin(); itr != m_RepeatersDelayList.end();)
+	cRedstoneSimulatorChunkData & ChunkData = a_Chunk->GetRedstoneSimulatorData();
+	for (cRedstoneSimulatorChunkData::iterator itr = ChunkData.begin(); itr != ChunkData.end(); ++itr)
 	{
-		int RelX = itr->a_BlockPos.x - a_ChunkX * cChunkDef::Width;
-		int RelZ = itr->a_BlockPos.z - a_ChunkZ * cChunkDef::Width;
-
-		BLOCKTYPE SourceBlockType;
-		if (!a_Chunk->UnboundedRelGetBlockType(RelX, itr->a_BlockPos.y, RelZ, SourceBlockType))
+		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ)) // We are at an entry matching the current (changed) block
 		{
-			continue;
+			if (!IsAllowedBlock(Block))
+			{
+				ChunkData.erase(itr); // The new blocktype is not redstone; it must be removed from this list
+			}
+			else
+			{
+				itr->Data = Block; // Update block information
+			}
+			return;
 		}
-
-		if ((SourceBlockType != E_BLOCK_REDSTONE_REPEATER_ON) && (SourceBlockType != E_BLOCK_REDSTONE_REPEATER_OFF))
-		{
-			itr = m_RepeatersDelayList.erase(itr);
-			continue;
-		}
-
-		++itr;
 	}
 
-	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(), end = ChunkData.end(); dataitr != end;)
+	if (!IsAllowedBlock(Block))
 	{
-		BLOCKTYPE BlockType = a_Chunk->GetBlock(dataitr->x, dataitr->y, dataitr->z);
-		if (!IsAllowedBlock(BlockType))
-		{
-			dataitr = ChunkData.erase(dataitr);
-			continue;
-		}
+		return;
+	}
 
-		// PoweredBlock and LinkedPoweredBlock list was fine, now to the actual handling
+	ChunkData.push_back(cCoordWithBlock(RelX, a_BlockY, RelZ, Block));
+}
+
+
+
+
+
+void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+{
+	// We still attempt to simulate all blocks in the chunk every tick, because of outside influence that needs to be taken into account
+	// For example, repeaters need to be ticked, pressure plates checked for entities, daylight sensor checked for light changes, etc.
+	// The easiest way to make this more efficient is probably just to reduce code within the handlers that put too much strain on server, like getting or setting blocks
+	// A marking dirty system might be a TODO for later on, perhaps
+
+	cRedstoneSimulatorChunkData & ChunkData = a_Chunk->GetRedstoneSimulatorData();
+	if (ChunkData.empty())
+	{
+		return;
+	}
+
+	int BaseX = a_Chunk->GetPosX() * cChunkDef::Width;
+	int BaseZ = a_Chunk->GetPosZ() * cChunkDef::Width;
+
+	for (cRedstoneSimulatorChunkData::const_iterator dataitr = ChunkData.begin(); dataitr != ChunkData.end(); ++dataitr)
+	{
 		int a_X = BaseX + dataitr->x;
 		int a_Z = BaseZ + dataitr->z;
-		switch (BlockType)
+		switch (dataitr->Data)
 		{
 			case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(a_X, dataitr->y, a_Z);	break;
 			case E_BLOCK_LEVER:                 HandleRedstoneLever(a_X, dataitr->y, a_Z);	break;
@@ -262,19 +224,19 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
 			{
-				HandleRedstoneTorch(a_X, dataitr->y, a_Z, BlockType);
+				HandleRedstoneTorch(a_X, dataitr->y, a_Z, dataitr->Data);
 				break;
 			}
 			case E_BLOCK_STONE_BUTTON:
 			case E_BLOCK_WOODEN_BUTTON:
 			{
-				HandleRedstoneButton(a_X, dataitr->y, a_Z, BlockType);
+				HandleRedstoneButton(a_X, dataitr->y, a_Z, dataitr->Data);
 				break;
 			}
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			{
-				HandleRedstoneRepeater(a_X, dataitr->y, a_Z, BlockType);
+				HandleRedstoneRepeater(a_X, dataitr->y, a_Z, dataitr->Data);
 				break;
 			}
 			case E_BLOCK_PISTON:
@@ -286,7 +248,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			case E_BLOCK_REDSTONE_LAMP_OFF:
 			case E_BLOCK_REDSTONE_LAMP_ON:
 			{
-				HandleRedstoneLamp(a_X, dataitr->y, a_Z, BlockType);
+				HandleRedstoneLamp(a_X, dataitr->y, a_Z, dataitr->Data);
 				break;
 			}
 			case E_BLOCK_DISPENSER:
@@ -305,18 +267,16 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 			case E_BLOCK_DETECTOR_RAIL:
 			case E_BLOCK_POWERED_RAIL:
 			{
-				HandleRail(a_X, dataitr->y, a_Z, BlockType);
+				HandleRail(a_X, dataitr->y, a_Z, dataitr->Data);
 				break;
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			{
-				HandlePressurePlate(a_X, dataitr->y, a_Z, BlockType);
+				HandlePressurePlate(a_X, dataitr->y, a_Z, dataitr->Data);
 				break;
 			}
 		}
-
-		++dataitr;
 	}
 }
 
@@ -487,7 +447,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 	};
 
 	// Check to see if directly beside a power source
-	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
+	if (IsWirePowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
 		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 15); // Maximum power
 	}
@@ -546,6 +506,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 			// However, self not directly powered anymore, so source must have been removed,
 			// therefore, self must be set to meta zero
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
+			m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 			return; // No need to process block power sets because self not powered
 		}
 		else
@@ -693,7 +654,7 @@ void cRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int 
 			// Apparently, incrementing ticks only works reliably here, and not in SimChunk;
 			// With a world with lots of redstone, the repeaters simply do not delay
 			// I am confounded to say why. Perhaps optimisation failure.
-			LOGD("Incremented a repeater @ %i %i %i | Elapsed ticks: %i | Target delay: %i", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z, itr->a_ElapsedTicks, itr->a_DelayTicks);
+			LOGD("Incremented a repeater @ {%i %i %i} | Elapsed ticks: %i | Target delay: %i", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z, itr->a_ElapsedTicks, itr->a_DelayTicks);
 			itr->a_ElapsedTicks++;
 		}
 	}
@@ -781,48 +742,20 @@ void cRedstoneSimulator::HandleTNT(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cRedstoneSimulator::HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	if ((m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x08) == 0x08)
+	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
-		// Block position is located at top half of door
-		// Is Y - 1 both within world boundaries, a door block, and the bottom half of a door?
-		// The bottom half stores the open/closed information
-		if (
-			(a_BlockY - 1 >= 0) &&
-			((m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_DOOR) || (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_IRON_DOOR)) &&
-			(m_World.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ & 0x08) == 0)
-			)
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
 		{
-			if ((m_World.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ) & 0x04) == 0) // Closed door?
-			{
-				if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) // Powered? If so, toggle open
-				{
-					cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
-				}
-			}
-			else // Opened door
-			{
-				if (!AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) // Unpowered? Close if so
-				{
-					cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
-				}
-			}
+			cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
 		}
 	}
 	else
 	{
-		if ((m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x04) == 0) // Closed door?
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
 		{
-			if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) // Powered? If so, toggle open
-			{
-				cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
-			}
-		}
-		else // Opened door
-		{
-			if (!AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ)) // Unpowered? Close if so
-			{
-				cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
-			}
+			cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}
 }
@@ -1188,6 +1121,33 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 
 
 
+bool cRedstoneSimulator::IsWirePowered(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
+	{
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+
+		if (m_World.GetBlock(itr->a_SourcePos) != E_BLOCK_REDSTONE_WIRE)
+		{
+			return true;
+		}
+	}
+
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr)
+	{
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+
+		if (m_World.GetBlock(itr->a_SourcePos) != E_BLOCK_REDSTONE_WIRE)
+		{
+			return true;
+		}
+	}
+	return false; // Source was in front of the piston's front face
+}
+
+
+
+
 
 bool cRedstoneSimulator::AreCoordsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool IsCurrentStatePowered)
 {
@@ -1333,11 +1293,6 @@ void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_Block
 		// Don't set air, fixes some bugs (wires powering themselves)
 		return;
 	}
-	if ((Block == E_BLOCK_REDSTONE_WIRE) && (a_SourceBlock == E_BLOCK_REDSTONE_WIRE))
-	{
-		// Wires cannot power themselves normally, instead, the wire handler will manually set meta
-		return;
-	}
 
 	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr) // Check powered list
 	{
@@ -1354,7 +1309,6 @@ void cRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_Block
 	sPoweredBlocks RC;
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 	RC.a_SourcePos = Vector3i(a_SourceX, a_SourceY, a_SourceZ);
-	RC.a_SourceBlock = a_SourceBlock;
 	m_PoweredBlocks.push_back(RC);
 }
 
@@ -1379,11 +1333,6 @@ void cRedstoneSimulator::SetBlockLinkedPowered(
 	{
 		return;
 	}
-	if ((a_SourceBlock == E_BLOCK_REDSTONE_WIRE) && (DestBlock == E_BLOCK_REDSTONE_WIRE))
-	{
-		// Wires cannot power another wire through a block
-		return;
-	}
 
 	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks.begin(); itr != m_LinkedPoweredBlocks.end(); ++itr) // Check linked powered list
 	{
@@ -1402,8 +1351,6 @@ void cRedstoneSimulator::SetBlockLinkedPowered(
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 	RC.a_MiddlePos = Vector3i(a_MiddleX, a_MiddleY, a_MiddleZ);
 	RC.a_SourcePos = Vector3i(a_SourceX, a_SourceY, a_SourceZ);
-	RC.a_SourceBlock = a_SourceBlock;
-	RC.a_MiddleBlock = a_MiddleBlock;
 	m_LinkedPoweredBlocks.push_back(RC);
 }
 
