@@ -1884,3 +1884,29 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 
 
 
+
+void cPlayer::Detach()
+{
+	super::Detach();
+	int PosX = (int)floor(GetPosX());
+	int PosY = (int)floor(GetPosY());
+	int PosZ = (int)floor(GetPosZ());
+
+	// Search for a position within an area to teleport player after detachment
+	// Position must be solid land, and occupied by a nonsolid block
+	// If nothing found, player remains where they are
+	for (int x = PosX - 2; x <= (PosX + 2); ++x)
+	{
+		for (int y = PosY; y <= (PosY + 3); ++y)
+		{
+			for (int z = PosZ - 2; z <= (PosZ + 2); ++z)
+			{
+				if (!g_BlockIsSolid[m_World->GetBlock(x, y, z)] && g_BlockIsSolid[m_World->GetBlock(x, y - 1, z)])
+				{
+					TeleportToCoords(x, y, z);
+					return;
+				}
+			}
+		}
+	}
+}

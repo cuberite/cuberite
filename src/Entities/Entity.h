@@ -327,7 +327,7 @@ public:
 	void AttachTo(cEntity * a_AttachTo);
 	
 	/// Detaches from the currently attached entity, if any
-	void Detach(void);
+	virtual void Detach(void);
 	
 	/// Makes sure head yaw is not over the specified range.
 	void WrapHeadYaw();

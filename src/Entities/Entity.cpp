@@ -1107,9 +1107,11 @@ void cEntity::AttachTo(cEntity * a_AttachTo)
 		// Already attached to that entity, nothing to do here
 		return;
 	}
-
-	// Detach from any previous entity:
-	Detach();
+	if (m_AttachedTo != NULL)
+	{
+		// Detach from any previous entity:
+		Detach();
+	}
 
 	// Attach to the new entity:
 	m_AttachedTo = a_AttachTo;
