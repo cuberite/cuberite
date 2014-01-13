@@ -1249,7 +1249,7 @@ bool cConnection::HandleServerLoginDisconnect(void)
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Reason);
 	Log("Received a login-disconnect packet from the server:");
 	Log("  Reason = \"%s\"", Reason.c_str());
-	COPY_TO_SERVER();
+	COPY_TO_CLIENT();
 	return true;
 }
 
