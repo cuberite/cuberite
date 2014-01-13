@@ -90,6 +90,16 @@ if exist %TAGFILE% (
 
 
 
+
+
+:: Configure the sources to use the MSVC2008 compiler:
+cmake -G "Visual Studio 9 2008" .
+if errorlevel 1 goto haderror
+
+
+
+
+
 :: Update the Bindings:
 echo Updating Lua bindings
 del src\Bindings\Bindings.cpp
@@ -107,7 +117,7 @@ echo Setting up VS environment...
 call "%VS90COMNTOOLS%\vsvars32.bat"
 echo Compiling MCServer...
 title MCS Nightbuild
-start "vc" /b /wait /low /min %vc% /r vc2008\MCServer.sln "Release|Win32"
+start "vc" /b /wait /low /min %vc% /r MCServer.sln "Release|Win32"
 if errorlevel 1 goto haderror
 
 
