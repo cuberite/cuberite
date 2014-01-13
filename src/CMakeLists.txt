@@ -55,7 +55,6 @@ else ()
 			"${PATH}/*.rc"
 		)
 		source_group("${PATH}" FILES ${FOLDER_FILES})
-		message("Files included in folder " ${PATH} ": " "${FOLDER_FILES}")
 	endfunction(includefolder)
 
 	foreach(folder ${FOLDERS})
