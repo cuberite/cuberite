@@ -72,10 +72,6 @@ void cSocket::CloseSocket()
 	
 	#else  // _WIN32
 	
-	if (shutdown(m_Socket, SHUT_RDWR) != 0)//SD_BOTH);
-	{
-		LOGWARN("Error on shutting down socket %d (%s): %s", m_Socket, m_IPString.c_str(), GetLastErrorString().c_str());
-	}
 	if (close(m_Socket) != 0)
 	{
 		LOGWARN("Error closing socket %d (%s): %s", m_Socket, m_IPString.c_str(), GetLastErrorString().c_str());
