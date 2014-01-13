@@ -25,6 +25,15 @@ if (NOT MSVC)
 
 	list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")
 
+	# If building a windows version, but not using MSVC, add the resources directly to the makefile:
+	if (WIN32)
+		FILE(GLOB ResourceFiles
+			"Resources/*.rc"
+		)
+		list(APPEND SOURCE "${ResourceFiles}")
+	endif()
+
+
 else ()
 
 	# Generate the Bindings if they don't exist:
@@ -37,12 +46,16 @@ else ()
 		)
 	endif()
 
+	# Add all subfolders as solution-folders:
+	list(APPEND FOLDERS "Resources")
 	function(includefolder PATH)
 		FILE(GLOB FOLDER_FILES
 			"${PATH}/*.cpp"
 			"${PATH}/*.h"
+			"${PATH}/*.rc"
 		)
 		source_group("${PATH}" FILES ${FOLDER_FILES})
+		message("Files included in folder " ${PATH} ": " "${FOLDER_FILES}")
 	endfunction(includefolder)
 
 	foreach(folder ${FOLDERS})
@@ -69,8 +82,8 @@ else ()
 	SET_SOURCE_FILES_PROPERTIES(
 		"StackWalker.cpp LeakFinder.h" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
 	)
+	list(APPEND SOURCE "Resources/MCServer.rc")
 endif()
-
 
 set(EXECUTABLE MCServer)
 
