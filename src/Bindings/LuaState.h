@@ -177,7 +177,6 @@ public:
 	void Push(cWebAdmin * a_WebAdmin);
 	void Push(const HTTPTemplateRequest * a_Request);
 	void Push(cTNTEntity * a_TNTEntity);
-	void Push(cCreeper * a_Creeper);
 	void Push(Vector3i * a_Vector);
 	void Push(void * a_Ptr);
 	void Push(cHopperEntity * a_Hopper);

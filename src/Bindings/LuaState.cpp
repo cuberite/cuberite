@@ -632,18 +632,6 @@ void cLuaState::Push(cTNTEntity * a_TNTEntity)
 
 
 
-void cLuaState::Push(cCreeper * a_Creeper)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Creeper, "cCreeper");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(Vector3i * a_Vector)
 {
 	ASSERT(IsValid());
