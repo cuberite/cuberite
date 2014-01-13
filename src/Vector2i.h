@@ -1,9 +1,10 @@
 #pragma once
 
+#include "Vector2b.h"
+
 class Vector2i
 {                                
-public:            
-        Vector2i( const Vector2d & v ) : x( (int)v.x ), z( (int)v.z ){}
+public:
 
         Vector2i() : x(0), z(0){}
         Vector2i(int a_x, int a_z) : x(a_x), z(a_z) {}
@@ -23,13 +24,26 @@ public:
 
         friend Vector2i operator + ( const Vector2i& v1, const Vector2i& v2 ) { return Vector2i( v1.x + v2.x, v1.z + v2.z ); }
         friend Vector2i operator + ( const Vector2i& v1, Vector2i* v2 ) { return Vector2i( v1.x + v2->x,  v1.z + v2->z ); }
+        friend Vector2i operator + ( const Vector2i& v, int s) { return Vector2i( v.x + s,  v.z + s ); }
         friend Vector2i operator - ( const Vector2i& v1, const Vector2i& v2 ) { return Vector2i( v1.x - v2.x,  v1.z - v2.z ); }
         friend Vector2i operator - ( const Vector2i& v1, Vector2i* v2 ) { return Vector2i( v1.x - v2->x, v1.z - v2->z ); }
         friend Vector2i operator - ( const Vector2i* v1, Vector2i& v2 ) { return Vector2i( v1->x - v2.x, v1->z - v2.z ); }
+        friend Vector2i operator - ( const Vector2i& v, int s ) { return Vector2i( v.x - s, v.z - s ); }
         friend Vector2i operator * ( const Vector2i& v, const int f ) { return Vector2i( v.x * f, v.z * f ); }
         friend Vector2i operator * ( const Vector2i& v1, const Vector2i& v2 ) { return Vector2i( v1.x * v2.x, v1.z * v2.z ); }
         friend Vector2i operator * ( const int f, const Vector2i& v ) { return Vector2i( v.x * f, v.z * f ); }
-        friend bool operator < ( const Vector2i& v1, const Vector2i& v2 ) { return (v1.x<v2.x)||(v1.x==v2.x && v1.z<v2.z); }
+        friend Vector2b operator < ( const Vector2i& v1, const Vector2i& v2 )
+        { 
+		    bool x = v1.x<v2.x;
+		    bool z = v1.z<v2.z;
+		    return Vector2b(x,z);
+        }
+        
+        friend Vector2b operator > ( const Vector2i& v1, const Vector2i& v2 )
+        { 
+		    return v2 > v1;
+        }
+        
 
         int x, z;
 };
