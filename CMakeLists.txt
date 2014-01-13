@@ -46,10 +46,15 @@ else()
 	add_flags_cxx("-pthread")
 endif()
 
-# Allow for a forced 32-bit build under 32-bit OS:
+# Allow for a forced 32-bit build under 64-bit OS:
 if (FORCE_32)
 	add_flags_cxx("-m32")
 	add_flags_lnk("-m32")
+endif()
+
+#have the compiler generate code spercificly targeted at the current machine on Linux
+if(LINUX AND NOT CROSSCOMPILE)
+	add_flags_cxx("-march=native")
 endif()
 
 # Set lower warnings-level for the libraries:
