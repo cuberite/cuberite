@@ -171,7 +171,13 @@ public:
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
 	void HandleDisconnect       (const AString & a_Reason);
 	void HandleEntityAction     (int a_EntityID, char a_ActionID);
+	
+	/** Called when the protocol handshake has been received (for protocol versions that support it;
+	otherwise the first instant when a username is received).
+	Returns true if the player is to be let in, false if they were disconnected
+	*/
 	bool HandleHandshake        (const AString & a_Username);
+	
 	void HandleKeepAlive        (int a_KeepAliveID);
 	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	void HandlePing             (void);

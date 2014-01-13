@@ -216,8 +216,23 @@ void cProtocol172::SendDestroyEntity(const cEntity & a_Entity)
 
 void cProtocol172::SendDisconnect(const AString & a_Reason)
 {
-	cPacketizer Pkt(*this, 0x40);
-	Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
+	switch (m_State)
+	{
+		case 2:
+		{
+			// During login:
+			cPacketizer Pkt(*this, 0);
+			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
+			break;
+		}
+		case 3:
+		{
+			// In-game:
+			cPacketizer Pkt(*this, 0x40);
+			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
+			break;
+		}
+	}
 }
 
 
@@ -1155,6 +1170,12 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 	a_ByteBuffer.ReadVarUTF8String(Username);
 	
 	// TODO: Protocol encryption should be set up here if not localhost / auth
+	
+	if (!m_Client->HandleHandshake(Username))
+	{
+		// The client is not welcome here, they have been sent a Kick packet already
+		return;
+	}
 	
 	// Send login success:
 	{
