@@ -707,7 +707,9 @@ end
 				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
 				IsCrouched = { Params = "", Return = "bool", Notes = "Returns true if the entity is crouched. Always false for entities that don't support crouching." },
 				IsDestroyed = { Params = "", Return = "bool", Notes = "Returns true if the entity has been destroyed and is awaiting removal from the internal structures." },
+				IsExpOrb = { Params = "", Return = "bool", Notes = "Returns true if the entity represents an experience orb" },
 				IsFallingBlock = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cFallingBlock}} entity." },
+				IsFloater = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a fishing rod floater" },
 				IsInvisible = { Params = "", Return = "bool", Notes = "Returns true if the entity is invisible" },
 				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cMinecart|minecart}}" },
 				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any {{cMonster|mob}}." },
@@ -768,6 +770,7 @@ end
 				etEntity = { Notes = "No further specialization available" },
 				etExpOrb = { Notes = "The entity is a {{cExpOrb}}" },
 				etFallingBlock = { Notes = "The entity is a {{cFallingBlock}}" },
+				etFloater = { Notes = "The entity is a fishing rod floater" },
 				etMob = { Notes = "The entity is a {{cMonster}} descendant" },
 				etMonster = { Notes = "The entity is a {{cMonster}} descendant" },
 				etMinecart = { Notes = "The entity is a {{cMinecart}} descendant" },
@@ -805,6 +808,7 @@ cFile:Delete("/usr/bin/virus.exe");
 				GetSize = { Params = "FileName", Return = "number", Notes = "(STATIC) Returns the size of the file, or -1 on failure." },
 				IsFile = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified path points to an existing file." },
 				IsFolder = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified path points to an existing folder." },
+				ReadWholeFile = { Params = "FileName", Return = "string", Notes = "(STATIC) Returns the entire contents of the specified file. Returns an empty string if the file cannot be opened." },
 				Rename = { Params = "OrigPath, NewPath", Return = "bool", Notes = "(STATIC) Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists." },
 			},
 		},  -- cFile
@@ -1584,6 +1588,7 @@ a_Player:OpenWindow(Window);
 				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
 				GetEyeHeight = { Return = "number", Notes = "Returns the height of the player's eyes, in absolute coords" },
 				GetEyePosition = { Return = "{{Vector3d|EyePositionVector}}", Notes = "Returns the position of the player's eyes, as a {{Vector3d}}" },
+				GetFloaterID = { Params = "", Return = "number", Notes = "Returns the Entity ID of the fishing hook floater that belongs to the player. Returns -1 if no floater is associated with the player. FIXME: Undefined behavior when the player has used multiple fishing rods simultanously." },
 				GetFoodExhaustionLevel = { Params = "", Return = "number", Notes = "Returns the food exhaustion level" },
 				GetFoodLevel = { Params = "", Return = "number", Notes = "Returns the food level (number of half-drumsticks on-screen)" },
 				GetFoodPoisonedTicksRemaining = { Params = "", Return = "", Notes = "Returns the number of ticks left for the food posoning effect" },
@@ -1608,6 +1613,7 @@ a_Player:OpenWindow(Window);
 				HasPermission = { Params = "PermissionString", Return = "bool", Notes = "Returns true if the player has the specified permission" },
 				Heal = { Params = "HitPoints", Return = "", Notes = "Heals the player by the specified amount of HPs. Only positive amounts are expected. Sends a health update to the client." },
 				IsEating = { Params = "", Return = "bool", Notes = "Returns true if the player is currently eating the item in their hand." },
+				IsFishing = { Params = "", Return = "bool", Notes = "Returns true if the player is currently fishing" },
 				IsFlying = { Return = "bool", Notes = "Returns true if the player is flying." },
 				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmAdventure gamemode, or has their gamemode unset and the world is a gmAdventure world." },
 				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmCreative gamemode, or has their gamemode unset and the world is a gmCreative world." },
@@ -1635,6 +1641,7 @@ a_Player:OpenWindow(Window);
 				SetFoodSaturationLevel = { Params = "FoodSaturationLevel", Return = "", Notes = "Sets the food saturation (overcharge of the food level)." },
 				SetFoodTickTimer = { Params = "FoodTickTimer", Return = "", Notes = "Sets the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
 				SetGameMode = { Params = "{{eGameMode|NewGameMode}}", Return = "", Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit." },
+				SetIsFishing = { Params = "IsFishing, [FloaterEntityID]", Return = "", Notes = "Sets the 'IsFishing' flag for the player. The floater entity ID is expected for the true variant, it can be omitted when IsFishing is false. FIXME: Undefined behavior when multiple fishing rods are used simultanously" },
 				SetName = { Params = "Name", Return = "", Notes = "Sets the player name. This rename will NOT be visible to any players already in the server who are close enough to see this player." },
 				SetNormalMaxSpeed = { Params = "NormalMaxSpeed", Return = "", Notes = "Sets the normal (walking) maximum speed (as reported by the 1.6.1+ protocols)" },
 				SetSprint = { Params = "IsSprinting", Return = "", Notes = "Sets whether the player is sprinting or not." },
@@ -1755,6 +1762,8 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				HOOK_PLAYER_BREAKING_BLOCK = { Notes = "Called when a player is about to break a block. A plugin may cancel the event." },
 				HOOK_PLAYER_BROKEN_BLOCK = { Notes = "Called after a player has broken a block." },
 				HOOK_PLAYER_EATING = { Notes = "Called when the player starts eating a held item. Plugins may abort the eating." },
+				HOOK_PLAYER_FISHED = { Notes = "Called when the player reels the fishing rod back in, after the server decides the player's fishing reward." },
+				HOOK_PLAYER_FISHING = { Notes = "Called when the player reels the fishing rod back in, plugins may alter the fishing reward." },
 				HOOK_PLAYER_JOINED = { Notes = "Called when the player entity has been created. It has not yet been fully initialized." },
 				HOOK_PLAYER_LEFT_CLICK = { Notes = "Called when the client sends the LeftClick packet." },
 				HOOK_PLAYER_MOVING = { Notes = "Called when the player has moved and the movement is now being applied." },
@@ -1990,6 +1999,7 @@ end
 
 			Functions =
 			{
+				BroadcastBlockAction = { Params = "BlockX, BlockY, BlockZ, ActionByte1, ActionByte2, BlockType, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Broadcasts the BlockAction packet to all clients who have the appropriate chunk loaded (except ExcludeClient). The contents of the packet are specified by the parameters for the call, the blocktype needn't match the actual block that is present in the world data at the specified location." },
 				BroadcastChat = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the Message to all players in this world, except the optional ExceptClient" },
 				BroadcastSoundEffect = { Params = "SoundName, X, Y, Z, Volume, Pitch, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient" },
 				BroadcastSoundParticleEffect = { Params = "EffectID, X, Y, Z, EffectData, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified effect to all players in this world, except the optional ExceptClient" },
@@ -2005,6 +2015,7 @@ end
 				DoWithDropperAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dropper at the specified coords, calls the CallbackFunction with the {{cDropperEntity}} parameter representing the dropper. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropperEntity|DropperEntity}}, [CallbackData])</pre> The function returns false if there is no dropper, or if there is, it returns the bool value that the callback has returned." },
 				DoWithEntityByID = { Params = "EntityID, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If an entity with the specified ID exists, calls the callback with the {{cEntity}} parameter representing the entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}}, [CallbackData])</pre> The function returns false if the entity was not found, and it returns the same bool value that the callback has returned if the entity was found." },
 				DoWithFurnaceAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a furnace at the specified coords, calls the CallbackFunction with the {{cFurnaceEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}}, [CallbackData])</pre> The function returns false if there is no furnace, or if there is, it returns the bool value that the callback has returned." },
+				DoWithNoteBlockAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a note block at the specified coords, calls the CallbackFunction with the {{cNoteEntity}} parameter representing the note block. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cNoteEntity|NoteEntity}}, [CallbackData])</pre> The function returns false if there is no note block, or if there is, it returns the bool value that the callback has returned." },
 				DoWithPlayer = { Params = "PlayerName, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a player of the specified name (exact match), calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}}, [CallbackData])</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found." },
 				FastSetBlock =
 				{
@@ -2088,6 +2099,7 @@ end
 				SetTicksUntilWeatherChange = { Params = "NumTicks", Return = "", Notes = "Sets the number of ticks after which the weather will be changed." },
 				SetTimeOfDay = { Params = "TimeOfDayTicks", Return = "", Notes = "Sets the time of day, expressed as number of ticks past sunrise, in the range 0 .. 24000." },
 				SetWeather = { Params = "Weather", Return = "", Notes = "Sets the current weather (wSunny, wRain, wStorm) and resets the TicksUntilWeatherChange to the default value for the new weather. The normal weather-changing hooks are called for the change." },
+				ShouldLavaSpawnFire = { Params = "", Return = "bool", Notes = "Returns true if the world is configured to spawn fires near lava (world.ini: [Physics].ShouldLavaSpawnFire value)" },
 				SpawnItemPickups =
 				{
 					{ Params = "{{cItems|Pickups}}, X, Y, Z, FlyAwaySpeed", Return = "", Notes = "Spawns the specified pickups at the position specified. The FlyAway speed is used to initialize the random speed in which the pickups fly away from the spawn position." },
@@ -2581,7 +2593,9 @@ end
 				DamageTypeToString = {Params = "{{Globals#DamageType|DamageType}}", Return = "string", Notes = "Converts the {{Globals#DamageType|DamageType}} enumerated value to a string representation "},
 				EscapeString = {Params = "string", Return = "string", Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash"},
 				GetChar = {Params = "String, Pos", Return = "string", Notes = "Returns one character from the string, specified by position "},
+				GetIniItemSet = { Params = "IniFile, SectionName, KeyName, DefaultValue", Return = "{{cItem}}", Notes = "Returns the item that has been read from the specified INI file value. If the value is not present in the INI file, the DefaultValue is stored in the file and parsed as the result. Returns empty item if the value cannot be parsed. " },
 				GetTime = {Return = "number", Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)"},
+				IsBiomeNoDownfall = { Params = "Biome", Return = "bool", Notes = "Returns true if the biome is 'dry', that is, there is no precipitation during rains and storms." },
 				IsValidBlock = {Params = "BlockType", Return = "bool", Notes = "Returns true if BlockType is a known block type"},
 				IsValidItem = {Params = "ItemType", Return = "bool", Notes = "Returns true if ItemType is a known item type"},
 				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
@@ -2593,6 +2607,7 @@ end
 				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
 				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
+				NormalizeAngleDegrees = { Params = "AngleDegrees", Return = "AngleDegrees", Notes = "Returns the angle, wrapped into the [-180, +180) range." },
 				ReplaceString = {Params = "full-string, to-be-replaced-string, to-replace-string", Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string"},
 				StringSplit = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered."},
 				StringSplitAndTrim = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Each of the separate strings is trimmed (whitespace removed from the beginning and end of the string)"},
