@@ -37,12 +37,14 @@ local function SendMessageFailureFallback(a_Player, a_Message)
 end
 
 -- These three "variables" will hold the actual functions to call.
--- By default they are initialized to the Fallback variants, but will be redirected to Core when all plugins load
+-- By default they are initialized to the Fallback variants,
+-- but will be redirected to Core when all plugins load
 SendMessage        = SendMessageFallback;
 SendMessageSuccess = SendMessageSuccessFallback;
 SendMessageFailure = SendMessageFailureFallback;
 
--- The callback tries to connect to the Core, if successful, overwrites the three functions with Core ones
+-- The callback tries to connect to the Core
+-- If successful, overwrites the three functions with Core ones
 local function OnPluginsLoaded()
 	local CorePlugin = cPluginManager:Get():GetPlugin("Core");
 	if (CorePlugin == nil) then
@@ -67,7 +69,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_PLUGINS_LOADED, CoreMessagingPluginsL
 
 
 -- Usage, anywhere else in the plugin:
-SendMessageFailure(a_Player, "Cannot teleport to player, the destination player " .. PlayerName .. " was not found");
+SendMessageFailure(
+	a_Player,
+	"Cannot teleport to player, the destination player " .. PlayerName .. " was not found"
+);
 				]],
 			},
 		} ,  -- CodeExamples
