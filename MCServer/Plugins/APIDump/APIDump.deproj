@@ -115,6 +115,9 @@
     <filename>Hooks\OnPlayerUsingItem.lua</filename>
   </file>
   <file>
+    <filename>Hooks\OnPluginMessage.lua</filename>
+  </file>
+  <file>
     <filename>Hooks\OnPostCrafting.lua</filename>
   </file>
   <file>
