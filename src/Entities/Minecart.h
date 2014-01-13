@@ -51,6 +51,7 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual void Destroyed() override;
 	
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
@@ -58,11 +59,30 @@ public:
 protected:
 	ePayload m_Payload;
 	int m_LastDamage;
+	Vector3i m_DetectorRailPosition;
+	bool m_bIsOnDetectorRail;
 	
 	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
-	void HandleRailPhysics(NIBBLETYPE a_RailMeta);
+
+	/** Handles physics on normal rails
+		For each tick, slow down on flat rails, speed up or slow down on ascending/descending rails (depending on direction), and turn on curved rails
+	*/
+	void HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt);
+
+	/** Handles powered rail physics
+		Each tick, speed up or slow down cart, depending on metadata of rail (powered or not)
+	*/
 	void HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta);
+
+	/** Handles detector rail activation
+		Activates detector rails when a minecart is on them. Calls HandleRailPhysics() for physics simulations
+	*/
+	void HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt);
+
+	/** Snaps a minecart to a rail's axis, resetting its speed */
 	void SnapToRail(NIBBLETYPE a_RailMeta);
+	/** Tests is a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction*/
+	bool TestBlockCollision(NIBBLETYPE a_RailMeta);
 
 } ;
 
