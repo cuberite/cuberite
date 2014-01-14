@@ -2,6 +2,13 @@
 
 #include "VectorTypes.h"
 
+
+/*
+Vector2i.h
+
+Represents a pair of booleans. Its primary purpose is as a return type for Vector2i comparison operators but can be used for preforming boolean operations in parallel.
+
+*/
 #ifdef USE_GCC_VECTORS 
 class Vector2b
 {
