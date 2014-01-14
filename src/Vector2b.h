@@ -14,7 +14,7 @@ public:
 		vec = (vec == (int2){1,1});
 	}
 	
-	bool ReduceOr() {return vec[0] | vec[1];}
+	bool ReduceOr() {return vec[0] || vec[1];}
 	
 	friend Vector2b operator || ( const Vector2b& v1, const Vector2b& v2 ) { return Vector2b( v1.vec | v2.vec ); }
 	
