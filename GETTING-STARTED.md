@@ -102,14 +102,14 @@ There are a few fairly easy issues for you to get started with, as well as some 
  * #288 
  * #385 
  * #402 
- * #388
- * #380 
+ * #380
+ * #503
+ * #491
  * Clean up some of the compiler warnings. (Check [Travis CI](http://travis-ci.org/mc-server/MCServer) for a list of them.) With clang, there are over 10000 lines of warnings to clean up.
 
 **More Difficult**:
 
  * #17
- * #418 
  * #398 
 
 You may also want to write some plugins. They are written in lua, with excellent API documentation available via [APIDump](http://mc-server.xoft.cz/LuaAPI). The [Core](https://github.com/mc-server/Core) plugin should also help quite a bit here.
