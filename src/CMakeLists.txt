@@ -100,6 +100,10 @@ endif()
 # Make the debug executable have a "_debug" suffix
 SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES DEBUG_POSTFIX "_debug")
 
+# Make the profiled executables have a "_profile" postfix
+SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES DEBUGPROFILE_POSTFIX "_debug_profile")
+SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES RELEASEPROFILE_POSTFIX "_profile")
+
 
 # Precompiled headers (2nd part)
 if (MSVC)
