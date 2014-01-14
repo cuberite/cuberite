@@ -46,16 +46,19 @@ else()
 	add_flags_cxx("-pthread")
 endif()
 
+
 # Allow for a forced 32-bit build under 64-bit OS:
 if (FORCE_32)
 	add_flags_cxx("-m32")
 	add_flags_lnk("-m32")
 endif()
 
-#have the compiler generate code spercificly targeted at the current machine on Linux
+
+# Have the compiler generate code specifically targeted at the current machine on Linux
 if(LINUX AND NOT CROSSCOMPILE)
 	add_flags_cxx("-march=native")
 endif()
+
 
 # Set lower warnings-level for the libraries:
 if (MSVC)
@@ -71,15 +74,18 @@ else()
 	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -w")
 endif()
 
+
 # Under clang, we need to disable ASM support in CryptoPP:
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_definitions(-DCRYPTOPP_DISABLE_ASM)
 endif()
 
+
 # Under Windows, we need Lua as DLL; on *nix we need it linked statically:
 if (WIN32)
 	add_definitions(-DLUA_BUILD_AS_DLL)
 endif()
+
 
 # On Unix we use two dynamic loading libraries dl and ltdl.
 # Preference is for dl on unknown systems as it is specified in POSIX
@@ -91,6 +97,7 @@ if (UNIX)
 		set(DYNAMIC_LOADER dl)
 	endif()
 endif()
+
 
 # The Expat library is linked in statically, make the source files aware of that:
 add_definitions(-DXML_STATIC)
@@ -104,6 +111,7 @@ else()
 	set (CXX_PROFILING "-pg")
 	set (LNK_PROFILING "-pg")
 endif()
+
 
 # Declare the profiling configurations:
 SET(CMAKE_CXX_FLAGS_DEBUGPROFILE
@@ -129,19 +137,19 @@ MARK_AS_ADVANCED(
     CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE )
 
 SET(CMAKE_CXX_FLAGS_RELEASEPROFILE
-    "${CMAKE_CXX_FLAGS_DEBUG} ${CXX_PROFILING}"
+    "${CMAKE_CXX_FLAGS_RELEASE} ${CXX_PROFILING}"
     CACHE STRING "Flags used by the C++ compiler during profile builds."
     FORCE )
 SET(CMAKE_C_FLAGS_RELEASEPROFILE
-    "${CMAKE_C_FLAGS_DEBUG} ${CXX_PROFILING}"
+    "${CMAKE_C_FLAGS_RELEASE} ${CXX_PROFILING}"
     CACHE STRING "Flags used by the C compiler during profile builds."
     FORCE )
 SET(CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
-    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${LNK_PROFILING}"
+    "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${LNK_PROFILING}"
     CACHE STRING "Flags used for linking binaries during profile builds."
     FORCE )
 SET(CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE
-    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${LNK_PROFILING}"
+    "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${LNK_PROFILING}"
     CACHE STRING "Flags used by the shared libraries linker during profile builds."
     FORCE )
 MARK_AS_ADVANCED(
