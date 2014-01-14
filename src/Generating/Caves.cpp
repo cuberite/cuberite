@@ -1,4 +1,5 @@
 
+
 // Caves.cpp
 
 // Implements the various cave structure generators:
@@ -30,7 +31,7 @@ reduced in complexity in order for this generator to be useful, so the caves' sh
 
 #include "Globals.h"
 #include "Caves.h"
-
+#include "Vector2i.h"
 
 
 
@@ -450,53 +451,48 @@ void cCaveTunnel::CalcBoundingBox(void)
 
 
 
-
 void cCaveTunnel::ProcessChunk(
 	int a_ChunkX, int a_ChunkZ,
 	cChunkDef::BlockTypes & a_BlockTypes,
 	cChunkDef::HeightMap & a_HeightMap
 )
 {
-	int BaseX = a_ChunkX * cChunkDef::Width;
-	int BaseZ = a_ChunkZ * cChunkDef::Width;
-	if (
-		(BaseX > m_MaxBlockX) || (BaseX + cChunkDef::Width < m_MinBlockX) ||
-		(BaseZ > m_MaxBlockZ) || (BaseZ + cChunkDef::Width < m_MinBlockZ)
-	)
+	Vector2i BlockStart(a_ChunkX,a_ChunkZ);
+	Vector2i ChunkWidth(cChunkDef::Width,cChunkDef::Width);
+	BlockStart *= ChunkWidth;
+	Vector2i MaxBlock(m_MaxBlockX,m_MaxBlockZ);
+	Vector2i MinBlock(m_MinBlockX,m_MinBlockZ);
+	bool Intersects = ((BlockStart > MaxBlock) || (BlockStart + ChunkWidth < MinBlock)).ReduceOr();
+	if (Intersects)
 	{
 		// Tunnel does not intersect the chunk at all, bail out
 		return;
 	}
-
-	int BlockStartX = a_ChunkX * cChunkDef::Width;
-	int BlockStartZ = a_ChunkZ * cChunkDef::Width;
-	int BlockEndX = BlockStartX + cChunkDef::Width;
-	int BlockEndZ = BlockStartZ + cChunkDef::Width;
+	Vector2i BlockEnd = BlockStart + ChunkWidth;
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
-		if (
-			(itr->m_BlockX + itr->m_Radius < BlockStartX) ||
-			(itr->m_BlockX - itr->m_Radius > BlockEndX) ||
-			(itr->m_BlockZ + itr->m_Radius < BlockStartZ) ||
-			(itr->m_BlockZ - itr->m_Radius > BlockEndZ)
-		)
+		Vector2i Block(itr->m_BlockX,itr->m_BlockZ);
+		Vector2i Radius(itr->m_Radius, itr->m_Radius);
+		if ((
+		  ((Block + Radius) < BlockStart) || 
+		  ((Block - Radius) > BlockEnd)).ReduceOr())
 		{
 			// Cannot intersect, bail out early
 			continue;
 		}
 
 		// Carve out a sphere around the xyz point, m_Radius in diameter; skip 3/7 off the top and bottom:
-		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
+		Vector2i Dif = Block - BlockStart; // substitution for faster calc
 		int DifY = itr->m_BlockY;
-		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
 		int Bottom = std::max(itr->m_BlockY - 3 * itr->m_Radius / 7, 1);
 		int Top    = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, (int)(cChunkDef::Height));
 		int SqRad  = itr->m_Radius * itr->m_Radius;
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
+			Vector2i xz(x,z);
 			for (int y = Bottom; y <= Top; y++)
 			{
-				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
+				int SqDist = (Dif - xz).SqrLength() + (DifY - y) * (DifY - y);
 				if (4 * SqDist <= SqRad)
 				{
 					switch (cChunkDef::GetBlock(a_BlockTypes, x, y, z))
