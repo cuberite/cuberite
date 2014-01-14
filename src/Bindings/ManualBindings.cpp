@@ -941,10 +941,6 @@ protected:
 	}
 } ;
 
-
-
-
-
 static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 {
 	// Binding for cWorld::QueueTask
@@ -980,7 +976,65 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 	return 0;
 }
 
+class cLuaScheduledWorldTask :
+	public cWorld::cScheduledTask
+{
+public:
+	cLuaScheduledWorldTask(cPluginLua & a_Plugin, int a_FnRef, int a_Ticks) :
+		cScheduledTask(a_Ticks),
+		m_Plugin(a_Plugin),
+		m_FnRef(a_FnRef)
+	{
+	}
 
+protected:
+	cPluginLua & m_Plugin;
+	int m_FnRef;
+	
+	// cWorld::cTask overrides:
+	virtual void Run(cWorld & a_World) override
+	{
+		m_Plugin.Call(m_FnRef, &a_World);
+	}
+};
+
+
+static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
+{
+	// Binding for cWorld::ScheduleTask
+	// Params: function, Ticks
+	
+	// Retrieve the cPlugin from the LuaState:
+	cPluginLua * Plugin = GetLuaPlugin(tolua_S);
+	if (Plugin == NULL)
+	{
+		// An error message has been already printed in GetLuaPlugin()
+		return 0;
+	}
+
+	// Retrieve the args:
+	cWorld * self = (cWorld *)tolua_tousertype(tolua_S, 1, 0);
+	if (self == NULL)
+	{
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
+	}
+	if (!lua_isfunction(tolua_S, 2))
+	{
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a function for parameter #1");
+	}
+
+	// Create a reference to the function:
+	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+	if (FnRef == LUA_REFNIL)
+	{
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
+	}
+	
+	int Ticks = (int) tolua_tonumber (tolua_S, 3, 0);
+
+	self->ScheduleTask(new cLuaScheduledWorldTask(*Plugin, FnRef,Ticks));
+	return 0;
+}
 
 
 
