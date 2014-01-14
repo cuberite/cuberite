@@ -56,7 +56,7 @@
 	#define stricmp strcasecmp
 
 	// use vectors in clang and gcc 4.7 or later
-	#if defined(__clang__) || __GNUC__ > 4 || (__GNUC__ = 4 && __GNUC_MINOR__ > 6)
+	#if defined(__clang__) || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6)
 		#define USE_GCC_VECTORS
 	#endif
 

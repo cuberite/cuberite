@@ -3,6 +3,18 @@
 #include "Vector2b.h"
 #include "VectorTypes.h"
 
+/*
+Vector2i.h
+
+Declares the Vector2i class which contains a pair of integers so that operations
+can be preformed on both. The purpose of this class is to make it easier to use 
+vector operations in x86(sse/avx) and ARM(NEON) cpus.
+
+Usage:
+Declare a Value of type Vector 2i passing a pair of integers. You can then use 
+mathematical operators to preform calculations in parallel. 
+*/
+
 #ifdef USE_GCC_VECTORS
 class Vector2i
 {                                
