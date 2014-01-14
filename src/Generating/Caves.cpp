@@ -458,23 +458,24 @@ void cCaveTunnel::ProcessChunk(
 )
 {
 	Vector2i BlockStart(a_ChunkX,a_ChunkZ);
-	BlockStart *= cChunkDef::Width;
+	Vector2i ChunkWidth(cChunkDef::Width,cChunkDef::Width);
+	BlockStart *= ChunkWidth;
 	Vector2i MaxBlock(m_MaxBlockX,m_MaxBlockZ);
 	Vector2i MinBlock(m_MinBlockX,m_MinBlockZ);
-	bool Intersects = ((BlockStart > MaxBlock) || (BlockStart + cChunkDef::Width < MinBlock)).ReduceOr();
+	bool Intersects = ((BlockStart > MaxBlock) || (BlockStart + ChunkWidth < MinBlock)).ReduceOr();
 	if (Intersects)
 	{
 		// Tunnel does not intersect the chunk at all, bail out
 		return;
 	}
-	Vector2i BlockEnd = BlockStart + cChunkDef::Width;
+	Vector2i BlockEnd = BlockStart + ChunkWidth;
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
 		Vector2i Block(itr->m_BlockX,itr->m_BlockZ);
-		
+		Vector2i Radius(itr->m_Radius, itr->m_Radius);
 		if ((
-		  ((Block + itr->m_Radius) < BlockStart) || 
-		  ((Block - itr->m_Radius) > BlockEnd)).ReduceOr())
+		  ((Block + Radius) < BlockStart) || 
+		  ((Block - Radius) > BlockEnd)).ReduceOr())
 		{
 			// Cannot intersect, bail out early
 			continue;

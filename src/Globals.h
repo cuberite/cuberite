@@ -55,6 +55,8 @@
 	// Some portability macros :)
 	#define stricmp strcasecmp
 
+	#define USE_GCC_VECTORS
+
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
