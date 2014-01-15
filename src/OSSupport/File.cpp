@@ -440,9 +440,11 @@ AString cFile::ReadWholeFile(const AString & a_FileName)
 int cFile::Printf(const char * a_Fmt, ...)
 {
 	AString buf;
-	va_list args;
+	va_list args, argsCopy;
 	va_start(args, a_Fmt);
-	AppendVPrintf(buf, a_Fmt, args);
+	va_start(argsCopy, a_Fmt);
+	AppendVPrintf(buf, a_Fmt, args, argsCopy);
+	va_end(argsCopy);
 	va_end(args);
 	return Write(buf.c_str(), buf.length());
 }
