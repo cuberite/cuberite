@@ -36,7 +36,9 @@ public:
 	cItem(void) :
 		m_ItemType(E_ITEM_EMPTY),
 		m_ItemCount(0),
-		m_ItemDamage(0)
+		m_ItemDamage(0),
+		m_CustomName(""),
+		m_Lore("")
 	{
 	}
 	
@@ -46,12 +48,16 @@ public:
 		short a_ItemType,
 		char a_ItemCount = 1,
 		short a_ItemDamage = 0,
-		const AString & a_Enchantments = ""
+		const AString & a_Enchantments = "",
+		const AString & a_CustomName = "",
+		const AString & a_Lore = ""
 	) :
 		m_ItemType    (a_ItemType),
 		m_ItemCount   (a_ItemCount),
 		m_ItemDamage  (a_ItemDamage),
-		m_Enchantments(a_Enchantments)
+		m_Enchantments(a_Enchantments),
+		m_CustomName  (a_CustomName),
+		m_Lore        (a_Lore)
 	{
 		if (!IsValidItem(m_ItemType))
 		{
@@ -69,7 +75,9 @@ public:
 		m_ItemType    (a_CopyFrom.m_ItemType),
 		m_ItemCount   (a_CopyFrom.m_ItemCount),
 		m_ItemDamage  (a_CopyFrom.m_ItemDamage),
-		m_Enchantments(a_CopyFrom.m_Enchantments)
+		m_Enchantments(a_CopyFrom.m_Enchantments),
+		m_CustomName  (a_CopyFrom.m_CustomName),
+		m_Lore        (a_CopyFrom.m_Lore)
 	{
 	}
 	
@@ -80,6 +88,8 @@ public:
 		m_ItemCount = 0;
 		m_ItemDamage = 0;
 		m_Enchantments.Clear();
+		m_CustomName = "";
+		m_Lore = "";
 	}
 	
 	
@@ -96,13 +106,16 @@ public:
 		return ((m_ItemType <= 0) || (m_ItemCount <= 0));
 	}
 	
-	
+	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
+	*/
 	bool IsEqual(const cItem & a_Item) const
 	{
 		return (
 			IsSameType(a_Item) &&
 			(m_ItemDamage == a_Item.m_ItemDamage) &&
-			(m_Enchantments == a_Item.m_Enchantments)
+			(m_Enchantments == a_Item.m_Enchantments) &&
+			(m_CustomName == a_Item.m_CustomName) &&
+			(m_Lore == a_Item.m_Lore)
 		);
 	}
 	
@@ -111,6 +124,16 @@ public:
 	{
 		return (m_ItemType == a_Item.m_ItemType) || (IsEmpty() && a_Item.IsEmpty());
 	}
+
+
+	bool IsBothNameAndLoreEmpty(void) const
+	{
+		return (m_CustomName.empty() && m_Lore.empty());
+	}
+
+
+	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
+	bool IsLoreEmpty(void) const { return (m_Lore.empty()); }
 	
 
 	/// Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items
@@ -127,8 +150,10 @@ public:
 
 	inline bool IsDamageable(void) const { return (GetMaxDamage() > 0); }
 	
-	/// Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
-	bool IsStackableWith(const cItem & a_OtherStack) const;
+	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
+	   THIS FUNCTION IS OBSOLETE; USE ISEQUAL INSTEAD
+	*/
+	OBSOLETE bool IsStackableWith(const cItem & a_OtherStack) const { return IsEqual(a_OtherStack); }
 	
 	/// Returns true if the item is stacked up to its maximum stacking.
 	bool IsFullStack(void) const;
@@ -155,6 +180,8 @@ public:
 	short         m_ItemType;
 	char          m_ItemCount;
 	short         m_ItemDamage;
+	AString       m_CustomName;
+	AString       m_Lore;
 	cEnchantments m_Enchantments;
 };
 // tolua_end

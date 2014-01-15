@@ -89,6 +89,9 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				Slot.m_ItemCount -= DraggingItem.m_ItemCount;
 				DraggingItem.m_ItemType = Slot.m_ItemType;
 				DraggingItem.m_ItemDamage = Slot.m_ItemDamage;
+				DraggingItem.m_Enchantments = Slot.m_Enchantments;
+				DraggingItem.m_CustomName = Slot.m_CustomName;
+				DraggingItem.m_Lore = Slot.m_Lore;
 
 				if (Slot.m_ItemCount <= 0)
 				{
@@ -105,6 +108,10 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 					Slot.m_ItemCount++;
 					Slot.m_ItemDamage = DraggingItem.m_ItemDamage;
 					DraggingItem.m_ItemCount--;
+
+					Slot.m_Enchantments = DraggingItem.m_Enchantments;
+					Slot.m_CustomName = DraggingItem.m_CustomName;
+					Slot.m_Lore = DraggingItem.m_Lore;
 				}
 				if (DraggingItem.m_ItemCount <= 0)
 				{
