@@ -151,10 +151,18 @@ public:
 	
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	bool IsFueled (void) const { return m_IsFueled; }
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+
+	// Set functions.
+	void SetIsFueled(bool a_IsFueled, int a_FueledTimeLeft = -1) {m_IsFueled = a_IsFueled; m_FueledTimeLeft = a_FueledTimeLeft;}
+
+	// Get functions.
+	int  GetFueledTimeLeft(void) const {return m_FueledTimeLeft; }
+	bool IsFueled (void)         const {return m_IsFueled;}
 
 private:
 
+	int m_FueledTimeLeft;
 	bool m_IsFueled;
 
 } ;
