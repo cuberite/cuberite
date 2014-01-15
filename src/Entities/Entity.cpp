@@ -321,7 +321,10 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_Health = 0;
 	}
 
-	AddSpeed(a_TDI.Knockback * 2);
+	if (IsMob() || IsPlayer()) // Knockback for only players and mobs
+	{
+		AddSpeed(a_TDI.Knockback * 2);
+	}
 
 	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_HURT);
 
@@ -626,11 +629,6 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			{
 				fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
 			}
-			else if (IsBlockRail(BlockBelow) && IsMinecart())  // Rails aren't solid, except for Minecarts
-			{
-				fallspeed = 0;
-				m_bOnGround = true;
-			}
 			else if (BlockIn == E_BLOCK_COBWEB)
 			{
 				NextSpeed.y *= 0.05;  // Reduce overall falling speed
@@ -645,41 +643,18 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			if (IsMinecart())
+			// Friction
+			if (NextSpeed.SqrLength() > 0.0004f)
 			{
-				if (!IsBlockRail(BlockBelow))
+				NextSpeed.x *= 0.7f / (1 + a_Dt);
+				if (fabs(NextSpeed.x) < 0.05)
 				{
-					// Friction if minecart is off track, otherwise, Minecart.cpp handles this
-					if (NextSpeed.SqrLength() > 0.0004f)
-					{
-						NextSpeed.x *= 0.7f / (1 + a_Dt);
-						if (fabs(NextSpeed.x) < 0.05)
-						{
-							NextSpeed.x = 0;
-						}
-						NextSpeed.z *= 0.7f / (1 + a_Dt);
-						if (fabs(NextSpeed.z) < 0.05)
-						{
-							NextSpeed.z = 0;
-						}
-					}
+					NextSpeed.x = 0;
 				}
-			}
-			else
-			{
-				// Friction for non-minecarts
-				if (NextSpeed.SqrLength() > 0.0004f)
+				NextSpeed.z *= 0.7f / (1 + a_Dt);
+				if (fabs(NextSpeed.z) < 0.05)
 				{
-					NextSpeed.x *= 0.7f / (1 + a_Dt);
-					if (fabs(NextSpeed.x) < 0.05)
-					{
-						NextSpeed.x = 0;
-					}
-					NextSpeed.z *= 0.7f / (1 + a_Dt);
-					if (fabs(NextSpeed.z) < 0.05)
-					{
-						NextSpeed.z = 0;
-					}
+					NextSpeed.z = 0;
 				}
 			}
 		}
@@ -1104,9 +1079,11 @@ void cEntity::AttachTo(cEntity * a_AttachTo)
 		// Already attached to that entity, nothing to do here
 		return;
 	}
-
-	// Detach from any previous entity:
-	Detach();
+	if (m_AttachedTo != NULL)
+	{
+		// Detach from any previous entity:
+		Detach();
+	}
 
 	// Attach to the new entity:
 	m_AttachedTo = a_AttachTo;

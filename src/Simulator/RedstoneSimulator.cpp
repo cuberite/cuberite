@@ -69,7 +69,7 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 			// Changeable sources
 			((Block == E_BLOCK_REDSTONE_WIRE) && (Meta == 0)) ||
 			((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
-			((Block == E_BLOCK_DETECTOR_RAIL) && (Meta & 0x08) == 0x08) ||
+			((Block == E_BLOCK_DETECTOR_RAIL) && (Meta & 0x08) == 0) ||
 			(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta))) ||
 			(((Block == E_BLOCK_STONE_PRESSURE_PLATE) || (Block == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (Meta == 0))
 			)
@@ -505,8 +505,7 @@ void cRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_Bl
 			// transferring power to other wires around.
 			// However, self not directly powered anymore, so source must have been removed,
 			// therefore, self must be set to meta zero
-			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
-			m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, 0); // SetMeta & WakeUpSims doesn't seem to work here, so SetBlock
 			return; // No need to process block power sets because self not powered
 		}
 		else
@@ -903,6 +902,7 @@ void cRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_BlockY, int a_B
 			else
 			{
 				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
+				m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 			}
 			break;
 		}
@@ -965,6 +965,7 @@ void cRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_BlockY, int a_B
 			else
 			{
 				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
+				m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 			}
 			break;
 		}

@@ -350,6 +350,8 @@ public:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const { return IsEating(); }
+
+	virtual void Detach(void);
 	
 protected:
 	typedef std::map< std::string, bool > PermissionMap;
