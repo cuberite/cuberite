@@ -750,7 +750,8 @@ void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 
 cMinecartWithFurnace::cMinecartWithFurnace(double a_X, double a_Y, double a_Z) :
 	super(mpFurnace, a_X, a_Y, a_Z),
-	m_IsFueled(false)
+	m_IsFueled(false),
+	m_FueledTimeLeft(-1)
 {
 }
 
@@ -771,6 +772,7 @@ void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 			AddSpeed(a_Player.GetLookVector().x, 0, a_Player.GetLookVector().z);
 		}
 		m_IsFueled = true;
+		m_FueledTimeLeft = m_FueledTimeLeft + 600; // The minecart will be active 600 more ticks.
 		m_World->BroadcastEntityMetadata(*this);
 	}
 }
@@ -785,6 +787,14 @@ void cMinecartWithFurnace::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_IsFueled)
 	{
+		m_FueledTimeLeft--;
+		if (m_FueledTimeLeft < 0)
+		{
+			m_IsFueled = false;
+			m_World->BroadcastEntityMetadata(*this);
+			return;
+		}
+
 		if (GetSpeed().Length() > 6)
 		{
 			return;
