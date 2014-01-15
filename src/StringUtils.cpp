@@ -28,6 +28,10 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 	// MS CRT provides secure printf that doesn't behave like in the C99 standard
 	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, args)) != -1)
 	#else  // _MSC_VER
+	// We need to store a copy of the args, because on AMD64 in GCC the vsnprintf() is allowed to make changes to it (WTF?)
+	// Ref.: issue #541, http://www.bailopan.net/blog/?p=30
+	va_list args2;
+	va_copy(args2, args);
 	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, args)) < ARRAYCOUNT(buffer))
 	#endif  // else _MSC_VER
 	{
@@ -51,7 +55,7 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 	#ifdef _MSC_VER
 	vsprintf_s((char *)&(Buffer.front()), Buffer.size(), format, args);
 	#else  // _MSC_VER
-	vsnprintf((char *)&(Buffer.front()), Buffer.size(), format, args);
+	vsnprintf((char *)&(Buffer.front()), Buffer.size(), format, args2);
 	#endif  // else _MSC_VER
 	str.append(&(Buffer.front()), Buffer.size() - 1);
 	return str;
