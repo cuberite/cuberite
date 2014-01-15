@@ -151,6 +151,7 @@ public:
 	
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	bool IsFueled (void) const { return m_IsFueled; }
 
 private:

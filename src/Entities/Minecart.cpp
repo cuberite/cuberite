@@ -766,9 +766,30 @@ void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
-
+		if (!m_IsFueled) // We don't want to change the direction by right clicking it.
+		{
+			AddSpeed(a_Player.GetLookVector().x, 0, a_Player.GetLookVector().z);
+		}
 		m_IsFueled = true;
 		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cMinecartWithFurnace::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	super::Tick(a_Dt, a_Chunk);
+
+	if (m_IsFueled)
+	{
+		if (GetSpeed().Length() > 6)
+		{
+			return;
+		}
+		AddSpeed(GetSpeed() / 4);
 	}
 }
 
