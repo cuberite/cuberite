@@ -36,6 +36,13 @@ endif()
 if(MSVC)
 	# Make build use multiple threads under MSVC:
 	add_flags_cxx("/MP")
+
+	# Make release builds use link-time code generation:
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
+	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   /GL")
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE    "${CMAKE_EXE_LINKER_FLAGS_RELEASE}    /LTCG")
+	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
+	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /LTCG")
 elseif(APPLE)
 	#on os x clang adds pthread for us but we need to add it for gcc
 	if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -172,7 +179,6 @@ MARK_AS_ADVANCED(
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;DebugProfile;ReleaseProfile" CACHE STRING "" FORCE)
 project (MCServer)
 
-
 # Include all the libraries:
 add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
@@ -196,5 +202,5 @@ if (NOT MSVC)
 	string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
 endif()
 
-add_subdirectory (src) 
+add_subdirectory (src)
 
