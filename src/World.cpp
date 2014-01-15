@@ -690,6 +690,7 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	TickClients(a_Dt);
 	TickQueuedBlocks();
 	TickQueuedTasks();
+	TickScheduledTasks();
 	
 	GetSimulatorManager()->Simulate(a_Dt);
 
@@ -861,6 +862,31 @@ void cWorld::TickQueuedTasks(void)
 	}  // for itr - m_Tasks[]
 }
 
+void cWorld::TickScheduledTasks()
+{
+	ScheduledTaskList Tasks;
+	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
+	{
+		cCSLock Lock(m_CSScheduledTasks);
+		ScheduledTaskList::iterator itr = m_ScheduledTasks.begin();
+		while (itr != m_ScheduledTasks.end() && (*itr)->Ticks > 0)
+		{
+			Tasks.push_back(m_ScheduledTasks.front());
+			m_ScheduledTasks.pop_front();
+		}
+		for(;itr != m_ScheduledTasks.end(); itr++)
+		{
+			(*itr)->Ticks--;
+		}
+	}
+
+	// Execute and delete each task:
+	for (ScheduledTaskList::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
+	{
+		(*itr)->Run(*this);
+		delete *itr;
+	}  // for itr - m_Tasks[]
+}
 
 
 
@@ -2571,6 +2597,19 @@ void cWorld::QueueTask(cTask * a_Task)
 	m_Tasks.push_back(a_Task);
 }
 
+void cWorld::ScheduleTask(cScheduledTask * a_Task)
+{
+	cCSLock Lock(m_CSScheduledTasks);
+	for(ScheduledTaskList::iterator itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end(); itr++) 
+	{
+		if((*itr)->Ticks >= a_Task->Ticks) 
+		{
+			m_ScheduledTasks.insert(itr, a_Task);
+			return;
+		}
+	}
+	m_ScheduledTasks.push_back(a_Task);
+}
 
 
 

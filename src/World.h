@@ -82,7 +82,18 @@ public:
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
+	/// A common ancestor for all scheduled tasks queued onto the tick thread
+	class cScheduledTask
+	{
+	public:
+		cScheduledTask(const int a_Ticks) : Ticks(a_Ticks) {};
+		virtual ~cScheduledTask() {};
+		virtual void Run(cWorld & a_World) = 0;
+		int Ticks;
+	};
+	
 	typedef std::vector<cTask *> cTasks;
+	typedef std::list<cScheduledTask *> ScheduledTaskList;
 	
 	class cTaskSaveAllChunks :
 		public cTask
@@ -533,6 +544,9 @@ public:
 	
 	/// Queues a task onto the tick thread. The task object will be deleted once the task is finished
 	void QueueTask(cTask * a_Task);  // Exported in ManualBindings.cpp
+	
+	// Queues a task onto the tick thread. The task object will be deleted once the task is finished
+	void ScheduleTask(cScheduledTask * a_Task);
 
 	/// Returns the number of chunks loaded	
 	int GetNumChunks() const;  // tolua_export
@@ -745,8 +759,15 @@ private:
 	/// Guards the m_Tasks
 	cCriticalSection m_CSTasks;
 	
+	/// Guards the m_ScheduledTasks
+	cCriticalSection m_CSScheduledTasks;
+	
 	/// Tasks that have been queued onto the tick thread; guarded by m_CSTasks
 	cTasks m_Tasks;
+	
+	/// Tasks that have been queued to be executed on the tick thread at some number of ticks in
+	/// the future; guarded by m_CSScheduledTasks
+	ScheduledTaskList m_ScheduledTasks;
 	
 	/// Guards m_Clients
 	cCriticalSection  m_CSClients;
@@ -774,6 +795,9 @@ private:
 	
 	/// Executes all tasks queued onto the tick thread
 	void TickQueuedTasks(void);
+	
+	/// Executes all tasks queued onto the tick thread
+	void TickScheduledTasks(void);
 	
 	/// Ticks all clients that are in this world
 	void TickClients(float a_Dt);
