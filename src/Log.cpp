@@ -99,10 +99,10 @@ void cLog::ClearLog()
 
 
 
-void cLog::Log(const char * a_Format, va_list argList)
+void cLog::Log(const char * a_Format, va_list argList, va_list argListCopy)
 {
 	AString Message;
-	AppendVPrintf(Message, a_Format, argList);
+	AppendVPrintf(Message, a_Format, argList, argListCopy);
 
 	time_t rawtime;
 	time ( &rawtime );
@@ -147,11 +147,13 @@ void cLog::Log(const char * a_Format, va_list argList)
 
 
 
-void cLog::Log(const char* a_Format, ...)
+void cLog::Log(const char * a_Format, ...)
 {
-	va_list argList;
+	va_list argList, argListCopy;
 	va_start(argList, a_Format);
-	Log( a_Format, argList );
+	va_start(argListCopy, a_Format);
+	Log(a_Format, argList, argListCopy);
+	va_end(argListCopy);
 	va_end(argList);
 }
 
@@ -159,9 +161,9 @@ void cLog::Log(const char* a_Format, ...)
 
 
 
-void cLog::SimpleLog(const char* a_String)
+void cLog::SimpleLog(const char * a_String)
 {
-	Log("%s", a_String );
+	Log("%s", a_String);
 }
 
 

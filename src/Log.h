@@ -14,11 +14,11 @@ private:
 public:
 	cLog(const AString & a_FileName);
 	~cLog();
-	void Log(const char* a_Format, va_list argList );
-	void Log(const char* a_Format, ...);
+	void Log(const char * a_Format, va_list argList, va_list argListCopy);
+	void Log(const char * a_Format, ...);
 	// tolua_begin
-	void SimpleLog(const char* a_String);
-	void OpenLog( const char* a_FileName );
+	void SimpleLog(const char * a_String);
+	void OpenLog(const char * a_FileName);
 	void CloseLog();
 	void ClearLog();
 	static cLog* GetInstance();

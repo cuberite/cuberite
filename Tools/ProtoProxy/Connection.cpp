@@ -249,10 +249,12 @@ void cConnection::Run(void)
 
 void cConnection::Log(const char * a_Format, ...)
 {
-	va_list args;
+	va_list args, argsCopy;
 	va_start(args, a_Format);
+	va_start(argsCopy, a_Format);
 	AString msg;
-	AppendVPrintf(msg, a_Format, args);
+	AppendVPrintf(msg, a_Format, args, argsCopy);
+	va_end(argsCopy);
 	va_end(args);
 	AString FullMsg;
 	Printf(FullMsg, "[%5.3f] %s\n", GetRelativeTime(), msg.c_str());
@@ -274,10 +276,12 @@ void cConnection::Log(const char * a_Format, ...)
 
 void cConnection::DataLog(const void * a_Data, int a_Size, const char * a_Format, ...)
 {
-	va_list args;
+	va_list args, argsCopy;
 	va_start(args, a_Format);
+	va_start(argsCopy, a_Format);
 	AString msg;
-	AppendVPrintf(msg, a_Format, args);
+	AppendVPrintf(msg, a_Format, args, argsCopy);
+	va_end(argsCopy);
 	va_end(args);
 	AString FullMsg;
 	AString Hex;
