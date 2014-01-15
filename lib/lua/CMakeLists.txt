@@ -27,6 +27,7 @@ if (WIN32)
 		SET_TARGET_PROPERTIES(lua PROPERTIES PREFIX "../")
 		SET_TARGET_PROPERTIES(lua PROPERTIES IMPORT_PREFIX "../")
 
+		# Remove SCL warnings, we expect this library to have been tested safe
 		SET_TARGET_PROPERTIES(
 			lua PROPERTIES COMPILE_FLAGS "-D_CRT_SECURE_NO_WARNINGS"
 		)
