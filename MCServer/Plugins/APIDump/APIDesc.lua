@@ -1571,7 +1571,7 @@ a_Player:OpenWindow(Window);
 			{
 				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
 				AddToGroup = { Params = "GroupName", Return = "", Notes = "Temporarily adds the player to the specified group. The assignment is lost when the player disconnects." },
-				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
+				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "(STATIC) Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
 				CanFly = { Return = "bool", Notes = "Returns if the player is able to fly." },
 				CanUseCommand = { Params = "Command", Return = "bool", Notes = "Returns true if the player is allowed to use the specified command." },
 				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
@@ -1648,7 +1648,7 @@ a_Player:OpenWindow(Window);
 				SetSprintingMaxSpeed = { Params = "SprintingMaxSpeed", Return = "", Notes = "Sets the sprinting maximum speed (as reported by the 1.6.1+ protocols)" },
 				SetVisible = { Params = "IsVisible", Return = "", Notes = "Sets the player visibility to other players" },
 				TossItem = { Params = "DraggedItem, [Amount], [CreateType], [CreateDamage]", Return = "", Notes = "FIXME: This function will be rewritten, avoid it. It tosses an item, either from the inventory, dragged in hand (while in UI window) or a newly created one." },
-				XpForLevel = { Params = "XPLevel", Return = "number", Notes = "Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp()." },
+				XpForLevel = { Params = "XPLevel", Return = "number", Notes = "(STATIC) Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp()." },
 			},
 			Constants =
 			{
