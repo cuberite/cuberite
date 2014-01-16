@@ -85,10 +85,10 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		{
 			if (DraggingItem.m_ItemType <= 0) // Empty-handed?
 			{
+				DraggingItem = Slot.CopyOne(); // Obtain copy of slot to preserve lore, enchantments, etc.
+
 				DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
 				Slot.m_ItemCount -= DraggingItem.m_ItemCount;
-
-				DraggingItem.CustomCopy(Slot, true, false, true, true, true, true);
 
 				if (Slot.m_ItemCount <= 0)
 				{
@@ -101,10 +101,13 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
 				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
 				{
-					Slot.m_ItemCount++;
-					DraggingItem.m_ItemCount--;
+					char OldSlotCount = Slot.m_ItemCount;
 
-					Slot.CustomCopy(DraggingItem, true, false, true, true, true, true);
+					Slot = DraggingItem.CopyOne(); // See above
+					OldSlotCount++;
+					Slot.m_ItemCount = OldSlotCount;
+
+					DraggingItem.m_ItemCount--;
 				}
 				if (DraggingItem.m_ItemCount <= 0)
 				{
