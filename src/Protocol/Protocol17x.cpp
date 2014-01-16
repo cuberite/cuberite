@@ -1039,7 +1039,20 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 
 		if (!HandlePacket(bb, PacketType))
 		{
-			// Unknown packet, already been reported, just bail out
+			// Unknown packet, already been reported, but without the length. Log the length here:
+			LOGWARNING("Unhandled packet: type 0x%x, length %u", PacketType, PacketLen);
+			
+			#ifdef _DEBUG
+				// Dump the packet contents into the log:
+				bb.ResetRead();
+				AString Packet;
+				bb.ReadAll(Packet);
+				Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
+				AString Out;
+				CreateHexDump(Out, Packet.data(), (int)Packet.size(), 24);
+				LOGD("Packet contents:\n%s", Out.c_str());
+			#endif  // _DEBUG
+			
 			return;
 		}
 		
