@@ -222,8 +222,10 @@ protected:
 	/// Adds the received (unencrypted) data to m_ReceivedData, parses complete packets
 	void AddReceivedData(const char * a_Data, int a_Size);
 	
-	/// Reads and handles the packet. The packet length and type have already been read.
-	void HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
+	/** Reads and handles the packet. The packet length and type have already been read.
+	Returns true if the packet was understood, false if it was an unknown packet
+	*/
+	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
 	
 	// Packet handlers while in the Status state (m_State == 1):
 	void HandlePacketStatusPing   (cByteBuffer & a_ByteBuffer);

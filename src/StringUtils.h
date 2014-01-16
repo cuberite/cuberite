@@ -21,12 +21,8 @@ typedef std::list<AString>   AStringList;
 
 
 
-/** Add the formated string to the existing data in the string
-It is silly to need to specify the arguments twice, but it is required for x64 / GCC:
-Ref.: issue #541, http://www.bailopan.net/blog/?p=30
-va_copy is not available until C++11, so we need to make do with passing a duplicate.
-*/
-extern AString & AppendVPrintf(AString & str, const char * format, va_list args, va_list argsCopy);
+/** Add the formated string to the existing data in the string */
+extern AString & AppendVPrintf(AString & str, const char * format, va_list args);
 
 /// Output the formatted text into the string
 extern AString & Printf       (AString & str, const char * format, ...);

@@ -22,11 +22,17 @@ endif()
 if (WIN32)
 	add_library(lua SHARED ${SOURCE})
 	set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
-	if (MSVC)
-		# MSVC generator adds a "Debug" or "Release" postfixes to the LIBRARY_OUTPUT_PATH, we need to cancel them:
-		SET_TARGET_PROPERTIES(lua PROPERTIES PREFIX "../")
-		SET_TARGET_PROPERTIES(lua PROPERTIES IMPORT_PREFIX "../")
 
+	# Output the executable into the $/MCServer folder, so that MCServer can find it:
+	set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
+	SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_SOURCE_DIR}/MCServer
+		RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${CMAKE_SOURCE_DIR}/MCServer
+		RUNTIME_OUTPUT_DIRECTORY_DEBUGPROFILE   ${CMAKE_SOURCE_DIR}/MCServer
+		RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_SOURCE_DIR}/MCServer
+	)
+
+	if (MSVC)
 		# Remove SCL warnings, we expect this library to have been tested safe
 		SET_TARGET_PROPERTIES(
 			lua PROPERTIES COMPILE_FLAGS "-D_CRT_SECURE_NO_WARNINGS"

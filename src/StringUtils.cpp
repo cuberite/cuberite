@@ -18,27 +18,40 @@
 
 
 
-AString & AppendVPrintf(AString & str, const char *format, va_list args, va_list argsCopy)
+AString & AppendVPrintf(AString & str, const char * format, va_list args)
 {
 	ASSERT(format != NULL);
 	
 	char buffer[2048];
 	size_t len;
+	#ifdef va_copy
+	va_list argsCopy;
+	va_copy(argsCopy, args);
+	#else
+	#define argsCopy args
+	#endif
 	#ifdef _MSC_VER
 	// MS CRT provides secure printf that doesn't behave like in the C99 standard
-	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, args)) != -1)
+	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, argsCopy)) != -1)
 	#else  // _MSC_VER
-	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, args)) < ARRAYCOUNT(buffer))
+	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, argsCopy)) < ARRAYCOUNT(buffer))
 	#endif  // else _MSC_VER
 	{
 		// The result did fit into the static buffer
+		#ifdef va_copy
+		va_end(argsCopy);
+		#endif
 		str.append(buffer, len);
 		return str;
 	}
+	#ifdef va_copy
+	va_end(argsCopy);
+	#endif
 	
-	// The result did not fit into the static buffer
+	// The result did not fit into the static buffer, use a dynamic buffer:
 	#ifdef _MSC_VER
 	// for MS CRT, we need to calculate the result length
+	// MS doesn't have va_copy() and does nod need it at all
 	len = _vscprintf(format, args);
 	if (len == -1)
 	{
@@ -47,6 +60,9 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args, va_list
 	#endif  // _MSC_VER
 	
 	// Allocate a buffer and printf into it:
+	#ifdef va_copy
+	va_copy(argsCopy, args);
+	#endif
 	std::vector<char> Buffer(len + 1);
 	#ifdef _MSC_VER
 	vsprintf_s((char *)&(Buffer.front()), Buffer.size(), format, argsCopy);
@@ -54,6 +70,9 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args, va_list
 	vsnprintf((char *)&(Buffer.front()), Buffer.size(), format, argsCopy);
 	#endif  // else _MSC_VER
 	str.append(&(Buffer.front()), Buffer.size() - 1);
+	#ifdef va_copy
+	va_end(argsCopy);
+	#endif
 	return str;
 }
 
@@ -64,11 +83,9 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args, va_list
 AString & Printf(AString & str, const char * format, ...)
 {
 	str.clear();
-	va_list args, argsCopy;
+	va_list args;
 	va_start(args, format);
-	va_start(argsCopy, format);
-	std::string &retval = AppendVPrintf(str, format, args, argsCopy);
-	va_end(argsCopy);
+	std::string &retval = AppendVPrintf(str, format, args);
 	va_end(args);
 	return retval;
 }
@@ -80,11 +97,9 @@ AString & Printf(AString & str, const char * format, ...)
 AString Printf(const char * format, ...)
 {
 	AString res;
-	va_list args, argsCopy;
+	va_list args;
 	va_start(args, format);
-	va_start(argsCopy, format);
-	AppendVPrintf(res, format, args, argsCopy);
-	va_end(argsCopy);
+	AppendVPrintf(res, format, args);
 	va_end(args);
 	return res;
 }
@@ -93,13 +108,11 @@ AString Printf(const char * format, ...)
 
 
 
-AString & AppendPrintf(AString &str, const char *format, ...)
+AString & AppendPrintf(AString &str, const char * format, ...)
 {
-	va_list args, argsCopy;
+	va_list args;
 	va_start(args, format);
-	va_start(argsCopy, format);
-	std::string &retval = AppendVPrintf(str, format, args, argsCopy);
-	va_end(argsCopy);
+	std::string &retval = AppendVPrintf(str, format, args);
 	va_end(args);
 	return retval;
 }
