@@ -446,12 +446,10 @@ bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName,
 
 bool cIniFile::SetValueV(const AString & a_KeyName, const AString & a_ValueName, const char * a_Format, ...)
 {
-	va_list args, argsCopy;
+	va_list args;
 	va_start(args, a_Format);
-	va_start(argsCopy, a_Format);
 	AString Data;
-	AppendVPrintf(Data, a_Format, args, argsCopy);
-	va_end(argsCopy);
+	AppendVPrintf(Data, a_Format, args);
 	va_end(args);
 	return SetValue(a_KeyName, a_ValueName, Data);
 }
