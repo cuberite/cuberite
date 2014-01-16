@@ -1682,7 +1682,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 					for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
 					{
-						AppendPrintf(Lore, "%s\n", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+						AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
 					}
 
 					a_Item.m_Lore = Lore;
@@ -1764,12 +1764,12 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 		{
 			Writer.BeginList("Lore", TAG_String);
 
-			AStringVector Decls = StringSplit(a_Item.m_Lore, "\n");
+			AStringVector Decls = StringSplit(a_Item.m_Lore, "`");
 			for (AStringVector::const_iterator itr = Decls.begin(), end = Decls.end(); itr != end; ++itr)
 			{
 				if (itr->empty())
 				{
-					// The decl is empty (two \ns), ignore
+					// The decl is empty (two `s), ignore
 					continue;
 				}
 				Writer.AddString("", itr->c_str());
