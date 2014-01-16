@@ -20,7 +20,7 @@ public:
 		// Flip the ON bit on/off using the XOR bitwise operation
 		NIBBLETYPE Meta = (a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x08);
 
-		a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LEVER, Meta); // SetMeta doesn't work for unpowering levers, so setblock
 		a_World->BroadcastSoundEffect("random.click", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 	}
 
