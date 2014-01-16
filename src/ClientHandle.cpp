@@ -1037,7 +1037,7 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 		return;
 	}
 	
-	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetYaw        (a_Rotation);
 	m_Player->SetHeadYaw    (a_Rotation);
 	m_Player->SetPitch      (a_Pitch);
 	m_Player->SetTouchGround(a_IsOnGround);
@@ -1069,7 +1069,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 	m_Player->SetStance     (a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
 	m_Player->SetHeadYaw    (a_Rotation);
-	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetYaw        (a_Rotation);
 	m_Player->SetPitch      (a_Pitch);
 }
 

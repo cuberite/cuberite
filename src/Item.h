@@ -153,11 +153,6 @@ public:
 
 	inline bool IsDamageable(void) const { return (GetMaxDamage() > 0); }
 	
-	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
-	   THIS FUNCTION IS OBSOLETE; USE ISEQUAL INSTEAD
-	*/
-	OBSOLETE bool IsStackableWith(const cItem & a_OtherStack) const { return IsEqual(a_OtherStack); }
-	
 	/// Returns true if the item is stacked up to its maximum stacking.
 	bool IsFullStack(void) const;
 	

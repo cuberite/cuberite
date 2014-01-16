@@ -155,7 +155,6 @@ public:
 	double           GetPosY      (void) const { return m_Pos.y;   }
 	double           GetPosZ      (void) const { return m_Pos.z;   }
 	const Vector3d & GetRot       (void) const { return m_Rot;     }
-	OBSOLETE double           GetRotation  (void) const { return m_Rot.x;   }  // OBSOLETE, use GetYaw() instead
 	double           GetYaw       (void) const { return m_Rot.x;   }
 	double           GetPitch     (void) const { return m_Rot.y;   }
 	double           GetRoll      (void) const { return m_Rot.z;   }
@@ -178,7 +177,6 @@ public:
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
 	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
 	void SetRot     (const Vector3f & a_Rot);
-	OBSOLETE void SetRotation(double a_Rotation) { SetYaw(a_Rotation); }  // OBSOLETE, use SetYaw() instead
 	void SetYaw     (double a_Yaw);
 	void SetPitch   (double a_Pitch);
 	void SetRoll    (double a_Roll);
@@ -223,7 +221,7 @@ public:
 	void SetGravity(float a_Gravity) { m_Gravity = a_Gravity; }
 	
 	/// Sets the rotation to match the speed vector (entity goes "face-forward")
-	void SetRotationFromSpeed(void);
+	void SetYawFromSpeed(void);
 	
 	/// Sets the pitch to match the speed vector (entity gies "face-forward")
 	void SetPitchFromSpeed(void);

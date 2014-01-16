@@ -226,7 +226,7 @@ int cItemGrid::HowManyCanFit(const cItem & a_ItemStack, bool a_AllowNewStacks)
 				NumLeft -= MaxStack;
 			}
 		}
-		else if (m_Slots[i].IsStackableWith(a_ItemStack))
+		else if (m_Slots[i].IsEqual(a_ItemStack))
 		{
 			NumLeft -= MaxStack - m_Slots[i].m_ItemCount;
 		}
@@ -275,7 +275,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 		(a_PrioritarySlot != -1) &&
 		(
 			m_Slots[a_PrioritarySlot].IsEmpty() ||
-			m_Slots[a_PrioritarySlot].IsStackableWith(a_ItemStack)
+			m_Slots[a_PrioritarySlot].IsEqual(a_ItemStack)
 		)
 	)
 	{
@@ -285,7 +285,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 	// Scan existing stacks:
 	for (int i = m_NumSlots - 1; i >= 0; i--)
 	{
-		if (m_Slots[i].IsStackableWith(a_ItemStack))
+		if (m_Slots[i].IsEqual(a_ItemStack))
 		{
 			NumLeft -= AddItemToSlot(a_ItemStack, i, NumLeft, MaxStack);
 		}
@@ -438,7 +438,7 @@ int cItemGrid::HowManyItems(const cItem & a_Item)
 	int res = 0;
 	for (int i = 0; i < m_NumSlots; i++)
 	{
-		if (m_Slots[i].IsStackableWith(a_Item))
+		if (m_Slots[i].IsEqual(a_Item))
 		{
 			res += m_Slots[i].m_ItemCount;
 		}

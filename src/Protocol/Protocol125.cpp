@@ -354,7 +354,7 @@ void cProtocol125::SendEntityLook(const cEntity & a_Entity)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENT_LOOK);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte((char)((a_Entity.GetRot().x / 360.f) * 256));
 	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
 	Flush();
 }
@@ -423,7 +423,7 @@ void cProtocol125::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, 
 	WriteByte(a_RelX);
 	WriteByte(a_RelY);
 	WriteByte(a_RelZ);
-	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte((char)((a_Entity.GetRot().x / 360.f) * 256));
 	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
 	Flush();
 }
@@ -664,7 +664,7 @@ void cProtocol125::SendPlayerMoveLook(void)
 	WriteDouble(Player->GetStance() + 0.03);  // Add a small amount so that the player doesn't start inside a block
 	WriteDouble(Player->GetPosY()   + 0.03);  // Add a small amount so that the player doesn't start inside a block
 	WriteDouble(Player->GetPosZ());
-	WriteFloat ((float)(Player->GetRotation()));
+	WriteFloat ((float)(Player->GetRot().x));
 	WriteFloat ((float)(Player->GetPitch()));
 	WriteBool  (Player->IsOnGround());
 	Flush();
@@ -864,7 +864,7 @@ void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	WriteInt  ((int)(a_Vehicle.GetPosY() * 32));
 	WriteInt  ((int)(a_Vehicle.GetPosZ() * 32));
 	WriteByte ((Byte)((a_Vehicle.GetPitch() / 360.f) * 256));
-	WriteByte ((Byte)((a_Vehicle.GetRotation() / 360.f) * 256));
+	WriteByte ((Byte)((a_Vehicle.GetRot().x / 360.f) * 256));
 	WriteInt  (a_VehicleSubType);
 	if (a_VehicleSubType != 0)
 	{
@@ -897,7 +897,7 @@ void cProtocol125::SendTeleportEntity(const cEntity & a_Entity)
 	WriteInt    ((int)(floor(a_Entity.GetPosX() * 32)));
 	WriteInt    ((int)(floor(a_Entity.GetPosY() * 32)));
 	WriteInt    ((int)(floor(a_Entity.GetPosZ() * 32)));
-	WriteByte   ((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte   ((char)((a_Entity.GetRot().x / 360.f) * 256));
 	WriteByte   ((char)((a_Entity.GetPitch() / 360.f) * 256));
 	Flush();
 }

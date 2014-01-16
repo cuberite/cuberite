@@ -226,7 +226,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 	for (int i = 0; i < m_NumSlots; i++)
 	{
 		const cItem * Slot = GetSlot(i, a_Player);
-		if (!Slot->IsStackableWith(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
 		{
 			// Different items
 			continue;
@@ -265,7 +265,7 @@ bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool 
 	for (int i = 0; i < NumSlots; i++)
 	{
 		const cItem & SlotItem = *GetSlot(i, a_Player);
-		if (!SlotItem.IsStackableWith(a_Dragging))
+		if (!SlotItem.IsEqual(a_Dragging))
 		{
 			continue;
 		}
@@ -908,7 +908,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 	}  // for i - itr->second[]
 	
 	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-a_Player.GetRotation(), a_Player.GetPitch(), vZ, vX, vY);
+	EulerToVector(-a_Player.GetRot().x, a_Player.GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
 	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because player created
 }

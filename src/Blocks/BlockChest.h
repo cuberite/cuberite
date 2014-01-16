@@ -42,7 +42,7 @@ public:
 		{
 			return false;
 		}
-		double rot = a_Player->GetRotation();
+		double rot = a_Player->GetRot().x;
 		if (
 			(Area.GetRelBlockType(0, 0, 1) == E_BLOCK_CHEST) ||
 			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
@@ -80,7 +80,7 @@ public:
 			return;
 		}
 		
-		double rot = a_Player->GetRotation();
+		double rot = a_Player->GetRot().x;
 		// Choose meta from player rotation, choose only between 2 or 3
 		NIBBLETYPE NewMeta = ((rot >= -90) && (rot < 90)) ? 2 : 3;
 		if (

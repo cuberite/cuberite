@@ -86,7 +86,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = PlayerYawToMetaData(a_Player->GetRotation());
+		a_BlockMeta = PlayerYawToMetaData(a_Player->GetRot().x);
 		return true;
 	}
 

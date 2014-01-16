@@ -34,7 +34,7 @@ public:
 	{
 		if (a_BlockFace == BLOCK_FACE_TOP)
 		{
-			a_BlockMeta = cBlockSignHandler::RotationToMetaData(a_Player->GetRotation());
+			a_BlockMeta = cBlockSignHandler::RotationToMetaData(a_Player->GetRot().x);
 			a_BlockType = E_BLOCK_SIGN_POST;
 		}
 		else
