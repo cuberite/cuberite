@@ -364,7 +364,7 @@ int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags
 
 int cSocket::Send(const char * a_Buffer, unsigned int a_Length)
 {
-	return send(m_Socket, a_Buffer, a_Length, 0);
+	return send(m_Socket, a_Buffer, a_Length, MSG_NOSIGNAL);
 }
 
 
