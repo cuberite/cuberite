@@ -134,6 +134,9 @@ public:
 
 	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
 	bool IsLoreEmpty(void) const { return (m_Lore.empty()); }
+
+	/** Copies specified internal variables from another item to this item */
+	void CustomCopy(cItem & a_OtherItem, bool a_CopyType, bool a_CopyCount, bool a_CopyDamage, bool a_CopyEnchantments, bool a_CopyCustomName, bool a_CopyLore);
 	
 
 	/// Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items

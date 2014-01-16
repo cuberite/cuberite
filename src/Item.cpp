@@ -99,6 +99,25 @@ bool cItem::IsFullStack(void) const
 
 
 
+void cItem::CustomCopy(cItem & a_OtherItem, bool a_CopyType, bool a_CopyCount, bool a_CopyDamage, bool a_CopyEnchantments, bool a_CopyCustomName, bool a_CopyLore)
+{
+	if (a_CopyType)
+		m_ItemType = a_OtherItem.m_ItemType;
+	if (a_CopyCount)
+		m_ItemCount = a_OtherItem.m_ItemCount;
+	if (a_CopyDamage)
+		m_ItemDamage = a_OtherItem.m_ItemDamage;
+	if (a_CopyEnchantments)
+		m_Enchantments = a_OtherItem.m_Enchantments;
+	if (a_CopyCustomName)
+		m_CustomName = a_OtherItem.m_CustomName;
+	if (a_CopyLore)
+		m_Lore = a_OtherItem.m_Lore;
+}
+
+
+
+
 
 char cItem::GetMaxStackSize(void) const
 {

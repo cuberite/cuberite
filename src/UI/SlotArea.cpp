@@ -87,11 +87,8 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			{
 				DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
 				Slot.m_ItemCount -= DraggingItem.m_ItemCount;
-				DraggingItem.m_ItemType = Slot.m_ItemType;
-				DraggingItem.m_ItemDamage = Slot.m_ItemDamage;
-				DraggingItem.m_Enchantments = Slot.m_Enchantments;
-				DraggingItem.m_CustomName = Slot.m_CustomName;
-				DraggingItem.m_Lore = Slot.m_Lore;
+
+				DraggingItem.CustomCopy(Slot, true, false, true, true, true, true);
 
 				if (Slot.m_ItemCount <= 0)
 				{
@@ -104,14 +101,10 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
 				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
 				{
-					Slot.m_ItemType = DraggingItem.m_ItemType;
 					Slot.m_ItemCount++;
-					Slot.m_ItemDamage = DraggingItem.m_ItemDamage;
 					DraggingItem.m_ItemCount--;
 
-					Slot.m_Enchantments = DraggingItem.m_Enchantments;
-					Slot.m_CustomName = DraggingItem.m_CustomName;
-					Slot.m_Lore = DraggingItem.m_Lore;
+					Slot.CustomCopy(DraggingItem, true, false, true, true, true, true);
 				}
 				if (DraggingItem.m_ItemCount <= 0)
 				{
