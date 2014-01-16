@@ -941,6 +941,10 @@ protected:
 	}
 } ;
 
+
+
+
+
 static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 {
 	// Binding for cWorld::QueueTask
@@ -976,6 +980,10 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 	return 0;
 }
 
+
+
+
+
 class cLuaScheduledWorldTask :
 	public cWorld::cScheduledTask
 {
@@ -997,6 +1005,9 @@ protected:
 		m_Plugin.Call(m_FnRef, &a_World);
 	}
 };
+
+
+
 
 
 static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
@@ -1032,9 +1043,11 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 	
 	int Ticks = (int) tolua_tonumber (tolua_S, 3, 0);
 
-	self->ScheduleTask(new cLuaScheduledWorldTask(*Plugin, FnRef,Ticks));
+	self->ScheduleTask(new cLuaScheduledWorldTask(*Plugin, FnRef, Ticks));
 	return 0;
 }
+
+
 
 
 
@@ -2272,6 +2285,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetBlockTypeMeta",          tolua_cWorld_GetBlockTypeMeta);
 			tolua_function(tolua_S, "GetSignLines",              tolua_cWorld_GetSignLines);
 			tolua_function(tolua_S, "QueueTask",                 tolua_cWorld_QueueTask);
+			tolua_function(tolua_S, "ScheduleTask",							 tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetSignLines",              tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "TryGetHeight",              tolua_cWorld_TryGetHeight);
 			tolua_function(tolua_S, "UpdateSign",                tolua_cWorld_SetSignLines);
