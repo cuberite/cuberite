@@ -14,23 +14,22 @@
 	#pragma comment(lib, "ws2_32.lib")
 #endif
 
-// For platforms that don't have va_copy, define out own, simplistic one:
-#ifndef va_copy
-	#define va_copy(dst, src) dst = src
-#endif va_copy
 
 
 
 
-
-AString & AppendVPrintf(AString & str, const char *format, va_list args)
+AString & AppendVPrintf(AString & str, const char * format, va_list args)
 {
 	ASSERT(format != NULL);
 	
 	char buffer[2048];
 	size_t len;
+	#ifdef va_copy
 	va_list argsCopy;
 	va_copy(argsCopy, args);
+	#else
+	#define argsCopy args
+	#endif
 	#ifdef _MSC_VER
 	// MS CRT provides secure printf that doesn't behave like in the C99 standard
 	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, argsCopy)) != -1)
@@ -39,27 +38,31 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 	#endif  // else _MSC_VER
 	{
 		// The result did fit into the static buffer
+		#ifdef va_copy
 		va_end(argsCopy);
+		#endif
 		str.append(buffer, len);
 		return str;
 	}
+	#ifdef va_copy
 	va_end(argsCopy);
+	#endif
 	
 	// The result did not fit into the static buffer, use a dynamic buffer:
 	#ifdef _MSC_VER
 	// for MS CRT, we need to calculate the result length
-	va_copy(argsCopy, args);
-	len = _vscprintf(format, argsCopy);
+	// MS doesn't have va_copy() and does nod need it at all
+	len = _vscprintf(format, args);
 	if (len == -1)
 	{
-		va_end(argsCopy);
 		return str;
 	}
-	va_end(argsCopy);
 	#endif  // _MSC_VER
 	
 	// Allocate a buffer and printf into it:
+	#ifdef va_copy
 	va_copy(argsCopy, args);
+	#endif
 	std::vector<char> Buffer(len + 1);
 	#ifdef _MSC_VER
 	vsprintf_s((char *)&(Buffer.front()), Buffer.size(), format, argsCopy);
@@ -67,7 +70,9 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 	vsnprintf((char *)&(Buffer.front()), Buffer.size(), format, argsCopy);
 	#endif  // else _MSC_VER
 	str.append(&(Buffer.front()), Buffer.size() - 1);
+	#ifdef va_copy
 	va_end(argsCopy);
+	#endif
 	return str;
 }
 
