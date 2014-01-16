@@ -79,7 +79,7 @@ public:
 	
 	cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height);
 
-	cItem GetContent(void)   const {return m_Content;}
+	const cItem & GetContent(void) const {return m_Content;}
 	int GetBlockHeight(void) const {return m_Height;}
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
