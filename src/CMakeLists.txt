@@ -1,5 +1,5 @@
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -88,13 +88,15 @@ set(EXECUTABLE MCServer)
 
 add_executable(${EXECUTABLE} ${SOURCE})
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
 
-if (MSVC)
-	# MSVC generator adds a "Debug" or "Release" postfixes to the EXECUTABLE_OUTPUT_PATH, we need to cancel them:
-	SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES PREFIX "../")
-	SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES IMPORT_PREFIX "../")
-endif()
+# Output the executable into the $/MCServer folder, so that it has access to external resources:
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
+SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_SOURCE_DIR}/MCServer
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${CMAKE_SOURCE_DIR}/MCServer
+	RUNTIME_OUTPUT_DIRECTORY_DEBUGPROFILE   ${CMAKE_SOURCE_DIR}/MCServer
+	RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_SOURCE_DIR}/MCServer
+)
 
 
 # Make the debug executable have a "_debug" suffix
