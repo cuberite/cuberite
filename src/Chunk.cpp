@@ -1743,7 +1743,14 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 	{
-		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"", (*itr)->GetUniqueID(), (*itr)->GetClass(), m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str());
+		/*
+		// DEBUG:
+		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"",
+			(*itr)->GetUniqueID(), (*itr)->GetClass(),
+			m_PosX, m_PosY, m_PosZ,
+			a_Client->GetUsername().c_str()
+		);
+		*/
 		(*itr)->SpawnOn(*a_Client);
 	}
 	return true;
@@ -1768,7 +1775,13 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 		{
 			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 			{
-				LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"", m_PosX, m_PosZ, (*itr)->GetUniqueID(), a_Client->GetUsername().c_str() );
+				/*
+				// DEBUG:
+				LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"",
+					m_PosX, m_PosZ,
+					(*itr)->GetUniqueID(), a_Client->GetUsername().c_str()
+				);
+				*/
 				a_Client->SendDestroyEntity(*(*itr));
 			}
 		}

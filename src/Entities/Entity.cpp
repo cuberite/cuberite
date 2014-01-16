@@ -75,13 +75,16 @@ cEntity::~cEntity()
 {
 	ASSERT(!m_World->HasEntity(m_UniqueID));  // Before deleting, the entity needs to have been removed from the world
 	
+	/*
+	// DEBUG:
 	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p", 
 		m_UniqueID,
 		m_Pos.x, m_Pos.y, m_Pos.z,
 		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
 		this
 		);
-
+	*/
+	
 	if (m_AttachedTo != NULL)
 	{
 		Detach();
@@ -138,9 +141,13 @@ bool cEntity::Initialize(cWorld * a_World)
 		return false;
 	}
 	
+	/*
+	// DEBUG:
 	LOGD("Initializing entity #%d (%s) at {%.02f, %.02f, %.02f}",
 		m_UniqueID, GetClass(), m_Pos.x, m_Pos.y, m_Pos.z
 	);
+	*/
+	
 	m_IsInitialized = true;
 	m_World = a_World;
 	m_World->AddEntity(this);
@@ -617,9 +624,12 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 			m_bOnGround = true;
 
+			/*
+			// DEBUG:
 			LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
 				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ
 			);
+			*/
 		}
 
 		if (!m_bOnGround)
