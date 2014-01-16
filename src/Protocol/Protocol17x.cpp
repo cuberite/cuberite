@@ -1037,11 +1037,18 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			return;
 		}
 
-		HandlePacket(bb, PacketType);
+		if (!HandlePacket(bb, PacketType))
+		{
+			// Unknown packet, already been reported, just bail out
+			return;
+		}
 		
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
+			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x. Read %u bytes, packet contained %u bytes",
+				PacketType, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
+			);
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
 		}
@@ -1051,7 +1058,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 
 
 
-void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	switch (m_State)
 	{
@@ -1060,8 +1067,8 @@ void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			// Status
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return;
-				case 0x01: HandlePacketStatusPing   (a_ByteBuffer); return;
+				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
+				case 0x01: HandlePacketStatusPing   (a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -1071,8 +1078,8 @@ void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			// Login
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return;
-				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return;
+				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
+				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -1082,29 +1089,29 @@ void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			// Game
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return;
-				case 0x01: HandlePacketChatMessage            (a_ByteBuffer); return;
-				case 0x02: HandlePacketUseEntity              (a_ByteBuffer); return;
-				case 0x03: HandlePacketPlayer                 (a_ByteBuffer); return;
-				case 0x04: HandlePacketPlayerPos              (a_ByteBuffer); return;
-				case 0x05: HandlePacketPlayerLook             (a_ByteBuffer); return;
-				case 0x06: HandlePacketPlayerPosLook          (a_ByteBuffer); return;
-				case 0x07: HandlePacketBlockDig               (a_ByteBuffer); return;
-				case 0x08: HandlePacketBlockPlace             (a_ByteBuffer); return;
-				case 0x09: HandlePacketSlotSelect             (a_ByteBuffer); return;
-				case 0x0a: HandlePacketAnimation              (a_ByteBuffer); return;
-				case 0x0b: HandlePacketEntityAction           (a_ByteBuffer); return;
-				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return;
-				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return;
-				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return;
+				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return true;
+				case 0x01: HandlePacketChatMessage            (a_ByteBuffer); return true;
+				case 0x02: HandlePacketUseEntity              (a_ByteBuffer); return true;
+				case 0x03: HandlePacketPlayer                 (a_ByteBuffer); return true;
+				case 0x04: HandlePacketPlayerPos              (a_ByteBuffer); return true;
+				case 0x05: HandlePacketPlayerLook             (a_ByteBuffer); return true;
+				case 0x06: HandlePacketPlayerPosLook          (a_ByteBuffer); return true;
+				case 0x07: HandlePacketBlockDig               (a_ByteBuffer); return true;
+				case 0x08: HandlePacketBlockPlace             (a_ByteBuffer); return true;
+				case 0x09: HandlePacketSlotSelect             (a_ByteBuffer); return true;
+				case 0x0a: HandlePacketAnimation              (a_ByteBuffer); return true;
+				case 0x0b: HandlePacketEntityAction           (a_ByteBuffer); return true;
+				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
+				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return true;
+				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return true;
 				case 0x0f: // Confirm transaction - not used in MCS
-				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return;
-				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return;
-				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return;
-				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return;
-				case 0x15: HandlePacketClientSettings         (a_ByteBuffer); return;
-				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return;
-				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return;
+				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return true;
+				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
+				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return true;
+				case 0x15: HandlePacketClientSettings         (a_ByteBuffer); return true;
+				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return true;
+				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -1112,6 +1119,7 @@ void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 	
 	// Unknown packet type, report to the client:
 	m_Client->PacketUnknown(a_PacketType);
+	return false;
 }
 
 
