@@ -885,7 +885,7 @@ void cWorld::TickScheduledTasks()
 	}  // for itr - m_Tasks[]
 	
 	// Increment TickID
-	m_TickID = (m_TickID+1) &0xFFFF;
+	m_TickID = (m_TickID+1) & 0x7FFFFFFF;
 }
 
 
@@ -2622,7 +2622,7 @@ void cWorld::QueueTask(cTask * a_Task)
 
 void cWorld::ScheduleTask(cScheduledTask * a_Task)
 {
-	a_Task->Ticks = (a_Task->Ticks + m_TickID) & 0xFFFF;
+	a_Task->Ticks = (a_Task->Ticks + m_TickID) & 0x7FFFFFFF;
 	cCSLock Lock(m_CSScheduledTasks);
 	for(ScheduledTaskList::iterator itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end(); itr++) 
 	{
