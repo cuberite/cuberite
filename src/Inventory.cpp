@@ -83,7 +83,7 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 		{
 			NumLeft -= MaxStack;
 		}
-		else if (Slot.IsStackableWith(a_ItemStack))
+		else if (Slot.IsEqual(a_ItemStack))
 		{
 			NumLeft -= MaxStack - Slot.m_ItemCount;
 		}

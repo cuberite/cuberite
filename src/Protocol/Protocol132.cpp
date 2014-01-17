@@ -421,7 +421,7 @@ void cProtocol132::SendSpawnMob(const cMonster & a_Mob)
 	WriteInt    (a_Mob.GetUniqueID());
 	WriteByte   (a_Mob.GetMobType());
 	WriteVectorI((Vector3i)(a_Mob.GetPosition() * 32));
-	WriteByte   ((Byte)((a_Mob.GetRotation() / 360.f) * 256));
+	WriteByte   ((Byte)((a_Mob.GetRot().x / 360.f) * 256));
 	WriteByte   ((Byte)((a_Mob.GetPitch() / 360.f) * 256));
 	WriteByte   ((Byte)((a_Mob.GetHeadYaw() / 360.f) * 256));
 	WriteShort  ((short)(a_Mob.GetSpeedX() * 400));

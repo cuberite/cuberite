@@ -148,7 +148,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 	{
 		case E_META_RAIL_ZM_ZP: // NORTHSOUTH
 		{
-			SetRotation(270);
+			SetYaw(270);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(0); // Don't move vertically as on ground
 			SetSpeedX(0); // Correct diagonal movement from curved rails
@@ -172,7 +172,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_XM_XP: // EASTWEST
 		{
-			SetRotation(180);
+			SetYaw(180);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(0);
 			SetSpeedZ(0);
@@ -194,7 +194,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_ASCEND_ZM: // ASCEND NORTH
 		{
-			SetRotation(270);
+			SetYaw(270);
 			SetSpeedX(0);
 
 			if (GetSpeedZ() >= 0)
@@ -216,7 +216,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_ASCEND_ZP: // ASCEND SOUTH
 		{
-			SetRotation(270);
+			SetYaw(270);
 			SetSpeedX(0);
 
 			if (GetSpeedZ() > 0)
@@ -238,7 +238,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_ASCEND_XM: // ASCEND EAST
 		{
-			SetRotation(180);
+			SetYaw(180);
 			SetSpeedZ(0);
 
 			if (GetSpeedX() >= 0)
@@ -258,7 +258,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_ASCEND_XP: // ASCEND WEST
 		{
-			SetRotation(180);
+			SetYaw(180);
 			SetSpeedZ(0);
 
 			if (GetSpeedX() > 0)
@@ -278,7 +278,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_CURVED_ZM_XM: // Ends pointing NORTH and WEST
 		{
-			SetRotation(315); // Set correct rotation server side
+			SetYaw(315); // Set correct rotation server side
 			SetPosY(floor(GetPosY()) + 0.55); // Levitate dat cart
 
 			if (TestBlockCollision(a_RailMeta)) return;
@@ -303,7 +303,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_CURVED_ZM_XP: // Curved NORTH EAST
 		{
-			SetRotation(225);
+			SetYaw(225);
 			SetPosY(floor(GetPosY()) + 0.55);
 
 			if (TestBlockCollision(a_RailMeta)) return;
@@ -326,7 +326,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_CURVED_ZP_XM: // Curved SOUTH WEST
 		{
-			SetRotation(135);
+			SetYaw(135);
 			SetPosY(floor(GetPosY()) + 0.55);
 
 			if (TestBlockCollision(a_RailMeta)) return;
@@ -349,7 +349,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		}
 		case E_META_RAIL_CURVED_ZP_XP: // Curved SOUTH EAST
 		{
-			SetRotation(45);
+			SetYaw(45);
 			SetPosY(floor(GetPosY()) + 0.55);
 
 			if (TestBlockCollision(a_RailMeta)) return;
@@ -398,7 +398,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 	{
 		case E_META_RAIL_ZM_ZP: // NORTHSOUTH
 		{
-			SetRotation(270);
+			SetYaw(270);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(0);
 			SetSpeedX(0);
@@ -420,7 +420,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_XM_XP: // EASTWEST
 		{
-			SetRotation(180);
+			SetYaw(180);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(0);
 			SetSpeedZ(0);
