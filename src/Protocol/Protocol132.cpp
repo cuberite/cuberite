@@ -367,8 +367,8 @@ void cProtocol132::SendPlayerSpawn(const cPlayer & a_Player)
 	WriteInt   ((int)(a_Player.GetPosX() * 32));
 	WriteInt   ((int)(a_Player.GetPosY() * 32));
 	WriteInt   ((int)(a_Player.GetPosZ() * 32));
-	WriteByte  ((char)((a_Player.GetRot().x / 360.f) * 256));
-	WriteByte  ((char)((a_Player.GetRot().y / 360.f) * 256));
+	WriteByte  ((char)((a_Player.GetYaw()   / 360.f) * 256));
+	WriteByte  ((char)((a_Player.GetPitch() / 360.f) * 256));
 	WriteShort (HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType);
 	// Player metadata: just use a default metadata value, since the client doesn't like starting without any metadata:
 	WriteByte  (0);  // Index 0, byte (flags)
@@ -421,8 +421,8 @@ void cProtocol132::SendSpawnMob(const cMonster & a_Mob)
 	WriteInt    (a_Mob.GetUniqueID());
 	WriteByte   (a_Mob.GetMobType());
 	WriteVectorI((Vector3i)(a_Mob.GetPosition() * 32));
-	WriteByte   ((Byte)((a_Mob.GetRot().x / 360.f) * 256));
-	WriteByte   ((Byte)((a_Mob.GetPitch() / 360.f) * 256));
+	WriteByte   ((Byte)((a_Mob.GetYaw()     / 360.f) * 256));
+	WriteByte   ((Byte)((a_Mob.GetPitch()   / 360.f) * 256));
 	WriteByte   ((Byte)((a_Mob.GetHeadYaw() / 360.f) * 256));
 	WriteShort  ((short)(a_Mob.GetSpeedX() * 400));
 	WriteShort  ((short)(a_Mob.GetSpeedY() * 400));

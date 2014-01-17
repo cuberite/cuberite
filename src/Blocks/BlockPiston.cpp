@@ -60,7 +60,7 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 )
 {
 	a_BlockType = m_BlockType;
-	a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetRot().x, a_Player->GetPitch());
+	a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetYaw(), a_Player->GetPitch());
 	return true;
 }
 

@@ -154,7 +154,7 @@ public:
 	double           GetPosX      (void) const { return m_Pos.x;   }
 	double           GetPosY      (void) const { return m_Pos.y;   }
 	double           GetPosZ      (void) const { return m_Pos.z;   }
-	const Vector3d & GetRot       (void) const { return m_Rot;     }
+	const Vector3d & GetRot       (void) const { return m_Rot;     }  // OBSOLETE, use individual GetYaw(), GetPitch, GetRoll() components
 	double           GetYaw       (void) const { return m_Rot.x;   }
 	double           GetPitch     (void) const { return m_Rot.y;   }
 	double           GetRoll      (void) const { return m_Rot.z;   }
@@ -176,7 +176,7 @@ public:
 	void SetPosZ    (double a_PosZ);
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
 	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
-	void SetRot     (const Vector3f & a_Rot);
+	void SetRot     (const Vector3f & a_Rot);  // OBSOLETE, use individual SetYaw(), SetPitch(), SetRoll() components
 	void SetYaw     (double a_Yaw);
 	void SetPitch   (double a_Pitch);
 	void SetRoll    (double a_Roll);

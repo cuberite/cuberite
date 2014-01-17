@@ -31,7 +31,7 @@ public:
 		a_BlockType = m_BlockType;
 		
 		// FIXME: Do not use cPiston class for dispenser placement!
-		a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetRot().x, a_Player->GetPitch());
+		a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetYaw(), a_Player->GetPitch());
 		return true;
 	}
 } ;

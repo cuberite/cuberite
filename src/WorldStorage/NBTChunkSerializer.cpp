@@ -257,7 +257,7 @@ void cNBTChunkSerializer::AddBasicEntity(cEntity * a_Entity, const AString & a_C
 		m_Writer.AddDouble("", a_Entity->GetSpeedZ());
 	m_Writer.EndList();
 	m_Writer.BeginList("Rotation", TAG_Double);
-		m_Writer.AddDouble("", a_Entity->GetRot().x);
+		m_Writer.AddDouble("", a_Entity->GetYaw());
 		m_Writer.AddDouble("", a_Entity->GetPitch());
 	m_Writer.EndList();
 }

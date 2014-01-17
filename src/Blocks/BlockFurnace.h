@@ -35,7 +35,7 @@ public:
 		a_BlockType = m_BlockType;
 		
 		// FIXME: Do not use cPiston class for furnace placement!
-		a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetRot().x, 0);
+		a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetYaw(), 0);
 		
 		return true;
 	}

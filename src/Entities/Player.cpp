@@ -1396,7 +1396,7 @@ void cPlayer::TossItem(
 		}
 	}
 	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetRot().x, GetPitch(), vZ, vX, vY);
+	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
@@ -1591,7 +1591,7 @@ bool cPlayer::SaveToDisk()
 	JSON_PlayerPosition.append(Json::Value(GetPosZ()));
 
 	Json::Value JSON_PlayerRotation;
-	JSON_PlayerRotation.append(Json::Value(GetRot().x));
+	JSON_PlayerRotation.append(Json::Value(GetYaw()));
 	JSON_PlayerRotation.append(Json::Value(GetPitch()));
 	JSON_PlayerRotation.append(Json::Value(GetRoll()));
 

@@ -37,7 +37,7 @@ public:
 			return false;
 		}
 
-		a_BlockMeta = cBlockBedHandler::RotationToMetaData(a_Player->GetRot().x);
+		a_BlockMeta = cBlockBedHandler::RotationToMetaData(a_Player->GetYaw());
 		
 		// Check if there is empty space for the foot section:
 		Vector3i Direction = cBlockBedHandler::MetaDataToDirection(a_BlockMeta);

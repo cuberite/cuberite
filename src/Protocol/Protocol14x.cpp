@@ -250,7 +250,7 @@ void cProtocol146::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	WriteInt  ((int)(a_Vehicle.GetPosY() * 32));
 	WriteInt  ((int)(a_Vehicle.GetPosZ() * 32));
 	WriteByte ((Byte)((a_Vehicle.GetPitch() / 360.f) * 256));
-	WriteByte ((Byte)((a_Vehicle.GetRot().x / 360.f) * 256));
+	WriteByte ((Byte)((a_Vehicle.GetYaw()   / 360.f) * 256));
 	WriteInt  (a_VehicleSubType);
 	if (a_VehicleSubType != 0)
 	{

@@ -358,7 +358,7 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		m_UniqueID,
 		GetPosX(), GetPosY(), GetPosZ(),
 		GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		GetRot().x, GetPitch()
+		GetYaw(), GetPitch()
 	);
 }
 
@@ -369,7 +369,7 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 {
 	// Default spawning - use the projectile kind to spawn an object:
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetRot().x), ANGLE_TO_PROTO(GetPitch()));
+	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
 	a_Client.SendEntityMetadata(*this);
 }
 
@@ -406,7 +406,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	SetPitchFromSpeed();
 	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",
 		m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		GetRot().x, GetPitch()
+		GetYaw(), GetPitch()
 	);
 }
 
