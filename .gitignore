@@ -1,4 +1,6 @@
 build/
+ipch/
+Win32/
 MCServer/MCServer
 ChunkWorxSave.ini
 doxy/
