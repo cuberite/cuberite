@@ -47,6 +47,7 @@ elseif(APPLE)
 	#on os x clang adds pthread for us but we need to add it for gcc
 	if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		add_flags_cxx("-pthread")
+		add_flags_cxx("-std=c++11")
 	endif()
 else()
 	# Let gcc / clang know that we're compiling a multi-threaded app:
