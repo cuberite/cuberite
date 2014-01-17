@@ -61,6 +61,7 @@ protected:
 	cNoise m_Noise;
 	int    m_Seed;
 
+	void TryPlaceClumb(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 

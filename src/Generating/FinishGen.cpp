@@ -44,38 +44,48 @@ static inline bool IsWater(BLOCKTYPE a_BlockType)
 
 void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	double ChunkX = a_ChunkDesc.GetChunkX() + 0.5; // We can't devide through 0 so lets add 0.5 to all the chunk coordinates.
-	double ChunkZ = a_ChunkDesc.GetChunkZ() + 0.5;
-
-	for (int z = 0; z < cChunkDef::Width; z++) 
+	double ChunkX = a_ChunkDesc.GetChunkX() + 0.1; // We can't devide through 0 so lets add 0.1 to all the chunk coordinates.
+	double ChunkZ = a_ChunkDesc.GetChunkZ() + 0.1;
+	
+	NOISE_DATATYPE Val = m_Noise.CubicNoise2D((float) ChunkX, (float) ChunkZ);
+	
+	int Pos;
+	if (Val <= 0)
 	{
-		for (int x = 0; x < cChunkDef::Width; x++)
+		Pos = (int) (Val + 1) * 16;
+	}
+	else if (Val <= 1)
+	{
+		Pos = (int) Val * 16;
+	}
+	else
+	{
+		Pos = (int) 16 / Val;
+	}
+	
+	for (int y = 1; y < cChunkDef::Height; y++)
+	{
+		if (a_ChunkDesc.GetBlockType(Pos, y, Pos) != E_BLOCK_AIR)
 		{
-			for (int y = 1; y < cChunkDef::Height; y++)
-			{
-				if (!g_BlockIsSolid[a_ChunkDesc.GetBlockType(x, y - 1, z)])  // Only place on solid blocks
-				{
-					continue;
-				}
-				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
-				{
-					continue;
-				}
-
-				NOISE_DATATYPE Val = m_Noise.CubicNoise1D((float) ((ChunkX * x) * (ChunkZ * z) * y));
-				if (Val < -0.98)
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_BROWN_MUSHROOM);
-				}
-				else if (Val < -0.96)
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_RED_MUSHROOM);
-				}
-				else if (Val < -0.94)
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_FIRE);
-				}
-			}
+			continue;
+		}
+		if (!g_BlockIsSolid[a_ChunkDesc.GetBlockType(Pos, y - 1, Pos)])  // Only place on solid blocks
+		{
+			continue;
+		}
+		
+		NOISE_DATATYPE BlockType = m_Noise.CubicNoise2D(ChunkX / ChunkZ, y * 0.01f);
+		if (BlockType > 0.08)
+		{
+			TryPlaceClumb(a_ChunkDesc, Pos, y, Pos, E_BLOCK_BROWN_MUSHROOM);
+		}
+		else if (BlockType > -0.18)
+		{
+			TryPlaceClumb(a_ChunkDesc, Pos, y, Pos, E_BLOCK_RED_MUSHROOM);
+		}
+		else if (BlockType > -0.28)
+		{
+			TryPlaceClumb(a_ChunkDesc, Pos, y, Pos, E_BLOCK_FIRE);
 		}
 	}
 }
@@ -83,6 +93,36 @@ void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
+
+void cFinishGenNetherSprinkleFoliage::TryPlaceClumb(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
+{
+	a_ChunkDesc.SetBlockType(a_RelX, a_RelY, a_RelZ, a_Block);
+	for (int x = a_RelX - 4; x < a_RelX + 4; x++)
+	{
+		float xx = (float) a_ChunkDesc.GetChunkX() * cChunkDef::Width + x;
+		for (int z = a_RelZ - 4; x < a_RelX + 4; x++)
+		{
+			float zz = (float) a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
+			for (int y = a_RelY - 2; y < a_RelY + 2; y++)
+			{
+				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) // Don't replace non air blocks.
+				{
+					continue;
+				}
+				if (!g_BlockIsSolid[a_ChunkDesc.GetBlockType(x, y - 1, z)])  // Only place on solid blocks
+				{
+					continue;
+				}
+
+				NOISE_DATATYPE Val = m_Noise.CubicNoise1D(xx * zz * 0.1f / y);
+				if (Val > 1)
+				{
+				a_ChunkDesc.SetBlockType(x, y, z, a_Block);
+				}
+			}
+		}
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
