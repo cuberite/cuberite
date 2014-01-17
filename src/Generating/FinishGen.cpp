@@ -93,15 +93,15 @@ void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		}
 		
 		NOISE_DATATYPE BlockType = m_Noise.CubicNoise1D((float) (ChunkX * ChunkZ) / (y * 0.1f));
-		if (BlockType < 0.10)
+		if (BlockType < -0.30)
 		{
 			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_BROWN_MUSHROOM);
 		}
-		else if (BlockType < -0.09)
+		else if (BlockType < -0.20)
 		{
 			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_RED_MUSHROOM);
 		}
-		else if (BlockType < -0.08)
+		else if (BlockType < -0.10)
 		{
 			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_FIRE);
 		}
