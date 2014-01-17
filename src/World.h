@@ -681,6 +681,8 @@ private:
 	/// Name of the storage schema used to load and save chunks
 	AString m_StorageSchema;
 	
+	int m_StorageCompressionFactor;
+	
 	/// The dimension of the world, used by the client to provide correct lighting scheme
 	eDimension m_Dimension;
 	

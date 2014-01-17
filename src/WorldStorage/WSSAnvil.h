@@ -47,7 +47,7 @@ class cWSSAnvil :
 	
 public:
 
-	cWSSAnvil(cWorld * a_World);
+	cWSSAnvil(cWorld * a_World, int a_CompressionFactor);
 	virtual ~cWSSAnvil();
 	
 protected:
@@ -89,6 +89,8 @@ protected:
 	
 	cCriticalSection m_CS;
 	cMCAFiles        m_Files;  // a MRU cache of MCA files
+	
+	int m_CompressionFactor;
 
 	/// Gets chunk data from the correct file; locks file CS as needed
 	bool GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data);

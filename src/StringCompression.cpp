@@ -11,7 +11,7 @@
 
 
 /// Compresses a_Data into a_Compressed; returns Z_XXX error constants same as zlib's compress2()
-int CompressString(const char * a_Data, int a_Length, AString & a_Compressed)
+int CompressString(const char * a_Data, int a_Length, AString & a_Compressed, int a_Factor)
 {
 	uLongf CompressedSize = compressBound(a_Length);
 	
@@ -19,7 +19,7 @@ int CompressString(const char * a_Data, int a_Length, AString & a_Compressed)
 	// It saves us one allocation and one memcpy of the entire compressed data
 	// It may not work on some STL implementations! (Confirmed working on MSVC 2008 & 2010)
 	a_Compressed.resize(CompressedSize);
-	int errorcode = compress2( (Bytef*)a_Compressed.data(), &CompressedSize, (const Bytef*)a_Data, a_Length, Z_DEFAULT_COMPRESSION);
+	int errorcode = compress2( (Bytef*)a_Compressed.data(), &CompressedSize, (const Bytef*)a_Data, a_Length, a_Factor);
 	if (errorcode != Z_OK)
 	{
 		return errorcode;
