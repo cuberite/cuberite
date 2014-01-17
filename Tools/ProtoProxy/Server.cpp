@@ -66,11 +66,11 @@ void cServer::Run(void)
 	{
 		sockaddr_in Addr;
 		memset(&Addr, 0, sizeof(Addr));
-		int AddrSize = sizeof(Addr);
+		socklen_t AddrSize = sizeof(Addr);
 		SOCKET client = accept(m_ListenSocket, (sockaddr *)&Addr, &AddrSize);
 		if (client == INVALID_SOCKET)
 		{
-			printf("accept returned an error: %d; bailing out.\n", WSAGetLastError());
+			printf("accept returned an error: %d; bailing out.\n", SocketError);
 			return;
 		}
 		printf("Client connected, proxying...\n");
