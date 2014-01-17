@@ -1040,7 +1040,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (!HandlePacket(bb, PacketType))
 		{
 			// Unknown packet, already been reported, but without the length. Log the length here:
-			LOGWARNING("Unhandled packet: type 0x%x, length %u", PacketType, PacketLen);
+			LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, PacketLen);
 			
 			#ifdef _DEBUG
 				// Dump the packet contents into the log:
@@ -1059,8 +1059,8 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
-			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x. Read %u bytes, packet contained %u bytes",
-				PacketType, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
+			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read %u bytes, packet contained %u bytes",
+				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
 			);
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
@@ -1128,9 +1128,26 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			}
 			break;
 		}
+		default:
+		{
+			// Received a packet in an unknown state, report:
+			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
+			
+			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
+			
+			// Switch to a state when all further packets are silently ignored:
+			m_State = 255;
+			return false;
+		}
+		case 255:
+		{
+			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
+			// Do not output anything (the caller will do that for us), just return failure
+			return false;
+		}
 	}  // switch (m_State)
 	
-	// Unknown packet type, report to the client:
+	// Unknown packet type, report to the ClientHandle:
 	m_Client->PacketUnknown(a_PacketType);
 	return false;
 }
