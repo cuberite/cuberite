@@ -2,10 +2,6 @@
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++03")
-endif()
-
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
 
