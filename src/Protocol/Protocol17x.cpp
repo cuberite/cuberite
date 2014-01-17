@@ -1890,8 +1890,23 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteInt(1); // Shaking direction, doesn't seem to affect anything
 			WriteByte(0x73);
 			WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
-
-			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
+			
+			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpNone)
+			{
+				cRideableMinecart & RideableMinecart = ((cRideableMinecart &)a_Entity);
+				if (!RideableMinecart.GetContent().IsEmpty())
+				{
+					WriteByte(0x54);
+					int Content = RideableMinecart.GetContent().m_ItemType;
+					Content |= RideableMinecart.GetContent().m_ItemDamage << 8;
+					WriteInt(Content);
+					WriteByte(0x55);
+					WriteInt(RideableMinecart.GetBlockHeight());
+					WriteByte(0x56);
+					WriteByte(1);
+				}
+			}
+			else if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
 			{
 				WriteByte(0x10);
 				WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0);

@@ -54,6 +54,7 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 		}
 	}
 	a_ClientHandle.SendSpawnVehicle(*this, 10, SubType); // 10 = Minecarts, SubType = What type of Minecart
+	a_ClientHandle.SendEntityMetadata(*this);
 }
 
 
@@ -672,10 +673,12 @@ void cMinecart::Destroyed()
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cEmptyMinecart:
+// cRideableMinecart:
 
-cEmptyMinecart::cEmptyMinecart(double a_X, double a_Y, double a_Z) :
-	super(mpNone, a_X, a_Y, a_Z)
+cRideableMinecart::cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height) :
+	super(mpNone, a_X, a_Y, a_Z),
+	m_Content(a_Content),
+	m_Height(a_Height)
 {
 }
 
@@ -683,7 +686,7 @@ cEmptyMinecart::cEmptyMinecart(double a_X, double a_Y, double a_Z) :
 
 
 
-void cEmptyMinecart::OnRightClicked(cPlayer & a_Player)
+void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 {
 	if (m_Attachee != NULL)
 	{
