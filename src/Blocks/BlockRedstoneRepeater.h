@@ -25,7 +25,7 @@ public:
 		) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = RepeaterRotationToMetaData(a_Player->GetRotation());
+		a_BlockMeta = RepeaterRotationToMetaData(a_Player->GetRot().x);
 		return true;
 	}
 	

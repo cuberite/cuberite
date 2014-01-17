@@ -263,16 +263,16 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 
 
-void cEntity::SetRotationFromSpeed(void)
+void cEntity::SetYawFromSpeed(void)
 {
 	const double EPS = 0.0000001;
 	if ((abs(m_Speed.x) < EPS) && (abs(m_Speed.z) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
-		SetRotation(0);
+		SetYaw(0);
 		return;
 	}
-	SetRotation(atan2(m_Speed.x, m_Speed.z) * 180 / PI);
+	SetYaw(atan2(m_Speed.x, m_Speed.z) * 180 / PI);
 }
 
 

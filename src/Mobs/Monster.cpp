@@ -208,7 +208,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		Distance.Normalize();
 		VectorToEuler( Distance.x, Distance.y, Distance.z, Rotation, Pitch );
 		SetHeadYaw (Rotation);
-		SetRotation( Rotation );
+		SetYaw( Rotation );
 		SetPitch( -Pitch );
 	}
 

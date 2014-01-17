@@ -1891,7 +1891,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 	{
 		return false;
 	}
-	a_Entity.SetRotation(Rotation[0]);
+	a_Entity.SetYaw(Rotation[0]);
 	a_Entity.SetRoll    (Rotation[1]);
 	
 	return true;

@@ -307,7 +307,7 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 /// Updates the current recipe, based on the current input
 void cFurnaceEntity::UpdateInput(void)
 {
-	if (!m_Contents.GetSlot(fsInput).IsStackableWith(m_LastInput))
+	if (!m_Contents.GetSlot(fsInput).IsEqual(m_LastInput))
 	{
 		// The input is different from what we had before, reset the cooking time
 		m_TimeCooked = 0;
@@ -417,7 +417,7 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 		return true;
 	}
 
-	if (!m_Contents.GetSlot(fsOutput).IsStackableWith(*m_CurrentRecipe->Out))
+	if (!m_Contents.GetSlot(fsOutput).IsEqual(*m_CurrentRecipe->Out))
 	{
 		// The output slot is blocked with something that cannot be stacked with the recipe's output
 		return false;

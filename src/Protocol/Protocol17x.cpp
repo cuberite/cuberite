@@ -1685,7 +1685,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 		return;
 	}
 	
-	// Load enchantments from the NBT:
+	// Load enchantments and custom display names from the NBT data:
 	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
 	{
 		if (
@@ -1697,6 +1697,27 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 		)
 		{
 			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+		}
+		else if ((NBT.GetType(tag) == TAG_Compound) && (NBT.GetName(tag) == "display")) // Custom name and lore tag
+		{
+			for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+			{
+				if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name")) // Custon name tag
+				{
+					a_Item.m_CustomName = NBT.GetString(displaytag);
+				}
+				else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore")) // Lore tag
+				{
+					AString Lore;
+
+					for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
+					{
+						AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+					}
+
+					a_Item.m_Lore = Lore;
+				}
+			}
 		}
 	}
 }
@@ -1749,16 +1770,45 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	WriteByte (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
-	if (a_Item.m_Enchantments.IsEmpty())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty())
 	{
 		WriteShort(-1);
 		return;
 	}
 
-	// Send the enchantments:
+	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
-	const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-	a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+		a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	}
+	if (!a_Item.IsBothNameAndLoreEmpty())
+	{
+		Writer.BeginCompound("display");
+		if (!a_Item.IsCustomNameEmpty())
+		{
+			Writer.AddString("Name", a_Item.m_CustomName.c_str());
+		}
+		if (!a_Item.IsLoreEmpty())
+		{
+			Writer.BeginList("Lore", TAG_String);
+
+			AStringVector Decls = StringSplit(a_Item.m_Lore, "`");
+			for (AStringVector::const_iterator itr = Decls.begin(), end = Decls.end(); itr != end; ++itr)
+			{
+				if (itr->empty())
+				{
+					// The decl is empty (two `s), ignore
+					continue;
+				}
+				Writer.AddString("", itr->c_str());
+			}
+
+			Writer.EndList();
+		}
+		Writer.EndCompound();
+	}
 	Writer.Finish();
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);

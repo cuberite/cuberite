@@ -1382,16 +1382,21 @@ void cPlayer::TossItem(
 			cItem DroppedItem(GetInventory().GetEquippedItem());
 			if (!DroppedItem.IsEmpty())
 			{
-				if (GetInventory().RemoveOneEquippedItem())
+				char NewAmount = a_Amount;
+				if (NewAmount > GetInventory().GetEquippedItem().m_ItemCount)
 				{
-					DroppedItem.m_ItemCount = 1; // RemoveItem decreases the count, so set it to 1 again
-					Drops.push_back(DroppedItem);
+					NewAmount = GetInventory().GetEquippedItem().m_ItemCount; // Drop only what's there
 				}
+
+				GetInventory().GetHotbarGrid().ChangeSlotCount(GetInventory().GetEquippedSlotNum() /* Returns hotbar subslot, which HotbarGrid takes */, -a_Amount);
+
+				DroppedItem.m_ItemCount = NewAmount;
+				Drops.push_back(DroppedItem);
 			}
 		}
 	}
 	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetRotation(), GetPitch(), vZ, vX, vY);
+	EulerToVector(-GetRot().x, GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
@@ -1523,7 +1528,7 @@ bool cPlayer::LoadFromDisk()
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if (JSON_PlayerRotation.size() == 3)
 	{
-		SetRotation ((float)JSON_PlayerRotation[(unsigned int)0].asDouble());
+		SetYaw      ((float)JSON_PlayerRotation[(unsigned int)0].asDouble());
 		SetPitch    ((float)JSON_PlayerRotation[(unsigned int)1].asDouble());
 		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
 	}
@@ -1586,7 +1591,7 @@ bool cPlayer::SaveToDisk()
 	JSON_PlayerPosition.append(Json::Value(GetPosZ()));
 
 	Json::Value JSON_PlayerRotation;
-	JSON_PlayerRotation.append(Json::Value(GetRotation()));
+	JSON_PlayerRotation.append(Json::Value(GetRot().x));
 	JSON_PlayerRotation.append(Json::Value(GetPitch()));
 	JSON_PlayerRotation.append(Json::Value(GetRoll()));
 

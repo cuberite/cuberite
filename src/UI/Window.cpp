@@ -642,7 +642,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 			Area->SetSlot(LocalSlotNum, a_Player, ToStore);
 			NumDistributed += ToStore.m_ItemCount;
 		}
-		else if (AtSlot.IsStackableWith(a_Item))
+		else if (AtSlot.IsEqual(a_Item))
 		{
 			// Occupied, add and cap at MaxStack:
 			int CanStore = std::min(a_NumToEachSlot, (int)MaxStack - AtSlot.m_ItemCount);
