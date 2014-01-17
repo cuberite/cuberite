@@ -52,7 +52,9 @@ void NonCtrlHandler(int a_Signal)
 			exit(EXIT_FAILURE);
 		}
 		case SIGABRT:
+		#ifdef SIGABRT_COMPAT
 		case SIGABRT_COMPAT:
+		#endif
 		{
 			std::signal(a_Signal, SIG_DFL);
 			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
