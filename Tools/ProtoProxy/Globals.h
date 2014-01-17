@@ -124,7 +124,7 @@ typedef unsigned short     UInt16;
 	#include <errno.h>
 	#include <fcntl.h>
 	
-	typedef SOCKET int;
+	typedef int SOCKET;
 	enum
 	{
 		INVALID_SOCKET = -1,
