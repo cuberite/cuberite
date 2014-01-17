@@ -76,7 +76,7 @@ public:
 	void UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void UnqueueSave(const cChunkCoords & a_Chunk);
 	
-	bool Start(cWorld * a_World, const AString & a_StorageSchemaName);  // Hide the cIsThread's Start() method, we need to provide args
+	bool Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor);  // Hide the cIsThread's Start() method, we need to provide args
 	void Stop(void);  // Hide the cIsThread's Stop() method, we need to signal the event
 	void WaitForFinish(void);
 	void WaitForLoadQueueEmpty(void);
@@ -126,7 +126,7 @@ protected:
 	/// The one storage schema used for saving
 	cWSSchema *   m_SaveSchema;
 	
-	void InitSchemas(void);
+	void InitSchemas(int a_StorageCompressionFactor);
 	
 	virtual void Execute(void) override;
 	

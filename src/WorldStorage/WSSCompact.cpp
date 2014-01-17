@@ -193,7 +193,7 @@ cWSSCompact::cPAKFile * cWSSCompact::LoadPAKFile(const cChunkCoords & a_Chunk)
 	// Load it anew:
 	AString FileName;
 	Printf(FileName, "%s/X%i_Z%i.pak", m_World->GetName().c_str(), LayerX, LayerZ );
-	cPAKFile * f = new cPAKFile(FileName, LayerX, LayerZ);
+	cPAKFile * f = new cPAKFile(FileName, LayerX, LayerZ, m_CompressionFactor);
 	if (f == NULL)
 	{
 		return NULL;
@@ -399,8 +399,9 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 		return; \
 	}
 
-cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_LayerZ) :
+cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_LayerZ, int a_CompressionFactor) :
 	m_FileName(a_FileName),
+	m_CompressionFactor(a_CompressionFactor),
 	m_LayerX(a_LayerX),
 	m_LayerZ(a_LayerZ),
 	m_NumDirty(0),
@@ -648,7 +649,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		// Re-compress data
 		AString CompressedData;
 		{
-			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData);
+			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData,m_CompressionFactor);
 			if (errorcode != Z_OK)
 			{
 				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
@@ -786,7 +787,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		// Re-compress data
 		AString CompressedData;
 		{
-			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData);
+			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData, m_CompressionFactor);
 			if (errorcode != Z_OK)
 			{
 				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
@@ -939,7 +940,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	
 	// Compress the data:
 	AString CompressedData;
-	int errorcode = CompressString(Data.data(), Data.size(), CompressedData);
+	int errorcode = CompressString(Data.data(), Data.size(), CompressedData, m_CompressionFactor);
 	if ( errorcode != Z_OK )
 	{
 		LOGERROR("Error %i compressing data for chunk [%d, %d, %d]", errorcode, a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ);

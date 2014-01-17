@@ -68,11 +68,11 @@ cWorldStorage::~cWorldStorage()
 
 
 
-bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName)
+bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor )
 {
 	m_World = a_World;
 	m_StorageSchemaName = a_StorageSchemaName;
-	InitSchemas();
+	InitSchemas(a_StorageCompressionFactor);
 	
 	return super::Start();
 }
@@ -197,11 +197,11 @@ void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 
 
 
-void cWorldStorage::InitSchemas(void)
+void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 {
 	// The first schema added is considered the default
-	m_Schemas.push_back(new cWSSAnvil    (m_World));
-	m_Schemas.push_back(new cWSSCompact  (m_World));
+	m_Schemas.push_back(new cWSSAnvil    (m_World,a_StorageCompressionFactor));
+	m_Schemas.push_back(new cWSSCompact  (m_World,a_StorageCompressionFactor));
 	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 	
