@@ -772,6 +772,9 @@ private:
 	/// the future; guarded by m_CSScheduledTasks
 	ScheduledTaskList m_ScheduledTasks;
 	
+	/// Current Tick number for sceduled tasks
+	int m_TickID;
+	
 	/// Guards m_Clients
 	cCriticalSection  m_CSClients;
 	
