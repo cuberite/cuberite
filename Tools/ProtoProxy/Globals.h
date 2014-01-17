@@ -123,6 +123,12 @@ typedef unsigned short     UInt16;
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
+	
+	typedef SOCKET int;
+	enum
+	{
+		INVALID_SOCKET = -1,
+	};
 #if !defined(ANDROID_NDK)
 	#include <tr1/memory>
 #endif

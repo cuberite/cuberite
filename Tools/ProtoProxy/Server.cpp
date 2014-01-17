@@ -22,13 +22,16 @@ cServer::cServer(void)
 int cServer::Init(short a_ListenPort, short a_ConnectPort)
 {
 	m_ConnectPort = a_ConnectPort;
-	WSAData wsa;
-	int res = WSAStartup(0x0202, &wsa);
-	if (res != 0)
-	{
-		printf("Cannot initialize WinSock: %d\n", res);
-		return res;
-	}
+	
+	#ifdef _WIN32
+		WSAData wsa;
+		int res = WSAStartup(0x0202, &wsa);
+		if (res != 0)
+		{
+			printf("Cannot initialize WinSock: %d\n", res);
+			return res;
+		}
+	#endif  // _WIN32
 	
 	printf("Generating protocol encryption keypair...\n");
 	time_t CurTime = time(NULL);
@@ -62,7 +65,7 @@ void cServer::Run(void)
 	while (true)
 	{
 		sockaddr_in Addr;
-		ZeroMemory(&Addr, sizeof(Addr));
+		memset(&Addr, 0, sizeof(Addr));
 		int AddrSize = sizeof(Addr);
 		SOCKET client = accept(m_ListenSocket, (sockaddr *)&Addr, &AddrSize);
 		if (client == INVALID_SOCKET)
