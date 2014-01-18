@@ -396,6 +396,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_LILY_PAD, biSwampland, 4, E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER));
 		}
+		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenNetherClumpFoliage(Seed));
+		}
 		else if (NoCaseCompare(*itr, "PreSimulator") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenPreSimulator);
@@ -407,10 +411,6 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "SprinkleFoliage") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(Seed));
-		}
-		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
-		{
-			m_FinishGens.push_back(new cFinishGenNetherClumpFoliage(Seed));
 		}
 		else if (NoCaseCompare(*itr, "WaterSprings") == 0)
 		{
