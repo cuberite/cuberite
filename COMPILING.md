@@ -81,8 +81,8 @@ This is useful if you want to compile MCServer to use on another 32-bit machine.
     
 to your cmake command and 32 bit will be forced.
 
-Compiling for another computer
-------------------------------
+### Compiling for another computer ###
+
 
 When compiling for another computer it is important to set cross compiling mode. This tells the compiler not to optimise for your machine. It can be used with debug or release mode. To enable simply add:
 
