@@ -2766,9 +2766,6 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	{
 		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	}
-
-	// Because it's logical that ALL mob spawns need spawn effects, not just spawners
-	BroadcastSoundParticleEffect(2004, (int)a_PosX, (int)a_PosY, (int)a_PosZ, 0);
 	
 	return SpawnMobFinalize(Monster);
 }
