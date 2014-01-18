@@ -9,8 +9,7 @@
 
 #pragma once
 
-#include "BlockEntityWithItems.h"
-#include "../UI/WindowOwner.h"
+#include "BlockEntity.h"
 
 
 
@@ -28,8 +27,7 @@ namespace Json
 // tolua_begin
 
 class cCommandBlockEntity : 
-	public cBlockEntity,
-	public cBlockEntityWindowOwner
+	public cBlockEntity
 {
 	typedef cBlockEntity super;
 	
@@ -39,7 +37,6 @@ public:
 	
 	/// Creates a new empty command block entity
 	cCommandBlockEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
-	virtual ~cCommandBlockEntity();
 
 	bool LoadFromJson( const Json::Value& a_Value );
 	virtual void SaveToJson(Json::Value& a_Value ) override;

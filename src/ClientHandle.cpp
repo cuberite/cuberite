@@ -570,19 +570,26 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 		return;
 	}
 
+	cByteBuffer Buffer(a_Length);
+	Buffer.Write(a_Data, a_Length);
+
 	int BlockX, BlockY, BlockZ;
 
 	AString Command;
 
-	switch (a_Data[0])
+	char Mode;
+
+	Buffer.ReadChar(Mode);
+
+	switch (Mode)
 	{
 		case 0x00:
 		{
-			BlockX = GetBEInt(a_Data + 1);
-			BlockY = GetBEInt(a_Data + 5);
-			BlockZ = GetBEInt(a_Data + 9);
+			Buffer.ReadBEInt(BlockX);
+			Buffer.ReadBEInt(BlockY);
+			Buffer.ReadBEInt(BlockZ);
 
-			Command = AString(a_Data + 14, (int)a_Data[13]);
+			Buffer.ReadVarUTF8String(Command);
 			break;
 		}
 

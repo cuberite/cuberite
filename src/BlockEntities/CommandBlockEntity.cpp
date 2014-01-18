@@ -20,24 +20,7 @@ cCommandBlockEntity::cCommandBlockEntity(int a_X, int a_Y, int a_Z, cWorld * a_W
 	super(E_BLOCK_COMMAND_BLOCK, a_X, a_Y, a_Z, a_World),
 	m_ShouldExecute(false),
 	m_IsPowered(false)
-{
-	SetBlockEntity(this); // cBlockEntityWindowOwner
-}
-
-
-
-
-
-
-cCommandBlockEntity::~cCommandBlockEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != NULL)
-	{
-		Window->OwnerDestroyed();
-	}
-}
+{}
 
 
 
@@ -46,21 +29,8 @@ cCommandBlockEntity::~cCommandBlockEntity()
 
 void cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 {
-	cWindow * Window = GetWindow();
-	if (Window == NULL)
-	{
-		// TODO 2014-01-18 xdot: Open the appropriate window.
-		// OpenWindow(new cCommandBlockWindow(m_PosX, m_PosY, m_PosZ, this));
-		Window = GetWindow();
-	}
-	
-	if (Window != NULL)
-	{
-		if (a_Player->GetWindow() != Window)
-		{
-			a_Player->OpenWindow(Window);
-		}
-	}
+	// Nothing to do
+	UNUSED(a_Player);
 }
 
 
