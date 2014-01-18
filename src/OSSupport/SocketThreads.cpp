@@ -71,29 +71,6 @@ bool cSocketThreads::AddClient(const cSocket & a_Socket, cCallback * a_Client)
 
 
 
-/*
-void cSocketThreads::RemoveClient(const cSocket * a_Socket)
-{
-	// Remove the socket (and associated client) from processing
-
-	cCSLock Lock(m_CS);
-	for (cSocketThreadList::iterator itr = m_Threads.begin(); itr != m_Threads.end(); ++itr)
-	{
-		if ((*itr)->RemoveSocket(a_Socket))
-		{
-			return;
-		}
-	}  // for itr - m_Threads[]
-	
-	// Cannot assert here, this may actually happen legally, since cClientHandle has to clean up the socket and it may have already closed in the meantime
-	// ASSERT(!"Removing an unknown socket");
-}
-*/
-
-
-
-
-
 void cSocketThreads::RemoveClient(const cCallback * a_Client)
 {
 	// Remove the associated socket and the client from processing
@@ -263,34 +240,6 @@ bool cSocketThreads::cSocketThread::RemoveClient(const cCallback * a_Client)
 	for (int i = m_NumSlots - 1; i >= 0 ; --i)
 	{
 		if (m_Slots[i].m_Client != a_Client)
-		{
-			continue;
-		}
-		
-		// Found, remove it:
-		m_Slots[i] = m_Slots[--m_NumSlots];
-		
-		// Notify the thread of the change:
-		ASSERT(m_ControlSocket2.IsValid());
-		m_ControlSocket2.Send("r", 1);
-		return true;
-	}  // for i - m_Slots[]
-	
-	// Not found
-	return false;
-}
-
-
-
-
-
-bool cSocketThreads::cSocketThread::RemoveSocket(const cSocket * a_Socket)
-{
-	// Returns true if removed, false if not found
-
-	for (int i = m_NumSlots - 1; i >= 0 ; --i)
-	{
-		if (m_Slots[i].m_Socket != *a_Socket)
 		{
 			continue;
 		}

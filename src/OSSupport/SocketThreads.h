@@ -81,7 +81,9 @@ public:
 	/// Add a (socket, client) pair for processing, data from a_Socket is to be sent to a_Client; returns true if successful
 	bool AddClient(const cSocket & a_Socket, cCallback * a_Client);
 	
-	/// Remove the associated socket and the client from processing. The socket is left to send its data and is removed only after all its m_OutgoingData is sent
+	/** Remove the associated socket and the client from processing.
+	The socket is left to send its data and is removed only after all its m_OutgoingData is sent
+	*/
 	void RemoveClient(const cCallback * a_Client);
 	
 	/// Notify the thread responsible for a_Client that the client has something to write
@@ -114,7 +116,6 @@ private:
 
 		void AddClient   (const cSocket &   a_Socket, cCallback * a_Client);  // Takes ownership of the socket
 		bool RemoveClient(const cCallback * a_Client);  // Returns true if removed, false if not found
-		bool RemoveSocket(const cSocket *   a_Socket);  // Returns true if removed, false if not found
 		bool HasClient   (const cCallback * a_Client) const;
 		bool HasSocket   (const cSocket *   a_Socket) const;
 		bool NotifyWrite (const cCallback * a_Client);  // Returns true if client handled by this thread
