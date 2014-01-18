@@ -8,6 +8,7 @@
 #include "Entities/Player.h"
 #include "Inventory.h"
 #include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/SignEntity.h"
 #include "UI/Window.h"
 #include "Item.h"
@@ -545,7 +546,70 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
+	if (a_Channel == "MC|AdvCdm") // Command block
+	{
+		const char* Data = a_Message.c_str();
+
+		HandleCommandBlockMessage(Data, a_Message.size());
+
+		return;
+	}
+
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
+}
+
+
+
+
+
+void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length)
+{
+	if (a_Length < 14)
+	{
+		LOGD("Malformed MC|AdvCdm packet.");
+		return;
+	}
+
+	int BlockX, BlockY, BlockZ;
+
+	AString Command;
+
+	switch (a_Data[0])
+	{
+		case 0x00:
+		{
+			BlockX = GetBEInt(a_Data + 1);
+			BlockY = GetBEInt(a_Data + 5);
+			BlockZ = GetBEInt(a_Data + 9);
+
+			Command = AString(a_Data + 14, (int)a_Data[13]);
+			break;
+		}
+
+		default:
+		{
+			LOGD("Unhandled MC|AdvCdm packet mode.");
+			return;
+		}
+	}
+
+	class cUpdateCommandBlock :
+		public cCommandBlockCallback
+	{
+		AString m_Command;
+	public:
+		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
+			
+		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
+		{
+			a_CommandBlock->SetCommand(m_Command);
+			return false;
+		}
+	} CmdBlockCB (Command);
+
+	cWorld * World = m_Player->GetWorld();
+
+	World->DoWithCommandBlockAt(BlockX, BlockY, BlockZ, CmdBlockCB);
 }
 
 

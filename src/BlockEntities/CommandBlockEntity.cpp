@@ -212,6 +212,8 @@ void cCommandBlockEntity::Execute()
 		}
 	} CmdBlockOutCb(this);
 
+	LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
+
 	cServer* Server = cRoot::Get()->GetServer();
 
 	Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);

@@ -236,7 +236,7 @@ void cNBTChunkSerializer::AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock
 		m_Writer.AddString("Command",      a_CmdBlock->GetCommand());
 		m_Writer.AddInt   ("SuccessCount", a_CmdBlock->GetResult());
 		m_Writer.AddString("LastOutput",   a_CmdBlock->GetLastOutput());
-		m_Writer.AddByte  ("TrackOutput",  1); // Unknown (?)
+		m_Writer.AddByte  ("TrackOutput",  1); // TODO 2014-01-18 xdot: Figure out what TrackOutput is and save it.
 	m_Writer.EndCompound();
 }
 
