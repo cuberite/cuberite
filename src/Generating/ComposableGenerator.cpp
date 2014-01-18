@@ -367,10 +367,10 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 {
 	int Seed = m_ChunkGenerator.GetSeed();
-	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava,DeadBushes,PreSimulator");
-
 	eDimension Dimension = StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld"));
-	AStringVector Str = StringSplitAndTrim(Structures, ",");
+
+	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava,DeadBushes,PreSimulator");
+	AStringVector Str = StringSplitAndTrim(Finishers, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
 		// Finishers, alpha-sorted:
@@ -407,6 +407,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "SprinkleFoliage") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(Seed));
+		}
+		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenNetherClumpFoliage(Seed));
 		}
 		else if (NoCaseCompare(*itr, "WaterSprings") == 0)
 		{
