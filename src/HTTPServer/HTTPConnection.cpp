@@ -205,6 +205,12 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 			{
 				m_State = wcsRecvIdle;
 				m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
+				if (!m_CurrentRequest->DoesAllowKeepAlive())
+				{
+					m_State = wcsInvalid;
+					m_HTTPServer.CloseConnection(*this);
+					return;
+				}
 				delete m_CurrentRequest;
 				m_CurrentRequest = NULL;
 			}
