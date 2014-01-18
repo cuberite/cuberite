@@ -13,6 +13,7 @@
 #include "../Noise.h"
 #include "../BlockID.h"
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
+#include "../Simulator/FireSimulator.h"
 #include "../World.h"
 
 
@@ -93,15 +94,15 @@ void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		}
 		
 		NOISE_DATATYPE BlockType = m_Noise.CubicNoise1D((float) (ChunkX * ChunkZ) / (y * 0.1f));
-		if (BlockType < -0.30)
+		if (BlockType < -0.7)
 		{
 			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_BROWN_MUSHROOM);
 		}
-		else if (BlockType < -0.20)
+		else if (BlockType < 0)
 		{
 			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_RED_MUSHROOM);
 		}
-		else if (BlockType < -0.10)
+		else if (BlockType < 0.7)
 		{
 			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_FIRE);
 		}
@@ -114,7 +115,8 @@ void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 void cFinishGenNetherSprinkleFoliage::TryPlaceClumb(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
 {
-	a_ChunkDesc.SetBlockType(a_RelX, a_RelY, a_RelZ, a_Block);
+	bool IsFireBlock = a_Block == E_BLOCK_FIRE;
+
 	for (int x = a_RelX - 4; x < a_RelX + 4; x++)
 	{
 		float xx = (float) a_ChunkDesc.GetChunkX() * cChunkDef::Width + x;
@@ -127,10 +129,21 @@ void cFinishGenNetherSprinkleFoliage::TryPlaceClumb(cChunkDesc & a_ChunkDesc, in
 				{
 					continue;
 				}
-				if (!g_BlockIsSolid[a_ChunkDesc.GetBlockType(x, y - 1, z)])  // Only place on solid blocks
+
+				BLOCKTYPE BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+				if (!g_BlockIsSolid[BlockBelow])  // Only place on solid blocks
 				{
 					continue;
 				}
+
+				if (IsFireBlock) // don't place fire on non-forever burning blocks.
+				{
+					if (!cFireSimulator::DoesBurnForever(BlockBelow))
+					{
+						continue;
+					}
+				}
+
 
 				NOISE_DATATYPE Val = m_Noise.CubicNoise2D(xx, zz);
 				if (Val < -0.70)
