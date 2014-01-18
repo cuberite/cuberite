@@ -8,9 +8,9 @@
 #include "CommandBlockEntity.h"
 #include "../Entities/Player.h"
 
-#include "CommandOutput.h"
-#include "Root.h"
-#include "Server.h" // ExecuteConsoleCommand()
+#include "../CommandOutput.h"
+#include "../Root.h"
+#include "../Server.h" // ExecuteConsoleCommand()
 
 
 
