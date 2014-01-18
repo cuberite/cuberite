@@ -45,7 +45,7 @@ void cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 	cWindow * Window = GetWindow();
 	if (Window == NULL)
 	{
-		//OpenWindow(new cDropSpenserWindow(m_PosX, m_PosY, m_PosZ, this));
+		//OpenWindow(new cDropSpenserWindow(m_PosX, m_PosY, m_PosZ, this)); FIXME
 		Window = GetWindow();
 	}
 	
@@ -71,6 +71,24 @@ void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 
 
 
+void cCommandBlockEntity::SetLastOutput(const AString & a_LastOut)
+{
+	m_LastOutput = a_LastOut;
+}
+
+
+
+
+
+void cCommandBlockEntity::SetResult(const NIBBLETYPE a_Result)
+{
+	m_Result = a_Result;
+}
+
+
+
+
+
 const AString & cCommandBlockEntity::GetCommand(void) const
 {
 	return m_Command;
@@ -83,6 +101,15 @@ const AString & cCommandBlockEntity::GetCommand(void) const
 const AString & cCommandBlockEntity::GetLastOutput(void) const
 {
 	return m_LastOutput;
+}
+
+
+
+
+
+NIBBLETYPE cCommandBlockEntity::GetResult(void) const
+{
+	return m_Result;
 }
 
 
@@ -164,8 +191,11 @@ void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 void cCommandBlockEntity::Execute()
 {
 	// TODO: Parse arguments and dispatch command
+
 	LOGD("Command: %s", m_Command.c_str());
+
 	m_LastOutput = "";
+	m_Result = 0;
 }
 
 

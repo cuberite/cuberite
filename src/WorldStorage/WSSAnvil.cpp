@@ -15,6 +15,7 @@
 #include "../StringCompression.h"
 
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
@@ -567,6 +568,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadChestFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "Control", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadCommandBlockFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		else if (strncmp(a_NBT.GetData(sID), "Dropper", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadDropperFromNBT(a_BlockEntities, a_NBT, Child);
@@ -909,6 +914,43 @@ void cWSSAnvil::LoadSignFromNBT(cBlockEntityList & a_BlockEntities, const cParse
 	}
 
 	a_BlockEntities.push_back(Sign.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadCommandBlockFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cCommandBlockEntity> CmdBlock(new cCommandBlockEntity(x, y, z, m_World));
+
+	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Command");
+	if (currentLine >= 0)
+	{
+		CmdBlock->SetCommand(a_NBT.GetString(currentLine));
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "SuccessCount");
+	if (currentLine >= 0)
+	{
+		CmdBlock->SetResult(a_NBT.GetInt(currentLine));
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "LastOutput");
+	if (currentLine >= 0)
+	{
+		CmdBlock->SetLastOutput(a_NBT.GetString(currentLine));
+	}
+
+	// FIXME: TrackOutput
+
+	a_BlockEntities.push_back(CmdBlock.release());
 }
 
 
