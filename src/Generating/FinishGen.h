@@ -51,7 +51,7 @@ class cFinishGenNetherSprinkleFoliage :
 	public cFinishGen
 {
 public:
-	cFinishGenNetherSprinkleFoliage(int a_Seed) : 
+	cFinishGenNetherClumpFoliage(int a_Seed) : 
 		m_Noise(a_Seed),
 		m_Seed(a_Seed) 
 	{
@@ -61,7 +61,7 @@ protected:
 	cNoise m_Noise;
 	int    m_Seed;
 
-	void TryPlaceClumb(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block);
+	void TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 

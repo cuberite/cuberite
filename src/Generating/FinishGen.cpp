@@ -41,9 +41,9 @@ static inline bool IsWater(BLOCKTYPE a_BlockType)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cFinishGenNetherSprinkleFoliage:
+// cFinishGenNetherClumpFoliage:
 
-void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
+void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	double ChunkX = a_ChunkDesc.GetChunkX() + 0.1; // We can't devide through 0 so lets add 0.1 to all the chunk coordinates.
 	double ChunkZ = a_ChunkDesc.GetChunkZ() + 0.1;
@@ -96,15 +96,15 @@ void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		NOISE_DATATYPE BlockType = m_Noise.CubicNoise1D((float) (ChunkX * ChunkZ) / (y * 0.1f));
 		if (BlockType < -0.7)
 		{
-			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_BROWN_MUSHROOM);
+			TryPlaceClump(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_BROWN_MUSHROOM);
 		}
 		else if (BlockType < 0)
 		{
-			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_RED_MUSHROOM);
+			TryPlaceClump(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_RED_MUSHROOM);
 		}
 		else if (BlockType < 0.7)
 		{
-			TryPlaceClumb(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_FIRE);
+			TryPlaceClump(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_FIRE);
 		}
 	}
 }
@@ -113,7 +113,7 @@ void cFinishGenNetherSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cFinishGenNetherSprinkleFoliage::TryPlaceClumb(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
+void cFinishGenNetherSprinkleFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
 {
 	bool IsFireBlock = a_Block == E_BLOCK_FIRE;
 
