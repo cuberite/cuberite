@@ -367,10 +367,10 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 {
 	int Seed = m_ChunkGenerator.GetSeed();
-	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava,DeadBushes,PreSimulator");
-
 	eDimension Dimension = StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld"));
-	AStringVector Str = StringSplitAndTrim(Structures, ",");
+
+	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava,DeadBushes,PreSimulator");
+	AStringVector Str = StringSplitAndTrim(Finishers, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
 		// Finishers, alpha-sorted:
@@ -395,6 +395,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "Lilypads") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_LILY_PAD, biSwampland, 4, E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER));
+		}
+		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenNetherClumpFoliage(Seed));
 		}
 		else if (NoCaseCompare(*itr, "PreSimulator") == 0)
 		{
