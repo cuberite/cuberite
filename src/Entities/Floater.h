@@ -7,21 +7,25 @@
 
 
 
+// tolua_begin
 class cFloater :
 	public cEntity
 {
 	typedef cFloater super;
 	
 public:
-	
+
+	//tolua_end
 	cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_PlayerID, int a_CountDownTime);
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
-
+	
+	// tolua_begin
 	bool CanPickup(void)       const { return m_CanPickupItem; }
 	int GetOwnerID(void)       const { return m_PlayerID; }
 	int GetAttachedMobID(void) const { return m_AttachedMobID; }
+	// tolua_end
 
 protected:
 	// Position
@@ -37,4 +41,4 @@ protected:
 	// Entity IDs
 	int m_PlayerID;
 	int m_AttachedMobID;
-} ;
+} ; // tolua_export
