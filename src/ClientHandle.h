@@ -324,6 +324,9 @@ private:
 	
 	/// Handles the DIG_FINISHED dig packet:
 	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+
+	/// Handles the "MC|AdvCdm" plugin message
+	void HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client

@@ -1968,6 +1968,23 @@ bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNot
 
 
 
+bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback)
+{
+	int ChunkX, ChunkZ;
+	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk == NULL) && !Chunk->IsValid())
+	{
+		return false;
+	}
+	return Chunk->DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
 
 bool cChunkMap::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {

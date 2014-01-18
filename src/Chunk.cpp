@@ -1298,6 +1298,7 @@ void cChunk::CreateBlockEntities(void)
 				switch (BlockType)
 				{
 					case E_BLOCK_CHEST:
+					case E_BLOCK_COMMAND_BLOCK:
 					case E_BLOCK_DISPENSER:
 					case E_BLOCK_DROPPER:
 					case E_BLOCK_ENDER_CHEST:
@@ -1425,6 +1426,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	switch (a_BlockType)
 	{
 		case E_BLOCK_CHEST:
+		case E_BLOCK_COMMAND_BLOCK:
 		case E_BLOCK_DISPENSER:
 		case E_BLOCK_DROPPER:
 		case E_BLOCK_ENDER_CHEST:
@@ -2254,6 +2256,38 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 		
 		// The correct block entity is here, 
 		if (a_Callback.Item((cNoteEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_COMMAND_BLOCK)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here, 
+		if (a_Callback.Item((cCommandBlockEntity *)*itr))
 		{
 			return false;
 		}
