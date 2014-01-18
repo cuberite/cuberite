@@ -948,7 +948,7 @@ void cWSSAnvil::LoadCommandBlockFromNBT(cBlockEntityList & a_BlockEntities, cons
 		CmdBlock->SetLastOutput(a_NBT.GetString(currentLine));
 	}
 
-	// FIXME: TrackOutput
+	// TODO 2014-01-18 xdot: Figure out what TrackOutput is and parse it.
 
 	a_BlockEntities.push_back(CmdBlock.release());
 }

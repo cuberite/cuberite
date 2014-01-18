@@ -8,6 +8,10 @@
 #include "CommandBlockEntity.h"
 #include "../Entities/Player.h"
 
+#include "CommandOutput.h"
+#include "Root.h"
+#include "Server.h" // ExecuteConsoleCommand()
+
 
 
 
@@ -45,7 +49,8 @@ void cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 	cWindow * Window = GetWindow();
 	if (Window == NULL)
 	{
-		//OpenWindow(new cDropSpenserWindow(m_PosX, m_PosY, m_PosZ, this)); FIXME
+		// TODO 2014-01-18 xdot: Open the appropriate window.
+		// OpenWindow(new cCommandBlockWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
 	
@@ -64,7 +69,7 @@ void cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 
 void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 {
-	m_Command = a_Cmd;LOGD("Hrey %s", a_Cmd.c_str());
+	m_Command = a_Cmd;
 }
 
 
@@ -190,11 +195,28 @@ void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 
 void cCommandBlockEntity::Execute()
 {
-	// TODO: Parse arguments and dispatch command
+	class CommandBlockOutCb :
+		public cCommandOutputCallback
+	{
+		cCommandBlockEntity* m_CmdBlock;
 
-	LOGD("Command: %s", m_Command.c_str());
+	public:
+		CommandBlockOutCb(cCommandBlockEntity* a_CmdBlock) : m_CmdBlock(a_CmdBlock) {}
 
-	m_LastOutput = "";
+		virtual void Out(const AString & a_Text)
+		{
+			ASSERT(m_CmdBlock != NULL);
+
+			// Overwrite field
+			m_CmdBlock->SetLastOutput(a_Text);
+		}
+	} CmdBlockOutCb(this);
+
+	cServer* Server = cRoot::Get()->GetServer();
+
+	Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
+
+	// TODO 2014-01-18 xdot: Update the signal strength.
 	m_Result = 0;
 }
 
