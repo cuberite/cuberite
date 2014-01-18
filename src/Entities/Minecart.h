@@ -79,10 +79,13 @@ protected:
 	*/
 	void HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt);
 
-	/** Snaps a minecart to a rail's axis, resetting its speed */
+	/** Snaps a mincecart to a rail's axis, resetting its speed
+		For curved rails, it changes the cart's direction as well as snapping it to axis */
 	void SnapToRail(NIBBLETYPE a_RailMeta);
-	/** Tests is a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction*/
+	/** Tests if a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction */
 	bool TestBlockCollision(NIBBLETYPE a_RailMeta);
+	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away */
+	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
 
 } ;
 
