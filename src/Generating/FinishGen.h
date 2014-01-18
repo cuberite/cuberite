@@ -47,7 +47,7 @@ protected:
 
 
 
-class cFinishGenNetherSprinkleFoliage :
+class cFinishGenNetherClumpFoliage :
 	public cFinishGen
 {
 public:
