@@ -798,7 +798,7 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if ((m_Team != NULL) && (m_Team == Attacker->m_Team))
 		{
-			if (!m_Team->GetFriendlyFire())
+			if (!m_Team->AllowsFriendlyFire())
 			{
 				// Friendly fire is disabled
 				return;
@@ -868,7 +868,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	cScoreboard* Scoreboard = m_World->GetScoreBoard();
 
 	// Update scoreboard objectives
-	Scoreboard->ForEachObjectiveWith(E_OBJECTIVE_DEATH_COUNT, IncrementCounter);
+	Scoreboard->ForEachObjectiveWith(cObjective::E_TYPE_DEATH_COUNT, IncrementCounter);
 }
 
 
@@ -953,14 +953,14 @@ void cPlayer::SetTeam(cTeam* a_Team)
 {
 	if (m_Team)
 	{
-		m_Team->RemovePlayer(this);
+		m_Team->RemovePlayer(GetName());
 	}
 
 	m_Team = a_Team;
 
 	if (m_Team)
 	{
-		m_Team->AddPlayer(this);
+		m_Team->AddPlayer(GetName());
 	}
 }
 

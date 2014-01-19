@@ -11,14 +11,14 @@
 
 
 
-cObjective::cObjective(eObjectiveType a_Type) : m_Type(a_Type)
+cObjective::cObjective(cObjective::eType a_Type) : m_Type(a_Type)
 {}
 
 
 
 
 
-void cObjective::SetDisplaySlot(eDisplaySlot a_Display)
+void cObjective::SetDisplaySlot(cObjective::eDisplaySlot a_Display)
 {
 	m_Display = a_Display;
 }
@@ -102,8 +102,8 @@ cObjective::Score cObjective::SubScore(const AString & a_Name, cObjective::Score
 
 cTeam::cTeam(const AString & a_Name, const AString & a_DisplayName,
 	     const AString & a_Prefix, const AString & a_Suffix)
-	: m_FriendlyFire(true)
-	, m_SeeFriendlyInvisible(false)
+	: m_AllowsFriendlyFire(true)
+	, m_CanSeeFriendlyInvisible(false)
 	, m_Name(a_Name)
 	, m_DisplayName(a_DisplayName)
 	, m_Prefix(a_Prefix)
@@ -114,18 +114,18 @@ cTeam::cTeam(const AString & a_Name, const AString & a_DisplayName,
 
 
 
-bool cTeam::AddPlayer(cPlayer * a_Player)
+bool cTeam::AddPlayer(const AString & a_Name)
 {
-	return m_Players.insert(a_Player).second;
+	return m_Players.insert(a_Name).second;
 }
 
 
 
 
 
-bool cTeam::RemovePlayer(cPlayer * a_Player)
+bool cTeam::RemovePlayer(const AString & a_Name)
 {
-	return m_Players.erase(a_Player) > 0;
+	return m_Players.erase(a_Name) > 0;
 }
 
 
@@ -149,38 +149,13 @@ unsigned int cTeam::GetNumPlayers(void) const
 
 
 
-cScoreboard::~cScoreboard()
+cObjective* cScoreboard::RegisterObjective(const AString & a_Name, cObjective::eType a_Type)
 {
-	for (ObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
-	{
-		delete it->second;
-	}
+	cObjective Objective(a_Type);
 
-	for (TeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
-	{
-		delete it->second;
-	}
-}
+	std::pair<ObjectiveMap::iterator, bool> Status = m_Objectives.insert(NamedObjective(a_Name, Objective));
 
-
-
-
-
-cObjective* cScoreboard::RegisterObjective(const AString & a_Name, eObjectiveType a_Type)
-{
-	cObjective* Objective = new cObjective(a_Type);
-
-	bool Status = m_Objectives.insert(NamedObjective(a_Name, Objective)).second;
-
-	if (Status)
-	{
-		return Objective;
-	}
-	else
-	{
-		delete Objective;
-		return NULL;
-	}
+	return Status.second ? &Status.first->second : NULL;
 }
 
 
@@ -215,7 +190,7 @@ cObjective* cScoreboard::GetObjective(const AString & a_Name)
 	}
 	else
 	{
-		return it->second;
+		return &it->second;
 	}
 }
 
@@ -223,22 +198,16 @@ cObjective* cScoreboard::GetObjective(const AString & a_Name)
 
 
 
-cTeam* cScoreboard::RegisterTeam(const AString & a_Name, const AString & a_DisplayName,
-                                 const AString & a_Prefix, const AString & a_Suffix)
+cTeam* cScoreboard::RegisterTeam(
+	const AString & a_Name, const AString & a_DisplayName,
+	const AString & a_Prefix, const AString & a_Suffix
+)
 {
-	cTeam* Team = new cTeam(a_Name, a_DisplayName, a_Prefix, a_Suffix);
+	cTeam Team(a_Name, a_DisplayName, a_Prefix, a_Suffix);
 
-	bool Status = m_Teams.insert(NamedTeam(a_Name, Team)).second;
+	std::pair<TeamMap::iterator, bool> Status = m_Teams.insert(NamedTeam(a_Name, Team));
 
-	if (Status)
-	{
-		return Team;
-	}
-	else
-	{
-		delete Team;
-		return NULL;
-	}
+	return Status.second ? &Status.first->second : NULL;
 }
 
 
@@ -273,7 +242,7 @@ cTeam* cScoreboard::GetTeam(const AString & a_Name)
 	}
 	else
 	{
-		return it->second;
+		return &it->second;
 	}
 }
 
@@ -281,14 +250,14 @@ cTeam* cScoreboard::GetTeam(const AString & a_Name)
 
 
 
-void cScoreboard::ForEachObjectiveWith(eObjectiveType a_Type, cObjectiveCallback& a_Callback)
+void cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback)
 {
 	for (ObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
 	{
-		if (it->second->GetType() == a_Type)
+		if (it->second.GetType() == a_Type)
 		{
 			// Call callback
-			if (a_Callback.Item(it->second))
+			if (a_Callback.Item(&it->second))
 			{
 				return;
 			}

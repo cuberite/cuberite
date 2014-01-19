@@ -13,47 +13,9 @@
 
 
 
-class cPlayer;
 class cObjective;
 
-typedef std::set< cPlayer * > cPlayerSet;
 typedef cItemCallback<cObjective> cObjectiveCallback;
-
-
-
-
-
-enum eObjectiveType
-{
-	E_OBJECTIVE_DUMMY,
-
-	E_OBJECTIVE_DEATH_COUNT,
-	E_OBJECTIVE_PLAYER_KILL_COUNT,
-	E_OBJECTIVE_TOTAL_KILL_COUNT,
-	E_OBJECTIVE_HEALTH,
-
-	E_OBJECTIVE_ACHIEVEMENT,
-
-	E_OBJECTIVE_STAT,
-	E_OBJECTIVE_STAT_ITEM_CRAFT,
-	E_OBJECTIVE_STAT_ITEM_USE,
-	E_OBJECTIVE_STAT_ITEM_BREAK,
-
-	E_OBJECTIVE_STAT_BLOCK_MINE,
-	E_OBJECTIVE_STAT_ENTITY_KILL,
-	E_OBJECTIVE_STAT_ENTITY_KILLED_BY
-};
-
-
-
-
-
-enum eDisplaySlot
-{
-	E_DISPLAY_SLOT_LIST,
-	E_DISPLAY_SLOT_SIDEBAR,
-	E_DISPLAY_SLOT_NAME
-};
 
 
 
@@ -64,10 +26,38 @@ class cObjective
 public:
 	typedef int Score;
 
-public:
-	cObjective(eObjectiveType a_Type);
+	enum eType
+	{
+		E_TYPE_DUMMY,
 
-	eObjectiveType GetType(void) const { return m_Type; }
+		E_TYPE_DEATH_COUNT,
+		E_TYPE_PLAYER_KILL_COUNT,
+		E_TYPE_TOTAL_KILL_COUNT,
+		E_TYPE_HEALTH,
+
+		E_TYPE_ACHIEVEMENT,
+
+		E_TYPE_STAT,
+		E_TYPE_STAT_ITEM_CRAFT,
+		E_TYPE_STAT_ITEM_USE,
+		E_TYPE_STAT_ITEM_BREAK,
+
+		E_TYPE_STAT_BLOCK_MINE,
+		E_TYPE_STAT_ENTITY_KILL,
+		E_TYPE_STAT_ENTITY_KILLED_BY
+	};
+
+	enum eDisplaySlot
+	{
+		E_DISPLAY_SLOT_LIST,
+		E_DISPLAY_SLOT_SIDEBAR,
+		E_DISPLAY_SLOT_NAME
+	};
+
+public:
+	cObjective(eType a_Type);
+
+	eType GetType(void) const { return m_Type; }
 
 	eDisplaySlot GetDisplaySlot(void) const { return m_Display; }
 
@@ -98,7 +88,7 @@ private:
 
 	ScoreMap m_Scores;
 
-	eObjectiveType m_Type;
+	eType m_Type;
 
 	eDisplaySlot m_Display;
 };
@@ -110,14 +100,17 @@ private:
 class cTeam
 {
 public:
-	cTeam(const AString & a_Name, const AString & a_DisplayName,
-	      const AString & a_Prefix, const AString & a_Suffix);
+
+	cTeam(
+		const AString & a_Name, const AString & a_DisplayName,
+		const AString & a_Prefix, const AString & a_Suffix
+	);
 
 	/// Adds a new player to the team
-	bool AddPlayer(cPlayer * a_Player);
+	bool AddPlayer(const AString & a_Name);
 
 	/// Removes a player from the team
-	bool RemovePlayer(cPlayer * a_Player);
+	bool RemovePlayer(const AString & a_Name);
 
 	/// Removes all registered players
 	void Reset(void);
@@ -125,10 +118,10 @@ public:
 	/// Returns the number of registered players
 	unsigned int GetNumPlayers(void) const;
 
-	bool GetFriendlyFire(void)            const { return m_FriendlyFire; }
-	bool GetCanSeeFriendlyInvisible(void) const { return m_SeeFriendlyInvisible; }
+	bool AllowsFriendlyFire(void)      const { return m_AllowsFriendlyFire; }
+	bool CanSeeFriendlyInvisible(void) const { return m_CanSeeFriendlyInvisible; }
 
-	const AString & GetDisplayName(void) const { return m_Name; }
+	const AString & GetDisplayName(void) const { return m_DisplayName; }
 	const AString & GetName(void)        const { return m_DisplayName; }
 
 	const AString & GetPrefix(void) const { return m_Prefix; }
@@ -144,8 +137,8 @@ public:
 
 private:
 
-	bool m_FriendlyFire;
-	bool m_SeeFriendlyInvisible;
+	bool m_AllowsFriendlyFire;
+	bool m_CanSeeFriendlyInvisible;
 
 	AString m_DisplayName;
 	AString m_Name;
@@ -154,7 +147,9 @@ private:
 	AString m_Suffix;
 
 	// TODO 2014-01-19 xdot: Potential optimization - vector/list
-	cPlayerSet m_Players;
+	typedef std::set<AString> PlayerNameSet;
+
+	PlayerNameSet m_Players;
 };
 
 
@@ -165,10 +160,9 @@ class cScoreboard
 {
 public:
 	cScoreboard() {}
-	virtual ~cScoreboard();
 
-	/// Registers a new scoreboard objective, returns the cObjective instance
-	cObjective* RegisterObjective(const AString & a_Name, eObjectiveType a_Type);
+	/// Registers a new scoreboard objective, returns the cObjective instance, NULL on name collision
+	cObjective* RegisterObjective(const AString & a_Name, cObjective::eType a_Type);
 
 	/// Removes a registered objective, returns true if operation was successful
 	bool RemoveObjective(const AString & a_Name);
@@ -176,7 +170,7 @@ public:
 	/// Retrieves the objective with the specified name, NULL if not found
 	cObjective* GetObjective(const AString & a_Name);
 
-	/// Registers a new team, returns the cTeam instance
+	/// Registers a new team, returns the cTeam instance, NULL on name collision
 	cTeam* RegisterTeam(const AString & a_Name, const AString & a_DisplayName,
 	                    const AString & a_Prefix, const AString & a_Suffix);
 
@@ -187,14 +181,14 @@ public:
 	cTeam* GetTeam(const AString & a_Name);
 
 	/// Execute callback for each objective with the specified type
-	void ForEachObjectiveWith(eObjectiveType a_Type, cObjectiveCallback& a_Callback);
+	void ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
 
 private:
-	typedef std::pair<AString, cObjective*> NamedObjective;
-	typedef std::pair<AString, cTeam*>      NamedTeam;
+	typedef std::pair<AString, cObjective> NamedObjective;
+	typedef std::pair<AString, cTeam>      NamedTeam;
 
-	typedef std::map<AString, cObjective*> ObjectiveMap;
-	typedef std::map<AString, cTeam*>      TeamMap;
+	typedef std::map<AString, cObjective> ObjectiveMap;
+	typedef std::map<AString, cTeam>      TeamMap;
 
 	// TODO 2014-01-19 xdot: Potential optimization - Sort objectives based on type
 	ObjectiveMap m_Objectives;
