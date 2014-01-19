@@ -87,6 +87,25 @@ void cSocket::CloseSocket()
 
 
 
+void cSocket::ShutdownReadWrite(void)
+{
+	#ifdef _WIN32
+		int res = shutdown(m_Socket, SD_BOTH);
+	#else
+		int res = shutdown(m_Socket, SHUT_RDWR);
+	#endif
+	if (res != 0)
+	{
+		LOGWARN("%s: Error shutting down socket %d (%s): %d (%s)",
+			__FUNCTION__, m_Socket, m_IPString.c_str(), this->GetLastError(), GetLastErrorString().c_str()
+		);
+	}
+}
+
+
+
+
+
 AString cSocket::GetErrorString( int a_ErrNo )
 {
 	char buffer[ 1024 ];

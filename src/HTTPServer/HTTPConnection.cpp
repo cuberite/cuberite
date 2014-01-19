@@ -26,7 +26,7 @@ cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
 
 cHTTPConnection::~cHTTPConnection()
 {
-	// LOGD("HTTP: Del connection at %p", this);
+	delete m_CurrentRequest;
 }
 
 

@@ -120,9 +120,6 @@ cClientHandle::~cClientHandle()
 	
 	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
 
-	// Remove from cSocketThreads, we're not to be called anymore:
-	cRoot::Get()->GetServer()->ClientDestroying(this);
-	
 	{
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
@@ -160,8 +157,7 @@ cClientHandle::~cClientHandle()
 		cRoot::Get()->GetServer()->WriteToClient(this, Data);
 	}
 	
-	// Queue the socket to close as soon as it sends all outgoing data:
-	cRoot::Get()->GetServer()->QueueClientClose(this);
+	// Close the socket as soon as it sends all outgoing data:
 	cRoot::Get()->GetServer()->RemoveClient(this);
 	
 	delete m_Protocol;

@@ -39,7 +39,11 @@ public:
 
 	bool IsValid(void) const { return IsValidSocket(m_Socket); }
 	void CloseSocket(void);
-
+	
+	/** Notifies the socket that we don't expect any more reads nor writes on it.
+	Most TCPIP implementations use this to send the FIN flag in a packet */
+	void ShutdownReadWrite(void);
+	
 	operator xSocket(void) const;
 	xSocket GetSocket(void) const;
 	
