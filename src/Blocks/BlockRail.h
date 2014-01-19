@@ -186,19 +186,29 @@ public:
 		}
 		if (RailsCnt > 1)
 		{
-			if      (Neighbors[3] && Neighbors[0]) return E_META_RAIL_CURVED_ZP_XP;
-			else if (Neighbors[3] && Neighbors[1]) return E_META_RAIL_CURVED_ZP_XM;
-			else if (Neighbors[2] && Neighbors[0]) return E_META_RAIL_CURVED_ZM_XP;
-			else if (Neighbors[2] && Neighbors[1]) return E_META_RAIL_CURVED_ZM_XM;
+			if      (Neighbors[3] && Neighbors[0] && CanThisRailCurve()) return E_META_RAIL_CURVED_ZP_XP;
+			else if (Neighbors[3] && Neighbors[1] && CanThisRailCurve()) return E_META_RAIL_CURVED_ZP_XM;
+			else if (Neighbors[2] && Neighbors[0] && CanThisRailCurve()) return E_META_RAIL_CURVED_ZM_XP;
+			else if (Neighbors[2] && Neighbors[1] && CanThisRailCurve()) return E_META_RAIL_CURVED_ZM_XM;
 			else if (Neighbors[7] && Neighbors[2]) return E_META_RAIL_ASCEND_ZP;
 			else if (Neighbors[3] && Neighbors[6]) return E_META_RAIL_ASCEND_ZM;
 			else if (Neighbors[5] && Neighbors[0]) return E_META_RAIL_ASCEND_XM;
 			else if (Neighbors[4] && Neighbors[1]) return E_META_RAIL_ASCEND_XP;
 			else if (Neighbors[0] && Neighbors[1]) return E_META_RAIL_XM_XP;
 			else if (Neighbors[2] && Neighbors[3]) return E_META_RAIL_ZM_ZP;
-			ASSERT(!"Weird neighbor count");
+
+			if (CanThisRailCurve())
+			{
+				ASSERT(!"Weird neighbor count");
+			}
 		}
 		return Meta;
+	}
+
+
+	inline bool CanThisRailCurve(void)
+	{
+		return m_BlockType == E_BLOCK_RAIL;
 	}
 
 
