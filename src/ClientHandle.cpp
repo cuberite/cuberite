@@ -547,12 +547,18 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	if (a_Channel == "MC|AdvCdm") // Command block
+	if (a_Channel == "MC|AdvCdm") // Command block, set text, Client -> Server
 	{
 		const char* Data = a_Message.c_str();
-
 		HandleCommandBlockMessage(Data, a_Message.size());
-
+		return;
+	}
+	else if (a_Channel == "MC|Brand") // Client <-> Server branding exchange
+	{
+		// We are custom,
+		// We are awesome,
+		// We are MCServer.
+		SendPluginMessage("MC|Brand", "MCServer");
 		return;
 	}
 
