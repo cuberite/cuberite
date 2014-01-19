@@ -871,15 +871,10 @@ void cWorld::TickScheduledTasks()
 	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
 	{
 		cCSLock Lock(m_CSScheduledTasks);
-		ScheduledTaskList::iterator itr = m_ScheduledTasks.begin();
-		while (itr != m_ScheduledTasks.end() && (*itr)->Ticks > 0)
+		while (!m_ScheduledTasks.empty() && m_ScheduledTasks.front()->Ticks < m_WorldAge)
 		{
 			Tasks.push_back(m_ScheduledTasks.front());
 			m_ScheduledTasks.pop_front();
-		}
-		for(;itr != m_ScheduledTasks.end(); itr++)
-		{
-			(*itr)->Ticks--;
 		}
 	}
 
@@ -2634,6 +2629,7 @@ void cWorld::QueueTask(cTask * a_Task)
 
 void cWorld::ScheduleTask(cScheduledTask * a_Task)
 {
+	a_Task->Ticks = a_Task->Ticks + m_WorldAge;
 	cCSLock Lock(m_CSScheduledTasks);
 	for(ScheduledTaskList::iterator itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end(); itr++) 
 	{
