@@ -2213,9 +2213,9 @@ void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cClientHandle::SendUpdateBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cBlockEntity & a_BlockEntity)
+void cClientHandle::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
-	m_Protocol->SendUpdateBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Action, a_BlockEntity);
+	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
 }
 
 

@@ -893,13 +893,21 @@ void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cProtocol172::SendUpdateBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cBlockEntity & a_BlockEntity)
+void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
-	Pkt.WriteInt(a_BlockX);
-	Pkt.WriteShort(a_BlockY);
-	Pkt.WriteInt(a_BlockZ);
-	Pkt.WriteByte(a_Action);
+	Pkt.WriteInt(a_BlockEntity.GetPosX());
+	Pkt.WriteShort(a_BlockEntity.GetPosY());
+	Pkt.WriteInt(a_BlockEntity.GetPosZ());
+
+	Byte Action = 0;
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
+		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+	}
+	Pkt.WriteByte(Action);
 
 	Pkt.WriteBlockEntity(a_BlockEntity);
 }

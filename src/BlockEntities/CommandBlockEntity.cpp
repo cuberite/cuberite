@@ -142,7 +142,7 @@ bool cCommandBlockEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cCommandBlockEntity::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendUpdateBlockEntity(GetPosX(), GetPosY(), GetPosZ(), 2, *this);
+	a_Client.SendUpdateBlockEntity(*this);
 }
 
 
