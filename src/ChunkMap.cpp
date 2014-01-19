@@ -1717,6 +1717,36 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 						}
 						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
 						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
+
+						switch (area.GetBlockType(bx + x, by + y + 1, bz + z))
+						{
+						case E_BLOCK_LEVER:
+						case E_BLOCK_REDSTONE_WIRE:
+						case E_BLOCK_REDSTONE_TORCH_OFF:
+						case E_BLOCK_REDSTONE_TORCH_ON:
+						case E_BLOCK_STONE_BUTTON:
+						case E_BLOCK_WOODEN_BUTTON:
+						case E_BLOCK_REDSTONE_REPEATER_OFF:
+						case E_BLOCK_REDSTONE_REPEATER_ON:
+						case E_BLOCK_WOODEN_DOOR:
+						case E_BLOCK_IRON_DOOR:
+						case E_BLOCK_ACTIVATOR_RAIL:
+						case E_BLOCK_DETECTOR_RAIL:
+						case E_BLOCK_POWERED_RAIL:
+						case E_BLOCK_WOODEN_PRESSURE_PLATE:
+						case E_BLOCK_STONE_PRESSURE_PLATE:
+						case E_BLOCK_TORCH:
+							{
+								if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
+								{
+									cItems Drops;
+									BlockHandler(area.GetBlockType(bx + x, by + y + 1, bz + z))->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y + 1, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
+									m_World->SpawnItemPickups(Drops, bx + x, by + y + 1, bz + z);
+								}
+								area.SetBlockType(bx + x, by + y + 1, bz + z, E_BLOCK_AIR);
+								a_BlocksAffected.push_back(Vector3i(bx + x, by + y + 1, bz + z));
+							}
+						}
 					}
 				}  // switch (BlockType)
 			}  // for z

@@ -725,7 +725,7 @@ void cRedstoneSimulator::HandleTNT(int a_BlockX, int a_BlockY, int a_BlockZ)
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
 		m_World.BroadcastSoundEffect("random.fuse", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.6f);
-		m_World.SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 4);  // 4 seconds to boom
+		m_World.SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, 4);  // 4 seconds to boom
 		m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 	}
 }
