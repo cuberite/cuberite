@@ -1671,7 +1671,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					{
 						// Activate the TNT, with a random fuse between 10 to 30 game ticks
 						double FuseTime = (double)(10 + m_World->GetTickRandomNumber(20)) / 20;
-						m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
+						m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y, a_BlockZ + z + 0.5, FuseTime);
 						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
 						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
 						break;
@@ -1684,29 +1684,116 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 						// These blocks are not affected by explosions
 						break;
 					}
-
 					case E_BLOCK_STATIONARY_WATER:
 					{
 						// Turn into simulated water:
 						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
 						break;
 					}
-					
 					case E_BLOCK_STATIONARY_LAVA:
 					{
 						// Turn into simulated lava:
 						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
 						break;
 					}
-					
 					case E_BLOCK_AIR:
 					{
 						// No pickups for air
 						break;
 					}
-					
+					case E_BLOCK_FIRE:
+					{
+						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+						break;
+					}
 					default:
 					{
+						switch (area.GetBlockType(bx + x, by + y + 1, bz + z))
+						{
+						case E_BLOCK_PISTON_EXTENSION:
+						case E_BLOCK_LEVER:
+						case E_BLOCK_SAPLING:
+						//case E_BLOCK_BED: ?
+						case E_BLOCK_POWERED_RAIL:
+						case E_BLOCK_DETECTOR_RAIL:
+						case E_BLOCK_TALL_GRASS:
+						case E_BLOCK_DEAD_BUSH:
+						case E_BLOCK_DANDELION:
+						case E_BLOCK_FLOWER:
+						case E_BLOCK_BROWN_MUSHROOM:
+						case E_BLOCK_RED_MUSHROOM:
+						case E_BLOCK_TORCH:
+						case E_BLOCK_REDSTONE_WIRE:
+						case E_BLOCK_CROPS:
+						case E_BLOCK_SIGN_POST:
+						case E_BLOCK_WOODEN_DOOR:
+						case E_BLOCK_RAIL:
+						case E_BLOCK_STONE_PRESSURE_PLATE:
+						case E_BLOCK_IRON_DOOR:
+						case E_BLOCK_WOODEN_PRESSURE_PLATE:
+						case E_BLOCK_REDSTONE_TORCH_OFF:
+						case E_BLOCK_REDSTONE_TORCH_ON:
+						case E_BLOCK_STONE_BUTTON:
+						case E_BLOCK_SNOW:
+						case E_BLOCK_SNOW_BLOCK:
+						case E_BLOCK_REDSTONE_REPEATER_OFF:
+						case E_BLOCK_REDSTONE_REPEATER_ON:
+						case E_BLOCK_NETHER_WART:
+						//case E_BLOCK_TRIPWIRE: ?
+						//case E_BLOCK_FLOWER_POT: ?
+						case E_BLOCK_CARROTS:
+						case E_BLOCK_POTATOES:
+						case E_BLOCK_WOODEN_BUTTON:
+						//case E_BLOCK_HEAD: ?
+						case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+						case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+						case E_BLOCK_INACTIVE_COMPARATOR:
+						case E_BLOCK_ACTIVE_COMPARATOR:
+						//case E_BLOCK_DAYLIGHT_SENSOR ?
+						case E_BLOCK_ACTIVATOR_RAIL:
+						case E_BLOCK_CARPET:
+						case E_BLOCK_BIG_FLOWER:
+							{
+								if (area.GetBlockType(bx + x, by + y + 1, bz + z) == E_BLOCK_PISTON_EXTENSION && (area.GetBlockMeta(bx + x, by + y + 1, bz + z) & 0x07) != 1)
+									break;
+
+								if (area.GetBlockType(bx + x, by + y + 1, bz + z) == E_BLOCK_LEVER && (area.GetBlockMeta(bx + x, by + y + 1, bz + z) & 0x07) != 6)
+									break;
+
+								if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
+								{
+									cItems Drops;
+									BlockHandler(area.GetBlockType(bx + x, by + y + 1, bz + z))->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y + 1, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
+									m_World->SpawnItemPickups(Drops, bx + x, by + y + 1, bz + z);
+								}
+								area.SetBlockType(bx + x, by + y + 1, bz + z, E_BLOCK_AIR);
+								a_BlocksAffected.push_back(Vector3i(bx + x, by + y + 1, bz + z));
+								break;
+							}
+						case E_BLOCK_FIRE:
+							{
+								area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+								break;
+							}
+						case E_BLOCK_CACTUS:
+						case E_BLOCK_SUGARCANE:
+							{
+								BLOCKTYPE type = area.GetBlockType(bx + x, by + y + 1, bz + z);
+								for (int i = 1; area.GetBlockType(bx + x, by + y + i, bz + z) == type; ++i)
+								{
+									if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
+									{
+										cItems Drops;
+										BlockHandler(area.GetBlockType(bx + x, by + y + i, bz + z))->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y + i, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
+										m_World->SpawnItemPickups(Drops, bx + x, by + y + i, bz + z);
+									}
+									area.SetBlockType(bx + x, by + y + i, bz + z, E_BLOCK_AIR);
+									a_BlocksAffected.push_back(Vector3i(bx + x, by + y + i, bz + z));
+								}
+								break;
+							}
+						}
+
 						if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
 						{
 							cItems Drops;
@@ -1717,36 +1804,6 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 						}
 						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
 						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
-
-						switch (area.GetBlockType(bx + x, by + y + 1, bz + z))
-						{
-						case E_BLOCK_LEVER:
-						case E_BLOCK_REDSTONE_WIRE:
-						case E_BLOCK_REDSTONE_TORCH_OFF:
-						case E_BLOCK_REDSTONE_TORCH_ON:
-						case E_BLOCK_STONE_BUTTON:
-						case E_BLOCK_WOODEN_BUTTON:
-						case E_BLOCK_REDSTONE_REPEATER_OFF:
-						case E_BLOCK_REDSTONE_REPEATER_ON:
-						case E_BLOCK_WOODEN_DOOR:
-						case E_BLOCK_IRON_DOOR:
-						case E_BLOCK_ACTIVATOR_RAIL:
-						case E_BLOCK_DETECTOR_RAIL:
-						case E_BLOCK_POWERED_RAIL:
-						case E_BLOCK_WOODEN_PRESSURE_PLATE:
-						case E_BLOCK_STONE_PRESSURE_PLATE:
-						case E_BLOCK_TORCH:
-							{
-								if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
-								{
-									cItems Drops;
-									BlockHandler(area.GetBlockType(bx + x, by + y + 1, bz + z))->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y + 1, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
-									m_World->SpawnItemPickups(Drops, bx + x, by + y + 1, bz + z);
-								}
-								area.SetBlockType(bx + x, by + y + 1, bz + z, E_BLOCK_AIR);
-								a_BlocksAffected.push_back(Vector3i(bx + x, by + y + 1, bz + z));
-							}
-						}
 					}
 				}  // switch (BlockType)
 			}  // for z
