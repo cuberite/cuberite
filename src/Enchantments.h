@@ -31,6 +31,7 @@ Serialization will never put zero-level enchantments into the stringspec and wil
 */
 class cEnchantments
 {
+friend class cEnchantmentSerializer;
 public:
 	/// Individual enchantment IDs, corresponding to their NBT IDs ( http://www.minecraftwiki.net/wiki/Data_Values#Enchantment_IDs )
 	enum
@@ -96,11 +97,7 @@ public:
 	/// Returns true if a_Other doesn't contain exactly the same enchantments and levels
 	bool operator !=(const cEnchantments & a_Other) const;
 	
-	/// Writes the enchantments into the specified NBT writer; begins with the LIST tag of the specified name ("ench" or "StoredEnchantments")
-	void WriteToNBTCompound(cFastNBTWriter & a_Writer, const AString & a_ListTagName) const;
-	
-	/// Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments)
-	void ParseFromNBT(const cParsedNBT & a_NBT, int a_EnchListTagIdx);
+
 	
 protected:
 	/// Maps enchantment ID -> enchantment level
