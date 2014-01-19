@@ -7,6 +7,7 @@
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
 #include "FastNBT.h"
+#include "EnchantmentSerializer.h"
 #include "zlib/zlib.h"
 #include "../World.h"
 #include "../BlockID.h"
@@ -644,7 +645,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	int EnchTag = a_NBT.FindChildByName(TagTag, EnchName);
 	if (EnchTag > 0)
 	{
-		a_Item.m_Enchantments.ParseFromNBT(a_NBT, EnchTag);
+		cEnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, a_NBT, EnchTag);
 	}
 	
 	return true;

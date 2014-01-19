@@ -16,6 +16,7 @@
 #include "../UI/Window.h"
 #include "../Entities/Pickup.h"
 #include "../WorldStorage/FastNBT.h"
+#include "../WorldStorage/EnchantmentSerializer.h"
 #include "../StringCompression.h"
 
 #ifdef _MSC_VER
@@ -763,7 +764,7 @@ void cProtocol132::WriteItem(const cItem & a_Item)
 	// Send the enchantments:
 	cFastNBTWriter Writer;
 	const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-	a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	cEnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
 	Writer.Finish();
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
@@ -849,7 +850,7 @@ int cProtocol132::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			)
 		)
 		{
-			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+			cEnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 		}
 	}
 	
