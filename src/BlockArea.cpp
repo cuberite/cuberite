@@ -6,7 +6,7 @@
 
 #include "Globals.h"
 #include "BlockArea.h"
-#include "World.h"
+#include "ChunkMapInterface.h"
 #include "OSSupport/GZipFile.h"
 #include "WorldStorage/FastNBT.h"
 #include "Blocks/BlockHandler.h"
@@ -266,7 +266,7 @@ void cBlockArea::SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ)
 
 
 
-bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
+bool cBlockArea::Read(cChunkMapInterface * a_ChunkMap, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	// Normalize the coords:
 	if (a_MinBlockX > a_MaxBlockX)
@@ -327,7 +327,7 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 	cChunkDef::AbsoluteToRelative(a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
 	
 	// Query block data:
-	if (!a_World->ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
+	if (!a_ChunkMap->ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
 	{
 		Clear();
 		return false;

@@ -205,3 +205,7 @@ endif()
 
 add_subdirectory (src)
 
+if(${GENERATE_TOOLS})
+	add_subdirectory(Tools/GeneratorPerformanceTest)
+endif()
+

@@ -48,7 +48,6 @@ typedef std::list< cPlayer * > cPlayerList;
 
 typedef cItemCallback<cPlayer>          cPlayerListCallback;
 typedef cItemCallback<cEntity>          cEntityCallback;
-typedef cItemCallback<cChestEntity>     cChestCallback;
 typedef cItemCallback<cDispenserEntity> cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
 typedef cItemCallback<cNoteEntity>      cNoteBlockCallback;
