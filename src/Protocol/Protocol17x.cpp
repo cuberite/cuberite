@@ -892,6 +892,20 @@ void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cProtocol172::SendUpdateBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cFastNBTWriter & a_NBT)
+{
+	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
+	Pkt.WriteInt(a_BlockX);
+	Pkt.WriteShort(a_BlockY);
+	Pkt.WriteInt(a_BlockZ);
+	Pkt.WriteByte(a_Action);
+
+	Pkt.WriteBlockEntity(a_NBT);
+}
+
+
+
+
 
 void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
@@ -1812,6 +1826,17 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	Writer.Finish();
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
+	WriteShort(Compressed.size());
+	WriteBuf(Compressed.data(), Compressed.size());
+}
+
+
+
+
+void cProtocol172::cPacketizer::WriteBlockEntity(const cFastNBTWriter & a_NBT)
+{
+	AString Compressed;
+	CompressStringGZIP(a_NBT.GetResult().data(), a_NBT.GetResult().size(), Compressed);
 	WriteShort(Compressed.size());
 	WriteBuf(Compressed.data(), Compressed.size());
 }

@@ -102,6 +102,7 @@ public:
 	virtual void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay) override;
 	virtual void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ) override;
+	virtual void SendUpdateBlockEntity   (int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cFastNBTWriter & a_NBT) override;
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
 	virtual void SendWeather             (eWeather a_Weather) override;
@@ -189,6 +190,7 @@ protected:
 		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
 		void WriteMobMetadata(const cMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
 		void WriteEntityProperties(const cEntity & a_Entity);  // Writes the entity properties for the specified entity, including the Count field
+		void WriteBlockEntity(const cFastNBTWriter & a_NBT);
 		
 	protected:
 		cProtocol172 & m_Protocol;

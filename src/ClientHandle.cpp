@@ -20,6 +20,7 @@
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/BlockSlab.h"
+#include "WorldStorage/FastNBT.h"
 
 #include "Vector3f.h"
 #include "Vector3d.h"
@@ -2198,6 +2199,14 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+void cClientHandle::SendUpdateBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cFastNBTWriter & a_NBT)
+{
+	m_Protocol->SendUpdateBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Action, a_NBT);
 }
 
 

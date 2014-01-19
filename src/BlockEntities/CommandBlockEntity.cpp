@@ -7,10 +7,11 @@
 #include "json/json.h"
 #include "CommandBlockEntity.h"
 #include "../Entities/Player.h"
+#include "../WorldStorage/FastNBT.h"
 
-#include "CommandOutput.h"
-#include "Root.h"
-#include "Server.h" // ExecuteConsoleCommand()
+#include "../CommandOutput.h"
+#include "../Root.h"
+#include "../Server.h" // ExecuteConsoleCommand()
 
 
 
@@ -40,6 +41,15 @@ void cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 {
 	m_Command = a_Cmd;
+
+	/*
+	Vanilla requires that the server send a Block Entity Update after a command has been set
+	Therefore, command blocks don't support on-the-fly (when window is open) updating of a command and therefore...
+	...the following code can't be put in UsedBy just before the window opens
+
+	Just documenting my experience in getting this to work :P
+	*/
+	m_World->BroadcastBlockEntity(GetPosX(), GetPosY(), GetPosZ());
 }
 
 
@@ -131,8 +141,30 @@ bool cCommandBlockEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cCommandBlockEntity::SendTo(cClientHandle & a_Client)
 {
-	// Nothing needs to be sent
-	UNUSED(a_Client);
+	cFastNBTWriter Writer;
+	Writer.AddByte("TrackOutput", 1); // Neither I nor the MC wiki has any idea about this
+	Writer.AddInt("SuccessCount", GetResult());
+	Writer.AddInt("x", GetPosX());
+	Writer.AddInt("y", GetPosY());
+	Writer.AddInt("z", GetPosZ());
+	Writer.AddString("Command", GetCommand().c_str());
+	// You can set custom names for windows in Vanilla
+	// For a command block, this would be the 'name' prepended to anything it outputs into global chat
+	// MCS doesn't have this, so just leave it @ '@'. (geddit?)
+	Writer.AddString("CustomName", "@");
+	Writer.AddString("id", "Control"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+
+	if (!GetLastOutput().empty())
+	{
+		AString Output;
+		Printf(Output, "{\"text\":\"%s\"}", GetLastOutput().c_str());
+
+		Writer.AddString("LastOutput", Output.c_str());
+	}
+
+	Writer.Finish();
+
+	a_Client.SendUpdateBlockEntity(GetPosX(), GetPosY(), GetPosZ(), 2, Writer);
 }
 
 
