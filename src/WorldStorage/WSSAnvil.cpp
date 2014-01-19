@@ -640,7 +640,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	int EnchTag = a_NBT.FindChildByName(TagTag, EnchName);
 	if (EnchTag > 0)
 	{
-		cEnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, a_NBT, EnchTag);
+		EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, a_NBT, EnchTag);
 	}
 	
 	return true;

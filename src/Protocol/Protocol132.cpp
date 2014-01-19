@@ -764,7 +764,7 @@ void cProtocol132::WriteItem(const cItem & a_Item)
 	// Send the enchantments:
 	cFastNBTWriter Writer;
 	const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-	cEnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+	EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
 	Writer.Finish();
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
@@ -850,7 +850,7 @@ int cProtocol132::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			)
 		)
 		{
-			cEnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
+			EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 		}
 	}
 	

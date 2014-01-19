@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "WorldStorage/EnchantmentSerializer.h"
 
 
 
@@ -20,7 +21,6 @@ class cParsedNBT;
 
 
 
-// tolua_begin
 
 /** Class that stores item enchantments or stored-enchantments
 The enchantments may be serialized to a stringspec and read back from such stringspec.
@@ -29,11 +29,12 @@ mapping each enchantment's id onto its level. ID may be either a number or the e
 Level value of 0 means no such enchantment, and it will not be stored in the m_Enchantments.
 Serialization will never put zero-level enchantments into the stringspec and will always use numeric IDs.
 */
+// tolua_begin
 class cEnchantments
 {
-friend class cEnchantmentSerializer;
 public:
 	/// Individual enchantment IDs, corresponding to their NBT IDs ( http://www.minecraftwiki.net/wiki/Data_Values#Enchantment_IDs )
+	
 	enum
 	{
 		enchProtection           = 0,
@@ -97,7 +98,11 @@ public:
 	/// Returns true if a_Other doesn't contain exactly the same enchantments and levels
 	bool operator !=(const cEnchantments & a_Other) const;
 	
-
+	/// Writes the enchantments into the specified NBT writer; begins with the LIST tag of the specified name ("ench" or "StoredEnchantments")
+	friend void EnchantmentSerializer::WriteToNBTCompound(cEnchantments const& a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName);
+	
+	/// Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments)
+	friend void EnchantmentSerializer::ParseFromNBT(cEnchantments& a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx);
 	
 protected:
 	/// Maps enchantment ID -> enchantment level

@@ -2,9 +2,10 @@
 #include "Globals.h"
 
 #include "EnchantmentSerializer.h"
+#include "Enchantments.h"
 #include "FastNBT.h"
 
-void cEnchantmentSerializer::WriteToNBTCompound(cEnchantments const& a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName)
+void EnchantmentSerializer::WriteToNBTCompound(cEnchantments const& a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName)
 {
 	// Write the enchantments into the specified NBT writer
 	// begin with the LIST tag of the specified name ("ench" or "StoredEnchantments")
@@ -24,7 +25,7 @@ void cEnchantmentSerializer::WriteToNBTCompound(cEnchantments const& a_Enchantme
 
 
 
-void cEnchantmentSerializer::ParseFromNBT(cEnchantments& a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx)
+void EnchantmentSerializer::ParseFromNBT(cEnchantments& a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx)
 {
 	// Read the enchantments from the specified NBT list tag (ench or StoredEnchantments)
 

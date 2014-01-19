@@ -1697,7 +1697,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			)
 		)
 		{
-			cEnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
+			EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 		}
 		else if ((NBT.GetType(tag) == TAG_Compound) && (NBT.GetName(tag) == "display")) // Custom name and lore tag
 		{
@@ -1782,7 +1782,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		cEnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments,Writer, TagName);
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments,Writer, TagName);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty())
 	{
