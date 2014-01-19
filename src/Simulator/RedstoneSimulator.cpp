@@ -168,14 +168,7 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 	{
 		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ)) // We are at an entry matching the current (changed) block
 		{
-			if (!IsAllowedBlock(Block))
-			{
-				ChunkData.erase(itr); // The new blocktype is not redstone; it must be removed from this list
-			}
-			else
-			{
-				itr->Data = Block; // Update block information
-			}
+			itr->Data = Block; // Update block information
 			return;
 		}
 	}
