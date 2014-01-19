@@ -542,12 +542,18 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	if (a_Channel == "MC|AdvCdm") // Command block
+	if (a_Channel == "MC|AdvCdm") // Command block, set text, Client -> Server
 	{
 		const char* Data = a_Message.c_str();
-
 		HandleCommandBlockMessage(Data, a_Message.size());
-
+		return;
+	}
+	else if (a_Channel == "MC|Brand") // Client <-> Server branding exchange
+	{
+		// We are custom,
+		// We are awesome,
+		// We are MCServer.
+		SendPluginMessage("MC|Brand", "MCServer");
 		return;
 	}
 
@@ -562,6 +568,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 {
 	if (a_Length < 14)
 	{
+		SendChat(Printf("%s[INFO]%s Failure setting command block command; bad request", cChatColor::Red.c_str(), cChatColor::White.c_str()));
 		LOGD("Malformed MC|AdvCdm packet.");
 		return;
 	}
@@ -591,6 +598,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 
 		default:
 		{
+			SendChat(Printf("%s[INFO]%s Failure setting command block command; unhandled mode", cChatColor::Red.c_str(), cChatColor::White.c_str()));
 			LOGD("Unhandled MC|AdvCdm packet mode.");
 			return;
 		}
@@ -613,6 +621,8 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 	cWorld * World = m_Player->GetWorld();
 
 	World->DoWithCommandBlockAt(BlockX, BlockY, BlockZ, CmdBlockCB);
+
+	SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
 }
 
 
@@ -2194,6 +2204,14 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+void cClientHandle::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
 }
 
 

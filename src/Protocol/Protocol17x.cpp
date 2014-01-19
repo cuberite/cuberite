@@ -24,6 +24,7 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/Player.h"
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 
 
 
@@ -887,6 +888,28 @@ void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 	Pkt.WriteShort(0);  // Primary bitmap
 	Pkt.WriteShort(0);  // Add bitmap
 	Pkt.WriteInt(0);  // Compressed data size
+}
+
+
+
+
+void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
+	Pkt.WriteInt(a_BlockEntity.GetPosX());
+	Pkt.WriteShort(a_BlockEntity.GetPosY());
+	Pkt.WriteInt(a_BlockEntity.GetPosZ());
+
+	Byte Action = 0;
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
+		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+	}
+	Pkt.WriteByte(Action);
+
+	Pkt.WriteBlockEntity(a_BlockEntity);
 }
 
 
@@ -1810,6 +1833,51 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 		Writer.EndCompound();
 	}
 	Writer.Finish();
+	AString Compressed;
+	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
+	WriteShort(Compressed.size());
+	WriteBuf(Compressed.data(), Compressed.size());
+}
+
+
+
+
+void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEntity)
+{
+	cFastNBTWriter Writer;
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_COMMAND_BLOCK:
+		{
+			cCommandBlockEntity & CommandBlockEntity = (cCommandBlockEntity &)a_BlockEntity;
+
+			Writer.AddByte("TrackOutput", 1); // Neither I nor the MC wiki has any idea about this
+			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
+			Writer.AddInt("x", CommandBlockEntity.GetPosX());
+			Writer.AddInt("y", CommandBlockEntity.GetPosY());
+			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			// You can set custom names for windows in Vanilla
+			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
+			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
+			Writer.AddString("CustomName", "@");
+			Writer.AddString("id", "Control"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+
+			if (!CommandBlockEntity.GetLastOutput().empty())
+			{
+				AString Output;
+				Printf(Output, "{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str());
+
+				Writer.AddString("LastOutput", Output.c_str());
+			}
+			break;
+		}
+		default: break;
+	}
+
+	Writer.Finish();
+
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 	WriteShort(Compressed.size());
