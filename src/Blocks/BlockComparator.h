@@ -53,7 +53,7 @@ public:
 		) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetRotation());
+		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
 

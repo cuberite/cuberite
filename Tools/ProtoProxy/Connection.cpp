@@ -155,6 +155,32 @@ AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor = 32)
 
 
 
+struct sCoords
+{
+	int x, y, z;
+	
+	sCoords(int a_X, int a_Y, int a_Z) : x(a_X), y(a_Y), z(a_Z) {}
+} ;
+
+
+
+
+
+struct sChunkMeta
+{
+	int m_ChunkX, m_ChunkZ;
+	short m_PrimaryBitmap;
+	short m_AddBitmap;
+	sChunkMeta(int a_ChunkX, int a_ChunkZ, short a_PrimaryBitmap, short a_AddBitmap) :
+		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_PrimaryBitmap(a_PrimaryBitmap), m_AddBitmap(a_AddBitmap)
+	{
+	}
+} ;
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cConnection:
 
@@ -220,7 +246,7 @@ void cConnection::Run(void)
 		int res = select(2, &ReadFDs, NULL, NULL, NULL);
 		if (res <= 0)
 		{
-			printf("select() failed: %d; aborting client", WSAGetLastError());
+			printf("select() failed: %d; aborting client", SocketError);
 			break;
 		}
 		if (FD_ISSET(m_ServerSocket, &ReadFDs))
@@ -249,12 +275,10 @@ void cConnection::Run(void)
 
 void cConnection::Log(const char * a_Format, ...)
 {
-	va_list args, argsCopy;
+	va_list args;
 	va_start(args, a_Format);
-	va_start(argsCopy, a_Format);
 	AString msg;
-	AppendVPrintf(msg, a_Format, args, argsCopy);
-	va_end(argsCopy);
+	AppendVPrintf(msg, a_Format, args);
 	va_end(args);
 	AString FullMsg;
 	Printf(FullMsg, "[%5.3f] %s\n", GetRelativeTime(), msg.c_str());
@@ -276,12 +300,10 @@ void cConnection::Log(const char * a_Format, ...)
 
 void cConnection::DataLog(const void * a_Data, int a_Size, const char * a_Format, ...)
 {
-	va_list args, argsCopy;
+	va_list args;
 	va_start(args, a_Format);
-	va_start(argsCopy, a_Format);
 	AString msg;
-	AppendVPrintf(msg, a_Format, args, argsCopy);
-	va_end(argsCopy);
+	AppendVPrintf(msg, a_Format, args);
 	va_end(args);
 	AString FullMsg;
 	AString Hex;
@@ -323,7 +345,7 @@ bool cConnection::ConnectToServer(void)
 	localhost.sin_addr.s_addr = htonl(0x7f000001);  // localhost
 	if (connect(m_ServerSocket, (sockaddr *)&localhost, sizeof(localhost)) != 0)
 	{
-		printf("connection to server failed: %d\n", WSAGetLastError());
+		printf("connection to server failed: %d\n", SocketError);
 		return false;
 	}
 	Log("Connected to SERVER");
@@ -340,7 +362,7 @@ bool cConnection::RelayFromServer(void)
 	int res = recv(m_ServerSocket, Buffer, sizeof(Buffer), 0);
 	if (res <= 0)
 	{
-		Log("Server closed the socket: %d; %d; aborting connection", res, WSAGetLastError());
+		Log("Server closed the socket: %d; %d; aborting connection", res, SocketError);
 		return false;
 	}
 	
@@ -380,7 +402,7 @@ bool cConnection::RelayFromClient(void)
 	int res = recv(m_ClientSocket, Buffer, sizeof(Buffer), 0);
 	if (res <= 0)
 	{
-		Log("Client closed the socket: %d; %d; aborting connection", res, WSAGetLastError());
+		Log("Client closed the socket: %d; %d; aborting connection", res, SocketError);
 		return false;
 	}
 	
@@ -428,7 +450,7 @@ bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, int a_Size, con
 	int res = send(a_Socket, a_Data, a_Size, 0);
 	if (res <= 0)
 	{
-		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, WSAGetLastError());
+		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, SocketError);
 		return false;
 	}
 	return true;
@@ -1668,12 +1690,6 @@ bool cConnection::HandleServerExplosion(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PosZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Force);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   NumRecords);
-	struct sCoords
-	{
-		int x, y, z;
-		
-		sCoords(int a_X, int a_Y, int a_Z) : x(a_X), y(a_Y), z(a_Z) {}
-	} ;
 	std::vector<sCoords> Records;
 	Records.reserve(NumRecords);
 	int PosXI = (int)PosX, PosYI = (int)PosY, PosZI = (int)PosZ;
@@ -1868,16 +1884,6 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	
 	// Read individual chunk metas.
 	// Need to read them first and only then start logging (in case we don't have the full packet yet)
-	struct sChunkMeta
-	{
-		int m_ChunkX, m_ChunkZ;
-		short m_PrimaryBitmap;
-		short m_AddBitmap;
-		sChunkMeta(int a_ChunkX, int a_ChunkZ, short a_PrimaryBitmap, short a_AddBitmap) :
-			m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_PrimaryBitmap(a_PrimaryBitmap), m_AddBitmap(a_AddBitmap)
-		{
-		}
-	} ;
 	typedef std::vector<sChunkMeta> sChunkMetas;
 	sChunkMetas ChunkMetas;
 	ChunkMetas.reserve(ChunkCount);
@@ -1907,7 +1913,6 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	// TODO: Save the compressed data into a file for later analysis
 	
 	COPY_TO_CLIENT();
-	Sleep(50);
 	return true;
 }
 
@@ -2857,8 +2862,8 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	int EncryptedLength = rsaEncryptor.FixedCiphertextLength();
 	ASSERT(EncryptedLength <= sizeof(EncryptedSecret));
 	rsaEncryptor.Encrypt(rng, SharedSecret, sizeof(SharedSecret), EncryptedSecret);
-	m_ServerEncryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16))(Name::FeedbackSize(), 1));
-	m_ServerDecryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16))(Name::FeedbackSize(), 1));
+	m_ServerEncryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16, true))(Name::FeedbackSize(), 1));
+	m_ServerDecryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16, true))(Name::FeedbackSize(), 1));
 	
 	// Encrypt the nonce:
 	byte EncryptedNonce[128];

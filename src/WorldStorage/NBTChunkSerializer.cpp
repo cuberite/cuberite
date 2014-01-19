@@ -10,6 +10,7 @@
 #include "FastNBT.h"
 
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
@@ -219,8 +220,23 @@ void cNBTChunkSerializer::AddJukeboxEntity(cJukeboxEntity * a_Jukebox)
 void cNBTChunkSerializer::AddNoteEntity(cNoteEntity * a_Note)
 {
 	m_Writer.BeginCompound("");
-	AddBasicTileEntity(a_Note, "Music");
-	m_Writer.AddByte("note", a_Note->GetPitch());
+		AddBasicTileEntity(a_Note, "Music");
+		m_Writer.AddByte("note", a_Note->GetPitch());
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock)
+{
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_CmdBlock, "Control");
+		m_Writer.AddString("Command",      a_CmdBlock->GetCommand());
+		m_Writer.AddInt   ("SuccessCount", a_CmdBlock->GetResult());
+		m_Writer.AddString("LastOutput",   a_CmdBlock->GetLastOutput());
+		m_Writer.AddByte  ("TrackOutput",  1); // TODO 2014-01-18 xdot: Figure out what TrackOutput is and save it.
 	m_Writer.EndCompound();
 }
 
@@ -257,7 +273,7 @@ void cNBTChunkSerializer::AddBasicEntity(cEntity * a_Entity, const AString & a_C
 		m_Writer.AddDouble("", a_Entity->GetSpeedZ());
 	m_Writer.EndList();
 	m_Writer.BeginList("Rotation", TAG_Double);
-		m_Writer.AddDouble("", a_Entity->GetRotation());
+		m_Writer.AddDouble("", a_Entity->GetYaw());
 		m_Writer.AddDouble("", a_Entity->GetPitch());
 	m_Writer.EndList();
 }
@@ -639,15 +655,16 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	// Add tile-entity into NBT:
 	switch (a_Entity->GetBlockType())
 	{
-		case E_BLOCK_CHEST:      AddChestEntity     ((cChestEntity *)     a_Entity); break;
-		case E_BLOCK_DISPENSER:  AddDispenserEntity ((cDispenserEntity *) a_Entity); break;
-		case E_BLOCK_DROPPER:    AddDropperEntity   ((cDropperEntity *)   a_Entity); break;
-		case E_BLOCK_FURNACE:    AddFurnaceEntity   ((cFurnaceEntity *)   a_Entity); break;
-		case E_BLOCK_HOPPER:     AddHopperEntity    ((cHopperEntity *)    a_Entity); break;
+		case E_BLOCK_CHEST:         AddChestEntity     ((cChestEntity *)     a_Entity); break;
+		case E_BLOCK_DISPENSER:     AddDispenserEntity ((cDispenserEntity *) a_Entity); break;
+		case E_BLOCK_DROPPER:       AddDropperEntity   ((cDropperEntity *)   a_Entity); break;
+		case E_BLOCK_FURNACE:       AddFurnaceEntity   ((cFurnaceEntity *)   a_Entity); break;
+		case E_BLOCK_HOPPER:        AddHopperEntity    ((cHopperEntity *)    a_Entity); break;
 		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN:   AddSignEntity      ((cSignEntity *)      a_Entity); break;
-		case E_BLOCK_NOTE_BLOCK: AddNoteEntity      ((cNoteEntity *)      a_Entity); break;
-		case E_BLOCK_JUKEBOX:    AddJukeboxEntity   ((cJukeboxEntity *)   a_Entity); break;
+		case E_BLOCK_WALLSIGN:      AddSignEntity      ((cSignEntity *)      a_Entity); break;
+		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity      ((cNoteEntity *)      a_Entity); break;
+		case E_BLOCK_JUKEBOX:       AddJukeboxEntity   ((cJukeboxEntity *)   a_Entity); break;
+		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity((cCommandBlockEntity *) a_Entity); break;
 		default:
 		{
 			ASSERT(!"Unhandled block entity saved into Anvil");

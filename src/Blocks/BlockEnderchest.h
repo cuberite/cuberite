@@ -30,7 +30,7 @@ public:
 		) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = RotationToMetaData(a_Player->GetRotation());
+		a_BlockMeta = RotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
 

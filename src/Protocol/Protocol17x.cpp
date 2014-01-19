@@ -1040,7 +1040,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (!HandlePacket(bb, PacketType))
 		{
 			// Unknown packet, already been reported, but without the length. Log the length here:
-			LOGWARNING("Unhandled packet: type 0x%x, length %u", PacketType, PacketLen);
+			LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, PacketLen);
 			
 			#ifdef _DEBUG
 				// Dump the packet contents into the log:
@@ -1059,8 +1059,8 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
-			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x. Read %u bytes, packet contained %u bytes",
-				PacketType, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
+			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read %u bytes, packet contained %u bytes",
+				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
 			);
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
@@ -1128,9 +1128,26 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			}
 			break;
 		}
+		default:
+		{
+			// Received a packet in an unknown state, report:
+			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
+			
+			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
+			
+			// Switch to a state when all further packets are silently ignored:
+			m_State = 255;
+			return false;
+		}
+		case 255:
+		{
+			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
+			// Do not output anything (the caller will do that for us), just return failure
+			return false;
+		}
 	}  // switch (m_State)
 	
-	// Unknown packet type, report to the client:
+	// Unknown packet type, report to the ClientHandle:
 	m_Client->PacketUnknown(a_PacketType);
 	return false;
 }
@@ -1668,7 +1685,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 		return;
 	}
 	
-	// Load enchantments from the NBT:
+	// Load enchantments and custom display names from the NBT data:
 	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
 	{
 		if (
@@ -1680,6 +1697,27 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 		)
 		{
 			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+		}
+		else if ((NBT.GetType(tag) == TAG_Compound) && (NBT.GetName(tag) == "display")) // Custom name and lore tag
+		{
+			for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+			{
+				if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name")) // Custon name tag
+				{
+					a_Item.m_CustomName = NBT.GetString(displaytag);
+				}
+				else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore")) // Lore tag
+				{
+					AString Lore;
+
+					for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
+					{
+						AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+					}
+
+					a_Item.m_Lore = Lore;
+				}
+			}
 		}
 	}
 }
@@ -1732,16 +1770,45 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	WriteByte (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
-	if (a_Item.m_Enchantments.IsEmpty())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty())
 	{
 		WriteShort(-1);
 		return;
 	}
 
-	// Send the enchantments:
+	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
-	const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-	a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+		a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	}
+	if (!a_Item.IsBothNameAndLoreEmpty())
+	{
+		Writer.BeginCompound("display");
+		if (!a_Item.IsCustomNameEmpty())
+		{
+			Writer.AddString("Name", a_Item.m_CustomName.c_str());
+		}
+		if (!a_Item.IsLoreEmpty())
+		{
+			Writer.BeginList("Lore", TAG_String);
+
+			AStringVector Decls = StringSplit(a_Item.m_Lore, "`");
+			for (AStringVector::const_iterator itr = Decls.begin(), end = Decls.end(); itr != end; ++itr)
+			{
+				if (itr->empty())
+				{
+					// The decl is empty (two `s), ignore
+					continue;
+				}
+				Writer.AddString("", itr->c_str());
+			}
+
+			Writer.EndList();
+		}
+		Writer.EndCompound();
+	}
 	Writer.Finish();
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
@@ -1823,8 +1890,23 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteInt(1); // Shaking direction, doesn't seem to affect anything
 			WriteByte(0x73);
 			WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
-
-			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
+			
+			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpNone)
+			{
+				cRideableMinecart & RideableMinecart = ((cRideableMinecart &)a_Entity);
+				if (!RideableMinecart.GetContent().IsEmpty())
+				{
+					WriteByte(0x54);
+					int Content = RideableMinecart.GetContent().m_ItemType;
+					Content |= RideableMinecart.GetContent().m_ItemDamage << 8;
+					WriteInt(Content);
+					WriteByte(0x55);
+					WriteInt(RideableMinecart.GetBlockHeight());
+					WriteByte(0x56);
+					WriteByte(1);
+				}
+			}
+			else if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
 			{
 				WriteByte(0x10);
 				WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0);

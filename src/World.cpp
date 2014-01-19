@@ -16,6 +16,7 @@
 // Entities (except mobs):
 #include "Entities/ExpOrb.h"
 #include "Entities/FallingBlock.h"
+#include "Entities/Minecart.h"
 #include "Entities/Pickup.h"
 #include "Entities/Player.h"
 #include "Entities/TNTEntity.h"
@@ -230,6 +231,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
+	m_StorageCompressionFactor(6),
 	m_IsSpawnExplicitlySet(false),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
@@ -511,6 +513,7 @@ void cWorld::Start(void)
 	}
 
 	m_StorageSchema             = IniFile.GetValueSet ("Storage",       "Schema",                    m_StorageSchema);
+	m_StorageCompressionFactor 	= IniFile.GetValueSetI ("Storage",       "CompressionFactor",                    m_StorageCompressionFactor);
 	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
 	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
 	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
@@ -584,7 +587,7 @@ void cWorld::Start(void)
 	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
 
 	m_Lighting.Start(this);
-	m_Storage.Start(this, m_StorageSchema);
+	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor );
 	m_Generator.Start(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
 	m_ChunkSender.Start(this);
 	m_TickThread.Start();
@@ -1146,6 +1149,15 @@ bool cWorld::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 
 
 
+bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
 bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	return m_ChunkMap->GetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
@@ -1667,6 +1679,29 @@ int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
 	ExpOrb->Initialize(this);
 	return ExpOrb->GetUniqueID();
+}
+
+
+
+
+
+int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
+{
+	cMinecart * Minecart;
+	switch (a_MinecartType)
+	{
+		case E_ITEM_MINECART:             Minecart = new cRideableMinecart     (a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = new cMinecartWithChest    (a_X, a_Y, a_Z); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = new cMinecartWithFurnace  (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = new cMinecartWithTNT      (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (a_X, a_Y, a_Z); break;
+		default:
+		{
+			return -1;
+		}
+	}  // switch (a_MinecartType)
+	Minecart->Initialize(this);
+	return Minecart->GetUniqueID();
 }
 
 
@@ -2740,9 +2775,6 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	{
 		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	}
-
-	// Because it's logical that ALL mob spawns need spawn effects, not just spawners
-	BroadcastSoundParticleEffect(2004, (int)a_PosX, (int)a_PosY, (int)a_PosZ, 0);
 	
 	return SpawnMobFinalize(Monster);
 }

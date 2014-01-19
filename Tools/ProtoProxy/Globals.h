@@ -95,6 +95,7 @@ typedef unsigned short     UInt16;
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
 	#include <winsock2.h>
+	#include <ws2tcpip.h>
 	
 	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
 	#undef min
@@ -104,6 +105,8 @@ typedef unsigned short     UInt16;
 	#ifdef GetFreeSpace
 		#undef GetFreeSpace
 	#endif  // GetFreeSpace
+	
+	#define SocketError WSAGetLastError()
 #else
 	#include <sys/types.h>
 	#include <sys/stat.h>   // for mkdir
@@ -116,6 +119,7 @@ typedef unsigned short     UInt16;
 	#include <dirent.h>
 	#include <errno.h>
 	#include <iostream>
+	#include <unistd.h>
 
 	#include <cstdio>
 	#include <cstring>
@@ -123,6 +127,14 @@ typedef unsigned short     UInt16;
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
+	
+	typedef int SOCKET;
+	enum
+	{
+		INVALID_SOCKET = -1,
+	};
+	#define closesocket close
+	#define SocketError errno
 #if !defined(ANDROID_NDK)
 	#include <tr1/memory>
 #endif
@@ -211,10 +223,10 @@ public:
 
 
 
-#include "CryptoPP/randpool.h"
-#include "CryptoPP/aes.h"
-#include "CryptoPP/rsa.h"
-#include "CryptoPP/modes.h"
+#include "cryptopp/randpool.h"
+#include "cryptopp/aes.h"
+#include "cryptopp/rsa.h"
+#include "cryptopp/modes.h"
 
 using namespace CryptoPP;
 

@@ -47,8 +47,19 @@ void NonCtrlHandler(int a_Signal)
 		case SIGSEGV:
 		{
 			std::signal(SIGSEGV, SIG_DFL);
-			LOGWARN("Segmentation fault; MCServer has crashed :(");
+			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
+			LOGERROR("Details | SIGSEGV: Segmentation fault");
 			exit(EXIT_FAILURE);
+		}
+		case SIGABRT:
+		#ifdef SIGABRT_COMPAT
+		case SIGABRT_COMPAT:
+		#endif
+		{
+			std::signal(a_Signal, SIG_DFL);
+			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
+			LOGERROR("Details | SIGABRT: Server self-terminated due to an internal fault");
+			break;
 		}
 		case SIGTERM:
 		{

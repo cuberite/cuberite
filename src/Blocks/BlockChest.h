@@ -42,13 +42,13 @@ public:
 		{
 			return false;
 		}
-		double rot = a_Player->GetRotation();
+		double yaw = a_Player->GetYaw();
 		if (
 			(Area.GetRelBlockType(0, 0, 1) == E_BLOCK_CHEST) ||
 			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
 		)
 		{
-			a_BlockMeta = ((rot >= -90) && (rot < 90)) ? 2 : 3;
+			a_BlockMeta = ((yaw >= -90) && (yaw < 90)) ? 2 : 3;
 			return true;
 		}
 		if (
@@ -56,12 +56,12 @@ public:
 			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
 		)
 		{
-			a_BlockMeta = (rot < 0) ? 4 : 5;
+			a_BlockMeta = (yaw < 0) ? 4 : 5;
 			return true;
 		}
 		
 		// Single chest, get meta from rotation only
-		a_BlockMeta = RotationToMetaData(rot);
+		a_BlockMeta = RotationToMetaData(yaw);
 		return true;
 	}
 	
@@ -80,7 +80,7 @@ public:
 			return;
 		}
 		
-		double rot = a_Player->GetRotation();
+		double rot = a_Player->GetYaw();  // FIXME: Rename rot to yaw
 		// Choose meta from player rotation, choose only between 2 or 3
 		NIBBLETYPE NewMeta = ((rot >= -90) && (rot < 90)) ? 2 : 3;
 		if (

@@ -40,12 +40,13 @@ class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
 
-typedef std::list<cClientHandle *>      cClientHandleList;
-typedef cItemCallback<cEntity>          cEntityCallback;
-typedef cItemCallback<cChestEntity>     cChestCallback;
-typedef cItemCallback<cDispenserEntity> cDispenserCallback;
-typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
-typedef cItemCallback<cNoteEntity>      cNoteBlockCallback;
+typedef std::list<cClientHandle *>         cClientHandleList;
+typedef cItemCallback<cEntity>             cEntityCallback;
+typedef cItemCallback<cChestEntity>        cChestCallback;
+typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
+typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
+typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
+typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 
 
 
@@ -236,6 +237,9 @@ public:
 
 	/// Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);
+
+	/// Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found
+	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback); 
 
 	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible

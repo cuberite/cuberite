@@ -46,12 +46,13 @@ class cMobCensus;
 
 typedef std::list< cPlayer * > cPlayerList;
 
-typedef cItemCallback<cPlayer>          cPlayerListCallback;
-typedef cItemCallback<cEntity>          cEntityCallback;
-typedef cItemCallback<cChestEntity>     cChestCallback;
-typedef cItemCallback<cDispenserEntity> cDispenserCallback;
-typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
-typedef cItemCallback<cNoteEntity>      cNoteBlockCallback;
+typedef cItemCallback<cPlayer>             cPlayerListCallback;
+typedef cItemCallback<cEntity>             cEntityCallback;
+typedef cItemCallback<cChestEntity>        cChestCallback;
+typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
+typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
+typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
+typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 
 
 
@@ -374,6 +375,9 @@ public:
 	/// Spawns an falling block entity at the given position. It returns the UniqueID of the spawned falling block.
 	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
 
+	/// Spawns an minecart at the given coordinates.
+	int SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
+
 	/// Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb.
 	int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward);
 
@@ -463,6 +467,9 @@ public:
 
 	/// Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
+
+	/// Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found
+	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
 	
 	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Exported in ManualBindings.cpp
@@ -677,6 +684,8 @@ private:
 	
 	/// Name of the storage schema used to load and save chunks
 	AString m_StorageSchema;
+	
+	int m_StorageCompressionFactor;
 	
 	/// The dimension of the world, used by the client to provide correct lighting scheme
 	eDimension m_Dimension;

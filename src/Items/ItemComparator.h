@@ -30,7 +30,7 @@ public:
 	) override
 	{
 		a_BlockType = E_BLOCK_INACTIVE_COMPARATOR;
-		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetRotation());
+		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
 } ;

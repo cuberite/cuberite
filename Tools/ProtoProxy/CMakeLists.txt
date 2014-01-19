@@ -77,8 +77,8 @@ endfunction()
 
 
 # Include the libraries:
-file(GLOB CRYPTOPP_SRC "../../lib/CryptoPP/*.cpp")
-file(GLOB CRYPTOPP_HDR "../../lib/CryptoPP/*.h")
+file(GLOB CRYPTOPP_SRC "../../lib/cryptopp/*.cpp")
+file(GLOB CRYPTOPP_HDR "../../lib/cryptopp/*.h")
 flatten_files(CRYPTOPP_SRC)
 flatten_files(CRYPTOPP_HDR)
 source_group("CryptoPP" FILES ${CRYPTOPP_SRC} ${CRYPTOPP_HDR})

@@ -459,7 +459,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		return;
 	}
-	
+
 	// Special handling: "stop" and "restart" are built in
 	if ((split[0].compare("stop") == 0) || (split[0].compare("restart") == 0))
 	{

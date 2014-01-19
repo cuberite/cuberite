@@ -8,6 +8,7 @@
 #include "Entities/Player.h"
 #include "Inventory.h"
 #include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/SignEntity.h"
 #include "UI/Window.h"
 #include "Item.h"
@@ -545,7 +546,77 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
+	if (a_Channel == "MC|AdvCdm") // Command block
+	{
+		const char* Data = a_Message.c_str();
+
+		HandleCommandBlockMessage(Data, a_Message.size());
+
+		return;
+	}
+
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
+}
+
+
+
+
+
+void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length)
+{
+	if (a_Length < 14)
+	{
+		LOGD("Malformed MC|AdvCdm packet.");
+		return;
+	}
+
+	cByteBuffer Buffer(a_Length);
+	Buffer.Write(a_Data, a_Length);
+
+	int BlockX, BlockY, BlockZ;
+
+	AString Command;
+
+	char Mode;
+
+	Buffer.ReadChar(Mode);
+
+	switch (Mode)
+	{
+		case 0x00:
+		{
+			Buffer.ReadBEInt(BlockX);
+			Buffer.ReadBEInt(BlockY);
+			Buffer.ReadBEInt(BlockZ);
+
+			Buffer.ReadVarUTF8String(Command);
+			break;
+		}
+
+		default:
+		{
+			LOGD("Unhandled MC|AdvCdm packet mode.");
+			return;
+		}
+	}
+
+	class cUpdateCommandBlock :
+		public cCommandBlockCallback
+	{
+		AString m_Command;
+	public:
+		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
+			
+		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
+		{
+			a_CommandBlock->SetCommand(m_Command);
+			return false;
+		}
+	} CmdBlockCB (Command);
+
+	cWorld * World = m_Player->GetWorld();
+
+	World->DoWithCommandBlockAt(BlockX, BlockY, BlockZ, CmdBlockCB);
 }
 
 
@@ -626,6 +697,17 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 		case DIG_STATUS_CANCELLED:
 		{
 			// Block breaking cancelled by player
+			return;
+		}
+
+		case DIG_STATUS_DROP_STACK:
+		{
+			if (PlgMgr->CallHookPlayerTossingItem(*m_Player))
+			{
+				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
+				return;
+			}
+			m_Player->TossItem(false, 64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
 			return;
 		}
 
@@ -1026,7 +1108,7 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 		return;
 	}
 	
-	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetYaw        (a_Rotation);
 	m_Player->SetHeadYaw    (a_Rotation);
 	m_Player->SetPitch      (a_Pitch);
 	m_Player->SetTouchGround(a_IsOnGround);
@@ -1058,7 +1140,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 	m_Player->SetStance     (a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
 	m_Player->SetHeadYaw    (a_Rotation);
-	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetYaw        (a_Rotation);
 	m_Player->SetPitch      (a_Pitch);
 }
 

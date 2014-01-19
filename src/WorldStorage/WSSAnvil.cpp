@@ -15,6 +15,7 @@
 #include "../StringCompression.h"
 
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
@@ -58,8 +59,9 @@ Since only the header is actually in the memory, this number can be high, but st
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil:
 
-cWSSAnvil::cWSSAnvil(cWorld * a_World) :
-	super(a_World)
+cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
+	super(a_World),
+	m_CompressionFactor(a_CompressionFactor)
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
 	AString fnam;
@@ -272,7 +274,7 @@ bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 	}
 	Writer.Finish();
 	
-	CompressString(Writer.GetResult().data(), Writer.GetResult().size(), a_Data);
+	CompressString(Writer.GetResult().data(), Writer.GetResult().size(), a_Data, m_CompressionFactor);
 	return true;
 }
 
@@ -565,6 +567,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		if (strncmp(a_NBT.GetData(sID), "Chest", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadChestFromNBT(a_BlockEntities, a_NBT, Child);
+		}
+		else if (strncmp(a_NBT.GetData(sID), "Control", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadCommandBlockFromNBT(a_BlockEntities, a_NBT, Child);
 		}
 		else if (strncmp(a_NBT.GetData(sID), "Dropper", a_NBT.GetDataLength(sID)) == 0)
 		{
@@ -914,6 +920,43 @@ void cWSSAnvil::LoadSignFromNBT(cBlockEntityList & a_BlockEntities, const cParse
 
 
 
+void cWSSAnvil::LoadCommandBlockFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cCommandBlockEntity> CmdBlock(new cCommandBlockEntity(x, y, z, m_World));
+
+	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Command");
+	if (currentLine >= 0)
+	{
+		CmdBlock->SetCommand(a_NBT.GetString(currentLine));
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "SuccessCount");
+	if (currentLine >= 0)
+	{
+		CmdBlock->SetResult(a_NBT.GetInt(currentLine));
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "LastOutput");
+	if (currentLine >= 0)
+	{
+		CmdBlock->SetLastOutput(a_NBT.GetString(currentLine));
+	}
+
+	// TODO 2014-01-18 xdot: Figure out what TrackOutput is and parse it.
+
+	a_BlockEntities.push_back(CmdBlock.release());
+}
+
+
+
+
+
 void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength)
 {
 	if (strncmp(a_IDTag, "Boat", a_IDTagLength) == 0)
@@ -1150,7 +1193,7 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadMinecartRFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cEmptyMinecart> Minecart(new cEmptyMinecart(0, 0, 0));
+	std::auto_ptr<cRideableMinecart> Minecart(new cRideableMinecart(0, 0, 0, cItem(), 1)); // TODO: Load the block and the height
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1891,7 +1934,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 	{
 		return false;
 	}
-	a_Entity.SetRotation(Rotation[0]);
+	a_Entity.SetYaw(Rotation[0]);
 	a_Entity.SetRoll    (Rotation[1]);
 	
 	return true;

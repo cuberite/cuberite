@@ -41,49 +41,52 @@ public:
 	cHTTPConnection(cHTTPServer & a_HTTPServer);
 	virtual ~cHTTPConnection();
 	
-	/// Sends HTTP status code together with a_Reason (used for HTTP errors)
+	/** Sends HTTP status code together with a_Reason (used for HTTP errors) */
 	void SendStatusAndReason(int a_StatusCode, const AString & a_Reason);
 	
-	/// Sends the "401 unauthorized" reply together with instructions on authorizing, using the specified realm
+	/** Sends the "401 unauthorized" reply together with instructions on authorizing, using the specified realm */
 	void SendNeedAuth(const AString & a_Realm);
 	
-	/// Sends the headers contained in a_Response
+	/** Sends the headers contained in a_Response */
 	void Send(const cHTTPResponse & a_Response);
 	
-	/// Sends the data as the response (may be called multiple times)
+	/** Sends the data as the response (may be called multiple times) */
 	void Send(const void * a_Data, int a_Size);
 
-	/// Sends the data as the response (may be called multiple times)
+	/** Sends the data as the response (may be called multiple times) */
 	void Send(const AString & a_Data) { Send(a_Data.data(), a_Data.size()); }
 	
-	/// Indicates that the current response is finished, gets ready for receiving another request (HTTP 1.1 keepalive)
+	/** Indicates that the current response is finished, gets ready for receiving another request (HTTP 1.1 keepalive) */
 	void FinishResponse(void);
 	
-	/// Resets the connection for a new request. Depending on the state, this will send an "InternalServerError" status or a "ResponseEnd"
+	/** Resets the internal connection state for a new request.
+	Depending on the state, this will send an "InternalServerError" status or a "ResponseEnd" */
 	void AwaitNextRequest(void);
 	
-	/// Terminates the connection; finishes any request being currently processed
+	/** Terminates the connection; finishes any request being currently processed */
 	void Terminate(void);
 	
 protected:
 	typedef std::map<AString, AString> cNameValueMap;
 	
-	/// The parent webserver that is to be notified of events on this connection
+	/** The parent webserver that is to be notified of events on this connection */
 	cHTTPServer & m_HTTPServer;
 	
-	/// All the incoming data until the entire request header is parsed
+	/** All the incoming data until the entire request header is parsed */
 	AString m_IncomingHeaderData;
 	
-	/// Status in which the request currently is
+	/** Status in which the request currently is */
 	eState m_State;
 	
-	/// Data that is queued for sending, once the socket becomes writable
+	/** Data that is queued for sending, once the socket becomes writable */
 	AString m_OutgoingData;
 	
-	/// The request being currently received (valid only between having parsed the headers and finishing receiving the body)
+	/** The request being currently received
+	Valid only between having parsed the headers and finishing receiving the body. */
 	cHTTPRequest * m_CurrentRequest;
 
-	/// Number of bytes that remain to read for the complete body of the message to be received. Valid only in wcsRecvBody
+	/** Number of bytes that remain to read for the complete body of the message to be received.
+	Valid only in wcsRecvBody */
 	int m_CurrentRequestBodyRemaining;
 	
 	
