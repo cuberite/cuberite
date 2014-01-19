@@ -720,56 +720,81 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 
 bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 {
+	cMinecartCollisionCallback MinecartCollisionCallback(GetPosition(), GetHeight(), GetWidth(), GetUniqueID(), ((m_Attachee == NULL) ? -1 : m_Attachee->GetUniqueID()));
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk((int)floor(GetPosX()), (int)floor(GetPosZ()), ChunkX, ChunkZ);
+	m_World->ForEachEntityInChunk(ChunkX, ChunkZ, MinecartCollisionCallback);
+
+	if (!MinecartCollisionCallback.FoundIntersection())
+	{
+		return false;
+	}
+
 	switch (a_RailMeta)
 	{
 		case E_META_RAIL_ZM_ZP:
 		{
-			cMinecartCollisionCallback MinecartCollisionCallback(GetPosition(), GetHeight(), GetWidth(), GetUniqueID(), ((m_Attachee == NULL) ? -1 : m_Attachee->GetUniqueID()));
-			m_World->ForEachEntity(MinecartCollisionCallback);
-
-			if (MinecartCollisionCallback.FoundIntersection())
+			if (MinecartCollisionCallback.GetCollidedEntityPosition().z >= GetPosZ())
 			{
-				if (MinecartCollisionCallback.GetCollidedEntityPosition().z >= GetPosZ())
+				if ((-GetSpeedZ() * 0.4) < 0.01)
 				{
-					if (((-GetSpeedZ()) * 0.4) < 0.01)
-					{
-						AddSpeedZ(-4);
-					}
-					else
-					{
-						SetSpeedZ((-GetSpeedZ()) * 0.4);
-					}
+					AddSpeedZ(-4);
 				}
 				else
 				{
-					if ((GetSpeedZ() * 0.4) < 0.01)
-					{
-						AddSpeedZ(4);
-					}
-					else
-					{
-						SetSpeedZ(GetSpeedZ() * 0.4);
-					}
+					SetSpeedZ(-GetSpeedZ() * 0.4);
 				}
-				return true;
 			}
-			break;
+			else
+			{
+				if ((GetSpeedZ() * 0.4) < 0.01)
+				{
+					AddSpeedZ(4);
+				}
+				else
+				{
+					SetSpeedZ(GetSpeedZ() * 0.4);
+				}
+			}
+			return true;
 		}
 		case E_META_RAIL_XM_XP:
 		{
-			
-			break;
+			if (MinecartCollisionCallback.GetCollidedEntityPosition().x >= GetPosX())
+			{
+				if ((-GetSpeedX() * 0.4) < 0.01)
+				{
+					AddSpeedX(-4);
+				}
+				else
+				{
+					SetSpeedX(-GetSpeedX() * 0.4);
+				}
+			}
+			else
+			{
+				if ((GetSpeedX() * 0.4) < 0.01)
+				{
+					AddSpeedX(4);
+				}
+				else
+				{
+					SetSpeedX(GetSpeedX() * 0.4);
+				}
+			}
+			return true;
 		}			
 		case E_META_RAIL_CURVED_ZM_XM:
 		case E_META_RAIL_CURVED_ZM_XP:
 		case E_META_RAIL_CURVED_ZP_XM:
 		case E_META_RAIL_CURVED_ZP_XP:
 		{
-			
+			// TODO - simply can't be bothered right now
 			break;
 		}
 		default: break;
 	}
+
 	return false;
 }
 
