@@ -160,10 +160,17 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		if (IsBlockRail(InsideType)) AddPosY(1); // Push cart upwards
 	}
 
+	bool WasDetectorRail = false;
 	if (IsBlockRail(InsideType))
 	{
-		bool WasDetectorRail = false;
-		SnapToRail(InsideMeta);
+		if (InsideType == E_BLOCK_RAIL)
+		{
+			SnapToRail(InsideMeta);
+		}
+		else
+		{
+			SnapToRail(InsideMeta & 0x07);
+		}
 
 		switch (InsideType)
 		{
@@ -180,18 +187,23 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 
 		AddPosition(GetSpeed() * (a_Dt / 1000)); // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
-
-		if (m_bIsOnDetectorRail && !WasDetectorRail)
-		{
-			m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
-			m_bIsOnDetectorRail = false;
-		}
 	}
 	else
 	{
 		// Not on rail, default physics
 		SetPosY(floor(GetPosY()) + 0.35); // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
 		super::HandlePhysics(a_Dt, *Chunk);
+	}
+
+	if (m_bIsOnDetectorRail && !Vector3i((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ())).Equals(m_DetectorRailPosition))
+	{
+		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		m_bIsOnDetectorRail = false;
+	}
+	else if (WasDetectorRail)
+	{
+		m_bIsOnDetectorRail = true;
+		m_DetectorRailPosition = Vector3i((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
 	}
 	
 	// Broadcast positioning changes to client
@@ -425,11 +437,11 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			{
 				if (GetSpeedZ() > 0)
 				{
-					AddSpeedZ(AccelDecelNegSpeed);
+					AddSpeedZ(AccelDecelSpeed);
 				}
 				else
 				{
-					AddSpeedZ(AccelDecelSpeed);
+					AddSpeedZ(AccelDecelNegSpeed);
 				}
 			}
 			break;
@@ -465,9 +477,6 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 {
-	m_bIsOnDetectorRail = true;
-	m_DetectorRailPosition = Vector3i((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
-
 	m_World->SetBlockMeta(m_DetectorRailPosition, a_RailMeta | 0x08);
 
 	HandleRailPhysics(a_RailMeta & 0x07, a_Dt);
@@ -497,19 +506,10 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 			SetPosX(floor(GetPosX()) + 0.5);
 			break;
 		}
+		// Curved rail physics: once minecart has reached more than half of the block in the direction that it is travelling in, jerk it in the direction of curvature
 		case E_META_RAIL_CURVED_ZM_XM:
 		{
-			if (GetPosZ() < floor(GetPosZ()) + 0.5)
-			{
-				if (GetSpeedX() > 0)
-				{
-					SetSpeedZ(-GetSpeedX() * 0.7);
-				}
-
-				SetSpeedX(0);
-				SetPosX(floor(GetPosX()) + 0.5);
-			}
-			else
+			if (GetPosZ() > floor(GetPosZ()) + 0.5)
 			{
 				if (GetSpeedZ() > 0)
 				{
@@ -519,21 +519,21 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 				SetSpeedZ(0);
 				SetPosZ(floor(GetPosZ()) + 0.5);
 			}
-			break;
-		}
-		case E_META_RAIL_CURVED_ZM_XP:
-		{
-			if (GetPosZ() < floor(GetPosZ()) + 0.5)
+			else if (GetPosX() > floor(GetPosX()) + 0.5)
 			{
-				if (GetSpeedX() < 0)
+				if (GetSpeedX() > 0)
 				{
-					SetSpeedZ(GetSpeedX() * 0.7);
+					SetSpeedZ(-GetSpeedX() * 0.7);
 				}
 
 				SetSpeedX(0);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
-			else
+			break;
+		}
+		case E_META_RAIL_CURVED_ZM_XP:
+		{
+			if (GetPosZ() > floor(GetPosZ()) + 0.5)
 			{
 				if (GetSpeedZ() > 0)
 				{
@@ -542,6 +542,16 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 
 				SetSpeedZ(0);
 				SetPosZ(floor(GetPosZ()) + 0.5);
+			}
+			else if (GetPosX() < floor(GetPosX()) + 0.5)
+			{
+				if (GetSpeedX() < 0)
+				{
+					SetSpeedZ(GetSpeedX() * 0.7);
+				}
+
+				SetSpeedX(0);
+				SetPosX(floor(GetPosX()) + 0.5);
 			}
 			break;
 		}
@@ -557,7 +567,7 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 				SetSpeedZ(0);
 				SetPosZ(floor(GetPosZ()) + 0.5);
 			}
-			else
+			else if (GetPosX() > floor(GetPosX()) + 0.5)
 			{
 				if (GetSpeedX() > 0)
 				{
@@ -581,7 +591,7 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 				SetSpeedZ(0);
 				SetPosZ(floor(GetPosZ()) + 0.5);
 			}
-			else
+			else if (GetPosX() < floor(GetPosX()) + 0.5)
 			{
 				if (GetSpeedX() < 0)
 				{
