@@ -4,6 +4,7 @@
 
 #include "Globals.h"
 #include "NBTChunkSerializer.h"
+#include "EnchantmentSerializer.h"
 #include "../BlockID.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
@@ -92,7 +93,7 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
 		m_Writer.BeginCompound("tag");
-			a_Item.m_Enchantments.WriteToNBTCompound(m_Writer, TagName);
+			EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, m_Writer, TagName);
 		m_Writer.EndCompound();
 	}
 	

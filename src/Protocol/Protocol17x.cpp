@@ -16,6 +16,7 @@ Implements the 1.7.x protocol classes:
 #include "../Server.h"
 #include "../World.h"
 #include "../WorldStorage/FastNBT.h"
+#include "../WorldStorage/EnchantmentSerializer.h"
 #include "../StringCompression.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
@@ -1719,7 +1720,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			)
 		)
 		{
-			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+			EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 		}
 		else if ((NBT.GetType(tag) == TAG_Compound) && (NBT.GetName(tag) == "display")) // Custom name and lore tag
 		{
@@ -1804,7 +1805,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments,Writer, TagName);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty())
 	{
