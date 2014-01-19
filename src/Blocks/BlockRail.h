@@ -204,7 +204,7 @@ public:
 
 	bool IsUnstable(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_RAIL)
+		if (!IsBlockRail(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			return false;
 		}
@@ -339,11 +339,11 @@ public:
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);
 		NIBBLETYPE Meta;
-		if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_RAIL)
+		if (!IsBlockRail(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			if ((a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ) != E_BLOCK_RAIL) || (a_Pure != E_PURE_UPDOWN))
+			if (!IsBlockRail(a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)) || (a_Pure != E_PURE_UPDOWN))
 			{
-				if ((a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) != E_BLOCK_RAIL) || (a_Pure == E_PURE_NONE))
+				if (!IsBlockRail(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)) || (a_Pure == E_PURE_NONE))
 				{
 					return true;
 				}

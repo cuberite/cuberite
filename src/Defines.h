@@ -282,6 +282,24 @@ inline bool IsBlockLiquid(BLOCKTYPE a_BlockType)
 
 
 
+inline bool IsBlockRail(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_RAIL:
+		case E_BLOCK_ACTIVATOR_RAIL:
+		case E_BLOCK_DETECTOR_RAIL:
+		case E_BLOCK_POWERED_RAIL:
+		{
+			return true;
+		}
+		default: return false;
+	}
+}
+
+
+
+
 
 inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 {
