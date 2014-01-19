@@ -815,6 +815,9 @@ public:
 	/// Returns true if the specified parameters on the stack are strings; also logs warning if not
 	bool CheckParamString(int a_StartParam, int a_EndParam = -1);
 	
+	/// Returns true if the specified parameters on the stack are functions; also logs warning if not
+	bool CheckParamFunction(int a_StartParam, int a_EndParam = -1);
+	
 	/// Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters)
 	bool CheckParamEnd(int a_Param);
 	
