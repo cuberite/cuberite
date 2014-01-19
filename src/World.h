@@ -22,6 +22,7 @@
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "Entities/ProjectileEntity.h"
+#include "Scoreboard.h"
 
 
 
@@ -513,6 +514,9 @@ public:
 	
 	/// Returns the name of the world.ini file used by this world
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
+
+	/// Returns the associated scoreboard instance
+	cScoreboard* GetScoreBoard(void) { return &m_Scoreboard; }
 	
 	// tolua_end
 
@@ -757,6 +761,8 @@ private:
 	sSetBlockList    m_FastSetBlockQueue;
 
 	cChunkGenerator  m_Generator;
+
+	cScoreboard      m_Scoreboard;
 	
 	/** The callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	cChunkGeneratorCallbacks m_GeneratorCallbacks;
