@@ -360,6 +360,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		{
 			SetYaw(315); // Set correct rotation server side
 			SetPosY(floor(GetPosY()) + 0.55); // Levitate dat cart
+			SetSpeedY(0);
 
 			TestBlockCollision(a_RailMeta);
 			TestEntityCollision(a_RailMeta);
@@ -372,6 +373,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		{
 			SetYaw(225);
 			SetPosY(floor(GetPosY()) + 0.55);
+			SetSpeedY(0);
 
 			TestBlockCollision(a_RailMeta);
 			TestEntityCollision(a_RailMeta);
@@ -382,6 +384,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		{
 			SetYaw(135);
 			SetPosY(floor(GetPosY()) + 0.55);
+			SetSpeedY(0);
 
 			TestBlockCollision(a_RailMeta);
 			TestEntityCollision(a_RailMeta);
@@ -392,6 +395,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		{
 			SetYaw(45);
 			SetPosY(floor(GetPosY()) + 0.55);
+			SetSpeedY(0);
 
 			TestBlockCollision(a_RailMeta);
 			TestEntityCollision(a_RailMeta);
@@ -431,7 +435,8 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			SetSpeedY(0);
 			SetSpeedX(0);
 
-			if (TestBlockCollision(a_RailMeta)) return;
+			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
+			if (EntCol || BlckCol) return;
 			
 			if (GetSpeedZ() != 0)
 			{
@@ -453,7 +458,8 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			SetSpeedY(0);
 			SetSpeedZ(0);
 
-			if (TestBlockCollision(a_RailMeta)) return;
+			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
+			if (EntCol || BlckCol) return;
 
 			if (GetSpeedX() != 0)
 			{
@@ -468,6 +474,27 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			}
 			break;
 		}
+		case E_META_RAIL_ASCEND_XM:
+		{
+			SetYaw(180);
+			SetSpeedZ(0);
+
+			if (GetSpeedX() >= 0)
+			{
+				if (GetSpeedX() <= MAX_SPEED)
+				{
+					AddSpeedX(1);
+					SetSpeedY(-GetSpeedX());
+				}
+			}
+			else
+			{
+				AddSpeedX(-1);
+				SetSpeedY(-GetSpeedX());
+			}
+			break;
+		}
+		default: ASSERT(!"Unhandled powered rail metadata!"); break;
 	}
 }
 
@@ -479,6 +506,15 @@ void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 {
 	m_World->SetBlockMeta(m_DetectorRailPosition, a_RailMeta | 0x08);
 
+	// No special handling
+	HandleRailPhysics(a_RailMeta & 0x07, a_Dt);
+}
+
+
+
+
+void cMinecart::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
+{
 	HandleRailPhysics(a_RailMeta & 0x07, a_Dt);
 }
 
@@ -529,6 +565,7 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 				SetSpeedX(0);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
+			SetSpeedY(0);
 			break;
 		}
 		case E_META_RAIL_CURVED_ZM_XP:
@@ -553,6 +590,7 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 				SetSpeedX(0);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
+			SetSpeedY(0);
 			break;
 		}
 		case E_META_RAIL_CURVED_ZP_XM:
@@ -577,6 +615,7 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 				SetSpeedX(0);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
+			SetSpeedY(0);
 			break;
 		}
 		case E_META_RAIL_CURVED_ZP_XP:
@@ -601,6 +640,7 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 				SetSpeedX(0);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
+			SetSpeedY(0);
 			break;
 		}
 		default: break;

@@ -65,6 +65,9 @@ protected:
 	*/
 	void HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt);
 
+	/** Handles activator rails - placeholder for future implementation */
+	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt);
+
 	/** Snaps a mincecart to a rail's axis, resetting its speed
 		For curved rails, it changes the cart's direction as well as snapping it to axis */
 	void SnapToRail(NIBBLETYPE a_RailMeta);
