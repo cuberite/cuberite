@@ -16,7 +16,6 @@
 #include "OSSupport/SocketThreads.h"
 #include "ChunkDef.h"
 #include "ByteBuffer.h"
-#include "WorldStorage/FastNBT.h"
 
 
 
@@ -137,7 +136,7 @@ public:
 	void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay);
 	void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ);
-	void SendUpdateBlockEntity   (int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cFastNBTWriter & a_NBT);
+	void SendUpdateBlockEntity   (int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cBlockEntity & a_BlockEntity);
 	void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 	void SendWeather             (eWeather a_Weather);

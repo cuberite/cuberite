@@ -24,6 +24,7 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/Player.h"
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 
 
 
@@ -892,7 +893,7 @@ void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cProtocol172::SendUpdateBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cFastNBTWriter & a_NBT)
+void cProtocol172::SendUpdateBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Action, cBlockEntity & a_BlockEntity)
 {
 	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
 	Pkt.WriteInt(a_BlockX);
@@ -900,7 +901,7 @@ void cProtocol172::SendUpdateBlockEntity(int a_BlockX, int a_BlockY, int a_Block
 	Pkt.WriteInt(a_BlockZ);
 	Pkt.WriteByte(a_Action);
 
-	Pkt.WriteBlockEntity(a_NBT);
+	Pkt.WriteBlockEntity(a_BlockEntity);
 }
 
 
@@ -1833,10 +1834,44 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 
 
 
-void cProtocol172::cPacketizer::WriteBlockEntity(const cFastNBTWriter & a_NBT)
+void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEntity)
 {
+	cFastNBTWriter Writer;
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_COMMAND_BLOCK:
+		{
+			cCommandBlockEntity & CommandBlockEntity = (cCommandBlockEntity &)a_BlockEntity;
+
+			Writer.AddByte("TrackOutput", 1); // Neither I nor the MC wiki has any idea about this
+			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
+			Writer.AddInt("x", CommandBlockEntity.GetPosX());
+			Writer.AddInt("y", CommandBlockEntity.GetPosY());
+			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			// You can set custom names for windows in Vanilla
+			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
+			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
+			Writer.AddString("CustomName", "@");
+			Writer.AddString("id", "Control"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+
+			if (!CommandBlockEntity.GetLastOutput().empty())
+			{
+				AString Output;
+				Printf(Output, "{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str());
+
+				Writer.AddString("LastOutput", Output.c_str());
+			}
+			break;
+		}
+		default: break;
+	}
+
+	Writer.Finish();
+
 	AString Compressed;
-	CompressStringGZIP(a_NBT.GetResult().data(), a_NBT.GetResult().size(), Compressed);
+	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 	WriteShort(Compressed.size());
 	WriteBuf(Compressed.data(), Compressed.size());
 }

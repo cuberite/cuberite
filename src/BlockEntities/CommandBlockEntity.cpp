@@ -58,6 +58,7 @@ void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 
 void cCommandBlockEntity::SetLastOutput(const AString & a_LastOut)
 {
+	m_World->BroadcastBlockEntity(GetPosX(), GetPosY(), GetPosZ());
 	m_LastOutput = a_LastOut;
 }
 
@@ -141,30 +142,7 @@ bool cCommandBlockEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cCommandBlockEntity::SendTo(cClientHandle & a_Client)
 {
-	cFastNBTWriter Writer;
-	Writer.AddByte("TrackOutput", 1); // Neither I nor the MC wiki has any idea about this
-	Writer.AddInt("SuccessCount", GetResult());
-	Writer.AddInt("x", GetPosX());
-	Writer.AddInt("y", GetPosY());
-	Writer.AddInt("z", GetPosZ());
-	Writer.AddString("Command", GetCommand().c_str());
-	// You can set custom names for windows in Vanilla
-	// For a command block, this would be the 'name' prepended to anything it outputs into global chat
-	// MCS doesn't have this, so just leave it @ '@'. (geddit?)
-	Writer.AddString("CustomName", "@");
-	Writer.AddString("id", "Control"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-
-	if (!GetLastOutput().empty())
-	{
-		AString Output;
-		Printf(Output, "{\"text\":\"%s\"}", GetLastOutput().c_str());
-
-		Writer.AddString("LastOutput", Output.c_str());
-	}
-
-	Writer.Finish();
-
-	a_Client.SendUpdateBlockEntity(GetPosX(), GetPosY(), GetPosZ(), 2, Writer);
+	a_Client.SendUpdateBlockEntity(GetPosX(), GetPosY(), GetPosZ(), 2, *this);
 }
 
 
