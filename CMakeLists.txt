@@ -203,5 +203,9 @@ if (NOT MSVC)
 	string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
 endif()
 
+if(${BUILD_TOOLS})
+add_subdirectory(Tools/GeneratorPerformanceTest/)
+endif()
+
 add_subdirectory (src)
 
