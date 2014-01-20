@@ -22,6 +22,7 @@
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "Entities/ProjectileEntity.h"
+#include "ForEachChunkProvider.h"
 
 
 

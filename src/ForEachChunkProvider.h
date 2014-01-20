@@ -1,4 +1,8 @@
 
+#pragma once
+
+class cChunkDataCallback;
+
 class cBlockArea;
 
 class cForEachChunkProvider

@@ -9,10 +9,10 @@ class cSchematicFileSerializer
 public:
 		
 	/// Loads an area from a .schematic file. Returns true if successful
-	static bool LoadFromSchematicFile(const AString & a_FileName);
+	static bool LoadFromSchematicFile(cBlockArea& a_BlockArea, const AString & a_FileName);
 	
 	/// Saves the area into a .schematic file. Returns true if successful
-	static bool SaveToSchematicFile(const AString & a_FileName);
+	static bool SaveToSchematicFile(cBlockArea& a_BlockArea, const AString & a_FileName);
 	
 private:
 	/// Loads the area from a schematic file uncompressed and parsed into a NBT tree. Returns true if successful.

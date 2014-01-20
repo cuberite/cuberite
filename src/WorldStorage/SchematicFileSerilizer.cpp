@@ -1,5 +1,12 @@
 
-bool cSchematicFileSerializer::LoadFromSchematicFile(const AString & a_FileName)
+#include "Globals.h"
+
+#include "OSSupport/GZipFile.h"
+#include "FastNBT.h"
+
+#include "SchematicFileSerilizer.h"
+
+bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea& a_BlockArea, const AString & a_FileName)
 {
 	// Un-GZip the contents:
 	AString Contents;
@@ -25,32 +32,32 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(const AString & a_FileName)
 		return false;
 	}
 	
-	return LoadFromSchematicNBT(NBT);
+	return LoadFromSchematicNBT(a_BlockArea, NBT);
 }
 
-bool cSchematicFileSerializer::SaveToSchematicFile(const AString & a_FileName)
+bool cSchematicFileSerializer::SaveToSchematicFile(cBlockArea& a_BlockArea, const AString & a_FileName)
 {
 	cFastNBTWriter Writer("Schematic");
-	Writer.AddShort("Width", m_SizeX);
-	Writer.AddShort("Height", m_SizeY);
-	Writer.AddShort("Length", m_SizeZ);
+	Writer.AddShort("Width",  a_BlockArea.m_SizeX);
+	Writer.AddShort("Height", a_BlockArea.m_SizeY);
+	Writer.AddShort("Length", a_BlockArea.m_SizeZ);
 	Writer.AddString("Materials", "Alpha");
-	if (HasBlockTypes())
+	if (a_BlockArea.HasBlockTypes())
 	{
-		Writer.AddByteArray("Blocks", (const char *)m_BlockTypes, GetBlockCount());
+		Writer.AddByteArray("Blocks", (const char *)a_BlockArea.m_BlockTypes, a_BlockArea.GetBlockCount());
 	}
 	else
 	{
-		AString Dummy(GetBlockCount(), 0);
+		AString Dummy(a_BlockArea.GetBlockCount(), 0);
 		Writer.AddByteArray("Blocks", Dummy.data(), Dummy.size());
 	}
-	if (HasBlockMetas())
+	if (a_BlockArea.HasBlockMetas())
 	{
-		Writer.AddByteArray("Data", (const char *)m_BlockMetas, GetBlockCount());
+		Writer.AddByteArray("Data", (const char *)a_BlockArea.m_BlockMetas, a_BlockArea.GetBlockCount());
 	}
 	else
 	{
-		AString Dummy(GetBlockCount(), 0);
+		AString Dummy(a_BlockArea.GetBlockCount(), 0);
 		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
 	}
 	// TODO: Save entities and block entities
@@ -75,7 +82,7 @@ bool cSchematicFileSerializer::SaveToSchematicFile(const AString & a_FileName)
 	return true;
 }
 
-bool cBlockArea::LoadFromSchematicNBT(cParsedNBT & a_NBT)
+bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea& a_BlockArea, cParsedNBT & a_NBT)
 {
 	int TMaterials = a_NBT.FindChildByName(a_NBT.GetRoot(), "Materials");
 	if ((TMaterials > 0) && (a_NBT.GetType(TMaterials) == TAG_String))
@@ -122,11 +129,11 @@ bool cBlockArea::LoadFromSchematicNBT(cParsedNBT & a_NBT)
 	}
 	bool AreMetasPresent = (TBlockMetas > 0) && (a_NBT.GetType(TBlockMetas) == TAG_ByteArray);
 	
-	Clear();
-	SetSize(SizeX, SizeY, SizeZ, AreMetasPresent ? (baTypes | baMetas) : baTypes);
+	a_BlockArea.Clear();
+	a_BlockArea.SetSize(SizeX, SizeY, SizeZ, AreMetasPresent ? (cBlockArea::baTypes | cBlockArea::baMetas) : cBlockArea::baTypes);
 	
 	// Copy the block types and metas:
-	int NumBytes = m_SizeX * m_SizeY * m_SizeZ;
+	int NumBytes = a_BlockArea.m_SizeX * a_BlockArea.m_SizeY * a_BlockArea.m_SizeZ;
 	if (a_NBT.GetDataLength(TBlockTypes) < NumBytes)
 	{
 		LOG("BlockTypes truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
@@ -134,11 +141,11 @@ bool cBlockArea::LoadFromSchematicNBT(cParsedNBT & a_NBT)
 		);
 		NumBytes = a_NBT.GetDataLength(TBlockTypes);
 	}
-	memcpy(m_BlockTypes, a_NBT.GetData(TBlockTypes), NumBytes);
+	memcpy(a_BlockArea.m_BlockTypes, a_NBT.GetData(TBlockTypes), NumBytes);
 	
 	if (AreMetasPresent)
 	{
-		int NumBytes = m_SizeX * m_SizeY * m_SizeZ;
+		int NumBytes = a_BlockArea.m_SizeX * a_BlockArea.m_SizeY * a_BlockArea.m_SizeZ;
 		if (a_NBT.GetDataLength(TBlockMetas) < NumBytes)
 		{
 			LOG("BlockMetas truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
@@ -146,7 +153,7 @@ bool cBlockArea::LoadFromSchematicNBT(cParsedNBT & a_NBT)
 			);
 			NumBytes = a_NBT.GetDataLength(TBlockMetas);
 		}
-		memcpy(m_BlockMetas, a_NBT.GetData(TBlockMetas), NumBytes);
+		memcpy(a_BlockArea.m_BlockMetas, a_NBT.GetData(TBlockMetas), NumBytes);
 	}
 	
 	return true;
