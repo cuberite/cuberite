@@ -4,6 +4,7 @@
 #include "RedstoneSimulator.h"
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/NoteEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
@@ -215,11 +216,12 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 		{
 			case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(a_X, dataitr->y, a_Z);	break;
 			case E_BLOCK_LEVER:                 HandleRedstoneLever(a_X, dataitr->y, a_Z);	break;
-			case E_BLOCK_TNT:                   HandleTNT(a_X, dataitr->y, a_Z);			break;
+			case E_BLOCK_TNT:                   HandleTNT(a_X, dataitr->y, a_Z);            break;
 			case E_BLOCK_TRAPDOOR:              HandleTrapdoor(a_X, dataitr->y, a_Z);       break;
 			case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(a_X, dataitr->y, a_Z);	break;
 			case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(a_X, dataitr->y, a_Z);      break;
 			case E_BLOCK_DAYLIGHT_SENSOR:       HandleDaylightSensor(a_X, dataitr->y, a_Z); break;
+			case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(a_X, dataitr->y, a_Z);   break;
 
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
@@ -757,6 +759,29 @@ void cRedstoneSimulator::HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ)
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}
+}
+
+
+
+
+
+void cRedstoneSimulator::HandleCommandBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	class cSetPowerToCommandBlock :
+		public cCommandBlockCallback
+	{
+		bool m_IsPowered;
+	public:
+		cSetPowerToCommandBlock(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
+				
+		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
+		{
+			a_CommandBlock->SetRedstonePower(m_IsPowered);
+			return false;
+		}
+	} CmdBlockSP (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ));
+
+	m_World.DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, CmdBlockSP);
 }
 
 

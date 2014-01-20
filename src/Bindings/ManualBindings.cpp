@@ -14,6 +14,7 @@
 #include "../WebAdmin.h"
 #include "../ClientHandle.h"
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
@@ -985,11 +986,10 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 
 
 class cLuaScheduledWorldTask :
-	public cWorld::cScheduledTask
+	public cWorld::cTask
 {
 public:
-	cLuaScheduledWorldTask(cPluginLua & a_Plugin, int a_FnRef, int a_Ticks) :
-		cScheduledTask(a_Ticks),
+	cLuaScheduledWorldTask(cPluginLua & a_Plugin, int a_FnRef) :
 		m_Plugin(a_Plugin),
 		m_FnRef(a_FnRef)
 	{
@@ -1024,14 +1024,19 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 	}
 
 	// Retrieve the args:
-	cWorld * self = (cWorld *)tolua_tousertype(tolua_S, 1, 0);
-	if (self == NULL)
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamNumber  (2) ||
+		!L.CheckParamFunction(3)
+	)
+	{
+		return 0;
+	}
+	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 1, NULL);
+	if (World == NULL)
 	{
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
-	}
-	if (!lua_isfunction(tolua_S, 2))
-	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a function for parameter #1");
 	}
 
 	// Create a reference to the function:
@@ -1041,9 +1046,9 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
 	}
 	
-	int Ticks = (int) tolua_tonumber (tolua_S, 3, 0);
+	int DelayTicks = (int)tolua_tonumber(tolua_S, 2, 0);
 
-	self->ScheduleTask(new cLuaScheduledWorldTask(*Plugin, FnRef, Ticks));
+	World->ScheduleTask(DelayTicks, new cLuaScheduledWorldTask(*Plugin, FnRef));
 	return 0;
 }
 
@@ -2265,16 +2270,17 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cWorld");
-			tolua_function(tolua_S, "DoWithBlockEntityAt",       tolua_DoWithXYZ<cWorld, cBlockEntity,       &cWorld::DoWithBlockEntityAt>);
-			tolua_function(tolua_S, "DoWithChestAt",             tolua_DoWithXYZ<cWorld, cChestEntity,       &cWorld::DoWithChestAt>);
-			tolua_function(tolua_S, "DoWithDispenserAt",         tolua_DoWithXYZ<cWorld, cDispenserEntity,   &cWorld::DoWithDispenserAt>);
-			tolua_function(tolua_S, "DoWithDropSpenserAt",       tolua_DoWithXYZ<cWorld, cDropSpenserEntity, &cWorld::DoWithDropSpenserAt>);
-			tolua_function(tolua_S, "DoWithDropperAt",           tolua_DoWithXYZ<cWorld, cDropperEntity,     &cWorld::DoWithDropperAt>);
-			tolua_function(tolua_S, "DoWithEntityByID",          tolua_DoWithID< cWorld, cEntity,            &cWorld::DoWithEntityByID>);
-			tolua_function(tolua_S, "DoWithFurnaceAt",           tolua_DoWithXYZ<cWorld, cFurnaceEntity,     &cWorld::DoWithFurnaceAt>);
-			tolua_function(tolua_S, "DoWithNoteBlockAt",         tolua_DoWithXYZ<cWorld, cNoteEntity,        &cWorld::DoWithNoteBlockAt>);
-			tolua_function(tolua_S, "DoWithPlayer",              tolua_DoWith<   cWorld, cPlayer,            &cWorld::DoWithPlayer>);
-			tolua_function(tolua_S, "FindAndDoWithPlayer",       tolua_DoWith<   cWorld, cPlayer,            &cWorld::FindAndDoWithPlayer>);
+			tolua_function(tolua_S, "DoWithBlockEntityAt",       tolua_DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
+			tolua_function(tolua_S, "DoWithChestAt",             tolua_DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);
+			tolua_function(tolua_S, "DoWithDispenserAt",         tolua_DoWithXYZ<cWorld, cDispenserEntity,    &cWorld::DoWithDispenserAt>);
+			tolua_function(tolua_S, "DoWithDropSpenserAt",       tolua_DoWithXYZ<cWorld, cDropSpenserEntity,  &cWorld::DoWithDropSpenserAt>);
+			tolua_function(tolua_S, "DoWithDropperAt",           tolua_DoWithXYZ<cWorld, cDropperEntity,      &cWorld::DoWithDropperAt>);
+			tolua_function(tolua_S, "DoWithEntityByID",          tolua_DoWithID< cWorld, cEntity,             &cWorld::DoWithEntityByID>);
+			tolua_function(tolua_S, "DoWithFurnaceAt",           tolua_DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
+			tolua_function(tolua_S, "DoWithNoteBlockAt",         tolua_DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
+			tolua_function(tolua_S, "DoWithCommandBlockAt",      tolua_DoWithXYZ<cWorld, cCommandBlockEntity, &cWorld::DoWithCommandBlockAt>);
+			tolua_function(tolua_S, "DoWithPlayer",              tolua_DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
+			tolua_function(tolua_S, "FindAndDoWithPlayer",       tolua_DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk", tolua_ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
 			tolua_function(tolua_S, "ForEachChestInChunk",       tolua_ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
 			tolua_function(tolua_S, "ForEachEntity",             tolua_ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);

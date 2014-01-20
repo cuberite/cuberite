@@ -8,6 +8,7 @@
 #include "Entities/Player.h"
 #include "Inventory.h"
 #include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/SignEntity.h"
 #include "UI/Window.h"
 #include "Item.h"
@@ -119,9 +120,6 @@ cClientHandle::~cClientHandle()
 	
 	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
 
-	// Remove from cSocketThreads, we're not to be called anymore:
-	cRoot::Get()->GetServer()->ClientDestroying(this);
-	
 	{
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
@@ -159,8 +157,7 @@ cClientHandle::~cClientHandle()
 		cRoot::Get()->GetServer()->WriteToClient(this, Data);
 	}
 	
-	// Queue the socket to close as soon as it sends all outgoing data:
-	cRoot::Get()->GetServer()->QueueClientClose(this);
+	// Close the socket as soon as it sends all outgoing data:
 	cRoot::Get()->GetServer()->RemoveClient(this);
 	
 	delete m_Protocol;
@@ -545,7 +542,87 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
+	if (a_Channel == "MC|AdvCdm") // Command block, set text, Client -> Server
+	{
+		const char* Data = a_Message.c_str();
+		HandleCommandBlockMessage(Data, a_Message.size());
+		return;
+	}
+	else if (a_Channel == "MC|Brand") // Client <-> Server branding exchange
+	{
+		// We are custom,
+		// We are awesome,
+		// We are MCServer.
+		SendPluginMessage("MC|Brand", "MCServer");
+		return;
+	}
+
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
+}
+
+
+
+
+
+void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length)
+{
+	if (a_Length < 14)
+	{
+		SendChat(Printf("%s[INFO]%s Failure setting command block command; bad request", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+		LOGD("Malformed MC|AdvCdm packet.");
+		return;
+	}
+
+	cByteBuffer Buffer(a_Length);
+	Buffer.Write(a_Data, a_Length);
+
+	int BlockX, BlockY, BlockZ;
+
+	AString Command;
+
+	char Mode;
+
+	Buffer.ReadChar(Mode);
+
+	switch (Mode)
+	{
+		case 0x00:
+		{
+			Buffer.ReadBEInt(BlockX);
+			Buffer.ReadBEInt(BlockY);
+			Buffer.ReadBEInt(BlockZ);
+
+			Buffer.ReadVarUTF8String(Command);
+			break;
+		}
+
+		default:
+		{
+			SendChat(Printf("%s[INFO]%s Failure setting command block command; unhandled mode", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+			LOGD("Unhandled MC|AdvCdm packet mode.");
+			return;
+		}
+	}
+
+	class cUpdateCommandBlock :
+		public cCommandBlockCallback
+	{
+		AString m_Command;
+	public:
+		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
+			
+		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
+		{
+			a_CommandBlock->SetCommand(m_Command);
+			return false;
+		}
+	} CmdBlockCB (Command);
+
+	cWorld * World = m_Player->GetWorld();
+
+	World->DoWithCommandBlockAt(BlockX, BlockY, BlockZ, CmdBlockCB);
+
+	SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
 }
 
 
@@ -2127,6 +2204,14 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+void cClientHandle::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
 }
 
 

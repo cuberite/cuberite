@@ -914,6 +914,40 @@ bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
 
 
 
+bool cLuaState::CheckParamFunction(int a_StartParam, int a_EndParam)
+{
+	ASSERT(IsValid());
+	
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+	
+	for (int i = a_StartParam; i <= a_EndParam; i++)
+	{
+		if (lua_isfunction(m_LuaState, i))
+		{
+			continue;
+		}
+		// Not the correct parameter
+		lua_Debug entry;
+		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+		AString ErrMsg = Printf("Error in function '%s' parameter #%d. Function expected, got %s",
+			(entry.name != NULL) ? entry.name : "?", i, GetTypeText(i).c_str()
+		);
+		LogStackTrace();
+		return false;
+	}  // for i - Param
+	
+	// All params checked ok
+	return true;
+}
+
+
+
+
+
 bool cLuaState::CheckParamEnd(int a_Param)
 {
 	tolua_Error tolua_err;

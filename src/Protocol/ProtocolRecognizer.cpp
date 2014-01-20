@@ -636,6 +636,16 @@ void cProtocolRecognizer::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cProtocolRecognizer::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_Protocol != NULL);

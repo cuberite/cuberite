@@ -2496,7 +2496,8 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockZ);
 	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Action);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, DataLength);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, DataLength);	
+
 	AString Data;
 	if ((DataLength > 0) && !m_ServerBuffer.ReadString(Data, DataLength))
 	{
@@ -2506,6 +2507,18 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Action = %d", Action);
 	DataLog(Data.data(), Data.size(), "  Data (%u bytes)", Data.size());
+
+	// Save metadata to a file:
+	AString fnam;
+	Printf(fnam, "%s_item_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
+	FILE * f = fopen(fnam.c_str(), "wb");
+	if (f != NULL)
+	{
+		fwrite(Data.data(), 1, Data.size(), f);
+		fclose(f);
+		Log("(saved to file \"%s\")", fnam.c_str());
+	}
+
 	COPY_TO_CLIENT();
 	return true;
 }

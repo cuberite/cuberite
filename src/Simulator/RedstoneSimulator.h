@@ -110,6 +110,8 @@ private:
 	void HandleRedstoneLamp(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
 	/** Handles doords */
 	void HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** Handles command blocks */
+	void HandleCommandBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/** Handles activator, detector, and powered rails */
 	void HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
 	/** Handles trapdoors */
@@ -166,6 +168,7 @@ private:
 		switch (Block)
 		{
 			case E_BLOCK_ACTIVATOR_RAIL:
+			case E_BLOCK_COMMAND_BLOCK:
 			case E_BLOCK_PISTON:
 			case E_BLOCK_STICKY_PISTON:
 			case E_BLOCK_DISPENSER:
@@ -220,6 +223,7 @@ private:
 			case E_BLOCK_ACTIVATOR_RAIL:
 			case E_BLOCK_ACTIVE_COMPARATOR:
 			case E_BLOCK_BLOCK_OF_REDSTONE:
+			case E_BLOCK_COMMAND_BLOCK:
 			case E_BLOCK_DETECTOR_RAIL:
 			case E_BLOCK_DISPENSER:
 			case E_BLOCK_DAYLIGHT_SENSOR:

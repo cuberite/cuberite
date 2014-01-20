@@ -118,7 +118,7 @@ cServer::cServer(void) :
 
 void cServer::ClientDestroying(const cClientHandle * a_Client)
 {
-	m_SocketThreads.StopReading(a_Client);
+	m_SocketThreads.RemoveClient(a_Client);
 }
 
 
@@ -137,15 +137,6 @@ void cServer::NotifyClientWrite(const cClientHandle * a_Client)
 void cServer::WriteToClient(const cClientHandle * a_Client, const AString & a_Data)
 {
 	m_SocketThreads.Write(a_Client, a_Data);
-}
-
-
-
-
-
-void cServer::QueueClientClose(const cClientHandle * a_Client)
-{
-	m_SocketThreads.QueueClose(a_Client);
 }
 
 
@@ -459,7 +450,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		return;
 	}
-	
+
 	// Special handling: "stop" and "restart" are built in
 	if ((split[0].compare("stop") == 0) || (split[0].compare("restart") == 0))
 	{
