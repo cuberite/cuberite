@@ -24,6 +24,7 @@ typedef cItemCallback<cObjective> cObjectiveCallback;
 class cObjective
 {
 public:
+
 	typedef int Score;
 
 	enum eType
@@ -47,21 +48,17 @@ public:
 		E_TYPE_STAT_ENTITY_KILLED_BY
 	};
 
-	enum eDisplaySlot
-	{
-		E_DISPLAY_SLOT_LIST,
-		E_DISPLAY_SLOT_SIDEBAR,
-		E_DISPLAY_SLOT_NAME
-	};
+	static AString TypeToString(eType a_Type);
+
+	static eType StringToType(const AString & a_Name);
 
 public:
-	cObjective(eType a_Type);
+
+	cObjective(const AString & a_DisplayName, eType a_Type);
 
 	eType GetType(void) const { return m_Type; }
 
-	eDisplaySlot GetDisplaySlot(void) const { return m_Display; }
-
-	void SetDisplaySlot(eDisplaySlot a_Display);
+	const AString & GetDisplayName(void) const { return m_DisplayName; }
 
 	/// Resets the objective
 	void Reset(void);
@@ -82,15 +79,17 @@ public:
 	Score SubScore(const AString & a_Name, Score a_Delta);
 
 private:
+
 	typedef std::pair<AString, Score> TrackedPlayer;
 
 	typedef std::map<AString, Score> ScoreMap;
 
 	ScoreMap m_Scores;
 
+	AString m_DisplayName;
+
 	eType m_Type;
 
-	eDisplaySlot m_Display;
 };
 
 
@@ -112,6 +111,9 @@ public:
 	/// Removes a player from the team
 	bool RemovePlayer(const AString & a_Name);
 
+	/// Returns whether the specified player is in this team
+	bool HasPlayer(const AString & a_Name) const;
+
 	/// Removes all registered players
 	void Reset(void);
 
@@ -127,8 +129,8 @@ public:
 	const AString & GetPrefix(void) const { return m_Prefix; }
 	const AString & GetSuffix(void) const { return m_Suffix; }
 
-	void SetFriendlyFire(bool a_Flag);
-	void SetCanSeeFriendlyInvisible(bool a_Flag);
+	void SetFriendlyFire(bool a_Flag)            { m_AllowsFriendlyFire = a_Flag; }
+	void SetCanSeeFriendlyInvisible(bool a_Flag) { m_CanSeeFriendlyInvisible = a_Flag; }
 
 	void SetDisplayName(const AString & a_Name);
 
@@ -136,6 +138,8 @@ public:
 	void SetSuffix(const AString & a_Suffix);
 
 private:
+
+	typedef std::set<AString> cPlayerNameSet;
 
 	bool m_AllowsFriendlyFire;
 	bool m_CanSeeFriendlyInvisible;
@@ -146,10 +150,8 @@ private:
 	AString m_Prefix;
 	AString m_Suffix;
 
-	// TODO 2014-01-19 xdot: Potential optimization - vector/list
-	typedef std::set<AString> PlayerNameSet;
+	cPlayerNameSet m_Players;
 
-	PlayerNameSet m_Players;
 };
 
 
@@ -159,41 +161,68 @@ private:
 class cScoreboard
 {
 public:
-	cScoreboard() {}
+
+	enum eDisplaySlot
+	{
+		E_DISPLAY_SLOT_LIST = 0,
+		E_DISPLAY_SLOT_SIDEBAR,
+		E_DISPLAY_SLOT_NAME,
+
+		E_DISPLAY_SLOT_COUNT
+	};
+
+
+public:
+
+	cScoreboard();
 
 	/// Registers a new scoreboard objective, returns the cObjective instance, NULL on name collision
-	cObjective* RegisterObjective(const AString & a_Name, cObjective::eType a_Type);
+	cObjective * RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type);
 
 	/// Removes a registered objective, returns true if operation was successful
 	bool RemoveObjective(const AString & a_Name);
 
 	/// Retrieves the objective with the specified name, NULL if not found
-	cObjective* GetObjective(const AString & a_Name);
+	cObjective * GetObjective(const AString & a_Name);
 
 	/// Registers a new team, returns the cTeam instance, NULL on name collision
-	cTeam* RegisterTeam(const AString & a_Name, const AString & a_DisplayName,
-	                    const AString & a_Prefix, const AString & a_Suffix);
+	cTeam * RegisterTeam(const AString & a_Name, const AString & a_DisplayName, const AString & a_Prefix, const AString & a_Suffix);
 
 	/// Removes a registered team, returns true if operation was successful
 	bool RemoveTeam(const AString & a_Name);
 
 	/// Retrieves the team with the specified name, NULL if not found
-	cTeam* GetTeam(const AString & a_Name);
+	cTeam * GetTeam(const AString & a_Name);
+
+	cTeam * QueryPlayerTeam(const AString & a_Name); // WARNING: O(n logn)
+
+	void SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot);
+
+	cObjective* GetObjectiveIn(eDisplaySlot a_Slot);
 
 	/// Execute callback for each objective with the specified type
 	void ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
 
-private:
-	typedef std::pair<AString, cObjective> NamedObjective;
-	typedef std::pair<AString, cTeam>      NamedTeam;
+	unsigned int GetNumObjectives(void) const;
 
-	typedef std::map<AString, cObjective> ObjectiveMap;
-	typedef std::map<AString, cTeam>      TeamMap;
+	unsigned int GetNumTeams(void) const;
+
+
+private:
+
+	typedef std::pair<AString, cObjective> cNamedObjective;
+	typedef std::pair<AString, cTeam>      cNamedTeam;
+
+	typedef std::map<AString, cObjective> cObjectiveMap;
+	typedef std::map<AString, cTeam>      cTeamMap;
 
 	// TODO 2014-01-19 xdot: Potential optimization - Sort objectives based on type
-	ObjectiveMap m_Objectives;
+	cObjectiveMap m_Objectives;
 
-	TeamMap m_Teams;
+	cTeamMap m_Teams;
+
+	cObjective* m_Display[E_DISPLAY_SLOT_COUNT];
+
 } ;
 
 

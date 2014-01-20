@@ -111,6 +111,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_LastJumpHeight = (float)(GetPosY());
 	m_LastGroundHeight = (float)(GetPosY());
 	m_Stance = GetPosY() + 1.62;
+
+	// UpdateTeam();
 	
 	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
@@ -949,8 +951,13 @@ bool cPlayer::IsGameModeAdventure(void) const
 
 
 
-void cPlayer::SetTeam(cTeam* a_Team)
+void cPlayer::SetTeam(cTeam * a_Team)
 {
+	if (m_Team == a_Team)
+	{
+		return;
+	}
+
 	if (m_Team)
 	{
 		m_Team->RemovePlayer(GetName());
@@ -962,6 +969,19 @@ void cPlayer::SetTeam(cTeam* a_Team)
 	{
 		m_Team->AddPlayer(GetName());
 	}
+}
+
+
+
+
+
+cTeam * cPlayer::UpdateTeam(void)
+{
+	cScoreboard * Scoreboard = m_World->GetScoreBoard();
+
+	m_Team = Scoreboard->QueryPlayerTeam(GetName());
+
+	return m_Team;
 }
 
 
