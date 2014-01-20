@@ -15,14 +15,6 @@
 #include "ForEachChunkProvider.h"
 
 
-
-// fwd: FastNBT.h
-class cParsedNBT;
-
-
-
-
-
 // tolua_begin
 class cBlockArea
 {
@@ -81,12 +73,6 @@ public:
 	
 	/// For testing purposes only, dumps the area into a file.
 	void DumpToRawFile(const AString & a_FileName);
-	
-	/// Loads an area from a .schematic file. Returns true if successful
-	bool LoadFromSchematicFile(const AString & a_FileName);
-	
-	/// Saves the area into a .schematic file. Returns true if successful
-	bool SaveToSchematicFile(const AString & a_FileName);
 	
 	/// Crops the internal contents by the specified amount of blocks from each border.
 	void Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
@@ -230,6 +216,7 @@ public:
 
 protected:
 	friend class cChunkDesc;
+	friend class cSchematicFileSerializer;
 	
 	class cChunkReader :
 		public cChunkDataCallback
@@ -288,9 +275,6 @@ protected:
 	// Expand helpers:
 	void ExpandBlockTypes(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 	void ExpandNibbles   (NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
-	
-	/// Loads the area from a schematic file uncompressed and parsed into a NBT tree. Returns true if successful.
-	bool LoadFromSchematicNBT(cParsedNBT & a_NBT);
 
 	/// Sets the specified datatypes at the specified location.
 	void RelSetData(
