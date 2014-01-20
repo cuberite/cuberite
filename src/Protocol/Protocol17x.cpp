@@ -1,4 +1,3 @@
-
 // Protocol17x.cpp
 
 /*
@@ -124,7 +123,7 @@ void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
 	cPacketizer Pkt(*this, 0x25);  // Block Break Animation packet
-	Pkt.WriteInt(a_EntityID);
+	Pkt.WriteVarInt(a_EntityID);
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteInt(a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
