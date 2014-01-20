@@ -1143,6 +1143,7 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return true;
 				case 0x0f: // Confirm transaction - not used in MCS
 				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x11: HandlePacketEnchanting			  (a_ByteBuffer); return true;
 				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return true;
 				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
 				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return true;
@@ -1539,6 +1540,22 @@ void cProtocol172::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  EntityID);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, MouseButton);
 	m_Client->HandleUseEntity(EntityID, (MouseButton == 1));
+}
+
+
+
+
+
+void cProtocol172::HandlePacketEnchanting(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Enchantment);
+
+	//TODO: EnchantItem (getWindow, getItem, Enchant)
+
+
+
+	LOG("Enchantment Paket empfangen!");
 }
 
 

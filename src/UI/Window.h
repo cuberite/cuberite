@@ -231,6 +231,18 @@ public:
 
 
 
+class cEnchantingWindow :
+	public cWindow
+{
+	typedef cWindow super;
+public:
+	cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
+};
+
+
+
+
+
 class cFurnaceWindow :
 	public cWindow
 {

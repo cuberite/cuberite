@@ -252,6 +252,34 @@ protected:
 
 
 
+class cSlotAreaEnchanting :
+	public cSlotAreaTemporary
+{
+	typedef cSlotAreaTemporary super;
+
+public:
+	/// a_GridSize is allowed to be only 2 or 3
+	cSlotAreaEnchanting(int a_NumSlots, cWindow & a_ParentWindow);
+
+	// cSlotAreaTemporary overrides:
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+
+	// Distributing items into this area is completely disabled
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override {}
+
+protected:
+	/// Handles a click in the result slot. Crafts using the current recipe, if possible
+	void ClickedResult(cPlayer & a_Player);
+
+	/// Handles a shift-click in the result slot. Crafts using the current recipe until it changes or no more space for result.
+	void ShiftClickedResult(cPlayer & a_Player);
+};
+
+
+
+
+
 class cSlotAreaChest :
 	public cSlotArea
 {

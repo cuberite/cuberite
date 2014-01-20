@@ -563,6 +563,92 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaEnchanting:
+
+cSlotAreaEnchanting::cSlotAreaEnchanting(int a_NumSlots, cWindow & a_ParentWindow) :
+cSlotAreaTemporary(a_NumSlots, a_ParentWindow)
+{
+}
+
+
+
+
+
+void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	LOG("Clicked");
+	// Check if Slot is in the Enchantment Table
+	if (a_SlotNum == 0)
+	{
+		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+		{
+			ShiftClickedResult(a_Player);
+		}
+		else
+		{
+			ClickedResult(a_Player);
+		}
+		return;
+	}
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+}
+
+
+
+
+
+void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
+{
+	// Toss the item in the enchanting slot
+	TossItems(a_Player, 0, 0);
+	// Player not found - that is acceptable
+}
+
+
+
+
+
+void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
+{
+	LOG("Click!");
+
+	if (a_Player.GetDraggingItem().IsEmpty())
+	{
+		LOG("EMPTY");
+		this->m_ParentWindow.SetProperty(0, NULL);
+		this->m_ParentWindow.SetProperty(1, NULL);
+		this->m_ParentWindow.SetProperty(2, NULL);
+	}
+	else if (a_Player.GetDraggingItem().IsEnchantable)
+	{
+		LOG("Enchantable");
+		this->m_ParentWindow.SetProperty(0, 30);
+		this->m_ParentWindow.SetProperty(1, 20);
+		this->m_ParentWindow.SetProperty(2, 10);
+	}
+	else
+	{
+		LOG("Not Enchantable");
+		this->m_ParentWindow.SetProperty(0, NULL);
+		this->m_ParentWindow.SetProperty(1, NULL);
+		this->m_ParentWindow.SetProperty(2, NULL);
+	}
+}
+
+
+
+
+
+void cSlotAreaEnchanting::ShiftClickedResult(cPlayer & a_Player)
+{
+	LOG("Shift Click!");
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnderChest:
 
 cSlotAreaEnderChest::cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWindow & a_ParentWindow) :

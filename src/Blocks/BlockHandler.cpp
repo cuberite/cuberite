@@ -21,6 +21,7 @@
 #include "BlockDirt.h"
 #include "BlockDoor.h"
 #include "BlockDropSpenser.h"
+#include "BlockEnchantmentTable.h"
 #include "BlockEnderchest.h"
 #include "BlockEntity.h"
 #include "BlockFarmland.h"
@@ -132,6 +133,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DOUBLE_WOODEN_SLAB:    return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DROPPER:               return new cBlockDropSpenserHandler     (a_BlockType);
 		case E_BLOCK_EMERALD_ORE:           return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_ENCHANTMENT_TABLE:     return new cBlockEnchantmentTableHandler(a_BlockType);
 		case E_BLOCK_ENDER_CHEST:           return new cBlockEnderchestHandler      (a_BlockType);
 		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler        (           );
 		case E_BLOCK_FENCE_GATE:            return new cBlockFenceGateHandler       (a_BlockType);
