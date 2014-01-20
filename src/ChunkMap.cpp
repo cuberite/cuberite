@@ -1619,204 +1619,71 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlocksAffected)
 {
+	int i_BlockX = (int) floor(a_BlockX);
+	int i_BlockY = (int) floor(a_BlockY);
+	int i_BlockZ = (int) floor(a_BlockZ);
+	int i_ExplosionSize = (int) ceil(a_ExplosionSize);
+	
 	// Don't explode if outside of Y range (prevents the following test running into unallocated memory):
-	if ((a_BlockY < 0) || (a_BlockY > cChunkDef::Height - 1))
+	if ((i_BlockY < 0) || (i_BlockY > cChunkDef::Height - 1))
 	{
 		return;
 	}
-	
-	// Don't explode if the explosion center is inside a liquid block:
-	switch (m_World->GetBlock((int)floor(a_BlockX), (int)floor(a_BlockY), (int)floor(a_BlockZ)))
-	{
-		case E_BLOCK_WATER:
-		case E_BLOCK_STATIONARY_WATER:
-		case E_BLOCK_LAVA:
-		case E_BLOCK_STATIONARY_LAVA:
-		{
-			return;
-		}
-	}
-	
-	cBlockArea area;
-	int bx = (int)floor(a_BlockX);
-	int by = (int)floor(a_BlockY);
-	int bz = (int)floor(a_BlockZ);
-	int ExplosionSizeInt = (int) ceil(a_ExplosionSize);
-	int ExplosionSizeSq =  ExplosionSizeInt * ExplosionSizeInt;
-	a_BlocksAffected.reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
-	int MinY = std::max((int)floor(a_BlockY - ExplosionSizeInt), 0);
-	int MaxY = std::min((int)ceil(a_BlockY + ExplosionSizeInt), cChunkDef::Height - 1);
-	area.Read(m_World, bx - ExplosionSizeInt, (int)ceil(a_BlockX + ExplosionSizeInt), MinY, MaxY, bz - ExplosionSizeInt, (int)ceil(a_BlockZ + ExplosionSizeInt));
-	for (int x = -ExplosionSizeInt; x < ExplosionSizeInt; x++)
-	{
-		for (int y = -ExplosionSizeInt; y < ExplosionSizeInt; y++)
-		{
-			if ((by + y >= cChunkDef::Height) || (by + y < 0))
-			{
-				// Outside of the world
-				continue;
-			}
-			for (int z = -ExplosionSizeInt; z < ExplosionSizeInt; z++)
-			{
-				if ((x * x + y * y + z * z) > ExplosionSizeSq)
-				{
-					// Too far away
-					continue;
-				}
 
-				BLOCKTYPE Block = area.GetBlockType(bx + x, by + y, bz + z);
-				switch (Block)
+	// Don't explode if the explosion center is inside a liquid block:
+	switch (m_World->GetBlock(i_BlockX, i_BlockY, i_BlockZ))
+	{
+	case E_BLOCK_WATER:
+	case E_BLOCK_STATIONARY_WATER:
+	case E_BLOCK_LAVA:
+	case E_BLOCK_STATIONARY_LAVA:
+		return;
+	}
+
+	a_BlocksAffected.reserve(8 * i_ExplosionSize * i_ExplosionSize * i_ExplosionSize);
+
+	for (int x = i_BlockX - i_ExplosionSize; x <= i_BlockX + i_ExplosionSize; x++)
+	{
+		for (int y = i_BlockY - i_ExplosionSize; y <= i_BlockY + i_ExplosionSize; y++)
+		{
+			if (y >= cChunkDef::Height || y < 0)
+				continue;
+
+			for (int z = i_BlockZ - i_ExplosionSize; z <= i_BlockZ + i_ExplosionSize; z++)
+			{
+				if (((x - i_BlockX) * (x - i_BlockX) + (y - i_BlockY) * (y - i_BlockY) + (z - i_BlockZ) * (z - i_BlockZ)) > i_ExplosionSize * i_ExplosionSize)
+					continue;
+
+				switch (m_World->GetBlock(x, y, z))
 				{
-					case E_BLOCK_TNT:
+				case E_BLOCK_TNT:
 					{
 						// Activate the TNT, with a random fuse between 10 to 30 game ticks
-						double FuseTime = (double)(10 + m_World->GetTickRandomNumber(20)) / 20;
-						m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y, a_BlockZ + z + 0.5, FuseTime);
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
-						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
+						m_World->SpawnPrimedTNT(x + 0.5, y, z + 0.5, (double) (10 + m_World->GetTickRandomNumber(20)) / 20);
+						m_World->SetBlock(x, y, z, E_BLOCK_AIR, 0);
+						a_BlocksAffected.push_back(Vector3i(x, y, z));
 						break;
 					}
-					case E_BLOCK_OBSIDIAN:
-					case E_BLOCK_BEDROCK:
-					case E_BLOCK_WATER:
-					case E_BLOCK_LAVA:
+				case E_BLOCK_OBSIDIAN:
+				case E_BLOCK_BEDROCK:
+				case E_BLOCK_AIR:
+					break;
+				
+				default:
 					{
-						// These blocks are not affected by explosions
-						break;
-					}
-					case E_BLOCK_STATIONARY_WATER:
-					{
-						// Turn into simulated water:
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
-						break;
-					}
-					case E_BLOCK_STATIONARY_LAVA:
-					{
-						// Turn into simulated lava:
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
-						break;
-					}
-					case E_BLOCK_AIR:
-					{
-						// No pickups for air
-						break;
-					}
-					case E_BLOCK_FIRE:
-					{
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
-						break;
-					}
-					default:
-					{
-						switch (area.GetBlockType(bx + x, by + y + 1, bz + z))
-						{
-						case E_BLOCK_PISTON_EXTENSION:
-						case E_BLOCK_LEVER:
-						case E_BLOCK_SAPLING:
-						//case E_BLOCK_BED: ?
-						case E_BLOCK_POWERED_RAIL:
-						case E_BLOCK_DETECTOR_RAIL:
-						case E_BLOCK_TALL_GRASS:
-						case E_BLOCK_DEAD_BUSH:
-						case E_BLOCK_DANDELION:
-						case E_BLOCK_FLOWER:
-						case E_BLOCK_BROWN_MUSHROOM:
-						case E_BLOCK_RED_MUSHROOM:
-						case E_BLOCK_TORCH:
-						case E_BLOCK_REDSTONE_WIRE:
-						case E_BLOCK_CROPS:
-						case E_BLOCK_SIGN_POST:
-						case E_BLOCK_WOODEN_DOOR:
-						case E_BLOCK_RAIL:
-						case E_BLOCK_STONE_PRESSURE_PLATE:
-						case E_BLOCK_IRON_DOOR:
-						case E_BLOCK_WOODEN_PRESSURE_PLATE:
-						case E_BLOCK_REDSTONE_TORCH_OFF:
-						case E_BLOCK_REDSTONE_TORCH_ON:
-						case E_BLOCK_STONE_BUTTON:
-						case E_BLOCK_SNOW:
-						case E_BLOCK_SNOW_BLOCK:
-						case E_BLOCK_REDSTONE_REPEATER_OFF:
-						case E_BLOCK_REDSTONE_REPEATER_ON:
-						case E_BLOCK_NETHER_WART:
-						//case E_BLOCK_TRIPWIRE: ?
-						//case E_BLOCK_FLOWER_POT: ?
-						case E_BLOCK_CARROTS:
-						case E_BLOCK_POTATOES:
-						case E_BLOCK_WOODEN_BUTTON:
-						//case E_BLOCK_HEAD: ?
-						case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-						case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-						case E_BLOCK_INACTIVE_COMPARATOR:
-						case E_BLOCK_ACTIVE_COMPARATOR:
-						//case E_BLOCK_DAYLIGHT_SENSOR ?
-						case E_BLOCK_ACTIVATOR_RAIL:
-						case E_BLOCK_CARPET:
-						case E_BLOCK_BIG_FLOWER:
-							{
-								if (area.GetBlockType(bx + x, by + y + 1, bz + z) == E_BLOCK_PISTON_EXTENSION && (area.GetBlockMeta(bx + x, by + y + 1, bz + z) & 0x07) != 1)
-									break;
-
-								if (area.GetBlockType(bx + x, by + y + 1, bz + z) == E_BLOCK_LEVER && (area.GetBlockMeta(bx + x, by + y + 1, bz + z) & 0x07) != 6)
-									break;
-
-								if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
-								{
-									cItems Drops;
-									BlockHandler(area.GetBlockType(bx + x, by + y + 1, bz + z))->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y + 1, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
-									m_World->SpawnItemPickups(Drops, bx + x, by + y + 1, bz + z);
-								}
-								area.SetBlockType(bx + x, by + y + 1, bz + z, E_BLOCK_AIR);
-								a_BlocksAffected.push_back(Vector3i(bx + x, by + y + 1, bz + z));
-								break;
-							}
-						case E_BLOCK_FIRE:
-							{
-								area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
-								break;
-							}
-						case E_BLOCK_CACTUS:
-						case E_BLOCK_SUGARCANE:
-							{
-								BLOCKTYPE type = area.GetBlockType(bx + x, by + y + 1, bz + z);
-								for (int i = 1; area.GetBlockType(bx + x, by + y + i, bz + z) == type; ++i)
-								{
-									if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
-									{
-										cItems Drops;
-										BlockHandler(area.GetBlockType(bx + x, by + y + i, bz + z))->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y + i, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
-										m_World->SpawnItemPickups(Drops, bx + x, by + y + i, bz + z);
-									}
-									area.SetBlockType(bx + x, by + y + i, bz + z, E_BLOCK_AIR);
-									a_BlocksAffected.push_back(Vector3i(bx + x, by + y + i, bz + z));
-								}
-								break;
-							}
-						}
-
 						if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
 						{
 							cItems Drops;
-							cBlockHandler * Handler = BlockHandler(Block);
-
-							Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
-							m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
+							BlockHandler(m_World->GetBlock(x, y, z))->ConvertToPickups(Drops, m_World->GetBlockMeta(x, y, z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
+							m_World->SpawnItemPickups(Drops, x, y, z);
 						}
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
-						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
+						DigBlock(x, y, z);
+						a_BlocksAffected.push_back(Vector3i(x, y, z));
 					}
-				}  // switch (BlockType)
-			}  // for z
-		}  // for y
-	}  // for x
-	area.Write(m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
-
-	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
-	WakeUpSimulatorsInArea(
-		bx - ExplosionSizeInt - 1, bx + ExplosionSizeInt + 1,
-		MinY, MaxY,
-		bz - ExplosionSizeInt - 1, bz + ExplosionSizeInt + 1
-	);
+				}
+			}
+		}
+	}
 }
 
 
