@@ -131,7 +131,7 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 				itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
 			);
 			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
-			RemoveFuelNeighbors(a_Chunk, itr->x, itr->y, itr->z);
+			RemoveFuelNeighbors(a_Chunk, itr->x, itr->y, itr->z); //TODO: this function sould be called more times
 			itr = Data.erase(itr);
 			continue;
 		}
@@ -330,11 +330,15 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 		{
 			continue;
 		}
-		bool ShouldReplaceFuel = (m_World.GetTickRandomNumber(MAX_CHANCE_REPLACE_FUEL) < m_ReplaceFuelChance);
-		a_Chunk->UnboundedRelSetBlock(
-			a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z,
-			ShouldReplaceFuel ? E_BLOCK_FIRE : E_BLOCK_AIR, 0
-		);
+
+		if (BlockType == E_BLOCK_TNT)
+		{
+			m_World.BroadcastSoundEffect("random.fuse", a_RelX + gNeighborCoords[i].x + a_Chunk->GetPosX() * cChunkDef::Width * 8, a_RelY + gNeighborCoords[i].y * 8, a_RelZ + gNeighborCoords[i].z + a_Chunk->GetPosZ() * cChunkDef::Width * 8, 0.5f, 0.6f);
+			m_World.SpawnPrimedTNT(a_RelX + gNeighborCoords[i].x + a_Chunk->GetPosX() * cChunkDef::Width + 0.5, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z + a_Chunk->GetPosZ() * cChunkDef::Width + 0.5, 4);
+			m_World.SetBlock(a_RelX + gNeighborCoords[i].x + a_Chunk->GetPosX() * cChunkDef::Width, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z + a_Chunk->GetPosZ() * cChunkDef::Width, (m_World.GetTickRandomNumber(MAX_CHANCE_REPLACE_FUEL) < m_ReplaceFuelChance) ? E_BLOCK_FIRE : E_BLOCK_AIR, 0);
+		}
+		else
+			a_Chunk->UnboundedRelSetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, (m_World.GetTickRandomNumber(MAX_CHANCE_REPLACE_FUEL) < m_ReplaceFuelChance) ? E_BLOCK_FIRE : E_BLOCK_AIR, 0);
 	}  // for i - Coords[]
 }
 
