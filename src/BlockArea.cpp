@@ -6,7 +6,6 @@
 
 #include "Globals.h"
 #include "BlockArea.h"
-#include "World.h"
 #include "OSSupport/GZipFile.h"
 #include "WorldStorage/FastNBT.h"
 #include "Blocks/BlockHandler.h"
@@ -266,7 +265,7 @@ void cBlockArea::SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ)
 
 
 
-bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
+bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	// Normalize the coords:
 	if (a_MinBlockX > a_MaxBlockX)
@@ -327,7 +326,7 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 	cChunkDef::AbsoluteToRelative(a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
 	
 	// Query block data:
-	if (!a_World->ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
+	if (!a_ForEachChunkProvider->ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
 	{
 		Clear();
 		return false;
@@ -340,7 +339,7 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 
 
 
-bool cBlockArea::Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
+bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	ASSERT((a_DataTypes & GetDataTypes()) == a_DataTypes);  // Are you requesting only the data that I have?
 	a_DataTypes = a_DataTypes & GetDataTypes();  // For release builds, silently cut off the datatypes that I don't have
@@ -357,7 +356,7 @@ bool cBlockArea::Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a
 		a_MinBlockY = cChunkDef::Height - m_SizeY;
 	}
 
-	return a_World->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
+	return a_ForEachChunkProvider->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
 }
 
 
