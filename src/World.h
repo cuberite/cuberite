@@ -59,7 +59,7 @@ typedef cItemCallback<cNoteEntity>      cNoteBlockCallback;
 
 
 // tolua_begin
-class cWorld
+class cWorld : public cForEachChunkProvider
 {
 public:
 
@@ -315,7 +315,7 @@ public:
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
 	
 	/// Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully
-	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
+	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
 
 	// tolua_begin
 	
@@ -361,7 +361,7 @@ public:
 	Prefer cBlockArea::Write() instead, this is the internal implementation; cBlockArea does error checking, too.
 	a_DataTypes is a bitmask of cBlockArea::baXXX constants ORed together.
 	*/
-	bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
+	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 	
 	// tolua_begin
 

@@ -12,12 +12,9 @@
 
 #pragma once
 
+#include "ForEachChunkProvider.h"
 
 
-
-
-// fwd: World.h
-class cWorld;
 
 // fwd: FastNBT.h
 class cParsedNBT;
@@ -68,13 +65,13 @@ public:
 	void SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ);
 	
 	/// Reads an area of blocks specified. Returns true if successful. All coords are inclusive.
-	bool Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
+	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
 	
 	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
 	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
 	
 	/// Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all
-	bool Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
+	bool Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
 	
 	/// Copies this object's contents into the specified BlockArea.
 	void CopyTo(cBlockArea & a_Into) const;
