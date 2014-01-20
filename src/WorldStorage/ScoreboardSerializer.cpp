@@ -109,20 +109,87 @@ bool cScoreboardSerializer::Save(void)
 void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 {
 	a_Writer.BeginCompound("Data");
-		a_Writer.BeginList("Objectives", TAG_Compound);
+	a_Writer.BeginList("Objectives", TAG_Compound);
+	
+	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
+	{
+		const cObjective & Objective = it->second;
+
+		a_Writer.BeginCompound("");
+
+		a_Writer.AddString("CriteriaName", cObjective::TypeToString(Objective.GetType()));
+
+		a_Writer.AddString("DisplayName", Objective.GetDisplayName());
+		a_Writer.AddString("Name", it->first);
+
+		a_Writer.EndCompound();
+	}
+
+	a_Writer.EndList();
+
+	a_Writer.BeginList("PlayerScores", TAG_Compound);
+
+	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
+	{
+		const cObjective & Objective = it->second;
+
+		for (cObjective::cScoreMap::const_iterator it2 = Objective.m_Scores.begin(); it2 != Objective.m_Scores.end(); ++it2)
+		{
+			a_Writer.BeginCompound("");
+
+			a_Writer.AddInt("Score", it2->second);
+
+			a_Writer.AddString("Name", it2->first);
+			a_Writer.AddString("Objective", it->first);
+			
+			a_Writer.EndCompound();
+		}
+	}
+
+	a_Writer.EndList();
+
+	a_Writer.BeginList("Teams", TAG_Compound);
+	
+	for (cScoreboard::cTeamMap::const_iterator it = m_ScoreBoard->m_Teams.begin(); it != m_ScoreBoard->m_Teams.end(); ++it)
+	{
+		const cTeam & Team = it->second;
+
+		a_Writer.BeginCompound("");
+
+		a_Writer.AddByte("AllowFriendlyFire",     Team.AllowsFriendlyFire()      ? 1 : 0);
+		a_Writer.AddByte("SeeFriendlyInvisibles", Team.CanSeeFriendlyInvisible() ? 1 : 0);
+
+		a_Writer.AddString("DisplayName", Team.GetDisplayName());
+		a_Writer.AddString("Name", it->first);
+
+		a_Writer.AddString("Prefix", Team.GetPrefix());
+		a_Writer.AddString("Suffix", Team.GetSuffix());
+
+		a_Writer.BeginList("Players", TAG_String);
+
+		for (cTeam::cPlayerNameSet::const_iterator it2 = Team.m_Players.begin(); it2 != Team.m_Players.end(); ++it2)
+		{
+			a_Writer.AddString("", *it2);
+		}
 
 		a_Writer.EndList();
 
-		a_Writer.BeginList("PlayerScores", TAG_Compound);
+		a_Writer.EndCompound();
+	}
 
-		a_Writer.EndList();
-
-		a_Writer.BeginList("Teams", TAG_Compound);
-
-		a_Writer.EndList();
+	a_Writer.EndList();
 	a_Writer.EndCompound();
 
 	a_Writer.BeginCompound("DisplaySlots");
+
+	cObjective * Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::E_DISPLAY_SLOT_LIST);
+	a_Writer.AddString("slot_0", (Objective == NULL) ? "" : Objective->GetName());
+
+	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::E_DISPLAY_SLOT_SIDEBAR);
+	a_Writer.AddString("slot_1", (Objective == NULL) ? "" : Objective->GetName());
+
+	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::E_DISPLAY_SLOT_NAME);
+	a_Writer.AddString("slot_2", (Objective == NULL) ? "" : Objective->GetName());
 
 	a_Writer.EndCompound();
 }

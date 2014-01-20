@@ -72,7 +72,10 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 
 
 
-cObjective::cObjective(const AString & a_DisplayName, cObjective::eType a_Type) : m_DisplayName(a_DisplayName), m_Type(a_Type)
+cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
+	: m_DisplayName(a_DisplayName)
+	, m_Name(a_Name)
+	, m_Type(a_Type)
 {}
 
 
@@ -90,7 +93,7 @@ void cObjective::Reset(void)
 
 cObjective::Score cObjective::GetScore(const AString & a_Name) const
 {
-	ScoreMap::const_iterator it = m_Scores.find(a_Name);
+	cScoreMap::const_iterator it = m_Scores.find(a_Name);
 
 	if (it == m_Scores.end())
 	{
@@ -226,7 +229,7 @@ cScoreboard::cScoreboard()
 
 cObjective* cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
 {
-	cObjective Objective(a_DisplayName, a_Type);
+	cObjective Objective(a_Name, a_DisplayName, a_Type);
 
 	std::pair<cObjectiveMap::iterator, bool> Status = m_Objectives.insert(cNamedObjective(a_Name, Objective));
 
@@ -355,7 +358,7 @@ void cScoreboard::SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot)
 
 
 
-cObjective* cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
+cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 {
 	ASSERT(a_Slot < E_DISPLAY_SLOT_COUNT);
 

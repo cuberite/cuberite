@@ -54,10 +54,11 @@ public:
 
 public:
 
-	cObjective(const AString & a_DisplayName, eType a_Type);
+	cObjective(const AString & a_Name, const AString & a_DisplayName, eType a_Type);
 
 	eType GetType(void) const { return m_Type; }
 
+	const AString & GetName(void)        const { return m_Name; }
 	const AString & GetDisplayName(void) const { return m_DisplayName; }
 
 	/// Resets the objective
@@ -80,15 +81,18 @@ public:
 
 private:
 
-	typedef std::pair<AString, Score> TrackedPlayer;
+	typedef std::pair<AString, Score> cTrackedPlayer;
 
-	typedef std::map<AString, Score> ScoreMap;
+	typedef std::map<AString, Score> cScoreMap;
 
-	ScoreMap m_Scores;
+	cScoreMap m_Scores;
 
 	AString m_DisplayName;
+	AString m_Name;
 
 	eType m_Type;
+
+	friend class cScoreboardSerializer;
 
 };
 
@@ -152,6 +156,8 @@ private:
 
 	cPlayerNameSet m_Players;
 
+	friend class cScoreboardSerializer;
+
 };
 
 
@@ -198,7 +204,7 @@ public:
 
 	void SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot);
 
-	cObjective* GetObjectiveIn(eDisplaySlot a_Slot);
+	cObjective * GetObjectiveIn(eDisplaySlot a_Slot);
 
 	/// Execute callback for each objective with the specified type
 	void ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
@@ -222,6 +228,8 @@ private:
 	cTeamMap m_Teams;
 
 	cObjective* m_Display[E_DISPLAY_SLOT_COUNT];
+
+	friend class cScoreboardSerializer;
 
 } ;
 
