@@ -116,7 +116,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			{
 				double TNTX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 				double TNTZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-				m_World->SpawnPrimedTNT(TNTX, DispY + 0.5, TNTZ, 4, 0);  // 4 seconds fuse, no initial velocity
+				m_World->SpawnPrimedTNT(TNTX, DispY, TNTZ, 4, 0);  // 4 seconds fuse, no initial velocity
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
 			break;
