@@ -1540,6 +1540,85 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 
 
 
+static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
+{
+	/*
+	Function signature:
+	cPluginManager:CallPlugin("PluginName", "FunctionName", args...)
+	*/
+	
+	// Check the parameters:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cPluginManager") ||
+		!L.CheckParamString(2, 3))
+	{
+		return 0;
+	}
+	
+	// Retrieve the plugin name and function name
+	AString PluginName, FunctionName;
+	L.ToString(2, PluginName);
+	L.ToString(3, FunctionName);
+	if (PluginName.empty() || FunctionName.empty())
+	{
+		LOGWARNING("cPluginManager:CallPlugin(): Invalid plugin name or function name");
+		L.LogStackTrace();
+		return 0;
+	}
+	
+	// If requesting calling the current plugin, refuse:
+	cPluginLua * ThisPlugin = GetLuaPlugin(L);
+	if (ThisPlugin == NULL)
+	{
+		return 0;
+	}
+	if (ThisPlugin->GetName() == PluginName)
+	{
+		LOGWARNING("cPluginManager::CallPlugin(): Calling self is not implemented (why would it?)");
+		L.LogStackTrace();
+		return 0;
+	}
+	
+	// Call the destination plugin using a plugin callback:
+	class cCallback :
+		public cPluginManager::cPluginCallback
+	{
+	public:
+		int m_NumReturns;
+
+		cCallback(const AString & a_FunctionName, cLuaState & a_SrcLuaState) :
+			m_FunctionName(a_FunctionName),
+			m_SrcLuaState(a_SrcLuaState),
+			m_NumReturns(0)
+		{
+		}
+	protected:
+		const AString & m_FunctionName;
+		cLuaState & m_SrcLuaState;
+		
+		virtual bool Item(cPlugin * a_Plugin) override
+		{
+			m_NumReturns = ((cPluginLua *)a_Plugin)->CallFunctionFromForeignState(
+				m_FunctionName, m_SrcLuaState, 4, lua_gettop(m_SrcLuaState)
+			);
+			return true;
+		}
+	} Callback(FunctionName, L);
+	if (!cPluginManager::Get()->DoWithPlugin(PluginName, Callback))
+	{
+		// TODO 2014_01_20 _X: This might be too much logging, plugins cannot know if other plugins are loaded (async)
+		LOGWARNING("cPluginManager::CallPlugin: No such plugin name (\"%s\")", PluginName.c_str());
+		L.LogStackTrace();
+		return 0;
+	}
+	return Callback.m_NumReturns;
+}
+
+
+
+
+
 static int tolua_cPlayer_GetGroups(lua_State* tolua_S)
 {
 	cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
@@ -1734,112 +1813,28 @@ static int tolua_cPluginLua_AddTab(lua_State* tolua_S)
 
 
 
-// Perhaps use this as well for copying tables https://github.com/keplerproject/rings/pull/1
-static int copy_lua_values(lua_State * a_Source, lua_State * a_Destination, int i, int top)
+
+static int tolua_cPlugin_Call(lua_State * tolua_S)
 {
-	for(; i <= top; ++i )
-	{
-		int t = lua_type(a_Source, i);
-		switch (t) {
-			case LUA_TSTRING:  /* strings */
-				{
-					const char * s = lua_tostring(a_Source, i);
-					LOGD("%i push string: %s", i, s);
-					tolua_pushstring(a_Destination, s);
-				}
-				break;
-			case LUA_TBOOLEAN:  /* booleans */
-				{
-					int b = tolua_toboolean(a_Source, i, false);
-					LOGD("%i push bool: %i", i, b);
-					tolua_pushboolean(a_Destination, b );
-				}
-				break;
-			case LUA_TNUMBER:  /* numbers */
-				{
-					lua_Number d = tolua_tonumber(a_Source, i, 0);
-					LOGD("%i push number: %0.2f", i, d);
-					tolua_pushnumber(a_Destination, d );
-				}
-				break;
-			case LUA_TUSERDATA:
-				{
-					const char * type = 0;
-					if (lua_getmetatable(a_Source,i))
-					{
-						lua_rawget(a_Source, LUA_REGISTRYINDEX);
-						type = lua_tostring(a_Source, -1);
-						lua_pop(a_Source, 1); // Pop.. something?! I don't knooow~~ T_T
-					}
-					
-					// don't need tolua_tousertype we already have the type
-					void * ud = tolua_touserdata(a_Source, i, 0);
-					LOGD("%i push usertype: %p of type '%s'", i, ud, type);
-					if( type == 0 )
-					{
-						LOGERROR("Call(): Something went wrong when trying to get usertype name!");
-						return 0;
-					}
-					tolua_pushusertype(a_Destination, ud, type);
-				}
-				break;
-			default:  /* other values */
-				LOGERROR("Call(): Unsupported value: '%s'. Can only use numbers and strings!", lua_typename(a_Source, t));
-				return 0;
-		}
-	}
-	return 1;
-}
-
-
-
-
-
-static int tolua_cPlugin_Call(lua_State* tolua_S)
-{
-	cPluginLua * self = (cPluginLua *) tolua_tousertype(tolua_S, 1, 0);
-	lua_State* targetState = self->GetLuaState();
-	int targetTop = lua_gettop(targetState);
-
-	int top = lua_gettop(tolua_S);
-	LOGD("total in stack: %i", top );
-
-	std::string funcName = tolua_tostring(tolua_S, 2, "");
-	LOGD("Func name: %s", funcName.c_str() );
-
-	lua_getglobal(targetState, funcName.c_str());
-	if(!lua_isfunction(targetState,-1))
-	{
-		LOGWARN("Error could not find function '%s' in plugin '%s'", funcName.c_str(), self->GetName().c_str() );
-		lua_pop(targetState,1);
-		return 0;
-	}
-
-	if( copy_lua_values(tolua_S, targetState, 3, top) == 0 ) // Start at 3 because 1 and 2 are the plugin and function name respectively
-	{
-		// something went wrong, exit
-		return 0;
-	}
+	cLuaState L(tolua_S);
 	
-	int s = lua_pcall(targetState, top - 2, LUA_MULTRET, 0);
-	if (cLuaState::ReportErrors(targetState, s))
+	// Log the obsoletion warning:
+	LOGWARNING("cPlugin:Call() is obsolete and unsafe, use cPluginManager:CallPlugin() instead.");
+	L.LogStackTrace();
+	
+	// Retrieve the params: plugin and the function name to call
+	cPluginLua * TargetPlugin = (cPluginLua *) tolua_tousertype(tolua_S, 1, 0);
+	AString FunctionName = tolua_tostring(tolua_S, 2, "");
+	
+	// Call the function:
+	int NumReturns = TargetPlugin->CallFunctionFromForeignState(FunctionName, L, 3, lua_gettop(L));
+	if (NumReturns < 0)
 	{
-		LOGWARN("Error while calling function '%s' in plugin '%s'", funcName.c_str(), self->GetName().c_str() );
+		LOGWARNING("cPlugin::Call() failed to call destination function");
+		L.LogStackTrace();
 		return 0;
 	}
-
-	int nresults = lua_gettop(targetState) - targetTop;
-	LOGD("num results: %i", nresults);
-	int ttop = lua_gettop(targetState);
-	if( copy_lua_values(targetState, tolua_S, targetTop+1, ttop) == 0 ) // Start at targetTop+1 and I have no idea why xD
-	{
-		// something went wrong, exit
-		return 0;
-	}
-
-	lua_pop(targetState, nresults); // I have no idea what I'm doing, but it works
-
-	return nresults;
+	return NumReturns;
 }
 
 
@@ -2305,6 +2300,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "AddHook",               tolua_cPluginManager_AddHook);
 			tolua_function(tolua_S, "BindCommand",           tolua_cPluginManager_BindCommand);
 			tolua_function(tolua_S, "BindConsoleCommand",    tolua_cPluginManager_BindConsoleCommand);
+			tolua_function(tolua_S, "CallPlugin",            tolua_cPluginManager_CallPlugin);
 			tolua_function(tolua_S, "ForEachCommand",        tolua_cPluginManager_ForEachCommand);
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);

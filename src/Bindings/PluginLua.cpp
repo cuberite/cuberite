@@ -1469,6 +1469,40 @@ bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 
 
 
+int cPluginLua::CallFunctionFromForeignState(
+	const AString & a_FunctionName,
+	cLuaState & a_ForeignState,
+	int a_ParamStart,
+	int a_ParamEnd
+)
+{
+	cCSLock Lock(m_CriticalSection);
+	
+	// Call the function:
+	int NumReturns = m_LuaState.CallFunctionWithForeignParams(a_FunctionName, a_ForeignState, a_ParamStart, a_ParamEnd);
+	if (NumReturns < 0)
+	{
+		// The call has failed, an error has already been output to the log, so just silently bail out with the same error
+		return NumReturns;
+	}
+	
+	// Copy all the return values:
+	int Top = lua_gettop(m_LuaState);
+	int res = a_ForeignState.CopyStackFrom(m_LuaState, Top - NumReturns + 1, Top);
+	
+	// Remove the return values off this stack:
+	if (NumReturns > 0)
+	{
+		lua_pop(m_LuaState, NumReturns);
+	}
+	
+	return res;
+}
+
+
+
+
+
 AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request )
 {
 	cCSLock Lock(m_CriticalSection);

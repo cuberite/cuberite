@@ -1736,6 +1736,21 @@ bool cPluginManager::IsValidHookType(int a_HookType)
 
 
 
+bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback)
+{
+	// TODO: Implement locking for plugins
+	PluginMap::iterator itr = m_Plugins.find(a_PluginName);
+	if (itr == m_Plugins.end())
+	{
+		return false;
+	}
+	return a_Callback.Item(itr->second);
+}
+
+
+
+
+
 bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 {
 	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;
