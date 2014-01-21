@@ -24,6 +24,7 @@ class cScoreboard;
 class cScoreboardSerializer
 {
 public:
+
 	cScoreboardSerializer(const AString & a_WorldName, cScoreboard* a_ScoreBoard);
 
 	/// Try to load the scoreboard
@@ -31,6 +32,7 @@ public:
 
 	/// Try to save the scoreboard
 	bool Save(void);
+
 
 private:
 
@@ -41,6 +43,8 @@ private:
 	cScoreboard* m_ScoreBoard;
 
 	AString m_Path;
+
+
 } ;
 
 

@@ -111,8 +111,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_LastJumpHeight = (float)(GetPosY());
 	m_LastGroundHeight = (float)(GetPosY());
 	m_Stance = GetPosY() + 1.62;
-
-	// UpdateTeam();
 	
 	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
@@ -867,10 +865,10 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		}
 	} IncrementCounter (GetName());
 
-	cScoreboard* Scoreboard = m_World->GetScoreBoard();
+	cScoreboard & Scoreboard = m_World->GetScoreBoard();
 
 	// Update scoreboard objectives
-	Scoreboard->ForEachObjectiveWith(cObjective::E_TYPE_DEATH_COUNT, IncrementCounter);
+	Scoreboard.ForEachObjectiveWith(cObjective::E_TYPE_DEATH_COUNT, IncrementCounter);
 }
 
 
@@ -977,9 +975,16 @@ void cPlayer::SetTeam(cTeam * a_Team)
 
 cTeam * cPlayer::UpdateTeam(void)
 {
-	cScoreboard * Scoreboard = m_World->GetScoreBoard();
+	if (m_World == NULL)
+	{
+		SetTeam(NULL);
+	}
+	else
+	{
+		cScoreboard & Scoreboard = m_World->GetScoreBoard();
 
-	m_Team = Scoreboard->QueryPlayerTeam(GetName());
+		SetTeam(Scoreboard.QueryPlayerTeam(GetName()));
+	}
 
 	return m_Team;
 }

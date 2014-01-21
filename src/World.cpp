@@ -242,7 +242,8 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
 	m_GeneratorCallbacks(*this),
-	m_TickThread(*this)
+	m_TickThread(*this),
+	m_Scoreboard(this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -1976,6 +1977,60 @@ void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline,
 void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastRemoveEntityEffect(a_Entity, a_EffectID, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendDisplayObjective(a_Objective, a_Display);
+	}
 }
 
 

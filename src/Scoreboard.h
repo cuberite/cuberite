@@ -14,6 +14,7 @@
 
 
 class cObjective;
+class cWorld;
 
 typedef cItemCallback<cObjective> cObjectiveCallback;
 
@@ -54,7 +55,7 @@ public:
 
 public:
 
-	cObjective(const AString & a_Name, const AString & a_DisplayName, eType a_Type);
+	cObjective(const AString & a_Name, const AString & a_DisplayName, eType a_Type, cWorld * a_World);
 
 	eType GetType(void) const { return m_Type; }
 
@@ -79,6 +80,8 @@ public:
 	/// Subtracts a_Delta and returns the new score
 	Score SubScore(const AString & a_Name, Score a_Delta);
 
+	void SetDisplayName(const AString & a_Name);
+
 private:
 
 	typedef std::pair<AString, Score> cTrackedPlayer;
@@ -91,6 +94,8 @@ private:
 	AString m_Name;
 
 	eType m_Type;
+
+	cWorld * m_World;
 
 	friend class cScoreboardSerializer;
 
@@ -180,7 +185,7 @@ public:
 
 public:
 
-	cScoreboard();
+	cScoreboard(cWorld * a_World);
 
 	/// Registers a new scoreboard objective, returns the cObjective instance, NULL on name collision
 	cObjective * RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type);
@@ -223,9 +228,13 @@ private:
 	typedef std::map<AString, cTeam>      cTeamMap;
 
 	// TODO 2014-01-19 xdot: Potential optimization - Sort objectives based on type
+	cCriticalSection m_CSObjectives;
 	cObjectiveMap m_Objectives;
 
+	cCriticalSection m_CSTeams;
 	cTeamMap m_Teams;
+
+	cWorld * m_World;
 
 	cObjective* m_Display[E_DISPLAY_SLOT_COUNT];
 

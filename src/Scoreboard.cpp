@@ -6,6 +6,7 @@
 #include "Globals.h"
 
 #include "Scoreboard.h"
+#include "World.h"
 
 
 
@@ -72,11 +73,13 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 
 
 
-cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
+cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type, cWorld * a_World)
 	: m_DisplayName(a_DisplayName)
 	, m_Name(a_Name)
 	, m_Type(a_Type)
-{}
+	, m_World(a_World)
+{
+}
 
 
 
@@ -84,6 +87,11 @@ cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cO
 
 void cObjective::Reset(void)
 {
+	for (cScoreMap::iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
+	{
+		m_World->BroadcastScoreUpdate(m_Name, it->first, 0, 1);
+	}
+
 	m_Scores.clear();
 }
 
@@ -112,6 +120,8 @@ cObjective::Score cObjective::GetScore(const AString & a_Name) const
 void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
 {
 	m_Scores[a_Name] = a_Score;
+
+	m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, 0);
 }
 
 
@@ -121,6 +131,8 @@ void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
 void cObjective::ResetScore(const AString & a_Name)
 {
 	m_Scores.erase(a_Name);
+
+	m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, 1);
 }
 
 
@@ -132,7 +144,7 @@ cObjective::Score cObjective::AddScore(const AString & a_Name, cObjective::Score
 	// TODO 2014-01-19 xdot: Potential optimization - Reuse iterator
 	Score NewScore = m_Scores[a_Name] + a_Delta;
 
-	m_Scores[a_Name] = NewScore;
+	SetScore(a_Name, NewScore);
 
 	return NewScore;
 }
@@ -146,9 +158,20 @@ cObjective::Score cObjective::SubScore(const AString & a_Name, cObjective::Score
 	// TODO 2014-01-19 xdot: Potential optimization - Reuse iterator
 	Score NewScore = m_Scores[a_Name] - a_Delta;
 
-	m_Scores[a_Name] = NewScore;
+	SetScore(a_Name, NewScore);
 
 	return NewScore;
+}
+
+
+
+
+
+void cObjective::SetDisplayName(const AString & a_Name)
+{
+	m_DisplayName = a_Name;
+
+	m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, 2);
 }
 
 
@@ -215,7 +238,7 @@ unsigned int cTeam::GetNumPlayers(void) const
 
 
 
-cScoreboard::cScoreboard()
+cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 {
 	for (int i = 0; i < (int) E_DISPLAY_SLOT_COUNT; ++i)
 	{
@@ -229,11 +252,21 @@ cScoreboard::cScoreboard()
 
 cObjective* cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
 {
-	cObjective Objective(a_Name, a_DisplayName, a_Type);
+	cObjective Objective(a_Name, a_DisplayName, a_Type, m_World);
 
 	std::pair<cObjectiveMap::iterator, bool> Status = m_Objectives.insert(cNamedObjective(a_Name, Objective));
 
-	return Status.second ? &Status.first->second : NULL;
+	if (Status.second)
+	{
+		ASSERT(m_World != NULL);
+		m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, 0);
+
+		return &Status.first->second;
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 
@@ -242,6 +275,8 @@ cObjective* cScoreboard::RegisterObjective(const AString & a_Name, const AString
 
 bool cScoreboard::RemoveObjective(const AString & a_Name)
 {
+	cCSLock Lock(m_CSObjectives);
+
 	cObjectiveMap::iterator it = m_Objectives.find(a_Name);
 
 	if (it == m_Objectives.end())
@@ -250,6 +285,9 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 	}
 
 	m_Objectives.erase(it);
+
+	ASSERT(m_World != NULL);
+	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
 
 	return true;
 }
@@ -260,6 +298,8 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 
 cObjective * cScoreboard::GetObjective(const AString & a_Name)
 {
+	cCSLock Lock(m_CSObjectives);
+
 	cObjectiveMap::iterator it = m_Objectives.find(a_Name);
 
 	if (it == m_Objectives.end())
@@ -294,6 +334,8 @@ cTeam * cScoreboard::RegisterTeam(
 
 bool cScoreboard::RemoveTeam(const AString & a_Name)
 {
+	cCSLock Lock(m_CSTeams);
+
 	cTeamMap::iterator it = m_Teams.find(a_Name);
 
 	if (it == m_Teams.end())
@@ -312,6 +354,8 @@ bool cScoreboard::RemoveTeam(const AString & a_Name)
 
 cTeam * cScoreboard::GetTeam(const AString & a_Name)
 {
+	cCSLock Lock(m_CSTeams);
+
 	cTeamMap::iterator it = m_Teams.find(a_Name);
 
 	if (it == m_Teams.end())
@@ -330,6 +374,8 @@ cTeam * cScoreboard::GetTeam(const AString & a_Name)
 
 cTeam * cScoreboard::QueryPlayerTeam(const AString & a_Name)
 {
+	cCSLock Lock(m_CSTeams);
+
 	for (cTeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
 	{
 		if (it->second.HasPlayer(a_Name))
@@ -352,6 +398,10 @@ void cScoreboard::SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot)
 	cObjective * Objective = GetObjective(a_Objective);
 
 	m_Display[a_Slot] = Objective;
+
+	ASSERT(m_World != NULL);
+	m_World->BroadcastDisplayObjective(Objective ? a_Objective : "", a_Slot);
+	
 }
 
 
@@ -371,6 +421,8 @@ cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 
 void cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback)
 {
+	cCSLock Lock(m_CSObjectives);
+
 	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
 	{
 		if (it->second.GetType() == a_Type)

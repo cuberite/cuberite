@@ -68,6 +68,9 @@ public:
 	virtual void SendRespawn             (void) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb &  a_ExpOrb) override;
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)                            override {} // This protocol doesn't support such message
+	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override {} // This protocol doesn't support such message
+	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)                              override {} // This protocol doesn't support such message
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
@@ -82,8 +85,8 @@ public:
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
 	virtual void SendWeather             (eWeather a_Weather) override;
-	virtual void SendWholeInventory      (const cWindow    & a_Window) override;
-	virtual void SendWindowClose         (const cWindow    & a_Window) override;
+	virtual void SendWholeInventory      (const cWindow & a_Window) override;
+	virtual void SendWindowClose         (const cWindow & a_Window) override;
 	virtual void SendWindowOpen          (const cWindow & a_Window) override;
 	virtual void SendWindowProperty      (const cWindow & a_Window, short a_Property, short a_Value) override;
 	
