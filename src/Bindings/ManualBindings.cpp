@@ -986,11 +986,10 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 
 
 class cLuaScheduledWorldTask :
-	public cWorld::cScheduledTask
+	public cWorld::cTask
 {
 public:
-	cLuaScheduledWorldTask(cPluginLua & a_Plugin, int a_FnRef, int a_Ticks) :
-		cScheduledTask(a_Ticks),
+	cLuaScheduledWorldTask(cPluginLua & a_Plugin, int a_FnRef) :
 		m_Plugin(a_Plugin),
 		m_FnRef(a_FnRef)
 	{
@@ -1025,14 +1024,19 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 	}
 
 	// Retrieve the args:
-	cWorld * self = (cWorld *)tolua_tousertype(tolua_S, 1, 0);
-	if (self == NULL)
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamNumber  (2) ||
+		!L.CheckParamFunction(3)
+	)
+	{
+		return 0;
+	}
+	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 1, NULL);
+	if (World == NULL)
 	{
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
-	}
-	if (!lua_isfunction(tolua_S, 2))
-	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a function for parameter #1");
 	}
 
 	// Create a reference to the function:
@@ -1042,9 +1046,9 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
 	}
 	
-	int Ticks = (int) tolua_tonumber (tolua_S, 3, 0);
+	int DelayTicks = (int)tolua_tonumber(tolua_S, 2, 0);
 
-	self->ScheduleTask(new cLuaScheduledWorldTask(*Plugin, FnRef, Ticks));
+	World->ScheduleTask(DelayTicks, new cLuaScheduledWorldTask(*Plugin, FnRef));
 	return 0;
 }
 

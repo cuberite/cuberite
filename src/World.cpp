@@ -866,28 +866,27 @@ void cWorld::TickQueuedTasks(void)
 	}  // for itr - m_Tasks[]
 }
 
-void cWorld::TickScheduledTasks()
+
+
+
+
+void cWorld::TickScheduledTasks(void)
 {
-	ScheduledTaskList Tasks;
 	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
+	cScheduledTasks Tasks;
 	{
 		cCSLock Lock(m_CSScheduledTasks);
-		ScheduledTaskList::iterator itr = m_ScheduledTasks.begin();
-		while (itr != m_ScheduledTasks.end() && (*itr)->Ticks > 0)
+		while (!m_ScheduledTasks.empty() && (m_ScheduledTasks.front()->m_TargetTick < m_WorldAge))
 		{
 			Tasks.push_back(m_ScheduledTasks.front());
 			m_ScheduledTasks.pop_front();
 		}
-		for(;itr != m_ScheduledTasks.end(); itr++)
-		{
-			(*itr)->Ticks--;
-		}
 	}
 
 	// Execute and delete each task:
-	for (ScheduledTaskList::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
+	for (cScheduledTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
 	{
-		(*itr)->Run(*this);
+		(*itr)->m_Task->Run(*this);
 		delete *itr;
 	}  // for itr - m_Tasks[]
 }
@@ -2687,18 +2686,25 @@ void cWorld::QueueTask(cTask * a_Task)
 	m_Tasks.push_back(a_Task);
 }
 
-void cWorld::ScheduleTask(cScheduledTask * a_Task)
+
+
+
+
+void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 {
+	Int64 TargetTick = a_DelayTicks + m_WorldAge;
+	
+	// Insert the task into the list of scheduled tasks, ordered by its target tick
 	cCSLock Lock(m_CSScheduledTasks);
-	for(ScheduledTaskList::iterator itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end(); itr++) 
+	for (cScheduledTasks::iterator itr = m_ScheduledTasks.begin(), end = m_ScheduledTasks.end(); itr != end; ++itr)
 	{
-		if((*itr)->Ticks >= a_Task->Ticks) 
+		if ((*itr)->m_TargetTick >= TargetTick)
 		{
-			m_ScheduledTasks.insert(itr, a_Task);
+			m_ScheduledTasks.insert(itr, new cScheduledTask(TargetTick, a_Task));
 			return;
 		}
 	}
-	m_ScheduledTasks.push_back(a_Task);
+	m_ScheduledTasks.push_back(new cScheduledTask(TargetTick, a_Task));
 }
 
 

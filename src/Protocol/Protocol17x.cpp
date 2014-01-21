@@ -1,4 +1,3 @@
-
 // Protocol17x.cpp
 
 /*
@@ -16,6 +15,7 @@ Implements the 1.7.x protocol classes:
 #include "../Server.h"
 #include "../World.h"
 #include "../WorldStorage/FastNBT.h"
+#include "../WorldStorage/EnchantmentSerializer.h"
 #include "../StringCompression.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
@@ -24,6 +24,7 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/Player.h"
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 
 
 
@@ -122,7 +123,7 @@ void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
 	cPacketizer Pkt(*this, 0x25);  // Block Break Animation packet
-	Pkt.WriteInt(a_EntityID);
+	Pkt.WriteVarInt(a_EntityID);
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteInt(a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
@@ -932,6 +933,28 @@ void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
+	Pkt.WriteInt(a_BlockEntity.GetPosX());
+	Pkt.WriteShort(a_BlockEntity.GetPosY());
+	Pkt.WriteInt(a_BlockEntity.GetPosZ());
+
+	Byte Action = 0;
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
+		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+	}
+	Pkt.WriteByte(Action);
+
+	Pkt.WriteBlockEntity(a_BlockEntity);
+}
+
+
+
+
 
 void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
@@ -1736,7 +1759,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			)
 		)
 		{
-			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+			EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 		}
 		else if ((NBT.GetType(tag) == TAG_Compound) && (NBT.GetName(tag) == "display")) // Custom name and lore tag
 		{
@@ -1821,7 +1844,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments,Writer, TagName);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty())
 	{
@@ -1850,6 +1873,51 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 		Writer.EndCompound();
 	}
 	Writer.Finish();
+	AString Compressed;
+	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
+	WriteShort(Compressed.size());
+	WriteBuf(Compressed.data(), Compressed.size());
+}
+
+
+
+
+void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEntity)
+{
+	cFastNBTWriter Writer;
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_COMMAND_BLOCK:
+		{
+			cCommandBlockEntity & CommandBlockEntity = (cCommandBlockEntity &)a_BlockEntity;
+
+			Writer.AddByte("TrackOutput", 1); // Neither I nor the MC wiki has any idea about this
+			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
+			Writer.AddInt("x", CommandBlockEntity.GetPosX());
+			Writer.AddInt("y", CommandBlockEntity.GetPosY());
+			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			// You can set custom names for windows in Vanilla
+			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
+			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
+			Writer.AddString("CustomName", "@");
+			Writer.AddString("id", "Control"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+
+			if (!CommandBlockEntity.GetLastOutput().empty())
+			{
+				AString Output;
+				Printf(Output, "{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str());
+
+				Writer.AddString("LastOutput", Output.c_str());
+			}
+			break;
+		}
+		default: break;
+	}
+
+	Writer.Finish();
+
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 	WriteShort(Compressed.size());

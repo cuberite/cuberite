@@ -1,0 +1,77 @@
+digraph
+{
+	node
+	[
+		shape="box"
+	]
+
+	edge
+	[
+		d
+	]
+
+	// Forward-declarations of nodes (so that they are laid out in a specific order:
+	ssNormal
+	ssWritingRestOut
+	ssShuttingDown
+	ssShuttingDown2
+
+	// Nodes with special labels / shapes:
+	ForceClose
+	[
+		label="Force close"
+		shape="ellipse"
+	]
+	X
+	[
+		label="Socket closed"
+		shape="ellipse"
+	]
+
+	// Edges:
+	ssNormal -> ssWritingRestOut
+	[
+		label="cSocketThreads::RemoveClient()"
+	]
+	ssWritingRestOut -> ssShuttingDown
+	[
+		label="All outgoing data written"
+	]
+	ssShuttingDown -> ssShuttingDown2
+	[
+		label="One thread loop"
+	]
+	ssShuttingDown2 -> ForceClose
+	[
+		label="One thread loop"
+	]
+	ssNormal -> ssRemoteClosed
+	[
+		label="Remote closed"
+		color="red"
+		fontcolor="red"
+	]
+	ssWritingRestOut -> X
+	[
+		label="Remote closed"
+		color="red"
+		fontcolor="red"
+	]
+	ssShuttingDown -> X
+	[
+		label="Remote closed"
+		color="red"
+		fontcolor="red"
+	]
+	ssShuttingDown2 -> X
+	[
+		label="Remote closed"
+		color="red"
+		fontcolor="red"
+	]
+	ssRemoteClosed -> X
+	[
+		label="cSocketThreads::RemoveClient()"
+	]
+	ForceClose -> X
+}

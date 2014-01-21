@@ -52,6 +52,7 @@ function Initialize(Plugin)
 	PM:BindCommand("/fill",    "debuggers", HandleFill,            "- Fills all block entities in current chunk with junk");
 	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
+	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 
 	Plugin:AddWebTab("Debuggers", HandleRequest_Debuggers);
 
@@ -949,6 +950,45 @@ function HandleFurnaceFuel(a_Split, a_Player)
 		a_Player:SendMessage(ItemToString(HeldItem) .. " will not power furnaces.");
 	end
 	return true;
+end
+
+
+
+
+
+function HandleSched(a_Split, a_Player)
+	local World = a_Player:GetWorld()
+	
+	-- Schedule a broadcast of a countdown message:
+	for i = 1, 10 do
+		World:ScheduleTask(i * 20,
+			function(a_World)
+				a_World:BroadcastChat("Countdown: " .. 11 - i)
+			end
+		)
+	end
+	
+	-- Schedule a broadcast of the final message and a note to the originating player
+	-- Note that we CANNOT us the a_Player in the callback - what if the player disconnected?
+	-- Therefore we store the player's EntityID
+	local PlayerID = a_Player:GetUniqueID()
+	World:ScheduleTask(220,
+		function(a_World)
+			a_World:BroadcastChat("Countdown: BOOM")
+			a_World:DoWithEntityByID(PlayerID,
+				function(a_Entity)
+					if (a_Entity:IsPlayer()) then
+						-- Although unlikely, it is possible that this player is not the originating player
+						-- However, I leave this as an excercise to you to fix this "bug"
+						local Player = tolua.cast(a_Entity, "cPlayer")
+						Player:SendMessage("Countdown finished")
+					end
+				end
+			)
+		end
+	)
+	
+	return true
 end
 
 
