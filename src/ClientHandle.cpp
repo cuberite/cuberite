@@ -270,6 +270,9 @@ void cClientHandle::Authenticate(void)
 	// Query player team
 	m_Player->UpdateTeam();
 
+	// Send scoreboard data
+	World->GetScoreBoard().SendTo(*this);
+
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
 

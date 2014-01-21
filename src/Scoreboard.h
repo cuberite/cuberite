@@ -22,9 +22,12 @@ typedef cItemCallback<cObjective> cObjectiveCallback;
 
 
 
+// tolua_begin
 class cObjective
 {
 public:
+
+	// tolua_end
 
 	typedef int Score;
 
@@ -82,6 +85,9 @@ public:
 
 	void SetDisplayName(const AString & a_Name);
 
+	/// Send this objective to the specified client
+	void SendTo(cClientHandle & a_Client);
+
 private:
 
 	typedef std::pair<AString, Score> cTrackedPlayer;
@@ -105,9 +111,12 @@ private:
 
 
 
+// tolua_begin
 class cTeam
 {
 public:
+
+	// tolua_end
 
 	cTeam(
 		const AString & a_Name, const AString & a_DisplayName,
@@ -169,9 +178,12 @@ private:
 
 
 
+// tolua_begin
 class cScoreboard
 {
 public:
+
+	// tolua_end
 
 	enum eDisplaySlot
 	{
@@ -209,10 +221,15 @@ public:
 
 	void SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot);
 
+	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
+
 	cObjective * GetObjectiveIn(eDisplaySlot a_Slot);
 
 	/// Execute callback for each objective with the specified type
 	void ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
+
+	/// Send this scoreboard to the specified client
+	void SendTo(cClientHandle & a_Client);
 
 	unsigned int GetNumObjectives(void) const;
 

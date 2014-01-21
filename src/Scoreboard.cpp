@@ -7,6 +7,7 @@
 
 #include "Scoreboard.h"
 #include "World.h"
+#include "ClientHandle.h"
 
 
 
@@ -172,6 +173,20 @@ void cObjective::SetDisplayName(const AString & a_Name)
 	m_DisplayName = a_Name;
 
 	m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, 2);
+}
+
+
+
+
+
+void cObjective::SendTo(cClientHandle & a_Client)
+{
+	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, 0);
+
+	for (cScoreMap::const_iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
+	{
+		a_Client.SendScoreUpdate(m_Name, it->first, it->second, 0);
+	}
 }
 
 
@@ -397,11 +412,19 @@ void cScoreboard::SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot)
 
 	cObjective * Objective = GetObjective(a_Objective);
 
-	m_Display[a_Slot] = Objective;
+	SetDisplay(Objective, a_Slot);
+}
+
+
+
+
+
+void cScoreboard::SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot)
+{
+	m_Display[a_Slot] = a_Objective;
 
 	ASSERT(m_World != NULL);
-	m_World->BroadcastDisplayObjective(Objective ? a_Objective : "", a_Slot);
-	
+	m_World->BroadcastDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
 }
 
 
@@ -432,6 +455,31 @@ void cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallb
 			{
 				return;
 			}
+		}
+	}
+}
+
+
+
+
+
+void cScoreboard::SendTo(cClientHandle & a_Client)
+{
+	cCSLock Lock(m_CSObjectives);
+
+	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
+	{
+		it->second.SendTo(a_Client);
+	}
+
+	for (int i = 0; i < (int) E_DISPLAY_SLOT_COUNT; ++i)
+	{
+		// Avoid race conditions
+		cObjective * Objective = m_Display[i];
+
+		if (Objective)
+		{
+			a_Client.SendDisplayObjective(Objective->GetName(), (eDisplaySlot) i);
 		}
 	}
 }

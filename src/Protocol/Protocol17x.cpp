@@ -707,7 +707,7 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 void cProtocol172::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
-	cPacketizer Pkt(*this, 0x3b);
+	cPacketizer Pkt(*this, 0x3B);
 	Pkt.WriteString(a_Name);
 	Pkt.WriteString(a_DisplayName);
 	Pkt.WriteByte(a_Mode);
@@ -719,7 +719,7 @@ void cProtocol172::SendScoreboardObjective(const AString & a_Name, const AString
 
 void cProtocol172::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
 {
-	cPacketizer Pkt(*this, 0x3c);
+	cPacketizer Pkt(*this, 0x3C);
 	Pkt.WriteString(a_Player);
 	Pkt.WriteByte(a_Mode);
 
@@ -736,7 +736,7 @@ void cProtocol172::SendScoreUpdate(const AString & a_Objective, const AString & 
 
 void cProtocol172::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
 {
-	cPacketizer Pkt(*this, 0x3d);
+	cPacketizer Pkt(*this, 0x3D);
 	Pkt.WriteByte((int) a_Display);
 	Pkt.WriteString(a_Objective);
 }
