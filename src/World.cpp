@@ -12,6 +12,7 @@
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
+#include "WorldStorage/ScoreboardSerializer.h"
 
 // Entities (except mobs):
 #include "Entities/ExpOrb.h"
@@ -248,6 +249,10 @@ cWorld::cWorld(const AString & a_WorldName) :
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
 	cFile::CreateFolder(FILE_IO_PREFIX + m_WorldName);
+
+	// Load the scoreboard
+	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
+	Serializer.Load();
 }
 
 
@@ -266,6 +271,10 @@ cWorld::~cWorld()
 	UnloadUnusedChunks();
 	
 	m_Storage.WaitForFinish();
+
+	// Unload the scoreboard
+	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
+	Serializer.Save();
 
 	delete m_ChunkMap;
 }

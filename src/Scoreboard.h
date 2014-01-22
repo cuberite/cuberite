@@ -27,8 +27,6 @@ class cObjective
 {
 public:
 
-	// tolua_end
-
 	typedef int Score;
 
 	enum eType
@@ -52,6 +50,8 @@ public:
 		E_TYPE_STAT_ENTITY_KILLED_BY
 	};
 
+	// tolua_end
+
 	static AString TypeToString(eType a_Type);
 
 	static eType StringToType(const AString & a_Name);
@@ -59,6 +59,8 @@ public:
 public:
 
 	cObjective(const AString & a_Name, const AString & a_DisplayName, eType a_Type, cWorld * a_World);
+
+	// tolua_begin
 
 	eType GetType(void) const { return m_Type; }
 
@@ -84,6 +86,8 @@ public:
 	Score SubScore(const AString & a_Name, Score a_Delta);
 
 	void SetDisplayName(const AString & a_Name);
+
+	// tolua_end
 
 	/// Send this objective to the specified client
 	void SendTo(cClientHandle & a_Client);
@@ -135,6 +139,8 @@ public:
 	/// Removes all registered players
 	void Reset(void);
 
+	// tolua_begin
+
 	/// Returns the number of registered players
 	unsigned int GetNumPlayers(void) const;
 
@@ -147,13 +153,15 @@ public:
 	const AString & GetPrefix(void) const { return m_Prefix; }
 	const AString & GetSuffix(void) const { return m_Suffix; }
 
-	void SetFriendlyFire(bool a_Flag)            { m_AllowsFriendlyFire = a_Flag; }
+	void SetFriendlyFire(bool a_Flag)            { m_AllowsFriendlyFire      = a_Flag; }
 	void SetCanSeeFriendlyInvisible(bool a_Flag) { m_CanSeeFriendlyInvisible = a_Flag; }
 
 	void SetDisplayName(const AString & a_Name);
 
-	void SetPrefix(const AString & a_Prefix);
-	void SetSuffix(const AString & a_Suffix);
+	void SetPrefix(const AString & a_Prefix) { m_Prefix = a_Prefix; }
+	void SetSuffix(const AString & a_Suffix) { m_Suffix = a_Suffix; }
+
+	// tolua_end
 
 private:
 
@@ -183,8 +191,6 @@ class cScoreboard
 {
 public:
 
-	// tolua_end
-
 	enum eDisplaySlot
 	{
 		E_DISPLAY_SLOT_LIST = 0,
@@ -194,10 +200,14 @@ public:
 		E_DISPLAY_SLOT_COUNT
 	};
 
+	// tolua_end
+
 
 public:
 
 	cScoreboard(cWorld * a_World);
+
+	// tolua_begin
 
 	/// Registers a new scoreboard objective, returns the cObjective instance, NULL on name collision
 	cObjective * RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type);
@@ -228,12 +238,14 @@ public:
 	/// Execute callback for each objective with the specified type
 	void ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
 
-	/// Send this scoreboard to the specified client
-	void SendTo(cClientHandle & a_Client);
-
 	unsigned int GetNumObjectives(void) const;
 
 	unsigned int GetNumTeams(void) const;
+
+	// tolua_end
+
+	/// Send this scoreboard to the specified client
+	void SendTo(cClientHandle & a_Client);
 
 
 private:

@@ -238,6 +238,8 @@ bool cTeam::HasPlayer(const AString & a_Name) const
 
 void cTeam::Reset(void)
 {
+	// TODO 2014-01-22 xdot: Inform online players
+
 	m_Players.clear();
 }
 
@@ -501,6 +503,7 @@ unsigned int cScoreboard::GetNumTeams(void) const
 {
 	return m_Teams.size();
 }
+
 
 
 

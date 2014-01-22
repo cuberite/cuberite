@@ -22,7 +22,12 @@
 cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard* a_ScoreBoard)
 	: m_ScoreBoard(a_ScoreBoard)
 {
-	Printf(m_Path, "%s/data/scoreboard.dat", a_WorldName.c_str());
+	AString DataPath;
+	Printf(DataPath, "%s/data", a_WorldName.c_str());
+
+	m_Path = DataPath + "/scoreboard.dat";
+
+	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
 }
 
 
@@ -33,7 +38,7 @@ bool cScoreboardSerializer::Load(void)
 {
 	cFile File;
 
-	if (!File.Open(m_Path, cFile::fmReadWrite))
+	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmReadWrite))
 	{
 		return false;
 	}
@@ -60,7 +65,7 @@ bool cScoreboardSerializer::Load(void)
 	{
 		return false;
 	}
-	
+
 	// Parse the NBT data:
 	cParsedNBT NBT(Uncompressed, strm.total_out);
 	if (!NBT.IsValid())
@@ -81,7 +86,7 @@ bool cScoreboardSerializer::Save(void)
 	cFastNBTWriter Writer;
 
 	Writer.BeginCompound("");
-	
+	m_ScoreBoard->RegisterObjective("test","test",cObjective::E_TYPE_DUMMY)->AddScore("dot", 2);
 	SaveScoreboardToNBT(Writer);
 
 	Writer.EndCompound();
@@ -91,7 +96,7 @@ bool cScoreboardSerializer::Save(void)
 	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
 	ASSERT(TestParse.IsValid());
 	#endif  // _DEBUG
-	
+
 	gzFile gz = gzopen((FILE_IO_PREFIX + m_Path).c_str(), "wb");
 	if (gz != NULL)
 	{
