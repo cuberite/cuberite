@@ -862,6 +862,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		virtual bool Item(cObjective * a_Objective) override
 		{
 			a_Objective->AddScore(m_Name, 1);
+			return true;
 		}
 	} IncrementCounter (GetName());
 
