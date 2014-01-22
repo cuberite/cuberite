@@ -13,6 +13,7 @@
 class cGroup;
 class cWindow;
 class cClientHandle;
+class cTeam;
 
 
 
@@ -152,6 +153,15 @@ public:
 	bool IsGameModeAdventure(void) const;
 	
 	AString GetIP(void) const { return m_IP; }  // tolua_export
+
+	/// Returns the associated team, NULL if none
+	cTeam * GetTeam(void) { return m_Team; } // tolua_export
+
+	/// Sets the player team, NULL if none
+	void SetTeam(cTeam * a_Team);
+
+	/// Forces the player to query the scoreboard for his team
+	cTeam * UpdateTeam(void);
 
 	// tolua_end
 	
@@ -456,6 +466,8 @@ protected:
 
 	int m_FloaterID;
 
+	cTeam* m_Team;
+
 
 
 	void ResolvePermissions(void);
@@ -463,7 +475,7 @@ protected:
 
 	virtual void Destroyed(void);
 
-	/// Filters out damage for creative mode
+	/// Filters out damage for creative mode/friendly fire
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
 	
 	/// Called in each tick to handle food-related processing

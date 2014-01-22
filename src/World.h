@@ -23,6 +23,7 @@
 #include "Mobs/Monster.h"
 #include "Entities/ProjectileEntity.h"
 #include "ForEachChunkProvider.h"
+#include "Scoreboard.h"
 
 
 
@@ -170,6 +171,9 @@ public:
 	void BroadcastParticleEffect     (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);
 	void BroadcastPlayerListItem     (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
+	void BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
+	void BroadcastScoreUpdate        (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
+	void BroadcastDisplayObjective   (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void BroadcastSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export a_Src coords are Block * 8
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL); // tolua_export
 	void BroadcastSpawnEntity        (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
@@ -229,10 +233,10 @@ public:
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
- 	/// Calls the callback for the player of the given name; returns true if the player was found and the callback called, false if player not found. Callback return ignored
- 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	/** Calls the callback for the player of the given name; returns true if the player was found and the callback called, false if player not found. Callback return ignored */
+	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
-	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
+	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
 	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
@@ -505,6 +509,9 @@ public:
 	
 	/** Returns the name of the world.ini file used by this world */
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
+
+	/// Returns the associated scoreboard instance
+	cScoreboard & GetScoreBoard(void) { return m_Scoreboard; }
 	
 	// tolua_end
 
@@ -773,6 +780,8 @@ private:
 	sSetBlockList    m_FastSetBlockQueue;
 
 	cChunkGenerator  m_Generator;
+
+	cScoreboard      m_Scoreboard;
 	
 	/** The callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	cChunkGeneratorCallbacks m_GeneratorCallbacks;

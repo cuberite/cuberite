@@ -16,6 +16,7 @@
 #include "OSSupport/SocketThreads.h"
 #include "ChunkDef.h"
 #include "ByteBuffer.h"
+#include "Scoreboard.h"
 
 
 
@@ -125,6 +126,9 @@ public:
 	void SendRespawn             (void);
 	void SendExperience          (void);
 	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
+	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
+	void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
+	void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
 	void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);

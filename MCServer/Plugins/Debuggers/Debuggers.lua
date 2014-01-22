@@ -64,10 +64,43 @@ function Initialize(Plugin)
 	-- TestBlockAreas();
 	-- TestSQLiteBindings();
 	-- TestExpatBindings();
-
+	TestPluginCalls();
+	
 	return true
 end;
 
+
+
+
+
+function TestPluginCalls()
+	-- In order to test the inter-plugin communication, we're going to call Core's ReturnColorFromChar() function
+	-- It is a rather simple function that doesn't need any tables as its params and returns a value, too
+	-- Note the signature: function ReturnColorFromChar( Split, char ) ... return cChatColog.Gray ... end
+	-- The Split parameter should be a table, but it is not used in that function anyway,
+	-- so we can get away with passing nil to it.
+	
+	-- Use the old, deprecated and unsafe method:
+	local Core = cPluginManager:Get():GetPlugin("Core")
+	if (Core ~= nil) then
+		LOGINFO("Calling Core::ReturnColorFromChar() the old-fashioned way...")
+		local Gray = Core:Call("ReturnColorFromChar", nil, "8")
+		if (Gray ~= cChatColor.Gray) then
+			LOGWARNING("Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
+		else
+			LOGINFO("Call succeeded")
+		end
+	end
+	
+	-- Use the new method:
+	LOGINFO("Calling Core::ReturnColorFromChar() the recommended way...")
+	local Gray = cPluginManager:CallPlugin("Core", "ReturnColorFromChar", nil, "8")
+	if (Gray ~= cChatColor.Gray) then
+		LOGWARNING("Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
+	else
+		LOGINFO("Call succeeded")
+	end
+end
 
 
 

@@ -1,4 +1,3 @@
-
 // Protocol17x.cpp
 
 /*
@@ -124,7 +123,7 @@ void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
 	cPacketizer Pkt(*this, 0x25);  // Block Break Animation packet
-	Pkt.WriteInt(a_EntityID);
+	Pkt.WriteVarInt(a_EntityID);
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteInt(a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
@@ -701,6 +700,46 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	Pkt.WriteInt((int) a_ExpOrb.GetPosY());
 	Pkt.WriteInt((int) a_ExpOrb.GetPosZ());
 	Pkt.WriteShort(a_ExpOrb.GetReward());
+}
+
+
+
+
+
+void cProtocol172::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	cPacketizer Pkt(*this, 0x3B);
+	Pkt.WriteString(a_Name);
+	Pkt.WriteString(a_DisplayName);
+	Pkt.WriteByte(a_Mode);
+}
+
+
+
+
+
+void cProtocol172::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	cPacketizer Pkt(*this, 0x3C);
+	Pkt.WriteString(a_Player);
+	Pkt.WriteByte(a_Mode);
+
+	if (a_Mode != 1)
+	{
+		Pkt.WriteString(a_Objective);
+		Pkt.WriteInt((int) a_Score);
+	}
+}
+
+
+
+
+
+void cProtocol172::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	cPacketizer Pkt(*this, 0x3D);
+	Pkt.WriteByte((int) a_Display);
+	Pkt.WriteString(a_Objective);
 }
 
 

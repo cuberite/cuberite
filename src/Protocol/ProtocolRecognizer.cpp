@@ -526,6 +526,36 @@ void cProtocolRecognizer::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
+void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_Protocol != NULL);
@@ -807,7 +837,7 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 	}
 	switch (ch)
 	{
-	 case PROTO_VERSION_1_3_2:
+		case PROTO_VERSION_1_3_2:
 		{
 			m_Protocol = new cProtocol132(m_Client);
 			return true;
