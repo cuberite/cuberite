@@ -263,6 +263,12 @@ void cClientHandle::Authenticate(void)
 	m_Player->Initialize(World);
 	m_State = csAuthenticated;
 
+	// Query player team
+	m_Player->UpdateTeam();
+
+	// Send scoreboard data
+	World->GetScoreBoard().SendTo(*this);
+
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
 
@@ -2105,6 +2111,33 @@ void cClientHandle::SendExperience(void)
 void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	m_Protocol->SendExperienceOrb(a_ExpOrb);
+}
+
+
+
+
+
+void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+}
+
+
+
+
+
+void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+}
+
+
+
+
+
+void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
 }
 
 

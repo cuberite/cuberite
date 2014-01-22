@@ -74,6 +74,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
 	, m_FloaterID(-1)
+	, m_Team(NULL)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -790,6 +791,20 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 			return;
 		}
 	}
+
+	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
+	{
+		cPlayer* Attacker = (cPlayer*) a_TDI.Attacker;
+
+		if ((m_Team != NULL) && (m_Team == Attacker->m_Team))
+		{
+			if (!m_Team->AllowsFriendlyFire())
+			{
+				// Friendly fire is disabled
+				return;
+			}
+		}
+	}
 	
 	super::DoTakeDamage(a_TDI);
 	
@@ -836,6 +851,24 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 
 		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by a %s", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str(), KillerClass.c_str()));
 	}
+
+	class cIncrementCounterCB
+		: public cObjectiveCallback
+	{
+		AString m_Name;
+	public:
+		cIncrementCounterCB(const AString & a_Name) : m_Name(a_Name) {}
+
+		virtual bool Item(cObjective * a_Objective) override
+		{
+			a_Objective->AddScore(m_Name, 1);
+		}
+	} IncrementCounter (GetName());
+
+	cScoreboard & Scoreboard = m_World->GetScoreBoard();
+
+	// Update scoreboard objectives
+	Scoreboard.ForEachObjectiveWith(cObjective::E_TYPE_DEATH_COUNT, IncrementCounter);
 }
 
 
@@ -910,6 +943,50 @@ bool cPlayer::IsGameModeAdventure(void) const
 {
 	return (m_GameMode == gmAdventure) ||  // Either the player is explicitly in Adventure
 		((m_GameMode == gmNotSet) &&  m_World->IsGameModeAdventure());  // or they inherit from the world and the world is Adventure
+}
+
+
+
+
+
+void cPlayer::SetTeam(cTeam * a_Team)
+{
+	if (m_Team == a_Team)
+	{
+		return;
+	}
+
+	if (m_Team)
+	{
+		m_Team->RemovePlayer(GetName());
+	}
+
+	m_Team = a_Team;
+
+	if (m_Team)
+	{
+		m_Team->AddPlayer(GetName());
+	}
+}
+
+
+
+
+
+cTeam * cPlayer::UpdateTeam(void)
+{
+	if (m_World == NULL)
+	{
+		SetTeam(NULL);
+	}
+	else
+	{
+		cScoreboard & Scoreboard = m_World->GetScoreBoard();
+
+		SetTeam(Scoreboard.QueryPlayerTeam(GetName()));
+	}
+
+	return m_Team;
 }
 
 
