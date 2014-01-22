@@ -4,7 +4,7 @@
 #include "OSSupport/GZipFile.h"
 #include "FastNBT.h"
 
-#include "SchematicFileSerilizer.h"
+#include "SchematicFileSerializer.h"
 
 bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
 {
