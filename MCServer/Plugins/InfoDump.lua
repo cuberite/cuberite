@@ -2,10 +2,17 @@
 
 -- InfoDump.lua
 
--- Goes through all subfolders, loads Info.lua and dumps its g_PluginInfo into various text formats
--- This is used for generating plugin documentation for the forum and for GitHub's INFO.md files
+--[[
+Loads plugins' Info.lua and dumps its g_PluginInfo into various text formats
+This is used for generating plugin documentation for the forum and for GitHub's INFO.md files
 
--- This script requires LuaRocks with LFS installed, instructions are printed when this is not present.
+This script can be used in two ways:
+Executing "lua InfoDump.lua" will go through all subfolders and dump each Info.lua file it can find
+	Note that this mode of operation requires LuaRocks with LFS installed; instructions are printed
+	when the prerequisites are not met.
+Executing "lua InfoDump.lua PluginName" will load the Info.lua file from PluginName's folder and dump
+only that one plugin's documentation. This mode of operation doesn't require LuaRocks
+--]]
 
 
 
@@ -16,34 +23,6 @@ if (_VERSION ~= "Lua 5.1") then
 	print("Unsupported Lua version. This script requires Lua version 5.1, this Lua is version " .. (_VERSION or "<nil>"));
 	return;
 end
-
--- Try to load lfs, do not abort if not found ...
-local lfs, err = pcall(
-	function()
-		return require("lfs")
-	end
-);
-
--- ... rather, print a nice message with instructions:
-if not(lfs) then
-	print([[
-Cannot load LuaFileSystem
-Install it through luarocks by executing the following command:
-	luarocks install luafilesystem (Windows)
-  sudo luarocks install luafilesystem (*nix)
-
-If you don't have luarocks installed, you need to install them using your OS's package manager, usually:
-  sudo apt-get install luarocks (Ubuntu / Debian)
-On windows, a binary distribution can be downloaded from the LuaRocks homepage, http://luarocks.org/en/Download
-]]);
-  
-	print("Original error text: ", err);
-	return;
-end
-
--- We now know that LFS is present, get it normally:
-lfs = require("lfs");
-
 
 
 
@@ -409,12 +388,6 @@ end
 --- Tries to load the g_PluginInfo from the plugin's Info.lua file
 -- Returns the g_PluginInfo table on success, or nil and error message on failure
 local function LoadPluginInfo(a_FolderName)
-	-- Check if the Info file is present at all:
-	local Attribs = lfs.attributes(a_FolderName .. "/Info.lua");
-	if ((Attribs == nil) or (Attribs.mode ~= "file")) then
-		return nil;
-	end
-	
 	-- Load and compile the Info file:
 	local cfg, err = loadfile(a_FolderName .. "/Info.lua");
 	if (cfg == nil) then
@@ -440,7 +413,7 @@ local function ProcessPluginFolder(a_FolderName)
 	local PluginInfo, Msg = LoadPluginInfo(a_FolderName);
 	if (PluginInfo == nil) then
 		if (Msg ~= nil) then
-			print("\tCannot load Info.lua: " .. Msg);
+			print("\t" .. Msg);
 		end
 		return;
 	end
@@ -451,19 +424,64 @@ end
 
 
 
-print("Processing plugin subfolders:");
-for fnam in lfs.dir(".") do
-	if ((fnam ~= ".") and (fnam ~= "..")) then
-		local Attributes = lfs.attributes(fnam);
-		if (Attributes ~= nil) then
-			if (Attributes.mode == "directory") then
-				print(fnam);
-				ProcessPluginFolder(fnam);
+--- Tries to load LFS through LuaRocks, returns the LFS instance, or nil on error
+local function LoadLFS()
+	-- Try to load lfs, do not abort if not found ...
+	local lfs, err = pcall(
+		function()
+			return require("lfs")
+		end
+	);
+
+	-- ... rather, print a nice message with instructions:
+	if not(lfs) then
+		print([[
+	Cannot load LuaFileSystem
+	Install it through luarocks by executing the following command:
+		luarocks install luafilesystem (Windows)
+		sudo luarocks install luafilesystem (*nix)
+
+	If you don't have luarocks installed, you need to install them using your OS's package manager, usually:
+		sudo apt-get install luarocks (Ubuntu / Debian)
+	On windows, a binary distribution can be downloaded from the LuaRocks homepage, http://luarocks.org/en/Download
+	]]);
+		
+		print("Original error text: ", err);
+		return nil;
+	end
+
+	-- We now know that LFS is present, get it normally:
+	return require("lfs");
+end
+
+
+
+
+
+local Arg1 = ...;
+if ((Arg1 ~= nil) and (Arg1 ~= "")) then
+	-- Called with a plugin folder name, export only that one
+	ProcessPluginFolder(Arg1)
+else
+	-- Called without any arguments, process all subfolders:
+	local lfs = LoadLFS();
+	if (lfs == nil) then
+		-- LFS not loaded, error has already been printed, just bail out
+		return;
+	end
+	print("Processing plugin subfolders:");
+	for fnam in lfs.dir(".") do
+		if ((fnam ~= ".") and (fnam ~= "..")) then
+			local Attributes = lfs.attributes(fnam);
+			if (Attributes ~= nil) then
+				if (Attributes.mode == "directory") then
+					print(fnam);
+					ProcessPluginFolder(fnam);
+				end
 			end
 		end
 	end
 end
-
-
+print("Done.");
 
 
