@@ -17,22 +17,23 @@ if (_VERSION ~= "Lua 5.1") then
 	return;
 end
 
--- Try to load lfs, do not abort if not found
+-- Try to load lfs, do not abort if not found ...
 local lfs, err = pcall(
 	function()
 		return require("lfs")
 	end
 );
 
--- Rather, print a nice message with instructions:
+-- ... rather, print a nice message with instructions:
 if not(lfs) then
 	print([[
 Cannot load LuaFileSystem
 Install it through luarocks by executing the following command:
-  sudo luarocks install luafilesystem
+	luarocks install luafilesystem (Windows)
+  sudo luarocks install luafilesystem (*nix)
 
 If you don't have luarocks installed, you need to install them using your OS's package manager, usually:
-  sudo apt-get install luarocks
+  sudo apt-get install luarocks (Ubuntu / Debian)
 On windows, a binary distribution can be downloaded from the LuaRocks homepage, http://luarocks.org/en/Download
 ]]);
   
@@ -161,6 +162,21 @@ end
 
 
 
+--- Returns a string specifying the command.
+-- If a_Command is a simple string, returns a_Command colorized to blue
+-- If a_Command is a table, expects members Name (full command name) and Params (command parameters),
+-- colorizes command name blue and params green
+local function GetCommandRefForum(a_Command)
+	if (type(a_Command) == "string") then
+		return "[color=blue]" .. a_Command .. "[/color]";
+	end
+	return "[color=blue]" .. a_Command.Name .. "[/color] [color=green]" .. a_Command.Params .. "[/color]";
+end
+
+
+
+
+
 --- Writes the specified command detailed help array to the output file, in the forum dump format
 local function WriteCommandParameterCombinationsForum(a_CmdString, a_ParameterCombinations, f)
 	assert(type(a_CmdString) == "string");
@@ -270,6 +286,97 @@ end
 
 
 
+--- Collects all permissions mentioned in the info, returns them as a sorted array
+-- Each array item is {Name = "PermissionName", Info = { PermissionInfo }}
+local function BuildPermissions(a_PluginInfo)
+	-- Collect all used permissions from Commands, reference the commands that use the permission:
+	local Permissions = a_PluginInfo.Permissions or {};
+	local function CollectPermissions(a_CmdPrefix, a_Commands)
+		for cmd, info in pairs(a_Commands) do
+			CommandString = a_CmdPrefix .. cmd;
+			if ((info.Permission ~= nil) and (info.Permission ~= "")) then
+				-- Add the permission to the list of permissions:
+				local Permission = Permissions[info.Permission] or {};
+				Permissions[info.Permission] = Permission;
+				-- Add the command to the list of commands using this permission:
+				Permission.CommandsAffected = Permission.CommandsAffected or {};
+				table.insert(Permission.CommandsAffected, CommandString);
+			end
+			
+			-- Process the command param combinations for permissions:
+			local ParamCombinations = info.ParameterCombinations or {};
+			for idx, comb in ipairs(ParamCombinations) do
+				if ((comb.Permission ~= nil) and (comb.Permission ~= "")) then
+					-- Add the permission to the list of permissions:
+					local Permission = Permissions[comb.Permission] or {};
+					Permissions[info.Permission] = Permission;
+					-- Add the command to the list of commands using this permission:
+					Permission.CommandsAffected = Permission.CommandsAffected or {};
+					table.insert(Permission.CommandsAffected, {Name = CommandString, Params = comb.Params});
+				end
+			end
+			
+			-- Process subcommands:
+			if (info.Subcommands ~= nil) then
+				CollectPermissions(CommandString .. " ", info.Subcommands);
+			end
+		end
+	end
+	CollectPermissions("", a_PluginInfo.Commands);
+	
+	-- Copy the list of permissions to an array:
+	local PermArray = {};
+	for name, perm in pairs(Permissions) do
+		table.insert(PermArray, {Name = name, Info = perm});
+	end
+	
+	-- Sort the permissions array:
+	table.sort(PermArray,
+		function(p1, p2)
+			return (p1.Name < p2.Name);
+		end
+	);
+	return PermArray;
+end
+
+
+
+
+
+local function DumpPermissionsForum(a_PluginInfo, f)
+	-- Get the processed sorted array of permissions:
+	local Permissions = BuildPermissions(a_PluginInfo);
+	if ((Permissions == nil) or (#Permissions <= 0)) then
+		return;
+	end
+
+	-- Dump the permissions:
+	f:write("\n[size=X-Large]Permissions[/size]\n[list]\n");
+	for idx, perm in ipairs(Permissions) do
+		f:write("  - [color=red]", perm.Name, "[/color] - ");
+		f:write(perm.Info.Description or "");
+		local CommandsAffected = perm.Info.CommandsAffected or {};
+		if (#CommandsAffected > 0) then
+			f:write("\n[list] Commands affected:\n- ");
+			local Affects = {};
+			for idx2, cmd in ipairs(CommandsAffected) do
+				table.insert(Affects, GetCommandRefForum(cmd));
+			end
+			f:write(table.concat(Affects, "\n - "));
+			f:write("\n[/list]");
+		end
+		if (perm.Info.RecommendedGroups ~= nil) then
+			f:write("\n[list] Recommended groups: ", perm.Info.RecommendedGroups, "[/list]");
+		end
+		f:write("\n");
+	end
+	f:write("[/list]");
+end
+
+
+
+
+
 local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
 	-- Open the output file:
 	local f, msg = io.open(a_PluginInfo.Name .. "_forum.txt", "w");
@@ -282,6 +389,7 @@ local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
 	f:write(ForumizeString(a_PluginInfo.Description), "\n");
 	DumpAdditionalInfoForum(a_PluginInfo, f);
 	DumpCommandsForum(a_PluginInfo, f);
+	DumpPermissionsForum(a_PluginInfo, f);
 
 	f:close();
 end
