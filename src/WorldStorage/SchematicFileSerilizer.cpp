@@ -6,7 +6,7 @@
 
 #include "SchematicFileSerilizer.h"
 
-bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea& a_BlockArea, const AString & a_FileName)
+bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
 {
 	// Un-GZip the contents:
 	AString Contents;
@@ -35,7 +35,12 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea& a_BlockArea, co
 	return LoadFromSchematicNBT(a_BlockArea, NBT);
 }
 
-bool cSchematicFileSerializer::SaveToSchematicFile(cBlockArea& a_BlockArea, const AString & a_FileName)
+
+
+
+
+
+bool cSchematicFileSerializer::SaveToSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
 {
 	cFastNBTWriter Writer("Schematic");
 	Writer.AddShort("Width",  a_BlockArea.m_SizeX);
@@ -82,7 +87,12 @@ bool cSchematicFileSerializer::SaveToSchematicFile(cBlockArea& a_BlockArea, cons
 	return true;
 }
 
-bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea& a_BlockArea, cParsedNBT & a_NBT)
+
+
+
+
+
+bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cParsedNBT & a_NBT)
 {
 	int TMaterials = a_NBT.FindChildByName(a_NBT.GetRoot(), "Materials");
 	if ((TMaterials > 0) && (a_NBT.GetType(TMaterials) == TAG_String))
