@@ -11,6 +11,52 @@ set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities)
 
 
 if (NOT MSVC)
+
+	#Bindings needs to reference other folders so are done here
+	
+	#lib dependecies are not included
+	
+	set(BINDING_DEPENDECIES ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} toluaGlobals.h ChunkDef.h BiomeDef.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} OSSupport/File.h Bindings/LuaFunctions.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Bindings/PluginManager.h Bindings/Plugin.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Bindings/PluginLua.h Bindings/WebPlugin.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Bindings/LuaWindow.h BlockID.h StringUtils.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Defines.h ChatColor.h ClientHandle.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Entities/Entity.h Entities/Floater.h )
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Entities/Pawn.h Entities/Player.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Entities/Pickup.h Entities/ProjectileEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Entities/TNTEntity.h Entities/Effects.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Server.h World.h Inventory.h Enchantments.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Item.h ItemGrid.h BlockEntities/BlockEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/BlockEntityWithItems.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/ChestEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/DropSpenserEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/DispenserEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/DropperEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/FurnaceEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/HopperEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/JukeboxEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/NoteEntity.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/SignEntity.h WebAdmin.h Root.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Vector3f.h Vector3d.h Vector3i.h Matrix4f.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Cuboid.h BoundingBox.h Tracer.h Group.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockArea.h Generating/ChunkDesc.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} CraftingRecipes.h UI/Window.h Mobs/Monster.h)
+	
+	ADD_CUSTOM_COMMAND(
+		# add any new generated bindings here
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
+	
+		# command execuded to regerate bindings
+		COMMAND tolua -L Bindings/virtual_method_hooks.lua -o Bindings/Bindings.cpp -H Bindings/Bindings.h Bindings/AllToLua.pkg
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
+	
+		# add any new generation dependencies here
+		DEPENDS ${BINDING_DEPENDECIES}
+	)
+
 	foreach(folder ${FOLDERS})
 		add_subdirectory(${folder})
 	endforeach(folder)
