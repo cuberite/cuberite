@@ -103,7 +103,8 @@ bool cScoreboardSerializer::Save(void)
 
 void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 {
-	a_Writer.BeginCompound("Data");
+	a_Writer.BeginCompound("data");
+
 	a_Writer.BeginList("Objectives", TAG_Compound);
 	
 	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
@@ -174,8 +175,6 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.EndList(); // Teams
 
-	a_Writer.EndCompound(); // Data
-
 	a_Writer.BeginCompound("DisplaySlots");
 
 	cObjective * Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::E_DISPLAY_SLOT_LIST);
@@ -188,6 +187,8 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 	a_Writer.AddString("slot_2", (Objective == NULL) ? "" : Objective->GetName());
 
 	a_Writer.EndCompound(); // DisplaySlots
+
+	a_Writer.EndCompound(); // Data
 }
 
 
@@ -196,7 +197,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 {
-	int Data = a_NBT.FindChildByName(0, "Data");
+	int Data = a_NBT.FindChildByName(0, "data");
 	if (Data < 0)
 	{
 		return false;
@@ -338,7 +339,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 		}
 	}
 
-	int DisplaySlots = a_NBT.FindChildByName(0, "DisplaySlots");
+	int DisplaySlots = a_NBT.FindChildByName(Data, "DisplaySlots");
 	if (DisplaySlots < 0)
 	{
 		return false;
