@@ -1740,7 +1740,7 @@ bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback 
 {
 	// TODO: Implement locking for plugins
 	PluginMap::iterator itr = m_Plugins.find(a_PluginName);
-	if (itr == m_Plugins.end())
+	if ((itr == m_Plugins.end()) || (itr->second == NULL))
 	{
 		return false;
 	}

@@ -22,6 +22,8 @@
 #include "Entities/Player.h"
 #include "Entities/TNTEntity.h"
 
+#include "BlockEntities/CommandBlockEntity.h"
+
 // Simulators:
 #include "Simulator/SimulatorManager.h"
 #include "Simulator/FloodyFluidSimulator.h"
@@ -523,7 +525,7 @@ void cWorld::Start(void)
 	}
 
 	m_StorageSchema             = IniFile.GetValueSet ("Storage",       "Schema",                    m_StorageSchema);
-	m_StorageCompressionFactor 	= IniFile.GetValueSetI ("Storage",       "CompressionFactor",                    m_StorageCompressionFactor);
+	m_StorageCompressionFactor  = IniFile.GetValueSetI("Storage",       "CompressionFactor",         m_StorageCompressionFactor);
 	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
 	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
 	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
@@ -540,6 +542,7 @@ void cWorld::Start(void)
 	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
 	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
 	m_ShouldLavaSpawnFire       = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",       true);
+	m_bCommandBlocksEnabled     = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",      false);
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
 
@@ -2605,6 +2608,28 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 bool cWorld::UpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	return SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+}
+
+
+
+
+
+bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command)
+{
+	class cUpdateCommandBlock : public cCommandBlockCallback
+	{
+		AString m_Command;
+	public:
+		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
+			
+		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
+		{
+			a_CommandBlock->SetCommand(m_Command);
+			return false;
+		}
+	} CmdBlockCB (a_Command);
+
+	return DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, CmdBlockCB);
 }
 
 
