@@ -13,11 +13,6 @@
 
 
 
-#define SCOREBOARD_INFLATE_MAX 16 KiB
-
-
-
-
 
 cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard* a_ScoreBoard)
 	: m_ScoreBoard(a_ScoreBoard)
@@ -37,37 +32,25 @@ cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScore
 bool cScoreboardSerializer::Load(void)
 {
 	cFile File;
-
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmReadWrite))
+	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmRead))
 	{
 		return false;
 	}
 
 	AString Data;
-
 	File.ReadRestOfFile(Data);
-
 	File.Close();
 
-	char Uncompressed[SCOREBOARD_INFLATE_MAX];
-	z_stream strm;
-	strm.zalloc = (alloc_func)NULL;
-	strm.zfree = (free_func)NULL;
-	strm.opaque = NULL;
-	inflateInit(&strm);
-	strm.next_out  = (Bytef *)Uncompressed;
-	strm.avail_out = sizeof(Uncompressed);
-	strm.next_in   = (Bytef *)Data.data();
-	strm.avail_in  = Data.size();
-	int res = inflate(&strm, Z_FINISH);
-	inflateEnd(&strm);
-	if (res != Z_STREAM_END)
+	AString Uncompressed;
+	int res = UncompressStringGZIP(Data.data(), Data.size(), Uncompressed);
+
+	if (res != Z_OK)
 	{
 		return false;
 	}
 
 	// Parse the NBT data:
-	cParsedNBT NBT(Uncompressed, strm.total_out);
+	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
@@ -85,11 +68,8 @@ bool cScoreboardSerializer::Save(void)
 {
 	cFastNBTWriter Writer;
 
-	Writer.BeginCompound("");
-	m_ScoreBoard->RegisterObjective("test","test",cObjective::E_TYPE_DUMMY)->AddScore("dot", 2);
 	SaveScoreboardToNBT(Writer);
 
-	Writer.EndCompound();
 	Writer.Finish();
 	
 	#ifdef _DEBUG
@@ -97,12 +77,22 @@ bool cScoreboardSerializer::Save(void)
 	ASSERT(TestParse.IsValid());
 	#endif  // _DEBUG
 
-	gzFile gz = gzopen((FILE_IO_PREFIX + m_Path).c_str(), "wb");
-	if (gz != NULL)
+	cFile File;
+	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
 	{
-		gzwrite(gz, Writer.GetResult().data(), Writer.GetResult().size());
+		return false;
 	}
-	gzclose(gz);
+
+	AString Compressed;
+	int res = CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
+
+	if (res != Z_OK)
+	{
+		return false;
+	}
+
+	File.Write(Compressed.data(), Compressed.size());
+	File.Close();
 
 	return true;
 }
@@ -113,7 +103,8 @@ bool cScoreboardSerializer::Save(void)
 
 void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 {
-	a_Writer.BeginCompound("Data");
+	a_Writer.BeginCompound("data");
+
 	a_Writer.BeginList("Objectives", TAG_Compound);
 	
 	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
@@ -130,7 +121,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 		a_Writer.EndCompound();
 	}
 
-	a_Writer.EndList();
+	a_Writer.EndList(); // Objectives
 
 	a_Writer.BeginList("PlayerScores", TAG_Compound);
 
@@ -151,7 +142,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 		}
 	}
 
-	a_Writer.EndList();
+	a_Writer.EndList(); // PlayerScores
 
 	a_Writer.BeginList("Teams", TAG_Compound);
 	
@@ -182,8 +173,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 		a_Writer.EndCompound();
 	}
 
-	a_Writer.EndList();
-	a_Writer.EndCompound();
+	a_Writer.EndList(); // Teams
 
 	a_Writer.BeginCompound("DisplaySlots");
 
@@ -196,7 +186,9 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::E_DISPLAY_SLOT_NAME);
 	a_Writer.AddString("slot_2", (Objective == NULL) ? "" : Objective->GetName());
 
-	a_Writer.EndCompound();
+	a_Writer.EndCompound(); // DisplaySlots
+
+	a_Writer.EndCompound(); // Data
 }
 
 
@@ -205,7 +197,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 {
-	int Data = a_NBT.FindChildByName(0, "Data");
+	int Data = a_NBT.FindChildByName(0, "data");
 	if (Data < 0)
 	{
 		return false;
@@ -347,7 +339,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 		}
 	}
 
-	int DisplaySlots = a_NBT.FindChildByName(0, "DisplaySlots");
+	int DisplaySlots = a_NBT.FindChildByName(Data, "DisplaySlots");
 	if (DisplaySlots < 0)
 	{
 		return false;
