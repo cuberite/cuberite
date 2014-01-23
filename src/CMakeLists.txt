@@ -5,7 +5,7 @@ project (MCServer)
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
 
-set(FOLDERS OSSupport HTTPServer Bindings Items Blocks Protocol Generating) 
+set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating) 
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities)
 
 
@@ -97,6 +97,7 @@ else ()
 
 	# Add all subfolders as solution-folders:
 	list(APPEND FOLDERS "Resources")
+	list(APPEND FOLDERS "Bindings")
 	function(includefolder PATH)
 		FILE(GLOB FOLDER_FILES
 			"${PATH}/*.cpp"
