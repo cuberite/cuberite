@@ -183,7 +183,7 @@ void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 
 void cCommandBlockEntity::Execute()
 {
-	if (m_World)
+	if (m_World != NULL)
 	{
 		if (!m_World->AreCommandBlocksEnabled())
 		{
@@ -194,10 +194,10 @@ void cCommandBlockEntity::Execute()
 	class CommandBlockOutCb :
 		public cCommandOutputCallback
 	{
-		cCommandBlockEntity* m_CmdBlock;
+		cCommandBlockEntity * m_CmdBlock;
 
 	public:
-		CommandBlockOutCb(cCommandBlockEntity* a_CmdBlock) : m_CmdBlock(a_CmdBlock) {}
+		CommandBlockOutCb(cCommandBlockEntity * a_CmdBlock) : m_CmdBlock(a_CmdBlock) {}
 
 		virtual void Out(const AString & a_Text)
 		{
@@ -208,7 +208,7 @@ void cCommandBlockEntity::Execute()
 
 	LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
 
-	cServer* Server = cRoot::Get()->GetServer();
+	cServer * Server = cRoot::Get()->GetServer();
 
 	Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
 
