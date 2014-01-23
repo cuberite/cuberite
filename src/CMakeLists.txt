@@ -64,6 +64,8 @@ if (NOT MSVC)
 
 	target_link_libraries(Bindings lua sqlite tolualib)
 
+	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "Bindings.cpp Bindings.h")
+
 	foreach(folder ${FOLDERS})
 		add_subdirectory(${folder})
 	endforeach(folder)
