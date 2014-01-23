@@ -284,8 +284,6 @@ void cWindow::OpenedByPlayer(cPlayer & a_Player)
 
 bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 {
-    cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-
 	// Checks whether the player is still holding an item
 	if (a_Player.IsDraggingItem())
 	{
