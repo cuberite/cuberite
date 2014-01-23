@@ -18,7 +18,7 @@ if (NOT MSVC)
 	
 	set(BINDING_DEPENDECIES ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua)
 	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} toluaGlobals.h ChunkDef.h BiomeDef.h)
+	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} ChunkDef.h BiomeDef.h)
 	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} OSSupport/File.h Bindings/LuaFunctions.h)
 	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Bindings/PluginManager.h Bindings/Plugin.h)
 	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Bindings/PluginLua.h Bindings/WebPlugin.h)
@@ -45,17 +45,24 @@ if (NOT MSVC)
 	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockArea.h Generating/ChunkDesc.h)
 	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} CraftingRecipes.h UI/Window.h Mobs/Monster.h)
 	
+	include_directories(Bindings)
+	include_directories(.)
+	
 	ADD_CUSTOM_COMMAND(
 		# add any new generated bindings here
 		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
 	
 		# command execuded to regerate bindings
-		COMMAND tolua -L Bindings/virtual_method_hooks.lua -o Bindings/Bindings.cpp -H Bindings/Bindings.h Bindings/AllToLua.pkg
+		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 	
 		# add any new generation dependencies here
 		DEPENDS ${BINDING_DEPENDECIES}
 	)
+	#add cpp files here
+	add_library(Bindings Bindings/PluginManager Bindings/LuaState Bindings/WebPlugin Bindings/Bindings Bindings/ManualBindings Bindings/LuaWindow Bindings/Plugin Bindings/PluginLua Bindings/WebPlugin)
+
+	target_link_libraries(Bindings lua sqlite tolualib)
 
 	foreach(folder ${FOLDERS})
 		add_subdirectory(${folder})
