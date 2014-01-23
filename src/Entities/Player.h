@@ -214,7 +214,14 @@ public:
 	/// Returns the full color code to use for this player, based on their primary group or set in m_Color
 	AString GetColor(void) const;
 
-	void TossItem(bool a_bDraggingItem, char a_Amount = 1, short a_CreateType = 0, short a_CreateHealth = 0);
+	// tosses the item in the selected hotbar slot
+	void TossEquippedItem(char a_Amount = 1);
+
+	// tosses the item held in hand (when in UI windows)
+	void TossHeldItem(char a_Amount = 1);
+
+	// tosses a pickup newly created from a_Item
+	void TossPickup(const cItem & a_Item);
 
 	/// Heals the player by the specified amount of HPs (positive only); sends health update
 	void Heal(int a_Health);
