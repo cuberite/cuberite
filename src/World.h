@@ -296,6 +296,9 @@ public:
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be NULL. Returns true if sign text changed. Same as SetSignLines() */
 	bool UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);	// Exported in ManualBindings.cpp
 
+	/** Sets the command block command. Returns true if command changed. */
+	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);	// tolua_export
+
 	/** Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable. To be used only by cChunkStay! */
 	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
 	
@@ -511,6 +514,10 @@ public:
 
 	/// Returns the associated scoreboard instance
 	cScoreboard & GetScoreBoard(void) { return m_Scoreboard; }
+
+	bool AreCommandBlocksEnabled(void) const { return m_bCommandBlocksEnabled; }
+
+	void SetCommandBlocksEnabled(bool a_Flag) { m_bCommandBlocksEnabled = a_Flag; }
 	
 	// tolua_end
 
@@ -774,6 +781,8 @@ private:
 	bool m_IsPumpkinBonemealable;
 	bool m_IsSaplingBonemealable;
 	bool m_IsSugarcaneBonemealable;
+
+	bool m_bCommandBlocksEnabled;
 	
 	cCriticalSection m_CSFastSetBlock;
 	sSetBlockList    m_FastSetBlockQueue;

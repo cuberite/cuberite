@@ -151,9 +151,13 @@ void cCommandBlockEntity::SendTo(cClientHandle & a_Client)
 
 bool cCommandBlockEntity::LoadFromJson(const Json::Value & a_Value)
 {
-	m_Command = a_Value.get("Command", "").asString();
+	m_PosX = a_Value.get("x", 0).asInt();
+	m_PosY = a_Value.get("y", 0).asInt();
+	m_PosZ = a_Value.get("z", 0).asInt();
 
-	m_LastOutput = a_Value.get("LastOutput", "").asString();
+	m_Command    = a_Value.get("Command",     "").asString();
+	m_LastOutput = a_Value.get("LastOutput",  "").asString();
+	m_Result     = a_Value.get("SuccessCount", 0).asInt();
 
 	return true;
 }
@@ -164,9 +168,13 @@ bool cCommandBlockEntity::LoadFromJson(const Json::Value & a_Value)
 
 void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 {
-	a_Value["Command"] = m_Command;
+	a_Value["x"] = m_PosX;
+	a_Value["y"] = m_PosY;
+	a_Value["z"] = m_PosZ;
 
-	a_Value["LastOutput"] = m_LastOutput;
+	a_Value["Command"]      = m_Command;
+	a_Value["LastOutput"]   = m_LastOutput;
+	a_Value["SuccessCount"] = m_Result;
 }
 
 
@@ -175,6 +183,14 @@ void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 
 void cCommandBlockEntity::Execute()
 {
+	if (m_World)
+	{
+		if (!m_World->AreCommandBlocksEnabled())
+		{
+			return;
+		}
+	}
+
 	class CommandBlockOutCb :
 		public cCommandOutputCallback
 	{
@@ -185,8 +201,6 @@ void cCommandBlockEntity::Execute()
 
 		virtual void Out(const AString & a_Text)
 		{
-			ASSERT(m_CmdBlock != NULL);
-
 			// Overwrite field
 			m_CmdBlock->SetLastOutput(a_Text);
 		}

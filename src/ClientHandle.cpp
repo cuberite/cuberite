@@ -610,25 +610,18 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 		}
 	}
 
-	class cUpdateCommandBlock :
-		public cCommandBlockCallback
-	{
-		AString m_Command;
-	public:
-		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
-			
-		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
-		{
-			a_CommandBlock->SetCommand(m_Command);
-			return false;
-		}
-	} CmdBlockCB (Command);
-
 	cWorld * World = m_Player->GetWorld();
 
-	World->DoWithCommandBlockAt(BlockX, BlockY, BlockZ, CmdBlockCB);
+	if (World->AreCommandBlocksEnabled())
+	{
+		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
 
-	SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+		SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+	}
+	else
+	{
+		SendChat(Printf("%s[INFO]%s Command blocks are not enabled on this server", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+	}
 }
 
 
