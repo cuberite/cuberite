@@ -26,21 +26,20 @@ Declares the 1.7.x protocol classes:
 	#pragma warning(disable:4702)
 #endif
 
-#include "cryptopp/modes.h"
-#include "cryptopp/aes.h"
-
 #ifdef _MSC_VER
 	#pragma warning(pop)
 #endif
+
+#include "../Crypto.h"
 
 
 
 
 
 class cProtocol172 :
-	public cProtocol  // TODO
+	public cProtocol
 {
-	typedef cProtocol super;  // TODO
+	typedef cProtocol super;
 	
 public:
 
@@ -220,9 +219,9 @@ protected:
 	cByteBuffer m_OutPacketLenBuffer;
 	
 	bool m_IsEncrypted;
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor;
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
 	
+	cAESCFBDecryptor m_Decryptor;
+	cAESCFBEncryptor m_Encryptor;
 	
 	/// Adds the received (unencrypted) data to m_ReceivedData, parses complete packets
 	void AddReceivedData(const char * a_Data, int a_Size);

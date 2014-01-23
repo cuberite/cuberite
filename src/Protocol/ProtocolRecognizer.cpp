@@ -965,7 +965,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			m_Buffer.ResetRead();
 			if (m_Buffer.CanReadBytes(2))
 			{
-				byte val;
+				Byte val;
 				m_Buffer.ReadByte(val);  // Packet type - Serverlist ping
 				m_Buffer.ReadByte(val);  // 0x01 magic value
 				ASSERT(val == 0x01);

@@ -20,12 +20,11 @@
 	#pragma warning(disable:4702)
 #endif
 
-#include "cryptopp/modes.h"
-#include "cryptopp/aes.h"
-
 #ifdef _MSC_VER
 	#pragma warning(pop)
 #endif
+
+#include "../Crypto.h"
 
 
 
@@ -79,15 +78,14 @@ public:
 	
 protected:
 	bool m_IsEncrypted;
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor;
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
+	
+	cAESCFBDecryptor m_Decryptor;
+	cAESCFBEncryptor m_Encryptor;
+	
 	AString m_DataToSend;
 	
 	/// The ServerID used for session authentication; set in StartEncryption(), used in GetAuthServerID()
 	AString m_AuthServerID;
-	
-	/// The server's public key, as used by SendEncryptionKeyRequest() and StartEncryption()
-	AString m_ServerPublicKey;
 	
 	virtual void SendData(const char * a_Data, int a_Size) override;
 	
@@ -108,7 +106,7 @@ protected:
 	void HandleEncryptionKeyResponse(const AString & a_EncKey, const AString & a_EncNonce);
 	
 	/// Starts the symmetric encryption with the specified key; also sets m_AuthServerID
-	void StartEncryption(const byte * a_Key);
+	void StartEncryption(const Byte * a_Key);
 } ;
 
 
