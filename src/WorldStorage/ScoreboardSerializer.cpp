@@ -321,13 +321,13 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 		CurrLine = a_NBT.FindChildByName(Child, "AllowFriendlyFire");
 		if (CurrLine >= 0)
 		{
-			AllowsFriendlyFire = a_NBT.GetInt(CurrLine);
+			AllowsFriendlyFire = (a_NBT.GetInt(CurrLine) != 0);
 		}
 
 		CurrLine = a_NBT.FindChildByName(Child, "SeeFriendlyInvisibles");
 		if (CurrLine >= 0)
 		{
-			CanSeeFriendlyInvisible = a_NBT.GetInt(CurrLine);
+			CanSeeFriendlyInvisible = (a_NBT.GetInt(CurrLine) != 0);
 		}
 
 		cTeam * Team = m_ScoreBoard->RegisterTeam(Name, DisplayName, Prefix, Suffix);
