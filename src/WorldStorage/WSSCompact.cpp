@@ -10,6 +10,7 @@
 #include "json/json.h"
 #include "../StringCompression.h"
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
@@ -71,14 +72,15 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 	const char * SaveInto = NULL;
 	switch (a_BlockEntity->GetBlockType())
 	{
-		case E_BLOCK_CHEST:      SaveInto = "Chests";      break;
-		case E_BLOCK_DISPENSER:  SaveInto = "Dispensers";  break;
-		case E_BLOCK_DROPPER:    SaveInto = "Droppers";    break;
-		case E_BLOCK_FURNACE:    SaveInto = "Furnaces";    break;
-		case E_BLOCK_SIGN_POST:  SaveInto = "Signs";       break;
-		case E_BLOCK_WALLSIGN:   SaveInto = "Signs";       break;
-		case E_BLOCK_NOTE_BLOCK: SaveInto = "Notes";       break;
-		case E_BLOCK_JUKEBOX:    SaveInto = "Jukeboxes";   break;
+		case E_BLOCK_CHEST:         SaveInto = "Chests";        break;
+		case E_BLOCK_DISPENSER:     SaveInto = "Dispensers";    break;
+		case E_BLOCK_DROPPER:       SaveInto = "Droppers";      break;
+		case E_BLOCK_FURNACE:       SaveInto = "Furnaces";      break;
+		case E_BLOCK_SIGN_POST:     SaveInto = "Signs";         break;
+		case E_BLOCK_WALLSIGN:      SaveInto = "Signs";         break;
+		case E_BLOCK_NOTE_BLOCK:    SaveInto = "Notes";         break;
+		case E_BLOCK_JUKEBOX:       SaveInto = "Jukeboxes";     break;
+		case E_BLOCK_COMMAND_BLOCK: SaveInto = "CommandBlocks"; break;
 
 		default:
 		{
@@ -382,6 +384,26 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 				a_BlockEntities.push_back( JukeboxEntity );
 			}
 		}  // for itr - AllJukeboxes[]
+	}
+
+	// Load command blocks
+	Json::Value AllCommandBlocks = a_Value.get("CommandBlocks", Json::nullValue);
+	if( !AllCommandBlocks.empty() )
+	{
+		for( Json::Value::iterator itr = AllCommandBlocks.begin(); itr != AllCommandBlocks.end(); ++itr )
+		{
+			Json::Value & CommandBlock = *itr;
+			cCommandBlockEntity * CommandBlockEntity = new cCommandBlockEntity(0, 0, 0, a_World);
+			if ( !CommandBlockEntity->LoadFromJson( CommandBlock ) )
+			{
+				LOGERROR("ERROR READING COMMAND BLOCK FROM JSON!" );
+				delete CommandBlockEntity;
+			}
+			else
+			{
+				a_BlockEntities.push_back( CommandBlockEntity );
+			}
+		}  // for itr - AllCommandBlocks[]
 	}
 }
 

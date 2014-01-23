@@ -652,20 +652,21 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 		m_Writer.BeginList("TileEntities", TAG_Compound);
 	}
 	m_IsTagOpen = true;
-	
+
 	// Add tile-entity into NBT:
 	switch (a_Entity->GetBlockType())
 	{
-		case E_BLOCK_CHEST:         AddChestEntity     ((cChestEntity *)     a_Entity); break;
-		case E_BLOCK_DISPENSER:     AddDispenserEntity ((cDispenserEntity *) a_Entity); break;
-		case E_BLOCK_DROPPER:       AddDropperEntity   ((cDropperEntity *)   a_Entity); break;
-		case E_BLOCK_FURNACE:       AddFurnaceEntity   ((cFurnaceEntity *)   a_Entity); break;
-		case E_BLOCK_HOPPER:        AddHopperEntity    ((cHopperEntity *)    a_Entity); break;
+		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)        a_Entity); break;
+		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)    a_Entity); break;
+		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)      a_Entity); break;
+		case E_BLOCK_FURNACE:       AddFurnaceEntity     ((cFurnaceEntity *)      a_Entity); break;
+		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)       a_Entity); break;
 		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN:      AddSignEntity      ((cSignEntity *)      a_Entity); break;
-		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity      ((cNoteEntity *)      a_Entity); break;
-		case E_BLOCK_JUKEBOX:       AddJukeboxEntity   ((cJukeboxEntity *)   a_Entity); break;
+		case E_BLOCK_WALLSIGN:      AddSignEntity        ((cSignEntity *)         a_Entity); break;
+		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        ((cNoteEntity *)         a_Entity); break;
+		case E_BLOCK_JUKEBOX:       AddJukeboxEntity     ((cJukeboxEntity *)      a_Entity); break;
 		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity((cCommandBlockEntity *) a_Entity); break;
+
 		default:
 		{
 			ASSERT(!"Unhandled block entity saved into Anvil");
