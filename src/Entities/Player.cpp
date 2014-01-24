@@ -1345,20 +1345,20 @@ AString cPlayer::GetColor(void) const
 void cPlayer::TossEquippedItem(char a_Amount)
 {
 	cItems Drops;
-    	cItem DroppedItem(GetInventory().GetEquippedItem());
-    	if (!DroppedItem.IsEmpty())
-   	{
-        	char NewAmount = a_Amount;
-        	if (NewAmount > GetInventory().GetEquippedItem().m_ItemCount)
-        	{
-            		NewAmount = GetInventory().GetEquippedItem().m_ItemCount; // Drop only what's there
-        	}
+	cItem DroppedItem(GetInventory().GetEquippedItem());
+	if (!DroppedItem.IsEmpty())
+	{
+		char NewAmount = a_Amount;
+		if (NewAmount > GetInventory().GetEquippedItem().m_ItemCount)
+		{
+			NewAmount = GetInventory().GetEquippedItem().m_ItemCount; // Drop only what's there
+		}
 
-        	GetInventory().GetHotbarGrid().ChangeSlotCount(GetInventory().GetEquippedSlotNum() /* Returns hotbar subslot, which HotbarGrid takes */, -a_Amount);
+		GetInventory().GetHotbarGrid().ChangeSlotCount(GetInventory().GetEquippedSlotNum() /* Returns hotbar subslot, which HotbarGrid takes */, -a_Amount);
 
-        	DroppedItem.m_ItemCount = NewAmount;
-        	Drops.push_back(DroppedItem);
-    	}
+		DroppedItem.m_ItemCount = NewAmount;
+		Drops.push_back(DroppedItem);
+	}
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
@@ -1373,24 +1373,24 @@ void cPlayer::TossEquippedItem(char a_Amount)
 void cPlayer::TossHeldItem(char a_Amount)
 {
 	cItems Drops;
-    	cItem & Item = GetDraggingItem();
-    	if (!Item.IsEmpty())
-    	{
-        	char OriginalItemAmount = Item.m_ItemCount;
-        	Item.m_ItemCount = std::min(OriginalItemAmount, a_Amount);
-        	Drops.push_back(Item);
-        	if (OriginalItemAmount > a_Amount)
-        	{
-            		Item.m_ItemCount = OriginalItemAmount - a_Amount;
-        	}
-        	else
-        	{
-            		Item.Empty();
-        	}
-    	}
+	cItem & Item = GetDraggingItem();
+	if (!Item.IsEmpty())
+	{
+		char OriginalItemAmount = Item.m_ItemCount;
+		Item.m_ItemCount = std::min(OriginalItemAmount, a_Amount);
+		Drops.push_back(Item);
+		if (OriginalItemAmount > a_Amount)
+		{
+			Item.m_ItemCount = OriginalItemAmount - a_Amount;
+		}
+		else
+		{
+			Item.Empty();
+		}
+	}
 
-   	double vX = 0, vY = 0, vZ = 0;
-    	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
+	double vX = 0, vY = 0, vZ = 0;
+	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
@@ -1402,7 +1402,7 @@ void cPlayer::TossHeldItem(char a_Amount)
 void cPlayer::TossPickup(const cItem & a_Item)
 {
 	cItems Drops;
-    	Drops.push_back(a_Item);
+	Drops.push_back(a_Item);
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
