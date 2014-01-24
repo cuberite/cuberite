@@ -1563,7 +1563,7 @@ void cProtocol172::HandlePacketEnchanting(cByteBuffer & a_ByteBuffer)
 	m_Client->GetPlayer()->GetWindow()->SetSlot(*m_Client->GetPlayer(), 0, EnchantItem);
 
 	LOGWARN("Item enchanted!");
-	
+
 }
 
 
