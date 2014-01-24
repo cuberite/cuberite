@@ -236,8 +236,8 @@ int main( int argc, char **argv )
 	for (int i = 0; i < argc; i++)
 	{
 		if (
-			(_stricmp(argv[i], "/commlog") == 0) ||
-			(_stricmp(argv[i], "/logcomm") == 0)
+			(NoCaseCompare(argv[i], "/commlog") == 0) ||
+			(NoCaseCompare(argv[i], "/logcomm") == 0)
 		)
 		{
 			g_ShouldLogComm = true;
