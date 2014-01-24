@@ -1389,8 +1389,8 @@ void cPlayer::TossHeldItem(char a_Amount)
         	}
     	}
 
-	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
+    double vX = 0, vY = 0, vZ = 0;
+    EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
@@ -1402,7 +1402,7 @@ void cPlayer::TossHeldItem(char a_Amount)
 void cPlayer::TossPickup(const cItem & a_Item)
 {
 	cItems Drops;
-    	Drops.push_back(a_Item);
+    Drops.push_back(a_Item);
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);

@@ -171,7 +171,6 @@ void cWindow::Clicked(
 )
 {
     cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-
 	if (a_WindowID != m_WindowID)
 	{
 		LOGWARNING("%s: Wrong window ID (exp %d, got %d) received from \"%s\"; ignoring click.", __FUNCTION__, m_WindowID, a_WindowID, a_Player.GetName().c_str());
@@ -182,16 +181,15 @@ void cWindow::Clicked(
 	{
 		case caRightClickOutside:
 		{
-			if (PlgMgr->CallHookPlayerTossingItem(a_Player))
+            if (PlgMgr->CallHookPlayerTossingItem(a_Player))
 			{
 			 	// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 			 	return;
 			}
-            
-            		if (a_Player.IsGameModeCreative())
-            		{
-                		a_Player.TossPickup(a_ClickedItem);
-            		}
+                if (a_Player.IsGameModeCreative())
+                {
+                    a_Player.TossPickup(a_ClickedItem);
+                }
 
 			// Toss one of the dragged items:
 			a_Player.TossHeldItem();
@@ -205,10 +203,10 @@ void cWindow::Clicked(
 			 	return;
 			}
 
-            		if (a_Player.IsGameModeCreative())
-            		{
-                		a_Player.TossPickup(a_ClickedItem);
-            		}
+                if (a_Player.IsGameModeCreative())
+                {
+                    a_Player.TossPickup(a_ClickedItem);
+                }
 
 			// Toss all dragged items:
 			a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
@@ -288,7 +286,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	if (a_Player.IsDraggingItem())
 	{
         LOGD("Player holds item! Dropping it...");
-		a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
+        a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
 	}
 
 	cClientHandle * ClientHandle = a_Player.GetClientHandle();
