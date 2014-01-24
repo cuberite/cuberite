@@ -657,7 +657,8 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
 			}
-			m_Player->TossItem(false);
+
+			m_Player->TossEquippedItem();
 			return;
 		}
 
@@ -712,7 +713,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
 			}
-			m_Player->TossItem(false, 64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
+			m_Player->TossEquippedItem(64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
 			return;
 		}
 
