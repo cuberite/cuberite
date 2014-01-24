@@ -108,7 +108,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		m_bMovingToDestination = false;
 	}
 
-	cPlayer * a_Closest_Player = FindClosestPlayer();
+	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), m_SightDistance);
 	if (a_Closest_Player != NULL)
 	{
 		switch (a_Closest_Player->GetEquippedItem().m_ItemType)
