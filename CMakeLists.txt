@@ -1,4 +1,3 @@
-
 cmake_minimum_required (VERSION 2.6)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
@@ -89,12 +88,6 @@ else()
 	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -w")
 	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -w")
 	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -w")
-endif()
-
-
-# Under clang, we need to disable ASM support in CryptoPP:
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_definitions(-DCRYPTOPP_DISABLE_ASM)
 endif()
 
 
