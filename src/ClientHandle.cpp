@@ -148,15 +148,6 @@ cClientHandle::~cClientHandle()
 		SendDisconnect("Server shut down? Kthnxbai");
 	}
 	
-	// Queue all remaining outgoing packets to cSocketThreads:
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		AString Data;
-		m_OutgoingData.ReadAll(Data);
-		m_OutgoingData.CommitRead();
-		cRoot::Get()->GetServer()->WriteToClient(this, Data);
-	}
-	
 	// Close the socket as soon as it sends all outgoing data:
 	cRoot::Get()->GetServer()->RemoveClient(this);
 	
