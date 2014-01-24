@@ -576,7 +576,7 @@ cSlotAreaTemporary(a_NumSlots, a_ParentWindow)
 
 void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
-	LOG("Clicked");
+	LOGWARN("Clicked");
 	// Check if Slot is in the Enchantment Table
 	if (a_SlotNum == 0)
 	{
@@ -610,28 +610,28 @@ void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 {
-	LOG("Click!");
+	LOGWARN("Click!");
 
 	if (a_Player.GetDraggingItem().IsEmpty())
 	{
-		LOG("EMPTY");
-		this->m_ParentWindow.SetProperty(0, NULL);
-		this->m_ParentWindow.SetProperty(1, NULL);
-		this->m_ParentWindow.SetProperty(2, NULL);
+		LOGWARN("EMPTY");
+		this->m_ParentWindow.SetProperty(0, 0);
+		this->m_ParentWindow.SetProperty(1, 0);
+		this->m_ParentWindow.SetProperty(2, 0);
 	}
 	else if (a_Player.GetDraggingItem().IsEnchantable)
 	{
-		LOG("Enchantable");
+		LOGWARN("Enchantable");
 		this->m_ParentWindow.SetProperty(0, 30);
 		this->m_ParentWindow.SetProperty(1, 20);
 		this->m_ParentWindow.SetProperty(2, 10);
 	}
 	else
 	{
-		LOG("Not Enchantable");
-		this->m_ParentWindow.SetProperty(0, NULL);
-		this->m_ParentWindow.SetProperty(1, NULL);
-		this->m_ParentWindow.SetProperty(2, NULL);
+		LOGWARN("Not Enchantable");
+		this->m_ParentWindow.SetProperty(0, 0);
+		this->m_ParentWindow.SetProperty(1, 0);
+		this->m_ParentWindow.SetProperty(2, 0);
 	}
 }
 
@@ -641,7 +641,7 @@ void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 
 void cSlotAreaEnchanting::ShiftClickedResult(cPlayer & a_Player)
 {
-	LOG("Shift Click!");
+	LOGWARN("Shift Click!");
 }
 
 

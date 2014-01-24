@@ -785,7 +785,7 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 // cEnchantingWindow:
 
 cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
-cWindow(wtEnchantment, "Enchantment Table")
+cWindow(wtEnchantment, "Enchant")
 {
 	m_SlotAreas.push_back(new cSlotAreaEnchanting(1, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
