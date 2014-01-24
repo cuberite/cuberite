@@ -30,15 +30,18 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSkeleton::MoveToPosition(const Vector3f & a_Position)
 {
-	m_Destination = a_Position;
-
 	// If the destination is in the sun and if it is not night AND the skeleton isn't on fire then block the movement.
-	if (!IsOnFire() && m_World->GetTimeOfDay() < 13187 && m_World->GetBlockSkyLight((int) a_Position.x, (int) a_Position.y, (int) a_Position.z) == 15)
+	if (
+		!IsOnFire() &&
+		(m_World->GetTimeOfDay() < 13187) &&
+		(m_World->GetBlockSkyLight((int) a_Position.x, (int) a_Position.y, (int) a_Position.z) == 15)
+		)
 	{
 		m_bMovingToDestination = false;
 		return;
 	}
-	m_bMovingToDestination = true;
+
+	super::MoveToPosition(a_Position);
 }
 
 
