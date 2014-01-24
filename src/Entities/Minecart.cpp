@@ -474,7 +474,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			}
 			break;
 		}
-		case E_META_RAIL_ASCEND_XM:
+		case E_META_RAIL_ASCEND_XM: // ASCEND EAST
 		{
 			SetYaw(180);
 			SetSpeedZ(0);
@@ -483,14 +483,74 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			{
 				if (GetSpeedX() <= MAX_SPEED)
 				{
-					AddSpeedX(1);
+					AddSpeedX(AccelDecelSpeed);
 					SetSpeedY(-GetSpeedX());
 				}
 			}
 			else
 			{
-				AddSpeedX(-1);
+				AddSpeedX(AccelDecelNegSpeed);
 				SetSpeedY(-GetSpeedX());
+			}
+			break;
+		}		
+		case E_META_RAIL_ASCEND_XP: // ASCEND WEST
+		{
+			SetYaw(180);
+			SetSpeedZ(0);
+
+			if (GetSpeedX() > 0)
+			{
+				AddSpeedX(AccelDecelSpeed);
+				SetSpeedY(GetSpeedX());
+			}
+			else
+			{
+				if (GetSpeedX() >= MAX_SPEED_NEGATIVE)
+				{
+					AddSpeedX(AccelDecelNegSpeed);
+					SetSpeedY(GetSpeedX());
+				}
+			}
+			break;
+		}			
+		case E_META_RAIL_ASCEND_ZM: // ASCEND NORTH
+		{
+			SetYaw(270);
+			SetSpeedX(0);
+
+			if (GetSpeedZ() >= 0)
+			{
+				if (GetSpeedZ() <= MAX_SPEED)
+				{
+					AddSpeedZ(AccelDecelSpeed);
+					SetSpeedY(-GetSpeedZ());
+				}
+			}
+			else
+			{
+				AddSpeedZ(AccelDecelNegSpeed);
+				SetSpeedY(-GetSpeedZ());
+			}
+			break;
+		}
+		case E_META_RAIL_ASCEND_ZP: // ASCEND SOUTH
+		{
+			SetYaw(270);
+			SetSpeedX(0);
+
+			if (GetSpeedZ() > 0)
+			{
+				AddSpeedZ(AccelDecelSpeed);
+				SetSpeedY(GetSpeedZ());
+			}
+			else
+			{
+				if (GetSpeedZ() >= MAX_SPEED_NEGATIVE)
+				{
+					AddSpeedZ(AccelDecelNegSpeed);
+					SetSpeedY(GetSpeedZ());
+				}
 			}
 			break;
 		}
