@@ -11,7 +11,6 @@
 #include "../MonsterConfig.h"
 #include "../MersenneTwister.h"
 
-#include "../Tracer.h"
 #include "../Chunk.h"
 #include "../FastRandom.h"
 
@@ -506,17 +505,10 @@ void cMonster::CheckEventSeePlayer(void)
 
 
 void cMonster::CheckEventLostPlayer(void)
-{
-	Vector3f pos;
-	cTracer LineOfSight(GetWorld());
-	
+{	
 	if (m_Target != NULL)
 	{
-		pos = m_Target->GetPosition();
-		if (
-			((pos - GetPosition()).Length() > m_SightDistance) || 
-			LineOfSight.Trace(Vector3d(GetPosX(), GetPosY() + 1, GetPosZ()), (pos - GetPosition()), (int)(pos - GetPosition()).Length())
-			)
+		if ((m_Target->GetPosition() - GetPosition()).Length() > m_SightDistance)
 		{
 			EventLosePlayer();
 		}
