@@ -1926,14 +1926,19 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 	double Speed[3];
 	if (!LoadDoublesListFromNBT(Speed, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "Motion")))
 	{
-		return false;
+		// Provide default speed:
+		Speed[0] = 0;
+		Speed[1] = 0;
+		Speed[2] = 0;
 	}
 	a_Entity.SetSpeed(Speed[0], Speed[1], Speed[2]);
 	
 	double Rotation[3];
 	if (!LoadDoublesListFromNBT(Rotation, 2, a_NBT, a_NBT.FindChildByName(a_TagIdx, "Rotation")))
 	{
-		return false;
+		// Provide default rotation:
+		Rotation[0] = 0;
+		Rotation[1] = 0;
 	}
 	a_Entity.SetYaw(Rotation[0]);
 	a_Entity.SetRoll(Rotation[1]);
