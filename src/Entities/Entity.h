@@ -4,6 +4,7 @@
 #include "../Item.h"
 #include "../Vector3d.h"
 #include "../Vector3f.h"
+#include "../Vector3i.h"
 
 
 
@@ -33,7 +34,6 @@
 
 
 class cWorld;
-class cReferenceManager;
 class cClientHandle;
 class cPlayer;
 class cChunk;
@@ -373,9 +373,6 @@ protected:
 	/// The entity which is attached to this entity (rider), NULL if none
 	cEntity * m_Attachee;
 
-	cReferenceManager* m_Referencers;
-	cReferenceManager* m_References;
-
 	// Flags that signal that we haven't updated the clients with the latest.
 	bool     m_bDirtyHead;
 	bool     m_bDirtyOrientation;
@@ -415,11 +412,6 @@ protected:
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
-	
-	friend class cReferenceManager;
-	void AddReference( cEntity*& a_EntityPtr );
-	void ReferencedBy( cEntity*& a_EntityPtr );
-	void Dereference( cEntity*& a_EntityPtr );
 	
 private:
 	// Measured in degrees, [-180, +180)

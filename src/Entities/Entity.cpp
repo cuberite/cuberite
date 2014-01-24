@@ -4,9 +4,7 @@
 #include "../World.h"
 #include "../Server.h"
 #include "../Root.h"
-#include "../Vector3d.h"
 #include "../Matrix4f.h"
-#include "../ReferenceManager.h"
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "../Simulator/FluidSimulator.h"
@@ -32,8 +30,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_MaxHealth(1)
 	, m_AttachedTo(NULL)
 	, m_Attachee(NULL)
-	, m_Referencers(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCERS))
-	, m_References(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCES))
 	, m_bDirtyHead(true)
 	, m_bDirtyOrientation(true)
 	, m_bDirtyPosition(true)
@@ -100,8 +96,6 @@ cEntity::~cEntity()
 		LOGWARNING("ERROR: Entity deallocated without being destroyed");
 		ASSERT(!"Entity deallocated without being destroyed or unlinked");
 	}
-	delete m_Referencers;
-	delete m_References;
 }
 
 
@@ -1425,36 +1419,6 @@ void cEntity::SetPosZ(double a_PosZ)
 {
 	m_Pos.z = a_PosZ;
 	m_bDirtyPosition = true;
-}
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
-// Reference stuffs
-void cEntity::AddReference(cEntity * & a_EntityPtr)
-{
-	m_References->AddReference(a_EntityPtr);
-	a_EntityPtr->ReferencedBy(a_EntityPtr);
-}
-
-
-
-
-
-void cEntity::ReferencedBy(cEntity * & a_EntityPtr)
-{
-	m_Referencers->AddReference(a_EntityPtr);
-}
-
-
-
-
-
-void cEntity::Dereference(cEntity * & a_EntityPtr)
-{
-	m_Referencers->Dereference(a_EntityPtr);
 }
 
 
