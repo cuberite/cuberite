@@ -243,7 +243,8 @@ void cConnection::Run(void)
 		FD_ZERO(&ReadFDs);
 		FD_SET(m_ServerSocket, &ReadFDs);
 		FD_SET(m_ClientSocket, &ReadFDs);
-		int res = select(2, &ReadFDs, NULL, NULL, NULL);
+		SOCKET MaxSocket = std::max(m_ServerSocket, m_ClientSocket);
+		int res = select(MaxSocket + 1, &ReadFDs, NULL, NULL, NULL);
 		if (res <= 0)
 		{
 			printf("select() failed: %d; aborting client", SocketError);
