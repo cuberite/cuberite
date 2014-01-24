@@ -6,19 +6,13 @@
 #endif
 
 #include "Pickup.h"
-#include "../ClientHandle.h"
-#include "../Inventory.h"
-#include "../World.h"
-#include "../Simulator/FluidSimulator.h"
-#include "../Server.h"
 #include "Player.h"
+#include "../ClientHandle.h"
+#include "../World.h"
+#include "../Server.h"
 #include "../Bindings/PluginManager.h"
-#include "../Item.h"
 #include "../Root.h"
 #include "../Chunk.h"
-
-#include "../Vector3d.h"
-#include "../Vector3f.h"
 
 
 
@@ -26,10 +20,10 @@
 
 cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
-	, m_Timer( 0.f )
+	, m_Timer(0.f)
 	, m_Item(a_Item)
-	, m_bCollected( false )
-	, m_bIsPlayerCreated( IsPlayerCreated )
+	, m_bCollected(false)
+	, m_bIsPlayerCreated(IsPlayerCreated)
 {
 	SetGravity(-10.5f);
 	SetMaxHealth(5);

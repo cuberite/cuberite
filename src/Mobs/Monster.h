@@ -168,6 +168,11 @@ protected:
 		If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
 		If current Y is solid, goes up to find first nonsolid block, and returns that */
 	int FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ);
+	/** Returns if a monster can actually reach a given height by jumping */
+	inline bool IsNextYPosReachable(int a_PosY)
+	{
+		return (a_PosY > (int)floor(GetPosY())) && (a_PosY == (int)floor(GetPosY()) + 1);
+	}
 
 	/** A semi-temporary list to store the traversed coordinates during active pathfinding so we don't visit them again */
 	std::vector<Vector3i> m_TraversedCoordinates;
@@ -188,14 +193,9 @@ protected:
 
 	/* ===========================*/
 
-	float m_AttackRate;
-	float m_IdleInterval;
-
 	
-	bool m_bPassiveAggressive;
 
-	float m_DestinationTime;
-
+	float m_IdleInterval;
 	float m_DestroyTimer;
 
 	eType m_MobType;
@@ -203,20 +203,16 @@ protected:
 	AString m_SoundHurt;
 	AString m_SoundDeath;
 
+	float m_AttackRate;	
 	int m_AttackDamage;
 	int m_AttackRange;
 	float m_AttackInterval;
 	int m_SightDistance;
 	
+	void HandleDaylightBurning(cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
 
-	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
-	
-	void HandleDaylightBurning(cChunk & a_Chunk);
-	inline bool IsNextYPosReachable(int a_PosY)
-	{
-		return (a_PosY > (int)floor(GetPosY())) && (a_PosY == (int)floor(GetPosY()) + 1);
-	}
+	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);	
 
 } ; // tolua_export
 

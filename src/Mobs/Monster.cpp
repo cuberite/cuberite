@@ -74,13 +74,12 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_AttackRate(3)
 	, m_IdleInterval(0)
 	, m_bMovingToDestination(false)
-	, m_DestinationTime( 0 )
-	, m_DestroyTimer( 0 )
+	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
-	, m_AttackDamage(1.0f)
-	, m_AttackRange(2.0f)
+	, m_AttackDamage(1)
+	, m_AttackRange(2)
 	, m_AttackInterval(0)
 	, m_BurnsInDaylight(false)
 {
@@ -492,7 +491,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 void cMonster::CheckEventSeePlayer(void)
 {
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
-	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), m_SightDistance);
+	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
 
 	if (Closest != NULL)
 	{
