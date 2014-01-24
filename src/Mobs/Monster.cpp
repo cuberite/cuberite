@@ -249,6 +249,9 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if ((m_Target != NULL) && m_Target->IsDestroyed())
+		m_Target = NULL;
+
 	// Burning in daylight
 	HandleDaylightBurning(a_Chunk);
 

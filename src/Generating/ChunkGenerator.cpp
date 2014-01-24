@@ -201,7 +201,7 @@ void cChunkGenerator::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
-		while (m_Queue.size() == 0)
+		while (m_Queue.empty())
 		{
 			if ((NumChunksGenerated > 16) && (clock() - LastReportTick > CLOCKS_PER_SEC))
 			{
@@ -219,6 +219,11 @@ void cChunkGenerator::Execute(void)
 			NumChunksGenerated = 0;
 			GenerationStart = clock();
 			LastReportTick = clock();
+		}
+
+		if (m_Queue.empty())
+		{
+			continue;
 		}
 
 		cChunkCoords coords = m_Queue.front();		// Get next coord from queue
