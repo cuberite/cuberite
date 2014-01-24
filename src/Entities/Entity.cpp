@@ -57,6 +57,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Mass (0.001)  // Default 1g
 	, m_Width(a_Width)
 	, m_Height(a_Height)
+	, m_IsSubmerged(false)
+	, m_IsSwimming(false)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
@@ -529,7 +531,17 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		TickInVoid(a_Chunk);
 	}
-	else { m_TicksSinceLastVoidDamage = 0; }
+	else
+		m_TicksSinceLastVoidDamage = 0;
+
+	if (IsMob() || IsPlayer())
+	{
+		// Set swimming state
+		SetSwimState(a_Chunk);
+
+		// Handle drowning
+		HandleAir();
+	}
 }
 
 
@@ -900,6 +912,87 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 	else
 	{
 		m_TicksSinceLastVoidDamage++;
+	}
+}
+
+
+
+
+
+void cEntity::SetSwimState(cChunk & a_Chunk)
+{
+	int RelY = (int)floor(m_LastPosY + 0.1);
+	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
+	{
+		m_IsSwimming = false;
+		m_IsSubmerged = false;
+		return;
+	}
+
+	BLOCKTYPE BlockIn;
+	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
+
+	// Check if the player is swimming:
+	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
+	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
+	{
+		// This sometimes happens on Linux machines
+		// Ref.: http://forum.mc-server.org/showthread.php?tid=1244
+		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, LastPos = {%.02f, %.02f}, Pos = %.02f, %.02f}",
+			RelX, RelY, m_LastPosX, m_LastPosZ, GetPosX(), GetPosZ()
+			);
+		m_IsSwimming = false;
+		m_IsSubmerged = false;
+		return;
+	}
+	m_IsSwimming = IsBlockWater(BlockIn);
+
+	// Check if the player is submerged:
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
+	m_IsSubmerged = IsBlockWater(BlockIn);
+}
+
+
+
+
+
+void cEntity::HandleAir(void)
+{
+	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
+	// See if the entity is /submerged/ water (block above is water)
+	// Get the type of block the entity is standing in:
+
+	if (IsSubmerged())
+	{
+		SetSpeedY(1); // Float in the water
+
+		// Either reduce air level or damage player
+		if (m_AirLevel < 1)
+		{
+			if (m_AirTickTimer < 1)
+			{
+				// Damage player 
+				TakeDamage(dtDrowning, NULL, 1, 1, 0);
+				// Reset timer
+				m_AirTickTimer = DROWNING_TICKS;
+			}
+			else
+			{
+				m_AirTickTimer -= 1;
+			}
+		}
+		else
+		{
+			// Reduce air supply
+			m_AirLevel -= 1;
+		}
+	}
+	else
+	{
+		// Set the air back to maximum
+		m_AirLevel = MAX_AIR_LEVEL;
+		m_AirTickTimer = DROWNING_TICKS;
 	}
 }
 
