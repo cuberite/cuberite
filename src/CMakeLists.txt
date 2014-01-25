@@ -16,34 +16,64 @@ if (NOT MSVC)
 	
 	#lib dependecies are not included
 	
-	set(BINDING_DEPENDECIES ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} ChunkDef.h BiomeDef.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} OSSupport/File.h Bindings/LuaFunctions.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Bindings/PluginManager.h Bindings/Plugin.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Bindings/PluginLua.h Bindings/WebPlugin.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Bindings/LuaWindow.h BlockID.h StringUtils.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Defines.h ChatColor.h ClientHandle.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Entities/Entity.h Entities/Floater.h )
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Entities/Pawn.h Entities/Player.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Entities/Pickup.h Entities/ProjectileEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Entities/TNTEntity.h Entities/Effects.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Server.h World.h Inventory.h Enchantments.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Item.h ItemGrid.h BlockEntities/BlockEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/BlockEntityWithItems.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/ChestEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/DropSpenserEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/DispenserEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/DropperEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/FurnaceEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/HopperEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/JukeboxEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/NoteEntity.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockEntities/SignEntity.h WebAdmin.h Root.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Vector3f.h Vector3d.h Vector3i.h Matrix4f.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} Cuboid.h BoundingBox.h Tracer.h Group.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} BlockArea.h Generating/ChunkDesc.h)
-	set(BINDING_DEPENDECIES ${BINDING_DEPENDECIES} CraftingRecipes.h UI/Window.h Mobs/Monster.h)
+	set(BINDING_DEPENDECIES
+		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
+		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
+		ChunkDef.h
+		BiomeDef.h
+		OSSupport/File.h
+		Bindings/LuaFunctions.h
+		Bindings/PluginManager.h
+		Bindings/Plugin.h
+		Bindings/PluginLua.h
+		Bindings/WebPlugin.h
+		Bindings/LuaWindow.h
+		BlockID.h
+		StringUtils.h
+		Defines.h
+		ChatColor.h
+		ClientHandle.h
+		Entities/Entity.h
+		Entities/Floater.h
+		Entities/Pawn.h
+		Entities/Player.h
+		Entities/Pickup.h
+		Entities/ProjectileEntity.h
+		Entities/TNTEntity.h
+		Entities/Effects.h
+		Server.h
+		World.h
+		Inventory.h
+		Enchantments.h
+		Item.h
+		ItemGrid.h
+		BlockEntities/BlockEntity.h
+		BlockEntities/BlockEntityWithItems.h
+		BlockEntities/ChestEntity.h
+		BlockEntities/DropSpenserEntity.h
+		BlockEntities/DispenserEntity.h
+		BlockEntities/DropperEntity.h
+		BlockEntities/FurnaceEntity.h
+		BlockEntities/HopperEntity.h
+		BlockEntities/JukeboxEntity.h
+		BlockEntities/NoteEntity.h
+		BlockEntities/SignEntity.h
+		WebAdmin.h
+		Root.h
+		Vector3f.h
+		Vector3d.h
+		Vector3i.h
+		Matrix4f.h
+		Cuboid.h
+		BoundingBox.h
+		Tracer.h
+		Group.h
+		BlockArea.h
+		Generating/ChunkDesc.h
+		CraftingRecipes.h
+		UI/Window.h
+		Mobs/Monster.h
+	)
 	
 	include_directories(Bindings)
 	include_directories(.)
@@ -63,6 +93,13 @@ if (NOT MSVC)
 	add_library(Bindings Bindings/PluginManager Bindings/LuaState Bindings/WebPlugin Bindings/Bindings Bindings/ManualBindings Bindings/LuaWindow Bindings/Plugin Bindings/PluginLua Bindings/WebPlugin)
 
 	target_link_libraries(Bindings lua sqlite tolualib)
+
+	#clear file
+	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
+	foreach(dependecy ${BINDING_DEPENDECIES})
+		#write each dependecy on a seperate line
+		file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt "${dependecy}\n")
+	endforeach()
 
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "Bindings.cpp Bindings.h")
 
