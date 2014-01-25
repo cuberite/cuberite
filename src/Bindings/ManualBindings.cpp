@@ -2308,12 +2308,12 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);
 		tolua_endmodule(tolua_S);
 		
-		tolua_beginmodule(tolua_S, "cHopperEntity");
+		tolua_beginmodule(tolua_S, "cBlockArea");
 			tolua_function(tolua_S, "LoadFromSchematicFile", tolua_cBlockArea_LoadFromSchematicFile);
 			tolua_function(tolua_S, "SaveToSchematicFile", tolua_cBlockArea_SaveToSchematicFile);
 		tolua_endmodule(tolua_S);
 		
-		tolua_beginmodule(tolua_S, "cBlockArea");
+		tolua_beginmodule(tolua_S, "cHopperEntity");
 			tolua_function(tolua_S, "GetOutputBlockPos", tolua_cHopperEntity_GetOutputBlockPos);
 		tolua_endmodule(tolua_S);
 		
