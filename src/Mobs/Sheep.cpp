@@ -13,7 +13,8 @@
 cSheep::cSheep(int a_Color) :
 	super("Sheep", mtSheep, "mob.sheep.say", "mob.sheep.say", 0.6, 1.3),
 	m_IsSheared(false),
-	m_WoolColor(a_Color)
+	m_WoolColor(a_Color),
+	m_TimeToStopEating(-1)
 {
 }
 
@@ -58,5 +59,41 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
 		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	// The sheep should not move when he's eating so only handle the physics.
+	if (m_TimeToStopEating > 0)
+	{
+		HandlePhysics(a_Dt, a_Chunk);
+		m_TimeToStopEating--;
+		if (m_TimeToStopEating == 0)
+		{
+			if (m_World->GetBlock((int) GetPosX(), (int) GetPosY() - 1, (int) GetPosZ()) == E_BLOCK_GRASS)
+			{
+				// The sheep ate the grass so we change it to dirt.
+				m_World->SetBlock((int) GetPosX(), (int) GetPosY() - 1, (int) GetPosZ(), E_BLOCK_DIRT, 0);
+				m_IsSheared = false;
+				m_World->BroadcastEntityMetadata(*this);
+			}
+		}
+	}
+	else
+	{
+		super::Tick(a_Dt, a_Chunk);
+		if (m_World->GetTickRandomNumber(600) == 1)
+		{
+			if (m_World->GetBlock((int) GetPosX(), (int) GetPosY() - 1, (int) GetPosZ()) == E_BLOCK_GRASS)
+			{
+				m_World->BroadcastEntityStatus(*this, 10);
+				m_TimeToStopEating = 40;
+			}
+		}
 	}
 }
