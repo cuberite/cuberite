@@ -620,7 +620,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 	}
 	else
 	{
-		SendChat(Printf("%s[INFO]%s Command blocks are not enabled on this server", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+		SendChat(Printf("%s[INFO]%s Command blocks are not enabled on this server", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
 	}
 }
 

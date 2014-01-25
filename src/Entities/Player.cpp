@@ -463,10 +463,8 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 		if (Damage > 0)
 		{
-			if (!IsGameModeCreative())
-			{
-				TakeDamage(dtFalling, NULL, Damage, Damage, 0);
-			}
+			// cPlayer makes sure damage isn't applied in creative, no need to check here
+			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 			
 			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
@@ -790,7 +788,7 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		if (IsGameModeCreative())
 		{
-			// No damage / health in creative mode
+			// No damage / health in creative mode if not void damage
 			return;
 		}
 	}
