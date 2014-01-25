@@ -222,6 +222,10 @@ protected:
 	
 	cAESCFBDecryptor m_Decryptor;
 	cAESCFBEncryptor m_Encryptor;
+
+	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
+	cFile m_CommLogFile;
+	
 	
 	/// Adds the received (unencrypted) data to m_ReceivedData, parses complete packets
 	void AddReceivedData(const char * a_Data, int a_Size);

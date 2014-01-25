@@ -53,6 +53,16 @@ Implements the 1.7.x protocol classes:
 
 
 
+// fwd: main.cpp:
+extern bool g_ShouldLogComm;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol172:
+
 cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client),
 	m_ServerAddress(a_ServerAddress),
@@ -63,6 +73,13 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
 	m_IsEncrypted(false)
 {
+	// Create the comm log file, if so requested:
+	if (g_ShouldLogComm)
+	{
+		cFile::CreateFolder("CommLogs");
+		AString FileName = Printf("CommLogs/%x__%s.log", (unsigned)time(NULL), a_Client->GetIPString().c_str());
+		m_CommLogFile.Open(FileName, cFile::fmWrite);
+	}
 }
 
 
@@ -1065,6 +1082,29 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 {
+	// Write the incoming data into the comm log file:
+	if (g_ShouldLogComm)
+	{
+		if (m_ReceivedData.GetReadableSpace() > 0)
+		{
+			AString AllData;
+			int OldReadableSpace = m_ReceivedData.GetReadableSpace();
+			m_ReceivedData.ReadAll(AllData);
+			m_ReceivedData.ResetRead();
+			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
+			AString Hex;
+			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+			m_CommLogFile.Printf("Incoming data, %d (0x%x) bytes unparsed already present in buffer:\n%s\n",
+				AllData.size(), AllData.size(), Hex.c_str()
+			);
+		}
+		AString Hex;
+		CreateHexDump(Hex, a_Data, a_Size, 16);
+		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
+			a_Size, a_Size, Hex.c_str()
+		);
+	}
+	
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
@@ -1100,6 +1140,22 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			return;
 		}
 
+		// Log the packet info into the comm log file:
+		if (g_ShouldLogComm)
+		{
+			AString PacketData;
+			bb.ReadAll(PacketData);
+			bb.ResetRead();
+			bb.ReadVarInt(PacketType);
+			ASSERT(PacketData.size() > 0);
+			PacketData.resize(PacketData.size() - 1);
+			AString PacketDataHex;
+			CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
+			m_CommLogFile.Printf("Next incoming packet is type %u (0x%x), length %u (0x%x) at state %d. Payload:\n%s\n",
+				PacketType, PacketType, PacketLen, PacketLen, m_State, PacketDataHex.c_str()
+			);
+		}
+		
 		if (!HandlePacket(bb, PacketType))
 		{
 			// Unknown packet, already been reported, but without the length. Log the length here:
@@ -1116,6 +1172,12 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 				LOGD("Packet contents:\n%s", Out.c_str());
 			#endif  // _DEBUG
 			
+			// Put a message in the comm log:
+			if (g_ShouldLogComm)
+			{
+				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
+			}
+			
 			return;
 		}
 		
@@ -1125,6 +1187,16 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read %u bytes, packet contained %u bytes",
 				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
 			);
+
+			// Put a message in the comm log:
+			if (g_ShouldLogComm)
+			{
+				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %d left) ^^^^^^\n\n\n",
+					1, bb.GetReadableSpace()
+				);
+				m_CommLogFile.Flush();
+			}
+
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
 		}
@@ -1807,6 +1879,17 @@ cProtocol172::cPacketizer::~cPacketizer()
 	m_Out.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
 	m_Out.CommitRead();
+	
+	// Log the comm into logfile:
+	if (g_ShouldLogComm)
+	{
+		AString Hex;
+		ASSERT(DataToSend.size() > 0);
+		CreateHexDump(Hex, DataToSend.data() + 1, DataToSend.size() - 1, 16);
+		m_Protocol.m_CommLogFile.Printf("Outgoing packet: type %d (0x%x), length %u (0x%x), state %d. Payload:\n%s\n",
+			DataToSend[0], DataToSend[0], PacketLen, PacketLen, m_Protocol.m_State, Hex.c_str()
+		);
+	}
 }
 
 

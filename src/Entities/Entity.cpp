@@ -73,7 +73,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 
 cEntity::~cEntity()
 {
-	ASSERT(!m_World->HasEntity(m_UniqueID));  // Before deleting, the entity needs to have been removed from the world
+	// Before deleting, the entity needs to have been removed from the world, if ever added
+	ASSERT((m_World == NULL) || !m_World->HasEntity(m_UniqueID));
 	
 	/*
 	// DEBUG:

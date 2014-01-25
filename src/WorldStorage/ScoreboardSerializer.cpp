@@ -31,15 +31,11 @@ cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScore
 
 bool cScoreboardSerializer::Load(void)
 {
-	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmRead))
+	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
+	if (Data.empty())
 	{
 		return false;
 	}
-
-	AString Data;
-	File.ReadRestOfFile(Data);
-	File.Close();
 
 	AString Uncompressed;
 	int res = UncompressStringGZIP(Data.data(), Data.size(), Uncompressed);

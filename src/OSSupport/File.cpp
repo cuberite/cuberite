@@ -450,3 +450,12 @@ int cFile::Printf(const char * a_Fmt, ...)
 
 
 
+
+void cFile::Flush(void)
+{
+	fflush(m_File);
+}
+
+
+
+
