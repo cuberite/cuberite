@@ -2258,7 +2258,6 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 	}
 
 	AString Filename = tolua_tostring(tolua_S, 2, 0);
-	LOGWARNING("cBlockArea::LoadFromSchematic file is depreciated. Please use cSchematicFileSerilizer::LoadFromSchematicFile.");
 	bool res = cSchematicFileSerializer::LoadFromSchematicFile(*self,Filename);
 	tolua_pushboolean(tolua_S, res);
 	return 1;
@@ -2287,7 +2286,6 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 		return 0;
 	}
 	AString Filename = tolua_tostring(tolua_S, 2, 0);
-	LOGWARNING("cBlockArea::SaveToSchematic file is depreciated. Please use cSchematicFileSerializer::SaveToSchematicFile.");
 	bool res = cSchematicFileSerializer::SaveToSchematicFile(*self,Filename);
 	tolua_pushboolean(tolua_S, res);
 	return 1;

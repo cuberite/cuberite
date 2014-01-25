@@ -70,7 +70,6 @@ $cfile "../Generating/ChunkDesc.h"
 $cfile "../CraftingRecipes.h"
 $cfile "../UI/Window.h"
 $cfile "../Mobs/Monster.h"
-$cfile "../WorldStorage/SchematicFileSerializer.h"
 
 
 
