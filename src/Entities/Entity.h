@@ -29,6 +29,11 @@
 		return super::GetClass(); \
 	}
 
+#define POSX_TOINT (int)floor(GetPosX())
+#define POSY_TOINT (int)floor(GetPosY())
+#define POSZ_TOINT (int)floor(GetPosZ())
+#define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
+
 
 
 

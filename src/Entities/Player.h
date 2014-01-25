@@ -415,7 +415,7 @@ protected:
 	float m_LastBlockActionTime;
 	int m_LastBlockActionCnt;
 	eGameMode m_GameMode;
-	std::string m_IP;
+	AString m_IP;
 	
 	/// The item being dragged by the cursor while in a UI window
 	cItem m_DraggingItem;

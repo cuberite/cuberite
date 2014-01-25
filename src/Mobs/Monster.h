@@ -199,9 +199,13 @@ protected:
 	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
 	void SetPitchAndYawFromDestination(void);
 
-	/* ===========================*/
+	/* =========================== */
+	/* ========= FALLING ========= */
 
-	
+	virtual void HandleFalling(void);
+	int m_LastGroundHeight;
+
+	/* =========================== */
 
 	float m_IdleInterval;
 	float m_DestroyTimer;

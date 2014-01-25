@@ -26,8 +26,6 @@
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
-#define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
-
 
 
 
@@ -440,7 +438,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		cWorld * World = GetWorld();
 		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
 		{
-			BLOCKTYPE BlockType = World->GetBlock(float2int(GetPosX()), float2int(GetPosY()), float2int(GetPosZ()));
+			BLOCKTYPE BlockType = World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
 			if (BlockType != E_BLOCK_AIR)
 			{
 				m_bTouchGround = true;
@@ -470,7 +468,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 			}
 			
-			// Mojang uses floor() to get X and Z positions, instead of just casting it to an (int)
+			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
 		}		
 

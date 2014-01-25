@@ -82,6 +82,7 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_AttackRange(2)
 	, m_AttackInterval(0)
 	, m_BurnsInDaylight(false)
+	, m_LastGroundHeight(POSY_TOINT)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -113,7 +114,7 @@ void cMonster::TickPathFinding()
 	std::vector<Vector3d> m_PotentialCoordinates;
 	m_TraversedCoordinates.push_back(Vector3i(PosX, PosY, PosZ));
 
-	static const struct // Define which directions the torch can power
+	static const struct // Define which directions to try to move to
 	{
 		int x, z;
 	} gCrossCoords[] =
@@ -261,9 +262,9 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_bOnGround)
 		{
-			int NextHeight = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
+			m_Destination.y = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
 
-			if (DoesPosYRequireJump(NextHeight))
+			if (DoesPosYRequireJump(m_Destination.y))
 			{
 				m_bOnGround = false;
 				AddPosY(1.5); // Jump!!
@@ -298,10 +299,11 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (ReachedFinalDestination())
+	if (ReachedFinalDestination() && (m_Target != NULL))
 		Attack(a_Dt);
 
 	SetPitchAndYawFromDestination();
+	HandleFalling();
 
 	switch (m_EMState)
 	{
@@ -363,6 +365,27 @@ void cMonster::SetPitchAndYawFromDestination()
 			VectorToEuler(BodyDistance.x, BodyDistance.y, BodyDistance.z, Rotation, Pitch);
 			SetYaw(Rotation);
 		}
+	}
+}
+
+
+
+
+void cMonster::HandleFalling()
+{
+	if (m_bOnGround)
+	{
+		int Damage = (m_LastGroundHeight - POSY_TOINT) - 3;
+
+		if (Damage > 0)
+		{
+			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
+
+			// Fall particles
+			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
+		}
+
+		m_LastGroundHeight = (int)floor(GetPosY());
 	}
 }
 
