@@ -416,8 +416,8 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 {
 	// Initialise to 'slow down' values
-	int AccelDecelSpeed = -1;
-	int AccelDecelNegSpeed = 1;
+	int AccelDecelSpeed = -2;
+	int AccelDecelNegSpeed = 2;
 
 	if ((a_RailMeta & 0x8) == 0x8)
 	{
