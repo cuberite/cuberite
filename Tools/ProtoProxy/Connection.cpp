@@ -378,13 +378,13 @@ bool cConnection::RelayFromServer(void)
 		}
 		case csEncryptedUnderstood:
 		{
-			m_ServerDecryptor.ProcessData((byte *)Buffer, (byte *)Buffer, res);
+			m_ServerDecryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
 			DataLog(Buffer, res, "Decrypted %d bytes from the SERVER", res);
 			return DecodeServersPackets(Buffer, res);
 		}
 		case csEncryptedUnknown:
 		{
-			m_ServerDecryptor.ProcessData((byte *)Buffer, (byte *)Buffer, res);
+			m_ServerDecryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
 			DataLog(Buffer, res, "Decrypted %d bytes from the SERVER", res);
 			return CLIENTSEND(Buffer, res);
 		}
@@ -423,7 +423,7 @@ bool cConnection::RelayFromClient(void)
 		case csEncryptedUnknown:
 		{
 			DataLog(Buffer, res, "Decrypted %d bytes from the CLIENT", res);
-			m_ServerEncryptor.ProcessData((byte *)Buffer, (byte *)Buffer, res);
+			m_ServerEncryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
 			return SERVERSEND(Buffer, res);
 		}
 	}
@@ -473,13 +473,13 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, Encryptor & a_Encryptor, const char * a_Data, int a_Size, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, int a_Size, const char * a_Peer)
 {
 	DataLog(a_Data, a_Size, "Encrypting %d bytes to %s", a_Size, a_Peer);
-	const byte * Data = (const byte *)a_Data;
+	const Byte * Data = (const Byte *)a_Data;
 	while (a_Size > 0)
 	{
-		byte Buffer[64 KiB];
+		Byte Buffer[64 KiB];
 		int NumBytes = (a_Size > sizeof(Buffer)) ? sizeof(Buffer) : a_Size;
 		a_Encryptor.ProcessData(Buffer, Data, NumBytes);
 		bool res = SendData(a_Socket, (const char *)Buffer, NumBytes, a_Peer);
@@ -497,7 +497,7 @@ bool cConnection::SendEncryptedData(SOCKET a_Socket, Encryptor & a_Encryptor, co
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
 {
 	AString All;
 	a_Data.ReadAll(All);
@@ -2701,7 +2701,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 		int Length = 0;
 		switch (Type)
 		{
-			case 0: Length = 1; break;  // byte
+			case 0: Length = 1; break;  // Byte
 			case 1: Length = 2; break;  // short
 			case 2: Length = 4; break;  // int
 			case 3: Length = 4; break;  // float
@@ -2860,37 +2860,26 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, const AString & a_Nonce)
 {
 	// Generate the shared secret and encrypt using the server's public key
-	byte SharedSecret[16];
-	byte EncryptedSecret[128];
+	Byte SharedSecret[16];
+	Byte EncryptedSecret[128];
 	memset(SharedSecret, 0, sizeof(SharedSecret));  // Use all zeroes for the initial secret
-	RSA::PublicKey pk;
-	CryptoPP::StringSource src(a_ServerPublicKey, true);
-	ByteQueue bq;
-	src.TransferTo(bq);
-	bq.MessageEnd();
-	pk.Load(bq);
-	RSAES<PKCS1v15>::Encryptor rsaEncryptor(pk);
-	RandomPool rng;
-	time_t CurTime = time(NULL);
-	rng.Put((const byte *)&CurTime, sizeof(CurTime));
-	int EncryptedLength = rsaEncryptor.FixedCiphertextLength();
-	ASSERT(EncryptedLength <= sizeof(EncryptedSecret));
-	rsaEncryptor.Encrypt(rng, SharedSecret, sizeof(SharedSecret), EncryptedSecret);
-	m_ServerEncryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16, true))(Name::FeedbackSize(), 1));
-	m_ServerDecryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16, true))(Name::FeedbackSize(), 1));
+	m_Server.GetPrivateKey().Encrypt(SharedSecret, sizeof(SharedSecret), EncryptedSecret, sizeof(EncryptedSecret));
+
+	m_ServerEncryptor.Init(SharedSecret, SharedSecret);
+	m_ServerDecryptor.Init(SharedSecret, SharedSecret);
 	
 	// Encrypt the nonce:
-	byte EncryptedNonce[128];
-	rsaEncryptor.Encrypt(rng, (const byte *)(a_Nonce.data()), a_Nonce.size(), EncryptedNonce);
+	Byte EncryptedNonce[128];
+	m_Server.GetPrivateKey().Encrypt((const Byte *)a_Nonce.data(), a_Nonce.size(), EncryptedNonce, sizeof(EncryptedNonce));
 	
 	// Send the packet to the server:
 	Log("Sending PACKET_ENCRYPTION_KEY_RESPONSE to the SERVER");
 	cByteBuffer ToServer(1024);
 	ToServer.WriteByte(0x01);  // To server: Encryption key response
-	ToServer.WriteBEShort(EncryptedLength);
-	ToServer.WriteBuf(EncryptedSecret, EncryptedLength);
-	ToServer.WriteBEShort(EncryptedLength);
-	ToServer.WriteBuf(EncryptedNonce, EncryptedLength);
+	ToServer.WriteBEShort((short)sizeof(EncryptedSecret));
+	ToServer.WriteBuf(EncryptedSecret, sizeof(EncryptedSecret));
+	ToServer.WriteBEShort((short)sizeof(EncryptedNonce));
+	ToServer.WriteBuf(EncryptedNonce, sizeof(EncryptedNonce));
 	SERVERSEND(ToServer);
 	m_ServerState = csEncryptedUnderstood;
 	m_IsServerEncrypted = true;

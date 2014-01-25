@@ -34,12 +34,8 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 	#endif  // _WIN32
 	
 	printf("Generating protocol encryption keypair...\n");
-	time_t CurTime = time(NULL);
-	RandomPool rng;
-	rng.Put((const byte *)&CurTime, sizeof(CurTime));
-	m_PrivateKey.GenerateRandomWithKeySize(rng, 1024);
-	RSA::PublicKey pk(m_PrivateKey);
-	m_PublicKey = pk;
+	m_PrivateKey.Generate();
+	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
 
 	m_ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	sockaddr_in local;
