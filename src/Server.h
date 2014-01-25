@@ -23,8 +23,7 @@
 	#pragma warning(disable:4702)
 #endif
 
-#include "cryptopp/rsa.h"
-#include "cryptopp/randpool.h"
+#include "Crypto.h"
 
 #ifdef _MSC_VER
 	#pragma warning(pop)
@@ -110,8 +109,8 @@ public:												// tolua_export
 	/** Returns base64 encoded favicon data (obtained from favicon.png) */
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
 	
-	CryptoPP::RSA::PrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
-	CryptoPP::RSA::PublicKey  & GetPublicKey (void) { return m_PublicKey; }
+	cRSAPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
+	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 	
 private:
 
@@ -180,8 +179,11 @@ private:
 
 	bool m_bRestarting;
 	
-	CryptoPP::RSA::PrivateKey m_PrivateKey;
-	CryptoPP::RSA::PublicKey  m_PublicKey;
+	/** The private key used for the assymetric encryption start in the protocols */
+	cRSAPrivateKey m_PrivateKey;
+	
+	/** Public key for m_PrivateKey, ASN1-DER-encoded */
+	AString m_PublicKeyDER;
 	
 	cRCONServer m_RCONServer;
 	

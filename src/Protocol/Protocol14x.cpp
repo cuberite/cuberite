@@ -33,8 +33,6 @@ Implements the 1.4.x protocol classes representing these protocols:
 	#pragma warning(disable:4702)
 #endif
 
-#include "cryptopp/randpool.h"
-
 #ifdef _MSC_VER
 	#pragma warning(pop)
 #endif

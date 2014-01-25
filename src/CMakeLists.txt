@@ -4,6 +4,7 @@ project (MCServer)
 
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
+include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
 
 set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating) 
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities)
@@ -220,4 +221,4 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
-target_link_libraries(${EXECUTABLE} md5 luaexpat iniFile jsoncpp cryptopp zlib lua sqlite)
+target_link_libraries(${EXECUTABLE} md5 luaexpat iniFile jsoncpp polarssl zlib lua sqlite)

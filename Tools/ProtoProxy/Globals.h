@@ -74,6 +74,8 @@ typedef unsigned long long UInt64;
 typedef unsigned int       UInt32;
 typedef unsigned short     UInt16;
 
+typedef unsigned char Byte;
+
 
 
 
@@ -223,12 +225,8 @@ public:
 
 
 
-#include "cryptopp/randpool.h"
-#include "cryptopp/aes.h"
-#include "cryptopp/rsa.h"
-#include "cryptopp/modes.h"
+#include "../../src/Crypto.h"
 
-using namespace CryptoPP;
 
 
 
