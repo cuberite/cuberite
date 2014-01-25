@@ -79,6 +79,8 @@ public:																	// tolua_export
 		HOOK_LOGIN,
 		HOOK_PLAYER_BREAKING_BLOCK,
 		HOOK_PLAYER_BROKEN_BLOCK,
+		HOOK_PLAYER_DESTROYING,
+		HOOK_PLAYER_DESTROYED,
 		HOOK_PLAYER_EATING,
 		HOOK_PLAYER_FISHED,
 		HOOK_PLAYER_FISHING,
@@ -170,6 +172,8 @@ public:																	// tolua_export
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerDestroying         (cPlayer & a_Player);
+	bool CallHookPlayerDestroyed          (cPlayer & a_Player);
 	bool CallHookPlayerEating             (cPlayer & a_Player);
 	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems a_Reward);
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
