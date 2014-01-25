@@ -50,9 +50,9 @@ void cAggressiveMonster::InStateChasing(float a_Dt)
 
 void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity)
 {
-	super::EventSeePlayer(a_Entity);
 	if (!((cPlayer *)a_Entity)->IsGameModeCreative())
 	{
+		super::EventSeePlayer(a_Entity);
 		m_EMState = CHASING;
 	}
 }
