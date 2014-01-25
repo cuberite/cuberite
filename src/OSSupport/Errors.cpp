@@ -50,3 +50,4 @@ AString GetOSErrorString( int a_ErrNo )
 	
 	#endif  // else _WIN32
 }
+
