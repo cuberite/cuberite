@@ -234,7 +234,11 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
+#ifdef _arm_
+	m_StorageCompressionFactor(3),
+#else
 	m_StorageCompressionFactor(6),
+#endif
 	m_IsSpawnExplicitlySet(false),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
@@ -2419,7 +2423,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 
 // TODO: This interface is dangerous!
-cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit)
+cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
 {
 	cTracer LineOfSight(this);
 
@@ -2434,7 +2438,12 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit)
 
 		if (Distance < ClosestDistance)
 		{
-			if (!LineOfSight.Trace(a_Pos,(Pos - a_Pos),(int)(Pos - a_Pos).Length()))
+			if (a_CheckLineOfSight && !LineOfSight.Trace(a_Pos,(Pos - a_Pos),(int)(Pos - a_Pos).Length()))
+			{
+				ClosestDistance = Distance;
+				ClosestPlayer = *itr;
+			}
+			else
 			{
 				ClosestDistance = Distance;
 				ClosestPlayer = *itr;

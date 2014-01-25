@@ -223,6 +223,8 @@ void cChunkGenerator::Execute(void)
 
 		if (m_Queue.empty())
 		{
+			// Sometimes the queue remains empty
+			// If so, we can't do any front() operations on it!
 			continue;
 		}
 

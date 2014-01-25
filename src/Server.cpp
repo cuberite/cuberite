@@ -194,7 +194,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
-	m_FaviconData = Base64Encode(cFile::ReadWholeFile("favicon.png")); // Will return empty string if file nonexistant; client doesn't mind
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png"))); // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{

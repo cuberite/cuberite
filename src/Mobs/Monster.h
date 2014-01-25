@@ -168,10 +168,18 @@ protected:
 		If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
 		If current Y is solid, goes up to find first nonsolid block, and returns that */
 	int FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ);
-	/** Returns if a monster can actually reach a given height by jumping */
+	/** Returns if a monster can actually reach a given height by jumping or walking */
 	inline bool IsNextYPosReachable(int a_PosY)
 	{
-		return (a_PosY > (int)floor(GetPosY())) && (a_PosY == (int)floor(GetPosY()) + 1);
+		return (
+			(a_PosY <= (int)floor(GetPosY())) ||
+			DoesPosYRequireJump(a_PosY)
+			);
+	}
+	/** Returns if a monster can reach a given height by jumping */
+	inline bool DoesPosYRequireJump(int a_PosY)
+	{
+		return ((a_PosY > (int)floor(GetPosY())) && (a_PosY == (int)floor(GetPosY()) + 1));
 	}
 
 	/** A semi-temporary list to store the traversed coordinates during active pathfinding so we don't visit them again */

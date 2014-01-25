@@ -259,6 +259,17 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_bMovingToDestination)
 	{
+		if (m_bOnGround)
+		{
+			int NextHeight = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
+
+			if (DoesPosYRequireJump(NextHeight))
+			{
+				m_bOnGround = false;
+				AddPosY(1.5); // Jump!!
+			}
+		}
+
 		Vector3f Distance = m_Destination - GetPosition();
 		if(!ReachedDestination() && !ReachedFinalDestination()) // If we haven't reached any sort of destination, move
 		{
@@ -283,17 +294,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			else
 			{
 				TickPathFinding(); // We have reached the next point in our path, calculate another point
-			}
-		}
-
-		if(m_bOnGround)
-		{
-			int NextHeight = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
-
-			if (IsNextYPosReachable(NextHeight))
-			{
-				m_bOnGround = false;
-				SetSpeedY(5.f); // Jump!!
 			}
 		}
 	}
@@ -372,6 +372,11 @@ void cMonster::SetPitchAndYawFromDestination()
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	int PosY = (int)floor(GetPosY());
+
+	if (PosY < 0)
+		PosY = 0;
+	else if (PosY > cChunkDef::Height)
+		PosY = cChunkDef::Height;
 
 	if (!g_BlockIsSolid[m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))])
 	{
@@ -494,7 +499,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 void cMonster::CheckEventSeePlayer(void)
 {
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
-	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
+	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance, false);
 
 	if (Closest != NULL)
 	{
@@ -548,6 +553,11 @@ void cMonster::EventLosePlayer(void)
 
 void cMonster::InStateIdle(float a_Dt)
 {
+	if (m_bMovingToDestination)
+	{
+		return; // Still getting there
+	}
+
 	m_IdleInterval += a_Dt;
 
 	if (m_IdleInterval > 1)
@@ -557,20 +567,19 @@ void cMonster::InStateIdle(float a_Dt)
 		m_IdleInterval -= 1; // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
-		Dist.x = (double)m_World->GetTickRandomNumber(m_SightDistance * 2) - m_SightDistance;
-		Dist.z = (double)m_World->GetTickRandomNumber(m_SightDistance * 2) - m_SightDistance;
+		Dist.x = (double)m_World->GetTickRandomNumber(10) - 5;
+		Dist.z = (double)m_World->GetTickRandomNumber(10) - 5;
 
 		if ((Dist.SqrLength() > 2)  && (rem >= 3))
 		{
-			m_Destination.x = GetPosX() + Dist.x;
-			m_Destination.z = GetPosZ() + Dist.z;
+			Vector3d Destination(GetPosX() + Dist.x, 0, GetPosZ() + Dist.z);
 
-			int NextHeight = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
+			int NextHeight = FindFirstNonAirBlockPosition(Destination.x, Destination.z);
 
-			if (IsNextYPosReachable(NextHeight + 1))
+			if (IsNextYPosReachable(NextHeight))
 			{
-				m_Destination.y = (double)NextHeight;
-				MoveToPosition(m_Destination);
+				Destination.y = NextHeight;
+				MoveToPosition(Destination);
 			}
 		}
 	}
