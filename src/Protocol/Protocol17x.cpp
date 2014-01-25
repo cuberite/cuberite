@@ -1090,10 +1090,23 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 	#ifdef _DEBUG
 	if (g_ShouldLogComm)
 	{
+		if (m_ReceivedData.GetReadableSpace() > 0)
+		{
+			AString AllData;
+			int OldReadableSpace = m_ReceivedData.GetReadableSpace();
+			m_ReceivedData.ReadAll(AllData);
+			m_ReceivedData.ResetRead();
+			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
+			AString Hex;
+			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+			m_CommLogFile.Printf("Incoming data, %d (0x%x) bytes unparsed already present in buffer:\n%s\n",
+				AllData.size(), AllData.size(), Hex.c_str()
+			);
+		}
 		AString Hex;
 		CreateHexDump(Hex, a_Data, a_Size, 16);
-		m_CommLogFile.Printf("Incoming data: %d bytes. %d bytes unparsed already present in buffer.\n%s\n",
-			a_Size, m_ReceivedData.GetReadableSpace(), Hex.c_str()
+		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
+			a_Size, a_Size, Hex.c_str()
 		);
 	}
 	#endif
