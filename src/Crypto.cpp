@@ -196,6 +196,40 @@ int cRSAPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLeng
 
 
 
+int cRSAPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength)
+{
+	if (a_EncryptedMaxLength < m_Rsa.len)
+	{
+		LOGD("%s: Invalid a_EncryptedMaxLength: got %u, exp at least %u",
+			__FUNCTION__, (unsigned)a_EncryptedMaxLength, (unsigned)(m_Rsa.len)
+		);
+		ASSERT(!"Invalid a_DecryptedMaxLength!");
+		return -1;
+	}
+	if (a_PlainLength < m_Rsa.len)
+	{
+		LOGD("%s: Invalid a_PlainLength: got %u, exp at least %u",
+			__FUNCTION__, (unsigned)a_PlainLength, (unsigned)(m_Rsa.len)
+		);
+		ASSERT(!"Invalid a_PlainLength!");
+		return -1;
+	}
+	size_t DecryptedLength;
+	int res = rsa_pkcs1_encrypt(
+		&m_Rsa, ctr_drbg_random, &m_Ctr_drbg, RSA_PUBLIC,
+		a_PlainLength, a_PlainData, a_EncryptedData
+	);
+	if (res != 0)
+	{
+		return -1;
+	}
+	return (int)DecryptedLength;
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cAESCFBDecryptor:
 
