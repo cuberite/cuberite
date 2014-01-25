@@ -13,6 +13,7 @@
 #include "../Entities/Player.h"
 #include "../WebAdmin.h"
 #include "../ClientHandle.h"
+#include "../BlockArea.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
@@ -22,6 +23,7 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "md5/md5.h"
 #include "../LineBlockTracer.h"
+#include "../WorldStorage/SchematicFileSerializer.h"
 
 
 
@@ -2234,6 +2236,63 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 
 
 
+
+static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
+{
+	// function cBlockArea::LoadFromSchematicFile
+	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cBlockArea") ||
+		!L.CheckParamString  (2) ||
+		!L.CheckParamEnd     (3)
+	)
+	{
+		return 0;
+	}
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, 0);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::LoadFromSchematicFile'", NULL);
+		return 0;
+	}
+
+	AString Filename = tolua_tostring(tolua_S, 2, 0);
+	bool res = cSchematicFileSerializer::LoadFromSchematicFile(*self,Filename);
+	tolua_pushboolean(tolua_S, res);
+	return 1;
+}
+
+
+
+
+static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
+{
+	// function cBlockArea::SaveToSchematicFile
+	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cBlockArea") ||
+		!L.CheckParamString  (2) ||
+		!L.CheckParamEnd     (3)
+	)
+	{
+		return 0;
+	}
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, 0);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::SaveToSchematicFile'", NULL);
+		return 0;
+	}
+	AString Filename = tolua_tostring(tolua_S, 2, 0);
+	bool res = cSchematicFileSerializer::SaveToSchematicFile(*self,Filename);
+	tolua_pushboolean(tolua_S, res);
+	return 1;
+}
+
+
+
 void ManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, NULL);
@@ -2247,6 +2306,11 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		
 		tolua_beginmodule(tolua_S, "cFile");
 			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);
+		tolua_endmodule(tolua_S);
+		
+		tolua_beginmodule(tolua_S, "cBlockArea");
+			tolua_function(tolua_S, "LoadFromSchematicFile", tolua_cBlockArea_LoadFromSchematicFile);
+			tolua_function(tolua_S, "SaveToSchematicFile", tolua_cBlockArea_SaveToSchematicFile);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cHopperEntity");

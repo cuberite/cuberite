@@ -12,18 +12,7 @@
 
 #pragma once
 
-
-
-
-
-// fwd: World.h
-class cWorld;
-
-// fwd: FastNBT.h
-class cParsedNBT;
-
-
-
+#include "ForEachChunkProvider.h"
 
 
 // tolua_begin
@@ -68,13 +57,13 @@ public:
 	void SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ);
 	
 	/// Reads an area of blocks specified. Returns true if successful. All coords are inclusive.
-	bool Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
+	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
 	
 	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
 	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
 	
 	/// Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all
-	bool Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
+	bool Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
 	
 	/// Copies this object's contents into the specified BlockArea.
 	void CopyTo(cBlockArea & a_Into) const;
@@ -84,12 +73,6 @@ public:
 	
 	/// For testing purposes only, dumps the area into a file.
 	void DumpToRawFile(const AString & a_FileName);
-	
-	/// Loads an area from a .schematic file. Returns true if successful
-	bool LoadFromSchematicFile(const AString & a_FileName);
-	
-	/// Saves the area into a .schematic file. Returns true if successful
-	bool SaveToSchematicFile(const AString & a_FileName);
 	
 	/// Crops the internal contents by the specified amount of blocks from each border.
 	void Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
@@ -233,6 +216,7 @@ public:
 
 protected:
 	friend class cChunkDesc;
+	friend class cSchematicFileSerializer;
 	
 	class cChunkReader :
 		public cChunkDataCallback
@@ -291,9 +275,6 @@ protected:
 	// Expand helpers:
 	void ExpandBlockTypes(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 	void ExpandNibbles   (NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
-	
-	/// Loads the area from a schematic file uncompressed and parsed into a NBT tree. Returns true if successful.
-	bool LoadFromSchematicNBT(cParsedNBT & a_NBT);
 
 	/// Sets the specified datatypes at the specified location.
 	void RelSetData(
