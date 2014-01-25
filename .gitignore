@@ -57,6 +57,7 @@ install_mainfest.txt
 src/MCServer
 lib/tolua++/tolua
 src/Bindings/Bindings.*
+src/Bindings/BindingsDependecies.txt
 MCServer.dir/
 
 #win32 cmake stuff

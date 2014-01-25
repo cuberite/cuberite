@@ -94,6 +94,13 @@ if (NOT MSVC)
 
 	target_link_libraries(Bindings lua sqlite tolualib)
 
+	#clear file
+	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
+	foreach(dependecy ${BINDING_DEPENDECIES})
+		#write each dependecy on a seperate line
+		file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt "${dependecy}\n")
+	endforeach()
+
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "Bindings.cpp Bindings.h")
 
 	foreach(folder ${FOLDERS})
