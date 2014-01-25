@@ -7,7 +7,6 @@
 #include "../UI/Window.h"
 #include "../UI/WindowOwner.h"
 #include "../World.h"
-#include "Pickup.h"
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../GroupManager.h"
@@ -27,8 +26,6 @@
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
-#define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
-
 
 
 
@@ -36,8 +33,6 @@
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	: super(etPlayer, 0.6, 1.8)
-	, m_AirLevel( MAX_AIR_LEVEL )
-	, m_AirTickTimer(DROWNING_TICKS)
 	, m_bVisible(true)
 	, m_FoodLevel(MAX_FOOD_LEVEL)
 	, m_FoodSaturationLevel(5)
@@ -108,9 +103,23 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
 		);
 	}
+
 	m_LastJumpHeight = (float)(GetPosY());
 	m_LastGroundHeight = (float)(GetPosY());
 	m_Stance = GetPosY() + 1.62;
+
+	if (m_GameMode == gmNotSet)
+	{
+		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
+		if (World == NULL)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+		if (World->IsGameModeCreative())
+		{
+			m_CanFly = true;
+		}
+	}
 	
 	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
@@ -196,12 +205,6 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	
 	super::Tick(a_Dt, a_Chunk);
-	
-	// Set player swimming state
-	SetSwimState(a_Chunk);
-
-	// Handle air drowning stuff
-	HandleAir();
 	
 	// Handle charging the bow:
 	if (m_IsChargingBow)
@@ -435,7 +438,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		cWorld * World = GetWorld();
 		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
 		{
-			BLOCKTYPE BlockType = World->GetBlock(float2int(GetPosX()), float2int(GetPosY()), float2int(GetPosZ()));
+			BLOCKTYPE BlockType = World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
 			if (BlockType != E_BLOCK_AIR)
 			{
 				m_bTouchGround = true;
@@ -460,12 +463,10 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 		if (Damage > 0)
 		{
-			if (!IsGameModeCreative())
-			{
-				TakeDamage(dtFalling, NULL, Damage, Damage, 0);
-			}
+			// cPlayer makes sure damage isn't applied in creative, no need to check here
+			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 			
-			// Mojang uses floor() to get X and Z positions, instead of just casting it to an (int)
+			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
 		}		
 
@@ -787,7 +788,7 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		if (IsGameModeCreative())
 		{
-			// No damage / health in creative mode
+			// No damage / health in creative mode if not void damage
 			return;
 		}
 	}
@@ -1630,26 +1631,11 @@ bool cPlayer::LoadFromDisk()
 	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
 	m_IsFlying            = root.get("isflying", 0).asBool();
 
-	//SetExperience(root.get("experience", 0).asInt());
-
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 
 	if (m_GameMode == eGameMode_Creative)
 	{
 		m_CanFly = true;
-	}
-	else if (m_GameMode == eGameMode_NotSet)
-	{
-		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
-		if (World == NULL)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
-
-		if (World->GetGameMode() == eGameMode_Creative)
-		{
-			m_CanFly = true;
-		}
 	}
 	
 	m_Inventory.LoadFromJson(root["inventory"]);
@@ -1760,85 +1746,6 @@ void cPlayer::UseEquippedItem(void)
 	if (GetInventory().DamageEquippedItem())
 	{
 		m_World->BroadcastSoundEffect("random.break", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-	}
-}
-
-
-
-
-
-void cPlayer::SetSwimState(cChunk & a_Chunk)
-{
-	int RelY = (int)floor(m_LastPosY + 0.1);
-	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
-	{
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
-		return;
-	}
-	
-	BLOCKTYPE BlockIn;
-	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	
-	// Check if the player is swimming:
-	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
-	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
-	{
-		// This sometimes happens on Linux machines
-		// Ref.: http://forum.mc-server.org/showthread.php?tid=1244
-		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, LastPos = {%.02f, %.02f}, Pos = %.02f, %.02f}",
-			RelX, RelY, m_LastPosX, m_LastPosZ, GetPosX(), GetPosZ()
-		);
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
-		return;
-	}
-	m_IsSwimming = IsBlockWater(BlockIn);
-
-	// Check if the player is submerged:
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
-	m_IsSubmerged = IsBlockWater(BlockIn);
-}
-
-
-
-
-
-void cPlayer::HandleAir(void)
-{
-	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
-	// see if the player is /submerged/ water (block above is water)
-	// Get the type of block the player's standing in:
-
-	if (IsSubmerged())
-	{
-		// either reduce air level or damage player
-		if (m_AirLevel < 1)
-		{
-			if (m_AirTickTimer < 1)
-			{
-				// damage player 
-				TakeDamage(dtDrowning, NULL, 1, 1, 0);
-				// reset timer
-				m_AirTickTimer = DROWNING_TICKS;
-			}
-			else
-			{
-				m_AirTickTimer -= 1;
-			}
-		}
-		else
-		{
-			// reduce air supply
-			m_AirLevel -= 1;
-		}
-	}
-	else
-	{
-		// set the air back to maximum
-		m_AirLevel = MAX_AIR_LEVEL;
-		m_AirTickTimer = DROWNING_TICKS;
 	}
 }
 

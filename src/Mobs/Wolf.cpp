@@ -37,6 +37,26 @@ void cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
+void cWolf::Attack(float a_Dt)
+{
+	UNUSED(a_Dt);
+
+	if ((m_Target != NULL) && (m_Target->IsPlayer()))
+	{
+		if (((cPlayer *)m_Target)->GetName() != m_OwnerName)
+		{
+			super::Attack(a_Dt);
+		}
+	}
+	else
+	{
+		super::Attack(a_Dt);
+	}
+}
+
+
+
+
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
@@ -108,7 +128,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		m_bMovingToDestination = false;
 	}
 
-	cPlayer * a_Closest_Player = FindClosestPlayer();
+	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
 	if (a_Closest_Player != NULL)
 	{
 		switch (a_Closest_Player->GetEquippedItem().m_ItemType)
@@ -125,9 +145,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 					SetIsBegging(true);
 					m_World->BroadcastEntityMetadata(*this);
 				}
-				Vector3f a_NewDestination = a_Closest_Player->GetPosition();
-				a_NewDestination.y = a_NewDestination.y + 1; // Look at the head of the player, not his feet.
-				m_Destination = Vector3f(a_NewDestination);
+				m_FinalDestination = a_Closest_Player->GetPosition();;
 				m_bMovingToDestination = false;
 				break;
 			}
@@ -163,23 +181,19 @@ void cWolf::TickFollowPlayer()
 			return false;
 		}
 	public:
-		Vector3f OwnerPos;
+		Vector3d OwnerPos;
 	} Callback;
 	if (m_World->DoWithPlayer(m_OwnerName, Callback))
 	{
 		// The player is present in the world, follow them:
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();
-		if (Distance < 3)
-		{
-			m_bMovingToDestination = false;
-		}
-		else if ((Distance > 30) && (!IsSitting()))
+		if ((Distance > 30) && (!IsSitting()))
 		{
 			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
 		}
 		else
 		{
-			m_Destination = Callback.OwnerPos;
+			MoveToPosition(Callback.OwnerPos);
 		}
 	}
 }
