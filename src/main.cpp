@@ -19,10 +19,8 @@ bool g_SERVER_TERMINATED = false; // Set to true when the server terminates, so 
 
 
 
-#ifdef _DEBUG
 /** If set to true, the protocols will log each player's communication to a separate logfile */
 bool g_ShouldLogComm;
-#endif
 
 
 
@@ -232,7 +230,6 @@ int main( int argc, char **argv )
 	// *((int *)0) = 0;
 	
 	// Check if comm logging is to be enabled:
-	#ifdef _DEBUG
 	for (int i = 0; i < argc; i++)
 	{
 		if (
@@ -243,7 +240,6 @@ int main( int argc, char **argv )
 			g_ShouldLogComm = true;
 		}
 	}
-	#endif  // _DEBUG
 	
 	#if !defined(ANDROID_NDK)
 	try

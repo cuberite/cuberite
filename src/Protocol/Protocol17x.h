@@ -223,10 +223,8 @@ protected:
 	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor;
 	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
 	
-	#ifdef _DEBUG
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
-	#endif
 	
 	
 	/// Adds the received (unencrypted) data to m_ReceivedData, parses complete packets

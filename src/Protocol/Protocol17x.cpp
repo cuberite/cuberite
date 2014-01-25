@@ -53,10 +53,8 @@ Implements the 1.7.x protocol classes:
 
 
 
-#ifdef _DEBUG
 // fwd: main.cpp:
 extern bool g_ShouldLogComm;
-#endif
 
 
 
@@ -76,14 +74,12 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_IsEncrypted(false)
 {
 	// Create the comm log file, if so requested:
-	#ifdef _DEBUG
 	if (g_ShouldLogComm)
 	{
 		cFile::CreateFolder("CommLogs");
 		AString FileName = Printf("CommLogs/%x__%s.log", (unsigned)time(NULL), a_Client->GetIPString().c_str());
 		m_CommLogFile.Open(FileName, cFile::fmWrite);
 	}
-	#endif  // _DEBUG
 }
 
 
@@ -1087,7 +1083,6 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 {
 	// Write the incoming data into the comm log file:
-	#ifdef _DEBUG
 	if (g_ShouldLogComm)
 	{
 		if (m_ReceivedData.GetReadableSpace() > 0)
@@ -1109,7 +1104,6 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			a_Size, a_Size, Hex.c_str()
 		);
 	}
-	#endif
 	
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
@@ -1147,7 +1141,6 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		}
 
 		// Log the packet info into the comm log file:
-		#ifdef _DEBUG
 		if (g_ShouldLogComm)
 		{
 			AString PacketData;
@@ -1162,7 +1155,6 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 				PacketType, PacketType, PacketLen, PacketLen, m_State, PacketDataHex.c_str()
 			);
 		}
-		#endif  // _DEBUG
 		
 		if (!HandlePacket(bb, PacketType))
 		{
@@ -1180,6 +1172,12 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 				LOGD("Packet contents:\n%s", Out.c_str());
 			#endif  // _DEBUG
 			
+			// Put a message in the comm log:
+			if (g_ShouldLogComm)
+			{
+				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
+			}
+			
 			return;
 		}
 		
@@ -1189,6 +1187,16 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read %u bytes, packet contained %u bytes",
 				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
 			);
+
+			// Put a message in the comm log:
+			if (g_ShouldLogComm)
+			{
+				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %d left) ^^^^^^\n\n\n",
+					1, bb.GetReadableSpace()
+				);
+				m_CommLogFile.Flush();
+			}
+
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
 		}
@@ -1873,7 +1881,6 @@ cProtocol172::cPacketizer::~cPacketizer()
 	m_Out.CommitRead();
 	
 	// Log the comm into logfile:
-	#ifdef _DEBUG
 	if (g_ShouldLogComm)
 	{
 		AString Hex;
@@ -1883,7 +1890,6 @@ cProtocol172::cPacketizer::~cPacketizer()
 			DataToSend[0], DataToSend[0], PacketLen, PacketLen, m_Protocol.m_State, Hex.c_str()
 		);
 	}
-	#endif  // _DEBUG
 }
 
 
