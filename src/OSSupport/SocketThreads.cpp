@@ -7,6 +7,7 @@
 
 #include "Globals.h"
 #include "SocketThreads.h"
+#include "Errors.h"
 
 
 
@@ -556,7 +557,7 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 		if (Sent < 0)
 		{
 			int Err = cSocket::GetLastError();
-			LOGWARNING("Error %d while writing to client \"%s\", disconnecting. \"%s\"", Err, m_Slots[i].m_Socket.GetIPString().c_str(), cSocket::GetErrorString(Err).c_str());
+			LOGWARNING("Error %d while writing to client \"%s\", disconnecting. \"%s\"", Err, m_Slots[i].m_Socket.GetIPString().c_str(), GetOSErrorString(Err).c_str());
 			m_Slots[i].m_Socket.CloseSocket();
 			if (m_Slots[i].m_Client != NULL)
 			{
