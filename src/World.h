@@ -24,6 +24,7 @@
 #include "Entities/ProjectileEntity.h"
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
+#include "Blocks/WorldInterface.h"
 
 
 
@@ -62,7 +63,7 @@ typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 
 
 // tolua_begin
-class cWorld : public cForEachChunkProvider
+class cWorld : public cForEachChunkProvider, public cWorldInterface
 {
 public:
 
@@ -107,7 +108,7 @@ public:
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 	Int64 GetWorldAge(void)  const { return m_WorldAge; }
-	Int64 GetTimeOfDay(void) const { return m_TimeOfDay; }
+	virtual Int64 GetTimeOfDay(void) const { return m_TimeOfDay; }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
@@ -138,7 +139,7 @@ public:
 	
 	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }
 	
-	eDimension GetDimension(void) const { return m_Dimension; }
+	virtual eDimension GetDimension(void) const { return m_Dimension; }
 
 	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
 	int GetHeight(int a_BlockX, int a_BlockZ);
@@ -180,7 +181,7 @@ public:
 	void BroadcastTeleportEntity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTimeUpdate         (const cClientHandle * a_Exclude = NULL);
-	void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	virtual void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 	void BroadcastWeather            (eWeather a_Weather, const cClientHandle * a_Exclude = NULL);
 	
 	/** If there is a block entity at the specified coords, sends it to the client specified */

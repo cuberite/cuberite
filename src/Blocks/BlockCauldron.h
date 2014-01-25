@@ -21,7 +21,7 @@ public:
 		a_Pickups.push_back(cItem(E_ITEM_CAULDRON, 1, 0));
 	}
 
-	void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+	void OnUse(cWorld * a_World, cWorldInterface * a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		char Meta = a_World->GetBlockMeta( a_BlockX, a_BlockY, a_BlockZ );
 		switch( a_Player->GetEquippedItem().m_ItemType )

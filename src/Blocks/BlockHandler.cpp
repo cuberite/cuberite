@@ -342,7 +342,7 @@ void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, 
 
 
 
-void cBlockHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+void cBlockHandler::OnUse(cWorld *a_World, cWorldInterface * a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 }
 
