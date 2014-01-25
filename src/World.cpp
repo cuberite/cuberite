@@ -235,7 +235,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
 #ifdef _arm_
-	m_StorageCompressionFactor(3),
+	m_StorageCompressionFactor(0),
 #else
 	m_StorageCompressionFactor(6),
 #endif
