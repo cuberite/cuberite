@@ -4,18 +4,24 @@
 :: When called without any parameters, it will pause for a keypress at the end
 :: Call with any parameter to disable the wait (for buildserver use)
 
+@echo off
+
 
 
 
 
 :: Regenerate the files:
-"tolua++.exe" -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+echo Regenerating LUA bindings...
+"tolua++.exe" -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg >nul
 
 
 
 
 : Wait for keypress, if no param given:
-if %ALLTOLUA_WAIT%N == N pause
+echo Bindings were generated
+echo.
+echo Please depress the 'any' key to continue
+if %ALLTOLUA_WAIT%N == N pause >nul
 
 
 
