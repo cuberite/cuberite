@@ -17,6 +17,51 @@
 
 
 
+class cPickupCombiningCallback :
+	public cEntityCallback
+{
+public:
+	cPickupCombiningCallback(Vector3d a_Position, cPickup * a_Pickup) :
+		m_Position(a_Position),
+		m_Pickup(a_Pickup),
+		m_FoundMatchingPickup(false)
+	{
+	}
+
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() == m_Pickup->GetUniqueID()) || a_Entity->IsDestroyed())
+		{
+			return false;
+		}
+
+		Vector3d EntityPos = a_Entity->GetPosition();
+		double Distance = (EntityPos - m_Position).Length();
+
+		if ((Distance < 1.2) && ((cPickup *)a_Entity)->GetItem().IsEqual(m_Pickup->GetItem()))
+		{
+			m_Pickup->GetItem().AddCount(((cPickup *)a_Entity)->GetItem().m_ItemCount);
+			a_Entity->Destroy();
+			m_FoundMatchingPickup = true;
+		}
+		return false;
+	}
+
+	inline bool FoundMatchingPickup()
+	{
+		return m_FoundMatchingPickup;
+	}
+
+protected:
+	bool m_FoundMatchingPickup;
+
+	Vector3d m_Position;
+	cPickup * m_Pickup;
+};
+
+
+
+
 
 cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
@@ -81,6 +126,16 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 					{
 						Destroy(true);
 						return;
+					}
+				}
+
+				if (!IsDestroyed()) // Don't try to combine if someone has tried to combine me
+				{
+					cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
+					m_World->ForEachEntity(PickupCombiningCallback); // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
+					if (PickupCombiningCallback.FoundMatchingPickup())
+					{
+						m_World->BroadcastEntityMetadata(*this);
 					}
 				}
 			}
