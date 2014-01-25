@@ -11,17 +11,15 @@
 
 
 :: Regenerate the files:
-echo Regenerating LUA bindings...
-"tolua++.exe" -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg >nul
+echo Regenerating LUA bindings . . .
+"tolua++.exe" -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
 
 
 
 
 : Wait for keypress, if no param given:
-echo Bindings were generated
 echo.
-echo Please depress the 'any' key to continue
-if %ALLTOLUA_WAIT%N == N pause >nul
+if %ALLTOLUA_WAIT%N == N pause
 
 
 
