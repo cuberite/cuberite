@@ -10,4 +10,4 @@ file(GLOB SOURCE
 
 add_library(Generating ${SOURCE})
 
-target_link_libraries(Generating OSSupport iniFile)
+target_link_libraries(Generating OSSupport iniFile Blocks)
