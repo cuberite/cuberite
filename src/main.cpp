@@ -19,8 +19,11 @@ bool g_SERVER_TERMINATED = false; // Set to true when the server terminates, so 
 
 
 
-/** If set to true, the protocols will log each player's communication to a separate logfile */
-bool g_ShouldLogComm;
+/** If set to true, the protocols will log each player's incoming (C->S) communication to a per-connection logfile */
+bool g_ShouldLogCommIn;
+
+/** If set to true, the protocols will log each player's outgoing (S->C) communication to a per-connection logfile */
+bool g_ShouldLogCommOut;
 
 
 
@@ -242,7 +245,24 @@ int main( int argc, char **argv )
 			(NoCaseCompare(argv[i], "/logcomm") == 0)
 		)
 		{
-			g_ShouldLogComm = true;
+			g_ShouldLogCommIn = true;
+			g_ShouldLogCommOut = true;
+		}
+		if (
+			(NoCaseCompare(argv[i], "/commlogin") == 0) ||
+			(NoCaseCompare(argv[i], "/comminlog") == 0) ||
+			(NoCaseCompare(argv[i], "/logcommin") == 0)
+		)
+		{
+			g_ShouldLogCommIn = true;
+		}
+		if (
+			(NoCaseCompare(argv[i], "/commlogout") == 0) ||
+			(NoCaseCompare(argv[i], "/commoutlog") == 0) ||
+			(NoCaseCompare(argv[i], "/logcommout") == 0)
+		)
+		{
+			g_ShouldLogCommOut = true;
 		}
 	}
 	
