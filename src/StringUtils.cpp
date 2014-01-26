@@ -833,7 +833,8 @@ AString Base64Encode(const AString & a_Input)
 
 short GetBEShort(const char * a_Mem)
 {
-	return (((short)a_Mem[0]) << 8) | a_Mem[1];
+	const Byte * Bytes = (const Byte *)a_Mem;
+	return (Bytes[0] << 8) | Bytes[1];
 }
 
 
@@ -842,7 +843,8 @@ short GetBEShort(const char * a_Mem)
 
 int GetBEInt(const char * a_Mem)
 {
-	return (((int)a_Mem[0]) << 24) | (((int)a_Mem[1]) << 16) | (((int)a_Mem[2]) << 8) | a_Mem[3];
+	const Byte * Bytes = (const Byte *)a_Mem;
+	return (Bytes[0] << 24) | (Bytes[1] << 16) | (Bytes[2] << 8) | Bytes[3];
 }
 
 
