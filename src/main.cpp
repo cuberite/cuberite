@@ -68,9 +68,10 @@ void NonCtrlHandler(int a_Signal)
 			LOGERROR("Details | SIGABRT: Server self-terminated due to an internal fault");
 			break;
 		}
+		case SIGINT:
 		case SIGTERM:
 		{
-			std::signal(SIGTERM, SIG_IGN); // Server is shutting down, wait for it...
+			std::signal(a_Signal, SIG_IGN); // Server is shutting down, wait for it...
 			break;
 		}
 		default: break;
@@ -224,6 +225,10 @@ int main( int argc, char **argv )
 	std::signal(SIGSEGV, NonCtrlHandler);
 	std::signal(SIGTERM, NonCtrlHandler);
 	std::signal(SIGINT,  NonCtrlHandler);
+	std::signal(SIGABRT, NonCtrlHandler);
+	#ifdef SIGABRT_COMPAT
+	std::signal(SIGABRT_COMPAT, NonCtrlHandler);
+	#endif // SIGABRT_COMPAT
 	#endif
 
 	// DEBUG: test the dumpfile creation:
