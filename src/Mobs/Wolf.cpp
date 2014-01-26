@@ -75,10 +75,12 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				SetIsTame(true);
 				SetOwner(a_Player.GetName());
 				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_WOLF_TAMED);
+				m_World->BroadcastParticleEffect("heart", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
 			}
 			else
 			{
 				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_WOLF_TAMING);
+				m_World->BroadcastParticleEffect("smoke", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
 			}
 		}
 	}
@@ -122,7 +124,8 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		super::Tick(a_Dt, a_Chunk);
 	}
-
+	
+	// The wolf is sitting so don't move him at all.
 	if (IsSitting())
 	{
 		m_bMovingToDestination = false;
@@ -145,8 +148,18 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 					SetIsBegging(true);
 					m_World->BroadcastEntityMetadata(*this);
 				}
-				m_FinalDestination = a_Closest_Player->GetPosition();;
-				m_bMovingToDestination = false;
+				// Don't move to the player if the wolf is sitting.
+				if (IsSitting())
+				{
+					m_bMovingToDestination = false;
+				}
+				else
+				{
+					m_bMovingToDestination = true;
+				}
+				Vector3d PlayerPos = a_Closest_Player->GetPosition();
+				PlayerPos.y++;
+				m_FinalDestination = PlayerPos;
 				break;
 			}
 			default:
@@ -185,15 +198,26 @@ void cWolf::TickFollowPlayer()
 	} Callback;
 	if (m_World->DoWithPlayer(m_OwnerName, Callback))
 	{
-		// The player is present in the world, follow them:
+		// The player is present in the world, follow him:
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();
-		if ((Distance > 30) && (!IsSitting()))
+		if (Distance > 30)
 		{
-			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+			if (!IsSitting())
+			{
+				TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+			}
 		}
 		else
 		{
-			MoveToPosition(Callback.OwnerPos);
+			m_FinalDestination = Callback.OwnerPos;
+			if (IsSitting())
+			{
+				m_bMovingToDestination = false;
+			}
+			else
+			{
+				m_bMovingToDestination = true;
+			}
 		}
 	}
 }
