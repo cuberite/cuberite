@@ -53,19 +53,19 @@ public:
 	}
 
 
-	void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	void OnDestroyed(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		cBlockHandler::OnDestroyed(a_World, a_BlockX, a_BlockY, a_BlockZ);
+		cBlockHandler::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
 		
 		//0.5% chance of dropping an apple
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_ChunkInterface->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		//check if Oak (0x1 and 0x2 bit not set)
 		MTRand rand;
 		if(!(Meta & 3) && rand.randInt(200) == 100)
 		{
 			cItems Drops;
 			Drops.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
-			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
+			a_WorldInterface->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 	

@@ -284,41 +284,41 @@ void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int
 
 
 
-void cBlockHandler::OnPlaced(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cBlockHandler::OnPlaced(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	// Notify the neighbors
-	NeighborChanged(a_World, a_BlockX - 1, a_BlockY, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX + 1, a_BlockY, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ - 1);
-	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ + 1);
+	NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ - 1);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ + 1);
 }
 
 
 
 
 
-void cBlockHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnDestroyed(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Notify the neighbors
-	NeighborChanged(a_World, a_BlockX - 1, a_BlockY, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX + 1, a_BlockY, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ - 1);
-	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ + 1);
+	NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ - 1);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ + 1);
 }
 
 
 
 
 
-void cBlockHandler::NeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::NeighborChanged(cChunkInterface *a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	if ((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height))
 	{
-		GetBlockHandler(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ);
+		GetBlockHandler(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 	}
 }
 
@@ -326,7 +326,7 @@ void cBlockHandler::NeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY,
 
 
 
-void cBlockHandler::OnNeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnNeighborChanged(cChunkInterface *a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -342,7 +342,7 @@ void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, 
 
 
 
-void cBlockHandler::OnUse(cWorld *a_World, cWorldInterface * a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+void cBlockHandler::OnUse(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 }
 

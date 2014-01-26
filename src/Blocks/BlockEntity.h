@@ -15,9 +15,9 @@ public:
 	{
 	}
 	
-	virtual void OnUse(cWorld * a_World, cWorldInterface * a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual void OnUse(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
-		a_World->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ);
+		a_ChunkInterface->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ);
 	}
 	
 	virtual bool IsUseable() override

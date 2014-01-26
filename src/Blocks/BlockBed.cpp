@@ -6,7 +6,7 @@
 
 
 void cBlockBedHandler::OnPlacedByPlayer(
-	cChunkInterface * a_ChunkInterface, cPlayer * a_Player,
+	cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer * a_Player,
 	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
@@ -15,7 +15,7 @@ void cBlockBedHandler::OnPlacedByPlayer(
 	if (a_BlockMeta < 8)
 	{
 		Vector3i Direction = MetaDataToDirection(a_BlockMeta);
-		a_ChunkInterface->SetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
+		a_ChunkInterface->SetBlock(a_WorldInterface,a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
 	}
 }
 
@@ -56,7 +56,7 @@ void cBlockBedHandler::OnUse(cChunkInterface * a_ChunkInterface, cWorldInterface
 	if (a_WorldInterface->GetDimension() != dimOverworld)
 	{
 		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
-		a_ChunkInterface->DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
+		a_WorldInterface->DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
 	}
 	else
 	{
@@ -66,7 +66,7 @@ void cBlockBedHandler::OnUse(cChunkInterface * a_ChunkInterface, cWorldInterface
 			if (Meta & 0x8)
 			{
 				// Is pillow	
-				a_WorldInterface->BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
+				a_WorldInterface->GetBroadcastManager()->BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
 			}
 			else
 			{
@@ -74,7 +74,7 @@ void cBlockBedHandler::OnUse(cChunkInterface * a_ChunkInterface, cWorldInterface
 				Vector3i Direction = MetaDataToDirection( Meta & 0x7 );
 				if (a_ChunkInterface->GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) == E_BLOCK_BED) // Must always use pillow location for sleeping
 				{
-					a_WorldInterface->BroadcastUseBed(*a_Player, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z);
+					a_WorldInterface->GetBroadcastManager()->BroadcastUseBed(*a_Player, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z);
 				}
 			}
 		} else {

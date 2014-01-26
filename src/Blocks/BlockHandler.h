@@ -5,13 +5,13 @@
 #include "../Item.h"
 #include "../Chunk.h"
 #include "WorldInterface.h"
+#include "ChunkInterface.h"
 
 
 
 
 
 // fwd:
-class cWorld;
 class cPlayer;
 
 
@@ -40,7 +40,7 @@ public:
 	);
 
 	/// Called by cWorld::SetBlock() after the block has been set
-	virtual void OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	virtual void OnPlaced(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	
 	/// Called by cClientHandle::HandlePlaceBlock() after the player has placed a new block. Called after OnPlaced().
 	virtual void OnPlacedByPlayer(
@@ -54,19 +54,19 @@ public:
 	virtual void OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called before a block gets destroyed / replaced with air
-	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void OnDestroyed(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called when a direct neighbor of this block has been changed (The position is the own position, not the neighbor position)
-	virtual void OnNeighborChanged(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void OnNeighborChanged(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Notifies all neighbors of the given block about a change
-	static void NeighborChanged(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	static void NeighborChanged(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called while the player diggs the block.
 	virtual void OnDigging(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called if the user right clicks the block and the block is useable
-	virtual void OnUse(cWorld * a_World, cWorldInterface * a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
+	virtual void OnUse(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	
 	/// <summary>Called when the item is mined to convert it into pickups. Pickups may specify multiple items. Appends items to a_Pickups, preserves its original contents</summary>
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
