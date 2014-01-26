@@ -21,7 +21,7 @@ cVillager::cVillager(eVillagerType VillagerType) :
 void cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	super::DoTakeDamage(a_TDI);
-	if (a_TDI.Attacker->IsPlayer())
+	if ((a_TDI.Attacker != NULL) && a_TDI.Attacker->IsPlayer())
 	{
 		if (m_World->GetTickRandomNumber(5) == 3)
 		{
