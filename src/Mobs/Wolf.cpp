@@ -202,7 +202,10 @@ void cWolf::TickFollowPlayer()
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();
 		if (Distance > 30)
 		{
-			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+			if (!IsSitting())
+			{
+				TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+			}
 		}
 		else
 		{
