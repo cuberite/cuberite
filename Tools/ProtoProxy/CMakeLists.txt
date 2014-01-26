@@ -63,7 +63,9 @@ endif()
 
 # Set include paths to the used libraries:
 include_directories("../../lib")
+include_directories("../../lib/polarssl/include")
 include_directories("../../src")
+
 
 
 function(flatten_files arg1)
@@ -77,11 +79,11 @@ endfunction()
 
 
 # Include the libraries:
-file(GLOB CRYPTOPP_SRC "../../lib/cryptopp/*.cpp")
-file(GLOB CRYPTOPP_HDR "../../lib/cryptopp/*.h")
-flatten_files(CRYPTOPP_SRC)
-flatten_files(CRYPTOPP_HDR)
-source_group("CryptoPP" FILES ${CRYPTOPP_SRC} ${CRYPTOPP_HDR})
+file(GLOB POLARSSL_SRC "../../lib/polarssl/library/*.c")
+file(GLOB POLARSSL_HDR "../../lib/polarssl/include/polarssl/*.h")
+flatten_files(POLARSSL_SRC)
+flatten_files(POLARSSL_HDR)
+source_group("PolarSSL" FILES ${POLARSSL_SRC} ${POLARSSL_HDR})
 
 file(GLOB ZLIB_SRC "../../lib/zlib/*.c")
 file(GLOB ZLIB_HDR "../../lib/zlib/*.h")
@@ -96,12 +98,14 @@ set(SHARED_SRC
 	../../src/StringUtils.cpp
 	../../src/Log.cpp
 	../../src/MCLogger.cpp
+	../../src/Crypto.cpp
 )
 set(SHARED_HDR
 	../../src/ByteBuffer.h
 	../../src/StringUtils.h
 	../../src/Log.h
 	../../src/MCLogger.h
+	../../src/Crypto.h
 )
 set(SHARED_OSS_SRC
 	../../src/OSSupport/CriticalSection.cpp
@@ -145,8 +149,8 @@ add_executable(ProtoProxy
 	${SHARED_HDR}
 	${SHARED_OSS_SRC}
 	${SHARED_OSS_HDR}
-	${CRYPTOPP_SRC}
-	${CRYPTOPP_HDR}
+	${POLARSSL_SRC}
+	${POLARSSL_HDR}
 	${ZLIB_SRC}
 	${ZLIB_HDR}
 )

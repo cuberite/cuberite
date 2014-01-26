@@ -862,8 +862,10 @@ static int MyAllocHook(int nAllocType, void *pvData,
 		{
 			// RequestID was found
 			size_t temp = g_CurrentMemUsage;
-			g_CurrentMemUsage -= nSize ;
-			g_pCRTTable->Remove(lRequest);
+			if (g_pCRTTable->Remove(lRequest))
+			{
+				g_CurrentMemUsage -= nSize;
+			}
 			if (g_CurrentMemUsage > temp)
 			{
 				printf("********************************************\n");
@@ -896,8 +898,11 @@ static int MyAllocHook(int nAllocType, void *pvData,
 			// Try to find the RequestID in the Hash-Table, mark it that it was freed
 			lReallocRequest = pHead->lRequest;
 			size_t temp = g_CurrentMemUsage;
-			g_CurrentMemUsage -= pHead->nDataSize;
 			bRet = g_pCRTTable->Remove(lReallocRequest);
+			if (bRet)
+			{
+				g_CurrentMemUsage -= pHead->nDataSize;
+			}
 			if (g_CurrentMemUsage > temp)
 			{
 				printf("********************************************\n");

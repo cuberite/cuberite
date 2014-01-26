@@ -12,9 +12,9 @@
 struct cMonsterConfig::sAttributesStruct
 {
 	AString m_Name;
-	double  m_SightDistance;
-	double  m_AttackDamage;
-	double  m_AttackRange;
+	int     m_SightDistance;
+	int     m_AttackDamage;
+	int     m_AttackRange;
 	double  m_AttackRate;
 	int     m_MaxHealth;
 };
@@ -67,9 +67,9 @@ void cMonsterConfig::Initialize()
 		sAttributesStruct Attributes;
 		AString Name = MonstersIniFile.GetKeyName(i);
 		Attributes.m_Name = Name;
-		Attributes.m_AttackDamage  = MonstersIniFile.GetValueF(Name, "AttackDamage",  0);
-		Attributes.m_AttackRange   = MonstersIniFile.GetValueF(Name, "AttackRange",   0);
-		Attributes.m_SightDistance = MonstersIniFile.GetValueF(Name, "SightDistance", 0);
+		Attributes.m_AttackDamage  = MonstersIniFile.GetValueI(Name, "AttackDamage",  0);
+		Attributes.m_AttackRange   = MonstersIniFile.GetValueI(Name, "AttackRange",   0);
+		Attributes.m_SightDistance = MonstersIniFile.GetValueI(Name, "SightDistance", 0);
 		Attributes.m_AttackRate    = MonstersIniFile.GetValueF(Name, "AttackRate",    0);
 		Attributes.m_MaxHealth     = MonstersIniFile.GetValueI(Name, "MaxHealth",     1);
 		m_pState->AttributesList.push_front(Attributes);
@@ -87,10 +87,10 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 	{
 		if (itr->m_Name.compare(a_Name) == 0)
 		{
-			a_Monster->SetAttackDamage ((float)itr->m_AttackDamage);
-			a_Monster->SetAttackRange  ((float)itr->m_AttackRange);
-			a_Monster->SetSightDistance((float)itr->m_SightDistance);
-			a_Monster->SetAttackRate   ((int)itr->m_AttackRate);
+			a_Monster->SetAttackDamage (itr->m_AttackDamage);
+			a_Monster->SetAttackRange  (itr->m_AttackRange);
+			a_Monster->SetSightDistance(itr->m_SightDistance);
+			a_Monster->SetAttackRate   ((float)itr->m_AttackRate);
 			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
 			return;
 		}

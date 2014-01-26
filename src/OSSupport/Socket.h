@@ -14,7 +14,7 @@
 #endif
 
 
-
+#include "Errors.h"
 
 
 class cSocket
@@ -57,11 +57,10 @@ public:
 	/// Initializes the network stack. Returns 0 on success, or another number as an error code.
 	static int WSAStartup(void);
 
-	static AString GetErrorString(int a_ErrNo);
 	static int     GetLastError();
 	static AString GetLastErrorString(void)
 	{
-		return GetErrorString(GetLastError());
+		return GetOSErrorString(GetLastError());
 	}
 	
 	/// Creates a new socket of the specified address family

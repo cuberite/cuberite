@@ -1,4 +1,3 @@
-
 cmake_minimum_required (VERSION 2.6)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
@@ -92,12 +91,6 @@ else()
 endif()
 
 
-# Under clang, we need to disable ASM support in CryptoPP:
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_definitions(-DCRYPTOPP_DISABLE_ASM)
-endif()
-
-
 # Under Windows, we need Lua as DLL; on *nix we need it linked statically:
 if (WIN32)
 	add_definitions(-DLUA_BUILD_AS_DLL)
@@ -183,7 +176,6 @@ project (MCServer)
 # Include all the libraries:
 add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
-add_subdirectory(lib/cryptopp/)
 add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)
 add_subdirectory(lib/tolua++/)
@@ -191,6 +183,12 @@ add_subdirectory(lib/sqlite/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/md5/)
+
+
+# We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
+# (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
+add_subdirectory(lib/polarssl/ EXCLUDE_FROM_ALL)
+
 
 # Remove disabling the maximum warning level:
 # clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings

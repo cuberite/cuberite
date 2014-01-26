@@ -5,8 +5,6 @@
 
 
 
-typedef unsigned char Byte;
-
 /// List of slot numbers, used for inventory-painting
 typedef std::vector<int> cSlotNums;
 
@@ -277,6 +275,24 @@ inline bool IsBlockLava(BLOCKTYPE a_BlockType)
 inline bool IsBlockLiquid(BLOCKTYPE a_BlockType)
 {
 	return IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType);
+}
+
+
+
+
+inline bool IsBlockRail(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_RAIL:
+		case E_BLOCK_ACTIVATOR_RAIL:
+		case E_BLOCK_DETECTOR_RAIL:
+		case E_BLOCK_POWERED_RAIL:
+		{
+			return true;
+		}
+		default: return false;
+	}
 }
 
 

@@ -149,15 +149,6 @@ cClientHandle::~cClientHandle()
 		SendDisconnect("Server shut down? Kthnxbai");
 	}
 	
-	// Queue all remaining outgoing packets to cSocketThreads:
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		AString Data;
-		m_OutgoingData.ReadAll(Data);
-		m_OutgoingData.CommitRead();
-		cRoot::Get()->GetServer()->WriteToClient(this, Data);
-	}
-	
 	// Close the socket as soon as it sends all outgoing data:
 	cRoot::Get()->GetServer()->RemoveClient(this);
 	
@@ -611,25 +602,18 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 		}
 	}
 
-	class cUpdateCommandBlock :
-		public cCommandBlockCallback
-	{
-		AString m_Command;
-	public:
-		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
-			
-		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
-		{
-			a_CommandBlock->SetCommand(m_Command);
-			return false;
-		}
-	} CmdBlockCB (Command);
-
 	cWorld * World = m_Player->GetWorld();
 
-	World->DoWithCommandBlockAt(BlockX, BlockY, BlockZ, CmdBlockCB);
+	if (World->AreCommandBlocksEnabled())
+	{
+		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
 
-	SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+		SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+	}
+	else
+	{
+		SendChat(Printf("%s[INFO]%s Command blocks are not enabled on this server", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
+	}
 }
 
 
@@ -665,7 +649,8 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
 			}
-			m_Player->TossItem(false);
+
+			m_Player->TossEquippedItem();
 			return;
 		}
 
@@ -720,7 +705,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
 			}
-			m_Player->TossItem(false, 64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
+			m_Player->TossEquippedItem(64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
 			return;
 		}
 

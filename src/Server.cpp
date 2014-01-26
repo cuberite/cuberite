@@ -194,7 +194,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
-	m_FaviconData = Base64Encode(cFile::ReadWholeFile("favicon.png")); // Will return empty string if file nonexistant; client doesn't mind
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png"))); // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{
@@ -284,17 +284,9 @@ int cServer::GetNumPlayers(void)
 
 void cServer::PrepareKeys(void)
 {
-	// TODO: Save and load key for persistence across sessions
-	// But generating the key takes only a moment, do we even need that?
-	
 	LOGD("Generating protocol encryption keypair...");
-	
-	time_t CurTime = time(NULL);
-	CryptoPP::RandomPool rng;
-	rng.Put((const byte *)&CurTime, sizeof(CurTime));
-	m_PrivateKey.GenerateRandomWithKeySize(rng, 1024);
-	CryptoPP::RSA::PublicKey pk(m_PrivateKey);
-	m_PublicKey = pk;
+	VERIFY(m_PrivateKey.Generate(1024));
+	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
 }
 
 

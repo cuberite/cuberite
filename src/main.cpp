@@ -19,6 +19,13 @@ bool g_SERVER_TERMINATED = false; // Set to true when the server terminates, so 
 
 
 
+/** If set to true, the protocols will log each player's communication to a separate logfile */
+bool g_ShouldLogComm;
+
+
+
+
+
 /// If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window
 #define ENABLE_LEAK_FINDER
 
@@ -216,11 +223,23 @@ int main( int argc, char **argv )
 	#ifndef _DEBUG
 	std::signal(SIGSEGV, NonCtrlHandler);
 	std::signal(SIGTERM, NonCtrlHandler);
-	std::signal(SIGINT, NonCtrlHandler);
+	std::signal(SIGINT,  NonCtrlHandler);
 	#endif
 
 	// DEBUG: test the dumpfile creation:
 	// *((int *)0) = 0;
+	
+	// Check if comm logging is to be enabled:
+	for (int i = 0; i < argc; i++)
+	{
+		if (
+			(NoCaseCompare(argv[i], "/commlog") == 0) ||
+			(NoCaseCompare(argv[i], "/logcomm") == 0)
+		)
+		{
+			g_ShouldLogComm = true;
+		}
+	}
 	
 	#if !defined(ANDROID_NDK)
 	try

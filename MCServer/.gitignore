@@ -4,6 +4,7 @@
 *.lib
 *.ini
 MCServer
+CommLogs/
 logs
 players
 world*
