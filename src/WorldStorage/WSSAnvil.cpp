@@ -611,12 +611,18 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 
 bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int ID = a_NBT.FindChildByName(a_TagIdx, "id");
-	if ((ID < 0) || (a_NBT.GetType(ID) != TAG_Short))
+	int Type = a_NBT.FindChildByName(a_TagIdx, "id");
+	if ((Type < 0) || (a_NBT.GetType(Type) != TAG_Short))
 	{
 		return false;
 	}
-	a_Item.m_ItemType = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
+	a_Item.m_ItemType = a_NBT.GetShort(Type);
+	if (a_Item.m_ItemType < 0)
+	{
+		LOGD("Encountered an item with negative type (%d). Replacing with an empty item.", a_NBT.GetShort(Type));
+		a_Item.Empty();
+		return true;
+	}
 	
 	int Damage = a_NBT.FindChildByName(a_TagIdx, "Damage");
 	if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
