@@ -30,11 +30,16 @@ public:
 	CLASS_PROTODEF(cVillager);
 
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual void Tick        (float a_Dt, cChunk & a_Chunk) override;
+
+	void HandleFarmer();
 	int GetVilType(void) const { return m_Type; }	
 
 private:
 
 	int m_Type;
+	bool m_DidFindCrops;
+	Vector3i m_CropsPos;
 
 } ;
 
