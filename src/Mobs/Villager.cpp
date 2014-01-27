@@ -47,8 +47,8 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 			BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 			if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
 			{
-				cBlockHandler Handler(CropBlock);
-				Handler.DropBlock(m_World, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
+				cBlockHandler * Handler = cBlockHandler::GetBlockHandler(CropBlock);
+				Handler->DropBlock(m_World, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 				m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
 			}
 		}
