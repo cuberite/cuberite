@@ -141,6 +141,11 @@ void cVillager::HandleFarmerAttemptSpecialAction()
 
 void cVillager::HandleFarmerAction()
 {
+	if (!m_World->VillagersShouldHarvestCrops())
+	{
+		return;
+	}
+
 	// Harvest the crops if the villager isn't moving and if the crops are closer then 2 blocks.
 	if (!m_bMovingToDestination && (GetPosition() - m_CropsPos).Length() < 2)
 	{
@@ -161,6 +166,11 @@ void cVillager::HandleFarmerAction()
 
 void cVillager::HandleFarmerEndCountDown()
 {
+	if (!m_World->VillagersShouldHarvestCrops())
+	{
+		return;
+	}
+
 	// Check if there is still farmland at the spot where the crops were.
 	if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == E_BLOCK_FARMLAND)
 	{
