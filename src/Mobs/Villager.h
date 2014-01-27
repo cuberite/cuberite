@@ -29,12 +29,18 @@ public:
 
 	CLASS_PROTODEF(cVillager);
 
+	// Override functions
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void Tick        (float a_Dt, cChunk & a_Chunk) override;
 
+	// cVillager functions
 	void HandleFarmer();
 	bool IsBlockFarmable(BLOCKTYPE a_BlockType);
+
+	// Get and set functions.
 	int GetVilType(void) const { return m_Type; }	
+	Vector3i GetCropsPos(void) const { return m_CropsPos; }
+	bool DidFindCrops(void) const { return m_DidFindCrops; }
 
 private:
 
