@@ -101,29 +101,30 @@ void cVillager::HandleFarmer()
 	(int) GetPosZ() - 5,
 	(int) GetPosZ() + 5);
 
-	// Check for crops in a 10x6x10 area.
-	for (int X = 0; X < 10; X++)
+	
+	for (int I = 0; I < 5; I++)
 	{
 		for (int Y = 0; Y < 6; Y++)
 		{
-			for (int Z = 0; Z < 10; Z++)
-			{
-				if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
-				{
-					continue;
-				}
-				if (Surrounding.GetRelBlockMeta(X, Y, Z) != 0x7)
-				{
-					continue;
-				}
+			// Pick random coordinates and check for crops.
+			int X = m_World->GetTickRandomNumber(11);
+			int Z = m_World->GetTickRandomNumber(11);
 
-				m_DidFindCrops = true;
-				m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
-				MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) m_CropsPos.y, (float) (m_CropsPos.z + 0.5)));
-				return;
+			if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
+			{
+				continue;
 			}
-		}
-	}
+			if (Surrounding.GetRelBlockMeta(X, Y, Z) != 0x7)
+			{
+				continue;
+			}
+
+			m_DidFindCrops = true;
+			m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
+			MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) m_CropsPos.y, (float) (m_CropsPos.z + 0.5)));
+			return;
+		} // for Y loop.
+	} // Repeat the procces 5 times.
 }
 
 
