@@ -34,19 +34,23 @@ public:
 	virtual void Tick        (float a_Dt, cChunk & a_Chunk) override;
 
 	// cVillager functions
-	void HandleFarmer();
 	bool IsBlockFarmable(BLOCKTYPE a_BlockType);
+
+	// Farmer functions
+	void HandleFarmerAttemptSpecialAction();
+	void HandleFarmerAction();
+	void HandleFarmerNoCountDown();
 
 	// Get and set functions.
 	int GetVilType(void) const { return m_Type; }	
 	Vector3i GetCropsPos(void) const { return m_CropsPos; }
-	bool DidFindCrops(void) const { return m_DidFindCrops; }
+	bool DoesHaveActionActivated(void) const { return m_VillagerAction; }
 
 private:
 
 	int m_ActionCountDown;
 	int m_Type;
-	bool m_DidFindCrops;
+	bool m_VillagerAction;
 	Vector3i m_CropsPos;
 
 } ;

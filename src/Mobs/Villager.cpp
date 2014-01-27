@@ -13,7 +13,7 @@
 cVillager::cVillager(eVillagerType VillagerType) :
 	super("Villager", mtVillager, "", "", 0.6, 1.8),
 	m_Type(VillagerType),
-	m_DidFindCrops(false),
+	m_VillagerAction(false),
 	m_ActionCountDown(-1)
 {
 }
@@ -50,33 +50,33 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 			{
 				case vtFarmer: 
 				{
-					if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == E_BLOCK_FARMLAND)
-					{
-						m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_CROPS, 0);
-					}
+					HandleFarmerNoCountDown();
 				}
 			}
 		}
 		return;
 	}
 
-	if (m_DidFindCrops && !m_bMovingToDestination)
+	if (m_VillagerAction)
 	{
-		if ((GetPosition() - m_CropsPos).Length() < 2)
+		switch (m_Type)
 		{
-			BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
-			if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
+			case vtFarmer:
 			{
-				cBlockHandler * Handler = cBlockHandler::GetBlockHandler(CropBlock);
-				Handler->DropBlock(m_World, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
-				m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
-				m_ActionCountDown = 20;
+				HandleFarmerAction();
 			}
 		}
-		m_DidFindCrops = false;
+		m_VillagerAction = false;
 	}
 
-	if (m_World->GetTickRandomNumber(100) != 0)
+	// The villager already has an special action activated.
+	if (m_VillagerAction)
+	{
+		return;
+	}
+
+	// Don't always try to do a special action. Each tick has 1% to do a special action.
+	if (m_World->GetTickRandomNumber(99) != 0)
 	{
 		return;
 	}
@@ -85,10 +85,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		case vtFarmer:
 		{
-			if (!m_DidFindCrops)
-			{
-				HandleFarmer();
-			}
+			HandleFarmerAttemptSpecialAction();
 		}
 	}
 }
@@ -96,16 +93,19 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cVillager::HandleFarmer()
+void cVillager::HandleFarmerAttemptSpecialAction()
 {
 	cBlockArea Surrounding;
-	Surrounding.Read(m_World,
-	(int) GetPosX() - 5,
-	(int) GetPosX() + 5,
-	(int) GetPosY() - 3,
-	(int) GetPosY() + 3,
-	(int) GetPosZ() - 5,
-	(int) GetPosZ() + 5);
+	/// Read a 11x7x11 area.
+	Surrounding.Read(
+		m_World,
+		(int) GetPosX() - 5,
+		(int) GetPosX() + 5,
+		(int) GetPosY() - 3,
+		(int) GetPosY() + 3,
+		(int) GetPosZ() - 5,
+		(int) GetPosZ() + 5
+	);
 
 	
 	for (int I = 0; I < 5; I++)
@@ -125,12 +125,42 @@ void cVillager::HandleFarmer()
 				continue;
 			}
 
-			m_DidFindCrops = true;
+			m_VillagerAction = true;
 			m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
 			MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) m_CropsPos.y, (float) (m_CropsPos.z + 0.5)));
 			return;
 		} // for Y loop.
 	} // Repeat the procces 5 times.
+}
+
+
+
+
+
+void cVillager::HandleFarmerAction()
+{
+	if (!m_bMovingToDestination && (GetPosition() - m_CropsPos).Length() < 2)
+	{
+		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
+		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
+		{
+			cBlockHandler * Handler = cBlockHandler::GetBlockHandler(CropBlock);
+			Handler->DropBlock(m_World, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
+			m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
+			m_ActionCountDown = 20;
+		}
+	}
+}
+
+
+
+
+void cVillager::HandleFarmerNoCountDown()
+{
+	if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == E_BLOCK_FARMLAND)
+	{
+		m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_CROPS, 0);
+	}
 }
 
 
