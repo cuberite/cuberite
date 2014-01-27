@@ -6,7 +6,8 @@
 #ifndef _WIN32
 	#include <netdb.h>
 	#include <unistd.h>
-	#include <arpa/inet.h>		//inet_ntoa()
+	#include <arpa/inet.h>  // inet_ntoa()
+	#include <sys/ioctl.h>  // ioctl()
 #else
 	#define socklen_t int
 #endif
