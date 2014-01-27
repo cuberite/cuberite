@@ -13,7 +13,8 @@
 cVillager::cVillager(eVillagerType VillagerType) :
 	super("Villager", mtVillager, "", "", 0.6, 1.8),
 	m_Type(VillagerType),
-	m_DidFindCrops(false)
+	m_DidFindCrops(false),
+	m_ActionCountDown(-1)
 {
 }
 
@@ -40,6 +41,19 @@ void cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+	if (m_ActionCountDown > -1)
+	{
+		m_ActionCountDown--;
+		if (m_ActionCountDown == 0)
+		{
+			switch (m_Type)
+			{
+				case vtFarmer: m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_CROPS, 0);
+			}
+		}
+		return;
+	}
+
 	if (m_DidFindCrops && !m_bMovingToDestination)
 	{
 		if ((GetPosition() - m_CropsPos).Length() < 2)
@@ -50,6 +64,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 				cBlockHandler * Handler = cBlockHandler::GetBlockHandler(CropBlock);
 				Handler->DropBlock(m_World, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 				m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
+				m_ActionCountDown = 20;
 			}
 		}
 		m_DidFindCrops = false;

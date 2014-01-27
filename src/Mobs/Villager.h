@@ -38,6 +38,7 @@ public:
 
 private:
 
+	int m_ActionCountDown;
 	int m_Type;
 	bool m_DidFindCrops;
 	Vector3i m_CropsPos;
