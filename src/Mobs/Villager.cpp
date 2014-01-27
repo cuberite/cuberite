@@ -3,7 +3,7 @@
 
 #include "Villager.h"
 #include "../World.h"
-#include "../Blockarea.h"
+#include "../BlockArea.h"
 #include "../Blocks/BlockHandler.h"
 
 
