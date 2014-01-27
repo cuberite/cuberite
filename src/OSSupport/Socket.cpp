@@ -361,24 +361,17 @@ void cSocket::SetNonBlocking(void)
 	#ifdef _WIN32
 		u_long NonBlocking = 1;
 		int res = ioctlsocket(m_Socket, FIONBIO, &NonBlocking);
-		if (res != 0)
-		{
-			LOGERROR("Cannot set socket to non-blocking. This would make the server deadlock later on, aborting.\nErr: %d, %d, %s",
-				res, GetLastError(), GetLastErrorString().c_str()
-			);
-			abort();
-		}
 	#else
 		int NonBlocking = 1;
 		int res = ioctl(m_Socket, FIONBIO, (char *)&NonBlocking);
-		if (res != 0)
-		{
-			LOGERROR("Cannot set socket to non-blocking. This would make the server deadlock later on, aborting.\nErr: %d, %d, %s",
-				res, GetLastError(), GetLastErrorString().c_str()
-			);
-			abort();
-		}
 	#endif
+	if (res != 0)
+	{
+		LOGERROR("Cannot set socket to non-blocking. This would make the server deadlock later on, aborting.\nErr: %d, %d, %s",
+			res, GetLastError(), GetLastErrorString().c_str()
+		);
+		abort();
+	}
 }
 
 
