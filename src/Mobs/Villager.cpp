@@ -43,11 +43,19 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 	if (m_DidFindCrops)
 	{
 		Vector3i Pos = Vector3i(GetPosition());
-		std::cout << Pos.Equals(m_CropsPos) << "\n";
 		if (Pos.Equals(m_CropsPos))
 		{
-			cBlockHandler Handler(E_BLOCK_CROPS);
-			Handler.DropBlock(m_World, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
+			BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
+			if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
+			{
+				cItems Pickups;
+				//Pickups.Add(E_ITEM_WHEAT, 1, 0);
+				//Pickups.Add(E_ITEM_SEEDS, 1 + m_World->GetTickRandomNumber(
+				cBlockHandler Handler(CropBlock);
+				Handler.ConvertToPickups(Pickups, 0x7);
+				m_World->SpawnItemPickups(Pickups, m_CropsPos.x + 0.5, m_CropsPos.y + 0.5, m_CropsPos.z + 0.5);
+				m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
+			}
 			m_DidFindCrops = false;
 		}
 	}
@@ -64,7 +72,6 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 			HandleFarmer();
 		}
 	}
-
 }
 
 
@@ -88,13 +95,19 @@ void cVillager::HandleFarmer()
 		{
 			for (int Z = 0; Z < 10; Z++)
 			{
-				if (Surrounding.GetRelBlockType(X, Y, Z) == E_BLOCK_CROPS && Surrounding.GetRelBlockMeta(X, Y, Z) == 0x7)
+				if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
 				{
-					m_DidFindCrops = true;
-					m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
-					MoveToPosition(Vector3f((float) GetPosX() + X - 5, (float) GetPosY() + Y - 3, (float) GetPosZ() + Z - 5));
-					return;
+					continue;
 				}
+				if (Surrounding.GetRelBlockMeta(X, Y, Z) != 0x7)
+				{
+					continue;
+				}
+
+				m_DidFindCrops = true;
+				m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
+				MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) (m_CropsPos.y), (float) (m_CropsPos.z + 0.5)));
+				return;
 			}
 		}
 	}
@@ -102,4 +115,19 @@ void cVillager::HandleFarmer()
 
 
 
+
+
+bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_CROPS:
+		case E_BLOCK_POTATOES:
+		case E_BLOCK_CARROTS:
+		{
+			return true;
+		}
+	}
+	return false;
+}
 

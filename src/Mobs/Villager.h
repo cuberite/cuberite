@@ -33,6 +33,7 @@ public:
 	virtual void Tick        (float a_Dt, cChunk & a_Chunk) override;
 
 	void HandleFarmer();
+	bool IsBlockFarmable(BLOCKTYPE a_BlockType);
 	int GetVilType(void) const { return m_Type; }	
 
 private:
