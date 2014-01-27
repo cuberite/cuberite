@@ -76,7 +76,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 		m_DidFindCrops = false;
 	}
 
-	if (m_World->GetTickRandomNumber(50) != 0)
+	if (m_World->GetTickRandomNumber(100) != 0)
 	{
 		return;
 	}
