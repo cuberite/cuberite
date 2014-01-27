@@ -48,7 +48,13 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			switch (m_Type)
 			{
-				case vtFarmer: m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_CROPS, 0);
+				case vtFarmer: 
+				{
+					if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == E_BLOCK_FARMLAND)
+					{
+						m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_CROPS, 0);
+					}
+				}
 			}
 		}
 		return;
