@@ -40,24 +40,19 @@ void cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	if (m_DidFindCrops)
+	if (m_DidFindCrops && !m_bMovingToDestination)
 	{
-		Vector3i Pos = Vector3i(GetPosition());
-		if (Pos.Equals(m_CropsPos))
+		if ((GetPosition() - m_CropsPos).Length() < 2)
 		{
 			BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 			if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
 			{
-				cItems Pickups;
-				//Pickups.Add(E_ITEM_WHEAT, 1, 0);
-				//Pickups.Add(E_ITEM_SEEDS, 1 + m_World->GetTickRandomNumber(
 				cBlockHandler Handler(CropBlock);
-				Handler.ConvertToPickups(Pickups, 0x7);
-				m_World->SpawnItemPickups(Pickups, m_CropsPos.x + 0.5, m_CropsPos.y + 0.5, m_CropsPos.z + 0.5);
+				Handler.DropBlock(m_World, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 				m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
 			}
-			m_DidFindCrops = false;
 		}
+		m_DidFindCrops = false;
 	}
 
 	if (m_World->GetTickRandomNumber(50) != 0)
@@ -69,7 +64,10 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		case vtFarmer:
 		{
-			HandleFarmer();
+			if (!m_DidFindCrops)
+			{
+				HandleFarmer();
+			}
 		}
 	}
 }
@@ -106,7 +104,7 @@ void cVillager::HandleFarmer()
 
 				m_DidFindCrops = true;
 				m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
-				MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) (m_CropsPos.y), (float) (m_CropsPos.z + 0.5)));
+				MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) m_CropsPos.y, (float) (m_CropsPos.z + 0.5)));
 				return;
 			}
 		}
