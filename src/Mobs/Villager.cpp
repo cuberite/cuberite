@@ -50,7 +50,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 			{
 				case vtFarmer: 
 				{
-					HandleFarmerNoCountDown();
+					HandleFarmerEndCountDown();
 				}
 			}
 		}
@@ -93,6 +93,8 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Farmer functions.
 void cVillager::HandleFarmerAttemptSpecialAction()
 {
 	cBlockArea Surrounding;
@@ -107,7 +109,6 @@ void cVillager::HandleFarmerAttemptSpecialAction()
 		(int) GetPosZ() + 5
 	);
 
-	
 	for (int I = 0; I < 5; I++)
 	{
 		for (int Y = 0; Y < 6; Y++)
@@ -116,6 +117,7 @@ void cVillager::HandleFarmerAttemptSpecialAction()
 			int X = m_World->GetTickRandomNumber(11);
 			int Z = m_World->GetTickRandomNumber(11);
 
+			// A villager can't farm this.
 			if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
 			{
 				continue;
@@ -139,8 +141,10 @@ void cVillager::HandleFarmerAttemptSpecialAction()
 
 void cVillager::HandleFarmerAction()
 {
+	// Harvest the crops if the villager isn't moving and if the crops are closer then 2 blocks.
 	if (!m_bMovingToDestination && (GetPosition() - m_CropsPos).Length() < 2)
 	{
+		// Check if the blocks didn't change while the villager was walking to the coordinates.
 		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
 		{
@@ -155,8 +159,9 @@ void cVillager::HandleFarmerAction()
 
 
 
-void cVillager::HandleFarmerNoCountDown()
+void cVillager::HandleFarmerEndCountDown()
 {
+	// Check if there is still farmland at the spot where the crops were.
 	if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == E_BLOCK_FARMLAND)
 	{
 		m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_CROPS, 0);

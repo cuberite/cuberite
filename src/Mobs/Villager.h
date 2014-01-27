@@ -39,7 +39,7 @@ public:
 	// Farmer functions
 	void HandleFarmerAttemptSpecialAction();
 	void HandleFarmerAction();
-	void HandleFarmerNoCountDown();
+	void HandleFarmerEndCountDown();
 
 	// Get and set functions.
 	int GetVilType(void) const { return m_Type; }	
