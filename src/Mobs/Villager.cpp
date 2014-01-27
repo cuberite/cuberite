@@ -97,6 +97,11 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 // Farmer functions.
 void cVillager::HandleFarmerAttemptSpecialAction()
 {
+	if (!m_World->VillagersShouldHarvestCrops())
+	{
+		return;
+	}
+
 	cBlockArea Surrounding;
 	/// Read a 11x7x11 area.
 	Surrounding.Read(
