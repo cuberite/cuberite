@@ -320,7 +320,7 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 
 
 
-int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags)
+int cSocket::Receive(char * a_Buffer, unsigned int a_Length, unsigned int a_Flags)
 {
 	return recv(m_Socket, a_Buffer, a_Length, a_Flags);
 }
@@ -349,6 +349,35 @@ unsigned short cSocket::GetPort(void) const
 		return 0;
 	}
 	return ntohs(Addr.sin_port);
+}
+
+
+
+
+
+void cSocket::SetNonBlocking(void)
+{
+	#ifdef _WIN32
+		u_long NonBlocking = 1;
+		int res = ioctlsocket(m_Socket, FIONBIO, &NonBlocking);
+		if (res != 0)
+		{
+			LOGERROR("Cannot set socket to non-blocking. This would make the server deadlock later on, aborting.\nErr: %d, %d, %s",
+				res, GetLastError(), GetLastErrorString().c_str()
+			);
+			abort();
+		}
+	#else
+		int NonBlocking = 1;
+		int res = ioctl(m_Socket, FIONBIO, (char *)&NonBlocking);
+		if (res != 0)
+		{
+			LOGERROR("Cannot set socket to non-blocking. This would make the server deadlock later on, aborting.\nErr: %d, %d, %s",
+				res, GetLastError(), GetLastErrorString().c_str()
+			);
+			abort();
+		}
+	#endif
 }
 
 
