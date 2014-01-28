@@ -1302,6 +1302,7 @@ bool cConnection::HandleServerLoginEncryptionKeyRequest(void)
 	}
 	Log("Got PACKET_ENCRYPTION_KEY_REQUEST from the SERVER:");
 	Log("  ServerID = %s", ServerID.c_str());
+	DataLog(PublicKey.data(), PublicKey.size(), "  Public key (%u bytes)", (unsigned)PublicKey.size());
 	
 	// Reply to the server:
 	SendEncryptionKeyResponse(PublicKey, Nonce);
@@ -2863,14 +2864,25 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	Byte SharedSecret[16];
 	Byte EncryptedSecret[128];
 	memset(SharedSecret, 0, sizeof(SharedSecret));  // Use all zeroes for the initial secret
-	m_Server.GetPrivateKey().Encrypt(SharedSecret, sizeof(SharedSecret), EncryptedSecret, sizeof(EncryptedSecret));
+	cPublicKey PubKey(a_ServerPublicKey);
+	int res = PubKey.Encrypt(SharedSecret, sizeof(SharedSecret), EncryptedSecret, sizeof(EncryptedSecret));
+	if (res < 0)
+	{
+		Log("Shared secret encryption failed: %d (0x%x)", res, res);
+		return;
+	}
 
 	m_ServerEncryptor.Init(SharedSecret, SharedSecret);
 	m_ServerDecryptor.Init(SharedSecret, SharedSecret);
 	
 	// Encrypt the nonce:
 	Byte EncryptedNonce[128];
-	m_Server.GetPrivateKey().Encrypt((const Byte *)a_Nonce.data(), a_Nonce.size(), EncryptedNonce, sizeof(EncryptedNonce));
+	res = PubKey.Encrypt((const Byte *)a_Nonce.data(), a_Nonce.size(), EncryptedNonce, sizeof(EncryptedNonce));
+	if (res < 0)
+	{
+		Log("Nonce encryption failed: %d (0x%x)", res, res);
+		return;
+	}
 	
 	// Send the packet to the server:
 	Log("Sending PACKET_ENCRYPTION_KEY_RESPONSE to the SERVER");
@@ -2880,6 +2892,11 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	ToServer.WriteBuf(EncryptedSecret, sizeof(EncryptedSecret));
 	ToServer.WriteBEShort((short)sizeof(EncryptedNonce));
 	ToServer.WriteBuf(EncryptedNonce, sizeof(EncryptedNonce));
+	DataLog(EncryptedSecret, sizeof(EncryptedSecret), "Encrypted secret (%u bytes)", (unsigned)sizeof(EncryptedSecret));
+	DataLog(EncryptedNonce,  sizeof(EncryptedNonce),  "Encrypted nonce (%u bytes)",  (unsigned)sizeof(EncryptedNonce));
+	cByteBuffer Len(5);
+	Len.WriteVarInt(ToServer.GetReadableSpace());
+	SERVERSEND(Len);
 	SERVERSEND(ToServer);
 	m_ServerState = csEncryptedUnderstood;
 	m_IsServerEncrypted = true;
