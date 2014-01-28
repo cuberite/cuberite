@@ -200,7 +200,7 @@ void cRoot::Start(void)
 		long long finishmseconds = Time.GetNowTime();
 		finishmseconds -= mseconds;
 
-		LOG("Startup complete, took %i ms!", finishmseconds);
+		LOG("Startup complete, took %lld ms!", finishmseconds);
 		#ifdef _WIN32
 		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED); // Re-enable close button
 		#endif
