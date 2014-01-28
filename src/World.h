@@ -138,6 +138,8 @@ public:
 	
 	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }
 	
+	bool VillagersShouldHarvestCrops(void) const { return m_VillagersShouldHarvestCrops; }
+
 	eDimension GetDimension(void) const { return m_Dimension; }
 
 	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
@@ -743,6 +745,7 @@ private:
 	bool m_bEnabledPVP;
 	bool m_IsDeepSnowEnabled;
 	bool m_ShouldLavaSpawnFire;
+	bool m_VillagersShouldHarvestCrops;
 	
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
 	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;	 // Second is for safely removing the objects from the queue
