@@ -14,6 +14,7 @@
 #include "polarssl/entropy.h"
 #include "polarssl/ctr_drbg.h"
 #include "polarssl/sha1.h"
+#include "polarssl/pk.h"
 
 
 
@@ -50,6 +51,36 @@ public:
 	
 protected:
 	rsa_context m_Rsa;
+	entropy_context m_Entropy;
+	ctr_drbg_context m_Ctr_drbg;
+	
+	/** Initializes the m_Entropy and m_Ctr_drbg contexts
+	Common part of this object's construction, called from all constructors. */
+	void InitRnd(void);
+} ;
+
+
+
+
+
+class cPublicKey
+{
+public:
+	cPublicKey(const AString & a_PublicKeyDER);
+	~cPublicKey();
+	
+	/** Decrypts the data using the stored public key
+	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
+	Returns the number of bytes decrypted, or negative number for error. */
+	int Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength);
+	
+	/** Encrypts the data using the stored public key
+	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
+	Returns the number of bytes decrypted, or negative number for error. */
+	int Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength);
+
+protected:
+	pk_context m_Pk;
 	entropy_context m_Entropy;
 	ctr_drbg_context m_Ctr_drbg;
 	
