@@ -214,7 +214,6 @@ int cRSAPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 		ASSERT(!"Invalid a_PlainLength!");
 		return -1;
 	}
-	size_t DecryptedLength;
 	int res = rsa_pkcs1_encrypt(
 		&m_Rsa, ctr_drbg_random, &m_Ctr_drbg, RSA_PUBLIC,
 		a_PlainLength, a_PlainData, a_EncryptedData
@@ -223,7 +222,7 @@ int cRSAPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 	{
 		return -1;
 	}
-	return (int)DecryptedLength;
+	return (int)m_Rsa.len;
 }
 
 
