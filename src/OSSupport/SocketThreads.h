@@ -66,7 +66,8 @@ public:
 		/** Called when data is received from the remote party */
 		virtual void DataReceived(const char * a_Data, int a_Size) = 0;
 		
-		/** Called when data can be sent to remote party; the function is supposed to *append* outgoing data to a_Data */
+		/** Called when data can be sent to remote party
+		The function is supposed to *set* outgoing data to a_Data (overwrite) */
 		virtual void GetOutgoingData(AString & a_Data) = 0;
 		
 		/** Called when the socket has been closed for any reason */
@@ -156,16 +157,27 @@ private:
 		
 		virtual void Execute(void) override;
 		
-		/** Puts all sockets into the set, along with m_ControlSocket1.
-		Only sockets that are able to send and receive data are put in the Set.
-		Is a_IsForWriting is true, the ssWritingRestOut sockets are added as well. */
-		void PrepareSet(fd_set * a_Set, cSocket::xSocket & a_Highest, bool a_IsForWriting);
+		/** Prepares the Read and Write socket sets for select()
+		Puts all sockets into the read set, along with m_ControlSocket1.
+		Only sockets that have outgoing data queued on them are put in the write set.*/
+		void PrepareSets(fd_set * a_ReadSet, fd_set * a_WriteSet, cSocket::xSocket & a_Highest);
 		
-		void ReadFromSockets(fd_set * a_Read);  // Reads from sockets indicated in a_Read
-		void WriteToSockets (fd_set * a_Write);  // Writes to sockets indicated in a_Write
+		/** Reads from sockets indicated in a_Read */
+		void ReadFromSockets(fd_set * a_Read);
 		
+		/** Writes to sockets indicated in a_Write */
+		void WriteToSockets (fd_set * a_Write);
+		
+		/** Sends data through the specified socket, trying to fill the OS send buffer in chunks.
+		Returns true if there was no error while sending, false if an error has occured.
+		Modifies a_Data to contain only the unsent data. */
+		bool SendDataThroughSocket(cSocket & a_Socket, AString & a_Data);
+
 		/** Removes those slots in ssShuttingDown2 state, sets those with ssShuttingDown state to ssShuttingDown2 */
 		void CleanUpShutSockets(void);
+		
+		/** Calls each client's callback to retrieve outgoing data for that client. */
+		void QueueOutgoingData(void);
 	} ;
 	
 	typedef std::list<cSocketThread *> cSocketThreadList;

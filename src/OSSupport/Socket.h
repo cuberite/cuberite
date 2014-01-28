@@ -24,6 +24,12 @@ public:
 	{
 		IPv4 = AF_INET,
 		IPv6 = AF_INET6,
+		
+		#ifdef _WIN32
+		ErrWouldBlock = WSAEWOULDBLOCK,
+		#else
+		ErrWouldBlock = EWOULDBLOCK,
+		#endif
 	} ;
 	
 #ifdef _WIN32
@@ -110,6 +116,9 @@ public:
 	unsigned short GetPort(void) const;  // Returns 0 on failure
 
 	const AString & GetIPString(void) const { return m_IPString; }
+	
+	/** Sets the socket into non-blocking mode */
+	void SetNonBlocking(void);
 
 private:
 	xSocket m_Socket;
