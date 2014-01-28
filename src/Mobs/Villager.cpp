@@ -41,6 +41,7 @@ void cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+
 	if (m_ActionCountDown > -1)
 	{
 		m_ActionCountDown--;
@@ -50,7 +51,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 			{
 				case vtFarmer: 
 				{
-					HandleFarmerEndCountDown();
+					HandleFarmerPlaceCrops();
 				}
 			}
 		}
@@ -63,15 +64,10 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			case vtFarmer:
 			{
-				HandleFarmerAction();
+				HandleFarmerTryHarvestCrops();
 			}
 		}
 		m_VillagerAction = false;
-	}
-
-	// The villager already has an special action activated.
-	if (m_VillagerAction)
-	{
 		return;
 	}
 
@@ -85,7 +81,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		case vtFarmer:
 		{
-			HandleFarmerAttemptSpecialAction();
+			HandleFarmerPrepareFarmCrops();
 		}
 	}
 }
@@ -95,7 +91,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Farmer functions.
-void cVillager::HandleFarmerAttemptSpecialAction()
+void cVillager::HandleFarmerPrepareFarmCrops()
 {
 	if (!m_World->VillagersShouldHarvestCrops())
 	{
@@ -144,7 +140,7 @@ void cVillager::HandleFarmerAttemptSpecialAction()
 
 
 
-void cVillager::HandleFarmerAction()
+void cVillager::HandleFarmerTryHarvestCrops()
 {
 	// Harvest the crops if the villager isn't moving and if the crops are closer then 2 blocks.
 	if (!m_bMovingToDestination && (GetPosition() - m_CropsPos).Length() < 2)
@@ -164,7 +160,7 @@ void cVillager::HandleFarmerAction()
 
 
 
-void cVillager::HandleFarmerEndCountDown()
+void cVillager::HandleFarmerPlaceCrops()
 {
 	// Check if there is still farmland at the spot where the crops were.
 	if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == E_BLOCK_FARMLAND)
