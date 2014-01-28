@@ -206,7 +206,7 @@ int cRSAPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 		ASSERT(!"Invalid a_DecryptedMaxLength!");
 		return -1;
 	}
-	if (a_PlainLength < m_Rsa.len)
+	if (a_EncryptedMaxLength < m_Rsa.len)
 	{
 		LOGD("%s: Invalid a_PlainLength: got %u, exp at least %u",
 			__FUNCTION__, (unsigned)a_PlainLength, (unsigned)(m_Rsa.len)
@@ -215,7 +215,7 @@ int cRSAPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 		return -1;
 	}
 	int res = rsa_pkcs1_encrypt(
-		&m_Rsa, ctr_drbg_random, &m_Ctr_drbg, RSA_PUBLIC,
+		&m_Rsa, ctr_drbg_random, &m_Ctr_drbg, RSA_PRIVATE,
 		a_PlainLength, a_PlainData, a_EncryptedData
 	);
 	if (res != 0)
