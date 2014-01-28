@@ -71,13 +71,13 @@ public:												// tolua_export
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
 	
-	/// Executes the console command, sends output through the specified callback
+	/** Executes the console command, sends output through the specified callback */
 	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
 	
-	/// Lists all available console commands and their helpstrings
+	/** Lists all available console commands and their helpstrings */
 	void PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
 
-	/// Binds the built-in console commands with the plugin manager
+	/** Binds the built-in console commands with the plugin manager */
 	static void BindBuiltInConsoleCommands(void);
 	
 	void Shutdown(void);
@@ -97,13 +97,13 @@ public:												// tolua_export
 	
 	void RemoveClient(const cClientHandle * a_Client);  // Removes the clienthandle from m_SocketThreads
 	
-	/// Don't tick a_Client anymore, it will be ticked from its cPlayer instead
+	/** Don't tick a_Client anymore, it will be ticked from its cPlayer instead */
 	void ClientMovedToWorld(const cClientHandle * a_Client);
 	
-	/// Notifies the server that a player was created; the server uses this to adjust the number of players
+	/** Notifies the server that a player was created; the server uses this to adjust the number of players */
 	void PlayerCreated(const cPlayer * a_Player);
 	
-	/// Notifies the server that a player is being destroyed; the server uses this to adjust the number of players
+	/** Notifies the server that a player is being destroyed; the server uses this to adjust the number of players */
 	void PlayerDestroying(const cPlayer * a_Player);
 
 	/** Returns base64 encoded favicon data (obtained from favicon.png) */
@@ -112,11 +112,13 @@ public:												// tolua_export
 	cRSAPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 	
+	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }
+	
 private:
 
 	friend class cRoot; // so cRoot can create and destroy cServer
 	
-	/// When NotifyClientWrite() is called, it is queued for this thread to process (to avoid deadlocks between cSocketThreads, cClientHandle and cChunkMap)
+	/** When NotifyClientWrite() is called, it is queued for this thread to process (to avoid deadlocks between cSocketThreads, cClientHandle and cChunkMap) */
 	class cNotifyWriteThread :
 		public cIsThread
 	{
@@ -140,7 +142,7 @@ private:
 		void NotifyClientWrite(const cClientHandle * a_Client);
 	} ;
 	
-	/// The server tick thread takes care of the players who aren't yet spawned in a world
+	/** The server tick thread takes care of the players who aren't yet spawned in a world */
 	class cTickThread :
 		public cIsThread
 	{
@@ -195,18 +197,22 @@ private:
 	cTickThread m_TickThread;
 	cEvent m_RestartEvent;
 	
-	/// The server ID used for client authentication
+	/** The server ID used for client authentication */
 	AString m_ServerID;
+	
+	/** If true, players will be online-authenticated agains Mojang servers.
+	This setting is the same as the "online-mode" setting in Vanilla. */
+	bool m_ShouldAuthenticate;
 	
 
 	cServer(void);
 
-	/// Loads, or generates, if missing, RSA keys for protocol encryption
+	/** Loads, or generates, if missing, RSA keys for protocol encryption */
 	void PrepareKeys(void);
 	
 	bool Tick(float a_Dt);
 	
-	/// Ticks the clients in m_Clients, manages the list in respect to removing clients
+	/** Ticks the clients in m_Clients, manages the list in respect to removing clients */
 	void TickClients(float a_Dt);
 
 	// cListenThread::cCallback overrides:

@@ -237,7 +237,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_bIsConnected = true;
 
 	m_ServerID = "-";
-	if (a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true))
+	m_ShouldAuthenticate = a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true);
+	if (m_ShouldAuthenticate)
 	{
 		MTRand mtrand1;
 		unsigned int r1 = (mtrand1.randInt() % 1147483647) + 1000000000;

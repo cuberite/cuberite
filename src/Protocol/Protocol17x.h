@@ -281,6 +281,8 @@ protected:
 	
 	/// Parses item metadata as read by ReadItem(), into the item enchantments.
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
+	
+	void StartEncryption(const Byte * a_Key);
 } ;
 
 
