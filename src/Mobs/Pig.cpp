@@ -73,6 +73,7 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 
 void cPig::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	super::Tick(a_Dt, a_Chunk);
 	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
 	if (a_Closest_Player != NULL)
 	{

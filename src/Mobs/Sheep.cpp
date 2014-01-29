@@ -68,6 +68,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 
 void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	super::Tick(a_Dt, a_Chunk);
 	// The sheep should not move when he's eating so only handle the physics.
 	if (m_TimeToStopEating > 0)
 	{

@@ -32,6 +32,7 @@ void cMooshroom::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cMooshroom::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	super::Tick(a_Dt, a_Chunk);
 	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
 	if (a_Closest_Player != NULL)
 	{
