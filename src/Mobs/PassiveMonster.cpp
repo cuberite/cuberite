@@ -3,7 +3,7 @@
 
 #include "PassiveMonster.h"
 #include "../World.h"
-
+#include "../Entities/Player.h"
 
 
 
@@ -38,6 +38,20 @@ void cPassiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	if (m_EMState == ESCAPING)
 	{
 		CheckEventLostPlayer();
+	}
+	cItem FollowedItem = GetFollowedItem();
+	if (FollowedItem.IsEmpty())
+	{
+		return;
+	}
+	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
+	if (a_Closest_Player != NULL)
+	{
+		if (a_Closest_Player->GetEquippedItem().IsEqual(FollowedItem))
+		{
+			Vector3d PlayerPos = a_Closest_Player->GetPosition();
+			MoveToPosition(PlayerPos);
+		}
 	}
 }
 
