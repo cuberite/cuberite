@@ -118,7 +118,7 @@ cServer::cServer(void) :
 
 void cServer::ClientDestroying(const cClientHandle * a_Client)
 {
-	m_SocketThreads.StopReading(a_Client);
+	m_SocketThreads.RemoveClient(a_Client);
 }
 
 
@@ -137,15 +137,6 @@ void cServer::NotifyClientWrite(const cClientHandle * a_Client)
 void cServer::WriteToClient(const cClientHandle * a_Client, const AString & a_Data)
 {
 	m_SocketThreads.Write(a_Client, a_Data);
-}
-
-
-
-
-
-void cServer::QueueClientClose(const cClientHandle * a_Client)
-{
-	m_SocketThreads.QueueClose(a_Client);
 }
 
 
@@ -173,6 +164,7 @@ void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
 
 void cServer::PlayerCreated(const cPlayer * a_Player)
 {
+	UNUSED(a_Player);
 	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
 	cCSLock Lock(m_CSPlayerCountDiff);
 	m_PlayerCountDiff += 1;
@@ -184,6 +176,7 @@ void cServer::PlayerCreated(const cPlayer * a_Player)
 
 void cServer::PlayerDestroying(const cPlayer * a_Player)
 {
+	UNUSED(a_Player);
 	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
 	cCSLock Lock(m_CSPlayerCountDiff);
 	m_PlayerCountDiff -= 1;
@@ -200,6 +193,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_bIsHardcore = a_SettingsIni.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
+
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png"))); // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{
@@ -242,7 +237,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_bIsConnected = true;
 
 	m_ServerID = "-";
-	if (a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true))
+	m_ShouldAuthenticate = a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true);
+	if (m_ShouldAuthenticate)
 	{
 		MTRand mtrand1;
 		unsigned int r1 = (mtrand1.randInt() % 1147483647) + 1000000000;
@@ -289,17 +285,9 @@ int cServer::GetNumPlayers(void)
 
 void cServer::PrepareKeys(void)
 {
-	// TODO: Save and load key for persistence across sessions
-	// But generating the key takes only a moment, do we even need that?
-	
 	LOGD("Generating protocol encryption keypair...");
-	
-	time_t CurTime = time(NULL);
-	CryptoPP::RandomPool rng;
-	rng.Put((const byte *)&CurTime, sizeof(CurTime));
-	m_PrivateKey.GenerateRandomWithKeySize(rng, 1024);
-	CryptoPP::RSA::PublicKey pk(m_PrivateKey);
-	m_PublicKey = pk;
+	VERIFY(m_PrivateKey.Generate(1024));
+	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
 }
 
 
@@ -455,7 +443,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		return;
 	}
-	
+
 	// Special handling: "stop" and "restart" are built in
 	if ((split[0].compare("stop") == 0) || (split[0].compare("restart") == 0))
 	{
@@ -491,13 +479,13 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	
 	if (split[0].compare("killmem") == 0)
 	{
-		while (true)
+		for (;;)
 		{
 			new char[100 * 1024 * 1024];  // Allocate and leak 100 MiB in a loop -> fill memory and kill MCS
 		}
 	}
 	#endif
-	
+
 	if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
 	{
 		a_Output.Finished();
@@ -514,6 +502,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 
 void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
 {
+	UNUSED(a_Split);
 	typedef std::pair<AString, AString> AStringPair;
 	typedef std::vector<AStringPair> AStringPairs;
 	
@@ -525,6 +514,8 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 		
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
+		UNUSED(a_Plugin);
+		UNUSED(a_Permission);
 			if (!a_HelpString.empty())
 			{
 				m_Commands.push_back(AStringPair(a_Command, a_HelpString));

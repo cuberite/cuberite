@@ -16,7 +16,6 @@ Implements the 1.4.x protocol classes representing these protocols:
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
-#include "cryptopp/randpool.h"
 #include "../Item.h"
 #include "ChunkDataSerializer.h"
 #include "../Entities/Player.h"
@@ -25,8 +24,18 @@ Implements the 1.4.x protocol classes representing these protocols:
 #include "../Entities/Pickup.h"
 #include "../Entities/FallingBlock.h"
 
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4231)
+	#pragma warning(disable:4189)
+	#pragma warning(disable:4702)
+#endif
 
-
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 
 #define HANDLE_PACKET_READ(Proc, Type, Var) \
@@ -239,7 +248,7 @@ void cProtocol146::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	WriteInt  ((int)(a_Vehicle.GetPosY() * 32));
 	WriteInt  ((int)(a_Vehicle.GetPosZ() * 32));
 	WriteByte ((Byte)((a_Vehicle.GetPitch() / 360.f) * 256));
-	WriteByte ((Byte)((a_Vehicle.GetRotation() / 360.f) * 256));
+	WriteByte ((Byte)((a_Vehicle.GetYaw()   / 360.f) * 256));
 	WriteInt  (a_VehicleSubType);
 	if (a_VehicleSubType != 0)
 	{

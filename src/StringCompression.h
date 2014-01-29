@@ -10,7 +10,7 @@
 
 
 /// Compresses a_Data into a_Compressed using ZLIB; returns Z_XXX error constants same as zlib's compress2()
-extern int CompressString(const char * a_Data, int a_Length, AString & a_Compressed);
+extern int CompressString(const char * a_Data, int a_Length, AString & a_Compressed, int a_Factor);
 
 /// Uncompresses a_Data into a_Uncompressed; returns Z_XXX error constants same as zlib's decompress()
 extern int UncompressString(const char * a_Data, int a_Length, AString & a_Uncompressed, int a_UncompressedSize);

@@ -3,3 +3,6 @@ Release
 Logs/
 *.log
 *.nbt
+*.sln
+*.vcproj
+*.vcxproj

@@ -154,13 +154,13 @@ public:
 	inline Int16 GetShort(int a_Tag) const
 	{
 		ASSERT(m_Tags[a_Tag].m_Type == TAG_Short);
-		return ntohs(*((Int16 *)(m_Data + m_Tags[a_Tag].m_DataStart)));
+		return GetBEShort(m_Data + m_Tags[a_Tag].m_DataStart);
 	}
 
 	inline Int32 GetInt(int a_Tag) const
 	{
 		ASSERT(m_Tags[a_Tag].m_Type == TAG_Int);
-		return ntohl(*((Int32 *)(m_Data + m_Tags[a_Tag].m_DataStart)));
+		return GetBEInt(m_Data + m_Tags[a_Tag].m_DataStart);
 	}
 
 	inline Int64 GetLong(int a_Tag) const
@@ -172,7 +172,7 @@ public:
 	inline float GetFloat(int a_Tag) const
 	{
 		ASSERT(m_Tags[a_Tag].m_Type == TAG_Float);
-		Int32 tmp = ntohl(*((Int32 *)(m_Data + m_Tags[a_Tag].m_DataStart)));
+		Int32 tmp = GetBEInt(m_Data + m_Tags[a_Tag].m_DataStart);
 		return *((float *)&tmp);
 	}
 	

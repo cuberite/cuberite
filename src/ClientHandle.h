@@ -16,6 +16,7 @@
 #include "OSSupport/SocketThreads.h"
 #include "ChunkDef.h"
 #include "ByteBuffer.h"
+#include "Scoreboard.h"
 
 
 
@@ -120,10 +121,14 @@ public:
 	void SendPlayerMoveLook      (void);
 	void SendPlayerPosition      (void);
 	void SendPlayerSpawn         (const cPlayer & a_Player);
+	void SendPluginMessage       (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID);
 	void SendRespawn             (void);
 	void SendExperience          (void);
 	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
+	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
+	void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
+	void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
 	void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);
@@ -135,6 +140,7 @@ public:
 	void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay);
 	void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ);
+	void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 	void SendWeather             (eWeather a_Weather);
@@ -170,7 +176,13 @@ public:
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
 	void HandleDisconnect       (const AString & a_Reason);
 	void HandleEntityAction     (int a_EntityID, char a_ActionID);
+	
+	/** Called when the protocol handshake has been received (for protocol versions that support it;
+	otherwise the first instant when a username is received).
+	Returns true if the player is to be let in, false if they were disconnected
+	*/
 	bool HandleHandshake        (const AString & a_Username);
+	
 	void HandleKeepAlive        (int a_KeepAliveID);
 	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	void HandlePing             (void);
@@ -178,6 +190,7 @@ public:
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
 	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
+	void HandlePluginMessage    (const AString & a_Channel, const AString & a_Message);
 	void HandleRespawn          (void);
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
 	void HandleSlotSelected     (short a_SlotNum);
@@ -316,6 +329,9 @@ private:
 	
 	/// Handles the DIG_FINISHED dig packet:
 	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+
+	/// Handles the "MC|AdvCdm" plugin message
+	void HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client

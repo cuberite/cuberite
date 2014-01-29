@@ -43,7 +43,8 @@ void cSquid::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	int RelX = (int)floor(Pos.x) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = (int)floor(Pos.z) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	if (!IsBlockWater(a_Chunk.GetBlock(RelX, RelY, RelZ)) && !IsOnFire())
+	BLOCKTYPE BlockType;
+	if (a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockType) && !IsBlockWater(BlockType) && !IsOnFire())
 	{
 		// Burn for 10 ticks, then decide again
 		StartBurning(10);

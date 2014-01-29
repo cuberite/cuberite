@@ -1,4 +1,3 @@
-
 Code Stuff
 ----------
 
@@ -23,7 +22,9 @@ Code Stuff
   - This helps prevent mistakes such as "if (a & 1 == 0)"
  * White space is free, so use it freely
   - "freely" as in "plentifully", not "arbitrarily"
- * Please leave the first line of all files blank, to get around an IDE bug.
+ * Each and every control statement deserves its braces. This helps maintainability later on when the file is edited, lines added or removed - the control logic doesn't break so easily.
+ * Please leave the first line of all source files blank, to get around an IDE bug.
+ * Also leave the last line of all source files blank (GCC and GIT can complain otherwise)
 
 
 Copyright

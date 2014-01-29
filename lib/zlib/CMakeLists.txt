@@ -9,3 +9,11 @@ file(GLOB SOURCE
 )
 
 add_library(zlib ${SOURCE})
+
+if (MSVC)
+	# Remove SCL warnings, we expect this library to have been tested safe
+	SET_TARGET_PROPERTIES(
+		zlib PROPERTIES COMPILE_FLAGS "-D_CRT_SECURE_NO_WARNINGS"
+	)
+endif()
+

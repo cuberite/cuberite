@@ -85,10 +85,10 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		{
 			if (DraggingItem.m_ItemType <= 0) // Empty-handed?
 			{
+				DraggingItem = Slot.CopyOne(); // Obtain copy of slot to preserve lore, enchantments, etc.
+
 				DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
 				Slot.m_ItemCount -= DraggingItem.m_ItemCount;
-				DraggingItem.m_ItemType = Slot.m_ItemType;
-				DraggingItem.m_ItemDamage = Slot.m_ItemDamage;
 
 				if (Slot.m_ItemCount <= 0)
 				{
@@ -101,9 +101,12 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
 				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
 				{
-					Slot.m_ItemType = DraggingItem.m_ItemType;
-					Slot.m_ItemCount++;
-					Slot.m_ItemDamage = DraggingItem.m_ItemDamage;
+					char OldSlotCount = Slot.m_ItemCount;
+
+					Slot = DraggingItem.CopyOne(); // See above
+					OldSlotCount++;
+					Slot.m_ItemCount = OldSlotCount;
+
 					DraggingItem.m_ItemCount--;
 				}
 				if (DraggingItem.m_ItemCount <= 0)
@@ -226,7 +229,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 	for (int i = 0; i < m_NumSlots; i++)
 	{
 		const cItem * Slot = GetSlot(i, a_Player);
-		if (!Slot->IsStackableWith(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
 		{
 			// Different items
 			continue;
@@ -265,7 +268,7 @@ bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool 
 	for (int i = 0; i < NumSlots; i++)
 	{
 		const cItem & SlotItem = *GetSlot(i, a_Player);
-		if (!SlotItem.IsStackableWith(a_Dragging))
+		if (!SlotItem.IsEqual(a_Dragging))
 		{
 			continue;
 		}
@@ -491,7 +494,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 		return;
 	}
 	cItem * PlayerSlots = GetPlayerSlots(a_Player) + 1;
-	do
+	for (;;)
 	{
 		// Try distributing the result. If it fails, bail out:
 		cItem ResultCopy(Result);
@@ -517,7 +520,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 			// The recipe has changed, bail out
 			return;
 		}
-	} while (true);
+	}
 }
 
 
@@ -908,7 +911,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 	}  // for i - itr->second[]
 	
 	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-a_Player.GetRotation(), a_Player.GetPitch(), vZ, vX, vY);
+	EulerToVector(-a_Player.GetYaw(), a_Player.GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
 	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because player created
 }

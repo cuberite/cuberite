@@ -10,14 +10,19 @@
 #include "Root.h"
 #include "inifile/iniFile.h"
 #include "ChunkMap.h"
+#include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
+#include "WorldStorage/ScoreboardSerializer.h"
 
 // Entities (except mobs):
 #include "Entities/ExpOrb.h"
 #include "Entities/FallingBlock.h"
+#include "Entities/Minecart.h"
 #include "Entities/Pickup.h"
 #include "Entities/Player.h"
 #include "Entities/TNTEntity.h"
+
+#include "BlockEntities/CommandBlockEntity.h"
 
 // Simulators:
 #include "Simulator/SimulatorManager.h"
@@ -229,6 +234,11 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
+#ifdef _arm_
+	m_StorageCompressionFactor(0),
+#else
+	m_StorageCompressionFactor(6),
+#endif
 	m_IsSpawnExplicitlySet(false),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
@@ -238,11 +248,17 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
-	m_TickThread(*this)
+	m_GeneratorCallbacks(*this),
+	m_TickThread(*this),
+	m_Scoreboard(this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
 	cFile::CreateFolder(FILE_IO_PREFIX + m_WorldName);
+
+	// Load the scoreboard
+	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
+	Serializer.Load();
 }
 
 
@@ -261,6 +277,10 @@ cWorld::~cWorld()
 	UnloadUnusedChunks();
 	
 	m_Storage.WaitForFinish();
+
+	// Unload the scoreboard
+	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
+	Serializer.Save();
 
 	delete m_ChunkMap;
 }
@@ -367,10 +387,13 @@ void cWorld::InitializeSpawn(void)
 		cWorldLoadProgress Progress(this);
 		
 		// Wait for the loader to finish loading
-		m_Storage.WaitForQueuesEmpty();
+		m_Storage.WaitForLoadQueueEmpty();
 		
 		// Wait for the generator to finish generating
 		m_Generator.WaitForQueueEmpty();
+
+		// Wait for the loader to finish saving
+		m_Storage.WaitForSaveQueueEmpty();
 		
 		Progress.Stop();
 	}
@@ -506,6 +529,7 @@ void cWorld::Start(void)
 	}
 
 	m_StorageSchema             = IniFile.GetValueSet ("Storage",       "Schema",                    m_StorageSchema);
+	m_StorageCompressionFactor  = IniFile.GetValueSetI("Storage",       "CompressionFactor",         m_StorageCompressionFactor);
 	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
 	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
 	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
@@ -522,6 +546,8 @@ void cWorld::Start(void)
 	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
 	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
 	m_ShouldLavaSpawnFire       = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",       true);
+	m_bCommandBlocksEnabled     = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",      false);
+	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",    "VillagersShouldHarvestCrops", true);
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
 
@@ -579,8 +605,8 @@ void cWorld::Start(void)
 	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
 
 	m_Lighting.Start(this);
-	m_Storage.Start(this, m_StorageSchema);
-	m_Generator.Start(this, IniFile);
+	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor );
+	m_Generator.Start(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
 	m_ChunkSender.Start(this);
 	m_TickThread.Start();
 
@@ -685,6 +711,7 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	TickClients(a_Dt);
 	TickQueuedBlocks();
 	TickQueuedTasks();
+	TickScheduledTasks();
 	
 	GetSimulatorManager()->Simulate(a_Dt);
 
@@ -723,6 +750,7 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 
 void cWorld::TickWeather(float a_Dt)
 {
+	UNUSED(a_Dt);
 	// There are no weather changes anywhere but in the Overworld:
 	if (GetDimension() != dimOverworld)
 	{
@@ -794,7 +822,7 @@ void cWorld::TickMobs(float a_Dt)
 			cMonster::mfAmbient,
 			cMonster::mfWater,
 		} ;
-		for (int i = 0; i < ARRAYCOUNT(AllFamilies); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(AllFamilies); i++)
 		{
 			cMonster::eFamily Family = AllFamilies[i];
 			int SpawnDelay = cMonster::GetSpawnDelay(Family);
@@ -855,6 +883,30 @@ void cWorld::TickQueuedTasks(void)
 	}  // for itr - m_Tasks[]
 }
 
+
+
+
+
+void cWorld::TickScheduledTasks(void)
+{
+	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
+	cScheduledTasks Tasks;
+	{
+		cCSLock Lock(m_CSScheduledTasks);
+		while (!m_ScheduledTasks.empty() && (m_ScheduledTasks.front()->m_TargetTick < m_WorldAge))
+		{
+			Tasks.push_back(m_ScheduledTasks.front());
+			m_ScheduledTasks.pop_front();
+		}
+	}
+
+	// Execute and delete each task:
+	for (cScheduledTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
+	{
+		(*itr)->m_Task->Run(*this);
+		delete *itr;
+	}  // for itr - m_Tasks[]
+}
 
 
 
@@ -1108,6 +1160,15 @@ bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 bool cWorld::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithNoteBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -1641,8 +1702,32 @@ int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 
 
 
+int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
+{
+	cMinecart * Minecart;
+	switch (a_MinecartType)
+	{
+		case E_ITEM_MINECART:             Minecart = new cRideableMinecart     (a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = new cMinecartWithChest    (a_X, a_Y, a_Z); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = new cMinecartWithFurnace  (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = new cMinecartWithTNT      (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (a_X, a_Y, a_Z); break;
+		default:
+		{
+			return -1;
+		}
+	}  // switch (a_MinecartType)
+	Minecart->Initialize(this);
+	return Minecart->GetUniqueID();
+}
+
+
+
+
+
 void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec, double a_InitialVelocityCoeff)
 {
+	UNUSED(a_InitialVelocityCoeff);
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTimeInSec);
 	TNT->Initialize(this);
 	// TODO: Add a bit of speed in horiz and vert axes, based on the a_InitialVelocityCoeff
@@ -1908,6 +1993,60 @@ void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline,
 void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastRemoveEntityEffect(a_Entity, a_EffectID, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendDisplayObjective(a_Objective, a_Display);
+	}
 }
 
 
@@ -2285,7 +2424,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 
 // TODO: This interface is dangerous!
-cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit)
+cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
 {
 	cTracer LineOfSight(this);
 
@@ -2300,7 +2439,12 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit)
 
 		if (Distance < ClosestDistance)
 		{
-			if (!LineOfSight.Trace(a_Pos,(Pos - a_Pos),(int)(Pos - a_Pos).Length()))
+			if (a_CheckLineOfSight && !LineOfSight.Trace(a_Pos,(Pos - a_Pos),(int)(Pos - a_Pos).Length()))
+			{
+				ClosestDistance = Distance;
+				ClosestPlayer = *itr;
+			}
+			else
 			{
 				ClosestDistance = Distance;
 				ClosestPlayer = *itr;
@@ -2480,6 +2624,28 @@ bool cWorld::UpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString 
 
 
 
+bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command)
+{
+	class cUpdateCommandBlock : public cCommandBlockCallback
+	{
+		AString m_Command;
+	public:
+		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
+			
+		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
+		{
+			a_CommandBlock->SetCommand(m_Command);
+			return false;
+		}
+	} CmdBlockCB (a_Command);
+
+	return DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, CmdBlockCB);
+}
+
+
+
+
+
 void cWorld::ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay)
 {
 	m_ChunkMap->ChunksStay(a_Chunks, a_Stay);
@@ -2564,6 +2730,26 @@ void cWorld::QueueTask(cTask * a_Task)
 	m_Tasks.push_back(a_Task);
 }
 
+
+
+
+
+void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
+{
+	Int64 TargetTick = a_DelayTicks + m_WorldAge;
+	
+	// Insert the task into the list of scheduled tasks, ordered by its target tick
+	cCSLock Lock(m_CSScheduledTasks);
+	for (cScheduledTasks::iterator itr = m_ScheduledTasks.begin(), end = m_ScheduledTasks.end(); itr != end; ++itr)
+	{
+		if ((*itr)->m_TargetTick >= TargetTick)
+		{
+			m_ScheduledTasks.insert(itr, new cScheduledTask(TargetTick, a_Task));
+			return;
+		}
+	}
+	m_ScheduledTasks.push_back(new cScheduledTask(TargetTick, a_Task));
+}
 
 
 
@@ -2694,9 +2880,6 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 	{
 		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	}
-
-	// Because it's logical that ALL mob spawns need spawn effects, not just spawners
-	BroadcastSoundParticleEffect(2004, (int)a_PosX, (int)a_PosY, (int)a_PosZ, 0);
 	
 	return SpawnMobFinalize(Monster);
 }
@@ -2832,6 +3015,80 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 {
 	a_World.SaveAllChunks();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cChunkGeneratorCallbacks:
+
+cWorld::cChunkGeneratorCallbacks::cChunkGeneratorCallbacks(cWorld & a_World) :
+	m_World(&a_World)
+{
+}
+
+
+
+
+
+void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc)
+{
+	cChunkDef::BlockNibbles BlockMetas;
+	a_ChunkDesc.CompressBlockMetas(BlockMetas);
+
+	m_World->SetChunkData(
+		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
+		a_ChunkDesc.GetBlockTypes(), BlockMetas,
+		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
+		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
+		a_ChunkDesc.GetEntities(), a_ChunkDesc.GetBlockEntities(),
+		true
+	);
+
+	// Save the chunk right after generating, so that we don't have to generate it again on next run
+	m_World->GetStorage().QueueSaveChunk(a_ChunkDesc.GetChunkX(), 0, a_ChunkDesc.GetChunkZ());
+}
+
+
+
+
+
+bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(int a_ChunkX, int a_ChunkZ)
+{
+	return m_World->IsChunkValid(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
+{
+	return m_World->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_ChunkDesc)
+{
+	cPluginManager::Get()->CallHookChunkGenerating(
+		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
+	);
+}
+
+
+
+
+
+void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_ChunkDesc)
+{
+	cPluginManager::Get()->CallHookChunkGenerated(
+		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
+	);
 }
 
 

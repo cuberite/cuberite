@@ -26,7 +26,6 @@ If the generator queue is overloaded, the generator skips chunks with no clients
 
 
 // fwd:
-class cWorld;
 class cIniFile;
 class cChunkDesc;
 
@@ -40,7 +39,7 @@ class cChunkGenerator :
 	typedef cIsThread super;
 	
 public:
-	/// The interface that a class has to implement to become a generator
+	/** The interface that a class has to implement to become a generator */
 	class cGenerator
 	{
 	public:
@@ -48,7 +47,7 @@ public:
 		virtual ~cGenerator() {} ;  // Force a virtual destructor
 
 		/// Called to initialize the generator on server startup.
-		virtual void Initialize(cWorld * a_World, cIniFile & a_IniFile);
+		virtual void Initialize(cIniFile & a_IniFile);
 		
 		/// Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading.
 		virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) = 0;
@@ -61,14 +60,59 @@ public:
 		
 	protected:
 		cChunkGenerator & m_ChunkGenerator;
-		cWorld          * m_World;
+	} ;
+	
+	
+	/** The interface through which the plugins are called for their OnChunkGenerating / OnChunkGenerated hooks. */
+	class cPluginInterface
+	{
+	public:
+		// Force a virtual destructor
+		virtual ~cPluginInterface() {}
+		
+		/** Called when the chunk is about to be generated.
+		The generator may be partly or fully overriden by the implementation
+		*/
+		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) = 0;
+		
+		/** Called after the chunk is generated, before it is handed to the chunk sink.
+		a_ChunkDesc contains the generated chunk data. Implementation may modify this data.
+		*/
+		virtual void CallHookChunkGenerated(cChunkDesc & a_ChunkDesc) = 0;
+	} ;
+	
+	
+	/** The interface through which the generated chunks are handed to the cWorld or whoever created us. */
+	class cChunkSink
+	{
+	public:
+		// Force a virtual destructor
+		virtual ~cChunkSink() {}
+		
+		/** Called after the chunk has been generated
+		The interface may store the chunk, send it over network, whatever.
+		The chunk is not expected to be modified, but the generator will survive if the implementation
+		changes the data within. All changes are ignored, though.
+		*/
+		virtual void OnChunkGenerated(cChunkDesc & a_ChunkDesc) = 0;
+		
+		/** Called just before the chunk generation is started,
+		to verify that it hasn't been generated in the meantime.
+		If this callback returns true, the chunk is not generated.
+		*/
+		virtual bool IsChunkValid(int a_ChunkX, int a_ChunkZ) = 0;
+		
+		/** Called when the generator is overloaded to skip chunks that are no longer needed.
+		If this callback returns false, the chunk is not generated.
+		*/
+		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) = 0;
 	} ;
 	
 
 	cChunkGenerator (void);
 	~cChunkGenerator();
 
-	bool Start(cWorld * a_World, cIniFile & a_IniFile);
+	bool Start(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
 	void Stop(void);
 
 	/// Queues the chunk for generation; removes duplicate requests
@@ -91,8 +135,6 @@ public:
 	
 private:
 
-	cWorld * m_World;
-	
 	int m_Seed;
 
 	cCriticalSection m_CS;
@@ -101,6 +143,13 @@ private:
 	cEvent           m_evtRemoved;  ///< Set when an item is removed from the queue
 	
 	cGenerator * m_Generator;  ///< The actual generator engine used to generate chunks
+	
+	/** The plugin interface that may modify the generated chunks */
+	cPluginInterface * m_PluginInterface;
+	
+	/** The destination where the generated chunks are sent */
+	cChunkSink * m_ChunkSink;
+	
 
 	// cIsThread override:
 	virtual void Execute(void) override;

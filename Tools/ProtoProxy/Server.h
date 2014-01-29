@@ -17,8 +17,8 @@
 class cServer
 {
 	SOCKET m_ListenSocket;
-	RSA::PrivateKey m_PrivateKey;
-	RSA::PublicKey  m_PublicKey;
+	cRSAPrivateKey m_PrivateKey;
+	AString m_PublicKeyDER;
 	short m_ConnectPort;
 	
 public:
@@ -27,8 +27,8 @@ public:
 	int  Init(short a_ListenPort, short a_ConnectPort);
 	void Run(void);
 	
-	RSA::PrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
-	RSA::PublicKey  & GetPublicKey (void) { return m_PublicKey; }
+	cRSAPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
+	const AString & GetPublicKeyDER (void) { return m_PublicKeyDER; }
 	
 	short GetConnectPort(void) const { return m_ConnectPort; }
 } ;

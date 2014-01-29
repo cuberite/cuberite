@@ -527,9 +527,11 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 			// MG TODO : check that "Level" really means Y
 			
+			/*
 			NIBBLETYPE SkyLight = 0;
 
 			NIBBLETYPE BlockLight = 0;
+			*/
 
 			if (IsLightValid())
 			{
@@ -1296,6 +1298,7 @@ void cChunk::CreateBlockEntities(void)
 				switch (BlockType)
 				{
 					case E_BLOCK_CHEST:
+					case E_BLOCK_COMMAND_BLOCK:
 					case E_BLOCK_DISPENSER:
 					case E_BLOCK_DROPPER:
 					case E_BLOCK_ENDER_CHEST:
@@ -1423,6 +1426,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	switch (a_BlockType)
 	{
 		case E_BLOCK_CHEST:
+		case E_BLOCK_COMMAND_BLOCK:
 		case E_BLOCK_DISPENSER:
 		case E_BLOCK_DROPPER:
 		case E_BLOCK_ENDER_CHEST:
@@ -1741,7 +1745,14 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 	{
-		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"", (*itr)->GetUniqueID(), (*itr)->GetClass(), m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str());
+		/*
+		// DEBUG:
+		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"",
+			(*itr)->GetUniqueID(), (*itr)->GetClass(),
+			m_PosX, m_PosY, m_PosZ,
+			a_Client->GetUsername().c_str()
+		);
+		*/
 		(*itr)->SpawnOn(*a_Client);
 	}
 	return true;
@@ -1766,7 +1777,13 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 		{
 			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 			{
-				LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"", m_PosX, m_PosZ, (*itr)->GetUniqueID(), a_Client->GetUsername().c_str() );
+				/*
+				// DEBUG:
+				LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"",
+					m_PosX, m_PosZ,
+					(*itr)->GetUniqueID(), a_Client->GetUsername().c_str()
+				);
+				*/
 				a_Client->SendDestroyEntity(*(*itr));
 			}
 		}
@@ -2253,6 +2270,38 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 
 
 
+bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_COMMAND_BLOCK)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here, 
+		if (a_Callback.Item((cCommandBlockEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
 bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
@@ -2324,8 +2373,8 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
 	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	a_BlockType = cChunkDef::GetBlock (m_BlockTypes, a_RelX, a_RelY, a_RelZ);
-	a_BlockMeta = cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ);
+	a_BlockType = cChunkDef::GetBlock (m_BlockTypes, Idx);
+	a_BlockMeta = cChunkDef::GetNibble(m_BlockMeta,  Idx);
 }
 
 
@@ -2897,10 +2946,6 @@ NIBBLETYPE cChunk::GetTimeAlteredLight(NIBBLETYPE a_Skylight) const
 
 
 
-
-#if !C_CHUNK_USE_INLINE
-# include "cChunk.inl.h"
-#endif
 
 
 

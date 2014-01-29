@@ -2,12 +2,12 @@
 
 <html>
 	<head>
-		<!--MCServer, a divison of McDonalds Enterprises-->
 		<title>MCS Plugin Tutorial</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
 		<script src="lang-lua.js"></script>
+		<meta charset="UTF-8">
 	</head>
 	<body>
 		<div id="content">
@@ -35,26 +35,26 @@
 			Format it like so:
 			</p>
 			<pre class="prettyprint lang-lua">
-			local PLUGIN
-			
-			function Initialize( Plugin )
-				Plugin:SetName( "DerpyPlugin" )
-				Plugin:SetVersion( 1 )
-				
-				PLUGIN = Plugin
+local PLUGIN
 
-				-- Hooks
-		
-				local PluginManager = cPluginManager:Get()
-				-- Command bindings
+function Initialize(Plugin)
+	Plugin:SetName("DerpyPlugin")
+	Plugin:SetVersion(1)
+	
+	PLUGIN = Plugin
 
-				LOG( "Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
-				return true
-			end
-			
-			function OnDisable()
-				LOG(PLUGIN:GetName() .. " is shutting down...")
-			end
+	-- Hooks
+
+	local PluginManager = cPluginManager:Get()
+	-- Command bindings
+
+	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	return true
+end
+
+function OnDisable()
+	LOG(PLUGIN:GetName() .. " is shutting down...")
+end
 			</pre>
 			<p>
 			Now for an explanation of the basics.
@@ -72,7 +72,7 @@
 			<h2>Registering hooks</h2>
 			<p>
 			Hooks are things that MCServer calls when an internal event occurs. For example, a hook is fired when a player places a block, moves,
-			logs on, eats, and many other things. For a full list, see <a href="http://mc-server.xoft.cz/LuaAPI/">the API documentation</a>.
+			logs on, eats, and many other things. For a full list, see <a href="index.html">the API documentation</a>.
 			</p>
 			<p>
 			A hook can be either informative or overridable. In any case, returning false will not trigger a response, but returning true will cancel
@@ -84,7 +84,7 @@
 			To register a hook, insert the following code template into the "-- Hooks" area in the previous code example.
 			</p>
 			<pre class="prettyprint lang-lua">
-				cPluginManager.AddHook(cPluginManager.HOOK_NAME_HERE, FunctionNameToBeCalled)
+cPluginManager:AddHook(cPluginManager.HOOK_NAME_HERE, FunctionNameToBeCalled)
 			</pre>
 			<p>
 			What does this code do?
@@ -98,22 +98,22 @@
 			So in total, this is a working representation of what we have so far covered.
 			</p>
 			<pre class="prettyprint lang-lua">
-			function Initialize( Plugin )
-				Plugin:SetName( "DerpyPlugin" )
-				Plugin:SetVersion( 1 )
+function Initialize(Plugin)
+	Plugin:SetName("DerpyPlugin")
+	Plugin:SetVersion(1)
 
-				cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
-		
-				local PluginManager = cPluginManager:Get()
-				-- Command bindings
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
 
-				LOG( "Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
-				return true
-			end
-			
-			function OnPlayerMoving(Player) -- See API docs for parameters of all hooks
-				return true -- Prohibit player movement, see docs for whether a hook is cancellable
-			end
+	local PluginManager = cPluginManager:Get()
+	-- Command bindings
+
+	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	return true
+end
+
+function OnPlayerMoving(Player) -- See API docs for parameters of all hooks
+	return true -- Prohibit player movement, see docs for whether a hook is cancellable
+end
 			</pre>
 			<p>
 			So, that code stops the player from moving. Not particularly helpful, but yes :P. Note that ALL documentation is available
@@ -126,11 +126,11 @@
 			We firstly add this template to the "-- Command bindings" section of the initial example:
 			</p>
 			<pre class="prettyprint lang-lua">
-				-- ADD THIS IF COMMAND DOES NOT REQUIRE A PARAMETER (/explode)
-				PluginManager:BindCommand("/commandname", "permissionnode", FunctionToCall, " - Description of command")
-				
-				-- ADD THIS IF COMMAND DOES REQUIRE A PARAMETER (/explode Notch)
-				PluginManager:BindCommand("/commandname", "permissionnode", FunctionToCall, " ~ Description of command and parameter(s)")
+-- ADD THIS IF COMMAND DOES NOT REQUIRE A PARAMETER (/explode)
+PluginManager:BindCommand("/commandname", "permissionnode", FunctionToCall, " - Description of command")
+
+-- ADD THIS IF COMMAND DOES REQUIRE A PARAMETER (/explode Notch)
+PluginManager:BindCommand("/commandname", "permissionnode", FunctionToCall, " ~ Description of command and parameter(s)")
 			</pre>
 			<p>
 			What does it do, and why are there two?
@@ -171,17 +171,17 @@
 			your code in. Since MCS brings all the files together on JIT compile, we don't need to worry about requiring any files or such. Simply follow the below examples:
 			</p>
 			<pre class="prettyprint lang-lua">
-				-- Format: §yellow[INFO] §white%text% (yellow [INFO], white text following it)
-				-- Use: Informational message, such as instructions for usage of a command
-				SendMessage(Player, "Usage: /explode [player]")
-				
-				-- Format: §green[INFO] §white%text% (green [INFO] etc.)
-				-- Use: Success message, like when a command executes successfully
-				SendMessageSuccess(Player, "Notch was blown up!")
-				
-				-- Format: §rose[INFO] §white%text% (rose coloured [INFO] etc.)
-				-- Use: Failure message, like when a command was entered correctly but failed to run, such as when the destination player wasn't found in a /tp command
-				SendMessageFailure(Player, "Player Salted was not found")
+-- Format: §yellow[INFO] §white%text% (yellow [INFO], white text following it)
+-- Use: Informational message, such as instructions for usage of a command
+SendMessage(Player, "Usage: /explode [player]")
+
+-- Format: §green[INFO] §white%text% (green [INFO] etc.)
+-- Use: Success message, like when a command executes successfully
+SendMessageSuccess(Player, "Notch was blown up!")
+
+-- Format: §rose[INFO] §white%text% (rose coloured [INFO] etc.)
+-- Use: Failure message, like when a command was entered correctly but failed to run, such as when the destination player wasn't found in a /tp command
+SendMessageFailure(Player, "Player Salted was not found")
 			</pre>
 			<p>
 			Those are the basics. If you want to output text to the player for a reason other than the three listed above, and you want to colour the text, simply concatenate
@@ -193,51 +193,63 @@
 			So, a working example that checks the validity of a command, and blows up a player, and also refuses pickup collection to players with >100ms ping.
 			</p>
 			<pre class="prettyprint lang-lua">
-			function Initialize( Plugin )
-				Plugin:SetName( "DerpyPluginThatBlowsPeopleUp" )
-				Plugin:SetVersion( 9001 )
-		
-				local PluginManager = cPluginManager:Get()
-				PluginManager:BindCommand("/explode", "derpyplugin.explode", Explode, " ~ Explode a player");
+function Initialize(Plugin)
+	Plugin:SetName("DerpyPluginThatBlowsPeopleUp")
+	Plugin:SetVersion(9001)
 
-				cPluginManager.AddHook(cPluginManager.HOOK_COLLECTING_PICKUP, OnCollectingPickup)
+	local PluginManager = cPluginManager:Get()
+	PluginManager:BindCommand("/explode", "derpyplugin.explode", Explode, " ~ Explode a player");
 
-				LOG( "Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
-				return true
-			end
-			
-			function Explode(Split, Player)
-				if #Split ~= 2
-					SendMessage(Player, "Usage: /explode [playername]") -- There was more or less than one argument (excluding the /explode bit)
-				else
-					local ExplodePlayer = function(Explodee) -- Create a callback ExplodePlayer with parameter Explodee, which MCS calls for every player on the server
-						if (Explodee:GetName() == Split[2] then -- If the player we are currently at is the one we specified as the parameter...
-							Player:GetWorld():DoExplosionAt(Explodee:GetPosX(), Explodee:GetPosY(), Explodee:GetPosZ(), false, esPlugin) -- Explode 'em; see API docs for further details of this function
-							SendMessageSuccess(Player, Split[2] .. " was successfully exploded") -- Success!
-							return true -- Break out
-						end
-					end
-					
-					cRoot:Get():FindAndDoWithPlayer(Split[2], ExplodePlayer) -- Tells MCS to loop through all players and call the callback above with the Player object it has found
-					
-					SendMessageFailure(Player, Split[2] .. " was not found") -- We have not broken out so far, therefore, the player must not exist, send failure
-				end
-				
-				return true -- Concluding return
-			end
-			
-			function OnCollectingPickup(Player, Pickup) -- Again, see the API docs for parameters of all hooks. In this case, it is a Player and Pickup object
-				if (Player:GetClientHandle():GetPing() > 100) then -- Get ping of player, in milliseconds
-					return true -- Discriminate against high latency - you don't get drops :D
-				else
-					return false -- You do get the drops! Yay~
-				end
-			end
+	cPluginManager:AddHook(cPluginManager.HOOK_COLLECTING_PICKUP, OnCollectingPickup)
+
+	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	return true
+end
+
+function Explode(Split, Player)
+	if (#Split ~= 2) then
+		-- There was more or less than one argument (excluding the "/explode" bit)
+		-- Send the proper usage to the player and exit
+		SendMessage(Player, "Usage: /explode [playername]")
+		return true
+	end
+
+	-- Create a callback ExplodePlayer with parameter Explodee, which MCS calls for every player on the server
+	local HasExploded = false
+	local ExplodePlayer = function(Explodee)
+		-- If the player we are currently at is the one we specified as the parameter
+		if (Explodee:GetName() == Split[2]) then
+			-- Create an explosion at the same position as they are; see <a href="cWorld.html">API docs</a> for further details of this function
+			Player:GetWorld():DoExplosionAt(Explodee:GetPosX(), Explodee:GetPosY(), Explodee:GetPosZ(), false, esPlugin)
+			SendMessageSuccess(Player, Split[2] .. " was successfully exploded")
+			HasExploded = true;
+			return true -- Signalize to MCS that we do not need to call this callback for any more players
+		end
+	end
+	
+	-- Tell MCS to loop through all players and call the callback above with the Player object it has found
+	cRoot:Get():FindAndDoWithPlayer(Split[2], ExplodePlayer)
+	
+	if not(HasExploded) then
+		-- We have not broken out so far, therefore, the player must not exist, send failure
+		SendMessageFailure(Player, Split[2] .. " was not found")
+	end
+	
+	return true
+end
+
+function OnCollectingPickup(Player, Pickup) -- Again, see the API docs for parameters of all hooks. In this case, it is a Player and Pickup object
+	if (Player:GetClientHandle():GetPing() > 100) then -- Get ping of player, in milliseconds
+		return true -- Discriminate against high latency - you don't get drops :D
+	else
+		return false -- You do get the drops! Yay~
+	end
+end
 			</pre>
 			<p>
 			Make sure to read the comments for a description of what everything does. Also be sure to return true for all <b>command</b> handlers, unless you want MCS to print out an "Unknown command" message
 			when the command gets executed :P. Make sure to follow standards - use CoreMessaging.lua functions for messaging, dashes for no parameter commands and tildes for vice versa,
-			and finally, <a href="http://mc-server.xoft.cz/LuaAPI/">the API documentation</a> is your friend!
+			and finally, <a href="index.html">the API documentation</a> is your friend!
 			</p>
 			<p>
 			Happy coding ;)
@@ -247,7 +259,5 @@
 				prettyPrint();
 			</script>
 		</div>
-		<hr />
-		<footer>This tutorial was brought you by Aperture Science, in conjunction with McDonalds Enterprises.<br /></footer>
 	</body>
 </html>

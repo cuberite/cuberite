@@ -264,7 +264,7 @@ void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 
 
 
-void cChunkSender::Entity(cEntity * a_Entity)
+void cChunkSender::Entity(cEntity *)
 {
 	// Nothing needed yet, perhaps in the future when we save entities into chunks we'd like to send them upon load, too ;)
 }

@@ -13,6 +13,7 @@
 class cGroup;
 class cWindow;
 class cClientHandle;
+class cTeam;
 
 
 
@@ -30,8 +31,6 @@ public:
 		MAX_HEALTH = 20,
 		MAX_FOOD_LEVEL = 20,
 		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
-		MAX_AIR_LEVEL = 300,
-		DROWNING_TICKS = 10, //number of ticks per heart of damage
 	} ;
 	// tolua_end
 	
@@ -45,7 +44,7 @@ public:
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override { };
+	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); };
 
 	/// Returns the curently equipped weapon; empty item if none
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
@@ -114,7 +113,7 @@ public:
 	double GetEyeHeight(void) const;													// tolua_export
 	Vector3d GetEyePosition(void) const;												// tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
-	inline const double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
+	inline double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 	
@@ -152,6 +151,15 @@ public:
 	bool IsGameModeAdventure(void) const;
 	
 	AString GetIP(void) const { return m_IP; }  // tolua_export
+
+	/// Returns the associated team, NULL if none
+	cTeam * GetTeam(void) { return m_Team; } // tolua_export
+
+	/// Sets the player team, NULL if none
+	void SetTeam(cTeam * a_Team);
+
+	/// Forces the player to query the scoreboard for his team
+	cTeam * UpdateTeam(void);
 
 	// tolua_end
 	
@@ -214,7 +222,14 @@ public:
 	/// Returns the full color code to use for this player, based on their primary group or set in m_Color
 	AString GetColor(void) const;
 
-	void TossItem(bool a_bDraggingItem, char a_Amount = 1, short a_CreateType = 0, short a_CreateHealth = 0);
+	/** tosses the item in the selected hotbar slot */
+	void TossEquippedItem(char a_Amount = 1);
+
+	/** tosses the item held in hand (when in UI windows) */
+	void TossHeldItem(char a_Amount = 1);
+
+	/** tosses a pickup newly created from a_Item */
+	void TossPickup(const cItem & a_Item);
 
 	/// Heals the player by the specified amount of HPs (positive only); sends health update
 	void Heal(int a_Health);
@@ -224,8 +239,6 @@ public:
 	int    GetFoodTickTimer             (void) const { return m_FoodTickTimer; }
 	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
 	int    GetFoodPoisonedTicksRemaining(void) const { return m_FoodPoisonedTicksRemaining; }
-
-	int GetAirLevel                     (void) const { return m_AirLevel; }
 	
 	/// Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore
 	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
@@ -336,12 +349,6 @@ public:
 	/// If true the player can fly even when he's not in creative.
 	void SetCanFly(bool a_CanFly);
 
-	/// Returns whether the player is swimming or not
-	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
-
-	/// Return whether the player is under water or not
-	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
-
 	/// Returns wheter the player can fly or not.
 	virtual bool CanFly(void) const { return m_CanFly; }
 	// tolua_end
@@ -350,6 +357,8 @@ public:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const { return IsEating(); }
+
+	virtual void Detach(void);
 	
 protected:
 	typedef std::map< std::string, bool > PermissionMap;
@@ -369,12 +378,6 @@ protected:
 		XP_PER_LEVEL_TO15 = 17,
 		XP_TO_LEVEL30 = 825
 	} ;
-
-	/// Player's air level (for swimming)
-	int m_AirLevel;
-
-	/// used to time ticks between damage taken via drowning/suffocation
-	int m_AirTickTimer;
 
 	bool m_bVisible;
 
@@ -412,7 +415,7 @@ protected:
 	float m_LastBlockActionTime;
 	int m_LastBlockActionCnt;
 	eGameMode m_GameMode;
-	std::string m_IP;
+	AString m_IP;
 	
 	/// The item being dragged by the cursor while in a UI window
 	cItem m_DraggingItem;
@@ -454,6 +457,8 @@ protected:
 
 	int m_FloaterID;
 
+	cTeam* m_Team;
+
 
 
 	void ResolvePermissions(void);
@@ -461,7 +466,7 @@ protected:
 
 	virtual void Destroyed(void);
 
-	/// Filters out damage for creative mode
+	/// Filters out damage for creative mode/friendly fire
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
 	
 	/// Called in each tick to handle food-related processing
@@ -469,12 +474,6 @@ protected:
 
 	/// Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item.
 	void HandleFloater(void);
-	
-	/// Called in each tick to handle air-related processing i.e. drowning
-	void HandleAir();
-
-	/// Called once per tick to set IsSwimming and IsSubmerged
-	void SetSwimState(cChunk & a_Chunk);
 
 	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
 	void ApplyFoodExhaustionFromMovement();

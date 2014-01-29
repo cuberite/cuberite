@@ -1,4 +1,6 @@
 build/
+ipch/
+Win32/
 MCServer/MCServer
 ChunkWorxSave.ini
 doxy/
@@ -11,6 +13,7 @@ cloc.xsl
 *.user
 *.suo
 /EveryNight.cmd
+/UploadLuaAPI.cmd
 
 # IDE Stuff
 ## Sublime Text
@@ -18,6 +21,7 @@ cloc.xsl
 ## emacs
 *.*~
 *~
+*.orig
 
 # world inside source
 ChunkWorx.ini
@@ -53,11 +57,22 @@ install_mainfest.txt
 src/MCServer
 lib/tolua++/tolua
 src/Bindings/Bindings.*
+src/Bindings/BindingsDependecies.txt
 MCServer.dir/
 
 #win32 cmake stuff
 *.vcxproj
+*.vcproj
 *.vcxproj.filters
 *.opensdf
 *.sdf
 *.sln
+*.idb
+
+#cmake output folders
+ZERO_CHECK.dir/
+Debug/
+DebugProfile/
+Release/
+ReleaseProfile/
+*.dir/

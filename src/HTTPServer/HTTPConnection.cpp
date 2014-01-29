@@ -26,7 +26,7 @@ cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
 
 cHTTPConnection::~cHTTPConnection()
 {
-	// LOGD("HTTP: Del connection at %p", this);
+	delete m_CurrentRequest;
 }
 
 
@@ -57,7 +57,7 @@ void cHTTPConnection::SendNeedAuth(const AString & a_Realm)
 
 void cHTTPConnection::Send(const cHTTPResponse & a_Response)
 {
-	ASSERT(m_State = wcsRecvIdle);
+	ASSERT(m_State == wcsRecvIdle);
 	a_Response.AppendToData(m_OutgoingData);
 	m_State = wcsSendingResp;
 	m_HTTPServer.NotifyConnectionWrite(*this);
@@ -205,6 +205,12 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 			{
 				m_State = wcsRecvIdle;
 				m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
+				if (!m_CurrentRequest->DoesAllowKeepAlive())
+				{
+					m_State = wcsInvalid;
+					m_HTTPServer.CloseConnection(*this);
+					return;
+				}
 				delete m_CurrentRequest;
 				m_CurrentRequest = NULL;
 			}

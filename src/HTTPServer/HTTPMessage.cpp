@@ -72,7 +72,8 @@ cHTTPRequest::cHTTPRequest(void) :
 	m_EnvelopeParser(*this),
 	m_IsValid(true),
 	m_UserData(NULL),
-	m_HasAuth(false)
+	m_HasAuth(false),
+	m_AllowKeepAlive(false)
 {
 }
 
@@ -235,6 +236,10 @@ void cHTTPRequest::OnHeaderLine(const AString & a_Key, const AString & a_Value)
 			m_AuthPassword = UserPass.substr(idxCol + 1);
 			m_HasAuth = true;
 		}
+	}
+	if ((a_Key == "Connection") && (NoCaseCompare(a_Value, "keep-alive") == 0))
+	{
+		m_AllowKeepAlive = true;
 	}
 	AddHeader(a_Key, a_Value);
 }

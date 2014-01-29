@@ -18,27 +18,40 @@
 
 
 
-AString & AppendVPrintf(AString & str, const char *format, va_list args)
+AString & AppendVPrintf(AString & str, const char * format, va_list args)
 {
 	ASSERT(format != NULL);
 	
 	char buffer[2048];
 	size_t len;
+	#ifdef va_copy
+	va_list argsCopy;
+	va_copy(argsCopy, args);
+	#else
+	#define argsCopy args
+	#endif
 	#ifdef _MSC_VER
 	// MS CRT provides secure printf that doesn't behave like in the C99 standard
-	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, args)) != -1)
+	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, argsCopy)) != -1)
 	#else  // _MSC_VER
-	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, args)) < ARRAYCOUNT(buffer))
+	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, argsCopy)) < ARRAYCOUNT(buffer))
 	#endif  // else _MSC_VER
 	{
 		// The result did fit into the static buffer
+		#ifdef va_copy
+		va_end(argsCopy);
+		#endif
 		str.append(buffer, len);
 		return str;
 	}
+	#ifdef va_copy
+	va_end(argsCopy);
+	#endif
 	
-	// The result did not fit into the static buffer
+	// The result did not fit into the static buffer, use a dynamic buffer:
 	#ifdef _MSC_VER
 	// for MS CRT, we need to calculate the result length
+	// MS doesn't have va_copy() and does nod need it at all
 	len = _vscprintf(format, args);
 	if (len == -1)
 	{
@@ -47,15 +60,19 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 	#endif  // _MSC_VER
 	
 	// Allocate a buffer and printf into it:
-	str.resize(len + 1);
-	// HACK: we're accessing AString's internal buffer in a way that is NOT guaranteed to always work. But it works on all STL implementations tested.
-	// I can't think of any other way that is safe, doesn't allocate twice as much space as needed and doesn't use C++11 features like the move constructor
+	#ifdef va_copy
+	va_copy(argsCopy, args);
+	#endif
+	std::vector<char> Buffer(len + 1);
 	#ifdef _MSC_VER
-	vsprintf_s((char *)str.data(), len + 1, format, args);
+	vsprintf_s((char *)&(Buffer.front()), Buffer.size(), format, argsCopy);
 	#else  // _MSC_VER
-	vsnprintf((char *)str.data(), len + 1, format, args);
+	vsnprintf((char *)&(Buffer.front()), Buffer.size(), format, argsCopy);
 	#endif  // else _MSC_VER
-	str.resize(len);
+	str.append(&(Buffer.front()), Buffer.size() - 1);
+	#ifdef va_copy
+	va_end(argsCopy);
+	#endif
 	return str;
 }
 
@@ -91,7 +108,7 @@ AString Printf(const char * format, ...)
 
 
 
-AString & AppendPrintf(AString &str, const char *format, ...)
+AString & AppendPrintf(AString &str, const char * format, ...)
 {
 	va_list args;
 	va_start(args, format);
@@ -612,7 +629,7 @@ AString StripColorCodes(const AString & a_Message)
 {
 	AString res(a_Message);
 	size_t idx = 0;
-	while (true)
+	for (;;)
 	{
 		idx = res.find("\xc2\xa7", idx);
 		if (idx == AString::npos)
@@ -759,7 +776,88 @@ AString Base64Decode(const AString & a_Base64String)
 		}
 	}
 	res.resize(o >> 3);
-	return res;}
+	return res;
+}
+
+
+
+
+
+AString Base64Encode(const AString & a_Input)
+{
+	static const char BASE64[64] = {
+		'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+		'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
+		'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
+		'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'
+	};
+
+	AString output;
+	output.resize(((a_Input.size() + 2) / 3) * 4);
+
+	size_t output_index = 0;
+	size_t size_full24 = (a_Input.size() / 3) * 3;
+
+	for (size_t i = 0; i < size_full24; i += 3)
+	{
+		output[output_index++] = BASE64[(unsigned char)a_Input[i] >> 2];
+		output[output_index++] = BASE64[((unsigned char)a_Input[i] << 4 | (unsigned char)a_Input[i + 1] >> 4) & 63];
+		output[output_index++] = BASE64[((unsigned char)a_Input[i + 1] << 2 | (unsigned char)a_Input[i + 2] >> 6) & 63];
+		output[output_index++] = BASE64[(unsigned char)a_Input[i + 2] & 63];
+	}
+
+	if (size_full24 < a_Input.size())
+	{
+		output[output_index++] = BASE64[(unsigned char)a_Input[size_full24] >> 2];
+		if (size_full24 + 1 == a_Input.size())
+		{
+			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24] << 4) & 63];
+			output[output_index++] = '=';
+		}
+		else
+		{
+			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24] << 4 | (unsigned char)a_Input[size_full24 + 1] >> 4) & 63];
+			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24 + 1] << 2) & 63];
+		}
+
+		output[output_index++] = '=';
+	}
+	ASSERT(output_index == output.size());
+
+	return output;
+}
+
+
+
+
+
+short GetBEShort(const char * a_Mem)
+{
+	const Byte * Bytes = (const Byte *)a_Mem;
+	return (Bytes[0] << 8) | Bytes[1];
+}
+
+
+
+
+
+int GetBEInt(const char * a_Mem)
+{
+	const Byte * Bytes = (const Byte *)a_Mem;
+	return (Bytes[0] << 24) | (Bytes[1] << 16) | (Bytes[2] << 8) | Bytes[3];
+}
+
+
+
+
+
+void SetBEInt(char * a_Mem, Int32 a_Value)
+{
+	a_Mem[0] = a_Value >> 24;
+	a_Mem[1] = (a_Value >> 16) & 0xff;
+	a_Mem[2] = (a_Value >> 8) & 0xff;
+	a_Mem[3] = a_Value & 0xff;
+}
 
 
 

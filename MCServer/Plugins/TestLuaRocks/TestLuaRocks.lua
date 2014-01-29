@@ -27,7 +27,7 @@ LOG("headers: ");
 for k, v in pairs(headers or {}) do
 	LOG("  " .. k .. ": " .. v);
 end
-LOG("body length: " .. string.length(body));
+LOG("body length: " .. string.len(body));
 
 
 

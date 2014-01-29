@@ -17,7 +17,6 @@
 
 
 
-
 /// If a chunk with this Y coord is de-queued, it is a signal to emit the saved-all message (cWorldStorage::QueueSavedMessage())
 #define CHUNK_Y_MESSAGE 2
 
@@ -63,19 +62,17 @@ cWorldStorage::~cWorldStorage()
 	{
 		delete *itr;
 	}  // for itr - m_Schemas[]
-	m_LoadQueue.clear();
-	m_SaveQueue.clear();
 }
 
 
 
 
 
-bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName)
+bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor )
 {
 	m_World = a_World;
 	m_StorageSchemaName = a_StorageSchemaName;
-	InitSchemas();
+	InitSchemas(a_StorageCompressionFactor);
 	
 	return super::Start();
 }
@@ -98,18 +95,15 @@ void cWorldStorage::WaitForFinish(void)
 	LOG("Waiting for the world storage to finish saving");
 	
 	{
-		// Cancel all loading requests:
-		cCSLock Lock(m_CSQueues);
-		m_LoadQueue.clear();
+		m_LoadQueue.Clear();
 	}
 	
 	// Wait for the saving to finish:
-	WaitForQueuesEmpty();
+	WaitForSaveQueueEmpty();
 	
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
-	m_Event.Set();
-	m_evtRemoved.Set();  // Wake up anybody waiting in the WaitForQueuesEmpty() method
+	m_Event.Set(); // Wake up the thread if waiting
 	super::Wait();
 	LOG("World storage thread finished");
 }
@@ -118,34 +112,36 @@ void cWorldStorage::WaitForFinish(void)
 
 
 
-void cWorldStorage::WaitForQueuesEmpty(void)
+void cWorldStorage::WaitForLoadQueueEmpty(void)
 {
-	cCSLock Lock(m_CSQueues);
-	while (!m_ShouldTerminate && (!m_LoadQueue.empty() || !m_SaveQueue.empty()))
-	{
-		cCSUnlock Unlock(Lock);
-		m_evtRemoved.Wait();
-	}
+	m_LoadQueue.BlockTillEmpty();
 }
 
 
 
 
 
-int cWorldStorage::GetLoadQueueLength(void)
+void cWorldStorage::WaitForSaveQueueEmpty(void)
 {
-	cCSLock Lock(m_CSQueues);
-	return (int)m_LoadQueue.size();
+	m_SaveQueue.BlockTillEmpty();
 }
 
 
 
 
 
-int cWorldStorage::GetSaveQueueLength(void)
+size_t cWorldStorage::GetLoadQueueLength(void)
 {
-	cCSLock Lock(m_CSQueues);
-	return (int)m_SaveQueue.size();
+	return m_LoadQueue.Size();
+}
+
+
+
+
+
+size_t cWorldStorage::GetSaveQueueLength(void)
+{
+	return m_SaveQueue.Size();
 }
 
 
@@ -154,21 +150,7 @@ int cWorldStorage::GetSaveQueueLength(void)
 
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate)
 {
-	// Queues the chunk for loading; if not loaded, the chunk will be generated
-	{
-		cCSLock Lock(m_CSQueues);
-		
-		// Check if already in the queue:
-		for (sChunkLoadQueue::iterator itr = m_LoadQueue.begin(); itr != m_LoadQueue.end(); ++itr)
-		{
-			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_Generate == a_Generate))
-			{
-				return;
-			}
-		}
-		m_LoadQueue.push_back(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
-	}
-	
+	m_LoadQueue.EnqueueItemIfNotPresent(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
 	m_Event.Set();
 }
 
@@ -178,11 +160,7 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, boo
 
 void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	{
-		cCSLock Lock(m_CSQueues);
-		m_SaveQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));  // Don't add twice
-		m_SaveQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
-	}
+	m_SaveQueue.EnqueueItemIfNotPresent(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	m_Event.Set();
 }
 
@@ -192,11 +170,8 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 void cWorldStorage::QueueSavedMessage(void)
 {
-	// Pushes a special coord pair into the queue, signalizing a message instead:
-	{
-		cCSLock Lock(m_CSQueues);
-		m_SaveQueue.push_back(cChunkCoords(0, CHUNK_Y_MESSAGE, 0));
-	}
+	// Pushes a special coord pair into the queue, signalizing a message instead
+	m_SaveQueue.EnqueueItem(cChunkCoords(0, CHUNK_Y_MESSAGE, 0));
 	m_Event.Set();
 }
 
@@ -206,18 +181,7 @@ void cWorldStorage::QueueSavedMessage(void)
 
 void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cCSLock Lock(m_CSQueues);
-	for (sChunkLoadQueue::iterator itr = m_LoadQueue.begin(); itr != m_LoadQueue.end(); ++itr)
-	{
-		if ((itr->m_ChunkX != a_ChunkX) || (itr->m_ChunkY != a_ChunkY) || (itr->m_ChunkZ != a_ChunkZ))
-		{
-			continue;
-		}
-		m_LoadQueue.erase(itr);
-		Lock.Unlock();
-		m_evtRemoved.Set();
-		return;
-	}  // for itr - m_LoadQueue[]
+	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ,true));
 }
 
 
@@ -226,22 +190,18 @@ void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 {
-	{
-		cCSLock Lock(m_CSQueues);
-		m_SaveQueue.remove(a_Chunk);
-	}
-	m_evtRemoved.Set();
+	m_SaveQueue.Remove(a_Chunk);
 }
 
 
 
 
 
-void cWorldStorage::InitSchemas(void)
+void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 {
 	// The first schema added is considered the default
-	m_Schemas.push_back(new cWSSAnvil    (m_World));
-	m_Schemas.push_back(new cWSSCompact  (m_World));
+	m_Schemas.push_back(new cWSSAnvil    (m_World,a_StorageCompressionFactor));
+	m_Schemas.push_back(new cWSSCompact  (m_World,a_StorageCompressionFactor));
 	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 	
@@ -279,21 +239,19 @@ void cWorldStorage::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		m_Event.Wait();
-		
 		// Process both queues until they are empty again:
-		bool HasMore;
+		bool Success;
 		do
 		{
-			HasMore = false;
+			Success = false;
 			if (m_ShouldTerminate)
 			{
 				return;
 			}
 			
-			HasMore = LoadOneChunk();
-			HasMore = HasMore | SaveOneChunk();
-			m_evtRemoved.Set();
-		} while (HasMore);
+			Success = LoadOneChunk();
+			Success |= SaveOneChunk();
+		} while (Success);
 	}
 }
 
@@ -304,19 +262,7 @@ void cWorldStorage::Execute(void)
 bool cWorldStorage::LoadOneChunk(void)
 {
 	sChunkLoad ToLoad(0, 0, 0, false);
-	bool HasMore;
-	bool ShouldLoad = false;
-	{
-		cCSLock Lock(m_CSQueues);
-		if (!m_LoadQueue.empty())
-		{
-			ToLoad = m_LoadQueue.front();
-			m_LoadQueue.pop_front();
-			ShouldLoad = true;
-		}
-		HasMore = !m_LoadQueue.empty();
-	}
-	
+	bool ShouldLoad = m_LoadQueue.TryDequeueItem(ToLoad);
 	if (ShouldLoad && !LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ))
 	{
 		if (ToLoad.m_Generate)
@@ -330,7 +276,7 @@ bool cWorldStorage::LoadOneChunk(void)
 			// m_World->ChunkLoadFailed(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
 		}
 	}
-	return HasMore;
+	return ShouldLoad;
 }
 
 
@@ -339,33 +285,24 @@ bool cWorldStorage::LoadOneChunk(void)
 
 bool cWorldStorage::SaveOneChunk(void)
 {
-	cChunkCoords Save(0, 0, 0);
-	bool HasMore;
-	bool ShouldSave = false;
-	{
-		cCSLock Lock(m_CSQueues);
-		if (!m_SaveQueue.empty())
+	cChunkCoords ToSave(0, 0, 0);
+	bool ShouldSave = m_SaveQueue.TryDequeueItem(ToSave);
+	if(ShouldSave) {
+		if (ToSave.m_ChunkY == CHUNK_Y_MESSAGE)
 		{
-			Save = m_SaveQueue.front();
-			m_SaveQueue.pop_front();
-			ShouldSave = true;
+			LOGINFO("Saved all chunks in world %s", m_World->GetName().c_str());
+			return ShouldSave;
 		}
-		HasMore = !m_SaveQueue.empty();
-	}
-	if (Save.m_ChunkY == CHUNK_Y_MESSAGE)
-	{
-		LOGINFO("Saved all chunks in world %s", m_World->GetName().c_str());
-		return HasMore;
-	}
-	if (ShouldSave && m_World->IsChunkValid(Save.m_ChunkX, Save.m_ChunkZ))
-	{
-		m_World->MarkChunkSaving(Save.m_ChunkX, Save.m_ChunkZ);
-		if (m_SaveSchema->SaveChunk(Save))
+		if (ShouldSave && m_World->IsChunkValid(ToSave.m_ChunkX, ToSave.m_ChunkZ))
 		{
-			m_World->MarkChunkSaved(Save.m_ChunkX, Save.m_ChunkZ);
+			m_World->MarkChunkSaving(ToSave.m_ChunkX, ToSave.m_ChunkZ);
+			if (m_SaveSchema->SaveChunk(ToSave))
+			{
+				m_World->MarkChunkSaved(ToSave.m_ChunkX, ToSave.m_ChunkZ);
+			}
 		}
 	}
-	return HasMore;
+	return ShouldSave;
 }
 
 

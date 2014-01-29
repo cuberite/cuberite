@@ -5,8 +5,6 @@
 
 
 
-typedef unsigned char Byte;
-
 /// List of slot numbers, used for inventory-painting
 typedef std::vector<int> cSlotNums;
 
@@ -41,8 +39,8 @@ extern bool g_BlockRequiresSpecialTool[256];
 /// Is this block solid (player cannot walk through)?
 extern bool g_BlockIsSolid[256];
 
-/// Can torches be placed on this block?
-extern bool g_BlockIsTorchPlaceable[256];
+/// Does this block fully occupy it's voxel - is it a 'full' block?
+extern bool g_BlockFullyOccupiesVoxel[256];
 
 /// Experience Orb setup
 enum
@@ -85,6 +83,7 @@ enum
 	DIG_STATUS_STARTED   = 0,
 	DIG_STATUS_CANCELLED = 1,
 	DIG_STATUS_FINISHED  = 2,
+	DIG_STATUS_DROP_STACK= 3,
 	DIG_STATUS_DROP_HELD = 4,
 	DIG_STATUS_SHOOT_EAT = 5,
 } ;
@@ -276,6 +275,24 @@ inline bool IsBlockLava(BLOCKTYPE a_BlockType)
 inline bool IsBlockLiquid(BLOCKTYPE a_BlockType)
 {
 	return IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType);
+}
+
+
+
+
+inline bool IsBlockRail(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_RAIL:
+		case E_BLOCK_ACTIVATOR_RAIL:
+		case E_BLOCK_DETECTOR_RAIL:
+		case E_BLOCK_POWERED_RAIL:
+		{
+			return true;
+		}
+		default: return false;
+	}
 }
 
 
@@ -560,34 +577,6 @@ namespace ItemCategory
 			IsLeggings(a_ItemType) ||
 			IsBoots(a_ItemType)
 		);
-	}
-}
-
-
-
-
-
-/// Returns true if the biome has no downfall - deserts and savannas
-inline bool IsBiomeNoDownfall(EMCSBiome a_Biome)
-{
-	switch (a_Biome)
-	{
-		case biDesert:
-		case biDesertHills:
-		case biDesertM:
-		case biSavanna:
-		case biSavannaM:
-		case biSavannaPlateau:
-		case biSavannaPlateauM:
-		case biNether:
-		case biEnd:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
 	}
 }
 

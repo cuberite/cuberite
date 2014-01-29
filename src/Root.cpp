@@ -200,7 +200,7 @@ void cRoot::Start(void)
 		long long finishmseconds = Time.GetNowTime();
 		finishmseconds -= mseconds;
 
-		LOG("Startup complete, took %i ms!", finishmseconds);
+		LOG("Startup complete, took %lld ms!", finishmseconds);
 		#ifdef _WIN32
 		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED); // Re-enable close button
 		#endif
@@ -596,10 +596,10 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 
 	public:
 		cCallback (const AString & a_PlayerName, cPlayerListCallback & a_Callback) :
-			m_Callback(a_Callback),
 			m_BestRating(0),
 			m_NameLength(a_PlayerName.length()),
 			m_PlayerName(a_PlayerName),
+			m_Callback(a_Callback),
 			m_BestMatch(NULL),
 			m_NumMatches(0)
 		{}
@@ -701,9 +701,9 @@ int cRoot::GetPhysicalRAMUsage(void)
 		{
 			AString Line;
 			std::getline(StatFile, Line);
-			if (strncmp(Line.c_str(), "VmRSS:", 7) == 0)
+			if (strncmp(Line.c_str(), "VmRSS:", 6) == 0)
 			{
-				int res = atoi(Line.c_str() + 8);
+				int res = atoi(Line.c_str() + 7);
 				return (res == 0) ? -1 : res;  // If parsing failed, return -1
 			}
 		}

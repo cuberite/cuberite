@@ -198,7 +198,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	else
 	{
 		// This is used when the client sends a server-ping, respond with the default packet:
-		WriteByte  ((char)0xff);  // PACKET_DISCONNECT
+		WriteByte  (0xff);  // PACKET_DISCONNECT
 		WriteString(a_Reason);
 	}
 }
@@ -476,6 +476,16 @@ void cProtocolRecognizer::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
+void cProtocolRecognizer::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPluginMessage(a_Channel, a_Message);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	ASSERT(m_Protocol != NULL);
@@ -510,6 +520,36 @@ void cProtocolRecognizer::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendExperienceOrb(a_ExpOrb);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
 }
 
 
@@ -620,6 +660,16 @@ void cProtocolRecognizer::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
 }
 
 
@@ -787,7 +837,7 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 	}
 	switch (ch)
 	{
-	 case PROTO_VERSION_1_3_2:
+		case PROTO_VERSION_1_3_2:
 		{
 			m_Protocol = new cProtocol132(m_Client);
 			return true;
@@ -915,7 +965,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			m_Buffer.ResetRead();
 			if (m_Buffer.CanReadBytes(2))
 			{
-				byte val;
+				Byte val;
 				m_Buffer.ReadByte(val);  // Packet type - Serverlist ping
 				m_Buffer.ReadByte(val);  // 0x01 magic value
 				ASSERT(val == 0x01);

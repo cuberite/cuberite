@@ -5,6 +5,18 @@
 
 
 
+// Windows and MacOSX don't have the MSG_NOSIGNAL flag
+#if ( \
+	defined(_WIN32) || \
+	(defined(__APPLE__) && defined(__MACH__)) \
+)
+	#define MSG_NOSIGNAL (0)
+#endif
+
+
+#include "Errors.h"
+
+
 class cSocket
 {
 public:
@@ -12,6 +24,12 @@ public:
 	{
 		IPv4 = AF_INET,
 		IPv6 = AF_INET6,
+		
+		#ifdef _WIN32
+		ErrWouldBlock = WSAEWOULDBLOCK,
+		#else
+		ErrWouldBlock = EWOULDBLOCK,
+		#endif
 	} ;
 	
 #ifdef _WIN32
@@ -27,7 +45,11 @@ public:
 
 	bool IsValid(void) const { return IsValidSocket(m_Socket); }
 	void CloseSocket(void);
-
+	
+	/** Notifies the socket that we don't expect any more reads nor writes on it.
+	Most TCPIP implementations use this to send the FIN flag in a packet */
+	void ShutdownReadWrite(void);
+	
 	operator xSocket(void) const;
 	xSocket GetSocket(void) const;
 	
@@ -41,11 +63,10 @@ public:
 	/// Initializes the network stack. Returns 0 on success, or another number as an error code.
 	static int WSAStartup(void);
 
-	static AString GetErrorString(int a_ErrNo);
 	static int     GetLastError();
 	static AString GetLastErrorString(void)
 	{
-		return GetErrorString(GetLastError());
+		return GetOSErrorString(GetLastError());
 	}
 	
 	/// Creates a new socket of the specified address family
@@ -95,6 +116,9 @@ public:
 	unsigned short GetPort(void) const;  // Returns 0 on failure
 
 	const AString & GetIPString(void) const { return m_IPString; }
+	
+	/** Sets the socket into non-blocking mode */
+	void SetNonBlocking(void);
 
 private:
 	xSocket m_Socket;

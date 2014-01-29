@@ -206,7 +206,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 	m_IsInGround(false)
 {
 	SetSpeed(a_Speed);
-	SetRotationFromSpeed();
+	SetYawFromSpeed();
 	SetPitchFromSpeed();
 }
 
@@ -350,7 +350,7 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	NewSpeed.y += m_Gravity / 20;
 	NewSpeed *= TracerCallback.GetSlowdownCoeff();
 	SetSpeed(NewSpeed);
-	SetRotationFromSpeed();
+	SetYawFromSpeed();
 	SetPitchFromSpeed();
 
 	// DEBUG:
@@ -358,7 +358,7 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		m_UniqueID,
 		GetPosX(), GetPosY(), GetPosZ(),
 		GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		GetRotation(), GetPitch()
+		GetYaw(), GetPitch()
 	);
 }
 
@@ -369,7 +369,7 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 {
 	// Default spawning - use the projectile kind to spawn an object:
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetRotation()), ANGLE_TO_PROTO(GetPitch()));
+	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
 	a_Client.SendEntityMetadata(*this);
 }
 
@@ -402,11 +402,11 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
-	SetRotationFromSpeed();
+	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",
 		m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		GetRotation(), GetPitch()
+		GetYaw(), GetPitch()
 	);
 }
 
@@ -679,7 +679,8 @@ super(pkExpBottle, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 
 void cExpBottleEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
-	// TODO: Spawn experience orbs
+	// Spawn an experience orb with a reward between 3 and 11.
+	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), 3 + m_World->GetTickRandomNumber(8));
 
 	Destroy();
 }
@@ -709,8 +710,6 @@ void cFireworkEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 
 	SetSpeed(0, 0, 0);
 	SetPosition(GetPosX(), GetPosY() - 0.5, GetPosZ());
-
-	std::cout << a_HitPos.x << " " << a_HitPos.y << " " << a_HitPos.z << std::endl;
 
 	m_IsInGround = true;
 

@@ -37,6 +37,11 @@ public:
 	
 	void MoveViewBy(int a_OffsX, int a_OffsY);
 	
+	void SetZoom(int a_NewZoom)
+	{
+		m_Zoom = a_NewZoom;
+	}
+	
 protected:
 	cBiomeCache m_Cache;
 	

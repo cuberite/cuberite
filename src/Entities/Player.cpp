@@ -7,7 +7,6 @@
 #include "../UI/Window.h"
 #include "../UI/WindowOwner.h"
 #include "../World.h"
-#include "Pickup.h"
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../GroupManager.h"
@@ -27,8 +26,6 @@
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
-#define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
-
 
 
 
@@ -36,8 +33,6 @@
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	: super(etPlayer, 0.6, 1.8)
-	, m_AirLevel( MAX_AIR_LEVEL )
-	, m_AirTickTimer(DROWNING_TICKS)
 	, m_bVisible(true)
 	, m_FoodLevel(MAX_FOOD_LEVEL)
 	, m_FoodSaturationLevel(5)
@@ -74,6 +69,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_IsChargingBow(false)
 	, m_BowCharge(0)
 	, m_FloaterID(-1)
+	, m_Team(NULL)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -107,9 +103,23 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
 		);
 	}
+
 	m_LastJumpHeight = (float)(GetPosY());
 	m_LastGroundHeight = (float)(GetPosY());
 	m_Stance = GetPosY() + 1.62;
+
+	if (m_GameMode == gmNotSet)
+	{
+		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
+		if (World == NULL)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+		if (World->IsGameModeCreative())
+		{
+			m_CanFly = true;
+		}
+	}
 	
 	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
@@ -195,12 +205,6 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	
 	super::Tick(a_Dt, a_Chunk);
-	
-	// Set player swimming state
-	SetSwimState(a_Chunk);
-
-	// Handle air drowning stuff
-	HandleAir();
 	
 	// Handle charging the bow:
 	if (m_IsChargingBow)
@@ -434,7 +438,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		cWorld * World = GetWorld();
 		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
 		{
-			BLOCKTYPE BlockType = World->GetBlock(float2int(GetPosX()), float2int(GetPosY()), float2int(GetPosZ()));
+			BLOCKTYPE BlockType = World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
 			if (BlockType != E_BLOCK_AIR)
 			{
 				m_bTouchGround = true;
@@ -459,12 +463,10 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 		if (Damage > 0)
 		{
-			if (!IsGameModeCreative())
-			{
-				TakeDamage(dtFalling, NULL, Damage, Damage, 0);
-			}
+			// cPlayer makes sure damage isn't applied in creative, no need to check here
+			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 			
-			// Mojang uses floor() to get X and Z positions, instead of just casting it to an (int)
+			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
 		}		
 
@@ -786,8 +788,22 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		if (IsGameModeCreative())
 		{
-			// No damage / health in creative mode
+			// No damage / health in creative mode if not void damage
 			return;
+		}
+	}
+
+	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
+	{
+		cPlayer* Attacker = (cPlayer*) a_TDI.Attacker;
+
+		if ((m_Team != NULL) && (m_Team == Attacker->m_Team))
+		{
+			if (!m_Team->AllowsFriendlyFire())
+			{
+				// Friendly fire is disabled
+				return;
+			}
 		}
 	}
 	
@@ -836,6 +852,25 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 
 		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by a %s", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str(), KillerClass.c_str()));
 	}
+
+	class cIncrementCounterCB
+		: public cObjectiveCallback
+	{
+		AString m_Name;
+	public:
+		cIncrementCounterCB(const AString & a_Name) : m_Name(a_Name) {}
+
+		virtual bool Item(cObjective * a_Objective) override
+		{
+			a_Objective->AddScore(m_Name, 1);
+			return true;
+		}
+	} IncrementCounter (GetName());
+
+	cScoreboard & Scoreboard = m_World->GetScoreBoard();
+
+	// Update scoreboard objectives
+	Scoreboard.ForEachObjectiveWith(cObjective::E_TYPE_DEATH_COUNT, IncrementCounter);
 }
 
 
@@ -908,8 +943,52 @@ bool cPlayer::IsGameModeSurvival(void) const
 
 bool cPlayer::IsGameModeAdventure(void) const
 {
-	return (m_GameMode == gmCreative) ||  // Either the player is explicitly in Adventure
-		((m_GameMode == gmNotSet) &&  m_World->IsGameModeCreative());  // or they inherit from the world and the world is Adventure
+	return (m_GameMode == gmAdventure) ||  // Either the player is explicitly in Adventure
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeAdventure());  // or they inherit from the world and the world is Adventure
+}
+
+
+
+
+
+void cPlayer::SetTeam(cTeam * a_Team)
+{
+	if (m_Team == a_Team)
+	{
+		return;
+	}
+
+	if (m_Team)
+	{
+		m_Team->RemovePlayer(GetName());
+	}
+
+	m_Team = a_Team;
+
+	if (m_Team)
+	{
+		m_Team->AddPlayer(GetName());
+	}
+}
+
+
+
+
+
+cTeam * cPlayer::UpdateTeam(void)
+{
+	if (m_World == NULL)
+	{
+		SetTeam(NULL);
+	}
+	else
+	{
+		cScoreboard & Scoreboard = m_World->GetScoreBoard();
+
+		SetTeam(Scoreboard.QueryPlayerTeam(GetName()));
+	}
+
+	return m_Team;
 }
 
 
@@ -1342,56 +1421,70 @@ AString cPlayer::GetColor(void) const
 
 
 
-void cPlayer::TossItem(
-	bool a_bDraggingItem,
-	char a_Amount /* = 1 */,
-	short a_CreateType /* = 0 */,
-	short a_CreateHealth /* = 0 */ 
-)
+void cPlayer::TossEquippedItem(char a_Amount)
 {
 	cItems Drops;
-	if (a_CreateType != 0)
+	cItem DroppedItem(GetInventory().GetEquippedItem());
+	if (!DroppedItem.IsEmpty())
 	{
-		// Just create item without touching the inventory (used in creative mode)
-		Drops.push_back(cItem(a_CreateType, a_Amount, a_CreateHealth));
-	}
-	else
-	{
-		// Drop an item from the inventory:
-		if (a_bDraggingItem)
+		char NewAmount = a_Amount;
+		if (NewAmount > GetInventory().GetEquippedItem().m_ItemCount)
 		{
-			cItem & Item = GetDraggingItem();
-			if (!Item.IsEmpty())
-			{
-				char OriginalItemAmount = Item.m_ItemCount;
-				Item.m_ItemCount = std::min(OriginalItemAmount, a_Amount);
-				Drops.push_back(Item);
-				if (OriginalItemAmount > a_Amount)
-				{
-					Item.m_ItemCount = OriginalItemAmount - (char)a_Amount;
-				}
-				else
-				{
-					Item.Empty();
-				}
-			}
+			NewAmount = GetInventory().GetEquippedItem().m_ItemCount; // Drop only what's there
+		}
+
+		GetInventory().GetHotbarGrid().ChangeSlotCount(GetInventory().GetEquippedSlotNum() /* Returns hotbar subslot, which HotbarGrid takes */, -a_Amount);
+
+		DroppedItem.m_ItemCount = NewAmount;
+		Drops.push_back(DroppedItem);
+	}
+
+	double vX = 0, vY = 0, vZ = 0;
+	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
+	vY = -vY * 2 + 1.f;
+	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+}
+
+
+
+
+
+void cPlayer::TossHeldItem(char a_Amount)
+{
+	cItems Drops;
+	cItem & Item = GetDraggingItem();
+	if (!Item.IsEmpty())
+	{
+		char OriginalItemAmount = Item.m_ItemCount;
+		Item.m_ItemCount = std::min(OriginalItemAmount, a_Amount);
+		Drops.push_back(Item);
+		if (OriginalItemAmount > a_Amount)
+		{
+			Item.m_ItemCount = OriginalItemAmount - a_Amount;
 		}
 		else
 		{
-			// Else drop equipped item
-			cItem DroppedItem(GetInventory().GetEquippedItem());
-			if (!DroppedItem.IsEmpty())
-			{
-				if (GetInventory().RemoveOneEquippedItem())
-				{
-					DroppedItem.m_ItemCount = 1; // RemoveItem decreases the count, so set it to 1 again
-					Drops.push_back(DroppedItem);
-				}
-			}
+			Item.Empty();
 		}
 	}
+
 	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetRotation(), GetPitch(), vZ, vX, vY);
+	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
+	vY = -vY * 2 + 1.f;
+	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+}
+
+
+
+
+
+void cPlayer::TossPickup(const cItem & a_Item)
+{
+	cItems Drops;
+	Drops.push_back(a_Item);
+
+	double vX = 0, vY = 0, vZ = 0;
+	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
@@ -1523,7 +1616,7 @@ bool cPlayer::LoadFromDisk()
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if (JSON_PlayerRotation.size() == 3)
 	{
-		SetRotation ((float)JSON_PlayerRotation[(unsigned int)0].asDouble());
+		SetYaw      ((float)JSON_PlayerRotation[(unsigned int)0].asDouble());
 		SetPitch    ((float)JSON_PlayerRotation[(unsigned int)1].asDouble());
 		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
 	}
@@ -1538,26 +1631,11 @@ bool cPlayer::LoadFromDisk()
 	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
 	m_IsFlying            = root.get("isflying", 0).asBool();
 
-	//SetExperience(root.get("experience", 0).asInt());
-
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 
 	if (m_GameMode == eGameMode_Creative)
 	{
 		m_CanFly = true;
-	}
-	else if (m_GameMode == eGameMode_NotSet)
-	{
-		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
-		if (World == NULL)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
-
-		if (World->GetGameMode() == eGameMode_Creative)
-		{
-			m_CanFly = true;
-		}
 	}
 	
 	m_Inventory.LoadFromJson(root["inventory"]);
@@ -1586,7 +1664,7 @@ bool cPlayer::SaveToDisk()
 	JSON_PlayerPosition.append(Json::Value(GetPosZ()));
 
 	Json::Value JSON_PlayerRotation;
-	JSON_PlayerRotation.append(Json::Value(GetRotation()));
+	JSON_PlayerRotation.append(Json::Value(GetYaw()));
 	JSON_PlayerRotation.append(Json::Value(GetPitch()));
 	JSON_PlayerRotation.append(Json::Value(GetRoll()));
 
@@ -1668,85 +1746,6 @@ void cPlayer::UseEquippedItem(void)
 	if (GetInventory().DamageEquippedItem())
 	{
 		m_World->BroadcastSoundEffect("random.break", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-	}
-}
-
-
-
-
-
-void cPlayer::SetSwimState(cChunk & a_Chunk)
-{
-	int RelY = (int)floor(m_LastPosY + 0.1);
-	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
-	{
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
-		return;
-	}
-	
-	BLOCKTYPE BlockIn;
-	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	
-	// Check if the player is swimming:
-	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
-	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
-	{
-		// This sometimes happens on Linux machines
-		// Ref.: http://forum.mc-server.org/showthread.php?tid=1244
-		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, LastPos = {%.02f, %.02f}, Pos = %.02f, %.02f}",
-			RelX, RelY, m_LastPosX, m_LastPosZ, GetPosX(), GetPosZ()
-		);
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
-		return;
-	}
-	m_IsSwimming = IsBlockWater(BlockIn);
-
-	// Check if the player is submerged:
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
-	m_IsSubmerged = IsBlockWater(BlockIn);
-}
-
-
-
-
-
-void cPlayer::HandleAir(void)
-{
-	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
-	// see if the player is /submerged/ water (block above is water)
-	// Get the type of block the player's standing in:
-
-	if (IsSubmerged())
-	{
-		// either reduce air level or damage player
-		if (m_AirLevel < 1)
-		{
-			if (m_AirTickTimer < 1)
-			{
-				// damage player 
-				TakeDamage(dtDrowning, NULL, 1, 1, 0);
-				// reset timer
-				m_AirTickTimer = DROWNING_TICKS;
-			}
-			else
-			{
-				m_AirTickTimer -= 1;
-			}
-		}
-		else
-		{
-			// reduce air supply
-			m_AirLevel -= 1;
-		}
-	}
-	else
-	{
-		// set the air back to maximum
-		m_AirLevel = MAX_AIR_LEVEL;
-		m_AirTickTimer = DROWNING_TICKS;
 	}
 }
 
@@ -1879,6 +1878,36 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 		BaseExhaustion = BaseExhaustion * 0.01;
 	}
 	m_FoodExhaustionLevel += BaseExhaustion;
+}
+
+
+
+
+
+void cPlayer::Detach()
+{
+	super::Detach();
+	int PosX = (int)floor(GetPosX());
+	int PosY = (int)floor(GetPosY());
+	int PosZ = (int)floor(GetPosZ());
+
+	// Search for a position within an area to teleport player after detachment
+	// Position must be solid land, and occupied by a nonsolid block
+	// If nothing found, player remains where they are
+	for (int x = PosX - 2; x <= (PosX + 2); ++x)
+	{
+		for (int y = PosY; y <= (PosY + 3); ++y)
+		{
+			for (int z = PosZ - 2; z <= (PosZ + 2); ++z)
+			{
+				if (!g_BlockIsSolid[m_World->GetBlock(x, y, z)] && g_BlockIsSolid[m_World->GetBlock(x, y - 1, z)])
+				{
+					TeleportToCoords(x, y, z);
+					return;
+				}
+			}
+		}
+	}
 }
 
 

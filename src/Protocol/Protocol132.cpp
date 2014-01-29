@@ -5,7 +5,6 @@
 
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
-#include "cryptopp/randpool.h"
 #include "Protocol132.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -17,7 +16,21 @@
 #include "../UI/Window.h"
 #include "../Entities/Pickup.h"
 #include "../WorldStorage/FastNBT.h"
+#include "../WorldStorage/EnchantmentSerializer.h"
 #include "../StringCompression.h"
+
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4231)
+	#pragma warning(disable:4189)
+	#pragma warning(disable:4702)
+#endif
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 
 
@@ -33,17 +46,6 @@
 		} \
 		m_ReceivedData.CheckValid(); \
 	}
-
-
-
-
-typedef unsigned char Byte;
-
-
-
-
-
-using namespace CryptoPP;
 
 
 
@@ -81,81 +83,6 @@ enum
 
 
 
-// Converts a raw 160-bit SHA1 digest into a Java Hex representation
-// According to http://wiki.vg/wiki/index.php?title=Protocol_Encryption&oldid=2802
-static void DigestToJava(byte a_Digest[20], AString & a_Out)
-{
-	bool IsNegative = (a_Digest[0] >= 0x80);
-	if (IsNegative)
-	{
-		// Two's complement:
-		bool carry = true;  // Add one to the whole number
-		for (int i = 19; i >= 0; i--)
-		{
-			a_Digest[i] = ~a_Digest[i];
-			if (carry)
-			{
-				carry = (a_Digest[i] == 0xff);
-				a_Digest[i]++;
-			}
-		}
-	}
-	a_Out.clear();
-	a_Out.reserve(40);
-	for (int i = 0; i < 20; i++)
-	{
-		AppendPrintf(a_Out, "%02x", a_Digest[i]);
-	}
-	while ((a_Out.length() > 0) && (a_Out[0] == '0'))
-	{
-		a_Out.erase(0, 1);
-	}
-	if (IsNegative)
-	{
-		a_Out.insert(0, "-");
-	}
-}
-
-
-
-
-
-/*
-// Self-test the hash formatting for known values:
-// sha1(Notch) : 4ed1f46bbe04bc756bcb17c0c7ce3e4632f06a48
-// sha1(jeb_)  : -7c9d5b0044c130109a5d7b5fb5c317c02b4e28c1
-// sha1(simon) : 88e16a1019277b15d58faf0541e11910eb756f6
-
-class Test
-{
-public:
-	Test(void)
-	{
-		AString DigestNotch, DigestJeb, DigestSimon;
-		byte Digest[20];
-		CryptoPP::SHA1 Checksum;
-		Checksum.Update((const byte *)"Notch", 5);
-		Checksum.Final(Digest);
-		DigestToJava(Digest, DigestNotch);
-		Checksum.Restart();
-		Checksum.Update((const byte *)"jeb_", 4);
-		Checksum.Final(Digest);
-		DigestToJava(Digest, DigestJeb);
-		Checksum.Restart();
-		Checksum.Update((const byte *)"simon", 5);
-		Checksum.Final(Digest);
-		DigestToJava(Digest, DigestSimon);
-		printf("Notch: \"%s\"", DigestNotch.c_str());
-		printf("jeb_: \"%s\"",  DigestJeb.c_str());
-		printf("simon: \"%s\"", DigestSimon.c_str());
-	}
-} test;
-*/
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cProtocol132:
 
@@ -185,11 +112,11 @@ void cProtocol132::DataReceived(const char * a_Data, int a_Size)
 {
 	if (m_IsEncrypted)
 	{
-		byte Decrypted[512];
+		Byte Decrypted[512];
 		while (a_Size > 0)
 		{
 			int NumBytes = (a_Size > (int)sizeof(Decrypted)) ? (int)sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, (byte *)a_Data, NumBytes);
+			m_Decryptor.ProcessData(Decrypted, (Byte *)a_Data, NumBytes);
 			super::DataReceived((const char *)Decrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -356,8 +283,8 @@ void cProtocol132::SendPlayerSpawn(const cPlayer & a_Player)
 	WriteInt   ((int)(a_Player.GetPosX() * 32));
 	WriteInt   ((int)(a_Player.GetPosY() * 32));
 	WriteInt   ((int)(a_Player.GetPosZ() * 32));
-	WriteByte  ((char)((a_Player.GetRot().x / 360.f) * 256));
-	WriteByte  ((char)((a_Player.GetRot().y / 360.f) * 256));
+	WriteByte  ((char)((a_Player.GetYaw()   / 360.f) * 256));
+	WriteByte  ((char)((a_Player.GetPitch() / 360.f) * 256));
 	WriteShort (HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType);
 	// Player metadata: just use a default metadata value, since the client doesn't like starting without any metadata:
 	WriteByte  (0);  // Index 0, byte (flags)
@@ -410,8 +337,8 @@ void cProtocol132::SendSpawnMob(const cMonster & a_Mob)
 	WriteInt    (a_Mob.GetUniqueID());
 	WriteByte   (a_Mob.GetMobType());
 	WriteVectorI((Vector3i)(a_Mob.GetPosition() * 32));
-	WriteByte   ((Byte)((a_Mob.GetRotation() / 360.f) * 256));
-	WriteByte   ((Byte)((a_Mob.GetPitch() / 360.f) * 256));
+	WriteByte   ((Byte)((a_Mob.GetYaw()     / 360.f) * 256));
+	WriteByte   ((Byte)((a_Mob.GetPitch()   / 360.f) * 256));
 	WriteByte   ((Byte)((a_Mob.GetHeadYaw() / 360.f) * 256));
 	WriteShort  ((short)(a_Mob.GetSpeedX() * 400));
 	WriteShort  ((short)(a_Mob.GetSpeedY() * 400));
@@ -570,9 +497,7 @@ int cProtocol132::ParseHandshake(void)
 		return PARSE_OK; // Player is not allowed into the server
 	}
 
-	// Send a 0xFD Encryption Key Request http://wiki.vg/Protocol#0xFD
-	CryptoPP::StringSink sink(m_ServerPublicKey);  // GCC won't allow inline instantiation in the following line, damned temporary refs
-	cRoot::Get()->GetServer()->GetPublicKey().Save(sink);
+	// Send a 0xfd Encryption Key Request http://wiki.vg/Protocol#0xFD
 	SendEncryptionKeyRequest();
 
 	return PARSE_OK;
@@ -584,7 +509,7 @@ int cProtocol132::ParseHandshake(void)
 
 int cProtocol132::ParseClientStatuses(void)
 {
-	HANDLE_PACKET_READ(ReadByte, byte, Status);
+	HANDLE_PACKET_READ(ReadByte, Byte, Status);
 	if ((Status & 1) == 0)
 	{
 		m_Client->HandleLogin(39, m_Username);
@@ -702,11 +627,11 @@ void cProtocol132::Flush(void)
 	int a_Size = m_DataToSend.size();
 	if (m_IsEncrypted)
 	{
-		byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
+		Byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
 			int NumBytes = (a_Size > (int)sizeof(Encrypted)) ? (int)sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, (byte *)a_Data, NumBytes);
+			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
 			super::SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -752,7 +677,7 @@ void cProtocol132::WriteItem(const cItem & a_Item)
 	// Send the enchantments:
 	cFastNBTWriter Writer;
 	const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-	a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
 	Writer.Finish();
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
@@ -838,7 +763,7 @@ int cProtocol132::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			)
 		)
 		{
-			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+			EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 		}
 	}
 	
@@ -866,10 +791,10 @@ void cProtocol132::SendCompass(const cWorld & a_World)
 void cProtocol132::SendEncryptionKeyRequest(void)
 {
 	cCSLock Lock(m_CSPacket);
-	WriteByte((char)0xfd);
+	WriteByte(0xfd);
 	WriteString(cRoot::Get()->GetServer()->GetServerID());
-	WriteShort((short)m_ServerPublicKey.size());
-	SendData(m_ServerPublicKey.data(), m_ServerPublicKey.size());
+	WriteShort((short)(cRoot::Get()->GetServer()->GetPublicKeyDER().size()));
+	SendData(cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
 	WriteShort(4);
 	WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 	Flush();
@@ -882,19 +807,17 @@ void cProtocol132::SendEncryptionKeyRequest(void)
 void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const AString & a_EncNonce)
 {
 	// Decrypt EncNonce using privkey
-	RSAES<PKCS1v15>::Decryptor rsaDecryptor(cRoot::Get()->GetServer()->GetPrivateKey());
-	time_t CurTime = time(NULL);
-	CryptoPP::RandomPool rng;
-	rng.Put((const byte *)&CurTime, sizeof(CurTime));
-	byte DecryptedNonce[MAX_ENC_LEN];
-	DecodingResult res = rsaDecryptor.Decrypt(rng, (const byte *)a_EncNonce.data(), a_EncNonce.size(), DecryptedNonce);
-	if (!res.isValidCoding || (res.messageLength != 4))
+	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+
+	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+	int res = rsaDecryptor.Decrypt((const Byte *)a_EncNonce.data(), a_EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
+	if (res != 4)
 	{
 		LOGD("Bad nonce length");
 		m_Client->Kick("Hacked client");
 		return;
 	}
-	if (ntohl(*((int *)DecryptedNonce)) != (unsigned)(uintptr_t)this)
+	if (ntohl(DecryptedNonce[0]) != (unsigned)(uintptr_t)this)
 	{
 		LOGD("Bad nonce value");
 		m_Client->Kick("Hacked client");
@@ -902,9 +825,9 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 	}
 	
 	// Decrypt the symmetric encryption key using privkey:
-	byte DecryptedKey[MAX_ENC_LEN];
-	res = rsaDecryptor.Decrypt(rng, (const byte *)a_EncKey.data(), a_EncKey.size(), DecryptedKey);
-	if (!res.isValidCoding || (res.messageLength != 16))
+	Byte DecryptedKey[MAX_ENC_LEN];
+	res = rsaDecryptor.Decrypt((const Byte *)a_EncKey.data(), a_EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
+	if (res != 16)
 	{
 		LOGD("Bad key length");
 		m_Client->Kick("Hacked client");
@@ -914,11 +837,17 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 	{
 		// Send encryption key response:
 		cCSLock Lock(m_CSPacket);
-		WriteByte((char)0xfc);
+		WriteByte(0xfc);
 		WriteShort(0);
 		WriteShort(0);
 		Flush();
 	}
+	
+	#ifdef _DEBUG
+	AString DecryptedKeyHex;
+	CreateHexDump(DecryptedKeyHex, DecryptedKey, res, 16);
+	LOGD("Received encryption key, %d bytes:\n%s", res, DecryptedKeyHex.c_str());
+	#endif
 	
 	StartEncryption(DecryptedKey);
 	return;
@@ -928,21 +857,21 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 
 
 
-void cProtocol132::StartEncryption(const byte * a_Key)
+void cProtocol132::StartEncryption(const Byte * a_Key)
 {
-	m_Encryptor.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
-	m_Decryptor.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
+	m_Encryptor.Init(a_Key, a_Key);
+	m_Decryptor.Init(a_Key, a_Key);
 	m_IsEncrypted = true;
 	
 	// Prepare the m_AuthServerID:
-	CryptoPP::SHA1 Checksum;
+	cSHA1Checksum Checksum;
 	AString ServerID = cRoot::Get()->GetServer()->GetServerID();
-	Checksum.Update((const byte *)ServerID.c_str(), ServerID.length());
+	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update((const byte *)m_ServerPublicKey.c_str(), m_ServerPublicKey.length());
-	byte Digest[20];
-	Checksum.Final(Digest);
-	DigestToJava(Digest, m_AuthServerID);
+	Checksum.Update((const Byte *)cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	Byte Digest[20];
+	Checksum.Finalize(Digest);
+	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
 
 

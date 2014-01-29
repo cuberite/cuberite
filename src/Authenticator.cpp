@@ -43,7 +43,6 @@ cAuthenticator::~cAuthenticator()
 
 
 
-/// Read custom values from INI
 void cAuthenticator::ReadINI(cIniFile & IniFile)
 {
 	m_Server  = IniFile.GetValueSet("Authentication", "Server", DEFAULT_AUTH_SERVER);
@@ -55,7 +54,6 @@ void cAuthenticator::ReadINI(cIniFile & IniFile)
 
 
 
-/// Queues a request for authenticating a user. If the auth fails, the user is kicked
 void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash)
 {
 	if (!m_ShouldAuthenticate)
@@ -141,7 +139,9 @@ bool cAuthenticator::AuthFromAddress(const AString & a_Server, const AString & a
 	cBlockingTCPLink Link;
 	if (!Link.Connect(a_Server.c_str(), 80))
 	{
-		LOGERROR("cAuthenticator: cannot connect to auth server \"%s\", kicking user \"%s\"", a_Server.c_str(), a_Server.c_str());
+		LOGWARNING("%s: cannot connect to auth server \"%s\", kicking user \"%s\"",
+			__FUNCTION__, a_Server.c_str(), a_UserName.c_str()
+		);
 		return false;
 	}
 	
@@ -170,7 +170,7 @@ bool cAuthenticator::AuthFromAddress(const AString & a_Server, const AString & a
 		if (code == 302)
 		{
 			// redirect blabla
-			LOGINFO("Need to redirect!");
+			LOGD("%s: Need to redirect, current level %d!", __FUNCTION__, a_Level);
 			if (a_Level > MAX_REDIRECTS)
 			{
 				LOGERROR("cAuthenticator: received too many levels of redirection from auth server \"%s\" for user \"%s\", bailing out and kicking the user", a_Server.c_str(), a_UserName.c_str());

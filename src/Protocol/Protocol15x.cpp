@@ -35,8 +35,11 @@ Implements the 1.5.x protocol classes:
 
 enum
 {
-	PACKET_WINDOW_OPEN = 0x64,
-	PACKET_PARTICLE_EFFECT = 0x3F,
+	PACKET_WINDOW_OPEN          = 0x64,
+	PACKET_PARTICLE_EFFECT      = 0x3F,
+	PACKET_SCOREBOARD_OBJECTIVE = 0xCE,
+	PACKET_SCORE_UPDATE         = 0xCF,
+	PACKET_DISPLAY_OBJECTIVE    = 0xD0
 } ;
 
 
@@ -97,6 +100,53 @@ void cProtocol150::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 
 
 
+void cProtocol150::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SCOREBOARD_OBJECTIVE);
+	WriteString(a_Name);
+	WriteString(a_DisplayName);
+	WriteByte(a_Mode);
+	Flush();
+}
+
+
+
+
+
+void cProtocol150::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SCORE_UPDATE);
+	WriteString(a_Player);
+	WriteByte(a_Mode);
+
+	if (a_Mode != 1)
+	{
+		WriteString(a_Objective);
+		WriteInt((int) a_Score);
+	}
+
+	Flush();
+}
+
+
+
+
+
+void cProtocol150::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_DISPLAY_OBJECTIVE);
+	WriteByte((int) a_Display);
+	WriteString(a_Objective);
+	Flush();
+}
+
+
+
+
+
 int cProtocol150::ParseWindowClick(void)
 {
 	HANDLE_PACKET_READ(ReadChar,    char,  WindowID);
@@ -112,7 +162,7 @@ int cProtocol150::ParseWindowClick(void)
 	}
 	
 	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
-	eClickAction Action;
+	eClickAction Action = caUnknown;
 	switch ((Mode << 8) | Button)
 	{
 		case 0x0000: Action = (SlotNum != -999) ? caLeftClick  : caLeftClickOutside;  break;

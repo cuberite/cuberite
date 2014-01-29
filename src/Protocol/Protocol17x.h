@@ -16,17 +16,30 @@ Declares the 1.7.x protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
-#include "cryptopp/modes.h"
-#include "cryptopp/aes.h"
+
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4231)
+	#pragma warning(disable:4189)
+	#pragma warning(disable:4702)
+#endif
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
+
+#include "../Crypto.h"
 
 
 
 
 
 class cProtocol172 :
-	public cProtocol  // TODO
+	public cProtocol
 {
-	typedef cProtocol super;  // TODO
+	typedef cProtocol super;
 	
 public:
 
@@ -72,11 +85,15 @@ public:
 	virtual void SendPlayerMoveLook      (void) override;
 	virtual void SendPlayerPosition      (void) override;
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
+	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendRespawn             (void) override;
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
+	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) override;
@@ -87,6 +104,7 @@ public:
 	virtual void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay) override;
 	virtual void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ) override;
+	virtual void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
 	virtual void SendWeather             (eWeather a_Weather) override;
@@ -174,6 +192,7 @@ protected:
 		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
 		void WriteMobMetadata(const cMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
 		void WriteEntityProperties(const cEntity & a_Entity);  // Writes the entity properties for the specified entity, including the Count field
+		void WriteBlockEntity(const cBlockEntity & a_BlockEntity);
 		
 	protected:
 		cProtocol172 & m_Protocol;
@@ -200,15 +219,21 @@ protected:
 	cByteBuffer m_OutPacketLenBuffer;
 	
 	bool m_IsEncrypted;
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor;
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
+	
+	cAESCFBDecryptor m_Decryptor;
+	cAESCFBEncryptor m_Encryptor;
+
+	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
+	cFile m_CommLogFile;
 	
 	
 	/// Adds the received (unencrypted) data to m_ReceivedData, parses complete packets
 	void AddReceivedData(const char * a_Data, int a_Size);
 	
-	/// Reads and handles the packet. The packet length and type have already been read.
-	void HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
+	/** Reads and handles the packet. The packet length and type have already been read.
+	Returns true if the packet was understood, false if it was an unknown packet
+	*/
+	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
 	
 	// Packet handlers while in the Status state (m_State == 1):
 	void HandlePacketStatusPing   (cByteBuffer & a_ByteBuffer);
@@ -256,6 +281,8 @@ protected:
 	
 	/// Parses item metadata as read by ReadItem(), into the item enchantments.
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
+	
+	void StartEncryption(const Byte * a_Key);
 } ;
 
 

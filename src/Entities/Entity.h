@@ -4,6 +4,7 @@
 #include "../Item.h"
 #include "../Vector3d.h"
 #include "../Vector3f.h"
+#include "../Vector3i.h"
 
 
 
@@ -28,12 +29,16 @@
 		return super::GetClass(); \
 	}
 
+#define POSX_TOINT (int)floor(GetPosX())
+#define POSY_TOINT (int)floor(GetPosY())
+#define POSZ_TOINT (int)floor(GetPosZ())
+#define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
+
 
 
 
 
 class cWorld;
-class cReferenceManager;
 class cClientHandle;
 class cPlayer;
 class cChunk;
@@ -110,6 +115,8 @@ public:
 		BURN_TICKS_PER_DAMAGE = 20,  ///< How many ticks to wait between damaging an entity when it is burning
 		BURN_DAMAGE = 1,             ///< How much damage to deal when the entity is burning
 		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
+		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
+		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
 	} ;
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
@@ -154,8 +161,7 @@ public:
 	double           GetPosX      (void) const { return m_Pos.x;   }
 	double           GetPosY      (void) const { return m_Pos.y;   }
 	double           GetPosZ      (void) const { return m_Pos.z;   }
-	const Vector3d & GetRot       (void) const { return m_Rot;     }
-	double           GetRotation  (void) const { return m_Rot.x;   }  // OBSOLETE, use GetYaw() instead
+	const Vector3d & GetRot       (void) const { return m_Rot;     }  // OBSOLETE, use individual GetYaw(), GetPitch, GetRoll() components
 	double           GetYaw       (void) const { return m_Rot.x;   }
 	double           GetPitch     (void) const { return m_Rot.y;   }
 	double           GetRoll      (void) const { return m_Rot.z;   }
@@ -177,8 +183,7 @@ public:
 	void SetPosZ    (double a_PosZ);
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
 	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
-	void SetRot     (const Vector3f & a_Rot);
-	void SetRotation(double a_Rotation) { SetYaw(a_Rotation); }  // OBSOLETE, use SetYaw() instead
+	void SetRot     (const Vector3f & a_Rot);  // OBSOLETE, use individual SetYaw(), SetPitch(), SetRoll() components
 	void SetYaw     (double a_Yaw);
 	void SetPitch   (double a_Pitch);
 	void SetRoll    (double a_Roll);
@@ -223,7 +228,7 @@ public:
 	void SetGravity(float a_Gravity) { m_Gravity = a_Gravity; }
 	
 	/// Sets the rotation to match the speed vector (entity goes "face-forward")
-	void SetRotationFromSpeed(void);
+	void SetYawFromSpeed(void);
 	
 	/// Sets the pitch to match the speed vector (entity gies "face-forward")
 	void SetPitchFromSpeed(void);
@@ -327,7 +332,7 @@ public:
 	void AttachTo(cEntity * a_AttachTo);
 	
 	/// Detaches from the currently attached entity, if any
-	void Detach(void);
+	virtual void Detach(void);
 	
 	/// Makes sure head yaw is not over the specified range.
 	void WrapHeadYaw();
@@ -346,15 +351,26 @@ public:
 	virtual bool IsRiding   (void) const {return false; }
 	virtual bool IsSprinting(void) const {return false; }
 	virtual bool IsRclking  (void) const {return false; }
-	virtual bool IsInvisible(void) const {return false; }
+	virtual bool IsInvisible(void) const { return false; }
+
+	/** Returns whether the player is swimming or not */
+	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
+	/** Return whether the player is under water or not */
+	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+	/** Gets remaining air of a monster */
+	int GetAirLevel(void) const { return m_AirLevel; }
 	
 	// tolua_end
 	
 	/// Called when the specified player right-clicks this entity
-	virtual void OnRightClicked(cPlayer & a_Player) {};
+	virtual void OnRightClicked(cPlayer &) {};
 
 	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) {}
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) 
+	{
+		UNUSED(a_Drops);
+		UNUSED(a_Killer);
+	}
 
 protected:
 	static cCriticalSection m_CSCount;
@@ -370,9 +386,6 @@ protected:
 	
 	/// The entity which is attached to this entity (rider), NULL if none
 	cEntity * m_Attachee;
-
-	cReferenceManager* m_Referencers;
-	cReferenceManager* m_References;
 
 	// Flags that signal that we haven't updated the clients with the latest.
 	bool     m_bDirtyHead;
@@ -413,18 +426,27 @@ protected:
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
-	
-	friend class cReferenceManager;
-	void AddReference( cEntity*& a_EntityPtr );
-	void ReferencedBy( cEntity*& a_EntityPtr );
-	void Dereference( cEntity*& a_EntityPtr );
+
+	/** Called in each tick to handle air-related processing i.e. drowning */
+	virtual void HandleAir();
+	/** Called once per tick to set IsSwimming and IsSubmerged */
+	virtual void SetSwimState(cChunk & a_Chunk);
+
+	/** If an entity is currently swimming in or submerged under water */
+	bool m_IsSwimming, m_IsSubmerged;
+
+	/** Air level of a mobile */
+	int m_AirLevel;
+	int m_AirTickTimer;
 	
 private:
-	// Measured in degrees (MAX 360°)
+	// Measured in degrees, [-180, +180)
 	double   m_HeadYaw;
+	
 	// Measured in meter/second (m/s)
 	Vector3d m_Speed;
-	// Measured in degrees (MAX 360°)
+	
+	// Measured in degrees, [-180, +180)
 	Vector3d m_Rot;
 	
 	/// Position of the entity's XZ center and Y bottom

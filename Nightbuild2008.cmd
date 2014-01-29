@@ -44,6 +44,7 @@ if "a%ftpsite%" == "a" (
 
 
 :: Get the date and time into vars:
+:: This is locale-dependent!
 For /f "tokens=2-4 delims=/. " %%a in ('date /t') do (
 	set MYYEAR=%%c
 	set MYMONTH=%%b
@@ -66,13 +67,11 @@ if errorlevel 1 goto haderror
 
 
 :: Update the external plugins to the latest revision:
-cd MCServer\Plugins\Core
-git pull
+git submodule update
 if errorlevel 1 goto haderror
-cd ..\ProtectionAreas
-git pull
-if errorlevel 1 goto haderror
-cd ..\..\..
+
+
+
 
 :: Get the Git commit ID into an environment var
 For /f "tokens=1 delims=/. " %%a in ('git log -1 --oneline --no-abbrev-commit') do (set COMMITID=%%a)
@@ -88,6 +87,16 @@ if exist %TAGFILE% (
 	echo Latest version already present, bailing out
 	goto end
 )
+
+
+
+
+
+:: Configure the sources to use the MSVC2008 compiler:
+cmake -G "Visual Studio 9 2008" .
+if errorlevel 1 goto haderror
+
+
 
 
 
@@ -108,15 +117,29 @@ echo Setting up VS environment...
 call "%VS90COMNTOOLS%\vsvars32.bat"
 echo Compiling MCServer...
 title MCS Nightbuild
-start "vc" /b /wait /low /min %vc% /r vc2008\MCServer.sln "Release|Win32"
+start "vc" /b /wait /low /min %vc% /r MCServer.sln "Release|Win32"
 if errorlevel 1 goto haderror
 
 
 
 
+:: Generate the .example.ini files by running the server without any ini files:
+cd MCServer
+del groups.ini
+del settings.ini
+del webadmin.ini
+echo stop | MCServer
+cd ..
+
+
 
 :: Copy all the example ini files into the Install folder for zipping:
-copy MCServer\*.example.ini Install\
+copy MCServer\groups.ini Install\groups.example.ini
+copy MCServer\settings.ini Install\settings.example.ini
+copy MCServer\webadmin.ini Install\webadmin.example.ini
+
+
+
 
 :: Use 7-zip to compress the resulting files into a single file:
 set FILESUFFIX=%MYYEAR%_%MYMONTH%_%MYDAY%_%MYTIME%_%COMMITID%

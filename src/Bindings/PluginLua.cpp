@@ -88,14 +88,37 @@ bool cPluginLua::Initialize(void)
 
 	std::string PluginPath = FILE_IO_PREFIX + GetLocalFolder() + "/";
 
-	// Load all files for this plugin, and execute them
+	// List all Lua files for this plugin. Info.lua has a special handling - make it the last to load:
 	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
-	for (AStringVector::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
+	AStringVector LuaFiles;
+	bool HasInfoLua = false;
+	for (AStringVector::const_iterator itr = Files.begin(), end = Files.end(); itr != end; ++itr)
 	{
-		if (itr->rfind(".lua") == AString::npos)
+		if (itr->rfind(".lua") != AString::npos)
 		{
-			continue;
+			if (*itr == "Info.lua")
+			{
+				HasInfoLua = true;
+			}
+			else
+			{
+				LuaFiles.push_back(*itr);
+			}
 		}
+	}
+	std::sort(LuaFiles.begin(), LuaFiles.end());
+	
+	// Warn if there are no Lua files in the plugin folder:
+	if (LuaFiles.empty())
+	{
+		LOGWARNING("No lua files found: plugin %s is missing.", GetName().c_str());
+		Close();
+		return false;
+	}
+
+	// Load all files in the list, including the Info.lua as last, if it exists:
+	for (AStringVector::const_iterator itr = LuaFiles.begin(), end = LuaFiles.end(); itr != end; ++itr)
+	{
 		AString Path = PluginPath + *itr;
 		if (!m_LuaState.LoadFile(Path))
 		{
@@ -103,8 +126,17 @@ bool cPluginLua::Initialize(void)
 			return false;
 		}
 	}  // for itr - Files[]
+	if (HasInfoLua)
+	{
+		AString Path = PluginPath + "Info.lua";
+		if (!m_LuaState.LoadFile(Path))
+		{
+			Close();
+			return false;
+		}
+	}
 
-	// Call intialize function
+	// Call the Initialize function:
 	bool res = false;
 	if (!m_LuaState.Call("Initialize", this, cLuaState::Return, res))
 	{
@@ -112,7 +144,6 @@ bool cPluginLua::Initialize(void)
 		Close();
 		return false;
 	}
-
 	if (!res)
 	{
 		LOGINFO("Plugin %s: Initialize() call failed, plugin is temporarily disabled.", GetName().c_str());
@@ -423,7 +454,7 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 		{
 			case esOther:            m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esPrimedTNT:        m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cTNTEntity *)a_SourceData, cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esCreeper:          m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cCreeper *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esMonster:          m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cMonster *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esBed:              m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esEnderCrystal:     m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esGhastFireball:    m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
@@ -618,6 +649,46 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
 		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FISHED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_Reward, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FISHING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_Reward, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -904,6 +975,44 @@ bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_Block
 		}
 	}
 	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLUGIN_MESSAGE];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Client, a_Channel, a_Message);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPluginsLoaded(void)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLUGINS_LOADED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		bool ret = false;
+		m_LuaState.Call((int)(**itr), cLuaState::Return, ret);
+		res = res || ret;
+	}
+	return res;
 }
 
 
@@ -1324,6 +1433,8 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_USED_ITEM:             return "OnPlayerUsedItem";
 		case cPluginManager::HOOK_PLAYER_USING_BLOCK:           return "OnPlayerUsingBlock";
 		case cPluginManager::HOOK_PLAYER_USING_ITEM:            return "OnPlayerUsingItem";
+		case cPluginManager::HOOK_PLUGIN_MESSAGE:               return "OnPluginMessage";
+		case cPluginManager::HOOK_PLUGINS_LOADED:               return "OnPluginsLoaded";
 		case cPluginManager::HOOK_POST_CRAFTING:                return "OnPostCrafting";
 		case cPluginManager::HOOK_PRE_CRAFTING:                 return "OnPreCrafting";
 		case cPluginManager::HOOK_SPAWNED_ENTITY:               return "OnSpawnedEntity";
@@ -1337,8 +1448,17 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_WEATHER_CHANGED:              return "OnWeatherChanged";
 		case cPluginManager::HOOK_WEATHER_CHANGING:             return "OnWeatherChanging";
 		case cPluginManager::HOOK_WORLD_TICK:                   return "OnWorldTick";
-		default: return NULL;
+		
+		case cPluginManager::HOOK_NUM_HOOKS:
+		{
+			// Satisfy a warning that all enum values should be used in a switch
+			// but don't want a default branch, so that we catch new hooks missing from this list.
+			break;
+		}
 	}  // switch (a_Hook)
+	LOGWARNING("Requested name of an unknown hook type function: %d (max is %d)", a_HookType, cPluginManager::HOOK_MAX);
+	ASSERT(!"Unknown hook requested!");
+	return NULL;
 }
 
 
@@ -1361,6 +1481,40 @@ bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 	
 	m_HookMap[a_HookType].push_back(Ref);
 	return true;
+}
+
+
+
+
+
+int cPluginLua::CallFunctionFromForeignState(
+	const AString & a_FunctionName,
+	cLuaState & a_ForeignState,
+	int a_ParamStart,
+	int a_ParamEnd
+)
+{
+	cCSLock Lock(m_CriticalSection);
+	
+	// Call the function:
+	int NumReturns = m_LuaState.CallFunctionWithForeignParams(a_FunctionName, a_ForeignState, a_ParamStart, a_ParamEnd);
+	if (NumReturns < 0)
+	{
+		// The call has failed, an error has already been output to the log, so just silently bail out with the same error
+		return NumReturns;
+	}
+	
+	// Copy all the return values:
+	int Top = lua_gettop(m_LuaState);
+	int res = a_ForeignState.CopyStackFrom(m_LuaState, Top - NumReturns + 1, Top);
+	
+	// Remove the return values off this stack:
+	if (NumReturns > 0)
+	{
+		lua_pop(m_LuaState, NumReturns);
+	}
+	
+	return res;
 }
 
 

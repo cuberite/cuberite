@@ -2,18 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockingTCPLink.h"
-
-
-
-
-
-#ifdef _WIN32
-	#define MSG_NOSIGNAL (0)
-#endif
-#ifdef __MACH__
-	#define MSG_NOSIGNAL (0)
-#endif
-
+#include "Errors.h"
 
 
 
@@ -86,7 +75,7 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 	server.sin_port = htons( (unsigned short)iPort);
 	if (connect(m_Socket, (struct sockaddr *)&server, sizeof(server)))
 	{
-		LOGWARN("cTCPLink: Connection to \"%s:%d\" failed (%s)", iAddress, iPort, cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
+		LOGWARN("cTCPLink: Connection to \"%s:%d\" failed (%s)", iAddress, iPort,GetOSErrorString( cSocket::GetLastError() ).c_str() );
 		CloseSocket();
 		return false;
 	}

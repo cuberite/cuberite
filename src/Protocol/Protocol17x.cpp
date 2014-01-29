@@ -1,4 +1,3 @@
-
 // Protocol17x.cpp
 
 /*
@@ -16,6 +15,7 @@ Implements the 1.7.x protocol classes:
 #include "../Server.h"
 #include "../World.h"
 #include "../WorldStorage/FastNBT.h"
+#include "../WorldStorage/EnchantmentSerializer.h"
 #include "../StringCompression.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
@@ -24,6 +24,7 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/Player.h"
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 
 
 
@@ -52,6 +53,22 @@ Implements the 1.7.x protocol classes:
 
 
 
+const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
+
+
+
+
+
+// fwd: main.cpp:
+extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol172:
+
 cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client),
 	m_ServerAddress(a_ServerAddress),
@@ -62,6 +79,13 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
 	m_IsEncrypted(false)
 {
+	// Create the comm log file, if so requested:
+	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
+	{
+		cFile::CreateFolder("CommLogs");
+		AString FileName = Printf("CommLogs/%x__%s.log", (unsigned)time(NULL), a_Client->GetIPString().c_str());
+		m_CommLogFile.Open(FileName, cFile::fmWrite);
+	}
 }
 
 
@@ -72,11 +96,11 @@ void cProtocol172::DataReceived(const char * a_Data, int a_Size)
 {
 	if (m_IsEncrypted)
 	{
-		byte Decrypted[512];
+		Byte Decrypted[512];
 		while (a_Size > 0)
 		{
 			int NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, (byte *)a_Data, NumBytes);
+			m_Decryptor.ProcessData(Decrypted, (Byte *)a_Data, NumBytes);
 			AddReceivedData((const char *)Decrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -121,8 +145,8 @@ void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 
 void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
-	cPacketizer Pkt(*this, 0x24);  // Block Break Animation packet
-	Pkt.WriteInt(a_EntityID);
+	cPacketizer Pkt(*this, 0x25);  // Block Break Animation packet
+	Pkt.WriteVarInt(a_EntityID);
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteInt(a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
@@ -216,8 +240,23 @@ void cProtocol172::SendDestroyEntity(const cEntity & a_Entity)
 
 void cProtocol172::SendDisconnect(const AString & a_Reason)
 {
-	cPacketizer Pkt(*this, 0x40);
-	Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
+	switch (m_State)
+	{
+		case 2:
+		{
+			// During login:
+			cPacketizer Pkt(*this, 0);
+			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
+			break;
+		}
+		case 3:
+		{
+			// In-game:
+			cPacketizer Pkt(*this, 0x40);
+			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
+			break;
+		}
+	}
 }
 
 
@@ -628,6 +667,18 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
+void cProtocol172::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	cPacketizer Pkt(*this, 0x3f);
+	Pkt.WriteString(a_Channel);
+	Pkt.WriteShort((short)a_Message.size());
+	Pkt.WriteBuf(a_Message.data(), a_Message.size());
+}
+
+
+
+
+
 void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	cPacketizer Pkt(*this, 0x1E);
@@ -672,6 +723,46 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	Pkt.WriteInt((int) a_ExpOrb.GetPosY());
 	Pkt.WriteInt((int) a_ExpOrb.GetPosZ());
 	Pkt.WriteShort(a_ExpOrb.GetReward());
+}
+
+
+
+
+
+void cProtocol172::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	cPacketizer Pkt(*this, 0x3B);
+	Pkt.WriteString(a_Name);
+	Pkt.WriteString(a_DisplayName);
+	Pkt.WriteByte(a_Mode);
+}
+
+
+
+
+
+void cProtocol172::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	cPacketizer Pkt(*this, 0x3C);
+	Pkt.WriteString(a_Player);
+	Pkt.WriteByte(a_Mode);
+
+	if (a_Mode != 1)
+	{
+		Pkt.WriteString(a_Objective);
+		Pkt.WriteInt((int) a_Score);
+	}
+}
+
+
+
+
+
+void cProtocol172::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	cPacketizer Pkt(*this, 0x3D);
+	Pkt.WriteByte((int) a_Display);
+	Pkt.WriteString(a_Objective);
 }
 
 
@@ -865,6 +956,28 @@ void cProtocol172::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
+	Pkt.WriteInt(a_BlockEntity.GetPosX());
+	Pkt.WriteShort(a_BlockEntity.GetPosY());
+	Pkt.WriteInt(a_BlockEntity.GetPosZ());
+
+	Byte Action = 0;
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
+		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+	}
+	Pkt.WriteByte(Action);
+
+	Pkt.WriteBlockEntity(a_BlockEntity);
+}
+
+
+
+
 
 void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
@@ -872,10 +985,11 @@ void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteShort((short)a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
-	Pkt.WriteString(a_Line1);
-	Pkt.WriteString(a_Line2);
-	Pkt.WriteString(a_Line3);
-	Pkt.WriteString(a_Line4);
+	// Need to send only up to 15 chars, otherwise the client crashes (#598)
+	Pkt.WriteString(a_Line1.substr(0, 15));
+	Pkt.WriteString(a_Line2.substr(0, 15));
+	Pkt.WriteString(a_Line3.substr(0, 15));
+	Pkt.WriteString(a_Line4.substr(0, 15));
 }
 
 
@@ -975,6 +1089,31 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 {
+	// Write the incoming data into the comm log file:
+	if (g_ShouldLogCommIn)
+	{
+		if (m_ReceivedData.GetReadableSpace() > 0)
+		{
+			AString AllData;
+			int OldReadableSpace = m_ReceivedData.GetReadableSpace();
+			m_ReceivedData.ReadAll(AllData);
+			m_ReceivedData.ResetRead();
+			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
+			ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
+			AString Hex;
+			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+			m_CommLogFile.Printf("Incoming data, %d (0x%x) unparsed bytes already present in buffer:\n%s\n",
+				AllData.size(), AllData.size(), Hex.c_str()
+			);
+		}
+		AString Hex;
+		CreateHexDump(Hex, a_Data, a_Size, 16);
+		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
+			a_Size, a_Size, Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
+	
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
@@ -983,19 +1122,20 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 	}
 	
 	// Handle all complete packets:
-	while (true)
+	for (;;)
 	{
 		UInt32 PacketLen;
-		int PacketStart = m_ReceivedData.GetDataStart();
 		if (!m_ReceivedData.ReadVarInt(PacketLen))
 		{
 			// Not enough data
-			return;
+			m_ReceivedData.ResetRead();
+			break;
 		}
 		if (!m_ReceivedData.CanReadBytes(PacketLen))
 		{
 			// The full packet hasn't been received yet
-			return;
+			m_ReceivedData.ResetRead();
+			break;
 		}
 		cByteBuffer bb(PacketLen + 1);
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
@@ -1008,24 +1148,93 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (!bb.ReadVarInt(PacketType))
 		{
 			// Not enough data
-			return;
+			break;
 		}
 
-		HandlePacket(bb, PacketType);
+		// Log the packet info into the comm log file:
+		if (g_ShouldLogCommIn)
+		{
+			AString PacketData;
+			bb.ReadAll(PacketData);
+			bb.ResetRead();
+			bb.ReadVarInt(PacketType);
+			ASSERT(PacketData.size() > 0);
+			PacketData.resize(PacketData.size() - 1);
+			AString PacketDataHex;
+			CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
+			m_CommLogFile.Printf("Next incoming packet is type %u (0x%x), length %u (0x%x) at state %d. Payload:\n%s\n",
+				PacketType, PacketType, PacketLen, PacketLen, m_State, PacketDataHex.c_str()
+			);
+		}
+		
+		if (!HandlePacket(bb, PacketType))
+		{
+			// Unknown packet, already been reported, but without the length. Log the length here:
+			LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, PacketLen);
+			
+			#ifdef _DEBUG
+				// Dump the packet contents into the log:
+				bb.ResetRead();
+				AString Packet;
+				bb.ReadAll(Packet);
+				Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
+				AString Out;
+				CreateHexDump(Out, Packet.data(), (int)Packet.size(), 24);
+				LOGD("Packet contents:\n%s", Out.c_str());
+			#endif  // _DEBUG
+			
+			// Put a message in the comm log:
+			if (g_ShouldLogCommIn)
+			{
+				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
+			}
+			
+			return;
+		}
 		
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
+			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read %u bytes, packet contained %u bytes",
+				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
+			);
+
+			// Put a message in the comm log:
+			if (g_ShouldLogCommIn)
+			{
+				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %d left) ^^^^^^\n\n\n",
+					1, bb.GetReadableSpace()
+				);
+				m_CommLogFile.Flush();
+			}
+
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
 		}
-	}  // while (true)
+	}  // for(ever)
+	
+	// Log any leftover bytes into the logfile:
+	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
+	{
+		AString AllData;
+		int OldReadableSpace = m_ReceivedData.GetReadableSpace();
+		m_ReceivedData.ReadAll(AllData);
+		m_ReceivedData.ResetRead();
+		m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
+		ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
+		AString Hex;
+		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+		m_CommLogFile.Printf("There are %d (0x%x) bytes of non-parse-able data left in the buffer:\n%s",
+			m_ReceivedData.GetReadableSpace(), m_ReceivedData.GetReadableSpace(), Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
 }
 
 
 
 
-void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	switch (m_State)
 	{
@@ -1034,8 +1243,8 @@ void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			// Status
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return;
-				case 0x01: HandlePacketStatusPing   (a_ByteBuffer); return;
+				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
+				case 0x01: HandlePacketStatusPing   (a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -1045,8 +1254,8 @@ void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			// Login
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return;
-				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return;
+				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
+				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -1056,36 +1265,54 @@ void cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			// Game
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return;
-				case 0x01: HandlePacketChatMessage            (a_ByteBuffer); return;
-				case 0x02: HandlePacketUseEntity              (a_ByteBuffer); return;
-				case 0x03: HandlePacketPlayer                 (a_ByteBuffer); return;
-				case 0x04: HandlePacketPlayerPos              (a_ByteBuffer); return;
-				case 0x05: HandlePacketPlayerLook             (a_ByteBuffer); return;
-				case 0x06: HandlePacketPlayerPosLook          (a_ByteBuffer); return;
-				case 0x07: HandlePacketBlockDig               (a_ByteBuffer); return;
-				case 0x08: HandlePacketBlockPlace             (a_ByteBuffer); return;
-				case 0x09: HandlePacketSlotSelect             (a_ByteBuffer); return;
-				case 0x0a: HandlePacketAnimation              (a_ByteBuffer); return;
-				case 0x0b: HandlePacketEntityAction           (a_ByteBuffer); return;
-				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return;
-				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return;
-				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return;
+				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return true;
+				case 0x01: HandlePacketChatMessage            (a_ByteBuffer); return true;
+				case 0x02: HandlePacketUseEntity              (a_ByteBuffer); return true;
+				case 0x03: HandlePacketPlayer                 (a_ByteBuffer); return true;
+				case 0x04: HandlePacketPlayerPos              (a_ByteBuffer); return true;
+				case 0x05: HandlePacketPlayerLook             (a_ByteBuffer); return true;
+				case 0x06: HandlePacketPlayerPosLook          (a_ByteBuffer); return true;
+				case 0x07: HandlePacketBlockDig               (a_ByteBuffer); return true;
+				case 0x08: HandlePacketBlockPlace             (a_ByteBuffer); return true;
+				case 0x09: HandlePacketSlotSelect             (a_ByteBuffer); return true;
+				case 0x0a: HandlePacketAnimation              (a_ByteBuffer); return true;
+				case 0x0b: HandlePacketEntityAction           (a_ByteBuffer); return true;
+				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
+				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return true;
+				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return true;
 				case 0x0f: // Confirm transaction - not used in MCS
-				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return;
-				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return;
-				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return;
-				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return;
-				case 0x15: HandlePacketClientSettings         (a_ByteBuffer); return;
-				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return;
-				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return;
+				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return true;
+				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
+				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return true;
+				case 0x15: HandlePacketClientSettings         (a_ByteBuffer); return true;
+				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return true;
+				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return true;
 			}
 			break;
 		}
+		default:
+		{
+			// Received a packet in an unknown state, report:
+			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
+			
+			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
+			
+			// Switch to a state when all further packets are silently ignored:
+			m_State = 255;
+			return false;
+		}
+		case 255:
+		{
+			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
+			// Do not output anything (the caller will do that for us), just return failure
+			return false;
+		}
 	}  // switch (m_State)
 	
-	// Unknown packet type, report to the client:
+	// Unknown packet type, report to the ClientHandle:
 	m_Client->PacketUnknown(a_PacketType);
+	return false;
 }
 
 
@@ -1113,8 +1340,11 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		cRoot::Get()->GetServer()->GetMaxPlayers(),
 		cRoot::Get()->GetServer()->GetNumPlayers()
 	);
-	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"}",
+	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
 		cRoot::Get()->GetServer()->GetDescription().c_str()
+	);
+	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+		cRoot::Get()->GetServer()->GetFaviconData().c_str()
 	);
 	Response.append("}");
 	
@@ -1128,7 +1358,64 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {
-	// TODO: Add protocol encryption
+	short EncKeyLength, EncNonceLength;
+	a_ByteBuffer.ReadBEShort(EncKeyLength);
+	AString EncKey;
+	if (!a_ByteBuffer.ReadString(EncKey, EncKeyLength))
+	{
+		return;
+	}
+	a_ByteBuffer.ReadBEShort(EncNonceLength);
+	AString EncNonce;
+	if (!a_ByteBuffer.ReadString(EncNonce, EncNonceLength))
+	{
+		return;
+	}
+	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
+	{
+		LOGD("Too long encryption");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+
+	// Decrypt EncNonce using privkey
+	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+	int res = rsaDecryptor.Decrypt((const Byte *)EncNonce.data(), EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
+	if (res != 4)
+	{
+		LOGD("Bad nonce length: got %d, exp %d", res, 4);
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	if (ntohl(DecryptedNonce[0]) != (unsigned)(uintptr_t)this)
+	{
+		LOGD("Bad nonce value");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	
+	// Decrypt the symmetric encryption key using privkey:
+	Byte DecryptedKey[MAX_ENC_LEN];
+	res = rsaDecryptor.Decrypt((const Byte *)EncKey.data(), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
+	if (res != 16)
+	{
+		LOGD("Bad key length");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	
+	StartEncryption(DecryptedKey);
+
+	// Send login success:
+	{
+		cPacketizer Pkt(*this, 0x02);  // Login success packet
+		Pkt.WriteString(Printf("%d", m_Client->GetUniqueID()));  // TODO: proper UUID
+		Pkt.WriteString(m_Client->GetUsername());
+	}
+
+	m_State = 3;  // State = Game
+	m_Client->HandleLogin(4, m_Client->GetUsername());
 }
 
 
@@ -1140,7 +1427,25 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 	AString Username;
 	a_ByteBuffer.ReadVarUTF8String(Username);
 	
-	// TODO: Protocol encryption should be set up here if not localhost / auth
+	if (!m_Client->HandleHandshake(Username))
+	{
+		// The client is not welcome here, they have been sent a Kick packet already
+		return;
+	}
+	
+	// If auth is required, then send the encryption request:
+	if (cRoot::Get()->GetServer()->ShouldAuthenticate())
+	{
+		cPacketizer Pkt(*this, 0x01);
+		Pkt.WriteString(cRoot::Get()->GetServer()->GetServerID());
+		const AString & PubKeyDer = cRoot::Get()->GetServer()->GetPublicKeyDER();
+		Pkt.WriteShort(PubKeyDer.size());
+		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
+		Pkt.WriteShort(4);
+		Pkt.WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+		m_Client->SetUsername(Username);
+		return;
+	}
 	
 	// Send login success:
 	{
@@ -1374,7 +1679,7 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   Length);
 	AString Data;
 	a_ByteBuffer.ReadString(Data, Length);
-	// TODO: m_Client->HandlePluginMessage(Channel, Data);
+	m_Client->HandlePluginMessage(Channel, Data);
 }
 
 
@@ -1528,11 +1833,11 @@ void cProtocol172::SendData(const char * a_Data, int a_Size)
 {
 	if (m_IsEncrypted)
 	{
-		byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
+		Byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
 			int NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, (byte *)a_Data, NumBytes);
+			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
 			m_Client->SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -1612,7 +1917,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 		return;
 	}
 	
-	// Load enchantments from the NBT:
+	// Load enchantments and custom display names from the NBT data:
 	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
 	{
 		if (
@@ -1623,9 +1928,51 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			)
 		)
 		{
-			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+			EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
+		}
+		else if ((NBT.GetType(tag) == TAG_Compound) && (NBT.GetName(tag) == "display")) // Custom name and lore tag
+		{
+			for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+			{
+				if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name")) // Custon name tag
+				{
+					a_Item.m_CustomName = NBT.GetString(displaytag);
+				}
+				else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore")) // Lore tag
+				{
+					AString Lore;
+
+					for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
+					{
+						AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+					}
+
+					a_Item.m_Lore = Lore;
+				}
+			}
 		}
 	}
+}
+
+
+
+
+
+void cProtocol172::StartEncryption(const Byte * a_Key)
+{
+	m_Encryptor.Init(a_Key, a_Key);
+	m_Decryptor.Init(a_Key, a_Key);
+	m_IsEncrypted = true;
+	
+	// Prepare the m_AuthServerID:
+	cSHA1Checksum Checksum;
+	const AString & ServerID = cRoot::Get()->GetServer()->GetServerID();
+	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
+	Checksum.Update(a_Key, 16);
+	Checksum.Update((const Byte *)cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	Byte Digest[20];
+	Checksum.Finalize(Digest);
+	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
 
 
@@ -1650,6 +1997,17 @@ cProtocol172::cPacketizer::~cPacketizer()
 	m_Out.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
 	m_Out.CommitRead();
+	
+	// Log the comm into logfile:
+	if (g_ShouldLogCommOut)
+	{
+		AString Hex;
+		ASSERT(DataToSend.size() > 0);
+		CreateHexDump(Hex, DataToSend.data() + 1, DataToSend.size() - 1, 16);
+		m_Protocol.m_CommLogFile.Printf("Outgoing packet: type %d (0x%x), length %u (0x%x), state %d. Payload:\n%s\n",
+			DataToSend[0], DataToSend[0], PacketLen, PacketLen, m_Protocol.m_State, Hex.c_str()
+		);
+	}
 }
 
 
@@ -1676,17 +2034,91 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	WriteByte (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
-	if (a_Item.m_Enchantments.IsEmpty())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty())
 	{
 		WriteShort(-1);
 		return;
 	}
 
-	// Send the enchantments:
+	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
-	const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-	a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments,Writer, TagName);
+	}
+	if (!a_Item.IsBothNameAndLoreEmpty())
+	{
+		Writer.BeginCompound("display");
+		if (!a_Item.IsCustomNameEmpty())
+		{
+			Writer.AddString("Name", a_Item.m_CustomName.c_str());
+		}
+		if (!a_Item.IsLoreEmpty())
+		{
+			Writer.BeginList("Lore", TAG_String);
+
+			AStringVector Decls = StringSplit(a_Item.m_Lore, "`");
+			for (AStringVector::const_iterator itr = Decls.begin(), end = Decls.end(); itr != end; ++itr)
+			{
+				if (itr->empty())
+				{
+					// The decl is empty (two `s), ignore
+					continue;
+				}
+				Writer.AddString("", itr->c_str());
+			}
+
+			Writer.EndList();
+		}
+		Writer.EndCompound();
+	}
 	Writer.Finish();
+	AString Compressed;
+	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
+	WriteShort(Compressed.size());
+	WriteBuf(Compressed.data(), Compressed.size());
+}
+
+
+
+
+void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEntity)
+{
+	cFastNBTWriter Writer;
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_COMMAND_BLOCK:
+		{
+			cCommandBlockEntity & CommandBlockEntity = (cCommandBlockEntity &)a_BlockEntity;
+
+			Writer.AddByte("TrackOutput", 1); // Neither I nor the MC wiki has any idea about this
+			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
+			Writer.AddInt("x", CommandBlockEntity.GetPosX());
+			Writer.AddInt("y", CommandBlockEntity.GetPosY());
+			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			// You can set custom names for windows in Vanilla
+			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
+			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
+			Writer.AddString("CustomName", "@");
+			Writer.AddString("id", "Control"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+
+			if (!CommandBlockEntity.GetLastOutput().empty())
+			{
+				AString Output;
+				Printf(Output, "{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str());
+
+				Writer.AddString("LastOutput", Output.c_str());
+			}
+			break;
+		}
+		default: break;
+	}
+
+	Writer.Finish();
+
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 	WriteShort(Compressed.size());
@@ -1767,8 +2199,23 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteInt(1); // Shaking direction, doesn't seem to affect anything
 			WriteByte(0x73);
 			WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
-
-			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
+			
+			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpNone)
+			{
+				cRideableMinecart & RideableMinecart = ((cRideableMinecart &)a_Entity);
+				if (!RideableMinecart.GetContent().IsEmpty())
+				{
+					WriteByte(0x54);
+					int Content = RideableMinecart.GetContent().m_ItemType;
+					Content |= RideableMinecart.GetContent().m_ItemDamage << 8;
+					WriteInt(Content);
+					WriteByte(0x55);
+					WriteInt(RideableMinecart.GetBlockHeight());
+					WriteByte(0x56);
+					WriteByte(1);
+				}
+			}
+			else if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
 			{
 				WriteByte(0x10);
 				WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0);

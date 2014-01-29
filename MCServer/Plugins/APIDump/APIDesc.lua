@@ -449,6 +449,7 @@ end
 				GetUsername = { Params = "", Return = "string", Notes = "Returns the username that the client has provided" },
 				GetViewDistance = { Params = "", Return = "number", Notes = "Returns the viewdistance (number of chunks loaded for the player in each direction)" },
 				Kick = { Params = "Reason", Return = "", Notes = "Kicks the user with the specified reason" },
+				SendPluginMessage = { Params = "Channel, Message", Return = "", Notes = "Sends the plugin message on the specified channel." },
 				SetUsername = { Params = "Name", Return = "", Notes = "Sets the username" },
 				SetViewDistance = { Params = "ViewDistance", Return = "", Notes = "Sets the viewdistance (number of chunks loaded for the player in each direction)" },
 				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player." },
@@ -706,7 +707,9 @@ end
 				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
 				IsCrouched = { Params = "", Return = "bool", Notes = "Returns true if the entity is crouched. Always false for entities that don't support crouching." },
 				IsDestroyed = { Params = "", Return = "bool", Notes = "Returns true if the entity has been destroyed and is awaiting removal from the internal structures." },
+				IsExpOrb = { Params = "", Return = "bool", Notes = "Returns true if the entity represents an experience orb" },
 				IsFallingBlock = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cFallingBlock}} entity." },
+				IsFloater = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a fishing rod floater" },
 				IsInvisible = { Params = "", Return = "bool", Notes = "Returns true if the entity is invisible" },
 				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cMinecart|minecart}}" },
 				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any {{cMonster|mob}}." },
@@ -767,6 +770,7 @@ end
 				etEntity = { Notes = "No further specialization available" },
 				etExpOrb = { Notes = "The entity is a {{cExpOrb}}" },
 				etFallingBlock = { Notes = "The entity is a {{cFallingBlock}}" },
+				etFloater = { Notes = "The entity is a fishing rod floater" },
 				etMob = { Notes = "The entity is a {{cMonster}} descendant" },
 				etMonster = { Notes = "The entity is a {{cMonster}} descendant" },
 				etMinecart = { Notes = "The entity is a {{cMinecart}} descendant" },
@@ -804,10 +808,25 @@ cFile:Delete("/usr/bin/virus.exe");
 				GetSize = { Params = "FileName", Return = "number", Notes = "(STATIC) Returns the size of the file, or -1 on failure." },
 				IsFile = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified path points to an existing file." },
 				IsFolder = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified path points to an existing folder." },
+				ReadWholeFile = { Params = "FileName", Return = "string", Notes = "(STATIC) Returns the entire contents of the specified file. Returns an empty string if the file cannot be opened." },
 				Rename = { Params = "OrigPath, NewPath", Return = "bool", Notes = "(STATIC) Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists." },
 			},
 		},  -- cFile
 
+		cFloater =
+		{
+			Desc = [[
+				When a player uses his/her fishing rod it creates a floater entity. This class manages it.
+			]],
+			Functions =
+			{
+				CanPickup = { Params = "", Return = "bool", Notes = "Returns true if the floater gives an item when the player right clicks." },
+				GetAttachedMobID = { Params = "", Return = "EntityID", Notes = "A floater can get attached to an mob. When it is and this functions gets called it returns the mob ID. If it isn't attached to a mob it returns -1" },
+				GetOwnerID = { Params = "", Return = "EntityID", Notes = "Returns the EntityID of the player who owns the floater." },
+			},
+			Inherits = "cEntity",
+		},
+		
 		cGroup =
 		{
 			Desc = [[
@@ -867,6 +886,10 @@ ValueName0=SomeOtherValue
 					{ Params = "KeyName, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
 				},
 				AddKeyName = { Params = "KeyName", Returns = "number", Notes = "Adds a new key of the specified name. Returns the KeyID of the new key." },
+				AddValue = { Params = "KeyName, ValueName, Value", Return = "", Notes = "Adds a new value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)" },
+				AddValueB = { Params = "KeyName, ValueName, Value", Return = "", Notes = "Adds a new bool value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)" },
+				AddValueF = { Params = "KeyName, ValueName, Value", Return = "", Notes = "Adds a new float value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)" },
+				AddValueI = { Params = "KeyName, ValueName, Value", Return = "", Notes = "Adds a new integer value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)" },
 				CaseInsensitive = { Params = "", Return = "", Notes = "Sets key names' and value names' comparisons to case insensitive (default)." },
 				CaseSensitive = { Params = "", Return = "", Notes = "Sets key names and value names comparisons to case sensitive." },
 				Clear = { Params = "", Return = "", Notes = "Removes all the in-memory data. Note that , like all the other operations, this doesn't affect any file data." },
@@ -1562,7 +1585,7 @@ a_Player:OpenWindow(Window);
 			{
 				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
 				AddToGroup = { Params = "GroupName", Return = "", Notes = "Temporarily adds the player to the specified group. The assignment is lost when the player disconnects." },
-				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
+				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "(STATIC) Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
 				CanFly = { Return = "bool", Notes = "Returns if the player is able to fly." },
 				CanUseCommand = { Params = "Command", Return = "bool", Notes = "Returns true if the player is allowed to use the specified command." },
 				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
@@ -1579,6 +1602,7 @@ a_Player:OpenWindow(Window);
 				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
 				GetEyeHeight = { Return = "number", Notes = "Returns the height of the player's eyes, in absolute coords" },
 				GetEyePosition = { Return = "{{Vector3d|EyePositionVector}}", Notes = "Returns the position of the player's eyes, as a {{Vector3d}}" },
+				GetFloaterID = { Params = "", Return = "number", Notes = "Returns the Entity ID of the fishing hook floater that belongs to the player. Returns -1 if no floater is associated with the player. FIXME: Undefined behavior when the player has used multiple fishing rods simultanously." },
 				GetFoodExhaustionLevel = { Params = "", Return = "number", Notes = "Returns the food exhaustion level" },
 				GetFoodLevel = { Params = "", Return = "number", Notes = "Returns the food level (number of half-drumsticks on-screen)" },
 				GetFoodPoisonedTicksRemaining = { Params = "", Return = "", Notes = "Returns the number of ticks left for the food posoning effect" },
@@ -1603,6 +1627,7 @@ a_Player:OpenWindow(Window);
 				HasPermission = { Params = "PermissionString", Return = "bool", Notes = "Returns true if the player has the specified permission" },
 				Heal = { Params = "HitPoints", Return = "", Notes = "Heals the player by the specified amount of HPs. Only positive amounts are expected. Sends a health update to the client." },
 				IsEating = { Params = "", Return = "bool", Notes = "Returns true if the player is currently eating the item in their hand." },
+				IsFishing = { Params = "", Return = "bool", Notes = "Returns true if the player is currently fishing" },
 				IsFlying = { Return = "bool", Notes = "Returns true if the player is flying." },
 				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmAdventure gamemode, or has their gamemode unset and the world is a gmAdventure world." },
 				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmCreative gamemode, or has their gamemode unset and the world is a gmCreative world." },
@@ -1630,13 +1655,14 @@ a_Player:OpenWindow(Window);
 				SetFoodSaturationLevel = { Params = "FoodSaturationLevel", Return = "", Notes = "Sets the food saturation (overcharge of the food level)." },
 				SetFoodTickTimer = { Params = "FoodTickTimer", Return = "", Notes = "Sets the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
 				SetGameMode = { Params = "{{eGameMode|NewGameMode}}", Return = "", Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit." },
+				SetIsFishing = { Params = "IsFishing, [FloaterEntityID]", Return = "", Notes = "Sets the 'IsFishing' flag for the player. The floater entity ID is expected for the true variant, it can be omitted when IsFishing is false. FIXME: Undefined behavior when multiple fishing rods are used simultanously" },
 				SetName = { Params = "Name", Return = "", Notes = "Sets the player name. This rename will NOT be visible to any players already in the server who are close enough to see this player." },
 				SetNormalMaxSpeed = { Params = "NormalMaxSpeed", Return = "", Notes = "Sets the normal (walking) maximum speed (as reported by the 1.6.1+ protocols)" },
 				SetSprint = { Params = "IsSprinting", Return = "", Notes = "Sets whether the player is sprinting or not." },
 				SetSprintingMaxSpeed = { Params = "SprintingMaxSpeed", Return = "", Notes = "Sets the sprinting maximum speed (as reported by the 1.6.1+ protocols)" },
 				SetVisible = { Params = "IsVisible", Return = "", Notes = "Sets the player visibility to other players" },
 				TossItem = { Params = "DraggedItem, [Amount], [CreateType], [CreateDamage]", Return = "", Notes = "FIXME: This function will be rewritten, avoid it. It tosses an item, either from the inventory, dragged in hand (while in UI window) or a newly created one." },
-				XpForLevel = { Params = "XPLevel", Return = "number", Notes = "Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp()." },
+				XpForLevel = { Params = "XPLevel", Return = "number", Notes = "(STATIC) Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp()." },
 			},
 			Constants =
 			{
@@ -1655,7 +1681,7 @@ a_Player:OpenWindow(Window);
 ]],
 			Functions =
 			{
-				Call = { Params = "Function name, [All the parameters divided with commas]", Notes = "This function allows you to call a function from another plugin. It can only use pass: integers, booleans, strings and usertypes (cPlayer, cEntity, cCuboid, etc.)." },
+				Call = { Params = "Function name, [All the parameters divided with commas]", Notes = "(<b>OBSOLETE</b>) This function allows you to call a function from another plugin. It can only use pass: integers, booleans, strings and usertypes (cPlayer, cEntity, cCuboid, etc.).<br /><br /><b>This function is obsolete and unsafe, use {{cPluginManager}}:CallPlugin() instead!</b>" },
 				GetDirectory = { Return = "string", Notes = "Returns the name of the folder where the plugin's files are. (APIDump)" },
 				GetLocalDirectory = { Notes = "OBSOLETE use GetLocalFolder instead." },
 				GetLocalFolder = { Return = "string", Notes = "Returns the path where the plugin's files are. (Plugins/APIDump)" },
@@ -1707,14 +1733,15 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 					{ Params = "Command, Callback, HelpString", Return = "", Notes = "(STATIC) Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command." },
 					{ Params = "Command, Callback, HelpString", Return = "", Notes = "Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command." },
 				},
+				CallPlugin = { Params = "PluginName, FunctionName, [FunctionArgs...]", Return = "[FunctionRets]", Notes = "(STATIC) Calls the specified function in the specified plugin, passing all the given arguments to it. If it succeeds, it returns all the values returned by that function. If it fails, returns no value at all. Note that only strings, numbers, bools, nils and classes can be used for parameters and return values; tables and functions cannot be copied across plugins." },
 				DisablePlugin = { Params = "PluginName", Return = "bool", Notes = "Disables a plugin specified by its name. Returns true if the plugin was disabled, false if it wasn't found or wasn't active." },
 				ExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Executes the command as if given by the specified Player. Checks permissions. Returns true if executed." },
 				FindPlugins = { Params = "", Return = "", Notes = "Refreshes the list of plugins to include all folders inside the Plugins folder (potentially new disabled plugins)" },
 				ForceExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Same as ExecuteCommand, but doesn't check permissions" },
 				ForEachCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function(Command, Permission, HelpString)</pre>. If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
 				ForEachConsoleCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindConsoleCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function (Command, HelpString)</pre>. If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
-				Get = { Params = "", Return = "cPluginManager", Notes = "Returns the single instance of the plugin manager" },
-				GetAllPlugins = { Params = "", Return = "table", Notes = "Returns a table (dictionary) of all plugins, [name => {{cPlugin}}] pairing." },
+				Get = { Params = "", Return = "cPluginManager", Notes = "(STATIC) Returns the single instance of the plugin manager" },
+				GetAllPlugins = { Params = "", Return = "table", Notes = "Returns a table (dictionary) of all plugins, [name => value], where value is a valid {{cPlugin}} if the plugin is loaded, or the bool value false if the plugin is not loaded." },
 				GetCommandPermission = { Params = "Command", Return = "Permission", Notes = "Returns the permission needed for executing the specified command" },
 				GetCurrentPlugin = { Params = "", Return = "{{cPlugin}}", Notes = "Returns the {{cPlugin}} object for the calling plugin. This is the same object that the Initialize function receives as the argument." },
 				GetNumPlugins = { Params = "", Return = "number", Notes = "Returns the number of plugins, including the disabled ones" },
@@ -1750,6 +1777,8 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				HOOK_PLAYER_BREAKING_BLOCK = { Notes = "Called when a player is about to break a block. A plugin may cancel the event." },
 				HOOK_PLAYER_BROKEN_BLOCK = { Notes = "Called after a player has broken a block." },
 				HOOK_PLAYER_EATING = { Notes = "Called when the player starts eating a held item. Plugins may abort the eating." },
+				HOOK_PLAYER_FISHED = { Notes = "Called when the player reels the fishing rod back in, after the server decides the player's fishing reward." },
+				HOOK_PLAYER_FISHING = { Notes = "Called when the player reels the fishing rod back in, plugins may alter the fishing reward." },
 				HOOK_PLAYER_JOINED = { Notes = "Called when the player entity has been created. It has not yet been fully initialized." },
 				HOOK_PLAYER_LEFT_CLICK = { Notes = "Called when the client sends the LeftClick packet." },
 				HOOK_PLAYER_MOVING = { Notes = "Called when the player has moved and the movement is now being applied." },
@@ -1985,6 +2014,7 @@ end
 
 			Functions =
 			{
+				BroadcastBlockAction = { Params = "BlockX, BlockY, BlockZ, ActionByte1, ActionByte2, BlockType, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Broadcasts the BlockAction packet to all clients who have the appropriate chunk loaded (except ExcludeClient). The contents of the packet are specified by the parameters for the call, the blocktype needn't match the actual block that is present in the world data at the specified location." },
 				BroadcastChat = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the Message to all players in this world, except the optional ExceptClient" },
 				BroadcastSoundEffect = { Params = "SoundName, X, Y, Z, Volume, Pitch, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient" },
 				BroadcastSoundParticleEffect = { Params = "EffectID, X, Y, Z, EffectData, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified effect to all players in this world, except the optional ExceptClient" },
@@ -2000,6 +2030,7 @@ end
 				DoWithDropperAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dropper at the specified coords, calls the CallbackFunction with the {{cDropperEntity}} parameter representing the dropper. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropperEntity|DropperEntity}}, [CallbackData])</pre> The function returns false if there is no dropper, or if there is, it returns the bool value that the callback has returned." },
 				DoWithEntityByID = { Params = "EntityID, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If an entity with the specified ID exists, calls the callback with the {{cEntity}} parameter representing the entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}}, [CallbackData])</pre> The function returns false if the entity was not found, and it returns the same bool value that the callback has returned if the entity was found." },
 				DoWithFurnaceAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a furnace at the specified coords, calls the CallbackFunction with the {{cFurnaceEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}}, [CallbackData])</pre> The function returns false if there is no furnace, or if there is, it returns the bool value that the callback has returned." },
+				DoWithNoteBlockAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a note block at the specified coords, calls the CallbackFunction with the {{cNoteEntity}} parameter representing the note block. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cNoteEntity|NoteEntity}}, [CallbackData])</pre> The function returns false if there is no note block, or if there is, it returns the bool value that the callback has returned." },
 				DoWithPlayer = { Params = "PlayerName, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a player of the specified name (exact match), calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}}, [CallbackData])</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found." },
 				FastSetBlock =
 				{
@@ -2069,8 +2100,9 @@ end
 				QueueBlockForTick = { Params = "BlockX, BlockY, BlockZ, TicksToWait", Return = "", Notes = "Queues the specified block to be ticked after the specified number of gameticks." },
 				QueueSaveAllChunks = { Params = "", Return = "", Notes = "Queues all chunks to be saved in the world storage thread" },
 				QueueSetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta, TickDelay", Return = "", Notes = "Queues the block to be set to the specified blocktype and meta after the specified amount of game ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are handled correctly." },
-				QueueTask = { Params = "TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the tick thread. This is the primary means of interaction with a cWorld from the WebAdmin page handlers (see {{WebWorldThreads}}). The function signature is <pre class=\"pretty-print lang-lua\">function()</pre>All return values from the function are ignored. Note that this function is actually called *after* the QueueTask() function returns." },
+				QueueTask = { Params = "TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the tick thread. This is the primary means of interaction with a cWorld from the WebAdmin page handlers (see {{WebWorldThreads}}). The function signature is <pre class=\"pretty-print lang-lua\">function()</pre>All return values from the function are ignored. Note that this function is actually called *after* the QueueTask() function returns. Note that it is unsafe to store references to MCServer objects, such as entities, across from the caller to the task handler function; store the EntityID instead." },
 				RegenerateChunk = { Params = "ChunkX, ChunkZ", Return = "", Notes = "Queues the specified chunk to be re-generated, overwriting the current data. To queue a chunk for generating only if it doesn't exist, use the GenerateChunk() instead." },
+				ScheduleTask = { Params = "DelayTicks, TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the world's tick thread after a the specified number of ticks. This enables operations to be queued for execution in the future. The function signature is <pre class=\"pretty-print lang-lua\">function({{cWorld|World}})</pre>All return values from the function are ignored. Note that it is unsafe to store references to MCServer objects, such as entities, across from the caller to the task handler function; store the EntityID instead." },
 				SendBlockTo = { Params = "BlockX, BlockY, BlockZ, {{cPlayer|Player}}", Return = "", Notes = "Sends the block at the specified coords to the specified player's client, as an UpdateBlock packet." },
 				SetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances." },
 				SetBlockMeta =
@@ -2083,6 +2115,7 @@ end
 				SetTicksUntilWeatherChange = { Params = "NumTicks", Return = "", Notes = "Sets the number of ticks after which the weather will be changed." },
 				SetTimeOfDay = { Params = "TimeOfDayTicks", Return = "", Notes = "Sets the time of day, expressed as number of ticks past sunrise, in the range 0 .. 24000." },
 				SetWeather = { Params = "Weather", Return = "", Notes = "Sets the current weather (wSunny, wRain, wStorm) and resets the TicksUntilWeatherChange to the default value for the new weather. The normal weather-changing hooks are called for the change." },
+				ShouldLavaSpawnFire = { Params = "", Return = "bool", Notes = "Returns true if the world is configured to spawn fires near lava (world.ini: [Physics].ShouldLavaSpawnFire value)" },
 				SpawnItemPickups =
 				{
 					{ Params = "{{cItems|Pickups}}, X, Y, Z, FlyAwaySpeed", Return = "", Notes = "Spawns the specified pickups at the position specified. The FlyAway speed is used to initialize the random speed in which the pickups fly away from the spawn position." },
@@ -2576,7 +2609,9 @@ end
 				DamageTypeToString = {Params = "{{Globals#DamageType|DamageType}}", Return = "string", Notes = "Converts the {{Globals#DamageType|DamageType}} enumerated value to a string representation "},
 				EscapeString = {Params = "string", Return = "string", Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash"},
 				GetChar = {Params = "String, Pos", Return = "string", Notes = "Returns one character from the string, specified by position "},
+				GetIniItemSet = { Params = "IniFile, SectionName, KeyName, DefaultValue", Return = "{{cItem}}", Notes = "Returns the item that has been read from the specified INI file value. If the value is not present in the INI file, the DefaultValue is stored in the file and parsed as the result. Returns empty item if the value cannot be parsed. " },
 				GetTime = {Return = "number", Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)"},
+				IsBiomeNoDownfall = { Params = "Biome", Return = "bool", Notes = "Returns true if the biome is 'dry', that is, there is no precipitation during rains and storms." },
 				IsValidBlock = {Params = "BlockType", Return = "bool", Notes = "Returns true if BlockType is a known block type"},
 				IsValidItem = {Params = "ItemType", Return = "bool", Notes = "Returns true if ItemType is a known item type"},
 				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
@@ -2588,6 +2623,7 @@ end
 				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
 				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
+				NormalizeAngleDegrees = { Params = "AngleDegrees", Return = "AngleDegrees", Notes = "Returns the angle, wrapped into the [-180, +180) range." },
 				ReplaceString = {Params = "full-string, to-be-replaced-string, to-replace-string", Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string"},
 				StringSplit = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered."},
 				StringSplitAndTrim = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Each of the separate strings is trimmed (whitespace removed from the beginning and end of the string)"},
@@ -2760,6 +2796,8 @@ end
 	ExtraPages =
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
+		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
+		{ FileName = "SettingUpDecoda.html", Title = "Setting up the Decoda Lua IDE" },
 		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
 	}
 } ;

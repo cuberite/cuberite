@@ -6,7 +6,8 @@
 #ifndef _WIN32
 	#include <netdb.h>
 	#include <unistd.h>
-	#include <arpa/inet.h>		//inet_ntoa()
+	#include <arpa/inet.h>  // inet_ntoa()
+	#include <sys/ioctl.h>  // ioctl()
 #else
 	#define socklen_t int
 #endif
@@ -72,10 +73,6 @@ void cSocket::CloseSocket()
 	
 	#else  // _WIN32
 	
-	if (shutdown(m_Socket, SHUT_RDWR) != 0)//SD_BOTH);
-	{
-		LOGWARN("Error on shutting down socket %d (%s): %s", m_Socket, m_IPString.c_str(), GetLastErrorString().c_str());
-	}
 	if (close(m_Socket) != 0)
 	{
 		LOGWARN("Error closing socket %d (%s): %s", m_Socket, m_IPString.c_str(), GetLastErrorString().c_str());
@@ -91,52 +88,19 @@ void cSocket::CloseSocket()
 
 
 
-AString cSocket::GetErrorString( int a_ErrNo )
+void cSocket::ShutdownReadWrite(void)
 {
-	char buffer[ 1024 ];
-	AString Out;
-
 	#ifdef _WIN32
-
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, a_ErrNo, 0, buffer, ARRAYCOUNT(buffer), NULL);
-	Printf(Out, "%d: %s", a_ErrNo, buffer);
-	if (!Out.empty() && (Out[Out.length() - 1] == '\n'))
+		int res = shutdown(m_Socket, SD_BOTH);
+	#else
+		int res = shutdown(m_Socket, SHUT_RDWR);
+	#endif
+	if (res != 0)
 	{
-		Out.erase(Out.length() - 2);
+		LOGWARN("%s: Error shutting down socket %d (%s): %d (%s)",
+			__FUNCTION__, m_Socket, m_IPString.c_str(), this->GetLastError(), GetLastErrorString().c_str()
+		);
 	}
-	return Out;
-	
-	#else  // _WIN32
-	
-	// According to http://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
-	
-	#if ( _GNU_SOURCE ) && !defined(ANDROID_NDK)  // GNU version of strerror_r()
-	
-	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
-	if( res != NULL )
-	{
-		Printf(Out, "%d: %s", a_ErrNo, res);
-		return Out;
-	}
-	
-	#else  // XSI version of strerror_r():
-	
-	int res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
-	if( res == 0 )
-	{
-		Printf(Out, "%d: %s", a_ErrNo, buffer);
-		return Out;
-	}
-	
-	#endif  // strerror_r() version
-	
-	else
-	{
-		Printf(Out, "Error %d while getting error string for error #%d!", errno, a_ErrNo);
-		return Out;
-	}
-	
-	#endif  // else _WIN32
 }
 
 
@@ -357,7 +321,7 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 
 
 
-int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags)
+int cSocket::Receive(char * a_Buffer, unsigned int a_Length, unsigned int a_Flags)
 {
 	return recv(m_Socket, a_Buffer, a_Length, a_Flags);
 }
@@ -368,7 +332,7 @@ int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags
 
 int cSocket::Send(const char * a_Buffer, unsigned int a_Length)
 {
-	return send(m_Socket, a_Buffer, a_Length, 0);
+	return send(m_Socket, a_Buffer, a_Length, MSG_NOSIGNAL);
 }
 
 
@@ -386,6 +350,28 @@ unsigned short cSocket::GetPort(void) const
 		return 0;
 	}
 	return ntohs(Addr.sin_port);
+}
+
+
+
+
+
+void cSocket::SetNonBlocking(void)
+{
+	#ifdef _WIN32
+		u_long NonBlocking = 1;
+		int res = ioctlsocket(m_Socket, FIONBIO, &NonBlocking);
+	#else
+		int NonBlocking = 1;
+		int res = ioctl(m_Socket, FIONBIO, (char *)&NonBlocking);
+	#endif
+	if (res != 0)
+	{
+		LOGERROR("Cannot set socket to non-blocking. This would make the server deadlock later on, aborting.\nErr: %d, %d, %s",
+			res, GetLastError(), GetLastErrorString().c_str()
+		);
+		abort();
+	}
 }
 
 

@@ -155,6 +155,32 @@ AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor = 32)
 
 
 
+struct sCoords
+{
+	int x, y, z;
+	
+	sCoords(int a_X, int a_Y, int a_Z) : x(a_X), y(a_Y), z(a_Z) {}
+} ;
+
+
+
+
+
+struct sChunkMeta
+{
+	int m_ChunkX, m_ChunkZ;
+	short m_PrimaryBitmap;
+	short m_AddBitmap;
+	sChunkMeta(int a_ChunkX, int a_ChunkZ, short a_PrimaryBitmap, short a_AddBitmap) :
+		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_PrimaryBitmap(a_PrimaryBitmap), m_AddBitmap(a_AddBitmap)
+	{
+	}
+} ;
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cConnection:
 
@@ -217,10 +243,11 @@ void cConnection::Run(void)
 		FD_ZERO(&ReadFDs);
 		FD_SET(m_ServerSocket, &ReadFDs);
 		FD_SET(m_ClientSocket, &ReadFDs);
-		int res = select(2, &ReadFDs, NULL, NULL, NULL);
+		SOCKET MaxSocket = std::max(m_ServerSocket, m_ClientSocket);
+		int res = select(MaxSocket + 1, &ReadFDs, NULL, NULL, NULL);
 		if (res <= 0)
 		{
-			printf("select() failed: %d; aborting client", WSAGetLastError());
+			printf("select() failed: %d; aborting client", SocketError);
 			break;
 		}
 		if (FD_ISSET(m_ServerSocket, &ReadFDs))
@@ -319,7 +346,7 @@ bool cConnection::ConnectToServer(void)
 	localhost.sin_addr.s_addr = htonl(0x7f000001);  // localhost
 	if (connect(m_ServerSocket, (sockaddr *)&localhost, sizeof(localhost)) != 0)
 	{
-		printf("connection to server failed: %d\n", WSAGetLastError());
+		printf("connection to server failed: %d\n", SocketError);
 		return false;
 	}
 	Log("Connected to SERVER");
@@ -336,7 +363,7 @@ bool cConnection::RelayFromServer(void)
 	int res = recv(m_ServerSocket, Buffer, sizeof(Buffer), 0);
 	if (res <= 0)
 	{
-		Log("Server closed the socket: %d; %d; aborting connection", res, WSAGetLastError());
+		Log("Server closed the socket: %d; %d; aborting connection", res, SocketError);
 		return false;
 	}
 	
@@ -351,13 +378,13 @@ bool cConnection::RelayFromServer(void)
 		}
 		case csEncryptedUnderstood:
 		{
-			m_ServerDecryptor.ProcessData((byte *)Buffer, (byte *)Buffer, res);
+			m_ServerDecryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
 			DataLog(Buffer, res, "Decrypted %d bytes from the SERVER", res);
 			return DecodeServersPackets(Buffer, res);
 		}
 		case csEncryptedUnknown:
 		{
-			m_ServerDecryptor.ProcessData((byte *)Buffer, (byte *)Buffer, res);
+			m_ServerDecryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
 			DataLog(Buffer, res, "Decrypted %d bytes from the SERVER", res);
 			return CLIENTSEND(Buffer, res);
 		}
@@ -376,7 +403,7 @@ bool cConnection::RelayFromClient(void)
 	int res = recv(m_ClientSocket, Buffer, sizeof(Buffer), 0);
 	if (res <= 0)
 	{
-		Log("Client closed the socket: %d; %d; aborting connection", res, WSAGetLastError());
+		Log("Client closed the socket: %d; %d; aborting connection", res, SocketError);
 		return false;
 	}
 	
@@ -396,7 +423,7 @@ bool cConnection::RelayFromClient(void)
 		case csEncryptedUnknown:
 		{
 			DataLog(Buffer, res, "Decrypted %d bytes from the CLIENT", res);
-			m_ServerEncryptor.ProcessData((byte *)Buffer, (byte *)Buffer, res);
+			m_ServerEncryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
 			return SERVERSEND(Buffer, res);
 		}
 	}
@@ -424,7 +451,7 @@ bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, int a_Size, con
 	int res = send(a_Socket, a_Data, a_Size, 0);
 	if (res <= 0)
 	{
-		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, WSAGetLastError());
+		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, SocketError);
 		return false;
 	}
 	return true;
@@ -446,13 +473,13 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, Encryptor & a_Encryptor, const char * a_Data, int a_Size, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, int a_Size, const char * a_Peer)
 {
 	DataLog(a_Data, a_Size, "Encrypting %d bytes to %s", a_Size, a_Peer);
-	const byte * Data = (const byte *)a_Data;
+	const Byte * Data = (const Byte *)a_Data;
 	while (a_Size > 0)
 	{
-		byte Buffer[64 KiB];
+		Byte Buffer[64 KiB];
 		int NumBytes = (a_Size > sizeof(Buffer)) ? sizeof(Buffer) : a_Size;
 		a_Encryptor.ProcessData(Buffer, Data, NumBytes);
 		bool res = SendData(a_Socket, (const char *)Buffer, NumBytes, a_Peer);
@@ -470,7 +497,7 @@ bool cConnection::SendEncryptedData(SOCKET a_Socket, Encryptor & a_Encryptor, co
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
 {
 	AString All;
 	a_Data.ReadAll(All);
@@ -1249,7 +1276,7 @@ bool cConnection::HandleServerLoginDisconnect(void)
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Reason);
 	Log("Received a login-disconnect packet from the server:");
 	Log("  Reason = \"%s\"", Reason.c_str());
-	COPY_TO_SERVER();
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -1275,6 +1302,7 @@ bool cConnection::HandleServerLoginEncryptionKeyRequest(void)
 	}
 	Log("Got PACKET_ENCRYPTION_KEY_REQUEST from the SERVER:");
 	Log("  ServerID = %s", ServerID.c_str());
+	DataLog(PublicKey.data(), PublicKey.size(), "  Public key (%u bytes)", (unsigned)PublicKey.size());
 	
 	// Reply to the server:
 	SendEncryptionKeyResponse(PublicKey, Nonce);
@@ -1664,12 +1692,6 @@ bool cConnection::HandleServerExplosion(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PosZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Force);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   NumRecords);
-	struct sCoords
-	{
-		int x, y, z;
-		
-		sCoords(int a_X, int a_Y, int a_Z) : x(a_X), y(a_Y), z(a_Z) {}
-	} ;
 	std::vector<sCoords> Records;
 	Records.reserve(NumRecords);
 	int PosXI = (int)PosX, PosYI = (int)PosY, PosZI = (int)PosZ;
@@ -1864,16 +1886,6 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	
 	// Read individual chunk metas.
 	// Need to read them first and only then start logging (in case we don't have the full packet yet)
-	struct sChunkMeta
-	{
-		int m_ChunkX, m_ChunkZ;
-		short m_PrimaryBitmap;
-		short m_AddBitmap;
-		sChunkMeta(int a_ChunkX, int a_ChunkZ, short a_PrimaryBitmap, short a_AddBitmap) :
-			m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_PrimaryBitmap(a_PrimaryBitmap), m_AddBitmap(a_AddBitmap)
-		{
-		}
-	} ;
 	typedef std::vector<sChunkMeta> sChunkMetas;
 	sChunkMetas ChunkMetas;
 	ChunkMetas.reserve(ChunkCount);
@@ -1903,7 +1915,6 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	// TODO: Save the compressed data into a file for later analysis
 	
 	COPY_TO_CLIENT();
-	Sleep(50);
 	return true;
 }
 
@@ -2390,12 +2401,12 @@ bool cConnection::HandleServerStatusResponse(void)
 	{
 		Response.assign(Response.substr(0, idx + sizeof(DescSearch) - 1) + "ProtoProxy: " + Response.substr(idx + sizeof(DescSearch) - 1));
 	}
-	cByteBuffer Packet(1000);
+	cByteBuffer Packet(Response.size() + 50);
 	Packet.WriteVarInt(0);  // Packet type - status response
 	Packet.WriteVarUTF8String(Response);
 	AString Pkt;
 	Packet.ReadAll(Pkt);
-	cByteBuffer ToClient(1000);
+	cByteBuffer ToClient(Response.size() + 50);
 	ToClient.WriteVarUTF8String(Pkt);
 	CLIENTSEND(ToClient);
 	return true;
@@ -2487,7 +2498,8 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockZ);
 	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Action);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, DataLength);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, DataLength);	
+
 	AString Data;
 	if ((DataLength > 0) && !m_ServerBuffer.ReadString(Data, DataLength))
 	{
@@ -2497,6 +2509,18 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Action = %d", Action);
 	DataLog(Data.data(), Data.size(), "  Data (%u bytes)", Data.size());
+
+	// Save metadata to a file:
+	AString fnam;
+	Printf(fnam, "%s_item_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
+	FILE * f = fopen(fnam.c_str(), "wb");
+	if (f != NULL)
+	{
+		fwrite(Data.data(), 1, Data.size(), f);
+		fclose(f);
+		Log("(saved to file \"%s\")", fnam.c_str());
+	}
+
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2678,7 +2702,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 		int Length = 0;
 		switch (Type)
 		{
-			case 0: Length = 1; break;  // byte
+			case 0: Length = 1; break;  // Byte
 			case 1: Length = 2; break;  // short
 			case 2: Length = 4; break;  // int
 			case 3: Length = 4; break;  // float
@@ -2837,37 +2861,42 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, const AString & a_Nonce)
 {
 	// Generate the shared secret and encrypt using the server's public key
-	byte SharedSecret[16];
-	byte EncryptedSecret[128];
+	Byte SharedSecret[16];
+	Byte EncryptedSecret[128];
 	memset(SharedSecret, 0, sizeof(SharedSecret));  // Use all zeroes for the initial secret
-	RSA::PublicKey pk;
-	CryptoPP::StringSource src(a_ServerPublicKey, true);
-	ByteQueue bq;
-	src.TransferTo(bq);
-	bq.MessageEnd();
-	pk.Load(bq);
-	RSAES<PKCS1v15>::Encryptor rsaEncryptor(pk);
-	RandomPool rng;
-	time_t CurTime = time(NULL);
-	rng.Put((const byte *)&CurTime, sizeof(CurTime));
-	int EncryptedLength = rsaEncryptor.FixedCiphertextLength();
-	ASSERT(EncryptedLength <= sizeof(EncryptedSecret));
-	rsaEncryptor.Encrypt(rng, SharedSecret, sizeof(SharedSecret), EncryptedSecret);
-	m_ServerEncryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16))(Name::FeedbackSize(), 1));
-	m_ServerDecryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16))(Name::FeedbackSize(), 1));
+	cPublicKey PubKey(a_ServerPublicKey);
+	int res = PubKey.Encrypt(SharedSecret, sizeof(SharedSecret), EncryptedSecret, sizeof(EncryptedSecret));
+	if (res < 0)
+	{
+		Log("Shared secret encryption failed: %d (0x%x)", res, res);
+		return;
+	}
+
+	m_ServerEncryptor.Init(SharedSecret, SharedSecret);
+	m_ServerDecryptor.Init(SharedSecret, SharedSecret);
 	
 	// Encrypt the nonce:
-	byte EncryptedNonce[128];
-	rsaEncryptor.Encrypt(rng, (const byte *)(a_Nonce.data()), a_Nonce.size(), EncryptedNonce);
+	Byte EncryptedNonce[128];
+	res = PubKey.Encrypt((const Byte *)a_Nonce.data(), a_Nonce.size(), EncryptedNonce, sizeof(EncryptedNonce));
+	if (res < 0)
+	{
+		Log("Nonce encryption failed: %d (0x%x)", res, res);
+		return;
+	}
 	
 	// Send the packet to the server:
 	Log("Sending PACKET_ENCRYPTION_KEY_RESPONSE to the SERVER");
 	cByteBuffer ToServer(1024);
 	ToServer.WriteByte(0x01);  // To server: Encryption key response
-	ToServer.WriteBEShort(EncryptedLength);
-	ToServer.WriteBuf(EncryptedSecret, EncryptedLength);
-	ToServer.WriteBEShort(EncryptedLength);
-	ToServer.WriteBuf(EncryptedNonce, EncryptedLength);
+	ToServer.WriteBEShort((short)sizeof(EncryptedSecret));
+	ToServer.WriteBuf(EncryptedSecret, sizeof(EncryptedSecret));
+	ToServer.WriteBEShort((short)sizeof(EncryptedNonce));
+	ToServer.WriteBuf(EncryptedNonce, sizeof(EncryptedNonce));
+	DataLog(EncryptedSecret, sizeof(EncryptedSecret), "Encrypted secret (%u bytes)", (unsigned)sizeof(EncryptedSecret));
+	DataLog(EncryptedNonce,  sizeof(EncryptedNonce),  "Encrypted nonce (%u bytes)",  (unsigned)sizeof(EncryptedNonce));
+	cByteBuffer Len(5);
+	Len.WriteVarInt(ToServer.GetReadableSpace());
+	SERVERSEND(Len);
 	SERVERSEND(ToServer);
 	m_ServerState = csEncryptedUnderstood;
 	m_IsServerEncrypted = true;

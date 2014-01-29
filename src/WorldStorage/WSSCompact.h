@@ -53,7 +53,7 @@ class cWSSCompact :
 	public cWSSchema
 {
 public:
-	cWSSCompact(cWorld * a_World) : cWSSchema(a_World) {}
+	cWSSCompact(cWorld * a_World, int a_CompressionFactor) : cWSSchema(a_World), m_CompressionFactor(a_CompressionFactor) {}
 	virtual ~cWSSCompact();
 	
 protected:
@@ -74,7 +74,7 @@ protected:
 	{
 	public:
 	
-		cPAKFile(const AString & a_FileName, int a_LayerX, int a_LayerZ);
+		cPAKFile(const AString & a_FileName, int a_LayerX, int a_LayerZ, int a_CompressionFactor);
 		~cPAKFile();
 
 		bool GetChunkData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, AString & a_Data);
@@ -95,6 +95,7 @@ protected:
 	protected:
 	
 		AString m_FileName;
+		int m_CompressionFactor;
 		int     m_LayerX;
 		int     m_LayerZ;
 		
@@ -118,6 +119,8 @@ protected:
 	
 	cCriticalSection m_CS;
 	cPAKFiles m_PAKFiles;  // A MRU cache of PAK files
+	
+	int m_CompressionFactor;
 	
 	/// Loads the correct PAK file either from cache or from disk, manages the m_PAKFiles cache
 	cPAKFile * LoadPAKFile(const cChunkCoords & a_Chunk);

@@ -407,7 +407,7 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 			m_Contents.SetSlot(i, One);
 			return true;
 		}
-		else if (m_Contents.GetSlot(i).IsStackableWith(One))
+		else if (m_Contents.GetSlot(i).IsEqual(One))
 		{
 			if (cPluginManager::Get()->CallHookHopperPullingItem(*m_World, *this, i, a_Entity, a_SlotNum))
 			{
@@ -488,7 +488,6 @@ bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, int a_BlockX, int a_Blo
 		// Feed the fuel slot of the furnace
 		return MoveItemsToSlot(*Furnace, cFurnaceEntity::fsFuel);
 	}
-	return false;
 }
 
 
@@ -545,7 +544,7 @@ bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstS
 		}
 		for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
 		{
-			if (m_Contents.GetSlot(i).IsStackableWith(DestSlot))
+			if (m_Contents.GetSlot(i).IsEqual(DestSlot))
 			{
 				if (cPluginManager::Get()->CallHookHopperPushingItem(*m_World, *this, i, a_Entity, a_DstSlotNum))
 				{

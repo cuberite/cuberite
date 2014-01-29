@@ -118,7 +118,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	int KeyNum = a_SettingsIni.FindKey("Plugins");
 
 	// If it does, how many plugins are there?
-	unsigned int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
+	int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
 
 	if (KeyNum == -1)
 	{
@@ -126,7 +126,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	}
 	else if (NumPlugins > 0)
 	{
-		for(unsigned int i = 0; i < NumPlugins; i++)
+		for (int i = 0; i < NumPlugins; i++)
 		{
 			AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
 			if (ValueName.compare("Plugin") == 0)
@@ -136,7 +136,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 				{
 					if (m_Plugins.find(PluginFile) != m_Plugins.end())
 					{
-						LoadPlugin( PluginFile );
+						LoadPlugin(PluginFile);
 					}
 				}
 			}
@@ -155,6 +155,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	{
 		LOG("-- Loaded 1 Plugin --");
 	}
+	CallHookPluginsLoaded();
 }
 
 
@@ -168,9 +169,9 @@ void cPluginManager::InsertDefaultPlugins(cIniFile & a_SettingsIni)
 	a_SettingsIni.AddKeyComment("Plugins", " Plugin=HookNotify");
 	a_SettingsIni.AddKeyComment("Plugins", " Plugin=ChunkWorx");
 	a_SettingsIni.AddKeyComment("Plugins", " Plugin=APIDump");
-	a_SettingsIni.SetValue("Plugins", "Plugin", "Core");
-	a_SettingsIni.SetValue("Plugins", "Plugin", "TransAPI");
-	a_SettingsIni.SetValue("Plugins", "Plugin", "ChatLog");
+	a_SettingsIni.AddValue("Plugins", "Plugin", "Core");
+	a_SettingsIni.AddValue("Plugins", "Plugin", "TransAPI");
+	a_SettingsIni.AddValue("Plugins", "Plugin", "ChatLog");
 }
 
 
@@ -693,6 +694,48 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems a_Reward)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_FISHED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerFished(a_Player, a_Reward))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_FISHING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerFishing(a_Player, a_Reward))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_JOINED);
@@ -981,6 +1024,46 @@ bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, i
 		}
 	}
 	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLUGIN_MESSAGE);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPluginMessage(a_Client, a_Channel, a_Message))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPluginsLoaded(void)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLUGINS_LOADED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	bool res = false;
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		res = !(*itr)->OnPluginsLoaded() || res;
+	}
+	return res;
 }
 
 
@@ -1647,6 +1730,21 @@ void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & 
 bool cPluginManager::IsValidHookType(int a_HookType)
 {
 	return ((a_HookType >= 0) && (a_HookType <= HOOK_MAX));
+}
+
+
+
+
+
+bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback)
+{
+	// TODO: Implement locking for plugins
+	PluginMap::iterator itr = m_Plugins.find(a_PluginName);
+	if ((itr == m_Plugins.end()) || (itr->second == NULL))
+	{
+		return false;
+	}
+	return a_Callback.Item(itr->second);
 }
 
 

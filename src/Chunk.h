@@ -12,19 +12,6 @@
 
 
 
-#define C_CHUNK_USE_INLINE 1
-
-// Do not touch
-#if C_CHUNK_USE_INLINE
-	#define __C_CHUNK_INLINE__ inline
-#else
-	#define __C_CHUNK_INLINE__
-#endif
-
-
-
-
-
 namespace Json
 {
 	class Value;
@@ -53,12 +40,13 @@ class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
 
-typedef std::list<cClientHandle *>      cClientHandleList;
-typedef cItemCallback<cEntity>          cEntityCallback;
-typedef cItemCallback<cChestEntity>     cChestCallback;
-typedef cItemCallback<cDispenserEntity> cDispenserCallback;
-typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
-typedef cItemCallback<cNoteEntity>      cNoteBlockCallback;
+typedef std::list<cClientHandle *>         cClientHandleList;
+typedef cItemCallback<cEntity>             cEntityCallback;
+typedef cItemCallback<cChestEntity>        cChestCallback;
+typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
+typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
+typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
+typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 
 
 
@@ -250,6 +238,9 @@ public:
 	/// Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);
 
+	/// Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found
+	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback); 
+
 	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
@@ -436,8 +427,6 @@ private:
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (cBlockEntity * a_BlockEntity);
 
-	void SpreadLightOfBlock(NIBBLETYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
-
 	/// Creates a block entity for each block that needs a block entity and doesn't have one in the list
 	void CreateBlockEntities(void);
 	
@@ -478,14 +467,6 @@ private:
 typedef cChunk * cChunkPtr;
 
 typedef std::list<cChunkPtr> cChunkPtrList;
-
-
-
-
-
-#if C_CHUNK_USE_INLINE
-	#include "Chunk.inl.h"
-#endif
 
 
 

@@ -6,7 +6,6 @@
 
 
 
-
 // TODO: Milk Cow
 
 
@@ -27,7 +26,6 @@ void cMooshroom::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_LEATHER);
 	AddRandomDropItem(a_Drops, 1, 3, IsOnFire() ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
 }
-
 
 
 

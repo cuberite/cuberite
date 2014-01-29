@@ -20,7 +20,7 @@ bool       g_BlockPistonBreakable[256];
 bool       g_BlockIsSnowable[256];
 bool       g_BlockRequiresSpecialTool[256];
 bool       g_BlockIsSolid[256];
-bool       g_BlockIsTorchPlaceable[256];
+bool       g_BlockFullyOccupiesVoxel[256];
 
 
 
@@ -267,106 +267,6 @@ AString ItemToFullString(const cItem & a_Item)
 
 
 
-EMCSBiome StringToBiome(const AString & a_BiomeString)
-{
-	// If it is a number, return it:
-	int res = atoi(a_BiomeString.c_str());
-	if ((res != 0) || (a_BiomeString.compare("0") == 0))
-	{
-		// It was a valid number
-		return (EMCSBiome)res;
-	}
-	
-	// Convert using the built-in map:
-	static struct {
-		EMCSBiome    m_Biome;
-		const char * m_String;
-	} BiomeMap[] =
-	{
-		{biOcean,            "Ocean"} ,
-		{biPlains,           "Plains"},
-		{biDesert,           "Desert"},
-		{biExtremeHills,     "ExtremeHills"},
-		{biForest,           "Forest"},
-		{biTaiga,            "Taiga"},
-		{biSwampland,        "Swampland"},
-		{biRiver,            "River"},
-		{biNether,           "Hell"},
-		{biNether,           "Nether"},
-		{biEnd,              "Sky"},
-		{biEnd,              "End"},
-		{biFrozenOcean,      "FrozenOcean"},
-		{biFrozenRiver,      "FrozenRiver"},
-		{biIcePlains,        "IcePlains"},
-		{biIcePlains,        "Tundra"},
-		{biIceMountains,     "IceMountains"},
-		{biMushroomIsland,   "MushroomIsland"},
-		{biMushroomShore,    "MushroomShore"},
-		{biBeach,            "Beach"},
-		{biDesertHills,      "DesertHills"},
-		{biForestHills,      "ForestHills"},
-		{biTaigaHills,       "TaigaHills"},
-		{biExtremeHillsEdge, "ExtremeHillsEdge"},
-		{biJungle,           "Jungle"},
-		{biJungleHills,      "JungleHills"},
-		
-		// Release 1.7 biomes:
-		{biJungleEdge,       "JungleEdge"},
-		{biDeepOcean,        "DeepOcean"},
-		{biStoneBeach,       "StoneBeach"},
-		{biColdBeach,        "ColdBeach"},
-		{biBirchForest,      "BirchForest"},
-		{biBirchForestHills, "BirchForestHills"},
-		{biRoofedForest,     "RoofedForest"},
-		{biColdTaiga,        "ColdTaiga"},
-		{biColdTaigaHills,   "ColdTaigaHills"},
-		{biMegaTaiga,        "MegaTaiga"},
-		{biMegaTaigaHills,   "MegaTaigaHills"},
-		{biExtremeHillsPlus, "ExtremeHillsPlus"},
-		{biSavanna,          "Savanna"},
-		{biSavannaPlateau,   "SavannaPlateau"},
-		{biMesa,             "Mesa"},
-		{biMesaPlateauF,     "MesaPlateauF"},
-		{biMesaPlateau,      "MesaPlateau"},
-		
-		// Release 1.7 variants:
-		{biSunflowerPlains,      "SunflowerPlains"},
-		{biDesertM,              "DesertM"},
-		{biExtremeHillsM,        "ExtremeHillsM"},
-		{biFlowerForest,         "FlowerForest"},
-		{biTaigaM,               "TaigaM"},
-		{biSwamplandM,           "SwamplandM"},
-		{biIcePlainsSpikes,      "IcePlainsSpikes"},
-		{biJungleM,              "JungleM"},
-		{biJungleEdgeM,          "JungleEdgeM"},
-		{biBirchForestM,         "BirchForestM"},
-		{biBirchForestHillsM,    "BirchForestHillsM"},
-		{biRoofedForestM,        "RoofedForestM"},
-		{biColdTaigaM,           "ColdTaigaM"},
-		{biMegaSpruceTaiga,      "MegaSpruceTaiga"},
-		{biMegaSpruceTaigaHills, "MegaSpruceTaigaHills"},
-		{biExtremeHillsPlusM,    "ExtremeHillsPlusM"},
-		{biSavannaM,             "SavannaM"},
-		{biSavannaPlateauM,      "SavannaPlateauM"},
-		{biMesaBryce,            "MesaBryce"},
-		{biMesaPlateauFM,        "MesaPlateauFM"},
-		{biMesaPlateauM,         "MesaPlateauM"},
-	} ;
-	
-	for (size_t i = 0; i < ARRAYCOUNT(BiomeMap); i++)
-	{
-		if (NoCaseCompare(BiomeMap[i].m_String, a_BiomeString) == 0)
-		{
-			return BiomeMap[i].m_Biome;
-		}
-	}  // for i - BiomeMap[]
-	return (EMCSBiome)-1;
-}
-
-
-
-
-
 int StringToMobType(const AString & a_MobString)
 {
 	static struct {
@@ -591,7 +491,7 @@ public:
 		memset(g_BlockTransparent,         0x00, sizeof(g_BlockTransparent));
 		memset(g_BlockOneHitDig,           0x00, sizeof(g_BlockOneHitDig));
 		memset(g_BlockPistonBreakable,     0x00, sizeof(g_BlockPistonBreakable));
-		memset(g_BlockIsTorchPlaceable,    0x00, sizeof(g_BlockIsTorchPlaceable));
+		memset(g_BlockFullyOccupiesVoxel,  0x00, sizeof(g_BlockFullyOccupiesVoxel));
 		
 		// Setting bools to true must be done manually, see http://forum.mc-server.org/showthread.php?tid=629&pid=5415#pid5415
 		for (size_t i = 0; i < ARRAYCOUNT(g_BlockIsSnowable); i++)
@@ -867,6 +767,8 @@ public:
 		g_BlockIsSolid[E_BLOCK_MELON_STEM]            = false;
 		g_BlockIsSolid[E_BLOCK_NETHER_PORTAL]         = false;
 		g_BlockIsSolid[E_BLOCK_PISTON_EXTENSION]      = false;
+		g_BlockIsSolid[E_BLOCK_POTATOES]              = false;
+		g_BlockIsSolid[E_BLOCK_POWERED_RAIL]          = false;
 		g_BlockIsSolid[E_BLOCK_RAIL]                  = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_TORCH_OFF]    = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_TORCH_ON]     = false;
@@ -891,67 +793,67 @@ public:
 		g_BlockIsSolid[E_BLOCK_WOODEN_SLAB]           = false;
 
 		// Torch placeable blocks:
-		g_BlockIsTorchPlaceable[E_BLOCK_BEDROCK]               = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_BLOCK_OF_COAL]         = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_BLOCK_OF_REDSTONE]     = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_BOOKCASE]              = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_BRICK]                 = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_CLAY]                  = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_COAL_ORE]              = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_COBBLESTONE]           = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_COMMAND_BLOCK]         = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_CRAFTING_TABLE]        = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_DIAMOND_BLOCK]         = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_DIAMOND_ORE]           = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_DIRT]                  = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_DISPENSER]             = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_DOUBLE_STONE_SLAB]     = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_DOUBLE_WOODEN_SLAB]    = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_DROPPER]               = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_EMERALD_BLOCK]         = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_EMERALD_ORE]           = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_END_STONE]             = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_FURNACE]               = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_GLOWSTONE]             = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_GOLD_BLOCK]            = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_GOLD_ORE]              = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_GRASS]                 = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_GRAVEL]                = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_HARDENED_CLAY]         = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_HAY_BALE]              = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_HUGE_BROWN_MUSHROOM]   = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_HUGE_RED_MUSHROOM]     = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_IRON_BLOCK]            = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_IRON_ORE]              = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_JACK_O_LANTERN]        = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_JUKEBOX]               = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_LAPIS_BLOCK]           = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_LAPIS_ORE]             = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_LOG]                   = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_MELON]                 = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_MOSSY_COBBLESTONE]     = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_MYCELIUM]              = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_NETHERRACK]            = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_NETHER_BRICK]          = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_NETHER_QUARTZ_ORE]     = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_NOTE_BLOCK]            = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_OBSIDIAN]              = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_PACKED_ICE]            = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_PLANKS]                = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_PUMPKIN]               = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_QUARTZ_BLOCK]          = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_REDSTONE_LAMP_OFF]     = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_REDSTONE_LAMP_ON]      = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_REDSTONE_ORE]          = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_REDSTONE_ORE_GLOWING]  = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_SANDSTONE]             = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_SAND]                  = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_SILVERFISH_EGG]        = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_SPONGE]                = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_STAINED_CLAY]          = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_WOOL]                  = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_STONE]                 = true;
-		g_BlockIsTorchPlaceable[E_BLOCK_STONE_BRICKS]          = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_BEDROCK]               = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_BLOCK_OF_COAL]         = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_BLOCK_OF_REDSTONE]     = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_BOOKCASE]              = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_BRICK]                 = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_CLAY]                  = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_COAL_ORE]              = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_COBBLESTONE]           = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_COMMAND_BLOCK]         = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_CRAFTING_TABLE]        = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_DIAMOND_BLOCK]         = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_DIAMOND_ORE]           = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_DIRT]                  = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_DISPENSER]             = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_DOUBLE_STONE_SLAB]     = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_DOUBLE_WOODEN_SLAB]    = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_DROPPER]               = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_EMERALD_BLOCK]         = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_EMERALD_ORE]           = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_END_STONE]             = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_FURNACE]               = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_GLOWSTONE]             = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_GOLD_BLOCK]            = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_GOLD_ORE]              = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_GRASS]                 = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_GRAVEL]                = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_HARDENED_CLAY]         = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_HAY_BALE]              = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_HUGE_BROWN_MUSHROOM]   = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_HUGE_RED_MUSHROOM]     = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_IRON_BLOCK]            = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_IRON_ORE]              = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_JACK_O_LANTERN]        = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_JUKEBOX]               = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_LAPIS_BLOCK]           = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_LAPIS_ORE]             = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_LOG]                   = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_MELON]                 = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_MOSSY_COBBLESTONE]     = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_MYCELIUM]              = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_NETHERRACK]            = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_NETHER_BRICK]          = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_NETHER_QUARTZ_ORE]     = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_NOTE_BLOCK]            = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_OBSIDIAN]              = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_PACKED_ICE]            = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_PLANKS]                = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_PUMPKIN]               = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_QUARTZ_BLOCK]          = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_REDSTONE_LAMP_OFF]     = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_REDSTONE_LAMP_ON]      = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_REDSTONE_ORE]          = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_REDSTONE_ORE_GLOWING]  = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_SANDSTONE]             = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_SAND]                  = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_SILVERFISH_EGG]        = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_SPONGE]                = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_STAINED_CLAY]          = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_WOOL]                  = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_STONE]                 = true;
+		g_BlockFullyOccupiesVoxel[E_BLOCK_STONE_BRICKS]          = true;
 	}
 } BlockPropertiesInitializer;
 

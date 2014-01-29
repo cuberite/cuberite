@@ -70,8 +70,8 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 		if (a_Player->GetWindow() != Window)
 		{
 			a_Player->OpenWindow(Window);
-			BroadcastProgress(PROGRESSBAR_FUEL,     m_LastProgressFuel);
-			BroadcastProgress(PROGRESSBAR_SMELTING, m_LastProgressCook);
+			BroadcastProgress(PROGRESSBAR_FUEL,     (short)m_LastProgressFuel);
+			BroadcastProgress(PROGRESSBAR_SMELTING, (short)m_LastProgressCook);
 		}
 	}
 }
@@ -307,7 +307,7 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 /// Updates the current recipe, based on the current input
 void cFurnaceEntity::UpdateInput(void)
 {
-	if (!m_Contents.GetSlot(fsInput).IsStackableWith(m_LastInput))
+	if (!m_Contents.GetSlot(fsInput).IsEqual(m_LastInput))
 	{
 		// The input is different from what we had before, reset the cooking time
 		m_TimeCooked = 0;
@@ -417,7 +417,7 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 		return true;
 	}
 
-	if (!m_Contents.GetSlot(fsOutput).IsStackableWith(*m_CurrentRecipe->Out))
+	if (!m_Contents.GetSlot(fsOutput).IsEqual(*m_CurrentRecipe->Out))
 	{
 		// The output slot is blocked with something that cannot be stacked with the recipe's output
 		return false;
@@ -445,14 +445,14 @@ void cFurnaceEntity::UpdateProgressBars(void)
 	int CurFuel = (m_FuelBurnTime > 0) ? (200 - 200 * m_TimeBurned / m_FuelBurnTime) : 0;
 	if ((CurFuel / 8) != (m_LastProgressFuel / 8))
 	{
-		BroadcastProgress(PROGRESSBAR_FUEL, CurFuel);
+		BroadcastProgress(PROGRESSBAR_FUEL, (short)CurFuel);
 		m_LastProgressFuel = CurFuel;
 	}
 	
 	int CurCook = (m_NeedCookTime > 0) ? (200 * m_TimeCooked / m_NeedCookTime) : 0;
 	if ((CurCook / 8) != (m_LastProgressCook / 8))
 	{
-		BroadcastProgress(PROGRESSBAR_SMELTING, CurCook);
+		BroadcastProgress(PROGRESSBAR_SMELTING, (short)CurCook);
 		m_LastProgressCook = CurCook;
 	}
 }

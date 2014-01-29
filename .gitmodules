@@ -1,9 +1,12 @@
 [submodule "MCServer/Plugins/Core"]
 	path = MCServer/Plugins/Core
-	url = git://github.com/mc-server/Core.git
+	url = https://github.com/mc-server/Core.git
 [submodule "MCServer/Plugins/ProtectionAreas"]
 	path = MCServer/Plugins/ProtectionAreas
-	url = git://github.com/mc-server/ProtectionAreas.git
+	url = https://github.com/mc-server/ProtectionAreas.git
 [submodule "MCServer/Plugins/TransAPI"]
 	path = MCServer/Plugins/TransAPI
-	url = git://github.com/bearbin/transapi.git
+	url = https://github.com/bearbin/transapi.git
+[submodule "lib/polarssl"]
+	path = lib/polarssl
+	url = https://github.com/polarssl/polarssl

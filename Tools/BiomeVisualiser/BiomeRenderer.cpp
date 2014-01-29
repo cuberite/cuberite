@@ -40,10 +40,10 @@ bool cBiomeRenderer::Render(cPixmap & a_Pixmap)
 	int Hei = a_Pixmap.GetHeight();
 	
 	// Hint the approximate view area to the biome source so that it can adjust its caches:
-	int MinBlockX = (    - m_OriginX) / m_Zoom;
-	int MaxBlockX = (Wid - m_OriginX) / m_Zoom;
-	int MinBlockZ = (    - m_OriginY) / m_Zoom;
-	int MaxBlockZ = (Hei - m_OriginY) / m_Zoom;
+	int MinBlockX = (    - m_OriginX) * m_Zoom;
+	int MaxBlockX = (Wid - m_OriginX) * m_Zoom;
+	int MinBlockZ = (    - m_OriginY) * m_Zoom;
+	int MaxBlockZ = (Hei - m_OriginY) * m_Zoom;
 	m_Cache.HintViewArea(MinBlockX / 16 - 1, MaxBlockX / 16 + 1, MinBlockZ / 16 - 1, MaxBlockZ / 16 + 1);
 	
 	// Hold one current chunk of biome data:
@@ -55,12 +55,12 @@ bool cBiomeRenderer::Render(cPixmap & a_Pixmap)
 	
 	for (int y = 0; y < Hei; y++)
 	{
-		int BlockZ = (y - m_OriginY) / m_Zoom;
+		int BlockZ = (y - m_OriginY) * m_Zoom;
 		int ChunkZ = (BlockZ >= 0) ? (BlockZ / 16) : ((BlockZ + 1) / 16 - 1);
 		int RelZ = BlockZ - ChunkZ * 16;
 		for (int x = 0; x < Wid; x++)
 		{
-			int BlockX = (x - m_OriginX) / m_Zoom;
+			int BlockX = (x - m_OriginX) * m_Zoom;
 			int ChunkX = (BlockX >= 0) ? (BlockX / 16) : ((BlockX + 1) / 16 - 1);
 			int RelX = BlockX - ChunkX * 16;
 			if ((ChunkZ != CurChunkZ) || (ChunkX != CurChunkX))

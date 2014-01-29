@@ -57,6 +57,8 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, bool a_ConsiderEmptySlo
 
 int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int a_EndSlotNum, bool a_ConsiderEmptySlots)
 {
+
+	UNUSED(a_ConsiderEmptySlots);
 	if ((a_BeginSlotNum < 0) || (a_BeginSlotNum >= invNumSlots))
 	{
 		LOGWARNING("%s: Bad BeginSlotNum, got %d, there are %d slots; correcting to 0.", __FUNCTION__, a_BeginSlotNum, invNumSlots - 1);
@@ -81,7 +83,7 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 		{
 			NumLeft -= MaxStack;
 		}
-		else if (Slot.IsStackableWith(a_ItemStack))
+		else if (Slot.IsEqual(a_ItemStack))
 		{
 			NumLeft -= MaxStack - Slot.m_ItemCount;
 		}
@@ -93,8 +95,6 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 	}  // for i - m_Slots[]
 	return a_ItemStack.m_ItemCount - NumLeft;
 }
-
-
 
 
 

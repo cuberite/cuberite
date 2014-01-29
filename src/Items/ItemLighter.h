@@ -42,6 +42,10 @@ public:
 			{
 				// Light a fire next to/on top of the block if air:
 				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+				{
+					break;
+				}
 				if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
 				{
 					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);

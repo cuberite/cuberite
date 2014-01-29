@@ -6,9 +6,7 @@
 
 #include "Globals.h"
 #include "BlockArea.h"
-#include "World.h"
 #include "OSSupport/GZipFile.h"
-#include "WorldStorage/FastNBT.h"
 #include "Blocks/BlockHandler.h"
 
 
@@ -28,6 +26,8 @@ template<typename Combinator> void InternalMergeBlocks(
 	Combinator a_Combinator
 )
 {
+	UNUSED(a_SrcSizeY);
+	UNUSED(a_DstSizeY);
 	for (int y = 0; y < a_SizeY; y++)
 	{
 		int SrcBaseY = (y + a_SrcOffY) * a_SrcSizeX * a_SrcSizeZ;
@@ -264,7 +264,7 @@ void cBlockArea::SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ)
 
 
 
-bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
+bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	// Normalize the coords:
 	if (a_MinBlockX > a_MaxBlockX)
@@ -325,7 +325,7 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 	cChunkDef::AbsoluteToRelative(a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
 	
 	// Query block data:
-	if (!a_World->ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
+	if (!a_ForEachChunkProvider->ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
 	{
 		Clear();
 		return false;
@@ -338,7 +338,7 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 
 
 
-bool cBlockArea::Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
+bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	ASSERT((a_DataTypes & GetDataTypes()) == a_DataTypes);  // Are you requesting only the data that I have?
 	a_DataTypes = a_DataTypes & GetDataTypes();  // For release builds, silently cut off the datatypes that I don't have
@@ -355,7 +355,7 @@ bool cBlockArea::Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a
 		a_MinBlockY = cChunkDef::Height - m_SizeY;
 	}
 
-	return a_World->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
+	return a_ForEachChunkProvider->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
 }
 
 
@@ -446,85 +446,12 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 
 
 
-bool cBlockArea::LoadFromSchematicFile(const AString & a_FileName)
-{
-	// Un-GZip the contents:
-	AString Contents;
-	cGZipFile File;
-	if (!File.Open(a_FileName, cGZipFile::fmRead))
-	{
-		LOG("Cannot open the schematic file \"%s\".", a_FileName.c_str());
-		return false;
-	}
-	int NumBytesRead = File.ReadRestOfFile(Contents);
-	if (NumBytesRead < 0)
-	{
-		LOG("Cannot read GZipped data in the schematic file \"%s\", error %d", a_FileName.c_str(), NumBytesRead);
-		return false;
-	}
-	File.Close();
-	
-	// Parse the NBT:
-	cParsedNBT NBT(Contents.data(), Contents.size());
-	if (!NBT.IsValid())
-	{
-		LOG("Cannot parse the NBT in the schematic file \"%s\".", a_FileName.c_str());
-		return false;
-	}
-	
-	return LoadFromSchematicNBT(NBT);
-}
 
 
 
 
 
-bool cBlockArea::SaveToSchematicFile(const AString & a_FileName)
-{
-	cFastNBTWriter Writer("Schematic");
-	Writer.AddShort("Width", m_SizeX);
-	Writer.AddShort("Height", m_SizeY);
-	Writer.AddShort("Length", m_SizeZ);
-	Writer.AddString("Materials", "Alpha");
-	if (HasBlockTypes())
-	{
-		Writer.AddByteArray("Blocks", (const char *)m_BlockTypes, GetBlockCount());
-	}
-	else
-	{
-		AString Dummy(GetBlockCount(), 0);
-		Writer.AddByteArray("Blocks", Dummy.data(), Dummy.size());
-	}
-	if (HasBlockMetas())
-	{
-		Writer.AddByteArray("Data", (const char *)m_BlockMetas, GetBlockCount());
-	}
-	else
-	{
-		AString Dummy(GetBlockCount(), 0);
-		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
-	}
-	// TODO: Save entities and block entities
-	Writer.BeginList("Entities", TAG_Compound);
-	Writer.EndList();
-	Writer.BeginList("TileEntities", TAG_Compound);
-	Writer.EndList();
-	Writer.Finish();
-	
-	// Save to file
-	cGZipFile File;
-	if (!File.Open(a_FileName, cGZipFile::fmWrite))
-	{
-		LOG("Cannot open file \"%s\" for writing.", a_FileName.c_str());
-		return false;
-	}
-	if (!File.Write(Writer.GetResult()))
-	{
-		LOG("Cannot write data to file \"%s\".", a_FileName.c_str());
-		return false;
-	}
-	return true;
-}
+
 
 
 
@@ -826,7 +753,7 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 		int yd = dy - dx / 2;
 		int zd = dz - dx / 2;
 
-		while (true)
+		for (;;)
 		{
 			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
 
@@ -858,7 +785,7 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 		int xd = dx - dy / 2;
 		int zd = dz - dy / 2;
 
-		while (true)
+		for (;;)
 		{
 			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
 
@@ -892,7 +819,7 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 		int xd = dx - dz / 2;
 		int yd = dy - dz / 2;
 
-		while (true)
+		for (;;)
 		{
 			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
 
@@ -2014,89 +1941,6 @@ void cBlockArea::ExpandNibbles(NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMa
 	delete a_Array;
 	a_Array = NewNibbles;
 }
-
-
-
-
-
-bool cBlockArea::LoadFromSchematicNBT(cParsedNBT & a_NBT)
-{
-	int TMaterials = a_NBT.FindChildByName(a_NBT.GetRoot(), "Materials");
-	if ((TMaterials > 0) && (a_NBT.GetType(TMaterials) == TAG_String))
-	{
-		AString Materials = a_NBT.GetString(TMaterials);
-		if (Materials.compare("Alpha") != 0)
-		{
-			LOG("Materials tag is present and \"%s\" instead of \"Alpha\". Possibly a wrong-format schematic file.", Materials.c_str());
-			return false;
-		}
-	}
-	int TSizeX = a_NBT.FindChildByName(a_NBT.GetRoot(), "Width");
-	int TSizeY = a_NBT.FindChildByName(a_NBT.GetRoot(), "Height");
-	int TSizeZ = a_NBT.FindChildByName(a_NBT.GetRoot(), "Length");
-	if (
-		(TSizeX < 0) || (TSizeY < 0) || (TSizeZ < 0) ||
-		(a_NBT.GetType(TSizeX) != TAG_Short) ||
-		(a_NBT.GetType(TSizeY) != TAG_Short) ||
-		(a_NBT.GetType(TSizeZ) != TAG_Short)
-	)
-	{
-		LOG("Dimensions are missing from the schematic file (%d, %d, %d), (%d, %d, %d)",
-			TSizeX, TSizeY, TSizeZ,
-			a_NBT.GetType(TSizeX), a_NBT.GetType(TSizeY), a_NBT.GetType(TSizeZ)
-		);
-		return false;
-	}
-	
-	int SizeX = a_NBT.GetShort(TSizeX);
-	int SizeY = a_NBT.GetShort(TSizeY);
-	int SizeZ = a_NBT.GetShort(TSizeZ);
-	if ((SizeX < 1) || (SizeY < 1) || (SizeZ < 1))
-	{
-		LOG("Dimensions are invalid in the schematic file: %d, %d, %d", SizeX, SizeY, SizeZ);
-		return false;
-	}
-	
-	int TBlockTypes = a_NBT.FindChildByName(a_NBT.GetRoot(), "Blocks");
-	int TBlockMetas = a_NBT.FindChildByName(a_NBT.GetRoot(), "Data");
-	if ((TBlockTypes < 0) || (a_NBT.GetType(TBlockTypes) != TAG_ByteArray))
-	{
-		LOG("BlockTypes are invalid in the schematic file: %d", TBlockTypes);
-		return false;
-	}
-	bool AreMetasPresent = (TBlockMetas > 0) && (a_NBT.GetType(TBlockMetas) == TAG_ByteArray);
-	
-	Clear();
-	SetSize(SizeX, SizeY, SizeZ, AreMetasPresent ? (baTypes | baMetas) : baTypes);
-	
-	// Copy the block types and metas:
-	int NumBytes = m_SizeX * m_SizeY * m_SizeZ;
-	if (a_NBT.GetDataLength(TBlockTypes) < NumBytes)
-	{
-		LOG("BlockTypes truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
-			NumBytes, a_NBT.GetDataLength(TBlockTypes)
-		);
-		NumBytes = a_NBT.GetDataLength(TBlockTypes);
-	}
-	memcpy(m_BlockTypes, a_NBT.GetData(TBlockTypes), NumBytes);
-	
-	if (AreMetasPresent)
-	{
-		int NumBytes = m_SizeX * m_SizeY * m_SizeZ;
-		if (a_NBT.GetDataLength(TBlockMetas) < NumBytes)
-		{
-			LOG("BlockMetas truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
-				NumBytes, a_NBT.GetDataLength(TBlockMetas)
-			);
-			NumBytes = a_NBT.GetDataLength(TBlockMetas);
-		}
-		memcpy(m_BlockMetas, a_NBT.GetData(TBlockMetas), NumBytes);
-	}
-	
-	return true;
-}
-
-
 
 
 void cBlockArea::RelSetData(

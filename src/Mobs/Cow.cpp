@@ -41,5 +41,3 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 	}
 }
 
-
-

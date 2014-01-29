@@ -18,7 +18,7 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2, 1.6.1, 1.6.2, 1.6.3, 1.6.4, 1.7.2"
+#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2, 1.6.1, 1.6.2, 1.6.3, 1.6.4, 1.7.2, 1.7.4"
 #define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49, 51, 60, 61, 73, 74, 77, 78, 4"
 
 
@@ -98,10 +98,14 @@ public:
 	virtual void SendPlayerMoveLook      (void) override;
 	virtual void SendPlayerPosition      (void) override;
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
+	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendRespawn             (void) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
+	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
@@ -113,6 +117,7 @@ public:
 	virtual void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay) override;
 	virtual void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ) override;
+	virtual void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
 	virtual void SendWeather             (eWeather a_Weather) override;

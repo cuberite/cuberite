@@ -95,15 +95,11 @@
  *
  **********************************************************************/
 
-#include <windows.h>
-#include <objidl.h>  // Needed if compiled with "WIN32_LEAN_AND_MEAN"
+#include "Globals.h"
+
 #include <tchar.h>
+#include <objidl.h>  // Needed if compiled with "WIN32_LEAN_AND_MEAN"
 #include <crtdbg.h>
-#include <stdio.h>
-
-#include <string>
-#include <vector>
-
 
 #include "LeakFinder.h"
 
@@ -463,11 +459,11 @@ public:
     pHashEntry->nDataSize = nDataSize;
     pHashEntry->Next = NULL;
 #ifdef _M_IX86
-    pHashEntry->pCallstackOffset = (LPVOID) min(context.Ebp, context.Esp);
+    pHashEntry->pCallstackOffset = (LPVOID) std::min(context.Ebp, context.Esp);
 #elif _M_X64
-    pHashEntry->pCallstackOffset = (LPVOID) min(context.Rdi, context.Rsp);
+    pHashEntry->pCallstackOffset = (LPVOID) std::min(context.Rdi, context.Rsp);
 #elif _M_IA64
-    pHashEntry->pCallstackOffset = (LPVOID) min(context.IntSp, context.RsBSP);
+    pHashEntry->pCallstackOffset = (LPVOID) std::min(context.IntSp, context.RsBSP);
 #else
 #error "Platform not supported!"
 #endif
@@ -490,7 +486,7 @@ public:
     if (pHashEntry->nMaxStackSize > 0)
     {
       SIZE_T len = ((SIZE_T) pHashEntry->pStackBaseAddr + pHashEntry->nMaxStackSize) - (SIZE_T)pHashEntry->pCallstackOffset;
-      bytesToRead = min(len, MAX_CALLSTACK_LEN_BUF);
+      bytesToRead = std::min(len, (SIZE_T)MAX_CALLSTACK_LEN_BUF);
     }
     // Now read the callstack:
     if (ReadProcessMemory(GetCurrentProcess(), (LPCVOID) pHashEntry->pCallstackOffset, &(pHashEntry->pcCallstackAddr), bytesToRead, &(pHashEntry->nCallstackLen)) == 0) 
@@ -866,8 +862,10 @@ static int MyAllocHook(int nAllocType, void *pvData,
 		{
 			// RequestID was found
 			size_t temp = g_CurrentMemUsage;
-			g_CurrentMemUsage -= nSize ;
-			g_pCRTTable->Remove(lRequest);
+			if (g_pCRTTable->Remove(lRequest))
+			{
+				g_CurrentMemUsage -= nSize;
+			}
 			if (g_CurrentMemUsage > temp)
 			{
 				printf("********************************************\n");
@@ -900,8 +898,11 @@ static int MyAllocHook(int nAllocType, void *pvData,
 			// Try to find the RequestID in the Hash-Table, mark it that it was freed
 			lReallocRequest = pHead->lRequest;
 			size_t temp = g_CurrentMemUsage;
-			g_CurrentMemUsage -= pHead->nDataSize;
 			bRet = g_pCRTTable->Remove(lReallocRequest);
+			if (bRet)
+			{
+				g_CurrentMemUsage -= pHead->nDataSize;
+			}
 			if (g_CurrentMemUsage > temp)
 			{
 				printf("********************************************\n");

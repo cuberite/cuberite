@@ -35,7 +35,7 @@
 class cIniFile
 {
 private:
-	bool        m_IsCaseInsensitive;
+	bool m_IsCaseInsensitive;
 	
 	struct key
 	{
@@ -122,22 +122,32 @@ public:
 		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) != 0);
 	}
 
-	// Sets value of [keyname] valuename =.
-	// Specify the optional paramter as false (0) if you do not want it to create
-	// the key if it doesn't exist. Returns true if data entered, false otherwise.
-	// Overloaded to accept string, int, and double.
-	bool SetValue( const int keyID, const int valueID, const AString & value);
-	bool SetValue( const AString & keyname, const AString & valuename, const AString & value, const bool create = true);
-	bool SetValueI( const AString & keyname, const AString & valuename, const int value, const bool create = true);
-	bool SetValueB( const AString & keyname, const AString & valuename, const bool value, const bool create = true)
+	// Adds a new value to the specified key.
+	// If a value of the same name already exists, creates another one (non-standard INI file)
+	void AddValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value);
+	void AddValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value);
+	void AddValueB(const AString & a_KeyName, const AString & a_ValueName, const bool a_Value)
 	{
-		return SetValueI( keyname, valuename, int(value), create);
+		return AddValueI(a_KeyName, a_ValueName, a_Value ? 1 : 0);
 	}
-	bool SetValueF( const AString & keyname, const AString & valuename, const double value, const bool create = true);
+	void AddValueF(const AString & a_KeyName, const AString & a_ValueName, const double a_Value);
+	
+	// Overwrites the value of [keyname].valuename
+	// Specify the optional parameter as false (0) if you do not want the value created if it doesn't exist.
+	// Returns true if value set, false otherwise.
+	// Overloaded to accept string, int, and double.
+	bool SetValue (const int keyID, const int valueID, const AString & value);
+	bool SetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists = true);
+	bool SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists = true);
+	bool SetValueB(const AString & a_KeyName, const AString & a_ValueName, const bool a_Value, const bool a_CreateIfNotExists = true)
+	{
+		return SetValueI(a_KeyName, a_ValueName, int(a_Value), a_CreateIfNotExists);
+	}
+	bool SetValueF(const AString & a_KeyName, const AString & a_ValueName, const double a_Value, const bool a_CreateIfNotExists = true);
 	
 	// tolua_end
 	
-	bool SetValueV( const AString & keyname, const AString & valuename, char *format, ...);
+	bool SetValueV( const AString & a_KeyName, const AString & a_ValueName, const char * a_Format, ...);
 	
 	// tolua_begin
 

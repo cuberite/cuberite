@@ -8,6 +8,7 @@
 #include "Entities/Player.h"
 #include "Inventory.h"
 #include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/SignEntity.h"
 #include "UI/Window.h"
 #include "Item.h"
@@ -119,9 +120,6 @@ cClientHandle::~cClientHandle()
 	
 	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
 
-	// Remove from cSocketThreads, we're not to be called anymore:
-	cRoot::Get()->GetServer()->ClientDestroying(this);
-	
 	{
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
@@ -150,17 +148,7 @@ cClientHandle::~cClientHandle()
 		SendDisconnect("Server shut down? Kthnxbai");
 	}
 	
-	// Queue all remaining outgoing packets to cSocketThreads:
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		AString Data;
-		m_OutgoingData.ReadAll(Data);
-		m_OutgoingData.CommitRead();
-		cRoot::Get()->GetServer()->WriteToClient(this, Data);
-	}
-	
-	// Queue the socket to close as soon as it sends all outgoing data:
-	cRoot::Get()->GetServer()->QueueClientClose(this);
+	// Close the socket as soon as it sends all outgoing data:
 	cRoot::Get()->GetServer()->RemoveClient(this);
 	
 	delete m_Protocol;
@@ -265,6 +253,12 @@ void cClientHandle::Authenticate(void)
 	
 	m_Player->Initialize(World);
 	m_State = csAuthenticated;
+
+	// Query player team
+	m_Player->UpdateTeam();
+
+	// Send scoreboard data
+	World->GetScoreBoard().SendTo(*this);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -543,6 +537,88 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 
 
+void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	if (a_Channel == "MC|AdvCdm") // Command block, set text, Client -> Server
+	{
+		const char* Data = a_Message.c_str();
+		HandleCommandBlockMessage(Data, a_Message.size());
+		return;
+	}
+	else if (a_Channel == "MC|Brand") // Client <-> Server branding exchange
+	{
+		// We are custom,
+		// We are awesome,
+		// We are MCServer.
+		SendPluginMessage("MC|Brand", "MCServer");
+		return;
+	}
+
+	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
+}
+
+
+
+
+
+void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length)
+{
+	if (a_Length < 14)
+	{
+		SendChat(Printf("%s[INFO]%s Failure setting command block command; bad request", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+		LOGD("Malformed MC|AdvCdm packet.");
+		return;
+	}
+
+	cByteBuffer Buffer(a_Length);
+	Buffer.Write(a_Data, a_Length);
+
+	int BlockX, BlockY, BlockZ;
+
+	AString Command;
+
+	char Mode;
+
+	Buffer.ReadChar(Mode);
+
+	switch (Mode)
+	{
+		case 0x00:
+		{
+			Buffer.ReadBEInt(BlockX);
+			Buffer.ReadBEInt(BlockY);
+			Buffer.ReadBEInt(BlockZ);
+
+			Buffer.ReadVarUTF8String(Command);
+			break;
+		}
+
+		default:
+		{
+			SendChat(Printf("%s[INFO]%s Failure setting command block command; unhandled mode", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+			LOGD("Unhandled MC|AdvCdm packet mode.");
+			return;
+		}
+	}
+
+	cWorld * World = m_Player->GetWorld();
+
+	if (World->AreCommandBlocksEnabled())
+	{
+		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
+
+		SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+	}
+	else
+	{
+		SendChat(Printf("%s[INFO]%s Command blocks are not enabled on this server", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
+	}
+}
+
+
+
+
+
 void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
 	LOGD("HandleLeftClick: {%i, %i, %i}; Face: %i; Stat: %i",
@@ -572,7 +648,8 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
 			}
-			m_Player->TossItem(false);
+
+			m_Player->TossEquippedItem();
 			return;
 		}
 
@@ -617,6 +694,17 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 		case DIG_STATUS_CANCELLED:
 		{
 			// Block breaking cancelled by player
+			return;
+		}
+
+		case DIG_STATUS_DROP_STACK:
+		{
+			if (PlgMgr->CallHookPlayerTossingItem(*m_Player))
+			{
+				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
+				return;
+			}
+			m_Player->TossEquippedItem(64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
 			return;
 		}
 
@@ -1017,7 +1105,7 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 		return;
 	}
 	
-	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetYaw        (a_Rotation);
 	m_Player->SetHeadYaw    (a_Rotation);
 	m_Player->SetPitch      (a_Pitch);
 	m_Player->SetTouchGround(a_IsOnGround);
@@ -1049,7 +1137,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 	m_Player->SetStance     (a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
 	m_Player->SetHeadYaw    (a_Rotation);
-	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetYaw        (a_Rotation);
 	m_Player->SetPitch      (a_Pitch);
 }
 
@@ -1409,6 +1497,7 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 
 void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 {
+	UNUSED(a_World);
 	ASSERT(m_Player != NULL);
 	
 	if (a_SendRespawnPacket)
@@ -1968,6 +2057,15 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
+void cClientHandle::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	m_Protocol->SendPluginMessage(a_Channel, a_Message);
+}
+
+
+
+
+
 void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	m_Protocol->SendRemoveEntityEffect(a_Entity, a_EffectID);
@@ -1998,6 +2096,33 @@ void cClientHandle::SendExperience(void)
 void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	m_Protocol->SendExperienceOrb(a_ExpOrb);
+}
+
+
+
+
+
+void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+}
+
+
+
+
+
+void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+}
+
+
+
+
+
+void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
 }
 
 
@@ -2097,6 +2222,14 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+void cClientHandle::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
 }
 
 

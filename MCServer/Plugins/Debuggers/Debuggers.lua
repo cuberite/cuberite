@@ -19,14 +19,16 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
 	--]]
 	
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
-	cPluginManager.AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
-	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick);
-	cPluginManager.AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
-	cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
-	cPluginManager.AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
+	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
+	cPluginManager:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
+	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
+	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
+	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 
 	PM = cRoot:Get():GetPluginManager();
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
@@ -50,6 +52,7 @@ function Initialize(Plugin)
 	PM:BindCommand("/fill",    "debuggers", HandleFill,            "- Fills all block entities in current chunk with junk");
 	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
+	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 
 	Plugin:AddWebTab("Debuggers", HandleRequest_Debuggers);
 
@@ -61,10 +64,43 @@ function Initialize(Plugin)
 	-- TestBlockAreas();
 	-- TestSQLiteBindings();
 	-- TestExpatBindings();
-
+	TestPluginCalls();
+	
 	return true
 end;
 
+
+
+
+
+function TestPluginCalls()
+	-- In order to test the inter-plugin communication, we're going to call Core's ReturnColorFromChar() function
+	-- It is a rather simple function that doesn't need any tables as its params and returns a value, too
+	-- Note the signature: function ReturnColorFromChar( Split, char ) ... return cChatColog.Gray ... end
+	-- The Split parameter should be a table, but it is not used in that function anyway,
+	-- so we can get away with passing nil to it.
+	
+	-- Use the old, deprecated and unsafe method:
+	local Core = cPluginManager:Get():GetPlugin("Core")
+	if (Core ~= nil) then
+		LOGINFO("Calling Core::ReturnColorFromChar() the old-fashioned way...")
+		local Gray = Core:Call("ReturnColorFromChar", nil, "8")
+		if (Gray ~= cChatColor.Gray) then
+			LOGWARNING("Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
+		else
+			LOGINFO("Call succeeded")
+		end
+	end
+	
+	-- Use the new method:
+	LOGINFO("Calling Core::ReturnColorFromChar() the recommended way...")
+	local Gray = cPluginManager:CallPlugin("Core", "ReturnColorFromChar", nil, "8")
+	if (Gray ~= cChatColor.Gray) then
+		LOGWARNING("Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
+	else
+		LOGINFO("Call succeeded")
+	end
+end
 
 
 
@@ -524,6 +560,14 @@ end
 
 
 
+function OnPluginsLoaded()
+	LOG("All plugins loaded");
+end
+
+
+
+
+
 function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	-- Get the topmost block coord:
 	local Height = a_ChunkDesc:GetHeight(0, 0);
@@ -532,7 +576,6 @@ function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
 	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
 	if (BlockEntity ~= nil) then
-		LOG("Setting sign lines...");
 		local SignEntity = tolua.cast(BlockEntity, "cSignEntity");
 		SignEntity:SetLines("Chunk:", tonumber(a_ChunkX) .. ", " .. tonumber(a_ChunkZ), "", "(Debuggers)");
 	end
@@ -946,9 +989,73 @@ end
 
 
 
+function HandleSched(a_Split, a_Player)
+	local World = a_Player:GetWorld()
+	
+	-- Schedule a broadcast of a countdown message:
+	for i = 1, 10 do
+		World:ScheduleTask(i * 20,
+			function(a_World)
+				a_World:BroadcastChat("Countdown: " .. 11 - i)
+			end
+		)
+	end
+	
+	-- Schedule a broadcast of the final message and a note to the originating player
+	-- Note that we CANNOT us the a_Player in the callback - what if the player disconnected?
+	-- Therefore we store the player's EntityID
+	local PlayerID = a_Player:GetUniqueID()
+	World:ScheduleTask(220,
+		function(a_World)
+			a_World:BroadcastChat("Countdown: BOOM")
+			a_World:DoWithEntityByID(PlayerID,
+				function(a_Entity)
+					if (a_Entity:IsPlayer()) then
+						-- Although unlikely, it is possible that this player is not the originating player
+						-- However, I leave this as an excercise to you to fix this "bug"
+						local Player = tolua.cast(a_Entity, "cPlayer")
+						Player:SendMessage("Countdown finished")
+					end
+				end
+			)
+		end
+	)
+	
+	return true
+end
+
+
+
+
+
 function HandleRequest_Debuggers(a_Request)
 	local FolderContents = cFile:GetFolderContents("./");
 	return "<p>The following objects have been returned by cFile:GetFolderContents():<ul><li>" .. table.concat(FolderContents, "</li><li>") .. "</li></ul></p>";
+end
+
+
+
+
+
+function OnPluginMessage(a_Client, a_Channel, a_Message)
+	LOGINFO("Received a plugin message from client " .. a_Client:GetUsername() .. ": channel '" .. a_Channel .. "', message '" .. a_Message .. "'");
+	
+	if (a_Channel == "REGISTER") then
+		if (a_Message:find("WECUI")) then
+			-- The client has WorldEditCUI mod installed, test the comm by sending a few WECUI messages:
+			--[[
+			WECUI messages have the following generic format:
+			<shape>|<params>
+			If shape is p (cuboid selection), the params are sent individually for each corner click and have the following format:
+			<point-index>|<x>|<y>|<z>|<volume>
+			point-index is 0 or 1 (lclk / rclk)
+			volume is the 3D volume of the current cuboid selected (all three coords' deltas multiplied), including the edge blocks; -1 if N/A
+			--]]
+			-- Select a 51 * 51 * 51 block cuboid:
+			a_Client:SendPluginMessage("WECUI", "p|0|50|50|50|-1");
+			a_Client:SendPluginMessage("WECUI", "p|1|100|100|100|132651");  -- 132651 = 51 * 51 * 51
+		end
+	end
 end
 
 

@@ -60,23 +60,23 @@ class cBlockEntity;
 
 
 
-/// Encapsulates a Lua state and provides some syntactic sugar for common operations
+/** Encapsulates a Lua state and provides some syntactic sugar for common operations */
 class cLuaState
 {
 public:
 
-	/// Used for storing references to object in the global registry
+	/** Used for storing references to object in the global registry */
 	class cRef
 	{
 	public:
-		/// Creates a reference in the specified LuaState for object at the specified StackPos
+		/** Creates a reference in the specified LuaState for object at the specified StackPos */
 		cRef(cLuaState & a_LuaState, int a_StackPos);
 		~cRef();
 		
-		/// Returns true if the reference is valid
+		/** Returns true if the reference is valid */
 		bool IsValid(void) const {return (m_Ref != LUA_REFNIL); }
 		
-		/// Allows to use this class wherever an int (i. e. ref) is to be used
+		/** Allows to use this class wherever an int (i. e. ref) is to be used */
 		operator int(void) const { return m_Ref; }
 		
 	protected:
@@ -85,7 +85,24 @@ public:
 	} ;
 	
 	
-	/// A dummy class that's used only to delimit function args from return values for cLuaState::Call()
+	/** Used for calling functions stored in a reference-stored table */
+	class cTableRef
+	{
+		int m_TableRef;
+		const char * m_FnName;
+	public:
+		cTableRef(int a_TableRef, const char * a_FnName) :
+			m_TableRef(a_TableRef),
+			m_FnName(a_FnName)
+		{
+		}
+		
+		int GetTableRef(void) const { return m_TableRef; }
+		const char * GetFnName(void) const { return m_FnName; }
+	} ;
+	
+	
+	/** A dummy class that's used only to delimit function args from return values for cLuaState::Call() */
 	class cRet
 	{
 	} ;
@@ -106,22 +123,22 @@ public:
 	
 	~cLuaState();
 	
-	/// Allows this object to be used in the same way as a lua_State *, for example in the LuaLib functions
+	/** Allows this object to be used in the same way as a lua_State *, for example in the LuaLib functions */
 	operator lua_State * (void) { return m_LuaState; }
 	
-	/// Creates the m_LuaState, if not closed already. This state will be automatically closed in the destructor
+	/** Creates the m_LuaState, if not closed already. This state will be automatically closed in the destructor */
 	void Create(void);
 	
-	/// Closes the m_LuaState, if not closed already
+	/** Closes the m_LuaState, if not closed already */
 	void Close(void);
 	
-	/// Attaches the specified state. Operations will be carried out on this state, but it will not be closed in the destructor
+	/** Attaches the specified state. Operations will be carried out on this state, but it will not be closed in the destructor */
 	void Attach(lua_State * a_State);
 	
-	/// Detaches a previously attached state.
+	/** Detaches a previously attached state. */
 	void Detach(void);
 	
-	/// Returns true if the m_LuaState is valid
+	/** Returns true if the m_LuaState is valid */
 	bool IsValid(void) const { return (m_LuaState != NULL); }
 	
 	/** Loads the specified file
@@ -130,27 +147,9 @@ public:
 	*/
 	bool LoadFile(const AString & a_FileName);
 	
-	/// Returns true if a_FunctionName is a valid Lua function that can be called
+	/** Returns true if a_FunctionName is a valid Lua function that can be called */
 	bool HasFunction(const char * a_FunctionName);
 	
-	/** Pushes the function of the specified name onto the stack.
-	Returns true if successful. Logs a warning on failure (incl. m_SubsystemName)
-	*/
-	bool PushFunction(const char * a_FunctionName);
-	
-	/** Pushes a function that has been saved into the global registry, identified by a_FnRef.
-	Returns true if successful. Logs a warning on failure
-	*/
-	bool PushFunction(int a_FnRef);
-	
-	/** Pushes a function that is stored in a table ref.
-	Returns true if successful, false on failure. Doesn't log failure.
-	*/
-	bool PushFunctionFromRefTable(cRef & a_TableRef, const char * a_FnName);
-	
-	/// Pushes a usertype of the specified class type onto the stack
-	void PushUserType(void * a_Object, const char * a_Type);
-
 	// Push a value onto the stack
 	void Push(const AString & a_String);
 	void Push(const AStringVector & a_Vector);
@@ -165,6 +164,7 @@ public:
 	void Push(cMonster * a_Monster);
 	void Push(cItem * a_Item);
 	void Push(cItems * a_Items);
+	void Push(const cItems & a_Items);
 	void Push(cClientHandle * a_ClientHandle);
 	void Push(cPickup * a_Pickup);
 	void Push(cChunkDesc * a_ChunkDesc);
@@ -177,13 +177,12 @@ public:
 	void Push(cWebAdmin * a_WebAdmin);
 	void Push(const HTTPTemplateRequest * a_Request);
 	void Push(cTNTEntity * a_TNTEntity);
-	void Push(cCreeper * a_Creeper);
 	void Push(Vector3i * a_Vector);
 	void Push(void * a_Ptr);
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cBlockEntity * a_BlockEntity);
-	
-	/// Call any 0-param 0-return Lua function in a single line:
+
+	/** Call any 0-param 0-return Lua function in a single line: */
 	template <typename FnT>
 	bool Call(FnT a_FnName)
 	{
@@ -194,7 +193,7 @@ public:
 		return CallFunction(0);
 	}
 
-	/// Call any 1-param 0-return Lua function in a single line:
+	/** Call any 1-param 0-return Lua function in a single line: */
 	template<
 		typename FnT,
 		typename ArgT1
@@ -209,7 +208,7 @@ public:
 		return CallFunction(0);
 	}
 
-	/// Call any 2-param 0-return Lua function in a single line:
+	/** Call any 2-param 0-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2
 	>
@@ -224,7 +223,7 @@ public:
 		return CallFunction(0);
 	}
 
-	/// Call any 3-param 0-return Lua function in a single line:
+	/** Call any 3-param 0-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3
 	>
@@ -240,12 +239,34 @@ public:
 		return CallFunction(0);
 	}
 
-	/// Call any 1-param 1-return Lua function in a single line:
+	/** Call any 0-param 1-return Lua function in a single line: */
+	template<
+		typename FnT, typename RetT1
+	>
+	bool Call(FnT a_FnName, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		UNUSED(a_Mark);
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
+
+	/** Call any 1-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		int InitialTop = lua_gettop(m_LuaState);
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -257,15 +278,17 @@ public:
 		}
 		GetReturn(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
+		ASSERT(InitialTop == lua_gettop(m_LuaState));
 		return true;
 	}
 
-	/// Call any 2-param 1-return Lua function in a single line:
+	/** Call any 2-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -281,12 +304,13 @@ public:
 		return true;
 	}
 
-	/// Call any 3-param 1-return Lua function in a single line:
+	/** Call any 3-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -303,12 +327,13 @@ public:
 		return true;
 	}
 	
-	/// Call any 4-param 1-return Lua function in a single line:
+	/** Call any 4-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -326,12 +351,13 @@ public:
 		return true;
 	}
 	
-	/// Call any 5-param 1-return Lua function in a single line:
+	/** Call any 5-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -350,13 +376,14 @@ public:
 		return true;
 	}
 	
-	/// Call any 6-param 1-return Lua function in a single line:
+	/** Call any 6-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -376,13 +403,14 @@ public:
 		return true;
 	}
 	
-	/// Call any 7-param 1-return Lua function in a single line:
+	/** Call any 7-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename ArgT7, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -403,13 +431,14 @@ public:
 		return true;
 	}
 	
-	/// Call any 8-param 1-return Lua function in a single line:
+	/** Call any 8-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename ArgT7, typename ArgT8, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -431,13 +460,14 @@ public:
 		return true;
 	}
 	
-	/// Call any 9-param 1-return Lua function in a single line:
+	/** Call any 9-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename ArgT7, typename ArgT8, typename ArgT9, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -460,13 +490,14 @@ public:
 		return true;
 	}
 	
-	/// Call any 10-param 1-return Lua function in a single line:
+	/** Call any 10-param 1-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename ArgT7, typename ArgT8, typename ArgT9, typename ArgT10, typename RetT1
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, ArgT10 a_Arg10, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -490,12 +521,13 @@ public:
 		return true;
 	}
 	
-	/// Call any 1-param 2-return Lua function in a single line:
+	/** Call any 1-param 2-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename RetT1, typename RetT2
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -511,12 +543,13 @@ public:
 		return true;
 	}
 
-	/// Call any 2-param 2-return Lua function in a single line:
+	/** Call any 2-param 2-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename RetT1, typename RetT2
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -533,13 +566,14 @@ public:
 		return true;
 	}
 
-	/// Call any 3-param 2-return Lua function in a single line:
+	/** Call any 3-param 2-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3,
 		typename RetT1, typename RetT2
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -557,13 +591,14 @@ public:
 		return true;
 	}
 
-	/// Call any 4-param 2-return Lua function in a single line:
+	/** Call any 4-param 2-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4,
 		typename RetT1, typename RetT2
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -582,13 +617,14 @@ public:
 		return true;
 	}
 
-	/// Call any 5-param 2-return Lua function in a single line:
+	/** Call any 5-param 2-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
 		typename RetT1, typename RetT2
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -608,7 +644,7 @@ public:
 		return true;
 	}
 
-	/// Call any 6-param 2-return Lua function in a single line:
+	/** Call any 6-param 2-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
 		typename ArgT6,
@@ -616,6 +652,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -636,7 +673,7 @@ public:
 		return true;
 	}
 
-	/// Call any 7-param 2-return Lua function in a single line:
+	/** Call any 7-param 2-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
 		typename ArgT6, typename ArgT7,
@@ -644,6 +681,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -665,7 +703,7 @@ public:
 		return true;
 	}
 
-	/// Call any 7-param 3-return Lua function in a single line:
+	/** Call any 7-param 3-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
 		typename ArgT6, typename ArgT7,
@@ -673,6 +711,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -695,7 +734,7 @@ public:
 		return true;
 	}
 
-	/// Call any 8-param 3-return Lua function in a single line:
+	/** Call any 8-param 3-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
 		typename ArgT6, typename ArgT7, typename ArgT8,
@@ -703,6 +742,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -726,7 +766,7 @@ public:
 		return true;
 	}
 
-	/// Call any 9-param 5-return Lua function in a single line:
+	/** Call any 9-param 5-return Lua function in a single line: */
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
 		typename ArgT6, typename ArgT7, typename ArgT8, typename ArgT9, 
@@ -734,6 +774,7 @@ public:
 	>
 	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3, RetT4 & a_Ret4, RetT5 & a_Ret5)
 	{
+		UNUSED(a_Mark);
 		if (!PushFunction(a_FnName))
 		{
 			return false;
@@ -761,16 +802,113 @@ public:
 	}
 
 
-	/// Retrieve value returned at a_StackPos, if it is a valid bool. If not, a_ReturnedVal is unchanged
+	/** Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions */
+	bool CheckParamUserTable(int a_StartParam, const char * a_UserTable, int a_EndParam = -1);
+	
+	/** Returns true if the specified parameters on the stack are of the specified usertype; also logs warning if not. Used for regular functions */
+	bool CheckParamUserType(int a_StartParam, const char * a_UserType, int a_EndParam = -1);
+	
+	/** Returns true if the specified parameters on the stack are tables; also logs warning if not */
+	bool CheckParamTable(int a_StartParam, int a_EndParam = -1);
+	
+	/** Returns true if the specified parameters on the stack are numbers; also logs warning if not */
+	bool CheckParamNumber(int a_StartParam, int a_EndParam = -1);
+	
+	/** Returns true if the specified parameters on the stack are strings; also logs warning if not */
+	bool CheckParamString(int a_StartParam, int a_EndParam = -1);
+	
+	/** Returns true if the specified parameters on the stack are functions; also logs warning if not */
+	bool CheckParamFunction(int a_StartParam, int a_EndParam = -1);
+	
+	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
+	bool CheckParamEnd(int a_Param);
+	
+	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
+	bool ReportErrors(int status);
+	
+	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
+	static bool ReportErrors(lua_State * a_LuaState, int status);
+	
+	/** Logs all items in the current stack trace to the server console */
+	void LogStackTrace(void);
+	
+	/** Logs all items in the current stack trace to the server console */
+	static void LogStackTrace(lua_State * a_LuaState);
+	
+	/** Returns the type of the item on the specified position in the stack */
+	AString GetTypeText(int a_StackPos);
+	
+	/** Calls the function specified by its name, with arguments copied off the foreign state.
+	If successful, keeps the return values on the stack and returns their number.
+	If unsuccessful, returns a negative number and keeps the stack position unchanged. */
+	int CallFunctionWithForeignParams(
+		const AString & a_FunctionName,
+		cLuaState & a_SrcLuaState,
+		int a_SrcParamStart,
+		int a_SrcParamEnd
+	);
+	
+	/** Copies objects on the stack from the specified state.
+	Only numbers, bools, strings and userdatas are copied.
+	If successful, returns the number of objects copied.
+	If failed, returns a negative number and rewinds the stack position. */
+	int CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd);
+	
+	/** Reads the value at the specified stack position as a string and sets it to a_String. */
+	void ToString(int a_StackPos, AString & a_String);
+
+	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
+	void LogStack(const char * a_Header);
+	
+	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
+	static void LogStack(lua_State * a_LuaState, const char * a_Header = NULL);
+	
+protected:
+	lua_State * m_LuaState;
+	
+	/** If true, the state is owned by this object and will be auto-Closed. False => attached state */
+	bool m_IsOwned;
+	
+	/** The subsystem name is used for reporting errors to the console, it is either "plugin %s" or "LuaScript"
+	whatever is given to the constructor
+	*/
+	AString m_SubsystemName;
+	
+	/** Name of the currently pushed function (for the Push / Call chain) */
+	AString m_CurrentFunctionName;
+	
+	/** Number of arguments currently pushed (for the Push / Call chain) */
+	int m_NumCurrentFunctionArgs;
+
+
+	/** Pushes the function of the specified name onto the stack.
+	Returns true if successful. Logs a warning on failure (incl. m_SubsystemName)
+	*/
+	bool PushFunction(const char * a_FunctionName);
+	
+	/** Pushes a function that has been saved into the global registry, identified by a_FnRef.
+	Returns true if successful. Logs a warning on failure
+	*/
+	bool PushFunction(int a_FnRef);
+	
+	/** Pushes a function that is stored in a referenced table by name
+	Returns true if successful. Logs a warning on failure
+	*/
+	bool PushFunction(const cTableRef & a_TableRef);
+	
+	/** Pushes a usertype of the specified class type onto the stack */
+	void PushUserType(void * a_Object, const char * a_Type);
+
+	/** Retrieve value returned at a_StackPos, if it is a valid bool. If not, a_ReturnedVal is unchanged */
 	void GetReturn(int a_StackPos, bool & a_ReturnedVal);
 	
-	/// Retrieve value returned at a_StackPos, if it is a valid string. If not, a_ReturnedVal is unchanged
+	/** Retrieve value returned at a_StackPos, if it is a valid string. If not, a_ReturnedVal is unchanged */
 	void GetReturn(int a_StackPos, AString & a_ReturnedVal);
 	
-	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
+	/** Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged */
 	void GetReturn(int a_StackPos, int & a_ReturnedVal);
 	
-	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
+	/** Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged */
 	void GetReturn(int a_StackPos, double & a_ReturnedVal);
 	
 	/**
@@ -780,52 +918,8 @@ public:
 	*/
 	bool CallFunction(int a_NumReturnValues);
 	
-	/// Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions
-	bool CheckParamUserTable(int a_StartParam, const char * a_UserTable, int a_EndParam = -1);
-	
-	/// Returns true if the specified parameters on the stack are of the specified usertype; also logs warning if not. Used for regular functions
-	bool CheckParamUserType(int a_StartParam, const char * a_UserType, int a_EndParam = -1);
-	
-	/// Returns true if the specified parameters on the stack are tables; also logs warning if not
-	bool CheckParamTable(int a_StartParam, int a_EndParam = -1);
-	
-	/// Returns true if the specified parameters on the stack are numbers; also logs warning if not
-	bool CheckParamNumber(int a_StartParam, int a_EndParam = -1);
-	
-	/// Returns true if the specified parameters on the stack are strings; also logs warning if not
-	bool CheckParamString(int a_StartParam, int a_EndParam = -1);
-	
-	/// Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters)
-	bool CheckParamEnd(int a_Param);
-	
-	/// If the status is nonzero, prints the text on the top of Lua stack and returns true
-	bool ReportErrors(int status);
-	
-	/// If the status is nonzero, prints the text on the top of Lua stack and returns true
-	static bool ReportErrors(lua_State * a_LuaState, int status);
-	
-	/// Logs all items in the current stack trace to the server console
-	void LogStackTrace(void);
-	
-	/// Returns the type of the item on the specified position in the stack
-	AString GetTypeText(int a_StackPos);
-	
-protected:
-	lua_State * m_LuaState;
-	
-	/// If true, the state is owned by this object and will be auto-Closed. False => attached state
-	bool m_IsOwned;
-	
-	/** The subsystem name is used for reporting errors to the console, it is either "plugin %s" or "LuaScript"
-	whatever is given to the constructor
-	*/
-	AString m_SubsystemName;
-	
-	/// Name of the currently pushed function (for the Push / Call chain)
-	AString m_CurrentFunctionName;
-	
-	/// Number of arguments currently pushed (for the Push / Call chain)
-	int m_NumCurrentFunctionArgs;
+	/** Used as the error reporting function for function calls */
+	static int ReportFnCallErrors(lua_State * a_LuaState);
 } ;
 
 

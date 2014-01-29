@@ -91,28 +91,6 @@ bool cItem::DamageItem(short a_Amount)
 
 
 
-bool cItem::IsStackableWith(const cItem & a_OtherStack) const
-{
-	if (a_OtherStack.m_ItemType != m_ItemType)
-	{
-		return false;
-	}
-	if (a_OtherStack.m_ItemDamage != m_ItemDamage)
-	{
-		return false;
-	}
-	if (a_OtherStack.m_Enchantments != m_Enchantments)
-	{
-		return false;
-	}
-	
-	return true;
-}
-
-
-
-
-
 bool cItem::IsFullStack(void) const
 {
 	return (m_ItemCount >= ItemHandler(m_ItemType)->GetMaxStackSize());
@@ -153,6 +131,14 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 		{
 			a_OutValue["ench"] = Enchantments;
 		}
+		if (!IsCustomNameEmpty())
+		{
+			a_OutValue["Name"] = m_CustomName;
+		}
+		if (!IsLoreEmpty())
+		{
+			a_OutValue["Lore"] = m_Lore;
+		}
 	}
 }
 
@@ -169,6 +155,8 @@ void cItem::FromJson(const Json::Value & a_Value)
 		m_ItemDamage = (short)a_Value.get("Health", -1 ).asInt();
 		m_Enchantments.Clear();
 		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
+		m_CustomName = a_Value.get("Name", "").asString();
+		m_Lore = a_Value.get("Lore", "").asString();
 	}
 }
 
@@ -246,7 +234,7 @@ void cItems::Delete(int a_Idx)
 
 
 
-void cItems::Set(int a_Idx, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemDamage)
+void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage)
 {
 	if ((a_Idx < 0) || (a_Idx >= (int)size()))
 	{

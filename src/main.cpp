@@ -19,6 +19,16 @@ bool g_SERVER_TERMINATED = false; // Set to true when the server terminates, so 
 
 
 
+/** If set to true, the protocols will log each player's incoming (C->S) communication to a per-connection logfile */
+bool g_ShouldLogCommIn;
+
+/** If set to true, the protocols will log each player's outgoing (S->C) communication to a per-connection logfile */
+bool g_ShouldLogCommOut;
+
+
+
+
+
 /// If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window
 #define ENABLE_LEAK_FINDER
 
@@ -47,8 +57,26 @@ void NonCtrlHandler(int a_Signal)
 		case SIGSEGV:
 		{
 			std::signal(SIGSEGV, SIG_DFL);
-			LOGWARN("Segmentation fault; MCServer has crashed :(");
+			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
+			LOGERROR("Details | SIGSEGV: Segmentation fault");
 			exit(EXIT_FAILURE);
+		}
+		case SIGABRT:
+		#ifdef SIGABRT_COMPAT
+		case SIGABRT_COMPAT:
+		#endif
+		{
+			std::signal(a_Signal, SIG_DFL);
+			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
+			LOGERROR("Details | SIGABRT: Server self-terminated due to an internal fault");
+			exit(EXIT_FAILURE);
+			break;
+		}
+		case SIGINT:
+		case SIGTERM:
+		{
+			std::signal(a_Signal, SIG_IGN); // Server is shutting down, wait for it...
+			break;
 		}
 		default: break;
 	}
@@ -200,11 +228,44 @@ int main( int argc, char **argv )
 	#ifndef _DEBUG
 	std::signal(SIGSEGV, NonCtrlHandler);
 	std::signal(SIGTERM, NonCtrlHandler);
-	std::signal(SIGINT, NonCtrlHandler);
+	std::signal(SIGINT,  NonCtrlHandler);
+	std::signal(SIGABRT, NonCtrlHandler);
+	#ifdef SIGABRT_COMPAT
+	std::signal(SIGABRT_COMPAT, NonCtrlHandler);
+	#endif // SIGABRT_COMPAT
 	#endif
 
 	// DEBUG: test the dumpfile creation:
 	// *((int *)0) = 0;
+	
+	// Check if comm logging is to be enabled:
+	for (int i = 0; i < argc; i++)
+	{
+		if (
+			(NoCaseCompare(argv[i], "/commlog") == 0) ||
+			(NoCaseCompare(argv[i], "/logcomm") == 0)
+		)
+		{
+			g_ShouldLogCommIn = true;
+			g_ShouldLogCommOut = true;
+		}
+		if (
+			(NoCaseCompare(argv[i], "/commlogin") == 0) ||
+			(NoCaseCompare(argv[i], "/comminlog") == 0) ||
+			(NoCaseCompare(argv[i], "/logcommin") == 0)
+		)
+		{
+			g_ShouldLogCommIn = true;
+		}
+		if (
+			(NoCaseCompare(argv[i], "/commlogout") == 0) ||
+			(NoCaseCompare(argv[i], "/commoutlog") == 0) ||
+			(NoCaseCompare(argv[i], "/logcommout") == 0)
+		)
+		{
+			g_ShouldLogCommOut = true;
+		}
+	}
 	
 	#if !defined(ANDROID_NDK)
 	try

@@ -29,6 +29,7 @@ if "a%ftpsite%" == "a" (
 :: Create the API documentation by running the server and stopping it right after it starts:
 
 cd MCServer
+copy /Y settings_apidump.ini settings.ini
 echo stop | MCServer
 cd ..
 
@@ -38,7 +39,7 @@ cd ..
 
 :: Upload the API to the web:
 
-ncftpput -p %ftppass% -u %ftpuser% -T temp_ %ftpsite% /LuaAPI MCServer/API/*.*
+ncftpput -p %ftppass% -u %ftpuser% -T temp_ -R %ftpsite% /LuaAPI MCServer/API/*.*
 if errorlevel 1 goto haderror
 echo Upload finished.
 

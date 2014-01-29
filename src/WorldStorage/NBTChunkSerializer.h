@@ -21,6 +21,7 @@ class cEntity;
 class cBlockEntity;
 class cBoat;
 class cChestEntity;
+class cCommandBlockEntity;
 class cDispenserEntity;
 class cDropperEntity;
 class cFurnaceEntity;
@@ -92,6 +93,7 @@ protected:
 	void AddJukeboxEntity  (cJukeboxEntity *   a_Jukebox);
 	void AddNoteEntity     (cNoteEntity *      a_Note);
 	void AddSignEntity     (cSignEntity *      a_Sign);
+	void AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock);
 	
 	// Entities:
 	void AddBasicEntity       (cEntity * a_Entity, const AString & a_ClassName);

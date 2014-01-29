@@ -504,3 +504,11 @@ end
 
 
 
+
+function post_output_hook()
+	print("Bindings have been generated.")
+end
+
+
+
+
