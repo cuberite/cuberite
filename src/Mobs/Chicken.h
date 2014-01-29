@@ -19,10 +19,13 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
+	bool    IsBegging     (void) const { return m_IsBegging; }
+
 private:
 
 
 	int m_EggDropTimer;
+	bool    m_IsBegging;
 } ;
 
 

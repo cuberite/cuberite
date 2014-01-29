@@ -21,11 +21,13 @@ public:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
+	bool IsBegging(void) const { return m_IsBegging; }
 	bool IsSheared(void) const { return m_IsSheared; }
 	int GetFurColor(void) const { return m_WoolColor; }
 
 private:
-	
+
+	bool m_IsBegging;	
 	bool m_IsSheared;
 	int m_WoolColor;
 	int m_TimeToStopEating;
