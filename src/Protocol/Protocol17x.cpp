@@ -1433,7 +1433,7 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 	}
 	
 	// If auth is required, then send the encryption request:
-	// if (cRoot::Get()->GetServer()->ShouldAuthenticate())
+	if (cRoot::Get()->GetServer()->ShouldAuthenticate())
 	{
 		cPacketizer Pkt(*this, 0x01);
 		Pkt.WriteString(cRoot::Get()->GetServer()->GetServerID());
