@@ -19,14 +19,13 @@ public:
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+
+	virtual const cItem GetFollowedItem(void) const override { return cItem(E_ITEM_CARROT); }
 
 	bool IsSaddled(void) const { return m_bIsSaddled; }
-	bool    IsBegging     (void) const { return m_IsBegging; }
 
 private:
 
-	bool m_IsBegging;
 	bool m_bIsSaddled;
 
 } ;

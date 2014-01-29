@@ -71,33 +71,5 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 	}
 }
 
-void cPig::Tick(float a_Dt, cChunk & a_Chunk)
-{
-	super::Tick(a_Dt, a_Chunk);
-	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
-	if (a_Closest_Player != NULL)
-	{
-		if (a_Closest_Player->GetEquippedItem().m_ItemType == E_ITEM_CARROT)
-		{
-			if (!IsBegging())
-			{
-				m_IsBegging = true;
-				m_World->BroadcastEntityMetadata(*this);
-			}
-			Vector3d PlayerPos = a_Closest_Player->GetPosition();
-			PlayerPos.y++;
-			m_FinalDestination = PlayerPos;
-		}
-		else
-		{
-			if (IsBegging())
-			{
-				m_IsBegging = false;
-				m_World->BroadcastEntityMetadata(*this);
-			}
-		}
-	}
-}
-
 
 
