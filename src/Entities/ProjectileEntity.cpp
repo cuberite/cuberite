@@ -711,8 +711,6 @@ void cFireworkEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 	SetSpeed(0, 0, 0);
 	SetPosition(GetPosX(), GetPosY() - 0.5, GetPosZ());
 
-	std::cout << a_HitPos.x << " " << a_HitPos.y << " " << a_HitPos.z << std::endl;
-
 	m_IsInGround = true;
 
 	BroadcastMovementUpdate();
