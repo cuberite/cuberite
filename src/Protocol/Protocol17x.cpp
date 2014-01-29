@@ -985,10 +985,11 @@ void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteShort((short)a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
-	Pkt.WriteString(a_Line1);
-	Pkt.WriteString(a_Line2);
-	Pkt.WriteString(a_Line3);
-	Pkt.WriteString(a_Line4);
+	// Need to send only up to 15 chars, otherwise the client crashes (#598)
+	Pkt.WriteString(a_Line1.substr(0, 15));
+	Pkt.WriteString(a_Line2.substr(0, 15));
+	Pkt.WriteString(a_Line3.substr(0, 15));
+	Pkt.WriteString(a_Line4.substr(0, 15));
 }
 
 
