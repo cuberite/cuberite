@@ -88,36 +88,55 @@ bool cPluginLua::Initialize(void)
 
 	std::string PluginPath = FILE_IO_PREFIX + GetLocalFolder() + "/";
 
-	// Load all files for this plugin, and execute them
+	// List all Lua files for this plugin. Info.lua has a special handling - make it the last to load:
 	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
-
-	int numFiles = 0;
-	for (AStringVector::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
+	AStringVector LuaFiles;
+	bool HasInfoLua = false;
+	for (AStringVector::const_iterator itr = Files.begin(), end = Files.end(); itr != end; ++itr)
 	{
-		if (itr->rfind(".lua") == AString::npos)
+		if (itr->rfind(".lua") != AString::npos)
 		{
-			continue;
+			if (*itr == "Info.lua")
+			{
+				HasInfoLua = true;
+			}
+			else
+			{
+				LuaFiles.push_back(*itr);
+			}
 		}
-		AString Path = PluginPath + *itr;
-		if (!m_LuaState.LoadFile(Path))
-		{
-			Close();
-			return false;
-		} 
-		else 
-		{
-			numFiles++;
-		}
-	}  // for itr - Files[]
-
-	if (numFiles == 0)
+	}
+	std::sort(LuaFiles.begin(), LuaFiles.end());
+	
+	// Warn if there are no Lua files in the plugin folder:
+	if (LuaFiles.empty())
 	{
 		LOGWARNING("No lua files found: plugin %s is missing.", GetName().c_str());
 		Close();
 		return false;
 	}
 
-	// Call intialize function
+	// Load all files in the list, including the Info.lua as last, if it exists:
+	for (AStringVector::const_iterator itr = LuaFiles.begin(), end = LuaFiles.end(); itr != end; ++itr)
+	{
+		AString Path = PluginPath + *itr;
+		if (!m_LuaState.LoadFile(Path))
+		{
+			Close();
+			return false;
+		}
+	}  // for itr - Files[]
+	if (HasInfoLua)
+	{
+		AString Path = PluginPath + "Info.lua";
+		if (!m_LuaState.LoadFile(Path))
+		{
+			Close();
+			return false;
+		}
+	}
+
+	// Call the Initialize function:
 	bool res = false;
 	if (!m_LuaState.Call("Initialize", this, cLuaState::Return, res))
 	{
@@ -125,7 +144,6 @@ bool cPluginLua::Initialize(void)
 		Close();
 		return false;
 	}
-
 	if (!res)
 	{
 		LOGINFO("Plugin %s: Initialize() call failed, plugin is temporarily disabled.", GetName().c_str());
