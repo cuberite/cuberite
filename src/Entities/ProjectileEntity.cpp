@@ -679,7 +679,8 @@ super(pkExpBottle, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 
 void cExpBottleEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
 {
-	// TODO: Spawn experience orbs
+	// Spawn an experience orb with a reward between 3 and 11.
+	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), 3 + m_World->GetTickRandomNumber(8));
 
 	Destroy();
 }
