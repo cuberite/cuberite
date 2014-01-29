@@ -68,7 +68,6 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 
 void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
 	// The sheep should not move when he's eating so only handle the physics.
 	if (m_TimeToStopEating > 0)
 	{
@@ -96,27 +95,27 @@ void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 				m_TimeToStopEating = 40;
 			}
 		}
-	}
-	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
-	if (a_Closest_Player != NULL)
-	{
-		if (a_Closest_Player->GetEquippedItem().m_ItemType == E_ITEM_WHEAT)
+		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
+		if (a_Closest_Player != NULL)
 		{
-			if (!IsBegging())
+			if (a_Closest_Player->GetEquippedItem().m_ItemType == E_ITEM_WHEAT)
 			{
-				m_IsBegging = true;
-				m_World->BroadcastEntityMetadata(*this);
+				if (!IsBegging())
+				{
+					m_IsBegging = true;
+					m_World->BroadcastEntityMetadata(*this);
+				}
+				Vector3d PlayerPos = a_Closest_Player->GetPosition();
+				PlayerPos.y++;
+				m_FinalDestination = PlayerPos;
 			}
-			Vector3d PlayerPos = a_Closest_Player->GetPosition();
-			PlayerPos.y++;
-			m_FinalDestination = PlayerPos;
-		}
-		else
-		{
-			if (IsBegging())
+			else
 			{
-				m_IsBegging = false;
-				m_World->BroadcastEntityMetadata(*this);
+				if (IsBegging())
+				{
+					m_IsBegging = false;
+					m_World->BroadcastEntityMetadata(*this);
+				}
 			}
 		}
 	}
