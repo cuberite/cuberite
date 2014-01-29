@@ -119,13 +119,51 @@ void cMCLogger::LogSimple(const char* a_Text, int a_LogType /* = 0 */ )
 
 
 
-void cMCLogger::Log(const char * a_Format, va_list a_ArgList)
+void cMCLogger::Log(const char * a_Format, va_list a_ArgList, bool a_ShouldReplaceLine)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor(csRegular);
-	m_Log->Log(a_Format, a_ArgList);
-	ResetColor();
-	puts("");
+
+	if (!m_BeginLineUpdate && a_ShouldReplaceLine)
+	{
+		a_ShouldReplaceLine = false; // Print a normal line first if this is the initial replace line
+		m_BeginLineUpdate = true;
+	}
+	else if (m_BeginLineUpdate && !a_ShouldReplaceLine)
+	{
+		m_BeginLineUpdate = false;
+	}
+
+	if (a_ShouldReplaceLine)
+	{
+#ifdef _WIN32
+		HANDLE Output = GetStdHandle(STD_OUTPUT_HANDLE);
+
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		GetConsoleScreenBufferInfo(Output, &csbi);
+
+		COORD Position = { 0, csbi.dwCursorPosition.Y - 1 }; // Move cursor up one line
+		SetConsoleCursorPosition(Output, Position);
+
+		SetColor(csRegular);
+		m_Log->Log(a_Format, a_ArgList, a_ShouldReplaceLine);
+		ResetColor();
+
+		Position = { 0, csbi.dwCursorPosition.Y }; // Set cursor to original position
+		SetConsoleCursorPosition(Output, Position);
+#else // _WIN32
+		fputs("\033[1A", stdout); // Move cursor up one line
+		SetColor(csRegular);
+		m_Log->Log(a_Format, a_ArgList, a_ShouldReplaceLine);
+		ResetColor();
+#endif
+	}
+	else
+	{
+		SetColor(csRegular);
+		m_Log->Log(a_Format, a_ArgList, a_ShouldReplaceLine);
+		ResetColor();
+		puts("");
+	}
 }
 
 
@@ -188,7 +226,7 @@ void cMCLogger::SetColor(eColorScheme a_Scheme)
 			default: ASSERT(!"Unhandled color scheme");
 		}
 		SetConsoleTextAttribute(g_Console, Attrib);
-	#elif defined(__linux) && !defined(ANDROID_NDK)
+	#elif (defined(__linux) || defined(__apple)) && !defined(ANDROID_NDK)
 		switch (a_Scheme)
 		{
 			case csRegular: printf("\x1b[0m");         break;  // Whatever the console default is
@@ -223,6 +261,14 @@ void cMCLogger::ResetColor(void)
 
 //////////////////////////////////////////////////////////////////////////
 // Global functions
+
+void LOGREPLACELINE(const char* a_Format, ...)
+{
+	va_list argList;
+	va_start(argList, a_Format);
+	cMCLogger::GetInstance()->Log(a_Format, argList, true);
+	va_end(argList);
+}
 
 void LOG(const char* a_Format, ...)
 {
