@@ -25,7 +25,7 @@
 			</p>
 			<p>
 			Next, we must obtain a copy of CoreMessaging.lua. This can be found
-			<a href="https://raw.github.com/mc-server/MCServer/master/MCServer/Plugins/MagicCarpet/coremessaging.lua">here.</a>
+			<a href="https://gist.github.com/bearbin/8715888">here.</a>
 			This is used to provide messaging support that is compliant with MCServer standards.
 			</p>
 			<h2>Creating the basic template</h2>
@@ -35,18 +35,13 @@
 			Format it like so:
 			</p>
 			<pre class="prettyprint lang-lua">
-local PLUGIN
+PLUGIN = nil
 
 function Initialize(Plugin)
-	Plugin:SetName("DerpyPlugin")
+	Plugin:SetName("NewPlugin")
 	Plugin:SetVersion(1)
 	
 	PLUGIN = Plugin
-
-	-- Hooks
-
-	local PluginManager = cPluginManager:Get()
-	-- Command bindings
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	return true
@@ -84,7 +79,7 @@ end
 			To register a hook, insert the following code template into the "-- Hooks" area in the previous code example.
 			</p>
 			<pre class="prettyprint lang-lua">
-cPluginManager:AddHook(cPluginManager.HOOK_NAME_HERE, FunctionNameToBeCalled)
+cPluginManager.AddHook(cPluginManager.HOOK_NAME_HERE, FunctionNameToBeCalled)
 			</pre>
 			<p>
 			What does this code do?
@@ -102,10 +97,7 @@ function Initialize(Plugin)
 	Plugin:SetName("DerpyPlugin")
 	Plugin:SetVersion(1)
 
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
-
-	local PluginManager = cPluginManager:Get()
-	-- Command bindings
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	return true
@@ -127,10 +119,10 @@ end
 			</p>
 			<pre class="prettyprint lang-lua">
 -- ADD THIS IF COMMAND DOES NOT REQUIRE A PARAMETER (/explode)
-PluginManager:BindCommand("/commandname", "permissionnode", FunctionToCall, " - Description of command")
+PluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " - Description of command")
 
 -- ADD THIS IF COMMAND DOES REQUIRE A PARAMETER (/explode Notch)
-PluginManager:BindCommand("/commandname", "permissionnode", FunctionToCall, " ~ Description of command and parameter(s)")
+PluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " ~ Description of command and parameter(s)")
 			</pre>
 			<p>
 			What does it do, and why are there two?
