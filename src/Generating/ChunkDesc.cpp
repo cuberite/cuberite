@@ -562,6 +562,31 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
+void cChunkDesc::UpdateHeightmap(void)
+{
+	for (int x = 0; x < cChunkDef::Width; x++)
+	{
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			int Height = 0;
+			for (int y = cChunkDef::Height - 1; y > 0; y--)
+			{
+				BLOCKTYPE BlockType = GetBlockType(x, y, z);
+				if (BlockType != E_BLOCK_AIR)
+				{
+					Height = y;
+					break;
+				}
+			}  // for y
+			SetHeight(x, z, Height);
+		}  // for z
+	}  // for x
+}
+
+
+
+
+
 void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 {
 	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();
