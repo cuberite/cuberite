@@ -1876,6 +1876,13 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 	{
 		return;
 	}
+	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
+	AString OwnerName = a_NBT.GetString(OwnerIdx);
+	if (OwnerName != "")
+	{
+		Monster->SetOwner(OwnerName);
+		Monster->SetIsTame(true);
+	}
 
 	a_Entities.push_back(Monster.release());
 }
