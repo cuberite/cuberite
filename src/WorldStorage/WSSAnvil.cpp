@@ -1877,7 +1877,7 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		return;
 	}
 	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
-	if (TypeIdx < 0) 
+	if (OwnerIdx < 0) 
 	{ 
 		return;
 	}
