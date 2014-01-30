@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockID.h"
@@ -234,7 +233,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
-#ifdef _arm_
+#ifdef __arm__
 	m_StorageCompressionFactor(0),
 #else
 	m_StorageCompressionFactor(6),
