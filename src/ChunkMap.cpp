@@ -1235,10 +1235,10 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 
 void cChunkMap::SetBlock(cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 {
-	cChunkInterface *ChunkInterface = new cChunkInterface(this);
+	cChunkInterface ChunkInterface(this);
 	if (a_BlockType == E_BLOCK_AIR)
 	{
-		BlockHandler(GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnDestroyed(ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
+		BlockHandler(GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnDestroyed(&ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
 	}
 
 	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
@@ -1251,8 +1251,7 @@ void cChunkMap::SetBlock(cWorldInterface * a_WorldInterface, int a_BlockX, int a
 		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
 		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
 	}
-	BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-	delete ChunkInterface;
+	BlockHandler(a_BlockType)->OnPlaced(&ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 
 

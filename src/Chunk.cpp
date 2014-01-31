@@ -753,7 +753,7 @@ void cChunk::BroadcastPendingBlockChanges(void)
 
 
 
-void cChunk::CheckBlocks(void)
+void cChunk::CheckBlocks()
 {
 	if (m_ToTickBlocks.size() == 0)
 	{
@@ -762,13 +762,15 @@ void cChunk::CheckBlocks(void)
 	std::vector<unsigned int> ToTickBlocks;
 	std::swap(m_ToTickBlocks, ToTickBlocks);
 	
+	cChunkInterface ChunkInterface(m_World->GetChunkMap());
+	
 	for (std::vector<unsigned int>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
 	{
 		unsigned int index = (*itr);
 		Vector3i BlockPos = IndexToCoordinate(index);
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(index));
-		Handler->Check(BlockPos.x, BlockPos.y, BlockPos.z, *this);
+		Handler->Check(&ChunkInterface, BlockPos.x, BlockPos.y, BlockPos.z, *this);
 	}  // for itr - ToTickBlocks[]
 }
 

@@ -440,7 +440,7 @@ private:
 	void BroadcastPendingBlockChanges(void);
 	
 	/// Checks the block scheduled for checking in m_ToTickBlocks[]
-	void CheckBlocks(void);
+	void CheckBlocks();
 	
 	/// Ticks several random blocks in the chunk
 	void TickBlocks(void);

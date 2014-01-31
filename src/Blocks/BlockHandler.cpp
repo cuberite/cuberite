@@ -268,7 +268,7 @@ void cBlockHandler::OnUpdate(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a
 
 
 
-void cBlockHandler::OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cBlockHandler::OnPlacedByPlayer(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 }
 
@@ -284,7 +284,7 @@ void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int
 
 
 
-void cBlockHandler::OnPlaced(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cBlockHandler::OnPlaced(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	// Notify the neighbors
 	NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY, a_BlockZ);
@@ -400,7 +400,7 @@ const char * cBlockHandler::GetStepSound()
 
 
 
-bool cBlockHandler::CanBeAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
+bool cBlockHandler::CanBeAt(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
 {
 	return true;
 }
@@ -445,9 +445,9 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 
-void cBlockHandler::Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
+void cBlockHandler::Check(cChunkInterface * a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
 {
-	if (!CanBeAt(a_RelX, a_RelY, a_RelZ, a_Chunk))
+	if (!CanBeAt(a_ChunkInterface, a_RelX, a_RelY, a_RelZ, a_Chunk))
 	{
 		if (DoesDropOnUnsuitable())
 		{

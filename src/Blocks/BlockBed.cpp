@@ -23,7 +23,7 @@ void cBlockBedHandler::OnPlacedByPlayer(
 
 
 
-void cBlockBedHandler::OnDestroyed(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockBedHandler::OnDestroyed(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 

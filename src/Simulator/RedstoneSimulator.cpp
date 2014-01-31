@@ -747,7 +747,8 @@ void cRedstoneSimulator::HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
 		{
-			cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
+			cChunkInterface ChunkInterface(m_World.GetChunkMap());
+			cBlockDoorHandler::ChangeDoor(&ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
 		}
 	}
@@ -755,7 +756,8 @@ void cRedstoneSimulator::HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
 		{
-			cBlockDoorHandler::ChangeDoor(&m_World, a_BlockX, a_BlockY, a_BlockZ);
+			cChunkInterface ChunkInterface(m_World.GetChunkMap());
+			cBlockDoorHandler::ChangeDoor(&ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}

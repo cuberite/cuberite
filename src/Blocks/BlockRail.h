@@ -42,9 +42,9 @@ public:
 	}
 
 
-	virtual void OnPlaced(cChunkInterface *a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual void OnPlaced(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
-		super::OnPlaced(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+		super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 
 		// Alert diagonal rails
 		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY + 1, a_BlockZ);
@@ -92,7 +92,7 @@ public:
 	}
 
 
-	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY <= 0)
 		{

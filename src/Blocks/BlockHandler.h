@@ -40,11 +40,11 @@ public:
 	);
 
 	/// Called by cWorld::SetBlock() after the block has been set
-	virtual void OnPlaced(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	virtual void OnPlaced(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	
 	/// Called by cClientHandle::HandlePlaceBlock() after the player has placed a new block. Called after OnPlaced().
 	virtual void OnPlacedByPlayer(
-		cWorld * a_World, cPlayer * a_Player, 
+		cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer * a_Player, 
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
@@ -78,7 +78,7 @@ public:
 	virtual const char * GetStepSound(void);
 	
 	/// Checks if the block can stay at the specified relative coords in the chunk
-	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk);
+	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk);
 	
 	/** Checks if the block can be placed at this point.
 	Default: CanBeAt(...) 
@@ -113,7 +113,7 @@ public:
 	By default drops if position no more suitable (CanBeAt(), DoesDropOnUnsuitable(), Drop()),
 	and wakes up all simulators on the block.
 	*/
-	virtual void Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
+	virtual void Check(cChunkInterface * ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 	
 	/// <summary>Rotates a given block meta counter-clockwise. Default: no change</summary>
 	/// <returns>Block meta following rotation</returns>

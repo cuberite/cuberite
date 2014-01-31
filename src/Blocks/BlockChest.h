@@ -66,7 +66,7 @@ public:
 	
 
 	virtual void OnPlacedByPlayer(
-		cChunkInterface * a_ChunkInterface, cPlayer * a_Player, 
+		cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer * a_Player, 
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
@@ -110,8 +110,13 @@ public:
 		return "step.wood";
 	}
 	
+	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk) override
+	{
+		return CanBeAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+	}
+
 	
-	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		cBlockArea Area;
 		if (!Area.Read(a_ChunkInterface, a_BlockX - 2, a_BlockX + 2, a_BlockY, a_BlockY, a_BlockZ - 2, a_BlockZ + 2))
@@ -206,7 +211,7 @@ public:
 	
 	
 	/// If there's a chest in the a_Area in the specified coords, modifies its meta to a_NewMeta and returns true.
-	bool CheckAndAdjustNeighbor(cChunkInterface * a_ChunkInterface, const cBlockArea & a_Area, int a_RelX, int a_RelZ, NIBBLETYPE a_NewMeta) override
+	bool CheckAndAdjustNeighbor(cChunkInterface * a_ChunkInterface, const cBlockArea & a_Area, int a_RelX, int a_RelZ, NIBBLETYPE a_NewMeta)
 	{
 		if (a_Area.GetRelBlockType(a_RelX, 0, a_RelZ) != E_BLOCK_CHEST)
 		{

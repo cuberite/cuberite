@@ -635,7 +635,7 @@ public:
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
 	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
+	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
 	int SpawnMobFinalize(cMonster* a_Monster);
 	
 	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise */

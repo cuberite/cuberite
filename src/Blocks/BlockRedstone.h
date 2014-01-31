@@ -18,7 +18,7 @@ public:
 	}
 	
 
-	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		return ((a_RelY > 0) && g_BlockFullyOccupiesVoxel[a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)]);
 	}

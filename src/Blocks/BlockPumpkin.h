@@ -14,7 +14,7 @@ public:
 	{
 	}
 	
-	virtual void OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual void OnPlacedByPlayer(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
 		// Check whether the pumpkin is a part of a golem or a snowman
 		
@@ -24,16 +24,16 @@ public:
 			return;
 		}
 		
-		BLOCKTYPE BlockY1 = a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
-		BLOCKTYPE BlockY2 = a_World->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ);
+		BLOCKTYPE BlockY1 = a_ChunkInterface->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
+		BLOCKTYPE BlockY2 = a_ChunkInterface->GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ);
 		
 		// Check for a snow golem:
 		if ((BlockY1 == E_BLOCK_SNOW_BLOCK) && (BlockY2 == E_BLOCK_SNOW_BLOCK))
 		{
-			a_World->FastSetBlock(a_BlockX, a_BlockY,     a_BlockZ, E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX, a_BlockY - 2, a_BlockZ, E_BLOCK_AIR, 0);
-			a_World->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtSnowGolem);
+			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY,     a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY - 2, a_BlockZ, E_BLOCK_AIR, 0);
+			a_WorldInterface->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtSnowGolem);
 			return;
 		}
 		
@@ -46,40 +46,40 @@ public:
 		
 		// Now check both orientations for hands:
 		if (
-			(a_World->GetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK) &&
-			(a_World->GetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK)
+			(a_ChunkInterface->GetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK) &&
+			(a_ChunkInterface->GetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ) == E_BLOCK_IRON_BLOCK)
 		)
 		{
 			// Remove the iron blocks:
-			a_World->FastSetBlock(a_BlockX,     a_BlockY,     a_BlockZ, E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX,     a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX,     a_BlockY - 2, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX,     a_BlockY,     a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX,     a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX,     a_BlockY - 2, a_BlockZ, E_BLOCK_AIR, 0);
 			
 			// Spawn the golem:
-			a_World->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtIronGolem);
+			a_WorldInterface->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtIronGolem);
 		}
 		else if (
-			(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1) == E_BLOCK_IRON_BLOCK) &&
-			(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1) == E_BLOCK_IRON_BLOCK)
+			(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1) == E_BLOCK_IRON_BLOCK) &&
+			(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1) == E_BLOCK_IRON_BLOCK)
 		)
 		{
 			// Remove the iron blocks:
-			a_World->FastSetBlock(a_BlockX, a_BlockY,     a_BlockZ,     E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ,     E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1, E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1, E_BLOCK_AIR, 0);
-			a_World->FastSetBlock(a_BlockX, a_BlockY - 2, a_BlockZ,     E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY,     a_BlockZ,     E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ,     E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1, E_BLOCK_AIR, 0);
+			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY - 2, a_BlockZ,     E_BLOCK_AIR, 0);
 			
 			// Spawn the golem:
-			a_World->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtIronGolem); 
+			a_WorldInterface->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtIronGolem); 
 		}
 	}
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
+		cChunkInterface * a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta

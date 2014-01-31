@@ -23,6 +23,10 @@ public:
 		return m_ChunkMap->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 	}
 
+	bool GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+	{
+		return m_ChunkMap->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	}
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed.
 	*/
