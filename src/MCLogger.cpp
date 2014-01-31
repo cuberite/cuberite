@@ -150,7 +150,6 @@ void cMCLogger::Log(const char * a_Format, va_list a_ArgList, bool a_ShouldRepla
 		if (!m_Log->LogReplaceLine(a_Format, a_ArgList))
 		{
 			m_BeginLineUpdate = false;
-			puts("");
 		}
 		ResetColor();
 
@@ -162,7 +161,6 @@ void cMCLogger::Log(const char * a_Format, va_list a_ArgList, bool a_ShouldRepla
 		if (!m_Log->LogReplaceLine(a_Format, a_ArgList))
 		{
 			m_BeginLineUpdate = false;
-			puts("");
 		}
 		ResetColor();
 #endif
