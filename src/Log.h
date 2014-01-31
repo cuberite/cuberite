@@ -10,7 +10,7 @@ class cLog
 private:
 	FILE * m_File;
 	static cLog * s_Log;
-	size_t m_LastStringSize = 0;
+	size_t m_LastStringSize;
 public:
 	cLog(const AString & a_FileName);
 	~cLog();

@@ -11,10 +11,6 @@
 cMCLogger * cMCLogger::s_MCLogger = NULL;
 bool g_ShouldColorOutput = false;
 
-/** Flag to show whether a 'replace line' log command has been issued
-Used to decide when to put a newline */
-bool g_BeginLineUpdate = false;
-
 #ifdef _WIN32
 	#include <io.h>  // Needed for _isatty(), not available on Linux
 	
@@ -38,6 +34,7 @@ cMCLogger * cMCLogger::GetInstance(void)
 
 
 cMCLogger::cMCLogger(void)
+	: m_BeginLineUpdate(false)
 {
 	AString FileName;
 	Printf(FileName, "LOG_%d.txt", (int)time(NULL));
@@ -49,6 +46,7 @@ cMCLogger::cMCLogger(void)
 
 
 cMCLogger::cMCLogger(const AString & a_FileName)
+	: m_BeginLineUpdate(false)
 {
 	InitLog(a_FileName);
 }
@@ -127,14 +125,14 @@ void cMCLogger::Log(const char * a_Format, va_list a_ArgList, bool a_ShouldRepla
 {
 	cCSLock Lock(m_CriticalSection);
 
-	if (!g_BeginLineUpdate && a_ShouldReplaceLine)
+	if (!m_BeginLineUpdate && a_ShouldReplaceLine)
 	{
 		a_ShouldReplaceLine = false; // Print a normal line first if this is the initial replace line
-		g_BeginLineUpdate = true;
+		m_BeginLineUpdate = true;
 	}
-	else if (g_BeginLineUpdate && !a_ShouldReplaceLine)
+	else if (m_BeginLineUpdate && !a_ShouldReplaceLine)
 	{
-		g_BeginLineUpdate = false;
+		m_BeginLineUpdate = false;
 	}
 
 	if (a_ShouldReplaceLine)
