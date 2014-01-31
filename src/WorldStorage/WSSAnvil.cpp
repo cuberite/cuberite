@@ -1886,6 +1886,12 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 			Monster->SetIsTame(true);
 		}
 	}
+	int SittingIdx = a_NBT.FindChildByName(a_TagIdx, "Sitting");
+	if (SittingIdx > 0)
+	{
+		bool IsSitting = (a_NBT.GetByte(SittingIdx) > 0);
+		Monster->SetIsSitting(IsSitting);
+	}
 	a_Entities.push_back(Monster.release());
 }
 
