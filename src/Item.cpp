@@ -189,6 +189,112 @@ bool cItem::IsEnchantable(short item)
 
 
 
+void cItem::GetApplicableEnchantmentsForType(short a_ItemType, cEnchantmentsArray & a_Enchantments)
+{
+	LOGWARN("Get Enchantments");
+
+	if (ItemCategory::IsSword(a_ItemType))
+	{
+		a_Enchantments.push_back(cEnchantments("Sharpness=4"));
+		a_Enchantments.push_back(cEnchantments("Smite=5"));
+		a_Enchantments.push_back(cEnchantments("BaneOfArthropods=5"));
+		a_Enchantments.push_back(cEnchantments("Knockback=2"));
+		a_Enchantments.push_back(cEnchantments("FireAspect=2"));
+		a_Enchantments.push_back(cEnchantments("Looting=3"));
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+	}
+
+	else if (ItemCategory::IsPickaxe(a_ItemType))
+	{
+		a_Enchantments.push_back(cEnchantments("Efficiency=4"));
+		a_Enchantments.push_back(cEnchantments("SilkTouch=1"));
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+		a_Enchantments.push_back(cEnchantments("Fortune=3"));
+	}
+
+	else if (ItemCategory::IsAxe(a_ItemType))
+	{
+		a_Enchantments.push_back(cEnchantments("Efficiency=4"));
+		a_Enchantments.push_back(cEnchantments("SilkTouch=1"));
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+		a_Enchantments.push_back(cEnchantments("Fortune=3"));
+	}
+
+	else if (ItemCategory::IsShovel(a_ItemType))
+	{
+		a_Enchantments.push_back(cEnchantments("Efficiency=4"));
+		a_Enchantments.push_back(cEnchantments("SilkTouch=1"));
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+		a_Enchantments.push_back(cEnchantments("Fortune=3"));
+	}
+
+	else if (ItemCategory::IsHoe(a_ItemType))
+	{
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+	}
+
+	else if (ItemCategory::IsArmor(a_ItemType))
+	{
+		a_Enchantments.push_back(cEnchantments("Protection=4"));
+		a_Enchantments.push_back(cEnchantments("FireProtection=4"));
+		a_Enchantments.push_back(cEnchantments("BlastProtection=4"));
+		a_Enchantments.push_back(cEnchantments("ProjectileProtection=4"));
+		a_Enchantments.push_back(cEnchantments("Thorns=3"));
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+
+		if (ItemCategory::IsHelmet(a_ItemType))
+		{
+			a_Enchantments.push_back(cEnchantments("Respiration=3"));
+			a_Enchantments.push_back(cEnchantments("AquaAffinity=1"));
+		}
+
+		else if (ItemCategory::IsBoots(a_ItemType))
+		{
+			a_Enchantments.push_back(cEnchantments("FeatherFalling=4"));
+		}
+	}
+
+	//Bow
+	else if (a_ItemType == 261)
+	{
+		a_Enchantments.push_back(cEnchantments("Power=4"));
+		a_Enchantments.push_back(cEnchantments("Punch=2"));
+		a_Enchantments.push_back(cEnchantments("Flame=1"));
+		a_Enchantments.push_back(cEnchantments("Infinity=1"));
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+	}
+
+	//Fishing Rod
+	else if (a_ItemType == 346)
+	{
+		a_Enchantments.push_back(cEnchantments("LuckOfTheSea=3"));
+		a_Enchantments.push_back(cEnchantments("Lure=3"));
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+	}
+
+	//Shears
+	else if (a_ItemType == 359)
+	{
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+	}
+
+	//Flint and Steel 
+	else if (a_ItemType == 259)
+	{
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+	}
+
+	//Carrot on a Stick
+	else if (a_ItemType == 398)
+	{
+		a_Enchantments.push_back(cEnchantments("Unbreaking=3"));
+	}
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cItems:
 

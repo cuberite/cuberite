@@ -2453,4 +2453,40 @@ void cClientHandle::SocketClosed(void)
 
 
 
+void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
+{
+	//Get Item
+	cItem EnchantItem = m_Player->GetDraggingItem();
+	
+	cEnchantmentsArray enchantments;
+	cItem::GetApplicableEnchantmentsForType(EnchantItem.m_ItemType, enchantments);
+
+	m_Player->SendMessage(Printf("ItemType: %d", EnchantItem.m_ItemType));
+
+
+	m_Player->SendMessage(enchantments[1].ToString());
+
+	//shuffle enchantments (i don't know if this is good)
+	std::random_shuffle(enchantments.begin(), enchantments.end());
+
+	m_Player->SendMessage(enchantments[1].ToString());
+
+
+
+
+
+
+	//Enchant Item
+	EnchantItem.m_Enchantments.AddFromString(enchantments[1].ToString());
+
+	//Set Enchanted Item to Window Slot
+	m_Player->GetWindow()->SetSlot(*m_Player, 0, EnchantItem);
+
+	LOGWARN("Item enchanted!");
+}
+
+
+
+
+
 

@@ -133,6 +133,7 @@ protected:
 	virtual int ParseSlotSelected           (void);
 	virtual int ParseUpdateSign             (void);
 	virtual int ParseUseEntity              (void);
+	virtual int ParseEnchantItem            (void);
 	virtual int ParseWindowClick            (void);
 	virtual int ParseWindowClose            (void);
 	

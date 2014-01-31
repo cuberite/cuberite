@@ -1535,6 +1535,21 @@ int cProtocol125::ParseUseEntity(void)
 
 
 
+int cProtocol125::ParseEnchantItem(void)
+{
+	HANDLE_PACKET_READ(ReadByte, byte, WindowID);
+	HANDLE_PACKET_READ(ReadByte, byte, Enchantment);
+
+	// TODO: Enchant Handling for older Protocols
+
+
+	return PARSE_OK;
+}
+
+
+
+
+
 int cProtocol125::ParseWindowClick(void)
 {
 	HANDLE_PACKET_READ(ReadChar,    char,  WindowID);

@@ -1143,7 +1143,7 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return true;
 				case 0x0f: // Confirm transaction - not used in MCS
 				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
-				case 0x11: HandlePacketEnchanting             (a_ByteBuffer); return true;
+				case 0x11: HandlePacketEnchantItem            (a_ByteBuffer); return true;
 				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return true;
 				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
 				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return true;
@@ -1546,23 +1546,14 @@ void cProtocol172::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol172::HandlePacketEnchanting(cByteBuffer & a_ByteBuffer)
+void cProtocol172::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, WindowID);
 	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Enchantment);
 
-	LOGWARN("Enchantment Packet received!");
+	LOGWARN("Protocol 1.7: Enchantment Packet received!");
 
-	//Get Item from Window Slot
-	cItem EnchantItem = *m_Client->GetPlayer()->GetWindow()->GetSlot(*m_Client->GetPlayer(), 0);
-
-	//Enchant item with Sharpness 5
-	EnchantItem.m_Enchantments.SetLevel(cEnchantments::enchSharpness, 5);
-
-	//Set Enchanted Item to Window Slot
-	m_Client->GetPlayer()->GetWindow()->SetSlot(*m_Client->GetPlayer(), 0, EnchantItem);
-
-	LOGWARN("Item enchanted!");
+	m_Client->HandleEnchantItem(WindowID, Enchantment);
 
 }
 

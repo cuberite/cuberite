@@ -214,6 +214,9 @@ public:
 	
 	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
 	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
+
+	///Handle item enchanting
+	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
 	
 private:
 

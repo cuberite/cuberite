@@ -29,6 +29,9 @@ mapping each enchantment's id onto its level. ID may be either a number or the e
 Level value of 0 means no such enchantment, and it will not be stored in the m_Enchantments.
 Serialization will never put zero-level enchantments into the stringspec and will always use numeric IDs.
 */
+
+typedef std::vector<cEnchantments> cEnchantmentsArray;
+
 // tolua_begin
 class cEnchantments
 {
@@ -62,7 +65,7 @@ public:
 		enchLuckOfTheSea         = 61,
 		enchLure                 = 62,
 	} ;
-	
+
 	/// Creates an empty enchantments container
 	cEnchantments(void);
 	
