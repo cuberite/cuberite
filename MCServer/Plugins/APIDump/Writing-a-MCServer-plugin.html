@@ -119,10 +119,10 @@ end
 			</p>
 			<pre class="prettyprint lang-lua">
 -- ADD THIS IF COMMAND DOES NOT REQUIRE A PARAMETER (/explode)
-PluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " - Description of command")
+cPluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " - Description of command")
 
 -- ADD THIS IF COMMAND DOES REQUIRE A PARAMETER (/explode Notch)
-PluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " ~ Description of command and parameter(s)")
+cPluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " ~ Description of command and parameter(s)")
 			</pre>
 			<p>
 			What does it do, and why are there two?
@@ -189,8 +189,7 @@ function Initialize(Plugin)
 	Plugin:SetName("DerpyPluginThatBlowsPeopleUp")
 	Plugin:SetVersion(9001)
 
-	local PluginManager = cPluginManager:Get()
-	PluginManager:BindCommand("/explode", "derpyplugin.explode", Explode, " ~ Explode a player");
+	cPluginManager.BindCommand("/explode", "derpyplugin.explode", Explode, " ~ Explode a player");
 
 	cPluginManager:AddHook(cPluginManager.HOOK_COLLECTING_PICKUP, OnCollectingPickup)
 
