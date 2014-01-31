@@ -454,8 +454,8 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case cMonster::mtWolf:
 			{
-				// TODO:
-				// _X: CopyPasta error: m_Writer.AddInt("Profession", ((const cVillager *)a_Monster)->GetVilType());
+				m_Writer.AddString("Owner", ((const cWolf *)a_Monster)->GetOwner());
+				m_Writer.AddByte("Sitting", ((const cWolf *)a_Monster)->IsSitting()); 
 				break;
 			}
 			case cMonster::mtZombie:
