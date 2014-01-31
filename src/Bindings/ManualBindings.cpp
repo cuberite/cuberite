@@ -2131,26 +2131,40 @@ protected:
 
 static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 {
-	// cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)
+	/* Supported function signatures:
+	cLineBlockTracer:Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // Canonical
+	cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)
+	*/
+	
+	// If the first param is the cLineBlockTracer class, shift param index by one:
+	int idx = 1;
+	tolua_Error err;
+	if (tolua_isusertable(tolua_S, 1, "cLineBlockTracer", 0, &err))
+	{
+		idx = 2;
+	}
+	
+	// Check params:
 	cLuaState L(tolua_S);
 	if (
-		!L.CheckParamUserType(1, "cWorld") ||
-		!L.CheckParamTable   (2) ||
-		!L.CheckParamNumber  (3, 8) ||
-		!L.CheckParamEnd     (9)
+		!L.CheckParamUserType(idx, "cWorld") ||
+		!L.CheckParamTable   (idx + 1) ||
+		!L.CheckParamNumber  (idx + 2, idx + 7) ||
+		!L.CheckParamEnd     (idx + 8)
 	)
 	{
 		return 0;
 	}
 
-	cWorld * World = (cWorld *)tolua_tousertype(L, 1, NULL);
-	cLuaBlockTracerCallbacks Callbacks(L, 2);
-	double StartX = tolua_tonumber(L, 3, 0);
-	double StartY = tolua_tonumber(L, 4, 0);
-	double StartZ = tolua_tonumber(L, 5, 0);
-	double EndX   = tolua_tonumber(L, 6, 0);
-	double EndY   = tolua_tonumber(L, 7, 0);
-	double EndZ   = tolua_tonumber(L, 8, 0);
+	// Trace:
+	cWorld * World = (cWorld *)tolua_tousertype(L, idx, NULL);
+	cLuaBlockTracerCallbacks Callbacks(L, idx + 1);
+	double StartX = tolua_tonumber(L, idx + 2, 0);
+	double StartY = tolua_tonumber(L, idx + 3, 0);
+	double StartZ = tolua_tonumber(L, idx + 4, 0);
+	double EndX   = tolua_tonumber(L, idx + 5, 0);
+	double EndY   = tolua_tonumber(L, idx + 6, 0);
+	double EndZ   = tolua_tonumber(L, idx + 7, 0);
 	bool res = cLineBlockTracer::Trace(*World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ);
 	tolua_pushboolean(L, res ? 1 : 0);
 	return 1;
