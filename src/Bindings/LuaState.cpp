@@ -289,9 +289,13 @@ bool cLuaState::PushFunction(const cTableRef & a_TableRef)
 	if (lua_isnil(m_LuaState, -1) || !lua_isfunction(m_LuaState, -1))
 	{
 		// Not a valid function, bail out
-		lua_pop(m_LuaState, 2);
+		lua_pop(m_LuaState, 3);
 		return false;
 	}
+	
+	// Pop the table off the stack:
+	lua_remove(m_LuaState, -2);
+	
 	Printf(m_CurrentFunctionName, "<table-callback %s>", a_TableRef.GetFnName());
 	m_NumCurrentFunctionArgs = 0;
 	return true;

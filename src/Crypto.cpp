@@ -206,7 +206,7 @@ int cRSAPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 		ASSERT(!"Invalid a_DecryptedMaxLength!");
 		return -1;
 	}
-	if (a_PlainLength < m_Rsa.len)
+	if (a_EncryptedMaxLength < m_Rsa.len)
 	{
 		LOGD("%s: Invalid a_PlainLength: got %u, exp at least %u",
 			__FUNCTION__, (unsigned)a_PlainLength, (unsigned)(m_Rsa.len)
@@ -214,16 +214,90 @@ int cRSAPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 		ASSERT(!"Invalid a_PlainLength!");
 		return -1;
 	}
-	size_t DecryptedLength;
 	int res = rsa_pkcs1_encrypt(
-		&m_Rsa, ctr_drbg_random, &m_Ctr_drbg, RSA_PUBLIC,
+		&m_Rsa, ctr_drbg_random, &m_Ctr_drbg, RSA_PRIVATE,
 		a_PlainLength, a_PlainData, a_EncryptedData
 	);
 	if (res != 0)
 	{
 		return -1;
 	}
-	return (int)DecryptedLength;
+	return (int)m_Rsa.len;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cPublicKey:
+
+cPublicKey::cPublicKey(const AString & a_PublicKeyDER)
+{
+	pk_init(&m_Pk);
+	if (pk_parse_public_key(&m_Pk, (const Byte *)a_PublicKeyDER.data(), a_PublicKeyDER.size()) != 0)
+	{
+		ASSERT(!"Cannot parse PubKey");
+		return;
+	}
+	InitRnd();
+}
+
+
+
+
+
+cPublicKey::~cPublicKey()
+{
+	pk_free(&m_Pk);
+}
+
+
+
+
+
+int cPublicKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength)
+{
+	size_t DecryptedLen = a_DecryptedMaxLength;
+	int res = pk_decrypt(&m_Pk,
+		a_EncryptedData, a_EncryptedLength,
+		a_DecryptedData, &DecryptedLen, a_DecryptedMaxLength,
+		ctr_drbg_random, &m_Ctr_drbg
+	);
+	if (res != 0)
+	{
+		return res;
+	}
+	return (int)DecryptedLen;
+}
+
+
+
+
+
+int cPublicKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength)
+{
+	size_t EncryptedLength = a_EncryptedMaxLength;
+	int res = pk_encrypt(&m_Pk,
+		a_PlainData, a_PlainLength, a_EncryptedData, &EncryptedLength, a_EncryptedMaxLength,
+		ctr_drbg_random, &m_Ctr_drbg
+	);
+	if (res != 0)
+	{
+		return res;
+	}
+	return (int)EncryptedLength;
+}
+
+
+
+
+
+void cPublicKey::InitRnd(void)
+{
+	entropy_init(&m_Entropy);
+	const unsigned char pers[] = "rsa_genkey";
+	ctr_drbg_init(&m_Ctr_drbg, entropy_func, &m_Entropy, pers, sizeof(pers) - 1);
 }
 
 

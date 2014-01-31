@@ -30,7 +30,7 @@ class cChunkDesc
 public:
 	// tolua_end
 	
-	/// Uncompressed block metas, 1 meta per byte
+	/** Uncompressed block metas, 1 meta per byte */
 	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];
 	
 	cChunkDesc(int a_ChunkX, int a_ChunkZ);
@@ -56,6 +56,8 @@ public:
 	void       SetBiome(int a_RelX, int a_RelZ, int a_BiomeID);
 	EMCSBiome  GetBiome(int a_RelX, int a_RelZ);
 
+	// These operate on the heightmap, so they could get out of sync with the data
+	// Use UpdateHeightmap() to re-sync
 	void       SetHeight(int a_RelX, int a_RelZ, int a_Height);
 	int        GetHeight(int a_RelX, int a_RelZ);
 
@@ -71,16 +73,16 @@ public:
 	void SetUseDefaultFinish(bool a_bUseDefaultFinish);
 	bool IsUsingDefaultFinish(void) const;
 
-	/// Writes the block area into the chunk, with its origin set at the specified relative coords. Area's data overwrite everything in the chunk.
+	/** Writes the block area into the chunk, with its origin set at the specified relative coords. Area's data overwrite everything in the chunk. */
 	void WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ, cBlockArea::eMergeStrategy a_MergeStrategy = cBlockArea::msOverwrite);
 
-	/// Reads an area from the chunk into a cBlockArea, blocktypes and blockmetas
+	/** Reads an area from the chunk into a cBlockArea, blocktypes and blockmetas */
 	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);
 
-	/// Returns the maximum height value in the heightmap
+	/** Returns the maximum height value in the heightmap */
 	HEIGHTTYPE GetMaxHeight(void) const;
 	
-	/// Fills the relative cuboid with specified block; allows cuboid out of range of this chunk
+	/** Fills the relative cuboid with specified block; allows cuboid out of range of this chunk */
 	void FillRelCuboid(
 		int a_MinX, int a_MaxX,
 		int a_MinY, int a_MaxY,
@@ -88,7 +90,7 @@ public:
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 	);
 	
-	/// Fills the relative cuboid with specified block; allows cuboid out of range of this chunk
+	/** Fills the relative cuboid with specified block; allows cuboid out of range of this chunk */
 	void FillRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		FillRelCuboid(
@@ -99,7 +101,7 @@ public:
 		);
 	}
 	
-	/// Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk
+	/** Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk */
 	void ReplaceRelCuboid(
 		int a_MinX, int a_MaxX,
 		int a_MinY, int a_MaxY,
@@ -108,7 +110,7 @@ public:
 		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
 	);
 	
-	/// Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk
+	/** Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk */
 	void ReplaceRelCuboid(
 		const cCuboid & a_RelCuboid,
 		BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta,
@@ -124,7 +126,7 @@ public:
 		);
 	}
 
-	/// Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid out of range of this chunk
+	/** Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid out of range of this chunk */
 	void FloorRelCuboid(
 		int a_MinX, int a_MaxX,
 		int a_MinY, int a_MaxY,
@@ -132,7 +134,7 @@ public:
 		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
 	);
 	
-	/// Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid out of range of this chunk
+	/** Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid out of range of this chunk */
 	void FloorRelCuboid(
 		const cCuboid & a_RelCuboid,
 		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
@@ -146,7 +148,7 @@ public:
 		);
 	}
 	
-	/// Fills the relative cuboid with specified block with a random chance; allows cuboid out of range of this chunk
+	/** Fills the relative cuboid with specified block with a random chance; allows cuboid out of range of this chunk */
 	void RandomFillRelCuboid(
 		int a_MinX, int a_MaxX,
 		int a_MinY, int a_MaxY,
@@ -155,7 +157,7 @@ public:
 		int a_RandomSeed, int a_ChanceOutOf10k
 	);
 	
-	/// Fills the relative cuboid with specified block with a random chance; allows cuboid out of range of this chunk
+	/** Fills the relative cuboid with specified block with a random chance; allows cuboid out of range of this chunk */
 	void RandomFillRelCuboid(
 		const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
 		int a_RandomSeed, int a_ChanceOutOf10k
@@ -170,10 +172,14 @@ public:
 		);
 	}
 	
-	/// Returns the block entity at the specified coords.
-	/// If there is no block entity at those coords, tries to create one, based on the block type
-	/// If the blocktype doesn't support a block entity, returns NULL.
+	/** Returns the block entity at the specified coords.
+	If there is no block entity at those coords, tries to create one, based on the block type
+	If the blocktype doesn't support a block entity, returns NULL. */
 	cBlockEntity * GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ);
+	
+	/** Updates the heightmap to match the current contents.
+	Useful for plugins when writing custom block areas into the chunk */
+	void UpdateHeightmap(void);
 	
 	// tolua_end
 	
@@ -187,11 +193,11 @@ public:
 	inline cEntityList &             GetEntities              (void) { return m_Entities; }
 	inline cBlockEntityList &        GetBlockEntities         (void) { return m_BlockEntities; }
 	
-	/// Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte)
+	/** Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte) */
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
 	
 	#ifdef _DEBUG
-	/// Verifies that the heightmap corresponds to blocktype contents; if not, asserts on that column
+	/** Verifies that the heightmap corresponds to blocktype contents; if not, asserts on that column */
 	void VerifyHeightmap(void);
 	#endif  // _DEBUG
 	

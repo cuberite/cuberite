@@ -53,8 +53,14 @@ Implements the 1.7.x protocol classes:
 
 
 
+const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
+
+
+
+
+
 // fwd: main.cpp:
-extern bool g_ShouldLogComm;
+extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 
 
 
@@ -74,7 +80,7 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_IsEncrypted(false)
 {
 	// Create the comm log file, if so requested:
-	if (g_ShouldLogComm)
+	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
 	{
 		cFile::CreateFolder("CommLogs");
 		AString FileName = Printf("CommLogs/%x__%s.log", (unsigned)time(NULL), a_Client->GetIPString().c_str());
@@ -979,10 +985,11 @@ void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteShort((short)a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
-	Pkt.WriteString(a_Line1);
-	Pkt.WriteString(a_Line2);
-	Pkt.WriteString(a_Line3);
-	Pkt.WriteString(a_Line4);
+	// Need to send only up to 15 chars, otherwise the client crashes (#598)
+	Pkt.WriteString(a_Line1.substr(0, 15));
+	Pkt.WriteString(a_Line2.substr(0, 15));
+	Pkt.WriteString(a_Line3.substr(0, 15));
+	Pkt.WriteString(a_Line4.substr(0, 15));
 }
 
 
@@ -1083,7 +1090,7 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 {
 	// Write the incoming data into the comm log file:
-	if (g_ShouldLogComm)
+	if (g_ShouldLogCommIn)
 	{
 		if (m_ReceivedData.GetReadableSpace() > 0)
 		{
@@ -1092,9 +1099,10 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			m_ReceivedData.ReadAll(AllData);
 			m_ReceivedData.ResetRead();
 			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
+			ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
 			AString Hex;
 			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-			m_CommLogFile.Printf("Incoming data, %d (0x%x) bytes unparsed already present in buffer:\n%s\n",
+			m_CommLogFile.Printf("Incoming data, %d (0x%x) unparsed bytes already present in buffer:\n%s\n",
 				AllData.size(), AllData.size(), Hex.c_str()
 			);
 		}
@@ -1103,6 +1111,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
 			a_Size, a_Size, Hex.c_str()
 		);
+		m_CommLogFile.Flush();
 	}
 	
 	if (!m_ReceivedData.Write(a_Data, a_Size))
@@ -1119,12 +1128,14 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (!m_ReceivedData.ReadVarInt(PacketLen))
 		{
 			// Not enough data
-			return;
+			m_ReceivedData.ResetRead();
+			break;
 		}
 		if (!m_ReceivedData.CanReadBytes(PacketLen))
 		{
 			// The full packet hasn't been received yet
-			return;
+			m_ReceivedData.ResetRead();
+			break;
 		}
 		cByteBuffer bb(PacketLen + 1);
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
@@ -1137,11 +1148,11 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (!bb.ReadVarInt(PacketType))
 		{
 			// Not enough data
-			return;
+			break;
 		}
 
 		// Log the packet info into the comm log file:
-		if (g_ShouldLogComm)
+		if (g_ShouldLogCommIn)
 		{
 			AString PacketData;
 			bb.ReadAll(PacketData);
@@ -1173,7 +1184,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			#endif  // _DEBUG
 			
 			// Put a message in the comm log:
-			if (g_ShouldLogComm)
+			if (g_ShouldLogCommIn)
 			{
 				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
 			}
@@ -1189,7 +1200,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			);
 
 			// Put a message in the comm log:
-			if (g_ShouldLogComm)
+			if (g_ShouldLogCommIn)
 			{
 				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %d left) ^^^^^^\n\n\n",
 					1, bb.GetReadableSpace()
@@ -1200,7 +1211,24 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
 		}
-	}  // while (true)
+	}  // for(ever)
+	
+	// Log any leftover bytes into the logfile:
+	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
+	{
+		AString AllData;
+		int OldReadableSpace = m_ReceivedData.GetReadableSpace();
+		m_ReceivedData.ReadAll(AllData);
+		m_ReceivedData.ResetRead();
+		m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
+		ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
+		AString Hex;
+		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+		m_CommLogFile.Printf("There are %d (0x%x) bytes of non-parse-able data left in the buffer:\n%s",
+			m_ReceivedData.GetReadableSpace(), m_ReceivedData.GetReadableSpace(), Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
 }
 
 
@@ -1330,7 +1358,64 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {
-	// TODO: Add protocol encryption
+	short EncKeyLength, EncNonceLength;
+	a_ByteBuffer.ReadBEShort(EncKeyLength);
+	AString EncKey;
+	if (!a_ByteBuffer.ReadString(EncKey, EncKeyLength))
+	{
+		return;
+	}
+	a_ByteBuffer.ReadBEShort(EncNonceLength);
+	AString EncNonce;
+	if (!a_ByteBuffer.ReadString(EncNonce, EncNonceLength))
+	{
+		return;
+	}
+	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
+	{
+		LOGD("Too long encryption");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+
+	// Decrypt EncNonce using privkey
+	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+	int res = rsaDecryptor.Decrypt((const Byte *)EncNonce.data(), EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
+	if (res != 4)
+	{
+		LOGD("Bad nonce length: got %d, exp %d", res, 4);
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	if (ntohl(DecryptedNonce[0]) != (unsigned)(uintptr_t)this)
+	{
+		LOGD("Bad nonce value");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	
+	// Decrypt the symmetric encryption key using privkey:
+	Byte DecryptedKey[MAX_ENC_LEN];
+	res = rsaDecryptor.Decrypt((const Byte *)EncKey.data(), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
+	if (res != 16)
+	{
+		LOGD("Bad key length");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	
+	StartEncryption(DecryptedKey);
+
+	// Send login success:
+	{
+		cPacketizer Pkt(*this, 0x02);  // Login success packet
+		Pkt.WriteString(Printf("%d", m_Client->GetUniqueID()));  // TODO: proper UUID
+		Pkt.WriteString(m_Client->GetUsername());
+	}
+
+	m_State = 3;  // State = Game
+	m_Client->HandleLogin(4, m_Client->GetUsername());
 }
 
 
@@ -1342,11 +1427,23 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 	AString Username;
 	a_ByteBuffer.ReadVarUTF8String(Username);
 	
-	// TODO: Protocol encryption should be set up here if not localhost / auth
-	
 	if (!m_Client->HandleHandshake(Username))
 	{
 		// The client is not welcome here, they have been sent a Kick packet already
+		return;
+	}
+	
+	// If auth is required, then send the encryption request:
+	if (cRoot::Get()->GetServer()->ShouldAuthenticate())
+	{
+		cPacketizer Pkt(*this, 0x01);
+		Pkt.WriteString(cRoot::Get()->GetServer()->GetServerID());
+		const AString & PubKeyDer = cRoot::Get()->GetServer()->GetPublicKeyDER();
+		Pkt.WriteShort(PubKeyDer.size());
+		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
+		Pkt.WriteShort(4);
+		Pkt.WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+		m_Client->SetUsername(Username);
 		return;
 	}
 	
@@ -1861,6 +1958,27 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 
 
+void cProtocol172::StartEncryption(const Byte * a_Key)
+{
+	m_Encryptor.Init(a_Key, a_Key);
+	m_Decryptor.Init(a_Key, a_Key);
+	m_IsEncrypted = true;
+	
+	// Prepare the m_AuthServerID:
+	cSHA1Checksum Checksum;
+	const AString & ServerID = cRoot::Get()->GetServer()->GetServerID();
+	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
+	Checksum.Update(a_Key, 16);
+	Checksum.Update((const Byte *)cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	Byte Digest[20];
+	Checksum.Finalize(Digest);
+	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cProtocol172::cPacketizer:
 
@@ -1881,7 +1999,7 @@ cProtocol172::cPacketizer::~cPacketizer()
 	m_Out.CommitRead();
 	
 	// Log the comm into logfile:
-	if (g_ShouldLogComm)
+	if (g_ShouldLogCommOut)
 	{
 		AString Hex;
 		ASSERT(DataToSend.size() > 0);

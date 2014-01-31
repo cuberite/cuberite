@@ -73,5 +73,3 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 
 
 
-
-

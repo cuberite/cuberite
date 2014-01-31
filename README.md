@@ -12,7 +12,9 @@ Installation
 
 To install MCServer, you can either download the repository and compile it, or download a pre-compiled version.
 
-After you've cloned the repository, you probably want to pull down the submodules (core plugins, some dependencies). This can be achieved with `git submodule init` and then on a regular basis (to keep up to date) `git submodule update`.
+If you've cloned the repository using Git, you need to pull down the submodules (core plugins, some dependencies). This can be achieved with `git submodule init` and then on a regular basis (to keep up to date) `git submodule update`.
+
+If you downloaded a ZIP file of the sources instead, you will need to download PolarSSL, too, from https://github.com/polarssl/polarssl , and unpack it into the `lib/polarssl` folder. You will also need to manually download all the plugins that you want included.
 
 Compilation instructions are available in the COMPILING file.
 

@@ -813,6 +813,20 @@ cFile:Delete("/usr/bin/virus.exe");
 			},
 		},  -- cFile
 
+		cFloater =
+		{
+			Desc = [[
+				When a player uses his/her fishing rod it creates a floater entity. This class manages it.
+			]],
+			Functions =
+			{
+				CanPickup = { Params = "", Return = "bool", Notes = "Returns true if the floater gives an item when the player right clicks." },
+				GetAttachedMobID = { Params = "", Return = "EntityID", Notes = "A floater can get attached to an mob. When it is and this functions gets called it returns the mob ID. If it isn't attached to a mob it returns -1" },
+				GetOwnerID = { Params = "", Return = "EntityID", Notes = "Returns the EntityID of the player who owns the floater." },
+			},
+			Inherits = "cEntity",
+		},
+		
 		cGroup =
 		{
 			Desc = [[

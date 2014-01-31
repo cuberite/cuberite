@@ -54,6 +54,7 @@ public:
 	{
 		TestRead();
 		TestWrite();
+		TestWrap();
 	}
 	
 	void TestRead(void)
@@ -61,11 +62,11 @@ public:
 		cByteBuffer buf(50);
 		buf.Write("\x05\xac\x02\x00", 4);
 		UInt32 v1;
-		ASSERT(buf.ReadVarInt(v1) && (v1 == 5));
+		assert(buf.ReadVarInt(v1) && (v1 == 5));
 		UInt32 v2;
-		ASSERT(buf.ReadVarInt(v2) && (v2 == 300));
+		assert(buf.ReadVarInt(v2) && (v2 == 300));
 		UInt32 v3;
-		ASSERT(buf.ReadVarInt(v3) && (v3 == 0));
+		assert(buf.ReadVarInt(v3) && (v3 == 0));
 	}
 	
 	void TestWrite(void)
@@ -76,9 +77,30 @@ public:
 		buf.WriteVarInt(0);
 		AString All;
 		buf.ReadAll(All);
-		ASSERT(All.size() == 4);
-		ASSERT(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
+		assert(All.size() == 4);
+		assert(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
 	}
+	
+	void TestWrap(void)
+	{
+		cByteBuffer buf(3);
+		for (int i = 0; i < 1000; i++)
+		{
+			int FreeSpace = buf.GetFreeSpace();
+			assert(buf.GetReadableSpace() == 0);
+			assert(FreeSpace > 0);
+			assert(buf.Write("a", 1));
+			assert(buf.CanReadBytes(1));
+			assert(buf.GetReadableSpace() == 1);
+			unsigned char v = 0;
+			assert(buf.ReadByte(v));
+			assert(v == 'a');
+			assert(buf.GetReadableSpace() == 0);
+			buf.CommitRead();
+			assert(buf.GetFreeSpace() == FreeSpace);  // We're back to normal
+		}
+	}
+	
 } g_ByteBufferTest;
 
 #endif
@@ -159,7 +181,7 @@ bool cByteBuffer::Write(const char * a_Bytes, int a_Count)
 	int CurReadableSpace = GetReadableSpace();
 	int WrittenBytes = 0;
 	
-	if (GetFreeSpace() < a_Count)
+	if (CurFreeSpace < a_Count)
 	{
 		return false;
 	}
@@ -860,6 +882,7 @@ void cByteBuffer::CheckValid(void) const
 	ASSERT(m_WritePos >= 0);
 	ASSERT(m_WritePos < m_BufferSize);
 }
+
 
 
 
