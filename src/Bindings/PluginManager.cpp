@@ -673,27 +673,6 @@ bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX,
 
 
 
-bool cPluginManager::CallHookPlayerDestroying(cPlayer & a_Player)
-{
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_DESTROYING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
-	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-	{
-		if ((*itr)->OnPlayerDestroying(a_Player))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-
-
 bool cPluginManager::CallHookPlayerDestroyed(cPlayer & a_Player)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_DESTROYED);

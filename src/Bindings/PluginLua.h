@@ -64,7 +64,6 @@ public:
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) override;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
-	virtual bool OnPlayerDestroying         (cPlayer & a_Player) override;
 	virtual bool OnPlayerDestroyed          (cPlayer & a_Player) override;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) override;
 	virtual bool OnPlayerFished             (cPlayer & a_Player, const cItems & a_Reward) override;

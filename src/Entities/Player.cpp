@@ -120,7 +120,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 cPlayer::~cPlayer(void)
 {
-	cRoot::Get()->GetPluginManager()->CallHookPlayerDestroying(*this);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this);
 
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
 	
@@ -136,8 +136,6 @@ cPlayer::~cPlayer(void)
 	delete m_InventoryWindow;
 	
 	LOGD("Player %p deleted", this);
-
-	cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this);
 }
 
 
