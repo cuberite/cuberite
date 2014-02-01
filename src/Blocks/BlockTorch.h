@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../World.h"
+#include "../Chunk.h"
 
 
 

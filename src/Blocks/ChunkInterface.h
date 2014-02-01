@@ -3,6 +3,9 @@
 
 #include "../ChunkMap.h"
 #include "../ForEachChunkProvider.h"
+#include "WorldInterface.h"
+
+class cBlockHandler;
 
 class cChunkInterface : public cForEachChunkProvider
 {
@@ -68,6 +71,8 @@ public:
 	{
 		return m_ChunkMap->WriteBlockArea(a_Area, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
 	}
+	
+	bool DigBlock(cWorldInterface & a_WorldInterface, int a_X, int a_Y, int a_Z);
 	
 private:
 	cChunkMap * m_ChunkMap;

@@ -2,6 +2,9 @@
 #pragma once
 
 #include "BroadcastInterface.h"
+#include "../Mobs/Monster.h"
+
+class cItems;
 
 class cWorldInterface
 {

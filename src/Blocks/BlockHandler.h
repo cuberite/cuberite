@@ -3,7 +3,6 @@
 
 #include "../Defines.h"
 #include "../Item.h"
-#include "../Chunk.h"
 #include "WorldInterface.h"
 #include "ChunkInterface.h"
 
@@ -13,6 +12,7 @@
 
 // fwd:
 class cPlayer;
+class cChunk;
 
 
 
@@ -51,7 +51,7 @@ public:
 	);
 	
 	/// Called before the player has destroyed a block
-	virtual void OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called before a block gets destroyed / replaced with air
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ);

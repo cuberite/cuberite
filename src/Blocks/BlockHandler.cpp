@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Root.h"
 #include "../Bindings/PluginManager.h"
+#include "../Chunk.h"
 #include "BlockBed.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
@@ -276,7 +277,7 @@ void cBlockHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldI
 
 
 
-void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 

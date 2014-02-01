@@ -2,8 +2,8 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../World.h"
 #include "../Entities/Player.h"
+#include "Chunk.h"
 
 
 
