@@ -169,7 +169,7 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 		{
 			if (!IsAllowedBlock(Block))
 			{
-				itr->SecondData = true; // The new blocktype is not redstone; it must be queued to be removed from this list
+				itr->DataTwo = true; // The new blocktype is not redstone; it must be queued to be removed from this list
 			}
 			else
 			{
@@ -209,7 +209,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 
 	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(); dataitr != ChunkData.end();)
 	{
-		if (dataitr->SecondData)
+		if (dataitr->DataTwo)
 		{
 			dataitr = ChunkData.erase(dataitr);
 			continue;
