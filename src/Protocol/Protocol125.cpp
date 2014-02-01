@@ -94,6 +94,7 @@ enum
 	PACKET_INVENTORY_WHOLE           = 0x68,
 	PACKET_WINDOW_PROPERTY           = 0x69,
 	PACKET_CREATIVE_INVENTORY_ACTION = 0x6B,
+	PACKET_ENCHANT_ITEM              = 0x6C,
 	PACKET_UPDATE_SIGN               = 0x82,
 	PACKET_PLAYER_LIST_ITEM          = 0xC9,
 	PACKET_PLAYER_ABILITIES          = 0xca,
@@ -1170,6 +1171,7 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 		case PACKET_SLOT_SELECTED:             return ParseSlotSelected();
 		case PACKET_UPDATE_SIGN:               return ParseUpdateSign();
 		case PACKET_USE_ENTITY:                return ParseUseEntity();
+		case PACKET_ENCHANT_ITEM:              return ParseEnchantItem();
 		case PACKET_WINDOW_CLICK:              return ParseWindowClick();
 		case PACKET_WINDOW_CLOSE:              return ParseWindowClose();
 	}
@@ -1540,8 +1542,9 @@ int cProtocol125::ParseEnchantItem(void)
 	HANDLE_PACKET_READ(ReadByte, byte, WindowID);
 	HANDLE_PACKET_READ(ReadByte, byte, Enchantment);
 
-	// TODO: Enchant Handling for older Protocols
+	LOGWARN("Older Protocol: Enchantment Packet received!");
 
+	m_Client->HandleEnchantItem(WindowID, Enchantment);
 
 	return PARSE_OK;
 }
