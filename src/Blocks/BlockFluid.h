@@ -32,7 +32,7 @@ public:
 	}
 	
 	
-	virtual void Check(cChunkInterface * a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
+	virtual void Check(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
 		switch (m_BlockType)
 		{

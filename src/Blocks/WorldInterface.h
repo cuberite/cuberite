@@ -12,7 +12,7 @@ public:
 	
 	virtual eDimension GetDimension(void) const = 0;
 	
-	virtual cBroadcastInterface * GetBroadcastManager() = 0;
+	virtual cBroadcastInterface & GetBroadcastManager() = 0;
 	
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) = 0; 
 	

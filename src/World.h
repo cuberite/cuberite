@@ -186,9 +186,9 @@ public:
 	virtual void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 	void BroadcastWeather            (eWeather a_Weather, const cClientHandle * a_Exclude = NULL);
 	
-	virtual cBroadcastInterface * GetBroadcastManager()
+	virtual cBroadcastInterface & GetBroadcastManager()
 	{
-		return this;
+		return *this;
 	}
 	
 	/** If there is a block entity at the specified coords, sends it to the client specified */

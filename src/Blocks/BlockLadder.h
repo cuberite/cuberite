@@ -19,7 +19,7 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface * a_ChunkInterface, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -68,7 +68,7 @@ public:
 
 
 	/// Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_BOTTOM on failure
-	static char FindSuitableBlockFace(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	static char FindSuitableBlockFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		for (int Face = 2; Face <= 5; Face++)
 		{
@@ -81,7 +81,7 @@ public:
 	}
 	
 
-	static bool LadderCanBePlacedAt(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+	static bool LadderCanBePlacedAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
 		if ((a_BlockFace == BLOCK_FACE_BOTTOM) || (a_BlockFace == BLOCK_FACE_TOP))
 		{
@@ -90,11 +90,11 @@ public:
 
 		AddFaceDirection( a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
 
-		return g_BlockIsSolid[a_ChunkInterface->GetBlock(a_BlockX, a_BlockY, a_BlockZ)];
+		return g_BlockIsSolid[a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)];
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface,int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface,int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		// TODO: Use AdjustCoordsByMeta(), then cChunk::UnboundedRelGetBlock() and finally some comparison
 		char BlockFace = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));

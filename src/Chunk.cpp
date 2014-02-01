@@ -770,7 +770,7 @@ void cChunk::CheckBlocks()
 		Vector3i BlockPos = IndexToCoordinate(index);
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(index));
-		Handler->Check(&ChunkInterface, BlockPos.x, BlockPos.y, BlockPos.z, *this);
+		Handler->Check(ChunkInterface, BlockPos.x, BlockPos.y, BlockPos.z, *this);
 	}  // for itr - ToTickBlocks[]
 }
 

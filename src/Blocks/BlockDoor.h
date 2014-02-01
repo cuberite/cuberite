@@ -14,13 +14,13 @@ class cBlockDoorHandler :
 public:
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 
-	virtual void OnDestroyed(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void OnUse(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual const char * GetStepSound(void) override;
 	
 	
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface * a_ChunkInterface, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -33,8 +33,8 @@ public:
 		}
 
 		if (
-			!CanReplaceBlock(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY, a_BlockZ)) ||
-			!CanReplaceBlock(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))
+			!CanReplaceBlock(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)) ||
+			!CanReplaceBlock(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))
 		)
 		{
 			return false;
@@ -53,7 +53,7 @@ public:
 
 
 	virtual void OnPlacedByPlayer(
-		cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
@@ -66,7 +66,7 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
 	}
@@ -136,32 +136,32 @@ public:
 
 
 	/// Changes the door at the specified coords from open to close or vice versa
-	static void ChangeDoor(cChunkInterface * a_ChunkInterface, int a_X, int a_Y, int a_Z)
+	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_X, int a_Y, int a_Z)
 	{
-		NIBBLETYPE OldMetaData = a_ChunkInterface->GetBlockMeta(a_X, a_Y, a_Z);
+		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_X, a_Y, a_Z);
 		
-		a_ChunkInterface->SetBlockMeta(a_X, a_Y, a_Z, ChangeStateMetaData(OldMetaData));
+		a_ChunkInterface.SetBlockMeta(a_X, a_Y, a_Z, ChangeStateMetaData(OldMetaData));
 		
 		if (OldMetaData & 8)
 		{
 			// Current block is top of the door
-			BLOCKTYPE  BottomBlock = a_ChunkInterface->GetBlock(a_X, a_Y - 1, a_Z);
-			NIBBLETYPE BottomMeta  = a_ChunkInterface->GetBlockMeta(a_X, a_Y - 1, a_Z);
+			BLOCKTYPE  BottomBlock = a_ChunkInterface.GetBlock(a_X, a_Y - 1, a_Z);
+			NIBBLETYPE BottomMeta  = a_ChunkInterface.GetBlockMeta(a_X, a_Y - 1, a_Z);
 
 			if (IsDoor(BottomBlock) && !(BottomMeta & 8))
 			{
-				a_ChunkInterface->SetBlockMeta(a_X, a_Y - 1, a_Z, ChangeStateMetaData(BottomMeta));
+				a_ChunkInterface.SetBlockMeta(a_X, a_Y - 1, a_Z, ChangeStateMetaData(BottomMeta));
 			}
 		}
 		else
 		{
 			// Current block is bottom of the door
-			BLOCKTYPE  TopBlock = a_ChunkInterface->GetBlock(a_X, a_Y + 1, a_Z);
-			NIBBLETYPE TopMeta = a_ChunkInterface->GetBlockMeta(a_X, a_Y + 1, a_Z);
+			BLOCKTYPE  TopBlock = a_ChunkInterface.GetBlock(a_X, a_Y + 1, a_Z);
+			NIBBLETYPE TopMeta = a_ChunkInterface.GetBlockMeta(a_X, a_Y + 1, a_Z);
 
 			if (IsDoor(TopBlock) && (TopMeta & 8))
 			{
-				a_ChunkInterface->SetBlockMeta(a_X, a_Y + 1, a_Z, ChangeStateMetaData(TopMeta));
+				a_ChunkInterface.SetBlockMeta(a_X, a_Y + 1, a_Z, ChangeStateMetaData(TopMeta));
 			}
 		}
 	}

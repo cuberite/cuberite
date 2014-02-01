@@ -30,7 +30,7 @@ public:
 	}
 	
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface * a_ChunkInterface, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -42,7 +42,7 @@ public:
 	}
 
 
-	virtual void OnPlaced(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
 		super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 
@@ -59,7 +59,7 @@ public:
 	}
 
 
-	virtual void OnDestroyed(cChunkInterface * a_ChunkInterface, cWorldInterface * a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		super::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
 
@@ -76,12 +76,12 @@ public:
 	}
 
 
-	virtual void OnNeighborChanged(cChunkInterface *a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ) && (Meta != FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			a_ChunkInterface->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ));
+			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ));
 		}
 	}
 
@@ -92,7 +92,7 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface * a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY <= 0)
 		{
@@ -136,7 +136,7 @@ public:
 		return true;
 	}
 
-	NIBBLETYPE FindMeta(cChunkInterface *a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		NIBBLETYPE Meta = 0;
 		char RailsCnt = 0;
@@ -211,13 +211,13 @@ public:
 	}
 
 
-	bool IsUnstable(cChunkInterface * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	bool IsUnstable(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		if (!IsBlockRail(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
+		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			return false;
 		}
-		NIBBLETYPE Meta = a_ChunkInterface->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		switch (Meta)
 		{
 			case E_META_RAIL_ZM_ZP:
@@ -344,31 +344,31 @@ public:
 	}
 
 
-	bool IsNotConnected(cChunkInterface  * a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Pure = 0)
+	bool IsNotConnected(cChunkInterface  & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Pure = 0)
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);
 		NIBBLETYPE Meta;
-		if (!IsBlockRail(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
+		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			if (!IsBlockRail(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)) || (a_Pure != E_PURE_UPDOWN))
+			if (!IsBlockRail(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)) || (a_Pure != E_PURE_UPDOWN))
 			{
-				if (!IsBlockRail(a_ChunkInterface->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)) || (a_Pure == E_PURE_NONE))
+				if (!IsBlockRail(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)) || (a_Pure == E_PURE_NONE))
 				{
 					return true;
 				}
 				else
 				{
-					Meta = a_ChunkInterface->GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
+					Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
 				}
 			}
 			else
 			{
-				Meta = a_ChunkInterface->GetBlockMeta(a_BlockX, a_BlockY + 1, a_BlockZ);
+				Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY + 1, a_BlockZ);
 			}
 		}
 		else
 		{
-			Meta = a_ChunkInterface->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+			Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		}
 		
 		switch (a_BlockFace)

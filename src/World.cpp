@@ -1486,7 +1486,7 @@ int cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 
 void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlock(this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	m_ChunkMap->SetBlock(*this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 
 
@@ -1672,9 +1672,8 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
 {
 	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(GetBlock(a_X, a_Y, a_Z));
-	cChunkInterface *ChunkInterface = new cChunkInterface(GetChunkMap());
-	Handler->OnDestroyed(ChunkInterface, this, a_X, a_Y, a_Z);
-	delete ChunkInterface;
+	cChunkInterface ChunkInterface(GetChunkMap());
+	Handler->OnDestroyed(ChunkInterface, *this, a_X, a_Y, a_Z);
 	return m_ChunkMap->DigBlock(a_X, a_Y, a_Z);
 }
 
