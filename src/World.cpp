@@ -635,7 +635,7 @@ void cWorld::GenerateRandomSpawn(void)
 {
 	LOGD("Generating random spawnpoint...");
 
-	while (IsBlockWater(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ)))
+	while (IsBlockWater(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ), true))
 	{
 		if ((GetTickRandomNumber(4) % 2) == 0) // Randomise whether to increment X or Z coords
 		{

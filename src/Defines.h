@@ -254,9 +254,16 @@ inline bool IsValidItem(int a_ItemType)
 
 
 
-inline bool IsBlockWater(BLOCKTYPE a_BlockType)
+inline bool IsBlockWater(BLOCKTYPE a_BlockType, bool a_IncludeFrozenWater = false)
 {
-	return ((a_BlockType == E_BLOCK_WATER) || (a_BlockType == E_BLOCK_STATIONARY_WATER));
+	if (a_IncludeFrozenWater)
+	{
+		return ((a_BlockType == E_BLOCK_WATER) || (a_BlockType == E_BLOCK_STATIONARY_WATER) || (a_BlockType == E_BLOCK_ICE));
+	}
+	else
+	{
+		return ((a_BlockType == E_BLOCK_WATER) || (a_BlockType == E_BLOCK_STATIONARY_WATER));
+	}
 }
 
 
