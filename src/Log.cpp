@@ -9,7 +9,7 @@
 
 #ifdef __linux
 #include <sys/ioctl.h>
-#include <unistd.h>  
+#include <unistd.h>
 #endif // __linux
 
 
@@ -24,8 +24,7 @@
 cLog* cLog::s_Log = NULL;
 
 cLog::cLog(const AString & a_FileName )
-	: m_File(NULL),
-	m_LastStringSize(0)
+	: m_File(NULL)
 {
 	s_Log = this;
 
@@ -115,20 +114,22 @@ bool cLog::LogReplaceLine(const char * a_Format, va_list argList)
 	time(&rawtime);
 
 	struct tm* timeinfo;
-#ifdef _MSC_VER
-	struct tm timeinforeal;
-	timeinfo = &timeinforeal;
-	localtime_s(timeinfo, &rawtime);
-#else
-	timeinfo = localtime(&rawtime);
-#endif
+
+	#ifdef _MSC_VER
+		struct tm timeinforeal;
+		timeinfo = &timeinforeal;
+		localtime_s(timeinfo, &rawtime);
+	#else
+		timeinfo = localtime(&rawtime);
+	#endif
 
 	AString Line;
-#ifdef _DEBUG
-	Printf(Line, "[%04x|%02d:%02d:%02d] %s", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
-#else
-	Printf(Line, "[%02d:%02d:%02d] %s", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
-#endif
+	#ifdef _DEBUG
+		Printf(Line, "[%04x|%02d:%02d:%02d] %s", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
+	#else
+		Printf(Line, "[%02d:%02d:%02d] %s", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
+	#endif
+
 	if (m_File)
 	{
 		fprintf(m_File, "%s\n", Line.c_str());
@@ -136,67 +137,68 @@ bool cLog::LogReplaceLine(const char * a_Format, va_list argList)
 	}
 
 	// Print to console:
-#if defined(ANDROID_NDK)
-	//__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
-	__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str());
-	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
-#else
-#ifdef _WIN32
-	size_t LineLength = Line.length();
+	#if defined(ANDROID_NDK)
+		//__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
+		__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str());
+		//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
+	#else
+		
+		size_t LineLength = Line.length();
+		#ifdef _WIN32
+			HANDLE Output = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	if (m_LastStringSize == 0)
-		m_LastStringSize = LineLength; // Initialise m_LastStringSize
+			CONSOLE_SCREEN_BUFFER_INFO csbi;
+			GetConsoleScreenBufferInfo(Output, &csbi); // Obtain console window information
 
-	HANDLE Output = GetStdHandle(STD_OUTPUT_HANDLE);
+			if ((size_t)((csbi.srWindow.Right - csbi.srWindow.Left) + 1) < LineLength) // Will text overrun width? If so, do not do a replace operation
+			{
+				printf("\n%s", Line.c_str()); // We are at line to be replaced, but since we can't, print normally with a newline
+				return false;
+			}
 
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	GetConsoleScreenBufferInfo(Output, &csbi);
+			for (size_t X = 0; X != (size_t)(csbi.srWindow.Right - csbi.srWindow.Left); ++X)
+			{
+				fputs(" ", stdout); // Clear current line in preparation for new text
+			}
+		#else // _WIN32
+			// Try to get console width; if text overruns, print normally with a newline
+			#ifdef TIOCGSIZE
+				struct ttysize ts;
+				ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
 
-	if ((size_t)((csbi.srWindow.Right - csbi.srWindow.Left) + 1) < LineLength)
-	{
-		printf("\n%s", Line.c_str()); // We are at line to be replaced, but since we can't, add a new line
-		return false;
-	}
+				if (ts.ts_cols < LineLength)
+				{
+					printf("\n%s", Line.c_str());
+					return false;
+				}
+			#elif defined(TIOCGWINSZ)
+				struct winsize ts;
+				ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
 
-	if (LineLength < m_LastStringSize) // If last printed line was longer than current, clear this line
-	{
-		for (size_t X = 0; X != m_LastStringSize + 1; ++X)
-		{
-			fputs(" ", stdout);
-		}
-	}
-#else // _WIN32
-	struct ttysize ts;
-#ifdef TIOCGSIZE
-	ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
-	if (ts.ts_cols < LineLength)
-	{
-		return false;
-	}
-#elif defined(TIOCGWINSZ)
-	ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
-	if (ts.ts_cols < LineLength)
-	{
-		return false;
-	}
-#else /* TIOCGSIZE */
-	return false;
-#endif
-	fputs("\033[K", stdout); // Clear current line
-#endif
-	printf("\r%s", Line.c_str());
-#ifdef __linux
-	fputs("\033[1B", stdout); // Move down one line
-#endif // __linux
+				if (ts.ws_col < LineLength)
+				{
+					printf("\n%s", Line.c_str());
+					return false;
+				}
+			#else
+				printf("\n%s", Line.c_str());
+				return false;
+			#endif
 
-	m_LastStringSize = LineLength;
+			fputs("\033[K", stdout); // Clear current line
+		#endif // Not _WIN32
 
-#endif // ANDROID_NDK
+		printf("\r%s", Line.c_str());
 
-#if defined (_WIN32) && defined(_DEBUG)
-	// In a Windows Debug build, output the log to debug console as well:
-	OutputDebugStringA((Line + "\n").c_str());
-#endif  // _WIN32
+		#ifdef __linux
+			fputs("\033[1B", stdout); // Move down one line
+		#endif // __linux
+	#endif // ANDROID_NDK
+
+	#if defined (_WIN32) && defined(_DEBUG)
+		// In a Windows Debug build, output the log to debug console as well:
+		OutputDebugStringA((Line + "\n").c_str());
+	#endif  // _WIN32
 
 	return true;
 }
@@ -241,7 +243,9 @@ void cLog::Log(const char * a_Format, va_list argList)
 	__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str() );
 	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
 	#else
-	printf("%s", Line.c_str());
+	// If something requests the current line to be rewritten (LogReplaceLine), on Linux it clears the current line, but that moves the cursor to the end of that line, so we reset it here (\r)
+	// Doesn't affect anything normally - cursor should already be at beginning of line
+	printf("\r%s", Line.c_str());
 	#endif
 
 	#if defined (_WIN32) && defined(_DEBUG)
