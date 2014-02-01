@@ -335,7 +335,7 @@ void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_
 
 
 
-void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnDigging(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
