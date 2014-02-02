@@ -33,18 +33,18 @@ cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
 
 
 
-void cBlockPistonHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	NIBBLETYPE OldMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
 	int newX = a_BlockX;
 	int newY = a_BlockY;
 	int newZ = a_BlockZ;
 	AddPistonDir(newX, newY, newZ, OldMeta & ~(8), 1);
 
-	if (a_World->GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION)
+	if (a_ChunkInterface.GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION)
 	{
-		a_World->SetBlock(newX, newY, newZ, E_BLOCK_AIR, 0);
+		a_ChunkInterface.SetBlock(a_WorldInterface, newX, newY, newZ, E_BLOCK_AIR, 0);
 	}
 }
 
@@ -53,7 +53,7 @@ void cBlockPistonHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_Bloc
 
 
 bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
-	cWorld * a_World, cPlayer * a_Player,
+	cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -80,19 +80,19 @@ cBlockPistonHeadHandler::cBlockPistonHeadHandler(void) :
 
 
 
-void cBlockPistonHeadHandler::OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	NIBBLETYPE OldMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
 	int newX = a_BlockX;
 	int newY = a_BlockY;
 	int newZ = a_BlockZ;
 	AddPistonDir(newX, newY, newZ, OldMeta & ~(8), -1);
 
-	BLOCKTYPE Block = a_World->GetBlock(newX, newY, newZ);
+	BLOCKTYPE Block = a_ChunkInterface.GetBlock(newX, newY, newZ);
 	if ((Block == E_BLOCK_STICKY_PISTON) || (Block == E_BLOCK_PISTON))
 	{
-		a_World->DigBlock(newX, newY, newZ);
+		a_ChunkInterface.DigBlock(a_WorldInterface, newX, newY, newZ);
 		if (a_Player->IsGameModeCreative())
 		{
 			return; // No pickups if creative
@@ -100,7 +100,7 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_
 
 		cItems Pickups;
 		Pickups.push_back(cItem(Block, 1));
-		a_World->SpawnItemPickups(Pickups, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
+		a_WorldInterface.SpawnItemPickups(Pickups, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
 	}
 }
 

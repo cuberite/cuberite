@@ -6,6 +6,7 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../Blocks/BlockHandler.h"
 #include "../LineBlockTracer.h"
+#include "../BlockInServerPluginInterface.h"
 
 
 
@@ -142,7 +143,9 @@ public:
 			cBlockHandler * Handler = BlockHandler(CurrentBlock);
 			if (Handler->DoesDropOnUnsuitable())
 			{
-				Handler->DropBlock(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+				cChunkInterface ChunkInterface(a_World->GetChunkMap());
+				cBlockInServerPluginInterface PluginInterface(*a_World);
+				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 			}
 		}
 

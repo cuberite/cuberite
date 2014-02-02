@@ -24,7 +24,8 @@
 #include "Entities/ProjectileEntity.h"
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
-
+#include "Blocks/WorldInterface.h"
+#include "Blocks/BroadcastInterface.h"
 
 
 
@@ -62,7 +63,7 @@ typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 
 
 // tolua_begin
-class cWorld : public cForEachChunkProvider
+class cWorld : public cForEachChunkProvider, public cWorldInterface, public cBroadcastInterface
 {
 public:
 
@@ -106,8 +107,8 @@ public:
 	// tolua_begin
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
-	Int64 GetWorldAge(void)  const { return m_WorldAge; }
-	Int64 GetTimeOfDay(void) const { return m_TimeOfDay; }
+	virtual Int64 GetWorldAge(void)  const { return m_WorldAge; }
+	virtual Int64 GetTimeOfDay(void) const { return m_TimeOfDay; }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
@@ -140,7 +141,7 @@ public:
 	
 	bool VillagersShouldHarvestCrops(void) const { return m_VillagersShouldHarvestCrops; }
 
-	eDimension GetDimension(void) const { return m_Dimension; }
+	virtual eDimension GetDimension(void) const { return m_Dimension; }
 
 	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
 	int GetHeight(int a_BlockX, int a_BlockZ);
@@ -182,8 +183,13 @@ public:
 	void BroadcastTeleportEntity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTimeUpdate         (const cClientHandle * a_Exclude = NULL);
-	void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	virtual void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 	void BroadcastWeather            (eWeather a_Weather, const cClientHandle * a_Exclude = NULL);
+	
+	virtual cBroadcastInterface & GetBroadcastManager()
+	{
+		return *this;
+	}
 	
 	/** If there is a block entity at the specified coords, sends it to the client specified */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
@@ -330,15 +336,28 @@ public:
 	The replacement doesn't trigger block updates.
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block)
 	*/
-	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		m_ChunkMap->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	}
 	
 	/** Queues a SetBlock() with the specified parameters after the specified number of ticks.
 	Calls SetBlock(), so performs full processing of the replaced block.
 	*/
-	void QueueSetBlock(int a_BlockX, int a_BLockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
+	void QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR)
+	{
+		m_ChunkMap->QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, GetWorldAge() + a_TickDelay, a_PreviousBlockType);
+	}
 	
-	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ);
-	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);
+	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		return m_ChunkMap->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	}
+	
+	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		return m_ChunkMap->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	}
 	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData);
 	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -368,10 +387,10 @@ public:
 	// tolua_begin
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
-	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false);
+	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false);
 	
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified: */
-	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false);
+	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false);
 	
 	/** Spawns an falling block entity at the given position. It returns the UniqueID of the spawned falling block. */
 	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
@@ -446,7 +465,7 @@ public:
 	| esWitherBirth | TBD |
 	| esPlugin | void * |
 	*/
-	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData);  // tolua_export
+	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData);  // tolua_export
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -523,21 +542,6 @@ public:
 	void SetCommandBlocksEnabled(bool a_Flag) { m_bCommandBlocksEnabled = a_Flag; }
 	
 	// tolua_end
-
-	inline static void AbsoluteToRelative( int & a_X, int & a_Y, int & a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
-	{
-		// TODO: Use floor() instead of weird if statements
-		// Also fix Y
-		a_ChunkX = a_X/cChunkDef::Width;
-		if(a_X < 0 && a_X % cChunkDef::Width != 0) a_ChunkX--;
-		a_ChunkY = 0;
-		a_ChunkZ = a_Z/cChunkDef::Width;
-		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
-
-		a_X = a_X - a_ChunkX*cChunkDef::Width;
-		a_Y = a_Y - a_ChunkY*cChunkDef::Height;
-		a_Z = a_Z - a_ChunkZ*cChunkDef::Width;
-	}
 	
 	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
@@ -633,7 +637,7 @@ public:
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
 	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
+	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType);  // tolua_export
 	int SpawnMobFinalize(cMonster* a_Monster);
 	
 	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise */
@@ -788,8 +792,6 @@ private:
 
 	bool m_bCommandBlocksEnabled;
 	
-	cCriticalSection m_CSFastSetBlock;
-	sSetBlockList    m_FastSetBlockQueue;
 
 	cChunkGenerator  m_Generator;
 

@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../BlockArea.h"
 #include "../Blocks/BlockHandler.h"
+#include "../BlockInServerPluginInterface.h"
 
 
 
@@ -150,7 +151,9 @@ void cVillager::HandleFarmerTryHarvestCrops()
 		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
 		{
 			cBlockHandler * Handler = cBlockHandler::GetBlockHandler(CropBlock);
-			Handler->DropBlock(m_World, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
+			cChunkInterface ChunkInterface(m_World->GetChunkMap());
+			cBlockInServerPluginInterface PluginInterface(*m_World);
+			Handler->DropBlock(ChunkInterface, *m_World, PluginInterface, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 			m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
 			m_ActionCountDown = 20;
 		}

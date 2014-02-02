@@ -32,7 +32,7 @@ public:
 	}
 	
 	
-	virtual void Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
+	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
 		switch (m_BlockType)
 		{
@@ -47,7 +47,7 @@ public:
 				break;
 			}
 		}
-		super::Check(a_RelX, a_RelY, a_RelZ, a_Chunk);
+		super::Check(a_ChunkInterface, a_PluginInterface, a_RelX, a_RelY, a_RelZ, a_Chunk);
 	}
 } ;
 
@@ -68,7 +68,7 @@ public:
 	
 	
 	/// Called to tick the block
-	virtual void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		if (a_Chunk.GetWorld()->ShouldLavaSpawnFire())
 		{

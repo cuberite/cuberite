@@ -31,12 +31,14 @@ public:
 	) override
 	{
 		a_BlockType = (m_ItemType == E_ITEM_WOODEN_DOOR) ? E_BLOCK_WOODEN_DOOR : E_BLOCK_IRON_DOOR;
-		return BlockHandler(a_BlockType)->GetPlacementBlockTypeMeta(
-			a_World, a_Player, 
+		cChunkInterface ChunkInterface(a_World->GetChunkMap());
+		bool Meta = BlockHandler(a_BlockType)->GetPlacementBlockTypeMeta(
+			ChunkInterface, a_Player, 
 			a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 
 			a_CursorX, a_CursorY, a_CursorZ,
 			a_BlockType, a_BlockMeta
 		);
+		return Meta;
 	}
 } ;
 

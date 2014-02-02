@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../World.h"
+#include "../Chunk.h"
 
 
 
@@ -18,7 +18,7 @@ public:
 	
 	
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -28,7 +28,7 @@ public:
 
 		if ((a_BlockFace == BLOCK_FACE_TOP) || (a_BlockFace == BLOCK_FACE_BOTTOM))
 		{
-			a_BlockFace = FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ); // Top or bottom faces clicked, find a suitable face
+			a_BlockFace = FindSuitableFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ); // Top or bottom faces clicked, find a suitable face
 			if (a_BlockFace == BLOCK_FACE_NONE)
 			{
 				// Client wouldn't have sent anything anyway, but whatever
@@ -39,11 +39,11 @@ public:
 		{
 			// Not top or bottom faces, try to preserve whatever face was clicked
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true); // Set to clicked block
-			if (!CanBePlacedOn(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace))
+			if (!CanBePlacedOn(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace))
 			{
 				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false); // Reset to torch block
 				// Torch couldn't be placed on whatever face was clicked, last ditch resort - find another face
-				a_BlockFace = FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ);
+				a_BlockFace = FindSuitableFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 				if (a_BlockFace == BLOCK_FACE_NONE)
 				{
 					return false;
@@ -111,12 +111,12 @@ public:
 	
 	
 	/// Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure
-	static char FindSuitableFace(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+	static char FindSuitableFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++) // Loop through all directions
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, true);
-			BLOCKTYPE BlockInQuestion = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+			BLOCKTYPE BlockInQuestion = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 
 			if ( // If on a block that can only hold a torch if torch is standing on it, return that face
 				((BlockInQuestion == E_BLOCK_GLASS) ||
@@ -143,7 +143,7 @@ public:
 	}
 
 
-	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		char Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
 

@@ -33,7 +33,7 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -47,7 +47,7 @@ public:
 		cItemHandler * ItemHandler = cItemHandler::GetItemHandler(GetDoubleSlabType(Type));
 
 		// Check if the block at the coordinates is a slab. Eligibility for combining has already been processed in ClientHandle
-		if (IsAnySlabType(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
+		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			// Call the function in ClientHandle that places a block when the client sends the packet,
 			// so that plugins may interfere with the placement.

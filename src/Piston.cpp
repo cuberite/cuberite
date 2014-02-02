@@ -9,6 +9,7 @@
 #include "World.h"
 #include "Server.h"
 #include "Blocks/BlockHandler.h"
+#include "BlockInServerPluginInterface.h"
 
 
 
@@ -90,7 +91,9 @@ void cPiston::ExtendPiston(int pistx, int pisty, int pistz)
 		cBlockHandler * Handler = BlockHandler(currBlock);
 		if (Handler->DoesDropOnUnsuitable())
 		{
-			Handler->DropBlock(m_World, NULL, pistx, pisty, pistz);
+			cChunkInterface ChunkInterface(m_World->GetChunkMap());
+			cBlockInServerPluginInterface PluginInterface(*m_World);
+			Handler->DropBlock(ChunkInterface, *m_World, PluginInterface, NULL, pistx, pisty, pistz);
 		}
 	}
 	

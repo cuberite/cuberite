@@ -18,7 +18,7 @@ public:
 	
 	
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -27,7 +27,7 @@ public:
 		// TODO: Disallow placement where the vine doesn't attach to something properly
 		BLOCKTYPE BlockType = 0;
 		NIBBLETYPE BlockMeta;
-		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+		a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 		if (BlockType == m_BlockType)
 		{
 			a_BlockMeta = BlockMeta | DirectionToMetaData(a_BlockFace);
@@ -105,7 +105,7 @@ public:
 	}
 	
 	
-	void Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
+	void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
 		NIBBLETYPE CurMeta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		NIBBLETYPE MaxMeta = GetMaxMeta(a_Chunk, a_RelX, a_RelY, a_RelZ);
@@ -128,7 +128,7 @@ public:
 				{
 					int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 					int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-					DropBlock(a_Chunk.GetWorld(), NULL, BlockX, a_RelY, BlockZ);
+					DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
 				}
 				a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
 				return;
