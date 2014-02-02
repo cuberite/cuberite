@@ -38,9 +38,10 @@ public:
 		else
 		{
 			// Not top or bottom faces, try to preserve whatever face was clicked
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true); // Set to clicked block
 			if (!CanBePlacedOn(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace))
 			{
+				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false); // Reset to torch block
 				// Torch couldn't be placed on whatever face was clicked, last ditch resort - find another face
 				a_BlockFace = FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ);
 				if (a_BlockFace == BLOCK_FACE_NONE)
