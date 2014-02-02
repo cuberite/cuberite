@@ -134,15 +134,14 @@ void cLog::Log(const char * a_Format, va_list argList, bool a_ReplaceCurrentLine
 	__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str() );
 	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
 #else
-	size_t LineLength = Line.length();
-
-	if (m_LastStringSize == 0)
-		m_LastStringSize = LineLength;
-
 	if (a_ReplaceCurrentLine)
 	{
 #ifdef _WIN32
-		if (LineLength < m_LastStringSize) // If last printed line was longer than current, clear this line
+		if (m_LastStringSize == 0)
+		{
+			m_LastStringSize = Line.length();
+		}
+		else if (Line.length() < m_LastStringSize) // If last printed line was longer than current, clear this line
 		{
 			for (size_t X = 0; X != m_LastStringSize; ++X)
 			{
@@ -163,9 +162,6 @@ void cLog::Log(const char * a_Format, va_list argList, bool a_ReplaceCurrentLine
 	{
 		printf("%s", Line.c_str());
 	}
-
-	m_LastStringSize = LineLength;
-
 #endif
 
 	#if defined (_WIN32) && defined(_DEBUG)

@@ -51,6 +51,10 @@ private:
 	
 	/// Common initialization for all constructors, creates a logfile with the specified name and assigns s_MCLogger to this
 	void InitLog(const AString & a_FileName);
+
+	/** Flag to show whether a 'replace line' log command has been issued
+		Used to decide when to put a newline */
+	bool m_BeginLineUpdate = false;
 };																	// tolua_export
 
 

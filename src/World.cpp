@@ -111,7 +111,6 @@ protected:
 				cSleep::MilliSleep(100);
 				if (m_ShouldTerminate)
 				{
-					LOGREPLACELINE("World successfully loaded!");
 					return;
 				}
 			}
@@ -162,7 +161,6 @@ protected:
 				cSleep::MilliSleep(100);
 				if (m_ShouldTerminate)
 				{
-					LOGREPLACELINE("Lighting successful!");
 					return;
 				}
 			}
