@@ -6,6 +6,7 @@
 #include "../Entities/Player.h"
 
 #include "../Blocks/BlockHandler.h"
+#include "../BlockInServerPluginInterface.h"
 
 
 
@@ -25,7 +26,9 @@ public:
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		if (Block == E_BLOCK_SNOW)
 		{
-			BlockHandler(Block)->DropBlock(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+			cChunkInterface ChunkInterface(a_World->GetChunkMap());
+			cBlockInServerPluginInterface PluginInterface(*a_World);
+			BlockHandler(Block)->DropBlock(ChunkInterface,*a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 			a_Player->UseEquippedItem();

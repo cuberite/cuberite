@@ -276,7 +276,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			Distance.y = 0;
 			Distance.Normalize();
-			Distance *= 3;
+			Distance *= 5;
 			SetSpeedX(Distance.x);
 			SetSpeedZ(Distance.z);
 
