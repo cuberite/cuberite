@@ -216,6 +216,12 @@ public:
 		a_World->SetBlockMeta(a_Area.GetOriginX() + a_RelX, a_Area.GetOriginY(), a_Area.GetOriginZ() + a_RelZ, a_NewMeta);
 		return true;
 	}
+
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		a_Pickups.push_back(cItem(E_BLOCK_CHEST, 1, 0));
+	}
 } ;
 
 

@@ -793,6 +793,7 @@ public:
 		g_BlockIsSolid[E_BLOCK_WOODEN_SLAB]           = false;
 
 		// Torch placeable blocks:
+		g_BlockFullyOccupiesVoxel[E_BLOCK_NEW_LOG]               = true;
 		g_BlockFullyOccupiesVoxel[E_BLOCK_BEDROCK]               = true;
 		g_BlockFullyOccupiesVoxel[E_BLOCK_BLOCK_OF_COAL]         = true;
 		g_BlockFullyOccupiesVoxel[E_BLOCK_BLOCK_OF_REDSTONE]     = true;
