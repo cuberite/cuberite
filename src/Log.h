@@ -11,6 +11,7 @@ private:
 
 	FILE * m_File;
 	static cLog * s_Log;
+	size_t m_LastStringSize;
 
 public:
 
