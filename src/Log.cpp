@@ -18,8 +18,7 @@
 cLog* cLog::s_Log = NULL;
 
 cLog::cLog(const AString & a_FileName )
-	: m_File(NULL),
-	m_LastStringSize(0)
+	: m_File(NULL)
 {
 	s_Log = this;
 
