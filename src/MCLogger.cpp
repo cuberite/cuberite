@@ -147,11 +147,7 @@ void cMCLogger::Log(const char * a_Format, va_list a_ArgList, bool a_ShouldRepla
 		SetConsoleCursorPosition(Output, Position);
 
 		SetColor(csRegular);
-		if (!m_Log->LogReplaceLine(a_Format, a_ArgList))
-		{
-			m_BeginLineUpdate = false;
-			puts("");
-		}
+		m_Log->Log(a_Format, a_ArgList, a_ShouldReplaceLine);
 		ResetColor();
 
 		Position = { 0, csbi.dwCursorPosition.Y }; // Set cursor to original position
@@ -159,18 +155,14 @@ void cMCLogger::Log(const char * a_Format, va_list a_ArgList, bool a_ShouldRepla
 #else // _WIN32
 		fputs("\033[1A", stdout); // Move cursor up one line
 		SetColor(csRegular);
-		if (!m_Log->LogReplaceLine(a_Format, a_ArgList))
-		{
-			m_BeginLineUpdate = false;
-			puts("");
-		}
+		m_Log->Log(a_Format, a_ArgList, a_ShouldReplaceLine);
 		ResetColor();
 #endif
 	}
 	else
 	{
 		SetColor(csRegular);
-		m_Log->Log(a_Format, a_ArgList);
+		m_Log->Log(a_Format, a_ArgList, a_ShouldReplaceLine);
 		ResetColor();
 		puts("");
 	}

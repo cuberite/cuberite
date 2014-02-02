@@ -100,105 +100,7 @@ void cLog::ClearLog()
 
 
 
-bool cLog::LogReplaceLine(const char * a_Format, va_list argList)
-{
-	AString Message;
-	AppendVPrintf(Message, a_Format, argList);
-
-	time_t rawtime;
-	time(&rawtime);
-
-	struct tm* timeinfo;
-#ifdef _MSC_VER
-	struct tm timeinforeal;
-	timeinfo = &timeinforeal;
-	localtime_s(timeinfo, &rawtime);
-#else
-	timeinfo = localtime(&rawtime);
-#endif
-
-	AString Line;
-#ifdef _DEBUG
-	Printf(Line, "[%04x|%02d:%02d:%02d] %s", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
-#else
-	Printf(Line, "[%02d:%02d:%02d] %s", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
-#endif
-	if (m_File)
-	{
-		fprintf(m_File, "%s\n", Line.c_str());
-		fflush(m_File);
-	}
-
-	// Print to console:
-#if defined(ANDROID_NDK)
-	//__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
-	__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str());
-	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
-#else
-	size_t LineLength = Line.length();
-
-	if (m_LastStringSize == 0)
-		m_LastStringSize = LineLength; // Initialise m_LastStringSize
-
-	HANDLE Output = GetStdHandle(STD_OUTPUT_HANDLE);
-
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	GetConsoleScreenBufferInfo(Output, &csbi);
-
-	if ((size_t)((csbi.srWindow.Right - csbi.srWindow.Left) + 1) < LineLength)
-	{
-		printf("\r%s", Line.c_str());
-		return false;
-	}
-#ifdef _WIN32
-	if (LineLength < m_LastStringSize) // If last printed line was longer than current, clear this line
-	{
-		for (size_t X = 0; X != m_LastStringSize + 1; ++X)
-		{
-			fputs(" ", stdout);
-		}
-	}
-#else // _WIN32
-	struct ttysize ts;
-#ifdef TIOCGSIZE
-	ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
-	if (ts.ts_cols < LineLength)
-	{
-		return false;
-	}
-#elif defined(TIOCGWINSZ)
-	ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
-	if (ts.ts_cols < LineLength)
-	{
-		return false;
-	}
-#else /* TIOCGSIZE */
-	return false;
-#endif
-	fputs("\033[K", stdout); // Clear current line
-#endif
-	printf("\r%s", Line.c_str());
-#ifdef __linux
-	fputs("\033[1B", stdout); // Move down one line
-#endif // __linux
-
-	m_LastStringSize = LineLength;
-
-#endif // ANDROID_NDK
-
-#if defined (_WIN32) && defined(_DEBUG)
-	// In a Windows Debug build, output the log to debug console as well:
-	OutputDebugStringA((Line + "\n").c_str());
-#endif  // _WIN32
-
-	return true;
-}
-
-
-
-
-
-void cLog::Log(const char * a_Format, va_list argList)
+void cLog::Log(const char * a_Format, va_list argList, bool a_ReplaceCurrentLine)
 {
 	AString Message;
 	AppendVPrintf(Message, a_Format, argList);
@@ -221,7 +123,6 @@ void cLog::Log(const char * a_Format, va_list argList)
 	#else
 	Printf(Line, "[%02d:%02d:%02d] %s", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
 	#endif
-
 	if (m_File)
 	{
 		fprintf(m_File, "%s\n", Line.c_str());
@@ -229,13 +130,44 @@ void cLog::Log(const char * a_Format, va_list argList)
 	}
 
 	// Print to console:
-	#if defined(ANDROID_NDK)
+#if defined(ANDROID_NDK)
 	//__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
 	__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str() );
 	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
-	#else
-	printf("%s", Line.c_str());
-	#endif
+#else
+	size_t LineLength = Line.length();
+
+	if (m_LastStringSize == 0)
+		m_LastStringSize = LineLength; // Initialise m_LastStringSize
+
+	if (a_ReplaceCurrentLine)
+	{
+#ifdef _WIN32
+		if (LineLength < m_LastStringSize) // If last printed line was longer than current, clear this line
+		{
+			for (size_t X = 0; X != m_LastStringSize; ++X)
+			{
+				fputs(" ", stdout);
+			}
+		}
+#else // _WIN32
+		fputs("\033[K", stdout); // Clear current line
+#endif
+
+		printf("\r%s", Line.c_str());
+
+#ifdef __linux
+		fputs("\033[1B", stdout); // Move down one line
+#endif // __linux
+	}
+	else
+	{
+		printf("%s", Line.c_str());
+	}
+
+	m_LastStringSize = LineLength;
+
+#endif
 
 	#if defined (_WIN32) && defined(_DEBUG)
 	// In a Windows Debug build, output the log to debug console as well:
