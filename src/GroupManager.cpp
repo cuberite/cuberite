@@ -58,11 +58,11 @@ cGroupManager::cGroupManager()
 		IniFile.SetValue("Moderator", "Color", "2", true);
 		IniFile.SetValue("Moderator", "Inherits", "Player", true);
 
-		IniFile.SetValue("Player", "Permissions", "core.build", true);
+		IniFile.SetValue("Player", "Permissions", "core.portal", true);
 		IniFile.SetValue("Player", "Color", "f", true);
 		IniFile.SetValue("Player", "Inherits", "Default", true);
 
-		IniFile.SetValue("Default", "Permissions", "core.help,core.playerlist,core.pluginlist,core.spawn,core.listworlds,core.back,core.motd,core.gotoworld,core.coords,core.viewdistance", true);
+		IniFile.SetValue("Default", "Permissions", "core.help,core.plugins,core.spawn,core.worlds,core.back,core.motd,core.build,core.locate,core.viewdistance", true);
 		IniFile.SetValue("Default", "Color", "f", true);
 
 		IniFile.WriteFile("groups.ini");
