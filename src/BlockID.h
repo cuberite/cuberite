@@ -801,6 +801,7 @@ enum eDamageType
 	dtPotionOfHarming,
 	dtEnderPearl,       // Thrown an ender pearl, teleported by it
 	dtAdmin,            // Damage applied by an admin command
+	dtExplosion,        // Damage applied by an explosion
 	
 	// Some common synonyms:
 	dtPawnAttack   = dtAttack,
