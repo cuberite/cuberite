@@ -456,6 +456,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			{
 				m_Writer.AddString("Owner", ((const cWolf *)a_Monster)->GetOwner());
 				m_Writer.AddByte("Sitting", (((const cWolf *)a_Monster)->IsSitting() ? 1 : 0));
+				m_Writer.AddByte("Angry", (((const cWolf *)a_Monster)->IsAngry() ? 1 : 0));
 				m_Writer.AddInt("CollarColor", ((const cWolf *)a_Monster)->GetCollarColor());
 				break;
 			}
