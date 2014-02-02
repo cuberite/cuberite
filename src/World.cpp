@@ -100,13 +100,13 @@ protected:
 	{
 		for (;;)
 		{
-			LOGREPLACELINE("%d chunks to load, %d chunks to generate", 
+			LOG("%d chunks to load, %d chunks to generate", 
 				m_World->GetStorage().GetLoadQueueLength(),
 				m_World->GetGenerator().GetQueueLength()
 			);
 			
-			// Wait for 0.5 sec, but be "reasonably wakeable" when the thread is to finish
-			for (int i = 0; i < 5; i++)
+			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
+			for (int i = 0; i < 20; i++)
 			{
 				cSleep::MilliSleep(100);
 				if (m_ShouldTerminate)
@@ -152,10 +152,10 @@ protected:
 	{
 		for (;;)
 		{
-			LOGREPLACELINE("%d chunks remaining to light", m_Lighting->GetQueueLength()
+			LOG("%d chunks remaining to light", m_Lighting->GetQueueLength()
 			);
 			
-			// Wait for 0.5 sec, but be "reasonably wakeable" when the thread is to finish
+			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
 			for (int i = 0; i < 20; i++)
 			{
 				cSleep::MilliSleep(100);
