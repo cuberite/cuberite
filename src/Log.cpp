@@ -135,7 +135,6 @@ bool cLog::LogReplaceLine(const char * a_Format, va_list argList)
 	__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str());
 	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
 #else
-#ifdef _WIN32
 	size_t LineLength = Line.length();
 
 	if (m_LastStringSize == 0)
@@ -151,7 +150,7 @@ bool cLog::LogReplaceLine(const char * a_Format, va_list argList)
 		printf("\n%s", Line.c_str()); // We are at line to be replaced, but since we can't, add a new line
 		return false;
 	}
-
+#ifdef _WIN32
 	if (LineLength < m_LastStringSize) // If last printed line was longer than current, clear this line
 	{
 		for (size_t X = 0; X != m_LastStringSize + 1; ++X)
