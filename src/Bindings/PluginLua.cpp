@@ -641,6 +641,26 @@ bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_Blo
 
 
 
+bool cPluginLua::OnPlayerDestroyed(cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_DESTROYED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
