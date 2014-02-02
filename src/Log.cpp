@@ -147,7 +147,7 @@ bool cLog::LogReplaceLine(const char * a_Format, va_list argList)
 
 	if ((size_t)((csbi.srWindow.Right - csbi.srWindow.Left) + 1) < LineLength)
 	{
-		printf("\n%s", Line.c_str()); // We are at line to be replaced, but since we can't, add a new line
+		printf("\r%s", Line.c_str());
 		return false;
 	}
 #ifdef _WIN32
