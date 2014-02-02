@@ -5,6 +5,7 @@
 #include "../Item.h"
 #include "WorldInterface.h"
 #include "ChunkInterface.h"
+#include "BlockPluginInterface.h"
 
 
 
@@ -25,7 +26,7 @@ public:
 
 	/// Called when the block gets ticked either by a random tick or by a queued tick.
 	/// Note that the coords are chunk-relative!
-	virtual void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
 
 	/** Called before a block is placed	into a world. 
 	The handler should return true to allow placement, false to refuse.
@@ -72,7 +73,7 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 	
 	/// Handles the dropping of a block based on what ConvertToDrops() returns. This will not destroy the block. a_Digger is the entity causing the drop; it may be NULL
-	virtual void DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Returns step sound name of block
 	virtual const char * GetStepSound(void);
@@ -113,7 +114,7 @@ public:
 	By default drops if position no more suitable (CanBeAt(), DoesDropOnUnsuitable(), Drop()),
 	and wakes up all simulators on the block.
 	*/
-	virtual void Check(cChunkInterface & ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
+	virtual void Check(cChunkInterface & ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 	
 	/// <summary>Rotates a given block meta counter-clockwise. Default: no change</summary>
 	/// <returns>Block meta following rotation</returns>

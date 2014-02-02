@@ -261,7 +261,7 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 
 
 
-void cBlockHandler::OnUpdate(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -361,14 +361,14 @@ void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 
 
 
-void cBlockHandler::DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cItems Pickups;
-	NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 	ConvertToPickups(Pickups, Meta);
 	
 	// Allow plugins to modify the pickups:
-	cRoot::Get()->GetPluginManager()->CallHookBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
+	a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
 	
 	if (!Pickups.empty())
 	{
@@ -384,7 +384,7 @@ void cBlockHandler::DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX
 		MicroX += r1.rand(1) - 0.5;
 		MicroZ += r1.rand(1) - 0.5;
 
-		a_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
+		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}
 }
 
@@ -446,7 +446,7 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 
-void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
+void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
 {
 	if (!CanBeAt(a_ChunkInterface, a_RelX, a_RelY, a_RelZ, a_Chunk))
 	{
@@ -454,7 +454,7 @@ void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, int a_RelX, int a_
 		{
 			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-			DropBlock(a_Chunk.GetWorld(), NULL, BlockX, a_RelY, BlockZ);
+			DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
 		}
 		
 		a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);

@@ -31,7 +31,7 @@
 #include "Simulator/FluidSimulator.h"
 #include "MobCensus.h"
 #include "MobSpawner.h"
-
+#include "BlockInServerPluginInterface.h"
 
 #include "json/json.h"
 
@@ -638,7 +638,9 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 	unsigned Index = MakeIndex(a_RelX, a_RelY, a_RelZ);
 	cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-	Handler->OnUpdate(*this, a_RelX, a_RelY, a_RelZ);
+	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
+	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
+	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface,*this, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -763,6 +765,7 @@ void cChunk::CheckBlocks()
 	std::swap(m_ToTickBlocks, ToTickBlocks);
 	
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
+	cBlockInServerPluginInterface PluginInterface(*m_World);
 	
 	for (std::vector<unsigned int>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
 	{
@@ -770,7 +773,7 @@ void cChunk::CheckBlocks()
 		Vector3i BlockPos = IndexToCoordinate(index);
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(index));
-		Handler->Check(ChunkInterface, BlockPos.x, BlockPos.y, BlockPos.z, *this);
+		Handler->Check(ChunkInterface, PluginInterface, BlockPos.x, BlockPos.y, BlockPos.z, *this);
 	}  // for itr - ToTickBlocks[]
 }
 
@@ -788,6 +791,9 @@ void cChunk::TickBlocks(void)
 	int TickX = m_BlockTickX;
 	int TickY = m_BlockTickY;
 	int TickZ = m_BlockTickZ;
+	
+	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
+	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
 
 	// This for loop looks disgusting, but it actually does a simple thing - first processes m_BlockTick, then adds random to it
 	// This is so that SetNextBlockTick() works
@@ -813,7 +819,7 @@ void cChunk::TickBlocks(void)
 		unsigned int Index = MakeIndexNoCheck(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 		cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
 		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-		Handler->OnUpdate(*this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
+		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 	}  // for i - tickblocks
 }
 

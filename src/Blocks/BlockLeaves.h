@@ -77,7 +77,7 @@ public:
 	}
 	
 	
-	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		if ((Meta & 0x04) != 0)
@@ -116,8 +116,8 @@ public:
 		}
 
 		// Decay the leaves:
-		DropBlock(a_Chunk.GetWorld(), NULL, BlockX, a_RelY, BlockZ);
-		a_Chunk.GetWorld()->DigBlock(BlockX, a_RelY, BlockZ);
+		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
+		a_ChunkInterface.DigBlock(a_WorldInterface, BlockX, a_RelY, BlockZ);
 	}
 
 
