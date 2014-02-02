@@ -7,12 +7,6 @@
 #include <ctime>
 #include "OSSupport/IsThread.h"
 
-#ifdef __linux
-#include <sys/ioctl.h>
-#include <unistd.h>  
-#endif // __linux
-
-
 #if defined(ANDROID_NDK)
 	#include <android/log.h>
 	#include "ToJava.h"
