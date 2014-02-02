@@ -137,7 +137,7 @@ void cLog::Log(const char * a_Format, va_list argList, bool a_ReplaceCurrentLine
 	size_t LineLength = Line.length();
 
 	if (m_LastStringSize == 0)
-		m_LastStringSize = LineLength; // Initialise m_LastStringSize
+		m_LastStringSize = LineLength;
 
 	if (a_ReplaceCurrentLine)
 	{
