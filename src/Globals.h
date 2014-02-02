@@ -44,8 +44,10 @@
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
 
-	// TODO: Can GCC mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
-	#define override
+	// override is part of c++11
+	#if __cplusplus < 201103L
+  		#define override
+	#endif	
 
 	#define OBSOLETE __attribute__((deprecated))
 

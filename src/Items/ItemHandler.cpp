@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../FastRandom.h"
+#include "../BlockInServerPluginInterface.h"
 
 // Handlers:
 #include "ItemBed.h"
@@ -257,7 +258,9 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 	{
 		if (!BlockRequiresSpecialTool(Block) || CanHarvestBlock(Block))
 		{
-			Handler->DropBlock(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+			cChunkInterface ChunkInterface(a_World->GetChunkMap());
+			cBlockInServerPluginInterface PluginInterface(*a_World);
+			Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 	
@@ -465,8 +468,9 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 	}
 	
 	cBlockHandler * BlockH = BlockHandler(m_ItemType);
+	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
-		a_World, a_Player,
+		ChunkInterface, a_Player,
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 
 		a_CursorX, a_CursorY, a_CursorZ,
 		a_BlockType, a_BlockMeta
