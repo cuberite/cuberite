@@ -118,9 +118,9 @@ void cChunkDesc::SetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_B
 
 
 
-void cChunkDesc::SetBiome(int a_RelX, int a_RelZ, int a_BiomeID)
+void cChunkDesc::SetBiome(int a_RelX, int a_RelZ, EMCSBiome a_BiomeID)
 {
-	cChunkDef::SetBiome(m_BiomeMap, a_RelX, a_RelZ, (EMCSBiome)a_BiomeID);
+	cChunkDef::SetBiome(m_BiomeMap, a_RelX, a_RelZ, a_BiomeID);
 }
 
 

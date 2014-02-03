@@ -78,7 +78,7 @@ bool cBiomeRenderer::Render(cPixmap & a_Pixmap)
 					{
 						for (int i = 0; i < ARRAYCOUNT(CurBiomes); i++)
 						{
-							CurBiomes[i] = (EMCSBiome)-1;
+							CurBiomes[i] = EMCSBiome::biInvalidBiome;
 						}
 						break;
 					}

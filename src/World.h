@@ -526,7 +526,7 @@ public:
 	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
-	int GetBiomeAt(int a_BlockX, int a_BlockZ);
+	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
 
 	/** Returns the name of the world */
 	const AString & GetName(void) const { return m_WorldName; }
