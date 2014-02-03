@@ -9,7 +9,6 @@
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
 #include "../Piston.h"
-#include "../Tracer.h"
 
 
 
@@ -170,7 +169,7 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 		{
 			if (!IsAllowedBlock(Block))
 			{
-				ChunkData.erase(itr); // The new blocktype is not redstone; it must be removed from this list
+				itr->DataTwo = true; // The new blocktype is not redstone; it must be queued to be removed from this list
 			}
 			else
 			{
@@ -185,7 +184,7 @@ void cRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChu
 		return;
 	}
 
-	ChunkData.push_back(cCoordWithBlock(RelX, a_BlockY, RelZ, Block));
+	ChunkData.push_back(cCoordWithBlockAndBool(RelX, a_BlockY, RelZ, Block, false));
 }
 
 
@@ -208,8 +207,14 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 	int BaseX = a_Chunk->GetPosX() * cChunkDef::Width;
 	int BaseZ = a_Chunk->GetPosZ() * cChunkDef::Width;
 
-	for (cRedstoneSimulatorChunkData::const_iterator dataitr = ChunkData.begin(); dataitr != ChunkData.end(); ++dataitr)
+	for (cRedstoneSimulatorChunkData::iterator dataitr = ChunkData.begin(); dataitr != ChunkData.end();)
 	{
+		if (dataitr->DataTwo)
+		{
+			dataitr = ChunkData.erase(dataitr);
+			continue;
+		}
+
 		int a_X = BaseX + dataitr->x;
 		int a_Z = BaseZ + dataitr->z;
 		switch (dataitr->Data)
@@ -279,6 +284,7 @@ void cRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, c
 				break;
 			}
 		}
+		++dataitr;
 	}
 }
 
@@ -919,7 +925,7 @@ void cRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_BlockY, int a_B
 		case E_BLOCK_STONE_PRESSURE_PLATE:
 		{
 			// MCS feature - stone pressure plates can only be triggered by players :D
-			cPlayer * a_Player = m_World.FindClosestPlayer(Vector3f(a_BlockX + 0.5f, (float)a_BlockY, a_BlockZ + 0.5f), 0.5f);
+			cPlayer * a_Player = m_World.FindClosestPlayer(Vector3f(a_BlockX + 0.5f, (float)a_BlockY, a_BlockZ + 0.5f), 0.5f, false);
 
 			if (a_Player != NULL)
 			{
@@ -950,19 +956,14 @@ void cRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_BlockY, int a_B
 
 				virtual bool Item(cEntity * a_Entity) override
 				{
-					cTracer LineOfSight(m_World);
-
 					Vector3f EntityPos = a_Entity->GetPosition();
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
 					float Distance = (EntityPos - BlockPos).Length();
 
 					if (Distance < 0.5)
 					{
-						if (!LineOfSight.Trace(BlockPos, (EntityPos - BlockPos), (int)(EntityPos - BlockPos).Length()))
-						{
-							m_Entity = a_Entity;
-							return true; // Break out, we only need to know for wooden plates that at least one entity is on top
-						}
+						m_Entity = a_Entity;
+						return true; // Break out, we only need to know for wooden plates that at least one entity is on top
 					}
 					return false;
 				}

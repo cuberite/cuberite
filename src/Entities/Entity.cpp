@@ -397,6 +397,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case dtPotionOfHarming:
 		case dtFalling:
 		case dtLightning:
+		case dtPlugin:
 		{
 			return 0;
 		}
@@ -473,7 +474,7 @@ void cEntity::KilledBy(cEntity * a_Killer)
 		return;
 	}
 
-	// Drop loot:	
+	// Drop loot:
 	cItems Drops;
 	GetDrops(Drops, a_Killer);
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());

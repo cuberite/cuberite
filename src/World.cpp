@@ -632,7 +632,7 @@ void cWorld::GenerateRandomSpawn(void)
 {
 	LOGD("Generating random spawnpoint...");
 
-	while (IsBlockWater(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ)))
+	while (IsBlockWaterOrIce(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ)))
 	{
 		if ((GetTickRandomNumber(4) % 2) == 0) // Randomise whether to increment X or Z coords
 		{
@@ -1551,7 +1551,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
-		if (!IsValidItem(itr->m_ItemType))
+		if (!IsValidItem(itr->m_ItemType) || itr->m_ItemType == E_BLOCK_AIR)
 		{
 			// Don't spawn pickup if item isn't even valid; should prevent client crashing too
 			continue;
@@ -1577,7 +1577,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
-		if (!IsValidItem(itr->m_ItemType))
+		if (!IsValidItem(itr->m_ItemType) || itr->m_ItemType == E_BLOCK_AIR)
 		{
 			continue;
 		}

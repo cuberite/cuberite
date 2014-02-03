@@ -4,7 +4,7 @@
 #include "Simulator.h"
 
 /// Per-chunk data for the simulator, specified individual chunks to simulate; 'Data' is not used
-typedef cCoordWithBlockVector cRedstoneSimulatorChunkData;
+typedef cCoordWithBlockAndBoolVector cRedstoneSimulatorChunkData;
 
 
 
