@@ -13,11 +13,11 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 	int res = atoi(a_BiomeString.c_str());
 	if ((res != 0) || (a_BiomeString.compare("0") == 0))
 	{
-		if(res >= biFirstBiome && res < biNumBiomes)
+		if ((res >= biFirstBiome) && (res < biNumBiomes))
 		{
 			return (EMCSBiome)res;
 		}
-		else if(res >= biFirstVarientBiome && res < biNumVarientBiomes)
+		else if ((res >= biFirstVariantBiome) && (res < biNumVariantBiomes))
 		{
 			return (EMCSBiome)res;
 		}

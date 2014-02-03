@@ -97,7 +97,7 @@ void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 {
 	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "Plains");
 	m_Biome = StringToBiome(Biome);
-	if (m_Biome == EMCSBiome::biInvalidBiome)
+	if (m_Biome == biInvalidBiome)
 	{
 		LOGWARN("[Generator]::ConstantBiome value \"%s\" not recognized, using \"Plains\".", Biome.c_str());
 		m_Biome = biPlains;

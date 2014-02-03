@@ -77,7 +77,7 @@ enum EMCSBiome
 	biVariant = 128,
 	
 	// Release 1.7 biome variants:
-	biFirstVarientBiome    = 129,
+	biFirstVariantBiome    = 129,
 	biSunflowerPlains      = 129,
 	biDesertM              = 130,
 	biExtremeHillsM        = 131,
@@ -100,8 +100,8 @@ enum EMCSBiome
 	biMesaPlateauFM        = 166,
 	biMesaPlateauM         = 167,
 	// Automatically capture the maximum consecutive biome value into biVarientMaxBiome:
-	biNumVarientBiomes,  // True number of biomes, since they are zero-based
-	biMaxVarientBiome = biNumVarientBiomes - 1,  // The maximum biome value
+	biNumVariantBiomes,  // True number of biomes, since they are zero-based
+	biMaxVariantBiome = biNumVariantBiomes - 1,  // The maximum biome value
 } ;
 
 /// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns biInvalidBiome on failure.
