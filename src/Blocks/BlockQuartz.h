@@ -25,7 +25,7 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
-		if (Meta != 0x2) // Check if the block is a pillar block.
+		if (Meta != E_META_QUARTZ_PILLAR) // Check if the block is a pillar block.
 		{
 			a_BlockMeta = Meta;
 			return true;
