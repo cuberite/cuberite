@@ -27,6 +27,7 @@ public:
 		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
 		if (Meta != 0x2) // Check if the block is a pillar block.
 		{
+			a_BlockMeta = Meta;
 			return true;
 		}
 
@@ -59,7 +60,7 @@ public:
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
-				return a_QuartzMeta; // No idea, give a special meta (all sides the sa)
+				return a_QuartzMeta; // No idea, give a special meta (all sides the same)
 			}
 		}
 	}
