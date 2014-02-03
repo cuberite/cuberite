@@ -263,6 +263,15 @@ inline bool IsBlockWater(BLOCKTYPE a_BlockType)
 
 
 
+inline bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType)
+{
+	return (IsBlockWater(a_BlockType) || (a_BlockType == E_BLOCK_ICE));
+}
+
+
+
+
+
 inline bool IsBlockLava(BLOCKTYPE a_BlockType)
 {
 	return ((a_BlockType == E_BLOCK_LAVA) || (a_BlockType == E_BLOCK_STATIONARY_LAVA));

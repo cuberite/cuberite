@@ -792,11 +792,11 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (a_TDI.DamageType != dtInVoid)
+	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
 		if (IsGameModeCreative())
 		{
-			// No damage / health in creative mode if not void damage
+			// No damage / health in creative mode if not void or plugin damage
 			return;
 		}
 	}

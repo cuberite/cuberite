@@ -69,47 +69,51 @@ cGroupManager::cGroupManager()
 	}
 
 	unsigned int NumKeys = IniFile.GetNumKeys();
-	for( unsigned int i = 0; i < NumKeys; i++ )
+	for (size_t i = 0; i < NumKeys; i++)
 	{
 		std::string KeyName = IniFile.GetKeyName( i );
 		cGroup* Group = GetGroup( KeyName.c_str() );
 
 		LOGD("Loading group: %s", KeyName.c_str() );
 
-		Group->SetName( KeyName );
-		char Color = IniFile.GetValue( KeyName, "Color", "-" )[0];
-		if( Color != '-' )
-			Group->SetColor( cChatColor::Color + Color );
+		Group->SetName(KeyName);
+		AString Color = IniFile.GetValue(KeyName, "Color", "-");
+		if ((Color != "-") && (Color.length() >= 1))
+		{
+			Group->SetColor(cChatColor::Color + Color[0]);
+		}
 		else
-			Group->SetColor( cChatColor::White );
-
-		AString Commands = IniFile.GetValue( KeyName, "Commands", "" );
-		if( Commands.size() > 0 )
 		{
-			AStringVector Split = StringSplit( Commands, "," );
-			for( unsigned int i = 0; i < Split.size(); i++)
+			Group->SetColor(cChatColor::White);
+		}
+
+		AString Commands = IniFile.GetValue(KeyName, "Commands", "");
+		if (!Commands.empty())
+		{
+			AStringVector Split = StringSplitAndTrim(Commands, ",");
+			for (size_t i = 0; i < Split.size(); i++)
 			{
-				Group->AddCommand( Split[i] );
+				Group->AddCommand(Split[i]);
 			}
 		}
 
-		AString Permissions = IniFile.GetValue( KeyName, "Permissions", "" );
-		if( Permissions.size() > 0 )
+		AString Permissions = IniFile.GetValue(KeyName, "Permissions", "");
+		if (!Permissions.empty())
 		{
-			AStringVector Split = StringSplit( Permissions, "," );
-			for( unsigned int i = 0; i < Split.size(); i++)
+			AStringVector Split = StringSplitAndTrim(Permissions, ",");
+			for (size_t i = 0; i < Split.size(); i++)
 			{
-				Group->AddPermission( Split[i] );
+				Group->AddPermission(Split[i]);
 			}
 		}
 
-		std::string Groups = IniFile.GetValue( KeyName, "Inherits", "" );
-		if( Groups.size() > 0 )
+		std::string Groups = IniFile.GetValue(KeyName, "Inherits", "");
+		if (!Groups.empty())
 		{
-			AStringVector Split = StringSplit( Groups, "," );
-			for( unsigned int i = 0; i < Split.size(); i++)
+			AStringVector Split = StringSplitAndTrim(Groups, ",");
+			for (size_t i = 0; i < Split.size(); i++)
 			{
-				Group->InheritFrom( GetGroup( Split[i].c_str() ) );
+				Group->InheritFrom(GetGroup(Split[i].c_str()));
 			}
 		}
 	}
