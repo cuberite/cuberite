@@ -158,7 +158,6 @@ public:
 	double           GetHeight    (void) const { return m_Height;  }
 	double           GetMass      (void) const { return m_Mass;    }
 	const Vector3d & GetPosition  (void) const { return m_Pos;     }
-	const Vector3d & GetPosition  (void) const { return m_Pos;     }
 	double           GetPosX      (void) const { return m_Pos.x;   }
 	double           GetPosY      (void) const { return m_Pos.y;   }
 	double           GetPosZ      (void) const { return m_Pos.z;   }
