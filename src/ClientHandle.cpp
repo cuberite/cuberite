@@ -230,7 +230,7 @@ void cClientHandle::Authenticate(void)
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
 		AString JoinMessage;
-		AppendPrintf(JoinMessage, "%s[JOIN] %s%s has joined the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
+		AppendPrintf(JoinMessage, "%s[JOIN] %s%s has joined the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), GetUsername().c_str());
 		cRoot::Get()->BroadcastChat(JoinMessage);
 		LOGINFO("Player %s has joined the game.", m_Username.c_str());
 	}
@@ -2461,13 +2461,7 @@ void cClientHandle::SocketClosed(void)
 
 	if (m_Username != "") // Ignore client pings
 	{
-		if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected"))
-		{
-			AString DisconnectMessage;
-			Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
-			cRoot::Get()->BroadcastChat(DisconnectMessage);
-			LOGINFO("Player %s has left the game.", m_Username.c_str());
-		}
+		cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected");
 	}
 
 	Destroy();

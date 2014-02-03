@@ -133,12 +133,12 @@ cPlayer::~cPlayer(void)
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
 	{
 		AString DisconnectMessage;
-		AppendPrintf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), GetClientHandle()->GetUsername().c_str());
+		AppendPrintf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), GetName().c_str());
 		cRoot::Get()->BroadcastChat(DisconnectMessage);
-		LOGINFO("Player %s has left the game.", GetClientHandle()->GetUsername().c_str());
+		LOGINFO("Player %s has left the game.", GetName().c_str());
 	}
 
-	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
+	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), this, GetUniqueID());
 	
 	// Notify the server that the player is being destroyed
 	cRoot::Get()->GetServer()->PlayerDestroying(this);
