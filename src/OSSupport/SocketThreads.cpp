@@ -209,6 +209,10 @@ bool cSocketThreads::cSocketThread::RemoveClient(const cCallback * a_Client)
 		if (m_Slots[i].m_State == sSlot::ssRemoteClosed)
 		{
 			// The remote has already closed the socket, remove the slot altogether:
+			if (m_Slots[i].m_Socket.IsValid())
+			{
+				m_Slots[i].m_Socket.CloseSocket();
+			}
 			m_Slots[i] = m_Slots[--m_NumSlots];
 		}
 		else
@@ -489,6 +493,7 @@ void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
 						// Notify the callback that the remote has closed the socket; keep the slot
 						m_Slots[i].m_Client->SocketClosed();
 						m_Slots[i].m_State = sSlot::ssRemoteClosed;
+						m_Slots[i].m_Socket.CloseSocket();
 						break;
 					}
 					case sSlot::ssWritingRestOut:
