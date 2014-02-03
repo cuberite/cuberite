@@ -1756,39 +1756,42 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			Vector3d EntityPos = a_Entity->GetPosition();
 			cBoundingBox bbEntity(EntityPos, a_Entity->GetWidth() / 2, a_Entity->GetHeight());
 
-			if (m_bbTNT.IsInside(bbEntity)) // IsInside actually acts like DoesSurround
+			if (!m_bbTNT.IsInside(bbEntity)) // IsInside actually acts like DoesSurround
 			{
-				Vector3d AbsoluteEntityPos(abs(EntityPos.x), abs(EntityPos.y), abs(EntityPos.z));
-				Vector3d MaxExplosionBoundary(m_ExplosionSizeSq, m_ExplosionSizeSq, m_ExplosionSizeSq);
-
-				// Work out how far we are from the edge of the TNT's explosive effect
-				AbsoluteEntityPos -= m_ExplosionPos;
-				AbsoluteEntityPos = MaxExplosionBoundary - AbsoluteEntityPos;
-
-				double FinalDamage = ((AbsoluteEntityPos.x + AbsoluteEntityPos.y + AbsoluteEntityPos.z) / 3) * m_ExplosionSize;
-				FinalDamage = a_Entity->GetMaxHealth() - abs(FinalDamage);
-
-				// Clip damage values
-				if (FinalDamage > a_Entity->GetMaxHealth())
-					FinalDamage = a_Entity->GetMaxHealth();
-				else if (FinalDamage < 0)
-					return false;
-
-				if (!a_Entity->IsTNT()) // Don't apply damage to other TNT entities, they should be invincible
-				{
-					a_Entity->TakeDamage(dtExplosion, NULL, (int)FinalDamage, 0);
-				}
-
-				// Apply force to entities around the explosion - code modified from World.cpp DoExplosionAt()
-				Vector3d distance_explosion = a_Entity->GetPosition() - m_ExplosionPos;
-				if (distance_explosion.SqrLength() < 4096.0)
-				{
-					distance_explosion.Normalize();
-					distance_explosion *= m_ExplosionSizeSq;
-
-					a_Entity->AddSpeed(distance_explosion);
-				}
+				return false;
 			}
+			
+			Vector3d AbsoluteEntityPos(abs(EntityPos.x), abs(EntityPos.y), abs(EntityPos.z));
+			Vector3d MaxExplosionBoundary(m_ExplosionSizeSq, m_ExplosionSizeSq, m_ExplosionSizeSq);
+
+			// Work out how far we are from the edge of the TNT's explosive effect
+			AbsoluteEntityPos -= m_ExplosionPos;
+			AbsoluteEntityPos = MaxExplosionBoundary - AbsoluteEntityPos;
+
+			double FinalDamage = ((AbsoluteEntityPos.x + AbsoluteEntityPos.y + AbsoluteEntityPos.z) / 3) * m_ExplosionSize;
+			FinalDamage = a_Entity->GetMaxHealth() - abs(FinalDamage);
+
+			// Clip damage values
+			if (FinalDamage > a_Entity->GetMaxHealth())
+				FinalDamage = a_Entity->GetMaxHealth();
+			else if (FinalDamage < 0)
+				return false;
+
+			if (!a_Entity->IsTNT()) // Don't apply damage to other TNT entities, they should be invincible
+			{
+				a_Entity->TakeDamage(dtExplosion, NULL, (int)FinalDamage, 0);
+			}
+
+			// Apply force to entities around the explosion - code modified from World.cpp DoExplosionAt()
+			Vector3d distance_explosion = a_Entity->GetPosition() - m_ExplosionPos;
+			if (distance_explosion.SqrLength() < 4096.0)
+			{
+				distance_explosion.Normalize();
+				distance_explosion *= m_ExplosionSizeSq;
+
+				a_Entity->AddSpeed(distance_explosion);
+			}
+			
 			return false;
 		}
 
