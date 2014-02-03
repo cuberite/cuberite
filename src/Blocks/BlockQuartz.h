@@ -7,15 +7,15 @@
 
 
 
-class cBlockWoodHandler : public cBlockHandler
+class cBlockQuartsHandler : public cBlockHandler
 {
 public:
-	cBlockWoodHandler(BLOCKTYPE a_BlockType)
+	cBlockQuartsHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
 	{
 	}
 
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
@@ -25,48 +25,42 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
+		if (Meta != 0x2) // Check if the block is a pillar block.
+		{
+			return false;
+		}
+
 		a_BlockMeta = BlockFaceToMetaData(a_BlockFace, Meta);
 		return true;
 	}
 
-	
-	inline static NIBBLETYPE BlockFaceToMetaData(char a_BlockFace, NIBBLETYPE a_WoodMeta)
+	inline static NIBBLETYPE BlockFaceToMetaData(char a_BlockFace, NIBBLETYPE a_QuartzMeta)
 	{
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP:
 			{
-				return a_WoodMeta; // Top or bottom, just return original
+				return a_QuartzMeta; // Top or bottom, just return original
 			}
 
 			case BLOCK_FACE_ZP:
 			case BLOCK_FACE_ZM:
 			{
-				return a_WoodMeta | 0x8; // North or south
+				return 0x4; // North or south
 			}
 
 			case BLOCK_FACE_XP:
 			case BLOCK_FACE_XM:
 			{
-				return a_WoodMeta | 0x4; // East or west
+				return 0x3; // East or west
 			}
 
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
-				return a_WoodMeta | 0xC; // No idea, give a special meta (all sides bark)
+				return a_QuartzMeta; // No idea, give a special meta (all sides the sa)
 			}
 		}
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
 } ;
-
-
-
-

@@ -49,6 +49,7 @@
 #include "BlockPlanks.h"
 #include "BlockPortal.h"
 #include "BlockPumpkin.h"
+#include "BlockQuartz.h"
 #include "BlockRail.h"
 #include "BlockRedstone.h"
 #include "BlockRedstoneLamp.h"
@@ -56,6 +57,7 @@
 #include "BlockRedstoneTorch.h"
 #include "BlockSand.h"
 #include "BlockSapling.h"
+#include "BlockSideways.h"
 #include "BlockSign.h"
 #include "BlockSlab.h"
 #include "BlockSnow.h"
@@ -67,7 +69,6 @@
 #include "BlockTorch.h"
 #include "BlockTrapdoor.h"
 #include "BlockVine.h"
-#include "BlockWood.h"
 #include "BlockWorkbench.h"
 
 
@@ -144,6 +145,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GLASS:                 return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
+		case E_BLOCK_HAY_BALE:              return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);
 		case E_BLOCK_ICE:                   return new cBlockIceHandler             (a_BlockType);
 		case E_BLOCK_INACTIVE_COMPARATOR:   return new cBlockComparatorHandler      (a_BlockType);
@@ -158,14 +160,14 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LAVA:                  return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
-		case E_BLOCK_LOG:                   return new cBlockWoodHandler            (a_BlockType);
+		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
 		case E_BLOCK_MYCELIUM:              return new cBlockMyceliumHandler        (a_BlockType);
 		case E_BLOCK_NETHER_BRICK_STAIRS:   return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_NETHER_PORTAL:         return new cBlockPortalHandler          (a_BlockType);
 		case E_BLOCK_NETHER_WART:           return new cBlockNetherWartHandler      (a_BlockType);
-		case E_BLOCK_NEW_LOG:               return new cBlockWoodHandler            (a_BlockType);
+		case E_BLOCK_NEW_LOG:               return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      (           );
@@ -174,6 +176,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_PUMPKIN:               return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_QUARTZ_BLOCK:          return new cBlockQuartsHandler          (a_BlockType);
 		case E_BLOCK_QUARTZ_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_REDSTONE_LAMP_ON:      return new cBlockRedstoneLampHandler    (a_BlockType); // We need this to change pickups to an off lamp; else 1.7+ clients crash
