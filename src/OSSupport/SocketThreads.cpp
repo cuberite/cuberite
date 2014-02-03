@@ -557,6 +557,11 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 			}
 		}  // if (outgoing data is empty)
 		
+		if (m_Slots[i].m_State == sSlot::ssRemoteClosed)
+		{
+			continue;
+		}
+		
 		if (!SendDataThroughSocket(m_Slots[i].m_Socket, m_Slots[i].m_Outgoing))
 		{
 			int Err = cSocket::GetLastError();
@@ -566,7 +571,7 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 			{
 				m_Slots[i].m_Client->SocketClosed();
 			}
-			return;
+			continue;
 		}
 		
 		if (m_Slots[i].m_Outgoing.empty() && (m_Slots[i].m_State == sSlot::ssWritingRestOut))
