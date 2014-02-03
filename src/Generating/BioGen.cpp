@@ -97,7 +97,7 @@ void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 {
 	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "Plains");
 	m_Biome = StringToBiome(Biome);
-	if (m_Biome == -1)
+	if (m_Biome == biInvalidBiome)
 	{
 		LOGWARN("[Generator]::ConstantBiome value \"%s\" not recognized, using \"Plains\".", Biome.c_str());
 		m_Biome = biPlains;
@@ -233,7 +233,7 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 			}
 		}
 		EMCSBiome Biome = StringToBiome(Split2[0]);
-		if (Biome != -1)
+		if (Biome != biInvalidBiome)
 		{
 			for (int i = 0; i < Count; i++)
 			{
@@ -500,7 +500,7 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 			int OffsetZ = (m_Noise4.IntNoise3DInt(RealCellX, 32 * RealCellX - 16 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
 			SeedX[xc][zc] = CellBlockX + OffsetX;
 			SeedZ[xc][zc] = CellBlockZ + OffsetZ;
-			SeedV[xc][zc] = (((m_Noise6.IntNoise3DInt(RealCellX, RealCellX - RealCellZ + 1000, RealCellZ) / 11) % 256) > 90) ? biOcean : ((EMCSBiome)(-1));
+			SeedV[xc][zc] = (((m_Noise6.IntNoise3DInt(RealCellX, RealCellX - RealCellZ + 1000, RealCellZ) / 11) % 256) > 90) ? biOcean : (biInvalidBiome);
 		}  // for z
 	}  // for x
 	
@@ -573,7 +573,7 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 		float NoiseCoordZ = (float)(a_ChunkZ * cChunkDef::Width + z) / m_RiverCellSize;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != -1)
+			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biInvalidBiome)
 			{
 				// Biome already set, skip this column
 				continue;
@@ -693,7 +693,7 @@ void cBioGenMultiStepMap::DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, con
 		int idxZ = 17 * z;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != -1)
+			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biInvalidBiome)
 			{
 				// Already set before
 				continue;
