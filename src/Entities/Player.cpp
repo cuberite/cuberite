@@ -130,7 +130,13 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 cPlayer::~cPlayer(void)
 {
-	cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this);
+	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
+	{
+		AString DisconnectMessage;
+		AppendPrintf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), GetClientHandle()->GetUsername().c_str());
+		cRoot::Get()->BroadcastChat(DisconnectMessage);
+		LOGINFO("Player %s has left the game.", GetClientHandle()->GetUsername().c_str());
+	}
 
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
 	

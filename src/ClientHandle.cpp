@@ -227,7 +227,13 @@ void cClientHandle::Authenticate(void)
 
 	m_Player->SetIP (m_IPString);
 
-	cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player);
+	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
+	{
+		AString JoinMessage;
+		AppendPrintf(JoinMessage, "%s[JOIN] %s%s has joined the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
+		cRoot::Get()->BroadcastChat(JoinMessage);
+		LOGINFO("Player %s has joined the game.", m_Username.c_str());
+	}
 	
 	m_ConfirmPosition = m_Player->GetPosition();
 
@@ -910,7 +916,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
-	if (ItemHandler->IsPlaceable())
+	if (ItemHandler->IsPlaceable() && (a_BlockFace > -1))
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
@@ -1330,13 +1336,9 @@ void cClientHandle::HandleRespawn(void)
 void cClientHandle::HandleDisconnect(const AString & a_Reason)
 {
 	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
-	if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason))
-	{
-		AString DisconnectMessage;
-		Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
-		cRoot::Get()->BroadcastChat(DisconnectMessage);
-		LOGINFO("Player %s has left the game.", m_Username.c_str());
-	}
+
+	cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason);
+
 	m_HasSentDC = true;
 	Destroy();
 }
