@@ -14,8 +14,10 @@ class cFloater :
 	typedef cFloater super;
 	
 public:
-
 	//tolua_end
+
+	CLASS_PROTODEF(cFloater);
+
 	cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_PlayerID, int a_CountDownTime);
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
