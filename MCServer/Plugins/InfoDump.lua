@@ -149,7 +149,7 @@ local function GetCommandRefForum(a_Command)
 	if (type(a_Command) == "string") then
 		return "[color=blue]" .. a_Command .. "[/color]";
 	end
-	return "[color=blue]" .. a_Command.Name .. "[/color] [color=green]" .. a_Command.Params .. "[/color]";
+	return "[color=blue]" .. a_Command.Name .. "[/color] [color=green]" .. (a_Command.Params or "") .. "[/color]";
 end
 
 
@@ -169,7 +169,7 @@ local function WriteCommandParameterCombinationsForum(a_CmdString, a_ParameterCo
 	
 	f:write("The following parameter combinations are recognized:\n");
 	for idx, combination in ipairs(a_ParameterCombinations) do
-		f:write("[color=blue]", a_CmdString, "[/color] [color=green]", combination.Params, "[/color]");
+		f:write("[color=blue]", a_CmdString, "[/color] [color=green]", combination.Params or "", "[/color]");
 		if (combination.Help ~= nil) then
 			f:write(" - ", ForumizeString(combination.Help));
 		end
