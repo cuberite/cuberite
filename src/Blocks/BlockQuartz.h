@@ -7,10 +7,10 @@
 
 
 
-class cBlockQuartsHandler : public cBlockHandler
+class cBlockQuartzHandler : public cBlockHandler
 {
 public:
-	cBlockQuartsHandler(BLOCKTYPE a_BlockType)
+	cBlockQuartzHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
 	{
 	}
@@ -27,7 +27,7 @@ public:
 		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
 		if (Meta != 0x2) // Check if the block is a pillar block.
 		{
-			return false;
+			return true;
 		}
 
 		a_BlockMeta = BlockFaceToMetaData(a_BlockFace, Meta);
