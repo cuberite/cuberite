@@ -196,6 +196,9 @@ public:
 	cClientHandle * GetClientHandle(void) const { return m_ClientHandle; }
 
 	void SendMessage(const AString & a_Message);
+	void SendMessageInfo(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtInformation)); }
+	void SendMessageFailure(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtFailure)); }
+	void SendMessageSuccess(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtSuccess)); }
 
 	const AString & GetName(void) const { return m_PlayerName; }
 	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }

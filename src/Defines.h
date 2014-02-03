@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ChatColor.h"
+
 
 
 
@@ -441,7 +443,73 @@ inline float GetSpecialSignf( float a_Val )
 
 
 
-// tolua_begin
+enum ChatPrefixCodes
+{
+	// http://forum.mc-server.org/showthread.php?tid=1212
+	// MessageType...
+
+	mtCustom, // Plugin prints what it wants
+	mtFailure, // Something could not be done (i.e. command not executed due to insufficient privilege)
+	mtInformation, // Informational message (i.e. command usage)
+	mtSuccess, // Something executed successfully
+	mtWarning, // Something concerning (i.e. reload) is about to happen
+	mtFatal, // Something catastrophic occured (i.e. plugin crash)
+	mtDeath, // Denotes death of player
+	mtPrivateMessage // Player to player messaging identifier
+};
+
+
+
+
+inline AString AppendChatEpithet(const AString & a_ChatMessage, ChatPrefixCodes a_ChatPrefix)
+{
+	switch (a_ChatPrefix)
+	{
+	case mtCustom: return a_ChatMessage;
+	case mtFailure:
+	{
+		AString Message(Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str()));
+		Message.append(a_ChatMessage);
+		return Message;
+	}
+	case mtInformation:
+	{
+		AString Message(Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
+		Message.append(a_ChatMessage);
+		return Message;
+	}
+	case mtSuccess:
+	{
+		AString Message(Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+		Message.append(a_ChatMessage);
+		return Message;
+	}
+	case mtWarning:
+	{
+		AString Message(Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str()));
+		Message.append(a_ChatMessage);
+		return Message;
+	}
+	case mtFatal:
+	{
+		AString Message(Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+		Message.append(a_ChatMessage);
+		return Message;
+	}
+	case mtDeath:
+	{
+		AString Message(Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str()));
+		Message.append(a_ChatMessage);
+		return Message;
+	}
+	case mtPrivateMessage:
+	{
+		AString Message(Printf("%s[MSG] %s%s", cChatColor::LightBlue.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str()));
+		Message.append(a_ChatMessage);
+		return Message;
+	}
+	}
+}// tolua_begin
 
 /// Normalizes an angle in degrees to the [-180, +180) range:
 inline double NormalizeAngleDegrees(const double a_Degrees)
