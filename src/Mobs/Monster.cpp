@@ -188,6 +188,10 @@ void cMonster::MoveToPosition(const Vector3f & a_Position)
 	TickPathFinding();
 }
 
+
+
+
+
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
 	FinishPathFinding();
