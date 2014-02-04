@@ -113,9 +113,10 @@ public:
 	/// Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure
 	static eBlockFace FindSuitableFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		for (eBlockFace i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++) // Loop through all directions
+		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++) // Loop through all directions
 		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, true);
+			eBlockFace Face = static_cast<eBlockFace>(i);
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face, true);
 			BLOCKTYPE BlockInQuestion = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 
 			if ( // If on a block that can only hold a torch if torch is standing on it, return that face
@@ -123,20 +124,20 @@ public:
 				(BlockInQuestion == E_BLOCK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL)) &&
-				(i == BLOCK_FACE_TOP)
+				(Face == BLOCK_FACE_TOP)
 				)
 			{
-				return i;
+				return Face;
 			}
 			else if ((g_BlockFullyOccupiesVoxel[BlockInQuestion]) && (i != BLOCK_FACE_BOTTOM))
 			{
 				// Otherwise, if block in that direction is torch placeable and we haven't gotten to it via the bottom face, return that face
-				return i;
+				return Face;
 			}
 			else
 			{
 				// Reset coords in preparation for next iteration
-				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, false);
+				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face, false);
 			}
 		}
 		return BLOCK_FACE_NONE;
