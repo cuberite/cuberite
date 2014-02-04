@@ -91,6 +91,7 @@ public:
 	virtual void KilledBy(cEntity * a_Killer) override;
 
 	virtual void MoveToPosition(const Vector3f & a_Position);
+	virtual void MoveToPosition(const Vector3d & a_Position); // tolua_export
 	virtual bool ReachedDestination(void);
 	
 	// tolua_begin

@@ -2339,7 +2339,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 
 // TODO: This interface is dangerous!
-cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
+cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
 {
 	cTracer LineOfSight(this);
 

@@ -167,7 +167,7 @@ public:
 	void FromJson(const Json::Value & a_Value);
 	
 	/// Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements)
-	static bool IsEnchantable(short a_ItemType);
+	static bool IsEnchantable(short a_ItemType); // tolua_export
 
 	// tolua_begin
 	
