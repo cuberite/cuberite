@@ -88,7 +88,7 @@ public:
 			default:
 			{
 				ASSERT(!"Unhandled block meta!");
-				return BLOCK_FACE_NONE;
+				return 0;
 			}
 		}
 	}

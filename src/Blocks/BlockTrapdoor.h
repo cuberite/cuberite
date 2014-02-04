@@ -68,7 +68,7 @@ public:
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
-				return 0x0;
+				return 0;
 			}
 		}
 	}
@@ -84,7 +84,7 @@ public:
 			default:
 			{
 				ASSERT(!"Unhandled block meta!");
-				return BLOCK_FACE_NONE;
+				return 0;
 			}
 		}
 	}
