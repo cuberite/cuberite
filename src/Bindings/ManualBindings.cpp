@@ -1106,6 +1106,16 @@ static int tolua_cPluginManager_GetCurrentPlugin(lua_State * S)
 
 
 
+static int tolua_cPluginManager_LogStackTrace(lua_State * S)
+{
+	cLuaState::LogStackTrace(S);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, cLuaState & S, int a_ParamIdx)
 {
 	// Helper function for cPluginmanager:AddHook() binding
@@ -2386,6 +2396,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
 			tolua_function(tolua_S, "GetCurrentPlugin",      tolua_cPluginManager_GetCurrentPlugin);
+			tolua_function(tolua_S, "LogStackTrace",         tolua_cPluginManager_LogStackTrace);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");
