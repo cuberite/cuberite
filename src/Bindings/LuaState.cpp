@@ -1018,9 +1018,7 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState)
 	int depth = 0;
 	while (lua_getstack(a_LuaState, depth, &entry))
 	{
-		int status = lua_getinfo(a_LuaState, "Sln", &entry);
-		assert(status);
-
+		lua_getinfo(a_LuaState, "Sln", &entry);
 		LOGWARNING("  %s(%d): %s", entry.short_src, entry.currentline, entry.name ? entry.name : "(no name)");
 		depth++;
 	}
