@@ -99,7 +99,7 @@ void cProtocol172::DataReceived(const char * a_Data, int a_Size)
 		Byte Decrypted[512];
 		while (a_Size > 0)
 		{
-			int NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
+			int NumBytes = (a_Size > (int)sizeof(Decrypted)) ? (int)sizeof(Decrypted) : a_Size;
 			m_Decryptor.ProcessData(Decrypted, (Byte *)a_Data, NumBytes);
 			AddReceivedData((const char *)Decrypted, NumBytes);
 			a_Size -= NumBytes;
@@ -1836,7 +1836,7 @@ void cProtocol172::SendData(const char * a_Data, int a_Size)
 		Byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
-			int NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
+			int NumBytes = (a_Size > (int)sizeof(Encrypted)) ? (int)sizeof(Encrypted) : a_Size;
 			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
 			m_Client->SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;
