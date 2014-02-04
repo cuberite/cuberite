@@ -1072,7 +1072,8 @@ int cLuaState::CallFunctionWithForeignParams(
 	}
 	
 	// Call the function, with an error handler:
-	int s = lua_pcall(m_LuaState, a_SrcParamEnd - a_SrcParamStart + 1, LUA_MULTRET, OldTop);
+	LogStack("Before pcall");
+	int s = lua_pcall(m_LuaState, a_SrcParamEnd - a_SrcParamStart + 1, LUA_MULTRET, OldTop + 1);
 	if (ReportErrors(s))
 	{
 		LOGWARN("Error while calling function '%s' in '%s'", a_FunctionName.c_str(), m_SubsystemName.c_str());
@@ -1088,7 +1089,9 @@ int cLuaState::CallFunctionWithForeignParams(
 		m_NumCurrentFunctionArgs = -1;
 		m_CurrentFunctionName.clear();
 		
-		return -1;
+		// Make Lua think everything is okay and return 0 values, so that plugins continue executing.
+		// The failure is indicated by the zero return values.
+		return 0;
 	}
 	
 	// Reset the internal checking mechanisms:
