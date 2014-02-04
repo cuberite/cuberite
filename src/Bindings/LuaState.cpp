@@ -1162,6 +1162,7 @@ int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_Sr
 				// Copy the value:
 				void * ud = tolua_touserdata(a_SrcLuaState, i, NULL);
 				tolua_pushusertype(m_LuaState, ud, type);
+				break;
 			}
 			default:
 			{
