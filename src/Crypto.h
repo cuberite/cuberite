@@ -132,8 +132,6 @@ protected:
 class cAESCFBEncryptor
 {
 public:
-	Byte test;
-	
 	cAESCFBEncryptor(void);
 	~cAESCFBEncryptor();
 	
