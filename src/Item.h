@@ -174,9 +174,9 @@ public:
 	short         m_ItemType;
 	char          m_ItemCount;
 	short         m_ItemDamage;
+	cEnchantments m_Enchantments;
 	AString       m_CustomName;
 	AString       m_Lore;
-	cEnchantments m_Enchantments;
 };
 // tolua_end
 
