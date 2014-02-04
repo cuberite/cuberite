@@ -475,6 +475,9 @@ protected:
 
 	/// Filters out damage for creative mode/friendly fire
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
+
+	/** Stops players from burning in creative mode */
+	virtual void TickBurning(cChunk & a_Chunk) override;
 	
 	/// Called in each tick to handle food-related processing
 	void HandleFood(void);

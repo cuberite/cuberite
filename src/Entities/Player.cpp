@@ -1760,6 +1760,23 @@ void cPlayer::UseEquippedItem(void)
 
 
 
+void cPlayer::TickBurning(cChunk & a_Chunk)
+{
+	// Don't burn in creative and stop burning in creative if necessary
+	if (!IsGameModeCreative())
+	{
+		super::TickBurning(a_Chunk);
+	}
+	else if (IsOnFire())
+	{
+		m_TicksLeftBurning = 0;
+		OnFinishedBurning();
+	}
+}
+
+
+
+
 
 void cPlayer::HandleFood(void)
 {
