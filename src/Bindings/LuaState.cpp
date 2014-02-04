@@ -1066,6 +1066,8 @@ int cLuaState::CallFunctionWithForeignParams(
 	{
 		// Something went wrong, fix the stack and exit
 		lua_pop(m_LuaState, 2);
+		m_NumCurrentFunctionArgs = -1;
+		m_CurrentFunctionName.clear();
 		return -1;
 	}
 	
@@ -1081,11 +1083,17 @@ int cLuaState::CallFunctionWithForeignParams(
 		{
 			lua_pop(m_LuaState, CurTop - OldTop);
 		}
+		
+		// Reset the internal checking mechanisms:
+		m_NumCurrentFunctionArgs = -1;
+		m_CurrentFunctionName.clear();
+		
 		return -1;
 	}
 	
 	// Reset the internal checking mechanisms:
 	m_NumCurrentFunctionArgs = -1;
+	m_CurrentFunctionName.clear();
 	
 	// Remove the error handler from the stack:
 	lua_remove(m_LuaState, OldTop + 1);
