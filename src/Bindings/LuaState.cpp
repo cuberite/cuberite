@@ -1072,7 +1072,6 @@ int cLuaState::CallFunctionWithForeignParams(
 	}
 	
 	// Call the function, with an error handler:
-	LogStack("Before pcall");
 	int s = lua_pcall(m_LuaState, a_SrcParamEnd - a_SrcParamStart + 1, LUA_MULTRET, OldTop + 1);
 	if (ReportErrors(s))
 	{
