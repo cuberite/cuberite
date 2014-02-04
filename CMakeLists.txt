@@ -60,6 +60,9 @@ else()
 		set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -std=c++11")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
 	endif()
+
+	# We use a signed char (fixes #640 on RasPi)
+	add_flags_cxx("-fsigned-char")
 endif()
 
 
