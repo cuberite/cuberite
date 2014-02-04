@@ -1480,7 +1480,7 @@ void cProtocol172::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, BlockY);
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockZ);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, Face, Status);
+	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), Status);
 }
 
 
@@ -1499,7 +1499,7 @@ void cProtocol172::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
 

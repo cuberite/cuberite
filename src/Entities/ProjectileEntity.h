@@ -49,7 +49,7 @@ public:
 	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d * a_Speed = NULL);
 	
 	/// Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace);
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace);
 	
 	/// Called by the physics blocktracer when the entity hits another entity
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) 
@@ -174,7 +174,7 @@ protected:
 	Vector3i m_HitBlockPos;
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
 	virtual void CollectedBy(cPlayer * a_Player) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
@@ -204,7 +204,7 @@ protected:
 	// tolua_end
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 
 	// tolua_begin
 	
@@ -232,7 +232,7 @@ protected:
 	// tolua_end
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 
 	// tolua_begin
 	
@@ -258,7 +258,7 @@ public:
 protected:
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 
 	// tolua_begin
 	
@@ -284,7 +284,7 @@ public:
 protected:
 
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 
 	// tolua_begin
 
@@ -310,7 +310,7 @@ public:
 protected:
 
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
 
 	// tolua_begin
@@ -339,7 +339,7 @@ protected:
 	void Explode(int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
 
 	// TODO: Deflecting the fireballs by arrow- or sword- hits
@@ -370,7 +370,7 @@ protected:
 	void Explode(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace) override;
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
 
 	// tolua_begin

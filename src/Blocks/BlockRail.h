@@ -31,7 +31,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -344,7 +344,7 @@ public:
 	}
 
 
-	bool IsNotConnected(cChunkInterface  & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Pure = 0)
+	bool IsNotConnected(cChunkInterface  & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Pure = 0)
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);
 		NIBBLETYPE Meta;
