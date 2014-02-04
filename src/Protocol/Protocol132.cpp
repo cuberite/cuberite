@@ -476,7 +476,7 @@ int cProtocol132::ParseBlockPlace(void)
 	HANDLE_PACKET_READ(ReadChar, char, CursorY);
 	HANDLE_PACKET_READ(ReadChar, char, CursorZ);
 
-	m_Client->HandleRightClick(PosX, PosY, PosZ, BlockFace, CursorX, CursorY, CursorZ, HeldItem);
+	m_Client->HandleRightClick(PosX, PosY, PosZ, static_cast<eBlockFace>(BlockFace), CursorX, CursorY, CursorZ, HeldItem);
 	return PARSE_OK;
 }
 

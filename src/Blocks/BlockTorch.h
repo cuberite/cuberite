@@ -19,7 +19,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -57,7 +57,7 @@ public:
 	}
 	
 
-	inline static NIBBLETYPE DirectionToMetaData(char a_Direction)
+	inline static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)
 	{
 		switch (a_Direction)
 		{
@@ -77,7 +77,7 @@ public:
 	}
 	
 
-	inline static char MetaDataToDirection(NIBBLETYPE a_MetaData)
+	inline static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
 		switch (a_MetaData)
 		{
@@ -93,11 +93,11 @@ public:
 				break;
 			}
 		}
-		return 0;
+		return BLOCK_FACE_TOP;
 	}
 
 
-	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, char a_BlockFace)
+	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, eBlockFace a_BlockFace)
 	{
 		if ( !g_BlockFullyOccupiesVoxel[a_BlockType] )
 		{
@@ -111,9 +111,9 @@ public:
 	
 	
 	/// Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure
-	static char FindSuitableFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	static eBlockFace FindSuitableFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++) // Loop through all directions
+		for (eBlockFace i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++) // Loop through all directions
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, i, true);
 			BLOCKTYPE BlockInQuestion = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
@@ -145,7 +145,7 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		char Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+		eBlockFace Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 		BLOCKTYPE BlockInQuestion;

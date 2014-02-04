@@ -2,7 +2,7 @@
 #pragma once
 
 
-
+#include "Defines.h"
 
 
 // fwd: World.h
@@ -51,6 +51,25 @@ public:
 			else
 			{
 				return 0x3;
+			}
+		}
+	}
+	
+	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
+	{
+		switch (a_MetaData)
+		{
+			//case -1:  return BLOCK_FACE_NONE; //can never happen as metadata is unsigned
+			case 0x0: return BLOCK_FACE_YM;
+			case 0x1: return BLOCK_FACE_YP;
+			case 0x2: return BLOCK_FACE_ZM;
+			case 0x3: return BLOCK_FACE_ZP;
+			case 0x4: return BLOCK_FACE_XM;
+			case 0x5: return BLOCK_FACE_XP;
+			default:
+			{
+				ASSERT(!"Invalid Metadata");
+				return BLOCK_FACE_NONE;
 			}
 		}
 	}

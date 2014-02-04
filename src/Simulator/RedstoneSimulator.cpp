@@ -1112,12 +1112,13 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 	// Pistons cannot be powered through their front face; this function verifies that a source meets this requirement
 
 	int OldX = a_BlockX, OldY = a_BlockY, OldZ = a_BlockZ;
+	eBlockFace Face = cPiston::MetaDataToDirection(a_Meta);
 
 	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks.begin(); itr != m_PoweredBlocks.end(); ++itr)
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Meta); // Piston meta is based on what direction they face, so we can do this
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face);
 
 		if (!itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
@@ -1133,7 +1134,7 @@ bool cRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_Block
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face);
 
 		if (!itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{

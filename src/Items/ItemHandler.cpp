@@ -231,7 +231,7 @@ cItemHandler::cItemHandler(int a_ItemType)
 
 
 
-bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
 {
 	return false;
 }
@@ -240,7 +240,7 @@ bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem &
 
 
 
-bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
 {
 	return false;
 }
@@ -454,7 +454,7 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 
 bool cItemHandler::GetPlacementBlockTypeMeta(
 	cWorld * a_World, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )

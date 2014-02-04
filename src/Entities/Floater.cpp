@@ -35,7 +35,7 @@ public:
 		cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
 
 		double LineCoeff;
-		char Face;
+		eBlockFace Face;
 		EntBox.Expand(m_Floater->GetWidth() / 2, m_Floater->GetHeight() / 2, m_Floater->GetWidth() / 2);
 		if (!EntBox.CalcLineIntersection(m_Pos, m_NextPos, LineCoeff, Face))
 		{
