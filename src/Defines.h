@@ -465,51 +465,54 @@ inline AString AppendChatEpithet(const AString & a_ChatMessage, ChatPrefixCodes 
 {
 	switch (a_ChatPrefix)
 	{
-	case mtCustom: return a_ChatMessage;
-	case mtFailure:
-	{
-		AString Message(Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str()));
-		Message.append(a_ChatMessage);
-		return Message;
+		case mtCustom: return a_ChatMessage;
+		case mtFailure:
+		{
+			AString Message(Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str()));
+			Message.append(a_ChatMessage);
+			return Message;
+		}
+		case mtInformation:
+		{
+			AString Message(Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
+			Message.append(a_ChatMessage);
+			return Message;
+		}
+		case mtSuccess:
+		{
+			AString Message(Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+			Message.append(a_ChatMessage);
+			return Message;
+		}
+		case mtWarning:
+		{
+			AString Message(Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str()));
+			Message.append(a_ChatMessage);
+			return Message;
+		}
+		case mtFatal:
+		{
+			AString Message(Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+			Message.append(a_ChatMessage);
+			return Message;
+		}
+		case mtDeath:
+		{
+			AString Message(Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str()));
+			Message.append(a_ChatMessage);
+			return Message;
+		}
+		case mtPrivateMessage:
+		{
+			AString Message(Printf("%s[MSG] %s%s", cChatColor::LightBlue.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str()));
+			Message.append(a_ChatMessage);
+			return Message;
+		}
+		default: ASSERT(!"Unhandled chat prefix type!"); return "";
 	}
-	case mtInformation:
-	{
-		AString Message(Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
-		Message.append(a_ChatMessage);
-		return Message;
-	}
-	case mtSuccess:
-	{
-		AString Message(Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str()));
-		Message.append(a_ChatMessage);
-		return Message;
-	}
-	case mtWarning:
-	{
-		AString Message(Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str()));
-		Message.append(a_ChatMessage);
-		return Message;
-	}
-	case mtFatal:
-	{
-		AString Message(Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str()));
-		Message.append(a_ChatMessage);
-		return Message;
-	}
-	case mtDeath:
-	{
-		AString Message(Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str()));
-		Message.append(a_ChatMessage);
-		return Message;
-	}
-	case mtPrivateMessage:
-	{
-		AString Message(Printf("%s[MSG] %s%s", cChatColor::LightBlue.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str()));
-		Message.append(a_ChatMessage);
-		return Message;
-	}
-	}
-}// tolua_begin
+}
+
+// tolua_begin
 
 /// Normalizes an angle in degrees to the [-180, +180) range:
 inline double NormalizeAngleDegrees(const double a_Degrees)

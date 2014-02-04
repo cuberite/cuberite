@@ -3,6 +3,7 @@
 
 #include "Authenticator.h"
 #include "HTTPServer/HTTPServer.h"
+#include "Defines.h"
 
 
 
@@ -98,9 +99,6 @@ public:
 	/// Saves all chunks in all worlds
 	void SaveAllChunks(void);  // tolua_export
 	
-	/// Sends a chat message to all connected clients (in all worlds)
-	void BroadcastChat(const AString & a_Message);  // tolua_export
-	
 	/// Calls the callback for each player in all worlds
 	bool ForEachPlayer(cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 
@@ -108,6 +106,16 @@ public:
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 	
 	// tolua_begin
+	
+	/// Sends a chat message to all connected clients (in all worlds)
+	void BroadcastChat(const AString & a_Message);
+	void BroadcastChatInfo(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtInformation)); }
+	void BroadcastChatFailure(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtFailure)); }
+	void BroadcastChatSuccess(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtSuccess)); }
+	void BroadcastChatWarning(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtWarning)); }
+	void BroadcastChatFatal(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtFailure)); }
+	void BroadcastChatDeath(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtDeath)); }
+	void BroadcastChatPrivateMsg(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtPrivateMessage)); }
 	
 	/// Returns the textual description of the protocol version: 49 -> "1.4.4". Provided specifically for Lua API
 	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);
