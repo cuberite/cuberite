@@ -53,9 +53,6 @@ public:
 	static const int MAX_VIEW_DISTANCE = 15;
 	static const int MIN_VIEW_DISTANCE = 3;
 	
-	/// How many ticks should be checked for a running average of explosions, for limiting purposes
-	static const int NUM_CHECK_EXPLOSIONS_TICKS = 20;
-	
 	cClientHandle(const cSocket * a_Socket, int a_ViewDistance);
 	virtual ~cClientHandle();
 
@@ -301,14 +298,8 @@ private:
 	/// If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded()
 	bool m_ShouldCheckDownloaded;
 
-	/// Stores the recent history of the number of explosions per tick
-	int m_NumExplosionsPerTick[NUM_CHECK_EXPLOSIONS_TICKS];
-	
-	/// Points to the current tick in the m_NumExplosionsPerTick[] array
-	int m_CurrentExplosionTick;
-	
-	/// Running sum of m_NumExplosionsPerTick[]
-	int m_RunningSumExplosions;
+	/** Number of explosions sent this tick */
+	int m_NumExplosionsThisTick;
 	
 	static int s_ClientCount;
 	int m_UniqueID;

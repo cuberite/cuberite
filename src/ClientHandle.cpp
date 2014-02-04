@@ -44,16 +44,13 @@
 
 
 
-/// If the number of queued outgoing packets reaches this, the client will be kicked
+/** If the number of queued outgoing packets reaches this, the client will be kicked */
 #define MAX_OUTGOING_PACKETS 2000
 
-/// How many explosions per single game tick are allowed
-static const int MAX_EXPLOSIONS_PER_TICK = 100;
+/** Maximum number of explosions to send this tick, server will start dropping if exceeded */
+#define MAX_EXPLOSIONS_PER_TICK 100
 
-/// How many explosions in the recent history are allowed
-static const int MAX_RUNNING_SUM_EXPLOSIONS = cClientHandle::NUM_CHECK_EXPLOSIONS_TICKS * MAX_EXPLOSIONS_PER_TICK / 8;
-
-/// How many ticks before the socket is closed after the client is destroyed (#31)
+/** How many ticks before the socket is closed after the client is destroyed (#31) */
 static const int TICKS_BEFORE_CLOSE = 20;
 
 
@@ -95,8 +92,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_TicksSinceDestruction(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),
-	m_CurrentExplosionTick(0),
-	m_RunningSumExplosions(0),
+	m_NumExplosionsThisTick(0),
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false)
 {
@@ -1637,10 +1633,8 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 	
-	// Update the explosion statistics:
-	m_CurrentExplosionTick = (m_CurrentExplosionTick + 1) % ARRAYCOUNT(m_NumExplosionsPerTick);
-	m_RunningSumExplosions -= m_NumExplosionsPerTick[m_CurrentExplosionTick];
-	m_NumExplosionsPerTick[m_CurrentExplosionTick] = 0;
+	// Reset explosion counter:
+	m_NumExplosionsThisTick = 0;
 }
 
 
@@ -1920,18 +1914,14 @@ void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 
 void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
-	if (
-		(m_NumExplosionsPerTick[m_CurrentExplosionTick] > MAX_EXPLOSIONS_PER_TICK) ||  // Too many explosions in this tick
-		(m_RunningSumExplosions > MAX_RUNNING_SUM_EXPLOSIONS)  // Too many explosions in the recent history
-	)
+	if (m_NumExplosionsThisTick > MAX_EXPLOSIONS_PER_TICK)
 	{
-		LOGD("Dropped %u explosions", a_BlocksAffected.size());
+		LOGD("Dropped an explosion!");
 		return;
 	}
 	
 	// Update the statistics:
-	m_NumExplosionsPerTick[m_CurrentExplosionTick] += a_BlocksAffected.size();
-	m_RunningSumExplosions += a_BlocksAffected.size();
+	m_NumExplosionsThisTick += 1;
 	
 	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
