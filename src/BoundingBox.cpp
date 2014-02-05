@@ -1,4 +1,3 @@
-
 // BoundingBox.cpp
 
 // Implements the cBoundingBox class representing an axis-aligned bounding box with floatingpoint coords
@@ -42,7 +41,7 @@ public:
 			bool res = cBoundingBox::CalcLineIntersection(Min, Max, Line1, Line2, LineCoeff, Face);
 			if (res != Results[i])
 			{
-				printf("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
+				fprintf(stderr,"LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
 					Line1.x, Line1.y, Line1.z,
 					Line2.x, Line2.y, Line2.z,
 					res ? 1 : 0, LineCoeff, Face
@@ -53,7 +52,7 @@ public:
 			{
 				if (LineCoeff != LineCoeffs[i])
 				{
-					printf("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
+					fprintf(stderr,"LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
 						Line1.x, Line1.y, Line1.z,
 						Line2.x, Line2.y, Line2.z,
 						res ? 1 : 0, LineCoeff, Face
@@ -62,7 +61,7 @@ public:
 				}
 			}
 		}  // for i - LineDefs[]
-		printf("BoundingBox selftest complete.");
+		fprintf(stderr,"BoundingBox selftest complete.");
 	}
 } Test;
 
