@@ -18,8 +18,6 @@ public:			// tolua_export
 	void AddPermission( AString a_Permission );						// tolua_export
 	void InheritFrom( cGroup* a_Group );							// tolua_export
 
-	bool HasCommand( AString a_Command );							// tolua_export
-
 	typedef std::map< AString, bool > PermissionMap;
 	const PermissionMap & GetPermissions() const { return m_Permissions; }
 
