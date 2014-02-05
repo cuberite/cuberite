@@ -172,6 +172,10 @@ void cPluginManager::InsertDefaultPlugins(cIniFile & a_SettingsIni)
 	a_SettingsIni.AddValue("Plugins", "Plugin", "Core");
 	a_SettingsIni.AddValue("Plugins", "Plugin", "TransAPI");
 	a_SettingsIni.AddValue("Plugins", "Plugin", "ChatLog");
+	
+	#ifdef SELFTEST
+	a_SettingsIni.AddValue("Plugins", "Plugin", "SelfTest");
+	#endif
 }
 
 
