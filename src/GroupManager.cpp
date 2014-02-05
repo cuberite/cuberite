@@ -133,6 +133,10 @@ void cGroupManager::LoadGroups()
 	}
 }
 
+
+
+
+
 cGroup* cGroupManager::GetGroup( const AString & a_Name )
 {
 	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
