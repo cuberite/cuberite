@@ -1,4 +1,3 @@
-
 // BoundingBox.cpp
 
 // Implements the cBoundingBox class representing an axis-aligned bounding box with floatingpoint coords
@@ -11,7 +10,7 @@
 
 
 
-#if 0
+#if SELF_TEST
 
 /// A simple self-test that is executed on program start, used to verify bbox functionality
 class SelfTest
@@ -30,20 +29,39 @@ public:
 			Vector3d(1.999, 0, 1.5), Vector3d(1.999, 4, 1.5),  // Should intersect at 0.25, face 0 (YM)
 			Vector3d(2.001, 0, 1.5), Vector3d(2.001, 4, 1.5),  // Should not intersect
 		} ;
+		bool Results[] = {true,true,true,false,true,false};
+		double LineCoeffs[] = {2,0.25,0.5,0,0.25,0};
+		
 		for (size_t i = 0; i < ARRAYCOUNT(LineDefs) / 2; i++)
 		{
 			double LineCoeff;
-			char Face;
+			eBlockFace Face;
 			Vector3d Line1 = LineDefs[2 * i];
 			Vector3d Line2 = LineDefs[2 * i + 1];
 			bool res = cBoundingBox::CalcLineIntersection(Min, Max, Line1, Line2, LineCoeff, Face);
-			printf("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
-				Line1.x, Line1.y, Line1.z,
-				Line2.x, Line2.y, Line2.z,
-				res ? 1 : 0, LineCoeff, Face
-			);
+			if (res != Results[i])
+			{
+				fprintf(stderr,"LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
+					Line1.x, Line1.y, Line1.z,
+					Line2.x, Line2.y, Line2.z,
+					res ? 1 : 0, LineCoeff, Face
+				);
+				abort();
+			}
+			if (res)
+			{
+				if (LineCoeff != LineCoeffs[i])
+				{
+					fprintf(stderr,"LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
+						Line1.x, Line1.y, Line1.z,
+						Line2.x, Line2.y, Line2.z,
+						res ? 1 : 0, LineCoeff, Face
+					);
+					abort();
+				}
+			}
 		}  // for i - LineDefs[]
-		printf("BoundingBox selftest complete.");
+		fprintf(stderr,"BoundingBox selftest complete.");
 	}
 } Test;
 
