@@ -448,14 +448,15 @@ enum ChatPrefixCodes
 	// http://forum.mc-server.org/showthread.php?tid=1212
 	// MessageType...
 
-	mtCustom, // Plugin prints what it wants
 	mtFailure, // Something could not be done (i.e. command not executed due to insufficient privilege)
 	mtInformation, // Informational message (i.e. command usage)
 	mtSuccess, // Something executed successfully
 	mtWarning, // Something concerning (i.e. reload) is about to happen
 	mtFatal, // Something catastrophic occured (i.e. plugin crash)
 	mtDeath, // Denotes death of player
-	mtPrivateMessage // Player to player messaging identifier
+	mtPrivateMessage, // Player to player messaging identifier
+	mtJoin, // A player has joined the server
+	mtLeave, // A player has left the server
 };
 
 
@@ -463,53 +464,60 @@ enum ChatPrefixCodes
 
 inline AString AppendChatEpithet(const AString & a_ChatMessage, ChatPrefixCodes a_ChatPrefix)
 {
+	AString Message;
+
 	switch (a_ChatPrefix)
 	{
-		case mtCustom: return a_ChatMessage;
 		case mtFailure:
 		{
-			AString Message(Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str()));
-			Message.append(a_ChatMessage);
-			return Message;
+			Message = Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			break;
 		}
 		case mtInformation:
 		{
-			AString Message(Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
-			Message.append(a_ChatMessage);
-			return Message;
+			Message = Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			break;
 		}
 		case mtSuccess:
 		{
-			AString Message(Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str()));
-			Message.append(a_ChatMessage);
-			return Message;
+			Message = Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str());
+			break;
 		}
 		case mtWarning:
 		{
-			AString Message(Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str()));
-			Message.append(a_ChatMessage);
-			return Message;
+			Message = Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			break;
 		}
 		case mtFatal:
 		{
-			AString Message(Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str()));
-			Message.append(a_ChatMessage);
-			return Message;
+			Message = Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str());
+			break;
 		}
 		case mtDeath:
 		{
-			AString Message(Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str()));
-			Message.append(a_ChatMessage);
-			return Message;
+			Message = Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str());
+			break;
 		}
 		case mtPrivateMessage:
 		{
-			AString Message(Printf("%s[MSG] %s%s", cChatColor::LightBlue.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str()));
-			Message.append(a_ChatMessage);
-			return Message;
+			Message = Printf("%s[MSG] %s%s", cChatColor::LightBlue.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+			break;
+		}
+		case mtJoin:
+		{
+			Message = Printf("%s[JOIN] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			break;
+		}
+		case mtLeave:
+		{
+			Message = Printf("%s[LEAVE] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			break;
 		}
 		default: ASSERT(!"Unhandled chat prefix type!"); return "";
 	}
+
+	Message.append(a_ChatMessage);
+	return Message;
 }
 
 // tolua_begin

@@ -157,7 +157,17 @@ public:
 	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
-	void BroadcastChat               (const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export
+
+	// tolua_start
+	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
+	void BroadcastChatInfo(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtInformation)); }
+	void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtFailure)); }
+	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtSuccess)); }
+	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtWarning)); }
+	void BroadcastChatFatal(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtFailure)); }
+	void BroadcastChatDeath(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtDeath)); }
+	// tolua_end
+
 	void BroadcastChunkData          (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity      (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
