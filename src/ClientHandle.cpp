@@ -225,9 +225,7 @@ void cClientHandle::Authenticate(void)
 
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
-		AString JoinMessage;
-		AppendPrintf(JoinMessage, "%s[JOIN] %s%s has joined the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), GetUsername().c_str());
-		cRoot::Get()->BroadcastChat(JoinMessage);
+		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
 		LOGINFO("Player %s has joined the game.", m_Username.c_str());
 	}
 	
@@ -568,7 +566,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 {
 	if (a_Length < 14)
 	{
-		SendChat(Printf("%s[INFO]%s Failure setting command block command; bad request", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+		SendChat(AppendChatEpithet("Failure setting command block command; bad request", mtFailure));
 		LOGD("Malformed MC|AdvCdm packet.");
 		return;
 	}
@@ -598,7 +596,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 
 		default:
 		{
-			SendChat(Printf("%s[INFO]%s Failure setting command block command; unhandled mode", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+			SendChat(AppendChatEpithet("Failure setting command block command; unhandled mode", mtFailure));
 			LOGD("Unhandled MC|AdvCdm packet mode.");
 			return;
 		}
@@ -609,12 +607,12 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 	if (World->AreCommandBlocksEnabled())
 	{
 		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
-
-		SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+		
+		SendChat(AppendChatEpithet("Successfully set command block command", mtSuccess));
 	}
 	else
 	{
-		SendChat(Printf("%s[INFO]%s Command blocks are not enabled on this server", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
+		SendChat(AppendChatEpithet("Command blocks are not enabled on this server", mtFailure));
 	}
 }
 

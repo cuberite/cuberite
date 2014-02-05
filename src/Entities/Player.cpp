@@ -132,9 +132,7 @@ cPlayer::~cPlayer(void)
 {
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
 	{
-		AString DisconnectMessage;
-		AppendPrintf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), GetName().c_str());
-		cRoot::Get()->BroadcastChat(DisconnectMessage);
+		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
 		LOGINFO("Player %s has left the game.", GetName().c_str());
 	}
 
@@ -847,18 +845,18 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 
 	if (a_Killer == NULL)
 	{
-		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by environmental damage", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str()));
+		GetWorld()->BroadcastChatDeath(Printf("%s was killed by environmental damage", GetName().c_str()));
 	}
 	else if (a_Killer->IsPlayer())
 	{
-		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by %s", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
+		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
 	}
 	else
 	{
 		AString KillerClass = a_Killer->GetClass();
 		KillerClass.erase(KillerClass.begin()); // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
 
-		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by a %s", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str(), KillerClass.c_str()));
+		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
 
 	class cIncrementCounterCB
