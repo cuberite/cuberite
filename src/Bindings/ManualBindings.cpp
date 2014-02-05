@@ -1593,9 +1593,9 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 		int m_NumReturns;
 
 		cCallback(const AString & a_FunctionName, cLuaState & a_SrcLuaState) :
+			m_NumReturns(0),
 			m_FunctionName(a_FunctionName),
-			m_SrcLuaState(a_SrcLuaState),
-			m_NumReturns(0)
+			m_SrcLuaState(a_SrcLuaState)
 		{
 		}
 	protected:

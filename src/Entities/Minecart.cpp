@@ -24,11 +24,11 @@ class cMinecartCollisionCallback :
 {
 public:
 	cMinecartCollisionCallback(Vector3d a_Pos, double a_Height, double a_Width, int a_UniqueID, int a_AttacheeUniqueID) :
+		m_DoesInteserct(false),
+		m_CollidedEntityPos(0, 0, 0),
 		m_Pos(a_Pos),
 		m_Height(a_Height),
 		m_Width(a_Width),
-		m_DoesInteserct(false),
-		m_CollidedEntityPos(0, 0, 0),
 		m_UniqueID(a_UniqueID),
 		m_AttacheeUniqueID(a_AttacheeUniqueID)
 	{
@@ -1057,8 +1057,8 @@ void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 
 cMinecartWithFurnace::cMinecartWithFurnace(double a_X, double a_Y, double a_Z) :
 	super(mpFurnace, a_X, a_Y, a_Z),
-	m_IsFueled(false),
-	m_FueledTimeLeft(-1)
+	m_FueledTimeLeft(-1),
+	m_IsFueled(false)
 {
 }
 

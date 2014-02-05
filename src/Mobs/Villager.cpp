@@ -13,9 +13,9 @@
 
 cVillager::cVillager(eVillagerType VillagerType) :
 	super("Villager", mtVillager, "", "", 0.6, 1.8),
+	m_ActionCountDown(-1),
 	m_Type(VillagerType),
-	m_VillagerAction(false),
-	m_ActionCountDown(-1)
+	m_VillagerAction(false)
 {
 }
 
