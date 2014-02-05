@@ -44,6 +44,18 @@ cGroupManager::cGroupManager()
 	: m_pState( new sGroupManagerState )
 {
 	LOGD("-- Loading Groups --");
+	
+	LoadGroups();
+	
+	LOGD("-- Groups Successfully Loaded --");
+}
+
+
+
+
+
+void cGroupManager::LoadGroups()
+{
 	cIniFile IniFile;
 	if (!IniFile.ReadFile("groups.ini"))
 	{
@@ -71,8 +83,10 @@ cGroupManager::cGroupManager()
 	unsigned int NumKeys = IniFile.GetNumKeys();
 	for (size_t i = 0; i < NumKeys; i++)
 	{
-		std::string KeyName = IniFile.GetKeyName( i );
+		AString KeyName = IniFile.GetKeyName( i );
 		cGroup* Group = GetGroup( KeyName.c_str() );
+		
+		Group->ClearPermission(); // Needed in case the groups are reloaded.
 
 		LOGD("Loading group: %s", KeyName.c_str() );
 
@@ -107,7 +121,7 @@ cGroupManager::cGroupManager()
 			}
 		}
 
-		std::string Groups = IniFile.GetValue(KeyName, "Inherits", "");
+		AString Groups = IniFile.GetValue(KeyName, "Inherits", "");
 		if (!Groups.empty())
 		{
 			AStringVector Split = StringSplitAndTrim(Groups, ",");
@@ -117,7 +131,6 @@ cGroupManager::cGroupManager()
 			}
 		}
 	}
-	LOGD("-- Groups Successfully Loaded --");
 }
 
 

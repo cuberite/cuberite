@@ -3,19 +3,34 @@
 
 #include "Group.h"
 
-void cGroup::AddCommand( std::string a_Command )
+
+
+
+
+void cGroup::AddCommand( AString a_Command )
 {
 	m_Commands[ a_Command ] = true;
 }
 
-void cGroup::AddPermission( std::string a_Permission )
+
+
+
+
+void cGroup::AddPermission( AString a_Permission )
 {
 	m_Permissions[ a_Permission ] = true;
 }
 
-bool cGroup::HasCommand( std::string a_Command )
+
+
+
+
+bool cGroup::HasCommand( AString a_Command )
 {
-	if( m_Commands.find("*") != m_Commands.end() ) return true;
+	if( m_Commands.find("*") != m_Commands.end() ) 
+	{
+		return true;
+	}
 
 	CommandMap::iterator itr = m_Commands.find( a_Command );
 	if( itr != m_Commands.end() )
@@ -34,4 +49,12 @@ void cGroup::InheritFrom( cGroup* a_Group )
 {
 	m_Inherits.remove( a_Group );
 	m_Inherits.push_back( a_Group );
+}
+
+
+
+
+void cGroup::ClearPermission()
+{
+	m_Permissions.clear();
 }

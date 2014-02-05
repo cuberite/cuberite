@@ -247,9 +247,9 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_Scoreboard(this),
 	m_GeneratorCallbacks(*this),
-	m_TickThread(*this),
-	m_Scoreboard(this)
+	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
