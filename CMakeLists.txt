@@ -124,6 +124,10 @@ endif()
 # The Expat library is linked in statically, make the source files aware of that:
 add_definitions(-DXML_STATIC)
 
+# Self Test Mode enables extra checks at startup
+if(${SELF_TEST})
+	add_definitions(-DSELF_TEST)
+endif()
 
 # Declare the flags used for profiling builds:
 if (MSVC)
