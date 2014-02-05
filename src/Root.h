@@ -98,6 +98,9 @@ public:
 	/// Saves all chunks in all worlds
 	void SaveAllChunks(void);  // tolua_export
 	
+	/// Reloads all the groups
+	void ReloadGroups(void); // tolua_export
+
 	/// Sends a chat message to all connected clients (in all worlds)
 	void BroadcastChat(const AString & a_Message);  // tolua_export
 	

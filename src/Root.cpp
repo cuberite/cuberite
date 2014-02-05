@@ -536,6 +536,15 @@ void cRoot::SaveAllChunks(void)
 
 
 
+void cRoot::ReloadGroups(void)
+{
+	m_GroupManager->LoadGroups();
+}
+
+
+
+
+
 void cRoot::BroadcastChat(const AString & a_Message)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
