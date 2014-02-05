@@ -48,7 +48,7 @@
 #define MAX_OUTGOING_PACKETS 2000
 
 /** Maximum number of explosions to send this tick, server will start dropping if exceeded */
-#define MAX_EXPLOSIONS_PER_TICK 100
+#define MAX_EXPLOSIONS_PER_TICK 20
 
 /** How many ticks before the socket is closed after the client is destroyed (#31) */
 static const int TICKS_BEFORE_CLOSE = 20;
