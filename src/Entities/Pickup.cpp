@@ -22,9 +22,9 @@ class cPickupCombiningCallback :
 {
 public:
 	cPickupCombiningCallback(Vector3d a_Position, cPickup * a_Pickup) :
+		m_FoundMatchingPickup(false),
 		m_Position(a_Position),
-		m_Pickup(a_Pickup),
-		m_FoundMatchingPickup(false)
+		m_Pickup(a_Pickup)
 	{
 	}
 

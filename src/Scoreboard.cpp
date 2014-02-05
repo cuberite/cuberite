@@ -197,8 +197,8 @@ cTeam::cTeam(const AString & a_Name, const AString & a_DisplayName,
 	     const AString & a_Prefix, const AString & a_Suffix)
 	: m_AllowsFriendlyFire(true)
 	, m_CanSeeFriendlyInvisible(false)
-	, m_Name(a_Name)
 	, m_DisplayName(a_DisplayName)
+	, m_Name(a_Name)
 	, m_Prefix(a_Prefix)
 	, m_Suffix(a_Suffix)
 {}

@@ -946,11 +946,11 @@ void cRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_BlockY, int a_B
 			{
 			public:
 				cWoodenPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+					m_Entity(NULL),
+					m_World(a_World),
 					m_X(a_BlockX),
 					m_Y(a_BlockY),
-					m_Z(a_BlockZ),
-					m_World(a_World),
-					m_Entity(NULL)
+					m_Z(a_BlockZ)
 				{
 				}
 
