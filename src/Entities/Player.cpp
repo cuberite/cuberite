@@ -1267,19 +1267,6 @@ void cPlayer::RemoveFromGroup( const AString & a_GroupName )
 
 
 
-bool cPlayer::CanUseCommand( const AString & a_Command )
-{
-	for( GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr )
-	{
-		if( (*itr)->HasCommand( a_Command ) ) return true;
-	}
-	return false;
-}
-
-
-
-
-
 bool cPlayer::HasPermission(const AString & a_Permission)
 {
 	if (a_Permission.empty())
