@@ -132,7 +132,7 @@ void cRoot::Start(void)
 			LOGWARN("Regenerating settings.ini, all settings will be reset");
 			IniFile.AddHeaderComment(" This is the main server configuration");
 			IniFile.AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
-			IniFile.AddHeaderComment(" See: http://www.mc-server.org/wiki/doku.php?id=configure:settings.ini for further configuration help");
+			IniFile.AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
 		}
 
 		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
@@ -220,6 +220,7 @@ void cRoot::Start(void)
 		#endif
 
 		// Deallocate stuffs
+		if
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
 		
