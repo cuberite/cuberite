@@ -219,17 +219,14 @@ void cRoot::Start(void)
 		delete m_InputThread; m_InputThread = NULL;
 		#endif
 
-		// Deallocate stuffs
-		if
+		// Stop the server:
+		m_WebAdmin->Stop();
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
-		
 		LOGD("Shutting down deadlock detector...");
 		dd.Stop();
-		
 		LOGD("Stopping world threads...");
 		StopWorlds();
-		
 		LOGD("Stopping authenticator...");
 		m_Authenticator.Stop();
 

@@ -42,6 +42,7 @@ public:
 
 cWebAdmin::cWebAdmin(void) :
 	m_IsInitialized(false),
+	m_IsRunning(false),
 	m_TemplateScript("<webadmin_template>")
 {
 }
@@ -52,29 +53,26 @@ cWebAdmin::cWebAdmin(void) :
 
 cWebAdmin::~cWebAdmin()
 {
-	if (m_IsInitialized)
-	{
-		LOGD("Stopping WebAdmin...");
-	}
+	ASSERT(!m_IsRunning);  // Was the HTTP server stopped properly?
 }
 
 
 
 
 
-void cWebAdmin::AddPlugin( cWebPlugin * a_Plugin )
+void cWebAdmin::AddPlugin(cWebPlugin * a_Plugin)
 {
-	m_Plugins.remove( a_Plugin );
-	m_Plugins.push_back( a_Plugin );
+	m_Plugins.remove(a_Plugin);
+	m_Plugins.push_back(a_Plugin);
 }
 
 
 
 
 
-void cWebAdmin::RemovePlugin( cWebPlugin * a_Plugin )
+void cWebAdmin::RemovePlugin(cWebPlugin * a_Plugin)
 {
-	m_Plugins.remove( a_Plugin );
+	m_Plugins.remove(a_Plugin);
 }
 
 
@@ -87,7 +85,8 @@ bool cWebAdmin::Init(void)
 	{
 		LOGWARN("Regenerating webadmin.ini, all settings will be reset");
 		m_IniFile.AddHeaderComment(" This file controls the webadmin feature of MCServer");
-		m_IniFile.AddHeaderComment(" Username format: [User:*username*] | Password format: Password=*password*; for example:");
+		m_IniFile.AddHeaderComment(" Username format: [User:*username*]");
+		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
 		m_IniFile.AddHeaderComment(" [User:admin]");
 		m_IniFile.AddHeaderComment(" Password=admin");
 	}
@@ -134,7 +133,24 @@ bool cWebAdmin::Start(void)
 		m_TemplateScript.Close();
 	}
 
-	return m_HTTPServer.Start(*this);
+	m_IsRunning = m_HTTPServer.Start(*this);
+	return m_IsRunning;
+}
+
+
+
+
+
+void cWebAdmin::Stop(void)
+{
+	if (!m_IsRunning)
+	{
+		return;
+	}
+	
+	LOGD("Stopping WebAdmin...");
+	m_HTTPServer.Stop();
+	m_IsRunning = false;
 }
 
 
