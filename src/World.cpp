@@ -551,7 +551,7 @@ void cWorld::Start(void)
 	m_bUseChatPrefixes          = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",           true);
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",    "VillagersShouldHarvestCrops", true);
 
-	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
+	m_GameMode = (eGameMode)IniFile.GetValueSetI("General", "Gamemode", m_GameMode);
 
 	// Load allowed mobs:
 	const char * DefaultMonsters = "";
