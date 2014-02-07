@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Simulator.h"
+#include "RedstoneManager.h"
 
 /// Per-chunk data for the simulator, specified individual chunks to simulate; 'Data' is not used
 typedef cCoordWithBlockAndBoolVector cRedstoneSimulatorChunkData;
@@ -11,9 +11,9 @@ typedef cCoordWithBlockAndBoolVector cRedstoneSimulatorChunkData;
 
 
 class cRedstoneSimulator :
-	public cSimulator
+	public cRedstoneManager
 {
-	typedef cSimulator super;
+	typedef cRedstoneManager super;
 public:
 
 	cRedstoneSimulator(cWorld & a_World);

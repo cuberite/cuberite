@@ -29,6 +29,7 @@
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
 #include "Simulator/NoopFluidSimulator.h"
+#include "Simulator/NoopRedstoneSimulator.h"
 #include "Simulator/SandSimulator.h"
 #include "Simulator/RedstoneSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
@@ -596,12 +597,11 @@ void cWorld::Start(void)
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
 	m_SandSimulator     = new cSandSimulator(*this, IniFile);
 	m_FireSimulator     = new cFireSimulator(*this, IniFile);
-	m_RedstoneSimulator = new cRedstoneSimulator(*this);
+	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
-	// Water and Lava simulators get registered in InitializeFluidSimulator()
+	// Water, Lava and Redstone simulators get registered in InitializeFluidSimulator()
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
 
 	m_Lighting.Start(this);
 	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor );
@@ -2865,6 +2865,40 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 		
 		a_Results.push_back((*itr)->GetName()); //Match!
 	}
+}
+
+
+
+
+
+cRedstoneManager * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
+{
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "");
+
+	if (SimulatorName.empty())
+	{
+		LOGWARNING("[Physics] RedstoneSimulator not present or empty in %s, using the default of \"Floody\".", GetIniFileName().c_str());
+		SimulatorName = "redstone";
+	}
+	
+	cRedstoneManager * res = NULL;
+
+	if (
+		(NoCaseCompare(SimulatorName, "redstone") == 0)
+	)
+	{
+		res = new cRedstoneSimulator(*this);
+	}
+	else if (
+		(NoCaseCompare(SimulatorName, "noop") == 0)
+	)
+	{
+		res = new cRedstoneNoopSimulator(*this);
+	}
+	
+	m_SimulatorManager->RegisterSimulator(res, 1);
+	
+	return res;
 }
 
 

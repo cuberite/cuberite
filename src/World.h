@@ -33,7 +33,7 @@
 class cFireSimulator;
 class cFluidSimulator;
 class cSandSimulator;
-class cRedstoneSimulator;
+class cRedstoneManager;
 class cItem;
 class cPlayer;
 class cClientHandle;
@@ -432,7 +432,7 @@ public:
 	
 	inline cFluidSimulator * GetWaterSimulator(void) { return m_WaterSimulator; }
 	inline cFluidSimulator * GetLavaSimulator (void) { return m_LavaSimulator; }
-	inline cRedstoneSimulator * GetRedstoneSimulator(void) { return m_RedstoneSimulator; }
+	inline cRedstoneManager * GetRedstoneSimulator(void) { return m_RedstoneSimulator; }
 	
 	/** Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -759,7 +759,7 @@ private:
 	cFluidSimulator *    m_WaterSimulator;
 	cFluidSimulator *    m_LavaSimulator;
 	cFireSimulator *     m_FireSimulator;
-	cRedstoneSimulator * m_RedstoneSimulator;
+	cRedstoneManager *   m_RedstoneSimulator;
 	
 	cCriticalSection m_CSPlayers;
 	cPlayerList      m_Players;
@@ -858,6 +858,9 @@ private:
 	
 	/** Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section) */
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
+
+	/** Creates a new redstone simulator.*/
+	cRedstoneManager * InitializeRedstoneSimulator(cIniFile & a_IniFile);
 }; // tolua_export
 
 
