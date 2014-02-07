@@ -31,7 +31,7 @@
 #include "Simulator/NoopFluidSimulator.h"
 #include "Simulator/NoopRedstoneSimulator.h"
 #include "Simulator/SandSimulator.h"
-#include "Simulator/RedstoneSimulator.h"
+#include "Simulator/IncrementalRedstoneSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
 
 // Mobs:
@@ -2871,27 +2871,23 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 
 
 
-cRedstoneManager * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
+cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 {
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "");
 
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("[Physics] RedstoneSimulator not present or empty in %s, using the default of \"Floody\".", GetIniFileName().c_str());
-		SimulatorName = "redstone";
+		LOGWARNING("[Physics] RedstoneSimulator not present or empty in %s, using the default of \"incremental\".", GetIniFileName().c_str());
+		SimulatorName = "incremental";
 	}
 	
-	cRedstoneManager * res = NULL;
+	cRedstoneSimulator * res = NULL;
 
-	if (
-		(NoCaseCompare(SimulatorName, "redstone") == 0)
-	)
+	if (NoCaseCompare(SimulatorName, "incremental") == 0)
 	{
-		res = new cRedstoneSimulator(*this);
+		res = new cIncrementalRedstoneSimulator(*this);
 	}
-	else if (
-		(NoCaseCompare(SimulatorName, "noop") == 0)
-	)
+	else if (NoCaseCompare(SimulatorName, "noop") == 0)
 	{
 		res = new cRedstoneNoopSimulator(*this);
 	}

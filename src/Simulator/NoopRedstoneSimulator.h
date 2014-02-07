@@ -1,16 +1,16 @@
 
 #pragma once
 
-#include "RedstoneManager.h"
+#include "RedstoneSimulator.h"
 
 
 
 
 
 class cRedstoneNoopSimulator :
-	public cRedstoneManager
+	public cRedstoneSimulator
 {
-	typedef cRedstoneManager super;
+	typedef cRedstoneSimulator super;
 public:
 
 	cRedstoneNoopSimulator(cWorld & a_World) :
