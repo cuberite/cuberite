@@ -5,6 +5,7 @@
 #include "../Inventory.h"
 #include "../Defines.h"
 #include "../World.h"
+#include "../ClientHandle.h"
 
 
 
@@ -195,13 +196,13 @@ public:
 
 	cClientHandle * GetClientHandle(void) const { return m_ClientHandle; }
 
-	void SendMessage(const AString & a_Message);
-	void SendMessageInfo(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtInformation)); }
-	void SendMessageFailure(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtFailure)); }
-	void SendMessageSuccess(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtSuccess)); }
-	void SendMessageWarning(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtWarning)); }
-	void SendMessageFatal(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtFailure)); }
-	void SendMessagePrivateMsg(const AString & a_Message) { SendMessage(AppendChatEpithet(a_Message, mtPrivateMessage)); }
+	void SendMessage          (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtCustom); }
+	void SendMessageInfo      (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtInformation); }
+	void SendMessageFailure   (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
+	void SendMessageSuccess   (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtSuccess); }
+	void SendMessageWarning   (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtWarning); }
+	void SendMessageFatal     (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
+	void SendMessagePrivateMsg(const AString & a_Message, const AString & a_Sender) { m_ClientHandle->SendChat(a_Message, mtPrivateMessage, a_Sender); }
 
 	const AString & GetName(void) const { return m_PlayerName; }
 	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }

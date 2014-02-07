@@ -158,14 +158,16 @@ public:
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 
-	// tolua_start
-	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
-	void BroadcastChatInfo(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtInformation)); }
-	void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtFailure)); }
-	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtSuccess)); }
-	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtWarning)); }
-	void BroadcastChatFatal(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtFailure)); }
-	void BroadcastChatDeath(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(AppendChatEpithet(a_Message, mtDeath)); }
+	void LoopPlayersAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const cClientHandle * a_Exclude = NULL);
+	void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtDeath, a_Exclude); }
+
+	// tolua_begin
+	void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtCustom, a_Exclude); }
+	void BroadcastChatInfo   (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtInformation, a_Exclude); }
+	void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtFailure, a_Exclude); }
+	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtSuccess, a_Exclude); }
+	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtWarning, a_Exclude); }
+	void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtFailure, a_Exclude); }
 	// tolua_end
 
 	void BroadcastChunkData          (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
@@ -544,12 +546,14 @@ public:
 	/** Returns the name of the world.ini file used by this world */
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
 
-	/// Returns the associated scoreboard instance
+	/** Returns the associated scoreboard instance */
 	cScoreboard & GetScoreBoard(void) { return m_Scoreboard; }
 
 	bool AreCommandBlocksEnabled(void) const { return m_bCommandBlocksEnabled; }
-
 	void SetCommandBlocksEnabled(bool a_Flag) { m_bCommandBlocksEnabled = a_Flag; }
+
+	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
+	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
 	
 	// tolua_end
 	
@@ -800,7 +804,10 @@ private:
 	bool m_IsSaplingBonemealable;
 	bool m_IsSugarcaneBonemealable;
 
+	/** Whether command blocks are enabled or not */
 	bool m_bCommandBlocksEnabled;
+	/** Whether prefixes such as [INFO] are prepended to SendMessageXXX() / BroadcastChatXXX() functions */
+	bool m_bUseChatPrefixes;
 	
 
 	cChunkGenerator  m_Generator;

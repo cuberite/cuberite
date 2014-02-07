@@ -89,7 +89,7 @@ public:
 	void SendBlockBreakAnim      (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta); // tolua_export
 	void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
-	void SendChat                (const AString & a_Message);
+	void SendChat                (const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
 	void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player);
 	void SendDestroyEntity       (const cEntity & a_Entity);

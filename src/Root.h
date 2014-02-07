@@ -105,19 +105,20 @@ public:
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 
-	void BroadcastChatJoin(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtJoin)); }
-	void BroadcastChatLeave(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtLeave)); }
+	void LoopWorldsAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix);
+	void BroadcastChatJoin   (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtJoin); }
+	void BroadcastChatLeave  (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtLeave); }
+	void BroadcastChatDeath  (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtDeath); }
 	
 	// tolua_begin
 	
 	/// Sends a chat message to all connected clients (in all worlds)
-	void BroadcastChat(const AString & a_Message);
-	void BroadcastChatInfo(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtInformation)); }
-	void BroadcastChatFailure(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtFailure)); }
-	void BroadcastChatSuccess(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtSuccess)); }
-	void BroadcastChatWarning(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtWarning)); }
-	void BroadcastChatFatal(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtFailure)); }
-	void BroadcastChatDeath(const AString & a_Message) { BroadcastChat(AppendChatEpithet(a_Message, mtDeath)); }
+	void BroadcastChat       (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtCustom); }
+	void BroadcastChatInfo   (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtInformation); }
+	void BroadcastChatFailure(const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtFailure); }
+	void BroadcastChatSuccess(const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtSuccess); }
+	void BroadcastChatWarning(const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtWarning); }
+	void BroadcastChatFatal  (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtFailure); }
 	
 	/// Returns the textual description of the protocol version: 49 -> "1.4.4". Provided specifically for Lua API
 	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);

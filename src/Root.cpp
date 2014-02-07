@@ -536,11 +536,11 @@ void cRoot::SaveAllChunks(void)
 
 
 
-void cRoot::BroadcastChat(const AString & a_Message)
+void cRoot::LoopWorldsAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
 	{
-		itr->second->BroadcastChat(a_Message);
+		itr->second->LoopPlayersAndBroadcastChat(a_Message, a_ChatPrefix);
 	}  // for itr - m_WorldsByName[]
 }
 

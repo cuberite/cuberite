@@ -448,6 +448,7 @@ enum ChatPrefixCodes
 	// http://forum.mc-server.org/showthread.php?tid=1212
 	// MessageType...
 
+	mtCustom, // Send raw data without any processing
 	mtFailure, // Something could not be done (i.e. command not executed due to insufficient privilege)
 	mtInformation, // Informational message (i.e. command usage)
 	mtSuccess, // Something executed successfully
@@ -459,70 +460,9 @@ enum ChatPrefixCodes
 	mtLeave, // A player has left the server
 };
 
-
-
-
-inline AString AppendChatEpithet(const AString & a_ChatMessage, ChatPrefixCodes a_ChatPrefix)
-{
-	AString Message;
-
-	switch (a_ChatPrefix)
-	{
-		case mtFailure:
-		{
-			Message = Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
-			break;
-		}
-		case mtInformation:
-		{
-			Message = Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			break;
-		}
-		case mtSuccess:
-		{
-			Message = Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str());
-			break;
-		}
-		case mtWarning:
-		{
-			Message = Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
-			break;
-		}
-		case mtFatal:
-		{
-			Message = Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str());
-			break;
-		}
-		case mtDeath:
-		{
-			Message = Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str());
-			break;
-		}
-		case mtPrivateMessage:
-		{
-			Message = Printf("%s[MSG] %s%s", cChatColor::LightBlue.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
-			break;
-		}
-		case mtJoin:
-		{
-			Message = Printf("%s[JOIN] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			break;
-		}
-		case mtLeave:
-		{
-			Message = Printf("%s[LEAVE] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			break;
-		}
-		default: ASSERT(!"Unhandled chat prefix type!"); return "";
-	}
-
-	Message.append(a_ChatMessage);
-	return Message;
-}
-
 // tolua_begin
 
-/// Normalizes an angle in degrees to the [-180, +180) range:
+/** Normalizes an angle in degrees to the [-180, +180) range: */
 inline double NormalizeAngleDegrees(const double a_Degrees)
 {
 	double Norm = fmod(a_Degrees + 180, 360);

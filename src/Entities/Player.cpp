@@ -3,7 +3,6 @@
 
 #include "Player.h"
 #include "../Server.h"
-#include "../ClientHandle.h"
 #include "../UI/Window.h"
 #include "../UI/WindowOwner.h"
 #include "../World.h"
@@ -1115,15 +1114,6 @@ void cPlayer::LoginSetGameMode( eGameMode a_GameMode )
 void cPlayer::SetIP(const AString & a_IP)
 {
 	m_IP = a_IP;
-}
-
-
-
-
-
-void cPlayer::SendMessage(const AString & a_Message)
-{
-	m_ClientHandle->SendChat(a_Message);
 }
 
 

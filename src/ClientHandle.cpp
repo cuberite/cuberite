@@ -566,7 +566,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 {
 	if (a_Length < 14)
 	{
-		SendChat(AppendChatEpithet("Failure setting command block command; bad request", mtFailure));
+		SendChat("Failure setting command block command; bad request", mtFailure);
 		LOGD("Malformed MC|AdvCdm packet.");
 		return;
 	}
@@ -596,7 +596,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 
 		default:
 		{
-			SendChat(AppendChatEpithet("Failure setting command block command; unhandled mode", mtFailure));
+			SendChat("Failure setting command block command; unhandled mode", mtFailure);
 			LOGD("Unhandled MC|AdvCdm packet mode.");
 			return;
 		}
@@ -608,11 +608,11 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 	{
 		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
 		
-		SendChat(AppendChatEpithet("Successfully set command block command", mtSuccess));
+		SendChat("Successfully set command block command", mtSuccess);
 	}
 	else
 	{
-		SendChat(AppendChatEpithet("Command blocks are not enabled on this server", mtFailure));
+		SendChat("Command blocks are not enabled on this server", mtFailure);
 	}
 }
 
@@ -1729,9 +1729,111 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
-void cClientHandle::SendChat(const AString & a_Message)
+void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData)
 {
-	m_Protocol->SendChat(a_Message);
+	bool ShouldAppendChatPrefixes = true;
+
+	if (GetPlayer()->GetWorld() == NULL)
+	{
+		cWorld * World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
+		if (World == NULL)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+
+		if (!World->ShouldUseChatPrefixes())
+		{
+			ShouldAppendChatPrefixes = false;
+		}
+	}
+	else if (!GetPlayer()->GetWorld()->ShouldUseChatPrefixes())
+	{
+		ShouldAppendChatPrefixes = false;
+	}
+
+	AString Message;
+
+	switch (a_ChatPrefix)
+	{
+		case mtCustom: break;
+		case mtFailure:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Rose.c_str());
+			break;
+		}
+		case mtInformation:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		case mtSuccess:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Green.c_str());
+			break;
+		}
+		case mtWarning:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Rose.c_str());
+			break;
+		}
+		case mtFatal:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Red.c_str());
+			break;
+		}
+		case mtDeath:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Gray.c_str());
+			break;
+		}
+		case mtPrivateMessage:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+			else
+				Message = Printf("%s", cChatColor::LightBlue.c_str());
+			break;
+		}
+		case mtJoin:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[JOIN] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		case mtLeave:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[LEAVE] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		default: ASSERT(!"Unhandled chat prefix type!"); return;
+	}
+
+	Message.append(a_Message);
+
+	m_Protocol->SendChat(Message);
 }
 
 
