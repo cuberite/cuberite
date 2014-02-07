@@ -1809,7 +1809,7 @@ void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPr
 			if (ShouldAppendChatPrefixes)
 				Message = Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
 			else
-				Message = Printf("%s", cChatColor::LightBlue.c_str());
+				Message = Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
 			break;
 		}
 		case mtJoin:
