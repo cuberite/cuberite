@@ -693,7 +693,6 @@ end
 				GetRawDamageAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the raw damage that this entity's equipment would cause when attacking the ReceiverEntity. This includes this entity's weapon {{cEnchantments|enchantments}}, but excludes the receiver's armor or potion effects. See {{TakeDamageInfo}} for more information on attack damage." },
 				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity. Currently unused." },
 				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the entire rotation vector (Yaw, Pitch, Roll)" },
-				GetRotation = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. OBSOLETE, use GetYaw() instead." },
 				GetSpeed = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the complete speed vector of the entity" },
 				GetSpeedX = { Params = "", Return = "number", Notes = "Returns the X-part of the speed vector" },
 				GetSpeedY = { Params = "", Return = "number", Notes = "Returns the Y-part of the speed vector" },
@@ -720,8 +719,11 @@ end
 				IsRclking = { Params = "", Return = "bool", Notes = "Currently unimplemented" },
 				IsRiding = { Params = "", Return = "bool", Notes = "Returns true if the entity is attached to (riding) another entity." },
 				IsSprinting = { Params = "", Return = "bool", Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false" },
+				IsSubmerged = { Params = "", Return = "bool", Notes = "Returns true if the mob or player is submerged in water (head is in a water block). Note, this function is only updated with mobs or players." },
+				IsSwimming = { Params = "", Return = "bool", Notes = "Returns true if the mob or player is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players." },
 				IsTNT = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cTNTEntity|TNT entity}}" },
 				KilledBy = { Notes = "FIXME: Remove this from API" },
+				GetAirLevel = { Params = "", Return = "number", Notes = "Returns the air level (number of ticks of air left). Note, this function is only updated with mobs or players." },
 				SetGravity = { Params = "Gravity", Return = "", Notes = "Sets the number that is used as the gravity for physics simulation. 1G (9.78) by default." },
 				SetHeadYaw = { Params = "HeadPitch", Return = "", Notes = "Sets the head pitch (FIXME: Rename to SetHeadPitch() )." },
 				SetHealth = { Params = "Hitpoints", Return = "", Notes = "Sets the entity's health to the specified amount of hitpoints. Doesn't broadcast any hurt animation. Doesn't kill the entity if health drops below zero. Use the TakeDamage() function instead for taking damage." },
@@ -740,8 +742,7 @@ end
 				SetPosZ = { Params = "number", Return = "", Notes = "Sets the Z-coord of the entity's pivot" },
 				SetRoll = { Params = "number", Return = "", Notes = "Sets the roll (sideways rotation) of the entity. Currently unused." },
 				SetRot = { Params = "{{Vector3f|Rotation}}", Return = "", Notes = "Sets the entire rotation vector (Yaw, Pitch, Roll)" },
-				SetRotation = { Params = "number", Return = "", Notes = "Sets the yaw (direction) of the entity. OBSOLETE, use SetYaw() instead." },
-				SetRotationFromSpeed = { Params = "", Return = "", Notes = "Sets the entity's yaw to match its current speed (entity looking forwards as it moves). (FIXME: Rename to SetYawFromSpeed)" },
+				SetYawFromSpeed = { Params = "", Return = "", Notes = "Sets the entity's yaw to match its current speed (entity looking forwards as it moves). (FIXME: Rename to SetYawFromSpeed)" },
 				SetSpeed =
 				{
 					{ Params = "SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Sets the current speed of the entity" },
@@ -1103,10 +1104,9 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				GetMaxStackSize = { Params = "", Return = "number", Notes = "Returns the maximum stack size for this item." },
 				IsDamageable = { Params = "", Return = "bool", Notes = "Returns true if this item does account for its damage" },
 				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
-				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage and enchantments)" },
+				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage, lore, name and enchantments)" },
 				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
 				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object. This is true even if the two items have different enchantments" },
-				IsStackableWith = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is stackable with the one stored in the object. Two items with different enchantments cannot be stacked" },
 			},
 			Variables =
 			{
@@ -1564,7 +1564,6 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				constructor = { Params = "PosX, PosY, PosZ, {{cItem|Item}}, IsPlayerCreated, [SpeedX, SpeedY, SpeedZ]", Return = "cPickup", Notes = "Creates a new pickup at the specified coords. If IsPlayerCreated is true, the pickup has a longer initial collection interval." },
 				CollectedBy = { Params = "{{cPlayer}}", Return = "bool", Notes = "Tries to make the player collect the pickup. Returns true if the pickup was collected, at least partially." },
 				GetAge = { Params = "", Return = "number", Notes = "Returns the number of ticks that the pickup has existed." },
 				GetItem = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item represented by this pickup" },
@@ -1594,7 +1593,6 @@ a_Player:OpenWindow(Window);
 				Feed = { Params = "AddFood, AddSaturation", Return = "bool", Notes = "Tries to add the specified amounts to food level and food saturation level (only positive amounts expected). Returns true if player was hungry and the food was consumed, false if too satiated." },
 				FoodPoison = { Params = "NumTicks", Return = "", Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two" },
 				ForceSetSpeed = { Params = "{{Vector3d|Direction}}", Notes = "Forces the player to move to the given direction." },
-				GetAirLevel = { Params = "", Return = "number", Notes = "Returns the air level (number of ticks of air left)." },
 				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
 				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player (based on the first group). Prefix player messages with this code." },
 				GetCurrentXp = { Params = "", Return = "number", Notes = "Returns the current amount of XP" },
@@ -1635,8 +1633,6 @@ a_Player:OpenWindow(Window);
 				IsInGroup = { Params = "GroupNameString", Return = "bool", Notes = "Returns true if the player is a member of the specified group." },
 				IsOnGround = { Params = "", Return = "bool", Notes = "Returns true if the player is on ground (not falling, not jumping, not flying)" },
 				IsSatiated = { Params = "", Return = "bool", Notes = "Returns true if the player is satiated (cannot eat)." },
-				IsSubmerged = { Params = "", Return = "bool", Notes = "Returns true if the player is submerged in water (the player's head is in a water block)" },
-				IsSwimming = { Params = "", Return = "bool", Notes = "Returns true if the player is swimming in water (the player's feet are in a water block)" },
 				IsVisible = { Params = "", Return = "bool", Notes = "Returns true if the player is visible to other players" },
 				LoadPermissionsFromDisk = { Params = "", Return = "", Notes = "Reloads the player's permissions from the disk. This loses any temporary changes made to the player's groups." },
 				MoveTo = { Params = "{{Vector3d|NewPosition}}", Return = "Tries to move the player into the specified position." },
@@ -1672,9 +1668,7 @@ a_Player:OpenWindow(Window);
 			},
 			Constants =
 			{
-				DROWNING_TICKS = { Notes = "Number of ticks per heart of damage when drowning (zero AirLevel)" },
 				EATING_TICKS   = { Notes = "Number of ticks required for consuming an item." },
-				MAX_AIR_LEVEL  = { Notes = "The maximum air level value. AirLevel gets reset to this value when the player exits water." },
 				MAX_FOOD_LEVEL = { Notes = "The maximum food level value. When the food level is at this value, the player cannot eat." },
 				MAX_HEALTH     = { Notes = "The maximum health value" },
 			},
