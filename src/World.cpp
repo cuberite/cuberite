@@ -599,7 +599,7 @@ void cWorld::Start(void)
 	m_FireSimulator     = new cFireSimulator(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
-	// Water, Lava and Redstone simulators get registered in InitializeFluidSimulator()
+	// Water, Lava and Redstone simulators get registered in their initialize function.
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
 
