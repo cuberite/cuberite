@@ -459,6 +459,17 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	if (split[0] == "reload")
 	{
 		cPluginManager::Get()->ReloadPlugins();
+		cRoot::Get()->ReloadGroups();
+		return;
+	}
+	if (split[0] == "reloadplugins")
+	{
+		cPluginManager::Get()->ReloadPlugins();
+		return;
+	}
+	if (split[0] == "reloadgroups")
+	{
+		cRoot::Get()->ReloadGroups();
 		return;
 	}
 	
