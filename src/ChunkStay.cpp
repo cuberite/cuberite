@@ -109,7 +109,7 @@ void cChunkStay::ChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
 	// Check if this is a chunk that we want:
 	bool IsMine = false;
-	for (cChunkCoordsVector::const_iterator itr = m_OutstandingChunks.begin(), end = m_OutstandingChunks.end(); itr != end; ++itr)
+	for (cChunkCoordsVector::iterator itr = m_OutstandingChunks.begin(), end = m_OutstandingChunks.end(); itr != end; ++itr)
 	{
 		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
 		{
