@@ -84,9 +84,9 @@ void cChunkStay::Enable(cChunkMap & a_ChunkMap)
 {
 	ASSERT(m_ChunkMap == NULL);
 	
+	m_OutstandingChunks = m_Chunks;
 	m_ChunkMap = &a_ChunkMap;
 	a_ChunkMap.AddChunkStay(*this);
-	m_OutstandingChunks = m_Chunks;
 }
 
 
