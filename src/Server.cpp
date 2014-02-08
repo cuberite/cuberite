@@ -456,6 +456,12 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		PrintHelp(split, a_Output);
 		return;
 	}
+	if (split[0] == "reload")
+	{
+		cPluginManager::Get()->ReloadPlugins();
+		cRoot::Get()->ReloadGroups();
+		return;
+	}
 	if (split[0] == "reloadplugins")
 	{
 		cPluginManager::Get()->ReloadPlugins();
@@ -464,6 +470,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	if (split[0] == "reloadgroups")
 	{
 		cRoot::Get()->ReloadGroups();
+		return;
 	}
 	
 	// There is currently no way a plugin can do these (and probably won't ever be):
