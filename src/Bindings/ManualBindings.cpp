@@ -906,8 +906,12 @@ static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 		{
 			int Height = 0;
 			bool res = self->TryGetHeight(BlockX, BlockZ, Height);
-			tolua_pushnumber(tolua_S, Height);
 			tolua_pushboolean(tolua_S, res ? 1 : 0);
+			if (res)
+			{
+				tolua_pushnumber(tolua_S, Height);
+				return 2;
+			}
 		}
 	}
 	return 1;
