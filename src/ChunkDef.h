@@ -481,6 +481,7 @@ public:
 } ;
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
+typedef std::vector<cChunkCoords> cChunkCoordsVector;
 
 
 

@@ -422,7 +422,6 @@ bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-/// Sets or resets the internal flag that prevents chunk from being unloaded
 void cChunk::Stay(bool a_Stay)
 {
 	m_StayCount += (a_Stay ? 1 : -1);
