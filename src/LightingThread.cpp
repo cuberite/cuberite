@@ -136,11 +136,13 @@ void cLightingThread::QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback
 	ASSERT(m_World != NULL);  // Did you call Start() properly?
 	
 	cChunkStay * ChunkStay = new cLightingChunkStay(*this, a_ChunkX, a_ChunkZ, a_CallbackAfter);
+	{
+		cCSLock Lock(m_CS);
+		m_PendingQueue.push_back(ChunkStay);
+	}
 	ChunkStay->Enable(*m_World->GetChunkMap());
 	// The ChunkStay will enqueue itself using the QueueChunkStay() once it is fully loaded
 	// In the meantime, put it into the PendingQueue so that it can be removed when stopping the thread
-	cCSLock Lock(m_CS);
-	m_PendingQueue.push_back(ChunkStay);
 }
 
 
