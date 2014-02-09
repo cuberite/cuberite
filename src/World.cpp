@@ -251,10 +251,8 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_Scoreboard(this),
 	m_GeneratorCallbacks(*this),
 	m_TickThread(*this),
-	m_Scoreboard(this),
 	m_bCommandBlocksEnabled(false),
 	m_bUseChatPrefixes(true)
-	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 

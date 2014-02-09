@@ -126,7 +126,7 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome)
 {
-	BLOCKTYPE TargetBlock;
+	BLOCKTYPE TargetBlock = E_BLOCK_AIR;
 	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end() && a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
 		NIBBLETYPE BlockLight = a_Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
