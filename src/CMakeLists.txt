@@ -143,6 +143,7 @@ else ()
 			"${PATH}/*.cpp"
 			"${PATH}/*.h"
 			"${PATH}/*.rc"
+			"${PATH}/*.pkg"
 		)
 		source_group("${PATH}" FILES ${FOLDER_FILES})
 	endfunction(includefolder)
@@ -154,6 +155,7 @@ else ()
 	file(GLOB_RECURSE SOURCE
 		"*.cpp"
 		"*.h"
+		"*.pkg"
 	)
 
 	include_directories("${PROJECT_SOURCE_DIR}")
