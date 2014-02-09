@@ -32,11 +32,15 @@ This class is abstract, the descendants are expected to provide the OnChunkAvail
 the OnAllChunksAvailable() callback implementations. Note that those are called from the contexts of
 different threads' - the caller, the Loader or the Generator thread.
 */
+// tolua_begin
 class cChunkStay
 {
 public:
+	// tolua_end
 	cChunkStay(void);
 	~cChunkStay();
+	
+	// tolua_begin
 	
 	void Clear(void);
 	
@@ -48,13 +52,19 @@ public:
 	To be used only while the ChunkStay object is not enabled. */
 	void Remove(int a_ChunkX, int a_ChunkZ);
 	
+	// tolua_end
+	
 	/** Enables the ChunkStay on the specified chunkmap, causing it to load and generate chunks.
 	All the contained chunks are queued for loading / generating. */
 	void Enable (cChunkMap & a_ChunkMap);
 	
+	// tolua_begin
+	
 	/** Disables the ChunkStay, the chunks are released and the ChunkStay
 	object can be edited with Add() and Remove() again*/
 	void Disable(void);
+	
+	// tolua_end
 	
 	/** Returns all the chunks that should be kept */
 	const cChunkCoordsVector & GetChunks(void) const { return m_Chunks; }
@@ -84,7 +94,7 @@ protected:
 	/** Called by cChunkMap when a chunk is available, checks m_NumLoaded and triggers the appropriate callbacks.
 	May be called for chunks outside this ChunkStay. */
 	void ChunkAvailable(int a_ChunkX, int a_ChunkZ);
-} ;
+} ;  // tolua_export
 
 
 

@@ -24,6 +24,7 @@ $cfile "Plugin.h"
 $cfile "PluginLua.h"
 $cfile "WebPlugin.h"
 $cfile "LuaWindow.h"
+$cfile "LuaChunkStay.h"
 
 $cfile "../BlockID.h"
 $cfile "../StringUtils.h"
@@ -70,6 +71,7 @@ $cfile "../Generating/ChunkDesc.h"
 $cfile "../CraftingRecipes.h"
 $cfile "../UI/Window.h"
 $cfile "../Mobs/Monster.h"
+$cfile "../ChunkStay.h"
 
 
 
