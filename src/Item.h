@@ -55,9 +55,9 @@ public:
 		m_ItemType    (a_ItemType),
 		m_ItemCount   (a_ItemCount),
 		m_ItemDamage  (a_ItemDamage),
+		m_Enchantments(a_Enchantments),
 		m_CustomName  (a_CustomName),
-		m_Lore        (a_Lore),
-		m_Enchantments(a_Enchantments)
+		m_Lore        (a_Lore)
 	{
 		if (!IsValidItem(m_ItemType))
 		{
@@ -75,9 +75,9 @@ public:
 		m_ItemType    (a_CopyFrom.m_ItemType),
 		m_ItemCount   (a_CopyFrom.m_ItemCount),
 		m_ItemDamage  (a_CopyFrom.m_ItemDamage),
+		m_Enchantments(a_CopyFrom.m_Enchantments),
 		m_CustomName  (a_CopyFrom.m_CustomName),
-		m_Lore        (a_CopyFrom.m_Lore),
-		m_Enchantments(a_CopyFrom.m_Enchantments)
+		m_Lore        (a_CopyFrom.m_Lore)
 	{
 	}
 	
