@@ -64,7 +64,7 @@ function Initialize(Plugin)
 	-- TestBlockAreas();
 	-- TestSQLiteBindings();
 	-- TestExpatBindings();
-	TestPluginCalls();
+	-- TestPluginCalls();
 	
 	return true
 end;
