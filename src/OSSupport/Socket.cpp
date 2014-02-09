@@ -33,16 +33,6 @@ cSocket::~cSocket()
 
 
 
-
-cSocket::operator cSocket::xSocket() const
-{
-	return m_Socket;
-}
-
-
-
-
-
 cSocket::xSocket cSocket::GetSocket() const
 {
 	return m_Socket;
@@ -157,32 +147,29 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 
 
 
-bool cSocket::BindToAnyIPv4(unsigned short a_Port)
+bool cSocket::BindToAny(unsigned short a_Port)
 {
-	sockaddr_in local;
-	memset(&local, 0, sizeof(local));
+	switch(m_family)
+	{
+		case IPv4:
+			sockaddr_in local;
+			memset(&local, 0, sizeof(local));
 
-	local.sin_family = AF_INET;
-	local.sin_port = htons((u_short)a_Port);
+			local.sin_family = AF_INET;
+			local.sin_port = htons((u_short)a_Port);
 
-	return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
+			return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
+		case IPv6:
+			sockaddr_in6 local6;
+			memset(&local6, 0, sizeof(local6));
+
+			local6.sin6_family = AF_INET6;
+			local6.sin6_port = htons((u_short)a_Port);
+
+			return (bind(m_Socket, (sockaddr *)&local6, sizeof(local6)) == 0);
+	}
+
 }
-
-
-
-
-
-bool cSocket::BindToAnyIPv6(unsigned short a_Port)
-{
-	sockaddr_in6 local;
-	memset(&local, 0, sizeof(local));
-
-	local.sin6_family = AF_INET6;
-	local.sin6_port = htons((u_short)a_Port);
-
-	return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
-}
-
 
 
 

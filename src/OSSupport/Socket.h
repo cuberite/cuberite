@@ -24,12 +24,18 @@ public:
 	{
 		IPv4 = AF_INET,
 		IPv6 = AF_INET6,
-		
+		IPDual
+	} ;
+	
+	enum eFlags
+	{
+	
 		#ifdef _WIN32
 		ErrWouldBlock = WSAEWOULDBLOCK,
 		#else
 		ErrWouldBlock = EWOULDBLOCK,
 		#endif
+		
 	} ;
 	
 #ifdef _WIN32
@@ -50,10 +56,9 @@ public:
 	Most TCPIP implementations use this to send the FIN flag in a packet */
 	void ShutdownReadWrite(void);
 	
-	operator xSocket(void) const;
 	xSocket GetSocket(void) const;
 	
-	bool operator == (const cSocket & a_Other) {return m_Socket == a_Other.m_Socket; }
+	bool operator == (const cSocket & a_Other) const {return m_Socket == a_Other.m_Socket; }
 	
 	void SetSocket(xSocket a_Socket);
 
@@ -86,11 +91,8 @@ public:
 	static const unsigned short ANY_PORT = 0;  // When given to Bind() functions, they will find a free port
 	static const int DEFAULT_BACKLOG = 10;
 
-	/// Binds to the specified port on "any" interface (0.0.0.0). Returns true if successful.
-	bool BindToAnyIPv4(unsigned short a_Port);
-	
-	/// Binds to the specified port on "any" interface (::/128). Returns true if successful.
-	bool BindToAnyIPv6(unsigned short a_Port);
+	/// Binds to the specified port on "any" interface (0.0.0.0 for IPv4, ::/128 for IPv6). Returns true if successful.
+	bool BindToAny(unsigned short a_Port);
 	
 	/// Binds to the specified port on localhost interface (127.0.0.1) through IPv4. Returns true if successful.
 	bool BindToLocalhostIPv4(unsigned short a_Port);
@@ -123,4 +125,5 @@ public:
 private:
 	xSocket m_Socket;
 	AString m_IPString;
+	eFamily m_family;
 };
