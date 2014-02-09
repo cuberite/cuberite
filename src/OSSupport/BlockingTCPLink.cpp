@@ -106,7 +106,7 @@ void cBlockingTCPLink::ReceiveData(AString & oData)
 
 	int Received = 0;
 	char Buffer[256];
-	while ((Received = recv(m_Socket, Buffer, sizeof(Buffer), 0)) > 0)
+	while ((Received = m_Socket.Receive(Buffer, sizeof(Buffer), 0)) > 0)
 	{
 		oData.append(Buffer, Received);
 	}
