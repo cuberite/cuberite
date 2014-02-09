@@ -41,39 +41,18 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 	ASSERT(!m_Socket.IsValid());
 	if (m_Socket.IsValid())
 	{
-		LOGWARN("WARNING: cTCPLink Connect() called while still connected.");
+		LOGWARN("WARNING: cBlockingTCPLink Connect() called while still connected.");
 		m_Socket.CloseSocket();
 	}
+	
+	m_Socket = cSocket::CreateSocket(cSocket::IPv4);
 
-	struct hostent *hp;
-	unsigned int addr;
-	struct sockaddr_in server;
-
-	m_Socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (!m_Socket.IsValid())
 	{
-		LOGERROR("cTCPLink: Cannot create a socket");
+		LOGERROR("cBlockingTCPLink: Cannot create a socket");
 		return false;
 	}
-
-	addr = inet_addr(iAddress);
-	hp = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET);
-	if (hp == NULL)
-	{
-		//LOGWARN("cTCPLink: gethostbyaddr returned NULL");
-		hp = gethostbyname(iAddress);
-		if (hp == NULL)
-		{
-			LOGWARN("cTCPLink: Could not resolve %s", iAddress);
-			CloseSocket();
-			return false;
-		}
-	}
-
-	server.sin_addr.s_addr = *((unsigned long *)hp->h_addr);
-	server.sin_family = AF_INET;
-	server.sin_port = htons( (unsigned short)iPort);
-	if (connect(m_Socket, (struct sockaddr *)&server, sizeof(server)))
+	if (!m_Socket.ConnectIPv4(iAddress,iPort))
 	{
 		LOGWARN("cTCPLink: Connection to \"%s:%d\" failed (%s)", iAddress, iPort,GetOSErrorString( cSocket::GetLastError() ).c_str() );
 		CloseSocket();
