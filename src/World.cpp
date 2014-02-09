@@ -250,7 +250,9 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
 	m_Scoreboard(this),
 	m_GeneratorCallbacks(*this),
-	m_TickThread(*this)
+	m_TickThread(*this),
+	m_bCommandBlocksEnabled(false),
+	m_bUseChatPrefixes(true)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -543,13 +545,14 @@ void cWorld::Start(void)
 	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
 	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
 	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
-	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
-	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
+	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  true);
 	m_ShouldLavaSpawnFire       = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",       true);
 	m_bCommandBlocksEnabled     = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",      false);
+	m_bEnabledPVP               = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                true);
+	m_bUseChatPrefixes          = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",           true);
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",    "VillagersShouldHarvestCrops", true);
 
-	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
+	m_GameMode = (eGameMode)IniFile.GetValueSetI("General", "Gamemode", m_GameMode);
 
 	// Load allowed mobs:
 	const char * DefaultMonsters = "";
@@ -1744,7 +1747,7 @@ void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 
 
-void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
+void cWorld::LoopPlayersAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -1754,7 +1757,7 @@ void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Ex
 		{
 			continue;
 		}
-		ch->SendChat(a_Message);
+		ch->SendChat(a_Message, a_ChatPrefix);
 	}
 }
 

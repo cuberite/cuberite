@@ -68,7 +68,7 @@ public:
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
-				return 0x0;
+				return 0;
 			}
 		}
 	}

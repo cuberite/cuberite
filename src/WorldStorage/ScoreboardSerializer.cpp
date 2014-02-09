@@ -242,7 +242,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 	{
 		AString Name, ObjectiveName;
 
-		cObjective::Score Score;
+		cObjective::Score Score = 0;
 
 		int CurrLine = a_NBT.FindChildByName(Child, "Score");
 		if (CurrLine >= 0)
@@ -280,7 +280,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 	{
 		AString Name, DisplayName, Prefix, Suffix;
 
-		bool AllowsFriendlyFire, CanSeeFriendlyInvisible;
+		bool AllowsFriendlyFire = false, CanSeeFriendlyInvisible = false;
 
 		int CurrLine = a_NBT.FindChildByName(Child, "Name");
 		if (CurrLine >= 0)

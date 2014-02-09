@@ -276,7 +276,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			m_Destination.y = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
 
-			if (DoesPosYRequireJump(m_Destination.y))
+			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;
 				AddPosY(1.5); // Jump!!

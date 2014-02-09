@@ -1839,7 +1839,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	bbTNT.Expand(ExplosionSizeInt * 2, ExplosionSizeInt * 2, ExplosionSizeInt * 2);
 
 
-	cTNTDamageCallback TNTDamageCallback(bbTNT, Vector3d(a_BlockX, a_BlockY, a_BlockZ), a_ExplosionSize, ExplosionSizeSq);
+	cTNTDamageCallback TNTDamageCallback(bbTNT, Vector3d(a_BlockX, a_BlockY, a_BlockZ), ExplosionSizeInt, ExplosionSizeSq);
 	ForEachEntity(TNTDamageCallback);
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):

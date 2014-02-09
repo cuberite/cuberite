@@ -53,9 +53,6 @@ public:
 	static const int MAX_VIEW_DISTANCE = 15;
 	static const int MIN_VIEW_DISTANCE = 3;
 	
-	/// How many ticks should be checked for a running average of explosions, for limiting purposes
-	static const int NUM_CHECK_EXPLOSIONS_TICKS = 20;
-	
 	cClientHandle(const cSocket * a_Socket, int a_ViewDistance);
 	virtual ~cClientHandle();
 
@@ -92,7 +89,7 @@ public:
 	void SendBlockBreakAnim      (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta); // tolua_export
 	void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
-	void SendChat                (const AString & a_Message);
+	void SendChat                (const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
 	void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player);
 	void SendDestroyEntity       (const cEntity & a_Entity);
@@ -301,14 +298,8 @@ private:
 	/// If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded()
 	bool m_ShouldCheckDownloaded;
 
-	/// Stores the recent history of the number of explosions per tick
-	int m_NumExplosionsPerTick[NUM_CHECK_EXPLOSIONS_TICKS];
-	
-	/// Points to the current tick in the m_NumExplosionsPerTick[] array
-	int m_CurrentExplosionTick;
-	
-	/// Running sum of m_NumExplosionsPerTick[]
-	int m_RunningSumExplosions;
+	/** Number of explosions sent this tick */
+	int m_NumExplosionsThisTick;
 	
 	static int s_ClientCount;
 	int m_UniqueID;

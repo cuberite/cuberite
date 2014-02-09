@@ -60,15 +60,6 @@ template <typename T> T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 
-static bool SortTreeBlocks(const sSetBlock & a_First, const sSetBlock & a_Second)
-{
-	return (a_First.BlockType == E_BLOCK_LOG) && (a_Second.BlockType != E_BLOCK_LOG);
-}
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenTrees:
 

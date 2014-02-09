@@ -248,7 +248,7 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
 		ASSERT(!Split.empty());  // This should not happen - we know there's at least one char in the message so the split needs to be at least one item long
-		a_Player->SendMessage(Printf("%s[INFO] %sUnknown command: \"%s\"", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), Split[0].c_str()));
+		a_Player->SendMessageInfo(Printf("Unknown command: \"%s\"", Split[0].c_str()));
 		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player->GetName().c_str(), a_Message.c_str());
 		return true;  // Cancel sending
 	}
@@ -1392,7 +1392,7 @@ bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command
 		!a_Player->HasPermission(cmd->second.m_Permission)
 	)
 	{
-		a_Player->SendMessage(Printf("%s[INFO] %sForbidden command; insufficient privileges: \"%s\"", cChatColor::Rose.c_str(), cChatColor::White.c_str(), Split[0].c_str()));
+		a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", Split[0].c_str()));
 		LOGINFO("Player %s tried to execute forbidden command: \"%s\"", a_Player->GetName().c_str(), Split[0].c_str());
 		a_WasCommandForbidden = true;
 		return false;

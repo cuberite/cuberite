@@ -181,23 +181,28 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 			return new cItemMinecartHandler(a_ItemType);
 		}
 		
-		// Food:
+		// Food (please keep alpha-sorted):
+		// (carrots and potatoes handled in SeedHandler as both seed and food
+		case E_ITEM_BAKED_POTATO:
 		case E_ITEM_BREAD:
-		case E_ITEM_COOKIE:
-		case E_ITEM_MELON_SLICE:
-		case E_ITEM_RAW_CHICKEN:
 		case E_ITEM_COOKED_CHICKEN:
-		case E_ITEM_RAW_BEEF:
-		case E_ITEM_RAW_PORKCHOP:
-		case E_ITEM_STEAK:
-		case E_ITEM_COOKED_PORKCHOP:
-		case E_ITEM_RAW_FISH:
 		case E_ITEM_COOKED_FISH:
-		case E_ITEM_RED_APPLE:
+		case E_ITEM_COOKED_PORKCHOP:
+		case E_ITEM_COOKIE:
 		case E_ITEM_GOLDEN_APPLE:
-		case E_ITEM_ROTTEN_FLESH:
+		case E_ITEM_GOLDEN_CARROT:
+		case E_ITEM_MELON_SLICE:
 		case E_ITEM_MUSHROOM_SOUP:
+		case E_ITEM_POISONOUS_POTATO:
+		case E_ITEM_PUMPKIN_PIE:
+		case E_ITEM_RAW_BEEF:
+		case E_ITEM_RAW_CHICKEN:
+		case E_ITEM_RAW_FISH:
+		case E_ITEM_RAW_PORKCHOP:
+		case E_ITEM_RED_APPLE:
+		case E_ITEM_ROTTEN_FLESH:
 		case E_ITEM_SPIDER_EYE:
+		case E_ITEM_STEAK:
 		{
 			return new cItemFoodHandler(a_ItemType);
 		}
@@ -511,7 +516,7 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 
 cItemHandler::FoodInfo cItemHandler::GetFoodInfo()
 {
-	return FoodInfo(0, 0.f);
+	return FoodInfo(0, 0);
 }
 
 
