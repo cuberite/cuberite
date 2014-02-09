@@ -62,7 +62,7 @@ public:
 	
 	/** Disables the ChunkStay, the chunks are released and the ChunkStay
 	object can be edited with Add() and Remove() again*/
-	void Disable(void);
+	virtual void Disable(void);
 	
 	// tolua_end
 	

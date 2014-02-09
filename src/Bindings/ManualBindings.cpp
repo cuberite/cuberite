@@ -8,6 +8,7 @@
 #include "PluginLua.h"
 #include "PluginManager.h"
 #include "LuaWindow.h"
+#include "LuaChunkStay.h"
 #include "../Root.h"
 #include "../World.h"
 #include "../Entities/Player.h"
@@ -1638,6 +1639,42 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 
 
 
+static int tolua_cLuaChunkStay_Enable(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cLuaChunkStay") ||
+		!L.CheckParamUserType(2, "cWorld") ||
+		!L.CheckParamFunction(3, 4)
+	)
+	{
+		return 0;
+	}
+	
+	// Read the params:
+	cLuaChunkStay * ChunkStay = (cLuaChunkStay *)tolua_tousertype(tolua_S, 1, NULL);
+	if (ChunkStay == NULL)
+	{
+		LOGWARNING("cLuaChunkStay:Enable(): invalid self");
+		L.LogStackTrace();
+		return 0;
+	}
+	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 2, NULL);
+	if (World == NULL)
+	{
+		LOGWARNING("cLuaChunkStay:Enable(): invalid world parameter");
+		L.LogStackTrace();
+		return 0;
+	}
+	
+	ChunkStay->Enable(*World, tolua_S, 3, 4);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cPlayer_GetGroups(lua_State* tolua_S)
 {
 	cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
@@ -2401,6 +2438,10 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
 			tolua_function(tolua_S, "GetCurrentPlugin",      tolua_cPluginManager_GetCurrentPlugin);
 			tolua_function(tolua_S, "LogStackTrace",         tolua_cPluginManager_LogStackTrace);
+		tolua_endmodule(tolua_S);
+		
+		tolua_beginmodule(tolua_S, "cLuaChunkStay");
+			tolua_function(tolua_S, "Enable", tolua_cLuaChunkStay_Enable);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");
