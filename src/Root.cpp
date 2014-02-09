@@ -132,7 +132,7 @@ void cRoot::Start(void)
 			LOGWARN("Regenerating settings.ini, all settings will be reset");
 			IniFile.AddHeaderComment(" This is the main server configuration");
 			IniFile.AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
-			IniFile.AddHeaderComment(" See: http://www.mc-server.org/wiki/doku.php?id=configure:settings.ini for further configuration help");
+			IniFile.AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
 		}
 
 		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
@@ -219,16 +219,14 @@ void cRoot::Start(void)
 		delete m_InputThread; m_InputThread = NULL;
 		#endif
 
-		// Deallocate stuffs
+		// Stop the server:
+		m_WebAdmin->Stop();
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
-		
 		LOGD("Shutting down deadlock detector...");
 		dd.Stop();
-		
 		LOGD("Stopping world threads...");
 		StopWorlds();
-		
 		LOGD("Stopping authenticator...");
 		m_Authenticator.Stop();
 
@@ -530,6 +528,15 @@ void cRoot::SaveAllChunks(void)
 	{
 		itr->second->QueueSaveAllChunks();
 	}
+}
+
+
+
+
+
+void cRoot::ReloadGroups(void)
+{
+	m_GroupManager->LoadGroups();
 }
 
 

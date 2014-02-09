@@ -308,8 +308,8 @@ void cPublicKey::InitRnd(void)
 // cAESCFBDecryptor:
 
 cAESCFBDecryptor::cAESCFBDecryptor(void) :
-	m_IsValid(false),
-	m_IVOffset(0)
+	m_IVOffset(0),
+	m_IsValid(false)
 {
 }
 
@@ -366,8 +366,8 @@ void cAESCFBDecryptor::ProcessData(Byte * a_DecryptedOut, const Byte * a_Encrypt
 // cAESCFBEncryptor:
 
 cAESCFBEncryptor::cAESCFBEncryptor(void) :
-	m_IsValid(false),
-	m_IVOffset(0)
+	m_IVOffset(0),
+	m_IsValid(false)
 {
 }
 

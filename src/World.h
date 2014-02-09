@@ -875,6 +875,9 @@ private:
 	
 	/** Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section) */
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
+
+	/** Creates a new redstone simulator.*/
+	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
 }; // tolua_export
 
 

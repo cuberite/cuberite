@@ -218,7 +218,6 @@ public:
 	/// Removes a player from the group, resolves permissions and group inheritance (case sensitive)
 	void RemoveFromGroup( const AString & a_GroupName );					// tolua_export
 	
-	bool CanUseCommand( const AString & a_Command );						// tolua_export
 	bool HasPermission( const AString & a_Permission );						// tolua_export
 	const GroupList & GetGroups() { return m_Groups; }						// >> EXPORTED IN MANUALBINDINGS <<
 	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<

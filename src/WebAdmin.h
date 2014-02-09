@@ -56,13 +56,13 @@ struct HTTPRequest
 	AString Username;
 	// tolua_end
 
-	/// Parameters given in the URL, after the questionmark
+	/** Parameters given in the URL, after the questionmark */
 	StringStringMap Params;     // >> EXPORTED IN MANUALBINDINGS <<
 
-	/// Parameters posted as a part of a form - either in the URL (GET method) or in the body (POST method)
+	/** Parameters posted as a part of a form - either in the URL (GET method) or in the body (POST method) */
 	StringStringMap PostParams; // >> EXPORTED IN MANUALBINDINGS <<
 
-	/// Same as PostParams
+	/** Same as PostParams */
 	FormDataMap FormData;       // >> EXPORTED IN MANUALBINDINGS <<
 } ; // tolua_export
 
@@ -107,14 +107,17 @@ public:
 	cWebAdmin(void);
 	virtual ~cWebAdmin();
 
-	/// Initializes the object. Returns true if successfully initialized and ready to start
+	/** Initializes the object. Returns true if successfully initialized and ready to start */
 	bool Init(void);
 
-	/// Starts the HTTP server taking care of the admin. Returns true if successful
+	/** Starts the HTTP server taking care of the admin. Returns true if successful */
 	bool Start(void);
+	
+	/** Stops the HTTP server, if it was started. */
+	void Stop(void);
 
-	void AddPlugin( cWebPlugin* a_Plugin );
-	void RemovePlugin( cWebPlugin* a_Plugin );
+	void AddPlugin(cWebPlugin * a_Plugin);
+	void RemovePlugin(cWebPlugin * a_Plugin);
 
 	// TODO: Convert this to the auto-locking callback mechanism used for looping players in worlds and such
 	PluginList GetPlugins() const { return m_Plugins; } // >> EXPORTED IN MANUALBINDINGS <<
@@ -123,13 +126,13 @@ public:
 
 	sWebAdminPage GetPage(const HTTPRequest & a_Request);
 
-	/// Returns the contents of the default page - the list of plugins and players
+	/** Returns the contents of the default page - the list of plugins and players */
 	AString GetDefaultPage(void);
 
-	/// Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style)
+	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style) */
 	AString GetBaseURL(const AString & a_URL);
 
-	/// Escapes text passed into it, so it can be embedded into html.
+	/** Escapes text passed into it, so it can be embedded into html. */
 	static AString GetHTMLEscapedString(const AString & a_Input);
 
 	AString GetIPv4Ports(void) const { return m_PortsIPv4; }
@@ -137,21 +140,21 @@ public:
 
 	// tolua_end
 
-	/// Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style)
+	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style) */
 	AString GetBaseURL(const AStringVector& a_URLSplit);
 
 protected:
-	/// Common base class for request body data handlers
+	/** Common base class for request body data handlers */
 	class cRequestData
 	{
 	public:
 		virtual ~cRequestData() {}  // Force a virtual destructor in all descendants
 
-		/// Called when a new chunk of body data is received
+		/** Called when a new chunk of body data is received */
 		virtual void OnBody(const char * a_Data, int a_Size) = 0;
 	} ;
 
-	/// The body handler for requests in the "/webadmin" and "/~webadmin" paths
+	/** The body handler for requests in the "/webadmin" and "/~webadmin" paths */
 	class cWebadminRequestData :
 		public cRequestData,
 		public cHTTPFormParser::cCallbacks
@@ -182,10 +185,13 @@ protected:
 	} ;
 
 
-	/// Set to true if Init() succeeds and the webadmin isn't to be disabled
+	/** Set to true if Init() succeeds and the webadmin isn't to be disabled */
 	bool m_IsInitialized;
+	
+	/** Set to true if Start() succeeds in starting the server, reset back to false in Stop(). */
+	bool m_IsRunning;
 
-	/// The webadmin.ini file, used for the settings and allowed logins
+	/** The webadmin.ini file, used for the settings and allowed logins */
 	cIniFile   m_IniFile;
 
 	PluginList m_Plugins;
@@ -193,19 +199,19 @@ protected:
 	AString m_PortsIPv4;
 	AString m_PortsIPv6;
 
-	/// The Lua template script to provide templates:
+	/** The Lua template script to provide templates: */
 	cLuaState m_TemplateScript;
 
-	/// The HTTP server which provides the underlying HTTP parsing, serialization and events
+	/** The HTTP server which provides the underlying HTTP parsing, serialization and events */
 	cHTTPServer m_HTTPServer;
 
 
 	AString GetTemplate(void);
 
-	/// Handles requests coming to the "/webadmin" or "/~webadmin" URLs
+	/** Handles requests coming to the "/webadmin" or "/~webadmin" URLs */
 	void HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
 
-	/// Handles requests for the root page
+	/** Handles requests for the root page */
 	void HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
 
 	// cHTTPServer::cCallbacks overrides:

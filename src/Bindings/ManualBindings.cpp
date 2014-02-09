@@ -906,8 +906,12 @@ static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 		{
 			int Height = 0;
 			bool res = self->TryGetHeight(BlockX, BlockZ, Height);
-			tolua_pushnumber(tolua_S, Height);
 			tolua_pushboolean(tolua_S, res ? 1 : 0);
+			if (res)
+			{
+				tolua_pushnumber(tolua_S, Height);
+				return 2;
+			}
 		}
 	}
 	return 1;
@@ -1100,6 +1104,16 @@ static int tolua_cPluginManager_GetCurrentPlugin(lua_State * S)
 	}
 	tolua_pushusertype(S, Plugin, "cPluginLua");
 	return 1;
+}
+
+
+
+
+
+static int tolua_cPluginManager_LogStackTrace(lua_State * S)
+{
+	cLuaState::LogStackTrace(S);
+	return 0;
 }
 
 
@@ -2386,6 +2400,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
 			tolua_function(tolua_S, "GetCurrentPlugin",      tolua_cPluginManager_GetCurrentPlugin);
+			tolua_function(tolua_S, "LogStackTrace",         tolua_cPluginManager_LogStackTrace);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");

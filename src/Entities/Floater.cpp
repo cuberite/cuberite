@@ -103,10 +103,10 @@ protected:
 
 cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_PlayerID, int a_CountDownTime) :
 	cEntity(etFloater, a_X, a_Y, a_Z, 0.2, 0.2),
-	m_PickupCountDown(0),
-	m_PlayerID(a_PlayerID),
 	m_CanPickupItem(false),
+	m_PickupCountDown(0),
 	m_CountDownTime(a_CountDownTime),
+	m_PlayerID(a_PlayerID),
 	m_AttachedMobID(-1)
 {
 	SetSpeed(a_Speed);

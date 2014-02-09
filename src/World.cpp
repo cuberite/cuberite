@@ -29,8 +29,9 @@
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
 #include "Simulator/NoopFluidSimulator.h"
+#include "Simulator/NoopRedstoneSimulator.h"
 #include "Simulator/SandSimulator.h"
-#include "Simulator/RedstoneSimulator.h"
+#include "Simulator/IncrementalRedstoneSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
 
 // Mobs:
@@ -247,11 +248,13 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_Scoreboard(this),
 	m_GeneratorCallbacks(*this),
 	m_TickThread(*this),
 	m_Scoreboard(this),
 	m_bCommandBlocksEnabled(false),
 	m_bUseChatPrefixes(true)
+	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -599,12 +602,11 @@ void cWorld::Start(void)
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
 	m_SandSimulator     = new cSandSimulator(*this, IniFile);
 	m_FireSimulator     = new cFireSimulator(*this, IniFile);
-	m_RedstoneSimulator = new cRedstoneSimulator(*this);
+	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
-	// Water and Lava simulators get registered in InitializeFluidSimulator()
+	// Water, Lava and Redstone simulators get registered in their initialize function.
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
 
 	m_Lighting.Start(this);
 	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor );
@@ -2868,6 +2870,36 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 		
 		a_Results.push_back((*itr)->GetName()); //Match!
 	}
+}
+
+
+
+
+
+cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
+{
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "");
+
+	if (SimulatorName.empty())
+	{
+		LOGWARNING("[Physics] RedstoneSimulator not present or empty in %s, using the default of \"incremental\".", GetIniFileName().c_str());
+		SimulatorName = "incremental";
+	}
+	
+	cRedstoneSimulator * res = NULL;
+
+	if (NoCaseCompare(SimulatorName, "incremental") == 0)
+	{
+		res = new cIncrementalRedstoneSimulator(*this);
+	}
+	else if (NoCaseCompare(SimulatorName, "noop") == 0)
+	{
+		res = new cRedstoneNoopSimulator(*this);
+	}
+	
+	m_SimulatorManager->RegisterSimulator(res, 1);
+	
+	return res;
 }
 
 

@@ -69,6 +69,47 @@ end
 
 
 
+--- Replaces generic formatting with forum-specific formatting
+-- Also removes the single line-ends
+local function GithubizeString(a_Str)
+	assert(type(a_Str) == "string");
+	
+	-- Remove the indentation, unless in the code tag:
+	-- Only one code or /code tag per line is supported!
+	local IsInCode = false;
+	local function RemoveIndentIfNotInCode(s)
+		if (IsInCode) then
+			-- we're in code section, check if this line terminates it
+			IsInCode = (s:find("{%%/code}") ~= nil);
+			return s .. "\n";
+		else
+			-- we're not in code section, check if this line starts it
+			IsInCode = (s:find("{%%code}") ~= nil);
+			return s:gsub("^%s*", "") .. "\n";
+		end
+	end
+	a_Str = a_Str:gsub("(.-)\n", RemoveIndentIfNotInCode);
+	
+	-- Replace multiple line ends with {%p} and single line ends with a space,
+	-- so that manual word-wrap in the Info.lua file doesn't wrap in the forum.
+	a_Str = a_Str:gsub("\n\n", "{%%p}");
+	a_Str = a_Str:gsub("\n", " ");
+	
+	-- Replace the generic formatting:
+	a_Str = a_Str:gsub("{%%p}", "\n\n");
+	a_Str = a_Str:gsub("{%%b}", "**"):gsub("{%%/b}", "**");
+	a_Str = a_Str:gsub("{%%i}", "*"):gsub("{%%/i}", "*");
+	a_Str = a_Str:gsub("{%%list}", ""):gsub("{%%/list}", "");
+	a_Str = a_Str:gsub("{%%li}", " - "):gsub("{%%/li}", "");
+	-- TODO: Other formatting
+	
+	return a_Str;
+end
+
+
+
+
+
 --- Builds an array of categories, each containing all the commands belonging to the category,
 -- and the category description, if available.
 -- Returns the array table, each item has the following format:
@@ -156,6 +197,28 @@ end
 
 
 
+--- Returns a string specifying the command.
+-- If a_CommandParams is nil, returns a_CommandName apostrophed
+-- If a_CommandParams is a string, apostrophes a_CommandName with a_CommandParams
+local function GetCommandRefGithub(a_CommandName, a_CommandParams)
+	assert(type(a_CommandName) == "string");
+	if (a_CommandParams == nil) then
+		return "`" .. a_CommandName .. "`";
+	end
+	
+	assert(type(a_CommandParams) == "table");
+	if ((a_CommandParams.Params == nil) or (a_CommandParams.Params == "")) then
+		return "`" .. a_CommandName .. "`";
+	end
+
+	assert(type(a_CommandParams.Params) == "string");
+	return "`" .. a_CommandName .. " " .. a_CommandParams.Params .. "`";
+end
+
+
+
+
+
 --- Writes the specified command detailed help array to the output file, in the forum dump format
 local function WriteCommandParameterCombinationsForum(a_CmdString, a_ParameterCombinations, f)
 	assert(type(a_CmdString) == "string");
@@ -175,6 +238,34 @@ local function WriteCommandParameterCombinationsForum(a_CmdString, a_ParameterCo
 		end
 		if (combination.Permission ~= nil) then
 			f:write(" (Requires permission '[color=red]", combination.Permission, "[/color]')");
+		end
+		f:write("\n");
+	end
+end
+
+
+
+
+
+--- Writes the specified command detailed help array to the output file, in the forum dump format
+local function WriteCommandParameterCombinationsGithub(a_CmdString, a_ParameterCombinations, f)
+	assert(type(a_CmdString) == "string");
+	assert(type(a_ParameterCombinations) == "table");
+	assert(f ~= nil);
+	
+	if (#a_ParameterCombinations == 0) then
+		-- No explicit parameter combinations to write
+		return;
+	end
+	
+	f:write("The following parameter combinations are recognized:\n\n");
+	for idx, combination in ipairs(a_ParameterCombinations) do
+		f:write(GetCommandRefGithub(a_CmdString, combination));
+		if (combination.Help ~= nil) then
+			f:write(" - ", GithubizeString(combination.Help));
+		end
+		if (combination.Permission ~= nil) then
+			f:write("   (Requires permission '**", combination.Permission, "**')");
 		end
 		f:write("\n");
 	end
@@ -206,13 +297,48 @@ local function WriteCommandsCategoryForum(a_Category, f)
 			f:write("Permission required: [color=red]", cmd.Info.Permission, "[/color]\n");
 		end
 		if (cmd.Info.DetailedDescription ~= nil) then
-			f:write(cmd.Info.DetailedDescription);
+			f:write(ForumizeString(cmd.Info.DetailedDescription));
 		end
 		if (cmd.Info.ParameterCombinations ~= nil) then
 			WriteCommandParameterCombinationsForum(cmd.CommandString, cmd.Info.ParameterCombinations, f);
 		end
 	end
 	f:write("[/list]\n\n")
+end
+
+
+
+
+
+--- Writes all commands in the specified category to the output file, in the Github dump format
+local function WriteCommandsCategoryGithub(a_Category, f)
+	-- Write category name:
+	local CategoryName = a_Category.Name;
+	if (CategoryName == "") then
+		CategoryName = "General";
+	end
+	f:write("\n## ", GithubizeString(a_Category.DisplayName or CategoryName), "\n");
+	
+	-- Write description:
+	if (a_Category.Description ~= "") then
+		f:write(GithubizeString(a_Category.Description), "\n");
+	end
+	
+	-- Write commands:
+	f:write("\n");
+	for idx2, cmd in ipairs(a_Category.Commands) do
+		f:write("\n### ", cmd.CommandString, "\n", GithubizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "\n\n");
+		if (cmd.Info.Permission ~= nil) then
+			f:write("Permission required: **", cmd.Info.Permission, "**\n\n");
+		end
+		if (cmd.Info.DetailedDescription ~= nil) then
+			f:write(GithubizeString(cmd.Info.DetailedDescription));
+		end
+		if (cmd.Info.ParameterCombinations ~= nil) then
+			WriteCommandParameterCombinationsGithub(cmd.CommandString, cmd.Info.ParameterCombinations, f);
+		end
+	end
+	f:write("\n\n")
 end
 
 
@@ -246,9 +372,36 @@ end
 
 
 
+local function DumpCommandsGithub(a_PluginInfo, f)
+	-- Copy all Categories from a dictionary into an array:
+	local Categories = BuildCategories(a_PluginInfo);
+	
+	-- Sort the categories by name:
+	table.sort(Categories,
+		function(cat1, cat2)
+			return (string.lower(cat1.Name) < string.lower(cat2.Name));
+		end
+	);
+	
+	if (#Categories == 0) then
+		return;
+	end
+	
+	f:write("\n# Commands\n");
+
+	-- Dump per-category commands:
+	for idx, cat in ipairs(Categories) do
+		WriteCommandsCategoryGithub(cat, f);
+	end
+end
+
+
+
+
+
 local function DumpAdditionalInfoForum(a_PluginInfo, f)
 	local AInfo = a_PluginInfo.AdditionalInfo;
-	if ((AInfo == nil) or (type(AInfo) ~= "table")) then
+	if (type(AInfo) ~= "table") then
 		-- There is no AdditionalInfo in a_PluginInfo
 		return;
 	end
@@ -257,6 +410,25 @@ local function DumpAdditionalInfoForum(a_PluginInfo, f)
 		if ((info.Title ~= nil) and (info.Contents ~= nil)) then
 			f:write("\n[size=X-Large]", ForumizeString(info.Title), "[/size]\n");
 			f:write(ForumizeString(info.Contents), "\n");
+		end
+	end
+end
+
+
+
+
+
+local function DumpAdditionalInfoGithub(a_PluginInfo, f)
+	local AInfo = a_PluginInfo.AdditionalInfo;
+	if (type(AInfo) ~= "table") then
+		-- There is no AdditionalInfo in a_PluginInfo
+		return;
+	end
+	
+	for idx, info in ipairs(a_PluginInfo.AdditionalInfo) do
+		if ((info.Title ~= nil) and (info.Contents ~= nil)) then
+			f:write("\n# ", GithubizeString(info.Title), "\n");
+			f:write(GithubizeString(info.Contents), "\n");
 		end
 	end
 end
@@ -333,7 +505,7 @@ local function DumpPermissionsForum(a_PluginInfo, f)
 	f:write("\n[size=X-Large]Permissions[/size]\n[list]\n");
 	for idx, perm in ipairs(Permissions) do
 		f:write("  - [color=red]", perm.Name, "[/color] - ");
-		f:write(perm.Info.Description or "");
+		f:write(ForumizeString(perm.Info.Description or ""));
 		local CommandsAffected = perm.Info.CommandsAffected or {};
 		if (#CommandsAffected > 0) then
 			f:write("\n[list] Commands affected:\n- ");
@@ -350,6 +522,43 @@ local function DumpPermissionsForum(a_PluginInfo, f)
 		f:write("\n");
 	end
 	f:write("[/list]");
+end
+
+
+
+
+
+local function DumpPermissionsGithub(a_PluginInfo, f)
+	-- Get the processed sorted array of permissions:
+	local Permissions = BuildPermissions(a_PluginInfo);
+	if ((Permissions == nil) or (#Permissions <= 0)) then
+		return;
+	end
+
+	-- Dump the permissions:
+	f:write("\n# Permissions\n");
+	for idx, perm in ipairs(Permissions) do
+		f:write("### ", perm.Name, "\n");
+		f:write(GithubizeString(perm.Info.Description or ""));
+		local CommandsAffected = perm.Info.CommandsAffected or {};
+		if (#CommandsAffected > 0) then
+			f:write("\n\nCommands affected:\n  - ");
+			local Affects = {};
+			for idx2, cmd in ipairs(CommandsAffected) do
+				if (type(cmd) == "string") then
+					table.insert(Affects, GetCommandRefGithub(cmd));
+				else
+					table.insert(Affects, GetCommandRefGithub(cmd.Name, cmd));
+				end
+			end
+			f:write(table.concat(Affects, "\n  - "));
+			f:write("\n");
+		end
+		if (perm.Info.RecommendedGroups ~= nil) then
+			f:write("\n\nRecommended groups: ", perm.Info.RecommendedGroups, "\n");
+		end
+		f:write("\n");
+	end
 end
 
 
@@ -377,8 +586,21 @@ end
 
 
 
-local function DumpPluginInfoGitHub()
-	-- TODO
+local function DumpPluginInfoGithub(a_PluginFolder, a_PluginInfo)
+	-- Open the output file:
+	local f, msg = io.open(a_PluginInfo.Name .. ".md", "w");  -- TODO: Save to a_PluginFolder .. "/Readme.md" instead
+	if (f == nil) then
+		print("\tCannot dump github info for plugin " .. a_PluginFolder .. ": " .. msg);
+		return;
+	end
+
+	-- Write the description:
+	f:write(GithubizeString(a_PluginInfo.Description), "\n");
+	DumpAdditionalInfoGithub(a_PluginInfo, f);
+	DumpCommandsGithub(a_PluginInfo, f);
+	DumpPermissionsGithub(a_PluginInfo, f);
+
+	f:close();
 end
 
 
@@ -418,6 +640,7 @@ local function ProcessPluginFolder(a_FolderName)
 		return;
 	end
 	DumpPluginInfoForum(a_FolderName, PluginInfo);
+	DumpPluginInfoGithub(a_FolderName, PluginInfo);
 end
 
 

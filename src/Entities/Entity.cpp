@@ -50,6 +50,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_TicksSinceLastFireDamage(0)
 	, m_TicksLeftBurning(0)
 	, m_TicksSinceLastVoidDamage(0)
+	, m_IsSwimming(false)
+	, m_IsSubmerged(false)
 	, m_HeadYaw( 0.0 )
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
@@ -57,8 +59,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Mass (0.001)  // Default 1g
 	, m_Width(a_Width)
 	, m_Height(a_Height)
-	, m_IsSubmerged(false)
-	, m_IsSwimming(false)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
