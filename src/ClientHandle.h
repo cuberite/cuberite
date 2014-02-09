@@ -181,7 +181,7 @@ public:
 	bool HandleHandshake        (const AString & a_Username);
 	
 	void HandleKeepAlive        (int a_KeepAliveID);
-	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
+	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status);
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
@@ -189,7 +189,7 @@ public:
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
 	void HandlePluginMessage    (const AString & a_Channel, const AString & a_Message);
 	void HandleRespawn          (void);
-	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
+	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
 	void HandleSlotSelected     (short a_SlotNum);
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
@@ -214,7 +214,7 @@ public:
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
 	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
-	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
+	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
 	
 private:
 
@@ -316,10 +316,10 @@ private:
 	void StreamChunk(int a_ChunkX, int a_ChunkZ);
 	
 	/// Handles the DIG_STARTED dig packet:
-	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
 	
 	/// Handles the DIG_FINISHED dig packet:
-	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
 
 	/// Handles the "MC|AdvCdm" plugin message
 	void HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length);

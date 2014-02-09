@@ -1808,7 +1808,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			if (FinalDamage > a_Entity->GetMaxHealth())
 				FinalDamage = a_Entity->GetMaxHealth();
 			else if (FinalDamage < 0)
-				return false;
+				FinalDamage = 0;
 
 			if (!a_Entity->IsTNT()) // Don't apply damage to other TNT entities, they should be invincible
 			{

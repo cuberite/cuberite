@@ -45,7 +45,7 @@ public:
 	}
 	
 	
-	static char DirectionToMetaData(char a_Direction)
+	static char DirectionToMetaData(eBlockFace a_Direction)
 	{
 		switch (a_Direction)
 		{
@@ -64,7 +64,7 @@ public:
 
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 	) override

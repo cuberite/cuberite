@@ -1105,8 +1105,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				IsDamageable = { Params = "", Return = "bool", Notes = "Returns true if this item does account for its damage" },
 				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
 				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage, lore, name and enchantments)" },
+				IsEnchantable = { Params = "", Return = "bool", Notes = "Returns true if the item is enchantable" },
 				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
 				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object. This is true even if the two items have different enchantments" },
+				IsStackableWith = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is stackable with the one stored in the object. Two items with different enchantments cannot be stacked" },
 			},
 			Variables =
 			{
@@ -1479,6 +1481,7 @@ a_Player:OpenWindow(Window);
 				GetMobType = { Params = "", Return = "{{cMonster#MobType|MobType}}", Notes = "Returns the type of this mob ({{cMonster#MobType|mtXXX}} constant)" },
 				GetSpawnDelay = { Params = "{{cMonster#MobFamily|MobFamily}}", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
 				MobTypeToString = { Params = "{{cMonster#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{cMonster#MobType|mtXXX}} constant), or empty string if unknown type." },
+				MoveToPosition = { Params = "Position", Return = "", Notes = "Moves mob to the specified position" },
 				StringToMobType = { Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{cMonster#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
 			},
 			Constants =

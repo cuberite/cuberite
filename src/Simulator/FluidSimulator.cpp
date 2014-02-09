@@ -166,14 +166,12 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 			{
 				LowestPoint = Meta;
 				X = Pos->x;
-				Pos->y; //Remove if no side effects
 				Z = Pos->z;
 			}
 		}else if(BlockID == E_BLOCK_AIR)
 		{
 			LowestPoint = 9;		//This always dominates
 			X = Pos->x;
-			Pos->y; //Remove if no side effects
 			Z = Pos->z;
 		
 		}

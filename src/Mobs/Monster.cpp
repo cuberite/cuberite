@@ -191,6 +191,18 @@ void cMonster::MoveToPosition(const Vector3f & a_Position)
 
 
 
+
+void cMonster::MoveToPosition(const Vector3d & a_Position)
+{
+	FinishPathFinding();
+
+	m_FinalDestination = a_Position;
+	m_bMovingToDestination = true;
+	TickPathFinding();
+}
+
+
+
 bool cMonster::IsCoordinateInTraversedList(Vector3i a_Coords)
 {
 	for (std::vector<Vector3i>::const_iterator itr = m_TraversedCoordinates.begin(); itr != m_TraversedCoordinates.end(); ++itr)

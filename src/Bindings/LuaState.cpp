@@ -1018,9 +1018,7 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState)
 	int depth = 0;
 	while (lua_getstack(a_LuaState, depth, &entry))
 	{
-		int status = lua_getinfo(a_LuaState, "Sln", &entry);
-		assert(status);
-
+		lua_getinfo(a_LuaState, "Sln", &entry);
 		LOGWARNING("  %s(%d): %s", entry.short_src, entry.currentline, entry.name ? entry.name : "(no name)");
 		depth++;
 	}
@@ -1066,11 +1064,13 @@ int cLuaState::CallFunctionWithForeignParams(
 	{
 		// Something went wrong, fix the stack and exit
 		lua_pop(m_LuaState, 2);
+		m_NumCurrentFunctionArgs = -1;
+		m_CurrentFunctionName.clear();
 		return -1;
 	}
 	
 	// Call the function, with an error handler:
-	int s = lua_pcall(m_LuaState, a_SrcParamEnd - a_SrcParamStart + 1, LUA_MULTRET, OldTop);
+	int s = lua_pcall(m_LuaState, a_SrcParamEnd - a_SrcParamStart + 1, LUA_MULTRET, OldTop + 1);
 	if (ReportErrors(s))
 	{
 		LOGWARN("Error while calling function '%s' in '%s'", a_FunctionName.c_str(), m_SubsystemName.c_str());
@@ -1081,11 +1081,19 @@ int cLuaState::CallFunctionWithForeignParams(
 		{
 			lua_pop(m_LuaState, CurTop - OldTop);
 		}
-		return -1;
+		
+		// Reset the internal checking mechanisms:
+		m_NumCurrentFunctionArgs = -1;
+		m_CurrentFunctionName.clear();
+		
+		// Make Lua think everything is okay and return 0 values, so that plugins continue executing.
+		// The failure is indicated by the zero return values.
+		return 0;
 	}
 	
 	// Reset the internal checking mechanisms:
 	m_NumCurrentFunctionArgs = -1;
+	m_CurrentFunctionName.clear();
 	
 	// Remove the error handler from the stack:
 	lua_remove(m_LuaState, OldTop + 1);
@@ -1152,6 +1160,7 @@ int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_Sr
 				// Copy the value:
 				void * ud = tolua_touserdata(a_SrcLuaState, i, NULL);
 				tolua_pushusertype(m_LuaState, ud, type);
+				break;
 			}
 			default:
 			{

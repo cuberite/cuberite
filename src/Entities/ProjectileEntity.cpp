@@ -63,7 +63,7 @@ protected:
 			Vector3d Line1 = m_Projectile->GetPosition();
 			Vector3d Line2 = Line1 + m_Projectile->GetSpeed();
 			double LineCoeff = 0;
-			char Face;
+			eBlockFace Face;
 			if (bb.CalcLineIntersection(Line1, Line2, LineCoeff, Face))
 			{
 				Vector3d Intersection = Line1 + m_Projectile->GetSpeed() * LineCoeff;
@@ -138,7 +138,7 @@ public:
 		// Instead of colliding the bounding box with another bounding box in motion, we collide an enlarged bounding box with a hairline.
 		// The results should be good enough for our purposes
 		double LineCoeff;
-		char Face;
+		eBlockFace Face;
 		EntBox.Expand(m_Projectile->GetWidth() / 2, m_Projectile->GetHeight() / 2, m_Projectile->GetWidth() / 2);
 		if (!EntBox.CalcLineIntersection(m_Pos, m_NextPos, LineCoeff, Face))
 		{
@@ -243,7 +243,7 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 
 
 
-void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	// Set the position based on what face was hit:
 	SetPosition(a_HitPos);
@@ -446,7 +446,7 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 
-void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	if (a_HitFace == BLOCK_FACE_NONE) { return; }
 
@@ -590,7 +590,7 @@ cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, 
 
 
 
-void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	if (m_World->GetTickRandomNumber(7) == 1)
 	{
@@ -623,7 +623,7 @@ cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X
 
 
 
-void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	// Teleport the creator here, make them take 5 damage:
 	if (m_Creator != NULL)
@@ -653,7 +653,7 @@ cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, double a_X, do
 
 
 
-void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	// TODO: Apply damage to certain mobs (blaze etc.) and anger all mobs
 	
@@ -677,7 +677,7 @@ super(pkExpBottle, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 
 
 
-void cExpBottleEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cExpBottleEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	// Spawn an experience orb with a reward between 3 and 11.
 	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), 3 + m_World->GetTickRandomNumber(8));
@@ -701,7 +701,7 @@ super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 
 
 
-void cFireworkEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cFireworkEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	if ((a_HitFace != BLOCK_FACE_BOTTOM) && (a_HitFace != BLOCK_FACE_NONE))
 	{
@@ -784,7 +784,7 @@ void cGhastFireballEntity::Explode(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cGhastFireballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cGhastFireballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	Destroy();
 	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
@@ -830,7 +830,7 @@ void cFireChargeEntity::Explode(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cFireChargeEntity::OnHitSolidBlock(const Vector3d & a_HitPos, char a_HitFace)
+void cFireChargeEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	Destroy();
 	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));

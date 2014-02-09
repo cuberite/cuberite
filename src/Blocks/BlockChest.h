@@ -21,7 +21,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -67,7 +67,7 @@ public:
 
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, 
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 	) override
@@ -110,9 +110,11 @@ public:
 		return "step.wood";
 	}
 	
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return CanBeAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+		return CanBeAt(a_ChunkInterface, BlockX, a_RelY, BlockZ);
 	}
 
 	

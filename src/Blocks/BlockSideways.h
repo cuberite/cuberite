@@ -7,10 +7,10 @@
 
 
 
-class cBlockWoodHandler : public cBlockHandler
+class cBlockSidewaysHandler : public cBlockHandler
 {
 public:
-	cBlockWoodHandler(BLOCKTYPE a_BlockType)
+	cBlockSidewaysHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
 	{
 	}
@@ -18,7 +18,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -30,7 +30,7 @@ public:
 	}
 
 	
-	inline static NIBBLETYPE BlockFaceToMetaData(char a_BlockFace, NIBBLETYPE a_WoodMeta)
+	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace, NIBBLETYPE a_WoodMeta)
 	{
 		switch (a_BlockFace)
 		{

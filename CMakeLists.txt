@@ -208,6 +208,7 @@ if (NOT MSVC)
 	string(REPLACE "-w" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
 	string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
 	string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
+	add_flags_cxx("-Wall")
 endif()
 
 if(${BUILD_TOOLS})

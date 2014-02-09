@@ -16,7 +16,7 @@ public:
 	}
 
 	
-	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		// Set p the ON bit to on
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x08);
@@ -44,7 +44,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -61,7 +61,7 @@ public:
 	}
 
 
-	inline static NIBBLETYPE BlockFaceToMetaData(char a_BlockFace)
+	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
 		switch (a_BlockFace)
 		{
@@ -77,7 +77,7 @@ public:
 		}
 	}
 
-	inline static NIBBLETYPE BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
+	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
 		{

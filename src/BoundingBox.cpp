@@ -228,7 +228,7 @@ bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max, doub
 
 
 
-bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, char & a_Face)
+bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face)
 {
 	return CalcLineIntersection(m_Min, m_Max, a_Line1, a_Line2, a_LineCoeff, a_Face);
 }
@@ -237,7 +237,7 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d
 
 
 
-bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, char & a_Face)
+bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face)
 {
 	if (IsInside(a_Min, a_Max, a_Line1))
 	{
@@ -247,7 +247,7 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 		return true;
 	}
 	
-	char Face = BLOCK_FACE_NONE;
+	eBlockFace Face = BLOCK_FACE_NONE;
 	double Coeff = Vector3d::NO_INTERSECTION;
 	
 	// Check each individual bbox face for intersection with the line, remember the one with the lowest coeff

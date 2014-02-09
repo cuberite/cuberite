@@ -260,7 +260,7 @@ public:
 	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
-	cPlayer * FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
+	cPlayer * FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true); 
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
@@ -538,7 +538,7 @@ public:
 	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
-	int GetBiomeAt(int a_BlockX, int a_BlockZ);
+	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
 
 	/** Returns the name of the world */
 	const AString & GetName(void) const { return m_WorldName; }
