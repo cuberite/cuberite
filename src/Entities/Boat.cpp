@@ -89,8 +89,14 @@ void cBoat::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();
-	SetSpeed(GetSpeed() * 0.97); // Slowly decrease the speed.
-	if (IsBlockWater(m_World->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ())))
+	SetSpeed(GetSpeed() * 0.97); // Slowly decrease the speed
+
+	if ((POSY_TOINT < 0) || (POSY_TOINT > cChunkDef::Height))
+	{
+		return;
+	}
+
+	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT)))
 	{
 		SetSpeedY(1);
 	}

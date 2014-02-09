@@ -90,6 +90,8 @@ public:
 		switch (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ))
 		{
 			case E_BLOCK_CROPS:
+			case E_BLOCK_POTATOES:
+			case E_BLOCK_CARROTS:
 			case E_BLOCK_MELON_STEM:
 			case E_BLOCK_PUMPKIN_STEM:
 			{

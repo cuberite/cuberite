@@ -2435,7 +2435,8 @@ void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
 		WriteInt(0);
 		return;
 	}
-	const cMonster & Mob = (const cMonster &)a_Entity;
+
+	//const cMonster & Mob = (const cMonster &)a_Entity;
 
 	// TODO: Send properties and modifiers based on the mob type
 	

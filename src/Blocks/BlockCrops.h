@@ -87,7 +87,7 @@ public:
 		
 		if ((Meta < 7) && (Light > 8))
 		{
-			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_CROPS, ++Meta);
+			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, ++Meta);
 		}
 		else if (Light < 9)
 		{

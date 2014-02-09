@@ -78,7 +78,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 				}
 			}
 		} else {
-			a_Player->SendMessage("You can only sleep at night");
+			a_Player->SendMessageFailure("You can only sleep at night");
 		}
 	}
 }

@@ -13,6 +13,7 @@ class cExpOrb :
 	typedef cExpOrb super;
 	
 public:
+	CLASS_PROTODEF(cExpOrb);
 	
 	cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward);
 	cExpOrb(const Vector3d & a_Pos, int a_Reward);

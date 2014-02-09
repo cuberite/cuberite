@@ -3,7 +3,6 @@
 
 #include "Player.h"
 #include "../Server.h"
-#include "../ClientHandle.h"
 #include "../UI/Window.h"
 #include "../UI/WindowOwner.h"
 #include "../World.h"
@@ -130,9 +129,13 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 cPlayer::~cPlayer(void)
 {
-	cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this);
+	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
+	{
+		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
+		LOGINFO("Player %s has left the game.", GetName().c_str());
+	}
 
-	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
+	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), this, GetUniqueID());
 	
 	// Notify the server that the player is being destroyed
 	cRoot::Get()->GetServer()->PlayerDestroying(this);
@@ -841,18 +844,18 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 
 	if (a_Killer == NULL)
 	{
-		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by environmental damage", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str()));
+		GetWorld()->BroadcastChatDeath(Printf("%s was killed by environmental damage", GetName().c_str()));
 	}
 	else if (a_Killer->IsPlayer())
 	{
-		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by %s", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
+		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
 	}
 	else
 	{
 		AString KillerClass = a_Killer->GetClass();
 		KillerClass.erase(KillerClass.begin()); // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
 
-		GetWorld()->BroadcastChat(Printf("%s[DEATH] %s%s was killed by a %s", cChatColor::Red.c_str(), cChatColor::White.c_str(), GetName().c_str(), KillerClass.c_str()));
+		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
 
 	class cIncrementCounterCB
@@ -1111,15 +1114,6 @@ void cPlayer::LoginSetGameMode( eGameMode a_GameMode )
 void cPlayer::SetIP(const AString & a_IP)
 {
 	m_IP = a_IP;
-}
-
-
-
-
-
-void cPlayer::SendMessage(const AString & a_Message)
-{
-	m_ClientHandle->SendChat(a_Message);
 }
 
 
@@ -1735,6 +1729,23 @@ void cPlayer::UseEquippedItem(void)
 	if (GetInventory().DamageEquippedItem())
 	{
 		m_World->BroadcastSoundEffect("random.break", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	}
+}
+
+
+
+
+void cPlayer::TickBurning(cChunk & a_Chunk)
+{
+	// Don't burn in creative and stop burning in creative if necessary
+	if (!IsGameModeCreative())
+	{
+		super::TickBurning(a_Chunk);
+	}
+	else if (IsOnFire())
+	{
+		m_TicksLeftBurning = 0;
+		OnFinishedBurning();
 	}
 }
 

@@ -44,16 +44,13 @@
 
 
 
-/// If the number of queued outgoing packets reaches this, the client will be kicked
+/** If the number of queued outgoing packets reaches this, the client will be kicked */
 #define MAX_OUTGOING_PACKETS 2000
 
-/// How many explosions per single game tick are allowed
-static const int MAX_EXPLOSIONS_PER_TICK = 100;
+/** Maximum number of explosions to send this tick, server will start dropping if exceeded */
+#define MAX_EXPLOSIONS_PER_TICK 20
 
-/// How many explosions in the recent history are allowed
-static const int MAX_RUNNING_SUM_EXPLOSIONS = cClientHandle::NUM_CHECK_EXPLOSIONS_TICKS * MAX_EXPLOSIONS_PER_TICK / 8;
-
-/// How many ticks before the socket is closed after the client is destroyed (#31)
+/** How many ticks before the socket is closed after the client is destroyed (#31) */
 static const int TICKS_BEFORE_CLOSE = 20;
 
 
@@ -95,8 +92,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_TicksSinceDestruction(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),
-	m_CurrentExplosionTick(0),
-	m_RunningSumExplosions(0),
+	m_NumExplosionsThisTick(0),
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false)
 {
@@ -227,7 +223,11 @@ void cClientHandle::Authenticate(void)
 
 	m_Player->SetIP (m_IPString);
 
-	cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player);
+	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
+	{
+		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
+		LOGINFO("Player %s has joined the game.", m_Username.c_str());
+	}
 	
 	m_ConfirmPosition = m_Player->GetPosition();
 
@@ -566,7 +566,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 {
 	if (a_Length < 14)
 	{
-		SendChat(Printf("%s[INFO]%s Failure setting command block command; bad request", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+		SendChat("Failure setting command block command; bad request", mtFailure);
 		LOGD("Malformed MC|AdvCdm packet.");
 		return;
 	}
@@ -596,7 +596,7 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 
 		default:
 		{
-			SendChat(Printf("%s[INFO]%s Failure setting command block command; unhandled mode", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+			SendChat("Failure setting command block command; unhandled mode", mtFailure);
 			LOGD("Unhandled MC|AdvCdm packet mode.");
 			return;
 		}
@@ -607,12 +607,12 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 	if (World->AreCommandBlocksEnabled())
 	{
 		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
-
-		SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+		
+		SendChat("Successfully set command block command", mtSuccess);
 	}
 	else
 	{
-		SendChat(Printf("%s[INFO]%s Command blocks are not enabled on this server", cChatColor::Yellow.c_str(), cChatColor::White.c_str()));
+		SendChat("Command blocks are not enabled on this server", mtFailure);
 	}
 }
 
@@ -910,7 +910,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
-	if (ItemHandler->IsPlaceable())
+	if (ItemHandler->IsPlaceable() && (a_BlockFace > -1))
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
@@ -1330,13 +1330,9 @@ void cClientHandle::HandleRespawn(void)
 void cClientHandle::HandleDisconnect(const AString & a_Reason)
 {
 	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
-	if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason))
-	{
-		AString DisconnectMessage;
-		Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
-		cRoot::Get()->BroadcastChat(DisconnectMessage);
-		LOGINFO("Player %s has left the game.", m_Username.c_str());
-	}
+
+	cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason);
+
 	m_HasSentDC = true;
 	Destroy();
 }
@@ -1635,10 +1631,8 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 	
-	// Update the explosion statistics:
-	m_CurrentExplosionTick = (m_CurrentExplosionTick + 1) % ARRAYCOUNT(m_NumExplosionsPerTick);
-	m_RunningSumExplosions -= m_NumExplosionsPerTick[m_CurrentExplosionTick];
-	m_NumExplosionsPerTick[m_CurrentExplosionTick] = 0;
+	// Reset explosion counter:
+	m_NumExplosionsThisTick = 0;
 }
 
 
@@ -1735,9 +1729,111 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
-void cClientHandle::SendChat(const AString & a_Message)
+void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData)
 {
-	m_Protocol->SendChat(a_Message);
+	bool ShouldAppendChatPrefixes = true;
+
+	if (GetPlayer()->GetWorld() == NULL)
+	{
+		cWorld * World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
+		if (World == NULL)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+
+		if (!World->ShouldUseChatPrefixes())
+		{
+			ShouldAppendChatPrefixes = false;
+		}
+	}
+	else if (!GetPlayer()->GetWorld()->ShouldUseChatPrefixes())
+	{
+		ShouldAppendChatPrefixes = false;
+	}
+
+	AString Message;
+
+	switch (a_ChatPrefix)
+	{
+		case mtCustom: break;
+		case mtFailure:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Rose.c_str());
+			break;
+		}
+		case mtInformation:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		case mtSuccess:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Green.c_str());
+			break;
+		}
+		case mtWarning:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Rose.c_str());
+			break;
+		}
+		case mtFatal:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Red.c_str());
+			break;
+		}
+		case mtDeath:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Gray.c_str());
+			break;
+		}
+		case mtPrivateMessage:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+			else
+				Message = Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
+			break;
+		}
+		case mtJoin:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[JOIN] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		case mtLeave:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[LEAVE] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		default: ASSERT(!"Unhandled chat prefix type!"); return;
+	}
+
+	Message.append(a_Message);
+
+	m_Protocol->SendChat(Message);
 }
 
 
@@ -1918,18 +2014,14 @@ void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 
 void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
-	if (
-		(m_NumExplosionsPerTick[m_CurrentExplosionTick] > MAX_EXPLOSIONS_PER_TICK) ||  // Too many explosions in this tick
-		(m_RunningSumExplosions > MAX_RUNNING_SUM_EXPLOSIONS)  // Too many explosions in the recent history
-	)
+	if (m_NumExplosionsThisTick > MAX_EXPLOSIONS_PER_TICK)
 	{
-		LOGD("Dropped %u explosions", a_BlocksAffected.size());
+		LOGD("Dropped an explosion!");
 		return;
 	}
 	
 	// Update the statistics:
-	m_NumExplosionsPerTick[m_CurrentExplosionTick] += a_BlocksAffected.size();
-	m_RunningSumExplosions += a_BlocksAffected.size();
+	m_NumExplosionsThisTick += 1;
 	
 	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
@@ -2459,13 +2551,7 @@ void cClientHandle::SocketClosed(void)
 
 	if (m_Username != "") // Ignore client pings
 	{
-		if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected"))
-		{
-			AString DisconnectMessage;
-			Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
-			cRoot::Get()->BroadcastChat(DisconnectMessage);
-			LOGINFO("Player %s has left the game.", m_Username.c_str());
-		}
+		cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected");
 	}
 
 	Destroy();
