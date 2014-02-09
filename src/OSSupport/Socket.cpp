@@ -10,6 +10,7 @@
 	#include <sys/ioctl.h>  // ioctl()
 #else
 	#define socklen_t int
+	#include <VersionHelpers.h>
 #endif
 
 
@@ -20,7 +21,6 @@ cSocket::cSocket(xSocket a_Socket, eFamily a_family)
 	: m_Socket(a_Socket), m_family(a_family)
 {
 }
-
 
 
 
@@ -140,8 +140,42 @@ int cSocket::WSAStartup(void)
 
 cSocket cSocket::CreateSocket(eFamily a_Family)
 {
-	xSocket Socket = socket((int)a_Family, SOCK_STREAM, 0);
-	return cSocket(Socket, a_Family);
+	switch(a_Family)
+	{
+		case IPv4:
+		case IPv6:
+		{
+			xSocket Socket = socket((int)a_Family, SOCK_STREAM, 0);
+			return cSocket(Socket, a_Family);
+		}
+		case IPDual:
+		{
+			xSocket Socket = socket((int)IPv6, SOCK_STREAM, 0);
+			#if defined(_WIN32)
+			if (!IsWindowsVistaOrGreater()) {
+				LOGWARNING("Dual Stack requires windows Vista or greater, server will only be accessable by IPv6");
+			} else {
+			#endif
+			#if defined(_WIN32) || defined(ANDROID_NDK)
+				char no = 1;
+			#else
+				int no = 1;
+			#endif
+			if (setsockopt(Socket, IPPROTO_IPV6, IPV6_V6ONLY, &no, sizeof(int)) == -1)
+			{
+				LOGWARNING("Failed to set dual stack, server may not be accessable on IPv4");
+				ASSERT(false);
+			}
+			return cSocket(Socket, a_Family);
+			#if defined(_WIN32)
+			}
+			#endif
+		}
+		case INVALID_PROTOCOL:
+		{
+			ASSERT(!"Invalid protocol");
+		}
+	}
 }
 
 
@@ -161,6 +195,7 @@ bool cSocket::BindToAny(unsigned short a_Port)
 
 			return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
 		case IPv6:
+		case IPDual:
 			sockaddr_in6 local6;
 			memset(&local6, 0, sizeof(local6));
 
@@ -168,6 +203,10 @@ bool cSocket::BindToAny(unsigned short a_Port)
 			local6.sin6_port = htons((u_short)a_Port);
 
 			return (bind(m_Socket, (sockaddr *)&local6, sizeof(local6)) == 0);
+		case INVALID_PROTOCOL:
+		{
+			ASSERT(!"Invalid protocol");
+		}
 	}
 
 }
@@ -219,6 +258,7 @@ cSocket cSocket::Accept(void)
 			break;
 		}
 		case IPv6:
+		case IPDual:
 		{
 			sockaddr_in6 from6;
 			socklen_t fromlen6 = sizeof(from6);
@@ -262,6 +302,10 @@ cSocket cSocket::Accept(void)
 				#endif  // _WIN32
 			}
 			break;
+		}
+		case INVALID_PROTOCOL:
+		{
+			ASSERT(!"Invalid protocol");
 		}
 	}
 	return SClient;

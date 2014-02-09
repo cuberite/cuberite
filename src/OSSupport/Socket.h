@@ -47,7 +47,6 @@ public:
 #endif
 
 	cSocket(void) : m_Socket(INVALID_SOCKET), m_family(INVALID_PROTOCOL) {}
-	cSocket(xSocket a_Socket, eFamily a_family);
 	~cSocket();
 
 	bool IsValid(void) const { return IsValidSocket(m_Socket); }
@@ -124,4 +123,6 @@ private:
 	xSocket m_Socket;
 	AString m_IPString;
 	eFamily m_family;
+	
+	cSocket(xSocket a_Socket, eFamily a_family);
 };
