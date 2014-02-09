@@ -65,13 +65,26 @@ class cLuaState
 {
 public:
 
-	/** Used for storing references to object in the global registry */
+	/** Used for storing references to object in the global registry.
+	Can be bound (contains a reference) or unbound (doesn't contain reference).
+	The reference can also be reset by calling RefStack(). */
 	class cRef
 	{
 	public:
+		/** Creates an unbound reference object. */
+		cRef(void);
+		
 		/** Creates a reference in the specified LuaState for object at the specified StackPos */
 		cRef(cLuaState & a_LuaState, int a_StackPos);
+		
 		~cRef();
+		
+		/** Creates a reference to Lua object at the specified stack pos, binds this object to it.
+		Calls UnRef() first if previously bound to another reference. */
+		void RefStack(cLuaState & a_LuaState, int a_StackPos);
+		
+		/** Removes the bound reference, resets the object to Unbound state. */
+		void UnRef(void);
 		
 		/** Returns true if the reference is valid */
 		bool IsValid(void) const {return (m_Ref != LUA_REFNIL); }
@@ -80,7 +93,7 @@ public:
 		operator int(void) const { return m_Ref; }
 		
 	protected:
-		cLuaState & m_LuaState;
+		cLuaState * m_LuaState;
 		int m_Ref;
 	} ;
 	

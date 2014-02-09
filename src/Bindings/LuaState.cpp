@@ -1240,13 +1240,21 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cRef:
 
-cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
-	m_LuaState(a_LuaState)
+cLuaState::cRef::cRef(void) :
+	m_LuaState(NULL),
+	m_Ref(LUA_REFNIL)
 {
-	ASSERT(m_LuaState.IsValid());
-	
-	lua_pushvalue(m_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
-	m_Ref = luaL_ref(m_LuaState, LUA_REGISTRYINDEX);
+}
+
+
+
+
+
+cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
+	m_LuaState(NULL),
+	m_Ref(LUA_REFNIL)
+{
+	RefStack(a_LuaState, a_StackPos);
 }
 
 
@@ -1255,12 +1263,42 @@ cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
 
 cLuaState::cRef::~cRef()
 {
-	ASSERT(m_LuaState.IsValid());
+	if (m_LuaState != NULL)
+	{
+		UnRef();
+	}
+}
+
+
+
+
+
+void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	ASSERT(a_LuaState.IsValid());
+	if (m_LuaState != NULL)
+	{
+		UnRef();
+	}
+	m_LuaState = &a_LuaState;
+	lua_pushvalue(a_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
+	m_Ref = luaL_ref(a_LuaState, LUA_REGISTRYINDEX);
+}
+
+
+
+
+
+void cLuaState::cRef::UnRef(void)
+{
+	ASSERT(m_LuaState->IsValid());  // The reference should be destroyed before destroying the LuaState
 	
 	if (IsValid())
 	{
-		luaL_unref(m_LuaState, LUA_REGISTRYINDEX, m_Ref);
+		luaL_unref(*m_LuaState, LUA_REGISTRYINDEX, m_Ref);
 	}
+	m_LuaState = NULL;
+	m_Ref = LUA_REFNIL;
 }
 
 
