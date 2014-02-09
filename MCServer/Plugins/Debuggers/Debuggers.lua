@@ -53,6 +53,7 @@ function Initialize(Plugin)
 	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
+	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
 
 	Plugin:AddWebTab("Debuggers", HandleRequest_Debuggers);
 
@@ -1056,6 +1057,77 @@ function OnPluginMessage(a_Client, a_Channel, a_Message)
 			a_Client:SendPluginMessage("WECUI", "p|1|100|100|100|132651");  -- 132651 = 51 * 51 * 51
 		end
 	end
+end
+
+
+
+
+
+function HandleChunkStay(a_Split, a_Player)
+	if (#a_Split ~= 3) then
+		a_Player:SendMessage("Usage: /cs <ChunkX> <ChunkZ>")
+		return true
+	end
+	
+	local ChunkX = tonumber(a_Split[2])
+	local ChunkZ = tonumber(a_Split[3])
+	if ((ChunkX == nil) or (ChunkZ == nil)) then
+		a_Player:SendMessage("Invalid chunk coords.")
+		return true
+	end
+	
+	local World = a_Player:GetWorld()
+	local PlayerID = a_Player:GetUniqueID()
+	
+	-- Create the ChunkStay object:
+	local ChunkStay = cLuaChunkStay()
+	
+	-- Add the wanted chunks:
+	for z = -1, 1 do for x = -1, 1 do
+		ChunkStay:Add(ChunkX + x, ChunkZ + z)
+	end end
+	
+	-- The function that is called when all chunks are available
+	-- Will perform the action and finally get rid of the ChunkStay object
+	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before this completes
+	local OnAllChunksAvailable = function()
+		-- Build something on the neighboring chunks, to verify:
+		for z = -1, 1 do for x = -1, 1 do
+			local BlockX = (ChunkX + x) * 16 + 8
+			local BlockZ = (ChunkZ + z) * 16 + 8
+			for y = 20, 80 do
+				World:SetBlock(BlockX, y, BlockZ, E_BLOCK_OBSIDIAN, 0)
+			end
+		end end
+		
+		-- Teleport the player there for visual inspection:
+		World:DoWithEntityByID(PlayerID,
+			function (a_CallbackPlayer)
+				a_CallbackPlayer:TeleportToCoords(ChunkX * 16 + 8, 85, ChunkZ * 16 + 8)
+				a_CallbackPlayer:SendMessage("ChunkStay fully available")
+			end
+		)
+		
+		-- Deactivate and remove the ChunkStay object (so that MCS can unload the chunks):
+		-- Forgetting this might crash the server when it stops!
+		ChunkStay:Disable()
+		ChunkStay = nil
+	end
+	
+	-- This function will be called for each chunk that is made available
+	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before this completes
+	local OnChunkAvailable = function(a_ChunkX, a_ChunkZ)
+		LOGINFO("ChunkStay now has chunk [" .. a_ChunkX .. ", " .. a_ChunkZ .. "]")
+		World:DoWithEntityByID(PlayerID,
+			function (a_CallbackPlayer)
+				a_CallbackPlayer:SendMessage("ChunkStay now has chunk [" .. a_ChunkX .. ", " .. a_ChunkZ .. "]")
+			end
+		)
+	end
+	
+	-- Activate the ChunkStay:
+	ChunkStay:Enable(World, OnChunkAvailable, OnAllChunksAvailable)
+	return true
 end
 
 
