@@ -16,8 +16,8 @@
 
 
 
-cSocket::cSocket(xSocket a_Socket)
-	: m_Socket(a_Socket)
+cSocket::cSocket(xSocket a_Socket, eFamily a_family)
+	: m_Socket(a_Socket), m_family(a_family)
 {
 }
 
@@ -140,7 +140,8 @@ int cSocket::WSAStartup(void)
 
 cSocket cSocket::CreateSocket(eFamily a_Family)
 {
-	return socket((int)a_Family, SOCK_STREAM, 0);
+	xSocket Socket = socket((int)a_Family, SOCK_STREAM, 0);
+	return cSocket(Socket, a_Family);
 }
 
 
@@ -209,7 +210,7 @@ cSocket cSocket::Accept(void)
 			sockaddr_in from;
 			socklen_t fromlen = sizeof(from);
 
-			SClient = accept(m_Socket, (sockaddr *)&from, &fromlen);
+			SClient = cSocket(accept(m_Socket, (sockaddr *)&from, &fromlen), m_family);
 
 			if (SClient.IsValid() && (from.sin_addr.s_addr != 0))  // Get IP in string form
 			{
@@ -222,7 +223,7 @@ cSocket cSocket::Accept(void)
 			sockaddr_in6 from6;
 			socklen_t fromlen6 = sizeof(from6);
 
-			cSocket SClient = accept(m_Socket, (sockaddr *)&from6, &fromlen6);
+			SClient = cSocket(accept(m_Socket, (sockaddr *)&from6, &fromlen6), m_family);
 
 			// Get IP in string form:
 			if (SClient.IsValid())

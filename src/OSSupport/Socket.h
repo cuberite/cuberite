@@ -24,7 +24,8 @@ public:
 	{
 		IPv4 = AF_INET,
 		IPv6 = AF_INET6,
-		IPDual
+		IPDual,
+		INVALID_PROTOCOL
 	} ;
 	
 	enum eFlags
@@ -45,8 +46,8 @@ public:
 	static const int INVALID_SOCKET = -1;
 #endif
 
-	cSocket(void) : m_Socket(INVALID_SOCKET) {}
-	cSocket(xSocket a_Socket);
+	cSocket(void) : m_Socket(INVALID_SOCKET), m_family(INVALID_PROTOCOL) {}
+	cSocket(xSocket a_Socket, eFamily a_family);
 	~cSocket();
 
 	bool IsValid(void) const { return IsValidSocket(m_Socket); }
