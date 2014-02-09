@@ -100,11 +100,8 @@ public:
 	/// Sets the socket to listen for incoming connections. Returns true if successful.
 	bool Listen(int a_Backlog = DEFAULT_BACKLOG);
 	
-	/// Accepts an IPv4 incoming connection. Blocks if none available.
-	cSocket AcceptIPv4(void);
-	
-	/// Accepts an IPv6 incoming connection. Blocks if none available.
-	cSocket AcceptIPv6(void);
+	/// Accepts an incoming connection. Blocks if none available.
+	cSocket Accept(void);
 	
 	/// Connects to a localhost socket on the specified port using IPv4; returns true if successful.
 	bool ConnectToLocalhostIPv4(unsigned short a_Port);
