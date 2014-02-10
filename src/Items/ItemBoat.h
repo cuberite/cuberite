@@ -31,7 +31,7 @@ public:
 	
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
-		if (a_Dir != BLOCK_FACE_YM || a_Dir != BLOCK_FACE_NONE)
+		if (a_Dir > 0)
 		{
 			return false;
 		}
