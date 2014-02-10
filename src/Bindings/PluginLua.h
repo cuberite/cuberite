@@ -35,7 +35,33 @@ class cPluginLua :
 public:
 	// tolua_end
 	
-	cPluginLua( const AString & a_PluginDirectory );
+	/** A RAII-style mutex lock for accessing the internal LuaState.
+	This will be the only way to retrieve the plugin's LuaState;
+	therefore it directly supports accessing the LuaState of the locked plugin.
+	Usage:
+		cPluginLua::cOperation Op(SomePlugin);
+		Op().Call(...)  // Call a function in the plugin's LuaState
+	*/
+	class cOperation
+	{
+	public:
+		cOperation(cPluginLua & a_Plugin) :
+			m_Plugin(a_Plugin),
+			m_Lock(a_Plugin.m_CriticalSection)
+		{
+		}
+
+		cLuaState & operator ()(void) { return m_Plugin.m_LuaState; }
+		
+	protected:
+		cPluginLua & m_Plugin;
+		
+		/** RAII lock for m_Plugin.m_CriticalSection */
+		cCSLock m_Lock;
+	} ;
+	
+	
+	cPluginLua(const AString & a_PluginDirectory);
 	~cPluginLua();
 
 	virtual void OnDisable(void) override;
