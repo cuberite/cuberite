@@ -83,7 +83,8 @@ protected:
 		
 	protected:
 		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override {}
-		virtual void OnAllChunksAvailable(void) override;
+		virtual bool OnAllChunksAvailable(void) override;
+		virtual void OnDisabled(void) override;
 	} ;
 	
 	typedef std::list<cChunkStay *> cChunkStays;

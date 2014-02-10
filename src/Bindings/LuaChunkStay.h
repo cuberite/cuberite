@@ -1,7 +1,7 @@
 
 // LuaChunkStay.h
 
-// Declares the cLuaChunkStay class representing a cChunkStay binding for plugins
+// Declares the cLuaChunkStay class representing a cChunkStay binding for plugins, used by cWorld:ChunkStay() Lua API
 
 
 
@@ -16,36 +16,36 @@
 
 
 
-// tolua_begin
+// fwd:
+class cPluginLua;
+
+
+
+
+
 class cLuaChunkStay
 	: public cChunkStay
 {
 	typedef cChunkStay super;
 	
 public:
-	// Allow Lua to construct objects of this class:
-	cLuaChunkStay(void);
+	cLuaChunkStay(cPluginLua & a_Plugin);
 	
-	// Allow Lua to garbage-collect objects of this class:
 	~cLuaChunkStay() { }
 
-	// tolua_end	
+	/** Adds chunks in the specified on-stack Lua table.
+	Returns true if any chunk added, false (plus log warning) if none. */
+	bool AddChunks(int a_ChunkCoordTableStackPos);
 	
-	/** Enables the ChunkStay for the specified world, with the specified Lua callbacks.
-	Exported in ManualBindings. */
-	void Enable(
-		cWorld & a_World, lua_State * a_LuaState,
-		int a_OnChunkAvailableStackPos, int a_OnAllChunksAvailableStackPos
-	);
-	
-	// tolua_begin
-	
-	/** Disables the ChunkStay. Cleans up the bound Lua state and callbacks */
-	virtual void Disable(void);
+	/** Enables the ChunkStay for the specified chunkmap, with the specified Lua callbacks. */
+	void Enable(cChunkMap & a_ChunkMap, int a_OnChunkAvailableStackPos, int a_OnAllChunksAvailableStackPos);
 	
 protected:
+	/** The plugin which has created the ChunkStay, via cWorld:ChunkStay() binding method.  */
+	cPluginLua & m_Plugin;
+	
 	/** The Lua state associated with the callbacks. Only valid when enabled. */
-	cLuaState m_LuaState;
+	cLuaState * m_LuaState;
 	
 	/** The Lua function to call in OnChunkAvailable. Only valid when enabled. */
 	cLuaState::cRef m_OnChunkAvailable;
@@ -53,12 +53,20 @@ protected:
 	/** The Lua function to call in OnAllChunksAvailable. Only valid when enabled. */
 	cLuaState::cRef m_OnAllChunksAvailable;
 	
+	
 	// cChunkStay overrides:
 	virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override;
-	virtual void OnAllChunksAvailable(void) override;
+	virtual bool OnAllChunksAvailable(void) override;
+	virtual void OnDisabled(void) override;
+	
+	/** Adds a single chunk coord from the table at the top of the Lua stack.
+	Expects the top element to be a table, checks that it contains two numbers.
+	Uses those two numbers as chunk coords appended to m_Chunks.
+	If the coords are already present, gives a warning and ignores the pair.
+	The a_Index parameter is only for the error messages. */
+	void AddChunkCoord(cLuaState & a_LuaState, int a_Index);
 } ;
 
-// tolua_end
 
 
 

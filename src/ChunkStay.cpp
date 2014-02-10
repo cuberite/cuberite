@@ -105,7 +105,7 @@ void cChunkStay::Disable(void)
 
 
 
-void cChunkStay::ChunkAvailable(int a_ChunkX, int a_ChunkZ)
+bool cChunkStay::ChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
 	// Check if this is a chunk that we want:
 	bool IsMine = false;
@@ -120,15 +120,16 @@ void cChunkStay::ChunkAvailable(int a_ChunkX, int a_ChunkZ)
 	}  // for itr - m_OutstandingChunks[]
 	if (!IsMine)
 	{
-		return;
+		return false;
 	}
 	
 	// Call the appropriate callbacks:
 	OnChunkAvailable(a_ChunkX, a_ChunkZ);
 	if (m_OutstandingChunks.empty())
 	{
-		OnAllChunksAvailable();
+		return OnAllChunksAvailable();
 	}
+	return false;
 }
 
 

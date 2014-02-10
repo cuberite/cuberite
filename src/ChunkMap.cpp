@@ -912,9 +912,18 @@ void cChunkMap::SetChunkData(
 		}
 		
 		// Notify relevant ChunkStays:
-		for (cChunkStays::iterator itr = m_ChunkStays.begin(), end = m_ChunkStays.end(); itr != end; ++itr)
+		for (cChunkStays::iterator itr = m_ChunkStays.begin(); itr != m_ChunkStays.end(); )
 		{
-			(*itr)->ChunkAvailable(a_ChunkX, a_ChunkZ);
+			if ((*itr)->ChunkAvailable(a_ChunkX, a_ChunkZ))
+			{
+				cChunkStays::iterator cur = itr;
+				++itr;
+				m_ChunkStays.erase(cur);
+			}
+			else
+			{
+				++itr;
+			}
 		}  // for itr - m_ChunkStays[]
 	}
 

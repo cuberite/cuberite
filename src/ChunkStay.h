@@ -32,39 +32,29 @@ This class is abstract, the descendants are expected to provide the OnChunkAvail
 the OnAllChunksAvailable() callback implementations. Note that those are called from the contexts of
 different threads' - the caller, the Loader or the Generator thread.
 */
-// tolua_begin
 class cChunkStay
 {
 public:
-	// tolua_end
 	cChunkStay(void);
 	~cChunkStay();
-	
-	// tolua_begin
 	
 	void Clear(void);
 	
 	/** Adds a chunk to be locked from unloading.
 	To be used only while the ChunkStay object is not enabled. */
-	void Add   (int a_ChunkX, int a_ChunkZ);
+	void Add(int a_ChunkX, int a_ChunkZ);
 	
 	/** Releases the chunk so that it's no longer locked from unloading.
 	To be used only while the ChunkStay object is not enabled. */
 	void Remove(int a_ChunkX, int a_ChunkZ);
 	
-	// tolua_end
-	
 	/** Enables the ChunkStay on the specified chunkmap, causing it to load and generate chunks.
 	All the contained chunks are queued for loading / generating. */
 	void Enable (cChunkMap & a_ChunkMap);
 	
-	// tolua_begin
-	
 	/** Disables the ChunkStay, the chunks are released and the ChunkStay
 	object can be edited with Add() and Remove() again*/
 	virtual void Disable(void);
-	
-	// tolua_end
 	
 	/** Returns all the chunks that should be kept */
 	const cChunkCoordsVector & GetChunks(void) const { return m_Chunks; }
@@ -72,8 +62,12 @@ public:
 	/** Called when a specific chunk become available. */
 	virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) = 0;
 	
-	/** Caled once all of the contained chunks are available. */
-	virtual void OnAllChunksAvailable(void) = 0;
+	/** Caled once all of the contained chunks are available.
+	If returns true, the ChunkStay is automatically disabled by the ChunkMap; if it returns false, the ChunkStay is kept. */
+	virtual bool OnAllChunksAvailable(void) = 0;
+	
+	/** Called by the ChunkMap when the ChunkStay is disabled. The object may choose to delete itself. */
+	virtual void OnDisabled(void) = 0;
 	
 protected:
 
@@ -92,9 +86,10 @@ protected:
 	
 	
 	/** Called by cChunkMap when a chunk is available, checks m_NumLoaded and triggers the appropriate callbacks.
-	May be called for chunks outside this ChunkStay. */
-	void ChunkAvailable(int a_ChunkX, int a_ChunkZ);
-} ;  // tolua_export
+	May be called for chunks outside this ChunkStay.
+	Returns true if the ChunkStay is to be automatically disabled by the ChunkMap; returns false to keep the ChunkStay. */
+	bool ChunkAvailable(int a_ChunkX, int a_ChunkZ);
+} ;
 
 
 

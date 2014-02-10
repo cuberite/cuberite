@@ -548,9 +548,21 @@ cLightingThread::cLightingChunkStay::cLightingChunkStay(cLightingThread & a_Ligh
 
 
 
-void cLightingThread::cLightingChunkStay::OnAllChunksAvailable(void)
+bool cLightingThread::cLightingChunkStay::OnAllChunksAvailable(void)
 {
 	m_LightingThread.QueueChunkStay(*this);
+	
+	// Keep the ChunkStay alive:
+	return false;
+}
+
+
+
+
+
+void cLightingThread::cLightingChunkStay::OnDisabled(void)
+{
+	// Nothing needed in this callback
 }
 
 

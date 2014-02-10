@@ -1639,35 +1639,46 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 
 
 
-static int tolua_cLuaChunkStay_Enable(lua_State * tolua_S)
+static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 {
+	/* Function signature:
+	World:ChunkStay(ChunkCoordTable, OnChunkAvailable, OnAllChunksAvailable)
+	ChunkCoordTable == { {Chunk1x, Chunk1z}, {Chunk2x, Chunk2z}, ... }
+	*/
+	
 	cLuaState L(tolua_S);
 	if (
-		!L.CheckParamUserType(1, "cLuaChunkStay") ||
-		!L.CheckParamUserType(2, "cWorld") ||
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamTable   (2) ||
 		!L.CheckParamFunction(3, 4)
 	)
 	{
 		return 0;
 	}
 	
-	// Read the params:
-	cLuaChunkStay * ChunkStay = (cLuaChunkStay *)tolua_tousertype(tolua_S, 1, NULL);
-	if (ChunkStay == NULL)
+	cPluginLua * Plugin = GetLuaPlugin(tolua_S);
+	if (Plugin == NULL)
 	{
-		LOGWARNING("cLuaChunkStay:Enable(): invalid self");
-		L.LogStackTrace();
 		return 0;
 	}
-	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 2, NULL);
+	cLuaChunkStay * ChunkStay = new cLuaChunkStay(*Plugin);
+	
+	// Read the params:
+	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 1, NULL);
 	if (World == NULL)
 	{
-		LOGWARNING("cLuaChunkStay:Enable(): invalid world parameter");
+		LOGWARNING("World:ChunkStay(): invalid world parameter");
 		L.LogStackTrace();
 		return 0;
 	}
-	
-	ChunkStay->Enable(*World, tolua_S, 3, 4);
+	L.LogStack("Before AddChunks()");
+	if (!ChunkStay->AddChunks(2))
+	{
+		return 0;
+	}
+	L.LogStack("After params read");
+
+	ChunkStay->Enable(*World->GetChunkMap(), 3, 4);
 	return 0;
 }
 
@@ -2397,6 +2408,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cWorld");
+			tolua_function(tolua_S, "ChunkStay",                 tolua_cWorld_ChunkStay);
 			tolua_function(tolua_S, "DoWithBlockEntityAt",       tolua_DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
 			tolua_function(tolua_S, "DoWithChestAt",             tolua_DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);
 			tolua_function(tolua_S, "DoWithDispenserAt",         tolua_DoWithXYZ<cWorld, cDispenserEntity,    &cWorld::DoWithDispenserAt>);
@@ -2438,10 +2450,6 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
 			tolua_function(tolua_S, "GetCurrentPlugin",      tolua_cPluginManager_GetCurrentPlugin);
 			tolua_function(tolua_S, "LogStackTrace",         tolua_cPluginManager_LogStackTrace);
-		tolua_endmodule(tolua_S);
-		
-		tolua_beginmodule(tolua_S, "cLuaChunkStay");
-			tolua_function(tolua_S, "Enable", tolua_cLuaChunkStay_Enable);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");
