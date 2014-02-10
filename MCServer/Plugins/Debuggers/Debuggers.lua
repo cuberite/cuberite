@@ -1079,18 +1079,17 @@ function HandleChunkStay(a_Split, a_Player)
 	local World = a_Player:GetWorld()
 	local PlayerID = a_Player:GetUniqueID()
 	
-	-- Create the ChunkStay object:
-	local ChunkStay = cLuaChunkStay()
-	
-	-- Add the wanted chunks:
+	-- Set the wanted chunks:
+	local Chunks = {}
 	for z = -1, 1 do for x = -1, 1 do
-		ChunkStay:Add(ChunkX + x, ChunkZ + z)
+		table.insert(Chunks, {ChunkX + x, ChunkZ + z})
 	end end
 	
 	-- The function that is called when all chunks are available
-	-- Will perform the action and finally get rid of the ChunkStay object
-	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before this completes
+	-- Will perform the actual action with all those chunks
+	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before the chunks load
 	local OnAllChunksAvailable = function()
+		LOGINFO("ChunkStay all chunks now available")
 		-- Build something on the neighboring chunks, to verify:
 		for z = -1, 1 do for x = -1, 1 do
 			local BlockX = (ChunkX + x) * 16 + 8
@@ -1107,15 +1106,10 @@ function HandleChunkStay(a_Split, a_Player)
 				a_CallbackPlayer:SendMessage("ChunkStay fully available")
 			end
 		)
-		
-		-- Deactivate and remove the ChunkStay object (so that MCS can unload the chunks):
-		-- Forgetting this might crash the server when it stops!
-		ChunkStay:Disable()
-		ChunkStay = nil
 	end
 	
 	-- This function will be called for each chunk that is made available
-	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before this completes
+	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before the chunks load
 	local OnChunkAvailable = function(a_ChunkX, a_ChunkZ)
 		LOGINFO("ChunkStay now has chunk [" .. a_ChunkX .. ", " .. a_ChunkZ .. "]")
 		World:DoWithEntityByID(PlayerID,
@@ -1125,8 +1119,8 @@ function HandleChunkStay(a_Split, a_Player)
 		)
 	end
 	
-	-- Activate the ChunkStay:
-	ChunkStay:Enable(World, OnChunkAvailable, OnAllChunksAvailable)
+	-- Process the ChunkStay:
+	World:ChunkStay(Chunks, OnChunkAvailable, OnAllChunksAvailable)
 	return true
 end
 
