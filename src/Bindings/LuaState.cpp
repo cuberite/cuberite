@@ -1206,7 +1206,7 @@ void cLuaState::LogStack(const char * a_Header)
 void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
 	LOGD((a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
-	for (int i = lua_gettop(a_LuaState); i >= 0; i--)
+	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;
 		int Type = lua_type(a_LuaState, i);
