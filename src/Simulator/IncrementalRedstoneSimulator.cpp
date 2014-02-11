@@ -318,6 +318,22 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_Bloc
 		{
 			// There was a match, torch goes off
 			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_TORCH_OFF, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
+			
+			float Pitch = (((1.0F-0.0F)*((float)rand()/RAND_MAX)) - ((1.0F-0.0F)*((float)rand()/RAND_MAX))) * 0.8F;
+			m_World.BroadcastSoundEffect("random.fizz",
+					((int) (a_BlockX + 0.5F) * 8.0),
+					((int) (a_BlockY + 0.5F) * 8.0),
+					((int) (a_BlockZ + 0.5F) * 8.0),
+					0.5F,
+					2.6F + Pitch);
+			
+			for (int l = 0; l < 5; ++l) {
+				float d0 = a_BlockX + (double(rand())/RAND_MAX) * 0.6F + 0.2F;
+				float d1 = a_BlockY + (double(rand())/RAND_MAX) * 0.6F + 0.2F;
+				float d2 = a_BlockZ + (double(rand())/RAND_MAX) * 0.6F + 0.2F;
+				m_World.BroadcastParticleEffect("smoke", d0, d1, d2, 0.0F, 0.0F, 0.0F, 0.01F, 1);
+			}
+
 			return;
 		}
 
@@ -414,6 +430,7 @@ void cIncrementalRedstoneSimulator::HandleFenceGate(int a_BlockX, int a_BlockY, 
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
 		{
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MetaData | 0x4);
+			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
 		}		
 	}
@@ -422,6 +439,7 @@ void cIncrementalRedstoneSimulator::HandleFenceGate(int a_BlockX, int a_BlockY, 
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
 		{
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MetaData & 0xFFFFFFFB);
+			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}
@@ -766,7 +784,7 @@ void cIncrementalRedstoneSimulator::HandleTNT(int a_BlockX, int a_BlockY, int a_
 {
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
-		m_World.BroadcastSoundEffect("random.fuse", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.6f);
+		m_World.BroadcastSoundEffect("game.tnt.primed", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.6f);
 		m_World.SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 4);  // 4 seconds to boom
 		m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 	}
@@ -784,6 +802,7 @@ void cIncrementalRedstoneSimulator::HandleDoor(int a_BlockX, int a_BlockY, int a
 		{
 			cChunkInterface ChunkInterface(m_World.GetChunkMap());
 			cBlockDoorHandler::ChangeDoor(ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
 		}
 	}
@@ -793,6 +812,7 @@ void cIncrementalRedstoneSimulator::HandleDoor(int a_BlockX, int a_BlockY, int a
 		{
 			cChunkInterface ChunkInterface(m_World.GetChunkMap());
 			cBlockDoorHandler::ChangeDoor(ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}
@@ -865,6 +885,7 @@ void cIncrementalRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, i
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
 		{
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x4);
+			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
 		}		
 	}
@@ -873,6 +894,7 @@ void cIncrementalRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, i
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
 		{
 			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0xB); // Take into account that the fourth bit is needed for trapdoors too
+			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}
