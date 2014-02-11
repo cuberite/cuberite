@@ -1064,20 +1064,25 @@ end
 
 
 function HandleChunkStay(a_Split, a_Player)
+	-- As an example of using ChunkStay, this call will load 3x3 chunks around the specified chunk coords,
+	-- then build an obsidian pillar in the middle of each one.
+	-- Once complete, the player will be teleported to the middle pillar
+	
 	if (#a_Split ~= 3) then
-		a_Player:SendMessage("Usage: /cs <ChunkX> <ChunkZ>")
+		a_Player:SendMessageInfo("Usage: /cs <ChunkX> <ChunkZ>")
 		return true
 	end
 	
 	local ChunkX = tonumber(a_Split[2])
 	local ChunkZ = tonumber(a_Split[3])
 	if ((ChunkX == nil) or (ChunkZ == nil)) then
-		a_Player:SendMessage("Invalid chunk coords.")
+		a_Player:SendMessageFailure("Invalid chunk coords.")
 		return true
 	end
 	
 	local World = a_Player:GetWorld()
 	local PlayerID = a_Player:GetUniqueID()
+	a_Player:SendMessageInfo("Loading chunks, stand by...");
 	
 	-- Set the wanted chunks:
 	local Chunks = {}
@@ -1103,7 +1108,7 @@ function HandleChunkStay(a_Split, a_Player)
 		World:DoWithEntityByID(PlayerID,
 			function (a_CallbackPlayer)
 				a_CallbackPlayer:TeleportToCoords(ChunkX * 16 + 8, 85, ChunkZ * 16 + 8)
-				a_CallbackPlayer:SendMessage("ChunkStay fully available")
+				a_CallbackPlayer:SendMessageSuccess("ChunkStay fully available")
 			end
 		)
 	end
@@ -1114,7 +1119,7 @@ function HandleChunkStay(a_Split, a_Player)
 		LOGINFO("ChunkStay now has chunk [" .. a_ChunkX .. ", " .. a_ChunkZ .. "]")
 		World:DoWithEntityByID(PlayerID,
 			function (a_CallbackPlayer)
-				a_CallbackPlayer:SendMessage("ChunkStay now has chunk [" .. a_ChunkX .. ", " .. a_ChunkZ .. "]")
+				a_CallbackPlayer:SendMessageInfo("ChunkStay now has chunk [" .. a_ChunkX .. ", " .. a_ChunkZ .. "]")
 			end
 		)
 	end
