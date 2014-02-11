@@ -99,6 +99,15 @@ public:
 	} ;
 	
 
+	class cTaskUnloadUnusedChunks :
+		public cTask
+	{
+	protected:
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
+	};
+
+
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
 		return "cWorld";
@@ -243,7 +252,12 @@ public:
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
 	
-	void UnloadUnusedChunks(void);    // tolua_export
+	
+	/*Unloads all chunks immediately. Dangerous interface, may deadlock, use QueueUnloadUnusedChunks() instead*/
+	void UnloadUnusedChunks(void);
+
+	/*Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading*/
+	void QueueUnloadUnusedChunks(void);  // tolua_export
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 

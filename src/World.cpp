@@ -2213,6 +2213,10 @@ void cWorld::UnloadUnusedChunks(void)
 }
 
 
+void cWorld::QueueUnloadUnusedChunks(void)
+{
+	QueueTask(new cWorld::cTaskUnloadUnusedChunks);
+}
 
 
 
@@ -2966,7 +2970,13 @@ void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTaskUnloadUnusedChunks
 
+void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
+{
+	a_World.UnloadUnusedChunks();
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
