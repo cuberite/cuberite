@@ -32,7 +32,7 @@ namespace Json
 class cItem
 {
 public:
-	/// Creates an empty item
+	/** Creates an empty item */
 	cItem(void) :
 		m_ItemType(E_ITEM_EMPTY),
 		m_ItemCount(0),
@@ -43,7 +43,7 @@ public:
 	}
 	
 	
-	/// Creates an item of the specified type, by default 1 piece with no damage and no enchantments
+	/** Creates an item of the specified type, by default 1 piece with no damage and no enchantments */
 	cItem(
 		short a_ItemType,
 		char a_ItemCount = 1,
@@ -55,9 +55,9 @@ public:
 		m_ItemType    (a_ItemType),
 		m_ItemCount   (a_ItemCount),
 		m_ItemDamage  (a_ItemDamage),
+		m_Enchantments(a_Enchantments),
 		m_CustomName  (a_CustomName),
-		m_Lore        (a_Lore),
-		m_Enchantments(a_Enchantments)
+		m_Lore        (a_Lore)
 	{
 		if (!IsValidItem(m_ItemType))
 		{
@@ -70,14 +70,14 @@ public:
 	}
 	
 	
-	/// Creates an exact copy of the item
+	/** Creates an exact copy of the item */
 	cItem(const cItem & a_CopyFrom) :
 		m_ItemType    (a_CopyFrom.m_ItemType),
 		m_ItemCount   (a_CopyFrom.m_ItemCount),
 		m_ItemDamage  (a_CopyFrom.m_ItemDamage),
+		m_Enchantments(a_CopyFrom.m_Enchantments),
 		m_CustomName  (a_CopyFrom.m_CustomName),
-		m_Lore        (a_CopyFrom.m_Lore),
-		m_Enchantments(a_CopyFrom.m_Enchantments)
+		m_Lore        (a_CopyFrom.m_Lore)
 	{
 	}
 	
@@ -106,8 +106,8 @@ public:
 		return ((m_ItemType <= 0) || (m_ItemCount <= 0));
 	}
 	
-	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
-	*/
+	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.)
+	ItemCounts are ignored. */
 	bool IsEqual(const cItem & a_Item) const
 	{
 		return (
@@ -135,38 +135,38 @@ public:
 	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
 	bool IsLoreEmpty(void) const { return (m_Lore.empty()); }	
 
-	/// Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items
+	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
 	cItem CopyOne(void) const;
 	
-	/// Adds the specified count to this object and returns the reference to self (useful for chaining)
+	/** Adds the specified count to this object and returns the reference to self (useful for chaining) */
 	cItem & AddCount(char a_AmountToAdd);
 	
-	/// Returns the maximum damage value that this item can have; zero if damage is not applied
+	/** Returns the maximum damage value that this item can have; zero if damage is not applied */
 	short GetMaxDamage(void) const;
 	
-	/// Damages a weapon / tool. Returns true when damage reaches max value and the item should be destroyed
+	/** Damages a weapon / tool. Returns true when damage reaches max value and the item should be destroyed */
 	bool DamageItem(short a_Amount = 1);
 
 	inline bool IsDamageable(void) const { return (GetMaxDamage() > 0); }
 	
-	/// Returns true if the item is stacked up to its maximum stacking.
+	/** Returns true if the item is stacked up to its maximum stacking. */
 	bool IsFullStack(void) const;
 	
-	/// Returns the maximum amount of stacked items of this type.
+	/** Returns the maximum amount of stacked items of this type. */
 	char GetMaxStackSize(void) const;
 
 	// tolua_end
 	
-	/// Returns the cItemHandler responsible for this item type
+	/** Returns the cItemHandler responsible for this item type */
 	cItemHandler * GetHandler(void) const;
 	
-	/// Saves the item data into JSON representation
+	/** Saves the item data into JSON representation */
 	void GetJson(Json::Value & a_OutValue) const;
 	
-	/// Loads the item data from JSON representation
+	/** Loads the item data from JSON representation */
 	void FromJson(const Json::Value & a_Value);
 	
-	/// Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements)
+	/** Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements) */
 	static bool IsEnchantable(short a_ItemType); // tolua_export
 
 	// tolua_begin
@@ -193,7 +193,7 @@ class cItems  // tolua_export
 public:
 	// tolua_begin
 	
-	/// Need a Lua-accessible constructor
+	/** Need a Lua-accessible constructor */
 	cItems(void) {}
 	
 	cItem * Get   (int a_Idx);
@@ -216,7 +216,7 @@ public:
 
 
 
-/// Used to store loot probability tables
+/** Used to store loot probability tables */
 class cLootProbab
 {
 public:
