@@ -62,8 +62,8 @@ public:												// tolua_export
 	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
 	int  GetNumPlayers(void);
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
-	cPlayer* GetPlayer(const AString & a_PlayerName);
-	std::vector<cPlayer*> GetOnlinePlayers(void);
+	cPlayer* GetPlayer(const AString & a_PlayerName);  // tolua_export
+	std::vector<cPlayer*> GetOnlinePlayers(void);  // tolua_export
 	
 	// Hardcore mode or not:
 	bool IsHardcore(void) const {return m_bIsHardcore; }
