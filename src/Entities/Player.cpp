@@ -1757,6 +1757,12 @@ void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
 	
+	if (IsGameModeCreative())
+	{
+		// Hunger is disabled for Creative
+		return;
+	}
+	
 	// Remember the food level before processing, for later comparison
 	int LastFoodLevel = m_FoodLevel;
 	
@@ -1774,7 +1780,7 @@ void cPlayer::HandleFood(void)
 				Heal(1);
 				m_FoodExhaustionLevel += 3;
 			}
-			else if (m_FoodLevel <= 0)
+			else if (m_FoodLevel <= 0 && m_Health > 1)
 			{
 				// Damage from starving
 				TakeDamage(dtStarving, NULL, 1, 1, 0);
