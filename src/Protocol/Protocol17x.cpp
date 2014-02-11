@@ -1424,12 +1424,29 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 
 void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 {
+	if (!m_Client->GetUsername().empty())
+	{
+		m_Client->Kick("The Login Start Packet was already sent!");
+		return;
+	}
 	AString Username;
 	a_ByteBuffer.ReadVarUTF8String(Username);
 	
 	if (!m_Client->HandleHandshake(Username))
 	{
 		// The client is not welcome here, they have been sent a Kick packet already
+		return;
+	}
+	
+	//Check Player Name and Online Status
+	if (Username.size() > 16 || Username.empty())
+	{
+		m_Client->Kick("Your Username is too long or empty.");
+		return;
+	}
+	if (cRoot::Get()->GetServer()->GetPlayer(Username) != NULL)
+	{
+		m_Client->Kick("You're already logged in as " + Username + "!");
 		return;
 	}
 	
