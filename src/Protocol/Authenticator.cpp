@@ -138,7 +138,7 @@ void cAuthenticator::Execute(void)
 		{
 			cRoot::Get()->SetGameProfile(ClientID, Profile);
 			cRoot::Get()->AuthenticateUser(ClientID);
-			LOGD("User %s authenticated with UUID %s", Profile->GetName().c_str(), Profile->GetUUID().c_str());
+			LOGINFO("User %s authenticated with UUID %s", Profile->GetName().c_str(), Profile->GetUUID().c_str());
 		}
 	}  // for (-ever)
 }
