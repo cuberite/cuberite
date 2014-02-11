@@ -29,6 +29,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <algorithm>    // for std::transform
+#include <ctype.h>      // for tolower
 
 extern "C" {
 	#include "zlib/zlib.h"
@@ -162,24 +164,33 @@ void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
 
 
 
-void cServer::PlayerCreated(const cPlayer * a_Player)
+void cServer::PlayerCreated(cPlayer * a_Player)
 {
 	UNUSED(a_Player);
 	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
 	cCSLock Lock(m_CSPlayerCountDiff);
 	m_PlayerCountDiff += 1;
+	
+	AString PlayerName = a_Player->GetName();
+	std::transform(PlayerName.begin(), PlayerName.end(), PlayerName.begin(), tolower);
+	m_Players.insert( std::pair<AString, cPlayer*> (PlayerName, a_Player) );
 }
 
 
 
 
 
-void cServer::PlayerDestroying(const cPlayer * a_Player)
+void cServer::PlayerDestroying(cPlayer * a_Player)
 {
 	UNUSED(a_Player);
 	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
 	cCSLock Lock(m_CSPlayerCountDiff);
 	m_PlayerCountDiff -= 1;
+	
+	AString PlayerName = a_Player->GetName();
+ 
+	std::transform(PlayerName.begin(), PlayerName.end(), PlayerName.begin(), tolower);
+	m_Players.erase(PlayerName);
 }
 
 
@@ -267,6 +278,37 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	PrepareKeys();
 	
 	return true;
+}
+
+
+
+
+
+
+cPlayer* cServer::GetPlayer(const AString & a_PlayerName) {
+	AString PlayerName = a_PlayerName;
+	std::transform(PlayerName.begin(), PlayerName.end(), PlayerName.begin(), tolower);
+	
+	PlayerMap::const_iterator pos = m_Players.find(PlayerName);
+	if (pos == m_Players.end())
+	{
+		return NULL;
+	}
+	return pos->second;
+}
+
+
+
+
+
+std::vector<cPlayer*> cServer::GetOnlinePlayers(void)
+{
+	std::vector<cPlayer*> OnlinePlayers;
+	for (PlayerMap::iterator it = m_Players.begin(); it != m_Players.end(); ++it)
+	{
+		OnlinePlayers.push_back(it->second);
+	}
+	return OnlinePlayers;
 }
 
 

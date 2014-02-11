@@ -40,6 +40,7 @@ class cIniFile;
 class cCommandOutputCallback ;
 
 typedef std::list<cClientHandle *> cClientHandleList;
+typedef std::map<AString, cPlayer *> PlayerMap;
 
 
 
@@ -57,10 +58,12 @@ public:												// tolua_export
 	
 	const AString & GetDescription(void) const {return m_Description; }
 
-	// Player counts:
+	// Players:
 	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
 	int  GetNumPlayers(void);
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
+	cPlayer* GetPlayer(const AString & a_PlayerName);
+	std::vector<cPlayer*> GetOnlinePlayers(void);
 	
 	// Hardcore mode or not:
 	bool IsHardcore(void) const {return m_bIsHardcore; }
@@ -101,10 +104,10 @@ public:												// tolua_export
 	void ClientMovedToWorld(const cClientHandle * a_Client);
 	
 	/** Notifies the server that a player was created; the server uses this to adjust the number of players */
-	void PlayerCreated(const cPlayer * a_Player);
+	void PlayerCreated(cPlayer * a_Player);
 	
 	/** Notifies the server that a player is being destroyed; the server uses this to adjust the number of players */
-	void PlayerDestroying(const cPlayer * a_Player);
+	void PlayerDestroying(cPlayer * a_Player);
 
 	/** Returns base64 encoded favicon data (obtained from favicon.png) */
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
@@ -169,6 +172,7 @@ private:
 	cClientHandleList m_ClientsToRemove;  ///< Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick()
 	
 	cCriticalSection m_CSPlayerCount;      ///< Locks the m_PlayerCount
+	PlayerMap        m_Players;            ///< All Players who joined on the Server
 	int              m_PlayerCount;        ///< Number of players currently playing in the server
 	cCriticalSection m_CSPlayerCountDiff;  ///< Locks the m_PlayerCountDiff
 	int              m_PlayerCountDiff;    ///< Adjustment to m_PlayerCount to be applied in the Tick thread
