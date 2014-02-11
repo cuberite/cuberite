@@ -803,6 +803,7 @@ private:
 
 	/** Whether command blocks are enabled or not */
 	bool m_bCommandBlocksEnabled;
+	
 	/** Whether prefixes such as [INFO] are prepended to SendMessageXXX() / BroadcastChatXXX() functions */
 	bool m_bUseChatPrefixes;
 	
@@ -846,7 +847,7 @@ private:
 
 
 	cWorld(const AString & a_WorldName);
-	~cWorld();
+	virtual ~cWorld();
 
 	void Tick(float a_Dt, int a_LastTickDurationMSec);
 
