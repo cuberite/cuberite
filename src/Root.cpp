@@ -508,6 +508,15 @@ void cRoot::AuthenticateUser(int a_ClientID)
 
 
 
+void cRoot::SetGameProfile(int a_ClientID, cGameProfile * a_GameProfile)
+{
+	m_Server->SetGameProfile(a_ClientID, a_GameProfile);
+}
+
+
+
+
+
 int cRoot::GetTotalChunkCount(void)
 {
 	int res = 0;

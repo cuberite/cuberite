@@ -27,7 +27,7 @@
 
 #include "Root.h"
 
-#include "Authenticator.h"
+#include "Protocol/Authenticator.h"
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
@@ -206,6 +206,12 @@ void cClientHandle::Authenticate(void)
 	}
 	
 	ASSERT( m_Player == NULL );
+	
+	// Game Profile
+	if (!m_GameProfile->Empty())
+	{
+		SetUsername(m_GameProfile->GetName());
+	}
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());

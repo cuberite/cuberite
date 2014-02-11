@@ -36,6 +36,7 @@
 // fwd:
 class cPlayer;
 class cClientHandle;
+class cGameProfile;
 class cIniFile;
 class cCommandOutputCallback ;
 
@@ -87,6 +88,7 @@ public:												// tolua_export
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
+	void SetGameProfile(int a_ClientID, cGameProfile * a_GameProfile); //Called by cAuthenticator to set the GameProfile for the specified user
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 	

@@ -34,6 +34,7 @@ class cWindow;
 class cFallingBlock;
 class cItemHandler;
 class cWorld;
+class cGameProfile;
 
 
 
@@ -59,6 +60,8 @@ public:
 	const AString & GetIPString(void) const { return m_IPString; }
 	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
+	void SetGameProfile(cGameProfile * a_GameProfile) { m_GameProfile = a_GameProfile; }
+	cGameProfile* GetGameProfile() { return m_GameProfile; }	// tolua_export
 
 	void Kick(const AString & a_Reason);		// tolua_export
 	void Authenticate(void);  // Called by cAuthenticator when the user passes authentication
@@ -243,6 +246,7 @@ private:
 	Vector3d m_ConfirmPosition;
 
 	cPlayer * m_Player;
+	cGameProfile * m_GameProfile;
 	
 	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
 	

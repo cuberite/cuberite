@@ -670,6 +670,23 @@ void cServer::AuthenticateUser(int a_ClientID)
 
 
 
+void cServer::SetGameProfile(int a_ClientID, cGameProfile * a_GameProfile)
+{
+	cCSLock Lock(m_CSClients);
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	{
+		if ((*itr)->GetUniqueID() == a_ClientID)
+		{
+			(*itr)->SetGameProfile(a_GameProfile);
+			return;
+		}
+	}  // for itr - m_Clients[]
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cServer::cNotifyWriteThread:
 

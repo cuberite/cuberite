@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Authenticator.h"
+#include "Protocol/Authenticator.h"
 #include "HTTPServer/HTTPServer.h"
 #include "Defines.h"
 
@@ -89,6 +89,9 @@ public:
 	
 	/// Called by cAuthenticator to auth the specified user
 	void AuthenticateUser(int a_ClientID);
+	
+	/// Called by cAuthenticator to set the GameProfile for the specified user
+	void SetGameProfile(int a_ClientID, cGameProfile * a_GameProfile);
 	
 	/// Executes commands queued in the command queue
 	void TickCommands(void);
