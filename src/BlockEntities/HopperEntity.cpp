@@ -7,10 +7,12 @@
 #include "HopperEntity.h"
 #include "../Chunk.h"
 #include "../Entities/Player.h"
+#include "../Entities/Pickup.h"
 #include "../Bindings/PluginManager.h"
 #include "ChestEntity.h"
 #include "DropSpenserEntity.h"
 #include "FurnaceEntity.h"
+#include "../BoundingBox.h"
 
 
 
@@ -190,8 +192,71 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 /// Moves pickups from above this hopper into it. Returns true if the contents have changed.
 bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 {
-	// TODO
-	return false;
+	UNUSED(a_CurrentTick);
+
+	class cHopperPickupSearchCallback :
+		public cEntityCallback
+	{
+	public:
+		cHopperPickupSearchCallback(Vector3i a_Pos, cItemGrid & a_Contents) :
+			m_Pos(a_Pos),
+			m_Contents(a_Contents),
+			m_bFoundPickupsAbove(false)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			ASSERT(a_Entity != NULL);
+
+			if (!a_Entity->IsPickup() || a_Entity->IsDestroyed())
+			{
+				return false;
+			}
+
+			Vector3f EntityPos = a_Entity->GetPosition();
+			Vector3f BlockPos(m_Pos.x + 0.5f, (float)m_Pos.y + 1, m_Pos.z + 0.5f); // One block above hopper, and search from center outwards
+			float Distance = (EntityPos - BlockPos).Length();
+
+			if (Distance < 0.5)
+			{
+				for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+				{
+					if (m_Contents.IsSlotEmpty(i))
+					{
+						m_bFoundPickupsAbove = true;
+						m_Contents.SetSlot(i, ((cPickup *)a_Entity)->GetItem());
+						a_Entity->Destroy(); // Kill pickup
+						return false; // Don't break enumeration
+					}
+					else if (m_Contents.GetSlot(i).IsEqual(((cPickup *)a_Entity)->GetItem()))
+					{
+						m_bFoundPickupsAbove = true;
+						m_Contents.ChangeSlotCount(i, ((cPickup *)a_Entity)->GetItem().m_ItemCount);
+						a_Entity->Destroy();
+						return false;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		bool FoundPickupsAbove(void) const
+		{
+			return m_bFoundPickupsAbove;
+		}
+
+	protected:
+		Vector3i m_Pos;
+		bool m_bFoundPickupsAbove;
+		cItemGrid & m_Contents;
+	};
+
+	cHopperPickupSearchCallback HopperPickupSearchCallback(Vector3i(GetPosX(), GetPosY(), GetPosZ()), m_Contents);
+	a_Chunk.ForEachEntity(HopperPickupSearchCallback);
+
+	return HopperPickupSearchCallback.FoundPickupsAbove();
 }
 
 
