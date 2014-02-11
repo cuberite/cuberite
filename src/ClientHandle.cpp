@@ -701,6 +701,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		case DIG_STATUS_CANCELLED:
 		{
 			// Block breaking cancelled by player
+			HandleBlockDigStop();
 			return;
 		}
 
@@ -818,15 +819,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	m_HasStartedDigging = false;
-	if (m_BlockDigAnimStage != -1)
-	{
-		// End dig animation
-		m_BlockDigAnimStage = -1;
-		// It seems that 10 ends block animation
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
-	}
-
+	HandleBlockDigStop();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 	
 	if (a_OldBlock == E_BLOCK_AIR)
@@ -853,6 +846,36 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+}
+
+
+
+
+
+void cClientHandle::HandleBlockDigStop()
+{
+	if (
+		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
+		(m_LastDigBlockX == -1) ||
+		(m_LastDigBlockY == -1) ||
+		(m_LastDigBlockZ == -1)
+	)
+	{
+		return;
+	}
+	
+	m_HasStartedDigging = false;
+	if (m_BlockDigAnimStage != -1)
+	{
+		// End dig animation
+		m_BlockDigAnimStage = -1;
+		// It seems that 10 ends block animation
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
+	}
+	
+	m_BlockDigAnimX = -1;
+	m_BlockDigAnimY = -1;
+	m_BlockDigAnimZ = -1;
 }
 
 
