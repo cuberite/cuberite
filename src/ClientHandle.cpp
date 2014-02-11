@@ -831,6 +831,15 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	
 	cWorld * World = m_Player->GetWorld();
+	if (
+		(std::max(m_Player->GetPosX(), double(a_BlockX)) - std::min(m_Player->GetPosX(), double(a_BlockX))) >= 6 ||
+		(std::max(m_Player->GetPosY(), double(a_BlockY)) - std::min(m_Player->GetPosY(), double(a_BlockY))) >= 6 ||
+		(std::max(m_Player->GetPosZ(), double(a_BlockZ)) - std::min(m_Player->GetPosZ(), double(a_BlockZ))) >= 6)
+	{
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+	
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -1047,6 +1056,15 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Handler refused the placement, send that information back to the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		return;
+	}
+	
+	if (
+		(std::max(m_Player->GetPosX(), double(a_BlockX)) - std::min(m_Player->GetPosX(), double(a_BlockX))) >= 6 ||
+		(std::max(m_Player->GetPosY(), double(a_BlockY)) - std::min(m_Player->GetPosY(), double(a_BlockY))) >= 6 ||
+		(std::max(m_Player->GetPosZ(), double(a_BlockZ)) - std::min(m_Player->GetPosZ(), double(a_BlockZ))) >= 6)
+	{
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
 	}
 	
