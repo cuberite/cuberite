@@ -253,10 +253,10 @@ public:
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
 	
 	
-	/*Unloads all chunks immediately. Dangerous interface, may deadlock, use QueueUnloadUnusedChunks() instead*/
+	/** Unloads all chunks immediately. Dangerous interface, may deadlock, use QueueUnloadUnusedChunks() instead*/
 	void UnloadUnusedChunks(void);
 
-	/*Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading*/
+	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading*/
 	void QueueUnloadUnusedChunks(void);  // tolua_export
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
