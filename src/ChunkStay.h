@@ -36,7 +36,7 @@ class cChunkStay
 {
 public:
 	cChunkStay(void);
-	~cChunkStay();
+	virtual ~cChunkStay();
 	
 	void Clear(void);
 	
