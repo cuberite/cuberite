@@ -33,6 +33,7 @@ Chunks from m_PostponedQueue are moved back into m_Queue when their neighbors ge
 
 #include "OSSupport/IsThread.h"
 #include "ChunkDef.h"
+#include "ChunkStay.h"
 
 
 
@@ -40,9 +41,6 @@ Chunks from m_PostponedQueue are moved back into m_Queue when their neighbors ge
 
 // fwd: "cWorld.h"
 class cWorld;
-
-// fwd: "cChunkMap.h"
-class cChunkStay;
 
 
 
@@ -62,43 +60,50 @@ public:
 	
 	void Stop(void);
 	
-	/// Queues the entire chunk for lighting
+	/** Queues the entire chunk for lighting */
 	void QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter = NULL);
 	
-	/// Blocks until the queue is empty or the thread is terminated
+	/** Blocks until the queue is empty or the thread is terminated */
 	void WaitForQueueEmpty(void);
 	
 	size_t GetQueueLength(void);
 	
-	/// Called from cWorld when a chunk gets valid. Chunks in m_PostponedQueue may need moving into m_Queue
-	void ChunkReady(int a_ChunkX, int a_ChunkZ);
-	
 protected:
 
-	struct sItem
+	class cLightingChunkStay :
+		public cChunkStay
 	{
-		int x, z;
-		cChunkStay * m_ChunkStay;
-		cChunkCoordCallback * m_Callback;
+	public:
+		cLightingThread & m_LightingThread;
+		int m_ChunkX;
+		int m_ChunkZ;
+		cChunkCoordCallback * m_CallbackAfter;
 		
-		sItem(void) {}  // empty default constructor needed
-		sItem(int a_X, int a_Z, cChunkStay * a_ChunkStay, cChunkCoordCallback * a_Callback) :
-			x(a_X),
-			z(a_Z),
-			m_ChunkStay(a_ChunkStay),
-			m_Callback(a_Callback)
-		{
-		}
+		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter);
+		
+	protected:
+		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override {}
+		virtual bool OnAllChunksAvailable(void) override;
+		virtual void OnDisabled(void) override;
 	} ;
 	
-	typedef std::list<sItem> sItems;
+	typedef std::list<cChunkStay *> cChunkStays;
 	
-	cWorld *         m_World;
+	
+	cWorld * m_World;
+	
+	/** The mutex to protect m_Queue and m_PendingQueue */
 	cCriticalSection m_CS;
-	sItems           m_Queue;
-	sItems           m_PostponedQueue;  // Chunks that have been postponed due to missing neighbors
-	cEvent           m_evtItemAdded;    // Set when queue is appended, or to stop the thread
-	cEvent           m_evtQueueEmpty;   // Set when the queue gets empty
+	
+	/** The ChunkStays that are loaded and are waiting to be lit. */
+	cChunkStays m_Queue;
+
+	/** The ChunkStays that are waiting for load. Used for stopping the thread. */
+	cChunkStays m_PendingQueue;
+
+	cEvent m_evtItemAdded;    // Set when queue is appended, or to stop the thread
+	cEvent m_evtQueueEmpty;   // Set when the queue gets empty
+	
 	
 	// Buffers for the 3x3 chunk data
 	// These buffers alone are 1.7 MiB in size, therefore they cannot be located on the stack safely - some architectures may have only 1 MiB for stack, or even less
@@ -124,29 +129,29 @@ protected:
 
 	virtual void Execute(void) override;
 
-	/// Lights the entire chunk. If neighbor chunks don't exist, touches them and re-queues the chunk
-	void LightChunk(sItem & a_Item);
+	/** Lights the entire chunk. If neighbor chunks don't exist, touches them and re-queues the chunk */
+	void LightChunk(cLightingChunkStay & a_Item);
 	
-	/// Prepares m_BlockTypes and m_HeightMap data; returns false if any of the chunks fail. Zeroes out the light arrays
+	/** Prepares m_BlockTypes and m_HeightMap data; returns false if any of the chunks fail. Zeroes out the light arrays */
 	bool ReadChunks(int a_ChunkX, int a_ChunkZ);
 	
-	/// Uses m_HeightMap to initialize the m_SkyLight[] data; fills in seeds for the skylight
+	/** Uses m_HeightMap to initialize the m_SkyLight[] data; fills in seeds for the skylight */
 	void PrepareSkyLight(void);
 	
-	/// Uses m_BlockTypes to initialize the m_BlockLight[] data; fills in seeds for the blocklight
+	/** Uses m_BlockTypes to initialize the m_BlockLight[] data; fills in seeds for the blocklight */
 	void PrepareBlockLight(void);
 	
-	/// Calculates light in the light array specified, using stored seeds
+	/** Calculates light in the light array specified, using stored seeds */
 	void CalcLight(NIBBLETYPE * a_Light);
 	
-	/// Does one step in the light calculation - one seed propagation and seed recalculation
+	/** Does one step in the light calculation - one seed propagation and seed recalculation */
 	void CalcLightStep(
 		NIBBLETYPE * a_Light, 
 		int a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);
 	
-	/// Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage):
+	/** Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage): */
 	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
 	
 	inline void PropagateLight(
@@ -173,6 +178,10 @@ protected:
 			a_SeedIdxOut[a_NumSeedsOut++] = a_DstIdx;
 		}
 	}
+	
+	/** Queues a chunkstay that has all of its chunks loaded.
+	Called by cLightingChunkStay when all of its chunks are loaded. */
+	void QueueChunkStay(cLightingChunkStay & a_ChunkStay);
 	
 } ;
 

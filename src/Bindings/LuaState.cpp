@@ -735,17 +735,20 @@ bool cLuaState::CallFunction(int a_NumResults)
 	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 1));  // The function to call
 	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 2));  // The error handler
 	
-	int s = lua_pcall(m_LuaState, m_NumCurrentFunctionArgs, a_NumResults, -m_NumCurrentFunctionArgs - 2);
+	// Save the current "stack" state and reset, in case the callback calls another function:
+	AString CurrentFunctionName;
+	std::swap(m_CurrentFunctionName, CurrentFunctionName);
+	int NumArgs = m_NumCurrentFunctionArgs;
+	m_NumCurrentFunctionArgs = -1;
+	
+	// Call the function:
+	int s = lua_pcall(m_LuaState, NumArgs, a_NumResults, -NumArgs - 2);
 	if (s != 0)
 	{
 		// The error has already been printed together with the stacktrace
-		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), m_CurrentFunctionName.c_str());
-		m_NumCurrentFunctionArgs = -1;
-		m_CurrentFunctionName.clear();
+		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), CurrentFunctionName.c_str());
 		return false;
 	}
-	m_NumCurrentFunctionArgs = -1;
-	m_CurrentFunctionName.clear();
 	
 	// Remove the error handler from the stack:
 	lua_remove(m_LuaState, -a_NumResults - 1);
@@ -1206,7 +1209,7 @@ void cLuaState::LogStack(const char * a_Header)
 void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
 	LOGD((a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
-	for (int i = lua_gettop(a_LuaState); i >= 0; i--)
+	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;
 		int Type = lua_type(a_LuaState, i);
@@ -1240,13 +1243,21 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cRef:
 
-cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
-	m_LuaState(a_LuaState)
+cLuaState::cRef::cRef(void) :
+	m_LuaState(NULL),
+	m_Ref(LUA_REFNIL)
 {
-	ASSERT(m_LuaState.IsValid());
-	
-	lua_pushvalue(m_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
-	m_Ref = luaL_ref(m_LuaState, LUA_REGISTRYINDEX);
+}
+
+
+
+
+
+cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
+	m_LuaState(NULL),
+	m_Ref(LUA_REFNIL)
+{
+	RefStack(a_LuaState, a_StackPos);
 }
 
 
@@ -1255,12 +1266,42 @@ cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
 
 cLuaState::cRef::~cRef()
 {
-	ASSERT(m_LuaState.IsValid());
+	if (m_LuaState != NULL)
+	{
+		UnRef();
+	}
+}
+
+
+
+
+
+void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	ASSERT(a_LuaState.IsValid());
+	if (m_LuaState != NULL)
+	{
+		UnRef();
+	}
+	m_LuaState = &a_LuaState;
+	lua_pushvalue(a_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
+	m_Ref = luaL_ref(a_LuaState, LUA_REGISTRYINDEX);
+}
+
+
+
+
+
+void cLuaState::cRef::UnRef(void)
+{
+	ASSERT(m_LuaState->IsValid());  // The reference should be destroyed before destroying the LuaState
 	
 	if (IsValid())
 	{
-		luaL_unref(m_LuaState, LUA_REGISTRYINDEX, m_Ref);
+		luaL_unref(*m_LuaState, LUA_REGISTRYINDEX, m_Ref);
 	}
+	m_LuaState = NULL;
+	m_Ref = LUA_REFNIL;
 }
 
 

@@ -320,9 +320,6 @@ public:
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);	// tolua_export
 
-	/** Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable. To be used only by cChunkStay! */
-	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
-	
 	/** Regenerate the given chunk: */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export
 	

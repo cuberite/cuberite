@@ -2148,9 +2148,6 @@ void cWorld::SetChunkData(
 	{
 		m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkZ);
 	}
-	
-	// Notify the lighting thread that the chunk has become valid (in case it is a neighbor of a postponed chunk):
-	m_Lighting.ChunkReady(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2558,15 +2555,6 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 	} CmdBlockCB (a_Command);
 
 	return DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, CmdBlockCB);
-}
-
-
-
-
-
-void cWorld::ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay)
-{
-	m_ChunkMap->ChunksStay(a_Chunks, a_Stay);
 }
 
 

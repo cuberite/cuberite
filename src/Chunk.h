@@ -85,10 +85,10 @@ public:
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
 	void MarkLoadFailed(void);  // Marks the chunk as failed to load. Ignored is the chunk is already valid
 	
-	/// Gets all chunk data, calls the a_Callback's methods for each data type
+	/** Gets all chunk data, calls the a_Callback's methods for each data type */
 	void GetAllData(cChunkDataCallback & a_Callback);
 	
-	/// Sets all chunk data
+	/** Sets all chunk data */
 	void SetAllData(
 		const BLOCKTYPE *  a_BlockTypes, 
 		const NIBBLETYPE * a_BlockMeta,
@@ -104,27 +104,29 @@ public:
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 	
-	/// Copies m_BlockData into a_BlockTypes, only the block types
+	/** Copies m_BlockData into a_BlockTypes, only the block types */
 	void GetBlockTypes(BLOCKTYPE  * a_BlockTypes);
 	
-	/// Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk!
+	/** Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk! */
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
-	/// Returns true if there is a block entity at the coords specified
+	/** Returns true if there is a block entity at the coords specified */
 	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
 	
-	/// Sets or resets the internal flag that prevents chunk from being unloaded
+	/** Sets or resets the internal flag that prevents chunk from being unloaded.
+	The flag is cumulative - it can be set multiple times and then needs to be un-set that many times
+	before the chunk is unloadable again. */
 	void Stay(bool a_Stay = true);
 	
-	/// Recence all mobs proximities to players in order to know what to do with them
+	/** Recence all mobs proximities to players in order to know what to do with them */
 	void CollectMobCensus(cMobCensus& toFill);
 
-	/// Try to Spawn Monsters inside chunk
+	/** Try to Spawn Monsters inside chunk */
 	void SpawnMobs(cMobSpawner& a_MobSpawner);
 
 	void Tick(float a_Dt);
 	
-	/// Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks
+	/** Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks */
 	void TickBlock(int a_RelX, int a_RelY, int a_RelZ);
 
 	int GetPosX(void) const { return m_PosX; }
@@ -137,13 +139,13 @@ public:
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta ); }
 	
-	/// Queues a block change till the specified world tick
+	/** Queues a block change till the specified world tick */
 	void QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
 	
-	/// Queues block for ticking (m_ToTickQueue)
+	/** Queues block for ticking (m_ToTickQueue) */
 	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
 	
-	/// Queues all 6 neighbors of the specified block for ticking (m_ToTickQueue). If any are outside the chunk, relays the checking to the proper neighboring chunk
+	/** Queues all 6 neighbors of the specified block for ticking (m_ToTickQueue). If any are outside the chunk, relays the checking to the proper neighboring chunk */
 	void QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ);
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
@@ -175,14 +177,14 @@ public:
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 	
-	/// Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk
+	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
 	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
 	int  GetHeight( int a_X, int a_Z );
 
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
-	/// Adds a client to the chunk; returns true if added, false if already there
+	/** Adds a client to the chunk; returns true if added, false if already there */
 	bool AddClient    (cClientHandle* a_Client );
 	
 	void RemoveClient (cClientHandle* a_Client );
@@ -193,55 +195,55 @@ public:
 	void RemoveEntity(cEntity * a_Entity);
 	bool HasEntity(int a_EntityID);
 	
-	/// Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true
+	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found.
+	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
 	bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible
 
-	/// Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true
+	/** Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntity(cBlockEntityCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for each chest; returns true if all chests processed, false if the callback aborted by returning true
+	/** Calls the callback for each chest; returns true if all chests processed, false if the callback aborted by returning true */
 	bool ForEachChest(cChestCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for each dispenser; returns true if all dispensers processed, false if the callback aborted by returning true
+	/** Calls the callback for each dispenser; returns true if all dispensers processed, false if the callback aborted by returning true */
 	bool ForEachDispenser(cDispenserCallback & a_Callback);
 
-	/// Calls the callback for each dropper; returns true if all droppers processed, false if the callback aborted by returning true
+	/** Calls the callback for each dropper; returns true if all droppers processed, false if the callback aborted by returning true */
 	bool ForEachDropper(cDropperCallback & a_Callback);
 
-	/// Calls the callback for each dropspenser; returns true if all dropspensers processed, false if the callback aborted by returning true
+	/** Calls the callback for each dropspenser; returns true if all dropspensers processed, false if the callback aborted by returning true */
 	bool ForEachDropSpenser(cDropSpenserCallback & a_Callback);
 
-	/// Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true
+	/** Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true */
 	bool ForEachFurnace(cFurnaceCallback & a_Callback);  // Lua-accessible
 	
-	/// Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found
+	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
 
-	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
+	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Lua-acessible
 
-	/// Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found
+	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
 	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback);
 
-	/// Calls the callback for the dispenser at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found
+	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
 	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback & a_Callback);
 
-	/// Calls the callback for the dispenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found
+	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
 	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback & a_Callback);
 
-	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found
+	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found
+	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);
 
-	/// Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found
+	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
 	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback); 
 
-	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
+	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
@@ -292,7 +294,7 @@ public:
 		m_IsSaving = false;
 	}
 	
-	/// Sets the blockticking to start at the specified block. Only one blocktick may be set, second call overwrites the first call
+	/** Sets the blockticking to start at the specified block. Only one blocktick may be set, second call overwrites the first call */
 	inline void SetNextBlockTick(int a_RelX, int a_RelY, int a_RelZ)
 	{
 		m_BlockTickX = a_RelX;
@@ -310,34 +312,34 @@ public:
 	inline NIBBLETYPE GetBlockLight(int a_Idx) const {return cChunkDef::GetNibble(m_BlockLight, a_Idx); }
 	inline NIBBLETYPE GetSkyLight  (int a_Idx) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_Idx); }
 	
-	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success
+	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	
-	/// Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success
+	/** Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType) const;
 	
-	/// Same as GetBlockMeta(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success
+	/** Same as GetBlockMeta(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockMeta) const;
 	
-	/// Same as GetBlockBlockLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success
+	/** Same as GetBlockBlockLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight) const;
 
-	/// Same as GetBlockSkyLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success
+	/** Same as GetBlockSkyLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_SkyLight) const;
 
-	/// Queries both BlockLight and SkyLight, relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success
+	/** Queries both BlockLight and SkyLight, relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const;
 
-	/// Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success
+	/** Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/// Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success
+	/** Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	
-	/// Same as QueueTickBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s in such a case), ignores unsuccessful attempts
+	/** Same as QueueTickBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s in such a case), ignores unsuccessful attempts */
 	void UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
 
-	/// Light alterations based on time
+	/** Light alterations based on time */
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 
@@ -389,7 +391,7 @@ private:
 	cEntityList        m_Entities;
 	cBlockEntityList   m_BlockEntities;
 	
-	/// Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded
+	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
 	int m_StayCount;
 
 	int m_PosX, m_PosY, m_PosZ;
@@ -427,40 +429,40 @@ private:
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (cBlockEntity * a_BlockEntity);
 
-	/// Creates a block entity for each block that needs a block entity and doesn't have one in the list
+	/** Creates a block entity for each block that needs a block entity and doesn't have one in the list */
 	void CreateBlockEntities(void);
 	
-	/// Wakes up each simulator for its specific blocks; through all the blocks in the chunk
+	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */
 	void WakeUpSimulators(void);
 	
 	// Makes a copy of the list
 	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
 
-	/// Sends m_PendingSendBlocks to all clients
+	/** Sends m_PendingSendBlocks to all clients */
 	void BroadcastPendingBlockChanges(void);
 	
-	/// Checks the block scheduled for checking in m_ToTickBlocks[]
+	/** Checks the block scheduled for checking in m_ToTickBlocks[] */
 	void CheckBlocks();
 	
-	/// Ticks several random blocks in the chunk
+	/** Ticks several random blocks in the chunk */
 	void TickBlocks(void);
 	
-	/// Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes
+	/** Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes */
 	void ApplyWeatherToTop(void);
 	
-	/// Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking)
+	/** Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking) */
 	void GrowSugarcane   (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
 	
-	/// Grows cactus by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking)
+	/** Grows cactus by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking) */
 	void GrowCactus      (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
 
-	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
+	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem) */
 	void GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
 	
-	/// Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients
+	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(cEntity * a_Entity);
 	
-	/// Processes all blocks that have been scheduled for replacement by the QueueSetBlock() function
+	/** Processes all blocks that have been scheduled for replacement by the QueueSetBlock() function */
 	void ProcessQueuedSetBlocks(void);
 };
 

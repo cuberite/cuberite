@@ -85,19 +85,19 @@ public:
 	void BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 	
-	/// Sends the block entity, if it is at the coords specified, to a_Client
+	/** Sends the block entity, if it is at the coords specified, to a_Client */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 	
-	/// a_Player rclked block entity at the coords specified, handle it
+	/** a_Player rclked block entity at the coords specified, handle it */
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);
 	
-	/// Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback
+	/** Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
 	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
 
-	/// Wakes up simulators for the specified block
+	/** Wakes up simulators for the specified block */
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	/// Wakes up the simulators for the specified area of blocks
+	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
 	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
@@ -130,7 +130,7 @@ public:
 	
 	bool GetChunkData       (int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback);
 	
-	/// Copies the chunk's blocktypes into a_Blocks; returns true if successful
+	/** Copies the chunk's blocktypes into a_Blocks; returns true if successful */
 	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
 	
 	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ);
@@ -153,154 +153,151 @@ public:
 	bool       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 
-	/// Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType
+	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
 	void      ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
 	
-	/// Special function used for growing trees, replaces only blocks that tree may overwrite
+	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
 	void      ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
 	
 	EMCSBiome GetBiomeAt (int a_BlockX, int a_BlockZ);
 	
-	/// Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read.
+	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
 	bool DigBlock   (int a_X, int a_Y, int a_Z);
 	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player);
 	
-	/// Compares clients of two chunks, calls the callback accordingly
+	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
 	
-	/// Compares clients of two chunks, calls the callback accordingly
+	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(cChunk * a_Chunk1, cChunk * a_Chunk2, cClientDiffCallback & a_Callback);
 
-	/// Adds client to a chunk, if not already present; returns true if added, false if present
+	/** Adds client to a chunk, if not already present; returns true if added, false if present */
 	bool AddChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 
-	/// Removes the client from the chunk
+	/** Removes the client from the chunk */
 	void RemoveChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 	
-	/// Removes the client from all chunks it is present in
+	/** Removes the client from all chunks it is present in */
 	void RemoveClientFromChunks(cClientHandle * a_Client);
 
-	/// Adds the entity to its appropriate chunk, takes ownership of the entity pointer
+	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
 	void AddEntity(cEntity * a_Entity);
 	
-	/// Returns true if the entity with specified ID is present in the chunks
+	/** Returns true if the entity with specified ID is present in the chunks */
 	bool HasEntity(int a_EntityID);
 	
-	/// Removes the entity from its appropriate chunk
+	/** Removes the entity from its appropriate chunk */
 	void RemoveEntity(cEntity * a_Entity);
 	
-	/// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
+	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true
+	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Lua-accessible
 
-	/// Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates
+	/** Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates */
 	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlockAffected);
 	
-	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false.
+	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false. */
 	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true
+	/** Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true
+	/** Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true */
 	bool ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for each dispenser in the specified chunk; returns true if all dispensers processed, false if the callback aborted by returning true
+	/** Calls the callback for each dispenser in the specified chunk; returns true if all dispensers processed, false if the callback aborted by returning true */
 	bool ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback & a_Callback);
 
-	/// Calls the callback for each dropper in the specified chunk; returns true if all droppers processed, false if the callback aborted by returning true
+	/** Calls the callback for each dropper in the specified chunk; returns true if all droppers processed, false if the callback aborted by returning true */
 	bool ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback & a_Callback);
 
-	/// Calls the callback for each dropspenser in the specified chunk; returns true if all dropspensers processed, false if the callback aborted by returning true
+	/** Calls the callback for each dropspenser in the specified chunk; returns true if all dropspensers processed, false if the callback aborted by returning true */
 	bool ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback & a_Callback);
 
-	/// Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true
+	/** Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true */
 	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Lua-accessible
 	
-	/// Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found
+	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
 
-	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
+	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Lua-acessible
 
-	/// Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found
+	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
 	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for the dropper at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found
+	/** Calls the callback for the dropper at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
 	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for the dropspenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found
+	/** Calls the callback for the dropspenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
 	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found
+	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found
+	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);  // Lua-accessible
 
-	/// Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found
+	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
 	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);  // Lua-accessible
 
-	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
+	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
-	/// Touches the chunk, causing it to be loaded or generated
+	/** Touches the chunk, causing it to be loaded or generated */
 	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	/// Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before)
+	/** Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before) */
 	bool LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	/// Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid()
+	/** Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid() */
 	void LoadChunks(const cChunkCoordsList & a_Chunks);
 
-	/// Marks the chunk as failed-to-load
+	/** Marks the chunk as failed-to-load */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	/// Sets the sign text. Returns true if sign text changed.
+	/** Sets the sign text. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	
-	/// Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable; to be used only by cChunkStay!
-	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
-	
-	/// Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk() )
+	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk() ) */
 	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
 	
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
 	
-	/// Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully
+	/** Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully */
 	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
 	
-	/// Writes the block area into the specified coords. Returns true if all chunks have been processed. Prefer cBlockArea::Write() instead.
+	/** Writes the block area into the specified coords. Returns true if all chunks have been processed. Prefer cBlockArea::Write() instead. */
 	bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
-	/// Returns the number of valid chunks and the number of dirty chunks
+	/** Returns the number of valid chunks and the number of dirty chunks */
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 	
-	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
+	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem) */
 	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand);
 	
-	/// Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config
+	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config */
 	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
-	/// Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config
+	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config */
 	void GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
-	/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
+	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	/// Make a Mob census, of all mobs, their family, their chunk and theyr distance to closest player
+	/** Make a Mob census, of all mobs, their family, their chunk and theyr distance to closest player */
 	void CollectMobCensus(cMobCensus& a_ToFill);
 
-	/// Try to Spawn Monsters inside all Chunks
+	/** Try to Spawn Monsters inside all Chunks */
 	void SpawnMobs(cMobSpawner& a_MobSpawner);
 
 	void Tick(float a_Dt);
 	
-	/// Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks
+	/** Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks */
 	void TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	void UnloadUnusedChunks(void);
@@ -312,15 +309,20 @@ public:
 	
 	void ChunkValidated(void);  // Called by chunks that have become valid
 	
-	/// Queues the specified block for ticking (block update)
+	/** Queues the specified block for ticking (block update) */
 	void QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 	
-	/// Returns the CS for locking the chunkmap; only cWorld::cLock may use this function!
+	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
 	cCriticalSection & GetCS(void) { return m_CSLayers; }
 
 private:
 
-	friend class cChunk;  // The chunks can manipulate neighbors while in their Tick() method, using LockedGetBlock() and LockedSetBlock()
+	// The chunks can manipulate neighbors while in their Tick() method, using LockedGetBlock() and LockedSetBlock()
+	friend class cChunk;
+	
+	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
+	friend class cChunkStay;
+	
 
 	class cChunkLayer
 	{
@@ -328,10 +330,10 @@ private:
 		cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent);
 		~cChunkLayer();
 
-		/// Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check
+		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
 		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
 		
-		/// Returns the specified chunk, or NULL if not created yet
+		/** Returns the specified chunk, or NULL if not created yet */
 		cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
 		
 		int GetX(void) const {return m_LayerX; }
@@ -344,22 +346,22 @@ private:
 		void Save(void);
 		void UnloadUnusedChunks(void);
 		
-		/// Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player
+		/** Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player */
 		void CollectMobCensus(cMobCensus& a_ToFill);		
-		/// Try to Spawn Monsters inside all Chunks
+		/** Try to Spawn Monsters inside all Chunks */
 		void SpawnMobs(cMobSpawner& a_MobSpawner);
 
 		void Tick(float a_Dt);
 		
 		void RemoveClient(cClientHandle * a_Client);
 		
-		/// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
+		/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 		bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
 
-		/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found.
+		/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
 		bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn);  // Lua-accessible
 
-		/// Returns true if there is an entity with the specified ID within this layer's chunks
+		/** Returns true if there is an entity with the specified ID within this layer's chunks */
 		bool HasEntity(int a_EntityID);
 		
 	protected:
@@ -372,17 +374,19 @@ private:
 	};
 	
 	typedef std::list<cChunkLayer *> cChunkLayerList;
+	
+	typedef std::list<cChunkStay *> cChunkStays;
 
-	/// Finds the cChunkLayer object responsible for the specified chunk; returns NULL if not found. Assumes m_CSLayers is locked.
+	/** Finds the cChunkLayer object responsible for the specified chunk; returns NULL if not found. Assumes m_CSLayers is locked. */
 	cChunkLayer * FindLayerForChunk(int a_ChunkX, int a_ChunkZ);
 	
-	/// Returns the specified cChunkLayer object; returns NULL if not found. Assumes m_CSLayers is locked.
+	/** Returns the specified cChunkLayer object; returns NULL if not found. Assumes m_CSLayers is locked. */
 	cChunkLayer * FindLayer(int a_LayerX, int a_LayerZ);
 	
-	/// Returns the cChunkLayer object responsible for the specified chunk; creates it if not found.
+	/** Returns the cChunkLayer object responsible for the specified chunk; creates it if not found. */
 	cChunkLayer * GetLayerForChunk (int a_ChunkX, int a_ChunkZ);
 	
-	/// Returns the specified cChunkLayer object; creates it if not found.
+	/** Returns the specified cChunkLayer object; creates it if not found. */
 	cChunkLayer * GetLayer(int a_LayerX, int a_LayerZ);
 	
 	void RemoveLayer(cChunkLayer * a_Layer);
@@ -395,67 +399,42 @@ private:
 	
 	cCriticalSection m_CSFastSetBlock;
 	sSetBlockList    m_FastSetBlockQueue;
+	
+	/** The cChunkStay descendants that are currently enabled in this chunkmap */
+	cChunkStays m_ChunkStays;
 
 	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
 	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
 	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Doesn't load, doesn't generate
 	
-	/// Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	/** Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	
-	/// Gets a block type in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	/** Gets a block type in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType);
 	
-	/// Gets a block meta in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	/** Gets a block meta in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta);
 	
-	/// Sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	/** Sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/// Fast-sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	/** Fast-sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	
-	/// Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSLayers is locked. To be called only from cChunkMap.
+	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSLayers is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Adds a new cChunkStay descendant to the internal list of ChunkStays; loads its chunks.
+	To be used only by cChunkStay; others should use cChunkStay::Enable() instead */
+	void AddChunkStay(cChunkStay & a_ChunkStay);
+	
+	/** Removes the specified cChunkStay descendant from the internal list of ChunkStays.
+	To be used only by cChunkStay; others should use cChunkStay::Disable() instead */
+	void DelChunkStay(cChunkStay & a_ChunkStay);
+	
 };
 
-
-
-
-
-/** Makes chunks stay loaded until this object is cleared or destroyed
-Works by setting internal flags in the cChunk that it should not be unloaded.
-To optimize for speed, cChunkStay has an Enabled flag, it will "stay" the chunks only when enabled and it will refuse manipulations when enabled
-The object itself is not made thread-safe, it's supposed to be used from a single thread only.
-*/
-class cChunkStay
-{
-public:
-	cChunkStay(cWorld * a_World);
-	~cChunkStay();
-	
-	void Clear(void);
-	
-	void Add(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void Remove(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	
-	void Enable(void);
-	void Disable(void);
-	
-	/// Queues each chunk in m_Chunks[] for loading / generating
-	void Load(void);
-	
-	// Allow cChunkStay be passed to functions expecting a const cChunkCoordsList &
-	operator const cChunkCoordsList(void) const {return m_Chunks; }
-	
-protected:
-
-	cWorld * m_World;
-	
-	bool m_IsEnabled;
-	
-	cChunkCoordsList m_Chunks;
-} ;
 
 
 

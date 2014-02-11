@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "LightingThread.h"
 #include "ChunkMap.h"
+#include "ChunkStay.h"
 #include "World.h"
 
 
@@ -109,9 +110,14 @@ void cLightingThread::Stop(void)
 {
 	{
 		cCSLock Lock(m_CS);
-		for (sItems::iterator itr = m_Queue.begin(), end = m_Queue.end(); itr != end; ++itr)
+		for (cChunkStays::iterator itr = m_PendingQueue.begin(), end = m_PendingQueue.end(); itr != end; ++itr)
 		{
-			delete itr->m_ChunkStay;
+			delete *itr;
+		}
+		m_PendingQueue.clear();
+		for (cChunkStays::iterator itr = m_Queue.begin(), end = m_Queue.end(); itr != end; ++itr)
+		{
+			delete *itr;
 		}
 		m_Queue.clear();
 	}
@@ -129,25 +135,14 @@ void cLightingThread::QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback
 {
 	ASSERT(m_World != NULL);  // Did you call Start() properly?
 	
-	cChunkStay * ChunkStay = new cChunkStay(m_World);
-	ChunkStay->Add(a_ChunkX + 1, ZERO_CHUNK_Y, a_ChunkZ + 1);
-	ChunkStay->Add(a_ChunkX + 1, ZERO_CHUNK_Y, a_ChunkZ);
-	ChunkStay->Add(a_ChunkX + 1, ZERO_CHUNK_Y, a_ChunkZ - 1);
-	ChunkStay->Add(a_ChunkX,     ZERO_CHUNK_Y, a_ChunkZ + 1);
-	ChunkStay->Add(a_ChunkX,     ZERO_CHUNK_Y, a_ChunkZ);
-	ChunkStay->Add(a_ChunkX,     ZERO_CHUNK_Y, a_ChunkZ - 1);
-	ChunkStay->Add(a_ChunkX - 1, ZERO_CHUNK_Y, a_ChunkZ + 1);
-	ChunkStay->Add(a_ChunkX - 1, ZERO_CHUNK_Y, a_ChunkZ);
-	ChunkStay->Add(a_ChunkX - 1, ZERO_CHUNK_Y, a_ChunkZ - 1);
-	ChunkStay->Enable();
-	ChunkStay->Load();
-	cCSLock Lock(m_CS);
-	m_Queue.push_back(sItem(a_ChunkX, a_ChunkZ, ChunkStay, a_CallbackAfter));
-	if (m_Queue.size() > WARN_ON_QUEUE_SIZE)
+	cChunkStay * ChunkStay = new cLightingChunkStay(*this, a_ChunkX, a_ChunkZ, a_CallbackAfter);
 	{
-		LOGINFO("Lighting thread overloaded, %d items in queue", m_Queue.size());
+		// The ChunkStay will enqueue itself using the QueueChunkStay() once it is fully loaded
+		// In the meantime, put it into the PendingQueue so that it can be removed when stopping the thread
+		cCSLock Lock(m_CS);
+		m_PendingQueue.push_back(ChunkStay);
 	}
-	m_evtItemAdded.Set();
+	ChunkStay->Enable(*m_World->GetChunkMap());
 }
 
 
@@ -157,7 +152,7 @@ void cLightingThread::QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback
 void cLightingThread::WaitForQueueEmpty(void)
 {
 	cCSLock Lock(m_CS);
-	while (!m_ShouldTerminate && (!m_Queue.empty() || !m_PostponedQueue.empty()))
+	while (!m_ShouldTerminate && (!m_Queue.empty() || !m_PendingQueue.empty()))
 	{
 		cCSUnlock Unlock(Lock);
 		m_evtQueueEmpty.Wait();
@@ -171,43 +166,7 @@ void cLightingThread::WaitForQueueEmpty(void)
 size_t cLightingThread::GetQueueLength(void)
 {
 	cCSLock Lock(m_CS);
-	return m_Queue.size() + m_PostponedQueue.size();
-}
-
-
-
-
-
-void cLightingThread::ChunkReady(int a_ChunkX, int a_ChunkZ)
-{
-	// Check all the items in the m_PostponedQueue, if the chunk is their neighbor, move the item to m_Queue
-	
-	bool NewlyAdded = false;
-	{
-		cCSLock Lock(m_CS);
-		for (sItems::iterator itr = m_PostponedQueue.begin(); itr != m_PostponedQueue.end(); )
-		{
-			if (
-				(itr->x - a_ChunkX >= -1) && (itr->x - a_ChunkX <= 1) &&
-				(itr->z - a_ChunkZ >= -1) && (itr->z - a_ChunkZ <= 1)
-			)
-			{
-				// It is a neighbor
-				m_Queue.push_back(*itr);
-				itr = m_PostponedQueue.erase(itr);
-				NewlyAdded = true;
-			}
-			else
-			{
-				++itr;
-			}
-		}  // for itr - m_PostponedQueue[]
-	}  // Lock(m_CS)
-	
-	if (NewlyAdded)
-	{
-		m_evtItemAdded.Set();  // Notify the thread it has some work to do
-	}
+	return m_Queue.size() + m_PendingQueue.size();
 }
 
 
@@ -233,14 +192,14 @@ void cLightingThread::Execute(void)
 		}
 		
 		// Process one items from the queue:
-		sItem Item;
+		cLightingChunkStay * Item;
 		{
 			cCSLock Lock(m_CS);
 			if (m_Queue.empty())
 			{
 				continue;
 			}
-			Item = m_Queue.front();
+			Item = (cLightingChunkStay *)m_Queue.front();
 			m_Queue.pop_front();
 			if (m_Queue.empty())
 			{
@@ -248,7 +207,7 @@ void cLightingThread::Execute(void)
 			}
 		}  // CSLock(m_CS)
 		
-		LightChunk(Item);
+		LightChunk(*Item);
 	}
 }
 
@@ -257,23 +216,11 @@ void cLightingThread::Execute(void)
 
 
 
-void cLightingThread::LightChunk(cLightingThread::sItem & a_Item)
+void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 {
 	cChunkDef::BlockNibbles BlockLight, SkyLight;
 	
-	if (!ReadChunks(a_Item.x, a_Item.z))
-	{
-		// Neighbors not available. Re-queue in the postponed queue
-		cCSLock Lock(m_CS);
-		m_PostponedQueue.push_back(a_Item);
-		return;
-	}
-	
-	/*
-	// DEBUG: torch somewhere:
-	m_BlockTypes[19 + 24 * cChunkDef::Width * 3 + (m_HeightMap[24 + 24 * cChunkDef::Width * 3] / 2) * BlocksPerYLayer] = E_BLOCK_TORCH;
-	// m_HeightMap[24 + 24 * cChunkDef::Width * 3]++;
-	*/
+	ReadChunks(a_Item.m_ChunkX, a_Item.m_ChunkZ);
 	
 	PrepareBlockLight();
 	CalcLight(m_BlockLight);
@@ -339,13 +286,13 @@ void cLightingThread::LightChunk(cLightingThread::sItem & a_Item)
 	CompressLight(m_BlockLight, BlockLight);
 	CompressLight(m_SkyLight, SkyLight);
 	
-	m_World->ChunkLighted(a_Item.x, a_Item.z, BlockLight, SkyLight);
+	m_World->ChunkLighted(a_Item.m_ChunkX, a_Item.m_ChunkZ, BlockLight, SkyLight);
 
-	if (a_Item.m_Callback != NULL)
+	if (a_Item.m_CallbackAfter != NULL)
 	{
-		a_Item.m_Callback->Call(a_Item.x, a_Item.z);
+		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ);
 	}
-	delete a_Item.m_ChunkStay;
+	delete &a_Item;
 }
 
 
@@ -556,6 +503,66 @@ void cLightingThread::CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_Ch
 		// We've already walked cChunkDef::Width * 3 in the "for z" cycle, that makes cChunkDef::Width * 6 rows left to skip
 		InIdx += cChunkDef::Width * cChunkDef::Width * 6;
 	}
+}
+
+
+
+
+
+void cLightingThread::QueueChunkStay(cLightingChunkStay & a_ChunkStay)
+{
+	// Move the ChunkStay from the Pending queue to the lighting queue.
+	{
+		cCSLock Lock(m_CS);
+		m_PendingQueue.remove(&a_ChunkStay);
+		m_Queue.push_back(&a_ChunkStay);
+	}
+	m_evtItemAdded.Set();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cLightingThread::cLightingChunkStay:
+
+cLightingThread::cLightingChunkStay::cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter) :
+	m_LightingThread(a_LightingThread),
+	m_ChunkX(a_ChunkX),
+	m_ChunkZ(a_ChunkZ),
+	m_CallbackAfter(a_CallbackAfter)
+{
+	Add(a_ChunkX + 1, a_ChunkZ + 1);
+	Add(a_ChunkX + 1, a_ChunkZ);
+	Add(a_ChunkX + 1, a_ChunkZ - 1);
+	Add(a_ChunkX,     a_ChunkZ + 1);
+	Add(a_ChunkX,     a_ChunkZ);
+	Add(a_ChunkX,     a_ChunkZ - 1);
+	Add(a_ChunkX - 1, a_ChunkZ + 1);
+	Add(a_ChunkX - 1, a_ChunkZ);
+	Add(a_ChunkX - 1, a_ChunkZ - 1);
+}
+
+
+
+
+
+bool cLightingThread::cLightingChunkStay::OnAllChunksAvailable(void)
+{
+	m_LightingThread.QueueChunkStay(*this);
+	
+	// Keep the ChunkStay alive:
+	return false;
+}
+
+
+
+
+
+void cLightingThread::cLightingChunkStay::OnDisabled(void)
+{
+	// Nothing needed in this callback
 }
 
 
