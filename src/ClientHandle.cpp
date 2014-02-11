@@ -1316,6 +1316,15 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 			cPlayer & m_Player;
 			virtual bool Item(cEntity * a_Entity) override
 			{
+				if (
+					std::max(m_Player.GetPosX(), a_Entity->GetPosX()) - std::min(m_Player.GetPosX(), a_Entity->GetPosX()) > 4 ||
+					std::max(m_Player.GetPosY(), a_Entity->GetPosY()) - std::min(m_Player.GetPosY(), a_Entity->GetPosY()) > 4 ||
+					std::max(m_Player.GetPosZ(), a_Entity->GetPosZ()) - std::min(m_Player.GetPosZ(), a_Entity->GetPosZ()) > 4
+				)
+				{
+					return true;
+				}
+				
 				if (cPluginManager::Get()->CallHookPlayerRightClickingEntity(m_Player, *a_Entity))
 				{
 					return false;
@@ -1337,6 +1346,15 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 	{
 		virtual bool Item(cEntity * a_Entity) override
 		{
+			if (
+				std::max(m_Attacker->GetPosX(), a_Entity->GetPosX()) - std::min(m_Attacker->GetPosX(), a_Entity->GetPosX()) > 4 ||
+				std::max(m_Attacker->GetPosY(), a_Entity->GetPosY()) - std::min(m_Attacker->GetPosY(), a_Entity->GetPosY()) > 4 ||
+				std::max(m_Attacker->GetPosZ(), a_Entity->GetPosZ()) - std::min(m_Attacker->GetPosZ(), a_Entity->GetPosZ()) > 4
+			)
+			{
+				return true;
+			}
+		
 			if (!a_Entity->GetWorld()->IsPVPEnabled())
 			{
 				// PVP is disabled, disallow players hurting other players:
