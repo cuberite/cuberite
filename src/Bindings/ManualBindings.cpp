@@ -1648,9 +1648,9 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 	
 	cLuaState L(tolua_S);
 	if (
-		!L.CheckParamUserType(1, "cWorld") ||
-		!L.CheckParamTable   (2) ||
-		!L.CheckParamFunction(3, 4)
+		!L.CheckParamUserType     (1, "cWorld") ||
+		!L.CheckParamTable        (2) ||
+		!L.CheckParamFunctionOrNil(3, 4)
 	)
 	{
 		return 0;
@@ -1671,12 +1671,10 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 		L.LogStackTrace();
 		return 0;
 	}
-	L.LogStack("Before AddChunks()");
 	if (!ChunkStay->AddChunks(2))
 	{
 		return 0;
 	}
-	L.LogStack("After params read");
 
 	ChunkStay->Enable(*World->GetChunkMap(), 3, 4);
 	return 0;
