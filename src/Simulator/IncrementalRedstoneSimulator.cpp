@@ -321,9 +321,9 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_BlockX, int a_Bloc
 			
 			float Pitch = (((1.0F-0.0F)*((float)rand()/RAND_MAX)) - ((1.0F-0.0F)*((float)rand()/RAND_MAX))) * 0.8F;
 			m_World.BroadcastSoundEffect("random.fizz",
-					((int) (a_BlockX + 0.5F) * 8.0),
-					((int) (a_BlockY + 0.5F) * 8.0),
-					((int) (a_BlockZ + 0.5F) * 8.0),
+					(int) ((a_BlockX + 0.5F) * 8.0),
+					(int) ((a_BlockY + 0.5F) * 8.0),
+					(int) ((a_BlockZ + 0.5F) * 8.0),
 					0.5F,
 					2.6F + Pitch);
 			
