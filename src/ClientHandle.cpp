@@ -741,13 +741,6 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		return;
 	}
 	
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
-	{
-		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
-	}
-	
 	// Set the last digging coords to the block being dug, so that they can be checked in DIG_FINISHED to avoid dig/aim bug in the client:
 	m_HasStartedDigging = true;
 	m_LastDigBlockX = a_BlockX;
@@ -821,6 +814,13 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	HandleBlockDigStop();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+	
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	{
+		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
 	
 	if (a_OldBlock == E_BLOCK_AIR)
 	{
@@ -922,6 +922,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+			m_Player->GetInventory().SendSlot(EquippedSlot);
 		}
 		return;
 	}
@@ -1084,6 +1086,8 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Handler refused the placement, send that information back to the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
 		return;
 	}
 	
@@ -1093,6 +1097,8 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		(std::max(m_Player->GetPosZ(), double(a_BlockZ)) - std::min(m_Player->GetPosZ(), double(a_BlockZ))) >= 6)
 	{
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
 		return;
 	}
 	
@@ -1102,6 +1108,8 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// A plugin doesn't agree with placing the block, revert the block on the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
 		return;
 	}
 	
