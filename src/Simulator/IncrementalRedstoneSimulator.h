@@ -84,6 +84,8 @@ private:
 	void HandleRedstoneBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/** Handles levers */
 	void HandleRedstoneLever(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** Handles Fence Gates */
+	void HandleFenceGate(int a_BlockX, int a_BlockY, int a_BlockZ);
 	/** Handles buttons */
 	void HandleRedstoneButton(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
 	/** Handles daylight sensors */

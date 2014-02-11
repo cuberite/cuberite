@@ -8,6 +8,7 @@
 #include "../Entities/TNTEntity.h"
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
+#include "../Blocks/BlockFenceGate.h"
 #include "../Piston.h"
 
 
@@ -221,6 +222,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 		{
 			case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(a_X, dataitr->y, a_Z);	break;
 			case E_BLOCK_LEVER:                 HandleRedstoneLever(a_X, dataitr->y, a_Z);	break;
+			case E_BLOCK_FENCE_GATE:            HandleFenceGate(a_X, dataitr->y, a_Z);      break;
 			case E_BLOCK_TNT:                   HandleTNT(a_X, dataitr->y, a_Z);            break;
 			case E_BLOCK_TRAPDOOR:              HandleTrapdoor(a_X, dataitr->y, a_Z);       break;
 			case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(a_X, dataitr->y, a_Z);	break;
@@ -395,6 +397,33 @@ void cIncrementalRedstoneSimulator::HandleRedstoneLever(int a_BlockX, int a_Bloc
 		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YP, E_BLOCK_LEVER);
 		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_LEVER);
 		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_LEVER);
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::HandleFenceGate(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	cChunkInterface ChunkInterface(m_World.GetChunkMap());
+	NIBBLETYPE MetaData = ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	
+	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
+	{
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
+		{
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MetaData | 0x4);
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
+		}		
+	}
+	else
+	{
+		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
+		{
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MetaData & 0xFFFFFFFB);
+			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
+		}
 	}
 }
 
