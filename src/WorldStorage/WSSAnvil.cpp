@@ -1083,6 +1083,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "Villager", a_IDTagLength) == 0)
+	{
+		LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "VillagerGolem", a_IDTagLength) == 0)
 	{
 		LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1130,10 +1134,6 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	else if (strncmp(a_IDTag, "Squid", a_IDTagLength) == 0)
 	{
 		LoadSquidFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Villager", a_IDTagLength) == 0)
-	{
-		LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 	else if (strncmp(a_IDTag, "Witch", a_IDTagLength) == 0)
 	{
