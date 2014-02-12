@@ -48,10 +48,6 @@ void cWolf::Attack(float a_Dt)
 			super::Attack(a_Dt);
 		}
 	}
-	else
-	{
-		super::Attack(a_Dt);
-	}
 }
 
 
