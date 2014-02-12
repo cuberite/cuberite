@@ -74,8 +74,13 @@ void cAggressiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		CheckEventSeePlayer();
 	}
 
+	if (m_Target == NULL)
+		return;
+
 	cTracer LineOfSight(GetWorld());
-	if (ReachedFinalDestination() && (m_Target != NULL) && !LineOfSight.Trace(GetPosition(), (m_Target->GetPosition() - GetPosition()), (int)(m_Target->GetPosition() - GetPosition()).Length()))
+	Vector3d AttackDirection(m_Target->GetPosition() - GetPosition());
+
+	if (ReachedFinalDestination() && !LineOfSight.Trace(GetPosition(), AttackDirection, (int)AttackDirection.Length()))
 	{
 		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
 		Attack(a_Dt / 1000);
