@@ -47,7 +47,6 @@ public:
 	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
-	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
 	
 	/// Opens a new chest window for this chest. Scans for neighbors to open a double chest window, if appropriate.
 	void OpenNewWindow(void);

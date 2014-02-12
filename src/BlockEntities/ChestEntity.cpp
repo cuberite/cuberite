@@ -170,18 +170,3 @@ void cChestEntity::OpenNewWindow(void)
 
 
 
-
-void cChestEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
-{
-	super::OnSlotChanged(a_Grid, a_SlotNum);
-
-	cWindow * Window = GetWindow();
-	if (Window != NULL)
-	{
-		Window->BroadcastWholeWindow();
-	}
-}
-
-
-
-
