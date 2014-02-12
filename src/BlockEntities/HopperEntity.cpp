@@ -198,10 +198,10 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		public cEntityCallback
 	{
 	public:
-		cHopperPickupSearchCallback(Vector3i a_Pos, cItemGrid & a_Contents) :
+		cHopperPickupSearchCallback(const Vector3i a_Pos, cItemGrid & a_Contents) :
 			m_Pos(a_Pos),
-			m_Contents(a_Contents),
-			m_bFoundPickupsAbove(false)
+			m_bFoundPickupsAbove(false),
+			m_Contents(a_Contents)
 		{
 		}
 
@@ -220,25 +220,42 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 			if (Distance < 0.5)
 			{
-				for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+				if (TrySuckPickupIn((cPickup *)a_Entity))
 				{
-					if (m_Contents.IsSlotEmpty(i))
-					{
-						m_bFoundPickupsAbove = true;
-						m_Contents.SetSlot(i, ((cPickup *)a_Entity)->GetItem());
-						a_Entity->Destroy(); // Kill pickup
-						return false; // Don't break enumeration
-					}
-					else if (m_Contents.GetSlot(i).IsEqual(((cPickup *)a_Entity)->GetItem()))
-					{
-						m_bFoundPickupsAbove = true;
-						m_Contents.ChangeSlotCount(i, ((cPickup *)a_Entity)->GetItem().m_ItemCount);
-						a_Entity->Destroy();
-						return false;
-					}
+					return false;
 				}
 			}
 
+			return false;
+		}
+
+		bool TrySuckPickupIn(cPickup * a_Pickup)
+		{
+			for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+			{
+				if (m_Contents.IsSlotEmpty(i))
+				{
+					m_bFoundPickupsAbove = true;
+					m_Contents.SetSlot(i, a_Pickup->GetItem());
+					a_Pickup->Destroy(); // Kill pickup
+					return true;
+				}
+				else if (m_Contents.GetSlot(i).IsEqual(a_Pickup->GetItem()) && !m_Contents.GetSlot(i).IsFullStack())
+				{
+					m_bFoundPickupsAbove = true;
+					LOGINFO("Previous counts, pickup: %i, hopper: %i", (int)a_Pickup->GetItem().m_ItemCount, (int)m_Contents.GetSlot(i).m_ItemCount);
+					int PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
+					a_Pickup->GetItem().m_ItemCount -= m_Contents.ChangeSlotCount(i, a_Pickup->GetItem().m_ItemCount) - PreviousCount; // Set count to however many items were added
+					LOGINFO("After counts, pickup: %i, hopper: %i", (int)a_Pickup->GetItem().m_ItemCount, (int)m_Contents.GetSlot(i).m_ItemCount);
+					
+					if (a_Pickup->GetItem().IsEmpty())
+					{
+						//LOGINFO("Pickup was empty!");
+						a_Pickup->Destroy(); // Kill pickup if all items were added
+					}
+					return true;
+				}
+			}
 			return false;
 		}
 
@@ -248,7 +265,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		}
 
 	protected:
-		Vector3i m_Pos;
+		const Vector3i m_Pos;
 		bool m_bFoundPickupsAbove;
 		cItemGrid & m_Contents;
 	};

@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-#include "../UI/WindowOwner.h"
 #include "../FurnaceRecipe.h"
 
 
@@ -23,8 +22,7 @@ class cServer;
 
 // tolua_begin
 class cFurnaceEntity :
-	public cBlockEntityWithItems,
-	public cBlockEntityWindowOwner
+	public cBlockEntityWithItems
 {
 	typedef cBlockEntityWithItems super;
 	
