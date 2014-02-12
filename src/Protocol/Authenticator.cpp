@@ -7,6 +7,7 @@
 #include "Server.h"
 
 #include "inifile/iniFile.h"
+#include "json/json.h"
 
 #include "polarssl/config.h"
 #include "polarssl/net.h"
@@ -67,12 +68,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 {
 	if (!m_ShouldAuthenticate)
 	{
-		AString Name = a_UserName;
-		AString UUID = "-";
-		cGameProfile * Profile = new cGameProfile(Name, UUID);
-		cRoot::Get()->SetGameProfile(a_ClientID, Profile);
-		
-		cRoot::Get()->AuthenticateUser(a_ClientID);
+		cRoot::Get()->AuthenticateUser(a_ClientID, a_UserName, Printf("%d", a_ClientID));
 		return;
 	}
 	
@@ -129,16 +125,16 @@ void cAuthenticator::Execute(void)
 		m_Queue.pop_front();
 		Lock.Unlock();
 
-		cGameProfile* Profile = AuthWithYggdrasil(UserName, ServerID);
-		if (Profile->Empty())
+		AString NewUserName = UserName;
+		AString UUID;
+		if (AuthWithYggdrasil(NewUserName, ServerID, UUID))
 		{
-			cRoot::Get()->KickUser(ClientID, "Failed to authenticate account!");
+			cRoot::Get()->AuthenticateUser(ClientID, NewUserName, UUID);
+			LOGINFO("User %s authenticated with UUID %s", NewUserName.c_str(), UUID.c_str());
 		}
 		else
 		{
-			cRoot::Get()->SetGameProfile(ClientID, Profile);
-			cRoot::Get()->AuthenticateUser(ClientID);
-			LOGINFO("User %s authenticated with UUID %s", Profile->GetName().c_str(), Profile->GetUUID().c_str());
+			cRoot::Get()->KickUser(ClientID, "Failed to authenticate account!");
 		}
 	}  // for (-ever)
 }
@@ -147,7 +143,7 @@ void cAuthenticator::Execute(void)
 
 
 
-cGameProfile * cAuthenticator::AuthWithYggdrasil(const AString & a_UserName, const AString & a_ServerId)
+bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID)
 {
 	AString REQUEST;
 	int ret, len, server_fd = -1;
@@ -167,7 +163,7 @@ cGameProfile * cAuthenticator::AuthWithYggdrasil(const AString & a_UserName, con
 	if ( ( ret = ctr_drbg_init( &ctr_drbg, entropy_func, &entropy, (const unsigned char *) pers, strlen( pers ) ) ) != 0 )
 	{
 		LOGERROR("cAuthenticator: ctr_drbg_init returned %d", ret );
-		return new cGameProfile();
+		return false;
 	}
 
 	/* Initialize certificates */
@@ -182,24 +178,23 @@ cGameProfile * cAuthenticator::AuthWithYggdrasil(const AString & a_UserName, con
 	if( ret < 0 )
 	{
 		LOGERROR("cAuthenticator: x509_crt_parse returned -0x%x", -ret);
-		return new cGameProfile();
+		return false;
 	}
 
 	/* Connect */
 	if( ( ret = net_connect( &server_fd, m_Server.c_str(), 443 ) ) != 0 )
 	{
 		LOGERROR("cAuthenticator: Can't connect to %s: %d", m_Server.c_str(), ret );
-		return new cGameProfile();
+		return false;
 	}
 
 	/* Setup */
 	if( ( ret = ssl_init( &ssl ) ) != 0 )
 	{
 		LOGERROR("cAuthenticator: ssl_init returned %d", ret);
-		return new cGameProfile();
-
-	ssl_set_endpoint( &ssl, SSL_IS_CLIENT );
+		return false;
 	}
+	ssl_set_endpoint( &ssl, SSL_IS_CLIENT );
 	ssl_set_authmode( &ssl, SSL_VERIFY_OPTIONAL );
 	ssl_set_ca_chain( &ssl, &cacert, NULL, "PolarSSL Server 1" );
 	ssl_set_rng( &ssl, ctr_drbg_random, &ctr_drbg );
@@ -211,7 +206,7 @@ cGameProfile * cAuthenticator::AuthWithYggdrasil(const AString & a_UserName, con
 		if( ret != POLARSSL_ERR_NET_WANT_READ && ret != POLARSSL_ERR_NET_WANT_WRITE )
 		{
 			LOGERROR("cAuthenticator: ssl_handshake returned -0x%x", -ret);
-			return new cGameProfile();
+			return false;
 		}
 	}
 
@@ -233,7 +228,7 @@ cGameProfile * cAuthenticator::AuthWithYggdrasil(const AString & a_UserName, con
 		if( ret != POLARSSL_ERR_NET_WANT_READ && ret != POLARSSL_ERR_NET_WANT_WRITE )
 		{
 			LOGERROR("cAuthenticator: ssl_write returned %d", ret);
-			return new cGameProfile();
+			return false;
 		}
 	}
 
@@ -276,7 +271,7 @@ cGameProfile * cAuthenticator::AuthWithYggdrasil(const AString & a_UserName, con
 	
 	std::string prefix("HTTP/1.1 200 OK");
 	if (Builder.compare(0, prefix.size(), prefix))
-		return new cGameProfile();
+		return false;
 	
 	std::stringstream ResponseBuilder;
 	bool NewLine = false;
@@ -307,17 +302,19 @@ cGameProfile * cAuthenticator::AuthWithYggdrasil(const AString & a_UserName, con
 	AString RESPONSE = ResponseBuilder.str();
 	
 	if (RESPONSE.empty())
-		return new cGameProfile();
+		return false;
 	
 	Json::Value root;
 	Json::Reader reader;
 	if (!reader.parse(RESPONSE, root, false))
 	{
 		LOGWARNING("cAuthenticator: Cannot parse Received Data to json!");
-		return new cGameProfile();
+		return false;
 	}
 	
-	return cGameProfile::NewFromJson(root);
+	a_UserName = root.get("name", "Unknown").asString();
+	a_UUID = root.get("id", "").asString();
+	return true;
 }
 
 

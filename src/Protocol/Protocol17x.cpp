@@ -1444,11 +1444,6 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		m_Client->Kick("Your Username is too long or empty.");
 		return;
 	}
-	if (cRoot::Get()->GetServer()->GetPlayer(Username) != NULL)
-	{
-		m_Client->Kick("You're already logged in as " + Username + "!");
-		return;
-	}
 	
 	// If auth is required, then send the encryption request:
 	if (cRoot::Get()->GetServer()->ShouldAuthenticate())

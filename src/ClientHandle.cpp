@@ -198,7 +198,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(void)
+void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 {
 	if (m_State != csAuthenticating)
 	{
@@ -207,11 +207,22 @@ void cClientHandle::Authenticate(void)
 	
 	ASSERT( m_Player == NULL );
 	
-	// Game Profile
-	if (!m_GameProfile->Empty())
+	if (!cRoot::Get()->GetServer()->IsMultipleLoginEnabled())
 	{
-		SetUsername(m_GameProfile->GetName());
+		class cCallback : public cPlayerListCallback
+		{
+			virtual bool Item (cPlayer * a_pPlayer)
+			{
+				a_pPlayer->GetClientHandle()->Kick("You Logged in From Another Location");
+				return true;
+			}
+		};
+		cCallback Callback;
+		cRoot::Get()->FindAndDoWithPlayer( a_Name, Callback );
 	}
+	
+	m_Username = a_Name;
+	m_UUID = a_UUID;
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());

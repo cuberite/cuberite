@@ -36,12 +36,10 @@
 // fwd:
 class cPlayer;
 class cClientHandle;
-class cGameProfile;
 class cIniFile;
 class cCommandOutputCallback ;
 
 typedef std::list<cClientHandle *> cClientHandleList;
-typedef std::map<AString, cPlayer *> PlayerMap;
 
 
 
@@ -63,8 +61,6 @@ public:												// tolua_export
 	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
 	int  GetNumPlayers(void);
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
-	cPlayer* GetPlayer(const AString & a_PlayerName);  // tolua_export
-	std::vector<cPlayer*> GetOnlinePlayers(void);  // tolua_export
 	
 	// Hardcore mode or not:
 	bool IsHardcore(void) const {return m_bIsHardcore; }
@@ -87,10 +83,10 @@ public:												// tolua_export
 	void Shutdown(void);
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
-	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
-	void SetGameProfile(int a_ClientID, cGameProfile * a_GameProfile); //Called by cAuthenticator to set the GameProfile for the specified user
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator to auth the specified user
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
+	const bool IsMultipleLoginEnabled(void) const { return m_AllowMultipleLogin; };  // tolua_export
 	
 	/** Called by cClientHandle's destructor; stop m_SocketThreads from calling back into a_Client */
 	void ClientDestroying(const cClientHandle * a_Client);
@@ -106,10 +102,10 @@ public:												// tolua_export
 	void ClientMovedToWorld(const cClientHandle * a_Client);
 	
 	/** Notifies the server that a player was created; the server uses this to adjust the number of players */
-	void PlayerCreated(cPlayer * a_Player);
+	void PlayerCreated(const cPlayer * a_Player);
 	
 	/** Notifies the server that a player is being destroyed; the server uses this to adjust the number of players */
-	void PlayerDestroying(cPlayer * a_Player);
+	void PlayerDestroying(const cPlayer * a_Player);
 
 	/** Returns base64 encoded favicon data (obtained from favicon.png) */
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
@@ -174,7 +170,6 @@ private:
 	cClientHandleList m_ClientsToRemove;  ///< Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick()
 	
 	cCriticalSection m_CSPlayerCount;      ///< Locks the m_PlayerCount
-	PlayerMap        m_Players;            ///< All Players who joined on the Server
 	int              m_PlayerCount;        ///< Number of players currently playing in the server
 	cCriticalSection m_CSPlayerCountDiff;  ///< Locks the m_PlayerCountDiff
 	int              m_PlayerCountDiff;    ///< Adjustment to m_PlayerCount to be applied in the Tick thread
@@ -205,6 +200,8 @@ private:
 	
 	/** The server ID used for client authentication */
 	AString m_ServerID;
+	
+	bool m_AllowMultipleLogin;
 	
 	/** If true, players will be online-authenticated agains Mojang servers.
 	This setting is the same as the "online-mode" setting in Vanilla. */

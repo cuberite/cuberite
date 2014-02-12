@@ -34,7 +34,6 @@ class cWindow;
 class cFallingBlock;
 class cItemHandler;
 class cWorld;
-class cGameProfile;
 
 
 
@@ -60,11 +59,12 @@ public:
 	const AString & GetIPString(void) const { return m_IPString; }
 	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
-	void SetGameProfile(cGameProfile * a_GameProfile) { m_GameProfile = a_GameProfile; }
-	cGameProfile* GetGameProfile() { return m_GameProfile; }	// tolua_export
+	
+	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
+	void setUUID(const AString & a_UUID) { m_UUID = a_UUID; }
 
 	void Kick(const AString & a_Reason);		// tolua_export
-	void Authenticate(void);  // Called by cAuthenticator when the user passes authentication
+	void Authenticate(const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator when the user passes authentication
 
 	void StreamChunks(void);
 	
@@ -246,7 +246,6 @@ private:
 	Vector3d m_ConfirmPosition;
 
 	cPlayer * m_Player;
-	cGameProfile * m_GameProfile;
 	
 	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
 	
@@ -307,6 +306,7 @@ private:
 	
 	static int s_ClientCount;
 	int m_UniqueID;
+	AString m_UUID;
 	
 	/// Set to true when the chunk where the player is is sent to the client. Used for spawning the player
 	bool m_HasSentPlayerChunk;

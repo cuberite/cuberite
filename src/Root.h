@@ -88,10 +88,7 @@ public:
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	
 	/// Called by cAuthenticator to auth the specified user
-	void AuthenticateUser(int a_ClientID);
-	
-	/// Called by cAuthenticator to set the GameProfile for the specified user
-	void SetGameProfile(int a_ClientID, cGameProfile * a_GameProfile);
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);
 	
 	/// Executes commands queued in the command queue
 	void TickCommands(void);
