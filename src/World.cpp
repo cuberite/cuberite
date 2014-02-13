@@ -2213,6 +2213,15 @@ void cWorld::UnloadUnusedChunks(void)
 
 
 
+void cWorld::QueueUnloadUnusedChunks(void)
+{
+	QueueTask(new cWorld::cTaskUnloadUnusedChunks);
+}
+
+
+
+
+
 void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
 {
 	m_ChunkMap->CollectPickupsByPlayer(a_Player);
@@ -2945,12 +2954,25 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTaskSaveAllChunks:
 
 void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 {
 	a_World.SaveAllChunks();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTaskUnloadUnusedChunks
+
+void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
+{
+	a_World.UnloadUnusedChunks();
 }
 
 
