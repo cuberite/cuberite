@@ -11,6 +11,13 @@
 
 
 
+// An array of 4096 zero bytes, used for writing the padding
+static const Byte g_Zeroes[4096] = {0};
+
+
+
+
+
 int main(int argc, char ** argv)
 {
 	new cMCLogger(Printf("Defrag_%08x.log", time(NULL)));
@@ -275,7 +282,7 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 	a_LocationRaw[0] = m_CurrentSectorOut >> 16;
 	a_LocationRaw[1] = (m_CurrentSectorOut >> 8) & 0xff;
 	a_LocationRaw[2] = m_CurrentSectorOut & 0xff;
-	a_LocationRaw[3] = (m_CompressedChunkDataSize + (4 KiB) - 1) / (4 KiB);
+	a_LocationRaw[3] = (m_CompressedChunkDataSize + (4 KiB) + 3) / (4 KiB);  // +3 because the m_CompressedChunkDataSize doesn't include the exact-length
 	
 	// Write the data length:
 	Byte Buf[4];
@@ -295,6 +302,17 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 		LOGWARNING("Failed to write chunk data!");
 		return false;
 	}
+	
+	// Pad onto the next sector:
+	int NumPadding = a_LocationRaw[3] * 4096 - (m_CompressedChunkDataSize + 4);
+	ASSERT(NumPadding >= 0);
+	if ((NumPadding > 0) && (a_File.Write(g_Zeroes, NumPadding) != NumPadding))
+	{
+		LOGWARNING("Failed to write padding");
+		return false;
+	}
+	
+	m_CurrentSectorOut += a_LocationRaw[3];
 	return true;
 }
 

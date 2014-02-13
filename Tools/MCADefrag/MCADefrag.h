@@ -47,10 +47,11 @@ protected:
 		
 		/** The current compressed chunk data. Valid after a successful ReadChunk().
 		This contains only the compression method byte and the compressed data,
-		but not the length preceding the data in the MCA file. */
+		but not the exact-length preceding the data in the MCA file. */
 		unsigned char m_CompressedChunkData[MAX_COMPRESSED_CHUNK_DATA_SIZE];
 		
-		/** Size of the actual current compressed chunk data. */
+		/** Size of the actual current compressed chunk data, excluding the 4 exact-length bytes.
+		This is the amount of bytes in m_CompressedChunkData[] that are valid. */
 		int m_CompressedChunkDataSize;
 		
 		/** The current raw chunk data. Valid after a successful ReadChunk(), if recompression is active. */
