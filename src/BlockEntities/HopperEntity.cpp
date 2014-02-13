@@ -198,7 +198,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		public cEntityCallback
 	{
 	public:
-		cHopperPickupSearchCallback(const Vector3i a_Pos, cItemGrid & a_Contents) :
+		cHopperPickupSearchCallback(const Vector3i & a_Pos, cItemGrid & a_Contents) :
 			m_Pos(a_Pos),
 			m_bFoundPickupsAbove(false),
 			m_Contents(a_Contents)
@@ -265,7 +265,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		}
 
 	protected:
-		const Vector3i m_Pos;
+		Vector3i m_Pos;
 		bool m_bFoundPickupsAbove;
 		cItemGrid & m_Contents;
 	};
