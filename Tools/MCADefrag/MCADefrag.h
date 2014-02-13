@@ -43,6 +43,14 @@ protected:
 		cThread(cMCADefrag & a_Parent);
 		
 	protected:
+		/** The compression methods, as specified by the MCA compression method byte. */
+		enum
+		{
+			COMPRESSION_GZIP = 1,
+			COMPRESSION_ZLIB = 2,
+		} ;
+
+		
 		cMCADefrag & m_Parent;
 		
 		/** The current compressed chunk data. Valid after a successful ReadChunk().
@@ -63,6 +71,10 @@ protected:
 		/** Number of the sector where the next chunk will be written by WriteChunk(). */
 		int m_CurrentSectorOut;
 		
+		/** Set to true when the chunk has been successfully uncompressed. Only used if recompression is active.
+		WriteChunk() tests this flag to decide whether to call Compress(). */
+		bool m_IsChunkUncompressed;
+		
 		
 		/** Processes the specified file. */
 		void ProcessFile(const AString & a_FileName);
@@ -79,6 +91,22 @@ protected:
 		the chunk's location is stored in that memory area. Updates m_CurrentSectorOut.
 		Returns true if successful. */
 		bool WriteChunk(cFile & a_File, Byte * a_LocationRaw);		
+		
+		/** Uncompresses the chunk data from m_CompressedChunkData into m_RawChunkData.
+		Returns true if successful, false on failure. */
+		bool UncompressChunk(void);
+		
+		/** Uncompresses the chunk data from m_CompressedChunkData into m_RawChunkData, using Gzip.
+		Returns true if successful, false on failure. */
+		bool UncompressChunkGzip(void);
+		
+		/** Uncompresses the chunk data from m_CompressedChunkData into m_RawChunkData, using Zlib.
+		Returns true if successful, false on failure. */
+		bool UncompressChunkZlib(void);
+		
+		/** Compresses the chunk data from m_RawChunkData into m_CompressedChunkData.
+		Returns true if successful, false on failure. */
+		bool CompressChunk(void);
 		
 		// cIsThread overrides:
 		virtual void Execute(void) override;
@@ -98,6 +126,9 @@ protected:
 	
 	/** The number of threads that should be started. Configurable on the command line. */
 	int m_NumThreads;
+	
+	/** If set to true, the chunk data is recompressed while saving each MCA file. */
+	bool m_ShouldRecompress;
 	
 	
 	/** Starts a new processing thread and adds it to cThreads. */

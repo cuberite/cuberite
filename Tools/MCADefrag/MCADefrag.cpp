@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "MCADefrag.h"
 #include "MCLogger.h"
+#include "zlib/zlib.h"
 
 
 
@@ -40,7 +41,8 @@ int main(int argc, char ** argv)
 // cMCADefrag:
 
 cMCADefrag::cMCADefrag(void) :
-	m_NumThreads(1)
+	m_NumThreads(4),
+	m_ShouldRecompress(true)
 {
 }
 
@@ -113,7 +115,8 @@ AString cMCADefrag::GetNextFileName(void)
 
 cMCADefrag::cThread::cThread(cMCADefrag & a_Parent) :
 	super("MCADefrag thread"),
-	m_Parent(a_Parent)
+	m_Parent(a_Parent),
+	m_IsChunkUncompressed(false)
 {
 }
 
@@ -204,6 +207,7 @@ void cMCADefrag::cThread::ProcessFile(const AString & a_FileName)
 			// Chunk not present
 			continue;
 		}
+		m_IsChunkUncompressed = false;
 		if (!ReadChunk(In, Locations + idx))
 		{
 			LOGWARNING("Cannot read chunk #%d from file %s. Skipping file.", i, a_FileName.c_str());
@@ -266,7 +270,15 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 		return false;
 	}
 	
-	// TODO: Uncompress the data if recompression is active
+	// Uncompress the data if recompression is active
+	if (m_Parent.m_ShouldRecompress)
+	{
+		m_IsChunkUncompressed = UncompressChunk();
+		if (!m_IsChunkUncompressed)
+		{
+			LOGINFO("Chunk failed to uncompress, will be copied verbatim instead.");
+		}
+	}
 	
 	return true;
 }
@@ -277,12 +289,21 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 
 bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 {
-	// TODO: Recompress the data if recompression is active
+	// Recompress the data if recompression is active:
+	if (m_Parent.m_ShouldRecompress)
+	{
+		if (!CompressChunk())
+		{
+			LOGINFO("Chunk failed to recompress, will be coped verbatim instead.");
+		}
+	}
 	
+	// Update the Location:
 	a_LocationRaw[0] = m_CurrentSectorOut >> 16;
 	a_LocationRaw[1] = (m_CurrentSectorOut >> 8) & 0xff;
 	a_LocationRaw[2] = m_CurrentSectorOut & 0xff;
 	a_LocationRaw[3] = (m_CompressedChunkDataSize + (4 KiB) + 3) / (4 KiB);  // +3 because the m_CompressedChunkDataSize doesn't include the exact-length
+	m_CurrentSectorOut += a_LocationRaw[3];
 	
 	// Write the data length:
 	Byte Buf[4];
@@ -312,7 +333,86 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 		return false;
 	}
 	
-	m_CurrentSectorOut += a_LocationRaw[3];
+	return true;
+}
+
+
+
+
+
+bool cMCADefrag::cThread::UncompressChunk(void)
+{
+	switch (m_CompressedChunkData[0])
+	{
+		case COMPRESSION_GZIP: return UncompressChunkGzip();
+		case COMPRESSION_ZLIB: return UncompressChunkZlib();
+	}
+	LOGINFO("Chunk is compressed with in an unknown algorithm");
+	return false;
+}
+
+
+
+
+
+bool cMCADefrag::cThread::UncompressChunkGzip(void)
+{
+	// TODO
+	// This format is not used in practice
+	return false;
+}
+
+
+
+
+
+bool cMCADefrag::cThread::UncompressChunkZlib(void)
+{
+	// Uncompress the data:
+	z_stream strm;
+	strm.zalloc = (alloc_func)NULL;
+	strm.zfree = (free_func)NULL;
+	strm.opaque = NULL;
+	inflateInit(&strm);
+	strm.next_out  = m_RawChunkData;
+	strm.avail_out = sizeof(m_RawChunkData);
+	strm.next_in   = m_CompressedChunkData + 1;  // The first byte is the compression method, skip it
+	strm.avail_in  = m_CompressedChunkDataSize;
+	int res = inflate(&strm, Z_FINISH);
+	inflateEnd(&strm);
+	if (res != Z_STREAM_END)
+	{
+		LOGWARNING("Failed to uncompress chunk data: %s", strm.msg);
+		return false;
+	}
+	m_RawChunkDataSize = strm.total_out;
+
+	return true;
+}
+
+
+
+
+
+bool cMCADefrag::cThread::CompressChunk(void)
+{
+	// Check that the compressed data can fit:
+	uLongf CompressedSize = compressBound(m_RawChunkDataSize);
+	if (CompressedSize > sizeof(m_CompressedChunkData))
+	{
+		LOGINFO("Too much data for the internal compression buffer!");
+		return false;
+	}
+	
+	// Compress the data using the highest compression factor:
+	int errorcode = compress2(m_CompressedChunkData + 1, &CompressedSize, m_RawChunkData, m_RawChunkDataSize, Z_BEST_COMPRESSION);
+	if (errorcode != Z_OK)
+	{
+		LOGINFO("Recompression failed: %d", errorcode);
+		return false;
+	}
+	m_CompressedChunkData[0] = COMPRESSION_ZLIB;
+	m_CompressedChunkDataSize = CompressedSize + 1;
 	return true;
 }
 
