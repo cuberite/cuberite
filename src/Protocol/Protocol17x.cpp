@@ -496,6 +496,41 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 
 
+void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	cPacketizer Pkt(*this, 0x34);
+	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteShort (3 + a_Length);
+
+	Pkt.WriteByte(0);
+	Pkt.WriteByte(a_X);
+	Pkt.WriteByte(a_Y);
+	
+	for (unsigned int i = 0; i < a_Length; ++i)
+	{
+		Pkt.WriteByte(a_Colors[i]);
+	}
+}
+
+
+
+
+
+void cProtocol172::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	cPacketizer Pkt(*this, 0x34);
+	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteShort (2);
+
+	Pkt.WriteByte(2);
+	Pkt.WriteByte(a_Scale);
+}
+
+
+
+
+
+
 void cProtocol172::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	{

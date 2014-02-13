@@ -95,6 +95,7 @@ enum
 	PACKET_WINDOW_PROPERTY           = 0x69,
 	PACKET_CREATIVE_INVENTORY_ACTION = 0x6B,
 	PACKET_UPDATE_SIGN               = 0x82,
+	PACKET_ITEM_DATA                 = 0x83,
 	PACKET_PLAYER_LIST_ITEM          = 0xC9,
 	PACKET_PLAYER_ABILITIES          = 0xca,
 	PACKET_PLUGIN_MESSAGE            = 0xfa,
@@ -571,6 +572,32 @@ void cProtocol125::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	WriteByte  (60);  // Client list width or something
 	Flush();
 }
+
+
+
+
+
+void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	cCSLock Lock(m_CSPacket);
+
+	WriteByte (PACKET_ITEM_DATA);
+	WriteShort(E_ITEM_MAP);
+	WriteShort(a_ID);
+	WriteShort(3 + a_Length);
+
+	WriteByte(0);
+	WriteByte(a_X);
+	WriteByte(a_Y);
+	
+	for (unsigned int i = 0; i < a_Length; ++i)
+	{
+		WriteByte(a_Colors[i]);
+	}
+
+	Flush();
+}
+
 
 
 

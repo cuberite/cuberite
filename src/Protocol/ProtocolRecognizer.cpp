@@ -386,6 +386,26 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 
 
 
+void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapInfo(a_ID, a_Scale);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
 {
 	ASSERT(m_Protocol != NULL);
