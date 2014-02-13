@@ -24,6 +24,7 @@
 #include "Entities/ProjectileEntity.h"
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
+#include "Map.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 
@@ -811,6 +812,10 @@ private:
 	cChunkGenerator  m_Generator;
 
 	cScoreboard      m_Scoreboard;
+
+	typedef std::vector<cMap> cMapList;
+
+	cMapList m_MapData;
 	
 	/** The callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	cChunkGeneratorCallbacks m_GeneratorCallbacks;
@@ -876,6 +881,12 @@ private:
 
 	/** Creates a new redstone simulator.*/
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
+
+	/** Loads the map data from the disk */
+	void LoadMapData(void);
+
+	/** Saves the map data to the disk */
+	void SaveMapData(void);
 }; // tolua_export
 
 

@@ -50,3 +50,28 @@ private:
 
 
 
+class cIDCountSerializer
+{
+public:
+
+	cIDCountSerializer(const AString & a_WorldName);
+
+	bool Load(void);
+
+	bool Save(void);
+
+	inline unsigned int GetMapCount(void) const { return m_MapCount; }
+
+	inline void SetMapCount(unsigned int a_MapCount) { m_MapCount = a_MapCount; }
+
+
+private:
+
+	AString m_Path;
+
+	unsigned int m_MapCount;
+};
+
+
+
+

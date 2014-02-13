@@ -37,6 +37,9 @@ public:
 
 public:
 
+	/// Construct an empty map
+	cMap(unsigned int a_ID, cWorld * a_World);
+
 	cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale = 3);
 
 	/** Update the map (Query the world) */

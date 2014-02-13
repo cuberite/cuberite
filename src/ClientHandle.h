@@ -109,8 +109,8 @@ public:
 	void SendGameMode            (eGameMode a_GameMode);
 	void SendHealth              (void);
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
-	void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) override;
-	void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
+	void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length);
+	void SendMapInfo             (int a_ID, unsigned int a_Scale);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
 	void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount);

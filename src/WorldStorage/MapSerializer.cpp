@@ -9,6 +9,7 @@
 #include "FastNBT.h"
 
 #include "../Map.h"
+#include "../World.h"
 
 
 
@@ -141,7 +142,7 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	{
 		eDimension Dimension = (eDimension) a_NBT.GetByte(CurrLine);
 		
-		// ASSERT(Dimension == m_World.GetDimension());
+		ASSERT(Dimension == m_Map->m_World->GetDimension());
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "width");
@@ -176,6 +177,82 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	m_Map->m_Data.resize(NumPixels);
 
 	// TODO xdot: Parse the byte array.
+
+	return true;
+}
+
+
+
+
+
+cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) : m_MapCount(0)
+{
+	AString DataPath;
+	Printf(DataPath, "%s/data", a_WorldName.c_str());
+
+	Printf(m_Path, "%s/idcounts.dat", DataPath.c_str());
+
+	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
+}
+
+
+
+
+
+bool cIDCountSerializer::Load(void)
+{
+	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
+	if (Data.empty())
+	{
+		return false;
+	}
+
+	// NOTE: idcounts.dat is not compressed (raw format)
+
+	// Parse the NBT data:
+	cParsedNBT NBT(Data.data(), Data.size());
+	if (!NBT.IsValid())
+	{
+		// NBT Parsing failed
+		return false;
+	}
+
+	int CurrLine = NBT.FindChildByName(0, "map");
+	if (CurrLine >= 0)
+	{
+		m_MapCount = (int)NBT.GetShort(CurrLine);
+	}
+
+	return true;
+}
+
+
+
+
+
+bool cIDCountSerializer::Save(void)
+{
+	cFastNBTWriter Writer;
+
+	Writer.AddShort("map", m_MapCount);
+
+	Writer.Finish();
+	
+	#ifdef _DEBUG
+	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+	ASSERT(TestParse.IsValid());
+	#endif  // _DEBUG
+
+	cFile File;
+	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
+	{
+		return false;
+	}
+
+	// NOTE: idcounts.dat is not compressed (raw format)
+
+	File.Write(Writer.GetResult().data(), Writer.GetResult().size());
+	File.Close();
 
 	return true;
 }

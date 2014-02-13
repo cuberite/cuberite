@@ -11,7 +11,9 @@
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
+
 #include "WorldStorage/ScoreboardSerializer.h"
+#include "WorldStorage/MapSerializer.h"
 
 // Entities (except mobs):
 #include "Entities/ExpOrb.h"
@@ -261,6 +263,8 @@ cWorld::cWorld(const AString & a_WorldName) :
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Load();
+
+	LoadMapData();
 }
 
 
@@ -283,6 +287,8 @@ cWorld::~cWorld()
 	// Unload the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Save();
+
+	SaveMapData();
 
 	delete m_ChunkMap;
 }
@@ -2940,6 +2946,54 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	m_SimulatorManager->RegisterSimulator(res, Rate);
 
 	return res;
+}
+
+
+
+
+
+void cWorld::LoadMapData(void)
+{
+	cIDCountSerializer IDSerializer(GetName());
+
+	IDSerializer.Load();
+
+	unsigned int MapCount = IDSerializer.GetMapCount();
+
+	m_MapData.clear();
+
+	for (unsigned int i = 0; i < MapCount; ++i)
+	{
+		cMap Map(i, this);
+
+		cMapSerializer Serializer(GetName(), &Map);
+
+		Serializer.Load();
+
+		m_MapData.push_back(Map);
+	}
+}
+
+
+
+
+
+void cWorld::SaveMapData(void)
+{
+	cIDCountSerializer IDSerializer(GetName());
+
+	IDSerializer.SetMapCount(m_MapData.size());
+
+	IDSerializer.Save();
+
+	for (cMapList::iterator it = m_MapData.begin(); it != m_MapData.end(); ++it)
+	{
+		cMap & Map = *it;
+
+		cMapSerializer Serializer(GetName(), &Map);
+
+		Serializer.Save();
+	}
 }
 
 
