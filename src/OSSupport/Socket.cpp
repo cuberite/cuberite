@@ -209,6 +209,8 @@ bool cSocket::BindToAny(unsigned short a_Port)
 		case INVALID_PROTOCOL:
 		{
 			ASSERT(!"Invalid protocol");
+			LOGWARNING("cannot bind to Invalid Protocol");
+			abort();
 		}
 	}
 
