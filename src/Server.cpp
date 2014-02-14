@@ -103,8 +103,8 @@ void cServer::cTickThread::Execute(void)
 // cServer:
 
 cServer::cServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client IPv4"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client IPv6"),
+	m_ListenThreadIPv4(*this, "Client IPv4"),
+	m_ListenThreadIPv6(*this, "Client IPv6"),
 	m_bIsConnected(false),
 	m_bRestarting(false),
 	m_RCONServer(*this),
@@ -214,14 +214,14 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	bool HasAnyPorts = false;
 	AString Ports = a_SettingsIni.GetValueSet("Server", "Port", "25565");
 	m_ListenThreadIPv4.SetReuseAddr(true);
-	if (m_ListenThreadIPv4.Initialize(Ports))
+	if (m_ListenThreadIPv4.Initialize(cSocket::IPv4, Ports))
 	{
 		HasAnyPorts = true;
 	}
 
 	Ports = a_SettingsIni.GetValueSet("Server", "PortsIPv6", "25565");
 	m_ListenThreadIPv6.SetReuseAddr(true);
-	if (m_ListenThreadIPv6.Initialize(Ports))
+	if (m_ListenThreadIPv6.Initialize(cSocket::IPv6, Ports))
 	{
 		HasAnyPorts = true;
 	}

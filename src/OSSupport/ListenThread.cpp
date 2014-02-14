@@ -10,10 +10,10 @@
 
 
 
-cListenThread::cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family, const AString & a_ServiceName) :
+cListenThread::cListenThread(cCallback & a_Callback,  const AString & a_ServiceName) :
 	super(Printf("ListenThread %s", a_ServiceName.c_str())),
 	m_Callback(a_Callback),
-	m_Family(a_Family),
+	m_Family(cSocket::INVALID_PROTOCOL),
 	m_ShouldReuseAddr(false),
 	m_ServiceName(a_ServiceName)
 {
@@ -32,10 +32,10 @@ cListenThread::~cListenThread()
 
 
 
-bool cListenThread::Initialize(const AString & a_PortsString)
+bool cListenThread::Initialize(cSocket::eFamily a_Family, const AString & a_PortsString)
 {
 	ASSERT(m_Sockets.empty());  // Not yet started
-	
+	m_Family = a_Family;
 	if (!CreateSockets(a_PortsString))
 	{
 		return false;

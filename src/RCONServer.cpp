@@ -78,8 +78,8 @@ protected:
 
 cRCONServer::cRCONServer(cServer & a_Server) :
 	m_Server(a_Server),
-	m_ListenThread4(*this, cSocket::IPv4, "RCON IPv4"),
-	m_ListenThread6(*this, cSocket::IPv6, "RCON IPv6")
+	m_ListenThread4(*this, "RCON IPv4"),
+	m_ListenThread6(*this, "RCON IPv6")
 {
 }
 
@@ -115,13 +115,13 @@ void cRCONServer::Initialize(cIniFile & a_IniFile)
 	// Read and initialize both IPv4 and IPv6 ports for RCON
 	bool HasAnyPorts = false;
 	AString Ports4 = a_IniFile.GetValueSet("RCON", "PortsIPv4", "25575");
-	if (m_ListenThread4.Initialize(Ports4))
+	if (m_ListenThread4.Initialize(cSocket::IPv4, Ports4))
 	{
 		HasAnyPorts = true;
 		m_ListenThread4.Start();
 	}
 	AString Ports6 = a_IniFile.GetValueSet("RCON", "PortsIPv6", "25575");
-	if (m_ListenThread6.Initialize(Ports6))
+	if (m_ListenThread6.Initialize(cSocket::IPv6, Ports6))
 	{
 		HasAnyPorts = true;
 		m_ListenThread6.Start();

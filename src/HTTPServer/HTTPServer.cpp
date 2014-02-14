@@ -117,8 +117,8 @@ class cDebugCallbacks :
 // cHTTPServer:
 
 cHTTPServer::cHTTPServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer IPv4"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer IPv6"),
+	m_ListenThreadIPv4(*this, "WebServer IPv4"),
+	m_ListenThreadIPv6(*this, "WebServer IPv6"),
 	m_Callbacks(NULL)
 {
 }
@@ -136,11 +136,17 @@ cHTTPServer::~cHTTPServer()
 
 
 
-bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_PortsIPv6)
+bool cHTTPServer::Initialize(bool a_DualStack, const AString & a_PortsIPv4, const AString & a_PortsIPv6)
 {
 	bool HasAnyPort;
-	HasAnyPort = m_ListenThreadIPv4.Initialize(a_PortsIPv4);
-	HasAnyPort = m_ListenThreadIPv6.Initialize(a_PortsIPv6) || HasAnyPort;
+	m_DualStack = a_DualStack;
+	if (a_DualStack)
+	{
+		HasAnyPort = m_ListenThreadIPv4.Initialize(cSocket::IPDual, a_PortsIPv4);
+	} else {
+		HasAnyPort = m_ListenThreadIPv4.Initialize(cSocket::IPv4, a_PortsIPv4);
+		HasAnyPort = m_ListenThreadIPv6.Initialize(cSocket::IPv6, a_PortsIPv6) || HasAnyPort;
+	}
 	if (!HasAnyPort)
 	{
 		return false;
@@ -160,10 +166,13 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks)
 	{
 		return false;
 	}
-	if (!m_ListenThreadIPv6.Start())
+	if (!m_DualStack) 
 	{
-		m_ListenThreadIPv4.Stop();
-		return false;
+		if (!m_ListenThreadIPv6.Start())
+		{
+			m_ListenThreadIPv4.Stop();
+			return false;
+		}
 	}
 	return true;
 }
@@ -175,7 +184,10 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks)
 void cHTTPServer::Stop(void)
 {
 	m_ListenThreadIPv4.Stop();
-	m_ListenThreadIPv6.Stop();
+	if (!m_DualStack) 
+	{
+		m_ListenThreadIPv6.Stop();
+	}
 	
 	// Drop all current connections:
 	cCSLock Lock(m_CSConnections);

@@ -37,11 +37,11 @@ public:
 		virtual void OnConnectionAccepted(cSocket & a_Socket) = 0;
 	} ;
 	
-	cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family, const AString & a_ServiceName = "");
+	cListenThread(cCallback & a_Callback, const AString & a_ServiceName = "");
 	~cListenThread();
 	
 	/// Creates all the sockets, returns trus if successful, false if not.
-	bool Initialize(const AString & a_PortsString);
+	bool Initialize(cSocket::eFamily a_Family, const AString & a_PortsString);
 	
 	bool Start(void);
 	
