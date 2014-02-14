@@ -552,6 +552,12 @@ public:
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
+
+	/** Returns the map with the specified ID, NULL if out of range. */
+	cMap * GetMapData(unsigned int a_ID);
+
+	/** Creates a new map. Returns NULL on error */
+	cMap * CreateMap(int a_CenterX, int a_CenterY, int a_Scale = 3);
 	
 	// tolua_end
 	

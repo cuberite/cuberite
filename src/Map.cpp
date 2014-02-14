@@ -7,6 +7,7 @@
 
 #include "ClientHandle.h"
 #include "World.h"
+#include "Chunk.h"
 
 
 
@@ -22,8 +23,6 @@ cMap::cMap(unsigned int a_ID, cWorld * a_World)
 	, m_World(a_World)
 {
 	m_Data.assign(m_Width * m_Height, 0);
-
-	// Do not update map
 }
 
 
@@ -41,19 +40,6 @@ cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, un
 {
 	m_Data.assign(m_Width * m_Height, 0);
 
-	UpdateMap();
-}
-
-
-
-
-
-void cMap::UpdateMap(void)
-{
-	// ASSERT(m_World != NULL);
-
-	// TODO
-
 	for (unsigned int X = 0; X < m_Width; ++X)
 	{
 		for (unsigned int Y = 0; Y < m_Height; ++Y)
@@ -62,6 +48,37 @@ void cMap::UpdateMap(void)
 			m_Data[Y + X * m_Height] = rand() % 100;
 		}
 	}
+}
+
+
+
+
+
+bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Y)
+{
+	ASSERT(m_World != NULL);
+
+	cChunk * Chunk = NULL;
+
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+
+	int Height = Chunk->GetHeight(a_X, a_Y);
+
+	// TODO
+
+	return true;
+}
+
+
+
+
+
+void cMap::EraseData(void)
+{
+	m_Data.assign(m_Width * m_Height, 0);
 }
 
 
@@ -90,8 +107,6 @@ void cMap::Resize(unsigned int a_Width, unsigned int a_Height)
 	m_Height = a_Height;
 
 	m_Data.assign(m_Width * m_Height, 0);
-
-	UpdateMap();
 }
 
 
@@ -107,8 +122,6 @@ void cMap::SetPosition(int a_CenterX, int a_CenterZ)
 
 	m_CenterX = a_CenterX;
 	m_CenterZ = a_CenterZ;
-
-	UpdateMap();
 }
 
 
@@ -123,8 +136,6 @@ void cMap::SetScale(unsigned int a_Scale)
 	}
 
 	m_Scale = a_Scale;
-
-	UpdateMap();
 }
 
 

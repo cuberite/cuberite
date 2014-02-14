@@ -26,27 +26,32 @@ class cWorld;
 
 
 
+// tolua_begin
 class cMap
 {
 public:
 
 	typedef Byte ColorID;
 
+	// tolua_end
+
 	typedef std::vector<ColorID> cColorList;
 
 
 public:
 
-	/// Construct an empty map
+	/** Construct an empty map. */
 	cMap(unsigned int a_ID, cWorld * a_World);
 
 	cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale = 3);
 
-	/** Update the map (Query the world) */
-	void UpdateMap(void);
-
 	/** Send this map to the specified client. */
 	void SendTo(cClientHandle & a_Client);
+
+	// tolua_begin
+
+	/** Erase pixel data */
+	void EraseData(void);
 
 	void Resize(unsigned int a_Width, unsigned int a_Height);
 
@@ -74,8 +79,15 @@ public:
 
 	unsigned int GetNumBlocksPerPixel(void) const;
 
+	// tolua_end
+
 
 private:
+
+	/** Update the specified pixel. */
+	bool UpdatePixel(unsigned int a_X, unsigned int a_Y);
+
+	void PixelToWorldCoords(unsigned int a_X, unsigned int a_Y, int & a_WorldX, int & a_WorldY);
 
 	unsigned int m_ID;
 

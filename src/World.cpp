@@ -1554,6 +1554,42 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 
 
+cMap * cWorld::GetMapData(unsigned int a_ID)
+{
+	if (a_ID < m_MapData.size())
+	{
+		return &m_MapData[a_ID];
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+
+
+
+
+cMap * cWorld::CreateMap(int a_CenterX, int a_CenterY, int a_Scale)
+{
+	if (m_MapData.size() >= 65536)
+	{
+		LOGD("cWorld::CreateMap - Too many maps in use");
+
+		return NULL;
+	}
+
+	cMap Map(m_MapData.size(), a_CenterX, a_CenterY, this, a_Scale);
+
+	m_MapData.push_back(Map);
+
+	return &m_MapData[Map.GetID()];
+}
+
+
+
+
+
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool IsPlayerCreated)
 {
 	MTRand r1;
@@ -2958,7 +2994,7 @@ void cWorld::LoadMapData(void)
 
 	IDSerializer.Load();
 
-	unsigned int MapCount = IDSerializer.GetMapCount();
+	unsigned int MapCount = IDSerializer.GetMapCount() + 1;
 
 	m_MapData.clear();
 
@@ -2980,9 +3016,14 @@ void cWorld::LoadMapData(void)
 
 void cWorld::SaveMapData(void)
 {
+	if (m_MapData.empty())
+	{
+		return;
+	}
+
 	cIDCountSerializer IDSerializer(GetName());
 
-	IDSerializer.SetMapCount(m_MapData.size());
+	IDSerializer.SetMapCount(m_MapData.size() - 1);
 
 	IDSerializer.Save();
 

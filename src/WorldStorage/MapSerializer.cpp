@@ -111,7 +111,6 @@ void cMapSerializer::SaveMapToNBT(cFastNBTWriter & a_Writer)
 	a_Writer.AddInt("xCenter", m_Map->GetCenterX());
 	a_Writer.AddInt("zCenter", m_Map->GetCenterZ());
 
-	// Potential bug - The internal representation may change
 	const cMap::cColorList & Data = m_Map->GetData();
 	a_Writer.AddByteArray("colors", (char *) Data.data(), Data.size());
 
@@ -134,7 +133,7 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	if (CurrLine >= 0)
 	{
 		unsigned int Scale = a_NBT.GetByte(CurrLine);
-		m_Map->m_Scale = Scale;
+		m_Map->SetScale(Scale);
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "dimension");
@@ -176,7 +175,11 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	unsigned int NumPixels = m_Map->GetNumPixels();
 	m_Map->m_Data.resize(NumPixels);
 
-	// TODO xdot: Parse the byte array.
+	CurrLine = a_NBT.FindChildByName(Data, "colors");
+	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_ByteArray))
+	{
+		memcpy(m_Map->m_Data.data(), a_NBT.GetData(CurrLine), NumPixels);
+	}
 
 	return true;
 }
