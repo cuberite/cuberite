@@ -15,6 +15,25 @@ public:
 
 	}
 
+	float PickaxePower()
+	{
+		switch(m_ItemType)
+		{
+		case E_ITEM_WOODEN_PICKAXE:
+			return 2.0F;
+		case E_ITEM_STONE_PICKAXE:
+			return 4.0F;
+		case E_ITEM_IRON_PICKAXE:
+			return 6.0F;
+		case E_ITEM_DIAMOND_PICKAXE:
+			return 8.0F;
+		case E_ITEM_GOLD_PICKAXE:
+			return 12.0F;
+		default:
+			return 2.0F;
+		}
+	}
+
 	char PickaxeLevel()
 	{
 		switch(m_ItemType)
@@ -61,6 +80,10 @@ public:
 				return PickaxeLevel() >= 2;
 			}
 			
+			case E_BLOCK_ANVIL:
+			case E_BLOCK_ENCHANTMENT_TABLE:
+			case E_BLOCK_FURNACE:
+			case E_BLOCK_LIT_FURNACE:
 			case E_BLOCK_COAL_ORE:
 			case E_BLOCK_STONE:
 			case E_BLOCK_COBBLESTONE:
@@ -84,6 +107,41 @@ public:
 			}
 		}
 		return false;
+	}
+	
+	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
+	{
+		if (a_BlockType == E_BLOCK_COBBLESTONE
+			|| a_BlockType == E_BLOCK_DOUBLE_STONE_SLAB
+			|| a_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB
+			|| a_BlockType == E_BLOCK_STONE_SLAB
+			|| a_BlockType == E_BLOCK_WOODEN_SLAB
+			|| a_BlockType == E_BLOCK_STONE
+			|| a_BlockType == E_BLOCK_SANDSTONE
+			|| a_BlockType == E_BLOCK_MOSSY_COBBLESTONE
+			|| a_BlockType == E_BLOCK_IRON_ORE
+			|| a_BlockType == E_BLOCK_IRON_BLOCK
+			|| a_BlockType == E_BLOCK_COAL_ORE
+			|| a_BlockType == E_BLOCK_BLOCK_OF_COAL
+			|| a_BlockType == E_BLOCK_GOLD_ORE
+			|| a_BlockType == E_BLOCK_DIAMOND_ORE
+			|| a_BlockType == E_BLOCK_DIAMOND_BLOCK
+			|| a_BlockType == E_BLOCK_ICE
+			|| a_BlockType == E_BLOCK_NETHERRACK
+			|| a_BlockType == E_BLOCK_LAPIS_ORE
+			|| a_BlockType == E_BLOCK_LAPIS_BLOCK
+			|| a_BlockType == E_BLOCK_REDSTONE_ORE
+			|| a_BlockType == E_BLOCK_REDSTONE_ORE_GLOWING
+			|| a_BlockType == E_BLOCK_DETECTOR_RAIL
+			|| a_BlockType == E_BLOCK_POWERED_RAIL
+			|| a_BlockType == E_BLOCK_RAIL
+			|| a_BlockType == E_BLOCK_ACTIVATOR_RAIL
+		)
+		{
+			return PickaxePower();
+		}
+		
+		return 1.0F;
 	}
 } ;
 

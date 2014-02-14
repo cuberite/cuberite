@@ -26,8 +26,8 @@ extern unsigned char g_BlockSpreadLightFalloff[];
 /// Is a block completely transparent? (light doesn't get decreased(?))
 extern bool g_BlockTransparent[];
 
-/// Is a block destroyed after a single hit?
-extern bool g_BlockOneHitDig[];
+/// How much time is required to break the blocks?
+extern float g_BlockDigTime[256];
 
 /// Can a piston break this block?
 extern bool g_BlockPistonBreakable[256];
