@@ -111,37 +111,37 @@ public:
 	
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
-		if (a_BlockType == E_BLOCK_COBBLESTONE
-			|| a_BlockType == E_BLOCK_DOUBLE_STONE_SLAB
-			|| a_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB
-			|| a_BlockType == E_BLOCK_STONE_SLAB
-			|| a_BlockType == E_BLOCK_WOODEN_SLAB
-			|| a_BlockType == E_BLOCK_STONE
-			|| a_BlockType == E_BLOCK_SANDSTONE
-			|| a_BlockType == E_BLOCK_MOSSY_COBBLESTONE
-			|| a_BlockType == E_BLOCK_IRON_ORE
-			|| a_BlockType == E_BLOCK_IRON_BLOCK
-			|| a_BlockType == E_BLOCK_COAL_ORE
-			|| a_BlockType == E_BLOCK_BLOCK_OF_COAL
-			|| a_BlockType == E_BLOCK_GOLD_ORE
-			|| a_BlockType == E_BLOCK_DIAMOND_ORE
-			|| a_BlockType == E_BLOCK_DIAMOND_BLOCK
-			|| a_BlockType == E_BLOCK_ICE
-			|| a_BlockType == E_BLOCK_NETHERRACK
-			|| a_BlockType == E_BLOCK_LAPIS_ORE
-			|| a_BlockType == E_BLOCK_LAPIS_BLOCK
-			|| a_BlockType == E_BLOCK_REDSTONE_ORE
-			|| a_BlockType == E_BLOCK_REDSTONE_ORE_GLOWING
-			|| a_BlockType == E_BLOCK_DETECTOR_RAIL
-			|| a_BlockType == E_BLOCK_POWERED_RAIL
-			|| a_BlockType == E_BLOCK_RAIL
-			|| a_BlockType == E_BLOCK_ACTIVATOR_RAIL
-		)
+		switch(a_BlockType)
 		{
-			return PickaxePower();
+			case E_BLOCK_COBBLESTONE:
+			case E_BLOCK_DOUBLE_STONE_SLAB:
+			case E_BLOCK_DOUBLE_WOODEN_SLAB:
+			case E_BLOCK_STONE_SLAB:
+			case E_BLOCK_WOODEN_SLAB:
+			case E_BLOCK_STONE:
+			case E_BLOCK_SANDSTONE:
+			case E_BLOCK_MOSSY_COBBLESTONE:
+			case E_BLOCK_IRON_ORE:
+			case E_BLOCK_IRON_BLOCK:
+			case E_BLOCK_COAL_ORE:
+			case E_BLOCK_BLOCK_OF_COAL:
+			case E_BLOCK_GOLD_ORE:
+			case E_BLOCK_DIAMOND_ORE:
+			case E_BLOCK_DIAMOND_BLOCK:
+			case E_BLOCK_ICE:
+			case E_BLOCK_NETHERRACK:
+			case E_BLOCK_LAPIS_ORE:
+			case E_BLOCK_LAPIS_BLOCK:
+			case E_BLOCK_REDSTONE_ORE:
+			case E_BLOCK_REDSTONE_ORE_GLOWING:
+			case E_BLOCK_DETECTOR_RAIL:
+			case E_BLOCK_POWERED_RAIL:
+			case E_BLOCK_RAIL:
+			case E_BLOCK_ACTIVATOR_RAIL:
+				return PickaxePower();
+			default:
+				return 1.0F;
 		}
-		
-		return 1.0F;
 	}
 } ;
 

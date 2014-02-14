@@ -42,18 +42,18 @@ public:
 	
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
-		if (a_BlockType == E_BLOCK_PLANKS
-			|| a_BlockType == E_BLOCK_BOOKCASE
-			|| a_BlockType == E_BLOCK_LOG
-			|| a_BlockType == E_BLOCK_NEW_LOG
-			|| a_BlockType == E_BLOCK_CHEST
-			|| a_BlockType == E_BLOCK_PUMPKIN
-			|| a_BlockType == E_BLOCK_JACK_O_LANTERN
-		)
+		switch(a_BlockType)
 		{
-			return AxePower();
+			case E_BLOCK_PLANKS:
+			case E_BLOCK_BOOKCASE:
+			case E_BLOCK_LOG:
+			case E_BLOCK_NEW_LOG:
+			case E_BLOCK_CHEST:
+			case E_BLOCK_PUMPKIN:
+			case E_BLOCK_JACK_O_LANTERN:
+				return AxePower();
+			default:
+				return 1.0F;
 		}
-		
-		return 1.0F;
 	}
 };

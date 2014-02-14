@@ -63,21 +63,21 @@ public:
 	
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
-		if (a_BlockType == E_BLOCK_GRASS
-			|| a_BlockType == E_BLOCK_DIRT
-			|| a_BlockType == E_BLOCK_SAND
-			|| a_BlockType == E_BLOCK_GRAVEL
-			|| a_BlockType == E_BLOCK_SNOW
-			|| a_BlockType == E_BLOCK_SNOW_BLOCK
-			|| a_BlockType == E_BLOCK_CLAY
-			|| a_BlockType == E_BLOCK_FARMLAND
-			|| a_BlockType == E_BLOCK_SOULSAND
-			|| a_BlockType == E_BLOCK_MYCELIUM
-		)
+		switch(a_BlockType)
 		{
-			return ShovelPower();
+			case E_BLOCK_GRASS:
+			case E_BLOCK_DIRT:
+			case E_BLOCK_SAND:
+			case E_BLOCK_GRAVEL:
+			case E_BLOCK_SNOW:
+			case E_BLOCK_SNOW_BLOCK:
+			case E_BLOCK_CLAY:
+			case E_BLOCK_FARMLAND:
+			case E_BLOCK_SOULSAND:
+			case E_BLOCK_MYCELIUM:
+				return ShovelPower();
+			default:
+				return 1.0F;
 		}
-		
-		return 1.0F;
 	}
 };
