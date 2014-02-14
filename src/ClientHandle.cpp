@@ -796,8 +796,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	// Start dig animation
 	// TODO: Send animation packets even without receiving any other packets
-	cTimer t1;
-	m_LastDigTick = t1.GetNowTime();
+	m_BlockDigTick = 1;
 	m_BlockDigAnimStage = (int) (speed * 10.0F);
 	m_BlockDigAnimX = a_BlockX;
 	m_BlockDigAnimY = a_BlockY;
@@ -852,10 +851,10 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	cTimer t1;
-	int Ticks = t1.GetNowTime() - m_LastDigTick;
-	float speed;
+	if (!m_Player->IsGameModeCreative() && g_BlockDigTime[a_OldBlock] != 0.0F)
 	{
+		float speed;
+		
 		float f = g_BlockDigTime[a_OldBlock];
 		float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_OldBlock);
 		if (m_Player->IsSwimming())
@@ -864,21 +863,21 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 			a /= 0.5;
 		
 		if (!m_Player->CanHarvestBlock(a_OldBlock))
-			speed = (a / f / 100.0F) * (Ticks + 1);
+			speed = (a / f / 100.0F) * m_BlockDigTick;
 		else
-			speed = (f < 0.0F ? 0.0F : a / f / 30.0F) * (Ticks + 1);
+			speed = (f < 0.0F ? 0.0F : a / f / 30.0F) * m_BlockDigTick;
+		
+		if (speed < 0.7F)
+		{
+			LOG("%s breaked a Block too fast!", m_Username.c_str());
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			HandleBlockDigStop();
+			return;
+		}
 	}
 	
 	if (m_Player->IsGameModeAdventure() && g_BlockDigTime[a_OldBlock] != 0.0F)
 	{
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		HandleBlockDigStop();
-		return;
-	}
-	
-	if (speed < 0.7F)
-	{
-		LOG("%s breaked a Block too fast!", m_Username.c_str());
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		HandleBlockDigStop();
 		return;
@@ -951,7 +950,7 @@ void cClientHandle::HandleBlockDigStop()
 	m_BlockDigAnimX = -1;
 	m_BlockDigAnimY = -1;
 	m_BlockDigAnimZ = -1;
-	m_LastDigTick = -1;
+	m_BlockDigTick = -1;
 }
 
 
@@ -1768,7 +1767,7 @@ void cClientHandle::Tick(float a_Dt)
 	// Handle block break animation:
 	if (m_BlockDigAnimStage > -1)
 	{
-		int Ticks = t1.GetNowTime() - m_LastDigTick;
+		++m_BlockDigTick;
 		
 		float speed;
 		{
@@ -1781,9 +1780,9 @@ void cClientHandle::Tick(float a_Dt)
 				a /= 0.5;
 		
 			if (!m_Player->CanHarvestBlock(a_OldBlock))
-				speed = (a / f / 100.0F) * (Ticks + 1);
+				speed = (a / f / 100.0F) * m_BlockDigTick;
 			else
-				speed = (f < 0.0F ? 0.0F : a / f / 30.0F) * (Ticks + 1);
+				speed = (f < 0.0F ? 0.0F : a / f / 30.0F) * m_BlockDigTick;
 		}
 		int i = (int) (speed * 10.0F);
 		if (i != m_BlockDigAnimStage)

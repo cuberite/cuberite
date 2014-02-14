@@ -773,6 +773,7 @@ public:
 		g_BlockDigTime[E_BLOCK_BLOCK_OF_COAL]           = 5.0F;
 		g_BlockDigTime[E_BLOCK_PACKED_ICE]              = 0.5F;
 		g_BlockDigTime[E_BLOCK_BIG_FLOWER]              = 0.0F;
+		g_BlockDigTime[E_BLOCK_BEDROCK]                 = 100.0F; //Is this correct?
 
 
 		// Blocks that break when pushed by piston:

@@ -264,13 +264,13 @@ private:
 	
 	// Values required for block dig animation
 	int m_BlockDigAnimStage;  // Current stage of the animation; -1 if not digging
+	int m_BlockDigTick;
 	int m_BlockDigAnimX;
 	int m_BlockDigAnimY;
 	int m_BlockDigAnimZ;
 
 	// To avoid dig/aim bug in the client, store the last position given in a DIG_START packet and compare to that when processing the DIG_FINISH packet:
 	bool m_HasStartedDigging;
-	int m_LastDigTick;
 	int m_LastDigBlockX;
 	int m_LastDigBlockY;
 	int m_LastDigBlockZ;
