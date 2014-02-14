@@ -157,9 +157,9 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 			} else {
 			#endif
 			#if defined(_WIN32) || defined(ANDROID_NDK)
-				char no = 1;
+				char no = 0;
 			#else
-				int no = 1;
+				int no = 0;
 			#endif
 			if (setsockopt(Socket, IPPROTO_IPV6, IPV6_V6ONLY, &no, sizeof(int)) == -1)
 			{
