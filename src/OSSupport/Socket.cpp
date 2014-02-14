@@ -174,6 +174,9 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 		case INVALID_PROTOCOL:
 		{
 			ASSERT(!"Invalid protocol");
+			LOGWARNING("Invalid Protocol, setting IPv4, server may not be accessable");
+			xSocket Socket = socket((int)IPv4, SOCK_STREAM, 0);
+			return cSocket(Socket, a_Family);
 		}
 	}
 }
