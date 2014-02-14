@@ -114,8 +114,9 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 	AString FamilyStr = m_ServiceName;
 	switch (m_Family)
 	{
-		case cSocket::IPv4: FamilyStr.append(" IPv4"); break;
-		case cSocket::IPv6: FamilyStr.append(" IPv6"); break;
+		case cSocket::IPv4:   FamilyStr.append(" IPv4"); break;
+		case cSocket::IPv6:   FamilyStr.append(" IPv6"); break;
+		case cSocket::IPDual: FamilyStr.append(" IP Dual Stack"); break;
 		default:
 		{
 			ASSERT(!"Unknown address family");
@@ -153,7 +154,11 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		{
 			case cSocket::IPv4:
 			case cSocket::IPv6:
+			case cSocket::IPDual:
 				res = m_Sockets.back().BindToAny(Port);
+				break;
+			case cSocket::INVALID_PROTOCOL:
+				ASSERT(!"Invalid Protocol");
 		}
 		if (!res)
 		{
