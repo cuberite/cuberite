@@ -115,16 +115,27 @@ void cRCONServer::Initialize(cIniFile & a_IniFile)
 	// Read and initialize both IPv4 and IPv6 ports for RCON
 	bool HasAnyPorts = false;
 	AString Ports4 = a_IniFile.GetValueSet("RCON", "PortsIPv4", "25575");
-	if (m_ListenThread4.Initialize(cSocket::IPv4, Ports4))
+	if(a_IniFile.GetValueSetB("RCON", "DualStack", false))
 	{
-		HasAnyPorts = true;
-		m_ListenThread4.Start();
+		if (m_ListenThread4.Initialize(cSocket::IPDual, Ports4))
+		{
+			HasAnyPorts = true;
+			m_ListenThread4.Start();
+		}
 	}
-	AString Ports6 = a_IniFile.GetValueSet("RCON", "PortsIPv6", "25575");
-	if (m_ListenThread6.Initialize(cSocket::IPv6, Ports6))
+	else
 	{
-		HasAnyPorts = true;
-		m_ListenThread6.Start();
+		if (m_ListenThread4.Initialize(cSocket::IPv4, Ports4))
+		{
+			HasAnyPorts = true;
+			m_ListenThread4.Start();
+		}
+		AString Ports6 = a_IniFile.GetValueSet("RCON", "PortsIPv6", "25575");
+		if (m_ListenThread6.Initialize(cSocket::IPv6, Ports6))
+		{
+			HasAnyPorts = true;
+			m_ListenThread6.Start();
+		}
 	}
 	if (!HasAnyPorts)
 	{

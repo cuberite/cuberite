@@ -143,7 +143,9 @@ bool cHTTPServer::Initialize(bool a_DualStack, const AString & a_PortsIPv4, cons
 	if (a_DualStack)
 	{
 		HasAnyPort = m_ListenThreadIPv4.Initialize(cSocket::IPDual, a_PortsIPv4);
-	} else {
+	}
+	else
+	{
 		HasAnyPort = m_ListenThreadIPv4.Initialize(cSocket::IPv4, a_PortsIPv4);
 		HasAnyPort = m_ListenThreadIPv6.Initialize(cSocket::IPv6, a_PortsIPv6) || HasAnyPort;
 	}
