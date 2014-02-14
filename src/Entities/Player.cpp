@@ -1053,6 +1053,15 @@ void cPlayer::CloseWindowIfID(char a_WindowID, bool a_CanRefuse)
 
 
 
+void cPlayer::PlaySoundEffect(const AString & a_SoundName, float a_Volume, float a_Pitch)
+{
+	m_ClientHandle->SendSoundEffect(a_SoundName, (int) (GetPosX() * 8.0), (int) (GetPosY() * 8.0), (int) (GetPosZ() * 8.0), a_Volume, a_Pitch);
+}
+
+
+
+
+
 void cPlayer::SetLastBlockActionTime()
 {
 	if (m_World != NULL)

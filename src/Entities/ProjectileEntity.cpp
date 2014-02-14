@@ -12,6 +12,8 @@
 #include "../ChunkMap.h"
 #include "../Chunk.h"
 
+#include <math.h>
+
 
 
 
@@ -680,6 +682,7 @@ super(pkExpBottle, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 void cExpBottleEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	// Spawn an experience orb with a reward between 3 and 11.
+	m_World->BroadcastSoundParticleEffect(2002, (int) round(GetPosX()), (int) round(GetPosY()), (int) round(GetPosZ()), 0);
 	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), 3 + m_World->GetTickRandomNumber(8));
 
 	Destroy();
