@@ -476,7 +476,7 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (cRoot::Get()->GetServer()->IsHardcore() ? 0x08 : 0)); // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteByte(cRoot::Get()->GetServer()->GetMaxPlayers());
+		Pkt.WriteByte(std::min(cRoot::Get()->GetServer()->GetMaxPlayers(), 60));
 		Pkt.WriteString("default");  // Level type - wtf?
 	}
 	
