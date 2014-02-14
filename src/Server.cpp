@@ -103,8 +103,8 @@ void cServer::cTickThread::Execute(void)
 // cServer:
 
 cServer::cServer(void) :
-	m_ListenThreadIPv4(*this, "Client IPv4"),
-	m_ListenThreadIPv6(*this, "Client IPv6"),
+	m_ListenThreadIPv4(*this, "Client"),
+	m_ListenThreadIPv6(*this, "Client"),
 	m_bIsConnected(false),
 	m_bRestarting(false),
 	m_RCONServer(*this),
