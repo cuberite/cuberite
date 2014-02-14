@@ -171,6 +171,8 @@ public:
 	void SetLastBlockActionCnt( int );
 	void SetLastBlockActionTime();
 	
+	bool CanHarvestBlock(BLOCKTYPE a_OldBlock);
+	
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
