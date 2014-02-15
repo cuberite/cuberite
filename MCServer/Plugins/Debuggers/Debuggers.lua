@@ -54,6 +54,7 @@ function Initialize(Plugin)
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
+	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings")
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -1189,6 +1190,28 @@ function HandleChunkStay(a_Split, a_Player)
 	
 	-- Process the ChunkStay:
 	World:ChunkStay(Chunks, OnChunkAvailable, OnAllChunksAvailable)
+	return true
+end
+
+
+
+
+
+function HandleCompo(a_Split, a_Player)
+	-- Send one composite message to self:
+	local msg = cCompositeChat()
+	msg:AddTextPart("Hello! ", "b@e")  -- bold yellow
+	msg:AddUrlPart("MCServer", "http://mc-server.org")
+	msg:AddTextPart(" rules! ")
+	msg:AddRunCommandPart("Set morning", "/time set 0")
+	a_Player:SendMessage(msg)
+	
+	-- Broadcast another one to the world:
+	local msg2 = cCompositeChat()
+	msg2:AddSuggestCommandPart(a_Player:GetName(), "/tell " .. a_Player:GetName() .. " ")
+	msg2:AddTextPart(" knows how to use cCompositeChat!");
+	a_Player:GetWorld():BroadcastChat(msg2)
+	
 	return true
 end
 
