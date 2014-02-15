@@ -46,6 +46,7 @@ class cDispenserEntity;
 class cFurnaceEntity;
 class cNoteEntity;
 class cMobCensus;
+class cCompositeChat;
 
 typedef std::list< cPlayer * > cPlayerList;
 
@@ -167,7 +168,7 @@ public:
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 
-	void LoopPlayersAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const cClientHandle * a_Exclude = NULL);
+	void LoopPlayersAndBroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix, const cClientHandle * a_Exclude = NULL);
 	void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtDeath, a_Exclude); }
 
 	// tolua_begin
@@ -177,6 +178,7 @@ public:
 	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtSuccess, a_Exclude); }
 	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtWarning, a_Exclude); }
 	void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtFailure, a_Exclude); }
+	void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = NULL);
 	// tolua_end
 
 	void BroadcastChunkData          (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);

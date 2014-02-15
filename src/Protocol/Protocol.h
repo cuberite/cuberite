@@ -28,6 +28,7 @@ class cWorld;
 class cMonster;
 class cChunkDataSerializer;
 class cFallingBlock;
+class cCompositeChat;
 
 
 
@@ -58,6 +59,7 @@ public:
 	virtual void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
 	virtual void SendChat                (const AString & a_Message) = 0;
+	virtual void SendChat                (const cCompositeChat & a_Message) = 0;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
 	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) = 0;

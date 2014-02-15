@@ -31,6 +31,7 @@
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
+#include "CompositeChat.h"
 
 
 
@@ -1729,7 +1730,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
-void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData)
+void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	bool ShouldAppendChatPrefixes = true;
 
@@ -1834,6 +1835,15 @@ void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPr
 	Message.append(a_Message);
 
 	m_Protocol->SendChat(Message);
+}
+
+
+
+
+
+void cClientHandle::SendChat(const cCompositeChat & a_Message)
+{
+	m_Protocol->SendChat(a_Message);
 }
 
 

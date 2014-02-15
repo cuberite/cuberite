@@ -20,7 +20,8 @@ class cPluginManager;
 class cServer;
 class cWorld;
 class cPlayer;
-class cCommandOutputCallback ;
+class cCommandOutputCallback;
+class cCompositeChat;
 
 typedef cItemCallback<cPlayer> cPlayerListCallback;
 typedef cItemCallback<cWorld>  cWorldListCallback;
@@ -108,7 +109,7 @@ public:
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 
-	void LoopWorldsAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix);
+	void LoopWorldsAndBroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix);
 	void BroadcastChatJoin   (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtJoin); }
 	void BroadcastChatLeave  (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtLeave); }
 	void BroadcastChatDeath  (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtDeath); }
@@ -122,6 +123,7 @@ public:
 	void BroadcastChatSuccess(const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtSuccess); }
 	void BroadcastChatWarning(const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtWarning); }
 	void BroadcastChatFatal  (const AString & a_Message) { LoopWorldsAndBroadcastChat(a_Message, mtFailure); }
+	void BroadcastChat       (const cCompositeChat & a_Message);
 	
 	/// Returns the textual description of the protocol version: 49 -> "1.4.4". Provided specifically for Lua API
 	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);

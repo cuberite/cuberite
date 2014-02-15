@@ -441,7 +441,10 @@ inline float GetSpecialSignf( float a_Val )
 
 
 
-enum ChatPrefixCodes
+
+// tolua_begin
+
+enum eMessageType
 {
 	// http://forum.mc-server.org/showthread.php?tid=1212
 	// MessageType...
@@ -458,7 +461,9 @@ enum ChatPrefixCodes
 	mtLeave, // A player has left the server
 };
 
-// tolua_begin
+
+
+
 
 /** Normalizes an angle in degrees to the [-180, +180) range: */
 inline double NormalizeAngleDegrees(const double a_Degrees)

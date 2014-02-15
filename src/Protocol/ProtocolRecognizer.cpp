@@ -159,6 +159,16 @@ void cProtocolRecognizer::SendChat(const AString & a_Message)
 
 
 
+void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendChat(a_Message);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	ASSERT(m_Protocol != NULL);
