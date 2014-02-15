@@ -31,7 +31,7 @@ cIncrementalRedstoneSimulator::~cIncrementalRedstoneSimulator()
 
 
 
-void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
+void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk, cChunk * a_OtherChunk)
 {
 	if ((a_Chunk == NULL) || !a_Chunk->IsValid())
 	{
@@ -42,12 +42,27 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 		return;
 	}
 
-	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
-	
+	// We may be called with coordinates in a chunk that is not the first chunk parameter
+	// In that case, the actual chunk (which the coordinates are in), will be passed as the second parameter
+	// Use that Chunk pointer to get a relative position
+
+	int RelX = 0;
+	int RelZ = 0;	
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	a_Chunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
+
+	if (a_OtherChunk != NULL)
+	{
+		RelX = a_BlockX - a_OtherChunk->GetPosX() * cChunkDef::Width;
+		RelZ = a_BlockZ - a_OtherChunk->GetPosZ() * cChunkDef::Width;
+		a_OtherChunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
+	}
+	else
+	{
+		RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
+		RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
+		a_Chunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
+	}
 
 	// Every time a block is changed (AddBlock called), we want to go through all lists and check to see if the coordiantes stored within are still valid
 	// Checking only when a block is changed, as opposed to every tick, also improves performance
@@ -63,7 +78,7 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 		if (!IsPotentialSource(Block))
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list as it no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			&(*PoweredBlocks).erase(itr);
+			PoweredBlocks->erase(itr);
 			break;
 		}
 		else if (
@@ -76,7 +91,7 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 			)
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			&(*PoweredBlocks).erase(itr);
+			PoweredBlocks->erase(itr);
 			break;
 		}
 		else if (Block == E_BLOCK_DAYLIGHT_SENSOR)
@@ -94,7 +109,7 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 				if (a_Chunk->GetTimeAlteredLight(SkyLight) <= 8) // Could use SkyLight - m_World.GetSkyDarkness();
 				{
 					LOGD("cIncrementalRedstoneSimulator: Erased daylight sensor from powered blocks list due to insufficient light level");
-					&(*PoweredBlocks).erase(itr);
+					PoweredBlocks->erase(itr);
 					break;
 				}
 			}
@@ -102,15 +117,16 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 	}
 
 	LinkedBlocksList * LinkedPoweredBlocks = a_Chunk->GetRedstoneSimulatorLinkedBlocksList();
-	for (LinkedBlocksList::iterator itr = LinkedPoweredBlocks->begin(); itr != LinkedPoweredBlocks->end(); ++itr)
+	// We loop through all values (insteading of breaking out at the first) to make sure everything is gone, as there can be multiple SourceBlock entries for one AddBlock coordinate
+	for (LinkedBlocksList::iterator itr = LinkedPoweredBlocks->begin(); itr != LinkedPoweredBlocks->end();)
 	{
 		if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			if (!IsPotentialSource(Block))
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				&(*LinkedPoweredBlocks).erase(itr);
-				break;
+				itr = LinkedPoweredBlocks->erase(itr);
+				continue;
 			}
 			else if (
 				// Things that can send power through a block but which depends on meta
@@ -120,8 +136,8 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 				)
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				&(*LinkedPoweredBlocks).erase(itr);
-				break;
+				itr = LinkedPoweredBlocks->erase(itr);
+				continue;
 			}
 		}
 		else if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
@@ -129,13 +145,14 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 			if (!IsViableMiddleBlock(Block))
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer powered through a valid middle block", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				&(*LinkedPoweredBlocks).erase(itr);
-				break;
+				itr = LinkedPoweredBlocks->erase(itr);
+				continue;
 			}
 		}
+		++itr;
 	}
 
-	 SimulatedPlayerToggleableList * SimulatedPlayerToggleableBlocks = a_Chunk->GetRedstoneSimulatorSimulatedPlayerToggleableList();
+	SimulatedPlayerToggleableList * SimulatedPlayerToggleableBlocks = a_Chunk->GetRedstoneSimulatorSimulatedPlayerToggleableList();
 	for (SimulatedPlayerToggleableList::iterator itr = SimulatedPlayerToggleableBlocks->begin(); itr != SimulatedPlayerToggleableBlocks->end(); ++itr)
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
@@ -146,7 +163,7 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 		if (!IsAllowedBlock(Block))
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from toggleable simulated list as it is no longer redstone", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			&(*SimulatedPlayerToggleableBlocks).erase(itr);
+			SimulatedPlayerToggleableBlocks->erase(itr);
 			break;
 		}
 	}
@@ -161,7 +178,7 @@ void cIncrementalRedstoneSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_B
 
 		if ((Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF))
 		{
-			&(*RepeatersDelayList).erase(itr);
+			RepeatersDelayList->erase(itr);
 			break;
 		}
 	}
@@ -313,10 +330,12 @@ void cIncrementalRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_Blo
 	{
 		// On a chunk boundary, alert all four sides (i.e. at least one neighbouring chunk)
 		AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk);
-		AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX - 1, a_BlockZ));
-		AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX + 1, a_BlockZ));
-		AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ - 1));
-		AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ + 1));
+		// Pass the original coordinates, because when adding things to our simulator lists, we get the chunk that they are in, and therefore any updates need to preseve their position
+		// RedstoneAddBlock to pass both the neighbouring chunk and the chunk which the coordiantes are in
+		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX - 1, a_BlockZ), a_Chunk);
+		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX + 1, a_BlockZ), a_Chunk);
+		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ - 1), a_Chunk);
+		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ + 1), a_Chunk);
 		return;
 	}
 
