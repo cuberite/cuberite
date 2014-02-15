@@ -1122,8 +1122,9 @@ void cPlayer::SetIP(const AString & a_IP)
 
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	SetPosition( a_PosX, a_PosY, a_PosZ );
+	SetPosition(a_PosX, a_PosY, a_PosZ);
 	m_LastGroundHeight = (float)a_PosY;
+	m_LastJumpHeight = (float)a_PosY;
 
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
 	m_ClientHandle->SendPlayerMoveLook();

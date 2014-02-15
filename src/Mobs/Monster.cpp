@@ -311,9 +311,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (ReachedFinalDestination() && (m_Target != NULL))
-		Attack(a_Dt);
-
 	SetPitchAndYawFromDestination();
 	HandleFalling();
 
@@ -651,17 +648,6 @@ void cMonster::InStateEscaping(float a_Dt)
 	{
 		m_EMState = IDLE;  // This shouldnt be required but just to be safe
 	}
-}
-
-
-
-
-
-// Do attack here
-// a_Dt is passed so we can set attack rate
-void cMonster::Attack(float a_Dt)
-{
-	m_AttackInterval += a_Dt * m_AttackRate;
 }
 
 

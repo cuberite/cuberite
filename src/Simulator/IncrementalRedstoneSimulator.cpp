@@ -960,7 +960,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
 					float Distance = (EntityPos - BlockPos).Length();
 
-					if (Distance < 0.5)
+					if (Distance <= 0.7)
 					{
 						m_Entity = a_Entity;
 						return true; // Break out, we only need to know for wooden plates that at least one entity is on top

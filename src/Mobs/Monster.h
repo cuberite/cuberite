@@ -112,8 +112,6 @@ public:
 	virtual void InStateChasing (float a_Dt);
 	virtual void InStateEscaping(float a_Dt);
 	
-	virtual void Attack(float a_Dt);
-	
 	int GetAttackRate() { return (int)m_AttackRate; }
 	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
 	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }

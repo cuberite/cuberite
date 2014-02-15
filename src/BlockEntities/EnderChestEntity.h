@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-#include "../UI/WindowOwner.h"
 
 
 
@@ -23,8 +22,7 @@ class cNBTData;
 
 // tolua_begin
 class cEnderChestEntity :
-	public cBlockEntityWithItems,
-	public cBlockEntityWindowOwner
+	public cBlockEntityWithItems
 {
 	typedef cBlockEntityWithItems super;
 	
