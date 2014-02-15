@@ -153,7 +153,9 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 			#if defined(_WIN32)
 			if (!IsWindowsVistaOrLater()) {
 				LOGWARNING("Dual Stack requires windows Vista or greater, server will only be accessable by IPv6");
-			} else {
+			}
+			else
+			{
 			#endif
 			#if defined(_WIN32) || defined(ANDROID_NDK)
 				char no = 0;
