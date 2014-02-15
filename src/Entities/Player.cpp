@@ -839,6 +839,12 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	cItems Pickups;
 	m_Inventory.CopyToItems(Pickups);
 	m_Inventory.Clear();
+
+	if (GetName() == "Notch")
+	{
+		Pickups.Add(cItem(E_ITEM_RED_APPLE));
+	}
+
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
