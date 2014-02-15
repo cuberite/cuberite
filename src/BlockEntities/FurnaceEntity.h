@@ -98,6 +98,8 @@ public:
 	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned) {m_FuelBurnTime = a_FuelBurnTime; m_TimeBurned = a_TimeBurned; }
 	void SetCookTimes(int a_NeedCookTime, int a_TimeCooked) {m_NeedCookTime = a_NeedCookTime; m_TimeCooked = a_TimeCooked; }
 	
+	void GiveExperience(int Blocks);
+	
 protected:
 
 	/// Block type of the block currently represented by this entity (changes when furnace lights up)
@@ -113,6 +115,8 @@ protected:
 	cItem m_LastInput;
 	
 	bool m_IsCooking;  ///< Set to true if the furnace is cooking an item
+	
+	float m_OutputExperience;
 	
 	// All timers are in ticks
 	int m_NeedCookTime;  ///< Amount of time needed to fully cook current item

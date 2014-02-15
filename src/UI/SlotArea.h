@@ -38,6 +38,8 @@ public:
 	/// Called to set an item in the specified slot for the specified player
 	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) = 0;
 	
+	virtual bool CanPlaceItem(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem);
+	
 	/// Called when a player clicks in the window. Parameters taken from the click packet.
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem);
 	
@@ -315,6 +317,7 @@ public:
 	
 	virtual ~cSlotAreaFurnace();
 	
+	virtual bool          CanPlaceItem(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem) override;
 	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;

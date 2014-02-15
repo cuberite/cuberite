@@ -859,6 +859,7 @@ public:
 		g_BlockIsSnowable[E_BLOCK_ACTIVATOR_RAIL]        = false;
 		g_BlockIsSnowable[E_BLOCK_POWERED_RAIL]          = false;
 		g_BlockIsSnowable[E_BLOCK_DETECTOR_RAIL]         = false;
+		g_BlockIsSnowable[E_BLOCK_COBWEB]                = false;
 		
 
 		// Blocks that don't drop without a special tool:

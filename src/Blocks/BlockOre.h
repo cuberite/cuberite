@@ -60,6 +60,9 @@ public:
 				ItemType = E_ITEM_REDSTONE_DUST;
 				break;
 			}
+			case E_BLOCK_NETHER_QUARTZ_ORE:
+				ItemType = E_ITEM_NETHER_QUARTZ;
+				break;
 			case E_BLOCK_EMERALD_ORE:
 			{
 				ItemType = E_ITEM_EMERALD;
@@ -72,6 +75,26 @@ public:
 			}
 		}
 		a_Pickups.push_back(cItem(ItemType, Count, Meta));
+	}
+	
+	virtual int GetExpDrop(void) override
+	{
+		MTRand r1;
+		switch (m_BlockType)
+		{
+			case E_BLOCK_COAL_ORE:
+				return (char)r1.randInt(1) * 2;
+			case E_BLOCK_DIAMOND_ORE:
+				return (char)r1.randInt(1) * 4 + 3;
+			case E_BLOCK_EMERALD_ORE:
+				return (char)r1.randInt(1) * 4 + 3;
+			case E_BLOCK_LAPIS_ORE:
+				return (char)r1.randInt(1) * 3 + 2;
+			case E_BLOCK_NETHER_QUARTZ_ORE:
+				return (char)r1.randInt(1) * 3 + 2;
+			default:
+				return 0;
+		}
 	}
 } ;
 
