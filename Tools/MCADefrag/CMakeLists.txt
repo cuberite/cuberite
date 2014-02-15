@@ -3,60 +3,13 @@ cmake_minimum_required (VERSION 2.6)
 
 project (MCADefrag)
 
+# Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
+enable_language(CXX C)
 
-
-macro(add_flags_cxx FLAGS)
-	set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}         ${FLAGS}")
-	set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}           ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   ${FLAGS}")
-	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FLAGS}")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   ${FLAGS}")
-endmacro()
-
-
-
-
-# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
-if (NOT MSVC)
-	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG")
-	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -D_DEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -DNDEBUG")
-endif()
-
-
-
-if(MSVC)
-	# Make build use multiple threads under MSVC:
-	add_flags_cxx("/MP")
-
-	# Make release builds use link-time code generation:
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   /GL")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE    "${CMAKE_EXE_LINKER_FLAGS_RELEASE}    /LTCG")
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
-	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /LTCG")
-elseif(APPLE)
-	#on os x clang adds pthread for us but we need to add it for gcc
-	if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		add_flags_cxx("-pthread")
-	endif()
-else()
-	# Let gcc / clang know that we're compiling a multi-threaded app:
-	add_flags_cxx("-pthread")
-endif()
-
-
-
-
-# Use static CRT in MSVC builds:
-if (MSVC)
-	string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-	string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
-	string(REPLACE "/MDd" "/MTd" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
-	string(REPLACE "/MDd" "/MTd" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
-endif()
+include(../../SetFlags.cmake)
+set_flags()
+set_lib_flags()
+enable_profile()
 
 
 
@@ -78,12 +31,16 @@ endfunction()
 
 
 # Include the libraries:
+if(NOT DEFINED ${ZLIB})
 file(GLOB ZLIB_SRC "../../lib/zlib/*.c")
 file(GLOB ZLIB_HDR "../../lib/zlib/*.h")
 flatten_files(ZLIB_SRC)
 flatten_files(ZLIB_HDR)
 source_group("ZLib" FILES ${ZLIB_SRC} ${ZLIB_HDR})
+set(ZLIB 1)
+endif()
 
+set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
@@ -98,6 +55,10 @@ set(SHARED_HDR
 	../../src/Log.h
 	../../src/MCLogger.h
 )
+flatten_files(SHARED_SRC)
+flatten_files(SHARED_HDR)
+source_group("Shared" FILES ${SHARED_SRC} ${SHARED_HDR})
+
 set(SHARED_OSS_SRC
 	../../src/OSSupport/CriticalSection.cpp
 	../../src/OSSupport/File.cpp
@@ -110,11 +71,10 @@ set(SHARED_OSS_HDR
 	../../src/OSSupport/IsThread.h
 	../../src/OSSupport/Timer.h
 )
-flatten_files(SHARED_SRC)
-flatten_files(SHARED_HDR)
+
 flatten_files(SHARED_OSS_SRC)
 flatten_files(SHARED_OSS_HDR)
-source_group("Shared" FILES ${SHARED_SRC} ${SHARED_HDR})
+
 source_group("Shared\\OSSupport" FILES ${SHARED_OSS_SRC} ${SHARED_OSS_HDR})
 
 
