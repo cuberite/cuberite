@@ -739,6 +739,41 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 
 
+float cClientHandle::GetBlockDigSpeed(BLOCKTYPE a_Block)
+{
+	float f = g_BlockDigTime[a_Block];
+	float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_Block);
+	
+	if (a > 1.0F && !m_Player->GetInventory().GetEquippedItem().IsEmpty())
+	{
+		cEnchantments Enchantments = m_Player->GetInventory().GetEquippedItem().m_Enchantments;
+		int Level = Enchantments.GetLevel(Enchantments.enchEfficiency);
+		if (Level > 0)
+		{
+			//TODO: Look in the next Minecraft Server Version (1.8) for Bug Fix. EntityHuman.java: public float a(Block block, boolean flag);
+			float a1 = Level * Level + 1;
+			a += a1;
+		}
+	}
+	
+	if (m_Player->IsSwimming())
+		a /= 0.5;
+	if (!m_Player->IsOnGround())
+		a /= 0.5;
+	
+	float speed;
+	if (!m_Player->CanHarvestBlock(a_Block))
+		speed = a / f / 100.0F;
+	else
+		speed = f < 0.0F ? 0.0F : a / f / 30.0F;
+	
+	return speed * m_BlockDigTick;
+}
+
+
+
+
+
 void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
 	if (
@@ -760,24 +795,12 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	
 	// Set the last digging coords to the block being dug, so that they can be checked in DIG_FINISHED to avoid dig/aim bug in the client:
 	m_HasStartedDigging = true;
+	m_BlockDigTick = 1;
 	m_LastDigBlockX = a_BlockX;
 	m_LastDigBlockY = a_BlockY;
 	m_LastDigBlockZ = a_BlockZ;
 
-	float speed;
-	{
-		float f = g_BlockDigTime[a_OldBlock];
-		float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_OldBlock);
-		if (m_Player->IsSwimming())
-			a /= 0.5;
-		if (!m_Player->IsOnGround())
-			a /= 0.5;
-		
-		if (!m_Player->CanHarvestBlock(a_OldBlock))
-			speed =  a / f / 100.0F;
-		else
-			speed = f < 0.0F ? 0.0F : a / f / 30.0F;
-	}
+	float speed = GetBlockDigSpeed(a_OldBlock);
 
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
@@ -796,7 +819,6 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	// Start dig animation
 	// TODO: Send animation packets even without receiving any other packets
-	m_BlockDigTick = 1;
 	m_BlockDigAnimStage = (int) (speed * 10.0F);
 	m_BlockDigAnimX = a_BlockX;
 	m_BlockDigAnimY = a_BlockY;
@@ -853,19 +875,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	if (!m_Player->IsGameModeCreative() && g_BlockDigTime[a_OldBlock] != 0.0F)
 	{
-		float speed;
-		
-		float f = g_BlockDigTime[a_OldBlock];
-		float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_OldBlock);
-		if (m_Player->IsSwimming())
-			a /= 0.5;
-		if (!m_Player->IsOnGround())
-			a /= 0.5;
-		
-		if (!m_Player->CanHarvestBlock(a_OldBlock))
-			speed = (a / f / 100.0F) * m_BlockDigTick;
-		else
-			speed = (f < 0.0F ? 0.0F : a / f / 30.0F) * m_BlockDigTick;
+		float speed = GetBlockDigSpeed(a_OldBlock);
 		
 		if (speed < 0.7F)
 		{
@@ -950,7 +960,7 @@ void cClientHandle::HandleBlockDigStop()
 	m_BlockDigAnimX = -1;
 	m_BlockDigAnimY = -1;
 	m_BlockDigAnimZ = -1;
-	m_BlockDigTick = -1;
+	m_BlockDigTick = 0;
 }
 
 
@@ -1769,38 +1779,14 @@ void cClientHandle::Tick(float a_Dt)
 	{
 		++m_BlockDigTick;
 		
-		float speed;
-		{
-			BLOCKTYPE a_OldBlock = m_Player->GetWorld()->GetBlock(m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ);
-			float f = g_BlockDigTime[a_OldBlock];
-			float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_OldBlock);
-			if (m_Player->IsSwimming())
-				a /= 0.5;
-			if (!m_Player->IsOnGround())
-				a /= 0.5;
-		
-			if (!m_Player->CanHarvestBlock(a_OldBlock))
-				speed = (a / f / 100.0F) * m_BlockDigTick;
-			else
-				speed = (f < 0.0F ? 0.0F : a / f / 30.0F) * m_BlockDigTick;
-		}
+		BLOCKTYPE a_OldBlock = m_Player->GetWorld()->GetBlock(m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ);
+		float speed = GetBlockDigSpeed(a_OldBlock);
 		int i = (int) (speed * 10.0F);
 		if (i != m_BlockDigAnimStage)
 		{
 			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, i, this);
 			m_BlockDigAnimStage = i;
 		}
-		
-		/*int lastAnimVal = m_BlockDigAnimStage;
-		m_BlockDigAnimStage += (int)(m_BlockDigAnimSpeed * a_Dt);
-		if (m_BlockDigAnimStage > 9000)
-		{
-			m_BlockDigAnimStage = 9000;
-		}
-		if (m_BlockDigAnimStage / 1000 != lastAnimVal / 1000)
-		{
-			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, (char)(m_BlockDigAnimStage / 1000), this);
-		}*/
 	}
 	
 	// Reset explosion counter:
