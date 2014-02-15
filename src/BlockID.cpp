@@ -708,7 +708,7 @@ public:
 		g_BlockDigTime[E_BLOCK_MELON]                   = 1.0F;
 		g_BlockDigTime[E_BLOCK_PUMPKIN_STEM]            = 0.0F;
 		g_BlockDigTime[E_BLOCK_MELON_STEM]              = 0.0F;
-		g_BlockDigTime[E_BLOCK_VINES]                   = 0.2F;
+		g_BlockDigTime[E_BLOCK_VINES]                   = 0.1F;
 		g_BlockDigTime[E_BLOCK_FENCE_GATE]              = 2.0F;
 		g_BlockDigTime[E_BLOCK_BRICK_STAIRS]            = 2.0F;
 		g_BlockDigTime[E_BLOCK_STONE_BRICK_STAIRS]      = 1.5F;
