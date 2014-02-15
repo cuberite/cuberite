@@ -168,16 +168,14 @@ public:
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 
-	void LoopPlayersAndBroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix, const cClientHandle * a_Exclude = NULL);
-	void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtDeath, a_Exclude); }
-
 	// tolua_begin
-	void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtCustom, a_Exclude); }
-	void BroadcastChatInfo   (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtInformation, a_Exclude); }
-	void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtFailure, a_Exclude); }
-	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtSuccess, a_Exclude); }
-	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtWarning, a_Exclude); }
-	void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtFailure, a_Exclude); }
+	void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = NULL, eMessageType a_ChatPrefix = mtCustom);
+	void BroadcastChatInfo   (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtInformation); }
+	void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtFailure); }
+	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtSuccess); }
+	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtWarning); }
+	void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtFailure); }
+	void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtDeath); }
 	void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = NULL);
 	// tolua_end
 

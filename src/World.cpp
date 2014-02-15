@@ -1747,7 +1747,7 @@ void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 
 
-void cWorld::LoopPlayersAndBroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix, const cClientHandle * a_Exclude)
+void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)

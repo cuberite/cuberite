@@ -543,11 +543,11 @@ void cRoot::ReloadGroups(void)
 
 
 
-void cRoot::LoopWorldsAndBroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
+void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
 	{
-		itr->second->LoopPlayersAndBroadcastChat(a_Message, a_ChatPrefix);
+		itr->second->BroadcastChat(a_Message, NULL, a_ChatPrefix);
 	}  // for itr - m_WorldsByName[]
 }
 
