@@ -4,8 +4,6 @@
 #include "Player.h"
 #include "../ClientHandle.h"
 
-#include <ctime>
-
 
 cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward) :
 	cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98),
@@ -54,10 +52,9 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
 			a_ClosestPlayer->DeltaExperience(m_Reward);
 			
-			srand (static_cast <unsigned> (time(0)));
-			float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);  // Random Float Value (Java: random.nextFloat())
-			float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);  // Random Float Value (Java: random.nextFloat())
-			a_ClosestPlayer->PlaySoundEffect("random.orb", 0.1F, 0.5F * ((r1 - r2) * 0.7F + 1.8F));
+			float r1 = (float) (0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64);  // Random Float Value
+			float r2 = (float) (0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64);  // Random Float Value
+			m_World->BroadcastSoundEffect("random.orb", (int) (GetPosX() * 8.0F), (int) (GetPosY() * 8.0F), (int) (GetPosZ() * 8.0F), 0.1F, 0.5F * ((r1 - r2) * 0.7F + 1.8F));
 			
 			Destroy(true);
 		}
