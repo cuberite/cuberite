@@ -19,18 +19,18 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
 	--]]
 	
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
-	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
-	cPluginManager:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
-	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
-	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
-	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
+	local PM = cPluginManager;
+	PM:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
+	PM:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
+	PM:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
+	PM:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
+	PM:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
+	PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
+	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 
-	PM = cRoot:Get():GetPluginManager();
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -55,7 +55,8 @@ function Initialize(Plugin)
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
 
-	Plugin:AddWebTab("Debuggers", HandleRequest_Debuggers);
+	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
+	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -1032,6 +1033,68 @@ end
 function HandleRequest_Debuggers(a_Request)
 	local FolderContents = cFile:GetFolderContents("./");
 	return "<p>The following objects have been returned by cFile:GetFolderContents():<ul><li>" .. table.concat(FolderContents, "</li><li>") .. "</li></ul></p>";
+end
+
+
+
+
+
+local g_Counter = 0
+local g_JavaScript =
+[[
+<script>
+function createXHR()
+{
+	var request = false;
+	try {
+		request = new ActiveXObject('Msxml2.XMLHTTP');
+	}
+	catch (err2)
+	{
+		try
+		{
+			request = new ActiveXObject('Microsoft.XMLHTTP');
+		}
+		catch (err3)
+		{
+			try
+			{
+				request = new XMLHttpRequest();
+			}
+			catch (err1)
+			{
+				request = false;
+			}
+		}
+	}
+	return request;
+}
+
+function RefreshCounter()
+{
+	var xhr = createXHR();
+	xhr.onreadystatechange = function()
+	{
+		if (xhr.readyState == 4)
+		{
+			document.getElementById("cnt").innerHTML = xhr.responseText;
+		}
+	};
+	xhr.open("POST", "/~webadmin/Debuggers/StressTest", true);
+	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xhr.send("counter=true");
+}
+
+setInterval(RefreshCounter, 10)
+</script>
+]]
+
+function HandleRequest_StressTest(a_Request)
+	if (a_Request.PostParams["counter"]) then
+		g_Counter = g_Counter + 1
+		return tostring(g_Counter)
+	end
+	return g_JavaScript .. "<p>The counter below should be reloading as fast as possible</p><div id='cnt'>0</div>"
 end
 
 
