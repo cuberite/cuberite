@@ -1053,6 +1053,15 @@ void cPlayer::CloseWindowIfID(char a_WindowID, bool a_CanRefuse)
 
 
 
+void cPlayer::PlaySoundEffect(const AString & a_SoundName, float a_Volume, float a_Pitch)
+{
+	m_ClientHandle->SendSoundEffect(a_SoundName, (int) (GetPosX() * 8.0), (int) (GetPosY() * 8.0), (int) (GetPosZ() * 8.0), a_Volume, a_Pitch);
+}
+
+
+
+
+
 void cPlayer::SetLastBlockActionTime()
 {
 	if (m_World != NULL)
@@ -1068,6 +1077,19 @@ void cPlayer::SetLastBlockActionTime()
 void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 {
 	m_LastBlockActionCnt = a_LastBlockActionCnt;
+}
+
+
+
+
+
+bool cPlayer::CanHarvestBlock(BLOCKTYPE a_OldBlock)
+{
+	if (!g_BlockRequiresSpecialTool[a_OldBlock])
+	{
+		return true;
+	}
+	return m_Inventory.GetEquippedItem().GetHandler()->CanHarvestBlock(a_OldBlock);
 }
 
 
@@ -1758,6 +1780,12 @@ void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
 	
+	if (IsGameModeCreative())
+	{
+		// Hunger is disabled for Creative
+		return;
+	}
+	
 	// Remember the food level before processing, for later comparison
 	int LastFoodLevel = m_FoodLevel;
 	
@@ -1775,7 +1803,7 @@ void cPlayer::HandleFood(void)
 				Heal(1);
 				m_FoodExhaustionLevel += 3;
 			}
-			else if (m_FoodLevel <= 0)
+			else if (m_FoodLevel <= 0 && m_Health > 1)
 			{
 				// Damage from starving
 				TakeDamage(dtStarving, NULL, 1, 1, 0);

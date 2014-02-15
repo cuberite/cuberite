@@ -476,7 +476,7 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (cRoot::Get()->GetServer()->IsHardcore() ? 0x08 : 0)); // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteByte(cRoot::Get()->GetServer()->GetMaxPlayers());
+		Pkt.WriteByte(std::min(cRoot::Get()->GetServer()->GetMaxPlayers(), 60));
 		Pkt.WriteString("default");  // Level type - wtf?
 	}
 	
@@ -1424,12 +1424,24 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 
 void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 {
+	if (!m_Client->GetUsername().empty())
+	{
+		m_Client->Kick("The Login Start Packet was already sent!");
+		return;
+	}
 	AString Username;
 	a_ByteBuffer.ReadVarUTF8String(Username);
 	
 	if (!m_Client->HandleHandshake(Username))
 	{
 		// The client is not welcome here, they have been sent a Kick packet already
+		return;
+	}
+	
+	//Check Player Name and Online Status
+	if (Username.size() > 16 || Username.empty())
+	{
+		m_Client->Kick("Your Username is too long or empty.");
 		return;
 	}
 	

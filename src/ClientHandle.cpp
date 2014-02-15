@@ -27,7 +27,7 @@
 
 #include "Root.h"
 
-#include "Authenticator.h"
+#include "Protocol/Authenticator.h"
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
@@ -198,7 +198,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(void)
+void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 {
 	if (m_State != csAuthenticating)
 	{
@@ -206,6 +206,23 @@ void cClientHandle::Authenticate(void)
 	}
 	
 	ASSERT( m_Player == NULL );
+	
+	if (!cRoot::Get()->GetServer()->IsMultipleLoginEnabled())
+	{
+		class cCallback : public cPlayerListCallback
+		{
+			virtual bool Item (cPlayer * a_pPlayer)
+			{
+				a_pPlayer->GetClientHandle()->Kick("You Logged in From Another Location");
+				return true;
+			}
+		};
+		cCallback Callback;
+		cRoot::Get()->FindAndDoWithPlayer( a_Name, Callback );
+	}
+	
+	m_Username = a_Name;
+	m_UUID = a_UUID;
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());
@@ -695,6 +712,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		case DIG_STATUS_CANCELLED:
 		{
 			// Block breaking cancelled by player
+			HandleBlockDigStop();
 			return;
 		}
 
@@ -734,10 +752,9 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		return;
 	}
 	
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	if (m_Player->GetHealth() <= 0)
 	{
-		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		// The player is dead
 		return;
 	}
 	
@@ -747,23 +764,43 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockY = a_BlockY;
 	m_LastDigBlockZ = a_BlockZ;
 
+	float speed;
+	{
+		float f = g_BlockDigTime[a_OldBlock];
+		float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_OldBlock);
+		if (m_Player->IsSwimming())
+			a /= 0.5;
+		if (!m_Player->IsOnGround())
+			a /= 0.5;
+		
+		if (!m_Player->CanHarvestBlock(a_OldBlock))
+			speed =  a / f / 100.0F;
+		else
+			speed = f < 0.0F ? 0.0F : a / f / 30.0F;
+	}
+
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
-		g_BlockOneHitDig[a_OldBlock]                        // One-hit blocks get destroyed immediately, too
+		g_BlockDigTime[a_OldBlock] == 0.0F   // One-hit blocks get destroyed immediately, too
 	)
 	{
 		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 		return;
 	}
+	
+	//Adventure can't break Blocks
+	if (m_Player->IsGameModeAdventure())
+	{
+		return;
+	}
 
 	// Start dig animation
-	// TODO: calculate real animation speed
 	// TODO: Send animation packets even without receiving any other packets
-	m_BlockDigAnimSpeed = 10;
+	m_BlockDigTick = 1;
+	m_BlockDigAnimStage = (int) (speed * 10.0F);
 	m_BlockDigAnimX = a_BlockX;
 	m_BlockDigAnimY = a_BlockY;
 	m_BlockDigAnimZ = a_BlockZ;
-	m_BlockDigAnimStage = 0;
 	m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 0, this);
 
 	cWorld * World = m_Player->GetWorld();
@@ -809,19 +846,52 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
 			m_HasStartedDigging
 		);
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		HandleBlockDigStop();
 		return;
 	}
 
-	m_HasStartedDigging = false;
-	if (m_BlockDigAnimStage != -1)
+	if (!m_Player->IsGameModeCreative() && g_BlockDigTime[a_OldBlock] != 0.0F)
 	{
-		// End dig animation
-		m_BlockDigAnimStage = -1;
-		// It seems that 10 ends block animation
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
+		float speed;
+		
+		float f = g_BlockDigTime[a_OldBlock];
+		float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_OldBlock);
+		if (m_Player->IsSwimming())
+			a /= 0.5;
+		if (!m_Player->IsOnGround())
+			a /= 0.5;
+		
+		if (!m_Player->CanHarvestBlock(a_OldBlock))
+			speed = (a / f / 100.0F) * m_BlockDigTick;
+		else
+			speed = (f < 0.0F ? 0.0F : a / f / 30.0F) * m_BlockDigTick;
+		
+		if (speed < 0.7F)
+		{
+			LOG("%s breaked a Block too fast!", m_Username.c_str());
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			HandleBlockDigStop();
+			return;
+		}
 	}
-
+	
+	if (m_Player->IsGameModeAdventure() && g_BlockDigTime[a_OldBlock] != 0.0F)
+	{
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		HandleBlockDigStop();
+		return;
+	}
+	
+	HandleBlockDigStop();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+	
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	{
+		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
 	
 	if (a_OldBlock == E_BLOCK_AIR)
 	{
@@ -830,6 +900,15 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	
 	cWorld * World = m_Player->GetWorld();
+	if (
+		(std::max(m_Player->GetPosX(), double(a_BlockX)) - std::min(m_Player->GetPosX(), double(a_BlockX))) >= 6 ||
+		(std::max(m_Player->GetPosY(), double(a_BlockY)) - std::min(m_Player->GetPosY(), double(a_BlockY))) >= 6 ||
+		(std::max(m_Player->GetPosZ(), double(a_BlockZ)) - std::min(m_Player->GetPosZ(), double(a_BlockZ))) >= 6)
+	{
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+	
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -838,6 +917,40 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+}
+
+
+
+
+
+void cClientHandle::HandleBlockDigStop()
+{
+	if (
+		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
+		(m_LastDigBlockX == -1) ||
+		(m_LastDigBlockY == -1) ||
+		(m_LastDigBlockZ == -1)
+	)
+	{
+		return;
+	}
+	
+	m_HasStartedDigging = false;
+	if (m_BlockDigAnimStage != -1)
+	{
+		// End dig animation
+		m_BlockDigAnimStage = -1;
+		// It seems that 10 ends block animation
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
+	}
+	
+	m_LastDigBlockX = -1;
+	m_LastDigBlockY = -1;
+	m_LastDigBlockZ = -1;
+	m_BlockDigAnimX = -1;
+	m_BlockDigAnimY = -1;
+	m_BlockDigAnimZ = -1;
+	m_BlockDigTick = -1;
 }
 
 
@@ -884,6 +997,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+			m_Player->GetInventory().SendSlot(EquippedSlot);
 		}
 		return;
 	}
@@ -1046,6 +1161,19 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Handler refused the placement, send that information back to the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
+		return;
+	}
+	
+	if (
+		(std::max(m_Player->GetPosX(), double(a_BlockX)) - std::min(m_Player->GetPosX(), double(a_BlockX))) >= 6 ||
+		(std::max(m_Player->GetPosY(), double(a_BlockY)) - std::min(m_Player->GetPosY(), double(a_BlockY))) >= 6 ||
+		(std::max(m_Player->GetPosZ(), double(a_BlockZ)) - std::min(m_Player->GetPosZ(), double(a_BlockZ))) >= 6)
+	{
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
 		return;
 	}
 	
@@ -1055,6 +1183,8 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// A plugin doesn't agree with placing the block, revert the block on the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
 		return;
 	}
 	
@@ -1261,6 +1391,15 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 			cPlayer & m_Player;
 			virtual bool Item(cEntity * a_Entity) override
 			{
+				if (
+					std::max(m_Player.GetPosX(), a_Entity->GetPosX()) - std::min(m_Player.GetPosX(), a_Entity->GetPosX()) > 4 ||
+					std::max(m_Player.GetPosY(), a_Entity->GetPosY()) - std::min(m_Player.GetPosY(), a_Entity->GetPosY()) > 4 ||
+					std::max(m_Player.GetPosZ(), a_Entity->GetPosZ()) - std::min(m_Player.GetPosZ(), a_Entity->GetPosZ()) > 4
+				)
+				{
+					return true;
+				}
+				
 				if (cPluginManager::Get()->CallHookPlayerRightClickingEntity(m_Player, *a_Entity))
 				{
 					return false;
@@ -1282,6 +1421,15 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 	{
 		virtual bool Item(cEntity * a_Entity) override
 		{
+			if (
+				std::max(m_Attacker->GetPosX(), a_Entity->GetPosX()) - std::min(m_Attacker->GetPosX(), a_Entity->GetPosX()) > 4 ||
+				std::max(m_Attacker->GetPosY(), a_Entity->GetPosY()) - std::min(m_Attacker->GetPosY(), a_Entity->GetPosY()) > 4 ||
+				std::max(m_Attacker->GetPosZ(), a_Entity->GetPosZ()) - std::min(m_Attacker->GetPosZ(), a_Entity->GetPosZ()) > 4
+			)
+			{
+				return true;
+			}
+		
 			if (!a_Entity->GetWorld()->IsPVPEnabled())
 			{
 				// PVP is disabled, disallow players hurting other players:
@@ -1619,7 +1767,31 @@ void cClientHandle::Tick(float a_Dt)
 	// Handle block break animation:
 	if (m_BlockDigAnimStage > -1)
 	{
-		int lastAnimVal = m_BlockDigAnimStage;
+		++m_BlockDigTick;
+		
+		float speed;
+		{
+			BLOCKTYPE a_OldBlock = m_Player->GetWorld()->GetBlock(m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ);
+			float f = g_BlockDigTime[a_OldBlock];
+			float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_OldBlock);
+			if (m_Player->IsSwimming())
+				a /= 0.5;
+			if (!m_Player->IsOnGround())
+				a /= 0.5;
+		
+			if (!m_Player->CanHarvestBlock(a_OldBlock))
+				speed = (a / f / 100.0F) * m_BlockDigTick;
+			else
+				speed = (f < 0.0F ? 0.0F : a / f / 30.0F) * m_BlockDigTick;
+		}
+		int i = (int) (speed * 10.0F);
+		if (i != m_BlockDigAnimStage)
+		{
+			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, i, this);
+			m_BlockDigAnimStage = i;
+		}
+		
+		/*int lastAnimVal = m_BlockDigAnimStage;
 		m_BlockDigAnimStage += (int)(m_BlockDigAnimSpeed * a_Dt);
 		if (m_BlockDigAnimStage > 9000)
 		{
@@ -1628,7 +1800,7 @@ void cClientHandle::Tick(float a_Dt)
 		if (m_BlockDigAnimStage / 1000 != lastAnimVal / 1000)
 		{
 			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, (char)(m_BlockDigAnimStage / 1000), this);
-		}
+		}*/
 	}
 	
 	// Reset explosion counter:

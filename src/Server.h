@@ -57,7 +57,7 @@ public:												// tolua_export
 	
 	const AString & GetDescription(void) const {return m_Description; }
 
-	// Player counts:
+	// Players:
 	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
 	int  GetNumPlayers(void);
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
@@ -83,9 +83,10 @@ public:												// tolua_export
 	void Shutdown(void);
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
-	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator to auth the specified user
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
+	const bool IsMultipleLoginEnabled(void) const { return m_AllowMultipleLogin; };  // tolua_export
 	
 	/** Called by cClientHandle's destructor; stop m_SocketThreads from calling back into a_Client */
 	void ClientDestroying(const cClientHandle * a_Client);
@@ -199,6 +200,8 @@ private:
 	
 	/** The server ID used for client authentication */
 	AString m_ServerID;
+	
+	bool m_AllowMultipleLogin;
 	
 	/** If true, players will be online-authenticated agains Mojang servers.
 	This setting is the same as the "online-mode" setting in Vanilla. */

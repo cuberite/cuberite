@@ -15,7 +15,7 @@
 NIBBLETYPE g_BlockLightValue[256];
 NIBBLETYPE g_BlockSpreadLightFalloff[256];
 bool       g_BlockTransparent[256];
-bool       g_BlockOneHitDig[256];
+float      g_BlockDigTime[256];
 bool       g_BlockPistonBreakable[256];
 bool       g_BlockIsSnowable[256];
 bool       g_BlockRequiresSpecialTool[256];
@@ -490,22 +490,15 @@ public:
 		memset(g_BlockLightValue,          0x00, sizeof(g_BlockLightValue));
 		memset(g_BlockSpreadLightFalloff,  0x0f, sizeof(g_BlockSpreadLightFalloff)); // 0x0f means total falloff
 		memset(g_BlockTransparent,         0x00, sizeof(g_BlockTransparent));
-		memset(g_BlockOneHitDig,           0x00, sizeof(g_BlockOneHitDig));
+		//memset(g_BlockDigTime,             0x00, sizeof(g_BlockDigTime) * sizeof(long));  // Set all blocks to a dig time of 0
 		memset(g_BlockPistonBreakable,     0x00, sizeof(g_BlockPistonBreakable));
 		memset(g_BlockFullyOccupiesVoxel,  0x00, sizeof(g_BlockFullyOccupiesVoxel));
 		
-		// Setting bools to true must be done manually, see http://forum.mc-server.org/showthread.php?tid=629&pid=5415#pid5415
-		for (size_t i = 0; i < ARRAYCOUNT(g_BlockIsSnowable); i++)
-		{
-			g_BlockIsSnowable[i] = true;
-		}
-		memset(g_BlockRequiresSpecialTool, 0x00, sizeof(g_BlockRequiresSpecialTool));  // Set all blocks to false
+		std::fill(g_BlockDigTime, g_BlockDigTime + sizeof(g_BlockDigTime), 0);
+		std::fill(g_BlockIsSnowable, g_BlockIsSnowable + sizeof(g_BlockIsSnowable), true);
+		std::fill(g_BlockIsSolid, g_BlockIsSolid + sizeof(g_BlockIsSolid), true);
 		
-		// Setting bools to true must be done manually, see http://forum.mc-server.org/showthread.php?tid=629&pid=5415#pid5415
-		for (size_t i = 0; i < ARRAYCOUNT(g_BlockIsSolid); i++)
-		{
-			g_BlockIsSolid[i] = true;
-		}
+		memset(g_BlockRequiresSpecialTool, 0x00, sizeof(g_BlockRequiresSpecialTool));  // Set all blocks to false
 
 		// Emissive blocks
 		g_BlockLightValue[E_BLOCK_FIRE]                 = 15;
@@ -605,32 +598,183 @@ public:
 		g_BlockTransparent[E_BLOCK_WOODEN_PRESSURE_PLATE] = true;
 
 		// TODO: Any other transparent blocks?
+		
+		// Blocks Dig Time
+		g_BlockDigTime[E_BLOCK_STONE]                   = 1.5F;
+		g_BlockDigTime[E_BLOCK_GRASS]                   = 0.6F;
+		g_BlockDigTime[E_BLOCK_DIRT]                    = 0.5F;
+		g_BlockDigTime[E_BLOCK_COBBLESTONE]             = 2.0F;
+		g_BlockDigTime[E_BLOCK_PLANKS]                  = 2.0F;
+		g_BlockDigTime[E_BLOCK_SAPLING]                 = 0.0F;
+		g_BlockDigTime[E_BLOCK_WATER]                   = 100.0F;
+		g_BlockDigTime[E_BLOCK_STATIONARY_WATER]        = 100.0F;
+		g_BlockDigTime[E_BLOCK_LAVA]                    = 100.0F;
+		g_BlockDigTime[E_BLOCK_STATIONARY_LAVA]         = 100.0F;
+		g_BlockDigTime[E_BLOCK_SAND]                    = 0.5F;
+		g_BlockDigTime[E_BLOCK_GRAVEL]                  = 0.6F;
+		g_BlockDigTime[E_BLOCK_GOLD_ORE]                = 3.0F;
+		g_BlockDigTime[E_BLOCK_IRON_ORE]                = 3.0F;
+		g_BlockDigTime[E_BLOCK_COAL_ORE]                = 3.0F;
+		g_BlockDigTime[E_BLOCK_LOG]                     = 2.0F;
+		g_BlockDigTime[E_BLOCK_LEAVES]                  = 0.2F;
+		g_BlockDigTime[E_BLOCK_SPONGE]                  = 0.6F;
+		g_BlockDigTime[E_BLOCK_GLASS]                   = 0.3F;
+		g_BlockDigTime[E_BLOCK_LAPIS_ORE]               = 3.0F;
+		g_BlockDigTime[E_BLOCK_LAPIS_BLOCK]             = 3.0F;
+		g_BlockDigTime[E_BLOCK_DISPENSER]               = 3.5F;
+		g_BlockDigTime[E_BLOCK_SANDSTONE]               = 0.8F;
+		g_BlockDigTime[E_BLOCK_NOTE_BLOCK]              = 0.8F;
+		g_BlockDigTime[E_BLOCK_BED]                     = 0.2F;
+		g_BlockDigTime[E_BLOCK_POWERED_RAIL]            = 0.7F;
+		g_BlockDigTime[E_BLOCK_DETECTOR_RAIL]           = 0.7F;
+		g_BlockDigTime[E_BLOCK_STICKY_PISTON]           = 0.5F;
+		g_BlockDigTime[E_BLOCK_COBWEB]                  = 4.0F;
+		g_BlockDigTime[E_BLOCK_TALL_GRASS]              = 0.0F;
+		g_BlockDigTime[E_BLOCK_DEAD_BUSH]               = 0.0F;
+		g_BlockDigTime[E_BLOCK_PISTON]                  = 0.5F;
+		g_BlockDigTime[E_BLOCK_PISTON_EXTENSION]        = 0.5F;
+		g_BlockDigTime[E_BLOCK_WOOL]                    = 0.8F;
+		g_BlockDigTime[E_BLOCK_PISTON_MOVED_BLOCK]      = 100.0F; //100.0F = No Break
+		g_BlockDigTime[E_BLOCK_DANDELION]               = 0.0F;
+		g_BlockDigTime[E_BLOCK_FLOWER]                  = 0.0F;
+		g_BlockDigTime[E_BLOCK_BROWN_MUSHROOM]          = 0.0F;
+		g_BlockDigTime[E_BLOCK_RED_MUSHROOM]            = 0.0F;
+		g_BlockDigTime[E_BLOCK_GOLD_BLOCK]              = 3.0F;
+		g_BlockDigTime[E_BLOCK_IRON_BLOCK]              = 5.0F;
+		g_BlockDigTime[E_BLOCK_DOUBLE_STONE_SLAB]       = 2.0F;
+		g_BlockDigTime[E_BLOCK_STONE_SLAB]              = 2.0F;
+		g_BlockDigTime[E_BLOCK_BRICK]                   = 2.0F;
+		g_BlockDigTime[E_BLOCK_TNT]                     = 0.0F;
+		g_BlockDigTime[E_BLOCK_BOOKCASE]                = 1.5F;
+		g_BlockDigTime[E_BLOCK_MOSSY_COBBLESTONE]       = 2.0F;
+		g_BlockDigTime[E_BLOCK_OBSIDIAN]                = 50.0F;
+		g_BlockDigTime[E_BLOCK_TORCH]                   = 0.0F;
+		g_BlockDigTime[E_BLOCK_FIRE]                    = 0.0F;
+		g_BlockDigTime[E_BLOCK_MOB_SPAWNER]             = 5.0F;
+		g_BlockDigTime[E_BLOCK_WOODEN_STAIRS]           = 2.0F;
+		g_BlockDigTime[E_BLOCK_CHEST]                   = 2.5F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_WIRE]           = 0.0F;
+		g_BlockDigTime[E_BLOCK_DIAMOND_ORE]             = 3.0F;
+		g_BlockDigTime[E_BLOCK_DIAMOND_BLOCK]           = 5.0F;
+		g_BlockDigTime[E_BLOCK_CRAFTING_TABLE]          = 2.5F;
+		g_BlockDigTime[E_BLOCK_WORKBENCH]               = 2.5F;
+		g_BlockDigTime[E_BLOCK_CROPS]                   = 0.0F;
+		g_BlockDigTime[E_BLOCK_FARMLAND]                = 0.6F;
+		g_BlockDigTime[E_BLOCK_FURNACE]                 = 3.5F;
+		g_BlockDigTime[E_BLOCK_LIT_FURNACE]             = 3.5F;
+		g_BlockDigTime[E_BLOCK_BURNING_FURNACE]         = 3.5F;
+		g_BlockDigTime[E_BLOCK_SIGN_POST]               = 1.0F;
+		g_BlockDigTime[E_BLOCK_WOODEN_DOOR]             = 3.0F;
+		g_BlockDigTime[E_BLOCK_LADDER]                  = 0.4F;
+		g_BlockDigTime[E_BLOCK_RAIL]                    = 0.7F;
+		//g_BlockDigTime[E_BLOCK_MINECART_TRACKS]         = ...;
+		g_BlockDigTime[E_BLOCK_COBBLESTONE_STAIRS]      = 2.0F;
+		g_BlockDigTime[E_BLOCK_WALLSIGN]                = 1.0F;
+		g_BlockDigTime[E_BLOCK_LEVER]                   = 0.5F;
+		g_BlockDigTime[E_BLOCK_STONE_PRESSURE_PLATE]    = 0.5F;
+		g_BlockDigTime[E_BLOCK_IRON_DOOR]               = 5.0F;
+		g_BlockDigTime[E_BLOCK_WOODEN_PRESSURE_PLATE]   = 0.5F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_ORE]            = 3.0F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_ORE_GLOWING]    = 3.0F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_TORCH_OFF]      = 0.0F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_TORCH_ON]       = 0.0F;
+		g_BlockDigTime[E_BLOCK_STONE_BUTTON]            = 0.5F;
+		g_BlockDigTime[E_BLOCK_SNOW]                    = 0.1F;
+		g_BlockDigTime[E_BLOCK_ICE]                     = 0.5F;
+		g_BlockDigTime[E_BLOCK_SNOW_BLOCK]              = 0.2F;
+		g_BlockDigTime[E_BLOCK_CACTUS]                  = 0.4F;
+		g_BlockDigTime[E_BLOCK_CLAY]                    = 0.6F;
+		//g_BlockDigTime[E_BLOCK_SUGARCANE]               = ...;
+		g_BlockDigTime[E_BLOCK_REEDS]                   = 0.0F;
+		g_BlockDigTime[E_BLOCK_JUKEBOX]                 = 2.0F;
+		g_BlockDigTime[E_BLOCK_FENCE]                   = 2.0F;
+		g_BlockDigTime[E_BLOCK_PUMPKIN]                 = 1.0F;
+		g_BlockDigTime[E_BLOCK_NETHERRACK]              = 0.4F;
+		g_BlockDigTime[E_BLOCK_SOULSAND]                = 0.5F;
+		g_BlockDigTime[E_BLOCK_GLOWSTONE]               = 0.3F;
+		g_BlockDigTime[E_BLOCK_NETHER_PORTAL]           = 100.0F; //100.0F = No Break
+		g_BlockDigTime[E_BLOCK_JACK_O_LANTERN]          = 1.0F;
+		g_BlockDigTime[E_BLOCK_CAKE]                    = 0.5F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_REPEATER_OFF]   = 0.0F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_REPEATER_ON]    = 0.0F;
+		g_BlockDigTime[E_BLOCK_STAINED_GLASS]           = 0.3F;
+		g_BlockDigTime[E_BLOCK_TRAPDOOR]                = 3.0F;
+		g_BlockDigTime[E_BLOCK_SILVERFISH_EGG]          = 0.75F;
+		g_BlockDigTime[E_BLOCK_STONE_BRICKS]            = 1.5F;
+		g_BlockDigTime[E_BLOCK_HUGE_BROWN_MUSHROOM]     = 0.2F;
+		g_BlockDigTime[E_BLOCK_HUGE_RED_MUSHROOM]       = 0.2F;
+		g_BlockDigTime[E_BLOCK_IRON_BARS]               = 5.0F;
+		g_BlockDigTime[E_BLOCK_GLASS_PANE]              = 0.3F;
+		g_BlockDigTime[E_BLOCK_MELON]                   = 1.0F;
+		g_BlockDigTime[E_BLOCK_PUMPKIN_STEM]            = 0.0F;
+		g_BlockDigTime[E_BLOCK_MELON_STEM]              = 0.0F;
+		g_BlockDigTime[E_BLOCK_VINES]                   = 0.2F;
+		g_BlockDigTime[E_BLOCK_FENCE_GATE]              = 2.0F;
+		g_BlockDigTime[E_BLOCK_BRICK_STAIRS]            = 2.0F;
+		g_BlockDigTime[E_BLOCK_STONE_BRICK_STAIRS]      = 1.5F;
+		g_BlockDigTime[E_BLOCK_MYCELIUM]                = 0.6F;
+		g_BlockDigTime[E_BLOCK_LILY_PAD]                = 0.0F;
+		g_BlockDigTime[E_BLOCK_NETHER_BRICK]            = 2.0F;
+		g_BlockDigTime[E_BLOCK_NETHER_BRICK_FENCE]      = 2.0F;
+		g_BlockDigTime[E_BLOCK_NETHER_BRICK_STAIRS]     = 2.0F;
+		g_BlockDigTime[E_BLOCK_NETHER_WART]             = 0.0F;
+		g_BlockDigTime[E_BLOCK_ENCHANTMENT_TABLE]       = 5.0F;
+		g_BlockDigTime[E_BLOCK_BREWING_STAND]           = 0.5F;
+		g_BlockDigTime[E_BLOCK_CAULDRON]                = 2.0F;
+		g_BlockDigTime[E_BLOCK_END_PORTAL]              = 100.0F; //100.0F = No Break
+		g_BlockDigTime[E_BLOCK_END_PORTAL_FRAME]        = 100.0F;
+		g_BlockDigTime[E_BLOCK_END_STONE]               = 3.0F;
+		g_BlockDigTime[E_BLOCK_DRAGON_EGG]              = 3.0F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_LAMP_OFF]       = 0.3F;
+		g_BlockDigTime[E_BLOCK_REDSTONE_LAMP_ON]        = 0.3F;
+		g_BlockDigTime[E_BLOCK_DOUBLE_WOODEN_SLAB]      = 2.0F;
+		g_BlockDigTime[E_BLOCK_WOODEN_SLAB]             = 2.0F;
+		g_BlockDigTime[E_BLOCK_COCOA_POD]               = 0.2F;
+		g_BlockDigTime[E_BLOCK_SANDSTONE_STAIRS]        = 0.8F;
+		g_BlockDigTime[E_BLOCK_EMERALD_ORE]             = 3.0F;
+		g_BlockDigTime[E_BLOCK_ENDER_CHEST]             = 22.5F;
+		g_BlockDigTime[E_BLOCK_TRIPWIRE_HOOK]           = 0.0F; //Is this correct?
+		g_BlockDigTime[E_BLOCK_TRIPWIRE]                = 0.0F; //Is this correct?
+		g_BlockDigTime[E_BLOCK_EMERALD_BLOCK]           = 5.0F;
+		g_BlockDigTime[E_BLOCK_SPRUCE_WOOD_STAIRS]      = 2.0F;
+		g_BlockDigTime[E_BLOCK_BIRCH_WOOD_STAIRS]       = 2.0F;
+		g_BlockDigTime[E_BLOCK_JUNGLE_WOOD_STAIRS]      = 2.0F;
+		g_BlockDigTime[E_BLOCK_COMMAND_BLOCK]           = 100.0F; //Is this correct? 100.0F = No Break
+		g_BlockDigTime[E_BLOCK_BEACON]                  = 3.0F;
+		g_BlockDigTime[E_BLOCK_COBBLESTONE_WALL]        = 2.0F;
+		g_BlockDigTime[E_BLOCK_FLOWER_POT]              = 0.0F;
+		g_BlockDigTime[E_BLOCK_CARROTS]                 = 0.0F;
+		g_BlockDigTime[E_BLOCK_POTATOES]                = 0.0F;
+		g_BlockDigTime[E_BLOCK_WOODEN_BUTTON]           = 0.5F;
+		g_BlockDigTime[E_BLOCK_HEAD]                    = 1.0F;
+		g_BlockDigTime[E_BLOCK_ANVIL]                   = 5.0F;
+		g_BlockDigTime[E_BLOCK_TRAPPED_CHEST]           = 2.5F;
+		g_BlockDigTime[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE] = 0.5F;
+		g_BlockDigTime[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE] = 0.5F;
+		g_BlockDigTime[E_BLOCK_INACTIVE_COMPARATOR]     = 0.0F;
+		g_BlockDigTime[E_BLOCK_ACTIVE_COMPARATOR]       = 0.0F;
+		g_BlockDigTime[E_BLOCK_DAYLIGHT_SENSOR]         = 0.2F;
+		g_BlockDigTime[E_BLOCK_BLOCK_OF_REDSTONE]       = 5.0F;
+		g_BlockDigTime[E_BLOCK_NETHER_QUARTZ_ORE]       = 3.0F;
+		g_BlockDigTime[E_BLOCK_HOPPER]                  = 3.0F;
+		g_BlockDigTime[E_BLOCK_QUARTZ_BLOCK]            = 0.8F;
+		g_BlockDigTime[E_BLOCK_QUARTZ_STAIRS]           = 0.8F;
+		g_BlockDigTime[E_BLOCK_ACTIVATOR_RAIL]          = 0.7F;
+		g_BlockDigTime[E_BLOCK_DROPPER]                 = 3.5F;
+		g_BlockDigTime[E_BLOCK_STAINED_CLAY]            = 1.25F;
+		g_BlockDigTime[E_BLOCK_STAINED_GLASS_PANE]      = 0.3F;
+		g_BlockDigTime[E_BLOCK_NEW_LEAVES]              = 0.2F;
+		g_BlockDigTime[E_BLOCK_NEW_LOG]                 = 2.0F;
+		g_BlockDigTime[E_BLOCK_ACACIA_WOOD_STAIRS]      = 2.0F;
+		g_BlockDigTime[E_BLOCK_DARK_OAK_WOOD_STAIRS]    = 2.0F;
+		g_BlockDigTime[E_BLOCK_HAY_BALE]                = 0.5F;
+		g_BlockDigTime[E_BLOCK_CARPET]                  = 0.1F;
+		g_BlockDigTime[E_BLOCK_HARDENED_CLAY]           = 1.25F;
+		g_BlockDigTime[E_BLOCK_BLOCK_OF_COAL]           = 5.0F;
+		g_BlockDigTime[E_BLOCK_PACKED_ICE]              = 0.5F;
+		g_BlockDigTime[E_BLOCK_BIG_FLOWER]              = 0.0F;
+		g_BlockDigTime[E_BLOCK_BEDROCK]                 = 100.0F; //Is this correct?
 
-		// One hit break blocks:
-		g_BlockOneHitDig[E_BLOCK_ACTIVE_COMPARATOR]     = true;
-		g_BlockOneHitDig[E_BLOCK_BIG_FLOWER]            = true;
-		g_BlockOneHitDig[E_BLOCK_BROWN_MUSHROOM]        = true;
-		g_BlockOneHitDig[E_BLOCK_CARROTS]               = true;
-		g_BlockOneHitDig[E_BLOCK_CROPS]                 = true;
-		g_BlockOneHitDig[E_BLOCK_DANDELION]             = true;
-		g_BlockOneHitDig[E_BLOCK_FIRE]                  = true;
-		g_BlockOneHitDig[E_BLOCK_FLOWER]                = true;
-		g_BlockOneHitDig[E_BLOCK_FLOWER_POT]            = true;
-		g_BlockOneHitDig[E_BLOCK_INACTIVE_COMPARATOR]   = true;
-		g_BlockOneHitDig[E_BLOCK_MELON_STEM]            = true;
-		g_BlockOneHitDig[E_BLOCK_POTATOES]              = true;
-		g_BlockOneHitDig[E_BLOCK_PUMPKIN_STEM]          = true;
-		g_BlockOneHitDig[E_BLOCK_REDSTONE_REPEATER_OFF] = true;
-		g_BlockOneHitDig[E_BLOCK_REDSTONE_REPEATER_ON]  = true;
-		g_BlockOneHitDig[E_BLOCK_REDSTONE_TORCH_OFF]    = true;
-		g_BlockOneHitDig[E_BLOCK_REDSTONE_TORCH_ON]     = true;
-		g_BlockOneHitDig[E_BLOCK_REDSTONE_WIRE]         = true;
-		g_BlockOneHitDig[E_BLOCK_RED_MUSHROOM]          = true;
-		g_BlockOneHitDig[E_BLOCK_REEDS]                 = true;
-		g_BlockOneHitDig[E_BLOCK_SAPLING]               = true;
-		g_BlockOneHitDig[E_BLOCK_TNT]                   = true;
-		g_BlockOneHitDig[E_BLOCK_TALL_GRASS]            = true;
-		g_BlockOneHitDig[E_BLOCK_TORCH]                 = true;
 
 		// Blocks that break when pushed by piston:
 		g_BlockPistonBreakable[E_BLOCK_ACTIVE_COMPARATOR]     = true;
@@ -711,6 +855,10 @@ public:
 		g_BlockIsSnowable[E_BLOCK_VINES]                 = false;
 		g_BlockIsSnowable[E_BLOCK_WALLSIGN]              = false;
 		g_BlockIsSnowable[E_BLOCK_WATER]                 = false;
+		g_BlockIsSnowable[E_BLOCK_RAIL]                  = false;
+		g_BlockIsSnowable[E_BLOCK_ACTIVATOR_RAIL]        = false;
+		g_BlockIsSnowable[E_BLOCK_POWERED_RAIL]          = false;
+		g_BlockIsSnowable[E_BLOCK_DETECTOR_RAIL]         = false;
 		
 
 		// Blocks that don't drop without a special tool:
@@ -747,6 +895,10 @@ public:
 		g_BlockRequiresSpecialTool[E_BLOCK_STONE_PRESSURE_PLATE] = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_STONE_SLAB]           = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_VINES]                = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_FURNACE]              = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_LIT_FURNACE]          = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_ANVIL]                = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_ENCHANTMENT_TABLE]    = true;
 
 		// Nonsolid blocks:
 		g_BlockIsSolid[E_BLOCK_ACTIVATOR_RAIL]        = false;

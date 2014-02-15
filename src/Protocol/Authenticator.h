@@ -14,7 +14,7 @@
 #ifndef CAUTHENTICATOR_H_INCLUDED
 #define CAUTHENTICATOR_H_INCLUDED
 
-#include "OSSupport/IsThread.h"
+#include "../OSSupport/IsThread.h"
 
 
 
@@ -80,6 +80,9 @@ private:
 	
 	// Returns true if the user authenticated okay, false on error; iLevel is the recursion deptht (bails out if too deep)
 	bool AuthFromAddress(const AString & a_Server, const AString & a_Address, const AString & a_UserName, int a_Level = 1);
+	
+	// Returns true if the user authenticated okey, false on error; iLevel is the recursion deptht (bails out if too deep)
+	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID);
 };
 
 

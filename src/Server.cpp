@@ -262,6 +262,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
 	}
 	
+	m_AllowMultipleLogin = a_SettingsIni.GetValueSetB("Allow", "MultipleLogin", false);
+	
 	m_NotifyWriteThread.Start(this);
 	
 	PrepareKeys();
@@ -611,14 +613,14 @@ void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 
 
 
-void cServer::AuthenticateUser(int a_ClientID)
+void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID)
 {
 	cCSLock Lock(m_CSClients);
 	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
-			(*itr)->Authenticate();
+			(*itr)->Authenticate(a_Name, a_UUID);
 			return;
 		}
 	}  // for itr - m_Clients[]
