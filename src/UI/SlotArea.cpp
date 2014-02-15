@@ -712,7 +712,6 @@ void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & 
 		if (a_Item.m_ItemCount <= OldItem->m_ItemCount)
 		{
 			int Count = OldItem->m_ItemCount - a_Item.m_ItemCount;
-			LOG("EXP Drop: %i", Count);
 			m_Furnace->GiveExperience(Count);
 		}
 	}
