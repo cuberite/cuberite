@@ -19,7 +19,6 @@ include_directories("../../lib")
 include_directories("../../src")
 
 
-
 function(flatten_files arg1)
 	set(res "")
 	foreach(f ${${arg1}})
@@ -32,12 +31,8 @@ endfunction()
 
 # Include the libraries:
 if(NOT DEFINED ${ZLIB})
-file(GLOB ZLIB_SRC "../../lib/zlib/*.c")
-file(GLOB ZLIB_HDR "../../lib/zlib/*.h")
-flatten_files(ZLIB_SRC)
-flatten_files(ZLIB_HDR)
-source_group("ZLib" FILES ${ZLIB_SRC} ${ZLIB_HDR})
-set(ZLIB 1)
+	add_subdirectory(../../lib/zlib lib/zlib)
+	set(ZLIB 1)
 endif()
 
 set_exe_flags()
@@ -98,7 +93,7 @@ add_executable(MCADefrag
 	${SHARED_HDR}
 	${SHARED_OSS_SRC}
 	${SHARED_OSS_HDR}
-	${ZLIB_SRC}
-	${ZLIB_HDR}
 )
+
+target_link_libraries(MCADefrag zlib)
 
