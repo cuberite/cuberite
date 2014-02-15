@@ -19,7 +19,7 @@ add_library(tolualib ${LIB_SOURCE})
 
 #m is the standard math librarys
 if(UNIX)
-target_link_libraries(tolua m)
+target_link_libraries(tolua m ${DYNAMIC_LOADER})
 endif()
 
 target_link_libraries(tolua lua tolualib)
