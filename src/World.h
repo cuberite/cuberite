@@ -411,14 +411,14 @@ public:
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false);
 	
+	/** Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb. */
+	virtual int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward);
+	
 	/** Spawns an falling block entity at the given position. It returns the UniqueID of the spawned falling block. */
 	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
 
 	/** Spawns an minecart at the given coordinates. */
 	int SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
-
-	/** Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb. */
-	int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward);
 
 	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration. Initial velocity is given based on the relative coefficient provided */
 	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec, double a_InitialVelocityCoeff = 1);
