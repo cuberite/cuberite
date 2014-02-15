@@ -490,13 +490,12 @@ public:
 		memset(g_BlockLightValue,          0x00, sizeof(g_BlockLightValue));
 		memset(g_BlockSpreadLightFalloff,  0x0f, sizeof(g_BlockSpreadLightFalloff)); // 0x0f means total falloff
 		memset(g_BlockTransparent,         0x00, sizeof(g_BlockTransparent));
-		//memset(g_BlockDigTime,             0x00, sizeof(g_BlockDigTime) * sizeof(long));  // Set all blocks to a dig time of 0
 		memset(g_BlockPistonBreakable,     0x00, sizeof(g_BlockPistonBreakable));
 		memset(g_BlockFullyOccupiesVoxel,  0x00, sizeof(g_BlockFullyOccupiesVoxel));
 		
-		std::fill(g_BlockDigTime, g_BlockDigTime + sizeof(g_BlockDigTime), 0);
-		std::fill(g_BlockIsSnowable, g_BlockIsSnowable + sizeof(g_BlockIsSnowable), true);
-		std::fill(g_BlockIsSolid, g_BlockIsSolid + sizeof(g_BlockIsSolid), true);
+		std::fill(g_BlockDigTime, g_BlockDigTime + ARRAYCOUNT(g_BlockDigTime), 0);
+		std::fill(g_BlockIsSnowable, g_BlockIsSnowable + ARRAYCOUNT(g_BlockIsSnowable), true);
+		std::fill(g_BlockIsSolid, g_BlockIsSolid + ARRAYCOUNT(g_BlockIsSolid), true);
 		
 		memset(g_BlockRequiresSpecialTool, 0x00, sizeof(g_BlockRequiresSpecialTool));  // Set all blocks to false
 
