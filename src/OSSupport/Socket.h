@@ -125,4 +125,8 @@ private:
 	eFamily m_family;
 	
 	cSocket(xSocket a_Socket, eFamily a_family);
+	
+	#ifdef _WIN32
+	bool IsVistaOrLater();
+	#endif
 };

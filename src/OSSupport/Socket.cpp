@@ -10,7 +10,6 @@
 	#include <sys/ioctl.h>  // ioctl()
 #else
 	#define socklen_t int
-	#include <VersionHelpers.h>
 #endif
 
 
@@ -152,7 +151,7 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 		{
 			xSocket Socket = socket((int)IPv6, SOCK_STREAM, 0);
 			#if defined(_WIN32)
-			if (!IsWindowsVistaOrGreater()) {
+			if (!IsWindowsVistaOrLater()) {
 				LOGWARNING("Dual Stack requires windows Vista or greater, server will only be accessable by IPv6");
 			} else {
 			#endif
@@ -414,6 +413,22 @@ void cSocket::SetNonBlocking(void)
 		abort();
 	}
 }
+
+
+
+
+#ifdef _WIN32
+bool IsVistaOrLater()
+{
+    DWORD version = GetVersion();
+    DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
+    DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
+
+	//Vista is Windows NT 6.0
+
+    return major >= 6;
+}
+#endif
 
 
 
