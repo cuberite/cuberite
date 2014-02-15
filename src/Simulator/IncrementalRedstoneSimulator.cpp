@@ -311,6 +311,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 				HandlePressurePlate(a_X, dataitr->y, a_Z, dataitr->Data);
 				break;
 			}
+			default: LOGD("Unhandled block (!) or unimplemented redstone block: %s", ItemToString(dataitr->Data).c_str()); break;
 		}
 		++dataitr;
 	}
