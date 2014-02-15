@@ -116,6 +116,7 @@ protected:
 	
 	bool m_IsCooking;  ///< Set to true if the furnace is cooking an item
 	
+	//TODO: Save Output Experience
 	float m_OutputExperience;
 	
 	// All timers are in ticks
