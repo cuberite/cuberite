@@ -21,6 +21,7 @@
 
 class cClientHandle;
 class cWorld;
+class cPlayer;
 
 
 
@@ -48,6 +49,11 @@ public:
 	/** Send this map to the specified client. */
 	void SendTo(cClientHandle & a_Client);
 
+	/** Update a circular region with the specified radius and center (in pixels). */
+	void UpdateRadius(int a_PixelX, int a_PixelZ, unsigned int a_Radius);
+
+	void UpdateRadius(cPlayer & a_Player, unsigned int a_Radius);
+
 	// tolua_begin
 
 	/** Erase pixel data */
@@ -71,13 +77,15 @@ public:
 
 	cWorld * GetWorld(void) { return m_World; }
 
+	AString GetName(void) { return m_Name; }
+
 	eDimension GetDimension(void) const;
 
 	const cColorList & GetData(void) const { return m_Data; }
 
 	unsigned int GetNumPixels(void) const;
 
-	unsigned int GetNumBlocksPerPixel(void) const;
+	unsigned int GetPixelWidth(void) const;
 
 	// tolua_end
 
@@ -86,8 +94,6 @@ private:
 
 	/** Update the specified pixel. */
 	bool UpdatePixel(unsigned int a_X, unsigned int a_Y);
-
-	void PixelToWorldCoords(unsigned int a_X, unsigned int a_Y, int & a_WorldX, int & a_WorldY);
 
 	unsigned int m_ID;
 
@@ -104,6 +110,11 @@ private:
 	cColorList m_Data;
 
 	cWorld * m_World;
+
+	//typedef std::vector<cPlayer*> cPlayerList;
+	//cPlayerList m_TrackedPlayers;
+
+	AString m_Name;
 
 	friend class cMapSerializer;
 

@@ -8,6 +8,7 @@
 #include "ClientHandle.h"
 #include "World.h"
 #include "Chunk.h"
+#include "Entities/Player.h"
 
 
 
@@ -23,6 +24,8 @@ cMap::cMap(unsigned int a_ID, cWorld * a_World)
 	, m_World(a_World)
 {
 	m_Data.assign(m_Width * m_Height, 0);
+
+	Printf(m_Name, "map_%i", m_ID);
 }
 
 
@@ -40,14 +43,50 @@ cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, un
 {
 	m_Data.assign(m_Width * m_Height, 0);
 
-	for (unsigned int X = 0; X < m_Width; ++X)
+	Printf(m_Name, "map_%i", m_ID);
+}
+
+
+
+
+
+void cMap::UpdateRadius(int a_PixelX, int a_PixelZ, unsigned int a_Radius)
+{
+	int PixelRadius = a_Radius / GetPixelWidth();
+
+	unsigned int StartX = std::max(a_PixelX - PixelRadius, 0);
+	unsigned int StartZ = std::max(a_PixelZ - PixelRadius, 0);
+
+	unsigned int EndX = std::min(a_PixelX + PixelRadius, (int)m_Width);
+	unsigned int EndZ = std::min(a_PixelZ + PixelRadius, (int)m_Height);
+
+	for (unsigned int X = StartX; X < EndX; ++X)
 	{
-		for (unsigned int Y = 0; Y < m_Height; ++Y)
+		for (unsigned int Z = StartZ; Z < EndZ; ++Z)
 		{
-			// Debug
-			m_Data[Y + X * m_Height] = rand() % 100;
+			int dX = X - a_PixelX;
+			int dZ = Z - a_PixelZ;
+
+			if ((dX * dX) + (dZ * dZ) < (PixelRadius * PixelRadius))
+			{
+				UpdatePixel(X, Z);
+			}
 		}
 	}
+}
+
+
+
+
+
+void cMap::UpdateRadius(cPlayer & a_Player, unsigned int a_Radius)
+{
+	unsigned int PixelWidth = GetPixelWidth();
+
+	int PixelX = (a_Player.GetPosX() - m_CenterX) / PixelWidth + (m_Width  / 2);
+	int PixelZ = (a_Player.GetPosZ() - m_CenterZ) / PixelWidth + (m_Height / 2);
+
+	UpdateRadius(PixelX, PixelZ, a_Radius);
 }
 
 
@@ -58,16 +97,67 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Y)
 {
 	ASSERT(m_World != NULL);
 
-	cChunk * Chunk = NULL;
+	unsigned int PixelWidth = GetPixelWidth();
 
-	if (Chunk == NULL)
+	int BlockX = m_CenterX + ((a_X - m_Width)  * PixelWidth);
+	int BlockZ = m_CenterZ + ((a_Y - m_Height) * PixelWidth);
+
+	int ChunkX, ChunkY, ChunkZ;
+	m_World->BlockToChunk(BlockX, 0, BlockZ, ChunkX, ChunkY, ChunkZ);
+
+	int RelX = BlockX - (ChunkX * cChunkDef::Width);
+	int RelZ = BlockZ - (ChunkZ * cChunkDef::Width);
+
+	class cCalculatePixelCb :
+		public cChunkCallback
 	{
-		return false;
-	}
+		cMap * m_Map;
 
-	int Height = Chunk->GetHeight(a_X, a_Y);
+		int m_RelX, m_RelZ;
 
-	// TODO
+		ColorID m_PixelData;
+
+	public:
+		cCalculatePixelCb(cMap * a_Map, int a_RelX, int a_RelZ)
+			: m_Map(a_Map), m_RelX(a_RelX), m_RelZ(a_RelZ), m_PixelData(0) {}
+
+		virtual bool Item(cChunk * a_Chunk) override
+		{
+			if (a_Chunk == NULL)
+			{
+				return false;
+			}
+
+			unsigned int PixelWidth = m_Map->GetPixelWidth();
+
+			for (unsigned int X = m_RelX; X < m_RelX + PixelWidth; ++X)
+			{
+				for (unsigned int Z = m_RelZ; Z < m_RelZ + PixelWidth; ++Z)
+				{
+					int Height = a_Chunk->GetHeight(X, Z);
+
+					if (Height > 0)
+					{
+						// TODO
+					}
+				}
+			}
+
+			m_PixelData = 8; // Debug
+
+			return false;
+		}
+
+		ColorID GetPixelData(void) const
+		{
+			return m_PixelData;
+		}
+	} CalculatePixelCb(this, RelX, RelZ);
+
+	ASSERT(m_World != NULL);
+	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);
+
+	m_Data[a_Y + (a_X * m_Height)] = CalculatePixelCb.GetPixelData();
 
 	return true;
 }
@@ -167,7 +257,7 @@ unsigned int cMap::GetNumPixels(void) const
 
 
 
-unsigned int cMap::GetNumBlocksPerPixel(void) const
+unsigned int cMap::GetPixelWidth(void) const
 {
 	return pow(2, m_Scale);
 }
