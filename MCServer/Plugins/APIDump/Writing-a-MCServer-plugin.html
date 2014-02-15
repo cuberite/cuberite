@@ -20,13 +20,7 @@
 			<p>
 			Let us begin. In order to begin development, we must firstly obtain a compiled copy
 			of MCServer, and make sure that the Core plugin is within the Plugins folder, and activated.
-			Core handles much of the MCServer end-user experience and is a necessary component of
-			plugin development, as necessary plugin components depend on sone of its functions.
-			</p>
-			<p>
-			Next, we must obtain a copy of CoreMessaging.lua. This can be found
-			<a href="https://gist.github.com/bearbin/8715888">here.</a>
-			This is used to provide messaging support that is compliant with MCServer standards.
+			Core handles much of the MCServer end-user experience and gameplay will be very bland without it.
 			</p>
 			<h2>Creating the basic template</h2>
 			<p>
@@ -41,7 +35,11 @@ function Initialize(Plugin)
 	Plugin:SetName("NewPlugin")
 	Plugin:SetVersion(1)
 	
-	PLUGIN = Plugin
+	-- Hooks
+	
+	PLUGIN = Plugin -- NOTE: only needed if you want OnDisable() to use GetName() or something like that
+	
+	-- Command Bindings
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	return true
@@ -58,7 +56,8 @@ end
 				<li><b>Plugin:SetName</b> sets the name of the plugin.</li>
 				<li><b>Plugin:SetVersion</b> sets the revision number of the plugin. This must be an integer.</li>
 				<li><b>LOG</b> logs to console a message, in this case, it prints that the plugin was initialised.</li>
-				<li>The <b>PLUGIN</b> variable just stores this plugin's object, so GetName() can be called in OnDisable (as no Plugin parameter is passed there, contrary to Initialize).</li>
+				<li>The <b>PLUGIN</b> variable just stores this plugin's object, so GetName() can be called in OnDisable (as no Plugin parameter is passed there, contrary to Initialize).
+					This global variable is only needed if you want to know the plugin details (name, etc.) when shutting down.</li>
 				<li><b>function OnDisable</b> is called when the plugin is disabled, commonly when the server is shutting down. Perform cleanup and logging here.</li>
 			</ul>
 			Be sure to return true for this function, else MCS thinks you plugin had failed to initialise and prints a stacktrace with an error message.
@@ -159,21 +158,23 @@ cPluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " ~
 			a message. Again, see the API documentation for fuller details. But, you ask, how <i>do</i> we send a message to the client?
 			</p>
 			<p>
-			Remember that copy of CoreMessaging.lua that we downloaded earlier? Make sure that file is in your plugin folder, along with the main.lua file you are typing
-			your code in. Since MCS brings all the files together on JIT compile, we don't need to worry about requiring any files or such. Simply follow the below examples:
+			There are dedicated functions used for sending a player formatted messages. By format, I refer to coloured prefixes/coloured text (depending on configuration)
+			that clearly categorise what type of message a player is being sent. For example, an informational message has a yellow coloured [INFO] prefix, and a warning message
+			has a rose coloured [WARNING] prefix. A few of the most used functions are listed here, but see the API docs for more details. Look in the cRoot, cWorld, and cPlayer sections
+			for functions that broadcast to the entire server, the whole world, and a single player, respectively.
 			</p>
 			<pre class="prettyprint lang-lua">
 -- Format: §yellow[INFO] §white%text% (yellow [INFO], white text following it)
 -- Use: Informational message, such as instructions for usage of a command
-SendMessage(Player, "Usage: /explode [player]")
+Player:SendMessageInfo("Usage: /explode [player]")
 
 -- Format: §green[INFO] §white%text% (green [INFO] etc.)
 -- Use: Success message, like when a command executes successfully
-SendMessageSuccess(Player, "Notch was blown up!")
+Player:SendMessageSuccess("Notch was blown up!")
 
 -- Format: §rose[INFO] §white%text% (rose coloured [INFO] etc.)
 -- Use: Failure message, like when a command was entered correctly but failed to run, such as when the destination player wasn't found in a /tp command
-SendMessageFailure(Player, "Player Salted was not found")
+Player:SendMessageFailure("Player Salted was not found")
 			</pre>
 			<p>
 			Those are the basics. If you want to output text to the player for a reason other than the three listed above, and you want to colour the text, simply concatenate
