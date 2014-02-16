@@ -1089,14 +1089,20 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		return;
 	}
 	
-	// Not a command, broadcast as a simple message:
-	AString Msg;
-	Printf(Msg, "%s<%s>%s %s",
-		m_Player->GetColor().c_str(),
-		m_Player->GetName().c_str(),
-		cChatColor::White.c_str(),
-		Message.c_str()
-	);
+	// Not a command, broadcast as a message:
+	cCompositeChat Msg;
+	AString Color = m_Player->GetColor();
+	if (Color.length() == 3)
+	{
+		Color = AString("@") + Color[2];
+	}
+	else
+	{
+		Color.empty();
+	}
+	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
+	Msg.ParseText(a_Message);
+	Msg.UnderlineUrls();
 	m_Player->GetWorld()->BroadcastChat(Msg);
 }
 

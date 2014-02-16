@@ -299,6 +299,21 @@ void cCompositeChat::SetMessageType(eMessageType a_MessageType)
 
 
 
+void cCompositeChat::UnderlineUrls(void)
+{
+	for (cParts::iterator itr = m_Parts.begin(), end = m_Parts.end(); itr != end; ++itr)
+	{
+		if ((*itr)->m_PartType == ptUrl)
+		{
+			(*itr)->m_Style.append("u");
+		}
+	}  // for itr - m_Parts[]
+}
+
+
+
+
+
 void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
 {
 	if (a_AddStyle.empty())

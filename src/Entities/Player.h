@@ -226,7 +226,8 @@ public:
 
 	// tolua_begin
 	
-	/// Returns the full color code to use for this player, based on their primary group or set in m_Color
+	/** Returns the full color code to use for this player, based on their primary group or set in m_Color.
+	The returned value includes the cChatColor::Delimiter. */
 	AString GetColor(void) const;
 
 	/** tosses the item in the selected hotbar slot */

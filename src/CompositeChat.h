@@ -155,6 +155,9 @@ public:
 	/** Returns the message type set previously by SetMessageType(). */
 	eMessageType GetMessageType(void) const { return m_MessageType; }
 	
+	/** Adds the "underline" style to each part that is an URL. */
+	void UnderlineUrls(void);
+	
 	// tolua_end
 	
 	const cParts & GetParts(void) const { return m_Parts; }
