@@ -215,6 +215,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	AString Ports = a_SettingsIni.GetValueSet("Server", "Port", "25565");
 	m_ListenThreadIPv4.SetReuseAddr(true);
 	if(a_SettingsIni.GetValueSetB("Server", "DualStack", false))
+	{
 		if (m_ListenThreadIPv4.Initialize(cSocket::IPDual, Ports))
 		{
 			HasAnyPorts = true;
