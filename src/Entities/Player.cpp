@@ -1059,15 +1059,6 @@ void cPlayer::CloseWindowIfID(char a_WindowID, bool a_CanRefuse)
 
 
 
-void cPlayer::PlaySoundEffect(const AString & a_SoundName, float a_Volume, float a_Pitch)
-{
-	m_ClientHandle->SendSoundEffect(a_SoundName, (int) (GetPosX() * 8.0), (int) (GetPosY() * 8.0), (int) (GetPosZ() * 8.0), a_Volume, a_Pitch);
-}
-
-
-
-
-
 void cPlayer::SetLastBlockActionTime()
 {
 	if (m_World != NULL)
@@ -1796,7 +1787,7 @@ void cPlayer::HandleFood(void)
 				Heal(1);
 				m_FoodExhaustionLevel += 3;
 			}
-			else if (m_FoodLevel <= 0 && m_Health > 1)
+			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
 				// Damage from starving
 				TakeDamage(dtStarving, NULL, 1, 1, 0);
