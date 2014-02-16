@@ -217,9 +217,7 @@ bool cSocket::BindToAny(unsigned short a_Port)
 		{
 			LOGWARNING("cannot bind to Invalid Protocol");
 			ASSERT(!"Invalid protocol");
-			abort();
-			// pretend we're returning something to MSVC
-			return cSocket();
+			return false;
 		}
 	}
 
