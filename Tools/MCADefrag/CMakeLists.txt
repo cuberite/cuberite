@@ -30,10 +30,8 @@ endfunction()
 
 
 # Include the libraries:
-if(NOT DEFINED ${ZLIB})
-	add_subdirectory(../../lib/zlib lib/zlib)
-	set(ZLIB 1)
-endif()
+
+add_subdirectory(../../lib/zlib lib/zlib)
 
 set_exe_flags()
 

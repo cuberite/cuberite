@@ -23,9 +23,6 @@ endmacro()
 
 
 macro(set_flags)
-	if(NOT DEFINED ${FLAGS_SET})
-		set(FLAGS_SET 1)
-
 	# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
 	if (NOT MSVC)
 		set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG")
@@ -88,121 +85,105 @@ macro(set_flags)
 		string(REPLACE "/MDd" "/MTd" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
 		string(REPLACE "/MDd" "/MTd" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
 	endif()
-
-	endif()
 endmacro()
 
 macro(set_lib_flags)
-	if(NOT DEFINED ${LIB_FLAGS_SET})
-		set(LIB_FLAGS_SET 1)
-		# Set lower warnings-level for the libraries:
-		if (MSVC)
-			# Remove /W3 from command line -- cannot just cancel it later with /w like in unix, MSVC produces a D9025 warning (option1 overriden by option2)
-			string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-			string(REPLACE "/W3" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
-			string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
-			string(REPLACE "/W3" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
+	# Set lower warnings-level for the libraries:
+	if (MSVC)
+		# Remove /W3 from command line -- cannot just cancel it later with /w like in unix, MSVC produces a D9025 warning (option1 overriden by option2)
+		string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+		string(REPLACE "/W3" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
+		string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
+		string(REPLACE "/W3" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
+	else()
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -w")
+		set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -w")
+		set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -w")
+		set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -w")
+	endif()
+
+	# On Unix we use two dynamic loading libraries dl and ltdl.
+	# Preference is for dl on unknown systems as it is specified in POSIX
+	# the dynamic loader is used by lua and sqllite.
+	if (UNIX)
+		if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+			set(DYNAMIC_LOADER ltdl)
 		else()
-			set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -w")
-			set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -w")
-			set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -w")
-			set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -w")
+			set(DYNAMIC_LOADER dl)
 		endif()
-
-		# On Unix we use two dynamic loading libraries dl and ltdl.
-		# Preference is for dl on unknown systems as it is specified in POSIX
-		# the dynamic loader is used by lua and sqllite.
-		if (UNIX)
-			if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
-				set(DYNAMIC_LOADER ltdl)
-			else()
-				set(DYNAMIC_LOADER dl)
-			endif()
-		endif()
-
-	
 	endif()
 endmacro()
 
 macro(enable_profile)
-	if(NOT DEFINED ${PROFILE_ENABLED})
-		set(PROFILE_ENABLED 1)
-		
-		# Declare the flags used for profiling builds:
-		if (MSVC)
-			set (CXX_PROFILING "")
-			set (LNK_PROFILING "/PROFILE")
-		else()
-			set (CXX_PROFILING "-pg")
-			set (LNK_PROFILING "-pg")
-		endif()
-
-
-		# Declare the profiling configurations:
-		SET(CMAKE_CXX_FLAGS_DEBUGPROFILE
-			"${CMAKE_CXX_FLAGS_DEBUG} ${PCXX_ROFILING}"
-			CACHE STRING "Flags used by the C++ compiler during profile builds."
-			FORCE )
-		SET(CMAKE_C_FLAGS_DEBUGPROFILE
-			"${CMAKE_C_FLAGS_DEBUG} ${CXX_PROFILING}"
-			CACHE STRING "Flags used by the C compiler during profile builds."
-			FORCE )
-		SET(CMAKE_EXE_LINKER_FLAGS_DEBUGPROFILE
-			"${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${LNK_PROFILING}"
-			CACHE STRING "Flags used for linking binaries during profile builds."
-			FORCE )
-		SET(CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE
-			"${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${LNK_PROFILING}"
-			CACHE STRING "Flags used by the shared libraries linker during profile builds."
-			FORCE )
-		MARK_AS_ADVANCED(
-			CMAKE_CXX_FLAGS_DEBUGPROFILE
-			CMAKE_C_FLAGS_DEBUGPROFILE
-			CMAKE_EXE_LINKER_FLAGS_DEBUGPROFILE
-			CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE )
-
-		SET(CMAKE_CXX_FLAGS_RELEASEPROFILE
-			"${CMAKE_CXX_FLAGS_RELEASE} ${CXX_PROFILING}"
-			CACHE STRING "Flags used by the C++ compiler during profile builds."
-			FORCE )
-		SET(CMAKE_C_FLAGS_RELEASEPROFILE
-			"${CMAKE_C_FLAGS_RELEASE} ${CXX_PROFILING}"
-			CACHE STRING "Flags used by the C compiler during profile builds."
-			FORCE )
-		SET(CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
-			"${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${LNK_PROFILING}"
-			CACHE STRING "Flags used for linking binaries during profile builds."
-			FORCE )
-		SET(CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE
-			"${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${LNK_PROFILING}"
-			CACHE STRING "Flags used by the shared libraries linker during profile builds."
-			FORCE )
-		MARK_AS_ADVANCED(
-			CMAKE_CXX_FLAGS_RELEASEPROFILE
-			CMAKE_C_FLAGS_RELEASEPROFILE
-			CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
-			CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE )
-		# The configuration types need to be set after their respective c/cxx/linker flags and before the project directive
-		set(CMAKE_CONFIGURATION_TYPES "Debug;Release;DebugProfile;ReleaseProfile" CACHE STRING "" FORCE)
+	# Declare the flags used for profiling builds:
+	if (MSVC)
+		set (CXX_PROFILING "")
+		set (LNK_PROFILING "/PROFILE")
+	else()
+		set (CXX_PROFILING "-pg")
+		set (LNK_PROFILING "-pg")
 	endif()
+
+
+	# Declare the profiling configurations:
+	SET(CMAKE_CXX_FLAGS_DEBUGPROFILE
+		"${CMAKE_CXX_FLAGS_DEBUG} ${PCXX_ROFILING}"
+		CACHE STRING "Flags used by the C++ compiler during profile builds."
+		FORCE )
+	SET(CMAKE_C_FLAGS_DEBUGPROFILE
+		"${CMAKE_C_FLAGS_DEBUG} ${CXX_PROFILING}"
+		CACHE STRING "Flags used by the C compiler during profile builds."
+		FORCE )
+	SET(CMAKE_EXE_LINKER_FLAGS_DEBUGPROFILE
+		"${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${LNK_PROFILING}"
+		CACHE STRING "Flags used for linking binaries during profile builds."
+		FORCE )
+	SET(CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE
+		"${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${LNK_PROFILING}"
+		CACHE STRING "Flags used by the shared libraries linker during profile builds."
+		FORCE )
+	MARK_AS_ADVANCED(
+		CMAKE_CXX_FLAGS_DEBUGPROFILE
+		CMAKE_C_FLAGS_DEBUGPROFILE
+		CMAKE_EXE_LINKER_FLAGS_DEBUGPROFILE
+		CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE )
+
+	SET(CMAKE_CXX_FLAGS_RELEASEPROFILE
+		"${CMAKE_CXX_FLAGS_RELEASE} ${CXX_PROFILING}"
+		CACHE STRING "Flags used by the C++ compiler during profile builds."
+		FORCE )
+	SET(CMAKE_C_FLAGS_RELEASEPROFILE
+		"${CMAKE_C_FLAGS_RELEASE} ${CXX_PROFILING}"
+		CACHE STRING "Flags used by the C compiler during profile builds."
+		FORCE )
+	SET(CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
+		"${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${LNK_PROFILING}"
+		CACHE STRING "Flags used for linking binaries during profile builds."
+		FORCE )
+	SET(CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE
+		"${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${LNK_PROFILING}"
+		CACHE STRING "Flags used by the shared libraries linker during profile builds."
+		FORCE )
+	MARK_AS_ADVANCED(
+		CMAKE_CXX_FLAGS_RELEASEPROFILE
+		CMAKE_C_FLAGS_RELEASEPROFILE
+		CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
+		CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE )
+	# The configuration types need to be set after their respective c/cxx/linker flags and before the project directive
+	set(CMAKE_CONFIGURATION_TYPES "Debug;Release;DebugProfile;ReleaseProfile" CACHE STRING "" FORCE)
 endmacro()
     
 macro(set_exe_flags)
-	if(NOT DEFINED ${EXE_FLAGS_SET})
-		set(EXE_FLAGS_SET 1)
-	
-		# Remove disabling the maximum warning level:
-		# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
-		# We do not do that for MSVC since MSVC produces an awful lot of warnings for its own STL headers;
-		# the important warnings are turned on using #pragma in Globals.h
-		if (NOT MSVC)
-			string(REPLACE "-w" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-			string(REPLACE "-w" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
-			string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
-			string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
-			add_flags_cxx("-Wall")
-		endif()
-
-	
+	# Remove disabling the maximum warning level:
+	# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
+	# We do not do that for MSVC since MSVC produces an awful lot of warnings for its own STL headers;
+	# the important warnings are turned on using #pragma in Globals.h
+	if (NOT MSVC)
+		string(REPLACE "-w" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+		string(REPLACE "-w" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
+		string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
+		string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
+		add_flags_cxx("-Wall")
 	endif()
+
 endmacro()
