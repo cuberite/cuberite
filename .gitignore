@@ -22,6 +22,9 @@ cloc.xsl
 *.*~
 *~
 *.orig
+## Eclipse
+.cproject
+.project
 
 # world inside source
 ChunkWorx.ini
@@ -57,7 +60,7 @@ install_mainfest.txt
 src/MCServer
 lib/tolua++/tolua
 src/Bindings/Bindings.*
-src/Bindings/BindingsDependecies.txt
+src/Bindings/BindingDependecies.txt
 MCServer.dir/
 
 #win32 cmake stuff

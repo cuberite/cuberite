@@ -4,6 +4,7 @@
 *.lib
 *.ini
 MCServer
+MCServer_debug
 CommLogs/
 logs
 players
