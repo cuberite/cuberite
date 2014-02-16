@@ -425,7 +425,7 @@ void cSocket::SetNonBlocking(void)
 
 
 #ifdef _WIN32
-bool IsVistaOrLater()
+bool cSocket::IsVistaOrLater()
 {
 	DWORD version = GetVersion();
 	DWORD major = (DWORD) (LOBYTE(LOWORD(version)));

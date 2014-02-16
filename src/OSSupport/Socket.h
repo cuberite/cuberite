@@ -127,6 +127,6 @@ private:
 	cSocket(xSocket a_Socket, eFamily a_family);
 	
 	#ifdef _WIN32
-	bool IsVistaOrLater();
+	static bool IsVistaOrLater();
 	#endif
 };
