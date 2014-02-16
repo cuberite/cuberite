@@ -143,14 +143,14 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 					m_World->BroadcastEntityMetadata(*this);
 				}
 
+				m_FinalDestination = a_Closest_Player->GetPosition(); // So that we will look at a player holding food
+
 				// Don't move to the player if the wolf is sitting.
-				if (IsSitting())
+				if (!IsSitting())
 				{
-					m_bMovingToDestination = false;
-					return;
+					MoveToPosition(a_Closest_Player->GetPosition());
 				}
 
-				MoveToPosition(a_Closest_Player->GetPosition());
 				break;
 			}
 			default:
@@ -167,6 +167,10 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 	if (IsTame() && !IsSitting())
 	{
 		TickFollowPlayer();
+	}
+	else if (IsSitting())
+	{
+		m_bMovingToDestination = false;
 	}
 }
 
@@ -194,11 +198,8 @@ void cWolf::TickFollowPlayer()
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();
 		if (Distance > 30)
 		{
-			if (!IsSitting())
-			{
-				Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
-				TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
-			}
+			Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
+			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
 		}
 		else
 		{
