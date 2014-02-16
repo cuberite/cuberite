@@ -734,22 +734,30 @@ float cClientHandle::GetBlockDigSpeed(BLOCKTYPE a_Block)
 		int Level = Enchantments.GetLevel(Enchantments.enchEfficiency);
 		if (Level > 0)
 		{
-			//TODO: Look in the next Minecraft Server Version (1.8) for Bug Fix. EntityHuman.java: public float a(Block block, boolean flag);
+			// TODO: Look in the next Minecraft Server Version (1.8) for Bug Fix. EntityHuman.java: public float a(Block block, boolean flag);
 			float a1 = Level * Level + 1;
 			a += a1;
 		}
 	}
 	
 	if (m_Player->IsSwimming())
+	{
 		a /= 0.5;
+	}
 	if (!m_Player->IsOnGround())
+	{
 		a /= 0.5;
+	}
 	
 	float speed;
 	if (!m_Player->CanHarvestBlock(a_Block))
+	{
 		speed = a / f / 100.0F;
+	}
 	else
+	{
 		speed = f < 0.0F ? 0.0F : a / f / 30.0F;
+	}
 	
 	return speed * m_BlockDigTick;
 }
@@ -795,7 +803,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		return;
 	}
 	
-	//Adventure can't break Blocks
+	// Adventure can't break Blocks
 	if (m_Player->IsGameModeAdventure())
 	{
 		return;
@@ -894,10 +902,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	
 	cWorld * World = m_Player->GetWorld();
-	if (
-		(std::max(m_Player->GetPosX(), double(a_BlockX)) - std::min(m_Player->GetPosX(), double(a_BlockX))) >= 6 ||
-		(std::max(m_Player->GetPosY(), double(a_BlockY)) - std::min(m_Player->GetPosY(), double(a_BlockY))) >= 6 ||
-		(std::max(m_Player->GetPosZ(), double(a_BlockZ)) - std::min(m_Player->GetPosZ(), double(a_BlockZ))) >= 6)
+	if (diff(m_Player->GetPosX(), double(a_BlockX)) >= 6 || diff(m_Player->GetPosY(), double(a_BlockY)) >= 6 || diff(m_Player->GetPosZ(), double(a_BlockZ)) >= 6)
 	{
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
@@ -1160,10 +1165,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		return;
 	}
 	
-	if (
-		(std::max(m_Player->GetPosX(), double(a_BlockX)) - std::min(m_Player->GetPosX(), double(a_BlockX))) >= 6 ||
-		(std::max(m_Player->GetPosY(), double(a_BlockY)) - std::min(m_Player->GetPosY(), double(a_BlockY))) >= 6 ||
-		(std::max(m_Player->GetPosZ(), double(a_BlockZ)) - std::min(m_Player->GetPosZ(), double(a_BlockZ))) >= 6)
+	if (diff(m_Player->GetPosX(), double(a_BlockX)) >= 6 || diff(m_Player->GetPosY(), double(a_BlockY)) >= 6 || diff(m_Player->GetPosZ(), double(a_BlockZ)) >= 6)
 	{
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();

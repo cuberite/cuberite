@@ -23,20 +23,20 @@ public:
 
 	float ShovelPower()
 	{
-		switch(m_ItemType)
+		switch (m_ItemType)
 		{
-		case E_ITEM_WOODEN_SHOVEL:
-			return 2.0F;
-		case E_ITEM_STONE_SHOVEL:
-			return 4.0F;
-		case E_ITEM_IRON_SHOVEL:
-			return 6.0F;
-		case E_ITEM_DIAMOND_SHOVEL:
-			return 8.0F;
-		case E_ITEM_GOLD_SHOVEL:
-			return 12.0F;
-		default:
-			return 2.0F;
+			case E_ITEM_WOODEN_SHOVEL:
+				return 2.0F;
+			case E_ITEM_STONE_SHOVEL:
+				return 4.0F;
+			case E_ITEM_IRON_SHOVEL:
+				return 6.0F;
+			case E_ITEM_DIAMOND_SHOVEL:
+				return 8.0F;
+			case E_ITEM_GOLD_SHOVEL:
+				return 12.0F;
+			default:
+				return 2.0F;
 		}
 	}
 
@@ -63,7 +63,7 @@ public:
 	
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockType)
+		switch (a_BlockType)
 		{
 			case E_BLOCK_GRASS:
 			case E_BLOCK_DIRT:

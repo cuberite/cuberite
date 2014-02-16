@@ -17,44 +17,44 @@ public:
 
 	float PickaxePower()
 	{
-		switch(m_ItemType)
+		switch (m_ItemType)
 		{
-		case E_ITEM_WOODEN_PICKAXE:
-			return 2.0F;
-		case E_ITEM_STONE_PICKAXE:
-			return 4.0F;
-		case E_ITEM_IRON_PICKAXE:
-			return 6.0F;
-		case E_ITEM_DIAMOND_PICKAXE:
-			return 8.0F;
-		case E_ITEM_GOLD_PICKAXE:
-			return 12.0F;
-		default:
-			return 2.0F;
+			case E_ITEM_WOODEN_PICKAXE:
+				return 2.0F;
+			case E_ITEM_STONE_PICKAXE:
+				return 4.0F;
+			case E_ITEM_IRON_PICKAXE:
+				return 6.0F;
+			case E_ITEM_DIAMOND_PICKAXE:
+				return 8.0F;
+			case E_ITEM_GOLD_PICKAXE:
+				return 12.0F;
+			default:
+				return 2.0F;
 		}
 	}
 
 	char PickaxeLevel()
 	{
-		switch(m_ItemType)
+		switch (m_ItemType)
 		{
-		case E_ITEM_WOODEN_PICKAXE:
-		case E_ITEM_GOLD_PICKAXE:
-			return 1;
-		case E_ITEM_STONE_PICKAXE:
-			return 2;
-		case E_ITEM_IRON_PICKAXE:
-			return 3;
-		case E_ITEM_DIAMOND_PICKAXE:
-			return 4;
-		default:
-			return 0;
+			case E_ITEM_WOODEN_PICKAXE:
+			case E_ITEM_GOLD_PICKAXE:
+				return 1;
+			case E_ITEM_STONE_PICKAXE:
+				return 2;
+			case E_ITEM_IRON_PICKAXE:
+				return 3;
+			case E_ITEM_DIAMOND_PICKAXE:
+				return 4;
+			default:
+				return 0;
 		}
 	}
 	
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockType)
+		switch (a_BlockType)
 		{
 			case E_BLOCK_OBSIDIAN:
 			{
@@ -111,7 +111,7 @@ public:
 	
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockType)
+		switch (a_BlockType)
 		{
 			case E_BLOCK_COBBLESTONE:
 			case E_BLOCK_DOUBLE_STONE_SLAB:

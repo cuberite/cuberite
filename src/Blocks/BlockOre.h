@@ -61,8 +61,10 @@ public:
 				break;
 			}
 			case E_BLOCK_NETHER_QUARTZ_ORE:
+			{
 				ItemType = E_ITEM_NETHER_QUARTZ;
 				break;
+			}
 			case E_BLOCK_EMERALD_ORE:
 			{
 				ItemType = E_ITEM_EMERALD;

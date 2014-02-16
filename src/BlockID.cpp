@@ -633,7 +633,7 @@ public:
 		g_BlockDigTime[E_BLOCK_PISTON]                  = 0.5F;
 		g_BlockDigTime[E_BLOCK_PISTON_EXTENSION]        = 0.5F;
 		g_BlockDigTime[E_BLOCK_WOOL]                    = 0.8F;
-		g_BlockDigTime[E_BLOCK_PISTON_MOVED_BLOCK]      = 100.0F; //100.0F = No Break
+		g_BlockDigTime[E_BLOCK_PISTON_MOVED_BLOCK]      = 100.0F;  // No Break
 		g_BlockDigTime[E_BLOCK_DANDELION]               = 0.0F;
 		g_BlockDigTime[E_BLOCK_FLOWER]                  = 0.0F;
 		g_BlockDigTime[E_BLOCK_BROWN_MUSHROOM]          = 0.0F;
@@ -666,7 +666,7 @@ public:
 		g_BlockDigTime[E_BLOCK_WOODEN_DOOR]             = 3.0F;
 		g_BlockDigTime[E_BLOCK_LADDER]                  = 0.4F;
 		g_BlockDigTime[E_BLOCK_RAIL]                    = 0.7F;
-		//g_BlockDigTime[E_BLOCK_MINECART_TRACKS]         = ...;
+		// g_BlockDigTime[E_BLOCK_MINECART_TRACKS]         = ...;
 		g_BlockDigTime[E_BLOCK_COBBLESTONE_STAIRS]      = 2.0F;
 		g_BlockDigTime[E_BLOCK_WALLSIGN]                = 1.0F;
 		g_BlockDigTime[E_BLOCK_LEVER]                   = 0.5F;
@@ -683,7 +683,7 @@ public:
 		g_BlockDigTime[E_BLOCK_SNOW_BLOCK]              = 0.2F;
 		g_BlockDigTime[E_BLOCK_CACTUS]                  = 0.4F;
 		g_BlockDigTime[E_BLOCK_CLAY]                    = 0.6F;
-		//g_BlockDigTime[E_BLOCK_SUGARCANE]               = ...;
+		// g_BlockDigTime[E_BLOCK_SUGARCANE]               = ...;
 		g_BlockDigTime[E_BLOCK_REEDS]                   = 0.0F;
 		g_BlockDigTime[E_BLOCK_JUKEBOX]                 = 2.0F;
 		g_BlockDigTime[E_BLOCK_FENCE]                   = 2.0F;
@@ -691,7 +691,7 @@ public:
 		g_BlockDigTime[E_BLOCK_NETHERRACK]              = 0.4F;
 		g_BlockDigTime[E_BLOCK_SOULSAND]                = 0.5F;
 		g_BlockDigTime[E_BLOCK_GLOWSTONE]               = 0.3F;
-		g_BlockDigTime[E_BLOCK_NETHER_PORTAL]           = 100.0F; //100.0F = No Break
+		g_BlockDigTime[E_BLOCK_NETHER_PORTAL]           = 100.0F;  // No Break
 		g_BlockDigTime[E_BLOCK_JACK_O_LANTERN]          = 1.0F;
 		g_BlockDigTime[E_BLOCK_CAKE]                    = 0.5F;
 		g_BlockDigTime[E_BLOCK_REDSTONE_REPEATER_OFF]   = 0.0F;
@@ -720,8 +720,8 @@ public:
 		g_BlockDigTime[E_BLOCK_ENCHANTMENT_TABLE]       = 5.0F;
 		g_BlockDigTime[E_BLOCK_BREWING_STAND]           = 0.5F;
 		g_BlockDigTime[E_BLOCK_CAULDRON]                = 2.0F;
-		g_BlockDigTime[E_BLOCK_END_PORTAL]              = 100.0F; //100.0F = No Break
-		g_BlockDigTime[E_BLOCK_END_PORTAL_FRAME]        = 100.0F;
+		g_BlockDigTime[E_BLOCK_END_PORTAL]              = 100.0F;  // No Break
+		g_BlockDigTime[E_BLOCK_END_PORTAL_FRAME]        = 100.0F;  // No Break
 		g_BlockDigTime[E_BLOCK_END_STONE]               = 3.0F;
 		g_BlockDigTime[E_BLOCK_DRAGON_EGG]              = 3.0F;
 		g_BlockDigTime[E_BLOCK_REDSTONE_LAMP_OFF]       = 0.3F;
@@ -732,13 +732,13 @@ public:
 		g_BlockDigTime[E_BLOCK_SANDSTONE_STAIRS]        = 0.8F;
 		g_BlockDigTime[E_BLOCK_EMERALD_ORE]             = 3.0F;
 		g_BlockDigTime[E_BLOCK_ENDER_CHEST]             = 22.5F;
-		g_BlockDigTime[E_BLOCK_TRIPWIRE_HOOK]           = 0.0F; //Is this correct?
-		g_BlockDigTime[E_BLOCK_TRIPWIRE]                = 0.0F; //Is this correct?
+		g_BlockDigTime[E_BLOCK_TRIPWIRE_HOOK]           = 0.0F;  // Is this correct?
+		g_BlockDigTime[E_BLOCK_TRIPWIRE]                = 0.0F;  // Is this correct?
 		g_BlockDigTime[E_BLOCK_EMERALD_BLOCK]           = 5.0F;
 		g_BlockDigTime[E_BLOCK_SPRUCE_WOOD_STAIRS]      = 2.0F;
 		g_BlockDigTime[E_BLOCK_BIRCH_WOOD_STAIRS]       = 2.0F;
 		g_BlockDigTime[E_BLOCK_JUNGLE_WOOD_STAIRS]      = 2.0F;
-		g_BlockDigTime[E_BLOCK_COMMAND_BLOCK]           = 100.0F; //Is this correct? 100.0F = No Break
+		g_BlockDigTime[E_BLOCK_COMMAND_BLOCK]           = 100.0F;  // Is this correct? No Break
 		g_BlockDigTime[E_BLOCK_BEACON]                  = 3.0F;
 		g_BlockDigTime[E_BLOCK_COBBLESTONE_WALL]        = 2.0F;
 		g_BlockDigTime[E_BLOCK_FLOWER_POT]              = 0.0F;
@@ -772,7 +772,7 @@ public:
 		g_BlockDigTime[E_BLOCK_BLOCK_OF_COAL]           = 5.0F;
 		g_BlockDigTime[E_BLOCK_PACKED_ICE]              = 0.5F;
 		g_BlockDigTime[E_BLOCK_BIG_FLOWER]              = 0.0F;
-		g_BlockDigTime[E_BLOCK_BEDROCK]                 = 100.0F; //Is this correct?
+		g_BlockDigTime[E_BLOCK_BEDROCK]                 = 100.0F;  // Is this correct?
 
 
 		// Blocks that break when pushed by piston:

@@ -424,6 +424,15 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 
 
 
+inline double diff(double a_Val1, double a_Val2)
+{
+	return (std::max(a_Val1, a_Val2) - std::min(a_Val1, a_Val2));
+}
+
+
+
+
+
 inline float GetSignf(float a_Val)
 {
 	return (a_Val < 0.f) ? -1.f : 1.f;

@@ -23,26 +23,26 @@ public:
 
 	float AxePower()
 	{
-		switch(m_ItemType)
+		switch (m_ItemType)
 		{
-		case E_ITEM_WOODEN_AXE:
-			return 2.0F;
-		case E_ITEM_STONE_AXE:
-			return 4.0F;
-		case E_ITEM_IRON_AXE:
-			return 6.0F;
-		case E_ITEM_DIAMOND_AXE:
-			return 8.0F;
-		case E_ITEM_GOLD_AXE:
-			return 12.0F;
-		default:
-			return 2.0F;
+			case E_ITEM_WOODEN_AXE:
+				return 2.0F;
+			case E_ITEM_STONE_AXE:
+				return 4.0F;
+			case E_ITEM_IRON_AXE:
+				return 6.0F;
+			case E_ITEM_DIAMOND_AXE:
+				return 8.0F;
+			case E_ITEM_GOLD_AXE:
+				return 12.0F;
+			default:
+				return 2.0F;
 		}
 	}
 	
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockType)
+		switch (a_BlockType)
 		{
 			case E_BLOCK_PLANKS:
 			case E_BLOCK_BOOKCASE:
