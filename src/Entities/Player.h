@@ -208,6 +208,8 @@ public:
 	const AString & GetName(void) const { return m_PlayerName; }
 	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }
 	
+	void PlaySoundEffect(const AString & a_SoundName, float a_Volume, float a_Pitch);
+	
 	// tolua_end
 
 	typedef std::list< cGroup* > GroupList;
