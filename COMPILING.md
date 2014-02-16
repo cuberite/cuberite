@@ -69,7 +69,7 @@ Assuming you are in the MCServer folder created in the initial setup step, you n
 ```
 mkdir Release
 cd Release
-cmake . -DCMAKE_BUILD_TYPE=RELEASE .. && make
+cmake .. -DCMAKE_BUILD_TYPE=RELEASE && make
 ```
 The executable will be built in the `MCServer/MCServer` folder and will be named `MCServer`.
 
@@ -81,7 +81,7 @@ Assuming you are in the MCServer folder created in the Getting the sources step,
 ```
 mkdir Debug
 cd Debug
-cmake . -DCMAKE_BUILD_TYPE=DEBUG && make`
+cmake .. -DCMAKE_BUILD_TYPE=DEBUG && make
 ```
 The executable will be built in the `MCServer/MCServer` folder and will be named `MCServer_debug`.
     
