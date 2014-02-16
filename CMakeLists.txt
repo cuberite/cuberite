@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
-#THis has to be done before any flags have been set up.
+# This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
 	add_subdirectory(Tools/MCADefrag/)
 	add_subdirectory(Tools/ProtoProxy/)
