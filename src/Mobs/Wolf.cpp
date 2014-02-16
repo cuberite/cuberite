@@ -124,12 +124,6 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		super::Tick(a_Dt, a_Chunk);
 	}
-	
-	// The wolf is sitting so don't move him at all.
-	if (IsSitting())
-	{
-		m_bMovingToDestination = false;
-	}
 
 	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
 	if (a_Closest_Player != NULL)
@@ -148,18 +142,15 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 					SetIsBegging(true);
 					m_World->BroadcastEntityMetadata(*this);
 				}
+
 				// Don't move to the player if the wolf is sitting.
 				if (IsSitting())
 				{
 					m_bMovingToDestination = false;
+					return;
 				}
-				else
-				{
-					m_bMovingToDestination = true;
-				}
-				Vector3d PlayerPos = a_Closest_Player->GetPosition();
-				PlayerPos.y++;
-				m_FinalDestination = PlayerPos;
+
+				MoveToPosition(a_Closest_Player->GetPosition());
 				break;
 			}
 			default:
@@ -173,7 +164,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (IsTame())
+	if (IsTame() && !IsSitting())
 	{
 		TickFollowPlayer();
 	}
@@ -196,6 +187,7 @@ void cWolf::TickFollowPlayer()
 	public:
 		Vector3d OwnerPos;
 	} Callback;
+
 	if (m_World->DoWithPlayer(m_OwnerName, Callback))
 	{
 		// The player is present in the world, follow him:
@@ -210,15 +202,7 @@ void cWolf::TickFollowPlayer()
 		}
 		else
 		{
-			m_FinalDestination = Callback.OwnerPos;
-			if (IsSitting())
-			{
-				m_bMovingToDestination = false;
-			}
-			else
-			{
-				m_bMovingToDestination = true;
-			}
+			MoveToPosition(Callback.OwnerPos);
 		}
 	}
 }
