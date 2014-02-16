@@ -214,16 +214,24 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	bool HasAnyPorts = false;
 	AString Ports = a_SettingsIni.GetValueSet("Server", "Port", "25565");
 	m_ListenThreadIPv4.SetReuseAddr(true);
-	if (m_ListenThreadIPv4.Initialize(cSocket::IPv4, Ports))
-	{
-		HasAnyPorts = true;
+	if(a_SettingsIni.GetValueSetB("Server", "DualStack", false))
+		if (m_ListenThreadIPv4.Initialize(cSocket::IPDual, Ports))
+		{
+			HasAnyPorts = true;
+		}
 	}
-
-	Ports = a_SettingsIni.GetValueSet("Server", "PortsIPv6", "25565");
-	m_ListenThreadIPv6.SetReuseAddr(true);
-	if (m_ListenThreadIPv6.Initialize(cSocket::IPv6, Ports))
+	else
 	{
-		HasAnyPorts = true;
+		if (m_ListenThreadIPv4.Initialize(cSocket::IPv4, Ports))
+		{
+			HasAnyPorts = true;
+		}
+		Ports = a_SettingsIni.GetValueSet("Server", "PortsIPv6", "25565");
+		m_ListenThreadIPv6.SetReuseAddr(true);
+		if (m_ListenThreadIPv6.Initialize(cSocket::IPv6, Ports))
+		{
+			HasAnyPorts = true;
+		}
 	}
 	
 	if (!HasAnyPorts)
