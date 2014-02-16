@@ -192,6 +192,7 @@ bool cSocket::BindToAny(unsigned short a_Port)
 	switch(m_family)
 	{
 		case IPv4:
+		{
 			sockaddr_in local;
 			memset(&local, 0, sizeof(local));
 
@@ -199,8 +200,10 @@ bool cSocket::BindToAny(unsigned short a_Port)
 			local.sin_port = htons((u_short)a_Port);
 
 			return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
+		}
 		case IPv6:
 		case IPDual:
+		{
 			sockaddr_in6 local6;
 			memset(&local6, 0, sizeof(local6));
 
@@ -208,6 +211,7 @@ bool cSocket::BindToAny(unsigned short a_Port)
 			local6.sin6_port = htons((u_short)a_Port);
 
 			return (bind(m_Socket, (sockaddr *)&local6, sizeof(local6)) == 0);
+		}
 		case INVALID_PROTOCOL:
 		{
 			ASSERT(!"Invalid protocol");
