@@ -834,7 +834,7 @@ AString cIniFile::CheckCase(const AString & s) const
 void cIniFile::RemoveBom(AString & a_line) const
 {
 	// The BOM sequence for UTF-8 is 0xEF,0xBB,0xBF ( In Unicode Latin I: ﻿ )
-	static unsigned char BOM[] = { 0xEF, 0xBB, 0xBF };
+	static const AString BOM = "" + 0xEF + 0xBB + 0xBF;
 
 	// The BOM sequence, if present, is always the first three characters of the input.
 	if (a_line.compare(0, 3, BOM) == 0)
