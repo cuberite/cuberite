@@ -219,7 +219,7 @@ bool cSocket::BindToAny(unsigned short a_Port)
 			ASSERT(!"Invalid protocol");
 			abort();
 			// pretend we're returning something to MSVC
-			return cSocket(INVALID_SOCKET);
+			return cSocket();
 		}
 	}
 
