@@ -183,6 +183,12 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		}
 	}
 
+	if (a_OtherChunk != NULL)
+	{
+		// DO NOT touch our chunk's data structure if we are being called with coordinates from another chunk - this one caused me massive grief :P
+		return;
+	}
+
 	cRedstoneSimulatorChunkData * RedstoneSimulatorChunkData = a_Chunk->GetRedstoneSimulatorData();
 	for (cRedstoneSimulatorChunkData::iterator itr = RedstoneSimulatorChunkData->begin(); itr != RedstoneSimulatorChunkData->end(); ++itr)
 	{
@@ -323,20 +329,22 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 void cIncrementalRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
 	if (
-		((a_BlockX % cChunkDef::Width) >= cChunkDef::Width - 2) ||
-		((a_BlockX % cChunkDef::Width) <= cChunkDef::Width + 2) ||
-		((a_BlockZ % cChunkDef::Width) >= cChunkDef::Width - 2) ||
-		((a_BlockZ % cChunkDef::Width) <= cChunkDef::Width + 2)
+		((a_BlockX % cChunkDef::Width) <= 1) ||
+		((a_BlockX % cChunkDef::Width) >= 14) ||
+		((a_BlockZ % cChunkDef::Width) <= 1) ||
+		((a_BlockZ % cChunkDef::Width) >= 14)
 		) // Are we on a chunk boundary? ± 2 because of LinkedPowered blocks
 	{
 		// On a chunk boundary, alert all four sides (i.e. at least one neighbouring chunk)
 		AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk);
+
 		// Pass the original coordinates, because when adding things to our simulator lists, we get the chunk that they are in, and therefore any updates need to preseve their position
-		// RedstoneAddBlock to pass both the neighbouring chunk and the chunk which the coordiantes are in
-		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX - 1, a_BlockZ), a_Chunk);
-		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX + 1, a_BlockZ), a_Chunk);
-		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ - 1), a_Chunk);
-		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ + 1), a_Chunk);
+		// RedstoneAddBlock to pass both the neighbouring chunk and the chunk which the coordiantes are in and ± 2 in GetNeighbour() to accomodate for LinkedPowered blocks being 2 away from chunk boundaries
+		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX - 2, a_BlockZ), a_Chunk);
+		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX + 2, a_BlockZ), a_Chunk);
+		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ - 2), a_Chunk);
+		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ + 2), a_Chunk);
+
 		return;
 	}
 
