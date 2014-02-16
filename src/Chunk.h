@@ -343,12 +343,17 @@ public:
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 
-	// Simulator data:
+	// Per-chunk simulator data:
 	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }
 	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
-	cRedstoneSimulatorChunkData & GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
+
+	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_RedstoneSimulatorData; }
+	cIncrementalRedstoneSimulator::PoweredBlocksList * GetRedstoneSimulatorPoweredBlocksList(void) { return &m_RedstoneSimulatorPoweredBlocksList; }
+	cIncrementalRedstoneSimulator::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; };
+	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; };
+	cIncrementalRedstoneSimulator::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; };
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
@@ -419,7 +424,12 @@ private:
 	cFluidSimulatorData *   m_WaterSimulatorData;
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
+
 	cRedstoneSimulatorChunkData m_RedstoneSimulatorData;
+	cIncrementalRedstoneSimulator::PoweredBlocksList m_RedstoneSimulatorPoweredBlocksList;
+	cIncrementalRedstoneSimulator::LinkedBlocksList m_RedstoneSimulatorLinkedBlocksList;
+	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList m_RedstoneSimulatorSimulatedPlayerToggleableList;
+	cIncrementalRedstoneSimulator::RepeatersDelayList m_RedstoneSimulatorRepeatersDelayList;
 
 
 	// pick up a random block of this chunk
