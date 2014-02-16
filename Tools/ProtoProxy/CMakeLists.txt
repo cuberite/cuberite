@@ -77,19 +77,8 @@ function(flatten_files arg1)
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
 
-
-# Include the libraries:
-file(GLOB POLARSSL_SRC "../../lib/polarssl/library/*.c")
-file(GLOB POLARSSL_HDR "../../lib/polarssl/include/polarssl/*.h")
-flatten_files(POLARSSL_SRC)
-flatten_files(POLARSSL_HDR)
-source_group("PolarSSL" FILES ${POLARSSL_SRC} ${POLARSSL_HDR})
-
-file(GLOB ZLIB_SRC "../../lib/zlib/*.c")
-file(GLOB ZLIB_HDR "../../lib/zlib/*.h")
-flatten_files(ZLIB_SRC)
-flatten_files(ZLIB_HDR)
-source_group("ZLib" FILES ${ZLIB_SRC} ${ZLIB_HDR})
+include(../../lib/polarssl.cmake)
+add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
 
 
 # Include the shared files:
@@ -149,9 +138,7 @@ add_executable(ProtoProxy
 	${SHARED_HDR}
 	${SHARED_OSS_SRC}
 	${SHARED_OSS_HDR}
-	${POLARSSL_SRC}
-	${POLARSSL_HDR}
-	${ZLIB_SRC}
-	${ZLIB_HDR}
 )
+
+target_link_libraries(ProtoProxy zlib polarssl)
 

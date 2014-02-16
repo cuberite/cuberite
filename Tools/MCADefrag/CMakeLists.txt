@@ -31,7 +31,7 @@ endfunction()
 
 # Include the libraries:
 
-add_subdirectory(../../lib/zlib lib/zlib)
+add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
 
 set_exe_flags()
 
