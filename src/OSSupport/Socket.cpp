@@ -151,7 +151,8 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 		{
 			xSocket Socket = socket((int)IPv6, SOCK_STREAM, 0);
 			#if defined(_WIN32)
-			if (!IsWindowsVistaOrLater()) {
+			if (!IsVistaOrLater())
+			{
 				LOGWARNING("Dual Stack requires windows Vista or greater, server will only be accessable by IPv6");
 			}
 			else
