@@ -6,6 +6,7 @@ enable_language(CXX C)
 #THis has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
 	add_subdirectory(Tools/MCADefrag/)
+	add_subdirectory(Tools/ProtoProxy/)
 endif()
 
 if(${BUILD_UNSTABLE_TOOLS})
@@ -51,7 +52,7 @@ add_subdirectory(lib/md5/)
 
 # We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
 # (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
-add_subdirectory(lib/polarssl/ EXCLUDE_FROM_ALL)
+include(lib/polarssl.cmake)
 
 set_exe_flags()
 
