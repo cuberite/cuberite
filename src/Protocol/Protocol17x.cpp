@@ -1598,6 +1598,8 @@ void cProtocol172::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    Difficulty);
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ShowCape);
+	
+	m_Client->SetLocale(Locale);
 	// TODO: handle in m_Client
 }
 

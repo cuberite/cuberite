@@ -155,6 +155,9 @@ public:
 	
 	void SetViewDistance(int a_ViewDistance);		// tolua_export
 	int  GetViewDistance(void) const { return m_ViewDistance; }  // tolua_export
+	
+	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }  // tolua_export
+	AString GetLocale(void) const { return m_Locale; }  // tolua_export
 
 	int GetUniqueID() const { return m_UniqueID; }	// tolua_export
 	
@@ -308,7 +311,9 @@ private:
 	
 	/// Set to true when the chunk where the player is is sent to the client. Used for spawning the player
 	bool m_HasSentPlayerChunk;
-	
+
+	/// Client Settings
+	AString m_Locale;
 
 
 	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)

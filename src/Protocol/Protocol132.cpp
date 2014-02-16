@@ -560,7 +560,7 @@ int cProtocol132::ParseLocaleViewDistance(void)
 	HANDLE_PACKET_READ(ReadChar,            char,    ViewDistance);
 	HANDLE_PACKET_READ(ReadChar,            char,    ChatFlags);
 	HANDLE_PACKET_READ(ReadChar,            char,    ClientDifficulty);
-	// TODO: m_Client->HandleLocale(Locale);
+	m_Client->SetLocale(Locale);
 	// TODO: m_Client->HandleViewDistance(ViewDistance);
 	// TODO: m_Client->HandleChatFlags(ChatFlags);
 	// Ignoring client difficulty

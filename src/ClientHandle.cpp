@@ -95,6 +95,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
 	m_UniqueID(0),
+	m_Locale("en_GB"),
 	m_HasSentPlayerChunk(false)
 {
 	m_Protocol = new cProtocolRecognizer(this);
