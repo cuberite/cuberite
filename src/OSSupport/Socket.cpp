@@ -422,13 +422,13 @@ void cSocket::SetNonBlocking(void)
 #ifdef _WIN32
 bool IsVistaOrLater()
 {
-    DWORD version = GetVersion();
-    DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
-    DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
+	DWORD version = GetVersion();
+	DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
+	DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
 
-	//Vista is Windows NT 6.0
+	// Vista is Windows NT 6.0
 
-    return major >= 6;
+	return major >= 6;
 }
 #endif
 
