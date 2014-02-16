@@ -29,6 +29,7 @@ public:
 	{
 		cItem * In;
 		cItem * Out;
+		float OutExp;
 		int CookTime;  ///< How long this recipe takes to smelt, in ticks
 	};
 	

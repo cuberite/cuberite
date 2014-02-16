@@ -266,7 +266,7 @@ private:
 	
 	// Values required for block dig animation
 	int m_BlockDigAnimStage;  // Current stage of the animation; -1 if not digging
-	int m_BlockDigAnimSpeed;  // Current speed of the animation (units ???)
+	int m_BlockDigTick;
 	int m_BlockDigAnimX;
 	int m_BlockDigAnimY;
 	int m_BlockDigAnimZ;
@@ -322,11 +322,17 @@ private:
 	/// Adds a single chunk to be streamed to the client; used by StreamChunks()
 	void StreamChunk(int a_ChunkX, int a_ChunkZ);
 	
+	/// Get the current Block Dig Speed
+	float GetBlockDigSpeed(BLOCKTYPE a_Block);
+	
 	/// Handles the DIG_STARTED dig packet:
 	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
 	
 	/// Handles the DIG_FINISHED dig packet:
 	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+
+	/// Handles the DIG_CANCELLED dig packet:
+	void HandleBlockDigStop();
 
 	/// Handles the "MC|AdvCdm" plugin message
 	void HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length);

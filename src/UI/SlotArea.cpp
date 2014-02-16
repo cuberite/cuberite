@@ -31,6 +31,15 @@ cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
 
 
 
+bool cSlotArea::CanPlaceItem(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem)
+{
+	return true;
+}
+
+
+
+
+
 void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	/*
@@ -83,7 +92,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 	{
 		case caRightClick:
 		{
-			if (DraggingItem.m_ItemType <= 0) // Empty-handed?
+			if (DraggingItem.IsEmpty()) // Empty-handed?
 			{
 				DraggingItem = Slot.CopyOne(); // Obtain copy of slot to preserve lore, enchantments, etc.
 
@@ -95,26 +104,39 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 					Slot.Empty();
 				}
 			}
-			else if ((Slot.m_ItemType <= 0) || DraggingItem.IsEqual(Slot))
+			else if (Slot.IsEmpty() || DraggingItem.IsEqual(Slot))
 			{
-				// Drop one item in slot
-				cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
-				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
+				if (!CanPlaceItem(a_Player, a_SlotNum, DraggingItem))
 				{
-					char OldSlotCount = Slot.m_ItemCount;
-
-					Slot = DraggingItem.CopyOne(); // See above
-					OldSlotCount++;
-					Slot.m_ItemCount = OldSlotCount;
-
-					DraggingItem.m_ItemCount--;
+					// Same type, add items to cursor:
+					cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
+					if (DraggingItem.IsEqual(Slot) && ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= Handler->GetMaxStackSize()))
+					{
+						DraggingItem.m_ItemCount += Slot.m_ItemCount;
+						Slot.Empty();
+					}
 				}
-				if (DraggingItem.m_ItemCount <= 0)
+				else
 				{
-					DraggingItem.Empty();
+					// Drop one item in slot
+					cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
+					if (!DraggingItem.IsEmpty() && Slot.m_ItemCount < Handler->GetMaxStackSize())
+					{
+						char OldSlotCount = Slot.m_ItemCount;
+
+						Slot = DraggingItem.CopyOne(); // See above
+						OldSlotCount++;
+						Slot.m_ItemCount = OldSlotCount;
+
+						DraggingItem.m_ItemCount--;
+					}
+					if (DraggingItem.m_ItemCount <= 0)
+					{
+						DraggingItem.Empty();
+					}
 				}
 			}
-			else if (!DraggingItem.IsEqual(Slot))
+			else if (CanPlaceItem(a_Player, a_SlotNum, DraggingItem))
 			{
 				// Swap contents
 				cItem tmp(DraggingItem);
@@ -126,30 +148,44 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		
 		case caLeftClick:
 		{
-			// Left-clicked
-			if (!DraggingItem.IsEqual(Slot))
+			if (DraggingItem.IsEqual(Slot))
 			{
-				// Switch contents
-				cItem tmp(DraggingItem);
-				DraggingItem = Slot;
-				Slot = tmp;
+				cItemHandler * Handler = ItemHandler(DraggingItem.m_ItemType);
+				if (CanPlaceItem(a_Player, a_SlotNum, DraggingItem))
+				{
+					// Same type, add items:
+					int FreeSlots = Handler->GetMaxStackSize() - Slot.m_ItemCount;
+					if (FreeSlots < 0)
+					{
+						ASSERT(!"Bad item stack size - where did we get more items in a slot than allowed?");
+						FreeSlots = 0;
+					}
+					int Filling = (FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots;
+					Slot.m_ItemCount += (char)Filling;
+					DraggingItem.m_ItemCount -= (char)Filling;
+					if (DraggingItem.m_ItemCount <= 0)
+					{
+						DraggingItem.Empty();
+					}
+				}
+				else
+				{
+					// Same type, add items to cursor:
+					if ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= Handler->GetMaxStackSize())
+					{
+						DraggingItem.m_ItemCount += Slot.m_ItemCount;
+						Slot.Empty();
+					}
+				}
 			}
 			else
 			{
-				// Same type, add items:
-				cItemHandler * Handler = ItemHandler(DraggingItem.m_ItemType);
-				int FreeSlots = Handler->GetMaxStackSize() - Slot.m_ItemCount;
-				if (FreeSlots < 0)
+				if (!(!DraggingItem.IsEmpty() && !CanPlaceItem(a_Player, a_SlotNum, DraggingItem)))
 				{
-					ASSERT(!"Bad item stack size - where did we get more items in a slot than allowed?");
-					FreeSlots = 0;
-				}
-				int Filling = (FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots;
-				Slot.m_ItemCount += (char)Filling;
-				DraggingItem.m_ItemCount -= (char)Filling;
-				if (DraggingItem.m_ItemCount <= 0)
-				{
-					DraggingItem.Empty();
+					// Switch contents
+					cItem tmp(DraggingItem);
+					DraggingItem = Slot;
+					Slot = tmp;
 				}
 			}
 			break;
@@ -240,6 +276,11 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 			// Full stack already
 			continue;
 		}
+		if (!CanPlaceItem(a_Player, i, a_ItemStack))
+		{
+			continue;
+		}
+		
 		if (NumFit > a_ItemStack.m_ItemCount)
 		{
 			NumFit = a_ItemStack.m_ItemCount;
@@ -617,6 +658,15 @@ cSlotAreaFurnace::~cSlotAreaFurnace()
 
 
 
+bool cSlotAreaFurnace::CanPlaceItem(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem)
+{
+	return (a_SlotNum != 2);
+}
+
+
+
+
+
 void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
@@ -645,6 +695,27 @@ const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 
 void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
+	if (a_SlotNum == 2)
+	{
+		const cItem * OldItem = GetSlot(a_SlotNum, a_Player);
+		if (OldItem == NULL || OldItem->IsEmpty())
+		{
+			m_Furnace->SetSlot(a_SlotNum, a_Item);
+			return;
+		}
+		if (!a_Item.IsEmpty() && !OldItem->IsSameType(a_Item))
+		{
+			m_Furnace->SetSlot(a_SlotNum, a_Item);
+			return;
+		}
+		
+		if (a_Item.m_ItemCount <= OldItem->m_ItemCount)
+		{
+			int Count = OldItem->m_ItemCount - a_Item.m_ItemCount;
+			m_Furnace->GiveExperience(Count);
+		}
+	}
+	
 	m_Furnace->SetSlot(a_SlotNum, a_Item);
 }
 
