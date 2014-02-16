@@ -83,91 +83,97 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 		}
 	}
 
-	while (getline(f, line))
+	if (getline(f, line))
 	{
-		// To be compatible with Win32, check for existence of '\r'.
-		// Win32 files have the '\r' and Unix files don't at the end of a line.
-		// Note that the '\r' will be written to INI files from
-		// Unix so that the created INI file can be read under Win32
-		// without change.
-		size_t lineLength = line.length();
-		if (lineLength == 0)
-		{
-			continue;
-		}
-		if (line[lineLength - 1] == '\r')
-		{
-			line = line.substr(0, lineLength - 1);
-		}
+		// Removes UTF-8 Byte Order Markers (BOM) if, present.
+		RemoveBom(line);
 
-		if (line.length() == 0)
+		do
 		{
-			continue;
-		}
+			// To be compatible with Win32, check for existence of '\r'.
+			// Win32 files have the '\r' and Unix files don't at the end of a line.
+			// Note that the '\r' will be written to INI files from
+			// Unix so that the created INI file can be read under Win32
+			// without change.
+			size_t lineLength = line.length();
+			if (lineLength == 0)
+			{
+				continue;
+			}
+			if (line[lineLength - 1] == '\r')
+			{
+				line = line.substr(0, lineLength - 1);
+			}
 
-		// Check that the user hasn't opened a binary file by checking the first
-		// character of each line!
-		if (!isprint(line[0]))
-		{
-			printf("%s: Binary-check failed on char %d\n", __FUNCTION__, line[0]);
-			f.close();
-			return false;
-		}
-		if ((pLeft = line.find_first_of(";#[=")) == AString::npos)
-		{
-			continue;
-		}
+			if (line.length() == 0)
+			{
+				continue;
+			}
 
-		switch (line[pLeft])
-		{
+			// Check that the user hasn't opened a binary file by checking the first
+			// character of each line!
+			if (!isprint(line[0]))
+			{
+				printf("%s: Binary-check failed on char %d\n", __FUNCTION__, line[0]);
+				f.close();
+				return false;
+			}
+			if ((pLeft = line.find_first_of(";#[=")) == AString::npos)
+			{
+				continue;
+			}
+
+			switch (line[pLeft])
+			{
 			case '[':
 			{
-				if (
-					((pRight = line.find_last_of("]")) != AString::npos) &&
-					(pRight > pLeft)
-					)
-				{
-					keyname = line.substr(pLeft + 1, pRight - pLeft - 1);
-					AddKeyName(keyname);
-				}
-				break;
+						if (
+							((pRight = line.find_last_of("]")) != AString::npos) &&
+							(pRight > pLeft)
+							)
+						{
+							keyname = line.substr(pLeft + 1, pRight - pLeft - 1);
+							AddKeyName(keyname);
+						}
+						break;
 			}
 
 			case '=':
 			{
-				valuename = line.substr(0, pLeft);
-				value = line.substr(pLeft + 1);
-				AddValue(keyname, valuename, value);
-				break;
+						valuename = line.substr(0, pLeft);
+						value = line.substr(pLeft + 1);
+						AddValue(keyname, valuename, value);
+						break;
 			}
 
 			case ';':
 			case '#':
 			{
-				if (names.size() == 0)
-				{
-					AddHeaderComment(line.substr(pLeft + 1));
-				}
-				else
-				{
-					AddKeyComment(keyname, line.substr(pLeft + 1));
-				}
-				break;
+						if (names.size() == 0)
+						{
+							AddHeaderComment(line.substr(pLeft + 1));
+						}
+						else
+						{
+							AddKeyComment(keyname, line.substr(pLeft + 1));
+						}
+						break;
 			}
-		}  // switch (line[pLeft])
-	}  // while (getline())
+			}  // switch (line[pLeft])
+		} while (getline(f, line));  // do
 
-	f.close();
-	if (names.size() == 0)
-	{
-		return false;
+		f.close();
+		if (names.size() == 0)
+		{
+			return false;
+		}
+
+		if (IsFromExampleRedirect)
+		{
+			WriteFile(FILE_IO_PREFIX + a_FileName);
+		}
+		return true;
 	}
-	
-	if (IsFromExampleRedirect)
-	{
-		WriteFile(FILE_IO_PREFIX + a_FileName);
-	}
-	return true;
 }
 
 
@@ -819,6 +825,22 @@ AString cIniFile::CheckCase(const AString & s) const
 		res[i] = tolower(res[i]);
 	}
 	return res;
+}
+
+
+
+
+
+void cIniFile::RemoveBom(AString & a_line) const
+{
+	// The BOM sequence for UTF-8 is 0xEF,0xBB,0xBF ( In Unicode Latin I: ﻿ )
+	static char BOM[] = { 0xEF, 0xBB, 0xBF };
+
+	// The BOM sequence, if present, is always the first three characters of the input.
+	if (a_line.compare(0, 3, BOM) == 0)
+	{
+		a_line.erase(0, 3);
+	}
 }
 
 
