@@ -167,10 +167,14 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 			case cSocket::IPv4:
 			case cSocket::IPv6:
 			case cSocket::IPDual:
+			{
 				res = m_Sockets.back().BindToAny(Port);
 				break;
+			}
 			case cSocket::INVALID_PROTOCOL:
+			{
 				ASSERT(!"Invalid Protocol");
+			}
 		}
 		if (!res)
 		{
