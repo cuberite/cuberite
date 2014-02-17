@@ -165,7 +165,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 				break;
 			}
 		}  // switch (line[pLeft])
-	}  // while(getline(f, line))
+	}  // while(getline())
 
 	f.close();
 	if (names.size() == 0)
