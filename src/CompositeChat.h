@@ -48,6 +48,9 @@ public:
 		AString m_Style;
 		
 		cBasePart(ePartType a_PartType, const AString & a_Text, const AString & a_Style = "");
+		
+		// Force a virtual destructor in descendants
+		virtual ~cBasePart() {}
 	} ;
 	
 	class cTextPart :
