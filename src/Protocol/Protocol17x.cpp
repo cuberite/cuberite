@@ -26,6 +26,7 @@ Implements the 1.7.x protocol classes:
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
 #include "../BlockEntities/CommandBlockEntity.h"
+#include "../BlockEntities/SkullEntity.h"
 #include "../CompositeChat.h"
 
 
@@ -1042,6 +1043,7 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	{
 		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
+		case E_BLOCK_HEAD:          Action = 4; break; // Update Skull entity
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteByte(Action);
@@ -2268,6 +2270,18 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 				Writer.AddString("LastOutput", Output.c_str());
 			}
 			break;
+		}
+		case E_BLOCK_HEAD:
+		{
+			cSkullEntity & SkullEntity = (cSkullEntity &)a_BlockEntity;
+			
+			Writer.AddInt("x", SkullEntity.GetPosX());
+			Writer.AddInt("y", SkullEntity.GetPosY());
+			Writer.AddInt("z", SkullEntity.GetPosZ());
+			Writer.AddByte("SkullType", SkullEntity.GetSkullType() & 0xFF);
+			Writer.AddByte("Rot", SkullEntity.GetRotation() & 0xFF);
+			Writer.AddString("ExtraType", SkullEntity.GetOwner().c_str());
+			Writer.AddString("id", "Skull"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 		}
 		default: break;
 	}

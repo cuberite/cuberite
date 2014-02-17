@@ -35,6 +35,7 @@
 #include "ItemShears.h"
 #include "ItemShovel.h"
 #include "ItemSign.h"
+#include "ItemSkull.h"
 #include "ItemSpawnEgg.h"
 #include "ItemSugarcane.h"
 #include "ItemSword.h"
@@ -110,6 +111,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
 		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);
 		case E_ITEM_SIGN:              return new cItemSignHandler(a_ItemType);
+		case E_ITEM_HEAD:              return new cItemSkullHandler(a_ItemType);
 		case E_ITEM_SNOWBALL:          return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:         return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemType);

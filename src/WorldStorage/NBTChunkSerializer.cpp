@@ -19,6 +19,7 @@
 #include "../BlockEntities/JukeboxEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
+#include "../BlockEntities/SkullEntity.h"
 
 #include "../Entities/Entity.h"
 #include "../Entities/FallingBlock.h"
@@ -248,11 +249,25 @@ void cNBTChunkSerializer::AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock
 void cNBTChunkSerializer::AddSignEntity(cSignEntity * a_Sign)
 {
 	m_Writer.BeginCompound("");
-	AddBasicTileEntity(a_Sign, "Sign");
-	m_Writer.AddString("Text1",   a_Sign->GetLine(0));
-	m_Writer.AddString("Text2",   a_Sign->GetLine(1));
-	m_Writer.AddString("Text3",   a_Sign->GetLine(2));
-	m_Writer.AddString("Text4",   a_Sign->GetLine(3));
+		AddBasicTileEntity(a_Sign, "Sign");
+		m_Writer.AddString("Text1",   a_Sign->GetLine(0));
+		m_Writer.AddString("Text2",   a_Sign->GetLine(1));
+		m_Writer.AddString("Text3",   a_Sign->GetLine(2));
+		m_Writer.AddString("Text4",   a_Sign->GetLine(3));
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddSkullEntity(cSkullEntity * a_Skull)
+{
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Skull, "Skull");
+		m_Writer.AddByte  ("SkullType", a_Skull->GetSkullType() & 0xFF);
+		m_Writer.AddByte  ("Rot",       a_Skull->GetRotation() & 0xFF);
+		m_Writer.AddString("ExtraType", a_Skull->GetOwner());
 	m_Writer.EndCompound();
 }
 
@@ -666,6 +681,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)       a_Entity); break;
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:      AddSignEntity        ((cSignEntity *)         a_Entity); break;
+		case E_BLOCK_HEAD:          AddSkullEntity       ((cSkullEntity *)        a_Entity); break;
 		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        ((cNoteEntity *)         a_Entity); break;
 		case E_BLOCK_JUKEBOX:       AddJukeboxEntity     ((cJukeboxEntity *)      a_Entity); break;
 		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity((cCommandBlockEntity *) a_Entity); break;

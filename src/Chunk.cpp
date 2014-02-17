@@ -1314,6 +1314,7 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_HOPPER:
 					case E_BLOCK_SIGN_POST:
 					case E_BLOCK_WALLSIGN:
+					case E_BLOCK_HEAD:
 					case E_BLOCK_NOTE_BLOCK:
 					case E_BLOCK_JUKEBOX:
 					{
@@ -1442,6 +1443,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_HOPPER:
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
+		case E_BLOCK_HEAD:
 		case E_BLOCK_NOTE_BLOCK:
 		case E_BLOCK_JUKEBOX:
 		{
