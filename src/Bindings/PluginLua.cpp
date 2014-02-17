@@ -82,6 +82,14 @@ bool cPluginLua::Initialize(void)
 		lua_pushstring(m_LuaState, GetName().c_str());
 		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
 		
+		// Add the plugin's folder to the package.path and package.cpath variables (#693):
+		m_LuaState.AddPackagePath("path", FILE_IO_PREFIX + GetLocalFolder() + "/?.lua");
+		#ifdef _WIN32
+			m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "\\?.dll");
+		#else
+			m_LuaState.AddPackagePath("cpath", FILE_IO_PREFIX + GetLocalFolder() + "/?.so");
+		#endif
+		
 		tolua_pushusertype(m_LuaState, this, "cPluginLua");
 		lua_setglobal(m_LuaState, "g_Plugin");
 	}

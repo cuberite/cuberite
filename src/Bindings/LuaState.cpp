@@ -173,6 +173,31 @@ void cLuaState::Detach(void)
 
 
 
+void cLuaState::AddPackagePath(const AString & a_PathVariable, const AString & a_Path)
+{
+	// Get the current path:
+	lua_getfield(m_LuaState, LUA_GLOBALSINDEX, "package");                           // Stk: <package>
+	lua_getfield(m_LuaState, -1, a_PathVariable.c_str());                            // Stk: <package> <package.path>
+	size_t len = 0;
+	const char * PackagePath = lua_tolstring(m_LuaState, -1, &len);
+	
+	// Append the new path:
+	AString NewPackagePath(PackagePath, len);
+	NewPackagePath.append(LUA_PATHSEP);
+	NewPackagePath.append(a_Path);
+	
+	// Set the new path to the environment:
+	lua_pop(m_LuaState, 1);                                                          // Stk: <package>
+	lua_pushlstring(m_LuaState, NewPackagePath.c_str(), NewPackagePath.length());    // Stk: <package> <NewPackagePath>
+	lua_setfield(m_LuaState, -2, a_PathVariable.c_str());                            // Stk: <package>
+	lua_pop(m_LuaState, 1);
+	lua_pop(m_LuaState, 1);                                                          // Stk: -
+}
+
+
+
+
+
 bool cLuaState::LoadFile(const AString & a_FileName)
 {
 	ASSERT(IsValid());
@@ -1251,6 +1276,7 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 			case LUA_TLIGHTUSERDATA: Printf(Value, "%p", lua_touserdata(a_LuaState, i)); break;
 			case LUA_TNUMBER:        Printf(Value, "%f", (double)lua_tonumber(a_LuaState, i)); break;
 			case LUA_TSTRING:        Printf(Value, "%s", lua_tostring(a_LuaState, i)); break;
+			case LUA_TTABLE:         Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
 			default: break;
 		}
 		LOGD("  Idx %d: type %d (%s) %s", i, Type, lua_typename(a_LuaState, Type), Value.c_str());

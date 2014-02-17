@@ -154,6 +154,9 @@ public:
 	/** Returns true if the m_LuaState is valid */
 	bool IsValid(void) const { return (m_LuaState != NULL); }
 	
+	/** Adds the specified path to package.<a_PathVariable> */
+	void AddPackagePath(const AString & a_PathVariable, const AString & a_Path);
+	
 	/** Loads the specified file
 	Returns false and logs a warning to the console if not successful (but the LuaState is kept open).
 	m_SubsystemName is displayed in the warning log message.
