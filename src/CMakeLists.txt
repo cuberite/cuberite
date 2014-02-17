@@ -39,6 +39,7 @@ if (NOT MSVC)
 		BlockEntities/JukeboxEntity.h
 		BlockEntities/NoteEntity.h
 		BlockEntities/SignEntity.h
+		BlockEntities/SkullEntity.h
 		BlockID.h
 		BoundingBox.h
 		ChatColor.h
