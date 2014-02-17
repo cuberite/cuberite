@@ -56,7 +56,7 @@ void cPluginManager::ReloadPlugins(void)
 
 void cPluginManager::FindPlugins(void)
 {
-	AString PluginsPath = FILE_IO_PREFIX + AString( "Plugins/" );
+	AString PluginsPath = GetPluginsPath() + "/";
 
 	// First get a clean list of only the currently running plugins, we don't want to mess those up
 	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
