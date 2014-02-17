@@ -21,6 +21,7 @@
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
+#include "ItemItemFrame.h"
 #include "ItemHoe.h"
 #include "ItemLeaves.h"
 #include "ItemLighter.h"
@@ -105,6 +106,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FISHING_ROD:       return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
@@ -342,6 +344,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_GUNPOWDER:            return 64;
 		case E_ITEM_HEAD:                 return 64;
 		case E_ITEM_IRON:                 return 64;
+		case E_ITEM_ITEM_FRAME:           return 64;
 		case E_ITEM_LEATHER:              return 64;
 		case E_ITEM_MAGMA_CREAM:          return 64;
 		case E_ITEM_MAP:                  return 64;
