@@ -27,10 +27,10 @@ public:
 
 	cMapSerializer(const AString& a_WorldName, cMap * a_Map);
 
-	/// Try to load the scoreboard
+	/** Try to load the scoreboard */
 	bool Load(void);
 
-	/// Try to save the scoreboard
+	/** Try to save the scoreboard */
 	bool Save(void);
 
 
@@ -56,8 +56,10 @@ public:
 
 	cIDCountSerializer(const AString & a_WorldName);
 
+	/** Try to load the ID counts */
 	bool Load(void);
 
+	/** Try to save the ID counts */
 	bool Save(void);
 
 	inline unsigned int GetMapCount(void) const { return m_MapCount; }
@@ -70,6 +72,7 @@ private:
 	AString m_Path;
 
 	unsigned int m_MapCount;
+
 };
 
 

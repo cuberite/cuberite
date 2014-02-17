@@ -1574,8 +1574,7 @@ cMap * cWorld::CreateMap(int a_CenterX, int a_CenterY, int a_Scale)
 {
 	if (m_MapData.size() >= 65536)
 	{
-		LOGD("cWorld::CreateMap - Too many maps in use");
-
+		LOGWARN("Could not craft map - Too many maps in use");
 		return NULL;
 	}
 
@@ -2992,9 +2991,12 @@ void cWorld::LoadMapData(void)
 {
 	cIDCountSerializer IDSerializer(GetName());
 
-	IDSerializer.Load();
+	if (!IDSerializer.Load())
+	{
+		return;
+	}
 
-	unsigned int MapCount = IDSerializer.GetMapCount() + 1;
+	unsigned int MapCount = IDSerializer.GetMapCount();
 
 	m_MapData.clear();
 
@@ -3004,7 +3006,10 @@ void cWorld::LoadMapData(void)
 
 		cMapSerializer Serializer(GetName(), &Map);
 
-		Serializer.Load();
+		if (!Serializer.Load())
+		{
+			LOGWARN("Could not load map #%i", Map.GetID());
+		}
 
 		m_MapData.push_back(Map);
 	}
@@ -3023,9 +3028,13 @@ void cWorld::SaveMapData(void)
 
 	cIDCountSerializer IDSerializer(GetName());
 
-	IDSerializer.SetMapCount(m_MapData.size() - 1);
+	IDSerializer.SetMapCount(m_MapData.size());
 
-	IDSerializer.Save();
+	if (!IDSerializer.Save())
+	{
+		LOGERROR("Could not save idcounts.dat");
+		return;
+	}
 
 	for (cMapList::iterator it = m_MapData.begin(); it != m_MapData.end(); ++it)
 	{
@@ -3033,7 +3042,10 @@ void cWorld::SaveMapData(void)
 
 		cMapSerializer Serializer(GetName(), &Map);
 
-		Serializer.Save();
+		if (!Serializer.Save())
+		{
+			LOGWARN("Could not save map #%i", Map.GetID());
+		}
 	}
 }
 

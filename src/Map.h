@@ -38,6 +38,8 @@ public:
 
 	typedef std::vector<ColorID> cColorList;
 
+	static const unsigned int DEFAULT_RADIUS = 128;
+
 
 public:
 
@@ -53,6 +55,10 @@ public:
 	void UpdateRadius(int a_PixelX, int a_PixelZ, unsigned int a_Radius);
 
 	void UpdateRadius(cPlayer & a_Player, unsigned int a_Radius);
+
+	void UpdateTrackedPlayers(void);
+
+	void AddTrackedPlayer(cPlayer * a_Player);
 
 	// tolua_begin
 
@@ -93,7 +99,7 @@ public:
 private:
 
 	/** Update the specified pixel. */
-	bool UpdatePixel(unsigned int a_X, unsigned int a_Y);
+	bool UpdatePixel(unsigned int a_X, unsigned int a_Z);
 
 	unsigned int m_ID;
 
@@ -111,8 +117,9 @@ private:
 
 	cWorld * m_World;
 
-	//typedef std::vector<cPlayer*> cPlayerList;
-	//cPlayerList m_TrackedPlayers;
+	typedef std::set<cPlayer*> cTrackedPlayerList;
+
+	cTrackedPlayerList m_TrackedPlayers;
 
 	AString m_Name;
 

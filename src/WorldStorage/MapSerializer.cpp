@@ -223,7 +223,11 @@ bool cIDCountSerializer::Load(void)
 	int CurrLine = NBT.FindChildByName(0, "map");
 	if (CurrLine >= 0)
 	{
-		m_MapCount = (int)NBT.GetShort(CurrLine);
+		m_MapCount = (int)NBT.GetShort(CurrLine) + 1;
+	}
+	else
+	{
+		m_MapCount = 0;
 	}
 
 	return true;
@@ -237,7 +241,10 @@ bool cIDCountSerializer::Save(void)
 {
 	cFastNBTWriter Writer;
 
-	Writer.AddShort("map", m_MapCount);
+	if (m_MapCount > 0)
+	{
+		Writer.AddShort("map", m_MapCount - 1);
+	}
 
 	Writer.Finish();
 	

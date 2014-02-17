@@ -50,15 +50,25 @@ cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, un
 
 
 
+template <typename T>
+T Clamp(T a_X, T a_Min, T a_Max)
+{
+	return std::min(std::max(a_X, a_Min), a_Max);
+}
+
+
+
+
+
 void cMap::UpdateRadius(int a_PixelX, int a_PixelZ, unsigned int a_Radius)
 {
 	int PixelRadius = a_Radius / GetPixelWidth();
 
-	unsigned int StartX = std::max(a_PixelX - PixelRadius, 0);
-	unsigned int StartZ = std::max(a_PixelZ - PixelRadius, 0);
+	unsigned int StartX = Clamp(a_PixelX - PixelRadius, 0, (int)m_Width);
+	unsigned int StartZ = Clamp(a_PixelZ - PixelRadius, 0, (int)m_Height);
 
-	unsigned int EndX = std::min(a_PixelX + PixelRadius, (int)m_Width);
-	unsigned int EndZ = std::min(a_PixelZ + PixelRadius, (int)m_Height);
+	unsigned int EndX   = Clamp(a_PixelX + PixelRadius, 0, (int)m_Width);
+	unsigned int EndZ   = Clamp(a_PixelZ + PixelRadius, 0, (int)m_Height);
 
 	for (unsigned int X = StartX; X < EndX; ++X)
 	{
@@ -93,11 +103,9 @@ void cMap::UpdateRadius(cPlayer & a_Player, unsigned int a_Radius)
 
 
 
-bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Y)
+bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 {
-	ASSERT(m_World != NULL);
-
-	unsigned int PixelWidth = GetPixelWidth();
+	/*unsigned int PixelWidth = GetPixelWidth();
 
 	int BlockX = m_CenterX + ((a_X - m_Width)  * PixelWidth);
 	int BlockZ = m_CenterZ + ((a_Y - m_Height) * PixelWidth);
@@ -119,7 +127,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Y)
 
 	public:
 		cCalculatePixelCb(cMap * a_Map, int a_RelX, int a_RelZ)
-			: m_Map(a_Map), m_RelX(a_RelX), m_RelZ(a_RelZ), m_PixelData(0) {}
+			: m_Map(a_Map), m_RelX(a_RelX), m_RelZ(a_RelZ), m_PixelData(4) {}
 
 		virtual bool Item(cChunk * a_Chunk) override
 		{
@@ -155,11 +163,44 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Y)
 	} CalculatePixelCb(this, RelX, RelZ);
 
 	ASSERT(m_World != NULL);
-	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);
+	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);*/
 
-	m_Data[a_Y + (a_X * m_Height)] = CalculatePixelCb.GetPixelData();
+	m_Data[a_Z + (a_X * m_Height)] = 4;
 
 	return true;
+}
+
+
+
+
+
+void cMap::UpdateTrackedPlayers(void)
+{
+	cTrackedPlayerList NewList;
+
+	for (cTrackedPlayerList::iterator it = m_TrackedPlayers.begin(); it != m_TrackedPlayers.end(); ++it)
+	{
+		cPlayer * Player = *it;
+
+		UpdateRadius(*Player, DEFAULT_RADIUS);
+
+		if (true)
+		{
+			NewList.insert(Player);
+		}
+	}
+
+	std::swap(m_TrackedPlayers, NewList);
+}
+
+
+
+
+
+void cMap::AddTrackedPlayer(cPlayer * a_Player)
+{
+	ASSERT(a_Player != NULL);
+	m_TrackedPlayers.insert(a_Player);
 }
 
 

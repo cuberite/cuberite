@@ -1199,8 +1199,6 @@ void cClientHandle::HandleSlotSelected(short a_SlotNum)
 
 		if (Map != NULL)
 		{
-			Map->UpdateRadius(*m_Player, 128); // Temporary
-
 			// TODO 2014-02-14 xdot: Optimization - Do not send the whole map.
 			Map->SendTo(*this);
 		}

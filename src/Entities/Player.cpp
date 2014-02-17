@@ -254,6 +254,9 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		HandleFloater();
 	}
 
+	// Update items (e.g. Maps)
+	m_Inventory.UpdateItems();
+
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
 	cTimer t1;
 	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime())

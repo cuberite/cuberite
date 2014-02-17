@@ -515,6 +515,31 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 
 
 
+void cInventory::UpdateItems(void)
+{
+	const cItem & Slot = GetEquippedItem();
+
+	if (Slot.IsEmpty())
+	{
+		return;
+	}
+
+	switch (Slot.m_ItemType)
+	{
+		case E_ITEM_MAP:
+		{
+			ItemHandler(Slot.m_ItemType)->OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
+			break;
+		}
+
+		default: break;
+	}
+}
+
+
+
+
+
 void cInventory::SaveToJson(Json::Value & a_Value)
 {
 	// The JSON originally included the 4 crafting slots and the result, so we have to put empty items there, too:
