@@ -132,37 +132,37 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 		{
 			case '[':
 			{
-					if (
-						((pRight = line.find_last_of("]")) != AString::npos) &&
-						(pRight > pLeft)
-						)
-					{
-						keyname = line.substr(pLeft + 1, pRight - pLeft - 1);
-						AddKeyName(keyname);
-					}
-					break;
+				if (
+					((pRight = line.find_last_of("]")) != AString::npos) &&
+					(pRight > pLeft)
+					)
+				{
+					keyname = line.substr(pLeft + 1, pRight - pLeft - 1);
+					AddKeyName(keyname);
+				}
+				break;
 			}
 
 			case '=':
 			{
-					valuename = line.substr(0, pLeft);
-					value = line.substr(pLeft + 1);
-					AddValue(keyname, valuename, value);
-					break;
+				valuename = line.substr(0, pLeft);
+				value = line.substr(pLeft + 1);
+				AddValue(keyname, valuename, value);
+				break;
 			}
 
 			case ';':
 			case '#':
 			{
-					if (names.size() == 0)
-					{
-						AddHeaderComment(line.substr(pLeft + 1));
-					}
-					else
-					{
-						AddKeyComment(keyname, line.substr(pLeft + 1));
-					}
-					break;
+				if (names.size() == 0)
+				{
+					AddHeaderComment(line.substr(pLeft + 1));
+				}
+				else
+				{
+					AddKeyComment(keyname, line.substr(pLeft + 1));
+				}
+				break;
 			}
 		}  // switch (line[pLeft])
 	}  // while(getline(f, line))
