@@ -130,8 +130,8 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 
 		switch (line[pLeft])
 		{
-		case '[':
-		{
+			case '[':
+			{
 					if (
 						((pRight = line.find_last_of("]")) != AString::npos) &&
 						(pRight > pLeft)
@@ -141,19 +141,19 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 						AddKeyName(keyname);
 					}
 					break;
-		}
+			}
 
-		case '=':
-		{
+			case '=':
+			{
 					valuename = line.substr(0, pLeft);
 					value = line.substr(pLeft + 1);
 					AddValue(keyname, valuename, value);
 					break;
-		}
+			}
 
-		case ';':
-		case '#':
-		{
+			case ';':
+			case '#':
+			{
 					if (names.size() == 0)
 					{
 						AddHeaderComment(line.substr(pLeft + 1));
@@ -163,7 +163,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 						AddKeyComment(keyname, line.substr(pLeft + 1));
 					}
 					break;
-		}
+			}
 		}  // switch (line[pLeft])
 	}  // while(getline(f, line))
 
