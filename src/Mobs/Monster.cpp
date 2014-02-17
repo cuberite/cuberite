@@ -142,11 +142,11 @@ void cMonster::TickPathFinding()
 		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYM = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY - 1, gCrossCoords[i].z + PosZ);
 
-		if (!g_BlockIsSolid[BlockAtY] && !g_BlockIsSolid[BlockAtYP] && !IsBlockLava(BlockAtYM) && BlockAtY!=E_BLOCK_FENCE && BlockAtY!=E_BLOCK_FENCE_GATE)
+		if ((!g_BlockIsSolid[BlockAtY]) && (!g_BlockIsSolid[BlockAtYP]) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY, gCrossCoords[i].z + PosZ));
 		}
-		else if (g_BlockIsSolid[BlockAtY] && !g_BlockIsSolid[BlockAtYP] && !g_BlockIsSolid[BlockAtYPP] && !IsBlockLava(BlockAtYM) && BlockAtY!=E_BLOCK_FENCE && BlockAtY!=E_BLOCK_FENCE_GATE)
+		else if ((g_BlockIsSolid[BlockAtY]) && (!g_BlockIsSolid[BlockAtYP]) && (!g_BlockIsSolid[BlockAtYPP]) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY + 1, gCrossCoords[i].z + PosZ));
 		}
