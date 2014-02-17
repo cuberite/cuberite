@@ -124,12 +124,6 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		super::Tick(a_Dt, a_Chunk);
 	}
-	
-	// The wolf is sitting so don't move him at all.
-	if (IsSitting())
-	{
-		m_bMovingToDestination = false;
-	}
 
 	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
 	if (a_Closest_Player != NULL)
@@ -148,18 +142,15 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 					SetIsBegging(true);
 					m_World->BroadcastEntityMetadata(*this);
 				}
+
+				m_FinalDestination = a_Closest_Player->GetPosition(); // So that we will look at a player holding food
+
 				// Don't move to the player if the wolf is sitting.
-				if (IsSitting())
+				if (!IsSitting())
 				{
-					m_bMovingToDestination = false;
+					MoveToPosition(a_Closest_Player->GetPosition());
 				}
-				else
-				{
-					m_bMovingToDestination = true;
-				}
-				Vector3d PlayerPos = a_Closest_Player->GetPosition();
-				PlayerPos.y++;
-				m_FinalDestination = PlayerPos;
+
 				break;
 			}
 			default:
@@ -173,9 +164,13 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (IsTame())
+	if (IsTame() && !IsSitting())
 	{
 		TickFollowPlayer();
+	}
+	else if (IsSitting())
+	{
+		m_bMovingToDestination = false;
 	}
 }
 
@@ -196,29 +191,19 @@ void cWolf::TickFollowPlayer()
 	public:
 		Vector3d OwnerPos;
 	} Callback;
+
 	if (m_World->DoWithPlayer(m_OwnerName, Callback))
 	{
 		// The player is present in the world, follow him:
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();
 		if (Distance > 30)
 		{
-			if (!IsSitting())
-			{
-				Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
-				TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
-			}
+			Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
+			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
 		}
 		else
 		{
-			m_FinalDestination = Callback.OwnerPos;
-			if (IsSitting())
-			{
-				m_bMovingToDestination = false;
-			}
-			else
-			{
-				m_bMovingToDestination = true;
-			}
+			MoveToPosition(Callback.OwnerPos);
 		}
 	}
 }
