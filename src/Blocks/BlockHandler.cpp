@@ -34,6 +34,7 @@
 #include "BlockGlass.h"
 #include "BlockGlowstone.h"
 #include "BlockGravel.h"
+#include "BlockSkull.h"
 #include "BlockHopper.h"
 #include "BlockIce.h"
 #include "BlockLadder.h"
@@ -146,6 +147,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
 		case E_BLOCK_HAY_BALE:              return new cBlockSidewaysHandler        (a_BlockType);
+		case E_BLOCK_HEAD:                  return new cBlockSkullHandler           (a_BlockType);
 		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);
 		case E_BLOCK_ICE:                   return new cBlockIceHandler             (a_BlockType);
 		case E_BLOCK_INACTIVE_COMPARATOR:   return new cBlockComparatorHandler      (a_BlockType);

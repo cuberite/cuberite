@@ -12,12 +12,10 @@
 
 
 
-cSkullEntity::cSkullEntity(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, cWorld * a_World) :
+cSkullEntity::cSkullEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(E_BLOCK_HEAD, a_BlockX, a_BlockY, a_BlockZ, a_World),
-	//m_SkullType(static_cast<eSkullType>(a_BlockMeta)),
 	m_Owner("")
 {
-	
 }
 
 

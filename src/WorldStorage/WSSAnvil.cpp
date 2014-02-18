@@ -940,7 +940,7 @@ void cWSSAnvil::LoadSkullFromNBT(cBlockEntityList & a_BlockEntities, const cPars
 	{
 		return;
 	}
-	std::auto_ptr<cSkullEntity> Skull(new cSkullEntity(E_BLOCK_HEAD, x, y, z, m_World));
+	std::auto_ptr<cSkullEntity> Skull(new cSkullEntity(x, y, z, m_World));
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "SkullType");
 	if (currentLine >= 0)
