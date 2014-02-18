@@ -565,7 +565,8 @@ public:
 	bool SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome);
 	
 	/** Sets the biome at the area. Returns true if successful, false if any subarea failed (chunk not loaded).
-	(Re)sends the chunks to their relevant clients if successful. */
+	(Re)sends the chunks to their relevant clients if successful.
+	The cuboid needn't be sorted. */
 	bool SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome);
 
 	/** Returns the name of the world */

@@ -1507,7 +1507,11 @@ bool cWorld::SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBi
 
 bool cWorld::SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome)
 {
-	return SetAreaBiome(a_Area.p1.x, a_Area.p2.x, a_Area.p1.z, a_Area.p2.z, a_Biome);
+	return SetAreaBiome(
+		std::min(a_Area.p1.x, a_Area.p2.x), std::max(a_Area.p1.x, a_Area.p2.x),
+		std::min(a_Area.p1.z, a_Area.p2.z), std::max(a_Area.p1.z, a_Area.p2.z),
+		a_Biome
+	);
 }
 
 
