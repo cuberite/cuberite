@@ -21,7 +21,7 @@ public:
 
 	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
-		if (a_Dir == BLOCK_FACE_NONE)
+		if ((a_Dir == BLOCK_FACE_NONE) || (a_Dir == BLOCK_FACE_YP) || (a_Dir == BLOCK_FACE_YM))
 		{
 			// Client sends this if clicked on top or bottom face
 			return false;
