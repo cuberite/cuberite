@@ -33,19 +33,7 @@ public:
 
 		if (Block == E_BLOCK_AIR)
 		{
-			int Dir = 0;
-			
-			// The client uses different values for painting directions and block faces. Our constants are for the block faces, so we convert them here to painting faces
-			switch (a_Dir)
-			{
-				case BLOCK_FACE_ZP: break; // Initialised to zero
-				case BLOCK_FACE_ZM: Dir = 2; break;
-				case BLOCK_FACE_XM: Dir = 1; break;
-				case BLOCK_FACE_XP: Dir = 3; break;
-				default: ASSERT(!"Unhandled block face when trying spawn item frame!"); return false;
-			}
-
-			cItemFrame * ItemFrame = new cItemFrame(Dir, a_BlockX, a_BlockY, a_BlockZ);
+			cItemFrame * ItemFrame = new cItemFrame(a_Dir, a_BlockX, a_BlockY, a_BlockZ);
 			ItemFrame->Initialize(a_World);
 
 			if (!a_Player->IsGameModeCreative())
