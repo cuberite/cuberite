@@ -405,6 +405,14 @@ void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, flo
 
 
 
+void cProtocolRecognizer::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	m_Protocol->SendPaintingSpawn(a_Painting);
+}
+
+
+
+
 
 void cProtocolRecognizer::SendPickupSpawn(const cPickup & a_Pickup)
 {

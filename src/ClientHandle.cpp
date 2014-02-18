@@ -2091,6 +2091,14 @@ void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
+void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	m_Protocol->SendPaintingSpawn(a_Painting);
+}
+
+
+
+
 
 void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
