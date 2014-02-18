@@ -48,7 +48,9 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 		// Item not empty, rotate, clipping values to zero to three inclusive
 		m_Rotation++;
 		if (m_Rotation >= 4)
+		{
 			m_Rotation = 0;
+		}
 	}
 	else if (!a_Player.GetEquippedItem().IsEmpty())
 	{
