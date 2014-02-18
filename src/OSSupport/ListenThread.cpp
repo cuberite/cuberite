@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "ListenThread.h"
+#include "SocketSet.h"
 
 
 
@@ -208,6 +209,8 @@ void cListenThread::Execute(void)
 		return;
 	}
 	
+	
+	/*
 	// Find the highest socket number:
 	cSocket::xSocket Highest = m_Sockets[0].GetSocket();
 	for (cSockets::iterator itr = m_Sockets.begin(), end = m_Sockets.end(); itr != end; ++itr)
@@ -216,10 +219,13 @@ void cListenThread::Execute(void)
 		{
 			Highest = itr->GetSocket();
 		}
-	}  // for itr - m_Sockets[]
+	}  // for itr - m_Sockets[]*/
+	
+	cSocketSet SocketSet(m_Sockets);
 
 	while (!m_ShouldTerminate)
 	{
+		/*
 		// Put all sockets into a FD set:
 		fd_set fdRead;
 		FD_ZERO(&fdRead);
@@ -233,12 +239,18 @@ void cListenThread::Execute(void)
 		tv.tv_usec = 0;
 		if (select(Highest + 1, &fdRead, NULL, NULL, &tv) == -1)
 		{
+fail
+		}
+		*/
+		
+		if (!cSocket::SelectRead(SocketSet, 1))
+		{
 			LOG("select(R) call failed in cListenThread: \"%s\"", cSocket::GetLastErrorString().c_str());
 			continue;
 		}
-		for (cSockets::iterator itr = m_Sockets.begin(), end = m_Sockets.end(); itr != end; ++itr)
+		for (cSocketSet::cEventIterator itr = SocketSet.Eventbegin(), end = SocketSet.Eventend(); itr != end; ++itr)
 		{
-			if (itr->IsValid() && FD_ISSET(itr->GetSocket(), &fdRead))
+			if (itr->IsValid())
 			{
 				cSocket Client = itr->Accept();
 				if (Client.IsValid())
@@ -247,6 +259,7 @@ void cListenThread::Execute(void)
 				}
 			}
 		}  // for itr - m_Sockets[]
+		SocketSet.Reset();
 	}  // while (!m_ShouldTerminate)
 }
 

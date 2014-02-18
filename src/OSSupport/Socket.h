@@ -17,6 +17,9 @@
 #include "Errors.h"
 
 
+class cSocketSet;
+
+
 class cSocket
 {
 public:
@@ -56,11 +59,13 @@ public:
 	Most TCPIP implementations use this to send the FIN flag in a packet */
 	void ShutdownReadWrite(void);
 	
-	xSocket GetSocket(void) const;
+	//xSocket GetSocket(void) const;
 	
 	bool operator == (const cSocket & a_Other) const {return m_Socket == a_Other.m_Socket; }
 	
-	void SetSocket(xSocket a_Socket);
+	bool operator < (const cSocket & a_Other) const {return m_Socket < a_Other.m_Socket; }
+	
+	//void SetSocket(xSocket a_Socket);
 
 	/// Sets the address-reuse socket flag; returns true on success
 	bool SetReuseAddress(void);
@@ -118,8 +123,14 @@ public:
 	
 	/** Sets the socket into non-blocking mode */
 	void SetNonBlocking(void);
+	
+	operator int ();
+	
+	static bool SelectRead(cSocketSet a_Sockets, int timeout);
+	static bool SelectReadWrite(cSocketSet a_ReadSockets, cSocketSet a_WriteSockets, int timeout);
 
 private:
+	friend class cSocketSet;
 	xSocket m_Socket;
 	AString m_IPString;
 	eFamily m_family;

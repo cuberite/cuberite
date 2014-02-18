@@ -103,11 +103,11 @@ private:
 	public:
 	
 		cSocketThread(cSocketThreads * a_Parent);
-		~cSocketThread();
+		virtual ~cSocketThread();
 		
 		// All these methods assume parent's m_CS is locked
-		bool HasEmptySlot(void) const {return m_NumSlots < MAX_SLOTS; }
-		bool IsEmpty     (void) const {return m_NumSlots == 0; }
+		bool HasEmptySlot(void) const {return m_Slots.size() < MAX_SLOTS;} //return m_NumSlots < MAX_SLOTS; }
+		bool IsEmpty     (void) const {return m_Slots.empty();}// return m_NumSlots == 0; }
 
 		void AddClient   (const cSocket &   a_Socket, cCallback * a_Client);  // Takes ownership of the socket
 		bool RemoveClient(const cCallback * a_Client);  // Returns true if removed, false if not found
@@ -152,21 +152,21 @@ private:
 			} m_State;
 		} ;
 		
-		sSlot m_Slots[MAX_SLOTS];
-		int   m_NumSlots;  // Number of slots actually used
+		std::map<cSocket, sSlot> m_Slots;
+		//int   m_NumSlots;  // Number of slots actually used
 		
 		virtual void Execute(void) override;
 		
 		/** Prepares the Read and Write socket sets for select()
 		Puts all sockets into the read set, along with m_ControlSocket1.
 		Only sockets that have outgoing data queued on them are put in the write set.*/
-		void PrepareSets(fd_set * a_ReadSet, fd_set * a_WriteSet, cSocket::xSocket & a_Highest);
+		void PrepareSets(cSocketSet & a_ReadSet, cSocketSet & a_WriteSet);
 		
 		/** Reads from sockets indicated in a_Read */
-		void ReadFromSockets(fd_set * a_Read);
+		void ReadFromSockets(cSocketSet & a_Read);
 		
 		/** Writes to sockets indicated in a_Write */
-		void WriteToSockets (fd_set * a_Write);
+		void WriteToSockets (cSocketSet & a_Write);
 		
 		/** Sends data through the specified socket, trying to fill the OS send buffer in chunks.
 		Returns true if there was no error while sending, false if an error has occured.
@@ -181,7 +181,6 @@ private:
 	} ;
 	
 	typedef std::list<cSocketThread *> cSocketThreadList;
-	
 	
 	cCriticalSection  m_CS;
 	cSocketThreadList m_Threads;

@@ -8,6 +8,7 @@
 #include "Globals.h"
 #include "SocketThreads.h"
 #include "Errors.h"
+#include "SocketSet.h"
 
 
 
@@ -139,7 +140,8 @@ void cSocketThreads::Write(const cCallback * a_Client, const AString & a_Data)
 cSocketThreads::cSocketThread::cSocketThread(cSocketThreads * a_Parent) :
 	cIsThread("cSocketThread"),
 	m_Parent(a_Parent),
-	m_NumSlots(0)
+	//m_NumSlots(0)
+	m_Slots()
 {
 	// Nothing needed yet
 }
@@ -171,14 +173,18 @@ cSocketThreads::cSocketThread::~cSocketThread()
 void cSocketThreads::cSocketThread::AddClient(const cSocket & a_Socket, cCallback * a_Client)
 {
 	ASSERT(m_Parent->m_CS.IsLockedByCurrentThread());
-	ASSERT(m_NumSlots < MAX_SLOTS);  // Use HasEmptySlot() to check before adding
+	ASSERT(HasEmptySlot());  // Use HasEmptySlot() to check before adding
 	
-	m_Slots[m_NumSlots].m_Client = a_Client;
+	std::pair<cSocket, sSlot> slot(a_Socket, {a_Socket, a_Client, "", sSlot::ssNormal});
+	
+	m_Slots.insert(slot);
+	
+	/*m_Slots[m_NumSlots].m_Client = a_Client;
 	m_Slots[m_NumSlots].m_Socket = a_Socket;
 	m_Slots[m_NumSlots].m_Socket.SetNonBlocking();
 	m_Slots[m_NumSlots].m_Outgoing.clear();
-	m_Slots[m_NumSlots].m_State = sSlot::ssNormal;
-	m_NumSlots++;
+	m_Slots[m_NumSlots].m_State = sSlot::ssNormal;*/
+	//m_NumSlots++;
 	
 	// Notify the thread of the change:
 	ASSERT(m_ControlSocket2.IsValid());
@@ -193,53 +199,54 @@ bool cSocketThreads::cSocketThread::RemoveClient(const cCallback * a_Client)
 {
 	ASSERT(m_Parent->m_CS.IsLockedByCurrentThread());
 	
-	if (m_NumSlots == 0)
+	if (IsEmpty())
 	{
 		return false;
 	}
 	
-	for (int i = m_NumSlots - 1; i >= 0 ; --i)
+	for (std::map<cSocket, sSlot>::iterator itr = m_Slots.begin(), end = m_Slots.end(); itr != end; itr++)
 	{
-		if (m_Slots[i].m_Client != a_Client)
+		if (itr->second.m_Client != a_Client)
 		{
 			continue;
 		}
 		
+		sSlot & slot = itr->second;
 		// Found the slot:
-		if (m_Slots[i].m_State == sSlot::ssRemoteClosed)
+		if (slot.m_State == sSlot::ssRemoteClosed)
 		{
 			// The remote has already closed the socket, remove the slot altogether:
-			if (m_Slots[i].m_Socket.IsValid())
+			if (slot.m_Socket.IsValid())
 			{
-				m_Slots[i].m_Socket.CloseSocket();
+				slot.m_Socket.CloseSocket();
 			}
-			m_Slots[i] = m_Slots[--m_NumSlots];
+			m_Slots.erase(itr);
 		}
 		else
 		{
 			// Query and queue the last batch of outgoing data:
 			AString Data;
-			m_Slots[i].m_Client->GetOutgoingData(Data);
-			m_Slots[i].m_Outgoing.append(Data);
-			if (m_Slots[i].m_Outgoing.empty())
+			slot.m_Client->GetOutgoingData(Data);
+			slot.m_Outgoing.append(Data);
+			if (itr->second.m_Outgoing.empty())
 			{
 				// No more outgoing data, shut the socket down immediately:
-				m_Slots[i].m_Socket.ShutdownReadWrite();
-				m_Slots[i].m_State = sSlot::ssShuttingDown;
+				slot.m_Socket.ShutdownReadWrite();
+				slot.m_State = sSlot::ssShuttingDown;
 			}
 			else
 			{
 				// More data to send, shut down reading and wait for the rest to get sent:
-				m_Slots[i].m_State = sSlot::ssWritingRestOut;
+				slot.m_State = sSlot::ssWritingRestOut;
 			}
-			m_Slots[i].m_Client = NULL;
+			slot.m_Client = NULL;
 		}
 		
 		// Notify the thread of the change:
 		ASSERT(m_ControlSocket2.IsValid());
 		m_ControlSocket2.Send("r", 1);
 		return true;
-	}  // for i - m_Slots[]
+	}
 	
 	// Not found
 	return false;
@@ -253,13 +260,13 @@ bool cSocketThreads::cSocketThread::HasClient(const cCallback * a_Client) const
 {
 	ASSERT(m_Parent->m_CS.IsLockedByCurrentThread());
 
-	for (int i = m_NumSlots - 1; i >= 0; --i)
+	for (std::map<cSocket, sSlot>::const_iterator itr = m_Slots.begin(), end = m_Slots.end(); itr != end ; itr++)
 	{
-		if (m_Slots[i].m_Client == a_Client)
+		if (itr->second.m_Client == a_Client)
 		{
 			return true;
 		}
-	}  // for i - m_Slots[]
+	}
 	return false;
 }
 
@@ -269,14 +276,7 @@ bool cSocketThreads::cSocketThread::HasClient(const cCallback * a_Client) const
 
 bool cSocketThreads::cSocketThread::HasSocket(const cSocket * a_Socket) const
 {
-	for (int i = m_NumSlots - 1; i >= 0; --i)
-	{
-		if (m_Slots[i].m_Socket == *a_Socket)
-		{
-			return true;
-		}
-	}  // for i - m_Slots[]
-	return false;
+	return(m_Slots.find(*a_Socket) != m_Slots.end());
 }
 
 
@@ -304,11 +304,11 @@ bool cSocketThreads::cSocketThread::NotifyWrite(const cCallback * a_Client)
 bool cSocketThreads::cSocketThread::Write(const cCallback * a_Client, const AString & a_Data)
 {
 	ASSERT(m_Parent->m_CS.IsLockedByCurrentThread());
-	for (int i = m_NumSlots - 1; i >= 0; --i)
+	for (std::map<cSocket, sSlot>::iterator itr = m_Slots.begin(), end = m_Slots.end(); itr != end ; itr++)
 	{
-		if (m_Slots[i].m_Client == a_Client)
+		if (itr->second.m_Client == a_Client)
 		{
-			m_Slots[i].m_Outgoing.append(a_Data);
+			itr->second.m_Outgoing.append(a_Data);
 			
 			// Notify the thread that there's data in the queue:
 			ASSERT(m_ControlSocket2.IsValid());
@@ -397,24 +397,30 @@ void cSocketThreads::cSocketThread::Execute(void)
 		QueueOutgoingData();
 		
 		// Put sockets into the sets
-		fd_set fdRead;
-		fd_set fdWrite;
-		cSocket::xSocket Highest = m_ControlSocket1.GetSocket();
-		PrepareSets(&fdRead, &fdWrite, Highest);
+		cSocketSet ReadSockets;
+		cSocketSet WriteSockets;
+		//fd_set fdRead;
+		//fd_set fdWrite;
+		//cSocket::xSocket Highest = m_ControlSocket1.GetSocket();
+		PrepareSets(ReadSockets, WriteSockets);
 		
 		// Wait for the sockets:
-		timeval Timeout;
+		/*timeval Timeout;
 		Timeout.tv_sec = 5;
 		Timeout.tv_usec = 0;
 		if (select(Highest + 1, &fdRead, &fdWrite, NULL, &Timeout) == -1)
+		{
+			
+		}*/
+		if (!cSocket::SelectReadWrite(ReadSockets,WriteSockets,5))
 		{
 			LOG("select() call failed in cSocketThread: \"%s\"", cSocket::GetLastErrorString().c_str());
 			continue;
 		}
 		
 		// Perform the IO:
-		ReadFromSockets(&fdRead);
-		WriteToSockets(&fdWrite);
+		ReadFromSockets(ReadSockets);
+		WriteToSockets(WriteSockets);
 		CleanUpShutSockets();
 	}  // while (!mShouldTerminate)
 }
@@ -423,48 +429,51 @@ void cSocketThreads::cSocketThread::Execute(void)
 
 
 
-void cSocketThreads::cSocketThread::PrepareSets(fd_set * a_Read, fd_set * a_Write, cSocket::xSocket & a_Highest)
+void cSocketThreads::cSocketThread::PrepareSets(cSocketSet & a_Read, cSocketSet & a_Write)
 {
-	FD_ZERO(a_Read);
-	FD_ZERO(a_Write);
-	FD_SET(m_ControlSocket1.GetSocket(), a_Read);
+	//FD_ZERO(a_Read);
+	//FD_ZERO(a_Write);
+	//FD_SET(m_ControlSocket1.GetSocket(), a_Read);
+	a_Read.Add(m_ControlSocket1);
 
 	cCSLock Lock(m_Parent->m_CS);
-	for (int i = m_NumSlots - 1; i >= 0; --i)
+	for (std::map<cSocket, sSlot>::iterator itr = m_Slots.begin(), end = m_Slots.end(); itr != end ; itr++)
 	{
-		if (!m_Slots[i].m_Socket.IsValid())
+		if (!itr->second.m_Socket.IsValid())
 		{
 			continue;
 		}
-		if (m_Slots[i].m_State == sSlot::ssRemoteClosed)
+		if (itr->second.m_State == sSlot::ssRemoteClosed)
 		{
 			// This socket won't provide nor consume any data anymore, don't put it in the Set
 			continue;
 		}
-		cSocket::xSocket s = m_Slots[i].m_Socket.GetSocket();
-		FD_SET(s, a_Read);
-		if (s > a_Highest)
-		{
-			a_Highest = s;
-		}
-		if (!m_Slots[i].m_Outgoing.empty())
+		cSocket s = itr->second.m_Socket;
+		a_Read.Add(s);
+		//FD_SET(s, a_Read);
+		//if (s > a_Highest)
+		//{
+		//	a_Highest = s;
+		//}
+		if (!itr->second.m_Outgoing.empty())
 		{
 			// There's outgoing data for the socket, put it in the Write set
-			FD_SET(s, a_Write);
+			//FD_SET(s, a_Write);
+			a_Write.Add(s);
 		}
-	}  // for i - m_Slots[]
+	} 
 }
 
 
 
 
 
-void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
+void cSocketThreads::cSocketThread::ReadFromSockets(cSocketSet & a_Read)
 {
 	// Read on available sockets:
 
 	// Reset Control socket state:
-	if (FD_ISSET(m_ControlSocket1.GetSocket(), a_Read))
+	if (a_Read.IsSet(m_ControlSocket1))
 	{
 		char Dummy[128];
 		m_ControlSocket1.Receive(Dummy, sizeof(Dummy), 0);
@@ -472,28 +481,29 @@ void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
 
 	// Read from clients:
 	cCSLock Lock(m_Parent->m_CS);
-	for (int i = m_NumSlots - 1; i >= 0; --i)
+	for (cSocketSet::cEventIterator itr = a_Read.Eventbegin(), end = a_Read.Eventend(); itr != end; itr++)
 	{
-		cSocket::xSocket Socket = m_Slots[i].m_Socket.GetSocket();
-		if (!cSocket::IsValidSocket(Socket) || !FD_ISSET(Socket, a_Read))
+		//cSocket::xSocket Socket = m_Slots[i].m_Socket.GetSocket();
+		if (!itr->IsValid())
 		{
 			continue;
 		}
 		char Buffer[1024];
-		int Received = m_Slots[i].m_Socket.Receive(Buffer, ARRAYCOUNT(Buffer), 0);
+		int Received = itr->Receive(Buffer, ARRAYCOUNT(Buffer), 0);
+		sSlot & slot = m_Slots.find(*itr)->second;
 		if (Received <= 0)
 		{
 			if (cSocket::GetLastError() != cSocket::ErrWouldBlock)
 			{
 				// The socket has been closed by the remote party
-				switch (m_Slots[i].m_State)
+				switch (slot.m_State)
 				{
 					case sSlot::ssNormal:
 					{
 						// Notify the callback that the remote has closed the socket; keep the slot
-						m_Slots[i].m_Client->SocketClosed();
-						m_Slots[i].m_State = sSlot::ssRemoteClosed;
-						m_Slots[i].m_Socket.CloseSocket();
+						slot.m_Client->SocketClosed();
+						slot.m_State = sSlot::ssRemoteClosed;
+						slot.m_Socket.CloseSocket();
 						break;
 					}
 					case sSlot::ssWritingRestOut:
@@ -501,14 +511,14 @@ void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
 					case sSlot::ssShuttingDown2:
 					{
 						// Force-close the socket and remove the slot:
-						m_Slots[i].m_Socket.CloseSocket();
-						m_Slots[i] = m_Slots[--m_NumSlots];
+						slot.m_Socket.CloseSocket();
+						m_Slots.erase(m_Slots.find(*itr));
 						break;
 					}
 					default:
 					{
 						LOG("%s: Unexpected socket state: %d (%s)",
-							__FUNCTION__, m_Slots[i].m_Socket.GetSocket(), m_Slots[i].m_Socket.GetIPString().c_str()
+							__FUNCTION__, static_cast<int>(*itr), itr->GetIPString().c_str()
 						);
 						ASSERT(!"Unexpected socket state");
 						break;
@@ -518,71 +528,72 @@ void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
 		}
 		else
 		{
-			if (m_Slots[i].m_Client != NULL)
+			if (slot.m_Client != NULL)
 			{
-				m_Slots[i].m_Client->DataReceived(Buffer, Received);
+				slot.m_Client->DataReceived(Buffer, Received);
 			}
 		}
-	}  // for i - m_Slots[]
+	}
 }
 
 
 
 
 
-void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
+void cSocketThreads::cSocketThread::WriteToSockets(cSocketSet & a_Write)
 {
 	// Write to available client sockets:
 	cCSLock Lock(m_Parent->m_CS);
-	for (int i = m_NumSlots - 1; i >= 0; --i)
+	for (cSocketSet::cEventIterator itr = a_Write.Eventbegin(), end = a_Write.Eventend(); itr != end; itr++)
 	{
-		cSocket::xSocket Socket = m_Slots[i].m_Socket.GetSocket();
-		if (!cSocket::IsValidSocket(Socket) || !FD_ISSET(Socket, a_Write))
+		//cSocket::xSocket Socket = m_Slots[i].m_Socket.GetSocket();
+		if (!itr->IsValid())
 		{
 			continue;
 		}
-		if (m_Slots[i].m_Outgoing.empty())
+		sSlot & slot = m_Slots.find(*itr)->second;
+		if (slot.m_Outgoing.empty())
 		{
 			// Request another chunk of outgoing data:
-			if (m_Slots[i].m_Client != NULL)
+			if (slot.m_Client != NULL)
 			{
 				AString Data;
-				m_Slots[i].m_Client->GetOutgoingData(Data);
-				m_Slots[i].m_Outgoing.append(Data);
+				slot.m_Client->GetOutgoingData(Data);
+				slot.m_Outgoing.append(Data);
 			}
-			if (m_Slots[i].m_Outgoing.empty())
+			if (slot.m_Outgoing.empty())
 			{
 				// No outgoing data is ready
-				if (m_Slots[i].m_State == sSlot::ssWritingRestOut)
+				if (slot.m_State == sSlot::ssWritingRestOut)
 				{
-					m_Slots[i].m_State = sSlot::ssShuttingDown;
-					m_Slots[i].m_Socket.ShutdownReadWrite();
+					slot.m_State = sSlot::ssShuttingDown;
+					slot.m_Socket.ShutdownReadWrite();
 				}
 				continue;
 			}
 		}  // if (outgoing data is empty)
 		
-		if (m_Slots[i].m_State == sSlot::ssRemoteClosed)
+		if (slot.m_State == sSlot::ssRemoteClosed)
 		{
 			continue;
 		}
 		
-		if (!SendDataThroughSocket(m_Slots[i].m_Socket, m_Slots[i].m_Outgoing))
+		if (!SendDataThroughSocket(*itr, slot.m_Outgoing))
 		{
 			int Err = cSocket::GetLastError();
-			LOGWARNING("Error %d while writing to client \"%s\", disconnecting. \"%s\"", Err, m_Slots[i].m_Socket.GetIPString().c_str(), GetOSErrorString(Err).c_str());
-			m_Slots[i].m_Socket.CloseSocket();
-			if (m_Slots[i].m_Client != NULL)
+			LOGWARNING("Error %d while writing to client \"%s\", disconnecting. \"%s\"", Err, itr->GetIPString().c_str(), GetOSErrorString(Err).c_str());
+			itr->CloseSocket();
+			if (slot.m_Client != NULL)
 			{
-				m_Slots[i].m_Client->SocketClosed();
+				slot.m_Client->SocketClosed();
 			}
 			continue;
 		}
 		
-		if (m_Slots[i].m_Outgoing.empty() && (m_Slots[i].m_State == sSlot::ssWritingRestOut))
+		if (slot.m_Outgoing.empty() && (slot.m_State == sSlot::ssWritingRestOut))
 		{
-			m_Slots[i].m_State = sSlot::ssShuttingDown;
-			m_Slots[i].m_Socket.ShutdownReadWrite();
+			slot.m_State = sSlot::ssShuttingDown;
+			slot.m_Socket.ShutdownReadWrite();
 		}
 
 		// _X: If there's data left, it means the client is not reading fast enough, the server would unnecessarily spin in the main loop with zero actions taken; so signalling is disabled
@@ -637,24 +648,29 @@ bool cSocketThreads::cSocketThread::SendDataThroughSocket(cSocket & a_Socket, AS
 void cSocketThreads::cSocketThread::CleanUpShutSockets(void)
 {
 	cCSLock Lock(m_Parent->m_CS);
-	for (int i = m_NumSlots - 1; i >= 0; i--)
+	for (std::map<cSocket, sSlot>::iterator itr = m_Slots.begin(), end = m_Slots.end(); itr != end ;)
 	{
-		switch (m_Slots[i].m_State)
+		switch (itr->second.m_State)
 		{
 			case sSlot::ssShuttingDown2:
 			{
 				// The socket has reached the shutdown timeout, close it and clear its slot:
-				m_Slots[i].m_Socket.CloseSocket();
-				m_Slots[i] = m_Slots[--m_NumSlots];
+				// increment then erase the previous value
+				m_Slots.erase(itr++);
 				break;
 			}
 			case sSlot::ssShuttingDown:
 			{
 				// The socket has been shut down for a single thread loop, let it loop once more before closing:
-				m_Slots[i].m_State = sSlot::ssShuttingDown2;
+				itr->second.m_State = sSlot::ssShuttingDown2;
+				itr++;
 				break;
 			}
-			default: break;
+			default:
+			{
+				itr++;
+				break;
+			}
 		}
 	}  // for i - m_Slots[]
 }
@@ -665,23 +681,24 @@ void cSocketThreads::cSocketThread::CleanUpShutSockets(void)
 void cSocketThreads::cSocketThread::QueueOutgoingData(void)
 {
 	cCSLock Lock(m_Parent->m_CS);
-	for (int i = 0; i < m_NumSlots; i++)
+	for (std::map<cSocket, sSlot>::iterator itr = m_Slots.begin(), end = m_Slots.end(); itr != end ; itr++)
 	{
-		if (m_Slots[i].m_Client != NULL)
+		sSlot & slot = itr->second;
+		if (slot.m_Client != NULL)
 		{
 			AString Data;
-			m_Slots[i].m_Client->GetOutgoingData(Data);
-			m_Slots[i].m_Outgoing.append(Data);
+			slot.m_Client->GetOutgoingData(Data);
+			slot.m_Outgoing.append(Data);
 		}
-		if (m_Slots[i].m_Outgoing.empty())
+		if (slot.m_Outgoing.empty())
 		{
 			// No outgoing data is ready
-			if (m_Slots[i].m_State == sSlot::ssWritingRestOut)
+			if (slot.m_State == sSlot::ssWritingRestOut)
 			{
 				// The socket doesn't want to be kept alive anymore, and doesn't have any remaining data to send.
 				// Shut it down and then close it after a timeout, or when the other side agrees
-				m_Slots[i].m_State = sSlot::ssShuttingDown;
-				m_Slots[i].m_Socket.ShutdownReadWrite();
+				slot.m_State = sSlot::ssShuttingDown;
+				slot.m_Socket.ShutdownReadWrite();
 			}
 			continue;
 		}

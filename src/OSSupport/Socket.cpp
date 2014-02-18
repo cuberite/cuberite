@@ -31,12 +31,12 @@ cSocket::~cSocket()
 
 
 
-
+/*
 cSocket::xSocket cSocket::GetSocket() const
 {
 	return m_Socket;
 }
-
+*/
 
 
 
