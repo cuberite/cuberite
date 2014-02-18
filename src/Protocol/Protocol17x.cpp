@@ -24,6 +24,7 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/Painting.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
+#include "../Entities/ItemFrame.h"
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
 #include "../BlockEntities/CommandBlockEntity.h"
@@ -938,8 +939,8 @@ void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	Pkt.WriteFPInt(a_Entity.GetPosX());
 	Pkt.WriteFPInt(a_Entity.GetPosY());
 	Pkt.WriteFPInt(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteInt(a_ObjectData);
 	if (a_ObjectData != 0)
 	{
@@ -961,8 +962,8 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	Pkt.WriteFPInt(a_Vehicle.GetPosX());
 	Pkt.WriteFPInt(a_Vehicle.GetPosY());
 	Pkt.WriteFPInt(a_Vehicle.GetPosZ());
-	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
+	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteInt(a_VehicleSubType);
 	if (a_VehicleSubType != 0)
 	{
@@ -2404,6 +2405,15 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 		case cEntity::etMonster:
 		{
 			WriteMobMetadata((const cMonster &)a_Entity);
+			break;
+		}
+		case cEntity::etItemFrame:
+		{
+			cItemFrame & Frame = (cItemFrame &)a_Entity;
+			WriteByte(0xA2);
+			WriteItem(Frame.GetItem());
+			WriteByte(0x3);
+			WriteByte(Frame.GetRotation());
 			break;
 		}
 	}
