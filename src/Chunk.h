@@ -175,6 +175,14 @@ public:
 	
 	EMCSBiome GetBiomeAt(int a_RelX, int a_RelZ) const {return cChunkDef::GetBiome(m_BiomeMap, a_RelX, a_RelZ); }
 	
+	/** Sets the biome at the specified relative coords.
+	Doesn't resend the chunk to clients. */
+	void SetBiomeAt(int a_RelX, int a_RelZ, EMCSBiome a_Biome);
+	
+	/** Sets the biome in the specified relative coords area. All the coords are inclusive.
+	Sends the chunk to all relevant clients. */
+	void SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome);
+	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 	
 	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */

@@ -47,6 +47,7 @@ class cFurnaceEntity;
 class cNoteEntity;
 class cMobCensus;
 class cCompositeChat;
+class cCuboid;
 
 typedef std::list< cPlayer * > cPlayerList;
 
@@ -306,8 +307,13 @@ public:
 	/** Removes the client from all chunks it is present in */
 	void RemoveClientFromChunks(cClientHandle * a_Client);
 	
-	/** Sends the chunk to the client specified, if the chunk is valid. If not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid+lighted) */
+	/** Sends the chunk to the client specified, if the client doesn't have the chunk yet.
+	If chunk not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
 	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
+	
+	/** Sends the chunk to the client specified, even if the client already has the chunk.
+	If the chunk's not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
+	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/** Removes client from ChunkSender's queue of chunks to be sent */
 	void RemoveClientFromChunkSender(cClientHandle * a_Client);
@@ -549,6 +555,18 @@ public:
 	
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
 	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
+	
+	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
+	Doesn't resend the chunk to clients, use ForceSendChunkTo() for that. */
+	bool SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome);
+	
+	/** Sets the biome at the area. Returns true if successful, false if any subarea failed (chunk not loaded).
+	(Re)sends the chunks to their relevant clients if successful. */
+	bool SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome);
+	
+	/** Sets the biome at the area. Returns true if successful, false if any subarea failed (chunk not loaded).
+	(Re)sends the chunks to their relevant clients if successful. */
+	bool SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome);
 
 	/** Returns the name of the world */
 	const AString & GetName(void) const { return m_WorldName; }

@@ -1652,6 +1652,38 @@ void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 
 
 
+void cChunk::SetBiomeAt(int a_RelX, int a_RelZ, EMCSBiome a_Biome)
+{
+	cChunkDef::SetBiome(m_BiomeMap, a_RelX, a_RelZ, a_Biome);
+	MarkDirty();
+}
+
+
+
+
+
+void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome)
+{
+	for (int z = a_MinRelZ; z <= a_MaxRelZ; z++)
+	{
+		for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+		{
+			cChunkDef::SetBiome(m_BiomeMap, x, z, a_Biome);
+		}
+	}
+	MarkDirty();
+	
+	// Re-send the chunk to all clients:
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	{
+		m_World->ForceSendChunkTo(m_PosX, m_PosZ, (*itr));
+	}  // for itr - m_LoadedByClient[]
+}
+
+
+
+
+
 void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 {
 	double PosX = a_Player->GetPosX();

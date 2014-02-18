@@ -1487,6 +1487,33 @@ EMCSBiome cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 
 
 
+bool cWorld::SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome)
+{
+	return m_ChunkMap->SetBiomeAt(a_BlockX, a_BlockZ, a_Biome);
+}
+
+
+
+
+
+bool cWorld::SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome)
+{
+	return m_ChunkMap->SetAreaBiome(a_MinX, a_MaxX, a_MinZ, a_MaxZ, a_Biome);
+}
+
+
+
+
+
+bool cWorld::SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome)
+{
+	return SetAreaBiome(a_Area.p1.x, a_Area.p2.x, a_Area.p1.z, a_Area.p2.z, a_Biome);
+}
+
+
+
+
+
 void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	m_ChunkMap->SetBlock(*this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
@@ -2483,6 +2510,16 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+}
+
+
+
+
+
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+{
+	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
 }
 
