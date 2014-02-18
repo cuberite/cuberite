@@ -24,6 +24,7 @@ class cWindow;
 class cInventory;
 class cPawn;
 class cPickup;
+class cPainting;
 class cWorld;
 class cMonster;
 class cChunkDataSerializer;
@@ -81,6 +82,7 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive           (int a_PingID) = 0;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) = 0;
+	virtual void SendPaintingSpawn       (const cPainting & a_Painting) = 0;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) = 0;
 	virtual void SendPlayerAbilities     (void) = 0;
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) = 0;

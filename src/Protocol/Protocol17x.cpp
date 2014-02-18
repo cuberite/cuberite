@@ -21,6 +21,7 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
+#include "../Entities/Painting.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
 #include "../Mobs/IncludeAllMonsters.h"
@@ -564,6 +565,20 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	
 	// Send player abilities:
 	SendPlayerAbilities();
+}
+
+
+
+
+void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
+	Pkt.WriteVarInt(a_Painting.GetUniqueID());
+	Pkt.WriteString(a_Painting.GetName().c_str());
+	Pkt.WriteInt((int)a_Painting.GetPosX());
+	Pkt.WriteInt((int)a_Painting.GetPosY());
+	Pkt.WriteInt((int)a_Painting.GetPosZ());
+	Pkt.WriteInt(a_Painting.GetDirection());
 }
 
 
