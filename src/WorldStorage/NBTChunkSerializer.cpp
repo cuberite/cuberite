@@ -628,6 +628,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etTNT: /* TODO */ break;
 		case cEntity::etExpOrb: /* TODO */ break;
 		case cEntity::etItemFrame: /* TODO */ break;
+		case cEntity::etPainting: /* TODO */ break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world
 		default:
 		{

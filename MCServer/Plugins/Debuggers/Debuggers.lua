@@ -55,6 +55,7 @@ function Initialize(Plugin)
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
 	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings")
+	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -1212,6 +1213,45 @@ function HandleCompo(a_Split, a_Player)
 	msg2:AddTextPart(" knows how to use cCompositeChat!");
 	a_Player:GetWorld():BroadcastChat(msg2)
 	
+	return true
+end
+
+
+
+
+
+function HandleSetBiome(a_Split, a_Player)
+	local Biome = biJungle
+	local Size = 20
+	local SplitSize = #a_Split
+	if (SplitSize > 3) then
+		a_Player:SendMessage("Too many parameters. Usage: " .. a_Split[1] .. " <BiomeType>")
+		return true
+	end
+
+	if (SplitSize >= 2) then
+		Biome = StringToBiome(a_Split[2])
+		if (Biome == biInvalidBiome) then
+			a_Player:SendMessage("Unknown biome: '" .. a_Split[2] .. "'. Command ignored.")
+			return true
+		end
+	end
+	if (SplitSize >= 3) then
+		Size = tostring(a_Split[3])
+		if (Size == nil) then
+			a_Player:SendMessage("Unknown size: '" .. a_Split[3] .. "'. Command ignored.")
+			return true
+		end
+	end
+	
+	local BlockX = math.floor(a_Player:GetPosX())
+	local BlockZ = math.floor(a_Player:GetPosZ())
+	a_Player:GetWorld():SetAreaBiome(BlockX - Size, BlockX + Size, BlockZ - Size, BlockZ + Size, Biome)
+	a_Player:SendMessage(
+		"Blocks {" .. (BlockX - Size) .. ", " .. (BlockZ - Size) ..
+		"} - {" .. (BlockX + Size) .. ", " .. (BlockZ + Size) ..
+		"} set to biome #" .. tostring(Biome) .. "."
+	)
 	return true
 end
 

@@ -44,7 +44,7 @@ function HandleRequest_Generation( Request )
 	if (Request.PostParams["AGHRRRR"] ~= nil) then
 		GENERATION_STATE = 0
 		WW_instance:SaveAllChunks()
-		WW_instance:UnloadUnusedChunks()
+		WW_instance:QueueUnloadUnusedChunks()
 		LOGERROR("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": works ABORTED by admin")
 	end
 	--Content = Content .. "<head><meta http-equiv=\"refresh\" content=\"2;\"></head>"

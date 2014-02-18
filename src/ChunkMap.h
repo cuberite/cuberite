@@ -159,7 +159,16 @@ public:
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
 	void      ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
 	
+	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
 	EMCSBiome GetBiomeAt (int a_BlockX, int a_BlockZ);
+	
+	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
+	Doesn't resend the chunk to clients. */
+	bool SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome);
+	
+	/** Sets the biome at the area. Returns true if successful, false if any subarea failed (chunk not loaded).
+	(Re)sends the chunks to their relevant clients if successful. */
+	bool SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome);
 	
 	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);

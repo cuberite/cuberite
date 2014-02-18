@@ -52,6 +52,7 @@ if (NOT MSVC)
 		Entities/Entity.h
 		Entities/Floater.h
 		Entities/Pawn.h
+		Entities/Painting.h
 		Entities/Pickup.h
 		Entities/Player.h
 		Entities/ProjectileEntity.h

@@ -27,6 +27,7 @@ class cInventory;
 class cMonster;
 class cPawn;
 class cExpOrb;
+class cPainting;
 class cPickup;
 class cPlayer;
 class cProtocol;
@@ -111,6 +112,7 @@ public:
 	void SendGameMode            (eGameMode a_GameMode);
 	void SendHealth              (void);
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
+	void SendPaintingSpawn       (const cPainting & a_Painting);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
 	void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount);

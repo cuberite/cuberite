@@ -82,6 +82,7 @@ public:
 		etExpOrb,
 		etFloater,
 		etItemFrame,
+		etPainting,
 		
 		// Common variations
 		etMob = etMonster,  // DEPRECATED, use etMonster instead!
@@ -141,6 +142,7 @@ public:
 	bool IsExpOrb      (void) const { return (m_EntityType == etExpOrb); }
 	bool IsFloater     (void) const { return (m_EntityType == etFloater); }
 	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame); }
+	bool IsPainting    (void) const { return (m_EntityType == etPainting); }
 	
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;
