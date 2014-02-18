@@ -2401,7 +2401,6 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteByte(Frame.GetRotation());
 			break;
 		}
-		default: break;
 	}
 }
 
@@ -2586,7 +2585,6 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			WriteInt(Horse.GetHorseArmour());
 			break;
 		}
-		default: break;
 	}  // switch (a_Mob.GetType())
 }
 
