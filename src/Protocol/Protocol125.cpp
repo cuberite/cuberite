@@ -602,6 +602,31 @@ void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 
 
 
+void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	cCSLock Lock(m_CSPacket);
+
+	WriteByte (PACKET_ITEM_DATA);
+	WriteShort(E_ITEM_MAP);
+	WriteShort(a_ID);
+	WriteShort(1 + (3 * a_Decorators.size()));
+
+	WriteByte(1);
+	
+	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
+	{
+		WriteByte((it->GetType() << 4) | (it->GetRot() & 0xf));
+		WriteByte(it->GetPixelX());
+		WriteByte(it->GetPixelZ());
+	}
+
+	Flush();
+}
+
+
+
+
+
 
 void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 {

@@ -36,8 +36,8 @@ public:
 			return;
 		}
 
-		// Map->AddTrackedPlayer(a_Player);
-
 		Map->UpdateRadius(*a_Player, DEFAULT_RADIUS);
+
+		Map->UpdateClient(a_Player);
 	}
 } ;

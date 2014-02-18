@@ -14,6 +14,111 @@
 
 
 
+cMapDecorator::cMapDecorator(cMap * a_Map, eType a_Type, int a_X, int a_Z, unsigned int a_Rot)
+	: m_Map(a_Map)
+	, m_Type(a_Type)
+	, m_PixelX(a_X)
+	, m_PixelZ(a_Z)
+	, m_Rot(a_Rot)
+	, m_Player(NULL)
+{
+}
+
+
+
+
+
+cMapDecorator::cMapDecorator(cMap * a_Map, cPlayer * a_Player)
+	: m_Map(a_Map)
+	, m_Type(E_TYPE_PLAYER)
+	, m_Player(a_Player)
+{
+	Update();
+}
+
+
+
+
+
+template <typename T>
+T Clamp(T a_X, T a_Min, T a_Max)
+{
+	return std::min(std::max(a_X, a_Min), a_Max);
+}
+
+
+
+
+
+void cMapDecorator::Update(void)
+{
+	ASSERT(m_Map != NULL);
+	unsigned int PixelWidth = m_Map->GetPixelWidth();
+
+	int InsideWidth  = (m_Map->GetWidth()  / 2) - 1;
+	int InsideHeight = (m_Map->GetHeight() / 2) - 1;
+
+	if (m_Player)
+	{
+		int PixelX = (m_Player->GetPosX() - m_Map->GetCenterX()) / PixelWidth;
+		int PixelZ = (m_Player->GetPosZ() - m_Map->GetCenterZ()) / PixelWidth;
+
+		// Center of pixel
+		m_PixelX = (2 * PixelX) + 1;
+		m_PixelZ = (2 * PixelZ) + 1;
+
+		// 1px border
+		if ((PixelX > -InsideWidth) && (PixelX <= InsideWidth) && (PixelZ > -InsideHeight) && (PixelZ <= InsideHeight))
+		{
+			double Yaw = m_Player->GetYaw();
+
+			m_Rot = (Yaw * 16) / 360;
+
+			if (m_Map->GetDimension() == dimNether)
+			{
+				Int64 WorldAge = m_Player->GetWorld()->GetWorldAge();
+
+				// TODO 2014-02-18 xdot: Random rotations
+			}
+
+			m_Type = E_TYPE_PLAYER;
+		}
+		else
+		{
+			if ((abs(PixelX) > 320.0) || (abs(PixelZ) > 320.0))
+			{
+				// TODO 2014-02-18 xdot: Remove decorator
+			}
+
+			m_Rot = 0;
+
+			m_Type = E_TYPE_PLAYER_OUTSIDE;
+
+			// Move to border
+			if (PixelX <= -InsideWidth)
+			{
+				m_PixelX = (2 * -InsideWidth) + 1;
+			}
+			if (PixelZ <= -InsideHeight)
+			{
+				m_PixelZ = (2 * -InsideHeight) + 1;
+			}
+			if (PixelX > InsideWidth)
+			{
+				m_PixelX = (2 * InsideWidth) + 1;
+			}
+			if (PixelZ > InsideHeight)
+			{
+				m_PixelZ = (2 * InsideHeight) + 1;
+			}
+		}
+	}
+}
+
+
+
+
+
 cMap::cMap(unsigned int a_ID, cWorld * a_World)
 	: m_ID(a_ID)
 	, m_Width(cChunkDef::Width * 8)
@@ -44,16 +149,6 @@ cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, un
 	m_Data.assign(m_Width * m_Height, 0);
 
 	Printf(m_Name, "map_%i", m_ID);
-}
-
-
-
-
-
-template <typename T>
-T Clamp(T a_X, T a_Min, T a_Max)
-{
-	return std::min(std::max(a_X, a_Min), a_Max);
 }
 
 
@@ -174,33 +269,117 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 
 
 
-void cMap::UpdateTrackedPlayers(void)
+void cMap::UpdateDecorators(void)
 {
-	cTrackedPlayerList NewList;
-
-	for (cTrackedPlayerList::iterator it = m_TrackedPlayers.begin(); it != m_TrackedPlayers.end(); ++it)
+	for (cMapDecoratorList::iterator it = m_Decorators.begin(); it != m_Decorators.end(); ++it)
 	{
-		cPlayer * Player = *it;
-
-		UpdateRadius(*Player, DEFAULT_RADIUS);
-
-		if (true)
-		{
-			NewList.insert(Player);
-		}
+		it->Update();
 	}
-
-	std::swap(m_TrackedPlayers, NewList);
 }
 
 
 
 
 
-void cMap::AddTrackedPlayer(cPlayer * a_Player)
+void cMap::UpdateClient(cPlayer * a_Player)
 {
 	ASSERT(a_Player != NULL);
-	m_TrackedPlayers.insert(a_Player);
+	cClientHandle * Handle = a_Player->GetClientHandle();
+
+	if (Handle == NULL)
+	{
+		return;
+	}
+
+	Int64 WorldAge = a_Player->GetWorld()->GetWorldAge();
+
+	// Remove invalid clients
+	for (cMapClientList::iterator it = m_Clients.begin(); it != m_Clients.end();)
+	{
+		// Check if client is active
+		if (it->m_LastUpdate < WorldAge - 5)
+		{
+			// Remove associated decorators
+			for (cMapDecoratorList::iterator it2 = m_Decorators.begin(); it2 != m_Decorators.end();)
+			{
+				if (it2->GetPlayer()->GetClientHandle() == Handle)
+				{
+					// Erase decorator
+					cMapDecoratorList::iterator temp = it2;
+					++it2;
+					m_Decorators.erase(temp);
+				}
+				else
+				{
+					++it2;
+				}
+			}
+
+			// Erase client
+			cMapClientList::iterator temp = it;
+			++it;
+			m_Clients.erase(temp);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	// Linear search for client state
+	for (cMapClientList::iterator it = m_Clients.begin(); it != m_Clients.end(); ++it)
+	{
+		if (it->m_Handle == Handle)
+		{
+			it->m_LastUpdate = WorldAge;
+
+			if (it->m_SendInfo)
+			{
+				Handle->SendMapInfo(m_ID, m_Scale);
+
+				it->m_SendInfo = false;
+
+				return;
+			}
+
+			++it->m_NextDecoratorUpdate;
+
+			if (it->m_NextDecoratorUpdate >= 4)
+			{
+				UpdateDecorators();
+
+				Handle->SendMapDecorators(m_ID, m_Decorators);
+
+				it->m_NextDecoratorUpdate = 0;
+			}
+			else
+			{
+				++it->m_DataUpdate;
+
+				unsigned int Y = (it->m_DataUpdate * 11) % m_Width;
+
+				const Byte * Colors = &m_Data[Y * m_Height];
+
+				Handle->SendMapColumn(m_ID, Y, 0, Colors, m_Height);
+			}
+
+			return;
+		}
+	}
+
+	// New player, construct a new client state
+	cMapClient MapClient;
+
+	MapClient.m_LastUpdate = WorldAge;
+	MapClient.m_SendInfo = true;
+	MapClient.m_Handle = a_Player->GetClientHandle();
+
+	m_Clients.push_back(MapClient);
+
+	// Insert new decorator
+	cMapDecorator PlayerDecorator(this, a_Player);
+
+	m_Decorators.push_back(PlayerDecorator);
 }
 
 
@@ -267,6 +446,11 @@ void cMap::SetScale(unsigned int a_Scale)
 	}
 
 	m_Scale = a_Scale;
+
+	for (cMapClientList::iterator it = m_Clients.begin(); it != m_Clients.end(); ++it)
+	{
+		it->m_SendInfo = true;
+	}
 }
 
 
@@ -283,6 +467,8 @@ void cMap::SendTo(cClientHandle & a_Client)
 
 		a_Client.SendMapColumn(m_ID, i, 0, Colors, m_Height);
 	}
+
+	a_Client.SendMapDecorators(m_ID, m_Decorators);
 }
 
 

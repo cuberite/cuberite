@@ -396,6 +396,16 @@ void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte *
 
 
 
+void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
 {
 	ASSERT(m_Protocol != NULL);

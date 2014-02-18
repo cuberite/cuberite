@@ -22,6 +22,55 @@
 class cClientHandle;
 class cWorld;
 class cPlayer;
+class cMap;
+
+
+
+
+
+class cMapDecorator
+{
+public:
+	enum eType
+	{
+		E_TYPE_PLAYER         = 0x00,
+		E_TYPE_ITEM_FRAME     = 0x01,
+		E_TYPE_PLAYER_OUTSIDE = 0x06
+	};
+
+
+public:
+
+	cMapDecorator(cMap * a_Map, eType a_Type, int a_X, int a_Z, unsigned int a_Rot);
+
+	cMapDecorator(cMap * a_Map, cPlayer * a_Player);
+
+	void Update(void);
+
+	unsigned int GetPixelX(void) const { return m_PixelX; }
+	unsigned int GetPixelZ(void) const { return m_PixelZ; }
+	unsigned int GetRot(void)    const { return m_Rot; }
+
+	eType GetType(void) const { return m_Type; }
+
+	cPlayer * GetPlayer(void) { return m_Player; }
+
+
+protected:
+
+	cMap * m_Map;
+
+	eType m_Type;
+
+	unsigned int m_PixelX;
+	unsigned int m_PixelZ;
+
+	unsigned int m_Rot;
+
+	cPlayer * m_Player;
+};
+
+typedef std::list<cMapDecorator> cMapDecoratorList;
 
 
 
@@ -38,7 +87,19 @@ public:
 
 	typedef std::vector<ColorID> cColorList;
 
-	static const unsigned int DEFAULT_RADIUS = 128;
+	struct cMapClient
+	{
+		cClientHandle * m_Handle;
+
+		bool m_SendInfo;
+
+		unsigned int m_NextDecoratorUpdate;
+
+		Int64 m_DataUpdate;
+		Int64 m_LastUpdate;
+	};
+
+	typedef std::list<cMapClient> cMapClientList;
 
 
 public:
@@ -56,9 +117,8 @@ public:
 
 	void UpdateRadius(cPlayer & a_Player, unsigned int a_Radius);
 
-	void UpdateTrackedPlayers(void);
-
-	void AddTrackedPlayer(cPlayer * a_Player);
+	/** Send next update packet and remove invalid decorators */
+	void UpdateClient(cPlayer * a_Player);
 
 	// tolua_begin
 
@@ -98,6 +158,9 @@ public:
 
 private:
 
+	/** Update the associated decorators. */
+	void UpdateDecorators(void);
+
 	/** Update the specified pixel. */
 	bool UpdatePixel(unsigned int a_X, unsigned int a_Z);
 
@@ -117,9 +180,9 @@ private:
 
 	cWorld * m_World;
 
-	typedef std::set<cPlayer*> cTrackedPlayerList;
+	cMapDecoratorList m_Decorators;
 
-	cTrackedPlayerList m_TrackedPlayers;
+	cMapClientList m_Clients;
 
 	AString m_Name;
 

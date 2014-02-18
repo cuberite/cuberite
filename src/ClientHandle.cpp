@@ -1190,19 +1190,6 @@ void cClientHandle::HandleSlotSelected(short a_SlotNum)
 {
 	m_Player->GetInventory().SetEquippedSlotNum(a_SlotNum);
 	m_Player->GetWorld()->BroadcastEntityEquipment(*m_Player, 0, m_Player->GetInventory().GetEquippedItem(), this);
-
-	const cItem & Item = m_Player->GetInventory().GetEquippedItem();
-	if (Item.m_ItemType == E_ITEM_MAP)
-	{
-		// TODO 2014-02-14 xdot: Do not hardcode this.
-		cMap * Map = m_Player->GetWorld()->GetMapData(Item.m_ItemDamage);
-
-		if (Map != NULL)
-		{
-			// TODO 2014-02-14 xdot: Optimization - Do not send the whole map.
-			Map->SendTo(*this);
-		}
-	}
 }
 
 
@@ -2073,6 +2060,15 @@ void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cI
 void cClientHandle::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
 {
 	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+}
+
+
+
+
+
+void cClientHandle::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
 }
 
 

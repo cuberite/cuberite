@@ -17,6 +17,7 @@
 #include "ChunkDef.h"
 #include "ByteBuffer.h"
 #include "Scoreboard.h"
+#include "Map.h"
 
 
 
@@ -110,6 +111,7 @@ public:
 	void SendHealth              (void);
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length);
+	void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators);
 	void SendMapInfo             (int a_ID, unsigned int a_Scale);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
