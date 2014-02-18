@@ -34,6 +34,8 @@ public:
 		if (Block == E_BLOCK_AIR)
 		{
 			int Dir = 0;
+			
+			// The client uses different values for painting directions and block faces. Our constants are for the block faces, so we convert them here to painting faces
 			switch (a_Dir)
 			{
 				case BLOCK_FACE_ZP: break; // Initialised to zero
