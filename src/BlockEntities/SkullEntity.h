@@ -35,7 +35,7 @@ public:
 	// tolua_end
 	
 	/// Creates a new skull entity at the specified block coords. a_World may be NULL
-	cSkullEntity(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, cWorld * a_World);
+	cSkullEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	bool LoadFromJson( const Json::Value& a_Value );
 	virtual void SaveToJson(Json::Value& a_Value ) override;
