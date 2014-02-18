@@ -713,6 +713,7 @@ end
 				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cMinecart|minecart}}" },
 				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any {{cMonster|mob}}." },
 				IsOnFire = { Params = "", Return = "bool", Notes = "Returns true if the entity is on fire" },
+				IsPainting = { Params = "", Return = "bool", Notes = "Returns if this entity is a painting." },
 				IsPickup = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPickup|pickup}}." },
 				IsPlayer = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPlayer|player}}" },
 				IsProjectile = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cProjectileEntity}} descendant." },
@@ -779,6 +780,7 @@ end
 				etPickup = { Notes = "The entity is a {{cPickup}}" },
 				etProjectile = { Notes = "The entity is a {{cProjectileEntity}} descendant" },
 				etTNT = { Notes = "The entity is a {{cTNTEntity}}" },
+				etPainting = { Notes = "The entity is a {{cPainting}}" },
 			},
 			ConstantGroups =
 			{
@@ -1109,6 +1111,9 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
 				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object. This is true even if the two items have different enchantments" },
 				IsStackableWith = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is stackable with the one stored in the object. Two items with different enchantments cannot be stacked" },
+				IsBothNameAndLoreEmpty = { Params = "", Return = "bool", Notes = "Returns if both the custom name and lore are not set." },
+				IsCustomNameEmpty = { Params = "", Return = "bool", Notes = "Returns if the custom name of the cItem is empty." },
+				IsLoreEmpty = { Params = "", Return = "", Notes = "Returns if the lore of the cItem is empty." },
 			},
 			Variables =
 			{
@@ -1116,6 +1121,8 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				m_ItemCount    = { Type = "number", Notes = "Number of items in this stack" },
 				m_ItemDamage   = { Type = "number", Notes = "The damage of the item. Zero means no damage. Maximum damage can be queried with GetMaxDamage()" },
 				m_ItemType     = { Type = "number", Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants" },
+				m_CustomName = { Type = "string", Notes = "The custom name for an item." },
+				m_Lore = { Type = "string", Notes = "The lore for an item. Line breaks are represented by the ` character." },
 			},
 			AdditionalInfo =
 			{
@@ -1159,6 +1166,17 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 				},
 			},
 		},  -- cItem
+
+		cPainting =
+		{
+			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
+			Functions =
+			{
+				GetDirection = { Params = "", Return = "number", Notes = "Returns the direction the painting faces. Directions: ZP - 0, ZM - 2, XM - 1, XP - 3. Note that these are not the BLOCK_FACE constants." },
+				GetName = { Params = "", Return = "string", Notes = "Returns the name of the painting" },
+			},
+
+		}, -- cPainting
 
 		cItemGrid =
 		{
