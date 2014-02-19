@@ -15,6 +15,7 @@
 #include "JukeboxEntity.h"
 #include "NoteEntity.h"
 #include "SignEntity.h"
+#include "MobHeadEntity.h"
 
 
 
@@ -29,6 +30,7 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 		case E_BLOCK_DISPENSER:     return new cDispenserEntity   (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_DROPPER:       return new cDropperEntity     (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_ENDER_CHEST:   return new cEnderChestEntity  (a_BlockX, a_BlockY, a_BlockZ, a_World);
+		case E_BLOCK_HEAD:          return new cMobHeadEntity     (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_LIT_FURNACE:   return new cFurnaceEntity     (a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_World);
 		case E_BLOCK_FURNACE:       return new cFurnaceEntity     (a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_World);
 		case E_BLOCK_HOPPER:        return new cHopperEntity      (a_BlockX, a_BlockY, a_BlockZ, a_World);
