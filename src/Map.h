@@ -51,7 +51,7 @@ public:
 	/** Constructs a map decorator that tracks a player. */
 	cMapDecorator(cMap * a_Map, cPlayer * a_Player);
 
-	/** Updates the pixel coordinates of the decorator. */
+	/** Updates the decorator. */
 	void Update(void);
 
 	unsigned int GetPixelX(void) const { return m_PixelX; }
@@ -123,7 +123,7 @@ public:
 	/** Construct an empty map. */
 	cMap(unsigned int a_ID, cWorld * a_World);
 
-	/** Constructs an empty map at the specified coordinates. */
+	/** Construct an empty map at the specified coordinates. */
 	cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale = 3);
 
 	/** Send this map to the specified client. WARNING: Slow */
@@ -135,7 +135,7 @@ public:
 	/** Update a circular region around the specified player. */
 	void UpdateRadius(cPlayer & a_Player, unsigned int a_Radius);
 
-	/** Send next update packet and remove invalid decorators */
+	/** Send next update packet to the specified player and remove invalid decorators/clients. */
 	void UpdateClient(cPlayer * a_Player);
 
 	// tolua_begin

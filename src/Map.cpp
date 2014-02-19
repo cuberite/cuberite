@@ -9,6 +9,7 @@
 #include "World.h"
 #include "Chunk.h"
 #include "Entities/Player.h"
+#include "FastRandom.h"
 
 
 
@@ -52,14 +53,14 @@ T Clamp(T a_X, T a_Min, T a_Max)
 
 void cMapDecorator::Update(void)
 {
-	ASSERT(m_Map != NULL);
-	unsigned int PixelWidth = m_Map->GetPixelWidth();
-
-	int InsideWidth  = (m_Map->GetWidth()  / 2) - 1;
-	int InsideHeight = (m_Map->GetHeight() / 2) - 1;
-
 	if (m_Player != NULL)
 	{
+		ASSERT(m_Map != NULL);
+		unsigned int PixelWidth = m_Map->GetPixelWidth();
+
+		int InsideWidth  = (m_Map->GetWidth()  / 2) - 1;
+		int InsideHeight = (m_Map->GetHeight() / 2) - 1;
+
 		int PixelX = (m_Player->GetPosX() - m_Map->GetCenterX()) / PixelWidth;
 		int PixelZ = (m_Player->GetPosZ() - m_Map->GetCenterZ()) / PixelWidth;
 
@@ -67,18 +68,22 @@ void cMapDecorator::Update(void)
 		m_PixelX = (2 * PixelX) + 1;
 		m_PixelZ = (2 * PixelZ) + 1;
 
-		// 1px border
 		if ((PixelX > -InsideWidth) && (PixelX <= InsideWidth) && (PixelZ > -InsideHeight) && (PixelZ <= InsideHeight))
 		{
 			double Yaw = m_Player->GetYaw();
 
-			m_Rot = (Yaw * 16) / 360;
-
 			if (m_Map->GetDimension() == dimNether)
 			{
+				cFastRandom Random;
+
 				Int64 WorldAge = m_Player->GetWorld()->GetWorldAge();
 
-				// TODO 2014-02-18 xdot: Random rotations
+				// TODO 2014-02-19 xdot: Refine
+				m_Rot = Random.NextInt(16, WorldAge);
+			}
+			else
+			{
+				m_Rot = (Yaw * 16) / 360;
 			}
 
 			m_Type = E_TYPE_PLAYER;
