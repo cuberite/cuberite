@@ -31,7 +31,7 @@ class cChestEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
 class cNoteEntity;
-class cSkullEntity;
+class cMobHeadEntity;
 class cBlockArea;
 class cPawn;
 class cPickup;
@@ -48,7 +48,7 @@ typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
 typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
 typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
-typedef cItemCallback<cSkullEntity>        cSkullBlockCallback;
+typedef cItemCallback<cMobHeadEntity>      cMobHeadBlockCallback;
 
 
 
@@ -245,8 +245,8 @@ public:
 	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
 	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);
 	
-	/** Calls the callback for the skull block at the specified coords; returns false if there's no skull block at those coords or callback returns true, returns true if found */
-	bool DoWithSkullBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cSkullBlockCallback & a_Callback);
+	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob header block at those coords or callback returns true, returns true if found */
+	bool DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback);
 
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible

@@ -19,7 +19,7 @@
 #include "BlockEntities/JukeboxEntity.h"
 #include "BlockEntities/NoteEntity.h"
 #include "BlockEntities/SignEntity.h"
-#include "BlockEntities/SkullEntity.h"
+#include "BlockEntities/MobHeadEntity.h"
 #include "Entities/Pickup.h"
 #include "Item.h"
 #include "Noise.h"
@@ -2312,7 +2312,7 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
-bool cChunk::DoWithSkullBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cSkullBlockCallback & a_Callback)
+bool cChunk::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
@@ -2329,7 +2329,7 @@ bool cChunk::DoWithSkullBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cSkull
 		}
 		
 		// The correct block entity is here, 
-		if (a_Callback.Item((cSkullEntity *)*itr))
+		if (a_Callback.Item((cMobHeadEntity *)*itr))
 		{
 			return false;
 		}
