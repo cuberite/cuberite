@@ -28,28 +28,36 @@ class cMap;
 
 
 
+/** Encapsulates a map decorator. */
 class cMapDecorator
 {
 public:
+
 	enum eType
 	{
 		E_TYPE_PLAYER         = 0x00,
 		E_TYPE_ITEM_FRAME     = 0x01,
+
+		/** Player outside of the boundaries of the map. */
 		E_TYPE_PLAYER_OUTSIDE = 0x06
 	};
 
 
 public:
 
-	cMapDecorator(cMap * a_Map, eType a_Type, int a_X, int a_Z, unsigned int a_Rot);
+	/** Constructs a map decorator fixed at the specified pixel coordinates. (DEBUG) */
+	cMapDecorator(cMap * a_Map, eType a_Type, int a_X, int a_Z, int a_Rot);
 
+	/** Constructs a map decorator that tracks a player. */
 	cMapDecorator(cMap * a_Map, cPlayer * a_Player);
 
+	/** Updates the pixel coordinates of the decorator. */
 	void Update(void);
 
 	unsigned int GetPixelX(void) const { return m_PixelX; }
 	unsigned int GetPixelZ(void) const { return m_PixelZ; }
-	unsigned int GetRot(void)    const { return m_Rot; }
+
+	int GetRot(void) const { return m_Rot; }
 
 	eType GetType(void) const { return m_Type; }
 
@@ -68,6 +76,7 @@ protected:
 	unsigned int m_Rot;
 
 	cPlayer * m_Player;
+
 };
 
 typedef std::list<cMapDecorator> cMapDecoratorList;
@@ -77,6 +86,8 @@ typedef std::list<cMapDecorator> cMapDecoratorList;
 
 
 // tolua_begin
+
+/** Encapsulates an in-game world map. */
 class cMap
 {
 public:
@@ -87,15 +98,20 @@ public:
 
 	typedef std::vector<ColorID> cColorList;
 
+	/** Encapsulates the state of a map client. */
 	struct cMapClient
 	{
 		cClientHandle * m_Handle;
 
+		/** Whether the map scale was modified and needs to be resent. */
 		bool m_SendInfo;
 
+		/** Ticks since last decorator update. */
 		unsigned int m_NextDecoratorUpdate;
 
+		/** Number of pixel data updates. */
 		Int64 m_DataUpdate;
+
 		Int64 m_LastUpdate;
 	};
 
@@ -107,14 +123,16 @@ public:
 	/** Construct an empty map. */
 	cMap(unsigned int a_ID, cWorld * a_World);
 
+	/** Constructs an empty map at the specified coordinates. */
 	cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale = 3);
 
-	/** Send this map to the specified client. */
+	/** Send this map to the specified client. WARNING: Slow */
 	void SendTo(cClientHandle & a_Client);
 
 	/** Update a circular region with the specified radius and center (in pixels). */
 	void UpdateRadius(int a_PixelX, int a_PixelZ, unsigned int a_Radius);
 
+	/** Update a circular region around the specified player. */
 	void UpdateRadius(cPlayer & a_Player, unsigned int a_Radius);
 
 	/** Send next update packet and remove invalid decorators */

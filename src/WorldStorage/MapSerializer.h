@@ -21,6 +21,7 @@ class cMap;
 
 
 
+/** Utility class used to serialize maps. */
 class cMapSerializer
 {
 public:
@@ -50,6 +51,7 @@ private:
 
 
 
+/** Utility class used to serialize item ID counts. */
 class cIDCountSerializer
 {
 public:

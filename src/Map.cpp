@@ -14,7 +14,7 @@
 
 
 
-cMapDecorator::cMapDecorator(cMap * a_Map, eType a_Type, int a_X, int a_Z, unsigned int a_Rot)
+cMapDecorator::cMapDecorator(cMap * a_Map, eType a_Type, int a_X, int a_Z, int a_Rot)
 	: m_Map(a_Map)
 	, m_Type(a_Type)
 	, m_PixelX(a_X)
@@ -58,7 +58,7 @@ void cMapDecorator::Update(void)
 	int InsideWidth  = (m_Map->GetWidth()  / 2) - 1;
 	int InsideHeight = (m_Map->GetHeight() / 2) - 1;
 
-	if (m_Player)
+	if (m_Player != NULL)
 	{
 		int PixelX = (m_Player->GetPosX() - m_Map->GetCenterX()) / PixelWidth;
 		int PixelZ = (m_Player->GetPosZ() - m_Map->GetCenterZ()) / PixelWidth;
@@ -200,7 +200,8 @@ void cMap::UpdateRadius(cPlayer & a_Player, unsigned int a_Radius)
 
 bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 {
-	/*unsigned int PixelWidth = GetPixelWidth();
+	/*
+	unsigned int PixelWidth = GetPixelWidth();
 
 	int BlockX = m_CenterX + ((a_X - m_Width)  * PixelWidth);
 	int BlockZ = m_CenterZ + ((a_Y - m_Height) * PixelWidth);
@@ -258,7 +259,8 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 	} CalculatePixelCb(this, RelX, RelZ);
 
 	ASSERT(m_World != NULL);
-	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);*/
+	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);
+	*/
 
 	m_Data[a_Z + (a_X * m_Height)] = 4;
 
@@ -346,6 +348,8 @@ void cMap::UpdateClient(cPlayer * a_Player)
 
 			if (it->m_NextDecoratorUpdate >= 4)
 			{
+				// TODO 2014-02-19 xdot
+				// This is dangerous as the player object may have been destroyed before the decorator is erased from the list
 				UpdateDecorators();
 
 				Handle->SendMapDecorators(m_ID, m_Decorators);
