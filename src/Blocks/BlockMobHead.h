@@ -2,17 +2,17 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "../BlockEntities/SkullEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
 
 
 
 
 
-class cBlockSkullHandler :
+class cBlockMobHeadHandler :
 	public cBlockEntityHandler
 {
 public:
-	cBlockSkullHandler(BLOCKTYPE a_BlockType)
+	cBlockMobHeadHandler(BLOCKTYPE a_BlockType)
 		: cBlockEntityHandler(a_BlockType)
 	{
 	}
@@ -29,13 +29,13 @@ public:
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 	) override
 	{
-		class cCallback : public cSkullBlockCallback
+		class cCallback : public cMobHeadBlockCallback
 		{
 			cPlayer * m_Player;
 			NIBBLETYPE m_OldBlockMeta;
 			NIBBLETYPE m_NewBlockMeta;
 			
-			virtual bool Item (cSkullEntity * a_SkullEntity)
+			virtual bool Item (cMobHeadEntity * a_MobHeadEntity)
 			{
 				int Rotation = 0;
 				if (m_NewBlockMeta == 1)
@@ -43,8 +43,8 @@ public:
 					Rotation = (int) floor(m_Player->GetYaw() * 16.0F / 360.0F + 0.5) & 0xF;
 				}
 				
-				a_SkullEntity->SetSkullType(static_cast<eSkullType>(m_OldBlockMeta));
-				a_SkullEntity->SetRotation(static_cast<eSkullRotation>(Rotation));
+				a_MobHeadEntity->SetType(static_cast<eMobHeadType>(m_OldBlockMeta));
+				a_MobHeadEntity->SetRotation(static_cast<eMobHeadRotation>(Rotation));
 				return false;
 			}
 		
@@ -59,7 +59,7 @@ public:
 		
 		a_BlockMeta = a_BlockFace;
 		cWorld * World = (cWorld *) &a_WorldInterface;
-		World->DoWithSkullBlockAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
+		World->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
 	}
 } ;

@@ -174,7 +174,7 @@ enum eWeather
 
 
 
-enum eSkullType
+enum eMobHeadType
 {
 	SKULL_TYPE_SKELETON    = 0,
 	SKULL_TYPE_WITHER      = 1,
@@ -187,7 +187,7 @@ enum eSkullType
 
 
 
-enum eSkullRotation
+enum eMobHeadRotation
 {
 	SKULL_ROTATION_NORTH = 0,
 	SKULL_ROTATION_NORTH_NORTH_EAST = 1,

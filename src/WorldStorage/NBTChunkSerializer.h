@@ -29,7 +29,7 @@ class cHopperEntity;
 class cJukeboxEntity;
 class cNoteEntity;
 class cSignEntity;
-class cSkullEntity;
+class cMobHeadEntity;
 class cFallingBlock;
 class cMinecart;
 class cMinecartWithChest;
@@ -94,7 +94,7 @@ protected:
 	void AddJukeboxEntity  (cJukeboxEntity *   a_Jukebox);
 	void AddNoteEntity     (cNoteEntity *      a_Note);
 	void AddSignEntity     (cSignEntity *      a_Sign);
-	void AddSkullEntity    (cSkullEntity *     a_Skull);
+	void AddMobHeadEntity  (cMobHeadEntity *     a_MobHead);
 	void AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock);
 	
 	// Entities:

@@ -8,11 +8,11 @@
 
 
 
-class cItemSkullHandler :
+class cItemMobHeadHandler :
 	public cItemHandler
 {
 public:
-	cItemSkullHandler(int a_ItemType) :
+	cItemMobHeadHandler(int a_ItemType) :
 		cItemHandler(a_ItemType)
 	{
 	}
@@ -31,10 +31,8 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		
 		a_BlockType = E_BLOCK_HEAD;
 		a_BlockMeta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x0f);
-		
 		return true;
 	}
 } ;
