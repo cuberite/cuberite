@@ -2298,6 +2298,7 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			Writer.AddByte("Rot", SkullEntity.GetRotation() & 0xFF);
 			Writer.AddString("ExtraType", SkullEntity.GetOwner().c_str());
 			Writer.AddString("id", "Skull"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
 		}
 		default: break;
 	}

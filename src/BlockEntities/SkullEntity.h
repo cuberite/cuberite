@@ -34,7 +34,7 @@ public:
 
 	// tolua_end
 	
-	/// Creates a new skull entity at the specified block coords. a_World may be NULL
+	/** Creates a new skull entity at the specified block coords. a_World may be NULL */
 	cSkullEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	bool LoadFromJson( const Json::Value& a_Value );
@@ -42,22 +42,22 @@ public:
 
 	// tolua_begin
 	
-	/// Set the Skull Type
+	/** Set the Skull Type */
 	void SetSkullType(const eSkullType & a_SkullType);
 	
-	/// Set the Rotation
+	/** Set the Rotation */
 	void SetRotation(eSkullRotation a_Rotation);
 	
-	// Set the Player Name for Player Skulls
+	/** Set the Player Name for Player Skull */
 	void SetOwner(const AString & a_Owner);
 	
-	/// Get the Skull Type
+	/** Get the Skull Type */
 	eSkullType GetSkullType(void) const { return m_SkullType; }
 	
-	/// Get the Rotation
+	/** Get the Rotation */
 	eSkullRotation GetRotation(void) const { return m_Rotation; }
 	
-	/// Get the setted Player Name
+	/** Get the setted Player Name */
 	AString GetOwner(void) const { return m_Owner; }
 	
 	// tolua_end
