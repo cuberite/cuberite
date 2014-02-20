@@ -542,19 +542,23 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	if (a_Channel == "MC|AdvCdm") // Command block, set text, Client -> Server
+	if (a_Channel == "MC|AdvCdm")
 	{
-		const char* Data = a_Message.c_str();
-		HandleCommandBlockMessage(Data, a_Message.size());
-		return;
+		// Command block, set text, Client -> Server
+		HandleCommandBlockMessage(a_Message.c_str(), a_Message.size());
 	}
-	else if (a_Channel == "MC|Brand") // Client <-> Server branding exchange
+	else if (a_Channel == "MC|Brand")
 	{
-		// We are custom,
-		// We are awesome,
-		// We are MCServer.
+		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
-		return;
+	}
+	else if (a_Channel == "REGISTER")
+	{
+		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
+	}
+	else if (a_Channel == "UNREGISTER")
+	{
+		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
 	}
 
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
@@ -564,7 +568,61 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length)
+AStringVector cClientHandle::BreakApartPluginChannels(const AString & a_PluginChannels)
+{
+	// Break the string on each NUL character.
+	// Note that StringSplit() doesn't work on this because NUL is a special char - string terminator
+	size_t len = a_PluginChannels.size();
+	size_t first = 0;
+	AStringVector res;
+	for (size_t i = 0; i < len; i++)
+	{
+		if (a_PluginChannels[i] != 0)
+		{
+			continue;
+		}
+		if (i > first)
+		{
+			res.push_back(a_PluginChannels.substr(first, i - first));
+		}
+		first = i + 1;
+	}  // for i - a_PluginChannels[]
+	if (first < len)
+	{
+		res.push_back(a_PluginChannels.substr(first, len - first));
+	}
+	return res;
+}
+
+
+
+
+
+void cClientHandle::RegisterPluginChannels(const AStringVector & a_ChannelList)
+{
+	for (AStringVector::const_iterator itr = a_ChannelList.begin(), end = a_ChannelList.end(); itr != end; ++itr)
+	{
+		m_PluginChannels.insert(*itr);
+	}  // for itr - a_ChannelList[]
+}
+
+
+
+
+
+void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList)
+{
+	for (AStringVector::const_iterator itr = a_ChannelList.begin(), end = a_ChannelList.end(); itr != end; ++itr)
+	{
+		m_PluginChannels.erase(*itr);
+	}  // for itr - a_ChannelList[]
+}
+
+
+
+
+
+void cClientHandle::HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length)
 {
 	if (a_Length < 14)
 	{
@@ -2457,6 +2515,15 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 	
 	// Need to re-stream chunks for the change to become apparent:
 	StreamChunks();
+}
+
+
+
+
+
+bool cClientHandle::HasPluginChannel(const AString & a_PluginChannel)
+{
+	return (m_PluginChannels.find(a_PluginChannel) != m_PluginChannels.end());
 }
 
 
