@@ -1390,10 +1390,10 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 EMCSBiome cChunkMap::GetBiomeAt (int a_BlockX, int a_BlockZ)
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = 0, Z = a_BlockZ;
-	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
 
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		return Chunk->GetBiomeAt(X, Z);
@@ -1402,6 +1402,63 @@ EMCSBiome cChunkMap::GetBiomeAt (int a_BlockX, int a_BlockZ)
 	{
 		return m_World->GetGenerator().GetBiomeAt(a_BlockX, a_BlockZ);
 	}
+}
+
+
+
+
+
+bool cChunkMap::SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome)
+{
+	int ChunkX, ChunkZ, X = a_BlockX, Y = 0, Z = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk != NULL) && Chunk->IsValid())
+	{
+		Chunk->SetBiomeAt(X, Z, a_Biome);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+bool cChunkMap::SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome)
+{
+	// Translate coords to relative:
+	int Y = 0;
+	int MinChunkX, MinChunkZ, MinX = a_MinX, MinZ = a_MinZ;
+	int MaxChunkX, MaxChunkZ, MaxX = a_MaxX, MaxZ = a_MaxZ;
+	cChunkDef::AbsoluteToRelative(MinX, Y, MinZ, MinChunkX, MinChunkZ);
+	cChunkDef::AbsoluteToRelative(MaxX, Y, MaxZ, MaxChunkX, MaxChunkZ);
+	
+	// Go through all chunks, set:
+	bool res = true;
+	cCSLock Lock(m_CSLayers);
+	for (int x = MinChunkX; x <= MaxChunkX; x++)
+	{
+		int MinRelX = (x == MinChunkX) ? MinX : 0;
+		int MaxRelX = (x == MaxChunkX) ? MaxX : cChunkDef::Width - 1;
+		for (int z = MinChunkZ; z <= MaxChunkZ; z++)
+		{
+			int MinRelZ = (z == MinChunkZ) ? MinZ : 0;
+			int MaxRelZ = (z == MaxChunkZ) ? MaxZ : cChunkDef::Width - 1;
+			cChunkPtr Chunk = GetChunkNoLoad(x, ZERO_CHUNK_Y, z);
+			if ((Chunk != NULL) && Chunk->IsValid())
+			{
+				Chunk->SetAreaBiome(MinRelX, MaxRelX, MinRelZ, MaxRelZ, a_Biome);
+			}
+			else
+			{
+				res = false;
+			}
+		}  // for z
+	}  // for x
+	return res;
 }
 
 
@@ -2115,6 +2172,24 @@ bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		return false;
 	}
 	return Chunk->DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cChunkMap::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+{
+	int ChunkX, ChunkZ;
+	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk == NULL) && !Chunk->IsValid())
+	{
+		return false;
+	}
+	return Chunk->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 

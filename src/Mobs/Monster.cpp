@@ -142,11 +142,11 @@ void cMonster::TickPathFinding()
 		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYM = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY - 1, gCrossCoords[i].z + PosZ);
 
-		if (!g_BlockIsSolid[BlockAtY] && !g_BlockIsSolid[BlockAtYP] && !IsBlockLava(BlockAtYM))
+		if ((!g_BlockIsSolid[BlockAtY]) && (!g_BlockIsSolid[BlockAtYP]) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY, gCrossCoords[i].z + PosZ));
 		}
-		else if (g_BlockIsSolid[BlockAtY] && !g_BlockIsSolid[BlockAtYP] && !g_BlockIsSolid[BlockAtYPP] && !IsBlockLava(BlockAtYM))
+		else if ((g_BlockIsSolid[BlockAtY]) && (!g_BlockIsSolid[BlockAtYP]) && (!g_BlockIsSolid[BlockAtYPP]) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY + 1, gCrossCoords[i].z + PosZ));
 		}
@@ -310,9 +310,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			}
 		}
 	}
-
-	if (ReachedFinalDestination() && (m_Target != NULL))
-		Attack(a_Dt);
 
 	SetPitchAndYawFromDestination();
 	HandleFalling();
@@ -651,17 +648,6 @@ void cMonster::InStateEscaping(float a_Dt)
 	{
 		m_EMState = IDLE;  // This shouldnt be required but just to be safe
 	}
-}
-
-
-
-
-
-// Do attack here
-// a_Dt is passed so we can set attack rate
-void cMonster::Attack(float a_Dt)
-{
-	m_AttackInterval += a_Dt * m_AttackRate;
 }
 
 

@@ -43,6 +43,8 @@ public:
 	void EjectRecord(void);
 	
 	// tolua_end
+
+	static const char * GetClassStatic(void) { return "cJukeboxEntity"; }
 	
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override { };

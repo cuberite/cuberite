@@ -51,7 +51,10 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
 			a_ClosestPlayer->DeltaExperience(m_Reward);
-			Destroy(true);
+			
+			m_World->BroadcastSoundEffect("random.orb", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+			
+			Destroy();
 		}
 		a_Distance.Normalize();
 		a_Distance *= ((float) (5.5 - Distance));

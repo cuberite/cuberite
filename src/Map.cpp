@@ -41,16 +41,6 @@ cMapDecorator::cMapDecorator(cMap * a_Map, cPlayer * a_Player)
 
 
 
-template <typename T>
-T Clamp(T a_X, T a_Min, T a_Max)
-{
-	return std::min(std::max(a_X, a_Min), a_Max);
-}
-
-
-
-
-
 void cMapDecorator::Update(void)
 {
 	if (m_Player != NULL)

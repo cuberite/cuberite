@@ -24,6 +24,7 @@
 #include "../BlockEntities/JukeboxEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
 
 
 #include "../Mobs/Monster.h"
@@ -597,6 +598,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadSignFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "Skull", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadMobHeadFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		else if (strncmp(a_NBT.GetData(sID), "Trap", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadDispenserFromNBT(a_BlockEntities, a_NBT, Child);
@@ -921,6 +926,41 @@ void cWSSAnvil::LoadSignFromNBT(cBlockEntityList & a_BlockEntities, const cParse
 	}
 
 	a_BlockEntities.push_back(Sign.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadMobHeadFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cMobHeadEntity> MobHead(new cMobHeadEntity(x, y, z, m_World));
+
+	int currentLine = a_NBT.FindChildByName(a_TagIdx, "SkullType");
+	if (currentLine >= 0)
+	{
+		MobHead->SetType(static_cast<eMobHeadType>(a_NBT.GetByte(currentLine)));
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "Rot");
+	if (currentLine >= 0)
+	{
+		MobHead->SetRotation(static_cast<eMobHeadRotation>(a_NBT.GetByte(currentLine)));
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "ExtraType");
+	if (currentLine >= 0)
+	{
+		MobHead->SetOwner(a_NBT.GetString(currentLine));
+	}
+
+	a_BlockEntities.push_back(MobHead.release());
 }
 
 

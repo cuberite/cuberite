@@ -46,7 +46,10 @@ class cChestEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
 class cNoteEntity;
+class cMobHeadEntity;
 class cMobCensus;
+class cCompositeChat;
+class cCuboid;
 
 typedef std::list< cPlayer * > cPlayerList;
 
@@ -57,6 +60,7 @@ typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
 typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
 typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
+typedef cItemCallback<cMobHeadEntity>      cMobHeadBlockCallback;
 
 
 
@@ -64,7 +68,10 @@ typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 
 
 // tolua_begin
-class cWorld : public cForEachChunkProvider, public cWorldInterface, public cBroadcastInterface
+class cWorld :
+	public cForEachChunkProvider,
+	public cWorldInterface,
+	public cBroadcastInterface
 {
 public:
 
@@ -99,6 +106,15 @@ public:
 		virtual void Run(cWorld & a_World) override;
 	} ;
 	
+
+	class cTaskUnloadUnusedChunks :
+		public cTask
+	{
+	protected:
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
+	};
+
 
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
@@ -159,16 +175,15 @@ public:
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 
-	void LoopPlayersAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const cClientHandle * a_Exclude = NULL);
-	void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtDeath, a_Exclude); }
-
 	// tolua_begin
-	void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtCustom, a_Exclude); }
-	void BroadcastChatInfo   (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtInformation, a_Exclude); }
-	void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtFailure, a_Exclude); }
-	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtSuccess, a_Exclude); }
-	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtWarning, a_Exclude); }
-	void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { LoopPlayersAndBroadcastChat(a_Message, mtFailure, a_Exclude); }
+	void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = NULL, eMessageType a_ChatPrefix = mtCustom);
+	void BroadcastChatInfo   (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtInformation); }
+	void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtFailure); }
+	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtSuccess); }
+	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtWarning); }
+	void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtFailure); }
+	void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = NULL) { BroadcastChat(a_Message, a_Exclude, mtDeath); }
+	void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = NULL);
 	// tolua_end
 
 	void BroadcastChunkData          (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
@@ -184,7 +199,7 @@ public:
 	void BroadcastEntityStatus       (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityVelocity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL);
-	void BroadcastParticleEffect     (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);
+	void BroadcastParticleEffect     (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL); // tolua_export
 	void BroadcastPlayerListItem     (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
 	void BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
@@ -244,7 +259,8 @@ public:
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
 	
-	void UnloadUnusedChunks(void);    // tolua_export
+	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading*/
+	void QueueUnloadUnusedChunks(void);  // tolua_export
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 
@@ -294,8 +310,13 @@ public:
 	/** Removes the client from all chunks it is present in */
 	void RemoveClientFromChunks(cClientHandle * a_Client);
 	
-	/** Sends the chunk to the client specified, if the chunk is valid. If not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid+lighted) */
+	/** Sends the chunk to the client specified, if the client doesn't have the chunk yet.
+	If chunk not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
 	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
+	
+	/** Sends the chunk to the client specified, even if the client already has the chunk.
+	If the chunk's not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
+	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/** Removes client from ChunkSender's queue of chunks to be sent */
 	void RemoveClientFromChunkSender(cClientHandle * a_Client);
@@ -392,15 +413,15 @@ public:
 	Prefer cBlockArea::Write() instead, this is the internal implementation; cBlockArea does error checking, too.
 	a_DataTypes is a bitmask of cBlockArea::baXXX constants ORed together.
 	*/
-	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
+	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes) override;
 	
 	// tolua_begin
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
-	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false);
+	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false);  // override; cannot specify it here due to tolua
 	
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified: */
-	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false);
+	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false);  // override; cannot specify it here due to tolua
 	
 	/** Spawns an falling block entity at the given position. It returns the UniqueID of the spawned falling block. */
 	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
@@ -501,6 +522,9 @@ public:
 	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
 	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
 	
+	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
+	bool DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
+	
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Exported in ManualBindings.cpp
 	
@@ -537,6 +561,19 @@ public:
 	
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
 	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
+	
+	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
+	Doesn't resend the chunk to clients, use ForceSendChunkTo() for that. */
+	bool SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome);
+	
+	/** Sets the biome at the area. Returns true if successful, false if any subarea failed (chunk not loaded).
+	(Re)sends the chunks to their relevant clients if successful. */
+	bool SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome);
+	
+	/** Sets the biome at the area. Returns true if successful, false if any subarea failed (chunk not loaded).
+	(Re)sends the chunks to their relevant clients if successful.
+	The cuboid needn't be sorted. */
+	bool SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome);
 
 	/** Returns the name of the world */
 	const AString & GetName(void) const { return m_WorldName; }
@@ -552,12 +589,6 @@ public:
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
-
-	/** Returns the map with the specified ID, NULL if out of range. */
-	cMap * GetMapData(unsigned int a_ID);
-
-	/** Creates a new map. Returns NULL on error */
-	cMap * CreateMap(int a_CenterX, int a_CenterY, int a_Scale = 3);
 	
 	// tolua_end
 	
@@ -818,10 +849,6 @@ private:
 	cChunkGenerator  m_Generator;
 
 	cScoreboard      m_Scoreboard;
-
-	typedef std::vector<cMap> cMapList;
-
-	cMapList m_MapData;
 	
 	/** The callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	cChunkGeneratorCallbacks m_GeneratorCallbacks;
@@ -877,6 +904,9 @@ private:
 	/** Ticks all clients that are in this world */
 	void TickClients(float a_Dt);
 
+	/** Unloads all chunks immediately.*/
+	void UnloadUnusedChunks(void);
+
 	void UpdateSkyDarkness(void);
 
 	/** <summary>Generates a random spawnpoint on solid land by walking chunks and finding their biomes</summary> */
@@ -887,12 +917,6 @@ private:
 
 	/** Creates a new redstone simulator.*/
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
-
-	/** Loads the map data from the disk */
-	void LoadMapData(void);
-
-	/** Saves the map data to the disk */
-	void SaveMapData(void);
 }; // tolua_export
 
 

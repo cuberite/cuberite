@@ -28,6 +28,7 @@ class cInventory;
 class cMonster;
 class cPawn;
 class cExpOrb;
+class cPainting;
 class cPickup;
 class cPlayer;
 class cProtocol;
@@ -35,6 +36,7 @@ class cWindow;
 class cFallingBlock;
 class cItemHandler;
 class cWorld;
+class cCompositeChat;
 
 
 
@@ -90,7 +92,8 @@ public:
 	void SendBlockBreakAnim      (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta); // tolua_export
 	void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
-	void SendChat                (const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData = "");
+	void SendChat                (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
+	void SendChat                (const cCompositeChat & a_Message);
 	void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
 	void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player);
 	void SendDestroyEntity       (const cEntity & a_Entity);
@@ -113,6 +116,7 @@ public:
 	void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length);
 	void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators);
 	void SendMapInfo             (int a_ID, unsigned int a_Scale);
+	void SendPaintingSpawn       (const cPainting & a_Painting);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
 	void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount);
@@ -157,6 +161,9 @@ public:
 	
 	void SetViewDistance(int a_ViewDistance);		// tolua_export
 	int  GetViewDistance(void) const { return m_ViewDistance; }  // tolua_export
+	
+	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }  // tolua_export
+	AString GetLocale(void) const { return m_Locale; }  // tolua_export
 
 	int GetUniqueID() const { return m_UniqueID; }	// tolua_export
 	
@@ -310,7 +317,9 @@ private:
 	
 	/// Set to true when the chunk where the player is is sent to the client. Used for spawning the player
 	bool m_HasSentPlayerChunk;
-	
+
+	/// Client Settings
+	AString m_Locale;
 
 
 	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)

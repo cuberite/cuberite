@@ -1171,6 +1171,15 @@ bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
+bool cWorld::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
 bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	return m_ChunkMap->GetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
@@ -1493,6 +1502,37 @@ EMCSBiome cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 
 
 
+bool cWorld::SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome)
+{
+	return m_ChunkMap->SetBiomeAt(a_BlockX, a_BlockZ, a_Biome);
+}
+
+
+
+
+
+bool cWorld::SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome)
+{
+	return m_ChunkMap->SetAreaBiome(a_MinX, a_MaxX, a_MinZ, a_MaxZ, a_Biome);
+}
+
+
+
+
+
+bool cWorld::SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome)
+{
+	return SetAreaBiome(
+		std::min(a_Area.p1.x, a_Area.p2.x), std::max(a_Area.p1.x, a_Area.p2.x),
+		std::min(a_Area.p1.z, a_Area.p2.z), std::max(a_Area.p1.z, a_Area.p2.z),
+		a_Biome
+	);
+}
+
+
+
+
+
 void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	m_ChunkMap->SetBlock(*this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
@@ -1548,41 +1588,6 @@ bool cWorld::GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & 
 bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	return m_ChunkMap->WriteBlockArea(a_Area, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
-}
-
-
-
-
-
-cMap * cWorld::GetMapData(unsigned int a_ID)
-{
-	if (a_ID < m_MapData.size())
-	{
-		return &m_MapData[a_ID];
-	}
-	else
-	{
-		return NULL;
-	}
-}
-
-
-
-
-
-cMap * cWorld::CreateMap(int a_CenterX, int a_CenterY, int a_Scale)
-{
-	if (m_MapData.size() >= 65536)
-	{
-		LOGWARN("Could not craft map - Too many maps in use");
-		return NULL;
-	}
-
-	cMap Map(m_MapData.size(), a_CenterX, a_CenterY, this, a_Scale);
-
-	m_MapData.push_back(Map);
-
-	return &m_MapData[Map.GetID()];
 }
 
 
@@ -1788,7 +1793,7 @@ void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 
 
-void cWorld::LoopPlayersAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const cClientHandle * a_Exclude)
+void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -1799,6 +1804,24 @@ void cWorld::LoopPlayersAndBroadcastChat(const AString & a_Message, ChatPrefixCo
 			continue;
 		}
 		ch->SendChat(a_Message, a_ChatPrefix);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendChat(a_Message);
 	}
 }
 
@@ -2254,6 +2277,15 @@ void cWorld::UnloadUnusedChunks(void)
 
 
 
+void cWorld::QueueUnloadUnusedChunks(void)
+{
+	QueueTask(new cWorld::cTaskUnloadUnusedChunks);
+}
+
+
+
+
+
 void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
 {
 	m_ChunkMap->CollectPickupsByPlayer(a_Player);
@@ -2497,6 +2529,16 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+}
+
+
+
+
+
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+{
+	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
 }
 
@@ -2987,70 +3029,6 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 
 
-void cWorld::LoadMapData(void)
-{
-	cIDCountSerializer IDSerializer(GetName());
-
-	if (!IDSerializer.Load())
-	{
-		return;
-	}
-
-	unsigned int MapCount = IDSerializer.GetMapCount();
-
-	m_MapData.clear();
-
-	for (unsigned int i = 0; i < MapCount; ++i)
-	{
-		cMap Map(i, this);
-
-		cMapSerializer Serializer(GetName(), &Map);
-
-		if (!Serializer.Load())
-		{
-			LOGWARN("Could not load map #%i", Map.GetID());
-		}
-
-		m_MapData.push_back(Map);
-	}
-}
-
-
-
-
-
-void cWorld::SaveMapData(void)
-{
-	if (m_MapData.empty())
-	{
-		return;
-	}
-
-	cIDCountSerializer IDSerializer(GetName());
-
-	IDSerializer.SetMapCount(m_MapData.size());
-
-	if (!IDSerializer.Save())
-	{
-		LOGERROR("Could not save idcounts.dat");
-		return;
-	}
-
-	for (cMapList::iterator it = m_MapData.begin(); it != m_MapData.end(); ++it)
-	{
-		cMap & Map = *it;
-
-		cMapSerializer Serializer(GetName(), &Map);
-
-		if (!Serializer.Save())
-		{
-			LOGWARN("Could not save map #%i", Map.GetID());
-		}
-	}
-}
-
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTaskSaveAllChunks:
@@ -3058,6 +3036,18 @@ void cWorld::SaveMapData(void)
 void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 {
 	a_World.SaveAllChunks();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTaskUnloadUnusedChunks
+
+void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
+{
+	a_World.UnloadUnusedChunks();
 }
 
 

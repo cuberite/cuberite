@@ -79,7 +79,7 @@ void cCreeper::Attack(float a_Dt)
 
 	if (!m_bIsBlowing)
 	{
-		m_World->BroadcastSoundEffect("random.fuse", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("game.tnt.primed", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
 	}

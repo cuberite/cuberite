@@ -19,6 +19,7 @@
 #include "BlockEntities/JukeboxEntity.h"
 #include "BlockEntities/NoteEntity.h"
 #include "BlockEntities/SignEntity.h"
+#include "BlockEntities/MobHeadEntity.h"
 #include "Entities/Pickup.h"
 #include "Item.h"
 #include "Noise.h"
@@ -1314,6 +1315,7 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_HOPPER:
 					case E_BLOCK_SIGN_POST:
 					case E_BLOCK_WALLSIGN:
+					case E_BLOCK_HEAD:
 					case E_BLOCK_NOTE_BLOCK:
 					case E_BLOCK_JUKEBOX:
 					{
@@ -1442,6 +1444,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_HOPPER:
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
+		case E_BLOCK_HEAD:
 		case E_BLOCK_NOTE_BLOCK:
 		case E_BLOCK_JUKEBOX:
 		{
@@ -1646,6 +1649,38 @@ void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 	{
 		be->UsedBy(a_Player);
 	}
+}
+
+
+
+
+
+void cChunk::SetBiomeAt(int a_RelX, int a_RelZ, EMCSBiome a_Biome)
+{
+	cChunkDef::SetBiome(m_BiomeMap, a_RelX, a_RelZ, a_Biome);
+	MarkDirty();
+}
+
+
+
+
+
+void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome)
+{
+	for (int z = a_MinRelZ; z <= a_MaxRelZ; z++)
+	{
+		for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+		{
+			cChunkDef::SetBiome(m_BiomeMap, x, z, a_Biome);
+		}
+	}
+	MarkDirty();
+	
+	// Re-send the chunk to all clients:
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	{
+		m_World->ForceSendChunkTo(m_PosX, m_PosZ, (*itr));
+	}  // for itr - m_LoadedByClient[]
 }
 
 
@@ -2295,6 +2330,38 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 		
 		// The correct block entity is here, 
 		if (a_Callback.Item((cCommandBlockEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_HEAD)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here, 
+		if (a_Callback.Item((cMobHeadEntity *)*itr))
 		{
 			return false;
 		}

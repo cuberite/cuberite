@@ -31,6 +31,7 @@
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
+#include "CompositeChat.h"
 
 
 
@@ -94,6 +95,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
 	m_UniqueID(0),
+	m_Locale("en_GB"),
 	m_HasSentPlayerChunk(false)
 {
 	m_Protocol = new cProtocolRecognizer(this);
@@ -1087,14 +1089,20 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		return;
 	}
 	
-	// Not a command, broadcast as a simple message:
-	AString Msg;
-	Printf(Msg, "%s<%s>%s %s",
-		m_Player->GetColor().c_str(),
-		m_Player->GetName().c_str(),
-		cChatColor::White.c_str(),
-		Message.c_str()
-	);
+	// Not a command, broadcast as a message:
+	cCompositeChat Msg;
+	AString Color = m_Player->GetColor();
+	if (Color.length() == 3)
+	{
+		Color = AString("@") + Color[2];
+	}
+	else
+	{
+		Color.empty();
+	}
+	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
+	Msg.ParseText(a_Message);
+	Msg.UnderlineUrls();
 	m_Player->GetWorld()->BroadcastChat(Msg);
 }
 
@@ -1729,7 +1737,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
-void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData)
+void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	bool ShouldAppendChatPrefixes = true;
 
@@ -1834,6 +1842,15 @@ void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPr
 	Message.append(a_Message);
 
 	m_Protocol->SendChat(Message);
+}
+
+
+
+
+
+void cClientHandle::SendChat(const cCompositeChat & a_Message)
+{
+	m_Protocol->SendChat(a_Message);
 }
 
 
@@ -2096,6 +2113,14 @@ void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_S
 void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	m_Protocol->SendPickupSpawn(a_Pickup);
+}
+
+
+
+
+void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	m_Protocol->SendPaintingSpawn(a_Painting);
 }
 
 

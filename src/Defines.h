@@ -174,6 +174,43 @@ enum eWeather
 
 
 
+enum eMobHeadType
+{
+	SKULL_TYPE_SKELETON    = 0,
+	SKULL_TYPE_WITHER      = 1,
+	SKULL_TYPE_ZOMBIE      = 2,
+	SKULL_TYPE_PLAYER      = 3,
+	SKULL_TYPE_CREEPER     = 4,
+} ;
+
+
+
+
+
+enum eMobHeadRotation
+{
+	SKULL_ROTATION_NORTH = 0,
+	SKULL_ROTATION_NORTH_NORTH_EAST = 1,
+	SKULL_ROTATION_NORTH_EAST = 2,
+	SKULL_ROTATION_EAST_NORTH_EAST = 3,
+	SKULL_ROTATION_EAST = 4,
+	SKULL_ROTATION_EAST_SOUTH_EAST = 5,
+	SKULL_ROTATION_SOUTH_EAST = 6,
+	SKULL_ROTATION_SOUTH_SOUTH_EAST = 7,
+	SKULL_ROTATION_SOUTH = 8,
+	SKULL_ROTATION_SOUTH_SOUTH_WEST = 9,
+	SKULL_ROTATION_SOUTH_WEST = 10,
+	SKULL_ROTATION_WEST_SOUTH_WEST = 11,
+	SKULL_ROTATION_WEST = 12,
+	SKULL_ROTATION_WEST_NORTH_WEST = 13,
+	SKULL_ROTATION_NORTH_WEST = 14,
+	SKULL_ROTATION_NORTH_NORTH_WEST = 15,
+} ;
+
+
+
+
+
 inline const char * ClickActionToString(eClickAction a_ClickAction)
 {
 	switch (a_ClickAction)
@@ -441,7 +478,10 @@ inline float GetSpecialSignf( float a_Val )
 
 
 
-enum ChatPrefixCodes
+
+// tolua_begin
+
+enum eMessageType
 {
 	// http://forum.mc-server.org/showthread.php?tid=1212
 	// MessageType...
@@ -458,7 +498,9 @@ enum ChatPrefixCodes
 	mtLeave, // A player has left the server
 };
 
-// tolua_begin
+
+
+
 
 /** Normalizes an angle in degrees to the [-180, +180) range: */
 inline double NormalizeAngleDegrees(const double a_Degrees)

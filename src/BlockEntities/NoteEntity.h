@@ -54,6 +54,8 @@ public:
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override { };
 
+	static const char * GetClassStatic(void) { return "cNoteEntity"; }
+
 private:
 	char m_Pitch;
 } ;  // tolua_export

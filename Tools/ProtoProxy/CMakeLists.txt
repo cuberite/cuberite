@@ -3,62 +3,10 @@ cmake_minimum_required (VERSION 2.6)
 
 project (ProtoProxy)
 
+include(../../SetFlags.cmake)
 
-
-macro(add_flags_cxx FLAGS)
-	set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}         ${FLAGS}")
-	set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}           ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   ${FLAGS}")
-	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FLAGS}")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   ${FLAGS}")
-endmacro()
-
-
-
-
-# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
-if (NOT MSVC)
-	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG")
-	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -D_DEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -DNDEBUG")
-endif()
-
-
-
-if(MSVC)
-	# Make build use multiple threads under MSVC:
-	add_flags_cxx("/MP")
-
-	# Make release builds use link-time code generation:
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   /GL")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE    "${CMAKE_EXE_LINKER_FLAGS_RELEASE}    /LTCG")
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
-	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /LTCG")
-elseif(APPLE)
-	#on os x clang adds pthread for us but we need to add it for gcc
-	if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		add_flags_cxx("-pthread")
-	endif()
-else()
-	# Let gcc / clang know that we're compiling a multi-threaded app:
-	add_flags_cxx("-pthread")
-endif()
-
-
-
-
-# Use static CRT in MSVC builds:
-if (MSVC)
-	string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-	string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
-	string(REPLACE "/MDd" "/MTd" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
-	string(REPLACE "/MDd" "/MTd" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
-endif()
-
-
+set_flags()
+set_lib_flags()
 
 
 # Set include paths to the used libraries:
@@ -77,20 +25,10 @@ function(flatten_files arg1)
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
 
+include(../../lib/polarssl.cmake)
+add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
 
-# Include the libraries:
-file(GLOB POLARSSL_SRC "../../lib/polarssl/library/*.c")
-file(GLOB POLARSSL_HDR "../../lib/polarssl/include/polarssl/*.h")
-flatten_files(POLARSSL_SRC)
-flatten_files(POLARSSL_HDR)
-source_group("PolarSSL" FILES ${POLARSSL_SRC} ${POLARSSL_HDR})
-
-file(GLOB ZLIB_SRC "../../lib/zlib/*.c")
-file(GLOB ZLIB_HDR "../../lib/zlib/*.h")
-flatten_files(ZLIB_SRC)
-flatten_files(ZLIB_HDR)
-source_group("ZLib" FILES ${ZLIB_SRC} ${ZLIB_HDR})
-
+set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
@@ -149,9 +87,7 @@ add_executable(ProtoProxy
 	${SHARED_HDR}
 	${SHARED_OSS_SRC}
 	${SHARED_OSS_HDR}
-	${POLARSSL_SRC}
-	${POLARSSL_HDR}
-	${ZLIB_SRC}
-	${ZLIB_HDR}
 )
+
+target_link_libraries(ProtoProxy zlib polarssl)
 

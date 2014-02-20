@@ -25,6 +25,7 @@ class cDropSpenserEntity;
 class cFurnaceEntity;
 class cNoteEntity;
 class cCommandBlockEntity;
+class cMobHeadEntity;
 class cPawn;
 class cPickup;
 class cChunkDataSerializer;
@@ -43,6 +44,7 @@ typedef cItemCallback<cDropSpenserEntity>  cDropSpenserCallback;
 typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
 typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
 typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
+typedef cItemCallback<cMobHeadEntity>      cMobHeadBlockCallback;
 typedef cItemCallback<cChunk>              cChunkCallback;
 
 
@@ -159,7 +161,16 @@ public:
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
 	void      ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
 	
+	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
 	EMCSBiome GetBiomeAt (int a_BlockX, int a_BlockZ);
+	
+	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
+	Doesn't resend the chunk to clients. */
+	bool SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome);
+	
+	/** Sets the biome at the area. Returns true if successful, false if any subarea failed (chunk not loaded).
+	(Re)sends the chunks to their relevant clients if successful. */
+	bool SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome);
 	
 	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
@@ -244,6 +255,9 @@ public:
 
 	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
 	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);  // Lua-accessible
+
+	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
+	bool DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback);  // Lua-accessible
 
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible

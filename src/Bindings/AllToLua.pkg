@@ -34,6 +34,7 @@ $cfile "../Entities/Entity.h"
 $cfile "../Entities/Floater.h"
 $cfile "../Entities/Pawn.h"
 $cfile "../Entities/Player.h"
+$cfile "../Entities/Painting.h"
 $cfile "../Entities/Pickup.h"
 $cfile "../Entities/ProjectileEntity.h"
 $cfile "../Entities/TNTEntity.h"
@@ -71,6 +72,7 @@ $cfile "../Generating/ChunkDesc.h"
 $cfile "../CraftingRecipes.h"
 $cfile "../UI/Window.h"
 $cfile "../Mobs/Monster.h"
+$cfile "../CompositeChat.h"
 
 
 

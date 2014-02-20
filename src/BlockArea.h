@@ -184,8 +184,14 @@ public:
 
 	void SetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
 	void SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
+	
+	// tolua_end
+	
+	// These need manual exporting, tolua generates the binding as requiring 2 extra input params
 	void GetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
+	
+	// tolua_begin
 	
 	int GetSizeX(void) const { return m_SizeX; }
 	int GetSizeY(void) const { return m_SizeY; }

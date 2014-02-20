@@ -39,6 +39,7 @@ if (NOT MSVC)
 		BlockEntities/JukeboxEntity.h
 		BlockEntities/NoteEntity.h
 		BlockEntities/SignEntity.h
+		BlockEntities/MobHeadEntity.h
 		BlockID.h
 		BoundingBox.h
 		ChatColor.h
@@ -52,6 +53,7 @@ if (NOT MSVC)
 		Entities/Entity.h
 		Entities/Floater.h
 		Entities/Pawn.h
+		Entities/Painting.h
 		Entities/Pickup.h
 		Entities/Player.h
 		Entities/ProjectileEntity.h

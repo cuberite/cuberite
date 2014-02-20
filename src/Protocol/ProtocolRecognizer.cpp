@@ -159,6 +159,16 @@ void cProtocolRecognizer::SendChat(const AString & a_Message)
 
 
 
+void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendChat(a_Message);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	ASSERT(m_Protocol != NULL);
@@ -420,6 +430,14 @@ void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, flo
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
+}
+
+
+
+
+void cProtocolRecognizer::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	m_Protocol->SendPaintingSpawn(a_Painting);
 }
 
 

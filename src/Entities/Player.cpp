@@ -842,6 +842,12 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	cItems Pickups;
 	m_Inventory.CopyToItems(Pickups);
 	m_Inventory.Clear();
+
+	if (GetName() == "Notch")
+	{
+		Pickups.Add(cItem(E_ITEM_RED_APPLE));
+	}
+
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
@@ -1125,8 +1131,9 @@ void cPlayer::SetIP(const AString & a_IP)
 
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	SetPosition( a_PosX, a_PosY, a_PosZ );
+	SetPosition(a_PosX, a_PosY, a_PosZ);
 	m_LastGroundHeight = (float)a_PosY;
+	m_LastJumpHeight = (float)a_PosY;
 
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
 	m_ClientHandle->SendPlayerMoveLook();
@@ -1760,6 +1767,12 @@ void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
 	
+	if (IsGameModeCreative())
+	{
+		// Hunger is disabled for Creative
+		return;
+	}
+	
 	// Remember the food level before processing, for later comparison
 	int LastFoodLevel = m_FoodLevel;
 	
@@ -1777,7 +1790,7 @@ void cPlayer::HandleFood(void)
 				Heal(1);
 				m_FoodExhaustionLevel += 3;
 			}
-			else if (m_FoodLevel <= 0)
+			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
 				// Damage from starving
 				TakeDamage(dtStarving, NULL, 1, 1, 0);

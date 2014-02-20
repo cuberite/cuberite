@@ -11,6 +11,7 @@
 
 #include "BlockEntity.h"
 #include "../ItemGrid.h"
+#include "../UI/WindowOwner.h"
 
 
 
@@ -22,6 +23,7 @@ class cBlockEntityWithItems :
 	// tolua_end
 	// tolua doesn't seem to support multiple inheritance?
 	, public cItemGrid::cListener
+	, public cBlockEntityWindowOwner
 	// tolua_begin
 {
 	typedef cBlockEntity super;
@@ -77,6 +79,11 @@ protected:
 		ASSERT(a_Grid == &m_Contents);
 		if (m_World != NULL)
 		{
+			if (GetWindow() != NULL)
+			{
+				GetWindow()->BroadcastWholeWindow();
+			}
+
 			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
 		}
 	}

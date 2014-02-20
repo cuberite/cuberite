@@ -25,10 +25,12 @@ class cWindow;
 class cInventory;
 class cPawn;
 class cPickup;
+class cPainting;
 class cWorld;
 class cMonster;
 class cChunkDataSerializer;
 class cFallingBlock;
+class cCompositeChat;
 
 
 
@@ -59,6 +61,7 @@ public:
 	virtual void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
 	virtual void SendChat                (const AString & a_Message) = 0;
+	virtual void SendChat                (const cCompositeChat & a_Message) = 0;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
 	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) = 0;
@@ -83,6 +86,7 @@ public:
 	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) = 0;
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) = 0;
 	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) = 0;
+	virtual void SendPaintingSpawn       (const cPainting & a_Painting) = 0;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) = 0;
 	virtual void SendPlayerAbilities     (void) = 0;
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) = 0;

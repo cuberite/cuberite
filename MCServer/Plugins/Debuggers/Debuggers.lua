@@ -19,18 +19,18 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
 	--]]
 	
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
-	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
-	cPluginManager:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
-	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
-	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
-	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
+	local PM = cPluginManager;
+	PM:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
+	PM:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
+	PM:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
+	PM:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
+	PM:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
+	PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
+	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 
-	PM = cRoot:Get():GetPluginManager();
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -54,8 +54,11 @@ function Initialize(Plugin)
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
+	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings")
+	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
 
-	Plugin:AddWebTab("Debuggers", HandleRequest_Debuggers);
+	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
+	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -1038,6 +1041,68 @@ end
 
 
 
+local g_Counter = 0
+local g_JavaScript =
+[[
+<script>
+function createXHR()
+{
+	var request = false;
+	try {
+		request = new ActiveXObject('Msxml2.XMLHTTP');
+	}
+	catch (err2)
+	{
+		try
+		{
+			request = new ActiveXObject('Microsoft.XMLHTTP');
+		}
+		catch (err3)
+		{
+			try
+			{
+				request = new XMLHttpRequest();
+			}
+			catch (err1)
+			{
+				request = false;
+			}
+		}
+	}
+	return request;
+}
+
+function RefreshCounter()
+{
+	var xhr = createXHR();
+	xhr.onreadystatechange = function()
+	{
+		if (xhr.readyState == 4)
+		{
+			document.getElementById("cnt").innerHTML = xhr.responseText;
+		}
+	};
+	xhr.open("POST", "/~webadmin/Debuggers/StressTest", true);
+	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xhr.send("counter=true");
+}
+
+setInterval(RefreshCounter, 10)
+</script>
+]]
+
+function HandleRequest_StressTest(a_Request)
+	if (a_Request.PostParams["counter"]) then
+		g_Counter = g_Counter + 1
+		return tostring(g_Counter)
+	end
+	return g_JavaScript .. "<p>The counter below should be reloading as fast as possible</p><div id='cnt'>0</div>"
+end
+
+
+
+
+
 function OnPluginMessage(a_Client, a_Channel, a_Message)
 	LOGINFO("Received a plugin message from client " .. a_Client:GetUsername() .. ": channel '" .. a_Channel .. "', message '" .. a_Message .. "'");
 	
@@ -1126,6 +1191,67 @@ function HandleChunkStay(a_Split, a_Player)
 	
 	-- Process the ChunkStay:
 	World:ChunkStay(Chunks, OnChunkAvailable, OnAllChunksAvailable)
+	return true
+end
+
+
+
+
+
+function HandleCompo(a_Split, a_Player)
+	-- Send one composite message to self:
+	local msg = cCompositeChat()
+	msg:AddTextPart("Hello! ", "b@e")  -- bold yellow
+	msg:AddUrlPart("MCServer", "http://mc-server.org")
+	msg:AddTextPart(" rules! ")
+	msg:AddRunCommandPart("Set morning", "/time set 0")
+	a_Player:SendMessage(msg)
+	
+	-- Broadcast another one to the world:
+	local msg2 = cCompositeChat()
+	msg2:AddSuggestCommandPart(a_Player:GetName(), "/tell " .. a_Player:GetName() .. " ")
+	msg2:AddTextPart(" knows how to use cCompositeChat!");
+	a_Player:GetWorld():BroadcastChat(msg2)
+	
+	return true
+end
+
+
+
+
+
+function HandleSetBiome(a_Split, a_Player)
+	local Biome = biJungle
+	local Size = 20
+	local SplitSize = #a_Split
+	if (SplitSize > 3) then
+		a_Player:SendMessage("Too many parameters. Usage: " .. a_Split[1] .. " <BiomeType>")
+		return true
+	end
+
+	if (SplitSize >= 2) then
+		Biome = StringToBiome(a_Split[2])
+		if (Biome == biInvalidBiome) then
+			a_Player:SendMessage("Unknown biome: '" .. a_Split[2] .. "'. Command ignored.")
+			return true
+		end
+	end
+	if (SplitSize >= 3) then
+		Size = tostring(a_Split[3])
+		if (Size == nil) then
+			a_Player:SendMessage("Unknown size: '" .. a_Split[3] .. "'. Command ignored.")
+			return true
+		end
+	end
+	
+	local BlockX = math.floor(a_Player:GetPosX())
+	local BlockZ = math.floor(a_Player:GetPosZ())
+	a_Player:GetWorld():SetAreaBiome(BlockX - Size, BlockX + Size, BlockZ - Size, BlockZ + Size, Biome)
+	a_Player:SendMessage(
+		"Blocks {" .. (BlockX - Size) .. ", " .. (BlockZ - Size) ..
+		"} - {" .. (BlockX + Size) .. ", " .. (BlockZ + Size) ..
+		"} set to biome #" .. tostring(Biome) .. "."
+	)
 	return true
 end
 

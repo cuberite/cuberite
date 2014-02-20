@@ -31,6 +31,7 @@ class cChestEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
 class cNoteEntity;
+class cMobHeadEntity;
 class cBlockArea;
 class cPawn;
 class cPickup;
@@ -47,6 +48,7 @@ typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
 typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
 typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
+typedef cItemCallback<cMobHeadEntity>      cMobHeadBlockCallback;
 
 
 
@@ -175,6 +177,14 @@ public:
 	
 	EMCSBiome GetBiomeAt(int a_RelX, int a_RelZ) const {return cChunkDef::GetBiome(m_BiomeMap, a_RelX, a_RelZ); }
 	
+	/** Sets the biome at the specified relative coords.
+	Doesn't resend the chunk to clients. */
+	void SetBiomeAt(int a_RelX, int a_RelZ, EMCSBiome a_Biome);
+	
+	/** Sets the biome in the specified relative coords area. All the coords are inclusive.
+	Sends the chunk to all relevant clients. */
+	void SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome);
+	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 	
 	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
@@ -241,7 +251,10 @@ public:
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);
 
 	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
-	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback); 
+	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);
+	
+	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob header block at those coords or callback returns true, returns true if found */
+	bool DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback);
 
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
@@ -343,12 +356,17 @@ public:
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 
-	// Simulator data:
+	// Per-chunk simulator data:
 	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }
 	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
-	cRedstoneSimulatorChunkData & GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
+
+	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_RedstoneSimulatorData; }
+	cIncrementalRedstoneSimulator::PoweredBlocksList * GetRedstoneSimulatorPoweredBlocksList(void) { return &m_RedstoneSimulatorPoweredBlocksList; }
+	cIncrementalRedstoneSimulator::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; };
+	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; };
+	cIncrementalRedstoneSimulator::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; };
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
@@ -419,7 +437,12 @@ private:
 	cFluidSimulatorData *   m_WaterSimulatorData;
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
+
 	cRedstoneSimulatorChunkData m_RedstoneSimulatorData;
+	cIncrementalRedstoneSimulator::PoweredBlocksList m_RedstoneSimulatorPoweredBlocksList;
+	cIncrementalRedstoneSimulator::LinkedBlocksList m_RedstoneSimulatorLinkedBlocksList;
+	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList m_RedstoneSimulatorSimulatedPlayerToggleableList;
+	cIncrementalRedstoneSimulator::RepeatersDelayList m_RedstoneSimulatorRepeatersDelayList;
 
 
 	// pick up a random block of this chunk

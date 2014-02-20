@@ -32,6 +32,8 @@ Documentation:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
+#include "../CompositeChat.h"
+
 
 
 
@@ -227,6 +229,42 @@ void cProtocol125::SendChat(const AString & a_Message)
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_CHAT);
 	WriteString(a_Message);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendChat(const cCompositeChat & a_Message)
+{
+	// This version doesn't support composite messages, just extract each part's text and use it:
+	AString Msg;
+	const cCompositeChat::cParts & Parts = a_Message.GetParts();
+	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
+	{
+		switch ((*itr)->m_PartType)
+		{
+			case cCompositeChat::ptText:
+			case cCompositeChat::ptClientTranslated:
+			case cCompositeChat::ptRunCommand:
+			case cCompositeChat::ptSuggestCommand:
+			{
+				Msg.append((*itr)->m_Text);
+				break;
+			}
+			case cCompositeChat::ptUrl:
+			{
+				Msg.append(((cCompositeChat::cUrlPart *)(*itr))->m_Url);
+				break;
+			}
+		}  // switch (PartType)
+	}  // for itr - Parts[]
+	
+	// Send the message:
+	cCSLock Lock(m_CSPacket);
+	WriteByte  (PACKET_CHAT);
+	WriteString(Msg);
 	Flush();
 }
 
