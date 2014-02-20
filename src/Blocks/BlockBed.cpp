@@ -63,25 +63,36 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 		if (a_WorldInterface.GetTimeOfDay() > 13000)
 		{
 			NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-			if (Meta & 0x8)
+			if(Meta & 0x4)
 			{
-				// Is pillow	
-				a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
+				a_Player->SendMessageFailure("This bed is occupied.");
 			}
 			else
 			{
-				// Is foot end
-				Vector3i Direction = MetaDataToDirection( Meta & 0x7 );
-				if (a_ChunkInterface.GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) == E_BLOCK_BED) // Must always use pillow location for sleeping
+				if (Meta & 0x8)
 				{
-					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z);
+					// Is pillow	
+					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
 				}
+				else
+				{
+					// Is foot end
+					Vector3i Direction = MetaDataToDirection( Meta & 0x7 );
+					if (a_ChunkInterface.GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) == E_BLOCK_BED) // Must always use pillow location for sleeping
+					{
+						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z);
+					}
+				}
+				a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, (Meta | (1 << 2)));
 			}
+			
 		} else {
 			a_Player->SendMessageFailure("You can only sleep at night");
 		}
 	}
 }
+
+
 
 
 
