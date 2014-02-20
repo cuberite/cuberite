@@ -30,7 +30,9 @@ bool g_ShouldLogCommOut;
 
 
 /// If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window
-#define ENABLE_LEAK_FINDER
+// _X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
+// and we haven't had a memory leak for over a year anyway.
+// #define ENABLE_LEAK_FINDER
 
 
 
