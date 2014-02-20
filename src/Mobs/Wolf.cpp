@@ -4,6 +4,7 @@
 #include "Wolf.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "../Items/ItemHandler.h"
 
 
 
@@ -86,23 +87,44 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	}
 	else if (IsTame())
 	{
-		if (a_Player.GetName() == m_OwnerName) // Is the player the owner of the dog?
+		switch (a_Player.GetEquippedItem().m_ItemType)
 		{
-			if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE)
+			case E_ITEM_RAW_BEEF:
+			case E_ITEM_STEAK:
+			case E_ITEM_RAW_PORKCHOP:
+			case E_ITEM_COOKED_PORKCHOP:
+			case E_ITEM_RAW_CHICKEN:
+			case E_ITEM_COOKED_CHICKEN:
+			case E_ITEM_ROTTEN_FLESH:
 			{
-				SetCollarColor(15 - a_Player.GetEquippedItem().m_ItemDamage);
-				if (!a_Player.IsGameModeCreative())
+				if (m_Health < m_MaxHealth)
 				{
-					a_Player.GetInventory().RemoveOneEquippedItem();
+					Heal(ItemHandler(a_Player.GetEquippedItem().m_ItemType)->GetFoodInfo().FoodLevel);
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
 				}
-			} 
-			else if (IsSitting()) 
-			{
-				SetIsSitting(false);
+				break;
 			}
-			else
+			case E_ITEM_DYE:
 			{
-				SetIsSitting(true);
+				if (a_Player.GetName() == m_OwnerName) // Is the player the owner of the dog?
+				{
+					SetCollarColor(15 - a_Player.GetEquippedItem().m_ItemDamage);
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
+				}
+				break;
+			}
+			default:
+			{
+				if (a_Player.GetName() == m_OwnerName) // Is the player the owner of the dog?
+				{
+					SetIsSitting(!IsSitting());
+				}
 			}
 		}
 	}
@@ -136,6 +158,8 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 			case E_ITEM_RAW_CHICKEN:
 			case E_ITEM_COOKED_CHICKEN:
 			case E_ITEM_ROTTEN_FLESH:
+			case E_ITEM_RAW_PORKCHOP:
+			case E_ITEM_COOKED_PORKCHOP:
 			{
 				if (!IsBegging())
 				{

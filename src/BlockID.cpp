@@ -644,9 +644,11 @@ public:
 		g_BlockPistonBreakable[E_BLOCK_DEAD_BUSH]             = true;
 		g_BlockPistonBreakable[E_BLOCK_FIRE]                  = true;
 		g_BlockPistonBreakable[E_BLOCK_FLOWER]                = true;
+		g_BlockPistonBreakable[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE] = true;
 		g_BlockPistonBreakable[E_BLOCK_INACTIVE_COMPARATOR]   = true;
 		g_BlockPistonBreakable[E_BLOCK_IRON_DOOR]             = true;
 		g_BlockPistonBreakable[E_BLOCK_JACK_O_LANTERN]        = true;
+		g_BlockPistonBreakable[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE] = true;
 		g_BlockPistonBreakable[E_BLOCK_LADDER]                = true;
 		g_BlockPistonBreakable[E_BLOCK_LAVA]                  = true;
 		g_BlockPistonBreakable[E_BLOCK_LEVER]                 = true;
@@ -727,10 +729,12 @@ public:
 		g_BlockRequiresSpecialTool[E_BLOCK_END_STONE]            = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_GOLD_BLOCK]           = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_GOLD_ORE]             = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE] = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_IRON_BLOCK]           = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_IRON_ORE]             = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_LAPIS_BLOCK]          = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_LAPIS_ORE]            = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE] = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_MOSSY_COBBLESTONE]    = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_NETHERRACK]           = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_NETHER_BRICK]         = true;
