@@ -448,6 +448,7 @@ end
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the UniqueID of the client used to identify the client in the server" },
 				GetUsername = { Params = "", Return = "string", Notes = "Returns the username that the client has provided" },
 				GetViewDistance = { Params = "", Return = "number", Notes = "Returns the viewdistance (number of chunks loaded for the player in each direction)" },
+				HasPluginChannel = { Params = "ChannelName", Return = "bool", Notes = "Returns true if the client has registered to receive messages on the specified plugin channel." },
 				Kick = { Params = "Reason", Return = "", Notes = "Kicks the user with the specified reason" },
 				SendPluginMessage = { Params = "Channel, Message", Return = "", Notes = "Sends the plugin message on the specified channel." },
 				SetUsername = { Params = "Name", Return = "", Notes = "Sets the username" },
