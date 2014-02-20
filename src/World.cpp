@@ -12,8 +12,8 @@
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
 
+// Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
-#include "WorldStorage/MapSerializer.h"
 
 // Entities (except mobs):
 #include "Entities/ExpOrb.h"
@@ -233,6 +233,7 @@ void cWorld::cTickThread::Execute(void)
 // cWorld:
 
 cWorld::cWorld(const AString & a_WorldName) :
+	cMapManager(this),
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),

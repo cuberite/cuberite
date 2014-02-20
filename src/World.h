@@ -24,7 +24,7 @@
 #include "Entities/ProjectileEntity.h"
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
-#include "Map.h"
+#include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 
@@ -71,7 +71,8 @@ typedef cItemCallback<cMobHeadEntity>      cMobHeadBlockCallback;
 class cWorld :
 	public cForEachChunkProvider,
 	public cWorldInterface,
-	public cBroadcastInterface
+	public cBroadcastInterface,
+	public cMapManager
 {
 public:
 

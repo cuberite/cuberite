@@ -28,7 +28,14 @@ class cMap;
 
 
 
-/** Encapsulates a map decorator. */
+/** Encapsulates a map decorator.
+ *
+ * A map decorator represents an object drawn on the map that can move freely.
+ * (e.g. player trackers and item frame pointers)
+ *
+ * Excluding manually placed decorators,
+ * decorators are automatically managed (allocated and freed) by their parent cMap instance.
+ */
 class cMapDecorator
 {
 public:
@@ -98,7 +105,11 @@ public:
 
 	typedef std::vector<ColorID> cColorList;
 
-	/** Encapsulates the state of a map client. */
+	/** Encapsulates the state of a map client.
+	 *
+	 * In order to enhance performace, maps are streamed column-by-column to each client.
+	 * This structure stores the state of the stream.
+	 */
 	struct cMapClient
 	{
 		cClientHandle * m_Handle;
