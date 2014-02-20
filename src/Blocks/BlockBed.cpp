@@ -63,7 +63,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 		if (a_WorldInterface.GetTimeOfDay() > 13000)
 		{
 			NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-			if(Meta & 0x4)
+			if (Meta & 0x4)
 			{
 				a_Player->SendMessageFailure("This bed is occupied.");
 			}
