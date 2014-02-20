@@ -902,7 +902,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	
 	cWorld * World = m_Player->GetWorld();
-	if (diff(m_Player->GetPosX(), double(a_BlockX)) >= 6 || diff(m_Player->GetPosY(), double(a_BlockY)) >= 6 || diff(m_Player->GetPosZ(), double(a_BlockZ)) >= 6)
+	if ((diff(m_Player->GetPosX(), double(a_BlockX)) >= 6) || (diff(m_Player->GetPosY(), double(a_BlockY)) >= 6) || (diff(m_Player->GetPosZ(), double(a_BlockZ)) >= 6))
 	{
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
@@ -1165,7 +1165,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		return;
 	}
 	
-	if (diff(m_Player->GetPosX(), double(a_BlockX)) >= 6 || diff(m_Player->GetPosY(), double(a_BlockY)) >= 6 || diff(m_Player->GetPosZ(), double(a_BlockZ)) >= 6)
+	if ((diff(m_Player->GetPosX(), double(a_BlockX)) >= 6) || (diff(m_Player->GetPosY(), double(a_BlockY)) >= 6) || (diff(m_Player->GetPosZ(), double(a_BlockZ)) >= 6))
 	{
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();

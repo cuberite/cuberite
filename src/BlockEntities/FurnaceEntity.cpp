@@ -386,12 +386,14 @@ void cFurnaceEntity::UpdateOutput(void)
 
 void cFurnaceEntity::GiveExperience(int Blocks)
 {
-	if (Blocks > 0 && m_OutputExperience > 0.0F)
+	if ((Blocks <= 0) || (m_OutputExperience <= 0.0F))
 	{
-		for (int i = 0; i < Blocks; i++)
-		{
-			m_World->SpawnExperienceOrb(m_PosX, m_PosY + 1, m_PosZ, m_OutputExperience);
-		}
+		return;
+	}
+	
+	for (int i = 0; i < Blocks; i++)
+	{
+		m_World->SpawnExperienceOrb(m_PosX, m_PosY + 1, m_PosZ, m_OutputExperience);
 	}
 }
 

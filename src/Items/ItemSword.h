@@ -26,10 +26,12 @@ public:
 	
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockType)
+		switch (a_BlockType)
 		{
 			case E_BLOCK_COBWEB:
+			{
 				return 15.0F;
+			}
 			case E_BLOCK_COCOA_POD:
 			case E_BLOCK_YELLOW_FLOWER:
 			case E_BLOCK_RED_ROSE:
@@ -42,9 +44,13 @@ public:
 			case E_BLOCK_NEW_LEAVES:
 			case E_BLOCK_MELON:
 			case E_BLOCK_PUMPKIN:
+			{
 				return 1.5F;
+			}
 			default:
+			{
 				return 1.0F;
+			}
 		}
 	}
 } ;

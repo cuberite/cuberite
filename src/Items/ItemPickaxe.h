@@ -19,18 +19,12 @@ public:
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_PICKAXE:
-				return 2.0F;
-			case E_ITEM_STONE_PICKAXE:
-				return 4.0F;
-			case E_ITEM_IRON_PICKAXE:
-				return 6.0F;
-			case E_ITEM_DIAMOND_PICKAXE:
-				return 8.0F;
-			case E_ITEM_GOLD_PICKAXE:
-				return 12.0F;
-			default:
-				return 2.0F;
+			case E_ITEM_WOODEN_PICKAXE:      return 2.0F;
+			case E_ITEM_STONE_PICKAXE:       return 4.0F;
+			case E_ITEM_IRON_PICKAXE:        return 6.0F;
+			case E_ITEM_DIAMOND_PICKAXE:     return 8.0F;
+			case E_ITEM_GOLD_PICKAXE:        return 12.0F;
+			default:                         return 2.0F;
 		}
 	}
 
@@ -38,17 +32,12 @@ public:
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_PICKAXE:
-			case E_ITEM_GOLD_PICKAXE:
-				return 1;
-			case E_ITEM_STONE_PICKAXE:
-				return 2;
-			case E_ITEM_IRON_PICKAXE:
-				return 3;
-			case E_ITEM_DIAMOND_PICKAXE:
-				return 4;
-			default:
-				return 0;
+			case E_ITEM_WOODEN_PICKAXE:      return 1;
+			case E_ITEM_GOLD_PICKAXE:        return 1;
+			case E_ITEM_STONE_PICKAXE:       return 2;
+			case E_ITEM_IRON_PICKAXE:        return 3;
+			case E_ITEM_DIAMOND_PICKAXE:     return 4;
+			default:                         return 0;
 		}
 	}
 	
@@ -139,9 +128,13 @@ public:
 			case E_BLOCK_POWERED_RAIL:
 			case E_BLOCK_RAIL:
 			case E_BLOCK_ACTIVATOR_RAIL:
+			{
 				return PickaxePower();
+			}
 			default:
+			{
 				return 1.0F;
+			}
 		}
 	}
 } ;

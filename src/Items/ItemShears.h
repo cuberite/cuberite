@@ -67,9 +67,13 @@ public:
 			case E_BLOCK_VINES:
 			case E_BLOCK_NEW_LEAVES:
 			case E_BLOCK_LEAVES:
+			{
 				return true;
+			}
 			default:
+			{
 				return false;
+			}
 		}
 	}
 	
@@ -80,11 +84,17 @@ public:
 			case E_BLOCK_COBWEB:
 			case E_BLOCK_NEW_LEAVES:
 			case E_BLOCK_LEAVES:
+			{
 				return 15.0F;
+			}
 			case E_BLOCK_WOOL:
+			{
 				return 5.0F;
+			}
 			default:
+			{
 				return 1.0F;
+			}
 		}
 	}
 } ;
