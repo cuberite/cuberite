@@ -1093,13 +1093,22 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 			cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ, &m_World);
 			m_World.ForEachEntity(PressurePlateCallback);
 
+			NIBBLETYPE Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 			if (PressurePlateCallback.FoundEntity())
 			{
+				if (Meta == 0x0)
+				{
+					m_World.BroadcastSoundEffect("random.click", (int) ((a_BlockX + 0.5) * 8.0), (int) ((a_BlockY + 0.1) * 8.0), (int) ((a_BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
+				}
 				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x1);
 				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, a_MyType);
 			}
 			else
 			{
+				if (Meta == 0x1)
+				{
+					m_World.BroadcastSoundEffect("random.click", (int) ((a_BlockX + 0.5) * 8.0), (int) ((a_BlockY + 0.1) * 8.0), (int) ((a_BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
+				}
 				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
 				m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 			}
