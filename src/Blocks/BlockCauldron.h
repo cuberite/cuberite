@@ -28,15 +28,18 @@ public:
 		{
 			case E_ITEM_WATER_BUCKET:
 			{
-				a_ChunkInterface->SetBlockMeta( a_BlockX, a_BlockY, a_BlockZ, 3 );
-				a_Player->GetInventory().RemoveOneEquippedItem();
-				cItem NewItem(E_ITEM_BUCKET, 1);
-				a_Player->GetInventory().AddItem(NewItem);
+				if (Meta < 3)
+				{
+					a_ChunkInterface->SetBlockMeta( a_BlockX, a_BlockY, a_BlockZ, 3 );
+					a_Player->GetInventory().RemoveOneEquippedItem();
+					cItem NewItem(E_ITEM_BUCKET, 1);
+					a_Player->GetInventory().AddItem(NewItem);
+				}
 				break;
 			}
 			case E_ITEM_GLASS_BOTTLE:
 			{
-				if( Meta > 0 )
+				if (Meta > 0)
 				{
 					a_ChunkInterface->SetBlockMeta( a_BlockX, a_BlockY, a_BlockZ, --Meta);
 					a_Player->GetInventory().RemoveOneEquippedItem();
