@@ -169,6 +169,7 @@ bool cFireSimulator::IsFuel(BLOCKTYPE a_BlockType)
 		case E_BLOCK_FENCE:
 		case E_BLOCK_TNT:
 		case E_BLOCK_VINES:
+		case E_BLOCK_HAY_BALE:
 		{
 			return true;
 		}
