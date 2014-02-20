@@ -11,8 +11,6 @@
 #include "../Blocks/BlockDoor.h"
 #include "../Piston.h"
 
-#include <typeinfo>
-
 
 
 
