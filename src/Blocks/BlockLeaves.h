@@ -139,6 +139,8 @@ bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		switch (Types[i])
 		{
+			case E_BLOCK_NEW_LEAVES:
+			case E_BLOCK_NEW_LOG:
 			case E_BLOCK_LEAVES:
 			case E_BLOCK_LOG:
 			{

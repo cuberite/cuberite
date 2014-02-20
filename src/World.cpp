@@ -1216,10 +1216,12 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 	sSetBlockVector Logs, Other;
 	switch (a_SaplingMeta & 0x07)
 	{
-		case E_META_SAPLING_APPLE:   GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_BIRCH:   GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_CONIFER: GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_JUNGLE:  GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_CONIFER:  GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_JUNGLE:   GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_DARK_OAK: GetDarkoakTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
 	}
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
