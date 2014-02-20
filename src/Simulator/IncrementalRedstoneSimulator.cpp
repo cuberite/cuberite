@@ -6,9 +6,12 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../Entities/TNTEntity.h"
+#include "../Entities/Pickup.h"
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
 #include "../Piston.h"
+
+#include <typeinfo>
 
 
 
@@ -87,7 +90,8 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
 			((Block == E_BLOCK_DETECTOR_RAIL) && (Meta & 0x08) == 0) ||
 			(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta))) ||
-			(((Block == E_BLOCK_STONE_PRESSURE_PLATE) || (Block == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (Meta == 0))
+			(((Block == E_BLOCK_STONE_PRESSURE_PLATE) || (Block == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (Meta == 0)) ||
+			(((Block == E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE) || (Block == E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE)) && (Meta == 0))
 			)
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
@@ -313,6 +317,8 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			{
 				HandlePressurePlate(a_X, dataitr->y, a_Z, dataitr->Data);
 				break;
@@ -333,13 +339,13 @@ void cIncrementalRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_Blo
 		((a_BlockX % cChunkDef::Width) >= 14) ||
 		((a_BlockZ % cChunkDef::Width) <= 1) ||
 		((a_BlockZ % cChunkDef::Width) >= 14)
-		) // Are we on a chunk boundary? ± 2 because of LinkedPowered blocks
+		) // Are we on a chunk boundary? \B1 2 because of LinkedPowered blocks
 	{
 		// On a chunk boundary, alert all four sides (i.e. at least one neighbouring chunk)
 		AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk);
 
 		// Pass the original coordinates, because when adding things to our simulator lists, we get the chunk that they are in, and therefore any updates need to preseve their position
-		// RedstoneAddBlock to pass both the neighbouring chunk and the chunk which the coordiantes are in and ± 2 in GetNeighbour() to accomodate for LinkedPowered blocks being 2 away from chunk boundaries
+		// RedstoneAddBlock to pass both the neighbouring chunk and the chunk which the coordiantes are in and \B1 2 in GetNeighbour() to accomodate for LinkedPowered blocks being 2 away from chunk boundaries
 		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX - 2, a_BlockZ), a_Chunk);
 		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX + 2, a_BlockZ), a_Chunk);
 		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ - 2), a_Chunk);
@@ -1039,13 +1045,15 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 			}
 			break;
 		}
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		{
-			class cWoodenPressurePlateCallback :
+			class cPressurePlateCallback :
 				public cEntityCallback
 			{
 			public:
-				cWoodenPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 					m_Entity(NULL),
 					m_World(a_World),
 					m_X(a_BlockX),
@@ -1063,7 +1071,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 					if (Distance <= 0.7)
 					{
 						m_Entity = a_Entity;
-						return true; // Break out, we only need to know for wooden plates that at least one entity is on top
+						return true; // Break out, we only need to know for plates that at least one entity is on top
 					}
 					return false;
 				}
@@ -1082,13 +1090,13 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 				int m_Z;
 			} ;
 
-			cWoodenPressurePlateCallback WoodenPressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ, &m_World);
-			m_World.ForEachEntity(WoodenPressurePlateCallback);
+			cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ, &m_World);
+			m_World.ForEachEntity(PressurePlateCallback);
 
-			if (WoodenPressurePlateCallback.FoundEntity())
+			if (PressurePlateCallback.FoundEntity())
 			{
 				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x1);
-				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_WOODEN_PRESSURE_PLATE);
+				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, a_MyType);
 			}
 			else
 			{
