@@ -337,13 +337,13 @@ void cIncrementalRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_Blo
 		((a_BlockX % cChunkDef::Width) >= 14) ||
 		((a_BlockZ % cChunkDef::Width) <= 1) ||
 		((a_BlockZ % cChunkDef::Width) >= 14)
-		) // Are we on a chunk boundary? ± 2 because of LinkedPowered blocks
+		) // Are we on a chunk boundary? +- 2 because of LinkedPowered blocks
 	{
 		// On a chunk boundary, alert all four sides (i.e. at least one neighbouring chunk)
 		AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk);
 
 		// Pass the original coordinates, because when adding things to our simulator lists, we get the chunk that they are in, and therefore any updates need to preseve their position
-		// RedstoneAddBlock to pass both the neighbouring chunk and the chunk which the coordiantes are in and ± 2 in GetNeighbour() to accomodate for LinkedPowered blocks being 2 away from chunk boundaries
+		// RedstoneAddBlock to pass both the neighbouring chunk and the chunk which the coordiantes are in and +- 2 in GetNeighbour() to accomodate for LinkedPowered blocks being 2 away from chunk boundaries
 		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX - 2, a_BlockZ), a_Chunk);
 		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX + 2, a_BlockZ), a_Chunk);
 		RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ - 2), a_Chunk);
