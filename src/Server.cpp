@@ -460,13 +460,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		cPluginManager::Get()->ReloadPlugins();
 		cRoot::Get()->ReloadGroups();
-		a_Output.Finished();
 		return;
 	}
 	if (split[0] == "reloadplugins")
 	{
 		cPluginManager::Get()->ReloadPlugins();
-		a_Output.Finished();
 		return;
 	}
 	if (split[0] == "reloadgroups")
