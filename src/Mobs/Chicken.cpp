@@ -48,8 +48,9 @@ void cChicken::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cChicken::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_FEATHER);
-	a_Drops.push_back(cItem(IsOnFire() ? E_ITEM_COOKED_CHICKEN : E_ITEM_RAW_CHICKEN, 1));
+	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(21);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_FEATHER);
+	AddRandomDropItem(a_Drops, 1, 1, IsOnFire() ? E_ITEM_COOKED_CHICKEN : E_ITEM_RAW_CHICKEN);
 }
 
 

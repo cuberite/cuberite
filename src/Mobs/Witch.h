@@ -2,6 +2,7 @@
 #pragma once
 
 #include "AggressiveMonster.h"
+#include "../MersenneTwister.h"
 
 
 

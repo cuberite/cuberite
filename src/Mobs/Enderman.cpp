@@ -21,7 +21,8 @@ cEnderman::cEnderman(void) :
 
 void cEnderman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_ENDER_PEARL);
+	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(21);
+	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_ENDER_PEARL);
 }
 
 

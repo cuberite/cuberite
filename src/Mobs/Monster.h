@@ -224,6 +224,9 @@ protected:
 	bool m_BurnsInDaylight;
 
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);	
+	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);	
+	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel); 
+	
 
 } ; // tolua_export
 

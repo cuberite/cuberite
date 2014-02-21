@@ -18,8 +18,9 @@ cGhast::cGhast(void) :
 
 void cGhast::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_GUNPOWDER);
-	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_GHAST_TEAR);
+	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(21);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
+	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_GHAST_TEAR);
 }
 
 

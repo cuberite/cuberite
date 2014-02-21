@@ -18,8 +18,12 @@ cSpider::cSpider(void) :
 
 void cSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_STRING);
-	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_SPIDER_EYE);
+	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(21);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_STRING);
+	if (a_Killer->IsA("cPlayer") || a_Killer->IsA("cWolf"))
+	{
+		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_SPIDER_EYE);
+	}
 }
 
 

@@ -19,7 +19,11 @@ cBlaze::cBlaze(void) :
 
 void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_BLAZE_ROD);
+	if (a_Killer->IsA("cPlayer") || a_Killer->IsA("cWolf"))
+	{
+		int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(21);
+		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_BLAZE_ROD);
+	}
 }
 
 

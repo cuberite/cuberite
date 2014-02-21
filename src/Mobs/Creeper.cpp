@@ -39,7 +39,8 @@ void cCreeper::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_GUNPOWDER);
+	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(21);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
 
 	if ((a_Killer != NULL) && (a_Killer->IsProjectile()))
 	{

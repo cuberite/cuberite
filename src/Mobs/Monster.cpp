@@ -880,6 +880,35 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 
 
 
+void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth)
+{
+	MTRand r1;
+	int Count = r1.randInt() % 1000;
+	if (Count < (a_Chance*10))
+	{
+		a_Drops.push_back(cItem(a_Item, 1, a_ItemHealth));
+	}
+}
+
+
+
+
+
+void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel)
+{
+	MTRand r1;
+	int Count = r1.randInt() % 200;
+	if (Count < (5 + a_LootingLevel))
+	{
+		int Rare = r1.randInt() % a_Items.Size();
+		a_Drops.push_back(a_Items.at(Rare));
+	}
+}
+
+
+
+
+
 void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 {
 	if (!m_BurnsInDaylight)
