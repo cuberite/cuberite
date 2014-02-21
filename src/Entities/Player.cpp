@@ -1529,7 +1529,11 @@ void cPlayer::LoadPermissionsFromDisk()
 			AStringVector Split = StringSplit( Groups, "," );
 			for( unsigned int i = 0; i < Split.size(); i++ )
 			{
-				AddToGroup( Split[i].c_str() );
+				if (!cRoot::Get()->GetGroupManager()->ExistsGroup(Split[i]))
+				{
+					LOGWARNING("The group %s for player %s was not found!", Split[i].c_str(), m_PlayerName.c_str());
+				}
+				AddToGroup(Split[i].c_str());
 			}
 		}
 		else
