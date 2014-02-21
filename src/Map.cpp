@@ -278,28 +278,35 @@ void cMap::UpdateDecorators(void)
 
 
 
-void cMap::UpdateClient(cPlayer * a_Player)
+void cMap::AddPlayer(cPlayer * a_Player, cClientHandle * a_Handle, Int64 a_WorldAge)
 {
-	ASSERT(a_Player != NULL);
-	cClientHandle * Handle = a_Player->GetClientHandle();
+	cMapClient MapClient;
 
-	if (Handle == NULL)
-	{
-		return;
-	}
+	MapClient.m_LastUpdate = a_WorldAge;
+	MapClient.m_SendInfo   = true;
+	MapClient.m_Handle     = a_Handle;
 
-	Int64 WorldAge = a_Player->GetWorld()->GetWorldAge();
+	m_Clients.push_back(MapClient);
 
-	// Remove invalid clients
+	cMapDecorator PlayerDecorator(this, a_Player);
+
+	m_Decorators.push_back(PlayerDecorator);
+}
+
+
+
+
+
+void cMap::RemoveInactiveClients(Int64 a_WorldAge)
+{
 	for (cMapClientList::iterator it = m_Clients.begin(); it != m_Clients.end();)
 	{
-		// Check if client is active
-		if (it->m_LastUpdate < WorldAge - 5)
+		if (it->m_LastUpdate < a_WorldAge)
 		{
 			// Remove associated decorators
 			for (cMapDecoratorList::iterator it2 = m_Decorators.begin(); it2 != m_Decorators.end();)
 			{
-				if (it2->GetPlayer()->GetClientHandle() == Handle)
+				if (it2->GetPlayer()->GetClientHandle() == it->m_Handle)
 				{
 					// Erase decorator
 					cMapDecoratorList::iterator temp = it2;
@@ -322,6 +329,66 @@ void cMap::UpdateClient(cPlayer * a_Player)
 			++it;
 		}
 	}
+}
+
+
+
+
+
+void cMap::StreamNext(cMapClient & a_Client)
+{
+	cClientHandle * Handle = a_Client.m_Handle;
+
+	if (a_Client.m_SendInfo)
+	{
+		Handle->SendMapInfo(m_ID, m_Scale);
+
+		a_Client.m_SendInfo = false;
+
+		return;
+	}
+
+	++a_Client.m_NextDecoratorUpdate;
+
+	if (a_Client.m_NextDecoratorUpdate >= 4)
+	{
+		// TODO 2014-02-19 xdot
+		// This is dangerous as the player object may have been destroyed before the decorator is erased from the list
+		UpdateDecorators();
+
+		Handle->SendMapDecorators(m_ID, m_Decorators);
+
+		a_Client.m_NextDecoratorUpdate = 0;
+	}
+	else
+	{
+		++a_Client.m_DataUpdate;
+
+		unsigned int Y = (a_Client.m_DataUpdate * 11) % m_Width;
+
+		const Byte * Colors = &m_Data[Y * m_Height];
+
+		Handle->SendMapColumn(m_ID, Y, 0, Colors, m_Height);
+	}
+}
+
+
+
+
+
+void cMap::UpdateClient(cPlayer * a_Player)
+{
+	ASSERT(a_Player != NULL);
+	cClientHandle * Handle = a_Player->GetClientHandle();
+
+	if (Handle == NULL)
+	{
+		return;
+	}
+
+	Int64 WorldAge = a_Player->GetWorld()->GetWorldAge();
+
+	RemoveInactiveClients(WorldAge - 5);
 
 	// Linear search for client state
 	for (cMapClientList::iterator it = m_Clients.begin(); it != m_Clients.end(); ++it)
@@ -330,55 +397,14 @@ void cMap::UpdateClient(cPlayer * a_Player)
 		{
 			it->m_LastUpdate = WorldAge;
 
-			if (it->m_SendInfo)
-			{
-				Handle->SendMapInfo(m_ID, m_Scale);
-
-				it->m_SendInfo = false;
-
-				return;
-			}
-
-			++it->m_NextDecoratorUpdate;
-
-			if (it->m_NextDecoratorUpdate >= 4)
-			{
-				// TODO 2014-02-19 xdot
-				// This is dangerous as the player object may have been destroyed before the decorator is erased from the list
-				UpdateDecorators();
-
-				Handle->SendMapDecorators(m_ID, m_Decorators);
-
-				it->m_NextDecoratorUpdate = 0;
-			}
-			else
-			{
-				++it->m_DataUpdate;
-
-				unsigned int Y = (it->m_DataUpdate * 11) % m_Width;
-
-				const Byte * Colors = &m_Data[Y * m_Height];
-
-				Handle->SendMapColumn(m_ID, Y, 0, Colors, m_Height);
-			}
+			StreamNext(*it);
 
 			return;
 		}
 	}
 
 	// New player, construct a new client state
-	cMapClient MapClient;
-
-	MapClient.m_LastUpdate = WorldAge;
-	MapClient.m_SendInfo = true;
-	MapClient.m_Handle = a_Player->GetClientHandle();
-
-	m_Clients.push_back(MapClient);
-
-	// Insert new decorator
-	cMapDecorator PlayerDecorator(this, a_Player);
-
-	m_Decorators.push_back(PlayerDecorator);
+	AddPlayer(a_Player, Handle, WorldAge);
 }
 
 

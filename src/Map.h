@@ -105,29 +105,6 @@ public:
 
 	typedef std::vector<ColorID> cColorList;
 
-	/** Encapsulates the state of a map client.
-	 *
-	 * In order to enhance performace, maps are streamed column-by-column to each client.
-	 * This structure stores the state of the stream.
-	 */
-	struct cMapClient
-	{
-		cClientHandle * m_Handle;
-
-		/** Whether the map scale was modified and needs to be resent. */
-		bool m_SendInfo;
-
-		/** Ticks since last decorator update. */
-		unsigned int m_NextDecoratorUpdate;
-
-		/** Number of pixel data updates. */
-		Int64 m_DataUpdate;
-
-		Int64 m_LastUpdate;
-	};
-
-	typedef std::list<cMapClient> cMapClientList;
-
 
 public:
 
@@ -185,6 +162,32 @@ public:
 	// tolua_end
 
 
+protected:
+
+	/** Encapsulates the state of a map client.
+	 *
+	 * In order to enhance performace, maps are streamed column-by-column to each client.
+	 * This structure stores the state of the stream.
+	 */
+	struct cMapClient
+	{
+		cClientHandle * m_Handle;
+
+		/** Whether the map scale was modified and needs to be resent. */
+		bool m_SendInfo;
+
+		/** Ticks since last decorator update. */
+		unsigned int m_NextDecoratorUpdate;
+
+		/** Number of pixel data updates. */
+		Int64 m_DataUpdate;
+
+		Int64 m_LastUpdate;
+	};
+
+	typedef std::list<cMapClient> cMapClientList;
+
+
 private:
 
 	/** Update the associated decorators. */
@@ -192,6 +195,15 @@ private:
 
 	/** Update the specified pixel. */
 	bool UpdatePixel(unsigned int a_X, unsigned int a_Z);
+
+	/** Add a new map client. */
+	void AddPlayer(cPlayer * a_Player, cClientHandle * a_Handle, Int64 a_WorldAge);
+
+	/** Remove inactive or invalid clients. */
+	void RemoveInactiveClients(Int64 a_WorldAge);
+
+	/** Send next update packet to the specified client. */
+	void StreamNext(cMapClient & a_Client);
 
 	unsigned int m_ID;
 
@@ -218,3 +230,6 @@ private:
 	friend class cMapSerializer;
 
 };
+
+
+
