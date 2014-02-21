@@ -37,10 +37,20 @@ public:
 	
 	int  GetRecord(void);
 	void SetRecord(int a_Record);
-	void PlayRecord(void);
 	
-	/// Ejects the currently held record as a pickup. Does nothing when no record inserted.
-	void EjectRecord(void);
+	/** Play a Record. Return false, when a_Record isn't a Record */
+	bool PlayRecord(int a_Record);
+	
+	/** Ejects the currently held record as a pickup. Return false when no record inserted. */
+	bool EjectRecord(void);
+	
+	/** Is in the Jukebox a Record? */
+	bool IsPlayingRecord(void);
+	
+	static bool IsRecordItem(int a_Item)
+	{
+		return ((a_Item >= E_ITEM_FIRST_DISC) && (a_Item <= E_ITEM_LAST_DISC));
+	}
 	
 	// tolua_end
 

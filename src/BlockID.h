@@ -466,6 +466,10 @@ enum
 	E_META_FLOWER_PINK_TULIP      = 7,
 	E_META_FLOWER_OXEYE_DAISY     = 8,
 	
+	// E_BLOCK_JUKEBOX metas
+	E_META_JUKEBOX_OFF            = 0,
+	E_META_JUKEBOX_ON             = 1,
+	
 	// E_BLOCK_HOPPER metas:
 	E_META_HOPPER_FACING_YM  = 0,
 	E_META_HOPPER_UNATTACHED = 1,  // Hopper doesn't move items up, there's no YP
