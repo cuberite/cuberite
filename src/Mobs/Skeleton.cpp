@@ -31,20 +31,14 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_COAL);
 		cItems RareDrops;
 		RareDrops.Add(cItem(E_ITEM_HEAD, 1, 1));
-		if (!GetEquippedWeapon().IsEmpty()) RareDrops.Add(GetEquippedWeapon());
 		AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
+		AddRandomArmorDropItem(a_Drops, LootingLevel);
 	}
 	else
 	{
 		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ARROW);
 		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
-		cItems RareDrops;
-		if (!GetEquippedHelmet().IsEmpty()) RareDrops.Add(GetEquippedHelmet());
-		if (!GetEquippedChestplate().IsEmpty()) RareDrops.Add(GetEquippedChestplate());
-		if (!GetEquippedLeggings().IsEmpty()) RareDrops.Add(GetEquippedLeggings());
-		if (!GetEquippedBoots().IsEmpty()) RareDrops.Add(GetEquippedBoots());
-		if (!GetEquippedWeapon().IsEmpty()) RareDrops.Add(GetEquippedWeapon());
-		AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
+		AddRandomArmorDropItem(a_Drops, LootingLevel);
 	}
 }
 

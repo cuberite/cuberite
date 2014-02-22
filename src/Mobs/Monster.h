@@ -5,6 +5,7 @@
 #include "../Defines.h"
 #include "../BlockID.h"
 #include "../Item.h"
+#include "../Enchantments.h"
 
 
 
@@ -225,10 +226,15 @@ protected:
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops*/
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);	
-	/** Adds a item a_Item with the chance of a_Chance to itemdrops a_Drops*/
+	
+	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops*/
 	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);	
+	
 	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops*/
 	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel); 
+	
+	/** Adds armor that is equipped with the chance of 8,5% (Looting 3: 11,5%) to the drop*/
+	void AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel);
 	
 
 } ; // tolua_export

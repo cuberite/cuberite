@@ -29,8 +29,8 @@ void cZombiePigman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	
 	cItems RareDrops;
 	RareDrops.Add(cItem(E_ITEM_GOLD));
-	if (!GetEquippedWeapon().IsEmpty()) RareDrops.Add(GetEquippedWeapon());
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
+	AddRandomArmorDropItem(a_Drops, LootingLevel);
 }
 
 

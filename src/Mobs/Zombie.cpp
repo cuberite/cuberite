@@ -33,12 +33,8 @@ void cZombie::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	RareDrops.Add(cItem(E_ITEM_IRON));
 	RareDrops.Add(cItem(E_ITEM_CARROT));
 	RareDrops.Add(cItem(E_ITEM_POTATO));
-	if (!GetEquippedHelmet().IsEmpty()) RareDrops.Add(GetEquippedHelmet());
-	if (!GetEquippedChestplate().IsEmpty()) RareDrops.Add(GetEquippedChestplate());
-	if (!GetEquippedLeggings().IsEmpty()) RareDrops.Add(GetEquippedLeggings());
-	if (!GetEquippedBoots().IsEmpty()) RareDrops.Add(GetEquippedBoots());
-	if (!GetEquippedWeapon().IsEmpty()) RareDrops.Add(GetEquippedWeapon());
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
+	AddRandomArmorDropItem(a_Drops, LootingLevel);
 }
 
 

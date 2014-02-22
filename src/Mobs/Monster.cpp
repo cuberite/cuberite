@@ -909,6 +909,34 @@ void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a
 
 
 
+void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
+{
+	MTRand r1;
+	if (r1.randInt() % 200 < (17 + (a_LootingLevel * 2)))
+	{
+		if (!GetEquippedHelmet().IsEmpty()) a_Drops.push_back(GetEquippedHelmet());
+	}
+	
+	if (r1.randInt() % 200 < (17 + (a_LootingLevel * 2)))
+	{
+		if (!GetEquippedChestplate().IsEmpty()) a_Drops.push_back(GetEquippedChestplate());
+	}
+	
+	if (r1.randInt() % 200 < (17 + (a_LootingLevel * 2)))
+	{
+		if (!GetEquippedLeggings().IsEmpty()) a_Drops.push_back(GetEquippedLeggings());
+	}
+	
+	if (r1.randInt() % 200 < (17 + (a_LootingLevel * 2)))
+	{
+		if (!GetEquippedBoots().IsEmpty()) a_Drops.push_back(GetEquippedBoots());
+	}
+}
+
+
+
+
+
 void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 {
 	if (!m_BurnsInDaylight)

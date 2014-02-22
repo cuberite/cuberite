@@ -37,7 +37,7 @@ void cCavespider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
 	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_STRING);
-	if (a_Killer != NULL && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
+	if ((a_Killer != NULL) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
 	{
 		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_SPIDER_EYE);
 	}
