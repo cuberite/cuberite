@@ -884,7 +884,7 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 {
 	MTRand r1;
 	int Count = r1.randInt() % 1000;
-	if (Count < (a_Chance*10))
+	if (Count < (a_Chance * 10))
 	{
 		a_Drops.push_back(cItem(a_Item, 1, a_ItemHealth));
 	}
