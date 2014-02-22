@@ -2,11 +2,12 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Mooshroom.h"
+#include "../Entities/Player.h"
 
 
 
 
-// TODO: Milk Cow
+
 
 
 
@@ -29,4 +30,39 @@ void cMooshroom::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 }
 
 
+
+
+
+void cMooshroom::OnRightClicked(cPlayer & a_Player)
+{
+	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_BUCKET))
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+			a_Player.GetInventory().AddItem(E_ITEM_MILK);
+		}
+	}
+	
+	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_BOWL))
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+			a_Player.GetInventory().AddItem(E_ITEM_MUSHROOM_SOUP);
+		}
+	}
+	
+	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SHEARS)
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.UseEquippedItem();
+		}
+
+		cItems Drops;
+		Drops.push_back(cItem(E_BLOCK_RED_MUSHROOM, 5, 0));
+		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+	}
+}
 
