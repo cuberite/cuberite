@@ -103,8 +103,64 @@ public:
 
 		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
 	}
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// Holds extraneous metadata values.  Position data uses first 4 bits;   0x07 == 1111
+		NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x07);
+		// Rotates according to a table.
+		switch (a_Meta & 0x07)
+		{ 
+			case 0x01: return 0x04 + OtherMeta;  // East  -> North
+			case 0x04: return 0x02 + OtherMeta;  // North -> West
+			case 0x02: return 0x03 + OtherMeta;  // West  -> South
+			case 0x03: return 0x01 + OtherMeta;  // South -> East
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// Holds extraneous metadata values.  Position data uses first 4 bits;   0x07 == 1111
+		NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x07);
+		// Rotates according to a table.  0x07 == 1111
+		switch (a_Meta & 0x07)
+		{
+			case 0x01: return 0x03 + OtherMeta;  // East  -> South
+			case 0x03: return 0x02 + OtherMeta;  // South -> West
+			case 0x02: return 0x04 + OtherMeta;  // West  -> North
+			case 0x04: return 0x01 + OtherMeta;  // North -> East
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// Holds extraneous metadata values.  Position data uses first 4 bits;   0x07 == 1111
+		NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x07);
+		// Mirrors according to a table.  0x07 == 1111
+		switch (a_Meta & 0x07)
+		{
+			case 0x03: return 0x04 + OtherMeta;  // South -> North
+			case 0x04: return 0x03 + OtherMeta;  // North -> South
+		}
+		// Not Facing North or South; No change.
+		return a_Meta;
+	}
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Holds extraneous metadata values.  Position data uses first 4 bits;   0x07 == 1111
+		NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x07);
+		// Mirrors according to a table.  0x07 == 1111
+		switch (a_Meta & 0x07)
+		{
+		case 0x01: return 0x02 + OtherMeta;  // East  -> West
+		case 0x02: return 0x01 + OtherMeta;  // West  -> East
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
 } ;
-
-
-
-
