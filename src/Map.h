@@ -99,6 +99,24 @@ class cMap
 {
 public:
 
+	enum eBaseColor
+	{
+		E_BASE_COLOR_TRANSPARENT = 0,  /* Air     */
+		E_BASE_COLOR_LIGHT_GREEN = 4,  /* Grass   */
+		E_BASE_COLOR_LIGHT_BROWN = 8,  /* Sand    */
+		E_BASE_COLOR_GRAY_1      = 12, /* Cloth   */
+		E_BASE_COLOR_RED         = 16, /* TNT     */
+		E_BASE_COLOR_PALE_BLUE   = 20, /* Ice     */
+		E_BASE_COLOR_GRAY_2      = 24, /* Iron    */
+		E_BASE_COLOR_DARK_GREEN  = 28, /* Foliage */
+		E_BASE_COLOR_WHITE       = 32, /* Snow    */
+		E_BASE_COLOR_LIGHT_GRAY  = 36, /* Clay    */
+		E_BASE_COLOR_BROWN       = 40, /* Dirt    */
+		E_BASE_COLOR_DARK_GRAY   = 44, /* Stone   */
+		E_BASE_COLOR_BLUE        = 48, /* Water   */
+		E_BASE_COLOR_DARK_BROWN  = 52  /* Wood    */
+	};
+
 	typedef Byte ColorID;
 
 	// tolua_end

@@ -123,7 +123,7 @@ cMap::cMap(unsigned int a_ID, cWorld * a_World)
 	, m_CenterZ(0)
 	, m_World(a_World)
 {
-	m_Data.assign(m_Width * m_Height, 0);
+	m_Data.assign(m_Width * m_Height, E_BASE_COLOR_TRANSPARENT);
 
 	Printf(m_Name, "map_%i", m_ID);
 }
@@ -141,7 +141,7 @@ cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, un
 	, m_CenterZ(a_CenterZ)
 	, m_World(a_World)
 {
-	m_Data.assign(m_Width * m_Height, 0);
+	m_Data.assign(m_Width * m_Height, E_BASE_COLOR_TRANSPARENT);
 
 	Printf(m_Name, "map_%i", m_ID);
 }
@@ -195,11 +195,10 @@ void cMap::UpdateRadius(cPlayer & a_Player, unsigned int a_Radius)
 
 bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 {
-	/*
 	unsigned int PixelWidth = GetPixelWidth();
 
-	int BlockX = m_CenterX + ((a_X - m_Width)  * PixelWidth);
-	int BlockZ = m_CenterZ + ((a_Y - m_Height) * PixelWidth);
+	int BlockX = m_CenterX + ((a_X - (m_Width  / 2)) * PixelWidth);
+	int BlockZ = m_CenterZ + ((a_Z - (m_Height / 2)) * PixelWidth);
 
 	int ChunkX, ChunkY, ChunkZ;
 	m_World->BlockToChunk(BlockX, 0, BlockZ, ChunkX, ChunkY, ChunkZ);
@@ -218,7 +217,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 
 	public:
 		cCalculatePixelCb(cMap * a_Map, int a_RelX, int a_RelZ)
-			: m_Map(a_Map), m_RelX(a_RelX), m_RelZ(a_RelZ), m_PixelData(4) {}
+			: m_Map(a_Map), m_RelX(a_RelX), m_RelZ(a_RelZ), m_PixelData(E_BASE_COLOR_TRANSPARENT) {}
 
 		virtual bool Item(cChunk * a_Chunk) override
 		{
@@ -229,20 +228,88 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 
 			unsigned int PixelWidth = m_Map->GetPixelWidth();
 
+			if (m_Map->GetDimension() == dimNether)
+			{
+				// TODO 2014-02-22 xdot: Nether maps
+
+				return false;
+			}
+
+			typedef std::map<ColorID, unsigned int> ColorCountMap;
+			ColorCountMap ColorCounts;
+
+			// Count surface blocks
 			for (unsigned int X = m_RelX; X < m_RelX + PixelWidth; ++X)
 			{
 				for (unsigned int Z = m_RelZ; Z < m_RelZ + PixelWidth; ++Z)
 				{
+					unsigned int WaterDepth = 0;
+
+					BLOCKTYPE TargetBlock = E_BLOCK_AIR;
+					NIBBLETYPE TargetMeta = 0;
+
 					int Height = a_Chunk->GetHeight(X, Z);
 
-					if (Height > 0)
+					while (Height > 0)
 					{
-						// TODO
+						a_Chunk->GetBlockTypeMeta(X, Height, Z, TargetBlock, TargetMeta);
+
+						// TODO 2014-02-22 xdot: Check if block color is transparent
+						if (TargetBlock == E_BLOCK_AIR)
+						{
+							--Height;
+							continue;
+						}
+						// TODO 2014-02-22 xdot: Check if block is liquid
+						else if (false)
+						{
+							--Height;
+							++WaterDepth;
+							continue;
+						}
+
+						break;
 					}
+
+					// TODO 2014-02-22 xdot: Query block color
+					ColorID Color = E_BASE_COLOR_BROWN;
+
+					// Debug - Temporary
+					switch (TargetBlock)
+					{
+						case E_BLOCK_GRASS:
+						{
+							Color = E_BASE_COLOR_LIGHT_GREEN; break;
+						}
+						case E_BLOCK_STATIONARY_WATER:
+						case E_BLOCK_WATER:
+						{
+							Color = E_BASE_COLOR_BLUE; break;
+						}
+					}
+
+					++ColorCounts[Color];
 				}
 			}
 
-			m_PixelData = 8; // Debug
+			// Find dominant color
+			ColorID PixelColor = E_BASE_COLOR_TRANSPARENT;
+
+			unsigned int MaxCount = 0;
+
+			for (ColorCountMap::iterator it = ColorCounts.begin(); it != ColorCounts.end(); ++it)
+			{
+				if (it->second > MaxCount)
+				{
+					PixelColor = it->first;
+					MaxCount = it->second;
+				}
+			}
+
+			// TODO 2014-02-22 xdot: Adjust brightness
+			unsigned int dColor = 1;
+
+			m_PixelData = PixelColor + dColor;
 
 			return false;
 		}
@@ -255,9 +322,8 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 
 	ASSERT(m_World != NULL);
 	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);
-	*/
 
-	m_Data[a_Z + (a_X * m_Height)] = 4;
+	m_Data[a_Z + (a_X * m_Height)] = CalculatePixelCb.GetPixelData();
 
 	return true;
 }
