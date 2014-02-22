@@ -155,6 +155,10 @@ public:
 
 	void SetScale(unsigned int a_Scale);
 
+	bool SetPixel(unsigned int a_X, unsigned int a_Z, ColorID a_Data);
+
+	ColorID GetPixel(unsigned int a_X, unsigned int a_Z);
+
 	unsigned int GetWidth (void) const { return m_Width;  }
 	unsigned int GetHeight(void) const { return m_Height; }
 
@@ -171,13 +175,15 @@ public:
 
 	eDimension GetDimension(void) const;
 
-	const cColorList & GetData(void) const { return m_Data; }
-
 	unsigned int GetNumPixels(void) const;
 
 	unsigned int GetPixelWidth(void) const;
 
 	// tolua_end
+
+	unsigned int GetNumDecorators(void) const;
+
+	const cColorList & GetData(void) const { return m_Data; }
 
 
 protected:
@@ -247,7 +253,7 @@ private:
 
 	friend class cMapSerializer;
 
-};
+}; // tolua_export
 
 
 

@@ -323,7 +323,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 	ASSERT(m_World != NULL);
 	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);
 
-	m_Data[a_Z + (a_X * m_Height)] = CalculatePixelCb.GetPixelData();
+	SetPixel(a_X, a_Z, CalculatePixelCb.GetPixelData());
 
 	return true;
 }
@@ -516,11 +516,6 @@ void cMap::Resize(unsigned int a_Width, unsigned int a_Height)
 
 void cMap::SetPosition(int a_CenterX, int a_CenterZ)
 {
-	if ((m_CenterX == a_CenterX) && (m_CenterZ == a_CenterZ))
-	{
-		return;
-	}
-
 	m_CenterX = a_CenterX;
 	m_CenterZ = a_CenterZ;
 }
@@ -541,6 +536,40 @@ void cMap::SetScale(unsigned int a_Scale)
 	for (cMapClientList::iterator it = m_Clients.begin(); it != m_Clients.end(); ++it)
 	{
 		it->m_SendInfo = true;
+	}
+}
+
+
+
+
+
+bool cMap::SetPixel(unsigned int a_X, unsigned int a_Z, cMap::ColorID a_Data)
+{
+	if ((a_X < m_Width) && (a_Z < m_Height))
+	{
+		m_Data[a_Z + (a_X * m_Height)] = a_Data;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+
+
+
+cMap::ColorID cMap::GetPixel(unsigned int a_X, unsigned int a_Z)
+{
+	if ((a_X < m_Width) && (a_Z < m_Height))
+	{
+		return m_Data[a_Z + (a_X * m_Height)];
+	}
+	else
+	{
+		return E_BASE_COLOR_TRANSPARENT;
 	}
 }
 
@@ -571,6 +600,14 @@ unsigned int cMap::GetNumPixels(void) const
 	return m_Width * m_Height;
 }
 
+
+
+
+
+unsigned int cMap::GetNumDecorators(void) const
+{
+	return m_Decorators.size();
+}
 
 
 

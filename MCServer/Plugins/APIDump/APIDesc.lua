@@ -1485,6 +1485,55 @@ a_Player:OpenWindow(Window);
 			Inherits = "cWindow",
 		},  -- cLuaWindow
 
+		cMap =
+		{
+			Desc = [[
+				This class encapsulates a single in-game colored map.</p>
+				<p>
+				The contents (i.e. pixel data) of a cMap are dynamically updated by each
+				tracked {{cPlayer}} instance. Furthermore, a cMap maintains and periodically
+				updates	a list of map decorators, which are objects drawn on the map that
+				can freely move (e.g. Player and item frame pointers).
+			]],
+			Functions =
+			{
+				EraseData = { Params = "", Return = "", Notes = "Erases all pixel data." },
+				GetCenterX = { Params = "", Return = "number", Notes = "Returns the X coord of the map's center." },
+				GetCenterZ = { Params = "", Return = "number", Notes = "Returns the Y coord of the map's center." },
+				GetDimension = { Params = "", Return = "eDimension", Notes = "Returns the dimension of the associated world." },
+				GetHeight = { Params = "", Return = "number", Notes = "Returns the height of the map." },
+				GetID = { Params = "", Return = "number", Notes = "Returns the numerical ID of the map. (The item damage value)" },
+				GetName = { Params = "", Return = "string", Notes = "Returns the name of the map." },
+				GetNumPixels = { Params = "", Return = "number", Notes = "Returns the number of pixels in this map." },
+				GetPixel = { Params = "PixelX, PixelZ", Return = "ColorID", Notes = "Returns the color of the specified pixel." },
+				GetPixelWidth = { Params = "", Return = "number", Notes = "Returns the width of a single pixel in blocks." },
+				GetScale = { Params = "", Return = "number", Notes = "Returns the scale of the map. Range: [0,4]" },
+				GetWidth = { Params = "", Return = "number", Notes = "Returns the width of the map." },
+				GetWorld = { Params = "", Return = "cWorld", Notes = "Returns the associated world." },
+				Resize = { Params = "Width, Height", Return = "", Notes = "Resizes the map. WARNING: This will erase the pixel data." },
+				SetPixel = { Params = "PixelX, PixelZ, ColorID", Return = "bool", Notes = "Sets the color of the specified pixel. Returns false on error (Out of range)." },
+				SetPosition = { Params = "CenterX, CenterZ", Return = "", Notes = "Relocates the map. The pixel data will not be modified." },
+				SetScale = { Params = "number", Return = "", Notes = "Rescales the map. The pixel data will not be modified." },
+			},
+			Constants =
+			{
+				E_BASE_COLOR_BLUE = { Notes = "" },
+				E_BASE_COLOR_BROWN = { Notes = "" },
+				E_BASE_COLOR_DARK_BROWN = { Notes = "" },
+				E_BASE_COLOR_DARK_GRAY = { Notes = "" },
+				E_BASE_COLOR_DARK_GREEN = { Notes = "" },
+				E_BASE_COLOR_GRAY_1 = { Notes = "" },
+				E_BASE_COLOR_GRAY_2 = { Notes = "" },
+				E_BASE_COLOR_LIGHT_BROWN = { Notes = "" },
+				E_BASE_COLOR_LIGHT_GRAY = { Notes = "" },
+				E_BASE_COLOR_LIGHT_GREEN = { Notes = "" },
+				E_BASE_COLOR_PALE_BLUE = { Notes = "" },
+				E_BASE_COLOR_RED = { Notes = "" },
+				E_BASE_COLOR_TRANSPARENT = { Notes = "" },
+				E_BASE_COLOR_WHITE = { Notes = "" },
+			},
+		}, -- cMap
+
 		cMonster =
 		{
 			Desc = [[
