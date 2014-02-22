@@ -21,7 +21,7 @@ cSquid::cSquid(void) :
 void cSquid::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	// Drops 0-3 Ink Sacs
-	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(21);
+	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
 	AddRandomDropItem(a_Drops, 0, 3 + LootingLevel, E_ITEM_DYE, E_META_DYE_BLACK);
 }
 

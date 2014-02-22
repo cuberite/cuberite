@@ -20,7 +20,7 @@ cSkeleton::cSkeleton(bool IsWither) :
 
 void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(21);
+	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
 	if (IsWither())
 	{
 		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
