@@ -107,7 +107,7 @@ public:
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
 		// Holds extraneous metadata values.  Position data uses first 4 bits;   0x07 == 1111
-		NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x07);
+		NIBBLETYPE OtherMeta = a_Meta & (UCHAR_MAX - 0x07);
 		// Rotates according to a table.
 		switch (a_Meta & 0x07)
 		{ 
@@ -123,7 +123,7 @@ public:
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		// Holds extraneous metadata values.  Position data uses first 4 bits;   0x07 == 1111
-		NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x07);
+		NIBBLETYPE OtherMeta = a_Meta & (UCHAR_MAX - 0x07);
 		// Rotates according to a table.  0x07 == 1111
 		switch (a_Meta & 0x07)
 		{
@@ -139,7 +139,7 @@ public:
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
 		// Holds extraneous metadata values.  Position data uses first 4 bits;   0x07 == 1111
-		NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x07);
+		NIBBLETYPE OtherMeta = a_Meta & (UCHAR_MAX - 0x07);
 		// Mirrors according to a table.  0x07 == 1111
 		switch (a_Meta & 0x07)
 		{
@@ -153,7 +153,7 @@ public:
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
 		// Holds extraneous metadata values.  Position data uses first 4 bits;   0x07 == 1111
-		NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x07);
+		NIBBLETYPE OtherMeta = a_Meta & (UCHAR_MAX - 0x07);
 		// Mirrors according to a table.  0x07 == 1111
 		switch (a_Meta & 0x07)
 		{

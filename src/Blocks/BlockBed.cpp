@@ -99,7 +99,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 NIBBLETYPE cBlockBedHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 {
 	// Bit 0x08 (Bit #4) is a flag; 0 is foot of bed, 1 is head of the bed; first two bits are for position. 0x03 = 11
-	NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x03);
+	NIBBLETYPE OtherMeta = a_Meta & (UCHAR_MAX - 0x03);
 	// Rotates by returning appropate metavalue; values are determined by a Metadata table.
 	switch (a_Meta & 0x03)
 	{
@@ -119,7 +119,7 @@ NIBBLETYPE cBlockBedHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 NIBBLETYPE cBlockBedHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 {
 	// Bit 0x08 (Bit #4) is a flag; 0 is foot of bed, 1 is head of the bed; first two bits are for position. 0x03 = 11
-	NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x03);
+	NIBBLETYPE OtherMeta = a_Meta & (UCHAR_MAX - 0x03);
 	// Rotates by returning appropate metavalue; values are determined by a Metadata table.
 	switch (a_Meta & 0x03)
 	{
@@ -139,7 +139,7 @@ NIBBLETYPE cBlockBedHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 NIBBLETYPE cBlockBedHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 {
 	// Bit 0x08 (Bit #4) is a flag; 0 is foot of bed, 1 is head of the bed; first two bits are for position. 0x03 = 11
-	NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x03);
+	NIBBLETYPE OtherMeta = a_Meta & (UCHAR_MAX - 0x03);
 	// Flips by returning appropate metavalue; values are determined by a Metadata table.
 	switch (a_Meta & 0x03)
 	{
@@ -157,7 +157,7 @@ NIBBLETYPE cBlockBedHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 NIBBLETYPE cBlockBedHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
 {
 	// Bit 0x08 (Bit #4) is a flag; 0 is foot of bed, 1 is head of the bed; first two bits are for position. 0x03 = 11
-	NIBBLETYPE OtherMeta = a_Meta & (CHAR_MAX - 0x03);
+	NIBBLETYPE OtherMeta = a_Meta & (UCHAR_MAX - 0x03);
 	// Rotates by returning appropate metavalue; values are determined by a Metadata table.
 	switch (a_Meta & 0x03)
 	{
