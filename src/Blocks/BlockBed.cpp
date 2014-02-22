@@ -161,8 +161,8 @@ NIBBLETYPE cBlockBedHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
 	// Rotates by returning appropate metavalue; values are determined by a Metadata table.
 	switch (a_Meta & 0x03)
 	{
-	case 0x01: return 0x03 + OtherMeta; // West  -> East
-	case 0x03: return 0x01 + OtherMeta; // East  -> West
+		case 0x01: return 0x03 + OtherMeta; // West  -> East
+		case 0x03: return 0x01 + OtherMeta; // East  -> West
 	}
 	// Not Facing East or West; No change.
 	return a_Meta;
