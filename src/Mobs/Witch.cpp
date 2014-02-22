@@ -18,7 +18,11 @@ cWitch::cWitch(void) :
 
 void cWitch::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
+	}
 	MTRand r1;
 	int DropTypeCount = (r1.randInt() % 3) + 1;
 	for (int i = 0; i < DropTypeCount; i++)

@@ -23,7 +23,11 @@ cZombie::cZombie(bool a_IsVillagerZombie) :
 
 void cZombie::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
+	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ROTTEN_FLESH);
 	cItems RareDrops;
 	RareDrops.Add(cItem(E_ITEM_IRON));
