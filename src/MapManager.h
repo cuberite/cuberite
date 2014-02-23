@@ -45,7 +45,7 @@ public:
 	 * Returns true if the map was found and the callback called, false if map not found. 
 	 * Callback return ignored.
 	 */
-	bool DoWithMap(unsigned int a_ID, cMapCallback & a_Callback); // tolua_export
+	bool DoWithMap(int a_ID, cMapCallback & a_Callback); // Exported in ManualBindings.cpp
 
 	/** Calls the callback for each map. 
 	 *

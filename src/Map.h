@@ -185,6 +185,11 @@ public:
 
 	const cColorList & GetData(void) const { return m_Data; }
 
+	static const char * GetClassStatic(void)  // Needed for ManualBindings's DoWith templates
+	{
+		return "cMap";
+	}
+
 
 protected:
 

@@ -1541,7 +1541,7 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				DoWithMap = { Params = "ID, Callback", Return = "bool", Notes = "Calls the callback for the map with the specified ID. Returns true if the map was found and the callback called, false if map not found." },
+				DoWithMap = { Params = "ID, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If a map with the specified ID exists, calls the CallbackFunction for that map. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMap|Map}}, [CallbackData])</pre> Returns true if the map was found and the callback called, false if map not found." },
 				GetNumMaps = { Params = "", Return = "number", Notes = "Returns the number of registered maps." },
 			},
 
