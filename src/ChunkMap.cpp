@@ -805,6 +805,10 @@ void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 /// Wakes up the simulators for the specified area of blocks
 void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
 {
+	// Limit the Y coords:
+	a_MinBlockY = std::max(a_MinBlockY, 0);
+	a_MaxBlockY = std::min(a_MaxBlockY, cChunkDef::Height - 1);
+	
 	cSimulatorManager * SimMgr = m_World->GetSimulatorManager();
 	int MinChunkX, MinChunkZ, MaxChunkX, MaxChunkZ;
 	cChunkDef::BlockToChunk(a_MinBlockX, a_MinBlockZ, MinChunkX, MinChunkZ);
