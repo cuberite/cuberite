@@ -21,11 +21,13 @@ typedef cItemCallback<cMap> cMapCallback;
 
 
 
+// tolua_begin
 
 /** Manages the in-game maps of a single world - Thread safe. */
 class cMapManager
 {
 public:
+	// tolua_end
 
 	cMapManager(cWorld * a_World);
 
@@ -43,7 +45,7 @@ public:
 	 * Returns true if the map was found and the callback called, false if map not found. 
 	 * Callback return ignored.
 	 */
-	bool DoWithMap(unsigned int a_ID, cMapCallback & a_Callback);
+	bool DoWithMap(unsigned int a_ID, cMapCallback & a_Callback); // tolua_export
 
 	/** Calls the callback for each map. 
 	 *
@@ -51,7 +53,7 @@ public:
 	 */
 	bool ForEachMap(cMapCallback & a_Callback);
 
-	unsigned int GetNumMaps(void) const;
+	unsigned int GetNumMaps(void) const; // tolua_export
 
 	/** Loads the map data from the disk */
 	void LoadMapData(void);
@@ -70,7 +72,7 @@ private:
 
 	cWorld * m_World;
 
-};
+}; // tolua_export
 
 
 

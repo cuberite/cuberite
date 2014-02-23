@@ -1534,6 +1534,19 @@ a_Player:OpenWindow(Window);
 			},
 		}, -- cMap
 
+		cMapManager =
+		{
+			Desc = [[
+				This class is associated with a single {{cWorld}} instance and manages a list of maps.
+			]],
+			Functions =
+			{
+				DoWithMap = { Params = "ID, Callback", Return = "bool", Notes = "Calls the callback for the map with the specified ID. Returns true if the map was found and the callback called, false if map not found." },
+				GetNumMaps = { Params = "", Return = "number", Notes = "Returns the number of registered maps." },
+			},
+
+		}, -- cMapManager
+
 		cMonster =
 		{
 			Desc = [[
@@ -2289,6 +2302,7 @@ World:ForEachEntity(
 					]],
 				},
 			},  -- AdditionalInfo
+			Inherits = "cMapManager"
 		},  -- cWorld
 
 		HTTPFormData =

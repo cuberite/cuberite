@@ -74,6 +74,7 @@ $cfile "../UI/Window.h"
 $cfile "../Mobs/Monster.h"
 $cfile "../CompositeChat.h"
 $cfile "../Map.h"
+$cfile "../MapManager.h"
 
 
 
