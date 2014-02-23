@@ -38,6 +38,7 @@ public:
 				a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 
 				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+				a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
 				a_Player->UseEquippedItem();
 				return true;
 			}
@@ -48,6 +49,7 @@ public:
 				a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 
 				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+				a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
 				a_Player->UseEquippedItem();
 				return true;
 			}
@@ -77,6 +79,7 @@ public:
 		}
 	}
 	
+	/** Get the Destroy Speed for the Block */
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
 		switch (a_BlockType)

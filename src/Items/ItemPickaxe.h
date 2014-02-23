@@ -15,6 +15,7 @@ public:
 
 	}
 
+	/** Get the Dig Speed from the Pickaxe */
 	float PickaxePower()
 	{
 		switch (m_ItemType)
@@ -98,6 +99,7 @@ public:
 		return false;
 	}
 	
+	/** Get the Destroy Speed for the Block */
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
 		switch (a_BlockType)

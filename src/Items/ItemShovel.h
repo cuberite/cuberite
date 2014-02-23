@@ -21,6 +21,7 @@ public:
 
 	}
 
+	/** Get the Dig Speed from the Shovel */
 	float ShovelPower()
 	{
 		switch (m_ItemType)
@@ -55,6 +56,7 @@ public:
 		return (a_BlockType == E_BLOCK_SNOW || a_BlockType == E_BLOCK_SNOW_BLOCK);
 	}
 	
+	/** Get the Destroy Speed for the Block */
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
 		switch (a_BlockType)

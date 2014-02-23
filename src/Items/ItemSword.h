@@ -24,6 +24,7 @@ public:
 		return (a_BlockType == E_BLOCK_COBWEB);
 	}
 	
+	/** Get the Destroy Speed for the Block */
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
 		switch (a_BlockType)

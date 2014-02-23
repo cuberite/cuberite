@@ -728,7 +728,7 @@ float cClientHandle::GetBlockDigSpeed(BLOCKTYPE a_Block)
 	float f = g_BlockDigTime[a_Block];
 	float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_Block);
 	
-	if (a > 1.0F && !m_Player->GetInventory().GetEquippedItem().IsEmpty())
+	if ((a > 1.0F) && (!m_Player->GetInventory().GetEquippedItem().IsEmpty()))
 	{
 		cEnchantments Enchantments = m_Player->GetInventory().GetEquippedItem().m_Enchantments;
 		int Level = Enchantments.GetLevel(Enchantments.enchEfficiency);
@@ -742,11 +742,11 @@ float cClientHandle::GetBlockDigSpeed(BLOCKTYPE a_Block)
 	
 	if (m_Player->IsSwimming())
 	{
-		a /= 0.5;
+		a /= 0.5F;
 	}
 	if (!m_Player->IsOnGround())
 	{
-		a /= 0.5;
+		a /= 0.5F;
 	}
 	
 	float speed;
@@ -756,7 +756,7 @@ float cClientHandle::GetBlockDigSpeed(BLOCKTYPE a_Block)
 	}
 	else
 	{
-		speed = f < 0.0F ? 0.0F : a / f / 30.0F;
+		speed = (f < 0.0F) ? (0.0F) : (a / f / 30.0F);
 	}
 	
 	return speed * m_BlockDigTick;
@@ -865,7 +865,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	if (!m_Player->IsGameModeCreative() && g_BlockDigTime[a_OldBlock] != 0.0F)
+	if ((!m_Player->IsGameModeCreative()) && (g_BlockDigTime[a_OldBlock] != 0.0F))
 	{
 		float speed = GetBlockDigSpeed(a_OldBlock);
 		
@@ -878,7 +878,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		}
 	}
 	
-	if (m_Player->IsGameModeAdventure() && g_BlockDigTime[a_OldBlock] != 0.0F)
+	if ((m_Player->IsGameModeAdventure()) && (g_BlockDigTime[a_OldBlock] != 0.0F))
 	{
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		HandleBlockDigStop();

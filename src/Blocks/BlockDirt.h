@@ -36,7 +36,7 @@ public:
 		if (a_RelY < cChunkDef::Height - 1)
 		{
 			BLOCKTYPE Above = a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
-			if ((!g_BlockTransparent[Above] && g_BlockDigTime[Above] != 0.0F) || IsBlockWater(Above))
+			if (((!g_BlockTransparent[Above]) && (g_BlockDigTime[Above] != 0.0F)) || (IsBlockWater(Above)))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
@@ -77,7 +77,7 @@ public:
 			BLOCKTYPE AboveDest;
 			NIBBLETYPE AboveMeta;
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
-			if ((g_BlockDigTime[AboveDest] == 0.0F || g_BlockTransparent[AboveDest]) && !IsBlockWater(AboveDest))
+			if (((g_BlockDigTime[AboveDest] == 0.0F) || g_BlockTransparent[AboveDest]) && (!IsBlockWater(AboveDest)))
 			{
 				Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
 			}

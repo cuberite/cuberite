@@ -21,6 +21,7 @@ public:
 
 	}
 
+	/** Get the Dig Speed from the Axe */
 	float AxePower()
 	{
 		switch (m_ItemType)
@@ -34,6 +35,7 @@ public:
 		}
 	}
 	
+	/** Get the Destroy Speed for the Block */
 	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
 	{
 		switch (a_BlockType)
