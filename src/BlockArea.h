@@ -24,7 +24,7 @@ class cBlockArea
 	
 public:
 
-	/// What data is to be queried (bit-mask)
+	/** What data is to be queried (bit-mask) */
 	enum
 	{
 		baTypes    = 1,
@@ -44,7 +44,7 @@ public:
 	cBlockArea(void);
 	~cBlockArea();
 	
-	/// Clears the data stored to reclaim memory
+	/** Clears the data stored to reclaim memory */
 	void Clear(void);
 	
 	/** Creates a new area of the specified size and contents. 
@@ -53,31 +53,31 @@ public:
 	*/
 	void Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes = baTypes | baMetas);
 	
-	/// Resets the origin. No other changes are made, contents are untouched.
+	/** Resets the origin. No other changes are made, contents are untouched. */
 	void SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ);
 	
-	/// Reads an area of blocks specified. Returns true if successful. All coords are inclusive.
+	/** Reads an area of blocks specified. Returns true if successful. All coords are inclusive. */
 	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
 	
 	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
 	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
 	
-	/// Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all */
 	bool Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
 	
-	/// Copies this object's contents into the specified BlockArea.
+	/** Copies this object's contents into the specified BlockArea. */
 	void CopyTo(cBlockArea & a_Into) const;
 	
-	/// Copies the contents from the specified BlockArea into this object.
+	/** Copies the contents from the specified BlockArea into this object. */
 	void CopyFrom(const cBlockArea & a_From);
 	
-	/// For testing purposes only, dumps the area into a file.
+	/** For testing purposes only, dumps the area into a file. */
 	void DumpToRawFile(const AString & a_FileName);
 	
-	/// Crops the internal contents by the specified amount of blocks from each border.
+	/** Crops the internal contents by the specified amount of blocks from each border. */
 	void Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
 	
-	/// Expands the internal contents by the specified amount of blocks from each border
+	/** Expands the internal contents by the specified amount of blocks from each border */
 	void Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 	
 	/** Merges another block area into this one, using the specified block combinating strategy
@@ -117,49 +117,49 @@ public:
 	*/
 	void Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy);
 	
-	/// Fills the entire block area with the specified data
+	/** Fills the entire block area with the specified data */
 	void Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0, NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f);
 	
-	/// Fills a cuboid inside the block area with the specified data
+	/** Fills a cuboid inside the block area with the specified data */
 	void FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ, 
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 	
-	/// Draws a line from between two points with the specified data
+	/** Draws a line from between two points with the specified data */
 	void RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int a_RelY2, int a_RelZ2,
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 	
-	/// Rotates the entire area counter-clockwise around the Y axis
+	/** Rotates the entire area counter-clockwise around the Y axis */
 	void RotateCCW(void);
 	
-	/// Rotates the entire area clockwise around the Y axis
+	/** Rotates the entire area clockwise around the Y axis */
 	void RotateCW(void);
 	
-	/// Mirrors the entire area around the XY plane
+	/** Mirrors the entire area around the XY plane */
 	void MirrorXY(void);
 	
-	/// Mirrors the entire area around the XZ plane
+	/** Mirrors the entire area around the XZ plane */
 	void MirrorXZ(void);
 	
-	/// Mirrors the entire area around the YZ plane
+	/** Mirrors the entire area around the YZ plane */
 	void MirrorYZ(void);
 	
-	/// Rotates the entire area counter-clockwise around the Y axis, doesn't use blockhandlers for block meta
+	/** Rotates the entire area counter-clockwise around the Y axis, doesn't use blockhandlers for block meta */
 	void RotateCCWNoMeta(void);
 	
-	/// Rotates the entire area clockwise around the Y axis, doesn't use blockhandlers for block meta
+	/** Rotates the entire area clockwise around the Y axis, doesn't use blockhandlers for block meta */
 	void RotateCWNoMeta(void);
 	
-	/// Mirrors the entire area around the XY plane, doesn't use blockhandlers for block meta
+	/** Mirrors the entire area around the XY plane, doesn't use blockhandlers for block meta */
 	void MirrorXYNoMeta(void);
 	
-	/// Mirrors the entire area around the XZ plane, doesn't use blockhandlers for block meta
+	/** Mirrors the entire area around the XZ plane, doesn't use blockhandlers for block meta */
 	void MirrorXZNoMeta(void);
 	
-	/// Mirrors the entire area around the YZ plane, doesn't use blockhandlers for block meta
+	/** Mirrors the entire area around the YZ plane, doesn't use blockhandlers for block meta */
 	void MirrorYZNoMeta(void);
 	
 	// Setters:
@@ -197,11 +197,14 @@ public:
 	int GetSizeY(void) const { return m_SizeY; }
 	int GetSizeZ(void) const { return m_SizeZ; }
 	
+	/** Returns the volume of the area, as number of blocks */
+	int GetVolume(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
+	
 	int GetOriginX(void) const { return m_OriginX; }
 	int GetOriginY(void) const { return m_OriginY; }
 	int GetOriginZ(void) const { return m_OriginZ; }
 	
-	/// Returns the datatypes that are stored in the object (bitmask of baXXX values)
+	/** Returns the datatypes that are stored in the object (bitmask of baXXX values) */
 	int GetDataTypes(void) const;
 	
 	bool HasBlockTypes    (void) const { return (m_BlockTypes    != NULL); }
@@ -212,7 +215,7 @@ public:
 	// tolua_end
 	
 	// Clients can use these for faster access to all blocktypes. Be careful though!
-	/// Returns the internal pointer to the block types
+	/** Returns the internal pointer to the block types */
 	BLOCKTYPE *  GetBlockTypes   (void) const { return m_BlockTypes; }
 	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas; }     // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight; }     // NOTE: one byte per block!
@@ -263,7 +266,7 @@ protected:
 	NIBBLETYPE * m_BlockLight;     // Each light value is stored as a separate byte for faster access
 	NIBBLETYPE * m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
 	
-	/// Clears the data stored and prepares a fresh new block area with the specified dimensions
+	/** Clears the data stored and prepares a fresh new block area with the specified dimensions */
 	bool SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes);
 	
 	// Basic Setters:
@@ -282,7 +285,7 @@ protected:
 	void ExpandBlockTypes(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 	void ExpandNibbles   (NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 
-	/// Sets the specified datatypes at the specified location.
+	/** Sets the specified datatypes at the specified location. */
 	void RelSetData(
 		int a_RelX, int a_RelY, int a_RelZ, 
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
