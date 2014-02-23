@@ -32,6 +32,7 @@
 
 #include "Protocol/ProtocolRecognizer.h"
 #include "CompositeChat.h"
+#include "Items/ItemSword.h"
 
 
 
@@ -791,6 +792,15 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	)
 	{
 		// It is a duplicate packet, drop it right away
+		return;
+	}
+	
+	if (
+		m_Player->IsGameModeCreative() &&
+		cItemSwordHandler::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType)
+	)
+	{
+		// Players can't destroy blocks with a Sword in the hand.
 		return;
 	}
 	
