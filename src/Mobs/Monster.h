@@ -119,6 +119,17 @@ public:
 	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
 	
+	float GetDropChanceWeapon() { return m_DropChanceWeapon; };
+	float GetDropChanceHelmet() { return m_DropChanceHelmet; };
+	float GetDropChanceChestplate() { return m_DropChanceChestplate; };
+	float GetDropChanceLeggings() { return m_DropChanceLeggings; };
+	float GetDropChanceBoots() { return m_DropChanceBoots; };
+	void SetDropChanceWeapon(float a_DropChanceWeapon) { m_DropChanceWeapon = a_DropChanceWeapon; };
+	void SetDropChanceHelmet(float a_DropChanceHelmet) { m_DropChanceHelmet = a_DropChanceHelmet; };
+	void SetDropChanceChestplate(float a_DropChanceChestplate) { m_DropChanceChestplate = a_DropChanceChestplate; };
+	void SetDropChanceLeggings(float a_DropChanceLeggings) { m_DropChanceLeggings = a_DropChanceLeggings; };
+	void SetDropChanceBoots(float a_DropChanceBoots) { m_DropChanceBoots = a_DropChanceBoots; };
+	
 	/// Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick
 	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
 
@@ -221,6 +232,12 @@ protected:
 	float m_AttackInterval;
 	int m_SightDistance;
 	
+	float m_DropChanceWeapon;
+	float m_DropChanceHelmet;
+	float m_DropChanceChestplate;
+	float m_DropChanceLeggings;
+	float m_DropChanceBoots;
+	
 	void HandleDaylightBurning(cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
 
@@ -235,6 +252,9 @@ protected:
 	
 	/** Adds armor that is equipped with the chance of 8,5% (Looting 3: 11,5%) to the drop*/
 	void AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel);
+	
+	/** Adds weapon that is equipped with the chance of 8,5% (Looting 3: 11,5%) to the drop*/
+	void AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel);
 	
 
 } ; // tolua_export

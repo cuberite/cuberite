@@ -407,6 +407,14 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 		}
 	}  // switch (payload)
 
+	m_Writer.BeginList("DropChances", TAG_Float);
+		m_Writer.AddFloat("", a_Monster->GetDropChanceWeapon());
+		m_Writer.AddFloat("", a_Monster->GetDropChanceHelmet());
+		m_Writer.AddFloat("", a_Monster->GetDropChanceChestplate());
+		m_Writer.AddFloat("", a_Monster->GetDropChanceLeggings());
+		m_Writer.AddFloat("", a_Monster->GetDropChanceBoots());
+	m_Writer.EndList();
+
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Monster, EntityClass);
 		switch (a_Monster->GetMobType())

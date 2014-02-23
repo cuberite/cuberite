@@ -39,34 +39,35 @@ void cMooshroom::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cMooshroom::OnRightClicked(cPlayer & a_Player)
 {
-	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_BUCKET))
+	switch (a_Player.GetEquippedItem().m_ItemType)
 	{
-		if (!a_Player.IsGameModeCreative())
+		case E_ITEM_BUCKET:
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
-			a_Player.GetInventory().AddItem(E_ITEM_MILK);
-		}
-	}
-	
-	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_BOWL))
-	{
-		if (!a_Player.IsGameModeCreative())
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+				a_Player.GetInventory().AddItem(E_ITEM_MILK);
+			}
+		} break;
+		case E_ITEM_BOWL:
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
-			a_Player.GetInventory().AddItem(E_ITEM_MUSHROOM_SOUP);
-		}
-	}
-	
-	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SHEARS)
-	{
-		if (!a_Player.IsGameModeCreative())
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+				a_Player.GetInventory().AddItem(E_ITEM_MUSHROOM_SOUP);
+			}
+		} break;
+		case E_ITEM_SHEARS:
 		{
-			a_Player.UseEquippedItem();
-		}
+			if (!a_Player.IsGameModeCreative())
+			{
+				a_Player.UseEquippedItem();
+			}
 
-		cItems Drops;
-		Drops.push_back(cItem(E_BLOCK_RED_MUSHROOM, 5, 0));
-		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+			cItems Drops;
+			Drops.push_back(cItem(E_BLOCK_RED_MUSHROOM, 5, 0));
+			m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+		} break;
 	}
 }
 

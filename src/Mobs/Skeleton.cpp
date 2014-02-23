@@ -27,19 +27,19 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	}
 	if (IsWither())
 	{
-		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
 		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_COAL);
 		cItems RareDrops;
 		RareDrops.Add(cItem(E_ITEM_HEAD, 1, 1));
 		AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
-		AddRandomArmorDropItem(a_Drops, LootingLevel);
 	}
 	else
 	{
 		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ARROW);
-		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
-		AddRandomArmorDropItem(a_Drops, LootingLevel);
+		
 	}
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
+	AddRandomArmorDropItem(a_Drops, LootingLevel);
+	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
 
 

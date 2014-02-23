@@ -81,6 +81,11 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_AttackDamage(1)
 	, m_AttackRange(2)
 	, m_AttackInterval(0)
+	, m_DropChanceWeapon(0.085)
+	, m_DropChanceHelmet(0.085)
+	, m_DropChanceChestplate(0.085)
+	, m_DropChanceLeggings(0.085)
+	, m_DropChanceBoots(0.085)
 	, m_SightDistance(25)
 	, m_BurnsInDaylight(false)
 {
@@ -912,24 +917,37 @@ void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a
 void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
 {
 	MTRand r1;
-	if (r1.randInt() % 200 < (17 + (a_LootingLevel * 2)))
+	if (r1.randInt() % 200 < ((m_DropChanceHelmet * 200) + (a_LootingLevel * 2)))
 	{
 		if (!GetEquippedHelmet().IsEmpty()) a_Drops.push_back(GetEquippedHelmet());
 	}
 	
-	if (r1.randInt() % 200 < (17 + (a_LootingLevel * 2)))
+	if (r1.randInt() % 200 < ((m_DropChanceChestplate * 200) + (a_LootingLevel * 2)))
 	{
 		if (!GetEquippedChestplate().IsEmpty()) a_Drops.push_back(GetEquippedChestplate());
 	}
 	
-	if (r1.randInt() % 200 < (17 + (a_LootingLevel * 2)))
+	if (r1.randInt() % 200 < ((m_DropChanceLeggings * 200) + (a_LootingLevel * 2)))
 	{
 		if (!GetEquippedLeggings().IsEmpty()) a_Drops.push_back(GetEquippedLeggings());
 	}
 	
-	if (r1.randInt() % 200 < (17 + (a_LootingLevel * 2)))
+	if (r1.randInt() % 200 < ((m_DropChanceBoots * 200) + (a_LootingLevel * 2)))
 	{
 		if (!GetEquippedBoots().IsEmpty()) a_Drops.push_back(GetEquippedBoots());
+	}
+}
+
+
+
+
+
+void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel)
+{
+	MTRand r1;
+	if (r1.randInt() % 200 < ((m_DropChanceWeapon * 200) + (a_LootingLevel * 2)))
+	{
+		if (!GetEquippedWeapon().IsEmpty()) a_Drops.push_back(GetEquippedWeapon());
 	}
 }
 

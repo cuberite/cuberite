@@ -39,9 +39,7 @@ void cWitch::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 			case 6: AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_SUGAR); break;
 		}
 	}
-	cItems RareDrops;
-	if (!GetEquippedWeapon().IsEmpty()) RareDrops.Add(GetEquippedWeapon());
-	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
+	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
 
 

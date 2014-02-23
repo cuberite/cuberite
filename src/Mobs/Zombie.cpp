@@ -35,6 +35,7 @@ void cZombie::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	RareDrops.Add(cItem(E_ITEM_POTATO));
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 	AddRandomArmorDropItem(a_Drops, LootingLevel);
+	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
 
 
