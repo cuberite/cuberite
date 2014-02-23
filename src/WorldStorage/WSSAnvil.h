@@ -10,6 +10,7 @@
 
 #include "WorldStorage.h"
 #include "FastNBT.h"
+#include "../Mobs/Monster.h"
 
 
 
@@ -202,6 +203,9 @@ protected:
 	
 	/// Loads an array of doubles of the specified length from the specified NBT list tag a_TagIdx; returns true if successful
 	bool LoadDoublesListFromNBT(double * a_Doubles, int a_NumDoubles, const cParsedNBT & a_NBT, int a_TagIdx);
+
+	/// Loads an array of floats of the specified length from the specified NBT list tag a_TagIdx; returns true if successful
+	bool LoadFloatsListFromNBT(float * a_Floats, int a_NumFloats, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/// Helper function for extracting the X, Y, and Z int subtags of a NBT compound; returns true if successful
 	bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int & a_X, int & a_Y, int & a_Z);

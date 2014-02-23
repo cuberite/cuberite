@@ -2167,10 +2167,10 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 
 
 
-bool LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx)
+bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	float DropChance[5];
-	if (!LoadDoublesListFromNBT(DropChance, 5, a_NBT, a_NBT.FindChildByName(a_TagIdx, "DropChance")))
+	if (!LoadFloatsListFromNBT(DropChance, 5, a_NBT, a_NBT.FindChildByName(a_TagIdx, "DropChance")))
 	{
 		return false;
 	}
@@ -2222,6 +2222,24 @@ bool cWSSAnvil::LoadDoublesListFromNBT(double * a_Doubles, int a_NumDoubles, con
 		a_Doubles[idx] = a_NBT.GetDouble(Tag);
 	}  // for Tag - PosTag[]
 	return (idx == a_NumDoubles);  // Did we read enough doubles?
+}
+
+
+
+
+
+bool cWSSAnvil::LoadFloatsListFromNBT(float * a_Floats, int a_NumFloats, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List) || (a_NBT.GetChildrenType(a_TagIdx) != TAG_Float))
+	{
+		return false;
+	}
+	int idx = 0;
+	for (int Tag = a_NBT.GetFirstChild(a_TagIdx); (Tag > 0) && (idx < a_NumFloats); Tag = a_NBT.GetNextSibling(Tag), ++idx)
+	{
+		a_Floats[idx] = a_NBT.GetFloat(Tag);
+	}  // for Tag - PosTag[]
+	return (idx == a_NumFloats);  // Did we read enough doubles?
 }
 
 
