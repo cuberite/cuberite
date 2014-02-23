@@ -409,6 +409,14 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Monster, EntityClass);
+		m_Writer.BeginList("DropChances", TAG_Float);
+			m_Writer.AddFloat("", a_Monster->GetDropChanceWeapon());
+			m_Writer.AddFloat("", a_Monster->GetDropChanceHelmet());
+			m_Writer.AddFloat("", a_Monster->GetDropChanceChestplate());
+			m_Writer.AddFloat("", a_Monster->GetDropChanceLeggings());
+			m_Writer.AddFloat("", a_Monster->GetDropChanceBoots());
+		m_Writer.EndList();
+		m_Writer.AddByte("CanPickUpLoot", (char)a_Monster->CanPickUpLoot());
 		switch (a_Monster->GetMobType())
 		{
 			case cMonster::mtBat:

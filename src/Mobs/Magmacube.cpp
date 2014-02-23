@@ -19,7 +19,10 @@ cMagmaCube::cMagmaCube(int a_Size) :
 
 void cMagmaCube::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_MAGMA_CREAM);
+	if (GetSize() > 1)
+	{
+		AddRandomUncommonDropItem(a_Drops, 25.0f, E_ITEM_MAGMA_CREAM);
+	}
 }
 
 
