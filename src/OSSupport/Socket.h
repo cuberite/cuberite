@@ -65,6 +65,8 @@ public:
 	
 	bool operator < (const cSocket & a_Other) const {return m_Socket < a_Other.m_Socket; }
 	
+	bool operator > (const cSocket & a_Other) const {return m_Socket > a_Other.m_Socket; }
+	
 	//void SetSocket(xSocket a_Socket);
 
 	/// Sets the address-reuse socket flag; returns true on success
@@ -124,11 +126,6 @@ public:
 	/** Sets the socket into non-blocking mode */
 	void SetNonBlocking(void);
 	
-	operator int ();
-	
-	static bool SelectRead(cSocketSet a_Sockets, int timeout);
-	static bool SelectReadWrite(cSocketSet a_ReadSockets, cSocketSet a_WriteSockets, int timeout);
-
 private:
 	friend class cSocketSet;
 	xSocket m_Socket;

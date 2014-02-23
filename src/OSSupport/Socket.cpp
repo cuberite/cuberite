@@ -424,7 +424,6 @@ void cSocket::SetNonBlocking(void)
 
 
 
-
 #ifdef _WIN32
 bool cSocket::IsVistaOrLater()
 {

@@ -243,7 +243,7 @@ fail
 		}
 		*/
 		
-		if (!cSocket::SelectRead(SocketSet, 1))
+		if (!SocketSet.SelectRead(1))
 		{
 			LOG("select(R) call failed in cListenThread: \"%s\"", cSocket::GetLastErrorString().c_str());
 			continue;

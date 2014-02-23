@@ -412,7 +412,7 @@ void cSocketThreads::cSocketThread::Execute(void)
 		{
 			
 		}*/
-		if (!cSocket::SelectReadWrite(ReadSockets,WriteSockets,5))
+		if (!cSocketSet::SelectReadWrite(ReadSockets,WriteSockets,5))
 		{
 			LOG("select() call failed in cSocketThread: \"%s\"", cSocket::GetLastErrorString().c_str());
 			continue;
@@ -517,8 +517,8 @@ void cSocketThreads::cSocketThread::ReadFromSockets(cSocketSet & a_Read)
 					}
 					default:
 					{
-						LOG("%s: Unexpected socket state: %d (%s)",
-							__FUNCTION__, static_cast<int>(*itr), itr->GetIPString().c_str()
+						LOG("%s: Unexpected socket state: %s",
+							__FUNCTION__,  itr->GetIPString().c_str()
 						);
 						ASSERT(!"Unexpected socket state");
 						break;
