@@ -344,13 +344,19 @@ void cMap::UpdateDecorators(void)
 
 
 
-void cMap::AddPlayer(cPlayer * a_Player, cClientHandle * a_Handle, Int64 a_WorldAge)
+void cMap::AddPlayer(cPlayer * a_Player, Int64 a_WorldAge)
 {
+	cClientHandle * Handle = a_Player->GetClientHandle();
+	if (Handle == NULL)
+	{
+		return;
+	}
+
 	cMapClient MapClient;
 
 	MapClient.m_LastUpdate = a_WorldAge;
 	MapClient.m_SendInfo   = true;
-	MapClient.m_Handle     = a_Handle;
+	MapClient.m_Handle     = Handle;
 
 	m_Clients.push_back(MapClient);
 
@@ -470,7 +476,7 @@ void cMap::UpdateClient(cPlayer * a_Player)
 	}
 
 	// New player, construct a new client state
-	AddPlayer(a_Player, Handle, WorldAge);
+	AddPlayer(a_Player, WorldAge);
 }
 
 

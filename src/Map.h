@@ -226,7 +226,7 @@ private:
 	bool UpdatePixel(unsigned int a_X, unsigned int a_Z);
 
 	/** Add a new map client. */
-	void AddPlayer(cPlayer * a_Player, cClientHandle * a_Handle, Int64 a_WorldAge);
+	void AddPlayer(cPlayer * a_Player, Int64 a_WorldAge);
 
 	/** Remove inactive or invalid clients. */
 	void RemoveInactiveClients(Int64 a_WorldAge);

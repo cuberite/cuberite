@@ -41,7 +41,7 @@ public:
 		int CenterX = round(a_Player->GetPosX() / (float) RegionWidth) * RegionWidth;
 		int CenterZ = round(a_Player->GetPosZ() / (float) RegionWidth) * RegionWidth;
 
-		cMap * NewMap = a_World->CreateMap(CenterX, CenterZ, DEFAULT_SCALE);
+		cMap * NewMap = a_World->GetMapManager().CreateMap(CenterX, CenterZ, DEFAULT_SCALE);
 
 		// Remove empty map from inventory
 		if (!a_Player->GetInventory().RemoveOneEquippedItem())

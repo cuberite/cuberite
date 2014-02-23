@@ -233,7 +233,6 @@ void cWorld::cTickThread::Execute(void)
 // cWorld:
 
 cWorld::cWorld(const AString & a_WorldName) :
-	cMapManager(this),
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
@@ -254,6 +253,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_bCommandBlocksEnabled(false),
 	m_bUseChatPrefixes(true),
 	m_Scoreboard(this),
+	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
 	m_TickThread(*this)
 {
@@ -265,7 +265,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Load();
 
-	LoadMapData();
+	m_MapManager.LoadMapData();
 }
 
 
@@ -289,7 +289,7 @@ cWorld::~cWorld()
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Save();
 
-	SaveMapData();
+	m_MapManager.SaveMapData();
 
 	delete m_ChunkMap;
 }
