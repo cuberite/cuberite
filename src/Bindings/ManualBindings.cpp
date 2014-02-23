@@ -2350,6 +2350,37 @@ static int tolua_cBlockArea_GetBlockTypeMeta(lua_State * tolua_S)
 
 
 
+static int tolua_cBlockArea_GetOrigin(lua_State * tolua_S)
+{
+	// function cBlockArea::GetOrigin()
+	// Returns all three coords of the origin point
+	// Exported manually because there's no direct C++ equivalent,
+	// plus tolua would generate extra input params for the outputs
+	
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cBlockArea"))
+	{
+		return 0;
+	}
+	
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetOrigin'", NULL);
+		return 0;
+	}
+	
+	// Push the three origin coords:
+	lua_pushnumber(tolua_S, self->GetOriginX());
+	lua_pushnumber(tolua_S, self->GetOriginY());
+	lua_pushnumber(tolua_S, self->GetOriginZ());
+	return 3;
+}
+
+
+
+
+
 static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * tolua_S)
 {
 	// function cBlockArea::GetRelBlockTypeMeta()
@@ -2379,6 +2410,37 @@ static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * tolua_S)
 	tolua_pushnumber(tolua_S, BlockType);
 	tolua_pushnumber(tolua_S, BlockMeta);
 	return 2;
+}
+
+
+
+
+
+static int tolua_cBlockArea_GetSize(lua_State * tolua_S)
+{
+	// function cBlockArea::GetSize()
+	// Returns all three sizes of the area
+	// Exported manually because there's no direct C++ equivalent,
+	// plus tolua would generate extra input params for the outputs
+	
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cBlockArea"))
+	{
+		return 0;
+	}
+	
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetSize'", NULL);
+		return 0;
+	}
+	
+	// Push the three origin coords:
+	lua_pushnumber(tolua_S, self->GetSizeX());
+	lua_pushnumber(tolua_S, self->GetSizeY());
+	lua_pushnumber(tolua_S, self->GetSizeZ());
+	return 3;
 }
 
 
@@ -2461,7 +2523,9 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		
 		tolua_beginmodule(tolua_S, "cBlockArea");
 			tolua_function(tolua_S, "GetBlockTypeMeta",      tolua_cBlockArea_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetOrigin",             tolua_cBlockArea_GetOrigin);
 			tolua_function(tolua_S, "GetRelBlockTypeMeta",   tolua_cBlockArea_GetRelBlockTypeMeta);
+			tolua_function(tolua_S, "GetSize",               tolua_cBlockArea_GetSize);
 			tolua_function(tolua_S, "LoadFromSchematicFile", tolua_cBlockArea_LoadFromSchematicFile);
 			tolua_function(tolua_S, "SaveToSchematicFile",   tolua_cBlockArea_SaveToSchematicFile);
 		tolua_endmodule(tolua_S);
