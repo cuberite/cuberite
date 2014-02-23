@@ -119,16 +119,18 @@ public:
 	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
 	
-	float GetDropChanceWeapon() { return m_DropChanceWeapon; };
-	float GetDropChanceHelmet() { return m_DropChanceHelmet; };
-	float GetDropChanceChestplate() { return m_DropChanceChestplate; };
-	float GetDropChanceLeggings() { return m_DropChanceLeggings; };
-	float GetDropChanceBoots() { return m_DropChanceBoots; };
-	void SetDropChanceWeapon(float a_DropChanceWeapon) { m_DropChanceWeapon = a_DropChanceWeapon; };
-	void SetDropChanceHelmet(float a_DropChanceHelmet) { m_DropChanceHelmet = a_DropChanceHelmet; };
-	void SetDropChanceChestplate(float a_DropChanceChestplate) { m_DropChanceChestplate = a_DropChanceChestplate; };
-	void SetDropChanceLeggings(float a_DropChanceLeggings) { m_DropChanceLeggings = a_DropChanceLeggings; };
-	void SetDropChanceBoots(float a_DropChanceBoots) { m_DropChanceBoots = a_DropChanceBoots; };
+	float GetDropChanceWeapon() { return m_DropChanceWeapon; }
+	float GetDropChanceHelmet() { return m_DropChanceHelmet; }
+	float GetDropChanceChestplate() { return m_DropChanceChestplate; }
+	float GetDropChanceLeggings() { return m_DropChanceLeggings; }
+	float GetDropChanceBoots() { return m_DropChanceBoots; }
+	bool CanPickUpLoot() { return m_CanPickUpLoot; }
+	void SetDropChanceWeapon(float a_DropChanceWeapon) { m_DropChanceWeapon = a_DropChanceWeapon; }
+	void SetDropChanceHelmet(float a_DropChanceHelmet) { m_DropChanceHelmet = a_DropChanceHelmet; }
+	void SetDropChanceChestplate(float a_DropChanceChestplate) { m_DropChanceChestplate = a_DropChanceChestplate; }
+	void SetDropChanceLeggings(float a_DropChanceLeggings) { m_DropChanceLeggings = a_DropChanceLeggings; }
+	void SetDropChanceBoots(float a_DropChanceBoots) { m_DropChanceBoots = a_DropChanceBoots; }
+	void SetCanPickUpLoot(bool a_CanPickUpLoot) { m_CanPickUpLoot = a_CanPickUpLoot; }
 	
 	/// Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick
 	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
@@ -237,6 +239,7 @@ protected:
 	float m_DropChanceChestplate;
 	float m_DropChanceLeggings;
 	float m_DropChanceBoots;
+	bool m_CanPickUpLoot;
 	
 	void HandleDaylightBurning(cChunk & a_Chunk);
 	bool m_BurnsInDaylight;

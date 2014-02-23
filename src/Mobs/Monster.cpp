@@ -86,6 +86,7 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_DropChanceChestplate(0.085)
 	, m_DropChanceLeggings(0.085)
 	, m_DropChanceBoots(0.085)
+	, m_CanPickUpLoot(true)
 	, m_SightDistance(25)
 	, m_BurnsInDaylight(false)
 {

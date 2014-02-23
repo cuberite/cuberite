@@ -2179,6 +2179,8 @@ bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & 
 	a_Monster.SetDropChanceChestplate(DropChance[2]);
 	a_Monster.SetDropChanceLeggings(DropChance[3]);
 	a_Monster.SetDropChanceBoots(DropChance[4]);
+	bool CanPickUpLoot = (a_NBT.GetByte(a_NBT.FindChildByName(a_TagIdx, "CanPickUpLoot")) == 1);
+	a_Monster.SetCanPickUpLoot(CanPickUpLoot);
 	return true;
 }
 
