@@ -29,7 +29,11 @@ public:
 	static void Delete(T) {};
 	
 	/// Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted
-	static void Combine(T & a_existing, const T & a_new) {};
+	static void Combine(T & a_existing, const T & a_new)
+	{
+		UNUSED(a_existing);
+		UNUSED(a_new);
+	};
 };
 
 
