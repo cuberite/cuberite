@@ -82,7 +82,11 @@ protected:
 		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter);
 		
 	protected:
-		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override {}
+		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override 
+		{
+			UNUSED(a_ChunkX);
+			UNUSED(a_ChunkZ);
+		}
 		virtual bool OnAllChunksAvailable(void) override;
 		virtual void OnDisabled(void) override;
 	} ;
