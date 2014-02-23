@@ -20,28 +20,26 @@ cSkeleton::cSkeleton(bool IsWither) :
 
 void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+	}
 	if (IsWither())
 	{
-		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
 		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_COAL);
 		cItems RareDrops;
 		RareDrops.Add(cItem(E_ITEM_HEAD, 1, 1));
-		if (!GetEquippedWeapon().IsEmpty()) RareDrops.Add(GetEquippedWeapon());
 		AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 	}
 	else
 	{
 		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ARROW);
-		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
-		cItems RareDrops;
-		if (!GetEquippedHelmet().IsEmpty()) RareDrops.Add(GetEquippedHelmet());
-		if (!GetEquippedChestplate().IsEmpty()) RareDrops.Add(GetEquippedChestplate());
-		if (!GetEquippedLeggings().IsEmpty()) RareDrops.Add(GetEquippedLeggings());
-		if (!GetEquippedBoots().IsEmpty()) RareDrops.Add(GetEquippedBoots());
-		if (!GetEquippedWeapon().IsEmpty()) RareDrops.Add(GetEquippedWeapon());
-		AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
+		
 	}
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
+	AddRandomArmorDropItem(a_Drops, LootingLevel);
+	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
 
 

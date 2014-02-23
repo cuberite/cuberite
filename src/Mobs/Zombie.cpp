@@ -23,18 +23,19 @@ cZombie::cZombie(bool a_IsVillagerZombie) :
 
 void cZombie::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(E_ENCHANTMENT_LOOTING);
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ROTTEN_FLESH);
 	cItems RareDrops;
 	RareDrops.Add(cItem(E_ITEM_IRON));
 	RareDrops.Add(cItem(E_ITEM_CARROT));
 	RareDrops.Add(cItem(E_ITEM_POTATO));
-	if (!GetEquippedHelmet().IsEmpty()) RareDrops.Add(GetEquippedHelmet());
-	if (!GetEquippedChestplate().IsEmpty()) RareDrops.Add(GetEquippedChestplate());
-	if (!GetEquippedLeggings().IsEmpty()) RareDrops.Add(GetEquippedLeggings());
-	if (!GetEquippedBoots().IsEmpty()) RareDrops.Add(GetEquippedBoots());
-	if (!GetEquippedWeapon().IsEmpty()) RareDrops.Add(GetEquippedWeapon());
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
+	AddRandomArmorDropItem(a_Drops, LootingLevel);
+	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
 
 
