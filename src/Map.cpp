@@ -51,8 +51,8 @@ void cMapDecorator::Update(void)
 		int InsideWidth  = (m_Map->GetWidth()  / 2) - 1;
 		int InsideHeight = (m_Map->GetHeight() / 2) - 1;
 
-		int PixelX = (m_Player->GetPosX() - m_Map->GetCenterX()) / PixelWidth;
-		int PixelZ = (m_Player->GetPosZ() - m_Map->GetCenterZ()) / PixelWidth;
+		int PixelX = (int) (m_Player->GetPosX() - m_Map->GetCenterX()) / PixelWidth;
+		int PixelZ = (int) (m_Player->GetPosZ() - m_Map->GetCenterZ()) / PixelWidth;
 
 		// Center of pixel
 		m_PixelX = (2 * PixelX) + 1;
@@ -69,11 +69,11 @@ void cMapDecorator::Update(void)
 				Int64 WorldAge = m_Player->GetWorld()->GetWorldAge();
 
 				// TODO 2014-02-19 xdot: Refine
-				m_Rot = Random.NextInt(16, WorldAge);
+				m_Rot = Random.NextInt(16, (int) WorldAge);
 			}
 			else
 			{
-				m_Rot = (Yaw * 16) / 360;
+				m_Rot = (int) (Yaw * 16) / 360;
 			}
 
 			m_Type = E_TYPE_PLAYER;
@@ -183,8 +183,8 @@ void cMap::UpdateRadius(cPlayer & a_Player, unsigned int a_Radius)
 {
 	unsigned int PixelWidth = GetPixelWidth();
 
-	int PixelX = (a_Player.GetPosX() - m_CenterX) / PixelWidth + (m_Width  / 2);
-	int PixelZ = (a_Player.GetPosZ() - m_CenterZ) / PixelWidth + (m_Height / 2);
+	int PixelX = (int) (a_Player.GetPosX() - m_CenterX) / PixelWidth + (m_Width  / 2);
+	int PixelZ = (int) (a_Player.GetPosZ() - m_CenterZ) / PixelWidth + (m_Height / 2);
 
 	UpdateRadius(PixelX, PixelZ, a_Radius);
 }
@@ -620,7 +620,7 @@ unsigned int cMap::GetNumDecorators(void) const
 
 unsigned int cMap::GetPixelWidth(void) const
 {
-	return pow(2, m_Scale);
+	return (int) pow(2.0, (double) m_Scale);
 }
 
 

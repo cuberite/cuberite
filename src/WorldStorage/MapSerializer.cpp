@@ -112,7 +112,7 @@ void cMapSerializer::SaveMapToNBT(cFastNBTWriter & a_Writer)
 	a_Writer.AddInt("zCenter", m_Map->GetCenterZ());
 
 	const cMap::cColorList & Data = m_Map->GetData();
-	a_Writer.AddByteArray("colors", (char *) Data.data(), Data.size());
+	a_Writer.AddByteArray("colors", (char *) &Data[0], Data.size());
 
 	a_Writer.EndCompound();
 }
@@ -178,7 +178,7 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	CurrLine = a_NBT.FindChildByName(Data, "colors");
 	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_ByteArray))
 	{
-		memcpy(m_Map->m_Data.data(), a_NBT.GetData(CurrLine), NumPixels);
+		memcpy(&m_Map->m_Data[0], a_NBT.GetData(CurrLine), NumPixels);
 	}
 
 	return true;
