@@ -89,6 +89,7 @@ void cBoat::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();
+
 	SetSpeed(GetSpeed() * 0.97); // Slowly decrease the speed
 
 	if ((POSY_TOINT < 0) || (POSY_TOINT > cChunkDef::Height))
@@ -98,7 +99,10 @@ void cBoat::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT)))
 	{
-		SetSpeedY(1);
+		if (GetSpeedY() < 2)
+		{	
+			AddSpeedY(0.2);
+		}
 	}
 }
 
@@ -108,12 +112,12 @@ void cBoat::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 {
-	if (GetSpeed().Length() > 7)
+	if (GetSpeed().Length() > 7.5)
 	{
 		return;
 	}
 	
-	Vector3d ToAddSpeed(m_Attachee->GetLookVector() * (a_Sideways * 1.5));
+	Vector3d ToAddSpeed = m_Attachee->GetLookVector() * (a_Sideways * 0.4) ;
 	ToAddSpeed.y = 0;
 
 	AddSpeed(ToAddSpeed);
