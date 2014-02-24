@@ -48,6 +48,7 @@ $cfile "../ItemGrid.h"
 $cfile "../BlockEntities/BlockEntity.h"
 $cfile "../BlockEntities/BlockEntityWithItems.h"
 $cfile "../BlockEntities/ChestEntity.h"
+$cfile "../BlockEntities/CommandBlockEntity.h"
 $cfile "../BlockEntities/DropSpenserEntity.h"
 $cfile "../BlockEntities/DispenserEntity.h"
 $cfile "../BlockEntities/DropperEntity.h"
@@ -72,6 +73,8 @@ $cfile "../CraftingRecipes.h"
 $cfile "../UI/Window.h"
 $cfile "../Mobs/Monster.h"
 $cfile "../CompositeChat.h"
+$cfile "../Map.h"
+$cfile "../MapManager.h"
 
 
 

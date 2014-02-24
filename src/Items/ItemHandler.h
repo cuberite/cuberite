@@ -32,6 +32,14 @@ public:
 		UNUSED(a_BlockZ);
 		UNUSED(a_BlockFace);
 	}
+
+	/// Called every tick while the item is on the player's inventory (Used by maps) - For now, called only for equipped items
+	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item)
+	{
+		UNUSED(a_World);
+		UNUSED(a_Player);
+		UNUSED(a_Item);
+	}
 	
 	/// Called while the player diggs a block using this item
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);

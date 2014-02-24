@@ -150,6 +150,9 @@ public:
 	/// Sends the slot contents to the owner
 	void SendSlot(int a_SlotNum);
 
+	/// Update items (e.g. Maps)
+	void UpdateItems(void);
+
 	/// Converts an armor slot number into the ID for the EntityEquipment packet
 	static int ArmorSlotNumToEntityEquipmentID(short a_ArmorSlotNum);
 

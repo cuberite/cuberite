@@ -11,6 +11,8 @@
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
+
+// Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
 
 // Entities (except mobs):
@@ -251,6 +253,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_bCommandBlocksEnabled(false),
 	m_bUseChatPrefixes(true),
 	m_Scoreboard(this),
+	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
 	m_TickThread(*this)
 {
@@ -261,6 +264,8 @@ cWorld::cWorld(const AString & a_WorldName) :
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Load();
+
+	m_MapManager.LoadMapData();
 }
 
 
@@ -283,6 +288,8 @@ cWorld::~cWorld()
 	// Unload the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Save();
+
+	m_MapManager.SaveMapData();
 
 	delete m_ChunkMap;
 }
@@ -3020,6 +3027,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 	return res;
 }
+
 
 
 

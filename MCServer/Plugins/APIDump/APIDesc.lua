@@ -1489,6 +1489,68 @@ a_Player:OpenWindow(Window);
 			Inherits = "cWindow",
 		},  -- cLuaWindow
 
+		cMap =
+		{
+			Desc = [[
+				This class encapsulates a single in-game colored map.</p>
+				<p>
+				The contents (i.e. pixel data) of a cMap are dynamically updated by each
+				tracked {{cPlayer}} instance. Furthermore, a cMap maintains and periodically
+				updates	a list of map decorators, which are objects drawn on the map that
+				can freely move (e.g. Player and item frame pointers).
+			]],
+			Functions =
+			{
+				EraseData = { Params = "", Return = "", Notes = "Erases all pixel data." },
+				GetCenterX = { Params = "", Return = "number", Notes = "Returns the X coord of the map's center." },
+				GetCenterZ = { Params = "", Return = "number", Notes = "Returns the Y coord of the map's center." },
+				GetDimension = { Params = "", Return = "eDimension", Notes = "Returns the dimension of the associated world." },
+				GetHeight = { Params = "", Return = "number", Notes = "Returns the height of the map." },
+				GetID = { Params = "", Return = "number", Notes = "Returns the numerical ID of the map. (The item damage value)" },
+				GetName = { Params = "", Return = "string", Notes = "Returns the name of the map." },
+				GetNumPixels = { Params = "", Return = "number", Notes = "Returns the number of pixels in this map." },
+				GetPixel = { Params = "PixelX, PixelZ", Return = "ColorID", Notes = "Returns the color of the specified pixel." },
+				GetPixelWidth = { Params = "", Return = "number", Notes = "Returns the width of a single pixel in blocks." },
+				GetScale = { Params = "", Return = "number", Notes = "Returns the scale of the map. Range: [0,4]" },
+				GetWidth = { Params = "", Return = "number", Notes = "Returns the width of the map." },
+				GetWorld = { Params = "", Return = "cWorld", Notes = "Returns the associated world." },
+				Resize = { Params = "Width, Height", Return = "", Notes = "Resizes the map. WARNING: This will erase the pixel data." },
+				SetPixel = { Params = "PixelX, PixelZ, ColorID", Return = "bool", Notes = "Sets the color of the specified pixel. Returns false on error (Out of range)." },
+				SetPosition = { Params = "CenterX, CenterZ", Return = "", Notes = "Relocates the map. The pixel data will not be modified." },
+				SetScale = { Params = "number", Return = "", Notes = "Rescales the map. The pixel data will not be modified." },
+			},
+			Constants =
+			{
+				E_BASE_COLOR_BLUE = { Notes = "" },
+				E_BASE_COLOR_BROWN = { Notes = "" },
+				E_BASE_COLOR_DARK_BROWN = { Notes = "" },
+				E_BASE_COLOR_DARK_GRAY = { Notes = "" },
+				E_BASE_COLOR_DARK_GREEN = { Notes = "" },
+				E_BASE_COLOR_GRAY_1 = { Notes = "" },
+				E_BASE_COLOR_GRAY_2 = { Notes = "" },
+				E_BASE_COLOR_LIGHT_BROWN = { Notes = "" },
+				E_BASE_COLOR_LIGHT_GRAY = { Notes = "" },
+				E_BASE_COLOR_LIGHT_GREEN = { Notes = "" },
+				E_BASE_COLOR_PALE_BLUE = { Notes = "" },
+				E_BASE_COLOR_RED = { Notes = "" },
+				E_BASE_COLOR_TRANSPARENT = { Notes = "" },
+				E_BASE_COLOR_WHITE = { Notes = "" },
+			},
+		}, -- cMap
+
+		cMapManager =
+		{
+			Desc = [[
+				This class is associated with a single {{cWorld}} instance and manages a list of maps.
+			]],
+			Functions =
+			{
+				DoWithMap = { Params = "ID, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If a map with the specified ID exists, calls the CallbackFunction for that map. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMap|Map}}, [CallbackData])</pre> Returns true if the map was found and the callback called, false if map not found." },
+				GetNumMaps = { Params = "", Return = "number", Notes = "Returns the number of registered maps." },
+			},
+
+		}, -- cMapManager
+
 		cMonster =
 		{
 			Desc = [[
@@ -2107,7 +2169,8 @@ end
 				GetGeneratorQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks that are queued in the chunk generator." },
 				GetHeight = { Params = "BlockX, BlockZ", Return = "number", Notes = "Returns the maximum height of the particula block column in the world. If the chunk is not loaded, it waits for it to load / generate. <b>WARNING</b>: Do not use, Use TryGetHeight() instead for a non-waiting version, otherwise you run the risk of a deadlock!" },
 				GetIniFileName = { Params = "", Return = "string", Notes = "Returns the name of the world.ini file that the world uses to store the information." },
-				GetLightingQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks in the lighting thread's queue." },
+				GetLightingQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks in the lighting thread's queue." },				
+				GetMapManager = { Params = "", Return = "{{cMapManager}}", Notes = "Returns the {{cMapManager|MapManager}} object used by this world." },
 				GetMaxCactusHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which cacti will grow naturally." },
 				GetMaxSugarcaneHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which sugarcane will grow naturally." },
 				GetName = { Params = "", Return = "string", Notes = "Returns the name of the world, as specified in the settings.ini file." },

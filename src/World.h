@@ -24,6 +24,7 @@
 #include "Entities/ProjectileEntity.h"
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
+#include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 
@@ -580,8 +581,11 @@ public:
 	/** Returns the name of the world.ini file used by this world */
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
 
-	/** Returns the associated scoreboard instance */
+	/** Returns the associated scoreboard instance. */
 	cScoreboard & GetScoreBoard(void) { return m_Scoreboard; }
+
+	/** Returns the associated map manager instance. */
+	cMapManager & GetMapManager(void) { return m_MapManager; }
 
 	bool AreCommandBlocksEnabled(void) const { return m_bCommandBlocksEnabled; }
 	void SetCommandBlocksEnabled(bool a_Flag) { m_bCommandBlocksEnabled = a_Flag; }
@@ -848,6 +852,7 @@ private:
 	cChunkGenerator  m_Generator;
 
 	cScoreboard      m_Scoreboard;
+	cMapManager      m_MapManager;
 	
 	/** The callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	cChunkGeneratorCallbacks m_GeneratorCallbacks;

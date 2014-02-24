@@ -2575,6 +2575,10 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "UpdateSign",                tolua_cWorld_SetSignLines);
 		tolua_endmodule(tolua_S);
 		
+		tolua_beginmodule(tolua_S, "cMapManager");
+			tolua_function(tolua_S, "DoWithMap", tolua_DoWithID<cMapManager, cMap, &cMapManager::DoWithMap>);
+		tolua_endmodule(tolua_S);
+		
 		tolua_beginmodule(tolua_S, "cPlugin");
 			tolua_function(tolua_S, "Call", tolua_cPlugin_Call);
 		tolua_endmodule(tolua_S);

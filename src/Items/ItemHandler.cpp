@@ -18,6 +18,7 @@
 #include "ItemComparator.h"
 #include "ItemDoor.h"
 #include "ItemDye.h"
+#include "ItemEmptyMap.h"
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
@@ -25,6 +26,7 @@
 #include "ItemHoe.h"
 #include "ItemLeaves.h"
 #include "ItemLighter.h"
+#include "ItemMap.h"
 #include "ItemMinecart.h"
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
@@ -103,11 +105,13 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_COMPARATOR:        return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:               return new cItemEggHandler();
+		case E_ITEM_EMPTY_MAP:         return new cItemEmptyMapHandler();
 		case E_ITEM_ENDER_PEARL:       return new cItemEnderPearlHandler();
 		case E_ITEM_FIREWORK_ROCKET:   return new cItemFireworkHandler();
 		case E_ITEM_FISHING_ROD:       return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_MAP:               return new cItemMapHandler();
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
