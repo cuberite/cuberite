@@ -424,7 +424,7 @@ bool cSocket::IsVistaOrLater()
 
 	// Vista is Windows NT 6.0
 
-	return major >= 6;
+	return (major >= 6);
 }
 #endif
 
