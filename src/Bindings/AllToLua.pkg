@@ -87,3 +87,10 @@ class cLineBlockTracer;
 
 
 
+
+// To avoid tolua treating Byte as a class, and avoid the need to $cfile entire Globals.h:
+typedef unsigned char Byte;
+
+
+
+
