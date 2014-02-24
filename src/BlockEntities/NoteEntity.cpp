@@ -21,6 +21,7 @@ cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_Wo
 
 void cNoteEntity::UsedBy(cPlayer * a_Player)
 {
+	UNUSED(a_Player);
 	IncrementPitch();
 	MakeSound();
 }

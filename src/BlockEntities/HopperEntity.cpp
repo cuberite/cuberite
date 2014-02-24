@@ -58,6 +58,7 @@ bool cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, i
 
 bool cHopperEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
 	Int64 CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
 	
 	bool res = false;
@@ -73,6 +74,7 @@ bool cHopperEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cHopperEntity::SaveToJson(Json::Value & a_Value)
 {
+	UNUSED(a_Value);
 	// TODO
 	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 }
