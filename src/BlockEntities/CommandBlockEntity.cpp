@@ -12,6 +12,7 @@
 #include "../CommandOutput.h"
 #include "../Root.h"
 #include "../Server.h" // ExecuteConsoleCommand()
+#include "../Chunk.h"
 
 
 

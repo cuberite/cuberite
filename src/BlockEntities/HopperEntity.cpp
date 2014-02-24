@@ -13,6 +13,7 @@
 #include "DropSpenserEntity.h"
 #include "FurnaceEntity.h"
 #include "../BoundingBox.h"
+#include "json/json.h"
 
 
 
