@@ -144,7 +144,7 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 			#if defined(_WIN32)
 			if (!IsVistaOrLater())
 			{
-				LOGWARNING("Dual Stack requires windows Vista or greater, server will only be accessable by IPv6");
+				LOGWARNING("Dual Stack requires windows Vista or greater, server will only be accessible by IPv6");
 				return cSocket(Socket, IPv6);
 			}
 			else
@@ -157,7 +157,7 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 			#endif
 			if (setsockopt(Socket, IPPROTO_IPV6, IPV6_V6ONLY, &no, sizeof(no)) == -1)
 			{
-				LOGWARNING("Failed to set dual stack, server may not be accessable on IPv4");
+				LOGWARNING("Failed to set dual stack, server may not be accessible on IPv4");
 				ASSERT(false);
 			}
 			return cSocket(Socket, a_Family);
@@ -167,8 +167,8 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 		}
 		case INVALID_PROTOCOL:
 		{
+			LOGWARNING("Invalid protocol specified, using IPv4 instead. Server may be inaccessible");
 			ASSERT(!"Invalid protocol");
-			LOGWARNING("Invalid Protocol, setting IPv4, server may not be accessable");
 			xSocket Socket = socket((int)IPv4, SOCK_STREAM, 0);
 			return cSocket(Socket, a_Family);
 		}
