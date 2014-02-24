@@ -59,15 +59,11 @@ public:
 	Most TCPIP implementations use this to send the FIN flag in a packet */
 	void ShutdownReadWrite(void);
 	
-	//xSocket GetSocket(void) const;
-	
 	bool operator == (const cSocket & a_Other) const {return m_Socket == a_Other.m_Socket; }
 	
 	bool operator < (const cSocket & a_Other) const {return m_Socket < a_Other.m_Socket; }
 	
 	bool operator > (const cSocket & a_Other) const {return m_Socket > a_Other.m_Socket; }
-	
-	//void SetSocket(xSocket a_Socket);
 
 	/// Sets the address-reuse socket flag; returns true on success
 	bool SetReuseAddress(void);

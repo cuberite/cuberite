@@ -31,15 +31,6 @@ cSocket::~cSocket()
 
 
 
-/*
-cSocket::xSocket cSocket::GetSocket() const
-{
-	return m_Socket;
-}
-*/
-
-
-
 
 bool cSocket::IsValidSocket(cSocket::xSocket a_Socket)
 {

@@ -209,39 +209,10 @@ void cListenThread::Execute(void)
 		return;
 	}
 	
-	
-	/*
-	// Find the highest socket number:
-	cSocket::xSocket Highest = m_Sockets[0].GetSocket();
-	for (cSockets::iterator itr = m_Sockets.begin(), end = m_Sockets.end(); itr != end; ++itr)
-	{
-		if (itr->GetSocket() > Highest)
-		{
-			Highest = itr->GetSocket();
-		}
-	}  // for itr - m_Sockets[]*/
-	
 	cSocketSet SocketSet(m_Sockets);
 
 	while (!m_ShouldTerminate)
 	{
-		/*
-		// Put all sockets into a FD set:
-		fd_set fdRead;
-		FD_ZERO(&fdRead);
-		for (cSockets::iterator itr = m_Sockets.begin(), end = m_Sockets.end(); itr != end; ++itr)
-		{
-			FD_SET(itr->GetSocket(), &fdRead);
-		}  // for itr - m_Sockets[]
-		
-		timeval tv;  // On Linux select() doesn't seem to wake up when socket is closed, so let's kinda busy-wait:
-		tv.tv_sec = 1;
-		tv.tv_usec = 0;
-		if (select(Highest + 1, &fdRead, NULL, NULL, &tv) == -1)
-		{
-fail
-		}
-		*/
 		
 		if (!SocketSet.SelectRead(1))
 		{

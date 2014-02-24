@@ -140,7 +140,6 @@ void cSocketThreads::Write(const cCallback * a_Client, const AString & a_Data)
 cSocketThreads::cSocketThread::cSocketThread(cSocketThreads * a_Parent) :
 	cIsThread("cSocketThread"),
 	m_Parent(a_Parent),
-	//m_NumSlots(0)
 	m_Slots()
 {
 	// Nothing needed yet
@@ -178,13 +177,6 @@ void cSocketThreads::cSocketThread::AddClient(const cSocket & a_Socket, cCallbac
 	std::pair<cSocket, sSlot> slot(a_Socket, {a_Socket, a_Client, "", sSlot::ssNormal});
 	
 	m_Slots.insert(slot);
-	
-	/*m_Slots[m_NumSlots].m_Client = a_Client;
-	m_Slots[m_NumSlots].m_Socket = a_Socket;
-	m_Slots[m_NumSlots].m_Socket.SetNonBlocking();
-	m_Slots[m_NumSlots].m_Outgoing.clear();
-	m_Slots[m_NumSlots].m_State = sSlot::ssNormal;*/
-	//m_NumSlots++;
 	
 	// Notify the thread of the change:
 	ASSERT(m_ControlSocket2.IsValid());
@@ -399,19 +391,9 @@ void cSocketThreads::cSocketThread::Execute(void)
 		// Put sockets into the sets
 		cSocketSet ReadSockets;
 		cSocketSet WriteSockets;
-		//fd_set fdRead;
-		//fd_set fdWrite;
-		//cSocket::xSocket Highest = m_ControlSocket1.GetSocket();
+
 		PrepareSets(ReadSockets, WriteSockets);
 		
-		// Wait for the sockets:
-		/*timeval Timeout;
-		Timeout.tv_sec = 5;
-		Timeout.tv_usec = 0;
-		if (select(Highest + 1, &fdRead, &fdWrite, NULL, &Timeout) == -1)
-		{
-			
-		}*/
 		if (!cSocketSet::SelectReadWrite(ReadSockets,WriteSockets,5))
 		{
 			LOG("select() call failed in cSocketThread: \"%s\"", cSocket::GetLastErrorString().c_str());
@@ -431,9 +413,7 @@ void cSocketThreads::cSocketThread::Execute(void)
 
 void cSocketThreads::cSocketThread::PrepareSets(cSocketSet & a_Read, cSocketSet & a_Write)
 {
-	//FD_ZERO(a_Read);
-	//FD_ZERO(a_Write);
-	//FD_SET(m_ControlSocket1.GetSocket(), a_Read);
+
 	a_Read.Add(m_ControlSocket1);
 
 	cCSLock Lock(m_Parent->m_CS);
@@ -450,15 +430,9 @@ void cSocketThreads::cSocketThread::PrepareSets(cSocketSet & a_Read, cSocketSet 
 		}
 		cSocket s = itr->second.m_Socket;
 		a_Read.Add(s);
-		//FD_SET(s, a_Read);
-		//if (s > a_Highest)
-		//{
-		//	a_Highest = s;
-		//}
+
 		if (!itr->second.m_Outgoing.empty())
 		{
-			// There's outgoing data for the socket, put it in the Write set
-			//FD_SET(s, a_Write);
 			a_Write.Add(s);
 		}
 	} 
@@ -483,7 +457,6 @@ void cSocketThreads::cSocketThread::ReadFromSockets(cSocketSet & a_Read)
 	cCSLock Lock(m_Parent->m_CS);
 	for (cSocketSet::cEventIterator itr = a_Read.Eventbegin(), end = a_Read.Eventend(); itr != end; itr++)
 	{
-		//cSocket::xSocket Socket = m_Slots[i].m_Socket.GetSocket();
 		if (!itr->IsValid())
 		{
 			continue;
@@ -546,7 +519,6 @@ void cSocketThreads::cSocketThread::WriteToSockets(cSocketSet & a_Write)
 	cCSLock Lock(m_Parent->m_CS);
 	for (cSocketSet::cEventIterator itr = a_Write.Eventbegin(), end = a_Write.Eventend(); itr != end; itr++)
 	{
-		//cSocket::xSocket Socket = m_Slots[i].m_Socket.GetSocket();
 		if (!itr->IsValid())
 		{
 			continue;
