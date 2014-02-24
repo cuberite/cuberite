@@ -106,7 +106,7 @@ bool cSocket::SetReuseAddress(void)
 	#else
 		int yes = 1;
 	#endif
-	return (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == 0);
+	return (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == 0);
 }
 
 
@@ -155,7 +155,7 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 			#else
 				int no = 0;
 			#endif
-			if (setsockopt(Socket, IPPROTO_IPV6, IPV6_V6ONLY, &no, sizeof(int)) == -1)
+			if (setsockopt(Socket, IPPROTO_IPV6, IPV6_V6ONLY, &no, sizeof(no)) == -1)
 			{
 				LOGWARNING("Failed to set dual stack, server may not be accessable on IPv4");
 				ASSERT(false);
