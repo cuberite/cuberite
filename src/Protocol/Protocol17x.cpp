@@ -8,6 +8,7 @@ Implements the 1.7.x protocol classes:
 */
 
 #include "Globals.h"
+#include "json/json.h"
 #include "Protocol17x.h"
 #include "ChunkDataSerializer.h"
 #include "../ClientHandle.h"
@@ -20,11 +21,15 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
+#include "../Entities/Painting.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
+#include "../Entities/ItemFrame.h"
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
 #include "../BlockEntities/CommandBlockEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
+#include "../CompositeChat.h"
 
 
 
@@ -194,6 +199,78 @@ void cProtocol172::SendChat(const AString & a_Message)
 {
 	cPacketizer Pkt(*this, 0x02);  // Chat Message packet
 	Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()));
+}
+
+
+
+
+
+void cProtocol172::SendChat(const cCompositeChat & a_Message)
+{
+	// Compose the complete Json string to send:
+	Json::Value msg;
+	msg["text"] = "";  // The client crashes without this
+	const cCompositeChat::cParts & Parts = a_Message.GetParts();
+	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
+	{
+		Json::Value Part;
+		switch ((*itr)->m_PartType)
+		{
+			case cCompositeChat::ptText:
+			{
+				Part["text"] = (*itr)->m_Text;
+				AddChatPartStyle(Part, (*itr)->m_Style);
+				break;
+			}
+			
+			case cCompositeChat::ptClientTranslated:
+			{
+				const cCompositeChat::cClientTranslatedPart & p = (const cCompositeChat::cClientTranslatedPart &)**itr;
+				Part["translate"] = p.m_Text;
+				Json::Value With;
+				for (AStringVector::const_iterator itrW = p.m_Parameters.begin(), endW = p.m_Parameters.end(); itrW != endW; ++itr)
+				{
+					With.append(*itrW);
+				}
+				if (!p.m_Parameters.empty())
+				{
+					Part["with"] = With;
+				}
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
+			
+			case cCompositeChat::ptUrl:
+			{
+				const cCompositeChat::cUrlPart & p = (const cCompositeChat::cUrlPart &)**itr;
+				Part["text"] = p.m_Text;
+				Json::Value Url;
+				Url["action"] = "open_url";
+				Url["value"] = p.m_Url;
+				Part["clickEvent"] = Url;
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
+			
+			case cCompositeChat::ptSuggestCommand:
+			case cCompositeChat::ptRunCommand:
+			{
+				const cCompositeChat::cCommandPart & p = (const cCompositeChat::cCommandPart &)**itr;
+				Part["text"] = p.m_Text;
+				Json::Value Cmd;
+				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
+				Cmd["value"] = p.m_Command;
+				Part["clickEvent"] = Cmd;
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
+		}
+		msg["extra"].append(Part);
+	}  // for itr - Parts[]
+	
+	// Send the message to the client:
+	cPacketizer Pkt(*this, 0x02);
+	Pkt.WriteString(msg.toStyledString());
 }
 
 
@@ -476,7 +553,7 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (cRoot::Get()->GetServer()->IsHardcore() ? 0x08 : 0)); // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteByte(cRoot::Get()->GetServer()->GetMaxPlayers());
+		Pkt.WriteByte(std::min(cRoot::Get()->GetServer()->GetMaxPlayers(), 60));
 		Pkt.WriteString("default");  // Level type - wtf?
 	}
 	
@@ -491,6 +568,75 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send player abilities:
 	SendPlayerAbilities();
 }
+
+
+
+
+void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
+	Pkt.WriteVarInt(a_Painting.GetUniqueID());
+	Pkt.WriteString(a_Painting.GetName().c_str());
+	Pkt.WriteInt((int)a_Painting.GetPosX());
+	Pkt.WriteInt((int)a_Painting.GetPosY());
+	Pkt.WriteInt((int)a_Painting.GetPosZ());
+	Pkt.WriteInt(a_Painting.GetDirection());
+}
+
+
+
+
+
+void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	cPacketizer Pkt(*this, 0x34);
+	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteShort (3 + a_Length);
+
+	Pkt.WriteByte(0);
+	Pkt.WriteByte(a_X);
+	Pkt.WriteByte(a_Y);
+	
+	for (unsigned int i = 0; i < a_Length; ++i)
+	{
+		Pkt.WriteByte(a_Colors[i]);
+	}
+}
+
+
+
+
+
+void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	cPacketizer Pkt(*this, 0x34);
+	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteShort (1 + (3 * a_Decorators.size()));
+
+	Pkt.WriteByte(1);
+	
+	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
+	{
+		Pkt.WriteByte((it->GetType() << 4) | (it->GetRot() & 0xf));
+		Pkt.WriteByte(it->GetPixelX());
+		Pkt.WriteByte(it->GetPixelZ());
+	}
+}
+
+
+
+
+
+void cProtocol172::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	cPacketizer Pkt(*this, 0x34);
+	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteShort (2);
+
+	Pkt.WriteByte(2);
+	Pkt.WriteByte(a_Scale);
+}
+
 
 
 
@@ -849,8 +995,8 @@ void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	Pkt.WriteFPInt(a_Entity.GetPosX());
 	Pkt.WriteFPInt(a_Entity.GetPosY());
 	Pkt.WriteFPInt(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteInt(a_ObjectData);
 	if (a_ObjectData != 0)
 	{
@@ -872,8 +1018,8 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	Pkt.WriteFPInt(a_Vehicle.GetPosX());
 	Pkt.WriteFPInt(a_Vehicle.GetPosY());
 	Pkt.WriteFPInt(a_Vehicle.GetPosZ());
-	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
+	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteInt(a_VehicleSubType);
 	if (a_VehicleSubType != 0)
 	{
@@ -968,6 +1114,7 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	{
 		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
+		case E_BLOCK_HEAD:          Action = 4; break; // Update Mobhead entity
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteByte(Action);
@@ -1524,6 +1671,8 @@ void cProtocol172::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    Difficulty);
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ShowCape);
+	
+	m_Client->SetLocale(Locale);
 	// TODO: handle in m_Client
 }
 
@@ -1979,6 +2128,85 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 
 
 
+void cProtocol172::AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle)
+{
+	size_t len = a_PartStyle.length();
+	for (size_t i = 0; i < len; i++)
+	{
+		switch (a_PartStyle[i])
+		{
+			case 'b':
+			{
+				// bold
+				a_Value["bold"] = Json::Value(true);
+				break;
+			}
+			
+			case 'i':
+			{
+				// italic
+				a_Value["italic"] = Json::Value(true);
+				break;
+			}
+			
+			case 'u':
+			{
+				// Underlined
+				a_Value["underlined"] = Json::Value(true);
+				break;
+			}
+			
+			case 's':
+			{
+				// strikethrough
+				a_Value["strikethrough"] = Json::Value(true);
+				break;
+			}
+			
+			case 'o':
+			{
+				// obfuscated
+				a_Value["obfuscated"] = Json::Value(true);
+				break;
+			}
+			
+			case '@':
+			{
+				// Color, specified by the next char:
+				i++;
+				if (i >= len)
+				{
+					// String too short, didn't contain a color
+					break;
+				}
+				switch (a_PartStyle[i])
+				{
+					case '0': a_Value["color"] = Json::Value("black");        break;
+					case '1': a_Value["color"] = Json::Value("dark_blue");    break;
+					case '2': a_Value["color"] = Json::Value("dark_green");   break;
+					case '3': a_Value["color"] = Json::Value("dark_aqua");    break;
+					case '4': a_Value["color"] = Json::Value("dark_red");     break;
+					case '5': a_Value["color"] = Json::Value("dark_purple");  break;
+					case '6': a_Value["color"] = Json::Value("gold");         break;
+					case '7': a_Value["color"] = Json::Value("gray");         break;
+					case '8': a_Value["color"] = Json::Value("dark_gray");    break;
+					case '9': a_Value["color"] = Json::Value("blue");         break;
+					case 'a': a_Value["color"] = Json::Value("green");        break;
+					case 'b': a_Value["color"] = Json::Value("aqua");         break;
+					case 'c': a_Value["color"] = Json::Value("red");          break;
+					case 'd': a_Value["color"] = Json::Value("light_purple"); break;
+					case 'e': a_Value["color"] = Json::Value("yellow");       break;
+					case 'f': a_Value["color"] = Json::Value("white");        break;
+				}  // switch (color)
+			}  // case '@'
+		}  // switch (Style[i])
+	}  // for i - a_PartStyle[]
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cProtocol172::cPacketizer:
 
@@ -2114,6 +2342,19 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			}
 			break;
 		}
+		case E_BLOCK_HEAD:
+		{
+			cMobHeadEntity & MobHeadEntity = (cMobHeadEntity &)a_BlockEntity;
+			
+			Writer.AddInt("x", MobHeadEntity.GetPosX());
+			Writer.AddInt("y", MobHeadEntity.GetPosY());
+			Writer.AddInt("z", MobHeadEntity.GetPosZ());
+			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
+			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
+			Writer.AddString("ExtraType", MobHeadEntity.GetOwner().c_str());
+			Writer.AddString("id", "Skull"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
 		default: break;
 	}
 
@@ -2234,6 +2475,15 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 		case cEntity::etMonster:
 		{
 			WriteMobMetadata((const cMonster &)a_Entity);
+			break;
+		}
+		case cEntity::etItemFrame:
+		{
+			cItemFrame & Frame = (cItemFrame &)a_Entity;
+			WriteByte(0xA2);
+			WriteItem(Frame.GetItem());
+			WriteByte(0x3);
+			WriteByte(Frame.GetRotation());
 			break;
 		}
 	}

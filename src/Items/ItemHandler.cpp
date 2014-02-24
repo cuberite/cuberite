@@ -18,14 +18,18 @@
 #include "ItemComparator.h"
 #include "ItemDoor.h"
 #include "ItemDye.h"
+#include "ItemEmptyMap.h"
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
+#include "ItemItemFrame.h"
 #include "ItemHoe.h"
 #include "ItemLeaves.h"
 #include "ItemLighter.h"
+#include "ItemMap.h"
 #include "ItemMinecart.h"
 #include "ItemNetherWart.h"
+#include "ItemPainting.h"
 #include "ItemPickaxe.h"
 #include "ItemThrowable.h"
 #include "ItemRedstoneDust.h"
@@ -35,6 +39,7 @@
 #include "ItemShears.h"
 #include "ItemShovel.h"
 #include "ItemSign.h"
+#include "ItemMobHead.h"
 #include "ItemSpawnEgg.h"
 #include "ItemSugarcane.h"
 #include "ItemSword.h"
@@ -100,16 +105,21 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_COMPARATOR:        return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:               return new cItemEggHandler();
+		case E_ITEM_EMPTY_MAP:         return new cItemEmptyMapHandler();
 		case E_ITEM_ENDER_PEARL:       return new cItemEnderPearlHandler();
 		case E_ITEM_FIREWORK_ROCKET:   return new cItemFireworkHandler();
 		case E_ITEM_FISHING_ROD:       return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_MAP:               return new cItemMapHandler();
+		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
+		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
 		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);
 		case E_ITEM_SIGN:              return new cItemSignHandler(a_ItemType);
+		case E_ITEM_HEAD:              return new cItemMobHeadHandler(a_ItemType);
 		case E_ITEM_SNOWBALL:          return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:         return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemType);
@@ -305,7 +315,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_BOWL:                 return 64;
 		case E_ITEM_BREAD:                return 64;
 		case E_ITEM_BREWING_STAND:        return 64;
-		case E_ITEM_BUCKET:               return 1;  // TODO: change this to 16 when turning compatibility to 1.3
+		case E_ITEM_BUCKET:               return 16;
 		case E_ITEM_CARROT:               return 64;
 		case E_ITEM_CAULDRON:             return 64;
 		case E_ITEM_CLAY:                 return 64;
@@ -342,6 +352,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_GUNPOWDER:            return 64;
 		case E_ITEM_HEAD:                 return 64;
 		case E_ITEM_IRON:                 return 64;
+		case E_ITEM_ITEM_FRAME:           return 64;
 		case E_ITEM_LEATHER:              return 64;
 		case E_ITEM_MAGMA_CREAM:          return 64;
 		case E_ITEM_MAP:                  return 64;
@@ -349,7 +360,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_MELON_SLICE:          return 64;
 		case E_ITEM_NETHER_BRICK:         return 64;
 		case E_ITEM_NETHER_WART:          return 64;
-		case E_ITEM_PAINTINGS:            return 64;
+		case E_ITEM_PAINTING:             return 64;
 		case E_ITEM_PAPER:                return 64;
 		case E_ITEM_POISONOUS_POTATO:     return 64;
 		case E_ITEM_POTATO:               return 64;

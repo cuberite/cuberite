@@ -20,60 +20,62 @@ if (NOT MSVC)
 	set(BINDING_DEPENDECIES
 		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
 		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
-		ChunkDef.h
-		BiomeDef.h
-		OSSupport/File.h
 		Bindings/LuaFunctions.h
-		Bindings/PluginManager.h
+		Bindings/LuaWindow.h
 		Bindings/Plugin.h
 		Bindings/PluginLua.h
+		Bindings/PluginManager.h
 		Bindings/WebPlugin.h
-		Bindings/LuaWindow.h
-		BlockID.h
-		StringUtils.h
-		Defines.h
-		ChatColor.h
-		ClientHandle.h
-		Entities/Entity.h
-		Entities/Floater.h
-		Entities/Pawn.h
-		Entities/Player.h
-		Entities/Pickup.h
-		Entities/ProjectileEntity.h
-		Entities/TNTEntity.h
-		Entities/Effects.h
-		Server.h
-		World.h
-		Inventory.h
-		Enchantments.h
-		Item.h
-		ItemGrid.h
+		BiomeDef.h
+		BlockArea.h
 		BlockEntities/BlockEntity.h
 		BlockEntities/BlockEntityWithItems.h
 		BlockEntities/ChestEntity.h
-		BlockEntities/DropSpenserEntity.h
 		BlockEntities/DispenserEntity.h
+		BlockEntities/DropSpenserEntity.h
 		BlockEntities/DropperEntity.h
 		BlockEntities/FurnaceEntity.h
 		BlockEntities/HopperEntity.h
 		BlockEntities/JukeboxEntity.h
 		BlockEntities/NoteEntity.h
 		BlockEntities/SignEntity.h
-		WebAdmin.h
-		Root.h
-		Vector3f.h
-		Vector3d.h
-		Vector3i.h
-		Matrix4f.h
-		Cuboid.h
+		BlockEntities/MobHeadEntity.h
+		BlockID.h
 		BoundingBox.h
-		Tracer.h
-		Group.h
-		BlockArea.h
-		Generating/ChunkDesc.h
+		ChatColor.h
+		ChunkDef.h
+		ClientHandle.h
 		CraftingRecipes.h
-		UI/Window.h
+		Cuboid.h
+		Defines.h
+		Enchantments.h
+		Entities/Effects.h
+		Entities/Entity.h
+		Entities/Floater.h
+		Entities/Pawn.h
+		Entities/Painting.h
+		Entities/Pickup.h
+		Entities/Player.h
+		Entities/ProjectileEntity.h
+		Entities/TNTEntity.h
+		Generating/ChunkDesc.h
+		Group.h
+		Inventory.h
+		Item.h
+		ItemGrid.h
+		Matrix4f.h
 		Mobs/Monster.h
+		OSSupport/File.h
+		Root.h
+		Server.h
+		StringUtils.h
+		Tracer.h
+		UI/Window.h
+		Vector3d.h
+		Vector3f.h
+		Vector3i.h
+		WebAdmin.h
+		World.h
 	)
 	
 	include_directories(Bindings)
@@ -91,7 +93,18 @@ if (NOT MSVC)
 		DEPENDS ${BINDING_DEPENDECIES}
 	)
 	#add cpp files here
-	add_library(Bindings Bindings/PluginManager Bindings/LuaState Bindings/WebPlugin Bindings/Bindings Bindings/ManualBindings Bindings/LuaWindow Bindings/Plugin Bindings/PluginLua Bindings/WebPlugin)
+	add_library(Bindings
+		Bindings/Bindings
+		Bindings/LuaChunkStay
+		Bindings/LuaState
+		Bindings/LuaWindow
+		Bindings/ManualBindings
+		Bindings/Plugin
+		Bindings/PluginLua
+		Bindings/PluginManager
+		Bindings/WebPlugin
+		Bindings/WebPlugin
+	)
 
 	target_link_libraries(Bindings lua sqlite tolualib)
 
@@ -143,6 +156,7 @@ else ()
 			"${PATH}/*.cpp"
 			"${PATH}/*.h"
 			"${PATH}/*.rc"
+			"${PATH}/*.pkg"
 		)
 		source_group("${PATH}" FILES ${FOLDER_FILES})
 	endfunction(includefolder)
@@ -154,6 +168,7 @@ else ()
 	file(GLOB_RECURSE SOURCE
 		"*.cpp"
 		"*.h"
+		"*.pkg"
 	)
 
 	include_directories("${PROJECT_SOURCE_DIR}")

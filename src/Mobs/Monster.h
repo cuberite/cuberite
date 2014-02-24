@@ -5,6 +5,7 @@
 #include "../Defines.h"
 #include "../BlockID.h"
 #include "../Item.h"
+#include "../Enchantments.h"
 
 
 
@@ -112,13 +113,24 @@ public:
 	virtual void InStateChasing (float a_Dt);
 	virtual void InStateEscaping(float a_Dt);
 	
-	virtual void Attack(float a_Dt);
-	
 	int GetAttackRate() { return (int)m_AttackRate; }
 	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
 	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
 	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
+	
+	float GetDropChanceWeapon() { return m_DropChanceWeapon; }
+	float GetDropChanceHelmet() { return m_DropChanceHelmet; }
+	float GetDropChanceChestplate() { return m_DropChanceChestplate; }
+	float GetDropChanceLeggings() { return m_DropChanceLeggings; }
+	float GetDropChanceBoots() { return m_DropChanceBoots; }
+	bool CanPickUpLoot() { return m_CanPickUpLoot; }
+	void SetDropChanceWeapon(float a_DropChanceWeapon) { m_DropChanceWeapon = a_DropChanceWeapon; }
+	void SetDropChanceHelmet(float a_DropChanceHelmet) { m_DropChanceHelmet = a_DropChanceHelmet; }
+	void SetDropChanceChestplate(float a_DropChanceChestplate) { m_DropChanceChestplate = a_DropChanceChestplate; }
+	void SetDropChanceLeggings(float a_DropChanceLeggings) { m_DropChanceLeggings = a_DropChanceLeggings; }
+	void SetDropChanceBoots(float a_DropChanceBoots) { m_DropChanceBoots = a_DropChanceBoots; }
+	void SetCanPickUpLoot(bool a_CanPickUpLoot) { m_CanPickUpLoot = a_CanPickUpLoot; }
 	
 	/// Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick
 	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
@@ -222,10 +234,31 @@ protected:
 	float m_AttackInterval;
 	int m_SightDistance;
 	
+	float m_DropChanceWeapon;
+	float m_DropChanceHelmet;
+	float m_DropChanceChestplate;
+	float m_DropChanceLeggings;
+	float m_DropChanceBoots;
+	bool m_CanPickUpLoot;
+	
 	void HandleDaylightBurning(cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
 
+	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops*/
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);	
+	
+	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops*/
+	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);	
+	
+	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops*/
+	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel); 
+	
+	/** Adds armor that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
+	void AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel);
+	
+	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
+	void AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel);
+	
 
 } ; // tolua_export
 

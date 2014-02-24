@@ -39,7 +39,12 @@ void cCreeper::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_GUNPOWDER);
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+	}
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
 
 	if ((a_Killer != NULL) && (a_Killer->IsProjectile()))
 	{
@@ -79,7 +84,7 @@ void cCreeper::Attack(float a_Dt)
 
 	if (!m_bIsBlowing)
 	{
-		m_World->BroadcastSoundEffect("random.fuse", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("game.tnt.primed", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
 	}

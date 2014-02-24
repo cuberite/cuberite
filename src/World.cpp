@@ -11,6 +11,8 @@
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
+
+// Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
 
 // Entities (except mobs):
@@ -248,11 +250,12 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
-	m_Scoreboard(this),
-	m_GeneratorCallbacks(*this),
-	m_TickThread(*this),
 	m_bCommandBlocksEnabled(false),
-	m_bUseChatPrefixes(true)
+	m_bUseChatPrefixes(true),
+	m_Scoreboard(this),
+	m_MapManager(this),
+	m_GeneratorCallbacks(*this),
+	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -261,6 +264,8 @@ cWorld::cWorld(const AString & a_WorldName) :
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Load();
+
+	m_MapManager.LoadMapData();
 }
 
 
@@ -283,6 +288,8 @@ cWorld::~cWorld()
 	// Unload the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Save();
+
+	m_MapManager.SaveMapData();
 
 	delete m_ChunkMap;
 }
@@ -1165,6 +1172,15 @@ bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
+bool cWorld::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
 bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	return m_ChunkMap->GetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
@@ -1207,10 +1223,12 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 	sSetBlockVector Logs, Other;
 	switch (a_SaplingMeta & 0x07)
 	{
-		case E_META_SAPLING_APPLE:   GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_BIRCH:   GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_CONIFER: GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_JUNGLE:  GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_CONIFER:  GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_JUNGLE:   GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_DARK_OAK: GetDarkoakTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
 	}
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
@@ -1487,6 +1505,37 @@ EMCSBiome cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 
 
 
+bool cWorld::SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome)
+{
+	return m_ChunkMap->SetBiomeAt(a_BlockX, a_BlockZ, a_Biome);
+}
+
+
+
+
+
+bool cWorld::SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome)
+{
+	return m_ChunkMap->SetAreaBiome(a_MinX, a_MaxX, a_MinZ, a_MaxZ, a_Biome);
+}
+
+
+
+
+
+bool cWorld::SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome)
+{
+	return SetAreaBiome(
+		std::min(a_Area.p1.x, a_Area.p2.x), std::max(a_Area.p1.x, a_Area.p2.x),
+		std::min(a_Area.p1.z, a_Area.p2.z), std::max(a_Area.p1.z, a_Area.p2.z),
+		a_Biome
+	);
+}
+
+
+
+
+
 void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	m_ChunkMap->SetBlock(*this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
@@ -1747,7 +1796,7 @@ void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 
 
-void cWorld::LoopPlayersAndBroadcastChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const cClientHandle * a_Exclude)
+void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -1758,6 +1807,24 @@ void cWorld::LoopPlayersAndBroadcastChat(const AString & a_Message, ChatPrefixCo
 			continue;
 		}
 		ch->SendChat(a_Message, a_ChatPrefix);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendChat(a_Message);
 	}
 }
 
@@ -2148,9 +2215,6 @@ void cWorld::SetChunkData(
 	{
 		m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkZ);
 	}
-	
-	// Notify the lighting thread that the chunk has become valid (in case it is a neighbor of a postponed chunk):
-	m_Lighting.ChunkReady(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2210,6 +2274,15 @@ void cWorld::UnloadUnusedChunks(void)
 {
 	m_LastUnload = m_WorldAge;
 	m_ChunkMap->UnloadUnusedChunks();
+}
+
+
+
+
+
+void cWorld::QueueUnloadUnusedChunks(void)
+{
+	QueueTask(new cWorld::cTaskUnloadUnusedChunks);
 }
 
 
@@ -2466,6 +2539,16 @@ void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 
 
 
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+{
+	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+}
+
+
+
+
+
 void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
 {
 	m_ChunkSender.RemoveClient(a_Client);
@@ -2558,15 +2641,6 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 	} CmdBlockCB (a_Command);
 
 	return DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, CmdBlockCB);
-}
-
-
-
-
-
-void cWorld::ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay)
-{
-	m_ChunkMap->ChunksStay(a_Chunks, a_Stay);
 }
 
 
@@ -2957,12 +3031,26 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 
 
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTaskSaveAllChunks:
 
 void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 {
 	a_World.SaveAllChunks();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTaskUnloadUnusedChunks
+
+void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
+{
+	a_World.UnloadUnusedChunks();
 }
 
 

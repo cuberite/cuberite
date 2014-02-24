@@ -878,7 +878,7 @@ void cBlockArea::RotateCCW(void)
 			int NewX = z;
 			for (int y = 0; y < m_SizeY; y++)
 			{
-				int NewIdx = NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ;
+				int NewIdx = NewX + NewZ * m_SizeZ + y * m_SizeX * m_SizeZ;
 				int OldIdx = MakeIndex(x, y, z);
 				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
 				NewMetas[NewIdx] = BlockHandler(m_BlockTypes[OldIdx])->MetaRotateCCW(m_BlockMetas[OldIdx]);
@@ -923,7 +923,7 @@ void cBlockArea::RotateCW(void)
 			int NewX = m_SizeZ - z - 1;
 			for (int y = 0; y < m_SizeY; y++)
 			{
-				int NewIdx = NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ;
+				int NewIdx = NewX + NewZ * m_SizeZ + y * m_SizeX * m_SizeZ;
 				int OldIdx = MakeIndex(x, y, z);
 				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
 				NewMetas[NewIdx] = BlockHandler(m_BlockTypes[OldIdx])->MetaRotateCW(m_BlockMetas[OldIdx]);
@@ -1075,7 +1075,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 				int NewX = z;
 				for (int y = 0; y < m_SizeY; y++)
 				{
-					NewTypes[NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ] = m_BlockTypes[MakeIndex(x, y, z)];
+					NewTypes[NewX + NewZ * m_SizeZ + y * m_SizeX * m_SizeZ] = m_BlockTypes[MakeIndex(x, y, z)];
 				}  // for y
 			}  // for z
 		}  // for x
@@ -1093,7 +1093,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 				int NewX = z;
 				for (int y = 0; y < m_SizeY; y++)
 				{
-					NewMetas[NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ] = m_BlockMetas[MakeIndex(x, y, z)];
+					NewMetas[NewX + NewZ * m_SizeZ + y * m_SizeX * m_SizeZ] = m_BlockMetas[MakeIndex(x, y, z)];
 				}  // for y
 			}  // for z
 		}  // for x
@@ -1120,7 +1120,7 @@ void cBlockArea::RotateCWNoMeta(void)
 				int NewZ = x;
 				for (int y = 0; y < m_SizeY; y++)
 				{
-					NewTypes[NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ] = m_BlockTypes[MakeIndex(x, y, z)];
+					NewTypes[NewX + NewZ * m_SizeZ + y * m_SizeX * m_SizeZ] = m_BlockTypes[MakeIndex(x, y, z)];
 				}  // for y
 			}  // for x
 		}  // for z
@@ -1138,7 +1138,7 @@ void cBlockArea::RotateCWNoMeta(void)
 				int NewZ = x;
 				for (int y = 0; y < m_SizeY; y++)
 				{
-					NewMetas[NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ] = m_BlockMetas[MakeIndex(x, y, z)];
+					NewMetas[NewX + NewZ * m_SizeZ + y * m_SizeX * m_SizeZ] = m_BlockMetas[MakeIndex(x, y, z)];
 				}  // for y
 			}  // for x
 		}  // for z

@@ -134,7 +134,7 @@ cChunkMap::cChunkLayer * cChunkMap::GetLayerForChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-cChunkPtr cChunkMap::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
+cChunkPtr cChunkMap::GetChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	// No need to lock m_CSLayers, since it's already locked by the operation that called us
 	ASSERT(m_CSLayers.IsLockedByCurrentThread());
@@ -805,6 +805,10 @@ void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 /// Wakes up the simulators for the specified area of blocks
 void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
 {
+	// Limit the Y coords:
+	a_MinBlockY = std::max(a_MinBlockY, 0);
+	a_MaxBlockY = std::min(a_MaxBlockY, cChunkDef::Height - 1);
+	
 	cSimulatorManager * SimMgr = m_World->GetSimulatorManager();
 	int MinChunkX, MinChunkZ, MaxChunkX, MaxChunkZ;
 	cChunkDef::BlockToChunk(a_MinBlockX, a_MinBlockZ, MinChunkX, MinChunkZ);
@@ -897,17 +901,34 @@ void cChunkMap::SetChunkData(
 	bool a_MarkDirty
 )
 {
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if (Chunk == NULL)
 	{
-		return;
-	}
-	Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_BiomeMap, a_BlockEntities);
-	
-	if (a_MarkDirty)
-	{
-		Chunk->MarkDirty();
+		cCSLock Lock(m_CSLayers);
+		cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+		if (Chunk == NULL)
+		{
+			return;
+		}
+		Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_BiomeMap, a_BlockEntities);
+		
+		if (a_MarkDirty)
+		{
+			Chunk->MarkDirty();
+		}
+		
+		// Notify relevant ChunkStays:
+		for (cChunkStays::iterator itr = m_ChunkStays.begin(); itr != m_ChunkStays.end(); )
+		{
+			if ((*itr)->ChunkAvailable(a_ChunkX, a_ChunkZ))
+			{
+				cChunkStays::iterator cur = itr;
+				++itr;
+				m_ChunkStays.erase(cur);
+			}
+			else
+			{
+				++itr;
+			}
+		}  // for itr - m_ChunkStays[]
 	}
 
 	// Notify plugins of the chunk becoming available
@@ -1373,10 +1394,10 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 EMCSBiome cChunkMap::GetBiomeAt (int a_BlockX, int a_BlockZ)
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = 0, Z = a_BlockZ;
-	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
 
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		return Chunk->GetBiomeAt(X, Z);
@@ -1385,6 +1406,63 @@ EMCSBiome cChunkMap::GetBiomeAt (int a_BlockX, int a_BlockZ)
 	{
 		return m_World->GetGenerator().GetBiomeAt(a_BlockX, a_BlockZ);
 	}
+}
+
+
+
+
+
+bool cChunkMap::SetBiomeAt(int a_BlockX, int a_BlockZ, EMCSBiome a_Biome)
+{
+	int ChunkX, ChunkZ, X = a_BlockX, Y = 0, Z = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk != NULL) && Chunk->IsValid())
+	{
+		Chunk->SetBiomeAt(X, Z, a_Biome);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+bool cChunkMap::SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome)
+{
+	// Translate coords to relative:
+	int Y = 0;
+	int MinChunkX, MinChunkZ, MinX = a_MinX, MinZ = a_MinZ;
+	int MaxChunkX, MaxChunkZ, MaxX = a_MaxX, MaxZ = a_MaxZ;
+	cChunkDef::AbsoluteToRelative(MinX, Y, MinZ, MinChunkX, MinChunkZ);
+	cChunkDef::AbsoluteToRelative(MaxX, Y, MaxZ, MaxChunkX, MaxChunkZ);
+	
+	// Go through all chunks, set:
+	bool res = true;
+	cCSLock Lock(m_CSLayers);
+	for (int x = MinChunkX; x <= MaxChunkX; x++)
+	{
+		int MinRelX = (x == MinChunkX) ? MinX : 0;
+		int MaxRelX = (x == MaxChunkX) ? MaxX : cChunkDef::Width - 1;
+		for (int z = MinChunkZ; z <= MaxChunkZ; z++)
+		{
+			int MinRelZ = (z == MinChunkZ) ? MinZ : 0;
+			int MaxRelZ = (z == MaxChunkZ) ? MaxZ : cChunkDef::Width - 1;
+			cChunkPtr Chunk = GetChunkNoLoad(x, ZERO_CHUNK_Y, z);
+			if ((Chunk != NULL) && Chunk->IsValid())
+			{
+				Chunk->SetAreaBiome(MinRelX, MaxRelX, MinRelZ, MaxRelZ, a_Biome);
+			}
+			else
+			{
+				res = false;
+			}
+		}  // for z
+	}  // for x
+	return res;
 }
 
 
@@ -2104,6 +2182,24 @@ bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
+bool cChunkMap::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+{
+	int ChunkX, ChunkZ;
+	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk == NULL) && !Chunk->IsValid())
+	{
+		return false;
+	}
+	return Chunk->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
 bool cChunkMap::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	int ChunkX, ChunkZ;
@@ -2200,24 +2296,6 @@ bool cChunkMap::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const ASt
 		return false;
 	}
 	return Chunk->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
-}
-
-
-
-
-
-void cChunkMap::ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay)
-{
-	cCSLock Lock(m_CSLayers);
-	for (cChunkCoordsList::const_iterator itr = a_Chunks.begin(); itr != a_Chunks.end(); ++itr)
-	{
-		cChunkPtr Chunk = GetChunkNoLoad(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
-		if (Chunk == NULL)
-		{
-			continue;
-		}
-		Chunk->Stay(a_Stay);
-	}
 }
 
 
@@ -2810,11 +2888,15 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 
 
 
-void cChunkMap::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cChunkMap::FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CSFastSetBlock);
-	m_FastSetBlockQueue.push_back(sSetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta)); 
+	m_FastSetBlockQueue.push_back(sSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)); 
 }
+
+
+
+
 
 void cChunkMap::FastSetQueuedBlocks()
 {
@@ -2834,110 +2916,75 @@ void cChunkMap::FastSetQueuedBlocks()
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cChunkStay:
 
-cChunkStay::cChunkStay(cWorld * a_World) :
-	m_World(a_World),
-	m_IsEnabled(false)
+
+
+void cChunkMap::AddChunkStay(cChunkStay & a_ChunkStay)
 {
-}
-
-
-
-
-
-cChunkStay::~cChunkStay()
-{
-	Clear();
-}
-
-
-
-
-
-void cChunkStay::Clear(void)
-{
-	if (m_IsEnabled)
+	cCSLock Lock(m_CSLayers);
+	
+	// Add it to the list:
+	ASSERT(std::find(m_ChunkStays.begin(), m_ChunkStays.end(), &a_ChunkStay) == m_ChunkStays.end());  // Has not yet been added
+	m_ChunkStays.push_back(&a_ChunkStay);
+	
+	// Schedule all chunks to be loaded / generated, and mark each as locked:
+	const cChunkCoordsVector & WantedChunks = a_ChunkStay.GetChunks();
+	for (cChunkCoordsVector::const_iterator itr = WantedChunks.begin(); itr != WantedChunks.end(); ++itr)
 	{
-		Disable();
+		cChunkPtr Chunk = GetChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
+		if (Chunk == NULL)
+		{
+			continue;
+		}
+		Chunk->Stay(true);
+		if (Chunk->IsValid())
+		{
+			a_ChunkStay.ChunkAvailable(itr->m_ChunkX, itr->m_ChunkZ);
+		}
+	}  // for itr - WantedChunks[]
+}
+
+
+
+
+
+/** Removes the specified cChunkStay descendant from the internal list of ChunkStays. */
+void cChunkMap::DelChunkStay(cChunkStay & a_ChunkStay)
+{
+	cCSLock Lock(m_CSLayers);
+	
+	// Remove from the list of active chunkstays:
+	bool HasFound = false;
+	for (cChunkStays::iterator itr = m_ChunkStays.begin(), end = m_ChunkStays.end(); itr != end; ++itr)
+	{
+		if (*itr == &a_ChunkStay)
+		{
+			m_ChunkStays.erase(itr);
+			HasFound = true;
+			break;
+		}
+	}  // for itr - m_ChunkStays[]
+	
+	if (!HasFound)
+	{
+		ASSERT(!"Removing a cChunkStay that hasn't been added!");
+		return;
 	}
-	m_Chunks.clear();
-}
-
-
-
-
-
-void cChunkStay::Add(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
-{
-	ASSERT(!m_IsEnabled);
-
-	for (cChunkCoordsList::const_iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
+	
+	// Unmark all contained chunks:
+	const cChunkCoordsVector & Chunks = a_ChunkStay.GetChunks();
+	for (cChunkCoordsVector::const_iterator itr = Chunks.begin(), end = Chunks.end(); itr != end; ++itr)
 	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
+		cChunkPtr Chunk = GetChunkNoLoad(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
+		if (Chunk == NULL)
 		{
-			// Already present
-			return;
+			continue;
 		}
+		Chunk->Stay(false);
 	}  // for itr - Chunks[]
-	m_Chunks.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 }
 
 
-
-
-
-void cChunkStay::Remove(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
-{
-	ASSERT(!m_IsEnabled);
-
-	for (cChunkCoordsList::iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
-	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
-		{
-			// Found, un-"stay"
-			m_Chunks.erase(itr);
-			return;
-		}
-	}  // for itr - m_Chunks[]
-}
-
-
-
-
-
-void cChunkStay::Enable(void)
-{
-	ASSERT(!m_IsEnabled);
-	
-	m_World->ChunksStay(*this, true);
-	m_IsEnabled = true;
-}
-
-
-
-
-
-void cChunkStay::Load(void)
-{
-	for (cChunkCoordsList::iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
-	{
-		m_World->TouchChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
-	}  // for itr - m_Chunks[]
-}
-
-
-
-
-
-void cChunkStay::Disable(void)
-{
-	ASSERT(m_IsEnabled);
-	
-	m_World->ChunksStay(*this, false);
-	m_IsEnabled = false;
-}
 
 
 

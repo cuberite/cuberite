@@ -31,6 +31,8 @@
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
+#include "CompositeChat.h"
+#include "Items/ItemSword.h"
 
 
 
@@ -94,6 +96,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
 	m_UniqueID(0),
+	m_Locale("en_GB"),
 	m_HasSentPlayerChunk(false)
 {
 	m_Protocol = new cProtocolRecognizer(this);
@@ -540,19 +543,23 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	if (a_Channel == "MC|AdvCdm") // Command block, set text, Client -> Server
+	if (a_Channel == "MC|AdvCdm")
 	{
-		const char* Data = a_Message.c_str();
-		HandleCommandBlockMessage(Data, a_Message.size());
-		return;
+		// Command block, set text, Client -> Server
+		HandleCommandBlockMessage(a_Message.c_str(), a_Message.size());
 	}
-	else if (a_Channel == "MC|Brand") // Client <-> Server branding exchange
+	else if (a_Channel == "MC|Brand")
 	{
-		// We are custom,
-		// We are awesome,
-		// We are MCServer.
+		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
-		return;
+	}
+	else if (a_Channel == "REGISTER")
+	{
+		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
+	}
+	else if (a_Channel == "UNREGISTER")
+	{
+		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
 	}
 
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
@@ -562,7 +569,61 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length)
+AStringVector cClientHandle::BreakApartPluginChannels(const AString & a_PluginChannels)
+{
+	// Break the string on each NUL character.
+	// Note that StringSplit() doesn't work on this because NUL is a special char - string terminator
+	size_t len = a_PluginChannels.size();
+	size_t first = 0;
+	AStringVector res;
+	for (size_t i = 0; i < len; i++)
+	{
+		if (a_PluginChannels[i] != 0)
+		{
+			continue;
+		}
+		if (i > first)
+		{
+			res.push_back(a_PluginChannels.substr(first, i - first));
+		}
+		first = i + 1;
+	}  // for i - a_PluginChannels[]
+	if (first < len)
+	{
+		res.push_back(a_PluginChannels.substr(first, len - first));
+	}
+	return res;
+}
+
+
+
+
+
+void cClientHandle::RegisterPluginChannels(const AStringVector & a_ChannelList)
+{
+	for (AStringVector::const_iterator itr = a_ChannelList.begin(), end = a_ChannelList.end(); itr != end; ++itr)
+	{
+		m_PluginChannels.insert(*itr);
+	}  // for itr - a_ChannelList[]
+}
+
+
+
+
+
+void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList)
+{
+	for (AStringVector::const_iterator itr = a_ChannelList.begin(), end = a_ChannelList.end(); itr != end; ++itr)
+	{
+		m_PluginChannels.erase(*itr);
+	}  // for itr - a_ChannelList[]
+}
+
+
+
+
+
+void cClientHandle::HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length)
 {
 	if (a_Length < 14)
 	{
@@ -731,6 +792,15 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	)
 	{
 		// It is a duplicate packet, drop it right away
+		return;
+	}
+	
+	if (
+		m_Player->IsGameModeCreative() &&
+		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType)
+	)
+	{
+		// Players can't destroy blocks with a Sword in the hand.
 		return;
 	}
 	
@@ -1087,14 +1157,20 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		return;
 	}
 	
-	// Not a command, broadcast as a simple message:
-	AString Msg;
-	Printf(Msg, "%s<%s>%s %s",
-		m_Player->GetColor().c_str(),
-		m_Player->GetName().c_str(),
-		cChatColor::White.c_str(),
-		Message.c_str()
-	);
+	// Not a command, broadcast as a message:
+	cCompositeChat Msg;
+	AString Color = m_Player->GetColor();
+	if (Color.length() == 3)
+	{
+		Color = AString("@") + Color[2];
+	}
+	else
+	{
+		Color.empty();
+	}
+	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
+	Msg.ParseText(a_Message);
+	Msg.UnderlineUrls();
 	m_Player->GetWorld()->BroadcastChat(Msg);
 }
 
@@ -1729,7 +1805,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
-void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData)
+void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	bool ShouldAppendChatPrefixes = true;
 
@@ -1834,6 +1910,15 @@ void cClientHandle::SendChat(const AString & a_Message, ChatPrefixCodes a_ChatPr
 	Message.append(a_Message);
 
 	m_Protocol->SendChat(Message);
+}
+
+
+
+
+
+void cClientHandle::SendChat(const cCompositeChat & a_Message)
+{
+	m_Protocol->SendChat(a_Message);
 }
 
 
@@ -2057,6 +2142,33 @@ void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cI
 
 
 
+void cClientHandle::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+}
+
+
+
+
+
+void cClientHandle::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
+}
+
+
+
+
+
+void cClientHandle::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	m_Protocol->SendMapInfo(a_ID, a_Scale);
+}
+
+
+
+
+
 void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
 {
 	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
@@ -2069,6 +2181,14 @@ void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_S
 void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	m_Protocol->SendPickupSpawn(a_Pickup);
+}
+
+
+
+
+void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	m_Protocol->SendPaintingSpawn(a_Painting);
 }
 
 
@@ -2432,6 +2552,15 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 	
 	// Need to re-stream chunks for the change to become apparent:
 	StreamChunks();
+}
+
+
+
+
+
+bool cClientHandle::HasPluginChannel(const AString & a_PluginChannel)
+{
+	return (m_PluginChannels.find(a_PluginChannel) != m_PluginChannels.end());
 }
 
 

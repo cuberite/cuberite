@@ -17,6 +17,7 @@
 #include "ChunkDef.h"
 #include "ByteBuffer.h"
 #include "Scoreboard.h"
+#include "Map.h"
 
 
 
@@ -27,6 +28,7 @@ class cInventory;
 class cMonster;
 class cPawn;
 class cExpOrb;
+class cPainting;
 class cPickup;
 class cPlayer;
 class cProtocol;
@@ -34,6 +36,7 @@ class cWindow;
 class cFallingBlock;
 class cItemHandler;
 class cWorld;
+class cCompositeChat;
 
 
 
@@ -70,10 +73,10 @@ public:
 	
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
-	/// Called while the client is being ticked from the world via its cPlayer object
+	/** Called while the client is being ticked from the world via its cPlayer object */
 	void Tick(float a_Dt);
 	
-	/// Called while the client is being ticked from the cServer object
+	/** Called while the client is being ticked from the cServer object */
 	void ServerTick(float a_Dt);
 
 	void Destroy(void);
@@ -89,7 +92,8 @@ public:
 	void SendBlockBreakAnim      (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta); // tolua_export
 	void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
-	void SendChat                (const AString & a_Message, ChatPrefixCodes a_ChatPrefix, const AString & a_AdditionalData = "");
+	void SendChat                (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
+	void SendChat                (const cCompositeChat & a_Message);
 	void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
 	void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player);
 	void SendDestroyEntity       (const cEntity & a_Entity);
@@ -109,6 +113,10 @@ public:
 	void SendGameMode            (eGameMode a_GameMode);
 	void SendHealth              (void);
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
+	void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length);
+	void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators);
+	void SendMapInfo             (int a_ID, unsigned int a_Scale);
+	void SendPaintingSpawn       (const cPainting & a_Painting);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
 	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
 	void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount);
@@ -146,20 +154,28 @@ public:
 	void SendWindowOpen          (const cWindow & a_Window);
 	void SendWindowProperty      (const cWindow & a_Window, int a_Property, int a_Value);
 
-	const AString & GetUsername(void) const;		// tolua_export
-	void SetUsername( const AString & a_Username );	// tolua_export
+	// tolua_begin
+	const AString & GetUsername(void) const;
+	void SetUsername( const AString & a_Username );
 	
-	inline short GetPing(void) const { return m_Ping; }	// tolua_export
+	inline short GetPing(void) const { return m_Ping; }
 	
-	void SetViewDistance(int a_ViewDistance);		// tolua_export
-	int  GetViewDistance(void) const { return m_ViewDistance; }  // tolua_export
+	void SetViewDistance(int a_ViewDistance);
+	int  GetViewDistance(void) const { return m_ViewDistance; }
+	
+	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }
+	AString GetLocale(void) const { return m_Locale; }
 
-	int GetUniqueID() const { return m_UniqueID; }	// tolua_export
+	int GetUniqueID(void) const { return m_UniqueID; }
 	
-	/// Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend)
+	bool HasPluginChannel(const AString & a_PluginChannel);
+	
+	// tolua_end
+	
+	/** Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend) */
 	bool WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	/// Adds the chunk specified to the list of chunks wanted for sending (m_ChunksToSend)
+	/** Adds the chunk specified to the list of chunks wanted for sending (m_ChunksToSend) */
 	void AddWantedChunk(int a_ChunkX, int a_ChunkZ);
 	
 	// Calls that cProtocol descendants use to report state:
@@ -210,13 +226,16 @@ public:
 	
 	void SendData(const char * a_Data, int a_Size);
 	
-	/// Called when the player moves into a different world; queues sreaming the new chunks
+	/** Called when the player moves into a different world; queues sreaming the new chunks */
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
-	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
+	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
 	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
 	
 private:
+
+	/** The type used for storing the names of registered plugin channels. */
+	typedef std::set<AString> cChannels;
 
 	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
 	
@@ -250,7 +269,7 @@ private:
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
 
-	/// Seconds since the last packet data was received (updated in Tick(), reset in DataReceived())
+	/** Seconds since the last packet data was received (updated in Tick(), reset in DataReceived()) */
 	float m_TimeSinceLastPacket;
 	
 	short m_Ping;
@@ -272,7 +291,7 @@ private:
 	int m_LastDigBlockY;
 	int m_LastDigBlockZ;
 	
-	/// Used while csDestroyedWaiting for counting the ticks until the connection is closed
+	/** Used while csDestroyedWaiting for counting the ticks until the connection is closed */
 	int m_TicksSinceDestruction;
 
 	enum eState
@@ -292,10 +311,10 @@ private:
 	
 	eState m_State;
 	
-	/// m_State needs to be locked in the Destroy() function so that the destruction code doesn't run twice on two different threads
+	/** m_State needs to be locked in the Destroy() function so that the destruction code doesn't run twice on two different threads */
 	cCriticalSection m_CSDestroyingState;
 
-	/// If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded()
+	/** If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded() */
 	bool m_ShouldCheckDownloaded;
 
 	/** Number of explosions sent this tick */
@@ -304,25 +323,39 @@ private:
 	static int s_ClientCount;
 	int m_UniqueID;
 	
-	/// Set to true when the chunk where the player is is sent to the client. Used for spawning the player
+	/** Set to true when the chunk where the player is is sent to the client. Used for spawning the player */
 	bool m_HasSentPlayerChunk;
+
+	/** Client Settings */
+	AString m_Locale;
 	
+	/** The plugin channels that the client has registered. */
+	cChannels m_PluginChannels;
 
 
-	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)
+	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
 	
-	/// Adds a single chunk to be streamed to the client; used by StreamChunks()
+	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
 	void StreamChunk(int a_ChunkX, int a_ChunkZ);
 	
-	/// Handles the DIG_STARTED dig packet:
+	/** Handles the DIG_STARTED dig packet: */
 	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
 	
-	/// Handles the DIG_FINISHED dig packet:
+	/** Handles the DIG_FINISHED dig packet: */
 	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
 
-	/// Handles the "MC|AdvCdm" plugin message
-	void HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length);
+	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
+	AStringVector BreakApartPluginChannels(const AString & a_PluginChannels);
+	
+	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
+	void RegisterPluginChannels(const AStringVector & a_ChannelList);
+	
+	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
+	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
+	
+	/** Handles the "MC|AdvCdm" plugin message */
+	void HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client

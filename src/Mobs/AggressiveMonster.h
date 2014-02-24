@@ -20,7 +20,7 @@ public:
 	virtual void InStateChasing(float a_Dt) override;
 	
 	virtual void EventSeePlayer(cEntity *) override;
-	virtual void Attack(float a_Dt) override;
+	virtual void Attack(float a_Dt);
 
 } ;
 

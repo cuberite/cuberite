@@ -266,6 +266,10 @@ public:																	// tolua_export
 	Returns false if plugin not found, and the value that the callback has returned otherwise. */
 	bool DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback);
 	
+	/** Returns the path where individual plugins' folders are expected.
+	The path doesn't end in a slash. */
+	static AString GetPluginsPath(void) { return FILE_IO_PREFIX + AString("Plugins"); }  // tolua_export
+	
 private:
 	friend class cRoot;
 	

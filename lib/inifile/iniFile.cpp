@@ -83,6 +83,8 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 		}
 	}
 
+	bool IsFirstLine = true;  
+
 	while (getline(f, line))
 	{
 		// To be compatible with Win32, check for existence of '\r'.
@@ -90,6 +92,14 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 		// Note that the '\r' will be written to INI files from
 		// Unix so that the created INI file can be read under Win32
 		// without change.
+
+		// Removes UTF-8 Byte Order Markers (BOM) if, present.
+		if (IsFirstLine)
+		{
+			RemoveBom(line);
+			IsFirstLine = false;
+		}
+
 		size_t lineLength = line.length();
 		if (lineLength == 0)
 		{
@@ -162,11 +172,12 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 	{
 		return false;
 	}
-	
+
 	if (IsFromExampleRedirect)
 	{
 		WriteFile(FILE_IO_PREFIX + a_FileName);
 	}
+
 	return true;
 }
 
@@ -819,6 +830,31 @@ AString cIniFile::CheckCase(const AString & s) const
 		res[i] = tolower(res[i]);
 	}
 	return res;
+}
+
+
+
+
+
+void cIniFile::RemoveBom(AString & a_line) const
+{
+	// The BOM sequence for UTF-8 is 0xEF,0xBB,0xBF
+	static unsigned const char BOM[] = { 0xEF, 0xBB, 0xBF };
+
+	// The BOM sequence, if present, is always th e first three characters of the input.
+	const AString ref = a_line.substr(0, 3);
+
+	// If any of the first three chars do not match, return and do nothing.
+	for (int i = 0; i < 3; ++i)
+	{
+		if (static_cast<unsigned char>(ref[i]) != BOM[i])
+		{
+			return;
+		}
+	}
+
+	// First three characters match; erase them.
+	a_line.erase(0, 3);
 }
 
 

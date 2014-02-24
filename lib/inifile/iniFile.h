@@ -51,6 +51,8 @@ private:
 	/// If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is
 	AString CheckCase(const AString & s) const;
 
+	/// Removes the UTF-8 BOMs (Byte order makers), if present.
+	void RemoveBom(AString & a_line) const;
 public:
 	enum errors
 	{

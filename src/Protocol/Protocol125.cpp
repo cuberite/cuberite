@@ -32,6 +32,8 @@ Documentation:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
+#include "../CompositeChat.h"
+
 
 
 
@@ -95,6 +97,7 @@ enum
 	PACKET_WINDOW_PROPERTY           = 0x69,
 	PACKET_CREATIVE_INVENTORY_ACTION = 0x6B,
 	PACKET_UPDATE_SIGN               = 0x82,
+	PACKET_ITEM_DATA                 = 0x83,
 	PACKET_PLAYER_LIST_ITEM          = 0xC9,
 	PACKET_PLAYER_ABILITIES          = 0xca,
 	PACKET_PLUGIN_MESSAGE            = 0xfa,
@@ -226,6 +229,42 @@ void cProtocol125::SendChat(const AString & a_Message)
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_CHAT);
 	WriteString(a_Message);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendChat(const cCompositeChat & a_Message)
+{
+	// This version doesn't support composite messages, just extract each part's text and use it:
+	AString Msg;
+	const cCompositeChat::cParts & Parts = a_Message.GetParts();
+	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
+	{
+		switch ((*itr)->m_PartType)
+		{
+			case cCompositeChat::ptText:
+			case cCompositeChat::ptClientTranslated:
+			case cCompositeChat::ptRunCommand:
+			case cCompositeChat::ptSuggestCommand:
+			{
+				Msg.append((*itr)->m_Text);
+				break;
+			}
+			case cCompositeChat::ptUrl:
+			{
+				Msg.append(((cCompositeChat::cUrlPart *)(*itr))->m_Url);
+				break;
+			}
+		}  // switch (PartType)
+	}  // for itr - Parts[]
+	
+	// Send the message:
+	cCSLock Lock(m_CSPacket);
+	WriteByte  (PACKET_CHAT);
+	WriteString(Msg);
 	Flush();
 }
 
@@ -571,6 +610,57 @@ void cProtocol125::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	WriteByte  (60);  // Client list width or something
 	Flush();
 }
+
+
+
+
+
+void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	cCSLock Lock(m_CSPacket);
+
+	WriteByte (PACKET_ITEM_DATA);
+	WriteShort(E_ITEM_MAP);
+	WriteShort(a_ID);
+	WriteShort(3 + a_Length);
+
+	WriteByte(0);
+	WriteByte(a_X);
+	WriteByte(a_Y);
+	
+	for (unsigned int i = 0; i < a_Length; ++i)
+	{
+		WriteByte(a_Colors[i]);
+	}
+
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	cCSLock Lock(m_CSPacket);
+
+	WriteByte (PACKET_ITEM_DATA);
+	WriteShort(E_ITEM_MAP);
+	WriteShort(a_ID);
+	WriteShort(1 + (3 * a_Decorators.size()));
+
+	WriteByte(1);
+	
+	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
+	{
+		WriteByte((it->GetType() << 4) | (it->GetRot() & 0xf));
+		WriteByte(it->GetPixelX());
+		WriteByte(it->GetPixelZ());
+	}
+
+	Flush();
+}
+
 
 
 

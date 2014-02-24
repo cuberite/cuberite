@@ -159,6 +159,16 @@ void cProtocolRecognizer::SendChat(const AString & a_Message)
 
 
 
+void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendChat(a_Message);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	ASSERT(m_Protocol != NULL);
@@ -386,10 +396,48 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 
 
 
+void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapInfo(a_ID, a_Scale);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
+}
+
+
+
+
+void cProtocolRecognizer::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	m_Protocol->SendPaintingSpawn(a_Painting);
 }
 
 

@@ -65,13 +65,26 @@ class cLuaState
 {
 public:
 
-	/** Used for storing references to object in the global registry */
+	/** Used for storing references to object in the global registry.
+	Can be bound (contains a reference) or unbound (doesn't contain reference).
+	The reference can also be reset by calling RefStack(). */
 	class cRef
 	{
 	public:
+		/** Creates an unbound reference object. */
+		cRef(void);
+		
 		/** Creates a reference in the specified LuaState for object at the specified StackPos */
 		cRef(cLuaState & a_LuaState, int a_StackPos);
+		
 		~cRef();
+		
+		/** Creates a reference to Lua object at the specified stack pos, binds this object to it.
+		Calls UnRef() first if previously bound to another reference. */
+		void RefStack(cLuaState & a_LuaState, int a_StackPos);
+		
+		/** Removes the bound reference, resets the object to Unbound state. */
+		void UnRef(void);
 		
 		/** Returns true if the reference is valid */
 		bool IsValid(void) const {return (m_Ref != LUA_REFNIL); }
@@ -80,7 +93,7 @@ public:
 		operator int(void) const { return m_Ref; }
 		
 	protected:
-		cLuaState & m_LuaState;
+		cLuaState * m_LuaState;
 		int m_Ref;
 	} ;
 	
@@ -140,6 +153,9 @@ public:
 	
 	/** Returns true if the m_LuaState is valid */
 	bool IsValid(void) const { return (m_LuaState != NULL); }
+	
+	/** Adds the specified path to package.<a_PathVariable> */
+	void AddPackagePath(const AString & a_PathVariable, const AString & a_Path);
 	
 	/** Loads the specified file
 	Returns false and logs a warning to the console if not successful (but the LuaState is kept open).
@@ -819,6 +835,9 @@ public:
 	
 	/** Returns true if the specified parameters on the stack are functions; also logs warning if not */
 	bool CheckParamFunction(int a_StartParam, int a_EndParam = -1);
+	
+	/** Returns true if the specified parameters on the stack are functions or nils; also logs warning if not */
+	bool CheckParamFunctionOrNil(int a_StartParam, int a_EndParam = -1);
 	
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);
