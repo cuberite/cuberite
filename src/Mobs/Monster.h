@@ -253,10 +253,10 @@ protected:
 	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops*/
 	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel); 
 	
-	/** Adds armor that is equipped with the chance of 8,5% (Looting 3: 11,5%) to the drop*/
+	/** Adds armor that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
 	void AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel);
 	
-	/** Adds weapon that is equipped with the chance of 8,5% (Looting 3: 11,5%) to the drop*/
+	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
 	void AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel);
 	
 
