@@ -19,7 +19,8 @@ cSnowGolem::cSnowGolem(void) :
 
 void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 5, E_ITEM_SNOWBALL);
+	UNUSED(a_Killer);
+	AddRandomDropItem(a_Drops, 0, 15, E_ITEM_SNOWBALL);
 }
 
 
