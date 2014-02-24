@@ -756,6 +756,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		case DIG_STATUS_CANCELLED:
 		{
 			// Block breaking cancelled by player
+			HandleBlockDigStop();
 			return;
 		}
 
@@ -776,6 +777,49 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 			return;
 		}
 	}  // switch (a_Status)
+}
+
+
+
+
+
+float cClientHandle::GetBlockDigSpeed(BLOCKTYPE a_Block)
+{
+	float f = g_BlockDigTime[a_Block];
+	float a = m_Player->GetInventory().GetEquippedItem().GetHandler()->GetDestroySpeed(a_Block);
+	
+	if ((a > 1.0F) && (!m_Player->GetInventory().GetEquippedItem().IsEmpty()))
+	{
+		cEnchantments Enchantments = m_Player->GetInventory().GetEquippedItem().m_Enchantments;
+		int Level = Enchantments.GetLevel(Enchantments.enchEfficiency);
+		if (Level > 0)
+		{
+			// TODO: Look in the next Minecraft Server Version (1.8) for Bug Fix. EntityHuman.java: public float a(Block block, boolean flag);
+			float a1 = Level * Level + 1;
+			a += a1;
+		}
+	}
+	
+	if (m_Player->IsSwimming())
+	{
+		a /= 0.5F;
+	}
+	if (!m_Player->IsOnGround())
+	{
+		a /= 0.5F;
+	}
+	
+	float speed;
+	if (!m_Player->CanHarvestBlock(a_Block))
+	{
+		speed = a / f / 100.0F;
+	}
+	else
+	{
+		speed = (f < 0.0F) ? (0.0F) : (a / f / 30.0F);
+	}
+	
+	return speed * m_BlockDigTick;
 }
 
 
@@ -804,36 +848,42 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		return;
 	}
 	
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	if (m_Player->GetHealth() <= 0)
 	{
-		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		// The player is dead
 		return;
 	}
 	
 	// Set the last digging coords to the block being dug, so that they can be checked in DIG_FINISHED to avoid dig/aim bug in the client:
 	m_HasStartedDigging = true;
+	m_BlockDigTick = 1;
 	m_LastDigBlockX = a_BlockX;
 	m_LastDigBlockY = a_BlockY;
 	m_LastDigBlockZ = a_BlockZ;
 
+	float speed = GetBlockDigSpeed(a_OldBlock);
+
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
-		g_BlockOneHitDig[a_OldBlock]                        // One-hit blocks get destroyed immediately, too
+		g_BlockDigTime[a_OldBlock] == 0.0F   // One-hit blocks get destroyed immediately, too
 	)
 	{
 		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 		return;
 	}
+	
+	// Adventure can't break Blocks
+	if (m_Player->IsGameModeAdventure())
+	{
+		return;
+	}
 
 	// Start dig animation
-	// TODO: calculate real animation speed
 	// TODO: Send animation packets even without receiving any other packets
-	m_BlockDigAnimSpeed = 10;
+	m_BlockDigAnimStage = (int) (speed * 10.0F);
 	m_BlockDigAnimX = a_BlockX;
 	m_BlockDigAnimY = a_BlockY;
 	m_BlockDigAnimZ = a_BlockZ;
-	m_BlockDigAnimStage = 0;
 	m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 0, this);
 
 	cWorld * World = m_Player->GetWorld();
@@ -879,19 +929,40 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
 			m_HasStartedDigging
 		);
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		HandleBlockDigStop();
 		return;
 	}
 
-	m_HasStartedDigging = false;
-	if (m_BlockDigAnimStage != -1)
+	if ((!m_Player->IsGameModeCreative()) && (g_BlockDigTime[a_OldBlock] != 0.0F))
 	{
-		// End dig animation
-		m_BlockDigAnimStage = -1;
-		// It seems that 10 ends block animation
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
+		float speed = GetBlockDigSpeed(a_OldBlock);
+		
+		if (speed < 0.7F)
+		{
+			LOG("%s breaked a Block too fast!", m_Username.c_str());
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			HandleBlockDigStop();
+			return;
+		}
 	}
-
+	
+	if ((m_Player->IsGameModeAdventure()) && (g_BlockDigTime[a_OldBlock] != 0.0F))
+	{
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		HandleBlockDigStop();
+		return;
+	}
+	
+	HandleBlockDigStop();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+	
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	{
+		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
 	
 	if (a_OldBlock == E_BLOCK_AIR)
 	{
@@ -900,6 +971,12 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	
 	cWorld * World = m_Player->GetWorld();
+	if ((diff(m_Player->GetPosX(), double(a_BlockX)) >= 6) || (diff(m_Player->GetPosY(), double(a_BlockY)) >= 6) || (diff(m_Player->GetPosZ(), double(a_BlockZ)) >= 6))
+	{
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+	
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -908,6 +985,40 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+}
+
+
+
+
+
+void cClientHandle::HandleBlockDigStop()
+{
+	if (
+		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
+		(m_LastDigBlockX == -1) ||
+		(m_LastDigBlockY == -1) ||
+		(m_LastDigBlockZ == -1)
+	)
+	{
+		return;
+	}
+	
+	m_HasStartedDigging = false;
+	if (m_BlockDigAnimStage != -1)
+	{
+		// End dig animation
+		m_BlockDigAnimStage = -1;
+		// It seems that 10 ends block animation
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
+	}
+	
+	m_LastDigBlockX = -1;
+	m_LastDigBlockY = -1;
+	m_LastDigBlockZ = -1;
+	m_BlockDigAnimX = -1;
+	m_BlockDigAnimY = -1;
+	m_BlockDigAnimZ = -1;
+	m_BlockDigTick = 0;
 }
 
 
@@ -928,6 +1039,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+			m_Player->GetInventory().SendSlot(EquippedSlot);
 		}
 		return;
 	}
@@ -1116,6 +1229,16 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Handler refused the placement, send that information back to the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
+		return;
+	}
+	
+	if ((diff(m_Player->GetPosX(), double(a_BlockX)) >= 6) || (diff(m_Player->GetPosY(), double(a_BlockY)) >= 6) || (diff(m_Player->GetPosZ(), double(a_BlockZ)) >= 6))
+	{
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
 		return;
 	}
 	
@@ -1125,6 +1248,8 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// A plugin doesn't agree with placing the block, revert the block on the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		int EquippedSlot = cInventory::invArmorCount + cInventory::invInventoryCount + m_Player->GetInventory().GetEquippedSlotNum();
+		m_Player->GetInventory().SendSlot(EquippedSlot);
 		return;
 	}
 	
@@ -1695,15 +1820,15 @@ void cClientHandle::Tick(float a_Dt)
 	// Handle block break animation:
 	if (m_BlockDigAnimStage > -1)
 	{
-		int lastAnimVal = m_BlockDigAnimStage;
-		m_BlockDigAnimStage += (int)(m_BlockDigAnimSpeed * a_Dt);
-		if (m_BlockDigAnimStage > 9000)
+		++m_BlockDigTick;
+		
+		BLOCKTYPE a_OldBlock = m_Player->GetWorld()->GetBlock(m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ);
+		float speed = GetBlockDigSpeed(a_OldBlock);
+		int i = (int) (speed * 10.0F);
+		if (i != m_BlockDigAnimStage)
 		{
-			m_BlockDigAnimStage = 9000;
-		}
-		if (m_BlockDigAnimStage / 1000 != lastAnimVal / 1000)
-		{
-			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, (char)(m_BlockDigAnimStage / 1000), this);
+			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, i, this);
+			m_BlockDigAnimStage = i;
 		}
 	}
 	

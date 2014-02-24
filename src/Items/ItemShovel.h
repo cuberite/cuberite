@@ -21,6 +21,20 @@ public:
 
 	}
 
+	/** Get the Dig Speed from the Shovel */
+	float ShovelPower()
+	{
+		switch (m_ItemType)
+		{
+			case E_ITEM_WOODEN_SHOVEL:      return 2.0F;
+			case E_ITEM_STONE_SHOVEL:       return 4.0F;
+			case E_ITEM_IRON_SHOVEL:        return 6.0F;
+			case E_ITEM_DIAMOND_SHOVEL:     return 8.0F;
+			case E_ITEM_GOLD_SHOVEL:        return 12.0F;
+			default:                        return 2.0F;
+		}
+	}
+
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
@@ -39,6 +53,31 @@ public:
 	
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		return (a_BlockType == E_BLOCK_SNOW);
+		return (a_BlockType == E_BLOCK_SNOW || a_BlockType == E_BLOCK_SNOW_BLOCK);
+	}
+	
+	/** Get the Destroy Speed for the Block */
+	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType) override
+	{
+		switch (a_BlockType)
+		{
+			case E_BLOCK_GRASS:
+			case E_BLOCK_DIRT:
+			case E_BLOCK_SAND:
+			case E_BLOCK_GRAVEL:
+			case E_BLOCK_SNOW:
+			case E_BLOCK_SNOW_BLOCK:
+			case E_BLOCK_CLAY:
+			case E_BLOCK_FARMLAND:
+			case E_BLOCK_SOULSAND:
+			case E_BLOCK_MYCELIUM:
+			{
+				return ShovelPower();
+			}
+			default:
+			{
+				return 1.0F;
+			}
+		}
 	}
 };

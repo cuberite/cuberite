@@ -1083,6 +1083,19 @@ void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 
 
 
+bool cPlayer::CanHarvestBlock(BLOCKTYPE a_OldBlock)
+{
+	if (!g_BlockRequiresSpecialTool[a_OldBlock])
+	{
+		return true;
+	}
+	return m_Inventory.GetEquippedItem().GetHandler()->CanHarvestBlock(a_OldBlock);
+}
+
+
+
+
+
 void cPlayer::SetGameMode(eGameMode a_GameMode)
 {
 	if ((a_GameMode < gmMin) || (a_GameMode >= gmMax))

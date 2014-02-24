@@ -26,8 +26,8 @@ extern unsigned char g_BlockSpreadLightFalloff[];
 /// Is a block completely transparent? (light doesn't get decreased(?))
 extern bool g_BlockTransparent[];
 
-/// Is a block destroyed after a single hit?
-extern bool g_BlockOneHitDig[];
+/// How much time is required to break the blocks?
+extern float g_BlockDigTime[256];
 
 /// Can a piston break this block?
 extern bool g_BlockPistonBreakable[256];
@@ -455,6 +455,15 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 		a_Pan = 0;
 	}
 	a_Pitch = atan2(a_Y, sqrt((a_X * a_X) + (a_Z * a_Z))) * 180 / PI;
+}
+
+
+
+
+
+inline double diff(double a_Val1, double a_Val2)
+{
+	return (std::max(a_Val1, a_Val2) - std::min(a_Val1, a_Val2));
 }
 
 

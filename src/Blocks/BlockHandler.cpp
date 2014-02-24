@@ -182,6 +182,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_PUMPKIN:               return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_NETHER_QUARTZ_ORE:     return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_QUARTZ_BLOCK:          return new cBlockQuartzHandler          (a_BlockType);
 		case E_BLOCK_QUARTZ_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
@@ -395,6 +396,12 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		MicroZ += r1.rand(1) - 0.5;
 
 		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
+	}
+	
+	int Experience = GetExpDrop();
+	if (Experience != 0)
+	{
+		a_WorldInterface.SpawnExperienceOrb(a_BlockX, a_BlockY, a_BlockZ, Experience);
 	}
 }
 

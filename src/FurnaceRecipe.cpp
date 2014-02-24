@@ -133,12 +133,13 @@ void cFurnaceRecipe::ReloadRecipes(void)
 		// Read items
 		int IItemID = 0, IItemCount = 0, IItemHealth = 0;
 		f >> IItemID;
+		if (IItemID == 0) continue;
 		f >> c; if( c != ':' ) { bSyntaxError = true; break; }
 		f >> IItemCount;
 
 		// Optional health
 		f >> c; 
-		if( c != ':' ) 
+		if( c != ':' )
 			f.unget();
 		else
 		{
@@ -157,17 +158,28 @@ void cFurnaceRecipe::ReloadRecipes(void)
 
 		// Optional health
 		f >> c; 
-		if( c != ':' ) 
+		if( c != ':' )
 			f.unget();
 		else
 		{
 			f >> OItemHealth;
+		}
+		
+		// Optional Experience
+		float OExperience = 0.0F;
+		f >> c;
+		if( c != '%' )
+			f.unget();
+		else
+		{
+			f >> OExperience;
 		}
 
 		// Add to recipe list
 		Recipe R;
 		R.In = new cItem( (ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth );
 		R.Out = new cItem( (ENUM_ITEM_ID)OItemID, (char)OItemCount, (short)OItemHealth );
+		R.OutExp = OExperience;
 		R.CookTime = CookTime;
 		m_pState->Recipes.push_back( R );
 	}

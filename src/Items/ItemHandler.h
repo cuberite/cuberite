@@ -93,8 +93,11 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	);
 	
-	/// Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood can´t) DEFAULT: False
+	/// Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood can't) DEFAULT: False
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
+	
+	/** Get the Destroy Speed for the Block */
+	virtual float GetDestroySpeed(BLOCKTYPE a_BlockType);
 
 	static cItemHandler * GetItemHandler(int a_ItemType);
 	static cItemHandler * GetItemHandler(const cItem & a_Item) { return GetItemHandler(a_Item.m_ItemType); }
