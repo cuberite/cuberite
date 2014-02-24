@@ -41,7 +41,7 @@ public:
 	~cListenThread();
 	
 	/// Creates all the sockets, returns trus if successful, false if not.
-	bool Initialize(cSocket::eFamily a_Family, const AString & a_PortsString);
+	bool Initialize(const AString & a_DualPortsString, AString a_v4PortsString, AString a_v6PortsString);
 	
 	bool Start(void);
 	
@@ -56,9 +56,6 @@ protected:
 	/// The callback which to notify of incoming connections	
 	cCallback & m_Callback;
 	
-	/// Socket address family to use
-	cSocket::eFamily m_Family;
-	
 	/// Sockets that are being monitored
 	cSockets m_Sockets;
 	
@@ -72,7 +69,7 @@ protected:
 	/** Fills in m_Sockets with individual sockets, each for one port specified in a_PortsString.
 	Returns true if successful and at least one socket has been created
 	*/
-	bool CreateSockets(const AString & a_PortsString);
+	bool CreateSockets(cSocket::eFamily a_Family, const AString & a_PortsString);
 	
 	// cIsThread override:
 	virtual void Execute(void) override;

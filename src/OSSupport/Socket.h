@@ -122,6 +122,30 @@ public:
 	/** Sets the socket into non-blocking mode */
 	void SetNonBlocking(void);
 	
+	static bool SupportsFamily(eFamily a_Family)
+	{
+		switch(a_Family)
+		{
+			case IPv4:
+			case IPv6:
+			{
+				return true;
+			}
+			case IPDual:
+			{
+			#ifdef _WIN32
+				return IsWindowsVista();
+			#else
+				return true;
+			#endif
+			}
+			case INVALID_PROTOCOL:
+			{
+				return false;
+			}
+		}
+	}
+	
 private:
 	friend class cSocketSet;
 	xSocket m_Socket;

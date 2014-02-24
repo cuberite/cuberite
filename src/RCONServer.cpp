@@ -78,8 +78,7 @@ protected:
 
 cRCONServer::cRCONServer(cServer & a_Server) :
 	m_Server(a_Server),
-	m_ListenThread4(*this, "RCON"),
-	m_ListenThread6(*this, "RCON")
+	m_ListenThread(*this, "RCON")
 {
 }
 
@@ -89,8 +88,7 @@ cRCONServer::cRCONServer(cServer & a_Server) :
 
 cRCONServer::~cRCONServer()
 {
-	m_ListenThread4.Stop();
-	m_ListenThread6.Stop();
+	m_ListenThread.Stop();
 }
 
 
@@ -113,31 +111,14 @@ void cRCONServer::Initialize(cIniFile & a_IniFile)
 	}
 	
 	// Read and initialize both IPv4 and IPv6 ports for RCON
-	bool HasAnyPorts = false;
-	AString Ports4 = a_IniFile.GetValueSet("RCON", "PortsIPv4", "25575");
-	if(a_IniFile.GetValueSetB("RCON", "DualStack", false))
+	AString Ports = a_IniFile.GetValueSet("RCON", "Ports", "25575");
+	AString Ports4 = a_IniFile.GetValueSet("RCON", "PortsIPv4", "");
+	AString Ports6 = a_IniFile.GetValueSet("RCON", "PortsIPv6", "");
+	if (m_ListenThread.Initialize(Ports,Ports4,Ports6))
 	{
-		if (m_ListenThread4.Initialize(cSocket::IPDual, Ports4))
-		{
-			HasAnyPorts = true;
-			m_ListenThread4.Start();
-		}
+		m_ListenThread.Start();
 	}
 	else
-	{
-		if (m_ListenThread4.Initialize(cSocket::IPv4, Ports4))
-		{
-			HasAnyPorts = true;
-			m_ListenThread4.Start();
-		}
-		AString Ports6 = a_IniFile.GetValueSet("RCON", "PortsIPv6", "25575");
-		if (m_ListenThread6.Initialize(cSocket::IPv6, Ports6))
-		{
-			HasAnyPorts = true;
-			m_ListenThread6.Start();
-		}
-	}
-	if (!HasAnyPorts)
 	{
 		LOGWARNING("RCON is requested, but no ports are specified. Specify at least one port in PortsIPv4 or PortsIPv6. RCON is now disabled.");
 		return;

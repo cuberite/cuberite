@@ -135,8 +135,28 @@ public:
 	/** Escapes text passed into it, so it can be embedded into html. */
 	static AString GetHTMLEscapedString(const AString & a_Input);
 
-	AString GetIPv4Ports(void) const { return m_PortsIPv4; }
-	AString GetIPv6Ports(void) const { return m_PortsIPv6; }
+	AString GetIPv4Ports(void) const 
+	{
+		if(m_Ports == "")
+		{
+			return m_PortsIPv4;
+		}
+		else
+		{
+			return m_PortsIPv4 + "," + m_Ports;
+		}
+	}
+	AString GetIPv6Ports(void) const 
+	{
+		if(m_Ports == "")
+		{
+			return m_PortsIPv6;
+		}
+		else
+		{
+			return m_PortsIPv6 + "," + m_Ports;
+		}
+	}
 
 	// tolua_end
 
@@ -196,6 +216,7 @@ protected:
 
 	PluginList m_Plugins;
 
+	AString m_Ports;
 	AString m_PortsIPv4;
 	AString m_PortsIPv6;
 

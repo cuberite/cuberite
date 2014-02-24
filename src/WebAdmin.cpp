@@ -99,11 +99,12 @@ bool cWebAdmin::Init(void)
 
 	LOGD("Initialising WebAdmin...");
 
-	bool m_DualStack = m_IniFile.GetValueSetB("WebAdmin", "DualStack", false);
-	m_PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
+	
+	m_Ports = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
+	m_PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "PortIPv4", "");
 	m_PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");
 
-	if (!m_HTTPServer.Initialize(m_DualStack, m_PortsIPv4, m_PortsIPv6))
+	if (!m_HTTPServer.Initialize(m_Ports, m_PortsIPv4, m_PortsIPv6))
 	{
 		return false;
 	}

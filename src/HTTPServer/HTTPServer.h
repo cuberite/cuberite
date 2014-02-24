@@ -53,7 +53,7 @@ public:
 	~cHTTPServer();
 	
 	/// Initializes the server on the specified ports
-	bool Initialize(bool a_DualStack, const AString & a_PortsIPv4, const AString & a_PortsIPv6);
+	bool Initialize(const AString & a_PortsIPDual, const AString & a_PortsIPv4, const AString & a_PortsIPv6);
 	
 	/// Starts the server and assigns the callbacks to use for incoming requests
 	bool Start(cCallbacks & a_Callbacks);
@@ -64,8 +64,7 @@ public:
 protected:
 	friend class cHTTPConnection;
 	
-	cListenThread m_ListenThreadIPv4;
-	cListenThread m_ListenThreadIPv6;
+	cListenThread m_ListenThread;
 	
 	cSocketThreads m_SocketThreads;
 
