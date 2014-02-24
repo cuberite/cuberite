@@ -8,6 +8,7 @@
 #include "BlockArea.h"
 #include "OSSupport/GZipFile.h"
 #include "Blocks/BlockHandler.h"
+#include "Cuboid.h"
 
 
 
@@ -264,6 +265,15 @@ void cBlockArea::SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ)
 
 
 
+void cBlockArea::SetOrigin(const Vector3i & a_Origin)
+{
+	SetOrigin(a_Origin.x, a_Origin.y, a_Origin.z);
+}
+
+
+
+
+
 bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	// Normalize the coords:
@@ -338,6 +348,36 @@ bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinB
 
 
 
+bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, const cCuboid & a_Bounds, int a_DataTypes)
+{
+	return Read(
+		a_ForEachChunkProvider,
+		a_Bounds.p1.x, a_Bounds.p2.x,
+		a_Bounds.p1.y, a_Bounds.p2.y,
+		a_Bounds.p1.z, a_Bounds.p2.z,
+		a_DataTypes
+	);
+}
+
+
+
+
+
+bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, const Vector3i & a_Point1, const Vector3i & a_Point2, int a_DataTypes)
+{
+	return Read(
+		a_ForEachChunkProvider,
+		a_Point1.x, a_Point2.x,
+		a_Point1.y, a_Point2.y,
+		a_Point1.z, a_Point2.z,
+		a_DataTypes
+	);
+}
+
+
+
+
+
 bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	ASSERT((a_DataTypes & GetDataTypes()) == a_DataTypes);  // Are you requesting only the data that I have?
@@ -356,6 +396,19 @@ bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_Min
 	}
 
 	return a_ForEachChunkProvider->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
+}
+
+
+
+
+
+bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes)
+{
+	return Write(
+		a_ForEachChunkProvider,
+		a_MinCoords.x, a_MinCoords.y, a_MinCoords.z,
+		a_DataTypes
+	);
 }
 
 
@@ -643,6 +696,15 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 
 
 
+void cBlockArea::Merge(const cBlockArea & a_Src, const Vector3i & a_RelMinCoords, eMergeStrategy a_Strategy)
+{
+	Merge(a_Src, a_RelMinCoords.x, a_RelMinCoords.y, a_RelMinCoords.z, a_Strategy);
+}
+
+
+
+
+
 void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight)
 {
 	if ((a_DataTypes & GetDataTypes()) != a_DataTypes)
@@ -729,6 +791,23 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 			m_BlockSkyLight[MakeIndex(x, y, z)] = a_BlockSkyLight;
 		}  // for x, z, y
 	}
+}
+
+
+
+
+
+void cBlockArea::FillRelCuboid(const cCuboid & a_RelCuboid,
+	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+)
+{
+	FillRelCuboid(
+		a_RelCuboid.p1.x, a_RelCuboid.p2.x,
+		a_RelCuboid.p1.y, a_RelCuboid.p2.y,
+		a_RelCuboid.p1.z, a_RelCuboid.p2.z,
+		a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight
+	);
 }
 
 
@@ -846,6 +925,22 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 			yd += dy;
 		}
 	}  // if (which dimension is dominant)
+}
+
+
+
+
+
+void cBlockArea::RelLine(const Vector3i & a_Point1, const Vector3i & a_Point2,
+	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+)
+{
+	RelLine(
+		a_Point1.x, a_Point1.y, a_Point1.z,
+		a_Point2.x, a_Point2.y, a_Point2.z,
+		a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight
+	);
 }
 
 

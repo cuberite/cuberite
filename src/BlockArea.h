@@ -15,6 +15,16 @@
 #include "ForEachChunkProvider.h"
 
 
+
+
+// fwd:
+class cCuboid;
+class Vector3i;
+
+
+
+
+
 // tolua_begin
 class cBlockArea
 {
@@ -56,14 +66,26 @@ public:
 	/** Resets the origin. No other changes are made, contents are untouched. */
 	void SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ);
 	
+	/** Resets the origin. No other changes are made, contents are untouched. */
+	void SetOrigin(const Vector3i & a_Origin);
+	
 	/** Reads an area of blocks specified. Returns true if successful. All coords are inclusive. */
 	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
+	
+	/** Reads an area of blocks specified. Returns true if successful. The bounds are included in the read area. */
+	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, const cCuboid & a_Bounds, int a_DataTypes = baTypes | baMetas);
+	
+	/** Reads an area of blocks specified. Returns true if successful. The bounds are included in the read area. */
+	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, const Vector3i & a_Point1, const Vector3i & a_Point2, int a_DataTypes = baTypes | baMetas);
 	
 	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
 	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
 	
 	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all */
 	bool Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
+	
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all */
+	bool Write(cForEachChunkProvider * a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes = baTypes | baMetas);
 	
 	/** Copies this object's contents into the specified BlockArea. */
 	void CopyTo(cBlockArea & a_Into) const;
@@ -117,6 +139,10 @@ public:
 	*/
 	void Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy);
 	
+	/** Merges another block area into this one, using the specified block combinating strategy.
+	See Merge() above for details. */
+	void Merge(const cBlockArea & a_Src, const Vector3i & a_RelMinCoords, eMergeStrategy a_Strategy);
+	
 	/** Fills the entire block area with the specified data */
 	void Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0, NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f);
 	
@@ -126,8 +152,20 @@ public:
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 	
+	/** Fills a cuboid inside the block area with the specified data. a_Cuboid must be sorted. */
+	void FillRelCuboid(const cCuboid & a_RelCuboid,
+		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	);
+	
 	/** Draws a line from between two points with the specified data */
 	void RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int a_RelY2, int a_RelZ2,
+		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	);
+	
+	/** Draws a line from between two points with the specified data */
+	void RelLine(const Vector3i & a_Point1, const Vector3i & a_Point2,
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
