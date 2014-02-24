@@ -562,13 +562,6 @@ void cChunk::Tick(float a_Dt)
 {
 	BroadcastPendingBlockChanges();
 
-	// Unload the chunk from all clients that have queued unloading:
-	for (cClientHandleList::iterator itr = m_UnloadQuery.begin(), end = m_UnloadQuery.end(); itr != end; ++itr)
-	{
-		(*itr)->SendUnloadChunk(m_PosX, m_PosZ);
-	}
-	m_UnloadQuery.clear();
-	
 	// Set all blocks that have been queued for setting later:
 	ProcessQueuedSetBlocks();
 

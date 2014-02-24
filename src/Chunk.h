@@ -405,7 +405,6 @@ private:
 	
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	cClientHandleList  m_LoadedByClient;
-	cClientHandleList  m_UnloadQuery;
 	cEntityList        m_Entities;
 	cBlockEntityList   m_BlockEntities;
 	
