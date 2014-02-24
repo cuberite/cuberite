@@ -37,7 +37,7 @@ bool cListenThread::Initialize(const AString & a_DualPortsString, AString a_v4Po
 	ASSERT(m_Sockets.empty());  // Not yet started
 	if(cSocket::SupportsFamily(cSocket::IPDual))
 	{
-		if (a_DualPortsString != "" && !CreateSockets(cSocket::IPDual, a_DualPortsString))
+		if ((a_DualPortsString != "") && (!CreateSockets(cSocket::IPDual, a_DualPortsString)))
 		{
 			return false;
 		}
@@ -50,17 +50,17 @@ bool cListenThread::Initialize(const AString & a_DualPortsString, AString a_v4Po
 	}
 	
 	
-	if (a_v4PortsString != "" && !CreateSockets(cSocket::IPv4, a_v4PortsString))
+	if ((a_v4PortsString != "") && (!CreateSockets(cSocket::IPv4, a_v4PortsString)))
 	{
 		return false;
 	}
 	
-	if (a_v6PortsString != "" && !CreateSockets(cSocket::IPv6, a_v6PortsString))
+	if ((a_v6PortsString != "") && (!CreateSockets(cSocket::IPv6, a_v6PortsString)))
 	{
 		return false;
 	}
 	
-	if (a_DualPortsString == "" && a_v4PortsString == "" && a_v6PortsString == "")
+	if ((a_DualPortsString == "") && (a_v4PortsString == "") && (a_v6PortsString == ""))
 	{
 		return false;
 	}
