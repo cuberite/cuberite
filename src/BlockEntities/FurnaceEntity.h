@@ -126,7 +126,7 @@ protected:
 	void BroadcastProgress(int a_ProgressbarID, short a_Value);
 	
 	/// One item finished cooking
-	void FinishOne(cChunk & a_Chunk);
+	void FinishOne();
 	
 	/// Starts burning a new fuel, if possible
 	void BurnNewFuel(void);
