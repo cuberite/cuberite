@@ -85,6 +85,10 @@ function RegisterPluginInfoCommands()
 	local function RegisterSubcommands(a_Prefix, a_Subcommands, a_Level)
 		assert(a_Subcommands ~= nil);
 		
+		-- A table that will hold aliases to subcommands temporarily, during subcommand iteration
+		local AliasTable = {}
+		
+		-- Iterate through the subcommands, register them, and accumulate aliases:
 		for cmd, info in pairs(a_Subcommands) do
 			local CmdName = a_Prefix .. cmd;
 			local Handler = info.Handler;
@@ -112,15 +116,25 @@ function RegisterPluginInfoCommands()
 					end
 					for idx, alias in ipairs(info.Alias) do
 						cPluginManager.BindCommand(a_Prefix .. alias, info.Permission or "", Handler, HelpString);
+						-- Also copy the alias's info table as a separate subcommand,
+						-- so that MultiCommandHandler() handles it properly. Need to off-load into a separate table
+						-- than the one we're currently iterating and join after the iterating.
+						AliasTable[alias] = info
 					end
 				end
-			end
+			end  -- else (if Handler == nil)
 			
 			-- Recursively register any subcommands:
 			if (info.Subcommands ~= nil) then
 				RegisterSubcommands(a_Prefix .. cmd .. " ", info.Subcommands, a_Level + 1);
 			end
+		end  -- for cmd, info - a_Subcommands[]
+		
+		-- Add the subcommand aliases that were off-loaded during registration:
+		for alias, info in pairs(AliasTable) do
+			a_Subcommands[alias] = info
 		end
+		AliasTable = {}
 	end
 	
 	-- Loop through all commands in the plugin info, register each:
