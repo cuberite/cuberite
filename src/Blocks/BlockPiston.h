@@ -21,6 +21,12 @@ public:
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override;
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override;
 } ;
 
 
@@ -42,6 +48,13 @@ public:
 		// No pickups
 		// Also with 1.7, the item forms of these tecnical blocks have been removed, so giving someone this will crash their client...
 	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override;
 } ;
 
 

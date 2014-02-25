@@ -239,7 +239,7 @@ public:
 			case 0x03: return 0x04;  // South -> West
 			case 0x04: return 0x02;  // West  -> North
 		}
-		// Not Facing East or West; No change.
+		// Not reachable, but to avoid a compiler warning:
 		return a_Meta;
 	}
 
@@ -254,7 +254,7 @@ public:
 			case 0x03: return 0x05;  // South -> East
 			case 0x05: return 0x02;  // East  -> North
 		}
-		// Not Facing East or West; No change.
+		// Not reachable, but to avoid a compiler warning:
 		return a_Meta;
 	}
 

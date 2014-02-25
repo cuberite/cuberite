@@ -104,6 +104,74 @@ public:
 
 		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
 	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+		switch (a_Meta)
+		{
+			case 0x00: return 0x07;  // Ceiling rotation
+			case 0x07: return 0x00;
+
+			case 0x05: return 0x06;  // Ground rotation
+			case 0x06: return 0x05;
+
+			case 0x04: return 0x01;  // North -> East
+			case 0x01: return 0x03;  // East  -> South
+			case 0x03: return 0x02;  // South -> West
+			case 0x02: return 0x04;  // West  -> North
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+		switch (a_Meta)
+		{
+			case 0x00: return 0x07;  // Ceiling rotation
+			case 0x07: return 0x00;
+
+			case 0x05: return 0x06;  // Ground rotation
+			case 0x06: return 0x05;
+
+			case 0x04: return 0x02;  // North -> West
+			case 0x02: return 0x03;  // West  -> South
+			case 0x03: return 0x01;  // South -> East
+			case 0x01: return 0x04;  // East  -> North
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// Mirrors defined by by a table. (Source, mincraft.gamepedia.com)
+		switch (a_Meta)
+		{
+		case 0x04: return 0x03;  // North -> South
+		case 0x03: return 0x04;  // South -> North
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Mirrors defined by by a table. (Source, mincraft.gamepedia.com).
+		switch (a_Meta)
+		{
+		case 0x02: return 0x01;  // West -> East
+		case 0x01: return 0x02;  // East -> West
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
 } ;
 
 

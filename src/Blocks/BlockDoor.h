@@ -18,6 +18,12 @@ public:
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual const char * GetStepSound(void) override;
 	
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override;
+
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
