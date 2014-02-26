@@ -29,7 +29,12 @@ public:
 	int DifY(void) const { return p2.y - p1.y; }
 	int DifZ(void) const { return p2.z - p1.z; }
 	
-	/// Returns true if the cuboids have at least one voxel in common. Both coords are considered inclusive.
+	/** Returns the volume of the cuboid, in blocks.
+	Note that the volume considers both coords inclusive.
+	Works on unsorted cuboids, too. */
+	int GetVolume(void) const;
+	
+	/** Returns true if the cuboids have at least one voxel in common. Both coords are considered inclusive. */
 	bool DoesIntersect(const cCuboid & a_Other) const;
 
 	bool IsInside(const Vector3i & v)	const
@@ -59,13 +64,27 @@ public:
 		);
 	}
 	
-	/// Returns true if this cuboid is completely inside the specifie cuboid (in all 6 coords)
+	/** Returns true if this cuboid is completely inside the specifie cuboid (in all 6 coords) */
 	bool IsCompletelyInside(const cCuboid & a_Outer) const;
 	
-	/// Moves the cuboid by the specified offsets in each direction
+	/** Moves the cuboid by the specified offsets in each direction */
 	void Move(int a_OfsX, int a_OfsY, int a_OfsZ);
+	
+	/** Expands the cuboid by the specified amount in each direction.
+	Works on unsorted cuboids as well.
+	Note that this function doesn't check for underflows. */
+	void Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
+	
+	/** Clamps both X coords to the specified range. Works on unsorted cuboids, too. */
+	void ClampX(int a_MinX, int a_MaxX);
 
-	/// Returns true if the coords are properly sorted (lesser in p1, greater in p2)
+	/** Clamps both Y coords to the specified range. Works on unsorted cuboids, too. */
+	void ClampY(int a_MinY, int a_MaxY);
+
+	/** Clamps both Z coords to the specified range. Works on unsorted cuboids, too. */
+	void ClampZ(int a_MinZ, int a_MaxZ);
+
+	/** Returns true if the coords are properly sorted (lesser in p1, greater in p2) */
 	bool IsSorted(void) const;
 } ;
 // tolua_end
