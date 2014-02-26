@@ -64,4 +64,30 @@ public:
 			}
 		}
 	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// Rotates according to table.  Only has two orientations that change under rotations.
+		switch (a_Meta)
+		{
+		case 0x03: return 0x04; // North/South -> East/West
+		case 0x04: return 0x03; // East/West   -> North/South
+		}
+		// All other cases:
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// Rotates according to table.  Only has two orientations that change under rotations.
+		switch (a_Meta)
+		{
+		case 0x03: return 0x04; // North/South -> East/West
+		case 0x04: return 0x03; // East/West   -> North/South
+		}
+		// All other cases:
+		return a_Meta;
+	}
 } ;

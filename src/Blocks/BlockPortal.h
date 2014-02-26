@@ -101,6 +101,70 @@ public:
 		}
 		return true;
 	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// 0x08 bit is a flag (Eye of ender inserted or not?)
+		NIBBLETYPE OtherMeta = a_Meta & 0x08;
+		// Rotates according to table; 0x07 == 0111.
+		switch (a_Meta & 0x07)
+		{
+			case 0x00: return 0x03 + OtherMeta;  // South -> East
+			case 0x03: return 0x02 + OtherMeta;  // East  -> North
+			case 0x02: return 0x01 + OtherMeta;  // North -> West
+			case 0x01: return 0x00 + OtherMeta;  // West  -> South
+		}
+		// To avoid a compiler warning;
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// 0x08 bit is a flag (Eye of ender inserted or not?)
+		NIBBLETYPE OtherMeta = a_Meta & 0x08;
+		// Rotates according to table; 0x07 == 0111.
+		switch (a_Meta & 0x07)
+		{
+			case 0x00: return 0x01 + OtherMeta;  // South -> West
+			case 0x01: return 0x02 + OtherMeta;  // West  -> North
+			case 0x02: return 0x03 + OtherMeta;  // North -> East
+			case 0x03: return 0x00 + OtherMeta;  // East  -> South
+		}
+		// To avoid a compiler warning;
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// 0x08 bit is a flag (Eye of ender inserted or not?)
+		NIBBLETYPE OtherMeta = a_Meta & 0x08;
+		// Rotates according to table; 0x07 == 0111.
+		switch (a_Meta & 0x07)
+		{
+			case 0x00: return 0x02 + OtherMeta;  // South -> North
+			case 0x02: return 0x00 + OtherMeta;  // North -> South
+		}
+		// Not Facing North or South; No change.
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Direction is stored in least two significant bits.  0x0C == 1100.
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Mirrors according to table; 0x03 == 0011.
+		switch (a_Meta & 0x03)
+		{
+			case 0x01: return 0x03 + OtherMeta;  // East  -> West
+			case 0x03: return 0x01 + OtherMeta;  // West  -> East
+		}
+		// Not Facing North or South; No change.
+		return a_Meta;
+	}
 } ;
 
 
