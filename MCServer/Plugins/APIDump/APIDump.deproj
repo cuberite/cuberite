@@ -7,6 +7,9 @@
     <filename>Classes\BlockEntities.lua</filename>
   </file>
   <file>
+    <filename>Classes\Geometry.lua</filename>
+  </file>
+  <file>
     <filename>Hooks\OnBlockToPickups.lua</filename>
   </file>
   <file>
