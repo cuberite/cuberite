@@ -46,7 +46,7 @@ public:
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);
 	
-	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d * a_Speed = NULL);
+	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item, const Vector3d * a_Speed = NULL);
 	
 	/// Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace);
@@ -305,13 +305,19 @@ public:
 
 	CLASS_PROTODEF(cFireworkEntity);
 
-	cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z);
+	cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item);
+	const cItem & GetItem(void) const { return m_FireworkItem; }
 
 protected:
 
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+
+private:
+
+	int m_ExplodeTimer;
+	cItem m_FireworkItem;
 
 	// tolua_begin
 

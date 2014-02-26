@@ -658,6 +658,12 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	{
 		EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, a_NBT, EnchTag);
 	}
+
+	int FireworksTag = a_NBT.FindChildByName(TagTag, ((a_Item.m_ItemType == E_ITEM_FIREWORK_STAR) ? "Fireworks" : "Explosion"));
+	if (EnchTag > 0)
+	{
+		cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, a_NBT, FireworksTag, (ENUM_ITEM_ID)a_Item.m_ItemType);
+	}
 	
 	return true;
 }

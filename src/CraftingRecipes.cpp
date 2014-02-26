@@ -1,4 +1,4 @@
-
+﻿
 // CraftingRecipes.cpp
 
 // Interfaces to the cCraftingRecipes class representing the storage of crafting recipes
@@ -762,6 +762,93 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		Recipe->m_Ingredients.push_back(*itrS);
 	}
 	Recipe->m_Ingredients.insert(Recipe->m_Ingredients.end(), MatchedSlots.begin(), MatchedSlots.end());
+
+
+	// Henceforth is code to handle fireworks
+	// We use Recipe instead of a_Recipe because we want the wildcard ingredients' slot numbers as well, which was just added previously
+
+	if (Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_ROCKET)
+	{
+		for (cRecipeSlots::const_iterator itr = Recipe->m_Ingredients.begin(); itr != Recipe->m_Ingredients.end(); ++itr)
+		{
+			switch (itr->m_Item.m_ItemType)
+			{
+				case E_ITEM_FIREWORK_STAR:
+				{
+					// Result was a rocket, found a star - copy star data to rocket data
+					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
+					Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
+					break;
+				}
+				case E_ITEM_GUNPOWDER:
+				{
+					// Gunpowder - increase flight time
+					Recipe->m_Result.m_FireworkItem.m_FlightTimeInTicks += 20;
+					break;
+				}
+				case E_ITEM_PAPER: break;
+				default: LOG("Unexpected item in firework rocket recipe, was the crafting file fireworks section changed?"); break;
+			}
+		}
+	}
+	else if (Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_STAR)
+	{
+		for (cRecipeSlots::const_iterator itr = Recipe->m_Ingredients.begin(); itr != Recipe->m_Ingredients.end(); ++itr)
+		{
+			switch (itr->m_Item.m_ItemType)
+			{
+				case E_ITEM_FIREWORK_STAR:
+				{
+					// Result was star, found another star - probably adding fade colours, but copy data over anyhow
+					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
+					Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
+					break;
+				}
+				case E_ITEM_DYE:
+				{
+					// Found a dye in ingredients...
+					for (cRecipeSlots::const_iterator itrnumerodos = Recipe->m_Ingredients.begin(); itrnumerodos != Recipe->m_Ingredients.end(); ++itrnumerodos)
+					{
+						// Loop through ingredients. Can we find a star?
+						if (itrnumerodos->m_Item.m_ItemType == E_ITEM_FIREWORK_STAR)
+						{
+							// Yes, this is definately adding fade colours, unless crafting.txt was changed :/
+							for (cRecipeSlots::const_iterator itrnumerotres = Recipe->m_Ingredients.begin(); itrnumerotres != Recipe->m_Ingredients.end(); ++itrnumerotres)
+							{
+								// Loop again, can we find dye?
+								if (itrnumerotres->m_Item.m_ItemType == E_ITEM_DYE)
+								{
+									// Yep, push back fade colour and exit the loop
+									// There is a potential for flexibility here - we can move the goto out of the loop, so we can add multiple dyes (∴ multiple fade colours)
+									// That will require lots of dye-adding to crafting.txt though - TODO, perchance?
+									int GridID = (itrnumerotres->x + a_OffsetX) + a_GridStride * (itrnumerotres->y + a_OffsetY);
+									Recipe->m_Result.m_FireworkItem.m_FadeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
+									goto next;
+								}
+							}
+						}
+					}
+
+					// Just normal crafting of star, push back normal colours
+					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
+					Recipe->m_Result.m_FireworkItem.m_Colours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
+
+					next:
+					break;
+				}
+				case E_ITEM_GUNPOWDER: break;
+				case E_ITEM_DIAMOND: Recipe->m_Result.m_FireworkItem.m_HasTrail = true; break;
+				case E_ITEM_GLOWSTONE_DUST: Recipe->m_Result.m_FireworkItem.m_HasFlicker = true; break;
+
+				case E_ITEM_FIRE_CHARGE: Recipe->m_Result.m_FireworkItem.m_Type = 1; break;
+				case E_ITEM_GOLD_NUGGET: Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
+				case E_ITEM_FEATHER: Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
+				case E_ITEM_HEAD: Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
+				default: LOG("Unexpected item in firework star recipe, was the crafting file fireworks section changed?"); break; // ermahgerd BARD ardmins
+			}
+		}
+	}
+
 	return Recipe.release();
 }
 

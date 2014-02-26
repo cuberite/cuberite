@@ -39,6 +39,7 @@
 #
 
 # Need to list each of the four log types, otherwise all logs would get converted into apple planks (^0)
+
 ApplePlanks, 4   = AppleLog, * 
 ConiferPlanks, 4 = ConiferLog, *
 BirchPlanks, 4   = BirchLog, *
@@ -434,6 +435,48 @@ GoldNugget, 9      = GoldIngot, *
 EnchantmentTable   = Obsidian, 1:3, 2:3, 3:3, 2:2 | Diamond, 1:2, 3:2 | Book, 2:1
 
 
+#******************************************************#
+# Fireworks & Co.
+# (Best not to add non-vanilla items to this as it will cause internal firework data handling code to log warnings)
 
+# Ballistic firework rockets - plain and with firework star, all with 1 - 3 gunpowder
+FireworkRocket   = Paper, * | Gunpowder, *
+FireworkRocket   = Paper, * | Gunpowder, * | Gunpowder, *
+FireworkRocket   = Paper, * | Gunpowder, * | Gunpowder, * | Gunpowder, *
+FireworkRocket   = FireworkStar, * | Paper, * | Gunpowder, *
+FireworkRocket   = FireworkStar, * | Paper, * | Gunpowder, * | Gunpowder, *
+FireworkRocket   = FireworkStar, * | Paper, * | Gunpowder, * | Gunpowder, * | Gunpowder, *
 
+# Radioactive firework stars
+# Plain powder and dye
+FireworkStar     = Gunpowder, * | Dye ^-1, *
 
+# Powder and effect, with effect combining
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Diamond, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Glowdust, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Glowdust, * | Diamond, *
+
+# Powder and shape (no shape combining possible)
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Firecharge, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Goldnugget, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Feather, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | SkeletonHead ^-1, *
+
+# Power and shape (no shape combining possible), combined with effect
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Firecharge, * | Diamond, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Firecharge, * | Glowdust, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Goldnugget, * | Diamond, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Goldnugget, * | Glowdust, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Feather, * | Diamond, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Feather, * | Glowdust, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | SkeletonHead ^-1, * | Diamond, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | SkeletonHead ^-1, * | Glowdust, *
+
+# Power and shape (no shape combining possible), combined with effect (with effect combining)
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Firecharge, * | Glowdust, * | Diamond, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Goldnugget, * | Glowdust, * | Diamond, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | Feather, * | Glowdust, * | Diamond, *
+FireworkStar     = Gunpowder, * | Dye ^-1, * | SkeletonHead ^-1, * | Glowdust, * | Diamond, *
+
+# Star colour-change
+FireworkStar     = FireworkStar, * | Dye ^-1, *

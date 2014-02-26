@@ -2069,36 +2069,47 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	// Load enchantments and custom display names from the NBT data:
 	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
 	{
-		if (
-			(NBT.GetType(tag) == TAG_List) &&
-			(
-				(NBT.GetName(tag) == "ench") ||
-				(NBT.GetName(tag) == "StoredEnchantments")
-			)
-		)
+		AString TagName = NBT.GetName(tag);
+		switch (NBT.GetType(tag))
 		{
-			EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
-		}
-		else if ((NBT.GetType(tag) == TAG_Compound) && (NBT.GetName(tag) == "display")) // Custom name and lore tag
-		{
-			for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+			case TAG_List:
 			{
-				if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name")) // Custon name tag
+				if ((TagName == "ench") || (TagName == "StoredEnchantments")) // Enchantments tags
 				{
-					a_Item.m_CustomName = NBT.GetString(displaytag);
+					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 				}
-				else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore")) // Lore tag
-				{
-					AString Lore;
-
-					for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
-					{
-						AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
-					}
-
-					a_Item.m_Lore = Lore;
-				}
+				break;
 			}
+			case TAG_Compound:
+			{
+				if (TagName == "display") // Custom name and lore tag
+				{
+					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+					{
+						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name")) // Custon name tag
+						{
+							a_Item.m_CustomName = NBT.GetString(displaytag);
+						}
+						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore")) // Lore tag
+						{
+							AString Lore;
+
+							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
+							{
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+							}
+
+							a_Item.m_Lore = Lore;
+						}
+					}
+				}
+				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
+				{
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, (ENUM_ITEM_ID)a_Item.m_ItemType);
+				}
+				break;
+			}
+			default: LOGD("Unimplemented NBT data when parsing!"); break;
 		}
 	}
 }
@@ -2262,7 +2273,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	WriteByte (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR))
 	{
 		WriteShort(-1);
 		return;
@@ -2300,6 +2311,10 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 			Writer.EndList();
 		}
 		Writer.EndCompound();
+	}
+	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	{
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, (ENUM_ITEM_ID)a_Item.m_ItemType);
 	}
 	Writer.Finish();
 	AString Compressed;
@@ -2465,10 +2480,22 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 		}
 		case cEntity::etProjectile:
 		{
-			if (((cProjectileEntity &)a_Entity).GetProjectileKind() == cProjectileEntity::pkArrow)
+			cProjectileEntity & Projectile = (cProjectileEntity &)a_Entity;
+			switch (Projectile.GetProjectileKind())
 			{
-				WriteByte(0x10);
-				WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0);
+				case cProjectileEntity::pkArrow:
+				{
+					WriteByte(0x10);
+					WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0);
+					break;
+				}
+				case cProjectileEntity::pkFirework:
+				{
+					WriteByte(0xA8);
+					WriteItem(((const cFireworkEntity &)a_Entity).GetItem());
+					break;
+				}
+				default: break;
 			}
 			break;
 		}
