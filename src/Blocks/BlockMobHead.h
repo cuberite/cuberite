@@ -63,7 +63,8 @@ public:
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
 	}
 
-
+	// MetaRotate/MetaMirror is currently broken for MobHeads.
+	/*
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
@@ -118,6 +119,7 @@ public:
 		// Not Facing East or West; No change.
 		return a_Meta;
 	}
+	*/
 } ;
 
 
