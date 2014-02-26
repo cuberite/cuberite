@@ -172,8 +172,17 @@ public:
 	inline float GetFloat(int a_Tag) const
 	{
 		ASSERT(m_Tags[a_Tag].m_Type == TAG_Float);
-		Int32 tmp = GetBEInt(m_Data + m_Tags[a_Tag].m_DataStart);
-		return *((float *)&tmp);
+		
+		// Cause a compile-time error if sizeof(int) != sizeof(float)
+		char Check1[sizeof(int) - sizeof(float) + 1];  // sizeof(int) >= sizeof(float)
+		char Check2[sizeof(float) - sizeof(int) + 1];  // sizeof(float) >= sizeof(int)
+		UNUSED(Check1);
+		UNUSED(Check2);
+		
+		int i = GetBEInt(m_Data + m_Tags[a_Tag].m_DataStart);
+		float f;
+		memcpy(&f, &i, sizeof(f));
+		return f;
 	}
 	
 	inline double GetDouble(int a_Tag) const
