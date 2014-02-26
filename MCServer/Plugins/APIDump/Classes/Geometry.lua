@@ -69,10 +69,15 @@ return
 				{ Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified points as its corners." },
 			},
 			Assign = { Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "", Notes = "Assigns all the coords stored in the cuboid. Sort-state is ignored." },
+			ClampX = { Params = "MinX, MaxX", Return = "", Notes = "Clamps both X coords into the range provided. Sortedness-agnostic." },
+			ClampY = { Params = "MinY, MaxY", Return = "", Notes = "Clamps both Y coords into the range provided. Sortedness-agnostic." },
+			ClampZ = { Params = "MinZ, MaxZ", Return = "", Notes = "Clamps both Z coords into the range provided. Sortedness-agnostic." },
 			DifX = { Params = "", Return = "number", Notes = "Returns the difference between the two X coords (X-size minus 1). Assumes sorted." },
 			DifY = { Params = "", Return = "number", Notes = "Returns the difference between the two Y coords (Y-size minus 1). Assumes sorted." },
 			DifZ = { Params = "", Return = "number", Notes = "Returns the difference between the two Z coords (Z-size minus 1). Assumes sorted." },
 			DoesIntersect = { Params = "OtherCuboid", Return = "bool", Notes = "Returns true if this cuboid has at least one voxel in common with OtherCuboid. Note that edges are considered inclusive. Assumes both sorted." },
+			Expand = { Params = "SubMinX, AddMaxX, SubMinY, AddMaxY, SubMinZ, AddMaxZ", Return = "", Notes = "Expands the cuboid by the specified amount in each direction. Works on unsorted cuboids as well. NOTE: this function doesn't check for underflows." },
+			GetVolume = { Params = "", Return = "number", Notes = "Returns the volume of the cuboid, in blocks. Note that the volume considers both coords inclusive. Works on unsorted cuboids, too." },
 			IsCompletelyInside = { Params = "OuterCuboid", Return = "bool", Notes = "Returns true if this cuboid is completely inside (in all directions) in OuterCuboid. Assumes both sorted." },
 			IsInside =
 			{
@@ -81,7 +86,7 @@ return
 				{ Params = "{{Vector3d|Point}}", Return = "bool", Notes = "Returns true if the specified point (floating-point coords) is inside this cuboid. Assumes sorted." },
 			},
 			IsSorted = { Params = "", Return = "bool", Notes = "Returns true if this cuboid is sorted" },
-			Move = { Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Adds the specified offsets to each respective coord, effectively moving the Cuboid. Sort-state is ignored." },
+			Move = { Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Adds the specified offsets to each respective coord, effectively moving the Cuboid. Sort-state is ignored and preserved." },
 			Sort = { Params = "", Return = "" , Notes = "Sorts the internal representation so that p1 contains the lesser coords and p2 contains the greater coords." },
 		},
 		Variables =
