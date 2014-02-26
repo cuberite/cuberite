@@ -677,6 +677,11 @@ void cLuaState::Push(void * a_Ptr)
 {
 	ASSERT(IsValid());
 
+	// Investigate the cause of this - what is the callstack?
+	LOGWARNING("Lua engine encountered an error - attempting to push a plain pointer");
+	LogStackTrace();
+	ASSERT(!"A plain pointer should never be pushed on Lua stack");
+	
 	lua_pushnil(m_LuaState);
 	m_NumCurrentFunctionArgs += 1;
 }
@@ -1265,6 +1270,8 @@ void cLuaState::LogStack(const char * a_Header)
 
 void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
+	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
+	
 	LOGD((a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{

@@ -1321,7 +1321,9 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 	private:
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
-			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
+			UNUSED(a_Plugin);
+			
+			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
 			tolua_pushcppstring(LuaState, a_Command);
 			tolua_pushcppstring(LuaState, a_Permission);
 			tolua_pushcppstring(LuaState, a_HelpString);
@@ -1396,7 +1398,10 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 	private:
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
-			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
+			UNUSED(a_Plugin);
+			UNUSED(a_Permission);
+			
+			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
 			tolua_pushcppstring(LuaState, a_Command);
 			tolua_pushcppstring(LuaState, a_HelpString);
 
