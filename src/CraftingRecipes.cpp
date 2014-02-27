@@ -806,6 +806,8 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 				}
 				case E_ITEM_DYE:
 				{
+					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
+
 					// Found a dye in ingredients...
 					for (cRecipeSlots::const_iterator itrnumerodos = Recipe->m_Ingredients.begin(); itrnumerodos != Recipe->m_Ingredients.end(); ++itrnumerodos)
 					{
@@ -821,7 +823,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 									// Yep, push back fade colour and exit the loop
 									// There is a potential for flexibility here - we can move the goto out of the loop, so we can add multiple dyes (∴ multiple fade colours)
 									// That will require lots of dye-adding to crafting.txt though - TODO, perchance?
-									int GridID = (itrnumerotres->x + a_OffsetX) + a_GridStride * (itrnumerotres->y + a_OffsetY);
+									GridID = (itrnumerotres->x + a_OffsetX) + a_GridStride * (itrnumerotres->y + a_OffsetY);
 									Recipe->m_Result.m_FireworkItem.m_FadeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
 									goto next;
 								}
@@ -830,7 +832,6 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 					}
 
 					// Just normal crafting of star, push back normal colours
-					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
 					Recipe->m_Result.m_FireworkItem.m_Colours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
 
 					next:
