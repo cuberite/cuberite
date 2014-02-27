@@ -2,7 +2,6 @@
 #include "Globals.h"
 #include "FireworksSerializer.h"
 #include "WorldStorage/FastNBT.h"
-#include <sstream>
 
 
 
@@ -219,7 +218,7 @@ void cFireworkItem::FadeColoursFromString(const AString & a_String, cFireworkIte
 
 
 
-int GetVanillaColourCodeFromDye(short a_DyeMeta)
+int cFireworkItem::GetVanillaColourCodeFromDye(short a_DyeMeta)
 {
 	/*
 	Colours are supposed to be calculated via: R << 16 + G << 8 + B

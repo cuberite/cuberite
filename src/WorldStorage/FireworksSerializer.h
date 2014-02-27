@@ -77,7 +77,7 @@ public:
 	static void FadeColoursFromString(const AString & a_String, cFireworkItem & a_FireworkItem);
 
 	/** Returns a colour code for fireworks used by the network code */
-	static const inline int GetVanillaColourCodeFromDye(short a_DyeMeta);
+	static int GetVanillaColourCodeFromDye(short a_DyeMeta);
 
 	bool m_HasFlicker;
 	bool m_HasTrail;
