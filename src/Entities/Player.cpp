@@ -10,17 +10,10 @@
 #include "../BlockEntities/BlockEntity.h"
 #include "../GroupManager.h"
 #include "../Group.h"
-#include "../ChatColor.h"
-#include "../Item.h"
-#include "../Tracer.h"
 #include "../Root.h"
 #include "../OSSupport/Timer.h"
-#include "../MersenneTwister.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
-
-#include "../Vector3d.h"
-#include "../Vector3f.h"
 
 #include "inifile/iniFile.h"
 #include "json/json.h"
