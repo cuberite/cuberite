@@ -36,10 +36,10 @@ public:
 
 		// The map center is fixed at the central point of the 8x8 block of chunks you are standing in when you right-click it.
 
-		const int RegionWidth = cChunkDef::Width * 8 * pow(2.0, (double) DEFAULT_SCALE);
+		const int RegionWidth = cChunkDef::Width * 8;
 
-		int CenterX = floor(a_Player->GetPosX() / (float) RegionWidth) * RegionWidth;
-		int CenterZ = floor(a_Player->GetPosZ() / (float) RegionWidth) * RegionWidth;
+		int CenterX = (int)(floor(a_Player->GetPosX() / (float) RegionWidth) * RegionWidth);
+		int CenterZ = (int)(floor(a_Player->GetPosZ() / (float) RegionWidth) * RegionWidth);
 
 		cMap * NewMap = a_World->GetMapManager().CreateMap(CenterX, CenterZ, DEFAULT_SCALE);
 
