@@ -446,6 +446,8 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		return;
 	}
 
+	std::transform(split[0].begin(), split[0].end(), split[0].begin(), ::tolower);
+
 	// Special handling: "stop" and "restart" are built in
 	if ((split[0].compare("stop") == 0) || (split[0].compare("restart") == 0))
 	{
