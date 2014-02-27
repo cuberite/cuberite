@@ -9,11 +9,11 @@
 
 
 class cBlockComparatorHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler,0x03,0x00,0x01,0x02,0x03>
 {
 public:
 	cBlockComparatorHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotater<cBlockHandler,0x03,0x00,0x01,0x02,0x03>(a_BlockType)
 	{
 	}
 

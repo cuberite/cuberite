@@ -9,8 +9,9 @@
 
 
 class cBlockDoorHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler,0x03,0x01,0x02,0x03,0x00>
 {
+	typedef super cMetaRotater<cBlockHandler,0x03,0x01,0x02,0x03,0x00>;
 public:
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 
@@ -166,6 +167,60 @@ public:
 		}
 	}
 	
+	
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		if (a_Meta & 0x08) 
+		{
+			return a_Meta;
+		}
+		else
+		{
+			return super::MetaRotateCCW(a_Meta);
+		}
+	}
+	
+	
+	
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		if (a_Meta & 0x08) 
+		{
+			return a_Meta;
+		}
+		else
+		{
+			return super::MetaRotateCW(a_Meta);
+		}
+	}
+	
+	
+	
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		if (a_Meta & 0x08) 
+		{
+			return a_Meta;
+		}
+		else
+		{
+			return super::MetaMirrorXY(a_Meta);
+		}
+	}
+	
+	
+	
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		if (a_Meta & 0x08) 
+		{
+			return a_Meta;
+		}
+		else
+		{
+			return super::MetaMirrorYZ(a_Meta);
+		}
+	}
 	
 } ;
 
