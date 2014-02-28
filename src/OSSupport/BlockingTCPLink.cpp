@@ -89,6 +89,8 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 
 int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 0 */ )
 {
+	UNUSED(a_Flags);
+	
 	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{
@@ -104,6 +106,8 @@ int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 
 
 int cBlockingTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ )
 {
+	UNUSED(a_Flags);
+	
 	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{

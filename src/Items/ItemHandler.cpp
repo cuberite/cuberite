@@ -248,6 +248,14 @@ cItemHandler::cItemHandler(int a_ItemType)
 
 bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
 {
+	UNUSED(a_World);
+	UNUSED(a_Player);
+	UNUSED(a_Item);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_Dir);
+
 	return false;
 }
 
@@ -257,6 +265,14 @@ bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem &
 
 bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
 {
+	UNUSED(a_World);
+	UNUSED(a_Player);
+	UNUSED(a_Item);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_Dir);
+	
 	return false;
 }
 
@@ -266,6 +282,8 @@ bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cI
 
 void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	UNUSED(a_Item);
+	
 	BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(Block);
 
@@ -288,7 +306,9 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 
 void cItemHandler::OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_Item)
 {
-
+	UNUSED(a_World);
+	UNUSED(a_Player);
+	UNUSED(a_Item);
 }
 
 
@@ -461,6 +481,8 @@ bool cItemHandler::IsPlaceable(void)
 
 bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 {
+	UNUSED(a_BlockType);
+	
 	return false;
 }
 
@@ -499,6 +521,8 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
+	UNUSED(a_Item);
+	
 	FoodInfo Info = GetFoodInfo();
 
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
