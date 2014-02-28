@@ -38,10 +38,11 @@ public:
 	int  GetRecord(void);
 	void SetRecord(int a_Record);
 	
-	/** Play a Record. Return false, when a_Record isn't a Record */
+	/** Plays the specified Record. Return false if a_Record isn't a playable Record (E_ITEM_XXX_DISC).
+	If there is a record already playing, ejects it first. */
 	bool PlayRecord(int a_Record);
 	
-	/** Ejects the currently held record as a pickup. Return false when no record inserted. */
+	/** Ejects the currently held record as a pickup. Return false when no record had been inserted. */
 	bool EjectRecord(void);
 	
 	/** Is in the Jukebox a Record? */
