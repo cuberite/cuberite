@@ -4,6 +4,7 @@
 #include "Creeper.h"
 #include "../World.h"
 #include "../Entities/ProjectileEntity.h"
+#include "../Entities/Player.h"
 
 
 
@@ -99,3 +100,15 @@ void cCreeper::Attack(float a_Dt)
 
 
 
+
+void cCreeper::OnRightClicked(cPlayer & a_Player)
+{
+	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_FLINT_AND_STEEL))
+	{
+		m_World->BroadcastSoundEffect("game.tnt.primed", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_bIsBlowing = true;
+		m_World->BroadcastEntityMetadata(*this);
+		m_World->DoExplosionAt((m_bIsCharged ? 5 : 3), GetPosX(), GetPosY(), GetPosZ(), false, esMonster, this);
+		Destroy();
+	}
+}
