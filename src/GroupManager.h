@@ -19,6 +19,9 @@ public:
 	void LoadGroups(void);
 	void CheckUsers(void);
 	
+	/** Writes the default header to the specified ini file, and saves it as "users.ini". */
+	static void GenerateDefaultUsersIni(cIniFile & a_IniFile);
+	
 private:
 	friend class cRoot;
 	cGroupManager();

@@ -55,16 +55,27 @@ cGroupManager::cGroupManager()
 
 
 
+void cGroupManager::GenerateDefaultUsersIni(cIniFile & a_IniFile)
+{
+	LOGWARN("Regenerating users.ini, all users will be reset");
+	a_IniFile.AddHeaderComment(" This file stores the players' groups.");
+	a_IniFile.AddHeaderComment(" The format is:");
+	a_IniFile.AddHeaderComment(" [PlayerName]");
+	a_IniFile.AddHeaderComment(" Groups = GroupName1, GroupName2, ...");
+
+	a_IniFile.WriteFile("users.ini");
+}
+
+
+
+
+
 void cGroupManager::CheckUsers(void)
 {
 	cIniFile IniFile;
 	if (!IniFile.ReadFile("users.ini"))
 	{
-		LOGWARN("Regenerating users.ini, all users will be reset");
-		IniFile.AddHeaderComment(" This is the file in which the group the player belongs to is stored");
-		IniFile.AddHeaderComment(" The format is: [PlayerName] | Groups=GroupName");
-
-		IniFile.WriteFile("users.ini");
+		GenerateDefaultUsersIni(IniFile);
 		return;
 	}
 	

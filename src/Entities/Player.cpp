@@ -1529,14 +1529,14 @@ void cPlayer::LoadPermissionsFromDisk()
 		std::string Groups = IniFile.GetValue(m_PlayerName, "Groups", "");
 		if (!Groups.empty())
 		{
-			AStringVector Split = StringSplit( Groups, "," );
-			for( unsigned int i = 0; i < Split.size(); i++ )
+			AStringVector Split = StringSplitAndTrim(Groups, ",");
+			for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
 			{
-				if (!cRoot::Get()->GetGroupManager()->ExistsGroup(Split[i]))
+				if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
 				{
-					LOGWARNING("The group %s for player %s was not found!", Split[i].c_str(), m_PlayerName.c_str());
+					LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
 				}
-				AddToGroup(Split[i].c_str());
+				AddToGroup(*itr);
 			}
 		}
 		else
@@ -1544,11 +1544,15 @@ void cPlayer::LoadPermissionsFromDisk()
 			AddToGroup("Default");
 		}
 
-		m_Color = IniFile.GetValue(m_PlayerName, "Color", "-")[0];
+		AString Color = IniFile.GetValue(m_PlayerName, "Color", "-");
+		if (!Color.empty())
+		{
+			m_Color = Color[0];
+		}
 	}
 	else
 	{
-		cRoot::Get()->GetGroupManager()->CheckUsers();
+		cGroupManager::GenerateDefaultUsersIni(IniFile);
 		AddToGroup("Default");
 	}
 	ResolvePermissions();
