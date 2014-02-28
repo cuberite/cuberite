@@ -1043,7 +1043,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if (
 		cBlockSlabHandler::IsAnySlabType(ClickedBlock) &&               // Is there a slab already?
 		cBlockSlabHandler::IsAnySlabType(EquippedBlock) &&              // Is the player placing another slab?
-		((ClickedBlockMeta & 0x07) == EquippedBlockDamage) &&  // Is it the same slab type?
+		((ClickedBlockMeta & 0x07) == EquippedBlockDamage) &&           // Is it the same slab type?
 		(
 			(a_BlockFace == BLOCK_FACE_TOP) ||                            // Clicking the top of a bottom slab
 			(a_BlockFace == BLOCK_FACE_BOTTOM)                            // Clicking the bottom of a top slab

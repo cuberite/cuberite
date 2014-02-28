@@ -176,15 +176,13 @@ public:
 	
 	virtual const char * GetStepSound(void) override
 	{
-		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
-		if (Block != m_BlockType)
+		switch (m_BlockType)
 		{
-			return cBlockHandler::GetBlockHandler(Block)->GetStepSound();
+			case E_BLOCK_DOUBLE_STONE_SLAB:  return "step.stone";
+			case E_BLOCK_DOUBLE_WOODEN_SLAB: return "step.wood";
 		}
-		else
-		{
-			return "step.stone";
-		}
+		ASSERT(!"Unhandled double slab type!");
+		return "";
 	}
 } ;
 
