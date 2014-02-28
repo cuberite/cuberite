@@ -194,7 +194,7 @@ void cRoot::Start(void)
 		#if !defined(ANDROID_NDK)
 		LOGD("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
-		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
+		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
 		#endif
 
 		long long finishmseconds = Time.GetNowTime();
@@ -536,7 +536,9 @@ void cRoot::SaveAllChunks(void)
 
 void cRoot::ReloadGroups(void)
 {
+	LOG("Reload groups ...");
 	m_GroupManager->LoadGroups();
+	m_GroupManager->CheckUsers();
 }
 
 

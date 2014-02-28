@@ -1532,7 +1532,11 @@ void cPlayer::LoadPermissionsFromDisk()
 			AStringVector Split = StringSplit( Groups, "," );
 			for( unsigned int i = 0; i < Split.size(); i++ )
 			{
-				AddToGroup( Split[i].c_str() );
+				if (!cRoot::Get()->GetGroupManager()->ExistsGroup(Split[i]))
+				{
+					LOGWARNING("The group %s for player %s was not found!", Split[i].c_str(), m_PlayerName.c_str());
+				}
+				AddToGroup(Split[i].c_str());
 			}
 		}
 		else
@@ -1544,12 +1548,7 @@ void cPlayer::LoadPermissionsFromDisk()
 	}
 	else
 	{
-		LOGWARN("Regenerating users.ini, player %s will be added to the \"Default\" group", m_PlayerName.c_str());
-		IniFile.AddHeaderComment(" This is the file in which the group the player belongs to is stored");
-		IniFile.AddHeaderComment(" The format is: [PlayerName] | Groups=GroupName");
-
-		IniFile.SetValue(m_PlayerName, "Groups", "Default");
-		IniFile.WriteFile("users.ini");
+		cRoot::Get()->GetGroupManager()->CheckUsers();
 		AddToGroup("Default");
 	}
 	ResolvePermissions();

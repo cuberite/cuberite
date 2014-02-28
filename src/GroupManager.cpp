@@ -46,8 +46,45 @@ cGroupManager::cGroupManager()
 	LOGD("-- Loading Groups --");
 	
 	LoadGroups();
+	CheckUsers();
 	
 	LOGD("-- Groups Successfully Loaded --");
+}
+
+
+
+
+
+void cGroupManager::CheckUsers(void)
+{
+	cIniFile IniFile;
+	if (!IniFile.ReadFile("users.ini"))
+	{
+		LOGWARN("Regenerating users.ini, all users will be reset");
+		IniFile.AddHeaderComment(" This is the file in which the group the player belongs to is stored");
+		IniFile.AddHeaderComment(" The format is: [PlayerName] | Groups=GroupName");
+
+		IniFile.WriteFile("users.ini");
+		return;
+	}
+	
+	unsigned int NumKeys = IniFile.GetNumKeys();
+	for (size_t i = 0; i < NumKeys; i++)
+	{
+		AString Player = IniFile.GetKeyName( i );
+		AString Groups = IniFile.GetValue(Player, "Groups", "");
+		if (!Groups.empty())
+		{
+			AStringVector Split = StringSplit( Groups, "," );
+			for( unsigned int i = 0; i < Split.size(); i++ )
+			{
+				if (!ExistsGroup(Split[i]))
+				{
+					LOGWARNING("The group %s for player %s was not found!", Split[i].c_str(), Player.c_str());
+				}
+			}
+		}
+	}
 }
 
 
@@ -131,6 +168,16 @@ void cGroupManager::LoadGroups()
 			}
 		}
 	}
+}
+
+
+
+
+
+bool cGroupManager::ExistsGroup( const AString & a_Name )
+{
+	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
+	return ( itr != m_pState->Groups.end() );
 }
 
 
