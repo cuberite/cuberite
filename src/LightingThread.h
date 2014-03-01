@@ -169,13 +169,13 @@ protected:
 		ASSERT(a_DstIdx >= 0);
 		ASSERT(a_DstIdx < (int)ARRAYCOUNT(m_BlockTypes));
 		
-		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + g_BlockSpreadLightFalloff[m_BlockTypes[a_DstIdx]])
+		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]))
 		{
 			// We're not offering more light than the dest block already has
 			return;
 		}
 
-		a_Light[a_DstIdx] = a_Light[a_SrcIdx] - g_BlockSpreadLightFalloff[m_BlockTypes[a_DstIdx]];
+		a_Light[a_DstIdx] = a_Light[a_SrcIdx] - cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]);
 		if (!a_IsSeedOut[a_DstIdx])
 		{
 			a_IsSeedOut[a_DstIdx] = true;

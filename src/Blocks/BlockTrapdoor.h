@@ -97,7 +97,7 @@ public:
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
 		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
+		return (a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn);
 	}
 };
 

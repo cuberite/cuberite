@@ -145,7 +145,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 			case cMonster::mtBat:
 			{
-				return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4) && (TargetBlock == E_BLOCK_AIR) && (!g_BlockTransparent[BlockAbove]);
+				return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4) && (TargetBlock == E_BLOCK_AIR) && !cBlockInfo::IsTransparent(BlockAbove);
 			}
 
 			case cMonster::mtChicken:
@@ -157,7 +157,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
-					(!g_BlockTransparent[BlockBelow]) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(BlockBelow == E_BLOCK_GRASS) &&
 					(SkyLight >= 9)
 				);
@@ -188,7 +188,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 							(TargetBlock == E_BLOCK_AIR) &&
 							(BlockAbove == E_BLOCK_AIR) &&
 							(BlockTop == E_BLOCK_AIR) &&
-							(!g_BlockTransparent[BlockBelow]) &&
+							(!cBlockInfo::IsTransparent(BlockBelow)) &&
 							(SkyLight <= 7) &&
 							(BlockLight <= 7)
 						);
@@ -215,7 +215,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 							HaveFloor ||
 							(
 								a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock) &&
-								!g_BlockTransparent[TargetBlock]
+								!cBlockInfo::IsTransparent(TargetBlock)
 							)
 						);
 					}
@@ -230,7 +230,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
-					(!g_BlockTransparent[BlockBelow]) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(SkyLight <= 7) &&
 					(BlockLight <= 7) &&
 					(m_Random.NextInt(2, a_Biome) == 0)
@@ -242,7 +242,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
-					(!g_BlockTransparent[BlockBelow]) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(
 						(a_RelY <= 40) || (a_Biome == biSwampland)
 					)
@@ -255,7 +255,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
-					(!g_BlockTransparent[BlockBelow]) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(m_Random.NextInt(20, a_Biome) == 0)
 				);
 			}

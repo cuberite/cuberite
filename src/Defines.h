@@ -654,7 +654,7 @@ namespace ItemCategory
 inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
 {
 	if(!IsValidBlock(a_BlockType)) return false;
-	return g_BlockRequiresSpecialTool[a_BlockType];
+	return cBlockInfo::RequiresSpecialTool(a_BlockType);
 }
 
 

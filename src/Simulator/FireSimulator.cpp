@@ -239,7 +239,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		{
 			return m_BurnStepTimeFuel;
 		}
-		IsBlockBelowSolid = g_BlockIsSolid[BlockBelow];
+		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
 	
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)

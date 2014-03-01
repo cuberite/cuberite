@@ -7,13 +7,13 @@
 
 
 
-BlockInfo BlockInfo::ms_Info[256];
+cBlockInfo cBlockInfo::ms_Info[256];
 
 
 
 
 
-BlockInfo::BlockInfo()
+cBlockInfo::cBlockInfo()
 	: m_LightValue(0x00)
 	, m_SpreadLightFalloff(0x0f)
 	, m_Transparent(false)
@@ -29,7 +29,7 @@ BlockInfo::BlockInfo()
 
 
 
-BlockInfo & BlockInfo::GetById(unsigned int a_ID)
+cBlockInfo & cBlockInfo::GetById(unsigned int a_ID)
 {
 	ASSERT(a_ID < 256);
 
@@ -40,7 +40,7 @@ BlockInfo & BlockInfo::GetById(unsigned int a_ID)
 
 
 
-void BlockInfo::Initialize(void)
+void cBlockInfo::Initialize(void)
 {
 	// Emissive blocks
 	ms_Info[E_BLOCK_FIRE                ].m_LightValue = 15;
@@ -413,7 +413,7 @@ class cBlockInfoInitializer
 public:
 	cBlockInfoInitializer(void)
 	{
-		BlockInfo::Initialize();
+		cBlockInfo::Initialize();
 	}
 } BlockInfoInitializer;
 

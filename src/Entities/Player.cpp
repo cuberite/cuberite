@@ -1904,7 +1904,7 @@ void cPlayer::Detach()
 		{
 			for (int z = PosZ - 2; z <= (PosZ + 2); ++z)
 			{
-				if (!g_BlockIsSolid[m_World->GetBlock(x, y, z)] && g_BlockIsSolid[m_World->GetBlock(x, y - 1, z)])
+				if (!cBlockInfo::IsSolid(m_World->GetBlock(x, y, z)) && cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z)))
 				{
 					TeleportToCoords(x, y, z);
 					return;
