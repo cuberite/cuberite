@@ -15,7 +15,7 @@ class cBlockChestHandler :
 {
 public:
 	cBlockChestHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotater<cBlockEntityHandler,0x07,0x02,0x05,0x03,0x04, true>(a_BlockType)
+		: cMetaRotater<cBlockEntityHandler,0x07,0x04,0x01,0x03,0x02, true>(a_BlockType)
 	{
 	}
 
