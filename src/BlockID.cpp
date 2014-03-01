@@ -16,6 +16,7 @@ NIBBLETYPE g_BlockLightValue[256];
 NIBBLETYPE g_BlockSpreadLightFalloff[256];
 bool       g_BlockTransparent[256];
 float      g_BlockDigTime[256];
+bool       g_BlockOneHitDig[256];
 bool       g_BlockPistonBreakable[256];
 bool       g_BlockIsSnowable[256];
 bool       g_BlockRequiresSpecialTool[256];
@@ -494,10 +495,10 @@ public:
 		memset(g_BlockFullyOccupiesVoxel,  0x00, sizeof(g_BlockFullyOccupiesVoxel));
 		
 		std::fill(g_BlockDigTime, g_BlockDigTime + ARRAYCOUNT(g_BlockDigTime), 0);
+		std::fill(g_BlockOneHitDig, g_BlockOneHitDig + ARRAYCOUNT(g_BlockOneHitDig), false);
 		std::fill(g_BlockIsSnowable, g_BlockIsSnowable + ARRAYCOUNT(g_BlockIsSnowable), true);
 		std::fill(g_BlockIsSolid, g_BlockIsSolid + ARRAYCOUNT(g_BlockIsSolid), true);
-		
-		memset(g_BlockRequiresSpecialTool, 0x00, sizeof(g_BlockRequiresSpecialTool));  // Set all blocks to false
+		std::fill(g_BlockRequiresSpecialTool, g_BlockRequiresSpecialTool + ARRAYCOUNT(g_BlockRequiresSpecialTool), false);
 
 		// Emissive blocks
 		g_BlockLightValue[E_BLOCK_FIRE]                 = 15;
@@ -1012,6 +1013,15 @@ public:
 		g_BlockFullyOccupiesVoxel[E_BLOCK_WOOL]                  = true;
 		g_BlockFullyOccupiesVoxel[E_BLOCK_STONE]                 = true;
 		g_BlockFullyOccupiesVoxel[E_BLOCK_STONE_BRICKS]          = true;
+		
+		// Fill the g_BlockOneHitDig Array:
+		for (size_t i = 0; i < ARRAYCOUNT(g_BlockDigTime); i++)
+		{
+			if (g_BlockDigTime[i] <= 0.0F)
+			{
+				g_BlockOneHitDig[i] = true;
+			}
+		}
 	}
 } BlockPropertiesInitializer;
 
