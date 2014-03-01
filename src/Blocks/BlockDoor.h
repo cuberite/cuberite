@@ -12,7 +12,7 @@
 class cBlockDoorHandler :
 	public cMetaRotater<cBlockHandler,0x03,0x01,0x02,0x03,0x00, true>
 {
-	typedef super cMetaRotater<cBlockHandler,0x03,0x01,0x02,0x03,0x00, true>;
+	typedef cMetaRotater<cBlockHandler,0x03,0x01,0x02,0x03,0x00, true> super;
 public:
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 
