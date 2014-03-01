@@ -175,8 +175,8 @@ public:
 		
 		// Cause a compile-time error if sizeof(float) != 4
 		// If your platform produces a compiler error here, you'll need to add code that manually decodes 32-bit floats
-		char Check1[5 - sizeof(float)];  // sizeof(float) <= 4
-		char Check2[sizeof(float) - 3];  // sizeof(float) >= 4
+		char Check1[5 - sizeof(float)];  // Fails if sizeof(float) > 4
+		char Check2[sizeof(float) - 3];  // Fails if sizeof(float) < 4
 		UNUSED(Check1);
 		UNUSED(Check2);
 		
