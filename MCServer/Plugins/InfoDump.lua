@@ -578,7 +578,10 @@ local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
 	DumpAdditionalInfoForum(a_PluginInfo, f);
 	DumpCommandsForum(a_PluginInfo, f);
 	DumpPermissionsForum(a_PluginInfo, f);
-
+	if (a_PluginInfo.SourceLocation ~= nil) then
+		f:write("[b][color=blue]Source:[/color] [url=" .. a_PluginInfo.SourceLocation .. "]Link[/url][/b]");
+	end
+	
 	f:close();
 end
 
