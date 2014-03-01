@@ -478,5 +478,12 @@ FireworkStar     = Gunpowder, * | Dye ^-1, * | Goldnugget, * | Glowdust, * | Dia
 FireworkStar     = Gunpowder, * | Dye ^-1, * | Feather, * | Glowdust, * | Diamond, *
 FireworkStar     = Gunpowder, * | Dye ^-1, * | SkeletonHead ^-1, * | Glowdust, * | Diamond, *
 
-# Star colour-change
+# Star fade colour-change
 FireworkStar     = FireworkStar, * | Dye ^-1, *
+FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, *
+FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
+FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
+FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
+FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
+FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
+FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
