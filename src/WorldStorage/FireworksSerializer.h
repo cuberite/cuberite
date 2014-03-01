@@ -64,15 +64,19 @@ public:
 
 	/** Writes firework NBT data to a Writer object */
 	static void WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_ID a_Type);
+
 	/** Reads NBT data from a NBT object and populates a FireworkItem with it */
 	static void ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_ID a_Type);
 
 	/** Converts the firework's vector of colours into a string of values separated by a semicolon */
 	static AString ColoursToString(const cFireworkItem & a_FireworkItem);
+
 	/** Parses a string containing encoded firework colours and populates a FireworkItem with it */
 	static void ColoursFromString(const AString & a_String, cFireworkItem & a_FireworkItem);
+
 	/** Converts the firework's vector of fade colours into a string of values separated by a semicolon */
 	static AString FadeColoursToString(const cFireworkItem & a_FireworkItem);
+
 	/** Parses a string containing encoded firework fade colours and populates a FireworkItem with it */
 	static void FadeColoursFromString(const AString & a_String, cFireworkItem & a_FireworkItem);
 

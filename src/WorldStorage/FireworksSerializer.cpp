@@ -89,26 +89,28 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 
 					if (ExplosionName == "Colors")
 					{
-						if (a_NBT.GetDataLength(explosiontag) == 0)
+						int DataLength = a_NBT.GetDataLength(explosiontag);
+						if (DataLength == 0)
 						{
 							continue;
 						}
 
 						const int * ColourData = (const int *)(a_NBT.GetData(explosiontag));
-						for (int i = 0; i < ARRAYCOUNT(ColourData); i++)
+						for (int i = 0; i < DataLength; i++)
 						{
 							a_FireworkItem.m_Colours.push_back(ntohl(ColourData[i]));
 						}
 					}
 					else if (ExplosionName == "FadeColors")
 					{
-						if (a_NBT.GetDataLength(explosiontag) == 0)
+						int DataLength = a_NBT.GetDataLength(explosiontag);
+						if (DataLength == 0)
 						{
 							continue;
 						}
 
 						const int * FadeColourData = (const int *)(a_NBT.GetData(explosiontag));
-						for (int i = 0; i < ARRAYCOUNT(FadeColourData); i++)
+						for (int i = 0; i < DataLength; i++)
 						{
 							a_FireworkItem.m_FadeColours.push_back(ntohl(FadeColourData[i]));
 						}
@@ -244,6 +246,6 @@ int cFireworkItem::GetVanillaColourCodeFromDye(short a_DyeMeta)
 		case E_META_DYE_MAGENTA: return 12801229;
 		case E_META_DYE_ORANGE: return 15435844;
 		case E_META_DYE_WHITE: return 15790320;
-		default: ASSERT(!"Unhandled dye meta whilst trying to get colour code for fireworks!"); break;
+		default: ASSERT(!"Unhandled dye meta whilst trying to get colour code for fireworks!"); return 0;
 	}
 }
