@@ -1135,19 +1135,19 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 			},
 			Constants =
 			{
-				E_TYPE_ACHIEVEMENT = { Notes = "" },
-				E_TYPE_DEATH_COUNT = { Notes = "" },
-				E_TYPE_DUMMY = { Notes = "" },
-				E_TYPE_HEALTH = { Notes = "" },
-				E_TYPE_PLAYER_KILL_COUNT = { Notes = "" },
-				E_TYPE_STAT = { Notes = "" },
-				E_TYPE_STAT_BLOCK_MINE = { Notes = "" },
-				E_TYPE_STAT_ENTITY_KILL = { Notes = "" },
-				E_TYPE_STAT_ENTITY_KILLED_BY = { Notes = "" },
-				E_TYPE_STAT_ITEM_BREAK = { Notes = "" },
-				E_TYPE_STAT_ITEM_CRAFT = { Notes = "" },
-				E_TYPE_STAT_ITEM_USE = { Notes = "" },
-				E_TYPE_TOTAL_KILL_COUNT = { Notes = "" },
+				otAchievement = { Notes = "" },
+				otDeathCount = { Notes = "" },
+				otDummy = { Notes = "" },
+				otHealth = { Notes = "" },
+				otPlayerKillCount = { Notes = "" },
+				otStat = { Notes = "" },
+				otStatBlockMine = { Notes = "" },
+				otStatEntityKill = { Notes = "" },
+				otStatEntityKilledBy = { Notes = "" },
+				otStatItemBreak = { Notes = "" },
+				otStatItemCraft = { Notes = "" },
+				otStatItemUse = { Notes = "" },
+				otTotalKillCount = { Notes = "" },
 			},
 		}, -- cObjective
 
@@ -1880,10 +1880,10 @@ end
 			},
 			Constants =
 			{
-				E_DISPLAY_SLOT_COUNT = { Notes = "" },
-				E_DISPLAY_SLOT_LIST = { Notes = "" },
-				E_DISPLAY_SLOT_NAME = { Notes = "" },
-				E_DISPLAY_SLOT_SIDEBAR = { Notes = "" },
+				dsCount = { Notes = "" },
+				dsList = { Notes = "" },
+				dsName = { Notes = "" },
+				dsSidebar = { Notes = "" },
 			},
 		}, -- cScoreboard
 
