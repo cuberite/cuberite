@@ -859,7 +859,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	{
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
 
-		m_World->GetScoreBoard().AddPlayerScore(((cPlayer *)a_Killer)->GetName(), cObjective::E_TYPE_PLAYER_KILL_COUNT, 1);
+		m_World->GetScoreBoard().AddPlayerScore(((cPlayer *)a_Killer)->GetName(), cObjective::otPlayerKillCount, 1);
 	}
 	else
 	{
@@ -869,7 +869,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
 
-	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::E_TYPE_DEATH_COUNT, 1);
+	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
 
 

@@ -31,23 +31,23 @@ public:
 
 	enum eType
 	{
-		E_TYPE_DUMMY,
+		otDummy,
 
-		E_TYPE_DEATH_COUNT,
-		E_TYPE_PLAYER_KILL_COUNT,
-		E_TYPE_TOTAL_KILL_COUNT,
-		E_TYPE_HEALTH,
+		otDeathCount,
+		otPlayerKillCount,
+		otTotalKillCount,
+		otHealth,
 
-		E_TYPE_ACHIEVEMENT,
+		otAchievement,
 
-		E_TYPE_STAT,
-		E_TYPE_STAT_ITEM_CRAFT,
-		E_TYPE_STAT_ITEM_USE,
-		E_TYPE_STAT_ITEM_BREAK,
+		otStat,
+		otStatItemCraft,
+		otStatItemUse,
+		otStatItemBreak,
 
-		E_TYPE_STAT_BLOCK_MINE,
-		E_TYPE_STAT_ENTITY_KILL,
-		E_TYPE_STAT_ENTITY_KILLED_BY
+		otStatBlockMine,
+		otStatEntityKill,
+		otStatEntityKilledBy
 	};
 
 	// tolua_end
@@ -201,11 +201,11 @@ public:
 
 	enum eDisplaySlot
 	{
-		E_DISPLAY_SLOT_LIST = 0,
-		E_DISPLAY_SLOT_SIDEBAR,
-		E_DISPLAY_SLOT_NAME,
+		dsList = 0,
+		dsSidebar,
+		dsName,
 
-		E_DISPLAY_SLOT_COUNT
+		dsCount
 	};
 
 	// tolua_end
@@ -284,7 +284,7 @@ private:
 
 	cWorld * m_World;
 
-	cObjective* m_Display[E_DISPLAY_SLOT_COUNT];
+	cObjective * m_Display[dsCount];
 
 	friend class cScoreboardSerializer;
 
