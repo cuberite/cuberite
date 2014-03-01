@@ -52,6 +52,9 @@
 /** Maximum number of explosions to send this tick, server will start dropping if exceeded */
 #define MAX_EXPLOSIONS_PER_TICK 20
 
+/** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
+#define MAX_BLOCK_CHANGE_INTERACTIONS 20
+
 /** How many ticks before the socket is closed after the client is destroyed (#31) */
 static const int TICKS_BEFORE_CLOSE = 20;
 
@@ -687,17 +690,19 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
 	);
 
+	m_NumBlockChangeInteractionsThisTick++;
+
+	if (!CheckBlockInteractionsRate())
+	{
+		Kick("Too many blocks were destroyed per unit time - hacked client?");
+		return;
+	}
+
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
-	}
-	
-	if (!CheckBlockInteractionsRate())
-	{
-		// Too many interactions per second, simply ignore. Probably a hacked client, so don't even send bak the block
 		return;
 	}
 
@@ -924,7 +929,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		if (a_BlockFace > -1)
+		if (a_BlockFace > BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -934,7 +939,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	if (!CheckBlockInteractionsRate())
 	{
-		LOGD("Too many block interactions, aborting placement");
+		Kick("Too many blocks were destroyed per unit time - hacked client?");
 		return;
 	}
 	
@@ -1613,28 +1618,12 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 {
 	ASSERT(m_Player != NULL);
 	ASSERT(m_Player->GetWorld() != NULL);
-	/*
-	// TODO: _X 2012_11_01: This needs a total re-thinking and rewriting
-	int LastActionCnt = m_Player->GetLastBlockActionCnt();
-	if ((m_Player->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1)
+
+	if (m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS)
 	{
-		// Limit the number of block interactions per tick
-		m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-		m_Player->SetLastBlockActionCnt(LastActionCnt + 1);
-		if (m_Player->GetLastBlockActionCnt() > MAXBLOCKCHANGEINTERACTIONS)
-		{
-			// Kick if more than MAXBLOCKCHANGEINTERACTIONS per tick
-			LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", m_Username.c_str());
-			Kick("You're a baaaaaad boy!");
-			return false;
-		}
+		return false;
 	}
-	else
-	{
-		m_Player->SetLastBlockActionCnt(0);  // Reset count 
-		m_Player->SetLastBlockActionTime();  // Player tried to interact with a block. Reset last block interation time.
-	}
-	*/
+
 	return true;
 }
 
@@ -1707,8 +1696,9 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 	
-	// Reset explosion counter:
+	// Reset explosion & block change counters:
 	m_NumExplosionsThisTick = 0;
+	m_NumBlockChangeInteractionsThisTick = 0;
 }
 
 

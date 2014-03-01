@@ -50,7 +50,7 @@ public:
 	/// Returns the curently equipped weapon; empty item if none
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 	
-	/// Returns the currently equipped helmet; empty item if nonte
+	/// Returns the currently equipped helmet; empty item if none
 	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
 	
 	/// Returns the currently equipped chestplate; empty item if none
@@ -165,11 +165,6 @@ public:
 	// tolua_end
 	
 	void SetIP(const AString & a_IP);
-
-	float GetLastBlockActionTime() { return m_LastBlockActionTime; }
-	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }
-	void SetLastBlockActionCnt( int );
-	void SetLastBlockActionTime();
 	
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
@@ -416,12 +411,8 @@ protected:
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
 
-	float m_TimeLastPickupCheck;
-
 	char m_Color;
 
-	float m_LastBlockActionTime;
-	int m_LastBlockActionCnt;
 	eGameMode m_GameMode;
 	AString m_IP;
 	
