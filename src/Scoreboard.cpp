@@ -498,6 +498,25 @@ bool cScoreboard::ForEachObjective(cObjectiveCallback& a_Callback)
 
 
 
+bool cScoreboard::ForEachTeam(cTeamCallback& a_Callback)
+{
+	cCSLock Lock(m_CSObjectives);
+
+	for (cTeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
+	{
+		// Call callback
+		if (a_Callback.Item(&it->second))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+
+
 void cScoreboard::AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value)
 {
 	cCSLock Lock(m_CSObjectives);

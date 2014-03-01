@@ -2586,6 +2586,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cScoreboard");
 			tolua_function(tolua_S, "ForEachObjective", tolua_ForEach<cScoreboard, cObjective, &cScoreboard::ForEachObjective>);
+			tolua_function(tolua_S, "ForEachTeam",      tolua_ForEach<cScoreboard, cTeam,      &cScoreboard::ForEachTeam>);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin");
