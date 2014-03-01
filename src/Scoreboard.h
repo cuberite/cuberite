@@ -14,9 +14,11 @@
 
 
 class cObjective;
+class cTeam;
 class cWorld;
 
 typedef cItemCallback<cObjective> cObjectiveCallback;
+typedef cItemCallback<cTeam>      cTeamCallback;
 
 
 
@@ -31,23 +33,23 @@ public:
 
 	enum eType
 	{
-		E_TYPE_DUMMY,
+		otDummy,
 
-		E_TYPE_DEATH_COUNT,
-		E_TYPE_PLAYER_KILL_COUNT,
-		E_TYPE_TOTAL_KILL_COUNT,
-		E_TYPE_HEALTH,
+		otDeathCount,
+		otPlayerKillCount,
+		otTotalKillCount,
+		otHealth,
 
-		E_TYPE_ACHIEVEMENT,
+		otAchievement,
 
-		E_TYPE_STAT,
-		E_TYPE_STAT_ITEM_CRAFT,
-		E_TYPE_STAT_ITEM_USE,
-		E_TYPE_STAT_ITEM_BREAK,
+		otStat,
+		otStatItemCraft,
+		otStatItemUse,
+		otStatItemBreak,
 
-		E_TYPE_STAT_BLOCK_MINE,
-		E_TYPE_STAT_ENTITY_KILL,
-		E_TYPE_STAT_ENTITY_KILLED_BY
+		otStatBlockMine,
+		otStatEntityKill,
+		otStatEntityKilledBy
 	};
 
 	// tolua_end
@@ -67,30 +69,36 @@ public:
 	const AString & GetName(void)        const { return m_Name; }
 	const AString & GetDisplayName(void) const { return m_DisplayName; }
 
-	/// Resets the objective
+	/** Resets the objective */
 	void Reset(void);
 
-	/// Returns the score of the specified player
+	/** Returns the score of the specified player */
 	Score GetScore(const AString & a_Name) const;
 
-	/// Sets the score of the specified player
+	/** Sets the score of the specified player */
 	void SetScore(const AString & a_Name, Score a_Score);
 
-	/// Resets the score of the specified player
+	/** Resets the score of the specified player */
 	void ResetScore(const AString & a_Name);
 
-	/// Adds a_Delta and returns the new score
+	/** Adds a_Delta and returns the new score */
 	Score AddScore(const AString & a_Name, Score a_Delta);
 
-	/// Subtracts a_Delta and returns the new score
+	/** Subtracts a_Delta and returns the new score */
 	Score SubScore(const AString & a_Name, Score a_Delta);
 
 	void SetDisplayName(const AString & a_Name);
 
 	// tolua_end
 
-	/// Send this objective to the specified client
+	/** Send this objective to the specified client */
 	void SendTo(cClientHandle & a_Client);
+
+	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
+	{
+		return "cObjective";
+	}
+
 
 private:
 
@@ -109,7 +117,8 @@ private:
 
 	friend class cScoreboardSerializer;
 
-};
+
+}; // tolua_export
 
 
 
@@ -127,21 +136,21 @@ public:
 		const AString & a_Prefix, const AString & a_Suffix
 	);
 
-	/// Adds a new player to the team
-	bool AddPlayer(const AString & a_Name);
-
-	/// Removes a player from the team
-	bool RemovePlayer(const AString & a_Name);
-
-	/// Returns whether the specified player is in this team
-	bool HasPlayer(const AString & a_Name) const;
-
-	/// Removes all registered players
-	void Reset(void);
-
 	// tolua_begin
 
-	/// Returns the number of registered players
+	/** Adds a new player to the team */
+	bool AddPlayer(const AString & a_Name);
+
+	/** Removes a player from the team */
+	bool RemovePlayer(const AString & a_Name);
+
+	/** Returns whether the specified player is in this team */
+	bool HasPlayer(const AString & a_Name) const;
+
+	/** Removes all registered players */
+	void Reset(void);
+
+	/** Returns the number of registered players */
 	unsigned int GetNumPlayers(void) const;
 
 	bool AllowsFriendlyFire(void)      const { return m_AllowsFriendlyFire; }
@@ -163,6 +172,11 @@ public:
 
 	// tolua_end
 
+	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
+	{
+		return "cTeam";
+	}
+
 private:
 
 	typedef std::set<AString> cPlayerNameSet;
@@ -180,7 +194,8 @@ private:
 
 	friend class cScoreboardSerializer;
 
-};
+
+}; // tolua_export
 
 
 
@@ -193,11 +208,11 @@ public:
 
 	enum eDisplaySlot
 	{
-		E_DISPLAY_SLOT_LIST = 0,
-		E_DISPLAY_SLOT_SIDEBAR,
-		E_DISPLAY_SLOT_NAME,
+		dsList = 0,
+		dsSidebar,
+		dsName,
 
-		E_DISPLAY_SLOT_COUNT
+		dsCount
 	};
 
 	// tolua_end
@@ -209,43 +224,60 @@ public:
 
 	// tolua_begin
 
-	/// Registers a new scoreboard objective, returns the cObjective instance, NULL on name collision
+	/** Registers a new scoreboard objective, returns the cObjective instance, NULL on name collision */
 	cObjective * RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type);
 
-	/// Removes a registered objective, returns true if operation was successful
+	/** Removes a registered objective, returns true if operation was successful */
 	bool RemoveObjective(const AString & a_Name);
 
-	/// Retrieves the objective with the specified name, NULL if not found
+	/** Retrieves the objective with the specified name, NULL if not found */
 	cObjective * GetObjective(const AString & a_Name);
 
-	/// Registers a new team, returns the cTeam instance, NULL on name collision
+	/** Registers a new team, returns the cTeam instance, NULL on name collision */
 	cTeam * RegisterTeam(const AString & a_Name, const AString & a_DisplayName, const AString & a_Prefix, const AString & a_Suffix);
 
-	/// Removes a registered team, returns true if operation was successful
+	/** Removes a registered team, returns true if operation was successful */
 	bool RemoveTeam(const AString & a_Name);
 
-	/// Retrieves the team with the specified name, NULL if not found
+	/** Retrieves the team with the specified name, NULL if not found */
 	cTeam * GetTeam(const AString & a_Name);
-
-	cTeam * QueryPlayerTeam(const AString & a_Name); // WARNING: O(n logn)
 
 	void SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot);
 
-	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
-
 	cObjective * GetObjectiveIn(eDisplaySlot a_Slot);
-
-	/// Execute callback for each objective with the specified type
-	void ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
 
 	unsigned int GetNumObjectives(void) const;
 
 	unsigned int GetNumTeams(void) const;
 
+	void AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value = 1);
+
 	// tolua_end
 
-	/// Send this scoreboard to the specified client
+	/** Send this scoreboard to the specified client */
 	void SendTo(cClientHandle & a_Client);
+
+	cTeam * QueryPlayerTeam(const AString & a_Name); // WARNING: O(n logn)
+
+	/** Execute callback for each objective with the specified type 
+	 *
+	 * Returns true if all objectives processed, false if the callback aborted by returning true.
+	 */
+	bool ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
+
+	/** Execute callback for each objective.
+	 *
+	 * Returns true if all objectives have been processed, false if the callback aborted by returning true.
+	 */
+	bool ForEachObjective(cObjectiveCallback& a_Callback); // Exported in ManualBindings.cpp
+
+	/** Execute callback for each team.
+	 *
+	 * Returns true if all teams have been processed, false if the callback aborted by returning true.
+	 */
+	bool ForEachTeam(cTeamCallback& a_Callback); // Exported in ManualBindings.cpp
+
+	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
 
 
 private:
@@ -265,11 +297,12 @@ private:
 
 	cWorld * m_World;
 
-	cObjective* m_Display[E_DISPLAY_SLOT_COUNT];
+	cObjective * m_Display[dsCount];
 
 	friend class cScoreboardSerializer;
 
-} ;
+
+}; // tolua_export
 
 
 

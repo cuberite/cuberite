@@ -46,8 +46,56 @@ cGroupManager::cGroupManager()
 	LOGD("-- Loading Groups --");
 	
 	LoadGroups();
+	CheckUsers();
 	
 	LOGD("-- Groups Successfully Loaded --");
+}
+
+
+
+
+
+void cGroupManager::GenerateDefaultUsersIni(cIniFile & a_IniFile)
+{
+	LOGWARN("Regenerating users.ini, all users will be reset");
+	a_IniFile.AddHeaderComment(" This file stores the players' groups.");
+	a_IniFile.AddHeaderComment(" The format is:");
+	a_IniFile.AddHeaderComment(" [PlayerName]");
+	a_IniFile.AddHeaderComment(" Groups = GroupName1, GroupName2, ...");
+
+	a_IniFile.WriteFile("users.ini");
+}
+
+
+
+
+
+void cGroupManager::CheckUsers(void)
+{
+	cIniFile IniFile;
+	if (!IniFile.ReadFile("users.ini"))
+	{
+		GenerateDefaultUsersIni(IniFile);
+		return;
+	}
+	
+	unsigned int NumKeys = IniFile.GetNumKeys();
+	for (size_t i = 0; i < NumKeys; i++)
+	{
+		AString Player = IniFile.GetKeyName( i );
+		AString Groups = IniFile.GetValue(Player, "Groups", "");
+		if (!Groups.empty())
+		{
+			AStringVector Split = StringSplit( Groups, "," );
+			for( unsigned int i = 0; i < Split.size(); i++ )
+			{
+				if (!ExistsGroup(Split[i]))
+				{
+					LOGWARNING("The group %s for player %s was not found!", Split[i].c_str(), Player.c_str());
+				}
+			}
+		}
+	}
 }
 
 
@@ -131,6 +179,16 @@ void cGroupManager::LoadGroups()
 			}
 		}
 	}
+}
+
+
+
+
+
+bool cGroupManager::ExistsGroup( const AString & a_Name )
+{
+	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
+	return ( itr != m_pState->Groups.end() );
 }
 
 

@@ -472,6 +472,8 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	if (split[0] == "reloadgroups")
 	{
 		cRoot::Get()->ReloadGroups();
+		a_Output.Out("Groups reloaded!");
+		a_Output.Finished();
 		return;
 	}
 	

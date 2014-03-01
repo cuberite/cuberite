@@ -858,6 +858,8 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	else if (a_Killer->IsPlayer())
 	{
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
+
+		m_World->GetScoreBoard().AddPlayerScore(((cPlayer *)a_Killer)->GetName(), cObjective::otPlayerKillCount, 1);
 	}
 	else
 	{
@@ -867,24 +869,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
 
-	class cIncrementCounterCB
-		: public cObjectiveCallback
-	{
-		AString m_Name;
-	public:
-		cIncrementCounterCB(const AString & a_Name) : m_Name(a_Name) {}
-
-		virtual bool Item(cObjective * a_Objective) override
-		{
-			a_Objective->AddScore(m_Name, 1);
-			return true;
-		}
-	} IncrementCounter (GetName());
-
-	cScoreboard & Scoreboard = m_World->GetScoreBoard();
-
-	// Update scoreboard objectives
-	Scoreboard.ForEachObjectiveWith(cObjective::E_TYPE_DEATH_COUNT, IncrementCounter);
+	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
 
 
@@ -1529,10 +1514,14 @@ void cPlayer::LoadPermissionsFromDisk()
 		std::string Groups = IniFile.GetValue(m_PlayerName, "Groups", "");
 		if (!Groups.empty())
 		{
-			AStringVector Split = StringSplit( Groups, "," );
-			for( unsigned int i = 0; i < Split.size(); i++ )
+			AStringVector Split = StringSplitAndTrim(Groups, ",");
+			for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
 			{
-				AddToGroup( Split[i].c_str() );
+				if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
+				{
+					LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
+				}
+				AddToGroup(*itr);
 			}
 		}
 		else
@@ -1540,16 +1529,15 @@ void cPlayer::LoadPermissionsFromDisk()
 			AddToGroup("Default");
 		}
 
-		m_Color = IniFile.GetValue(m_PlayerName, "Color", "-")[0];
+		AString Color = IniFile.GetValue(m_PlayerName, "Color", "-");
+		if (!Color.empty())
+		{
+			m_Color = Color[0];
+		}
 	}
 	else
 	{
-		LOGWARN("Regenerating users.ini, player %s will be added to the \"Default\" group", m_PlayerName.c_str());
-		IniFile.AddHeaderComment(" This is the file in which the group the player belongs to is stored");
-		IniFile.AddHeaderComment(" The format is: [PlayerName] | Groups=GroupName");
-
-		IniFile.SetValue(m_PlayerName, "Groups", "Default");
-		IniFile.WriteFile("users.ini");
+		cGroupManager::GenerateDefaultUsersIni(IniFile);
 		AddToGroup("Default");
 	}
 	ResolvePermissions();

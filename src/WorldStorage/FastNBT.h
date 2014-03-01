@@ -173,13 +173,14 @@ public:
 	{
 		ASSERT(m_Tags[a_Tag].m_Type == TAG_Float);
 		
-		// Cause a compile-time error if sizeof(int) != sizeof(float)
-		char Check1[sizeof(int) - sizeof(float) + 1];  // sizeof(int) >= sizeof(float)
-		char Check2[sizeof(float) - sizeof(int) + 1];  // sizeof(float) >= sizeof(int)
+		// Cause a compile-time error if sizeof(float) != 4
+		// If your platform produces a compiler error here, you'll need to add code that manually decodes 32-bit floats
+		char Check1[5 - sizeof(float)];  // Fails if sizeof(float) > 4
+		char Check2[sizeof(float) - 3];  // Fails if sizeof(float) < 4
 		UNUSED(Check1);
 		UNUSED(Check2);
 		
-		int i = GetBEInt(m_Data + m_Tags[a_Tag].m_DataStart);
+		Int32 i = GetBEInt(m_Data + m_Tags[a_Tag].m_DataStart);
 		float f;
 		memcpy(&f, &i, sizeof(f));
 		return f;

@@ -29,6 +29,8 @@ class cDebugCallbacks :
 {
 		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
+			UNUSED(a_Connection);
+			
 			if (cHTTPFormParser::HasFormData(a_Request))
 			{
 				a_Request.SetUserData(new cHTTPFormParser(a_Request, *this));
@@ -38,6 +40,8 @@ class cDebugCallbacks :
 		
 		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size) override
 		{
+			UNUSED(a_Connection);
+			
 			cHTTPFormParser * FormParser = (cHTTPFormParser *)(a_Request.GetUserData());
 			if (FormParser != NULL)
 			{
