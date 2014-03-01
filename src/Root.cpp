@@ -472,7 +472,14 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
 	AString String(a_Cmd);
-	std::transform(String.begin(), String.end(), String.begin(), ::tolower);
+
+	// Try to transform command bit
+	size_t FirstSpace = a_Cmd.find_first_of(" ");
+
+	if (FirstSpace != AString::npos)
+	{
+		std::transform(String.begin(), String.begin() + FirstSpace, String.begin(), ::tolower);
+	}
 
 	// Some commands are built-in:
 	if (String == "stop")
