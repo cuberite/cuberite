@@ -20,7 +20,7 @@
 
 
 class cStructGenMarbleCaves :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenMarbleCaves(int a_Seed) : m_Seed(a_Seed) {}
@@ -29,8 +29,8 @@ protected:
 
 	int m_Seed;
 	
-	// cStructureGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -38,7 +38,7 @@ protected:
 
 
 class cStructGenDualRidgeCaves :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenDualRidgeCaves(int a_Seed, float a_Threshold) :
@@ -55,8 +55,8 @@ protected:
 	int    m_Seed;
 	float  m_Threshold;
 	
-	// cStructureGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -64,7 +64,7 @@ protected:
 
 
 class cStructGenWormNestCaves :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenWormNestCaves(int a_Seed, int a_Size = 64, int a_Grid = 96, int a_MaxOffset = 128) :
@@ -94,7 +94,7 @@ protected:
 	void GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cCaveSystems & a_Caves);
 	
 	// cStructGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 

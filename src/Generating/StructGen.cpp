@@ -54,7 +54,7 @@ const int NEST_SIZE_GRAVEL = 32;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenTrees:
 
-void cStructGenTrees::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -306,7 +306,7 @@ int cStructGenTrees::GetNumTrees(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenOreNests:
 
-void cStructGenOreNests::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenOreNests::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -413,7 +413,7 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenLakes:
 
-void cStructGenLakes::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -545,7 +545,7 @@ cStructGenDirectOverhangs::cStructGenDirectOverhangs(int a_Seed) :
 
 
 
-void cStructGenDirectOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// If there is no column of the wanted biome, bail out:
 	if (!HasWantedBiome(a_ChunkDesc))
@@ -665,7 +665,7 @@ cStructGenDistortedMembraneOverhangs::cStructGenDistortedMembraneOverhangs(int a
 
 
 
-void cStructGenDistortedMembraneOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenDistortedMembraneOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	const NOISE_DATATYPE Frequency = (NOISE_DATATYPE)16;
 	const NOISE_DATATYPE Amount = (NOISE_DATATYPE)1;

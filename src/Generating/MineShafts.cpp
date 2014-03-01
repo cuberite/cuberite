@@ -1407,7 +1407,7 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 
 
 
-void cStructGenMineShafts::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenMineShafts::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
