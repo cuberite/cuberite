@@ -763,13 +763,24 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	}
 	Recipe->m_Ingredients.insert(Recipe->m_Ingredients.end(), MatchedSlots.begin(), MatchedSlots.end());
 
-
-	// Henceforth is code to handle fireworks
 	// We use Recipe instead of a_Recipe because we want the wildcard ingredients' slot numbers as well, which was just added previously
+	HandleFireworks(a_CraftingGrid, Recipe.get(), a_GridStride, a_OffsetX, a_OffsetY);
 
-	if (Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_ROCKET)
+	return Recipe.release();
+}
+
+
+
+
+
+void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_OffsetX, int a_OffsetY)
+{
+	// TODO: add support for more than one dye in the recipe
+	// A manual and temporary solution (listing everything) is in crafting.txt for fade colours, but a programmatic solutions needs to be done for everything else
+
+	if (a_Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_ROCKET)
 	{
-		for (cRecipeSlots::const_iterator itr = Recipe->m_Ingredients.begin(); itr != Recipe->m_Ingredients.end(); ++itr)
+		for (cRecipeSlots::const_iterator itr = a_Recipe->m_Ingredients.begin(); itr != a_Recipe->m_Ingredients.end(); ++itr)
 		{
 			switch (itr->m_Item.m_ItemType)
 			{
@@ -777,80 +788,66 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 				{
 					// Result was a rocket, found a star - copy star data to rocket data
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
+					a_Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
 					break;
 				}
 				case E_ITEM_GUNPOWDER:
 				{
 					// Gunpowder - increase flight time
-					Recipe->m_Result.m_FireworkItem.m_FlightTimeInTicks += 20;
+					a_Recipe->m_Result.m_FireworkItem.m_FlightTimeInTicks += 20;
 					break;
 				}
 				case E_ITEM_PAPER: break;
-				default: LOG("Unexpected item in firework rocket recipe, was the crafting file fireworks section changed?"); break;
+				default: LOG("Unexpected item in firework rocket a_Recipe, was the crafting file fireworks section changed?"); break;
 			}
 		}
 	}
-	else if (Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_STAR)
+	else if (a_Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_STAR)
 	{
-		for (cRecipeSlots::const_iterator itr = Recipe->m_Ingredients.begin(); itr != Recipe->m_Ingredients.end(); ++itr)
+		std::vector<int> DyeColours;
+		bool FoundStar = false;
+
+		for (cRecipeSlots::const_iterator itr = a_Recipe->m_Ingredients.begin(); itr != a_Recipe->m_Ingredients.end(); ++itr)
 		{
 			switch (itr->m_Item.m_ItemType)
 			{
 				case E_ITEM_FIREWORK_STAR:
 				{
 					// Result was star, found another star - probably adding fade colours, but copy data over anyhow
+					FoundStar = true;
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
+					a_Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
 					break;
 				}
 				case E_ITEM_DYE:
 				{
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-
-					// Found a dye in ingredients...
-					for (cRecipeSlots::const_iterator itrnumerodos = Recipe->m_Ingredients.begin(); itrnumerodos != Recipe->m_Ingredients.end(); ++itrnumerodos)
-					{
-						// Loop through ingredients. Can we find a star?
-						if (itrnumerodos->m_Item.m_ItemType == E_ITEM_FIREWORK_STAR)
-						{
-							// Yes, this is definately adding fade colours, unless crafting.txt was changed :/
-							for (cRecipeSlots::const_iterator itrnumerotres = Recipe->m_Ingredients.begin(); itrnumerotres != Recipe->m_Ingredients.end(); ++itrnumerotres)
-							{
-								// Loop again, can we find dye?
-								if (itrnumerotres->m_Item.m_ItemType == E_ITEM_DYE)
-								{
-									// Yep, push back fade colour and exit the loop
-									// There is a potential for flexibility here - we can move the goto out of the loop, so we can add multiple dyes (∴ multiple fade colours)
-									// That will require lots of dye-adding to crafting.txt though - TODO, perchance?
-									GridID = (itrnumerotres->x + a_OffsetX) + a_GridStride * (itrnumerotres->y + a_OffsetY);
-									Recipe->m_Result.m_FireworkItem.m_FadeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
-									goto next;
-								}
-							}
-						}
-					}
-
-					// Just normal crafting of star, push back normal colours
-					Recipe->m_Result.m_FireworkItem.m_Colours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
-
-					next:
+					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
 					break;
 				}
 				case E_ITEM_GUNPOWDER: break;
-				case E_ITEM_DIAMOND: Recipe->m_Result.m_FireworkItem.m_HasTrail = true; break;
-				case E_ITEM_GLOWSTONE_DUST: Recipe->m_Result.m_FireworkItem.m_HasFlicker = true; break;
+				case E_ITEM_DIAMOND: a_Recipe->m_Result.m_FireworkItem.m_HasTrail = true; break;
+				case E_ITEM_GLOWSTONE_DUST: a_Recipe->m_Result.m_FireworkItem.m_HasFlicker = true; break;
 
-				case E_ITEM_FIRE_CHARGE: Recipe->m_Result.m_FireworkItem.m_Type = 1; break;
-				case E_ITEM_GOLD_NUGGET: Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
-				case E_ITEM_FEATHER: Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
-				case E_ITEM_HEAD: Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
-				default: LOG("Unexpected item in firework star recipe, was the crafting file fireworks section changed?"); break; // ermahgerd BARD ardmins
+				case E_ITEM_FIRE_CHARGE: a_Recipe->m_Result.m_FireworkItem.m_Type = 1; break;
+				case E_ITEM_GOLD_NUGGET: a_Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
+				case E_ITEM_FEATHER: a_Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
+				case E_ITEM_HEAD: a_Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
+				default: LOG("Unexpected item in firework star a_Recipe, was the crafting file fireworks section changed?"); break; // ermahgerd BARD ardmins
 			}
 		}
-	}
 
-	return Recipe.release();
+		if (FoundStar && (!DyeColours.empty()))
+		{
+			// Found a star and a dye? Fade colours.
+			a_Recipe->m_Result.m_FireworkItem.m_FadeColours = DyeColours;
+		}
+		else if (!DyeColours.empty())
+		{
+			// Only dye? Normal colours.
+			a_Recipe->m_Result.m_FireworkItem.m_Colours = DyeColours;
+		}
+	}
 }
 
 
