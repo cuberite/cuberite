@@ -858,6 +858,8 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	else if (a_Killer->IsPlayer())
 	{
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
+
+		m_World->GetScoreBoard().AddPlayerScore(((cPlayer *)a_Killer)->GetName(), cObjective::E_TYPE_PLAYER_KILL_COUNT, 1);
 	}
 	else
 	{
@@ -867,24 +869,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
 
-	class cIncrementCounterCB
-		: public cObjectiveCallback
-	{
-		AString m_Name;
-	public:
-		cIncrementCounterCB(const AString & a_Name) : m_Name(a_Name) {}
-
-		virtual bool Item(cObjective * a_Objective) override
-		{
-			a_Objective->AddScore(m_Name, 1);
-			return true;
-		}
-	} IncrementCounter (GetName());
-
-	cScoreboard & Scoreboard = m_World->GetScoreBoard();
-
-	// Update scoreboard objectives
-	Scoreboard.ForEachObjectiveWith(cObjective::E_TYPE_DEATH_COUNT, IncrementCounter);
+	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::E_TYPE_DEATH_COUNT, 1);
 }
 
 

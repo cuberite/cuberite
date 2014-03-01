@@ -246,6 +246,17 @@ void cTeam::Reset(void)
 
 
 
+void cTeam::SetDisplayName(const AString & a_Name)
+{
+	m_DisplayName = a_Name;
+
+	// TODO 2014-03-01 xdot: Update clients
+}
+
+
+
+
+
 unsigned int cTeam::GetNumPlayers(void) const
 {
 	return m_Players.size();
@@ -305,6 +316,8 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 
 	ASSERT(m_World != NULL);
 	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
+
+	// TODO 2014-03-01 xdot: Remove objective from display slot
 
 	return true;
 }
@@ -457,6 +470,23 @@ void cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallb
 			{
 				return;
 			}
+		}
+	}
+}
+
+
+
+
+
+void cScoreboard::AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value)
+{
+	cCSLock Lock(m_CSObjectives);
+
+	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
+	{
+		if (it->second.GetType() == a_Type)
+		{
+			it->second.AddScore(a_Name, a_Value);
 		}
 	}
 }

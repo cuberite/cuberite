@@ -1115,6 +1115,42 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 			},
 		},  -- cItem
 
+		cObjective =
+		{
+			Desc = [[
+				This class represents a single scoreboard objective.
+			]],
+			Functions =
+			{
+				AddScore = { Params = "string, number", Return = "Score", Notes = "Adds a value to the score of the specified player and returns the new value." },
+				GetDisplayName = { Params = "", Return = "string", Notes = "Returns the display name of the objective. This name will be shown to the connected players." },
+				GetName = { Params = "", Return = "string", Notes = "Returns the internal name of the objective." },
+				GetScore = { Params = "string", Return = "Score", Notes = "Returns the score of the specified player." },
+				GetType = { Params = "", Return = "eType", Notes = "Returns the type of the objective. (i.e what is being tracked)" },
+				Reset = { Params = "", Return = "", Notes = "Resets the scores of the tracked players." },
+				ResetScore = { Params = "string", Return = "", Notes = "Reset the score of the specified player." },
+				SetDisplayName = { Params = "string", Return = "", Notes = "Sets the display name of the objective." },
+				SetScore = { Params = "string, Score", Return = "", Notes = "Sets the score of the specified player." },
+				SubScore = { Params = "string, number", Return = "Score", Notes = "Subtracts a value from the score of the specified player and returns the new value." },
+			},
+			Constants =
+			{
+				E_TYPE_ACHIEVEMENT = { Notes = "" },
+				E_TYPE_DEATH_COUNT = { Notes = "" },
+				E_TYPE_DUMMY = { Notes = "" },
+				E_TYPE_HEALTH = { Notes = "" },
+				E_TYPE_PLAYER_KILL_COUNT = { Notes = "" },
+				E_TYPE_STAT = { Notes = "" },
+				E_TYPE_STAT_BLOCK_MINE = { Notes = "" },
+				E_TYPE_STAT_ENTITY_KILL = { Notes = "" },
+				E_TYPE_STAT_ENTITY_KILLED_BY = { Notes = "" },
+				E_TYPE_STAT_ITEM_BREAK = { Notes = "" },
+				E_TYPE_STAT_ITEM_CRAFT = { Notes = "" },
+				E_TYPE_STAT_ITEM_USE = { Notes = "" },
+				E_TYPE_TOTAL_KILL_COUNT = { Notes = "" },
+			},
+		}, -- cObjective
+
 		cPainting =
 		{
 			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
@@ -1821,6 +1857,34 @@ end
 			},
 		},  -- cRoot
 
+		cScoreboard =
+		{
+			Desc = [[
+				This class manages the objectives and teams of a single world.
+			]],
+			Functions =
+			{
+				AddPlayerScore = { Params = "Name, Type, Value", Return = "", Notes = "Adds a value to all player scores of the specified objective type." },
+				GetNumObjectives = { Params = "", Return = "number", Notes = "Returns the nuber of registered objectives." },
+				GetNumTeams = { Params = "", Return = "number", Notes = "Returns the number of registered teams." },
+				GetObjective = { Params = "string", Return = "{{cObjective}}", Notes = "Returns the objective with the specified name." },
+				GetObjectiveIn = { Params = "DisplaySlot", Return = "{{cObjective}}", Notes = "Returns the objective in the specified display slot. Can be nil." },
+				GetTeam = { Params = "string", Return = "{{cTeam}}", Notes = "Returns the team with the specified name." },
+				RegisterObjective = { Params = "Name, DisplayName, Type", Return = "{{cObjective}}", Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, nil on error." },
+				RegisterTeam = { Params = "Name, DisplayName, Prefix, Suffix", Return = "{{cTeam}}", Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error." },
+				RemoveObjective = { Params = "string", Return = "bool", Notes = "Removes the objective with the specified name. Returns true if operation was successful." },
+				RemoveTeam = { Params = "string", Return = "bool", Notes = "Removes the team with the specified name. Returns true if operation was successful." },
+				SetDisplay = { Params = "Name, DisplaySlot", Return = "", Notes = "Updates the currently displayed objective." },
+			},
+			Constants =
+			{
+				E_DISPLAY_SLOT_COUNT = { Notes = "" },
+				E_DISPLAY_SLOT_LIST = { Notes = "" },
+				E_DISPLAY_SLOT_NAME = { Notes = "" },
+				E_DISPLAY_SLOT_SIDEBAR = { Notes = "" },
+			},
+		}, -- cScoreboard
+
 		cServer =
 		{
 			Desc = [[
@@ -1840,6 +1904,32 @@ end
 				IsHardcore = { Params = "", Return = "bool", Notes = "Returns true if the server is hardcore (players get banned on death)." },
 			},
 		},  -- cServer
+
+		cTeam =
+		{
+			Desc = [[
+				This class manages a single player team.
+			]],
+			Functions =
+			{
+				AddPlayer = { Params = "string", Returns = "bool", Notes = "Adds a player to this team. Returns true if the operation was successful." },
+				AllowsFriendlyFire = { Params = "", Return = "bool", Notes = "Returns whether team friendly fire is allowed." },
+				CanSeeFriendlyInvisible = { Params = "", Return = "bool", Notes = "Returns whether players can see invisible teammates." },
+				HasPlayer = { Params = "string", Returns = "bool", Notes = "Returns whether the specified player is a member of this team." },
+				GetDisplayName = { Params = "", Return = "string", Notes = "Returns the display name of the team." },
+				GetName = { Params = "", Return = "string", Notes = "Returns the internal name of the team." },
+				GetNumPlayers = { Params = "", Return = "number", Notes = "Returns the number of registered players." },
+				GetPrefix = { Params = "", Return = "string", Notes = "Returns the prefix prepended to the names of the members of this team." },
+				RemovePlayer = { Params = "string", Returns = "bool", Notes = "Removes the player with the specified name from this team. Returns true if the operation was successful." },
+				Reset = { Params = "", Returns = "", Notes = "Removes all players from this team." },
+				GetSuffix = { Params = "", Return = "string", Notes = "Returns the suffix appended to the names of the members of this team." },
+				SetCanSeeFriendlyInvisible = { Params = "bool", Return = "", Notes = "Set whether players can see invisible teammates." },
+				SetDisplayName = { Params = "string", Return = "", Notes = "Sets the display name of this team. (i.e. what will be shown to the players)" },
+				SetFriendlyFire = { Params = "bool", Return = "", Notes = "Sets whether team friendly fire is allowed." },
+				SetPrefix = { Params = "string", Return = "", Notes = "Sets the prefix prepended to the names of the members of this team." },
+				SetSuffix = { Params = "string", Return = "", Notes = "Sets the suffix appended to the names of the members of this team." },
+			},
+		}, -- cTeam
 
 		cTNTEntity =
 		{
