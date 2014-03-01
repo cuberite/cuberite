@@ -1865,6 +1865,7 @@ end
 			Functions =
 			{
 				AddPlayerScore = { Params = "Name, Type, Value", Return = "", Notes = "Adds a value to all player scores of the specified objective type." },
+				ForEachObjective = { Params = "CallBackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each objective in the scoreboard. Returns true if all objectives have been processed (including when there are zero objectives), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cObjective|Objective}}, [CallbackData])</pre> The callback should return false or no value to continue with the next objective, or true to abort the enumeration." },
 				GetNumObjectives = { Params = "", Return = "number", Notes = "Returns the nuber of registered objectives." },
 				GetNumTeams = { Params = "", Return = "number", Notes = "Returns the number of registered teams." },
 				GetObjective = { Params = "string", Return = "{{cObjective}}", Notes = "Returns the objective with the specified name." },

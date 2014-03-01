@@ -92,6 +92,12 @@ public:
 	/** Send this objective to the specified client */
 	void SendTo(cClientHandle & a_Client);
 
+	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
+	{
+		return "cObjective";
+	}
+
+
 private:
 
 	typedef std::pair<AString, Score> cTrackedPlayer;
@@ -246,8 +252,17 @@ public:
 
 	cTeam * QueryPlayerTeam(const AString & a_Name); // WARNING: O(n logn)
 
-	/** Execute callback for each objective with the specified type */
-	void ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
+	/** Execute callback for each objective with the specified type 
+	 *
+	 * Returns true if all objectives processed, false if the callback aborted by returning true.
+	 */
+	bool ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
+
+	/** Execute callback for each objective.
+	 *
+	 * Returns true if all objectives processed, false if the callback aborted by returning true.
+	 */
+	bool ForEachObjective(cObjectiveCallback& a_Callback); // Exported in ManualBindings.cpp
 
 	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
 

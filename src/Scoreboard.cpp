@@ -457,7 +457,7 @@ cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 
 
 
-void cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback)
+bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -468,10 +468,30 @@ void cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallb
 			// Call callback
 			if (a_Callback.Item(&it->second))
 			{
-				return;
+				return false;
 			}
 		}
 	}
+	return true;
+}
+
+
+
+
+
+bool cScoreboard::ForEachObjective(cObjectiveCallback& a_Callback)
+{
+	cCSLock Lock(m_CSObjectives);
+
+	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
+	{
+		// Call callback
+		if (a_Callback.Item(&it->second))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 
