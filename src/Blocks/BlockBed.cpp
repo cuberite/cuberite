@@ -96,4 +96,74 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 
 
+NIBBLETYPE cBlockBedHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag; 0 is foot of bed, 1 is head of the bed; first two bits are for position. 0x0C = 1100
+	NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+	// Rotates by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+	switch (a_Meta & 0x03)
+	{
+		case 0x00: return 0x03 + OtherMeta; // South -> East
+		case 0x03: return 0x02 + OtherMeta; // East  -> North
+		case 0x02: return 0x01 + OtherMeta; // North -> West
+		case 0x01: return 0x00 + OtherMeta; // West  -> South
+	}
+	// Not reachable, but to avoid a compiler warning:
+	return a_Meta;
+}
 
+
+
+
+
+NIBBLETYPE cBlockBedHandler::MetaRotateCW(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag; 0 is foot of bed, 1 is head of the bed; first two bits are for position. 0x0C = 1100
+	NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+	// Rotates by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+	switch (a_Meta & 0x03)
+	{
+		case 0x00: return 0x01 + OtherMeta; // South -> West
+		case 0x01: return 0x02 + OtherMeta; // West  -> North
+		case 0x02: return 0x03 + OtherMeta; // North -> East
+		case 0x03: return 0x00 + OtherMeta; // East  -> South
+	}
+	// Not reachable, but to avoid a compiler warning:
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockBedHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag; 0 is foot of bed, 1 is head of the bed; first two bits are for position. 0x0C = 1100
+	NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+	// Mirrors by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+	switch (a_Meta & 0x03)
+	{
+	case 0x00: return 0x02 + OtherMeta; // South -> North
+	case 0x02: return 0x00 + OtherMeta; // North -> South
+	}
+	// Not Facing North or South; No change.
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockBedHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag; 0 is foot of bed, 1 is head of the bed; first two bits are for position. 0x0C = 1100
+	NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+	// Mirrors by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+	switch (a_Meta & 0x03)
+	{
+		case 0x01: return 0x03 + OtherMeta; // West  -> East
+		case 0x03: return 0x01 + OtherMeta; // East  -> West
+	}
+	// Not Facing East or West; No change.
+	return a_Meta;
+}

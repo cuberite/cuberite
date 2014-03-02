@@ -103,8 +103,56 @@ public:
 
 		return (a_RelY > 0) && (cBlockInfo::IsSolid(BlockIsOn));
 	}
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// Rotates according to a table.
+		switch (a_Meta)
+		{ 
+			case 0x01: return 0x04;  // East  -> North
+			case 0x04: return 0x02;  // North -> West
+			case 0x02: return 0x03;  // West  -> South
+			case 0x03: return 0x01;  // South -> East
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// Rotates according to a table.
+		switch (a_Meta)
+		{
+			case 0x01: return 0x03;  // East  -> South
+			case 0x03: return 0x02;  // South -> West
+			case 0x02: return 0x04;  // West  -> North
+			case 0x04: return 0x01;  // North -> East
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// Mirrors according to a table.
+		switch (a_Meta)
+		{
+			case 0x03: return 0x04;  // South -> North
+			case 0x04: return 0x03;  // North -> South
+		}
+		// Not Facing North or South; No change.
+		return a_Meta;
+	}
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Mirrors according to a table.
+		switch (a_Meta)
+		{
+		case 0x01: return 0x02;  // East  -> West
+		case 0x02: return 0x01;  // West  -> East
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
 } ;
-
-
-
-

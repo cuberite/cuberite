@@ -117,6 +117,61 @@ public:
 		}
 	}
 
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+		switch (a_Meta)
+		{
+			case 0x00: return 0x01;  // South -> West
+			case 0x01: return 0x02;  // West -> North
+			case 0x02: return 0x03;  // North -> East
+			case 0x03: return 0x00;  // East -> South
+		}
+		// No Face on Pumpkin, no change.
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+		switch (a_Meta)
+		{
+			case 0x00: return 0x03;  // South -> East
+			case 0x03: return 0x02;  // East -> North
+			case 0x02: return 0x01;  // North -> West
+			case 0x01: return 0x00;  // West -> South
+		}
+		// No Face on pumpkin, no change.
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// Mirrors over XY-plane (North/South).
+		switch (a_Meta)
+		{
+			case 0x00: return 0x02;  // South -> North
+			case 0x02: return 0x00;  // North -> South
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Mirrors over YZ-plane (East/West).
+		switch (a_Meta)
+		{
+			case 0x01: return 0x03;  // West -> East
+			case 0x03: return 0x01;  // East -> West
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
 } ;
 
 

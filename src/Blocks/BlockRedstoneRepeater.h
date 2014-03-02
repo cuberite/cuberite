@@ -87,6 +87,70 @@ public:
 			return 0x0;
 		}
 	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// Bits 0x02 and 0x04 (Bits #3 and #4) are flags; lowest two bits are for position. 0x0C = 1100
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Rotates by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+		switch (a_Meta & 0x03)
+		{
+			case 0x00: return 0x03 + OtherMeta; // North -> West
+			case 0x03: return 0x02 + OtherMeta; // West  -> South
+			case 0x02: return 0x01 + OtherMeta; // South -> East
+			case 0x01: return 0x00 + OtherMeta; // East  -> North
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// Bits 0x02 and 0x04 (Bits #3 and #4) are flags; lowest two bits are for position. 0x0C = 1100
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Rotates by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+		switch (a_Meta & 0x03)
+		{
+			case 0x00: return 0x01 + OtherMeta; // North -> East
+			case 0x01: return 0x02 + OtherMeta; // East  -> South
+			case 0x02: return 0x03 + OtherMeta; // South -> West
+			case 0x03: return 0x00 + OtherMeta; // West  -> North
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// Bits 0x02 and 0x04 (Bits #3 and #4) are flags; lowest two bits are for position. 0x0C = 1100
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Mirrors by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+		switch (a_Meta & 0x03)
+		{
+			case 0x00: return 0x02 + OtherMeta; // North -> South
+			case 0x02: return 0x00 + OtherMeta; // South -> North
+		}
+		// Not Facing North or South; No change.
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Bits 0x02 and 0x04 (Bits #3 and #4) are flags; lowest two bits are for position. 0x0C = 1100
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Mirrors by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+		switch (a_Meta & 0x03)
+		{
+			case 0x01: return 0x03 + OtherMeta; // East  -> West
+			case 0x03: return 0x01 + OtherMeta; // West  -> East
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
 } ;
 
 

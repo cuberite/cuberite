@@ -99,6 +99,85 @@ public:
 
 		return (a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn);
 	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// Bits 0x08 and 0x04 (Bits #3 and #4) are flags; lowest two bits are for position. 0x0C = 1100
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Rotates by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+		switch (a_Meta & 0x03)
+		{
+			case 0x00: return 0x02 + OtherMeta; // South -> East
+			case 0x02: return 0x01 + OtherMeta; // East  -> North
+			case 0x01: return 0x03 + OtherMeta; // South -> West
+			case 0x03: return 0x00 + OtherMeta; // West  -> South
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// Bits 0x08 and 0x04 (Bits #3 and #4) are flags; lowest two bits are for position. 0x0C = 1100
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Rotates by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+		switch (a_Meta & 0x03)
+		{
+			case 0x00: return 0x03 + OtherMeta; // South -> West
+			case 0x03: return 0x01 + OtherMeta; // West  -> North
+			case 0x01: return 0x02 + OtherMeta; // South -> East
+			case 0x02: return 0x00 + OtherMeta; // East  -> South
+		}
+		// Not reachable, but to avoid a compiler warning:
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// Bits 0x08 and 0x04 (Bits #3 and #4) are flags; lowest two bits are for position. 0x0C = 1100
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Mirrors by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+		switch (a_Meta & 0x03)
+		{
+			case 0x01: return 0x00 + OtherMeta; // North -> South
+			case 0x00: return 0x01 + OtherMeta; // South -> North
+		}
+		// Not Facing North or South; No change.
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	{
+		// Bit 0x08 is a flag that determines if the trap door is on the top or bottom of a block.  0x07 == 0111
+		NIBBLETYPE OtherMeta = a_Meta & 0x07;
+		// Mirrors by returning appropate metavalue; values are determined by a Metadata table. 0x08 == 1000
+		switch (a_Meta & 0x08)
+		{
+			case 0x08: return 0x00 + OtherMeta; // Top   -> Bottom
+			case 0x00: return 0x08 + OtherMeta; // Bottom-> Top
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Bits 0x08 and 0x04 (Bits #3 and #4) are flags; lowest two bits are for position. 0x0C = 1100
+		NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+		// Mirrors by returning appropate metavalue; values are determined by a Metadata table. 0x03 == 0011
+		switch (a_Meta & 0x03)
+		{
+			case 0x02: return 0x03 + OtherMeta; // East  -> West
+			case 0x03: return 0x02 + OtherMeta; // West  -> East
+		}
+		// Not Facing East or West; No change.
+		return a_Meta;
+	}
 };
 
 

@@ -68,6 +68,100 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 
 
 
+NIBBLETYPE cBlockPistonHandler::MetaRotateCW(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x02: return 0x05 + OtherMeta;  // North -> East
+	case 0x05: return 0x03 + OtherMeta;  // East  -> South
+	case 0x03: return 0x04 + OtherMeta;  // South -> West
+	case 0x04: return 0x02 + OtherMeta;  // West  -> North
+	}
+	// Faces up/down
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockPistonHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x02: return 0x04 + OtherMeta;  // North -> West
+	case 0x04: return 0x03 + OtherMeta;  // West  -> South
+	case 0x03: return 0x05 + OtherMeta;  // South -> East
+	case 0x05: return 0x02 + OtherMeta;  // East  -> North
+	}
+	// Faces up/down
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockPistonHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x02: return 0x03 + OtherMeta;  // North -> South
+	case 0x03: return 0x02 + OtherMeta;  // South -> North
+	}
+	// Not Facing East or West; No change.
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockPistonHandler::MetaMirrorXZ(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x00: return 0x01 + OtherMeta;  // Up   -> down
+	case 0x01: return 0x00 + OtherMeta;  // Down -> Up
+	}
+	// Not Facing Up or Down; No change.
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockPistonHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x04: return 0x05 + OtherMeta;  // West -> East
+	case 0x05: return 0x04 + OtherMeta;  // East -> West
+	}
+	// Not Facing East or West; No change.
+	return a_Meta;
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBlockPistonHeadHandler:
 
@@ -104,6 +198,99 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 	}
 }
 
+
+
+
+
+NIBBLETYPE cBlockPistonHeadHandler::MetaRotateCW(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x02: return 0x05 + OtherMeta;  // North -> East
+	case 0x05: return 0x03 + OtherMeta;  // East  -> South
+	case 0x03: return 0x04 + OtherMeta;  // South -> West
+	case 0x04: return 0x02 + OtherMeta;  // West  -> North
+	}
+	// Faces up/down
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockPistonHeadHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x02: return 0x04 + OtherMeta;  // North -> West
+	case 0x04: return 0x03 + OtherMeta;  // West  -> South
+	case 0x03: return 0x05 + OtherMeta;  // South -> East
+	case 0x05: return 0x02 + OtherMeta;  // East  -> North
+	}
+	// Faces up/down
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockPistonHeadHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x02: return 0x03 + OtherMeta;  // North -> South
+	case 0x03: return 0x02 + OtherMeta;  // South -> North
+	}
+	// Not Facing East or West; No change.
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockPistonHeadHandler::MetaMirrorXZ(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x00: return 0x01 + OtherMeta;  // Up   -> down
+	case 0x01: return 0x00 + OtherMeta;  // Down -> Up
+	}
+	// Not Facing Up or Down; No change.
+	return a_Meta;
+}
+
+
+
+
+
+NIBBLETYPE cBlockPistonHeadHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
+{
+	// Bit 0x08 (Bit #4) is a flag.
+	NIBBLETYPE OtherMeta = a_Meta & 0x08;
+	// Rotations defined by by a table. (Source, mincraft.gamepedia.com)
+	switch (a_Meta & 0x07)
+	{
+	case 0x04: return 0x05 + OtherMeta;  // West -> East
+	case 0x05: return 0x04 + OtherMeta;  // East -> West
+	}
+	// Not Facing East or West; No change.
+	return a_Meta;
+}
 
 
 
