@@ -324,7 +324,7 @@ local function WriteCommandsCategoryGithub(a_Category, f)
 		f:write(GithubizeString(a_Category.Description), "\n\n");
 	end
 	
-	f:write("| Command | Permission | Discription | \n")
+	f:write("| Command | Permission | Description | \n")
 	f:write("| ------- | ---------- | ----------- | \n")
 	
 	-- Write commands:
