@@ -939,7 +939,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	if (!CheckBlockInteractionsRate())
 	{
-		Kick("Too many blocks were destroyed per unit time - hacked client?");
+		Kick("Too many blocks were placed/interacted with per unit time - hacked client?");
 		return;
 	}
 	
