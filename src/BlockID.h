@@ -909,17 +909,3 @@ extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const c
 
 
 
-// Block properties:
-extern NIBBLETYPE g_BlockLightValue[256];
-extern NIBBLETYPE g_BlockSpreadLightFalloff[256];
-extern bool       g_BlockTransparent[256];
-extern bool       g_BlockOneHitDig[256];
-extern bool       g_BlockPistonBreakable[256];
-extern bool       g_BlockIsSnowable[256];
-extern bool       g_BlockRequiresSpecialTool[256];
-extern bool       g_BlockIsSolid[256];
-extern bool       g_BlockFullyOccupiesVoxel[256];
-
-
-
-

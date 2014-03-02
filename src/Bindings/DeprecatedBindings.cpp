@@ -418,6 +418,8 @@ static int tolua_set_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 
 void DeprecatedBindings::Bind(lua_State * tolua_S)
 {
+	tolua_beginmodule(tolua_S, NULL);
+
 	tolua_array(tolua_S, "g_BlockLightValue",          tolua_get_AllToLua_g_BlockLightValue,          tolua_set_AllToLua_g_BlockLightValue);
 	tolua_array(tolua_S, "g_BlockSpreadLightFalloff",  tolua_get_AllToLua_g_BlockSpreadLightFalloff,  tolua_set_AllToLua_g_BlockSpreadLightFalloff);
 	tolua_array(tolua_S, "g_BlockTransparent",         tolua_get_AllToLua_g_BlockTransparent,         tolua_set_AllToLua_g_BlockTransparent);
@@ -427,6 +429,8 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_array(tolua_S, "g_BlockRequiresSpecialTool", tolua_get_AllToLua_g_BlockRequiresSpecialTool, tolua_set_AllToLua_g_BlockRequiresSpecialTool);
 	tolua_array(tolua_S, "g_BlockIsSolid",             tolua_get_AllToLua_g_BlockIsSolid,             tolua_set_AllToLua_g_BlockIsSolid);
 	tolua_array(tolua_S, "g_BlockFullyOccupiesVoxel",  tolua_get_AllToLua_g_BlockFullyOccupiesVoxel,  tolua_set_AllToLua_g_BlockFullyOccupiesVoxel);
+
+	tolua_endmodule(tolua_S);
 }
 
 
