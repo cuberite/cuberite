@@ -38,6 +38,10 @@ static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* set function: g_BlockLightValue */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockLightValue
 static int tolua_set_AllToLua_g_BlockLightValue(lua_State* tolua_S)
@@ -59,6 +63,10 @@ static int tolua_set_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
+
+
+
+
 
 /* get function: g_BlockSpreadLightFalloff */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockSpreadLightFalloff
@@ -82,6 +90,10 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* set function: g_BlockSpreadLightFalloff */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockSpreadLightFalloff
 static int tolua_set_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
@@ -104,6 +116,10 @@ static int tolua_set_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* get function: g_BlockTransparent */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockTransparent
 static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
@@ -121,10 +137,14 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 	if (tolua_index<0)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	tolua_pushboolean(tolua_S,(bool)cBlockInfo::IsTransparent(tolua_index));
+	tolua_pushboolean(tolua_S, cBlockInfo::IsTransparent(tolua_index));
 	return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
+
+
+
+
 
 /* set function: g_BlockTransparent */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockTransparent
@@ -143,10 +163,14 @@ static int tolua_set_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 	if (tolua_index<0)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::Get(tolua_index).m_Transparent = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_Transparent = (tolua_toboolean(tolua_S,3,0) != 0);
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
+
+
+
+
 
 /* get function: g_BlockOneHitDig */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockOneHitDig
@@ -170,6 +194,10 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* set function: g_BlockOneHitDig */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockOneHitDig
 static int tolua_set_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
@@ -187,10 +215,14 @@ static int tolua_set_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 	if (tolua_index<0)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::Get(tolua_index).m_OneHitDig = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_OneHitDig = (tolua_toboolean(tolua_S,3,0) != 0);
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
+
+
+
+
 
 /* get function: g_BlockPistonBreakable */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockPistonBreakable
@@ -214,6 +246,10 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* set function: g_BlockPistonBreakable */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockPistonBreakable
 static int tolua_set_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
@@ -231,10 +267,14 @@ static int tolua_set_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::Get(tolua_index).m_PistonBreakable = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_PistonBreakable = (tolua_toboolean(tolua_S,3,0) != 0);
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
+
+
+
+
 
 /* get function: g_BlockIsSnowable */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSnowable
@@ -258,6 +298,10 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* set function: g_BlockIsSnowable */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockIsSnowable
 static int tolua_set_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
@@ -275,10 +319,14 @@ static int tolua_set_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::Get(tolua_index).m_IsSnowable = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_IsSnowable = (tolua_toboolean(tolua_S,3,0) != 0);
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
+
+
+
+
 
 /* get function: g_BlockRequiresSpecialTool */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockRequiresSpecialTool
@@ -302,6 +350,10 @@ static int tolua_get_AllToLua_g_BlockRequiresSpecialTool(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* set function: g_BlockRequiresSpecialTool */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockRequiresSpecialTool
 static int tolua_set_AllToLua_g_BlockRequiresSpecialTool(lua_State* tolua_S)
@@ -319,10 +371,14 @@ static int tolua_set_AllToLua_g_BlockRequiresSpecialTool(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::Get(tolua_index).m_RequiresSpecialTool = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_RequiresSpecialTool = (tolua_toboolean(tolua_S,3,0) != 0);
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
+
+
+
+
 
 /* get function: g_BlockIsSolid */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSolid
@@ -346,6 +402,10 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* set function: g_BlockIsSolid */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockIsSolid
 static int tolua_set_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
@@ -363,10 +423,14 @@ static int tolua_set_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::Get(tolua_index).m_IsSolid = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_IsSolid = (tolua_toboolean(tolua_S,3,0) != 0);
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
+
+
+
+
 
 /* get function: g_BlockFullyOccupiesVoxel */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockFullyOccupiesVoxel
@@ -390,6 +454,10 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+
+
+
+
 /* set function: g_BlockFullyOccupiesVoxel */
 #ifndef TOLUA_DISABLE_tolua_set_AllToLua_g_BlockFullyOccupiesVoxel
 static int tolua_set_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
@@ -407,7 +475,7 @@ static int tolua_set_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::Get(tolua_index).m_FullyOccupiesVoxel = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_FullyOccupiesVoxel = (tolua_toboolean(tolua_S,3,0) != 0);
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
