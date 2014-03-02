@@ -231,22 +231,22 @@ int cFireworkItem::GetVanillaColourCodeFromDye(short a_DyeMeta)
 
 	switch (a_DyeMeta)
 	{
-		case E_META_DYE_BLACK: return 1973019;
-		case E_META_DYE_RED: return 11743532;
-		case E_META_DYE_GREEN: return 3887386;
-		case E_META_DYE_BROWN:  return 5320730;
-		case E_META_DYE_BLUE: return 2437522;
-		case E_META_DYE_PURPLE: return 8073150;
-		case E_META_DYE_CYAN: return 2651799;
-		case E_META_DYE_LIGHTGRAY: return 11250603;
-		case E_META_DYE_GRAY: return 4408131;
-		case E_META_DYE_PINK: return 14188952;
-		case E_META_DYE_LIGHTGREEN: return 4312372;
-		case E_META_DYE_YELLOW: return 14602026;
-		case E_META_DYE_LIGHTBLUE: return 6719955;
-		case E_META_DYE_MAGENTA: return 12801229;
-		case E_META_DYE_ORANGE: return 15435844;
-		case E_META_DYE_WHITE: return 15790320;
+		case E_META_DYE_BLACK: return 0x1E1B1B;
+		case E_META_DYE_RED: return 0xB3312C;
+		case E_META_DYE_GREEN: return 0x3B511A;
+		case E_META_DYE_BROWN:  return 0x51301A;
+		case E_META_DYE_BLUE: return 0x253192;
+		case E_META_DYE_PURPLE: return 0x7B2FBE;
+		case E_META_DYE_CYAN: return 0x287697;
+		case E_META_DYE_LIGHTGRAY: return 0xABABAB;
+		case E_META_DYE_GRAY: return 0x434343;
+		case E_META_DYE_PINK: return 0xD88198;
+		case E_META_DYE_LIGHTGREEN: return 0x41CD34;
+		case E_META_DYE_YELLOW: return 0xDECF2A;
+		case E_META_DYE_LIGHTBLUE: return 0x6689D3;
+		case E_META_DYE_MAGENTA: return 0xC354CD;
+		case E_META_DYE_ORANGE: return 0xEB8844;
+		case E_META_DYE_WHITE: return 0xF0F0F0;
 		default: ASSERT(!"Unhandled dye meta whilst trying to get colour code for fireworks!"); return 0;
 	}
 }
