@@ -30,6 +30,7 @@
 #include "ItemMinecart.h"
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
+#include "ItemAxe.h"
 #include "ItemPickaxe.h"
 #include "ItemThrowable.h"
 #include "ItemRedstoneDust.h"
@@ -131,6 +132,15 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_DIAMOND_HOE:
 		{
 			return new cItemHoeHandler(a_ItemType);
+		}
+		
+		case E_ITEM_WOODEN_AXE:
+		case E_ITEM_STONE_AXE:
+		case E_ITEM_IRON_AXE:
+		case E_ITEM_GOLD_AXE:
+		case E_ITEM_DIAMOND_AXE:
+		{
+			return new cItemAxeHandler(a_ItemType);
 		}
 		
 		case E_ITEM_WOODEN_PICKAXE:
@@ -379,6 +389,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_MELON_SEEDS:          return 64;
 		case E_ITEM_MELON_SLICE:          return 64;
 		case E_ITEM_NETHER_BRICK:         return 64;
+		case E_ITEM_NETHER_QUARTZ:        return 64;
 		case E_ITEM_NETHER_WART:          return 64;
 		case E_ITEM_PAINTING:             return 64;
 		case E_ITEM_PAPER:                return 64;
@@ -484,6 +495,11 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 	UNUSED(a_BlockType);
 	
 	return false;
+}
+
+float cItemHandler::GetDestroySpeed(BLOCKTYPE a_BlockType)
+{
+	return 1.0F;
 }
 
 

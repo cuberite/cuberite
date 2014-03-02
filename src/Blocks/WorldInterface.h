@@ -19,6 +19,9 @@ public:
 	
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) = 0; 
 	
+	/** Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb. */
+	virtual int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
+	
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) = 0;
 	

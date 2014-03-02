@@ -222,6 +222,7 @@ void cFurnaceEntity::FinishOne()
 	{
 		m_Contents.ChangeSlotCount(fsOutput, m_CurrentRecipe->Out->m_ItemCount);
 	}
+	m_OutputExperience = m_CurrentRecipe->OutExp;
 	m_Contents.ChangeSlotCount(fsInput, -m_CurrentRecipe->In->m_ItemCount);
 	
 	UpdateIsCooking();
@@ -361,6 +362,10 @@ void cFurnaceEntity::UpdateFuel(void)
 /// Called when the output slot changes; starts burning if space became available
 void cFurnaceEntity::UpdateOutput(void)
 {
+	if (GetOutputSlot().IsEmpty())
+	{
+		m_OutputExperience = 0.0F;
+	}
 	if (!CanCookInputToOutput())
 	{
 		// Cannot cook anymore:
@@ -375,6 +380,23 @@ void cFurnaceEntity::UpdateOutput(void)
 	// Can cook, start cooking if not already underway:
 	m_NeedCookTime = m_CurrentRecipe->CookTime;
 	SetIsCooking(m_FuelBurnTime > 0);
+}
+
+
+
+
+
+void cFurnaceEntity::GiveExperience(int Blocks)
+{
+	if ((Blocks <= 0) || (m_OutputExperience <= 0.0F))
+	{
+		return;
+	}
+	
+	for (int i = 0; i < Blocks; i++)
+	{
+		m_World->SpawnExperienceOrb(m_PosX, m_PosY + 1, m_PosZ, m_OutputExperience);
+	}
 }
 
 
