@@ -28,7 +28,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta));
+		a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta & 0x7));
 	}
 
 
@@ -41,7 +41,7 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		BLOCKTYPE  Type = (BLOCKTYPE) (a_Player->GetEquippedItem().m_ItemType);
-		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x07);
+		NIBBLETYPE Meta = (NIBBLETYPE) a_Player->GetEquippedItem().m_ItemDamage;
 		
 		// HandlePlaceBlock wants a cItemHandler pointer thing, so let's give it one
 		cItemHandler * ItemHandler = cItemHandler::GetItemHandler(GetDoubleSlabType(Type));
@@ -159,21 +159,30 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		if (m_BlockType ==  E_BLOCK_DOUBLE_STONE_SLAB)
-		{
-			m_BlockType = E_BLOCK_STONE_SLAB;
-		}
-		else
-		{
-			m_BlockType = E_BLOCK_WOODEN_SLAB;
-		}
-		a_Pickups.push_back(cItem(m_BlockType, 2, a_BlockMeta));
+		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
+		a_Pickups.push_back(cItem(Block, 2, a_BlockMeta & 0x7));
 	}
-
+	
+	inline static BLOCKTYPE GetSingleSlabType(BLOCKTYPE a_BlockType)
+	{
+		switch (a_BlockType)
+		{
+			case E_BLOCK_DOUBLE_STONE_SLAB:  return E_BLOCK_STONE_SLAB;
+			case E_BLOCK_DOUBLE_WOODEN_SLAB: return E_BLOCK_WOODEN_SLAB;
+		}
+		ASSERT(!"Unhandled double slab type!");
+		return a_BlockType;
+	}
 	
 	virtual const char * GetStepSound(void) override
-	{		
-		return ((m_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB) || (m_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB)) ?  "step.wood" : "step.stone";
+	{
+		switch (m_BlockType)
+		{
+			case E_BLOCK_DOUBLE_STONE_SLAB:  return "step.stone";
+			case E_BLOCK_DOUBLE_WOODEN_SLAB: return "step.wood";
+		}
+		ASSERT(!"Unhandled double slab type!");
+		return "";
 	}
 } ;
 

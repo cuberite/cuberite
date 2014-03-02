@@ -162,14 +162,27 @@ bool cFireSimulator::IsFuel(BLOCKTYPE a_BlockType)
 	switch (a_BlockType)
 	{
 		case E_BLOCK_PLANKS:
+		case E_BLOCK_DOUBLE_WOODEN_SLAB:
+		case E_BLOCK_WOODEN_SLAB:
+		case E_BLOCK_WOODEN_STAIRS:
+		case E_BLOCK_SPRUCE_WOOD_STAIRS:
+		case E_BLOCK_BIRCH_WOOD_STAIRS:
+		case E_BLOCK_JUNGLE_WOOD_STAIRS:
 		case E_BLOCK_LEAVES:
+		case E_BLOCK_NEW_LEAVES:
 		case E_BLOCK_LOG:
+		case E_BLOCK_NEW_LOG:
 		case E_BLOCK_WOOL:
 		case E_BLOCK_BOOKCASE:
 		case E_BLOCK_FENCE:
 		case E_BLOCK_TNT:
 		case E_BLOCK_VINES:
 		case E_BLOCK_HAY_BALE:
+		case E_BLOCK_TALL_GRASS:
+		case E_BLOCK_BIG_FLOWER:
+		case E_BLOCK_DANDELION:
+		case E_BLOCK_FLOWER:
+		case E_BLOCK_CARPET:
 		{
 			return true;
 		}
