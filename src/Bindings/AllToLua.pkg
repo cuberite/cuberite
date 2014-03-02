@@ -26,6 +26,7 @@ $cfile "WebPlugin.h"
 $cfile "LuaWindow.h"
 
 $cfile "../BlockID.h"
+$cfile "../BlockInfo.h"
 $cfile "../StringUtils.h"
 $cfile "../Defines.h"
 $cfile "../ChatColor.h"

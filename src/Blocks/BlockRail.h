@@ -98,7 +98,7 @@ public:
 		{
 			return false;
 		}
-		if (!g_BlockIsSolid[a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)])
+		if (!cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)))
 		{
 			return false;
 		}
@@ -130,7 +130,7 @@ public:
 					// Too close to the edge, cannot simulate
 					return true;
 				}
-				return g_BlockIsSolid[BlockType];
+				return cBlockInfo::IsSolid(BlockType);
 			}
 		}
 		return true;

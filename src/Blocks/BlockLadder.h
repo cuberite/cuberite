@@ -91,7 +91,7 @@ public:
 
 		AddFaceDirection( a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
 
-		return g_BlockIsSolid[a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)];
+		return cBlockInfo::IsSolid(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ));
 	}
 
 

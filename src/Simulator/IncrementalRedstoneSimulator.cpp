@@ -566,14 +566,14 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 		{
 			if ((i >= 4) && (i <= 7)) // If we are currently checking for wire surrounding ourself one block above...
 			{
-				if (g_BlockIsSolid[m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)]) // If there is something solid above us (wire cut off)...
+				if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))) // If there is something solid above us (wire cut off)...
 				{
 					continue; // We don't receive power from that wire
 				}
 			}
 			else if ((i >= 8) && (i <= 11)) // See above, but this is for wire below us
 			{
-				if (g_BlockIsSolid[m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y + 1, a_BlockZ + gCrossCoords[i].z)])
+				if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y + 1, a_BlockZ + gCrossCoords[i].z)))
 				{
 					continue;
 				}

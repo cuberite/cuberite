@@ -883,7 +883,7 @@ void cChunk::ApplyWeatherToTop()
 					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
 				}
 			}
-			else if (g_BlockIsSnowable[TopBlock])
+			else if (cBlockInfo::IsSnowable(TopBlock))
 			{
 				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
 			}
@@ -1540,10 +1540,10 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	SetNibble(m_BlockMeta, index, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
-	if(
-		(g_BlockLightValue[OldBlockType ]        != g_BlockLightValue[a_BlockType]) ||
-		(g_BlockSpreadLightFalloff[OldBlockType] != g_BlockSpreadLightFalloff[a_BlockType]) ||
-		(g_BlockTransparent[OldBlockType]        != g_BlockTransparent[a_BlockType])
+	if (
+		(cBlockInfo::GetLightValue        (OldBlockType) != cBlockInfo::GetLightValue        (a_BlockType)) ||
+		(cBlockInfo::GetSpreadLightFalloff(OldBlockType) != cBlockInfo::GetSpreadLightFalloff(a_BlockType)) ||
+		(cBlockInfo::IsTransparent        (OldBlockType) != cBlockInfo::IsTransparent        (a_BlockType))
 	)
 	{
 		m_IsLightValid = false;

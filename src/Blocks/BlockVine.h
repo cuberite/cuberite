@@ -70,7 +70,7 @@ public:
 	/// Returns true if the specified block type is good for vines to attach to
 	static bool IsBlockAttachable(BLOCKTYPE a_BlockType)
 	{
-		return (a_BlockType == E_BLOCK_LEAVES) || g_BlockIsSolid[a_BlockType];
+		return (a_BlockType == E_BLOCK_LEAVES) || cBlockInfo::IsSolid(a_BlockType);
 	}
 
 

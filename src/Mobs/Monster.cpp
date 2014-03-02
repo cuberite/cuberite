@@ -148,11 +148,11 @@ void cMonster::TickPathFinding()
 		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYM = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY - 1, gCrossCoords[i].z + PosZ);
 
-		if ((!g_BlockIsSolid[BlockAtY]) && (!g_BlockIsSolid[BlockAtYP]) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
+		if ((!cBlockInfo::IsSolid(BlockAtY)) && (!cBlockInfo::IsSolid(BlockAtYP)) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY, gCrossCoords[i].z + PosZ));
 		}
-		else if ((g_BlockIsSolid[BlockAtY]) && (!g_BlockIsSolid[BlockAtYP]) && (!g_BlockIsSolid[BlockAtYPP]) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
+		else if ((cBlockInfo::IsSolid(BlockAtY)) && (!cBlockInfo::IsSolid(BlockAtYP)) && (!cBlockInfo::IsSolid(BlockAtYPP)) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY + 1, gCrossCoords[i].z + PosZ));
 		}
@@ -416,9 +416,9 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	else if (PosY > cChunkDef::Height)
 		PosY = cChunkDef::Height;
 
-	if (!g_BlockIsSolid[m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))])
+	if (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
 	{
-		while (!g_BlockIsSolid[m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))] && (PosY > 0))
+		while (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))) && (PosY > 0))
 		{
 			PosY--;
 		}
@@ -427,7 +427,7 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	}
 	else
 	{
-		while (g_BlockIsSolid[m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))] && (PosY < cChunkDef::Height))
+		while (cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))) && (PosY < cChunkDef::Height))
 		{
 			PosY++;
 		}

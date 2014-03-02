@@ -14,6 +14,7 @@ extern "C"
 #include "tolua++/include/tolua++.h"
 #include "Bindings.h"
 #include "ManualBindings.h"
+#include "DeprecatedBindings.h"
 
 // fwd: SQLite/lsqlite3.c
 extern "C"
@@ -95,6 +96,7 @@ void cLuaState::Create(void)
 	luaL_openlibs(m_LuaState);
 	tolua_AllToLua_open(m_LuaState);
 	ManualBindings::Bind(m_LuaState);
+	DeprecatedBindings::Bind(m_LuaState);
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
 	m_IsOwned = true;
