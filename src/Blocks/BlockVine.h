@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "BlockHandler.h"
@@ -8,11 +7,11 @@
 
 
 class cBlockVineHandler :
-	public cMetaRotater<cBlockHandler,0xF,0x4,0x8,0x1,0x2,true>
+	public cBlockHandler
 {
 public:
 	cBlockVineHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotater<cBlockHandler,0xF,0x4,0x8,0x1,0x2,true>(a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 	
@@ -168,6 +167,31 @@ public:
 		{
 			a_World->SetBlock(X, Y - 1, Z, E_BLOCK_VINES, a_World->GetBlockMeta(X, Y, Z));
 		}
+	}
+	
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		return ((a_Meta >> 1) | (a_Meta << 3)) & 0x0f;  // Rotate bits to the right
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		return ((a_Meta << 1) | (a_Meta >> 3)) & 0x0f;  // Rotate bits to the left
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// Bits 2 and 4 stay, bits 1 and 3 swap
+		return ((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Bits 1 and 3 stay, bits 2 and 4 swap
+		return ((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
 	}
 
 } ;
