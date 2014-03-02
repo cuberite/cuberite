@@ -139,6 +139,9 @@ public:
 		BroadcastTimeUpdate();
 	}
 	
+	/** Returns the default weather interval for the specific weather type */
+	int GetDefaultWeatherInterval(eWeather a_Weather);
+	
 	/** Returns the current game mode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable */
 	eGameMode GetGameMode(void) const { return m_GameMode; }
 
