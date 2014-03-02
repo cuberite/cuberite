@@ -2,6 +2,7 @@
 #include "Globals.h"
 
 #include "BlockInfo.h"
+#include "Blocks/BlockHandler.h"
 
 
 
@@ -23,7 +24,20 @@ cBlockInfo::cBlockInfo()
 	, m_RequiresSpecialTool(false)
 	, m_IsSolid(true)
 	, m_FullyOccupiesVoxel(false)
+	, m_Handler(NULL)
 {}
+
+
+
+
+
+cBlockInfo::~cBlockInfo()
+{
+	if (m_Handler != NULL)
+	{
+		delete m_Handler;
+	}
+}
 
 
 
@@ -42,6 +56,14 @@ cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
 
 void cBlockInfo::Initialize(void)
 {
+	for (unsigned int i = 0; i < 256; ++i)
+	{
+		if (ms_Info[i].m_Handler == NULL)
+		{
+			ms_Info[i].m_Handler = cBlockHandler::CreateBlockHandler((BLOCKTYPE) i);
+		}
+	}
+
 	// Emissive blocks
 	ms_Info[E_BLOCK_FIRE                ].m_LightValue = 15;
 	ms_Info[E_BLOCK_GLOWSTONE           ].m_LightValue = 15;

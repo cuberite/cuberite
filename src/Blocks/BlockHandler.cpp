@@ -77,33 +77,6 @@
 
 
 
-bool            cBlockHandler::m_HandlerInitialized = false;
-cBlockHandler * cBlockHandler::m_BlockHandler[256];
-
-
-
-
-
-cBlockHandler * cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
-{
-	if (!m_HandlerInitialized)
-	{
-		// We have to initialize
-		memset(m_BlockHandler, 0, sizeof(m_BlockHandler));
-		m_HandlerInitialized = true;
-	}
-	if (m_BlockHandler[a_BlockType] != NULL)
-	{
-		return m_BlockHandler[a_BlockType];
-	}
-
-	return m_BlockHandler[a_BlockType] = CreateBlockHandler(a_BlockType);
-}
-
-
-
-
-
 cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
 	switch(a_BlockType)
@@ -192,7 +165,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_REDSTONE_REPEATER_ON:  return new cBlockRedstoneRepeaterHandler(a_BlockType);
 		case E_BLOCK_REDSTONE_TORCH_OFF:    return new cBlockRedstoneTorchHandler   (a_BlockType);
 		case E_BLOCK_REDSTONE_TORCH_ON:     return new cBlockRedstoneTorchHandler   (a_BlockType);
-		case E_BLOCK_REDSTONE_WIRE:	        return new cBlockRedstoneHandler        (a_BlockType);
+		case E_BLOCK_REDSTONE_WIRE:         return new cBlockRedstoneHandler        (a_BlockType);
 		case E_BLOCK_RED_MUSHROOM:          return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_RED_ROSE:              return new cBlockFlowerHandler          (a_BlockType);
 		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
@@ -225,20 +198,6 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 			
 		default: return new cBlockHandler(a_BlockType);
 	}
-}
-
-
-
-
-
-void cBlockHandler::Deinit()
-{
-	for (int i = 0; i < 256; i++)
-	{
-		delete m_BlockHandler[i];
-	}
-	memset(m_BlockHandler, 0, sizeof(m_BlockHandler));  // Don't leave any dangling pointers around, just in case
-	m_HandlerInitialized = false;
 }
 
 
@@ -329,7 +288,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_Bl
 {
 	if ((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height))
 	{
-		GetBlockHandler(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		cBlockInfo::GetHandler(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 	}
 }
 

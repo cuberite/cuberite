@@ -838,7 +838,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(a_OldBlock);
+	cBlockHandler * Handler = cBlockInfo::GetHandler(a_OldBlock);
 	Handler->OnDigging(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
@@ -852,7 +852,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		int pZ = a_BlockZ;
 
 		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
-		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
+		Handler = cBlockInfo::GetHandler(World->GetBlock(pX, pY, pZ));
 
 		if (Handler->IsClickedThrough())
 		{
@@ -963,7 +963,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	cBlockHandler * BlockHandler = cBlockHandler::GetBlockHandler(BlockType);
+	cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 	
 	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 	{
