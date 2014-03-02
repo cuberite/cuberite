@@ -290,6 +290,38 @@ g_APIDesc =
 			},  -- AdditionalInfo
 		},  -- cBlockArea
 
+		cBlockInfo =
+		{
+			Desc = [[
+				This class is used to query and register block properties.
+			]],
+			Functions =
+			{
+				FullyOccupiesVoxel = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block fully occupies its voxel." },
+				GetById = { Params = "ID", Return = "{{cBlockInfo}}", Notes = "Returns the {{cBlockInfo}} structure for the block with the specified ID." },
+				GetLightValue = { Params = "ID", Return = "number", Notes = "Returns how much light the specified block emits on its own." },
+				GetSpreadLightFalloff = { Params = "ID", Return = "number", Notes = "Returns how much light the specified block consumes." },
+				IsOneHitDig = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block will be destroyed after a single hit." },
+				IsPistonBreakable = { Params = "ID", Return = "bool", Notes = "Returns whether a piston can break the specified block." },
+				IsSnowable = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block can hold snow atop." },
+				IsSolid = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block is solid." },
+				IsTransparent = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block is transparent." },
+				RequiresSpecialTool = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block requires a special tool to drop." },
+			},
+			Variables =
+			{
+				m_FullyOccupiesVoxel = { Type = "bool", Notes = "Does this block fully occupy its voxel - is it a 'full' block?" },
+				m_IsSnowable = { Type = "bool", Notes = "Can this block hold snow atop?" },
+				m_IsSolid = { Type = "bool", Notes = "Is this block solid (player cannot walk through)?" },
+				m_LightValue = { Type = "number", Notes = "How much light do the blocks emit on their own?" },
+				m_OneHitDig = { Type = "bool", Notes = "Is a block destroyed after a single hit?" },
+				m_PistonBreakable = { Type = "bool", Notes = "Can a piston break this block?" },
+				m_RequiresSpecialTool = { Type = "bool", Notes = "Does this block require a tool to drop?" },
+				m_SpreadLightFalloff = { Type = "number", Notes = "How much light do the blocks consume?" },
+				m_Transparent = { Type = "bool", Notes = "Is a block completely transparent? (light doesn't get decreased(?))" },
+			},
+		}, -- cBlockInfo
+
 		cChatColor =
 		{
 			Desc = [[

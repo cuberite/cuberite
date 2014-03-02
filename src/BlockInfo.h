@@ -5,15 +5,18 @@
 
 
 
-
+// tolua_begin
 class cBlockInfo
 {
 public:
+	// tolua_end
 
 	cBlockInfo();
 
 	/** (Re-)Initializes the internal BlockInfo structures. */
 	static void Initialize(void);
+
+	// tolua_begin
 
 	/** Returns the associated BlockInfo structure. */
 	static cBlockInfo & GetById(unsigned int a_ID);
@@ -43,7 +46,7 @@ public:
 	/** Is this block solid (player cannot walk through)? */
 	bool m_IsSolid;
 
-	/** Does this block fully occupy it's voxel - is it a 'full' block? */
+	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	bool m_FullyOccupiesVoxel;
 
 
@@ -57,6 +60,8 @@ public:
 	inline static bool IsSolid                    (unsigned int a_ID) { return GetById(a_ID).m_IsSolid;             }
 	inline static bool FullyOccupiesVoxel         (unsigned int a_ID) { return GetById(a_ID).m_FullyOccupiesVoxel;  }
 
+	// tolua_end
+
 
 protected:
 
@@ -64,7 +69,7 @@ protected:
 	static cBlockInfo ms_Info[256];
 
 
-};
+}; // tolua_export
 
 
 
