@@ -29,11 +29,11 @@ cBlockInfo::cBlockInfo()
 
 
 
-cBlockInfo & cBlockInfo::GetById(unsigned int a_ID)
+cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
 {
-	ASSERT(a_ID < 256);
+	ASSERT(a_Type < 256);
 
-	return ms_Info[a_ID];
+	return ms_Info[a_Type];
 }
 
 

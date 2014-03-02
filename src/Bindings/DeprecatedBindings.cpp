@@ -55,7 +55,7 @@ static int tolua_set_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 	if (tolua_index<0)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_LightValue = ((unsigned char)  tolua_tonumber(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_LightValue = ((unsigned char)  tolua_tonumber(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -99,7 +99,7 @@ static int tolua_set_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 	if (tolua_index<0)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_SpreadLightFalloff = ((unsigned char)  tolua_tonumber(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_SpreadLightFalloff = ((unsigned char)  tolua_tonumber(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -143,7 +143,7 @@ static int tolua_set_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 	if (tolua_index<0)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_Transparent = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_Transparent = ((bool)  tolua_toboolean(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -187,7 +187,7 @@ static int tolua_set_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 	if (tolua_index<0)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_OneHitDig = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_OneHitDig = ((bool)  tolua_toboolean(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -231,7 +231,7 @@ static int tolua_set_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_PistonBreakable = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_PistonBreakable = ((bool)  tolua_toboolean(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -275,7 +275,7 @@ static int tolua_set_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_IsSnowable = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_IsSnowable = ((bool)  tolua_toboolean(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -319,7 +319,7 @@ static int tolua_set_AllToLua_g_BlockRequiresSpecialTool(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_RequiresSpecialTool = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_RequiresSpecialTool = ((bool)  tolua_toboolean(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -363,7 +363,7 @@ static int tolua_set_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_IsSolid = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_IsSolid = ((bool)  tolua_toboolean(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -407,7 +407,7 @@ static int tolua_set_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 	if (tolua_index<0 || tolua_index>=256)
 		tolua_error(tolua_S,"array indexing out of range.",NULL);
 	#endif
-	cBlockInfo::GetById(tolua_index).m_FullyOccupiesVoxel = ((bool)  tolua_toboolean(tolua_S,3,0));
+	cBlockInfo::Get(tolua_index).m_FullyOccupiesVoxel = ((bool)  tolua_toboolean(tolua_S,3,0));
 	return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
