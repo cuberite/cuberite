@@ -8,11 +8,11 @@
 
 
 class cBlockButtonHandler :
-	public cMetaRotater<cBlockHandler,0x07,0x04,0x01,0x03,0x02,true>
+	public cMetaRotater<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>
 {
 public:
 	cBlockButtonHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotater<cBlockHandler,0x07,0x04,0x01,0x03,0x02,true>(a_BlockType)
+		: cMetaRotater<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>(a_BlockType)
 	{
 	}
 

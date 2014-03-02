@@ -11,11 +11,11 @@
 
 
 class cBlockChestHandler :
-	public cMetaRotater<cBlockEntityHandler,0x07,0x04,0x01,0x03,0x02, true>
+	public cMetaRotater<cBlockEntityHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>
 {
 public:
 	cBlockChestHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotater<cBlockEntityHandler,0x07,0x04,0x01,0x03,0x02, true>(a_BlockType)
+		: cMetaRotater<cBlockEntityHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>(a_BlockType)
 	{
 	}
 

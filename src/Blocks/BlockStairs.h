@@ -8,11 +8,11 @@
 
 
 class cBlockStairsHandler :
-	public cMetaRotater<cBlockHandler,0x03,0x03,0x00,0x02,0x01,true>
+	public cMetaRotater<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>
 {
 public:
 	cBlockStairsHandler(BLOCKTYPE a_BlockType) :
-		cMetaRotater<cBlockHandler,0x03,0x03,0x00,0x02,0x01,true>(a_BlockType)
+		cMetaRotater<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>(a_BlockType)
 	{
 
 	}
