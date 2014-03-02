@@ -95,6 +95,7 @@ if (NOT MSVC)
 	#add cpp files here
 	add_library(Bindings
 		Bindings/Bindings
+		Bindings/DeprecatedBindings
 		Bindings/LuaChunkStay
 		Bindings/LuaState
 		Bindings/LuaWindow
