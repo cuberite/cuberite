@@ -136,30 +136,14 @@ public:
 	/// <returns>Block meta following mirroring</returns>
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) { return a_Meta; }
 	
-	/// <summary>Get the blockhandler for a specific block id</summary>
-	static cBlockHandler * GetBlockHandler(BLOCKTYPE a_BlockType);
-
-	/// <summary>Deletes all initialised block handlers</summary>
-	static void Deinit();
-	
 protected:
 	BLOCKTYPE m_BlockType;
 	
 	// Creates a new blockhandler for the given block type. For internal use only, use ::GetBlockHandler() instead.
-	static cBlockHandler *CreateBlockHandler(BLOCKTYPE a_BlockType);
-	static cBlockHandler *m_BlockHandler[256];
-	static bool m_HandlerInitialized;	//used to detect if the blockhandlers are initialized
+	static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType);
+
+	friend class cBlockInfo;
 };
-
-
-
-
-
-// Shortcut to get the blockhandler for a specific block
-inline cBlockHandler * BlockHandler(BLOCKTYPE a_BlockType)
-{
-	return cBlockHandler::GetBlockHandler(a_BlockType);
-}
 
 
 

@@ -5,6 +5,13 @@
 
 
 
+// fwd:
+class cBlockHandler;
+
+
+
+
+
 // tolua_begin
 class cBlockInfo
 {
@@ -12,6 +19,8 @@ public:
 	// tolua_end
 
 	cBlockInfo();
+
+	~cBlockInfo();
 
 	/** (Re-)Initializes the internal BlockInfo structures. */
 	static void Initialize(void);
@@ -49,6 +58,12 @@ public:
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	bool m_FullyOccupiesVoxel;
 
+	// tolua_end
+
+	/** Associated block handler. */
+	cBlockHandler * m_Handler;
+
+	// tolua_begin
 
 	inline static NIBBLETYPE GetLightValue        (BLOCKTYPE a_Type) { return Get(a_Type).m_LightValue;          }
 	inline static NIBBLETYPE GetSpreadLightFalloff(BLOCKTYPE a_Type) { return Get(a_Type).m_SpreadLightFalloff;  }
@@ -62,6 +77,8 @@ public:
 
 	// tolua_end
 
+	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler;             }
+
 
 protected:
 
@@ -70,6 +87,16 @@ protected:
 
 
 }; // tolua_export
+
+
+
+
+
+// Shortcut to get the blockhandler for a specific block
+inline cBlockHandler * BlockHandler(BLOCKTYPE a_BlockType)
+{
+	return cBlockInfo::Get(a_BlockType).m_Handler;
+}
 
 
 

@@ -245,7 +245,6 @@ void cRoot::Start(void)
 		delete m_PluginManager; m_PluginManager = NULL;
 
 		cItemHandler::Deinit();
-		cBlockHandler::Deinit();
 
 		LOG("Cleaning up...");
 		delete m_Server; m_Server = NULL;
