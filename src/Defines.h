@@ -226,6 +226,56 @@ inline const char * ClickActionToString(eClickAction a_ClickAction)
 
 
 
+/** Returns a blockface mirrored around the Y axis (doesn't change up/down). */
+inline eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
+	}
+	return a_BlockFace;
+}
+
+
+
+
+
+/** Returns a blockface rotated around the Y axis counter-clockwise. */
+inline eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_XP;
+	}
+	return a_BlockFace;
+}
+
+
+
+
+
+inline eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_XP: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_XM;
+	}
+	return a_BlockFace;
+}
+
+
+
+
+
 inline bool IsValidBlock(int a_BlockType)
 {
 	if (
