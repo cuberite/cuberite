@@ -317,26 +317,19 @@ local function WriteCommandsCategoryGithub(a_Category, f)
 	if (CategoryName == "") then
 		CategoryName = "General";
 	end
-	f:write("\n## ", GithubizeString(a_Category.DisplayName or CategoryName), "\n");
+	f:write("\n### ", GithubizeString(a_Category.DisplayName or CategoryName), "\n");
 	
 	-- Write description:
 	if (a_Category.Description ~= "") then
-		f:write(GithubizeString(a_Category.Description), "\n");
+		f:write(GithubizeString(a_Category.Description), "\n\n");
 	end
 	
+	f:write("| Command | Permission | Discription | \n")
+	f:write("| ------- | ---------- | ----------- | \n")
+	
 	-- Write commands:
-	f:write("\n");
 	for idx2, cmd in ipairs(a_Category.Commands) do
-		f:write("\n### ", cmd.CommandString, "\n", GithubizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "\n\n");
-		if (cmd.Info.Permission ~= nil) then
-			f:write("Permission required: **", cmd.Info.Permission, "**\n\n");
-		end
-		if (cmd.Info.DetailedDescription ~= nil) then
-			f:write(GithubizeString(cmd.Info.DetailedDescription));
-		end
-		if (cmd.Info.ParameterCombinations ~= nil) then
-			WriteCommandParameterCombinationsGithub(cmd.CommandString, cmd.Info.ParameterCombinations, f);
-		end
+		f:write("|", cmd.CommandString, " | ", cmd.Info.Permission or "", " | ", GithubizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "| \n")
 	end
 	f:write("\n\n")
 end
@@ -601,7 +594,7 @@ local function DumpPluginInfoGithub(a_PluginFolder, a_PluginInfo)
 	f:write(GithubizeString(a_PluginInfo.Description), "\n");
 	DumpAdditionalInfoGithub(a_PluginInfo, f);
 	DumpCommandsGithub(a_PluginInfo, f);
-	DumpPermissionsGithub(a_PluginInfo, f);
+	--DumpPermissionsGithub(a_PluginInfo, f); -- Seems a little overkill since they are already mentioned in the commands.
 
 	f:close();
 end
