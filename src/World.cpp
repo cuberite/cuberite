@@ -2647,6 +2647,43 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 
 
 
+bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	if (GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_TRAPDOOR)
+	{
+		return false;
+	}
+	
+	NIBBLETYPE Meta = GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	return (Meta & 0x4) > 0;
+}
+
+
+
+
+
+bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
+{
+	if (GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_TRAPDOOR)
+	{
+		return false;
+	}
+	
+	NIBBLETYPE Meta = GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	bool IsOpen = (Meta & 0x4) > 0;
+	if (a_Open != IsOpen)
+	{
+		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
+		BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
 void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);

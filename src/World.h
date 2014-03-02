@@ -342,6 +342,12 @@ public:
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);	// tolua_export
 
+	/** Is the trapdoor open? */
+	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export
+
+	/** Set the state of a trapdoor */
+	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
+
 	/** Regenerate the given chunk: */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export
 	
