@@ -297,16 +297,16 @@ g_APIDesc =
 			]],
 			Functions =
 			{
-				FullyOccupiesVoxel = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block fully occupies its voxel." },
-				GetById = { Params = "ID", Return = "{{cBlockInfo}}", Notes = "Returns the {{cBlockInfo}} structure for the block with the specified ID." },
-				GetLightValue = { Params = "ID", Return = "number", Notes = "Returns how much light the specified block emits on its own." },
-				GetSpreadLightFalloff = { Params = "ID", Return = "number", Notes = "Returns how much light the specified block consumes." },
-				IsOneHitDig = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block will be destroyed after a single hit." },
-				IsPistonBreakable = { Params = "ID", Return = "bool", Notes = "Returns whether a piston can break the specified block." },
-				IsSnowable = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block can hold snow atop." },
-				IsSolid = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block is solid." },
-				IsTransparent = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block is transparent." },
-				RequiresSpecialTool = { Params = "ID", Return = "bool", Notes = "Returns whether the specified block requires a special tool to drop." },
+				FullyOccupiesVoxel = { Params = "Type", Return = "bool", Notes = "Returns whether the specified block fully occupies its voxel." },
+				GetById = { Params = "Type", Return = "{{cBlockInfo}}", Notes = "Returns the {{cBlockInfo}} structure for the specified type." },
+				GetLightValue = { Params = "Type", Return = "number", Notes = "Returns how much light the specified block emits on its own." },
+				GetSpreadLightFalloff = { Params = "Type", Return = "number", Notes = "Returns how much light the specified block consumes." },
+				IsOneHitDig = { Params = "Type", Return = "bool", Notes = "Returns whether the specified block will be destroyed after a single hit." },
+				IsPistonBreakable = { Params = "Type", Return = "bool", Notes = "Returns whether a piston can break the specified block." },
+				IsSnowable = { Params = "Type", Return = "bool", Notes = "Returns whether the specified block can hold snow atop." },
+				IsSolid = { Params = "Type", Return = "bool", Notes = "Returns whether the specified block is solid." },
+				IsTransparent = { Params = "Type", Return = "bool", Notes = "Returns whether the specified block is transparent." },
+				RequiresSpecialTool = { Params = "Type", Return = "bool", Notes = "Returns whether the specified block requires a special tool to drop." },
 			},
 			Variables =
 			{
