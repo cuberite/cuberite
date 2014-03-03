@@ -325,8 +325,8 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 		}
 		default:
 		{
-			LOGWARNING("Missing default weather interval for weather %d.", a_Weather);
-			return 1200;
+			LOGWARNING("%s: Missing default weather interval for weather %d.", __FUNCTION__, a_Weather);
+			return -1;
 		}
 	}  // switch (Weather)
 }
@@ -348,7 +348,7 @@ void cWorld::SetWeather(eWeather a_NewWeather)
 	m_WeatherInterval = GetDefaultWeatherInterval(a_NewWeather);
 	
 	// The weather can't be found:
-	if (m_WeatherInterval == 1200)
+	if (m_WeatherInterval < 0)
 	{
 		return;
 	}
