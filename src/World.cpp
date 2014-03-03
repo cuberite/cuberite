@@ -307,25 +307,52 @@ void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
+{
+	switch (a_Weather)
+	{
+		case eWeather_Sunny:
+		{
+			return 14400 + (m_TickRand.randInt() % 4800);  // 12 - 16 minutes
+		}
+		case eWeather_Rain:
+		{
+			return 9600 + (m_TickRand.randInt() % 7200);   // 8 - 14 minutes
+		}
+		case eWeather_ThunderStorm:
+		{
+			return 2400 + (m_TickRand.randInt() % 4800);   // 2 - 6 minutes
+		}
+		default:
+		{
+			LOGWARNING("Missing default weather interval for weather %d.", a_Weather);
+			return 1200;
+		}
+	}  // switch (Weather)
+}
+
+
+
+
+
 void cWorld::SetWeather(eWeather a_NewWeather)
 {
 	// Do the plugins agree? Do they want a different weather?
-	cRoot::Get()->GetPluginManager()->CallHookWeatherChanging(*this, a_NewWeather);
+	if (cRoot::Get()->GetPluginManager()->CallHookWeatherChanging(*this, a_NewWeather))
+	{
+		m_WeatherInterval = GetDefaultWeatherInterval(m_Weather);
+		return;
+	}
 	
 	// Set new period for the selected weather:
-	switch (a_NewWeather)
+	m_WeatherInterval = GetDefaultWeatherInterval(a_NewWeather);
+	
+	// The weather can't be found:
+	if (m_WeatherInterval == 1200)
 	{
-		case eWeather_Sunny:        m_WeatherInterval = 14400 + (m_TickRand.randInt() % 4800); break;  // 12 - 16 minutes
-		case eWeather_Rain:         m_WeatherInterval =  9600 + (m_TickRand.randInt() % 7200); break;  //  8 - 14 minutes
-		case eWeather_ThunderStorm: m_WeatherInterval =  2400 + (m_TickRand.randInt() % 4800); break;  //  2 - 6 minutes
-		default:
-		{
-			LOGWARNING("Requested unknown weather %d, setting sunny for a minute instead.", a_NewWeather);
-			a_NewWeather = eWeather_Sunny;
-			m_WeatherInterval = 1200;
-			break;
-		}
-	}  // switch (NewWeather)
+		return;
+	}
+	
 	m_Weather = a_NewWeather;
 	BroadcastWeather(m_Weather);
 	
@@ -2641,6 +2668,47 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 	} CmdBlockCB (a_Command);
 
 	return DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, CmdBlockCB);
+}
+
+
+
+
+
+bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	BLOCKTYPE Block;
+	NIBBLETYPE Meta;
+	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+	if (Block != E_BLOCK_TRAPDOOR)
+	{
+		return false;
+	}
+	
+	return (Meta & 0x4) > 0;
+}
+
+
+
+
+
+bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
+{
+	BLOCKTYPE Block;
+	NIBBLETYPE Meta;
+	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+	if (Block != E_BLOCK_TRAPDOOR)
+	{
+		return false;
+	}
+	
+	bool IsOpen = (Meta & 0x4) > 0;
+	if (a_Open != IsOpen)
+	{
+		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
+		BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
+		return true;
+	}
+	return false;
 }
 
 

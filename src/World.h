@@ -139,6 +139,9 @@ public:
 		BroadcastTimeUpdate();
 	}
 	
+	/** Returns the default weather interval for the specific weather type */
+	int GetDefaultWeatherInterval(eWeather a_Weather);
+	
 	/** Returns the current game mode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable */
 	eGameMode GetGameMode(void) const { return m_GameMode; }
 
@@ -341,6 +344,12 @@ public:
 
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);	// tolua_export
+
+	/** Is the trapdoor open? Returns false if there is no trapdoor at the specified coords. */
+	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export
+
+	/** Set the state of a trapdoor. Returns true if the trapdoor was update, false if there was no trapdoor at those coords. */
+	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
 	/** Regenerate the given chunk: */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export

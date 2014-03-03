@@ -36,8 +36,10 @@ public:
 	{
 		// Flip the ON bit on/off using the XOR bitwise operation
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x04);
-
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+		
+		cWorld * World = (cWorld *) &a_WorldInterface;
+		World->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
