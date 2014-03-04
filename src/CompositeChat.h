@@ -124,14 +124,15 @@ public:
 	/** Removes all parts from the object. */
 	void Clear(void);
 	
+	// tolua_end
+
+	// The following are exported in ManualBindings in order to support chaining - they return *this in Lua (#755)
+	
 	/** Adds a plain text part, with optional style.
 	The default style is plain white text. */
 	void AddTextPart(const AString & a_Message, const AString & a_Style = "");
 	
-	// tolua_end
-	
-	/** Adds a part that is translated client-side, with the formatting parameters and optional style.
-	Exported in ManualBindings due to AStringVector usage - Lua uses an array-table of strings. */
+	/** Adds a part that is translated client-side, with the formatting parameters and optional style. */
 	void AddClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style = "");
 	
 	// tolua_begin
@@ -155,11 +156,13 @@ public:
 	/** Sets the message type, which is indicated by prefixes added to the message when serializing. */
 	void SetMessageType(eMessageType a_MessageType);
 	
-	/** Returns the message type set previously by SetMessageType(). */
-	eMessageType GetMessageType(void) const { return m_MessageType; }
-	
 	/** Adds the "underline" style to each part that is an URL. */
 	void UnderlineUrls(void);
+	
+	// tolua_begin
+
+	/** Returns the message type set previously by SetMessageType(). */
+	eMessageType GetMessageType(void) const { return m_MessageType; }
 	
 	// tolua_end
 	

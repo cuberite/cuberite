@@ -26,6 +26,7 @@
 #include "md5/md5.h"
 #include "../LineBlockTracer.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
+#include "../CompositeChat.h"
 
 
 
@@ -2511,6 +2512,253 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 
 
 
+static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddRunCommandPart(Message, Command, [Style])
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2, 3)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddRunCommandPart'", NULL);
+		return 0;
+	}
+	
+	// Add the part:
+	AString Text, Command, Style;
+	L.GetStackValue(2, Text);
+	L.GetStackValue(3, Command);
+	L.GetStackValue(4, Style);
+	self->AddRunCommandPart(Text, Command, Style);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_AddSuggestCommandPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddSuggestCommandPart(Message, Command, [Style])
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2, 3)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddSuggestCommandPart'", NULL);
+		return 0;
+	}
+	
+	// Add the part:
+	AString Text, Command, Style;
+	L.GetStackValue(2, Text);
+	L.GetStackValue(3, Command);
+	L.GetStackValue(4, Style);
+	self->AddSuggestCommandPart(Text, Command, Style);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_AddTextPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddTextPart(Message, [Style])
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddTextPart'", NULL);
+		return 0;
+	}
+	
+	// Add the part:
+	AString Text, Style;
+	L.GetStackValue(2, Text);
+	L.GetStackValue(3, Style);
+	self->AddTextPart(Text, Style);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_AddUrlPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddTextPart(Message, Url, [Style])
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2, 3)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddUrlPart'", NULL);
+		return 0;
+	}
+	
+	// Add the part:
+	AString Text, Url, Style;
+	L.GetStackValue(2, Text);
+	L.GetStackValue(3, Url);
+	L.GetStackValue(4, Style);
+	self->AddUrlPart(Text, Url, Style);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_ParseText(lua_State * tolua_S)
+{
+	// function cCompositeChat:ParseText(TextMessage)
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:ParseText'", NULL);
+		return 0;
+	}
+	
+	// Parse the text:
+	AString Text;
+	L.GetStackValue(2, Text);
+	self->ParseText(Text);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_SetMessageType(lua_State * tolua_S)
+{
+	// function cCompositeChat:SetMessageType(MessageType)
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamNumber(2)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:SetMessageType'", NULL);
+		return 0;
+	}
+	
+	// Set the type:
+	int MessageType;
+	L.GetStackValue(1, MessageType);
+	self->SetMessageType((eMessageType)MessageType);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
+{
+	// function cCompositeChat:UnderlineUrls()
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cCompositeChat"))
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:UnderlineUrls'", NULL);
+		return 0;
+	}
+	
+	// Call the processing
+	self->UnderlineUrls();
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
 void ManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, NULL);
@@ -2533,6 +2781,16 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetSize",               tolua_cBlockArea_GetSize);
 			tolua_function(tolua_S, "LoadFromSchematicFile", tolua_cBlockArea_LoadFromSchematicFile);
 			tolua_function(tolua_S, "SaveToSchematicFile",   tolua_cBlockArea_SaveToSchematicFile);
+		tolua_endmodule(tolua_S);
+		
+		tolua_beginmodule(tolua_S, "cCompositeChat");
+			tolua_function(tolua_S, "AddRunCommandPart",     tolua_cCompositeChat_AddRunCommandPart);
+			tolua_function(tolua_S, "AddSuggestCommandPart", tolua_cCompositeChat_AddSuggestCommandPart);
+			tolua_function(tolua_S, "AddTextPart",           tolua_cCompositeChat_AddTextPart);
+			tolua_function(tolua_S, "AddUrlPart",            tolua_cCompositeChat_AddUrlPart);
+			tolua_function(tolua_S, "ParseText",             tolua_cCompositeChat_ParseText);
+			tolua_function(tolua_S, "SetMessageType",        tolua_cCompositeChat_SetMessageType);
+			tolua_function(tolua_S, "UnderlineUrls",         tolua_cCompositeChat_UnderlineUrls);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cHopperEntity");
