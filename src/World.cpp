@@ -264,8 +264,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Load();
-
-	m_MapManager.LoadMapData();
 }
 
 
@@ -652,13 +650,13 @@ void cWorld::Start(void)
 	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfAmbient, 0));
 	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfWater, 0));
 
+	m_MapManager.LoadMapData();
 
 	// Save any changes that the defaults may have done to the ini file:
 	if (!IniFile.WriteFile(m_IniFileName))
 	{
 		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
 	}
-
 }
 
 
