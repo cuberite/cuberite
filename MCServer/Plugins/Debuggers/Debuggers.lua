@@ -30,6 +30,7 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
 	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_JOINED,                OnPlayerJoined)
 
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
@@ -1253,6 +1254,20 @@ function HandleSetBiome(a_Split, a_Player)
 		"} set to biome #" .. tostring(Biome) .. "."
 	)
 	return true
+end
+
+
+
+
+
+function OnPlayerJoined(a_Player)
+	-- Test composite chat chaining:
+	a_Player:SendMessage(cCompositeChat()
+		:AddTextPart("Hello, ")
+		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")
+		:AddSuggestCommandPart(", and welcome.", "/help", "u")
+		:AddRunCommandPart(" SetDay", "/time set 0")
+	)
 end
 
 
