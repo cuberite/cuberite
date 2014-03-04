@@ -197,6 +197,19 @@ public:
 	void Push(void * a_Ptr);
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cBlockEntity * a_BlockEntity);
+	
+	/** Retrieve value at a_StackPos, if it is a valid bool. If not, a_Value is unchanged */
+	void GetStackValue(int a_StackPos, bool & a_Value);
+	
+	/** Retrieve value at a_StackPos, if it is a valid string. If not, a_Value is unchanged */
+	void GetStackValue(int a_StackPos, AString & a_Value);
+	
+	/** Retrieve value at a_StackPos, if it is a valid number. If not, a_Value is unchanged */
+	void GetStackValue(int a_StackPos, int & a_Value);
+	
+	/** Retrieve value at a_StackPos, if it is a valid number. If not, a_Value is unchanged */
+	void GetStackValue(int a_StackPos, double & a_Value);
+	
 
 	/** Call any 0-param 0-return Lua function in a single line: */
 	template <typename FnT>
@@ -270,7 +283,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -292,7 +305,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		ASSERT(InitialTop == lua_gettop(m_LuaState));
 		return true;
@@ -315,7 +328,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -338,7 +351,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -362,7 +375,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -387,7 +400,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -414,7 +427,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -442,7 +455,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -471,7 +484,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -501,7 +514,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -532,7 +545,7 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-1, a_Ret1);
+		GetStackValue(-1, a_Ret1);
 		lua_pop(m_LuaState, 1);
 		return true;
 	}
@@ -553,8 +566,8 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-2, a_Ret1);
-		GetReturn(-1, a_Ret2);
+		GetStackValue(-2, a_Ret1);
+		GetStackValue(-1, a_Ret2);
 		lua_pop(m_LuaState, 2);
 		return true;
 	}
@@ -576,8 +589,8 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-2, a_Ret1);
-		GetReturn(-1, a_Ret2);
+		GetStackValue(-2, a_Ret1);
+		GetStackValue(-1, a_Ret2);
 		lua_pop(m_LuaState, 2);
 		return true;
 	}
@@ -601,8 +614,8 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-2, a_Ret1);
-		GetReturn(-1, a_Ret2);
+		GetStackValue(-2, a_Ret1);
+		GetStackValue(-1, a_Ret2);
 		lua_pop(m_LuaState, 2);
 		return true;
 	}
@@ -627,8 +640,8 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-2, a_Ret1);
-		GetReturn(-1, a_Ret2);
+		GetStackValue(-2, a_Ret1);
+		GetStackValue(-1, a_Ret2);
 		lua_pop(m_LuaState, 2);
 		return true;
 	}
@@ -654,8 +667,8 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-2, a_Ret1);
-		GetReturn(-1, a_Ret2);
+		GetStackValue(-2, a_Ret1);
+		GetStackValue(-1, a_Ret2);
 		lua_pop(m_LuaState, 2);
 		return true;
 	}
@@ -683,8 +696,8 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-2, a_Ret1);
-		GetReturn(-1, a_Ret2);
+		GetStackValue(-2, a_Ret1);
+		GetStackValue(-1, a_Ret2);
 		lua_pop(m_LuaState, 2);
 		return true;
 	}
@@ -713,8 +726,8 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-2, a_Ret1);
-		GetReturn(-1, a_Ret2);
+		GetStackValue(-2, a_Ret1);
+		GetStackValue(-1, a_Ret2);
 		lua_pop(m_LuaState, 2);
 		return true;
 	}
@@ -743,9 +756,9 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-3, a_Ret1);
-		GetReturn(-2, a_Ret2);
-		GetReturn(-1, a_Ret3);
+		GetStackValue(-3, a_Ret1);
+		GetStackValue(-2, a_Ret2);
+		GetStackValue(-1, a_Ret3);
 		lua_pop(m_LuaState, 3);
 		return true;
 	}
@@ -775,9 +788,9 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-3, a_Ret1);
-		GetReturn(-2, a_Ret2);
-		GetReturn(-1, a_Ret3);
+		GetStackValue(-3, a_Ret1);
+		GetStackValue(-2, a_Ret2);
+		GetStackValue(-1, a_Ret3);
 		lua_pop(m_LuaState, 3);
 		return true;
 	}
@@ -808,11 +821,11 @@ public:
 		{
 			return false;
 		}
-		GetReturn(-5, a_Ret1);
-		GetReturn(-4, a_Ret2);
-		GetReturn(-3, a_Ret3);
-		GetReturn(-2, a_Ret4);
-		GetReturn(-1, a_Ret5);
+		GetStackValue(-5, a_Ret1);
+		GetStackValue(-4, a_Ret2);
+		GetStackValue(-3, a_Ret3);
+		GetStackValue(-2, a_Ret4);
+		GetStackValue(-1, a_Ret5);
 		lua_pop(m_LuaState, 5);
 		return true;
 	}
@@ -918,18 +931,6 @@ protected:
 	/** Pushes a usertype of the specified class type onto the stack */
 	void PushUserType(void * a_Object, const char * a_Type);
 
-	/** Retrieve value returned at a_StackPos, if it is a valid bool. If not, a_ReturnedVal is unchanged */
-	void GetReturn(int a_StackPos, bool & a_ReturnedVal);
-	
-	/** Retrieve value returned at a_StackPos, if it is a valid string. If not, a_ReturnedVal is unchanged */
-	void GetReturn(int a_StackPos, AString & a_ReturnedVal);
-	
-	/** Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged */
-	void GetReturn(int a_StackPos, int & a_ReturnedVal);
-	
-	/** Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged */
-	void GetReturn(int a_StackPos, double & a_ReturnedVal);
-	
 	/**
 	Calls the function that has been pushed onto the stack by PushFunction(),
 	with arguments pushed by PushXXX().
