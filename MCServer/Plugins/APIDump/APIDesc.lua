@@ -2701,16 +2701,16 @@ end
 
 	IgnoreClasses =
 	{
-		"coroutine",
-		"debug",
-		"io",
-		"math",
-		"package",
-		"os",
-		"string",
-		"table",
-		"g_Stats",
-		"g_TrackedPages",
+		"^coroutine$",
+		"^debug$",
+		"^io$",
+		"^math$",
+		"^package$",
+		"^os$",
+		"^string$",
+		"^table$",
+		"^g_Stats$",
+		"^g_TrackedPages$",
 	},
 
 	IgnoreFunctions =
