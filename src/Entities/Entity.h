@@ -119,6 +119,7 @@ public:
 		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
 		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
 		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
+		VOID_BOUNDARY = -46          ///< At what position Y to begin applying void damage
 	} ;
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);

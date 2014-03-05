@@ -1696,7 +1696,11 @@ void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, double a_FuseTim
 	UNUSED(a_InitialVelocityCoeff);
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTimeInSec);
 	TNT->Initialize(this);
-	// TODO: Add a bit of speed in horiz and vert axes, based on the a_InitialVelocityCoeff
+	TNT->SetSpeed(
+		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /** -1, 0, 1 */
+		a_InitialVelocityCoeff * 2,
+		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1)
+		);
 }
 
 
