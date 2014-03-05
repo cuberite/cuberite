@@ -483,6 +483,58 @@ end
 			},
 		},  -- cClientHandle
 
+		cCompositeChat =
+		{
+			Desc = [[
+				Encapsulates a chat message that can contain various formatting, URLs, commands executed on click
+				and commands suggested on click. The chat message can be sent by the regular chat-sending functions,
+				{{cPlayer}}:SendMessage(), {{cWorld}}:BroadcastChat() and {{cRoot}}:BroadcastChat().</p>
+				<p>
+				Note that most of the functions in this class are so-called modifiers - they modify the object and
+				then return the object itself, so that they can be chained one after another.
+			]],
+			Functions =
+			{
+				constructor =
+				{
+					{ Params = "", Return = "", Notes = "Creates an empty chat message" },
+					{ Params = "Text", Return = "", Notes = "Creates a chat message containing the specified text, parsed by the ParseText() function. This allows easy migration from old chat messages." },
+				},
+				AddRunCommandPart = { Params = "Text, Command, [Style]", Return = "self", Notes = "Adds a text which, when clicked, runs the specified command. Chaining." },
+				AddSuggestCommandPart = { Params = "Text, Command, [Style]", Return = "self", Notes = "Adds a text which, when clicked, puts the specified command into the player's chat input area. Chaining." },
+				AddTextPart = { Params = "Text, [Style]", Return = "self", Notes = "Adds a regular text. Chaining." },
+				AddUrlPart = { Params = "Text, Url, [Style]", Return = "self", Notes = "Adds a text which, when clicked, opens up a browser at the specified URL. Chaining." },
+				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
+				GetMessageType = { Params = "", Return = "MessageType", Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)" },
+				ParseText = { Params = "Text", Return = "self", Notes = "Adds text, while recognizing http and https URLs and old-style formatting codes (\"@2\"). Chaining." },
+				SetMessageType = { Params = "MessageType", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.) Chaining." },
+				UnderlineUrls = { Params = "", Return = "self", Notes = "Makes all URL parts contained in the message underlined. Doesn't affect parts added in the future. Chaining." },
+			},
+
+			AdditionalInfo =
+			{
+				{
+					Header = "Chaining example",
+					Contents = [[
+						Sending a chat message that is composed of multiple different parts has been made easy thanks to
+						chaining. Consider the following example that shows how a message containing all kinds of parts
+						is sent (adapted from the Debuggers plugin):
+<pre class="prettyprint lang-lua">
+function OnPlayerJoined(a_Player)
+	-- Send an example composite chat message to the player:
+	a_Player:SendMessage(cCompositeChat()
+		:AddTextPart("Hello, ")
+		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")  -- Colored underlined link
+		:AddSuggestCommandPart(", and welcome.", "/help", "u")       -- Underlined suggest-command
+		:AddRunCommandPart(" SetDay", "/time set 0")                 -- Regular text that will execute command when clicked
+		:SetMessageType(mtJoin)                                      -- It is a join-message
+	)
+end</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cCompositeChat
+		
 		cCraftingGrid =
 		{
 			Desc = [[
