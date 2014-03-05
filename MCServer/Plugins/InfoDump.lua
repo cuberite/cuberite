@@ -530,12 +530,13 @@ local function DumpPermissionsGithub(a_PluginInfo, f)
 
 	-- Dump the permissions:
 	f:write("\n# Permissions\n");
+	f:write("| Permissions | Description | Commands | Recommended groups |\n")
+	f:write("| ----------- | ----------- | -------- | ------------------ |\n")
 	for idx, perm in ipairs(Permissions) do
-		f:write("### ", perm.Name, "\n");
-		f:write(GithubizeString(perm.Info.Description or ""));
+		f:write(perm.Name, " | ");
+		f:write(GithubizeString(perm.Info.Description or ""), " | ");
 		local CommandsAffected = perm.Info.CommandsAffected or {};
 		if (#CommandsAffected > 0) then
-			f:write("\n\nCommands affected:\n  - ");
 			local Affects = {};
 			for idx2, cmd in ipairs(CommandsAffected) do
 				if (type(cmd) == "string") then
@@ -544,11 +545,10 @@ local function DumpPermissionsGithub(a_PluginInfo, f)
 					table.insert(Affects, GetCommandRefGithub(cmd.Name, cmd));
 				end
 			end
-			f:write(table.concat(Affects, "\n  - "));
-			f:write("\n");
+			f:write(table.concat(Affects, ", "), " | ");
 		end
 		if (perm.Info.RecommendedGroups ~= nil) then
-			f:write("\n\nRecommended groups: ", perm.Info.RecommendedGroups, "\n");
+			f:write(perm.Info.RecommendedGroups, " |");
 		end
 		f:write("\n");
 	end
@@ -594,7 +594,7 @@ local function DumpPluginInfoGithub(a_PluginFolder, a_PluginInfo)
 	f:write(GithubizeString(a_PluginInfo.Description), "\n");
 	DumpAdditionalInfoGithub(a_PluginInfo, f);
 	DumpCommandsGithub(a_PluginInfo, f);
-	--DumpPermissionsGithub(a_PluginInfo, f); -- Seems a little overkill since they are already mentioned in the commands.
+	DumpPermissionsGithub(a_PluginInfo, f);
 
 	f:close();
 end
