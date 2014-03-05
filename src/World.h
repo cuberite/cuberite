@@ -455,7 +455,7 @@ public:
 	
 	// tolua_begin
 	bool DigBlock   (int a_X, int a_Y, int a_Z);
-	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player );
+	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player);
 
 	double GetSpawnX(void) const { return m_SpawnX; }
 	double GetSpawnY(void) const { return m_SpawnY; }
