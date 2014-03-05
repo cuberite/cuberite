@@ -86,7 +86,12 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		{
 			// Spread only down, possibly washing away what's there or turning lava to stone / cobble / obsidian:
 			SpreadToNeighbor(a_Chunk, a_RelX, a_RelY - 1, a_RelZ, 8);
-			SpreadFurther = false;
+
+			// Source blocks spread both downwards and sideways
+			if (MyMeta != 0)
+			{
+				SpreadFurther = false;
+			}
 		}
 		// If source creation is on, check for it here:
 		else if (
@@ -105,16 +110,24 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 	if (SpreadFurther && (NewMeta < 8))
 	{
 		// Spread to the neighbors:
-		SpreadToNeighbor(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     NewMeta);
-		SpreadToNeighbor(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     NewMeta);
-		SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, NewMeta);
-		SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, NewMeta);
+		Spread(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
 	}
 	
 	// Mark as processed:
 	a_Chunk->FastSetBlock(a_RelX, a_RelY, a_RelZ, m_StationaryFluidBlock, MyMeta);
 }
 
+
+
+
+
+void cFloodyFluidSimulator::Spread(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta)
+{
+	SpreadToNeighbor(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, a_NewMeta);
+}
 
 
 
