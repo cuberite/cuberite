@@ -34,6 +34,7 @@
 #include "Simulator/NoopRedstoneSimulator.h"
 #include "Simulator/SandSimulator.h"
 #include "Simulator/IncrementalRedstoneSimulator.h"
+#include "Simulator/VanillaFluidSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
 
 // Mobs:
@@ -3053,8 +3054,8 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "");
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Floody\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
-		SimulatorName = "Floody";
+		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Vanilla\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
+		SimulatorName = "Vanilla";
 	}
 	
 	cFluidSimulator * res = NULL;
@@ -3078,15 +3079,24 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	}
 	else
 	{
-		if (NoCaseCompare(SimulatorName, "floody") != 0)
-		{
-			// The simulator name doesn't match anything we have, issue a warning:
-			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Floody\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
-		}
 		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
 		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
 		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
-		res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+
+		if (NoCaseCompare(SimulatorName, "floody") == 0)
+		{
+			res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
+		else if (NoCaseCompare(SimulatorName, "vanilla") == 0)
+		{
+			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
+		else
+		{
+			// The simulator name doesn't match anything we have, issue a warning:
+			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Vanilla\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
+			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
 	}
 	
 	m_SimulatorManager->RegisterSimulator(res, Rate);
