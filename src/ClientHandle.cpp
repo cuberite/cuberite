@@ -555,11 +555,24 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 	}
 	else if (a_Channel == "REGISTER")
 	{
+		if (HasPluginChannel(a_Channel))
+		{
+			SendPluginMessage("UNREGISTER", a_Channel);
+			return; // Can't register again if already taken - kinda defeats the point of plugin messaging!
+		}
+
 		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
 	}
 	else if (a_Channel == "UNREGISTER")
 	{
 		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
+	}
+	else if (!HasPluginChannel(a_Channel))
+	{
+		// Ignore if client sent something but didn't register the channel first
+		LOGD("Player %s sent a plugin message on channel \"%s\", but didn't REGISTER it first", GetUsername().c_str(), a_Channel.c_str());
+		SendPluginMessage("UNREGISTER", a_Channel);
+		return;
 	}
 
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
