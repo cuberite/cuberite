@@ -1198,9 +1198,18 @@ bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
-bool cWorld::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+bool cWorld::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
 {
-	return m_ChunkMap->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return m_ChunkMap->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithFlowerPotAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 

@@ -29,6 +29,7 @@ Implements the 1.7.x protocol classes:
 #include "../UI/Window.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 #include "../CompositeChat.h"
 
 
@@ -1115,6 +1116,7 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
 		case E_BLOCK_HEAD:          Action = 4; break; // Update Mobhead entity
+		case E_BLOCK_FLOWER_POT:    Action = 5; break; // Update flower pot
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteByte(Action);
@@ -2345,7 +2347,7 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 		case E_BLOCK_HEAD:
 		{
 			cMobHeadEntity & MobHeadEntity = (cMobHeadEntity &)a_BlockEntity;
-			
+
 			Writer.AddInt("x", MobHeadEntity.GetPosX());
 			Writer.AddInt("y", MobHeadEntity.GetPosY());
 			Writer.AddInt("z", MobHeadEntity.GetPosZ());
@@ -2353,6 +2355,18 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
 			Writer.AddString("ExtraType", MobHeadEntity.GetOwner().c_str());
 			Writer.AddString("id", "Skull"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
+		case E_BLOCK_FLOWER_POT:
+		{
+			cFlowerPotEntity & FlowerPotEntity = (cFlowerPotEntity &)a_BlockEntity;
+
+			Writer.AddInt("x", FlowerPotEntity.GetPosX());
+			Writer.AddInt("y", FlowerPotEntity.GetPosY());
+			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
+			Writer.AddInt("Item", (Int32) FlowerPotEntity.GetItem().m_ItemType);
+			Writer.AddInt("Data", (Int32) FlowerPotEntity.GetItem().m_ItemDamage);
+			Writer.AddString("id", "FlowerPot"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
 		default: break;

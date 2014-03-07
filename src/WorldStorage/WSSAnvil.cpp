@@ -25,6 +25,7 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 
 
 #include "../Mobs/Monster.h"
@@ -578,6 +579,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadDropperFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "FlowerPot", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadFlowerPotFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		else if (strncmp(a_NBT.GetData(sID), "Furnace", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadFurnaceFromNBT(a_BlockEntities, a_NBT, Child, a_BlockTypes, a_BlockMetas);
@@ -754,6 +759,37 @@ void cWSSAnvil::LoadDropperFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 	std::auto_ptr<cDropperEntity> Dropper(new cDropperEntity(x, y, z, m_World));
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
 	a_BlockEntities.push_back(Dropper.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadFlowerPotFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cFlowerPotEntity> FlowerPot(new cFlowerPotEntity(x, y, z, m_World));
+	short ItemType = 0, ItemData = 0;
+
+	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Item");
+	if (currentLine >= 0)
+	{
+		ItemType = (short) a_NBT.GetInt(currentLine);
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "Data");
+	if (currentLine >= 0)
+	{
+		ItemData = (short) a_NBT.GetInt(currentLine);
+	}
+
+	FlowerPot->SetItem(cItem(ItemType, 1, ItemData));
+	a_BlockEntities.push_back(FlowerPot.release());
 }
 
 

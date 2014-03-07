@@ -20,6 +20,7 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Entities/Entity.h"
 #include "../Entities/FallingBlock.h"
@@ -268,6 +269,19 @@ void cNBTChunkSerializer::AddMobHeadEntity(cMobHeadEntity * a_MobHead)
 		m_Writer.AddByte  ("SkullType", a_MobHead->GetType() & 0xFF);
 		m_Writer.AddByte  ("Rot",       a_MobHead->GetRotation() & 0xFF);
 		m_Writer.AddString("ExtraType", a_MobHead->GetOwner());
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddFlowerPotEntity(cFlowerPotEntity * a_FlowerPot)
+{
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_FlowerPot, "FlowerPot");
+		m_Writer.AddInt   ("Item", (Int32) a_FlowerPot->GetItem().m_ItemType);
+		m_Writer.AddInt   ("Data", (Int32) a_FlowerPot->GetItem().m_ItemDamage);
 	m_Writer.EndCompound();
 }
 
@@ -687,6 +701,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)        a_Entity); break;
 		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)    a_Entity); break;
 		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)      a_Entity); break;
+		case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   ((cFlowerPotEntity *)    a_Entity); break;
 		case E_BLOCK_FURNACE:       AddFurnaceEntity     ((cFurnaceEntity *)      a_Entity); break;
 		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)       a_Entity); break;
 		case E_BLOCK_SIGN_POST:

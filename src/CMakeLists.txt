@@ -40,6 +40,7 @@ if (NOT MSVC)
 		BlockEntities/NoteEntity.h
 		BlockEntities/SignEntity.h
 		BlockEntities/MobHeadEntity.h
+		BlockEntities/FlowerPotEntity.h
 		BlockID.h
 		BoundingBox.h
 		ChatColor.h
