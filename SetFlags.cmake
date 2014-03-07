@@ -1,5 +1,4 @@
 
-
 macro (add_flags_lnk FLAGS)
 	set(CMAKE_EXE_LINKER_FLAGS            "${CMAKE_EXE_LINKER_FLAGS}            ${FLAGS}")
 	set(CMAKE_EXE_LINKER_FLAGS_DEBUG      "${CMAKE_EXE_LINKER_FLAGS_DEBUG}      ${FLAGS}")
@@ -50,6 +49,9 @@ macro(set_flags)
 		else()
 			add_flags_cxx("-pthread")
 		endif()
+		
+		#we support non-IEEE 754 fpus so can make no guarentees about error
+		add_flags_cxx("-ffast-math")
 
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
@@ -62,6 +64,9 @@ macro(set_flags)
 
 		# We use a signed char (fixes #640 on RasPi)
 		add_flags_cxx("-fsigned-char")
+		
+		#we support non-IEEE 754 fpus so can make no guarentees about error
+		add_flags_cxx("-ffast-math")
 	endif()
 
 
