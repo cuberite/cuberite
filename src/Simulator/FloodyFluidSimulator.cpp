@@ -64,8 +64,10 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		return;
 	}
 
+	// When in contact with water, lava should harden
 	if (HardenBlock(a_Chunk, a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta))
 	{
+		// Block was changed, bail out
 		return;
 	}
 
