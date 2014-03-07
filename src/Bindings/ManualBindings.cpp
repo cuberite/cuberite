@@ -2456,7 +2456,7 @@ static int tolua_cBlockArea_GetSize(lua_State * tolua_S)
 static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 {
 	// function cBlockArea::LoadFromSchematicFile
-	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cBlockArea") ||
@@ -2486,7 +2486,7 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 static int tolua_cBlockArea_LoadFromSchematicString(lua_State * tolua_S)
 {
 	// function cBlockArea::LoadFromSchematicString
-	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cBlockArea") ||
@@ -2517,7 +2517,7 @@ static int tolua_cBlockArea_LoadFromSchematicString(lua_State * tolua_S)
 static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 {
 	// function cBlockArea::SaveToSchematicFile
-	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cBlockArea") ||
@@ -2546,7 +2546,7 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 static int tolua_cBlockArea_SaveToSchematicString(lua_State * tolua_S)
 {
 	// function cBlockArea::SaveToSchematicString
-	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cBlockArea") ||
