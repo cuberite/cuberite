@@ -61,7 +61,7 @@ typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
 typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
 typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
-typedef cItemCallback<cMobHeadEntity>      cMobHeadBlockCallback;
+typedef cItemCallback<cMobHeadEntity>      cMobHeadCallback;
 typedef cItemCallback<cFlowerPotEntity>    cFlowerPotCallback;
 
 
@@ -535,7 +535,7 @@ public:
 	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
-	bool DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
 	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback);  // Exported in ManualBindings.cpp

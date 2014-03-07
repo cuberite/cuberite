@@ -2820,7 +2820,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithFurnaceAt",           tolua_DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
 			tolua_function(tolua_S, "DoWithNoteBlockAt",         tolua_DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
 			tolua_function(tolua_S, "DoWithCommandBlockAt",      tolua_DoWithXYZ<cWorld, cCommandBlockEntity, &cWorld::DoWithCommandBlockAt>);
-			tolua_function(tolua_S, "DoWithMobHeadBlockAt",      tolua_DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadBlockAt>);
+			tolua_function(tolua_S, "DoWithMobHeadAt",           tolua_DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
 			tolua_function(tolua_S, "DoWithFlowerPotAt",         tolua_DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
 			tolua_function(tolua_S, "DoWithPlayer",              tolua_DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",       tolua_DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);

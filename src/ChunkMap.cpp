@@ -2182,7 +2182,7 @@ bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-bool cChunkMap::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+bool cChunkMap::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2193,7 +2193,7 @@ bool cChunkMap::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	{
 		return false;
 	}
-	return Chunk->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
