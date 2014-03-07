@@ -247,8 +247,8 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		Functions =
 		{
 			IsItemInPot = { Params = "", Return = "bool", Notes = "Is a flower in the pot?" },
-			GetItem = { Params = "", Return = "cItem", Notes = "Returns the item in the flower pot." },
-			SetItem = { Params = "cItem", Return = "", Notes = "Set the item in the flower pot" },
+			GetItem = { Params = "", Return = "{{cItem|Item}}", Notes = "Returns the item in the flower pot." },
+			SetItem = { Params = "{{cItem|Item}}", Return = "", Notes = "Set the item in the flower pot" },
 		},
 		Inherits = "cBlockEntity";
 	},  -- cFlowerPotEntity
