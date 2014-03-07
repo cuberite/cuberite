@@ -1,0 +1,213 @@
+
+// PieceGenerator.h
+
+// Declares the cBFSPieceGenerator class and cDFSPieceGenerator class 
+// representing base classes for generating structures composed of individual "pieces"
+
+/*
+Each uses a slightly different approach to generating:
+	- DFS extends pieces one by one until it hits the configured depth (or can't connect another piece anymore),
+		then starts looking at adjacent connectors (like depth-first search).
+	- BFS keeps a pool of currently-open connectors, chooses one at random and tries to place a piece on it,
+		thus possibly extending the pool of open connectors (like breadth-first search).
+*/
+
+
+
+
+
+#pragma once
+
+#include "../Defines.h"
+#include "../Cuboid.h"
+#include "../Noise.h"
+
+
+
+
+
+/** Represents a single piece. Can have multiple connectors of different types where other pieces can connect. */
+class cPiece
+{
+public:
+	struct cConnector
+	{
+		int m_X;
+		int m_Y;
+		int m_Z;
+		int m_Type;
+		eBlockFace m_Direction;
+		
+		cConnector(int a_X, int a_Y, int a_Z, int a_Type, eBlockFace m_Direction);
+	};
+	
+	typedef std::vector<cConnector> cConnectors;
+	
+	/** Returns all of the available connectors that the piece has.
+	Each connector has a (relative) position in the piece, and a type associated with it. */
+	virtual cConnectors GetConnectors(void) const = 0;
+	
+	/** Returns the dimensions of this piece.
+	The dimensions cover the entire piece, there is no block that the piece generates outside of this size. */
+	virtual Vector3i GetSize(void) const = 0;
+	
+	/** Returns the "hitbox" of this piece.
+	A hitbox is what is compared and must not intersect other pieces' hitboxes when generating. */
+	virtual cCuboid GetHitBox(void) const = 0;
+	
+	/** Returns true if the piece can be rotated CCW the specific number of 90-degree turns. */
+	virtual bool CanRotateCCW(int a_NumRotations) const = 0;
+	
+	/** Returns a copy of the connector that is rotated and then moved by the specified amounts. */
+	cConnector RotateMoveConnector(const cConnector & a_Connector, int a_NumCCWRotations, int a_MoveX, int a_MoveY, int a_MoveZ) const;
+	
+	/** Returns the hitbox after the specified number of rotations and moved so that a_MyConnector is placed at a_ToConnector*/
+	cCuboid RotateHitBoxToConnector(const cConnector & a_MyConnector, const cConnector & a_ToConnector, int a_NumCCWRotations) const;
+};
+
+typedef std::vector<cPiece *> cPieces;
+
+
+
+
+
+class cPiecePool
+{
+public:
+	/** Returns a list of pieces that contain the specified connector type.
+	The cPiece pointers returned are managed by the pool and the caller doesn't free them. */
+	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) = 0;
+	
+	/** Returns the pieces that should be used as the starting point.
+	Multiple starting points are supported, one of the returned piece will be chosen. */
+	virtual cPieces GetStartingPieces(void) = 0;
+	
+	/** Called after a piece is placed, to notify the pool that it has been used.
+	The pool may adjust the pieces it will return the next time. */
+	virtual void PiecePlaced(const cPiece & a_Piece) = 0;
+	
+	/** Called when the pool has finished the current structure and should reset any piece-counters it has
+	for a new structure. */
+	virtual void Reset(void) = 0;
+};
+
+
+
+
+
+/** Represents a single piece that has been placed to specific coords in the world. */
+class cPlacedPiece
+{
+public:
+	cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece, const Vector3i & a_Coords, int a_NumCCWRotations);
+	
+	const cPiece &   GetPiece          (void) const { return *m_Piece; }
+	const Vector3i & GetCoords         (void) const { return m_Coords; }
+	const int        GetNumCCWRotations(void) const { return m_NumCCWRotations; }
+	const cCuboid &  GetHitBox         (void) const { return m_HitBox; }
+	const int        GetDepth          (void) const { return m_Depth; }
+	
+protected:
+	const cPlacedPiece * m_Parent;
+	const cPiece * m_Piece;
+	Vector3i m_Coords;
+	int m_NumCCWRotations;
+	cCuboid m_HitBox;
+	int m_Depth;
+};
+
+typedef std::vector<cPlacedPiece> cPlacedPieces;
+
+
+
+
+
+class cPieceGenerator
+{
+public:
+	cPieceGenerator(cPiecePool & a_PiecePool, int a_Seed);
+	
+protected:
+	/** The type used for storing a connection from one piece to another, while building the piece tree. */
+	struct cConnection
+	{
+		cPiece * m_Piece;                  // The piece being connected
+		cPiece::cConnector * m_Connector;  // The piece's connector being used
+		int m_NumCCWRotations;             // Number of rotations necessary to match the two connectors
+		
+		cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations);
+	};
+	typedef std::vector<cConnection> cConnections;
+	
+	/** The type used for storing a pool of connectors that will be attempted to expand by another piece. */
+	struct cFreeConnector
+	{
+		cPlacedPiece * m_Piece;
+		cPiece::cConnector m_Connector;
+		
+		cFreeConnector(cPlacedPiece & a_Piece, const cPiece::cConnector & a_Connector);
+	};
+	typedef std::vector<cFreeConnector> cFreeConnectors;
+
+
+	cPiecePool & m_PiecePool;
+	cNoise m_Noise;
+	int m_Seed;
+
+	
+	/** Selects a starting piece and places it, including the rotations.
+	Also puts the piece's connectors in a_OutConnectors. */
+	cPlacedPiece PlaceStartingPiece(int a_BlockX, int a_BlockY, int a_BlockZ, cFreeConnectors & a_OutConnectors);
+	
+	/** Tries to place a new piece at the specified (placed) connector. Returns true if successful. */
+	bool TryPlacePieceAtConnector(
+		const cPlacedPiece & a_ParentPiece,
+		const cPiece::cConnector & a_Connector,
+		cPlacedPieces & a_OutPieces
+	);
+
+	/** Checks if the specified piece would fit with the already-placed pieces, using the specified connector
+	and number of CCW rotations.
+	Returns true if the piece fits, false if not. */
+	bool CheckConnection(
+		const cPiece::cConnector & a_ExistingConnector,  // The existing connector
+		const cPiece & a_Piece,                          // The new piece
+		const cPiece::cConnector & a_NewConnector,       // The connector of the new piece 
+		int a_NumCCWRotations,                           // Number of rotations for the new piece to align the connector
+		const cPlacedPieces & a_OutPieces                // All the already-placed pieces to check
+	);
+} ;
+
+
+
+
+
+class cBFSPieceGenerator :
+	public cPieceGenerator
+{
+	typedef cPieceGenerator super;
+	
+public:
+	cBFSPieceGenerator(cPiecePool & a_PiecePool, int a_Seed);
+	
+	/** Generates a placement for pieces at the specified coords. */
+	void PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, cPlacedPieces & a_OutPieces);
+};
+
+
+
+
+
+class cDFSPieceGenerator :
+	public cPieceGenerator
+{
+public:
+	cDFSPieceGenerator(cPiecePool & a_PiecePool, int a_Seed);
+	
+	/** Generates a placement for pieces at the specified coords. */
+	void PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, cPlacedPieces & a_OutPieces);
+};
+
+
+
+
