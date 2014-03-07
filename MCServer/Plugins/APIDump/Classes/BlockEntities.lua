@@ -238,6 +238,20 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		},
 		Inherits = "cBlockEntity";
 	},  -- cSignEntity
+
+	cFlowerPotEntity =
+	{
+		Desc = [[
+			This class represents a flower pot entity in the world.
+		]],
+		Functions =
+		{
+			IsItemInPot = { Params = "", Return = "bool", Notes = "Is a flower in the pot?" },
+			GetItem = { Params = "", Return = "cItem", Notes = "Returns the item in the flower pot." },
+			SetItem = { Params = "cItem", Return = "", Notes = "Set the item in the flower pot" },
+		},
+		Inherits = "cBlockEntity";
+	},  -- cFlowerPotEntity
 }
 
 
