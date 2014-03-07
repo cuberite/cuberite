@@ -1,22 +1,45 @@
+
+// Vector3i.h
+
+// Declares the Vector3i class representing an int-based 3D vector
+
+
+
+
+
 #pragma once
 
-#include <math.h>
 
+
+
+
+// fwd:
 class Vector3d;
-class Vector3i	// tolua_export
-{				// tolua_export
-public:			// tolua_export
-	Vector3i( const Vector3d & v );														// tolua_export
 
-	Vector3i() : x(0), y(0), z(0) {}													// tolua_export
-	Vector3i(int a_x, int a_y, int a_z) : x(a_x), y(a_y), z(a_z) {}						// tolua_export
 
-	inline void Set(int a_x, int a_y, int a_z) { x = a_x, y = a_y, z = a_z; }			// tolua_export
-	inline float Length() const { return sqrtf( (float)( x * x + y * y + z * z) ); }	// tolua_export
-	inline int SqrLength() const { return x * x + y * y + z * z; }						// tolua_export
 
-	inline bool Equals( const Vector3i & v ) const { return (x == v.x && y == v.y && z == v.z ); }		// tolua_export
-	inline bool Equals( const Vector3i * v ) const { return (x == v->x && y == v->y && z == v->z ); }	// tolua_export
+
+
+// tolua_begin
+class Vector3i
+{
+public:
+	/** Creates an int vector based on the floor()-ed coords of a double vector. */
+	Vector3i(const Vector3d & v);
+
+	Vector3i(void);
+	Vector3i(int a_x, int a_y, int a_z);
+
+	inline void Set(int a_x, int a_y, int a_z) { x = a_x, y = a_y, z = a_z; }
+	inline float Length() const { return sqrtf( (float)( x * x + y * y + z * z) ); }
+	inline int SqrLength() const { return x * x + y * y + z * z; }
+
+	inline bool Equals( const Vector3i & v ) const { return (x == v.x && y == v.y && z == v.z ); }
+	inline bool Equals( const Vector3i * v ) const { return (x == v->x && y == v->y && z == v->z ); }
+	
+	void Move(int a_MoveX, int a_MoveY, int a_MoveZ);
+	
+	// tolua_end
 
 	void operator += ( const Vector3i& a_V ) { x += a_V.x; y += a_V.y; z += a_V.z; }
 	void operator += ( Vector3i* a_V ) { x += a_V->x; y += a_V->y; z += a_V->z; }
