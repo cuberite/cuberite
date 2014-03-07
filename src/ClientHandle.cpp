@@ -920,14 +920,22 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
 	
+	cWorld * World = m_Player->GetWorld();
+	
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
+		cChunkInterface ChunkInterface(World->GetChunkMap());
+		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		
 		if (a_BlockFace > -1)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player); //2 block high things
 		}
 		return;
 	}
@@ -953,12 +961,10 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		if (a_BlockFace > -1)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		}
 		return;
 	}
-	
-	cWorld * World = m_Player->GetWorld();
 
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
