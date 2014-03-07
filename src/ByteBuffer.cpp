@@ -171,7 +171,7 @@ cByteBuffer::~cByteBuffer()
 
 
 
-bool cByteBuffer::Write(const char * a_Bytes, int a_Count)
+bool cByteBuffer::Write(const char * a_Bytes, size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
@@ -263,7 +263,7 @@ int cByteBuffer::GetReadableSpace(void) const
 
 
 
-bool cByteBuffer::CanReadBytes(int a_Count) const
+bool cByteBuffer::CanReadBytes(size_t a_Count) const
 {
 	CHECK_THREAD;
 	CheckValid();
@@ -274,7 +274,7 @@ bool cByteBuffer::CanReadBytes(int a_Count) const
 
 
 
-bool cByteBuffer::CanWriteBytes(int a_Count) const
+bool cByteBuffer::CanWriteBytes(size_t a_Count) const
 {
 	CHECK_THREAD;
 	CheckValid();
@@ -767,7 +767,7 @@ bool cByteBuffer::ReadUTF16String(AString & a_String, int a_NumChars)
 
 
 
-bool cByteBuffer::SkipRead(int a_Count)
+bool cByteBuffer::SkipRead(size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
@@ -860,7 +860,7 @@ void cByteBuffer::ReadAgain(AString & a_Out)
 
 
 
-void cByteBuffer::AdvanceReadPos(int a_Count)
+void cByteBuffer::AdvanceReadPos(size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();

@@ -59,7 +59,7 @@ public:
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
 	
 	/// Called when client sends some data:
-	virtual void DataReceived(const char * a_Data, int a_Size) override;
+	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 	
 	/// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity        (const cEntity & a_Entity, const cEntity * a_Vehicle) override;

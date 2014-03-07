@@ -1186,7 +1186,7 @@ void cProtocol125::SendData(const char * a_Data, int a_Size)
 
 
 
-void cProtocol125::DataReceived(const char * a_Data, int a_Size)
+void cProtocol125::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{

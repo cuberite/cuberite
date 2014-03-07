@@ -108,7 +108,7 @@ cProtocol132::~cProtocol132()
 
 
 
-void cProtocol132::DataReceived(const char * a_Data, int a_Size)
+void cProtocol132::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{

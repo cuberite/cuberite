@@ -98,7 +98,7 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 
 
 
-void cProtocol172::DataReceived(const char * a_Data, int a_Size)
+void cProtocol172::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
