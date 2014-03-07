@@ -3,6 +3,15 @@ cmake_minimum_required (VERSION 2.6)
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
+if(DEFINED ENV{MCSERVER_BUILD_TYPE})
+	message("Setting build type to $ENV{MCSERVER_BUILD_TYPE}")
+	set(CMAKE_BUILD_TYPE $ENV{MCSERVER_BUILD_TYPE})
+endif()
+
+if(DEFINED ENV{MCSERVER_FORCE32})
+	set(FORCE32 $ENV{MCSERVER_FORCE32})
+endif()
+
 # This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
 	add_subdirectory(Tools/MCADefrag/)
