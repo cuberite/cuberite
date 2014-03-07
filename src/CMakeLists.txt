@@ -9,6 +9,14 @@ include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
 set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating) 
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities)
 
+if(DEFINED ENV{MCSERVER_BUILD_TYPE})
+	message("Setting build type to $ENV{MCSERVER_BUILD_TYPE}")
+	set(CMAKE_BUILD_TYPE $ENV{MCSERVER_BUILD_TYPE})
+endif()
+
+if(DEFINED ENV{MCSERVER_FORCE32})
+	set(FORCE32 $ENV{MCSERVER_FORCE32})
+endif()
 
 
 if (NOT MSVC)
