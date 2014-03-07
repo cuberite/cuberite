@@ -54,11 +54,18 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ)
 	);
 	
-	NIBBLETYPE MyMeta = a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ);
-	if (!IsAnyFluidBlock(a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ)))
+	BLOCKTYPE MyBlock; NIBBLETYPE MyMeta;
+	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta);
+
+	if (!IsAnyFluidBlock(MyBlock))
 	{
 		// Can happen - if a block is scheduled for simulating and gets replaced in the meantime.
 		FLOG("  BadBlockType exit");
+		return;
+	}
+
+	if (HardenBlock(a_Chunk, a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta))
+	{
 		return;
 	}
 
@@ -309,6 +316,8 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		a_NewMeta
 	);
 	a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
+
+	HardenBlock(a_NearChunk, a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
 }
 
 
@@ -358,6 +367,59 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 	return false;
 }
 
+
+
+
+
+bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+{
+	// Only lava blocks can harden
+	if (!IsBlockLava(a_BlockType))
+	{
+		return false;
+	}
+
+	bool ShouldHarden = false;
+
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	static const Vector3i Coords[] =
+	{
+		Vector3i( 1, 0,  0),
+		Vector3i(-1, 0,  0),
+		Vector3i( 0, 0,  1),
+		Vector3i( 0, 0, -1),
+	};
+	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+	{
+		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+		{
+			continue;
+		}
+		if (IsBlockWater(BlockType))
+		{
+			ShouldHarden = true;
+		}
+	}  // for i - Coords[]
+
+	if (ShouldHarden)
+	{
+		if (a_Meta == 0)
+		{
+			// Source lava block
+			a_Chunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_OBSIDIAN, 0);
+			return true;
+		}
+		// Ignore last lava level
+		else if (a_Meta <= 4)
+		{
+			a_Chunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_COBBLESTONE, 0);
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
 

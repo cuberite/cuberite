@@ -47,6 +47,9 @@ protected:
 	/** Checks if there are enough neighbors to create a source at the coords specified; turns into source and returns true if so. */
 	bool CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
 
+	/** Check if block should harden (Water/Lava interaction) */
+	bool HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta);
+
 	/** Spread water to neighbors.
 	 *
 	 * May be overridden to provide more sophisticated algorithms.
