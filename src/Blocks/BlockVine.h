@@ -24,6 +24,10 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
+		UNUSED(a_Player);
+		UNUSED(a_CursorX);
+		UNUSED(a_CursorY);
+		UNUSED(a_CursorZ);
 		// TODO: Disallow placement where the vine doesn't attach to something properly
 		BLOCKTYPE BlockType = 0;
 		NIBBLETYPE BlockMeta;
@@ -162,11 +166,17 @@ public:
 		return false;
 	}
 	
-	virtual void OnUpdate(cWorld * a_World, int X, int Y, int Z)
+	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 	{
-		if (a_World->GetBlock(X, Y - 1, Z) == E_BLOCK_AIR)
+		UNUSED(a_ChunkInterface);
+		UNUSED(a_WorldInterface);
+		UNUSED(a_BlockPluginInterface);
+
+		BLOCKTYPE Block;
+		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY - 1, a_RelZ, Block);
+		if (Block == E_BLOCK_AIR)
 		{
-			a_World->SetBlock(X, Y - 1, Z, E_BLOCK_VINES, a_World->GetBlockMeta(X, Y, Z));
+			a_Chunk.UnboundedRelSetBlock(a_RelX, a_RelY - 1, a_RelZ, E_BLOCK_VINES, a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
 		}
 	}
 	
