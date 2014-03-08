@@ -103,7 +103,7 @@ bool cSchematicFileSerializer::SaveToSchematicFile(const cBlockArea & a_BlockAre
 
 
 
-AString cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_BlockArea)
+bool cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_BlockArea, AString & a_Out)
 {
 	// Serialize into NBT data:
 	AString NBT = SaveToSchematicNBT(a_BlockArea);
@@ -114,14 +114,13 @@ AString cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_Blo
 	}
 	
 	// Gzip the data:
-	AString Compressed;
-	int res = CompressStringGZIP(NBT.data(), NBT.size(), Compressed);
+	int res = CompressStringGZIP(NBT.data(), NBT.size(), a_Out);
 	if (res != Z_OK)
 	{
 		LOG("%s: Cannot Gzip the area data NBT representation: %d", __FUNCTION__, res);
 		return false;
 	}
-	return Compressed;
+	return true;
 }
 
 

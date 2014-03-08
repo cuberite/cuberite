@@ -271,6 +271,11 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_VINES               ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_WALLSIGN            ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_WATER               ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_RAIL                ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_POWERED_RAIL        ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_DETECTOR_RAIL       ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_COBWEB              ].m_IsSnowable = false;
 
 
 	// Blocks that don't drop without a special tool:
@@ -309,6 +314,10 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_STONE_SLAB          ].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_VINES               ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_FURNACE             ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_LIT_FURNACE         ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_ANVIL               ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_ENCHANTMENT_TABLE   ].m_RequiresSpecialTool = true;
 
 
 	// Nonsolid blocks:

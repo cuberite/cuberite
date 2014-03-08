@@ -86,7 +86,7 @@ int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int 
 	{
 		return Cost;
 	}
-	if (!IsPassableForFluid(BlockType))
+	if (!IsPassableForFluid(BlockType) && !IsBlockLiquid(BlockType))
 	{
 		return Cost;
 	}
@@ -96,7 +96,7 @@ int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int 
 	{
 		return Cost;
 	}
-	if (IsPassableForFluid(BlockType))
+	if (IsPassableForFluid(BlockType) || IsBlockLiquid(BlockType))
 	{
 		// Path found, exit
 		return a_Iteration;
