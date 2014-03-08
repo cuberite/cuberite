@@ -44,7 +44,7 @@
 
 
 
-#if 0
+#ifdef SELF_TEST
 
 /// Self-test of the VarInt-reading and writing code
 class cByteBufferSelfTest
