@@ -182,7 +182,7 @@ macro(set_exe_flags)
 		string(REPLACE "-w" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
 		string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
 		string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
-		add_flags_cxx("-Wall -Wextra -Werror -Wno-error=unused-parameter")
+		add_flags_cxx("-Wall -Wextra")
 		
 		# we support non-IEEE 754 fpus so can make no guarentees about error
 		add_flags_cxx("-ffast-math")
