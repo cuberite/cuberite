@@ -2026,8 +2026,8 @@ end
 			Functions =
 			{
 				Explode = { Return = "", Notes = "Explode the tnt." },
-				GetFuseTicks = { Return = "number", Notes = "Returns the fuse ticks (in seconds) until the tnt will explode." },
-				SetFuseTicks = { Return = "number", Notes = "Set the fuse ticks (in seconds) until the tnt will explode." },
+				GetFuseTicks = { Return = "number", Notes = "Returns the fuse ticks until the tnt will explode." },
+				SetFuseTicks = { Return = "number", Notes = "Set the fuse ticks until the tnt will explode." },
 			},
 			Inherits = "cEntity",
 		},
@@ -2262,7 +2262,7 @@ end
 				SpawnMob = { Params = "X, Y, Z, {{cMonster|MonsterType}}", Return = "EntityID", Notes = "Spawns the specified type of mob at the specified coords. Returns the EntityID of the creates entity, or -1 on failure. " },
 				SpawnFallingBlock = { Params = "X, Y, Z, BlockType, BlockMeta", Return = "EntityID", Notes = "Spawns an {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta" },
 				SpawnExperienceOrb = { Params = "X, Y, Z, Reward", Return = "EntityID", Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward" },
-				SpawnPrimedTNT = { Params = "X, Y, Z, FuseTimeSecs, InitialVelocityCoeff", Return = "", Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse time. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value." },
+				SpawnPrimedTNT = { Params = "X, Y, Z, FuseTicks, InitialVelocityCoeff", Return = "", Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value." },
 				TryGetHeight = { Params = "BlockX, BlockZ", Return = "IsValid, Height", Notes = "Returns true and height of the highest non-air block if the chunk is loaded, or false otherwise." },
 				UpdateSign = { Params = "X, Y, Z, Line1, Line2, Line3, Line4, [{{cPlayer|Player}}]", Return = "", Notes = "Sets the sign text at the specified coords. The sign-updating hooks are called for the change. The Player parameter is used to indicate the player from whom the change has come, it may be nil. Same as SetSignLiens()" },
 				UseBlockEntity = { Params = "{{cPlayer|Player}}, BlockX, BlockY, BlockZ", Return = "", Notes = "Makes the specified Player use the block entity at the specified coords (open chest UI, etc.) If the cords are in an unloaded chunk or there's no block entity, ignores the call." },
