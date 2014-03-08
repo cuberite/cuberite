@@ -1244,7 +1244,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (m_ReceivedData.GetReadableSpace() > 0)
 		{
 			AString AllData;
-			int OldReadableSpace = m_ReceivedData.GetReadableSpace();
+			size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
 			m_ReceivedData.ReadAll(AllData);
 			m_ReceivedData.ResetRead();
 			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
@@ -1366,7 +1366,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
 	{
 		AString AllData;
-		int OldReadableSpace = m_ReceivedData.GetReadableSpace();
+		size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
 		m_ReceivedData.ReadAll(AllData);
 		m_ReceivedData.ResetRead();
 		m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);

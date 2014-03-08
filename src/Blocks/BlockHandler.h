@@ -23,6 +23,8 @@ class cBlockHandler
 {
 public:
 	cBlockHandler(BLOCKTYPE a_BlockType);
+	
+	virtual ~cBlockHandler() {}
 
 	/// Called when the block gets ticked either by a random tick or by a queued tick.
 	/// Note that the coords are chunk-relative!
