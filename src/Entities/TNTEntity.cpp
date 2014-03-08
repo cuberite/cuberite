@@ -8,9 +8,9 @@
 
 
 
-cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec) :
+cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks) :
 	super(etTNT, a_X, a_Y, a_Z, 0.98, 0.98),
-	m_FuseTicks(a_FuseTimeInSec)
+	m_FuseTicks(a_FuseTicks)
 {
 }
 
@@ -18,9 +18,9 @@ cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, double a_FuseTimeInSe
 
 
 
-cTNTEntity::cTNTEntity(const Vector3d & a_Pos, double a_FuseTimeInSec) :
+cTNTEntity::cTNTEntity(const Vector3d & a_Pos, int a_FuseTicks) :
 	super(etTNT, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98),
-	m_FuseTicks(a_FuseTimeInSec)
+	m_FuseTicks(a_FuseTicks)
 {
 }
 
@@ -56,8 +56,8 @@ void cTNTEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();
-	float delta_time = a_Dt / 1000;  // Convert miliseconds to seconds
-	m_FuseTicks -= delta_time;
+	
+	m_FuseTicks -= 1;
 	if (m_FuseTicks <= 0)
 	{
 		Explode();

@@ -2184,8 +2184,7 @@ void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
 	if (FuseTicks > 0)
 	{
-		int MojangFuseTicks = (int) a_NBT.GetByte(FuseTicks);
-		TNT->SetFuseTicks((double) MojangFuseTicks / 10);
+		TNT->SetFuseTicks((int) a_NBT.GetByte(FuseTicks));
 	}
 	
 	a_Entities.push_back(TNT.release());

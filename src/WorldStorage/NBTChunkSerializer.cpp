@@ -588,7 +588,7 @@ void cNBTChunkSerializer::AddTNTEntity(cTNTEntity * a_TNT)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_TNT, "PrimedTnt");
-		m_Writer.AddByte("Fuse", ((unsigned char)a_TNT->GetFuseTicks()) * 10);
+		m_Writer.AddByte("Fuse", (unsigned char)a_TNT->GetFuseTicks());
 	m_Writer.EndCompound();
 }
 

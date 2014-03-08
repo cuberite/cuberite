@@ -445,7 +445,7 @@ public:
 	int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward);
 
 	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration. Initial velocity is given based on the relative coefficient provided */
-	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec, double a_InitialVelocityCoeff = 1);
+	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);
 
 	// tolua_end
 

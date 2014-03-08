@@ -16,8 +16,8 @@ public:
 	// tolua_end
 	CLASS_PROTODEF(cTNTEntity);
 
-	cTNTEntity(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec = 4);
-	cTNTEntity(const Vector3d & a_Pos, double a_FuseTimeInSec = 4);
+	cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks = 80);
+	cTNTEntity(const Vector3d & a_Pos, int a_FuseTicks = 80);
 	
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
@@ -29,15 +29,15 @@ public:
 	void Explode(void);
 	
 	/** Returns the fuse ticks until the tnt will explode */
-	double GetFuseTicks(void) const { return m_FuseTicks; }
+	int GetFuseTicks(void) const { return m_FuseTicks; }
 	
 	/** Set the fuse ticks until the tnt will explode */
-	void SetFuseTicks(double a_FuseTicks) { m_FuseTicks = a_FuseTicks; }
+	void SetFuseTicks(int a_FuseTicks) { m_FuseTicks = a_FuseTicks; }
 	
 	// tolua_end
 	
 protected:
-	double m_FuseTicks;      ///< How much time in seconds is left, while the tnt will explode
+	int m_FuseTicks;      ///< How much ticks is left, while the tnt will explode
 }; // tolua_export
 
 
