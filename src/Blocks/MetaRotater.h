@@ -1,4 +1,3 @@
-
 // MetaRotater.h
 
 // Provides a mixin for rotations and reflections
@@ -44,9 +43,10 @@ NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatc
 	if (AssertIfNotMatched)
 	{
 		ASSERT(!"Invalid Meta value");
-		return a_Meta;
 	}
+	return a_Meta;
 }
+
 
 
 template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
@@ -63,8 +63,8 @@ NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatc
 	if (AssertIfNotMatched)
 	{
 		ASSERT(!"Invalid Meta value");
-		return a_Meta;
 	}
+	return a_Meta;
 }
 
 
