@@ -506,7 +506,7 @@ bool cScoreboard::ForEachObjective(cObjectiveCallback& a_Callback)
 
 bool cScoreboard::ForEachTeam(cTeamCallback& a_Callback)
 {
-	cCSLock Lock(m_CSObjectives);
+	cCSLock Lock(m_CSTeams);
 
 	for (cTeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
 	{
