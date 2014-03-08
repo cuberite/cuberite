@@ -650,7 +650,7 @@ bool cByteBuffer::WriteLEInt(int a_Value)
 
 
 
-bool cByteBuffer::ReadBuf(void * a_Buffer, int a_Count)
+bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
@@ -684,7 +684,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, int a_Count)
 
 
 
-bool cByteBuffer::WriteBuf(const void * a_Buffer, int a_Count)
+bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
@@ -714,7 +714,7 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, int a_Count)
 
 
 
-bool cByteBuffer::ReadString(AString & a_String, int a_Count)
+bool cByteBuffer::ReadString(AString & a_String, size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
