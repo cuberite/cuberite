@@ -2563,9 +2563,13 @@ static int tolua_cBlockArea_SaveToSchematicString(lua_State * tolua_S)
 		return 0;
 	}
 	
-	AString Data = cSchematicFileSerializer::SaveToSchematicString(*self);
-	L.Push(Data);
-	return 1;
+	AString Data;
+	if (cSchematicFileSerializer::SaveToSchematicString(*self, Data))
+	{
+		L.Push(Data);
+		return 1;
+	}
+	return 0;
 }
 
 

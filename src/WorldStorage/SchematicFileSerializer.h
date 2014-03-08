@@ -36,8 +36,8 @@ public:
 	static bool SaveToSchematicFile(const cBlockArea & a_BlockArea, const AString & a_FileName);
 	
 	/** Saves the area into a string containing the .schematic file data.
-	Returns the data, or empty string if failed. */
-	static AString SaveToSchematicString(const cBlockArea & a_BlockArea);
+	Returns true if successful, false on failure. The data is stored into a_Out. */
+	static bool SaveToSchematicString(const cBlockArea & a_BlockArea, AString & a_Out);
 	
 private:
 	/** Loads the area from a schematic file uncompressed and parsed into a NBT tree.
