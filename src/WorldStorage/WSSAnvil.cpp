@@ -36,6 +36,7 @@
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/ProjectileEntity.h"
+#include "../Entities/TNTEntity.h"
 
 
 
@@ -1231,6 +1232,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadPigZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "PrimedTnt", a_IDTagLength) == 0)
+	{
+		LoadTNTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	// TODO: other entities
 }
 
@@ -2161,6 +2166,29 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 
 	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cTNTEntity> TNT(new cTNTEntity(0.0, 0.0, 0.0, 0));
+	if (!LoadEntityBaseFromNBT(*TNT.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Load Fuse Ticks:
+	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
+	if (FuseTicks > 0)
+	{
+		int MojangFuseTicks = (int) a_NBT.GetByte(FuseTicks);
+		TNT->SetFuseTicks((double) MojangFuseTicks / 10);
+	}
+	
+	a_Entities.push_back(TNT.release());
 }
 
 

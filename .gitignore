@@ -1,4 +1,5 @@
 build/
+nbproject/
 ipch/
 Win32/
 MCServer/MCServer
