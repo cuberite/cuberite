@@ -1453,7 +1453,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
-void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
+void cClientHandle::HandleEntityCrouch(int a_EntityID, bool a_IsCrouching)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -1461,35 +1461,37 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 		return;
 	}
 
-	switch (a_ActionID)
+	m_Player->SetCrouch(a_IsCrouching);
+}
+
+
+
+
+
+void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
+{
+	if (a_EntityID != m_Player->GetUniqueID())
 	{
-		case 1:  // Crouch
-		{
-			m_Player->SetCrouch(true);
-			break;
-		}
-		case 2:  // Uncrouch
-		{
-			m_Player->SetCrouch(false);
-			break;
-		}
-		case 3:  // Leave bed
-		{
-			m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
-			break;
-		}
-		case 4:  // Start sprinting
-		{
-			m_Player->SetSprint(true);
-			break;
-		}
-		case 5:  // Stop sprinting
-		{
-			m_Player->SetSprint(false);
-			SendPlayerMaxSpeed();
-			break;
-		}
+		// We should only receive entity actions from the entity that is performing the action
+		return;
 	}
+
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
+}
+
+
+
+
+
+void cClientHandle::HandleEntitySprinting(int a_EntityID, bool a_IsSprinting)
+{
+	if (a_EntityID != m_Player->GetUniqueID())
+	{
+		// We should only receive entity actions from the entity that is performing the action
+		return;
+	}
+
+	m_Player->SetSprint(a_IsSprinting);
 }
 
 

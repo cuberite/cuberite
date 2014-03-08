@@ -188,7 +188,9 @@ public:
 	void HandleChat             (const AString & a_Message);
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
 	void HandleDisconnect       (const AString & a_Reason);
-	void HandleEntityAction     (int a_EntityID, char a_ActionID);
+	void HandleEntityCrouch     (int a_EntityID, bool a_IsCrouching);
+	void HandleEntityLeaveBed   (int a_EntityID);
+	void HandleEntitySprinting  (int a_EntityID, bool a_IsSprinting);
 	
 	/** Called when the protocol handshake has been received (for protocol versions that support it;
 	otherwise the first instant when a username is received).

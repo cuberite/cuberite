@@ -1375,7 +1375,28 @@ int cProtocol125::ParseEntityAction(void)
 {
 	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
 	HANDLE_PACKET_READ(ReadChar,  char, ActionID);
-	m_Client->HandleEntityAction(EntityID, ActionID);
+
+	if (ActionID == 1) // Crouch
+	{
+		m_Client->HandleEntityCrouch(EntityID, true);
+	}
+	else if (ActionID == 2) // Uncrouch
+	{
+		m_Client->HandleEntityCrouch(EntityID, false);
+	}
+	else if (ActionID == 3) // Leave Bed
+	{
+		m_Client->HandleEntityLeaveBed(EntityID);
+	}
+	else if (ActionID == 4) // Start sprinting
+	{
+		m_Client->HandleEntitySprinting(EntityID, true);
+	}
+	else if (ActionID == 5) // Stop sprinting
+	{
+		m_Client->HandleEntitySprinting(EntityID, false);
+	}
+
 	return PARSE_OK;
 }
 
