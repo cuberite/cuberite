@@ -47,7 +47,7 @@
 #ifdef SELF_TEST
 
 /// Self-test of the VarInt-reading and writing code
-class cByteBufferSelfTest
+static class cByteBufferSelfTest
 {
 public:
 	cByteBufferSelfTest(void)
