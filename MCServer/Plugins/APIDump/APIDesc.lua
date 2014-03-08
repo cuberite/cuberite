@@ -2023,8 +2023,9 @@ end
 			Desc = "This class manages a TNT entity.",
 			Functions =
 			{
-				GetCounterTime = { Return = "number", Notes = "Returns the time until the entity explodes." },
-				GetMaxFuseTime = { Return = "number", Notes = "Returns how long the fuse was." },
+				Explode = { Return = "", Notes = "Explode the tnt." },
+				GetFuseTicks = { Return = "number", Notes = "Returns the fuse ticks (in seconds) until the tnt will explode." },
+				SetFuseTicks = { Return = "number", Notes = "Set the fuse ticks (in seconds) until the tnt will explode." },
 			},
 			Inherits = "cEntity",
 		},
