@@ -254,5 +254,3 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 #include "Entities/Effects.h"
 
 
-
-

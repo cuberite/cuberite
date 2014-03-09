@@ -124,7 +124,9 @@ public:
 			(z < Width)  && (z > -1)
 		)
 		{
-			return MakeIndexNoCheck(x, y, z);
+			return MakeIndexNoCheck(static_cast<unsigned int>(x), 
+				static_cast<unsigned int>(y), 
+				static_cast<unsigned int>(z));
 		}
 		LOGERROR("cChunkDef::MakeIndex(): coords out of range: {%d, %d, %d}; returning fake index 0", x, y, z);
 		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
@@ -166,7 +168,9 @@ public:
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)] = a_Type;
+		a_BlockTypes[MakeIndexNoCheck(static_cast<unsigned int>(a_X), 
+			static_cast<unsigned int>(a_Y), 
+			static_cast<unsigned int>(a_Z))] = a_Type;
 	}
 	
 	
@@ -182,7 +186,9 @@ public:
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)];
+		return a_BlockTypes[MakeIndexNoCheck(static_cast<unsigned int>(a_X), 
+			static_cast<unsigned int>(a_Y), 
+			static_cast<unsigned int>(a_Z))];
 	}
 	
 	
@@ -240,7 +246,9 @@ public:
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			unsigned int Index = MakeIndexNoCheck(x, y, z);
+			unsigned int Index = MakeIndexNoCheck(static_cast<unsigned int>(x),
+				static_cast<unsigned int>(y),
+				static_cast<unsigned int>(z));
 			return (a_Buffer[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
@@ -255,8 +263,8 @@ public:
 			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
 			return;
 		}
-		a_Buffer[a_BlockIdx / 2] = (
-			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> (static_cast<NIBBLETYPE>(a_BlockIdx & 1) * 4))) |  // The untouched nibble
+		a_Buffer[a_BlockIdx / 2] = static_cast<NIBBLETYPE>(
+			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
 		);
 	}
@@ -274,8 +282,10 @@ public:
 			return;
 		}
 
-		int Index = MakeIndexNoCheck(x, y, z);
-		a_Buffer[Index / 2] = (
+		unsigned int Index = MakeIndexNoCheck(static_cast<unsigned int>(x),
+			static_cast<unsigned int>(y),
+			static_cast<unsigned int>(z));
+		a_Buffer[Index / 2] = static_cast<NIBBLETYPE>(
 			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 		);
@@ -435,6 +445,9 @@ Used primarily for entity moving while both chunks are locked.
 class cClientDiffCallback
 {
 public:
+
+	virtual ~cClientDiffCallback() {}
+
 	/// Called for clients that are in Chunk1 and not in Chunk2,
 	virtual void Removed(cClientHandle * a_Client) = 0;
 	
@@ -495,6 +508,9 @@ typedef std::vector<cChunkCoords> cChunkCoordsVector;
 class cChunkCoordCallback
 {
 public:
+
+	virtual ~cChunkCoordCallback() {}
+
 	virtual void Call(int a_ChunkX, int a_ChunkZ) = 0;
 } ;
 
