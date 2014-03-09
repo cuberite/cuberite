@@ -30,6 +30,9 @@ Each uses a slightly different approach to generating:
 class cPiece
 {
 public:
+	// Force a virtual destructor in all descendants
+	virtual ~cPiece() {}
+	
 	struct cConnector
 	{
 		/** Position relative to the piece */
@@ -82,9 +85,14 @@ typedef std::vector<cPiece *> cPieces;
 
 
 
+/** This class is an interface that provides pieces for the generator. It can keep track of what pieces were
+placed and adjust the returned piece vectors. */
 class cPiecePool
 {
 public:
+	// Force a virtual destructor in all descendants:
+	virtual ~cPiecePool() {}
+	
 	/** Returns a list of pieces that contain the specified connector type.
 	The cPiece pointers returned are managed by the pool and the caller doesn't free them. */
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) = 0;
@@ -140,7 +148,7 @@ public:
 	
 	/** Cleans up all the memory used by the placed pieces.
 	Call this utility function instead of freeing the items on your own. */
-	void FreePieces(cPlacedPieces & a_PlacedPieces);
+	static void FreePieces(cPlacedPieces & a_PlacedPieces);
 	
 protected:
 	/** The type used for storing a connection from one piece to another, while building the piece tree. */

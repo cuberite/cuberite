@@ -11,6 +11,8 @@
 
 
 
+#ifdef SELF_TEST
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Self-test:
 
@@ -131,6 +133,8 @@ protected:
 		m_Pieces.push_back(new cTestPiece(9));
 	}
 } g_Test;
+
+#endif  // SELF_TEST
 
 
 
@@ -287,6 +291,7 @@ cPlacedPiece::cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece
 {
 	m_Depth = (m_Parent == NULL) ? 0 : (m_Parent->GetDepth() + 1);
 	m_HitBox = a_Piece.RotateMoveHitBox(a_NumCCWRotations, a_Coords.x, a_Coords.y, a_Coords.z);
+	m_HitBox.Sort();
 }
 
 
@@ -375,10 +380,10 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		/*         YM, YP, ZM, ZP, XM, XP
 		/* YM */ { 0,  0,  0,  0,  0,  0},
 		/* YP */ { 0,  0,  0,  0,  0,  0},
-		/* ZM */ { 0,  0,  0,  2,  1,  3},
-		/* ZP */ { 0,  0,  2,  0,  3,  1},
-		/* XM */ { 0,  0,  3,  1,  0,  2},
-		/* XP */ { 0,  0,  1,  3,  2,  0},
+		/* ZM */ { 0,  0,  2,  0,  1,  3},
+		/* ZP */ { 0,  0,  0,  2,  3,  1},
+		/* XM */ { 0,  0,  3,  1,  2,  0},
+		/* XP */ { 0,  0,  1,  3,  0,  2},
 	};
 	
 	// Get a list of available connections:
@@ -389,8 +394,10 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 	Vector3i ConnPos = a_Connector.m_Pos;  // The position at which the new connector should be placed - 1 block away from the connector
 	AddFaceDirection(ConnPos.x, ConnPos.y, ConnPos.z, a_Connector.m_Direction);
 	
+	/*
 	// DEBUG:
-	printf("Placing piece at pos {%d, %d, %d}, direction %s\n", ConnPos.x, ConnPos.y, ConnPos.z, BlockFaceToString(a_Connector.m_Direction).c_str());
+	printf("Placing piece at connector pos {%d, %d, %d}, direction %s\n", ConnPos.x, ConnPos.y, ConnPos.z, BlockFaceToString(a_Connector.m_Direction).c_str());
+	//*/
 	
 	for (cPieces::iterator itrP = AvailablePieces.begin(), endP = AvailablePieces.end(); itrP != endP; ++itrP)
 	{
@@ -427,11 +434,15 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 	cConnection & Conn = Connections[rnd % Connections.size()];
 	
 	// Place the piece:
+	/*
+	// DEBUG
 	printf("Chosen connector at {%d, %d, %d}, direction %s, needs %d rotations\n",
 		Conn.m_Connector.m_Pos.x, Conn.m_Connector.m_Pos.y, Conn.m_Connector.m_Pos.z,
 		BlockFaceToString(Conn.m_Connector.m_Direction).c_str(),
 		Conn.m_NumCCWRotations
 	);
+	//*/
+	
 	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
 	ConnPos -= NewPos;
 	cPlacedPiece * PlacedPiece = new cPlacedPiece(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
@@ -440,8 +451,10 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 	// Add the new piece's connectors to the list of free connectors:
 	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();
 	
+	/*
 	// DEBUG:
 	printf("Adding %u connectors to the pool\n", Connectors.size() - 1);
+	//*/
 	
 	for (cPiece::cConnectors::const_iterator itr = Connectors.begin(), end = Connectors.end(); itr != end; ++itr)
 	{
@@ -471,6 +484,7 @@ bool cPieceGenerator::CheckConnection(
 {
 	// For each placed piece, test the hitbox against the new piece:
 	cCuboid RotatedHitBox = a_Piece.RotateHitBoxToConnector(a_NewConnector, a_ToPos, a_NumCCWRotations);
+	RotatedHitBox.Sort();
 	for (cPlacedPieces::const_iterator itr = a_OutPieces.begin(), end = a_OutPieces.end(); itr != end; ++itr)
 	{
 		if ((*itr)->GetHitBox().DoesIntersect(RotatedHitBox))
@@ -485,6 +499,7 @@ bool cPieceGenerator::CheckConnection(
 
 
 
+//*
 // DEBUG:
 void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors & a_ConnectorPool, size_t a_NumProcessed)
 {
@@ -501,6 +516,7 @@ void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors 
 		);
 	}  // for itr - a_ConnectorPool[]
 }
+//*/
 
 
 
@@ -553,6 +569,7 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, i
 	// Place the starting piece:
 	a_OutPieces.push_back(PlaceStartingPiece(a_BlockX, a_BlockY, a_BlockZ, ConnectorPool));
 	
+	/*
 	// DEBUG:
 	printf("Placed the starting piece at {%d, %d, %d}\n", a_BlockX, a_BlockY, a_BlockZ);
 	cCuboid Hitbox = a_OutPieces[0]->GetHitBox();
@@ -563,6 +580,7 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, i
 		Hitbox.DifX() + 1, Hitbox.DifY() + 1, Hitbox.DifZ() + 1
 	);
 	DebugConnectorPool(ConnectorPool, 0);
+	//*/
 	
 	// Place pieces at the available connectors:
 	/*
@@ -578,6 +596,8 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, i
 		{
 			if (TryPlacePieceAtConnector(*Conn.m_Piece, Conn.m_Connector, a_OutPieces, ConnectorPool))
 			{
+				/*
+				// DEBUG:
 				const cPlacedPiece * NewPiece = a_OutPieces.back();
 				const Vector3i & Coords = NewPiece->GetCoords();
 				printf("Placed a new piece at {%d, %d, %d}, rotation %d\n", Coords.x, Coords.y, Coords.z, NewPiece->GetNumCCWRotations());
@@ -589,6 +609,7 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, i
 					Hitbox.DifX() + 1, Hitbox.DifY() + 1, Hitbox.DifZ() + 1
 				);
 				DebugConnectorPool(ConnectorPool, NumProcessed + 1);
+				//*/
 			}
 		}
 		NumProcessed++;
