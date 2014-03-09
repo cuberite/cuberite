@@ -43,7 +43,7 @@ public:
 	size_t GetReadableSpace(void) const;
 	
 	/// Returns the current data start index. For debugging purposes.
-	int  GetDataStart(void) const { return m_DataStart; }
+	size_t  GetDataStart(void) const { return m_DataStart; }
 	
 	/// Returns true if the specified amount of bytes are available for reading
 	bool CanReadBytes(size_t a_Count) const;
