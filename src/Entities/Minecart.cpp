@@ -1031,9 +1031,9 @@ cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
 
 
 
-void cMinecartWithChest::SetSlot(int a_Idx, const cItem & a_Item)
+void cMinecartWithChest::SetSlot(size_t a_Idx, const cItem & a_Item)
 {
-	ASSERT((a_Idx >= 0) && (a_Idx < ARRAYCOUNT(m_Items)));
+	ASSERT(a_Idx < ARRAYCOUNT(m_Items));
 	
 	m_Items[a_Idx] = a_Item;
 }

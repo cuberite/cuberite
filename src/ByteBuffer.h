@@ -31,25 +31,25 @@ public:
 	~cByteBuffer();
 	
 	/// Writes the bytes specified to the ringbuffer. Returns true if successful, false if not
-	bool Write(const char * a_Bytes, int a_Count);
+	bool Write(const char * a_Bytes, size_t a_Count);
 	
 	/// Returns the number of bytes that can be successfully written to the ringbuffer
-	int  GetFreeSpace(void) const;
+	size_t GetFreeSpace(void) const;
 	
 	/// Returns the number of bytes that are currently in the ringbuffer. Note GetReadableBytes()
-	int  GetUsedSpace(void) const;
+	size_t GetUsedSpace(void) const;
 	
 	/// Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some data having been read already)
-	int  GetReadableSpace(void) const;
+	size_t GetReadableSpace(void) const;
 	
 	/// Returns the current data start index. For debugging purposes.
 	int  GetDataStart(void) const { return m_DataStart; }
 	
 	/// Returns true if the specified amount of bytes are available for reading
-	bool CanReadBytes(int a_Count) const;
+	bool CanReadBytes(size_t a_Count) const;
 
 	/// Returns true if the specified amount of bytes are available for writing
-	bool CanWriteBytes(int a_Count) const;
+	bool CanWriteBytes(size_t a_Count) const;
 
 	// Read the specified datatype and advance the read pointer; return true if successfully read:
 	bool ReadChar           (char & a_Value);
@@ -92,19 +92,19 @@ public:
 	bool WriteLEInt          (int a_Value);
 	
 	/// Reads a_Count bytes into a_Buffer; returns true if successful
-	bool ReadBuf(void * a_Buffer, int a_Count);
+	bool ReadBuf(void * a_Buffer, size_t a_Count);
 	
 	/// Writes a_Count bytes into a_Buffer; returns true if successful
-	bool WriteBuf(const void * a_Buffer, int a_Count);
+	bool WriteBuf(const void * a_Buffer, size_t a_Count);
 	
 	/// Reads a_Count bytes into a_String; returns true if successful
-	bool ReadString(AString & a_String, int a_Count);
+	bool ReadString(AString & a_String, size_t a_Count);
 	
 	/// Reads 2 * a_NumChars bytes and interprets it as a UTF16-BE string, converting it into UTF8 string a_String
 	bool ReadUTF16String(AString & a_String, int a_NumChars);
 	
 	/// Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer
-	bool SkipRead(int a_Count);
+	bool SkipRead(size_t a_Count);
 	
 	/// Reads all available data into a_Data
 	void ReadAll(AString & a_Data);
@@ -126,18 +126,18 @@ public:
 
 protected:
 	char * m_Buffer;
-	int    m_BufferSize;  // Total size of the ringbuffer
+	size_t m_BufferSize;  // Total size of the ringbuffer
 	
 	#ifdef _DEBUG
 	volatile unsigned long m_ThreadID;  // Thread that is currently accessing the object, checked via cSingleThreadAccessChecker
 	#endif  // _DEBUG
 	
-	int    m_DataStart;  // Where the data starts in the ringbuffer
-	int    m_WritePos;   // Where the data ends in the ringbuffer
-	int    m_ReadPos;    // Where the next read will start in the ringbuffer
+	size_t m_DataStart;  // Where the data starts in the ringbuffer
+	size_t m_WritePos;   // Where the data ends in the ringbuffer
+	size_t m_ReadPos;    // Where the next read will start in the ringbuffer
 	
 	/// Advances the m_ReadPos by a_Count bytes
-	void AdvanceReadPos(int a_Count);
+	void AdvanceReadPos(size_t a_Count);
 } ;
 
 

@@ -25,6 +25,14 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
+		UNUSED(a_ChunkInterface);
+		UNUSED(a_BlockX);
+		UNUSED(a_BlockY);
+		UNUSED(a_BlockZ);
+		UNUSED(a_CursorX);
+		UNUSED(a_CursorY);
+		UNUSED(a_CursorZ);
+		UNUSED(a_BlockMeta);
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RotationToMetaData(a_Player->GetYaw());
 		switch (a_BlockFace)
