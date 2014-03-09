@@ -86,7 +86,7 @@ public:
 		cByteBuffer buf(3);
 		for (int i = 0; i < 1000; i++)
 		{
-			int FreeSpace = buf.GetFreeSpace();
+			size_t FreeSpace = buf.GetFreeSpace();
 			assert(buf.GetReadableSpace() == 0);
 			assert(FreeSpace > 0);
 			assert(buf.Write("a", 1));
