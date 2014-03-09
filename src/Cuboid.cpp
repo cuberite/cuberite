@@ -197,3 +197,37 @@ bool cCuboid::IsSorted(void) const
 
 
 
+
+void cCuboid::Engulf(const Vector3i & a_Point)
+{
+	if (a_Point.x < p1.x)
+	{
+		p1.x = a_Point.x;
+	}
+	else if (a_Point.x > p2.x)
+	{
+		p2.x = a_Point.x;
+	}
+
+	if (a_Point.y < p1.y)
+	{
+		p1.y = a_Point.y;
+	}
+	else if (a_Point.y > p2.y)
+	{
+		p2.y = a_Point.y;
+	}
+
+	if (a_Point.z < p1.z)
+	{
+		p1.z = a_Point.z;
+	}
+	else if (a_Point.z > p2.z)
+	{
+		p2.z = a_Point.z;
+	}
+}
+
+
+
+

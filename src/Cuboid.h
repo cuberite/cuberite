@@ -86,6 +86,9 @@ public:
 
 	/** Returns true if the coords are properly sorted (lesser in p1, greater in p2) */
 	bool IsSorted(void) const;
+	
+	/** If needed, expands the cuboid so that it contains the specified point. Assumes sorted. Doesn't contract. */
+	void Engulf(const Vector3i & a_Point);
 } ;
 // tolua_end
 
