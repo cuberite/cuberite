@@ -27,4 +27,9 @@ public:
 	
 	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
 	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) = 0;
+	
+	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
+	virtual bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback) = 0;
+
+	virtual void SetTimeOfDay(Int64 a_TimeOfDay) = 0;
 };
