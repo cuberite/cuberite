@@ -176,9 +176,10 @@ protected:
 	
 	/** Tries to place a new piece at the specified (placed) connector. Returns true if successful. */
 	bool TryPlacePieceAtConnector(
-		const cPlacedPiece & a_ParentPiece,
-		const cPiece::cConnector & a_Connector,
-		cPlacedPieces & a_OutPieces
+		const cPlacedPiece & a_ParentPiece,      // The existing piece to a new piece should be placed
+		const cPiece::cConnector & a_Connector,  // The existing connector (world-coords) to which a new piece should be placed
+		cPlacedPieces & a_OutPieces,             // Already placed pieces, to be checked for intersections
+		cFreeConnectors & a_OutConnectors        // List of free connectors to which the new connectors will be placed
 	);
 
 	/** Checks if the specified piece would fit with the already-placed pieces, using the specified connector

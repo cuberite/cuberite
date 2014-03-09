@@ -361,7 +361,12 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, i
 
 
 
-bool cPieceGenerator::TryPlacePieceAtConnector(const cPlacedPiece & a_ParentPiece, const cPiece::cConnector & a_Connector, cPlacedPieces & a_OutPieces)
+bool cPieceGenerator::TryPlacePieceAtConnector(
+	const cPlacedPiece & a_ParentPiece,
+	const cPiece::cConnector & a_Connector,
+	cPlacedPieces & a_OutPieces,
+	cPieceGenerator::cFreeConnectors & a_OutConnectors
+)
 {
 	// Translation of direction - direction -> number of CCW rotations needed:
 	// You need DirectionRotationTable[rot1][rot2] CCW turns to connect rot1 to rot2 (they are opposite)
@@ -429,10 +434,24 @@ bool cPieceGenerator::TryPlacePieceAtConnector(const cPlacedPiece & a_ParentPiec
 	);
 	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
 	ConnPos -= NewPos;
-	a_OutPieces.push_back(new cPlacedPiece(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations));
+	cPlacedPiece * PlacedPiece = new cPlacedPiece(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
+	a_OutPieces.push_back(PlacedPiece);
 	
 	// Add the new piece's connectors to the list of free connectors:
-	// TODO
+	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();
+	
+	// DEBUG:
+	printf("Adding %u connectors to the pool\n", Connectors.size() - 1);
+	
+	for (cPiece::cConnectors::const_iterator itr = Connectors.begin(), end = Connectors.end(); itr != end; ++itr)
+	{
+		if (itr->m_Pos.Equals(Conn.m_Connector.m_Pos))
+		{
+			// This is the connector through which we have been connected to the parent, don't add
+			continue;
+		}
+		a_OutConnectors.push_back(cFreeConnector(PlacedPiece, Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z)));
+	}
 	
 	return true;
 }
@@ -473,11 +492,12 @@ void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors 
 	size_t idx = 0;
 	for (cPieceGenerator::cFreeConnectors::const_iterator itr = a_ConnectorPool.begin() + a_NumProcessed, end = a_ConnectorPool.end(); itr != end; ++itr, ++idx)
 	{
-		printf("    %u: {%d, %d, %d}, type %d, direction %s\n",
+		printf("    %u: {%d, %d, %d}, type %d, direction %s, depth %d\n",
 			idx,
 			itr->m_Connector.m_Pos.x, itr->m_Connector.m_Pos.y, itr->m_Connector.m_Pos.z,
 			itr->m_Connector.m_Type,
-			BlockFaceToString(itr->m_Connector.m_Direction).c_str()
+			BlockFaceToString(itr->m_Connector.m_Direction).c_str(),
+			itr->m_Piece->GetDepth()
 		);
 	}  // for itr - a_ConnectorPool[]
 }
@@ -556,7 +576,7 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, i
 		cFreeConnector & Conn = ConnectorPool[NumProcessed];
 		if (Conn.m_Piece->GetDepth() < a_MaxDepth)
 		{
-			if (TryPlacePieceAtConnector(*Conn.m_Piece, Conn.m_Connector, a_OutPieces))
+			if (TryPlacePieceAtConnector(*Conn.m_Piece, Conn.m_Connector, a_OutPieces, ConnectorPool))
 			{
 				const cPlacedPiece * NewPiece = a_OutPieces.back();
 				const Vector3i & Coords = NewPiece->GetCoords();
