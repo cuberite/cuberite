@@ -1478,6 +1478,8 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 	AString Command   (tolua_tocppstring(L, idx,     ""));
 	AString Permission(tolua_tocppstring(L, idx + 1, ""));
 	AString HelpString(tolua_tocppstring(L, idx + 3, ""));
+
+	std::transform(Command.begin(), Command.end(), Command.begin(), ::tolower);
 	
 	// Store the function reference:
 	lua_pop(L, 1);  // Pop the help string off the stack
@@ -1542,6 +1544,8 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	cPluginManager * self = cPluginManager::Get();
 	AString Command   (tolua_tocppstring(L, idx,     ""));
 	AString HelpString(tolua_tocppstring(L, idx + 2, ""));
+
+	std::transform(Command.begin(), Command.end(), Command.begin(), ::tolower);
 	
 	// Store the function reference:
 	lua_pop(L, 1);  // Pop the help string off the stack

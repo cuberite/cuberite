@@ -471,18 +471,28 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 
 void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
+	AString String(a_Cmd);
+
+	// Try to transform command bit
+	size_t FirstSpace = a_Cmd.find_first_of(" ");
+
+	if (FirstSpace != AString::npos)
+	{
+		std::transform(String.begin(), String.begin() + FirstSpace, String.begin(), ::tolower);
+	}
+
 	// Some commands are built-in:
-	if (a_Cmd == "stop")
+	if (String == "stop")
 	{
 		m_bStop = true;
 	}
-	else if (a_Cmd == "restart")
+	else if (String == "restart")
 	{
 		m_bRestart = true;
 	}
 
 	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
-	m_Server->ExecuteConsoleCommand(a_Cmd, a_Output);
+	m_Server->ExecuteConsoleCommand(String, a_Output);
 }
 
 

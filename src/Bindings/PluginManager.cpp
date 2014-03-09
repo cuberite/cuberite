@@ -1372,6 +1372,8 @@ bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command
 		return false;
 	}
 
+	std::transform(Split[0].begin(), Split[0].end(), Split[0].begin(), ::tolower);
+
 	CommandMap::iterator cmd = m_Commands.find(Split[0]);
 	if (cmd == m_Commands.end())
 	{
