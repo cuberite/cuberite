@@ -949,7 +949,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		
-		if (a_BlockFace > BLOCK_FACE_NONE)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
