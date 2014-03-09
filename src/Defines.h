@@ -276,6 +276,26 @@ inline eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
 
 
 
+/** Returns the textual representation of the BlockFace constant. */
+inline AString BlockFaceToString(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return "BLOCK_FACE_XM";
+		case BLOCK_FACE_XP: return "BLOCK_FACE_XP";
+		case BLOCK_FACE_YM: return "BLOCK_FACE_YM";
+		case BLOCK_FACE_YP: return "BLOCK_FACE_YP";
+		case BLOCK_FACE_ZM: return "BLOCK_FACE_ZM";
+		case BLOCK_FACE_ZP: return "BLOCK_FACE_ZP";
+		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
+	}
+	return Printf("Unknown BLOCK_FACE: %d", a_BlockFace);
+}
+
+
+
+
+
 inline bool IsValidBlock(int a_BlockType)
 {
 	if (
