@@ -1735,21 +1735,11 @@ void cProtocol172::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	switch (Action)
 	{
-	case 1: // Crouch
-		m_Client->HandleEntityCrouch(PlayerID, true);
-		break;
-	case 2: // Unchrouch
-		m_Client->HandleEntityCrouch(PlayerID, false);
-		break;
-	case 3: // Leave Bed
-		m_Client->HandleEntityLeaveBed(PlayerID);
-		break;
-	case 4: // Start sprinting
-		m_Client->HandleEntitySprinting(PlayerID, true);
-		break;
-	case 5: // Stop sprinting
-		m_Client->HandleEntitySprinting(PlayerID, false);
-		break;
+		case 1: m_Client->HandleEntityCrouch(PlayerID, true);     break; // Crouch
+		case 2: m_Client->HandleEntityCrouch(PlayerID, false);    break; // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(PlayerID);         break; // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(PlayerID, true);  break; // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(PlayerID, false); break; // Stop sprinting
 	}
 }
 
