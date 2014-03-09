@@ -32,13 +32,18 @@ class cPiece
 public:
 	struct cConnector
 	{
-		int m_X;
-		int m_Y;
-		int m_Z;
+		/** Position relative to the piece */
+		Vector3i m_Pos;
+		
+		/** Type of the connector. Any arbitrary number; the generator connects only connectors of the same type. */
 		int m_Type;
+		
+		/** Direction in which the connector is facing.
+		Will be matched by the opposite direction for the connecting connector. */
 		eBlockFace m_Direction;
 		
-		cConnector(int a_X, int a_Y, int a_Z, int a_Type, eBlockFace m_Direction);
+		cConnector(int a_X, int a_Y, int a_Z, int a_Type, eBlockFace a_Direction);
+		cConnector(const Vector3i & a_Pos, int a_Type, eBlockFace a_Direction);
 	};
 	
 	typedef std::vector<cConnector> cConnectors;
@@ -58,11 +63,17 @@ public:
 	/** Returns true if the piece can be rotated CCW the specific number of 90-degree turns. */
 	virtual bool CanRotateCCW(int a_NumRotations) const = 0;
 	
+	/** Returns a copy of the a_Pos after rotating the piece the specified number of CCW rotations. */
+	Vector3i RotatePos(const Vector3i & a_Pos, int a_NumCCWRotations) const;
+
 	/** Returns a copy of the connector that is rotated and then moved by the specified amounts. */
 	cConnector RotateMoveConnector(const cConnector & a_Connector, int a_NumCCWRotations, int a_MoveX, int a_MoveY, int a_MoveZ) const;
 	
-	/** Returns the hitbox after the specified number of rotations and moved so that a_MyConnector is placed at a_ToConnector*/
-	cCuboid RotateHitBoxToConnector(const cConnector & a_MyConnector, const cConnector & a_ToConnector, int a_NumCCWRotations) const;
+	/** Returns the hitbox after the specified number of rotations and moved so that a_MyConnector is placed at a_ToConnectorPos. */
+	cCuboid RotateHitBoxToConnector(const cConnector & a_MyConnector, const Vector3i & a_ToConnectorPos, int a_NumCCWRotations) const;
+	
+	/** Returns the hitbox after the specified number of CCW rotations and moved by the specified amounts. */
+	cCuboid RotateMoveHitBox(int a_NumCCWRotations, int a_MoveX, int a_MoveY, int a_MoveZ) const;
 };
 
 typedef std::vector<cPiece *> cPieces;
@@ -116,7 +127,7 @@ protected:
 	int m_Depth;
 };
 
-typedef std::vector<cPlacedPiece> cPlacedPieces;
+typedef std::vector<cPlacedPiece *> cPlacedPieces;
 
 
 
@@ -127,12 +138,16 @@ class cPieceGenerator
 public:
 	cPieceGenerator(cPiecePool & a_PiecePool, int a_Seed);
 	
+	/** Cleans up all the memory used by the placed pieces.
+	Call this utility function instead of freeing the items on your own. */
+	void FreePieces(cPlacedPieces & a_PlacedPieces);
+	
 protected:
 	/** The type used for storing a connection from one piece to another, while building the piece tree. */
 	struct cConnection
 	{
 		cPiece * m_Piece;                  // The piece being connected
-		cPiece::cConnector * m_Connector;  // The piece's connector being used
+		cPiece::cConnector m_Connector;    // The piece's connector being used (relative non-rotated coords)
 		int m_NumCCWRotations;             // Number of rotations necessary to match the two connectors
 		
 		cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations);
@@ -145,7 +160,7 @@ protected:
 		cPlacedPiece * m_Piece;
 		cPiece::cConnector m_Connector;
 		
-		cFreeConnector(cPlacedPiece & a_Piece, const cPiece::cConnector & a_Connector);
+		cFreeConnector(cPlacedPiece * a_Piece, const cPiece::cConnector & a_Connector);
 	};
 	typedef std::vector<cFreeConnector> cFreeConnectors;
 
@@ -157,7 +172,7 @@ protected:
 	
 	/** Selects a starting piece and places it, including the rotations.
 	Also puts the piece's connectors in a_OutConnectors. */
-	cPlacedPiece PlaceStartingPiece(int a_BlockX, int a_BlockY, int a_BlockZ, cFreeConnectors & a_OutConnectors);
+	cPlacedPiece * PlaceStartingPiece(int a_BlockX, int a_BlockY, int a_BlockZ, cFreeConnectors & a_OutConnectors);
 	
 	/** Tries to place a new piece at the specified (placed) connector. Returns true if successful. */
 	bool TryPlacePieceAtConnector(
@@ -168,14 +183,22 @@ protected:
 
 	/** Checks if the specified piece would fit with the already-placed pieces, using the specified connector
 	and number of CCW rotations.
+	a_ExistingConnector is in world-coords and is already rotated properly
+	a_ToPos is the world-coords position on which the new connector should be placed (1 block away from a_ExistingConnector, in its Direction)
+	a_NewConnector is in the original (non-rotated) coords.
 	Returns true if the piece fits, false if not. */
 	bool CheckConnection(
 		const cPiece::cConnector & a_ExistingConnector,  // The existing connector
+		const Vector3i & a_ToPos,                        // The position on which the new connector should be placed
 		const cPiece & a_Piece,                          // The new piece
 		const cPiece::cConnector & a_NewConnector,       // The connector of the new piece 
 		int a_NumCCWRotations,                           // Number of rotations for the new piece to align the connector
 		const cPlacedPieces & a_OutPieces                // All the already-placed pieces to check
 	);
+	
+	/** DEBUG: Outputs all the connectors in the pool into stdout.
+	a_NumProcessed signals the number of connectors from the pool that should be considered processed (not listed). */
+	void DebugConnectorPool(const cPieceGenerator::cFreeConnectors & a_ConnectorPool, size_t a_NumProcessed);
 } ;
 
 
@@ -190,8 +213,9 @@ class cBFSPieceGenerator :
 public:
 	cBFSPieceGenerator(cPiecePool & a_PiecePool, int a_Seed);
 	
-	/** Generates a placement for pieces at the specified coords. */
-	void PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, cPlacedPieces & a_OutPieces);
+	/** Generates a placement for pieces at the specified coords.
+	Caller must free each individual cPlacedPiece in a_OutPieces. */
+	void PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MaxDepth, cPlacedPieces & a_OutPieces);
 };
 
 
@@ -204,7 +228,8 @@ class cDFSPieceGenerator :
 public:
 	cDFSPieceGenerator(cPiecePool & a_PiecePool, int a_Seed);
 	
-	/** Generates a placement for pieces at the specified coords. */
+	/** Generates a placement for pieces at the specified coords.
+	Caller must free each individual cPlacedPiece in a_OutPieces. */
 	void PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, cPlacedPieces & a_OutPieces);
 };
 
