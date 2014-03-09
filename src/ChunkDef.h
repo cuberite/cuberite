@@ -62,16 +62,12 @@ typedef unsigned char HEIGHTTYPE;
 class cChunkDef
 {
 public:
-	enum
-	{
-		// Chunk dimensions:
-		Width = 16,
-		Height = 256,
-		NumBlocks = Width * Height * Width,
-		
-		/// If the data is collected into a single buffer, how large it needs to be:
-		BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2),  // 2.5 * numblocks
-	} ;
+	// Chunk dimensions:
+	static const int Width = 16;
+	static const int Height = 256;
+	static const int NumBlocks = Width * Height * Width;
+	/// If the data is collected into a single buffer, how large it needs to be:
+	static const int BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2);  // 2.5 * numblocks
 
 	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
