@@ -1732,7 +1732,15 @@ void cProtocol172::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  PlayerID);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Action);
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  JumpBoost);
-	m_Client->HandleEntityAction(PlayerID, Action);
+
+	switch (Action)
+	{
+		case 1: m_Client->HandleEntityCrouch(PlayerID, true);     break; // Crouch
+		case 2: m_Client->HandleEntityCrouch(PlayerID, false);    break; // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(PlayerID);         break; // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(PlayerID, true);  break; // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(PlayerID, false); break; // Stop sprinting
+	}
 }
 
 
