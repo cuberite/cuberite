@@ -81,7 +81,7 @@
 #endif
 
 
-
+#include <stddef.h>
 
 
 // Integral types with predefined sizes:
@@ -96,8 +96,22 @@ typedef unsigned short     UInt16;
 typedef unsigned char Byte;
 
 
+// If you get an error about specialization check the size of integral types
+template <typename T, size_t Size, bool x = sizeof(T) == Size>
+class SizeChecker;
 
+template <typename T, size_t Size>
+class SizeChecker<T, Size, true> {
+  T v;
+};
 
+template class SizeChecker<Int64, 8>;
+template class SizeChecker<Int32, 4>;
+template class SizeChecker<Int16, 2>;
+
+template class SizeChecker<UInt64, 8>;
+template class SizeChecker<UInt32, 4>;
+template class SizeChecker<UInt16, 2>;
 
 // A macro to disallow the copy constructor and operator= functions
 // This should be used in the private: declarations for any class that shouldn't allow copying itself
@@ -179,7 +193,7 @@ typedef unsigned char Byte;
 #include <memory>
 #include <set>
 #include <queue>
-
+#include <limits>
 
 
 

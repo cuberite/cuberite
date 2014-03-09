@@ -59,8 +59,6 @@
 #include <ctime>
 #include <cmath>
 
-#include "Globals.h"
-
 class MTRand {
 // Data
 public:

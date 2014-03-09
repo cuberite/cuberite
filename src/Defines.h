@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ChatColor.h"
+#include <limits>
 
 
 
@@ -469,7 +470,7 @@ inline void EulerToVector(double a_Pan, double a_Pitch, double & a_X, double & a
 
 inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, double & a_Pitch)
 {
-	if (fabs(a_X) < std::numeric_limits::epsilon() )
+	if (fabs(a_X) < std::numeric_limits<double>::epsilon())
 	{
 		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
 	}
