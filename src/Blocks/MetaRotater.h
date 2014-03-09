@@ -4,6 +4,15 @@
 
 #pragma once
 
+// MSVC generates warnings for the templated AssertIfNotMatched parameter conditions, so disable it:
+#ifdef _MSC_VER
+	#pragma warning(disable: 4127) // Conditional expression is constant
+#endif
+
+
+
+
+
 /*
 Provides a mixin for rotations and reflections following the standard pattern of apply mask then use case.
 
@@ -29,6 +38,9 @@ public:
 };
 
 
+
+
+
 template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
 NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatched>::MetaRotateCW(NIBBLETYPE a_Meta)
 {
@@ -46,6 +58,8 @@ NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatc
 	}
 	return a_Meta;
 }
+
+
 
 
 
@@ -69,6 +83,8 @@ NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatc
 
 
 
+
+
 template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
 NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatched>::MetaMirrorXY(NIBBLETYPE a_Meta)
 {
@@ -85,6 +101,7 @@ NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatc
 
 
 
+
 template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
 NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatched>::MetaMirrorYZ(NIBBLETYPE a_Meta)
 {
@@ -97,3 +114,7 @@ NIBBLETYPE cMetaRotater<Base, BitMask, North, East, South, West, AssertIfNotMatc
 	// Not Facing East or West; No change.
 	return a_Meta;
 }
+
+
+
+
