@@ -209,6 +209,7 @@ bool cChunkDesc::IsUsingDefaultComposition(void) const
 
 void cChunkDesc::SetUseDefaultStructures(bool a_bUseDefaultStructures)
 {
+	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
 	m_bUseDefaultStructures = a_bUseDefaultStructures;
 }
 
@@ -218,6 +219,7 @@ void cChunkDesc::SetUseDefaultStructures(bool a_bUseDefaultStructures)
 
 bool cChunkDesc::IsUsingDefaultStructures(void) const
 {
+	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
 	return m_bUseDefaultStructures;
 }
 

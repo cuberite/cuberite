@@ -50,12 +50,12 @@ protected:
 		LOGD("Hit block %d:%d at {%d, %d, %d} face %d, %s (%s)",
 			a_BlockType, a_BlockMeta,
 			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
-			g_BlockIsSolid[a_BlockType] ? "solid" : "non-solid",
+			cBlockInfo::IsSolid(a_BlockType) ? "solid" : "non-solid",
 			ItemToString(cItem(a_BlockType, 1, a_BlockMeta)).c_str()
 		);
 		*/
 		
-		if (g_BlockIsSolid[a_BlockType])
+		if (cBlockInfo::IsSolid(a_BlockType))
 		{
 			// The projectile hit a solid block
 			// Calculate the exact hit coords:

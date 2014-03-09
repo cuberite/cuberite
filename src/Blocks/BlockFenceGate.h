@@ -2,17 +2,17 @@
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "MetaRotater.h"
 
 
 
 
 class cBlockFenceGateHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01, true>
 {
 public:
 	cBlockFenceGateHandler(BLOCKTYPE a_BlockType) :
-		cBlockHandler(a_BlockType)
+		cMetaRotater<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01, true>(a_BlockType)
 	{
 	}
 
@@ -45,6 +45,12 @@ public:
 			// Standing aside - use last direction
 			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, OldMetaData);
 		}
+	}
+
+
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	{
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 
 

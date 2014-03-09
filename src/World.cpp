@@ -34,6 +34,7 @@
 #include "Simulator/NoopRedstoneSimulator.h"
 #include "Simulator/SandSimulator.h"
 #include "Simulator/IncrementalRedstoneSimulator.h"
+#include "Simulator/VanillaFluidSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
 
 // Mobs:
@@ -264,8 +265,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Load();
-
-	m_MapManager.LoadMapData();
 }
 
 
@@ -307,25 +306,52 @@ void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
+{
+	switch (a_Weather)
+	{
+		case eWeather_Sunny:
+		{
+			return 14400 + (m_TickRand.randInt() % 4800);  // 12 - 16 minutes
+		}
+		case eWeather_Rain:
+		{
+			return 9600 + (m_TickRand.randInt() % 7200);   // 8 - 14 minutes
+		}
+		case eWeather_ThunderStorm:
+		{
+			return 2400 + (m_TickRand.randInt() % 4800);   // 2 - 6 minutes
+		}
+		default:
+		{
+			LOGWARNING("%s: Missing default weather interval for weather %d.", __FUNCTION__, a_Weather);
+			return -1;
+		}
+	}  // switch (Weather)
+}
+
+
+
+
+
 void cWorld::SetWeather(eWeather a_NewWeather)
 {
 	// Do the plugins agree? Do they want a different weather?
-	cRoot::Get()->GetPluginManager()->CallHookWeatherChanging(*this, a_NewWeather);
+	if (cRoot::Get()->GetPluginManager()->CallHookWeatherChanging(*this, a_NewWeather))
+	{
+		m_WeatherInterval = GetDefaultWeatherInterval(m_Weather);
+		return;
+	}
 	
 	// Set new period for the selected weather:
-	switch (a_NewWeather)
+	m_WeatherInterval = GetDefaultWeatherInterval(a_NewWeather);
+	
+	// The weather can't be found:
+	if (m_WeatherInterval < 0)
 	{
-		case eWeather_Sunny:        m_WeatherInterval = 14400 + (m_TickRand.randInt() % 4800); break;  // 12 - 16 minutes
-		case eWeather_Rain:         m_WeatherInterval =  9600 + (m_TickRand.randInt() % 7200); break;  //  8 - 14 minutes
-		case eWeather_ThunderStorm: m_WeatherInterval =  2400 + (m_TickRand.randInt() % 4800); break;  //  2 - 6 minutes
-		default:
-		{
-			LOGWARNING("Requested unknown weather %d, setting sunny for a minute instead.", a_NewWeather);
-			a_NewWeather = eWeather_Sunny;
-			m_WeatherInterval = 1200;
-			break;
-		}
-	}  // switch (NewWeather)
+		return;
+	}
+	
 	m_Weather = a_NewWeather;
 	BroadcastWeather(m_Weather);
 	
@@ -625,13 +651,13 @@ void cWorld::Start(void)
 	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfAmbient, 0));
 	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfWater, 0));
 
+	m_MapManager.LoadMapData();
 
 	// Save any changes that the defaults may have done to the ini file:
 	if (!IniFile.WriteFile(m_IniFileName))
 	{
 		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
 	}
-
 }
 
 
@@ -1172,9 +1198,18 @@ bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
-bool cWorld::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+bool cWorld::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
 {
-	return m_ChunkMap->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return m_ChunkMap->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithFlowerPotAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -1723,7 +1758,7 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
 {
-	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(GetBlock(a_X, a_Y, a_Z));
+	cBlockHandler * Handler = cBlockInfo::GetHandler(GetBlock(a_X, a_Y, a_Z));
 	cChunkInterface ChunkInterface(GetChunkMap());
 	Handler->OnDestroyed(ChunkInterface, *this, a_X, a_Y, a_Z);
 	return m_ChunkMap->DigBlock(a_X, a_Y, a_Z);
@@ -2647,6 +2682,47 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 
 
 
+bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	BLOCKTYPE Block;
+	NIBBLETYPE Meta;
+	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+	if (Block != E_BLOCK_TRAPDOOR)
+	{
+		return false;
+	}
+	
+	return (Meta & 0x4) > 0;
+}
+
+
+
+
+
+bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
+{
+	BLOCKTYPE Block;
+	NIBBLETYPE Meta;
+	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+	if (Block != E_BLOCK_TRAPDOOR)
+	{
+		return false;
+	}
+	
+	bool IsOpen = (Meta & 0x4) > 0;
+	if (a_Open != IsOpen)
+	{
+		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
+		BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
 void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
@@ -2987,8 +3063,8 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "");
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Floody\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
-		SimulatorName = "Floody";
+		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Vanilla\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
+		SimulatorName = "Vanilla";
 	}
 	
 	cFluidSimulator * res = NULL;
@@ -3012,15 +3088,24 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	}
 	else
 	{
-		if (NoCaseCompare(SimulatorName, "floody") != 0)
-		{
-			// The simulator name doesn't match anything we have, issue a warning:
-			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Floody\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
-		}
 		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
 		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
 		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
-		res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+
+		if (NoCaseCompare(SimulatorName, "floody") == 0)
+		{
+			res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
+		else if (NoCaseCompare(SimulatorName, "vanilla") == 0)
+		{
+			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
+		else
+		{
+			// The simulator name doesn't match anything we have, issue a warning:
+			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Vanilla\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
+			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
 	}
 	
 	m_SimulatorManager->RegisterSimulator(res, Rate);

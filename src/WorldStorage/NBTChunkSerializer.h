@@ -30,6 +30,7 @@ class cJukeboxEntity;
 class cNoteEntity;
 class cSignEntity;
 class cMobHeadEntity;
+class cFlowerPotEntity;
 class cFallingBlock;
 class cMinecart;
 class cMinecartWithChest;
@@ -96,6 +97,7 @@ protected:
 	void AddSignEntity     (cSignEntity *      a_Sign);
 	void AddMobHeadEntity  (cMobHeadEntity *     a_MobHead);
 	void AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock);
+	void AddFlowerPotEntity(cFlowerPotEntity * a_FlowerPot);
 	
 	// Entities:
 	void AddBasicEntity       (cEntity * a_Entity, const AString & a_ClassName);

@@ -9,7 +9,7 @@
 
 
 cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType)
-	: cBlockHandler(a_BlockType)
+	: super(a_BlockType)
 {
 }
 
@@ -48,6 +48,29 @@ void cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 	if (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_DOOR)
 	{
 		ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+	}
+}
+
+
+
+
+
+void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+{
+	UNUSED(a_ChunkInterface);
+	
+	a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	
+	if (Meta & 8)
+	{
+		// Current block is top of the door
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, a_Player);
+	}
+	else
+	{
+		// Current block is bottom of the door
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, a_Player);
 	}
 }
 

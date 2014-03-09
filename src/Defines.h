@@ -17,33 +17,6 @@ typedef std::vector<int> cSlotNums;
 
 // tolua_begin
 
-/// How much light do the blocks emit on their own?
-extern unsigned char g_BlockLightValue[];
-
-/// How much light do the block consume?
-extern unsigned char g_BlockSpreadLightFalloff[];
-
-/// Is a block completely transparent? (light doesn't get decreased(?))
-extern bool g_BlockTransparent[];
-
-/// Is a block destroyed after a single hit?
-extern bool g_BlockOneHitDig[];
-
-/// Can a piston break this block?
-extern bool g_BlockPistonBreakable[256];
-
-/// Can this block hold snow atop?
-extern bool g_BlockIsSnowable[256];
-
-/// Does this block require a tool to drop?
-extern bool g_BlockRequiresSpecialTool[256];
-
-/// Is this block solid (player cannot walk through)?
-extern bool g_BlockIsSolid[256];
-
-/// Does this block fully occupy it's voxel - is it a 'full' block?
-extern bool g_BlockFullyOccupiesVoxel[256];
-
 /// Experience Orb setup
 enum
 {
@@ -247,6 +220,56 @@ inline const char * ClickActionToString(eClickAction a_ClickAction)
 	}
 	ASSERT(!"Unknown click action");
 	return "caUnknown";
+}
+
+
+
+
+
+/** Returns a blockface mirrored around the Y axis (doesn't change up/down). */
+inline eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
+		default: return a_BlockFace;
+	}
+}
+
+
+
+
+
+/** Returns a blockface rotated around the Y axis counter-clockwise. */
+inline eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_XP;
+		default: return a_BlockFace;
+	}
+}
+
+
+
+
+
+inline eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_XP: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_XM;
+		default: return a_BlockFace;
+	}
 }
 
 
@@ -654,7 +677,7 @@ namespace ItemCategory
 inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
 {
 	if(!IsValidBlock(a_BlockType)) return false;
-	return g_BlockRequiresSpecialTool[a_BlockType];
+	return cBlockInfo::RequiresSpecialTool(a_BlockType);
 }
 
 

@@ -720,7 +720,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			if (GetSpeedZ() > 0)
 			{
 				BLOCKTYPE Block = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)ceil(GetPosZ()));
-				if (!IsBlockRail(Block) && g_BlockIsSolid[Block])
+				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
 					// We could try to detect a block in front based purely on coordinates, but xoft made a bounding box system - why not use? :P
 					cBoundingBox bbBlock(Vector3d((int)floor(GetPosX()), (int)floor(GetPosY()), (int)ceil(GetPosZ())), 0.5, 1);
@@ -737,7 +737,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			else if (GetSpeedZ() < 0)
 			{
 				BLOCKTYPE Block = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) - 1);
-				if (!IsBlockRail(Block) && g_BlockIsSolid[Block])
+				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
 					cBoundingBox bbBlock(Vector3d((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) - 1), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ() - 1), GetWidth() / 2, GetHeight());
@@ -757,7 +757,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			if (GetSpeedX() > 0)
 			{
 				BLOCKTYPE Block = m_World->GetBlock((int)ceil(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
-				if (!IsBlockRail(Block) && g_BlockIsSolid[Block])
+				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
 					cBoundingBox bbBlock(Vector3d((int)ceil(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ())), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
@@ -773,7 +773,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			else if (GetSpeedX() < 0)
 			{
 				BLOCKTYPE Block = m_World->GetBlock((int)floor(GetPosX()) - 1, (int)floor(GetPosY()), (int)floor(GetPosZ()));
-				if (!IsBlockRail(Block) && g_BlockIsSolid[Block])
+				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
 					cBoundingBox bbBlock(Vector3d((int)floor(GetPosX()) - 1, (int)floor(GetPosY()), (int)floor(GetPosZ())), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX() - 1, floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
@@ -798,10 +798,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			BLOCKTYPE BlockZM = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) + 1);
 			BLOCKTYPE BlockZP = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) + 1);
 			if (
-				(!IsBlockRail(BlockXM) && g_BlockIsSolid[BlockXM]) ||
-				(!IsBlockRail(BlockXP) && g_BlockIsSolid[BlockXP]) ||
-				(!IsBlockRail(BlockZM) && g_BlockIsSolid[BlockZM]) ||
-				(!IsBlockRail(BlockZP) && g_BlockIsSolid[BlockZP])
+				(!IsBlockRail(BlockXM) && cBlockInfo::IsSolid(BlockXM)) ||
+				(!IsBlockRail(BlockXP) && cBlockInfo::IsSolid(BlockXP)) ||
+				(!IsBlockRail(BlockZM) && cBlockInfo::IsSolid(BlockZM)) ||
+				(!IsBlockRail(BlockZP) && cBlockInfo::IsSolid(BlockZP))
 				)
 			{
 				SetSpeed(0, 0, 0);

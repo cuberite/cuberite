@@ -30,6 +30,7 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
 	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_JOINED,                OnPlayerJoined)
 
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
@@ -69,6 +70,8 @@ function Initialize(Plugin)
 	-- TestSQLiteBindings();
 	-- TestExpatBindings();
 	-- TestPluginCalls();
+	
+	TestBlockAreasString()
 	
 	return true
 end;
@@ -198,6 +201,42 @@ end
 
 
 	
+
+
+
+function TestBlockAreasString()
+	-- Write one area to string, then to file:
+	local BA1 = cBlockArea()
+	BA1:Create(5, 5, 5, cBlockArea.baTypes + cBlockArea.baMetas)
+	BA1:Fill(cBlockArea.baTypes, E_BLOCK_DIAMOND_BLOCK)
+	BA1:FillRelCuboid(1, 3, 1, 3, 1, 3, cBlockArea.baTypes, E_BLOCK_GOLD_BLOCK)
+	local Data = BA1:SaveToSchematicString()
+	if ((type(Data) ~= "string") or (Data == "")) then
+		LOG("Cannot save schematic to string")
+		return
+	end
+	cFile:CreateFolder("schematics")
+	local f = io.open("schematics/StringTest.schematic", "w")
+	f:write(Data)
+	f:close()
+	
+	-- Load a second area from that file:
+	local BA2 = cBlockArea()
+	if not(BA2:LoadFromSchematicFile("schematics/StringTest.schematic")) then
+		LOG("Cannot read schematic from string test file")
+		return
+	end
+	BA2:Clear()
+	
+	-- Load another area from a string in that file:
+	f = io.open("schematics/StringTest.schematic", "r")
+	Data = f:read("*all")
+	if not(BA2:LoadFromSchematicString(Data)) then
+		LOG("Cannot load schematic from string")
+	end
+end
+
+
 
 
 
@@ -1253,6 +1292,20 @@ function HandleSetBiome(a_Split, a_Player)
 		"} set to biome #" .. tostring(Biome) .. "."
 	)
 	return true
+end
+
+
+
+
+
+function OnPlayerJoined(a_Player)
+	-- Test composite chat chaining:
+	a_Player:SendMessage(cCompositeChat()
+		:AddTextPart("Hello, ")
+		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")
+		:AddSuggestCommandPart(", and welcome.", "/help", "u")
+		:AddRunCommandPart(" SetDay", "/time set 0")
+	)
 end
 
 

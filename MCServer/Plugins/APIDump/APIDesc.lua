@@ -134,6 +134,7 @@ g_APIDesc =
 				HasBlockSkyLights = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include skylight" },
 				HasBlockTypes = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include block types" },
 				LoadFromSchematicFile = { Params = "FileName", Return = "", Notes = "Clears current content and loads new content from the specified schematic file. Returns true if successful. Returns false and logs error if unsuccessful, old content is preserved in such a case." },
+				LoadFromSchematicString = { Params = "SchematicData", Return = "", Notes = "Clears current content and loads new content from the specified string (assumed to contain .schematic data). Returns true if successful. Returns false and logs error if unsuccessful, old content is preserved in such a case." },
 				Merge =
 				{
 					{ Params = "BlockAreaSrc, {{Vector3i|RelMinCoords}}, Strategy", Return = "", Notes = "Merges BlockAreaSrc into this object at the specified relative coords, using the specified strategy" },
@@ -161,6 +162,7 @@ g_APIDesc =
 				RotateCW = { Params = "", Return = "", Notes = "Rotates the block area around the Y axis, clockwise (north -> east). Modifies blocks' metas (if present) to match." },
 				RotateCWNoMeta = { Params = "", Return = "", Notes = "Rotates the block area around the Y axis, clockwise (north -> east). Doesn't modify blocks' metas." },
 				SaveToSchematicFile = { Params = "FileName", Return = "", Notes = "Saves the current contents to a schematic file. Returns true if successful." },
+				SaveToSchematicString = { Params = "", Return = "string", Notes = "Saves the current contents to a string (in a .schematic file format). Returns the data if successful, nil if failed." },
 				SetBlockLight = { Params = "BlockX, BlockY, BlockZ, BlockLight", Return = "", Notes = "Sets the blocklight at the specified absolute coords" },
 				SetBlockMeta = { Params = "BlockX, BlockY, BlockZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified absolute coords" },
 				SetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ, SkyLight", Return = "", Notes = "Sets the skylight at the specified absolute coords" },
@@ -289,6 +291,38 @@ g_APIDesc =
 				},  -- Merge strategies
 			},  -- AdditionalInfo
 		},  -- cBlockArea
+
+		cBlockInfo =
+		{
+			Desc = [[
+				This class is used to query and register block properties.
+			]],
+			Functions =
+			{
+				FullyOccupiesVoxel = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block fully occupies its voxel." },
+				Get = { Params = "Type", Return = "{{cBlockInfo}}", Notes = "(STATIC) Returns the {{cBlockInfo}} structure for the specified type." },
+				GetLightValue = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block emits on its own." },
+				GetSpreadLightFalloff = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block consumes." },
+				IsOneHitDig = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block will be destroyed after a single hit." },
+				IsPistonBreakable = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether a piston can break the specified block." },
+				IsSnowable = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block can hold snow atop." },
+				IsSolid = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block is solid." },
+				IsTransparent = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block is transparent." },
+				RequiresSpecialTool = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block requires a special tool to drop." },
+			},
+			Variables =
+			{
+				m_FullyOccupiesVoxel = { Type = "bool", Notes = "Does this block fully occupy its voxel - is it a 'full' block?" },
+				m_IsSnowable = { Type = "bool", Notes = "Can this block hold snow atop?" },
+				m_IsSolid = { Type = "bool", Notes = "Is this block solid (player cannot walk through)?" },
+				m_LightValue = { Type = "number", Notes = "How much light do the blocks emit on their own?" },
+				m_OneHitDig = { Type = "bool", Notes = "Is a block destroyed after a single hit?" },
+				m_PistonBreakable = { Type = "bool", Notes = "Can a piston break this block?" },
+				m_RequiresSpecialTool = { Type = "bool", Notes = "Does this block require a tool to drop?" },
+				m_SpreadLightFalloff = { Type = "number", Notes = "How much light do the blocks consume?" },
+				m_Transparent = { Type = "bool", Notes = "Is a block completely transparent? (light doesn't get decreased(?))" },
+			},
+		}, -- cBlockInfo
 
 		cChatColor =
 		{
@@ -451,6 +485,58 @@ end
 			},
 		},  -- cClientHandle
 
+		cCompositeChat =
+		{
+			Desc = [[
+				Encapsulates a chat message that can contain various formatting, URLs, commands executed on click
+				and commands suggested on click. The chat message can be sent by the regular chat-sending functions,
+				{{cPlayer}}:SendMessage(), {{cWorld}}:BroadcastChat() and {{cRoot}}:BroadcastChat().</p>
+				<p>
+				Note that most of the functions in this class are so-called modifiers - they modify the object and
+				then return the object itself, so that they can be chained one after another.
+			]],
+			Functions =
+			{
+				constructor =
+				{
+					{ Params = "", Return = "", Notes = "Creates an empty chat message" },
+					{ Params = "Text", Return = "", Notes = "Creates a chat message containing the specified text, parsed by the ParseText() function. This allows easy migration from old chat messages." },
+				},
+				AddRunCommandPart = { Params = "Text, Command, [Style]", Return = "self", Notes = "Adds a text which, when clicked, runs the specified command. Chaining." },
+				AddSuggestCommandPart = { Params = "Text, Command, [Style]", Return = "self", Notes = "Adds a text which, when clicked, puts the specified command into the player's chat input area. Chaining." },
+				AddTextPart = { Params = "Text, [Style]", Return = "self", Notes = "Adds a regular text. Chaining." },
+				AddUrlPart = { Params = "Text, Url, [Style]", Return = "self", Notes = "Adds a text which, when clicked, opens up a browser at the specified URL. Chaining." },
+				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
+				GetMessageType = { Params = "", Return = "MessageType", Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)" },
+				ParseText = { Params = "Text", Return = "self", Notes = "Adds text, while recognizing http and https URLs and old-style formatting codes (\"@2\"). Chaining." },
+				SetMessageType = { Params = "MessageType", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.) Chaining." },
+				UnderlineUrls = { Params = "", Return = "self", Notes = "Makes all URL parts contained in the message underlined. Doesn't affect parts added in the future. Chaining." },
+			},
+
+			AdditionalInfo =
+			{
+				{
+					Header = "Chaining example",
+					Contents = [[
+						Sending a chat message that is composed of multiple different parts has been made easy thanks to
+						chaining. Consider the following example that shows how a message containing all kinds of parts
+						is sent (adapted from the Debuggers plugin):
+<pre class="prettyprint lang-lua">
+function OnPlayerJoined(a_Player)
+	-- Send an example composite chat message to the player:
+	a_Player:SendMessage(cCompositeChat()
+		:AddTextPart("Hello, ")
+		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")  -- Colored underlined link
+		:AddSuggestCommandPart(", and welcome.", "/help", "u")       -- Underlined suggest-command
+		:AddRunCommandPart(" SetDay", "/time set 0")                 -- Regular text that will execute command when clicked
+		:SetMessageType(mtJoin)                                      -- It is a join-message
+	)
+end</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cCompositeChat
+		
 		cCraftingGrid =
 		{
 			Desc = [[
@@ -1115,6 +1201,42 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 			},
 		},  -- cItem
 
+		cObjective =
+		{
+			Desc = [[
+				This class represents a single scoreboard objective.
+			]],
+			Functions =
+			{
+				AddScore = { Params = "string, number", Return = "Score", Notes = "Adds a value to the score of the specified player and returns the new value." },
+				GetDisplayName = { Params = "", Return = "string", Notes = "Returns the display name of the objective. This name will be shown to the connected players." },
+				GetName = { Params = "", Return = "string", Notes = "Returns the internal name of the objective." },
+				GetScore = { Params = "string", Return = "Score", Notes = "Returns the score of the specified player." },
+				GetType = { Params = "", Return = "eType", Notes = "Returns the type of the objective. (i.e what is being tracked)" },
+				Reset = { Params = "", Return = "", Notes = "Resets the scores of the tracked players." },
+				ResetScore = { Params = "string", Return = "", Notes = "Reset the score of the specified player." },
+				SetDisplayName = { Params = "string", Return = "", Notes = "Sets the display name of the objective." },
+				SetScore = { Params = "string, Score", Return = "", Notes = "Sets the score of the specified player." },
+				SubScore = { Params = "string, number", Return = "Score", Notes = "Subtracts a value from the score of the specified player and returns the new value." },
+			},
+			Constants =
+			{
+				otAchievement = { Notes = "" },
+				otDeathCount = { Notes = "" },
+				otDummy = { Notes = "" },
+				otHealth = { Notes = "" },
+				otPlayerKillCount = { Notes = "" },
+				otStat = { Notes = "" },
+				otStatBlockMine = { Notes = "" },
+				otStatEntityKill = { Notes = "" },
+				otStatEntityKilledBy = { Notes = "" },
+				otStatItemBreak = { Notes = "" },
+				otStatItemCraft = { Notes = "" },
+				otStatItemUse = { Notes = "" },
+				otTotalKillCount = { Notes = "" },
+			},
+		}, -- cObjective
+
 		cPainting =
 		{
 			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
@@ -1773,6 +1895,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				BroadcastChatInfo = { Params = "Message", Return = "", Notes = "Prepends Yellow [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For informational messages, such as command usage." },
 				BroadcastChatSuccess = { Params = "Message", Return = "", Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For success messages." },
 				BroadcastChatWarning = { Params = "Message", Return = "", Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For concerning events, such as plugin reload etc." },
+				CreateAndInitializeWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Creates a new world and initializes it. If there is a world whith the same name it returns nil." },
 				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for the given player." },
 				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
@@ -1821,6 +1944,36 @@ end
 			},
 		},  -- cRoot
 
+		cScoreboard =
+		{
+			Desc = [[
+				This class manages the objectives and teams of a single world.
+			]],
+			Functions =
+			{
+				AddPlayerScore = { Params = "Name, Type, Value", Return = "", Notes = "Adds a value to all player scores of the specified objective type." },
+				ForEachObjective = { Params = "CallBackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each objective in the scoreboard. Returns true if all objectives have been processed (including when there are zero objectives), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cObjective|Objective}}, [CallbackData])</pre> The callback should return false or no value to continue with the next objective, or true to abort the enumeration." },
+				ForEachTeam = { Params = "CallBackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each team in the scoreboard. Returns true if all teams have been processed (including when there are zero teams), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cObjective|Objective}}, [CallbackData])</pre> The callback should return false or no value to continue with the next team, or true to abort the enumeration." },
+				GetNumObjectives = { Params = "", Return = "number", Notes = "Returns the nuber of registered objectives." },
+				GetNumTeams = { Params = "", Return = "number", Notes = "Returns the number of registered teams." },
+				GetObjective = { Params = "string", Return = "{{cObjective}}", Notes = "Returns the objective with the specified name." },
+				GetObjectiveIn = { Params = "DisplaySlot", Return = "{{cObjective}}", Notes = "Returns the objective in the specified display slot. Can be nil." },
+				GetTeam = { Params = "string", Return = "{{cTeam}}", Notes = "Returns the team with the specified name." },
+				RegisterObjective = { Params = "Name, DisplayName, Type", Return = "{{cObjective}}", Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, nil on error." },
+				RegisterTeam = { Params = "Name, DisplayName, Prefix, Suffix", Return = "{{cTeam}}", Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error." },
+				RemoveObjective = { Params = "string", Return = "bool", Notes = "Removes the objective with the specified name. Returns true if operation was successful." },
+				RemoveTeam = { Params = "string", Return = "bool", Notes = "Removes the team with the specified name. Returns true if operation was successful." },
+				SetDisplay = { Params = "Name, DisplaySlot", Return = "", Notes = "Updates the currently displayed objective." },
+			},
+			Constants =
+			{
+				dsCount = { Notes = "" },
+				dsList = { Notes = "" },
+				dsName = { Notes = "" },
+				dsSidebar = { Notes = "" },
+			},
+		}, -- cScoreboard
+
 		cServer =
 		{
 			Desc = [[
@@ -1840,6 +1993,32 @@ end
 				IsHardcore = { Params = "", Return = "bool", Notes = "Returns true if the server is hardcore (players get banned on death)." },
 			},
 		},  -- cServer
+
+		cTeam =
+		{
+			Desc = [[
+				This class manages a single player team.
+			]],
+			Functions =
+			{
+				AddPlayer = { Params = "string", Returns = "bool", Notes = "Adds a player to this team. Returns true if the operation was successful." },
+				AllowsFriendlyFire = { Params = "", Return = "bool", Notes = "Returns whether team friendly fire is allowed." },
+				CanSeeFriendlyInvisible = { Params = "", Return = "bool", Notes = "Returns whether players can see invisible teammates." },
+				HasPlayer = { Params = "string", Returns = "bool", Notes = "Returns whether the specified player is a member of this team." },
+				GetDisplayName = { Params = "", Return = "string", Notes = "Returns the display name of the team." },
+				GetName = { Params = "", Return = "string", Notes = "Returns the internal name of the team." },
+				GetNumPlayers = { Params = "", Return = "number", Notes = "Returns the number of registered players." },
+				GetPrefix = { Params = "", Return = "string", Notes = "Returns the prefix prepended to the names of the members of this team." },
+				RemovePlayer = { Params = "string", Returns = "bool", Notes = "Removes the player with the specified name from this team. Returns true if the operation was successful." },
+				Reset = { Params = "", Returns = "", Notes = "Removes all players from this team." },
+				GetSuffix = { Params = "", Return = "string", Notes = "Returns the suffix appended to the names of the members of this team." },
+				SetCanSeeFriendlyInvisible = { Params = "bool", Return = "", Notes = "Set whether players can see invisible teammates." },
+				SetDisplayName = { Params = "string", Return = "", Notes = "Sets the display name of this team. (i.e. what will be shown to the players)" },
+				SetFriendlyFire = { Params = "bool", Return = "", Notes = "Sets whether team friendly fire is allowed." },
+				SetPrefix = { Params = "string", Return = "", Notes = "Sets the prefix prepended to the names of the members of this team." },
+				SetSuffix = { Params = "string", Return = "", Notes = "Sets the suffix appended to the names of the members of this team." },
+			},
+		}, -- cTeam
 
 		cTNTEntity =
 		{
@@ -1973,7 +2152,9 @@ end
 				DoWithDropSpenserAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dropper or a dispenser at the specified coords, calls the CallbackFunction with the {{cDropSpenserEntity}} parameter representing the dropper or dispenser. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropSpenserEntity|DropSpenserEntity}}, [CallbackData])</pre> Note that this can be used to access both dispensers and droppers in a similar way. The function returns false if there is neither dispenser nor dropper, or if there is, it returns the bool value that the callback has returned." },
 				DoWithDropperAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a dropper at the specified coords, calls the CallbackFunction with the {{cDropperEntity}} parameter representing the dropper. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropperEntity|DropperEntity}}, [CallbackData])</pre> The function returns false if there is no dropper, or if there is, it returns the bool value that the callback has returned." },
 				DoWithEntityByID = { Params = "EntityID, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If an entity with the specified ID exists, calls the callback with the {{cEntity}} parameter representing the entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}}, [CallbackData])</pre> The function returns false if the entity was not found, and it returns the same bool value that the callback has returned if the entity was found." },
+				DoWithFlowerPotAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a flower pot at the specified coords, calls the CallbackFunction with the {{cFlowerPotEntity}} parameter representing the flower pot. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFlowerPotEntity|FlowerPotEntity}}, [CallbackData])</pre> The function returns false if there is no flower pot, or if there is, it returns the bool value that the callback has returned." },
 				DoWithFurnaceAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a furnace at the specified coords, calls the CallbackFunction with the {{cFurnaceEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}}, [CallbackData])</pre> The function returns false if there is no furnace, or if there is, it returns the bool value that the callback has returned." },
+				DoWithMobHeadAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a mob head at the specified coords, calls the CallbackFunction with the {{cMobHeadEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMobHeadEntity|MobHeadEntity}}, [CallbackData])</pre> The function returns false if there is no mob head, or if there is, it returns the bool value that the callback has returned." },
 				DoWithNoteBlockAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a note block at the specified coords, calls the CallbackFunction with the {{cNoteEntity}} parameter representing the note block. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cNoteEntity|NoteEntity}}, [CallbackData])</pre> The function returns false if there is no note block, or if there is, it returns the bool value that the callback has returned." },
 				DoWithPlayer = { Params = "PlayerName, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a player of the specified name (exact match), calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}}, [CallbackData])</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found." },
 				FastSetBlock =
@@ -2576,16 +2757,16 @@ end
 
 	IgnoreClasses =
 	{
-		"coroutine",
-		"debug",
-		"io",
-		"math",
-		"package",
-		"os",
-		"string",
-		"table",
-		"g_Stats",
-		"g_TrackedPages",
+		"^coroutine$",
+		"^debug$",
+		"^io$",
+		"^math$",
+		"^package$",
+		"^os$",
+		"^string$",
+		"^table$",
+		"^g_Stats$",
+		"^g_TrackedPages$",
 	},
 
 	IgnoreFunctions =

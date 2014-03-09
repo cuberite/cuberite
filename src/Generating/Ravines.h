@@ -17,7 +17,7 @@
 
 
 class cStructGenRavines :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenRavines(int a_Seed, int a_Size);
@@ -37,8 +37,8 @@ protected:
 	/// Returns all ravines that *may* intersect the given chunk. All the ravines are valid until the next call to this function.
 	void GetRavinesForChunk(int a_ChunkX, int a_ChunkZ, cRavines & a_Ravines);
 	
-	// cStructureGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 

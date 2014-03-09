@@ -2,16 +2,17 @@
 
 #include "BlockHandler.h"
 #include "Chunk.h"
+#include "MetaRotater.h"
 
 
 
 
 class cBlockButtonHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>
 {
 public:
 	cBlockButtonHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotater<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>(a_BlockType)
 	{
 	}
 
@@ -101,7 +102,7 @@ public:
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
 		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
+		return (a_RelY > 0) && (cBlockInfo::IsSolid(BlockIsOn));
 	}
 } ;
 

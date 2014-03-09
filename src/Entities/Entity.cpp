@@ -582,11 +582,11 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
 		BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
 		BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
-		if (!g_BlockIsSolid[BlockIn])  // Making sure we are not inside a solid block
+		if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 		{
 			if (m_bOnGround)  // check if it's still on the ground
 			{
-				if (!g_BlockIsSolid[BlockBelow])  // Check if block below is air or water.
+				if (!cBlockInfo::IsSolid(BlockBelow))  // Check if block below is air or water.
 				{
 					m_bOnGround = false;
 				}
@@ -616,7 +616,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 					// The pickup is too close to an unloaded chunk, bail out of any physics handling
 					return;
 				}
-				if (!g_BlockIsSolid[GotBlock])
+				if (!cBlockInfo::IsSolid(GotBlock))
 				{
 					NextPos.x += gCrossCoords[i].x;
 					NextPos.z += gCrossCoords[i].z;

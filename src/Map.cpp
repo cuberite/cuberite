@@ -357,6 +357,8 @@ void cMap::AddPlayer(cPlayer * a_Player, Int64 a_WorldAge)
 	MapClient.m_LastUpdate = a_WorldAge;
 	MapClient.m_SendInfo   = true;
 	MapClient.m_Handle     = Handle;
+	MapClient.m_DataUpdate = 0;
+	MapClient.m_NextDecoratorUpdate = 0;
 
 	m_Clients.push_back(MapClient);
 

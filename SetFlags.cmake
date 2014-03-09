@@ -1,5 +1,3 @@
-
-
 macro (add_flags_lnk FLAGS)
 	set(CMAKE_EXE_LINKER_FLAGS            "${CMAKE_EXE_LINKER_FLAGS}            ${FLAGS}")
 	set(CMAKE_EXE_LINKER_FLAGS_DEBUG      "${CMAKE_EXE_LINKER_FLAGS_DEBUG}      ${FLAGS}")
@@ -62,6 +60,7 @@ macro(set_flags)
 
 		# We use a signed char (fixes #640 on RasPi)
 		add_flags_cxx("-fsigned-char")
+		
 	endif()
 
 
@@ -184,6 +183,14 @@ macro(set_exe_flags)
 		string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
 		string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
 		add_flags_cxx("-Wall -Wextra")
+		
+		# we support non-IEEE 754 fpus so can make no guarentees about error
+		add_flags_cxx("-ffast-math")
+		
+		# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
+		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			add_flags_cxx("-D__extern_always_inline=inline")
+		endif()
 	endif()
 
 endmacro()

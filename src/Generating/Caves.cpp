@@ -762,7 +762,7 @@ void cStructGenWormNestCaves::ClearCache(void)
 
 
 
-void cStructGenWormNestCaves::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenWormNestCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -902,7 +902,7 @@ static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
 
 
 
-void cStructGenMarbleCaves::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenMarbleCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	cNoise Noise(m_Seed);
 	for (int z = 0; z < cChunkDef::Width; z++)
@@ -938,7 +938,7 @@ void cStructGenMarbleCaves::GenStructures(cChunkDesc & a_ChunkDesc)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenDualRidgeCaves:
 
-void cStructGenDualRidgeCaves::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenDualRidgeCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{

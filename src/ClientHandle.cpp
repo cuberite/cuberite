@@ -558,11 +558,24 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 	}
 	else if (a_Channel == "REGISTER")
 	{
+		if (HasPluginChannel(a_Channel))
+		{
+			SendPluginMessage("UNREGISTER", a_Channel);
+			return; // Can't register again if already taken - kinda defeats the point of plugin messaging!
+		}
+
 		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
 	}
 	else if (a_Channel == "UNREGISTER")
 	{
 		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
+	}
+	else if (!HasPluginChannel(a_Channel))
+	{
+		// Ignore if client sent something but didn't register the channel first
+		LOGD("Player %s sent a plugin message on channel \"%s\", but didn't REGISTER it first", GetUsername().c_str(), a_Channel.c_str());
+		SendPluginMessage("UNREGISTER", a_Channel);
+		return;
 	}
 
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
@@ -824,7 +837,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
-		g_BlockOneHitDig[a_OldBlock]                        // One-hit blocks get destroyed immediately, too
+		cBlockInfo::IsOneHitDig(a_OldBlock)  // One-hit blocks get destroyed immediately, too
 	)
 	{
 		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
@@ -843,7 +856,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(a_OldBlock);
+	cBlockHandler * Handler = cBlockInfo::GetHandler(a_OldBlock);
 	Handler->OnDigging(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
@@ -857,7 +870,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		int pZ = a_BlockZ;
 
 		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
-		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
+		Handler = cBlockInfo::GetHandler(World->GetBlock(pX, pY, pZ));
 
 		if (Handler->IsClickedThrough())
 		{
@@ -925,14 +938,22 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
 	
+	cWorld * World = m_Player->GetWorld();
+	
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
+		cChunkInterface ChunkInterface(World->GetChunkMap());
+		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		
 		if (a_BlockFace > BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player); //2 block high things
 		}
 		return;
 	}
@@ -958,17 +979,15 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		if (a_BlockFace > -1)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		}
 		return;
 	}
-	
-	cWorld * World = m_Player->GetWorld();
 
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	cBlockHandler * BlockHandler = cBlockHandler::GetBlockHandler(BlockType);
+	cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 	
 	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 	{
@@ -1048,7 +1067,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if (
 		cBlockSlabHandler::IsAnySlabType(ClickedBlock) &&               // Is there a slab already?
 		cBlockSlabHandler::IsAnySlabType(EquippedBlock) &&              // Is the player placing another slab?
-		((ClickedBlockMeta & 0x07) == (EquippedBlockDamage & 0x07)) &&  // Is it the same slab type?
+		((ClickedBlockMeta & 0x07) == EquippedBlockDamage) &&           // Is it the same slab type?
 		(
 			(a_BlockFace == BLOCK_FACE_TOP) ||                            // Clicking the top of a bottom slab
 			(a_BlockFace == BLOCK_FACE_BOTTOM)                            // Clicking the bottom of a top slab

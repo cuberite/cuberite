@@ -20,6 +20,7 @@
 #include "BlockEntities/NoteEntity.h"
 #include "BlockEntities/SignEntity.h"
 #include "BlockEntities/MobHeadEntity.h"
+#include "BlockEntities/FlowerPotEntity.h"
 #include "Entities/Pickup.h"
 #include "Item.h"
 #include "Noise.h"
@@ -883,7 +884,7 @@ void cChunk::ApplyWeatherToTop()
 					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
 				}
 			}
-			else if (g_BlockIsSnowable[TopBlock])
+			else if (cBlockInfo::IsSnowable(TopBlock))
 			{
 				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
 			}
@@ -1311,6 +1312,7 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_HEAD:
 					case E_BLOCK_NOTE_BLOCK:
 					case E_BLOCK_JUKEBOX:
+					case E_BLOCK_FLOWER_POT:
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
@@ -1440,6 +1442,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_HEAD:
 		case E_BLOCK_NOTE_BLOCK:
 		case E_BLOCK_JUKEBOX:
+		case E_BLOCK_FLOWER_POT:
 		{
 			AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
@@ -1540,10 +1543,10 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	SetNibble(m_BlockMeta, index, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
-	if(
-		(g_BlockLightValue[OldBlockType ]        != g_BlockLightValue[a_BlockType]) ||
-		(g_BlockSpreadLightFalloff[OldBlockType] != g_BlockSpreadLightFalloff[a_BlockType]) ||
-		(g_BlockTransparent[OldBlockType]        != g_BlockTransparent[a_BlockType])
+	if (
+		(cBlockInfo::GetLightValue        (OldBlockType) != cBlockInfo::GetLightValue        (a_BlockType)) ||
+		(cBlockInfo::GetSpreadLightFalloff(OldBlockType) != cBlockInfo::GetSpreadLightFalloff(a_BlockType)) ||
+		(cBlockInfo::IsTransparent        (OldBlockType) != cBlockInfo::IsTransparent        (a_BlockType))
 	)
 	{
 		m_IsLightValid = false;
@@ -2337,7 +2340,7 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
-bool cChunk::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
@@ -2355,6 +2358,38 @@ bool cChunk::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMob
 		
 		// The correct block entity is here, 
 		if (a_Callback.Item((cMobHeadEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_FLOWER_POT)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here, 
+		if (a_Callback.Item((cFlowerPotEntity *)*itr))
 		{
 			return false;
 		}

@@ -17,19 +17,19 @@ AString cObjective::TypeToString(eType a_Type)
 {
 	switch (a_Type)
 	{
-		case E_TYPE_DUMMY:                 return "dummy";
-		case E_TYPE_DEATH_COUNT:           return "deathCount";
-		case E_TYPE_PLAYER_KILL_COUNT:     return "playerKillCount";
-		case E_TYPE_TOTAL_KILL_COUNT:      return "totalKillCount";
-		case E_TYPE_HEALTH:                return "health";
-		case E_TYPE_ACHIEVEMENT:           return "achievement";
-		case E_TYPE_STAT:                  return "stat";
-		case E_TYPE_STAT_ITEM_CRAFT:       return "stat.craftItem";
-		case E_TYPE_STAT_ITEM_USE:         return "stat.useItem";
-		case E_TYPE_STAT_ITEM_BREAK:       return "stat.breakItem";
-		case E_TYPE_STAT_BLOCK_MINE:       return "stat.mineBlock";
-		case E_TYPE_STAT_ENTITY_KILL:      return "stat.killEntity";
-		case E_TYPE_STAT_ENTITY_KILLED_BY: return "stat.entityKilledBy";
+		case otDummy:              return "dummy";
+		case otDeathCount:         return "deathCount";
+		case otPlayerKillCount:    return "playerKillCount";
+		case otTotalKillCount:     return "totalKillCount";
+		case otHealth:             return "health";
+		case otAchievement:        return "achievement";
+		case otStat:               return "stat";
+		case otStatItemCraft:      return "stat.craftItem";
+		case otStatItemUse:        return "stat.useItem";
+		case otStatItemBreak:      return "stat.breakItem";
+		case otStatBlockMine:      return "stat.mineBlock";
+		case otStatEntityKill:     return "stat.killEntity";
+		case otStatEntityKilledBy: return "stat.entityKilledBy";
 
 		default: return "";
 	}
@@ -46,19 +46,19 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 		const char * m_String;
 	} TypeMap [] =
 	{
-		{E_TYPE_DUMMY,                 "dummy"},
-		{E_TYPE_DEATH_COUNT,           "deathCount"},
-		{E_TYPE_PLAYER_KILL_COUNT,     "playerKillCount"},
-		{E_TYPE_TOTAL_KILL_COUNT,      "totalKillCount"},
-		{E_TYPE_HEALTH,                "health"},
-		{E_TYPE_ACHIEVEMENT,           "achievement"},
-		{E_TYPE_STAT,                  "stat"},
-		{E_TYPE_STAT_ITEM_CRAFT,       "stat.craftItem"},
-		{E_TYPE_STAT_ITEM_USE,         "stat.useItem"},
-		{E_TYPE_STAT_ITEM_BREAK,       "stat.breakItem"},
-		{E_TYPE_STAT_BLOCK_MINE,       "stat.mineBlock"},
-		{E_TYPE_STAT_ENTITY_KILL,      "stat.killEntity"},
-		{E_TYPE_STAT_ENTITY_KILLED_BY, "stat.entityKilledBy"}
+		{otDummy,              "dummy"              },
+		{otDeathCount,         "deathCount"         },
+		{otPlayerKillCount,    "playerKillCount"    },
+		{otTotalKillCount,     "totalKillCount"     },
+		{otHealth,             "health"             },
+		{otAchievement,        "achievement"        },
+		{otStat,               "stat"               },
+		{otStatItemCraft,      "stat.craftItem"     },
+		{otStatItemUse,        "stat.useItem"       },
+		{otStatItemBreak,      "stat.breakItem"     },
+		{otStatBlockMine,      "stat.mineBlock"     },
+		{otStatEntityKill,     "stat.killEntity"    },
+		{otStatEntityKilledBy, "stat.entityKilledBy"}
 	};
 	for (size_t i = 0; i < ARRAYCOUNT(TypeMap); i++)
 	{
@@ -67,7 +67,7 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 			return TypeMap[i].m_Type;
 		}
 	}  // for i - TypeMap[]
-	return E_TYPE_DUMMY;
+	return otDummy;
 }
 
 
@@ -246,6 +246,17 @@ void cTeam::Reset(void)
 
 
 
+void cTeam::SetDisplayName(const AString & a_Name)
+{
+	m_DisplayName = a_Name;
+
+	// TODO 2014-03-01 xdot: Update clients
+}
+
+
+
+
+
 unsigned int cTeam::GetNumPlayers(void) const
 {
 	return m_Players.size();
@@ -257,7 +268,7 @@ unsigned int cTeam::GetNumPlayers(void) const
 
 cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 {
-	for (int i = 0; i < (int) E_DISPLAY_SLOT_COUNT; ++i)
+	for (int i = 0; i < (int) dsCount; ++i)
 	{
 		m_Display[i] = NULL;
 	}
@@ -301,10 +312,18 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 		return false;
 	}
 
-	m_Objectives.erase(it);
-
 	ASSERT(m_World != NULL);
 	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
+
+	for (unsigned int i = 0; i < (unsigned int) dsCount; ++i)
+	{
+		if (m_Display[i] == &it->second)
+		{
+			SetDisplay(NULL, (eDisplaySlot) i);
+		}
+	}
+
+	m_Objectives.erase(it);
 
 	return true;
 }
@@ -410,7 +429,7 @@ cTeam * cScoreboard::QueryPlayerTeam(const AString & a_Name)
 
 void cScoreboard::SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot)
 {
-	ASSERT(a_Slot < E_DISPLAY_SLOT_COUNT);
+	ASSERT(a_Slot < dsCount);
 
 	cObjective * Objective = GetObjective(a_Objective);
 
@@ -435,7 +454,7 @@ void cScoreboard::SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot)
 
 cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 {
-	ASSERT(a_Slot < E_DISPLAY_SLOT_COUNT);
+	ASSERT(a_Slot < dsCount);
 
 	return m_Display[a_Slot];
 }
@@ -444,7 +463,7 @@ cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 
 
 
-void cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback)
+bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -455,8 +474,64 @@ void cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallb
 			// Call callback
 			if (a_Callback.Item(&it->second))
 			{
-				return;
+				return false;
 			}
+		}
+	}
+	return true;
+}
+
+
+
+
+
+bool cScoreboard::ForEachObjective(cObjectiveCallback& a_Callback)
+{
+	cCSLock Lock(m_CSObjectives);
+
+	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
+	{
+		// Call callback
+		if (a_Callback.Item(&it->second))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+
+
+bool cScoreboard::ForEachTeam(cTeamCallback& a_Callback)
+{
+	cCSLock Lock(m_CSTeams);
+
+	for (cTeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
+	{
+		// Call callback
+		if (a_Callback.Item(&it->second))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+
+
+void cScoreboard::AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value)
+{
+	cCSLock Lock(m_CSObjectives);
+
+	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
+	{
+		if (it->second.GetType() == a_Type)
+		{
+			it->second.AddScore(a_Name, a_Value);
 		}
 	}
 }
@@ -474,7 +549,7 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 		it->second.SendTo(a_Client);
 	}
 
-	for (int i = 0; i < (int) E_DISPLAY_SLOT_COUNT; ++i)
+	for (int i = 0; i < (int) dsCount; ++i)
 	{
 		// Avoid race conditions
 		cObjective * Objective = m_Display[i];

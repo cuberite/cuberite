@@ -29,7 +29,7 @@ public:
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 	) override
 	{
-		class cCallback : public cMobHeadBlockCallback
+		class cCallback : public cMobHeadCallback
 		{
 			cPlayer * m_Player;
 			NIBBLETYPE m_OldBlockMeta;
@@ -45,6 +45,7 @@ public:
 				
 				a_MobHeadEntity->SetType(static_cast<eMobHeadType>(m_OldBlockMeta));
 				a_MobHeadEntity->SetRotation(static_cast<eMobHeadRotation>(Rotation));
+				a_MobHeadEntity->GetWorld()->BroadcastBlockEntity(a_MobHeadEntity->GetPosX(), a_MobHeadEntity->GetPosY(), a_MobHeadEntity->GetPosZ(), m_Player->GetClientHandle());
 				return false;
 			}
 		
@@ -59,7 +60,7 @@ public:
 		
 		a_BlockMeta = a_BlockFace;
 		cWorld * World = (cWorld *) &a_WorldInterface;
-		World->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
+		World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
 	}
 } ;

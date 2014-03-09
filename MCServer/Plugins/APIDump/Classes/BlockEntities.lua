@@ -196,9 +196,11 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		Inherits = "cBlockEntity",
 		Functions =
 		{
-			EjectRecord = { Params = "", Return = "", Notes = "Ejects the current record as a {{cPickup|pickup}}. No action if there's no current record. To remove record without generating the pickup, use SetRecord(0)" },
+			EjectRecord = { Params = "", Return = "bool", Notes = "Ejects the current record as a {{cPickup|pickup}}. No action if there's no current record. To remove record without generating the pickup, use SetRecord(0). Returns true if pickup ejected." },
 			GetRecord = { Params = "", Return = "number", Notes = "Returns the record currently present. Zero for no record, E_ITEM_*_DISC for records." },
-			PlayRecord = { Params = "", Return = "", Notes = "Plays the currently present record. No action if there's no current record." },
+			IsPlayingRecord = { Params = "", Return = "bool", Notes = "Returns true if the jukebox is playing a record." },
+			IsRecordItem = { Params = "ItemType", Return = "bool", Notes = "Returns true if the specified item is a record that can be played." },
+			PlayRecord = { Params = "RecordItemType", Return = "bool", Notes = "Plays the specified Record. Return false if the parameter isn't a playable Record (E_ITEM_XXX_DISC). If there is a record already playing, ejects it first." },
 			SetRecord = { Params = "number", Return = "", Notes = "Sets the currently present record. Use zero for no record, or E_ITEM_*_DISC for records." },
 		},
 	},  -- cJukeboxEntity
@@ -236,6 +238,20 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		},
 		Inherits = "cBlockEntity";
 	},  -- cSignEntity
+
+	cFlowerPotEntity =
+	{
+		Desc = [[
+			This class represents a flower pot entity in the world.
+		]],
+		Functions =
+		{
+			IsItemInPot = { Params = "", Return = "bool", Notes = "Is a flower in the pot?" },
+			GetItem = { Params = "", Return = "{{cItem|Item}}", Notes = "Returns the item in the flower pot." },
+			SetItem = { Params = "{{cItem|Item}}", Return = "", Notes = "Set the item in the flower pot" },
+		},
+		Inherits = "cBlockEntity";
+	},  -- cFlowerPotEntity
 }
 
 

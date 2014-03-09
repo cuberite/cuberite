@@ -2,17 +2,17 @@
 
 #include "BlockHandler.h"
 #include "../Chunk.h"
-
+#include "MetaRotater.h"
 
 
 
 
 class cBlockTorchHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
 {
 public:
 	cBlockTorchHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotater<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>(a_BlockType)
 	{
 	}
 	
@@ -99,7 +99,7 @@ public:
 
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, eBlockFace a_BlockFace)
 	{
-		if ( !g_BlockFullyOccupiesVoxel[a_BlockType] )
+		if ( !cBlockInfo::FullyOccupiesVoxel(a_BlockType) )
 		{
 			return (a_BlockFace == BLOCK_FACE_TOP);  // Allow placement only when torch upright (for glass, etc.); exceptions won't even be sent by client, no need to handle
 		}
@@ -129,7 +129,7 @@ public:
 			{
 				return Face;
 			}
-			else if ((g_BlockFullyOccupiesVoxel[BlockInQuestion]) && (i != BLOCK_FACE_BOTTOM))
+			else if (cBlockInfo::FullyOccupiesVoxel(BlockInQuestion) && (i != BLOCK_FACE_BOTTOM))
 			{
 				// Otherwise, if block in that direction is torch placeable and we haven't gotten to it via the bottom face, return that face
 				return Face;
@@ -163,7 +163,7 @@ public:
 			// No need to check for upright orientation, it was done when the torch was placed
 			return true;
 		}
-		else if ( !g_BlockFullyOccupiesVoxel[BlockInQuestion] )
+		else if ( !cBlockInfo::FullyOccupiesVoxel(BlockInQuestion) )
 		{
 			return false;
 		}
@@ -184,67 +184,6 @@ public:
 	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
-	}
-	
-	
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
-	{
-		// Bit 4 stays, the rest is swapped around according to a table:
-		NIBBLETYPE TopBits = (a_Meta & 0x08);
-		switch (a_Meta & 0x07)
-		{
-			case 0x01: return TopBits | 0x04;  // East  -> North
-			case 0x02: return TopBits | 0x03;  // West  -> South
-			case 0x03: return TopBits | 0x01;  // South -> East
-			case 0x04: return TopBits | 0x02;  // North -> West
-			default:   return a_Meta;          // Floor -> Floor
-		}
-	}
-
-
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
-	{
-		// Bit 4 stays, the rest is swapped around according to a table:
-		NIBBLETYPE TopBits = (a_Meta & 0x08);
-		switch (a_Meta & 0x07)
-		{
-			case 0x01: return TopBits | 0x03;  // East  -> South
-			case 0x02: return TopBits | 0x04;  // West  -> North
-			case 0x03: return TopBits | 0x02;  // South -> West
-			case 0x04: return TopBits | 0x01;  // North -> East
-			default:   return a_Meta;          // Floor -> Floor
-		}
-	}
-
-
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
-	{
-		// Bit 4 stays, the rest is swapped around according to a table:
-		NIBBLETYPE TopBits = (a_Meta & 0x08);
-		switch (a_Meta & 0x07)
-		{
-			case 0x03: return TopBits | 0x04;  // South -> North
-			case 0x04: return TopBits | 0x03;  // North -> South
-			default:   return a_Meta;          // Keep the rest
-		}
-	}
-
-
-	// Mirroring around the XZ plane doesn't make sense for floor torches,
-	// the others stay the same, so let's keep all the metas the same.
-	// The base class does tht for us, no need to override MetaMirrorXZ()
-
-	
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
-	{
-		// Bit 4 stays, the rest is swapped around according to a table:
-		NIBBLETYPE TopBits = (a_Meta & 0x08);
-		switch (a_Meta & 0x07)
-		{
-			case 0x01: return TopBits | 0x02;  // East -> West
-			case 0x02: return TopBits | 0x01;  // West -> East
-			default:   return a_Meta;          // Keep the rest
-		}
 	}
 } ;
 

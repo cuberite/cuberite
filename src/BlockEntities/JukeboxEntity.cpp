@@ -30,48 +30,70 @@ cJukeboxEntity::~cJukeboxEntity()
 
 void cJukeboxEntity::UsedBy(cPlayer * a_Player)
 {
-	if (m_Record == 0)
-	{
-		const cItem & HeldItem = a_Player->GetEquippedItem();
-		if (HeldItem.m_ItemType >= 2256 && HeldItem.m_ItemType <= 2267)
-		{
-			m_Record = HeldItem.m_ItemType;
-			a_Player->GetInventory().RemoveOneEquippedItem();
-			PlayRecord();
-		}
-	}
-	else
+	if (IsPlayingRecord())
 	{
 		EjectRecord();
 	}
+	else
+	{
+		const cItem & HeldItem = a_Player->GetEquippedItem();
+		if (PlayRecord(HeldItem.m_ItemType))
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
+	}
 }
 
 
 
 
 
-void cJukeboxEntity::PlayRecord(void)
+bool cJukeboxEntity::PlayRecord(int a_Record)
 {
+	if (!IsRecordItem(a_Record))
+	{
+		// This isn't a Record Item
+		return false;
+	}
+	if (IsPlayingRecord())
+	{
+		// A Record is already in the Jukebox.
+		EjectRecord();
+	}
+	m_Record = a_Record;
 	m_World->BroadcastSoundParticleEffect(1005, m_PosX, m_PosY, m_PosZ, m_Record);
+	m_World->SetBlockMeta(m_PosX, m_PosY, m_PosZ, E_META_JUKEBOX_ON);
+	return true;
 }
 
 
 
 
 
-void cJukeboxEntity::EjectRecord(void)
+bool cJukeboxEntity::EjectRecord(void)
 {
-	if ((m_Record < E_ITEM_FIRST_DISC) || (m_Record > E_ITEM_LAST_DISC))
+	if (!IsPlayingRecord())
 	{
 		// There's no record here
-		return;
+		return false;
 	}
 
 	cItems Drops;
 	Drops.push_back(cItem(m_Record, 1, 0));
+	m_Record = 0;
 	m_World->SpawnItemPickups(Drops, m_PosX + 0.5, m_PosY + 1, m_PosZ + 0.5, 8);
 	m_World->BroadcastSoundParticleEffect(1005, m_PosX, m_PosY, m_PosZ, 0);
-	m_Record = 0;
+	m_World->SetBlockMeta(m_PosX, m_PosY, m_PosZ, E_META_JUKEBOX_OFF);
+	return true;
+}
+
+
+
+
+
+bool cJukeboxEntity::IsPlayingRecord(void)
+{
+	return (m_Record != 0);
 }
 
 

@@ -133,11 +133,6 @@ cComposableGenerator::~cComposableGenerator()
 		delete *itr;
 	}
 	m_FinishGens.clear();
-	for (cStructureGenList::const_iterator itr = m_StructureGens.begin(); itr != m_StructureGens.end(); ++itr)
-	{
-		delete *itr;
-	}
-	m_StructureGens.clear();
 
 	delete m_CompositionGen;
 	m_CompositionGen = NULL;
@@ -164,7 +159,6 @@ void cComposableGenerator::Initialize(cIniFile & a_IniFile)
 	InitBiomeGen(a_IniFile);
 	InitHeightGen(a_IniFile);
 	InitCompositionGen(a_IniFile);
-	InitStructureGens(a_IniFile);
 	InitFinishGens(a_IniFile);
 }
 
@@ -201,14 +195,6 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 		m_CompositionGen->ComposeTerrain(a_ChunkDesc);
 	}
 
-	if (a_ChunkDesc.IsUsingDefaultStructures())
-	{	
-		for (cStructureGenList::iterator itr = m_StructureGens.begin(); itr != m_StructureGens.end(); ++itr)
-		{
-			(*itr)->GenStructures(a_ChunkDesc);
-		}   // for itr - m_StructureGens[]
-	}
-	
 	if (a_ChunkDesc.IsUsingDefaultFinish())
 	{
 		for (cFinishGenList::iterator itr = m_FinishGens.begin(); itr != m_FinishGens.end(); ++itr)
@@ -290,86 +276,26 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 
 
 
-void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
-{
-	AString Structures = a_IniFile.GetValueSet("Generator", "Structures", "Ravines, WormNestCaves, WaterLakes, LavaLakes, OreNests, Trees");
-
-	int Seed = m_ChunkGenerator.GetSeed();
-	AStringVector Str = StringSplitAndTrim(Structures, ",");
-	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
-	{
-		if (NoCaseCompare(*itr, "DualRidgeCaves") == 0)
-		{
-			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
-			m_StructureGens.push_back(new cStructGenDualRidgeCaves(Seed, Threshold));
-		}
-		else if (NoCaseCompare(*itr, "DirectOverhangs") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenDirectOverhangs(Seed));
-		}
-		else if (NoCaseCompare(*itr, "DistortedMembraneOverhangs") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenDistortedMembraneOverhangs(Seed));
-		}
-		else if (NoCaseCompare(*itr, "LavaLakes") == 0)
-		{
-			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
-			m_StructureGens.push_back(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_HeightGen, Probability));
-		}
-		else if (NoCaseCompare(*itr, "MarbleCaves") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenMarbleCaves(Seed));
-		}
-		else if (NoCaseCompare(*itr, "MineShafts") == 0)
-		{
-			int GridSize        = a_IniFile.GetValueSetI("Generator", "MineShaftsGridSize",        512);
-			int MaxSystemSize   = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxSystemSize",   160);
-			int ChanceCorridor  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCorridor",  600);
-			int ChanceCrossing  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCrossing",  200);
-			int ChanceStaircase = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceStaircase", 200);
-			m_StructureGens.push_back(new cStructGenMineShafts(
-				Seed, GridSize, MaxSystemSize, 
-				ChanceCorridor, ChanceCrossing, ChanceStaircase
-			));
-		}
-		else if (NoCaseCompare(*itr, "OreNests") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenOreNests(Seed));
-		}
-		else if (NoCaseCompare(*itr, "Ravines") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenRavines(Seed, 128));
-		}
-		else if (NoCaseCompare(*itr, "Trees") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen));
-		}
-		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
-		{
-			int Probability = a_IniFile.GetValueSetI("Generator", "WaterLakesProbability", 25);
-			m_StructureGens.push_back(new cStructGenLakes(Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, *m_HeightGen, Probability));
-		}
-		else if (NoCaseCompare(*itr, "WormNestCaves") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenWormNestCaves(Seed));
-		}
-		else
-		{
-			LOGWARNING("Unknown structure generator: \"%s\". Ignoring.", itr->c_str());
-		}
-	}  // for itr - Str[]
-}
-
-
-
-
-
 void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 {
 	int Seed = m_ChunkGenerator.GetSeed();
 	eDimension Dimension = StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld"));
 
-	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava,DeadBushes,PreSimulator");
+	// Older configuration used "Structures" in addition to "Finishers"; we don't distinguish between the two anymore (#398)
+	// Therefore, we load Structures from the ini file for compatibility, but move its contents over to Finishers:
+	AString Structures = a_IniFile.GetValue("Generator", "Structures", "");
+	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, LavaLakes, OreNests, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
+	if (!Structures.empty())
+	{
+		LOGINFO("[Generator].Structures is deprecated, moving the contents to [Generator].Finishers.");
+		// Structures used to generate before Finishers, so place them first:
+		Structures.append(", ");
+		Finishers = Structures + Finishers;
+		a_IniFile.SetValue("Generator", "Finishers", Finishers);
+	}
+	a_IniFile.DeleteValue("Generator", "Structures");
+
+	// Create all requested finishers:
 	AStringVector Str = StringSplitAndTrim(Finishers, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
@@ -384,13 +310,47 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_DEAD_BUSH, biDesert, 2, E_BLOCK_SAND, E_BLOCK_SAND));
 		}
+		else if (NoCaseCompare(*itr, "DirectOverhangs") == 0)
+		{
+			m_FinishGens.push_back(new cStructGenDirectOverhangs(Seed));
+		}
+		else if (NoCaseCompare(*itr, "DistortedMembraneOverhangs") == 0)
+		{
+			m_FinishGens.push_back(new cStructGenDistortedMembraneOverhangs(Seed));
+		}
+		else if (NoCaseCompare(*itr, "DualRidgeCaves") == 0)
+		{
+			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
+			m_FinishGens.push_back(new cStructGenDualRidgeCaves(Seed, Threshold));
+		}
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenIce);
 		}
+		else if (NoCaseCompare(*itr, "LavaLakes") == 0)
+		{
+			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
+			m_FinishGens.push_back(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_HeightGen, Probability));
+		}
 		else if (NoCaseCompare(*itr, "LavaSprings") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenFluidSprings(Seed, E_BLOCK_LAVA, a_IniFile, Dimension));
+		}
+		else if (NoCaseCompare(*itr, "MarbleCaves") == 0)
+		{
+			m_FinishGens.push_back(new cStructGenMarbleCaves(Seed));
+		}
+		else if (NoCaseCompare(*itr, "MineShafts") == 0)
+		{
+			int GridSize        = a_IniFile.GetValueSetI("Generator", "MineShaftsGridSize",        512);
+			int MaxSystemSize   = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxSystemSize",   160);
+			int ChanceCorridor  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCorridor",  600);
+			int ChanceCrossing  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCrossing",  200);
+			int ChanceStaircase = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceStaircase", 200);
+			m_FinishGens.push_back(new cStructGenMineShafts(
+				Seed, GridSize, MaxSystemSize, 
+				ChanceCorridor, ChanceCrossing, ChanceStaircase
+			));
 		}
 		else if (NoCaseCompare(*itr, "Lilypads") == 0)
 		{
@@ -400,9 +360,17 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenNetherClumpFoliage(Seed));
 		}
+		else if (NoCaseCompare(*itr, "OreNests") == 0)
+		{
+			m_FinishGens.push_back(new cStructGenOreNests(Seed));
+		}
 		else if (NoCaseCompare(*itr, "PreSimulator") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenPreSimulator);
+		}
+		else if (NoCaseCompare(*itr, "Ravines") == 0)
+		{
+			m_FinishGens.push_back(new cStructGenRavines(Seed, 128));
 		}
 		else if (NoCaseCompare(*itr, "Snow") == 0)
 		{
@@ -412,9 +380,26 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(Seed));
 		}
+		else if (NoCaseCompare(*itr, "Trees") == 0)
+		{
+			m_FinishGens.push_back(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen));
+		}
+		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
+		{
+			int Probability = a_IniFile.GetValueSetI("Generator", "WaterLakesProbability", 25);
+			m_FinishGens.push_back(new cStructGenLakes(Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, *m_HeightGen, Probability));
+		}
 		else if (NoCaseCompare(*itr, "WaterSprings") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenFluidSprings(Seed, E_BLOCK_WATER, a_IniFile, Dimension));
+		}
+		else if (NoCaseCompare(*itr, "WormNestCaves") == 0)
+		{
+			m_FinishGens.push_back(new cStructGenWormNestCaves(Seed));
+		}
+		else
+		{
+			LOGWARNING("Unknown Finisher in the [Generator] section: \"%s\". Ignoring.", itr->c_str());
 		}
 	}  // for itr - Str[]
 }

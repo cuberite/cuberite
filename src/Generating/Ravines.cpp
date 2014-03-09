@@ -117,7 +117,7 @@ void cStructGenRavines::ClearCache(void)
 
 
 
-void cStructGenRavines::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenRavines::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();

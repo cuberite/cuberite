@@ -38,7 +38,7 @@ void cSnowGolem::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		BLOCKTYPE BlockBelow = m_World->GetBlock((int) floor(GetPosX()), (int) floor(GetPosY()) - 1, (int) floor(GetPosZ()));
 		BLOCKTYPE Block = m_World->GetBlock((int) floor(GetPosX()), (int) floor(GetPosY()), (int) floor(GetPosZ()));
-		if (Block == E_BLOCK_AIR && g_BlockIsSolid[BlockBelow])
+		if (Block == E_BLOCK_AIR && cBlockInfo::IsSolid(BlockBelow))
 		{
 			m_World->SetBlock((int) floor(GetPosX()), (int) floor(GetPosY()), (int) floor(GetPosZ()), E_BLOCK_SNOW, 0);
 		}
