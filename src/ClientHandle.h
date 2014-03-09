@@ -46,7 +46,6 @@ class cClientHandle :  // tolua_export
 	public cSocketThreads::cCallback
 {											// tolua_export
 public:
-	static const int MAXBLOCKCHANGEINTERACTIONS = 20; // 5 didn't help, 10 still doesn't work in Creative, 20 seems to have done the trick
 	
 #if defined(ANDROID_NDK)
 	static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
@@ -321,6 +320,9 @@ private:
 
 	/** Number of explosions sent this tick */
 	int m_NumExplosionsThisTick;
+
+	/** Number of place or break interactions this tick */
+	int m_NumBlockChangeInteractionsThisTick;
 	
 	static int s_ClientCount;
 	int m_UniqueID;
