@@ -9,7 +9,7 @@
 
 
 cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType)
-	: cBlockHandler(a_BlockType)
+	: super(a_BlockType)
 {
 }
 

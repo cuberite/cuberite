@@ -11,6 +11,7 @@
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+#include "../Entities/Painting.h"
 
 
 
