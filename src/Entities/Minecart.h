@@ -122,7 +122,7 @@ public:
 	const cItem & GetSlot(int a_Idx) const { return m_Items[a_Idx]; }
 	cItem &       GetSlot(int a_Idx)       { return m_Items[a_Idx]; }
 	
-	void SetSlot(int a_Idx, const cItem & a_Item);
+	void SetSlot(size_t a_Idx, const cItem & a_Item);
 
 protected:
 

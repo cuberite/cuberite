@@ -34,13 +34,13 @@ public:
 	bool Write(const char * a_Bytes, size_t a_Count);
 	
 	/// Returns the number of bytes that can be successfully written to the ringbuffer
-	int  GetFreeSpace(void) const;
+	size_t GetFreeSpace(void) const;
 	
 	/// Returns the number of bytes that are currently in the ringbuffer. Note GetReadableBytes()
-	int  GetUsedSpace(void) const;
+	size_t GetUsedSpace(void) const;
 	
 	/// Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some data having been read already)
-	int  GetReadableSpace(void) const;
+	size_t GetReadableSpace(void) const;
 	
 	/// Returns the current data start index. For debugging purposes.
 	int  GetDataStart(void) const { return m_DataStart; }

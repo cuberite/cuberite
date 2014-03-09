@@ -44,10 +44,10 @@
 
 
 
-#if 0
+#ifdef SELF_TEST
 
 /// Self-test of the VarInt-reading and writing code
-class cByteBufferSelfTest
+static class cByteBufferSelfTest
 {
 public:
 	cByteBufferSelfTest(void)
@@ -177,15 +177,16 @@ bool cByteBuffer::Write(const char * a_Bytes, size_t a_Count)
 	CheckValid();
 
 	// Store the current free space for a check after writing:
-	int CurFreeSpace = GetFreeSpace();
-	int CurReadableSpace = GetReadableSpace();
-	int WrittenBytes = 0;
+	size_t CurFreeSpace = GetFreeSpace();
+	size_t CurReadableSpace = GetReadableSpace();
+	size_t WrittenBytes = 0;
 	
 	if (CurFreeSpace < a_Count)
 	{
 		return false;
 	}
-	int TillEnd = m_BufferSize - m_WritePos;
+	ASSERT(m_BufferSize >= m_WritePos);
+	size_t TillEnd = m_BufferSize - m_WritePos;
 	if (TillEnd <= a_Count)
 	{
 		// Need to wrap around the ringbuffer end
@@ -216,16 +217,20 @@ bool cByteBuffer::Write(const char * a_Bytes, size_t a_Count)
 
 
 
-int cByteBuffer::GetFreeSpace(void) const
+size_t cByteBuffer::GetFreeSpace(void) const
 {
 	CHECK_THREAD;
 	CheckValid();
 	if (m_WritePos >= m_DataStart)
 	{
 		// Wrap around the buffer end:
+		ASSERT(m_BufferSize >= m_WritePos);
+		ASSERT((m_BufferSize - m_WritePos + m_DataStart) >= 1);
 		return m_BufferSize - m_WritePos + m_DataStart - 1;
 	}
 	// Single free space partition:
+	ASSERT(m_BufferSize >= m_WritePos);
+	ASSERT(m_BufferSize - m_WritePos >= 1);
 	return m_DataStart - m_WritePos - 1;
 }
 
@@ -234,10 +239,12 @@ int cByteBuffer::GetFreeSpace(void) const
 
 
 /// Returns the number of bytes that are currently in the ringbuffer. Note GetReadableBytes()
-int cByteBuffer::GetUsedSpace(void) const
+size_t cByteBuffer::GetUsedSpace(void) const
 {
 	CHECK_THREAD;
 	CheckValid();
+	ASSERT(m_BufferSize >= GetFreeSpace());
+	ASSERT((m_BufferSize - GetFreeSpace()) >= 1);
 	return m_BufferSize - GetFreeSpace() - 1;
 }
 
@@ -246,16 +253,18 @@ int cByteBuffer::GetUsedSpace(void) const
 
 
 /// Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some data having been read already)
-int cByteBuffer::GetReadableSpace(void) const
+size_t cByteBuffer::GetReadableSpace(void) const
 {
 	CHECK_THREAD;
 	CheckValid();
 	if (m_ReadPos > m_WritePos)
 	{
 		// Wrap around the buffer end:
+		ASSERT(m_BufferSize >= m_ReadPos);
 		return m_BufferSize - m_ReadPos + m_WritePos;
 	}
 	// Single readable space partition:
+	ASSERT(m_WritePos >= m_ReadPos);
 	return m_WritePos - m_ReadPos ;
 }
 
@@ -654,11 +663,10 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
-	ASSERT(a_Count >= 0);
 	NEEDBYTES(a_Count);
 	char * Dst = (char *)a_Buffer;  // So that we can do byte math
-	int BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
-	ASSERT(BytesToEndOfBuffer >= 0);  // Sanity check
+	ASSERT(m_BufferSize >= m_ReadPos);
+	size_t BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
 	if (BytesToEndOfBuffer <= a_Count)
 	{
 		// Reading across the ringbuffer end, read the first part and adjust parameters:
@@ -688,10 +696,10 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
-	ASSERT(a_Count >= 0);
 	PUTBYTES(a_Count);
 	char * Src = (char *)a_Buffer;  // So that we can do byte math
-	int BytesToEndOfBuffer = m_BufferSize - m_WritePos;
+	ASSERT(m_BufferSize >= m_ReadPos);
+	size_t BytesToEndOfBuffer = m_BufferSize - m_WritePos;
 	if (BytesToEndOfBuffer <= a_Count)
 	{
 		// Reading across the ringbuffer end, read the first part and adjust parameters:
@@ -718,18 +726,18 @@ bool cByteBuffer::ReadString(AString & a_String, size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
-	ASSERT(a_Count >= 0);
 	NEEDBYTES(a_Count);
 	a_String.clear();
 	a_String.reserve(a_Count);
-	int BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
-	ASSERT(BytesToEndOfBuffer >= 0);  // Sanity check
+	ASSERT(m_BufferSize >= m_ReadPos);
+	size_t BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
 	if (BytesToEndOfBuffer <= a_Count)
 	{
 		// Reading across the ringbuffer end, read the first part and adjust parameters:
 		if (BytesToEndOfBuffer > 0)
 		{
 			a_String.assign(m_Buffer + m_ReadPos, BytesToEndOfBuffer);
+			ASSERT(a_Count >= BytesToEndOfBuffer);
 			a_Count -= BytesToEndOfBuffer;
 		}
 		m_ReadPos = 0;
@@ -771,7 +779,6 @@ bool cByteBuffer::SkipRead(size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
-	ASSERT(a_Count >= 0);
 	if (!CanReadBytes(a_Count))
 	{
 		return false;
@@ -809,6 +816,7 @@ bool cByteBuffer::ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes)
 		size_t num = (a_NumBytes > sizeof(buf)) ? sizeof(buf) : a_NumBytes;
 		VERIFY(ReadBuf(buf, num));
 		VERIFY(a_Dst.Write(buf, num));
+		ASSERT(a_NumBytes >= num);
 		a_NumBytes -= num;
 	}
 	return true;
@@ -846,13 +854,15 @@ void cByteBuffer::ReadAgain(AString & a_Out)
 	// Used by ProtoProxy to repeat communication twice, once for parsing and the other time for the remote party
 	CHECK_THREAD;
 	CheckValid();
-	int DataStart = m_DataStart;
+	size_t DataStart = m_DataStart;
 	if (m_ReadPos < m_DataStart)
 	{
 		// Across the ringbuffer end, read the first part and adjust next part's start:
+		ASSERT(m_BufferSize >= m_DataStart);
 		a_Out.append(m_Buffer + m_DataStart, m_BufferSize - m_DataStart);
 		DataStart = 0;
 	}
+	ASSERT(m_ReadPos >= DataStart);
 	a_Out.append(m_Buffer + DataStart, m_ReadPos - DataStart);
 }
 
