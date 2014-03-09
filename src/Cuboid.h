@@ -34,7 +34,8 @@ public:
 	Works on unsorted cuboids, too. */
 	int GetVolume(void) const;
 	
-	/** Returns true if the cuboids have at least one voxel in common. Both coords are considered inclusive. */
+	/** Returns true if the cuboids have at least one voxel in common. Both coords are considered inclusive.
+	Assumes both cuboids are sorted. */
 	bool DoesIntersect(const cCuboid & a_Other) const;
 
 	bool IsInside(const Vector3i & v)	const
@@ -64,7 +65,8 @@ public:
 		);
 	}
 	
-	/** Returns true if this cuboid is completely inside the specifie cuboid (in all 6 coords) */
+	/** Returns true if this cuboid is completely inside the specifie cuboid (in all 6 coords).
+	Assumes both cuboids are sorted. */
 	bool IsCompletelyInside(const cCuboid & a_Outer) const;
 	
 	/** Moves the cuboid by the specified offsets in each direction */
@@ -72,7 +74,7 @@ public:
 	
 	/** Expands the cuboid by the specified amount in each direction.
 	Works on unsorted cuboids as well.
-	Note that this function doesn't check for underflows. */
+	Note that this function doesn't check for underflows when using negative amounts. */
 	void Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 	
 	/** Clamps both X coords to the specified range. Works on unsorted cuboids, too. */
