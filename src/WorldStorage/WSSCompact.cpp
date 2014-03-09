@@ -39,7 +39,7 @@ struct cWSSCompact::sChunkHeader
 
 
 /// The maximum number of PAK files that are cached
-const int MAX_PAK_FILES = static_cast<cWSSCompact::cPAKFiles::size_type>(16);
+const size_t MAX_PAK_FILES = 16;
 
 /// The maximum number of unsaved chunks before the cPAKFile saves them to disk
 const int MAX_DIRTY_CHUNKS = 16;
