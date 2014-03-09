@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "FireSimulator.h"
@@ -334,7 +333,6 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 	for (size_t i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
 		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
 		int X = a_RelX + gNeighborCoords[i].x;
 		int Z = a_RelZ + gNeighborCoords[i].z;
 
@@ -343,7 +341,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 		{
 			continue;
 		}
-		Neighbour->GetBlockTypeMeta(X, a_RelY + gCrossCoords[i].y, Z, BlockType, BlockMeta);
+		BlockType = Neighbour->GetBlockTypeMeta(X, a_RelY + gCrossCoords[i].y, Z);
 
 		if (!IsFuel(BlockType))
 		{
