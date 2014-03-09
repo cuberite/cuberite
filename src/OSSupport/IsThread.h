@@ -34,7 +34,7 @@ protected:
 	
 public:
 	cIsThread(const AString & iThreadName);
-	~cIsThread();
+	virtual ~cIsThread();
 	
 	/// Starts the thread; returns without waiting for the actual start
 	bool Start(void);
