@@ -32,4 +32,7 @@ public:
 	virtual bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback) = 0;
 
 	virtual void SetTimeOfDay(Int64 a_TimeOfDay) = 0;
+
+	/** Sends the block on those coords to the player */
+	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer * a_Player) = 0;
 };

@@ -12,8 +12,10 @@
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
 
@@ -75,12 +77,14 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 		case E_BLOCK_CHEST:         SaveInto = "Chests";        break;
 		case E_BLOCK_DISPENSER:     SaveInto = "Dispensers";    break;
 		case E_BLOCK_DROPPER:       SaveInto = "Droppers";      break;
+		case E_BLOCK_FLOWER_POT:    SaveInto = "FlowerPots";    break;
 		case E_BLOCK_FURNACE:       SaveInto = "Furnaces";      break;
 		case E_BLOCK_SIGN_POST:     SaveInto = "Signs";         break;
 		case E_BLOCK_WALLSIGN:      SaveInto = "Signs";         break;
 		case E_BLOCK_NOTE_BLOCK:    SaveInto = "Notes";         break;
 		case E_BLOCK_JUKEBOX:       SaveInto = "Jukeboxes";     break;
 		case E_BLOCK_COMMAND_BLOCK: SaveInto = "CommandBlocks"; break;
+		case E_BLOCK_HEAD:          SaveInto = "MobHeads";      break;
 
 		default:
 		{
@@ -298,6 +302,21 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 		}
 	}  // for itr - AllDispensers[]
 
+	// Load Flowerpots:
+	Json::Value AllFlowerPots = a_Value.get("FlowerPots", Json::nullValue);
+	for (Json::Value::iterator itr = AllFlowerPots.begin(); itr != AllFlowerPots.end(); ++itr)
+	{
+		std::auto_ptr<cFlowerPotEntity> FlowerPotEntity(new cFlowerPotEntity(0, 0, 0, a_World));
+		if (!FlowerPotEntity->LoadFromJson(*itr))
+		{
+			LOGWARNING("ERROR READING FLOWERPOT FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(FlowerPotEntity.release());
+		}
+	}  // for itr - AllFlowerPots[]
+
 	// Load furnaces:
 	Json::Value AllFurnaces = a_Value.get("Furnaces", Json::nullValue);
 	for (Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr)
@@ -331,7 +350,7 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 
 	// Load note blocks:
 	Json::Value AllNotes = a_Value.get("Notes", Json::nullValue);
-	for( Json::Value::iterator itr = AllNotes.begin(); itr != AllNotes.end(); ++itr )
+	for (Json::Value::iterator itr = AllNotes.begin(); itr != AllNotes.end(); ++itr)
 	{
 		std::auto_ptr<cNoteEntity> NoteEntity(new cNoteEntity(0, 0, 0, a_World));
 		if (!NoteEntity->LoadFromJson(*itr))
@@ -346,7 +365,7 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 
 	// Load jukeboxes:
 	Json::Value AllJukeboxes = a_Value.get("Jukeboxes", Json::nullValue);
-	for( Json::Value::iterator itr = AllJukeboxes.begin(); itr != AllJukeboxes.end(); ++itr )
+	for (Json::Value::iterator itr = AllJukeboxes.begin(); itr != AllJukeboxes.end(); ++itr)
 	{
 		std::auto_ptr<cJukeboxEntity> JukeboxEntity(new cJukeboxEntity(0, 0, 0, a_World));
 		if (!JukeboxEntity->LoadFromJson(*itr))
@@ -361,7 +380,7 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 
 	// Load command blocks:
 	Json::Value AllCommandBlocks = a_Value.get("CommandBlocks", Json::nullValue);
-	for( Json::Value::iterator itr = AllCommandBlocks.begin(); itr != AllCommandBlocks.end(); ++itr )
+	for (Json::Value::iterator itr = AllCommandBlocks.begin(); itr != AllCommandBlocks.end(); ++itr)
 	{
 		std::auto_ptr<cCommandBlockEntity> CommandBlockEntity(new cCommandBlockEntity(0, 0, 0, a_World));
 		if (!CommandBlockEntity->LoadFromJson(*itr))
@@ -373,6 +392,21 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 			a_BlockEntities.push_back(CommandBlockEntity.release());
 		}
 	}  // for itr - AllCommandBlocks[]
+
+	// Load mob heads:
+	Json::Value AllMobHeads = a_Value.get("MobHeads", Json::nullValue);
+	for (Json::Value::iterator itr = AllMobHeads.begin(); itr != AllMobHeads.end(); ++itr)
+	{
+		std::auto_ptr<cMobHeadEntity> MobHeadEntity(new cMobHeadEntity(0, 0, 0, a_World));
+		if (!MobHeadEntity->LoadFromJson(*itr))
+		{
+			LOGWARNING("ERROR READING MOB HEAD FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(MobHeadEntity.release());
+		}
+	}  // for itr - AllMobHeads[]
 }
 
 

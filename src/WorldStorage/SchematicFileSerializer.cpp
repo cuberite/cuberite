@@ -1,10 +1,18 @@
 
+// SchematicFileSerializer.cpp
+
+// Implements the cSchematicFileSerializer class representing the interface to load and save cBlockArea to a .schematic file
+
 #include "Globals.h"
 
 #include "OSSupport/GZipFile.h"
 #include "FastNBT.h"
-
 #include "SchematicFileSerializer.h"
+#include "../StringCompression.h"
+
+
+
+
 
 bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
 {
@@ -40,53 +48,80 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, c
 
 
 
-bool cSchematicFileSerializer::SaveToSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
+bool cSchematicFileSerializer::LoadFromSchematicString(cBlockArea & a_BlockArea, const AString & a_SchematicData)
 {
-	cFastNBTWriter Writer("Schematic");
-	Writer.AddShort("Width",  a_BlockArea.m_SizeX);
-	Writer.AddShort("Height", a_BlockArea.m_SizeY);
-	Writer.AddShort("Length", a_BlockArea.m_SizeZ);
-	Writer.AddString("Materials", "Alpha");
-	if (a_BlockArea.HasBlockTypes())
+	// Uncompress the data:
+	AString UngzippedData;
+	if (UncompressStringGZIP(a_SchematicData.data(), a_SchematicData.size(), UngzippedData) != Z_OK)
 	{
-		Writer.AddByteArray("Blocks", (const char *)a_BlockArea.m_BlockTypes, a_BlockArea.GetBlockCount());
+		LOG("%s: Cannot unGZip the schematic data.", __FUNCTION__);
+		return false;
 	}
-	else
+
+	// Parse the NBT:
+	cParsedNBT NBT(UngzippedData.data(), UngzippedData.size());
+	if (!NBT.IsValid())
 	{
-		AString Dummy(a_BlockArea.GetBlockCount(), 0);
-		Writer.AddByteArray("Blocks", Dummy.data(), Dummy.size());
+		LOG("%s: Cannot parse the NBT in the schematic data.", __FUNCTION__);
+		return false;
 	}
-	if (a_BlockArea.HasBlockMetas())
+	
+	return LoadFromSchematicNBT(a_BlockArea, NBT);
+}
+
+
+
+
+
+bool cSchematicFileSerializer::SaveToSchematicFile(const cBlockArea & a_BlockArea, const AString & a_FileName)
+{
+	// Serialize into NBT data:
+	AString NBT = SaveToSchematicNBT(a_BlockArea);
+	if (NBT.empty())
 	{
-		Writer.AddByteArray("Data", (const char *)a_BlockArea.m_BlockMetas, a_BlockArea.GetBlockCount());
+		LOG("%s: Cannot serialize the area into an NBT representation for file \"%s\".", __FUNCTION__, a_FileName.c_str());
+		return false;
 	}
-	else
-	{
-		AString Dummy(a_BlockArea.GetBlockCount(), 0);
-		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
-	}
-	// TODO: Save entities and block entities
-	Writer.BeginList("Entities", TAG_Compound);
-	Writer.EndList();
-	Writer.BeginList("TileEntities", TAG_Compound);
-	Writer.EndList();
-	Writer.Finish();
 	
 	// Save to file
 	cGZipFile File;
 	if (!File.Open(a_FileName, cGZipFile::fmWrite))
 	{
-		LOG("Cannot open file \"%s\" for writing.", a_FileName.c_str());
+		LOG("%s: Cannot open file \"%s\" for writing.", __FUNCTION__, a_FileName.c_str());
 		return false;
 	}
-	if (!File.Write(Writer.GetResult()))
+	if (!File.Write(NBT))
 	{
-		LOG("Cannot write data to file \"%s\".", a_FileName.c_str());
+		LOG("%s: Cannot write data to file \"%s\".", __FUNCTION__, a_FileName.c_str());
 		return false;
 	}
 	return true;
 }
 
+
+
+
+
+
+bool cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_BlockArea, AString & a_Out)
+{
+	// Serialize into NBT data:
+	AString NBT = SaveToSchematicNBT(a_BlockArea);
+	if (NBT.empty())
+	{
+		LOG("%s: Cannot serialize the area into an NBT representation.", __FUNCTION__);
+		return false;
+	}
+	
+	// Gzip the data:
+	int res = CompressStringGZIP(NBT.data(), NBT.size(), a_Out);
+	if (res != Z_OK)
+	{
+		LOG("%s: Cannot Gzip the area data NBT representation: %d", __FUNCTION__, res);
+		return false;
+	}
+	return true;
+}
 
 
 
@@ -168,5 +203,47 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	
 	return true;
 }
+
+
+
+
+
+AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockArea)
+{
+	cFastNBTWriter Writer("Schematic");
+	Writer.AddShort("Width",  a_BlockArea.m_SizeX);
+	Writer.AddShort("Height", a_BlockArea.m_SizeY);
+	Writer.AddShort("Length", a_BlockArea.m_SizeZ);
+	Writer.AddString("Materials", "Alpha");
+	if (a_BlockArea.HasBlockTypes())
+	{
+		Writer.AddByteArray("Blocks", (const char *)a_BlockArea.m_BlockTypes, a_BlockArea.GetBlockCount());
+	}
+	else
+	{
+		AString Dummy(a_BlockArea.GetBlockCount(), 0);
+		Writer.AddByteArray("Blocks", Dummy.data(), Dummy.size());
+	}
+	if (a_BlockArea.HasBlockMetas())
+	{
+		Writer.AddByteArray("Data", (const char *)a_BlockArea.m_BlockMetas, a_BlockArea.GetBlockCount());
+	}
+	else
+	{
+		AString Dummy(a_BlockArea.GetBlockCount(), 0);
+		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
+	}
+	
+	// TODO: Save entities and block entities
+	Writer.BeginList("Entities", TAG_Compound);
+	Writer.EndList();
+	Writer.BeginList("TileEntities", TAG_Compound);
+	Writer.EndList();
+	Writer.Finish();
+	
+	return Writer.GetResult();
+}
+
+
 
 

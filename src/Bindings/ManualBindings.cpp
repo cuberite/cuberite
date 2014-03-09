@@ -23,6 +23,7 @@
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 #include "md5/md5.h"
 #include "../LineBlockTracer.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
@@ -2456,7 +2457,7 @@ static int tolua_cBlockArea_GetSize(lua_State * tolua_S)
 static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 {
 	// function cBlockArea::LoadFromSchematicFile
-	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cBlockArea") ||
@@ -2483,10 +2484,41 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 
 
 
+static int tolua_cBlockArea_LoadFromSchematicString(lua_State * tolua_S)
+{
+	// function cBlockArea::LoadFromSchematicString
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cBlockArea") ||
+		!L.CheckParamString  (2) ||
+		!L.CheckParamEnd     (3)
+	)
+	{
+		return 0;
+	}
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::LoadFromSchematicFile'", NULL);
+		return 0;
+	}
+
+	AString Data;
+	L.GetStackValue(2, Data);
+	bool res = cSchematicFileSerializer::LoadFromSchematicString(*self, Data);
+	tolua_pushboolean(tolua_S, res);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 {
 	// function cBlockArea::SaveToSchematicFile
-	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cBlockArea") ||
@@ -2506,6 +2538,38 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 	bool res = cSchematicFileSerializer::SaveToSchematicFile(*self,Filename);
 	tolua_pushboolean(tolua_S, res);
 	return 1;
+}
+
+
+
+
+
+static int tolua_cBlockArea_SaveToSchematicString(lua_State * tolua_S)
+{
+	// function cBlockArea::SaveToSchematicString
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cBlockArea") ||
+		!L.CheckParamEnd     (2)
+	)
+	{
+		return 0;
+	}
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::SaveToSchematicFile'", NULL);
+		return 0;
+	}
+	
+	AString Data;
+	if (cSchematicFileSerializer::SaveToSchematicString(*self, Data))
+	{
+		L.Push(Data);
+		return 1;
+	}
+	return 0;
 }
 
 
@@ -2775,12 +2839,14 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cBlockArea");
-			tolua_function(tolua_S, "GetBlockTypeMeta",      tolua_cBlockArea_GetBlockTypeMeta);
-			tolua_function(tolua_S, "GetOrigin",             tolua_cBlockArea_GetOrigin);
-			tolua_function(tolua_S, "GetRelBlockTypeMeta",   tolua_cBlockArea_GetRelBlockTypeMeta);
-			tolua_function(tolua_S, "GetSize",               tolua_cBlockArea_GetSize);
-			tolua_function(tolua_S, "LoadFromSchematicFile", tolua_cBlockArea_LoadFromSchematicFile);
-			tolua_function(tolua_S, "SaveToSchematicFile",   tolua_cBlockArea_SaveToSchematicFile);
+			tolua_function(tolua_S, "GetBlockTypeMeta",        tolua_cBlockArea_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetOrigin",               tolua_cBlockArea_GetOrigin);
+			tolua_function(tolua_S, "GetRelBlockTypeMeta",     tolua_cBlockArea_GetRelBlockTypeMeta);
+			tolua_function(tolua_S, "GetSize",                 tolua_cBlockArea_GetSize);
+			tolua_function(tolua_S, "LoadFromSchematicFile",   tolua_cBlockArea_LoadFromSchematicFile);
+			tolua_function(tolua_S, "LoadFromSchematicString", tolua_cBlockArea_LoadFromSchematicString);
+			tolua_function(tolua_S, "SaveToSchematicFile",     tolua_cBlockArea_SaveToSchematicFile);
+			tolua_function(tolua_S, "SaveToSchematicString",   tolua_cBlockArea_SaveToSchematicString);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cCompositeChat");
@@ -2819,7 +2885,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithFurnaceAt",           tolua_DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
 			tolua_function(tolua_S, "DoWithNoteBlockAt",         tolua_DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
 			tolua_function(tolua_S, "DoWithCommandBlockAt",      tolua_DoWithXYZ<cWorld, cCommandBlockEntity, &cWorld::DoWithCommandBlockAt>);
-			tolua_function(tolua_S, "DoWithMobHeadBlockAt",      tolua_DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadBlockAt>);
+			tolua_function(tolua_S, "DoWithMobHeadAt",           tolua_DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
+			tolua_function(tolua_S, "DoWithFlowerPotAt",         tolua_DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
 			tolua_function(tolua_S, "DoWithPlayer",              tolua_DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",       tolua_DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk", tolua_ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);

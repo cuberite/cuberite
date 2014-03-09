@@ -19,17 +19,13 @@ public:
 	{
 		switch(m_ItemType)
 		{
-		case E_ITEM_WOODEN_PICKAXE:
-		case E_ITEM_GOLD_PICKAXE:
-			return 1;
-		case E_ITEM_STONE_PICKAXE:
-			return 2;
-		case E_ITEM_IRON_PICKAXE:
-			return 3;
-		case E_ITEM_DIAMOND_PICKAXE:
-			return 4;
-		default:
-			return 0;
+			case E_ITEM_WOODEN_PICKAXE:  return 1;
+			case E_ITEM_GOLD_PICKAXE:    return 1;
+			case E_ITEM_STONE_PICKAXE:   return 2;
+			case E_ITEM_IRON_PICKAXE:    return 3;
+			case E_ITEM_DIAMOND_PICKAXE: return 4;
+
+			default: return 0;
 		}
 	}
 	
@@ -61,6 +57,10 @@ public:
 				return PickaxeLevel() >= 2;
 			}
 			
+			case E_BLOCK_ANVIL:
+			case E_BLOCK_ENCHANTMENT_TABLE:
+			case E_BLOCK_FURNACE:
+			case E_BLOCK_LIT_FURNACE:
 			case E_BLOCK_COAL_ORE:
 			case E_BLOCK_STONE:
 			case E_BLOCK_COBBLESTONE:

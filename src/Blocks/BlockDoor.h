@@ -4,18 +4,21 @@
 #include "BlockHandler.h"
 #include "../Entities/Player.h"
 #include "Chunk.h"
+#include "MetaRotater.h"
 
 
 
 
 class cBlockDoorHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>
 {
+	typedef cMetaRotater<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true> super;
 public:
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override;
 	virtual const char * GetStepSound(void) override;
 	
 	
@@ -166,6 +169,60 @@ public:
 		}
 	}
 	
+	
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		if (a_Meta & 0x08) 
+		{
+			return a_Meta;
+		}
+		else
+		{
+			return super::MetaRotateCCW(a_Meta);
+		}
+	}
+	
+	
+	
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		if (a_Meta & 0x08) 
+		{
+			return a_Meta;
+		}
+		else
+		{
+			return super::MetaRotateCW(a_Meta);
+		}
+	}
+	
+	
+	
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		if (a_Meta & 0x08) 
+		{
+			return a_Meta;
+		}
+		else
+		{
+			return super::MetaMirrorXY(a_Meta);
+		}
+	}
+	
+	
+	
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		if (a_Meta & 0x08) 
+		{
+			return a_Meta;
+		}
+		else
+		{
+			return super::MetaMirrorYZ(a_Meta);
+		}
+	}
 	
 } ;
 
