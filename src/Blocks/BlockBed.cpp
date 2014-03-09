@@ -122,7 +122,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 				else
 				{
 					// Is foot end
-					VERIFY((Meta & 0x4) != 1); // Occupied flag should never be set, else our compilator (intended) is broken
+					VERIFY((Meta & 0x4) != 0x4); // Occupied flag should never be set, else our compilator (intended) is broken
 
 					PillowDirection = MetaDataToDirection(Meta & 0x7);
 					if (a_ChunkInterface.GetBlock(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z) == E_BLOCK_BED) // Must always use pillow location for sleeping
