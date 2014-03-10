@@ -288,13 +288,13 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 // Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
-AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8)
+AString & RawBEToUTF8(const char * a_RawData, int a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
 	a_UTF8.reserve(3 * a_NumShorts / 2);  // a quick guess of the resulting size
 	for (int i = 0; i < a_NumShorts; i++)
 	{
-		int c = ntohs(*(a_RawData + i));
+		int c = GetBEShort(a_RawData + i*2);
 		if (c < 0x80)
 		{
 			a_UTF8.push_back((char)c);
@@ -364,10 +364,7 @@ Notice from the original file:
 
 #define UNI_MAX_BMP         0x0000FFFF
 #define UNI_MAX_UTF16       0x0010FFFF
-#define UNI_MAX_UTF32       0x7FFFFFFF
-#define UNI_MAX_LEGAL_UTF32 0x0010FFFF
 #define UNI_SUR_HIGH_START  0xD800
-#define UNI_SUR_HIGH_END    0xDBFF
 #define UNI_SUR_LOW_START   0xDC00
 #define UNI_SUR_LOW_END     0xDFFF
 

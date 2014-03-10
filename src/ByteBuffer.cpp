@@ -767,7 +767,7 @@ bool cByteBuffer::ReadUTF16String(AString & a_String, int a_NumChars)
 	{
 		return false;
 	}
-	RawBEToUTF8((short *)(RawData.data()), a_NumChars, a_String);
+	RawBEToUTF8((RawData.data()), a_NumChars, a_String);
 	return true;
 }
 
