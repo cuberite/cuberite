@@ -234,9 +234,10 @@ template class SizeChecker<UInt16, 2>;
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
 
-
-
-
+// Same as assert but in all Self test builds
+#ifdef SELF_TEST
+#define assert_test(x) ( !!(x) || (assert(0), exit(1), 0))
+#endif
 
 /// A generic interface used mainly in ForEach() functions
 template <typename Type> class cItemCallback

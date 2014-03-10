@@ -46,9 +46,6 @@
 
 #ifdef SELF_TEST
 
-#define assert_test(x) ( !!(x) || \
-	LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), abort(1))
-
 /// Self-test of the VarInt-reading and writing code
 static class cByteBufferSelfTest
 {

@@ -192,7 +192,9 @@ void cCraftingGrid::Dump(void)
 {
 	for (int y = 0; y < m_Height; y++) for (int x = 0; x < m_Width; x++)
 	{
+		#ifdef _DEBUG
 		int idx = x + m_Width * y;
+		#endif
 		LOGD("Slot (%d, %d): Type %d, health %d, count %d", 
 			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemDamage, m_Items[idx].m_ItemCount
 		);
