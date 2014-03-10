@@ -177,6 +177,25 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	a_BlockArea.Clear();
 	a_BlockArea.SetSize(SizeX, SizeY, SizeZ, AreMetasPresent ? (cBlockArea::baTypes | cBlockArea::baMetas) : cBlockArea::baTypes);
 	
+	int TOffsetX = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetX");
+	int TOffsetY = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetY");
+	int TOffsetZ = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetZ");
+	
+	if (
+		(TOffsetX < 0) || (TOffsetY < 0) || (TOffsetZ < 0) ||
+		(a_NBT.GetType(TOffsetX) != TAG_Int) ||
+		(a_NBT.GetType(TOffsetY) != TAG_Int) ||
+		(a_NBT.GetType(TOffsetZ) != TAG_Int)
+	)
+	{
+		// Not every schematic file has an offset, so we shoudn't give a warn message.
+		a_BlockArea.SetOffset(0, 0, 0);
+	}
+	else
+	{
+		a_BlockArea.SetOffset(a_NBT.GetInt(TOffsetX), a_NBT.GetInt(TOffsetY), a_NBT.GetInt(TOffsetZ));
+	}
+
 	// Copy the block types and metas:
 	int NumBytes = a_BlockArea.m_SizeX * a_BlockArea.m_SizeY * a_BlockArea.m_SizeZ;
 	if (a_NBT.GetDataLength(TBlockTypes) < NumBytes)
@@ -234,6 +253,10 @@ AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockA
 		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
 	}
 	
+	Writer.AddInt("WEOffsetX", a_BlockArea.m_Offset.x);
+	Writer.AddInt("WEOffsetY", a_BlockArea.m_Offset.y);
+	Writer.AddInt("WEOffsetZ", a_BlockArea.m_Offset.z);
+
 	// TODO: Save entities and block entities
 	Writer.BeginList("Entities", TAG_Compound);
 	Writer.EndList();
