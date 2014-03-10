@@ -20,13 +20,14 @@ class cPOCPiece :
 	public cPiece
 {
 public:
-	cPOCPiece(int a_Size) :
-		m_Size(a_Size)
+	cPOCPiece(int a_SizeXZ, int a_Height) :
+		m_SizeXZ(a_SizeXZ),
+		m_Height(a_Height)
 	{
-		m_Connectors.push_back(cConnector(m_Size / 2, 1, 0,          0, BLOCK_FACE_ZM));
-		m_Connectors.push_back(cConnector(m_Size / 2, 1, m_Size - 1, 1, BLOCK_FACE_ZP));
-		m_Connectors.push_back(cConnector(0,          1, m_Size / 2, 2, BLOCK_FACE_XM));
-		m_Connectors.push_back(cConnector(m_Size - 1, 1, m_Size / 2, m_Size % 3, BLOCK_FACE_XP));
+		m_Connectors.push_back(cConnector(m_SizeXZ / 2, a_Height / 2, 0,            0,            BLOCK_FACE_ZM));
+		m_Connectors.push_back(cConnector(m_SizeXZ / 2, a_Height / 2, m_SizeXZ - 1, 1,            BLOCK_FACE_ZP));
+		m_Connectors.push_back(cConnector(0,            a_Height / 2, m_SizeXZ / 2, 2,            BLOCK_FACE_XM));
+		m_Connectors.push_back(cConnector(m_SizeXZ - 1, a_Height - 1, m_SizeXZ / 2, m_SizeXZ % 3, BLOCK_FACE_XP));
 	}
 	
 	
@@ -38,7 +39,7 @@ public:
 		Vector3i Min = a_Pos;
 		Min.Move(-BlockX, 0, -BlockZ);
 		Vector3i Max = Min;
-		Max.Move(m_Size - 1, 2, m_Size - 1);
+		Max.Move(m_SizeXZ - 1, m_Height - 1, m_SizeXZ - 1);
 		ASSERT(Min.x < cChunkDef::Width);
 		ASSERT(Min.z < cChunkDef::Width);
 		ASSERT(Max.x >= 0);
@@ -46,22 +47,22 @@ public:
 		if (Min.x >= 0)
 		{
 			// Draw the XM wall:
-			a_ChunkDesc.FillRelCuboid(Min.x, Min.x, Min.y, Max.y, Min.z, Max.z, E_BLOCK_STAINED_GLASS, m_Size % 16);
+			a_ChunkDesc.FillRelCuboid(Min.x, Min.x, Min.y, Max.y, Min.z, Max.z, E_BLOCK_STAINED_GLASS, m_SizeXZ % 16);
 		}
 		if (Min.z >= 0)
 		{
 			// Draw the ZM wall:
-			a_ChunkDesc.FillRelCuboid(Min.x, Max.x, Min.y, Max.y, Min.z, Min.z, E_BLOCK_STAINED_GLASS, m_Size % 16);
+			a_ChunkDesc.FillRelCuboid(Min.x, Max.x, Min.y, Max.y, Min.z, Min.z, E_BLOCK_STAINED_GLASS, m_SizeXZ % 16);
 		}
 		if (Max.x < cChunkDef::Width)
 		{
 			// Draw the XP wall:
-			a_ChunkDesc.FillRelCuboid(Max.x, Max.x, Min.y, Max.y, Min.z, Max.z, E_BLOCK_STAINED_GLASS, m_Size % 16);
+			a_ChunkDesc.FillRelCuboid(Max.x, Max.x, Min.y, Max.y, Min.z, Max.z, E_BLOCK_STAINED_GLASS, m_SizeXZ % 16);
 		}
 		if (Max.z < cChunkDef::Width)
 		{
 			// Draw the ZP wall:
-			a_ChunkDesc.FillRelCuboid(Min.x, Max.x, Min.y, Max.y, Max.z, Max.z, E_BLOCK_STAINED_GLASS, m_Size % 16);
+			a_ChunkDesc.FillRelCuboid(Min.x, Max.x, Min.y, Max.y, Max.z, Max.z, E_BLOCK_STAINED_GLASS, m_SizeXZ % 16);
 		}
 		
 		// Draw all the connectors:
@@ -100,7 +101,8 @@ public:
 	}
 	
 protected:
-	int m_Size;
+	int m_SizeXZ;
+	int m_Height;
 	cConnectors m_Connectors;
 	
 	// cPiece overrides:
@@ -111,12 +113,12 @@ protected:
 	
 	virtual Vector3i GetSize(void) const override
 	{
-		return Vector3i(m_Size, 3, m_Size);
+		return Vector3i(m_SizeXZ, m_Height, m_SizeXZ);
 	}
 	
 	virtual cCuboid GetHitBox(void) const override
 	{
-		return cCuboid(0, 0, 0, m_Size - 1, 2, m_Size - 1);
+		return cCuboid(0, 0, 0, m_SizeXZ - 1, m_Height - 1, m_SizeXZ - 1);
 	}
 	
 	virtual bool CanRotateCCW(int a_NumRotations) const override
@@ -153,9 +155,10 @@ cPOCPieceGenerator::cPOCPieceGenerator(int a_Seed) :
 	m_Seed(a_Seed)
 {
 	// Prepare a vector of available pieces:
-	m_AvailPieces.push_back(new cPOCPiece(5));
-	m_AvailPieces.push_back(new cPOCPiece(7));
-	m_AvailPieces.push_back(new cPOCPiece(9));
+	m_AvailPieces.push_back(new cPOCPiece(5, 3));
+	m_AvailPieces.push_back(new cPOCPiece(7, 5));
+	m_AvailPieces.push_back(new cPOCPiece(9, 5));
+	m_AvailPieces.push_back(new cPOCPiece(5, 7));
 	
 	// Generate the structure:
 	cBFSPieceGenerator Gen(*this, a_Seed);
