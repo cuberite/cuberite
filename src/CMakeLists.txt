@@ -1,4 +1,3 @@
-
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
@@ -8,7 +7,6 @@ include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
 
 set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating) 
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities)
-
 
 
 if (NOT MSVC)
