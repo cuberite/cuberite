@@ -20,8 +20,8 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 			a_Writer.AddByte("Flicker", a_FireworkItem.m_HasFlicker);
 			a_Writer.AddByte("Trail", a_FireworkItem.m_HasTrail);
 			a_Writer.AddByte("Type", a_FireworkItem.m_Type);
-			a_Writer.AddIntArray("Colors", a_FireworkItem.m_Colours.data(), a_FireworkItem.m_Colours.size());
-			a_Writer.AddIntArray("FadeColors", a_FireworkItem.m_FadeColours.data(), a_FireworkItem.m_FadeColours.size());
+			a_Writer.AddIntArray("Colors", &(a_FireworkItem.m_Colours[0]), a_FireworkItem.m_Colours.size());
+			a_Writer.AddIntArray("FadeColors", &(a_FireworkItem.m_FadeColours[0]), a_FireworkItem.m_FadeColours.size());
 			a_Writer.EndCompound();
 			a_Writer.EndList();
 			a_Writer.EndCompound();
@@ -35,11 +35,11 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 			a_Writer.AddByte("Type", a_FireworkItem.m_Type);
 			if (!a_FireworkItem.m_Colours.empty())
 			{
-				a_Writer.AddIntArray("Colors", a_FireworkItem.m_Colours.data(), a_FireworkItem.m_Colours.size());
+				a_Writer.AddIntArray("Colors", &(a_FireworkItem.m_Colours[0]), a_FireworkItem.m_Colours.size());
 			}
 			if (!a_FireworkItem.m_FadeColours.empty())
 			{
-				a_Writer.AddIntArray("FadeColors", a_FireworkItem.m_FadeColours.data(), a_FireworkItem.m_FadeColours.size());
+				a_Writer.AddIntArray("FadeColors", &(a_FireworkItem.m_FadeColours[0]), a_FireworkItem.m_FadeColours.size());
 			}
 			a_Writer.EndCompound();
 			break;
