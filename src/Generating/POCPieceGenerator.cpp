@@ -2,7 +2,7 @@
 // POCPieceGenerator.cpp
 
 // Implements the cPOCPieceGenerator class representing a Proof-Of_Concept structure generator using the cPieceGenerator technique
-// The generator generates a maze of rooms at {0, 100, 0}
+// The generator generates a maze of rooms at {0, 50, 0}
 
 #include "Globals.h"
 #include "POCPieceGenerator.h"
@@ -131,6 +131,7 @@ protected:
 
 
 
+/*
 static void DebugPieces(const cPlacedPieces & a_Pieces)
 {
 	size_t idx = 0;
@@ -143,6 +144,7 @@ static void DebugPieces(const cPlacedPieces & a_Pieces)
 		);
 	}  // for itr - a_Pieces[]
 }
+//*/
 
 
 
