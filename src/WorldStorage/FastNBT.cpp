@@ -510,7 +510,7 @@ void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, si
 	size_t size = m_Result.length();
 	if ((cap - size) < (4 + a_NumElements * 4))
 	{
-		m_Result.reserve(size +4 + a_NumElements * 4);
+		m_Result.reserve(size + 4 + (a_NumElements * 4));
 	}
 	m_Result.append((const char *)&len, 4);
 	for (size_t i = 0; i < a_NumElements; i++)

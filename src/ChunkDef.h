@@ -124,9 +124,7 @@ public:
 			(z < Width)  && (z > -1)
 		)
 		{
-			return MakeIndexNoCheck(static_cast<unsigned int>(x), 
-				static_cast<unsigned int>(y), 
-				static_cast<unsigned int>(z));
+			return MakeIndexNoCheck(x, y, z);
 		}
 		LOGERROR("cChunkDef::MakeIndex(): coords out of range: {%d, %d, %d}; returning fake index 0", x, y, z);
 		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
@@ -134,13 +132,13 @@ public:
 	}
 
 
-	inline static unsigned int MakeIndexNoCheck(unsigned int x, unsigned int y, unsigned int z)
+	inline static unsigned int MakeIndexNoCheck(int x, int y, int z)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
-			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width); // 1.2 is XZY
+			return static_cast<unsigned int>(x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width)); // 1.2 is XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width); // 1.1 is YZX
+			return static_cast<unsigned int>(y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width)); // 1.1 is YZX
 		#endif
 	}
 
@@ -168,9 +166,7 @@ public:
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_BlockTypes[MakeIndexNoCheck(static_cast<unsigned int>(a_X), 
-			static_cast<unsigned int>(a_Y), 
-			static_cast<unsigned int>(a_Z))] = a_Type;
+		a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)] = a_Type;
 	}
 	
 	
@@ -186,9 +182,7 @@ public:
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_BlockTypes[MakeIndexNoCheck(static_cast<unsigned int>(a_X), 
-			static_cast<unsigned int>(a_Y), 
-			static_cast<unsigned int>(a_Z))];
+		return a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)];
 	}
 	
 	
@@ -246,9 +240,7 @@ public:
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			unsigned int Index = MakeIndexNoCheck(static_cast<unsigned int>(x),
-				static_cast<unsigned int>(y),
-				static_cast<unsigned int>(z));
+			unsigned int Index = MakeIndexNoCheck(x, y, z);
 			return (a_Buffer[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
@@ -282,9 +274,7 @@ public:
 			return;
 		}
 
-		unsigned int Index = MakeIndexNoCheck(static_cast<unsigned int>(x),
-			static_cast<unsigned int>(y),
-			static_cast<unsigned int>(z));
+		unsigned int Index = MakeIndexNoCheck(x, y, z);
 		a_Buffer[Index / 2] = static_cast<NIBBLETYPE>(
 			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set

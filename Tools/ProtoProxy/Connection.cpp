@@ -2697,7 +2697,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 	a_Metadata.push_back(x);
 	while (x != 0x7f)
 	{
-		//int Index = ((unsigned)((unsigned char)x)) & 0x1f;  // Lower 5 bits = index
+		// int Index = ((unsigned)((unsigned char)x)) & 0x1f;  // Lower 5 bits = index
 		int Type  = ((unsigned)((unsigned char)x)) >> 5;    // Upper 3 bits = type
 		int Length = 0;
 		switch (Type)

@@ -294,7 +294,7 @@ AString & RawBEToUTF8(const char * a_RawData, int a_NumShorts, AString & a_UTF8)
 	a_UTF8.reserve(3 * a_NumShorts / 2);  // a quick guess of the resulting size
 	for (int i = 0; i < a_NumShorts; i++)
 	{
-		int c = GetBEShort(a_RawData + i*2);
+		int c = GetBEShort(&a_RawData[i * 2]);
 		if (c < 0x80)
 		{
 			a_UTF8.push_back((char)c);
