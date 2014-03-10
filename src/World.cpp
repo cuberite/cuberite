@@ -1725,10 +1725,10 @@ int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType
 
 
 
-void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec, double a_InitialVelocityCoeff)
+void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
 	UNUSED(a_InitialVelocityCoeff);
-	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTimeInSec);
+	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
 	TNT->Initialize(this);
 	TNT->SetSpeed(
 		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /** -1, 0, 1 */
@@ -2983,9 +2983,9 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 
 
-int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const Vector3d * a_Speed)
+int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem a_Item, const Vector3d * a_Speed)
 {
-	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Speed);
+	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
 	if (Projectile == NULL)
 	{
 		return -1;
@@ -3008,18 +3008,18 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
-		size_t LastSpace = a_Text.find_last_of(" "); //Find the position of the last space
+		size_t LastSpace = a_Text.find_last_of(" "); // Find the position of the last space
 		
-		std::string LastWord = a_Text.substr(LastSpace + 1, a_Text.length()); //Find the last word
-		std::string PlayerName ((*itr)->GetName());
-		std::size_t Found = PlayerName.find(LastWord); //Try to find last word in playername
+		AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length()); // Find the last word
+		AString PlayerName ((*itr)->GetName());
+		size_t Found = PlayerName.find(LastWord); // Try to find last word in playername
 		
-		if (Found!=0)
+		if (Found == AString::npos)
 		{
-			continue; //No match
+			continue; // No match
 		}
 		
-		a_Results.push_back((*itr)->GetName()); //Match!
+		a_Results.push_back(PlayerName); // Match!
 	}
 }
 

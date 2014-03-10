@@ -1,7 +1,7 @@
 Code Stuff
 ----------
 
- * We use C++03
+ * We use C++03 with some C++11 extensions (ask if you think that something would be useful)
  * Use the provided wrappers for OS stuff:
   - Threading is done by inheriting from `cIsThread`, thread synchronization through `cCriticalSection`, `cSemaphore` and `cEvent`, file access and filesystem operations through the `cFile` class, high-precision timers through `cTimer`, high-precision sleep through `cSleep`
  * No magic numbers, use named constants:

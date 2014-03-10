@@ -65,8 +65,8 @@ public:
 	enum
 	{
 		// Chunk dimensions:
-		Width = 16,
-		Height = 256,
+		Width = 16U,
+		Height = 256U,
 		NumBlocks = Width * Height * Width,
 		
 		/// If the data is collected into a single buffer, how large it needs to be:
@@ -132,7 +132,7 @@ public:
 	}
 
 
-	inline static unsigned int MakeIndexNoCheck(int x, int y, int z)
+	inline static unsigned int MakeIndexNoCheck(unsigned int x, unsigned int y, unsigned int z)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
@@ -240,7 +240,7 @@ public:
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			int Index = MakeIndexNoCheck(x, y, z);
+			unsigned int Index = MakeIndexNoCheck(x, y, z);
 			return (a_Buffer[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
@@ -256,7 +256,7 @@ public:
 			return;
 		}
 		a_Buffer[a_BlockIdx / 2] = (
-			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
+			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> (static_cast<NIBBLETYPE>(a_BlockIdx & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
 		);
 	}
@@ -282,13 +282,13 @@ public:
 	}
 
 
-	inline static char GetNibble(const NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos )
+	inline static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos )
 	{
 		return GetNibble(a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
 	}
 	
 	
-	inline static void SetNibble(NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos, char a_Value )
+	inline static void SetNibble(NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos, NIBBLETYPE a_Value )
 	{
 		SetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Value );
 	}
@@ -306,6 +306,9 @@ The virtual methods are called in the same order as they're declared here.
 class cChunkDataCallback abstract
 {
 public:
+
+	virtual ~cChunkDataCallback() {}
+
 	/** Called before any other callbacks to inform of the current coords 
 	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()). 
 	If false is returned, the chunk is skipped.
