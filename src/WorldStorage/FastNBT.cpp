@@ -506,22 +506,18 @@ void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, si
 {
 	TagCommon(a_Name, TAG_IntArray);
 	Int32 len = htonl(a_NumElements);
+	size_t cap = m_Result.capacity();
+	size_t size = m_Result.length();
+	if ((cap - size) < (4 + a_NumElements * 4))
+	{
+		m_Result.reserve(size +4 + a_NumElements * 4);
+	}
 	m_Result.append((const char *)&len, 4);
-#if defined(ANDROID_NDK)
-	// Android has alignment issues - cannot byteswap (htonl) an int that is not 32-bit-aligned, which happens in the regular version
 	for (size_t i = 0; i < a_NumElements; i++)
 	{
 		int Element = htonl(a_Value[i]);
 		m_Result.append((const char *)&Element, 4);
 	}
-#else
-	int * Elements = (int *)(m_Result.data() + m_Result.size());
-	m_Result.append(a_NumElements * 4, (char)0);
-	for (size_t i = 0; i < a_NumElements; i++)
-	{
-		Elements[i] = htonl(a_Value[i]);
-	}
-#endif
 }
 
 
