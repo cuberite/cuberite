@@ -54,11 +54,20 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ)
 	);
 	
-	NIBBLETYPE MyMeta = a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ);
-	if (!IsAnyFluidBlock(a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ)))
+	BLOCKTYPE MyBlock; NIBBLETYPE MyMeta;
+	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta);
+
+	if (!IsAnyFluidBlock(MyBlock))
 	{
 		// Can happen - if a block is scheduled for simulating and gets replaced in the meantime.
 		FLOG("  BadBlockType exit");
+		return;
+	}
+
+	// When in contact with water, lava should harden
+	if (HardenBlock(a_Chunk, a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta))
+	{
+		// Block was changed, bail out
 		return;
 	}
 
@@ -86,7 +95,12 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		{
 			// Spread only down, possibly washing away what's there or turning lava to stone / cobble / obsidian:
 			SpreadToNeighbor(a_Chunk, a_RelX, a_RelY - 1, a_RelZ, 8);
-			SpreadFurther = false;
+
+			// Source blocks spread both downwards and sideways
+			if (MyMeta != 0)
+			{
+				SpreadFurther = false;
+			}
 		}
 		// If source creation is on, check for it here:
 		else if (
@@ -105,16 +119,24 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 	if (SpreadFurther && (NewMeta < 8))
 	{
 		// Spread to the neighbors:
-		SpreadToNeighbor(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     NewMeta);
-		SpreadToNeighbor(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     NewMeta);
-		SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, NewMeta);
-		SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, NewMeta);
+		Spread(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
 	}
 	
 	// Mark as processed:
 	a_Chunk->FastSetBlock(a_RelX, a_RelY, a_RelZ, m_StationaryFluidBlock, MyMeta);
 }
 
+
+
+
+
+void cFloodyFluidSimulator::Spread(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta)
+{
+	SpreadToNeighbor(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, a_NewMeta);
+}
 
 
 
@@ -296,6 +318,8 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		a_NewMeta
 	);
 	a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
+
+	HardenBlock(a_NearChunk, a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
 }
 
 
@@ -345,6 +369,59 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 	return false;
 }
 
+
+
+
+
+bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+{
+	// Only lava blocks can harden
+	if (!IsBlockLava(a_BlockType))
+	{
+		return false;
+	}
+
+	bool ShouldHarden = false;
+
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	static const Vector3i Coords[] =
+	{
+		Vector3i( 1, 0,  0),
+		Vector3i(-1, 0,  0),
+		Vector3i( 0, 0,  1),
+		Vector3i( 0, 0, -1),
+	};
+	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+	{
+		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+		{
+			continue;
+		}
+		if (IsBlockWater(BlockType))
+		{
+			ShouldHarden = true;
+		}
+	}  // for i - Coords[]
+
+	if (ShouldHarden)
+	{
+		if (a_Meta == 0)
+		{
+			// Source lava block
+			a_Chunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_OBSIDIAN, 0);
+			return true;
+		}
+		// Ignore last lava level
+		else if (a_Meta <= 4)
+		{
+			a_Chunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_COBBLESTONE, 0);
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
 

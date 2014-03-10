@@ -2,17 +2,17 @@
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "MetaRotater.h"
 
 
 
 
 class cBlockStairsHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>
 {
 public:
 	cBlockStairsHandler(BLOCKTYPE a_BlockType) :
-		cBlockHandler(a_BlockType)
+		cMetaRotater<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>(a_BlockType)
 	{
 
 	}
@@ -25,6 +25,14 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
+		UNUSED(a_ChunkInterface);
+		UNUSED(a_BlockX);
+		UNUSED(a_BlockY);
+		UNUSED(a_BlockZ);
+		UNUSED(a_CursorX);
+		UNUSED(a_CursorY);
+		UNUSED(a_CursorZ);
+		UNUSED(a_BlockMeta);
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RotationToMetaData(a_Player->GetYaw());
 		switch (a_BlockFace)
@@ -96,54 +104,6 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
-	{
-		// Bits 3 and 4 stay, the rest is swapped around according to a table:
-		NIBBLETYPE TopBits = (a_Meta & 0x0c);
-		switch (a_Meta & 0x03)
-		{
-			case 0x00: return TopBits | 0x03;  // East -> North
-			case 0x01: return TopBits | 0x02;  // West -> South
-			case 0x02: return TopBits | 0x00;  // South -> East
-			case 0x03: return TopBits | 0x01;  // North -> West
-		}
-		// Not reachable, but to avoid a compiler warning:
-		return 0;
-	}
-
-
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
-	{
-		// Bits 3 and 4 stay, the rest is swapped around according to a table:
-		NIBBLETYPE TopBits = (a_Meta & 0x0c);
-		switch (a_Meta & 0x03)
-		{
-			case 0x00: return TopBits | 0x02;  // East -> South
-			case 0x01: return TopBits | 0x03;  // West -> North
-			case 0x02: return TopBits | 0x01;  // South -> West
-			case 0x03: return TopBits | 0x00;  // North -> East
-		}
-		// Not reachable, but to avoid a compiler warning:
-		return 0;
-	}
-
-
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
-	{
-		// Bits 3 and 4 stay, the rest is swapped around according to a table:
-		NIBBLETYPE TopBits = (a_Meta & 0x0c);
-		switch (a_Meta & 0x03)
-		{
-			case 0x00: return TopBits | 0x00;  // East -> East
-			case 0x01: return TopBits | 0x01;  // West -> West
-			case 0x02: return TopBits | 0x03;  // South -> North
-			case 0x03: return TopBits | 0x02;  // North -> South
-		}
-		// Not reachable, but to avoid a compiler warning:
-		return 0;
-	}
-
-
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Toggle bit 3:
@@ -151,20 +111,6 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
-	{
-		// Bits 3 and 4 stay, the rest is swapped around according to a table:
-		NIBBLETYPE TopBits = (a_Meta & 0x0c);
-		switch (a_Meta & 0x03)
-		{
-			case 0x00: return TopBits | 0x01;  // East -> West
-			case 0x01: return TopBits | 0x00;  // West -> East
-			case 0x02: return TopBits | 0x02;  // South -> South
-			case 0x03: return TopBits | 0x03;  // North -> North
-		}
-		// Not reachable, but to avoid a compiler warning:
-		return 0;
-	}
 } ;
 
 

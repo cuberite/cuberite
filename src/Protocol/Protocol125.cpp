@@ -1186,7 +1186,7 @@ void cProtocol125::SendData(const char * a_Data, int a_Size)
 
 
 
-void cProtocol125::DataReceived(const char * a_Data, int a_Size)
+void cProtocol125::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
@@ -1375,7 +1375,16 @@ int cProtocol125::ParseEntityAction(void)
 {
 	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
 	HANDLE_PACKET_READ(ReadChar,  char, ActionID);
-	m_Client->HandleEntityAction(EntityID, ActionID);
+
+	switch (ActionID)
+	{
+		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break; // Crouch
+		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break; // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break; // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break; // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(EntityID, false); break; // Stop sprinting
+	}
+
 	return PARSE_OK;
 }
 

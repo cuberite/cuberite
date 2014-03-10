@@ -68,7 +68,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 
 
 
-void cProtocolRecognizer::DataReceived(const char * a_Data, int a_Size)
+void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_Protocol == NULL)
 	{

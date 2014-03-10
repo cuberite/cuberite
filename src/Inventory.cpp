@@ -204,6 +204,12 @@ void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 		return;
 	}
 	Grid->SetSlot(GridSlotNum, a_Item);
+
+	// Broadcast the Equipped Item, if the Slot is changed.
+	if ((Grid == &m_HotbarSlots) && (m_EquippedSlotNum == (a_SlotNum - invHotbarOffset)))
+	{
+		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, 0, a_Item, m_Owner.GetClientHandle());
+	}
 }
 
 

@@ -38,14 +38,26 @@ protected:
 	// cDelayedFluidSimulator overrides:
 	virtual void SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override;
 	
-	/// Checks tributaries, if not fed, decreases the block's level and returns true
+	/** Checks tributaries, if not fed, decreases the block's level and returns true. */
 	bool CheckTributaries(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_MyMeta);
 
-	/// Spreads into the specified block, if the blocktype there allows. a_Area is for checking.
+	/** Spreads into the specified block, if the blocktype there allows. a_Area is for checking. */
 	void SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta);
 	
-	/// Checks if there are enough neighbors to create a source at the coords specified; turns into source and returns true if so
+	/** Checks if there are enough neighbors to create a source at the coords specified; turns into source and returns true if so. */
 	bool CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+
+	/** Checks if the specified block should harden (Water/Lava interaction) and if so, converts it to a suitable block.
+	 *
+	 * Returns whether the block was changed or not.
+	 */
+	bool HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta);
+
+	/** Spread water to neighbors.
+	 *
+	 * May be overridden to provide more sophisticated algorithms.
+	 */
+	virtual void Spread(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta);
 } ;
 
 

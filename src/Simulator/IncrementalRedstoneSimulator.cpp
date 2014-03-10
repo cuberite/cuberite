@@ -937,17 +937,15 @@ void cIncrementalRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, i
 	{
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
 		{
-			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x4);
-			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
+			m_World.SetTrapdoorOpen(a_BlockX, a_BlockY, a_BlockZ, true);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
-		}		
+		}
 	}
 	else
 	{
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
 		{
-			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0xB); // Take into account that the fourth bit is needed for trapdoors too
-			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
+			m_World.SetTrapdoorOpen(a_BlockX, a_BlockY, a_BlockZ, false);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}

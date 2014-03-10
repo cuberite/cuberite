@@ -3,17 +3,18 @@
 
 #include "BlockHandler.h"
 #include "BlockRedstoneRepeater.h"
+#include "MetaRotater.h"
 
 
 
 
 
 class cBlockComparatorHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
 {
 public:
 	cBlockComparatorHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotater<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
 	{
 	}
 
@@ -23,6 +24,13 @@ public:
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		Meta ^= 0x04; // Toggle 3rd (addition/subtraction) bit with XOR
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+	}
+
+
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	{
+		UNUSED(a_ChunkInterface);
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 
 

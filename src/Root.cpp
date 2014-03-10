@@ -245,7 +245,6 @@ void cRoot::Start(void)
 		delete m_PluginManager; m_PluginManager = NULL;
 
 		cItemHandler::Deinit();
-		cBlockHandler::Deinit();
 
 		LOG("Cleaning up...");
 		delete m_Server; m_Server = NULL;
@@ -594,7 +593,6 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 		unsigned      m_NameLength;
 		const AString m_PlayerName;
 
-		cPlayerListCallback & m_Callback;
 		virtual bool Item (cPlayer * a_pPlayer)
 		{
 			unsigned int Rating = RateCompareString (m_PlayerName, a_pPlayer->GetName());
@@ -616,18 +614,17 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 		}
 
 	public:
-		cCallback (const AString & a_PlayerName, cPlayerListCallback & a_Callback) :
+		cCallback (const AString & a_PlayerName) :
 			m_BestRating(0),
 			m_NameLength(a_PlayerName.length()),
 			m_PlayerName(a_PlayerName),
-			m_Callback(a_Callback),
 			m_BestMatch(NULL),
 			m_NumMatches(0)
 		{}
 
 		cPlayer * m_BestMatch;
 		unsigned  m_NumMatches;
-	} Callback (a_PlayerName, a_Callback);
+	} Callback (a_PlayerName);
 	ForEachPlayer( Callback );
 
 	if (Callback.m_NumMatches == 1)

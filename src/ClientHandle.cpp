@@ -96,8 +96,8 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
 	m_UniqueID(0),
-	m_Locale("en_GB"),
-	m_HasSentPlayerChunk(false)
+	m_HasSentPlayerChunk(false),
+	m_Locale("en_GB")
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -555,11 +555,24 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 	}
 	else if (a_Channel == "REGISTER")
 	{
+		if (HasPluginChannel(a_Channel))
+		{
+			SendPluginMessage("UNREGISTER", a_Channel);
+			return; // Can't register again if already taken - kinda defeats the point of plugin messaging!
+		}
+
 		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
 	}
 	else if (a_Channel == "UNREGISTER")
 	{
 		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
+	}
+	else if (!HasPluginChannel(a_Channel))
+	{
+		// Ignore if client sent something but didn't register the channel first
+		LOGD("Player %s sent a plugin message on channel \"%s\", but didn't REGISTER it first", GetUsername().c_str(), a_Channel.c_str());
+		SendPluginMessage("UNREGISTER", a_Channel);
+		return;
 	}
 
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
@@ -838,7 +851,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(a_OldBlock);
+	cBlockHandler * Handler = cBlockInfo::GetHandler(a_OldBlock);
 	Handler->OnDigging(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
@@ -852,7 +865,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		int pZ = a_BlockZ;
 
 		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
-		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
+		Handler = cBlockInfo::GetHandler(World->GetBlock(pX, pY, pZ));
 
 		if (Handler->IsClickedThrough())
 		{
@@ -920,14 +933,22 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
 	
+	cWorld * World = m_Player->GetWorld();
+	
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
+		cChunkInterface ChunkInterface(World->GetChunkMap());
+		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		
 		if (a_BlockFace > -1)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player); //2 block high things
 		}
 		return;
 	}
@@ -953,17 +974,15 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		if (a_BlockFace > -1)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		}
 		return;
 	}
-	
-	cWorld * World = m_Player->GetWorld();
 
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	cBlockHandler * BlockHandler = cBlockHandler::GetBlockHandler(BlockType);
+	cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 	
 	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 	{
@@ -1447,7 +1466,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
-void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
+void cClientHandle::HandleEntityCrouch(int a_EntityID, bool a_IsCrouching)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -1455,35 +1474,37 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 		return;
 	}
 
-	switch (a_ActionID)
+	m_Player->SetCrouch(a_IsCrouching);
+}
+
+
+
+
+
+void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
+{
+	if (a_EntityID != m_Player->GetUniqueID())
 	{
-		case 1:  // Crouch
-		{
-			m_Player->SetCrouch(true);
-			break;
-		}
-		case 2:  // Uncrouch
-		{
-			m_Player->SetCrouch(false);
-			break;
-		}
-		case 3:  // Leave bed
-		{
-			m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
-			break;
-		}
-		case 4:  // Start sprinting
-		{
-			m_Player->SetSprint(true);
-			break;
-		}
-		case 5:  // Stop sprinting
-		{
-			m_Player->SetSprint(false);
-			SendPlayerMaxSpeed();
-			break;
-		}
+		// We should only receive entity actions from the entity that is performing the action
+		return;
 	}
+
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
+}
+
+
+
+
+
+void cClientHandle::HandleEntitySprinting(int a_EntityID, bool a_IsSprinting)
+{
+	if (a_EntityID != m_Player->GetUniqueID())
+	{
+		// We should only receive entity actions from the entity that is performing the action
+		return;
+	}
+
+	m_Player->SetSprint(a_IsSprinting);
 }
 
 

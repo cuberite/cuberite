@@ -312,12 +312,18 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 		return false;
 	}
 
-	m_Objectives.erase(it);
-
 	ASSERT(m_World != NULL);
 	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
 
-	// TODO 2014-03-01 xdot: Remove objective from display slot
+	for (unsigned int i = 0; i < (unsigned int) dsCount; ++i)
+	{
+		if (m_Display[i] == &it->second)
+		{
+			SetDisplay(NULL, (eDisplaySlot) i);
+		}
+	}
+
+	m_Objectives.erase(it);
 
 	return true;
 }
@@ -500,7 +506,7 @@ bool cScoreboard::ForEachObjective(cObjectiveCallback& a_Callback)
 
 bool cScoreboard::ForEachTeam(cTeamCallback& a_Callback)
 {
-	cCSLock Lock(m_CSObjectives);
+	cCSLock Lock(m_CSTeams);
 
 	for (cTeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
 	{

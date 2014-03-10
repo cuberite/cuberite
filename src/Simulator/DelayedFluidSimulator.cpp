@@ -20,7 +20,7 @@
 bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_RelZ)
 {
 	ASSERT(a_RelZ >= 0);
-	ASSERT(a_RelZ < ARRAYCOUNT(m_Blocks));
+	ASSERT(a_RelZ < static_cast<int>(ARRAYCOUNT(m_Blocks)));
 	
 	cCoordWithIntVector & Blocks = m_Blocks[a_RelZ];
 	int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);

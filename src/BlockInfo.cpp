@@ -2,6 +2,7 @@
 #include "Globals.h"
 
 #include "BlockInfo.h"
+#include "Blocks/BlockHandler.h"
 
 
 
@@ -23,7 +24,17 @@ cBlockInfo::cBlockInfo()
 	, m_RequiresSpecialTool(false)
 	, m_IsSolid(true)
 	, m_FullyOccupiesVoxel(false)
+	, m_Handler(NULL)
 {}
+
+
+
+
+
+cBlockInfo::~cBlockInfo()
+{
+	delete m_Handler;
+}
 
 
 
@@ -31,8 +42,6 @@ cBlockInfo::cBlockInfo()
 
 cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
 {
-	ASSERT(a_Type < 256);
-
 	return ms_Info[a_Type];
 }
 
@@ -42,6 +51,14 @@ cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
 
 void cBlockInfo::Initialize(void)
 {
+	for (unsigned int i = 0; i < 256; ++i)
+	{
+		if (ms_Info[i].m_Handler == NULL)
+		{
+			ms_Info[i].m_Handler = cBlockHandler::CreateBlockHandler((BLOCKTYPE) i);
+		}
+	}
+
 	// Emissive blocks
 	ms_Info[E_BLOCK_FIRE                ].m_LightValue = 15;
 	ms_Info[E_BLOCK_GLOWSTONE           ].m_LightValue = 15;
@@ -252,6 +269,11 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_VINES               ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_WALLSIGN            ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_WATER               ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_RAIL                ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_POWERED_RAIL        ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_DETECTOR_RAIL       ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_COBWEB              ].m_IsSnowable = false;
 
 
 	// Blocks that don't drop without a special tool:
@@ -290,6 +312,10 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_STONE_SLAB          ].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_VINES               ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_FURNACE             ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_LIT_FURNACE         ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_ANVIL               ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_ENCHANTMENT_TABLE   ].m_RequiresSpecialTool = true;
 
 
 	// Nonsolid blocks:
