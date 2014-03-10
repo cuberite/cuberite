@@ -165,6 +165,9 @@ protected:
 	
 	/// Checks if the grid matches the specified recipe, offset by the specified offsets. Returns a matched cRecipe * if so, or NULL if not matching. Caller must delete the return value!
 	cRecipe * MatchRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride, const cRecipe * a_Recipe, int a_OffsetX, int a_OffsetY);
+
+	/** Searches for anything firework related, and does the data setting if appropriate */
+	void HandleFireworks(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_OffsetX, int a_OffsetY);
 } ;
 
 
