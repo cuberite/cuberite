@@ -3,13 +3,15 @@ cmake_minimum_required (VERSION 2.6)
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
-if(DEFINED ENV{MCSERVER_BUILD_TYPE})
-	message("Setting build type to $ENV{MCSERVER_BUILD_TYPE}")
-	set(CMAKE_BUILD_TYPE $ENV{MCSERVER_BUILD_TYPE})
+# These env variables are used for configuring Travis CI builds.
+# See https://github.com/mc-server/MCServer/pull/767
+if(DEFINED ENV{TRAVIS_MCSERVER_BUILD_TYPE})
+	message("Setting build type to $ENV{TRAVIS_MCSERVER_BUILD_TYPE}")
+	set(CMAKE_BUILD_TYPE $ENV{TRAVIS_MCSERVER_BUILD_TYPE})
 endif()
 
-if(DEFINED ENV{MCSERVER_FORCE32})
-	set(FORCE32 $ENV{MCSERVER_FORCE32})
+if(DEFINED ENV{TRAVIS_MCSERVER_FORCE32})
+	set(FORCE32 $ENV{TRAVIS_MCSERVER_FORCE32})
 endif()
 
 # This has to be done before any flags have been set up.
