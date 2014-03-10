@@ -46,6 +46,9 @@
 
 #ifdef SELF_TEST
 
+#define assert_test(x) ( !!(x) || \
+	LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), abort(1))
+
 /// Self-test of the VarInt-reading and writing code
 static class cByteBufferSelfTest
 {
@@ -62,11 +65,11 @@ public:
 		cByteBuffer buf(50);
 		buf.Write("\x05\xac\x02\x00", 4);
 		UInt32 v1;
-		assert(buf.ReadVarInt(v1) && (v1 == 5));
+		assert_test(buf.ReadVarInt(v1) && (v1 == 5));
 		UInt32 v2;
-		assert(buf.ReadVarInt(v2) && (v2 == 300));
+		assert_test(buf.ReadVarInt(v2) && (v2 == 300));
 		UInt32 v3;
-		assert(buf.ReadVarInt(v3) && (v3 == 0));
+		assert_test(buf.ReadVarInt(v3) && (v3 == 0));
 	}
 	
 	void TestWrite(void)
@@ -77,8 +80,8 @@ public:
 		buf.WriteVarInt(0);
 		AString All;
 		buf.ReadAll(All);
-		assert(All.size() == 4);
-		assert(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
+		assert_test(All.size() == 4);
+		assert_test(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
 	}
 	
 	void TestWrap(void)
@@ -87,17 +90,17 @@ public:
 		for (int i = 0; i < 1000; i++)
 		{
 			size_t FreeSpace = buf.GetFreeSpace();
-			assert(buf.GetReadableSpace() == 0);
-			assert(FreeSpace > 0);
-			assert(buf.Write("a", 1));
-			assert(buf.CanReadBytes(1));
-			assert(buf.GetReadableSpace() == 1);
+			assert_test(buf.GetReadableSpace() == 0);
+			assert_test(FreeSpace > 0);
+			assert_test(buf.Write("a", 1));
+			assert_test(buf.CanReadBytes(1));
+			assert_test(buf.GetReadableSpace() == 1);
 			unsigned char v = 0;
-			assert(buf.ReadByte(v));
-			assert(v == 'a');
-			assert(buf.GetReadableSpace() == 0);
+			assert_test(buf.ReadByte(v));
+			assert_test(v == 'a');
+			assert_test(buf.GetReadableSpace() == 0);
 			buf.CommitRead();
-			assert(buf.GetFreeSpace() == FreeSpace);  // We're back to normal
+			assert_test(buf.GetFreeSpace() == FreeSpace);  // We're back to normal
 		}
 	}
 	
