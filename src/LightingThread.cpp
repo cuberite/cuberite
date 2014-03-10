@@ -13,12 +13,6 @@
 
 
 
-/// If more than this many chunks are in the queue, a warning is printed to the log
-#define WARN_ON_QUEUE_SIZE 800
-
-
-
-
 
 /// Chunk data callback that takes the chunk data and puts them into cLightingThread's m_BlockTypes[] / m_HeightMap[]:
 class cReader :

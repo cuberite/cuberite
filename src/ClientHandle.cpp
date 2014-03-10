@@ -36,19 +36,6 @@
 
 
 
-
-
-#define AddPistonDir(x, y, z, dir, amount) switch (dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
-													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
-													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
-
-
-
-
-
-/** If the number of queued outgoing packets reaches this, the client will be kicked */
-#define MAX_OUTGOING_PACKETS 2000
-
 /** Maximum number of explosions to send this tick, server will start dropping if exceeded */
 #define MAX_EXPLOSIONS_PER_TICK 20
 
