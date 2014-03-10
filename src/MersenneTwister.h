@@ -72,7 +72,7 @@ protected:
 	
 	uint32 state[N];   // internal state
 	uint32 *pNext;     // next value to get from state
-	int left;          // number of values left before reload needed
+	uint32 left;       // number of values left before reload needed
 
 // Methods
 public:
@@ -164,7 +164,7 @@ inline void MTRand::initialize( const uint32 seed )
 	// only MSBs of the state array.  Modified 9 Jan 2002 by Makoto Matsumoto.
 	uint32 *s = state;
 	uint32 *r = state;
-	int i = 1;
+	uint32 i = 1;
 	*s++ = seed & 0xffffffffUL;
 	for( ; i < N; ++i )
 	{
@@ -205,9 +205,9 @@ inline void MTRand::seed( uint32 *const bigSeed, const uint32 seedLength )
 	// in each element are discarded.
 	// Just call seed() if you want to get array from /dev/urandom
 	initialize(19650218UL);
-	int i = 1;
+	uint32 i = 1;
 	uint32 j = 0;
-	int k = ( (uint32)N > seedLength ? (uint32)N : seedLength );
+	uint32 k = ( (uint32)N > seedLength ? (uint32)N : seedLength );
 	for( ; k; --k )
 	{
 		state[i] =
