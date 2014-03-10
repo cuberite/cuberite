@@ -250,8 +250,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
-	m_bCommandBlocksEnabled(false),
-	m_bUseChatPrefixes(true),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -554,6 +552,7 @@ void cWorld::Start(void)
 	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
 	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  true);
 	m_ShouldLavaSpawnFire       = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",       true);
+	m_bTNTSpawnsShrapnel        = IniFile.GetValueSetB("Physics",       "IsTNTShrapnelEnabled",      true);
 	m_bCommandBlocksEnabled     = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",      false);
 	m_bEnabledPVP               = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                true);
 	m_bUseChatPrefixes          = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",           true);

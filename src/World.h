@@ -590,6 +590,9 @@ public:
 	bool AreCommandBlocksEnabled(void) const { return m_bCommandBlocksEnabled; }
 	void SetCommandBlocksEnabled(bool a_Flag) { m_bCommandBlocksEnabled = a_Flag; }
 
+	bool IsTNTShrapnelEnabled(void) const { return m_bTNTSpawnsShrapnel; }
+	void SetTNTShrapnelEnabled(bool a_Flag) { m_bTNTSpawnsShrapnel = a_Flag; }
+
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
 	
@@ -847,6 +850,9 @@ private:
 	
 	/** Whether prefixes such as [INFO] are prepended to SendMessageXXX() / BroadcastChatXXX() functions */
 	bool m_bUseChatPrefixes;
+
+	/** Whether TNT explosions, done via cWorld::DoExplosionAt(), should project random affected blocks as FallingBlock entities */
+	bool m_bTNTSpawnsShrapnel;
 	
 
 	cChunkGenerator  m_Generator;

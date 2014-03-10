@@ -1832,7 +1832,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
 							m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
 						}
-						else if (m_World->GetTickRandomNumber(100) < 20) // 20% chance of flinging stuff around
+						else if (m_World->IsTNTShrapnelEnabled() && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
 						{
 							if (!cBlockInfo::FullyOccupiesVoxel(area.GetBlockType(bx + x, by + y, bz + z)))
 							{
