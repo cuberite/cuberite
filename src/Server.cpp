@@ -105,8 +105,7 @@ void cServer::cTickThread::Execute(void)
 // cServer:
 
 cServer::cServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client IPv4"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client IPv6"),
+	m_ListenThread(*this, "Client"),
 	m_bIsConnected(false),
 	m_bRestarting(false),
 	m_RCONServer(*this),
@@ -213,22 +212,11 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		return false;
 	}
 
-	bool HasAnyPorts = false;
 	AString Ports = a_SettingsIni.GetValueSet("Server", "Port", "25565");
-	m_ListenThreadIPv4.SetReuseAddr(true);
-	if (m_ListenThreadIPv4.Initialize(Ports))
-	{
-		HasAnyPorts = true;
-	}
-
-	Ports = a_SettingsIni.GetValueSet("Server", "PortsIPv6", "25565");
-	m_ListenThreadIPv6.SetReuseAddr(true);
-	if (m_ListenThreadIPv6.Initialize(Ports))
-	{
-		HasAnyPorts = true;
-	}
-	
-	if (!HasAnyPorts)
+	AString Ports4 = a_SettingsIni.GetValueSet("Server", "PortsIPv4", "");
+	AString Ports6 = a_SettingsIni.GetValueSet("Server", "PortsIPv6", "");
+	m_ListenThread.SetReuseAddr(true);
+	if (!m_ListenThread.Initialize(Ports,Ports4,Ports6))
 	{
 		LOGERROR("Couldn't open any ports. Aborting the server");
 		return false;
@@ -410,11 +398,7 @@ void cServer::TickClients(float a_Dt)
 
 bool cServer::Start(void)
 {
-	if (!m_ListenThreadIPv4.Start())
-	{
-		return false;
-	}
-	if (!m_ListenThreadIPv6.Start())
+	if (!m_ListenThread.Start())
 	{
 		return false;
 	}
@@ -578,8 +562,7 @@ void cServer::BindBuiltInConsoleCommands(void)
 
 void cServer::Shutdown(void)
 {
-	m_ListenThreadIPv4.Stop();
-	m_ListenThreadIPv6.Stop();
+	m_ListenThread.Stop();
 	
 	m_bRestarting = true;
 	m_RestartEvent.Wait();

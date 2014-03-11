@@ -17,6 +17,9 @@
 #include "Errors.h"
 
 
+class cSocketSet;
+
+
 class cSocket
 {
 public:
@@ -24,12 +27,19 @@ public:
 	{
 		IPv4 = AF_INET,
 		IPv6 = AF_INET6,
-		
+		IPDual,
+		INVALID_PROTOCOL
+	} ;
+	
+	enum eFlags
+	{
+	
 		#ifdef _WIN32
 		ErrWouldBlock = WSAEWOULDBLOCK,
 		#else
 		ErrWouldBlock = EWOULDBLOCK,
 		#endif
+		
 	} ;
 	
 #ifdef _WIN32
@@ -39,8 +49,7 @@ public:
 	static const int INVALID_SOCKET = -1;
 #endif
 
-	cSocket(void) : m_Socket(INVALID_SOCKET) {}
-	cSocket(xSocket a_Socket);
+	cSocket(void) : m_Socket(INVALID_SOCKET), m_family(INVALID_PROTOCOL) {}
 	~cSocket();
 
 	bool IsValid(void) const { return IsValidSocket(m_Socket); }
@@ -50,12 +59,11 @@ public:
 	Most TCPIP implementations use this to send the FIN flag in a packet */
 	void ShutdownReadWrite(void);
 	
-	operator xSocket(void) const;
-	xSocket GetSocket(void) const;
+	bool operator == (const cSocket & a_Other) const {return m_Socket == a_Other.m_Socket; }
 	
-	bool operator == (const cSocket & a_Other) {return m_Socket == a_Other.m_Socket; }
+	bool operator < (const cSocket & a_Other) const {return m_Socket < a_Other.m_Socket; }
 	
-	void SetSocket(xSocket a_Socket);
+	bool operator > (const cSocket & a_Other) const {return m_Socket > a_Other.m_Socket; }
 
 	/// Sets the address-reuse socket flag; returns true on success
 	bool SetReuseAddress(void);
@@ -86,11 +94,8 @@ public:
 	static const unsigned short ANY_PORT = 0;  // When given to Bind() functions, they will find a free port
 	static const int DEFAULT_BACKLOG = 10;
 
-	/// Binds to the specified port on "any" interface (0.0.0.0). Returns true if successful.
-	bool BindToAnyIPv4(unsigned short a_Port);
-	
-	/// Binds to the specified port on "any" interface (::/128). Returns true if successful.
-	bool BindToAnyIPv6(unsigned short a_Port);
+	/// Binds to the specified port on "any" interface (0.0.0.0 for IPv4, ::/128 for IPv6). Returns true if successful.
+	bool BindToAny(unsigned short a_Port);
 	
 	/// Binds to the specified port on localhost interface (127.0.0.1) through IPv4. Returns true if successful.
 	bool BindToLocalhostIPv4(unsigned short a_Port);
@@ -98,11 +103,8 @@ public:
 	/// Sets the socket to listen for incoming connections. Returns true if successful.
 	bool Listen(int a_Backlog = DEFAULT_BACKLOG);
 	
-	/// Accepts an IPv4 incoming connection. Blocks if none available.
-	cSocket AcceptIPv4(void);
-	
-	/// Accepts an IPv6 incoming connection. Blocks if none available.
-	cSocket AcceptIPv6(void);
+	/// Accepts an incoming connection. Blocks if none available.
+	cSocket Accept(void);
 	
 	/// Connects to a localhost socket on the specified port using IPv4; returns true if successful.
 	bool ConnectToLocalhostIPv4(unsigned short a_Port);
@@ -119,8 +121,40 @@ public:
 	
 	/** Sets the socket into non-blocking mode */
 	void SetNonBlocking(void);
-
+	
+	static bool SupportsFamily(eFamily a_Family)
+	{
+		switch(a_Family)
+		{
+			case IPv4:
+			case IPv6:
+			{
+				return true;
+			}
+			case IPDual:
+			{
+			#ifdef _WIN32
+				return IsWindowsVista();
+			#else
+				return true;
+			#endif
+			}
+			case INVALID_PROTOCOL:
+			{
+				return false;
+			}
+		}
+	}
+	
 private:
+	friend class cSocketSet;
 	xSocket m_Socket;
 	AString m_IPString;
+	eFamily m_family;
+	
+	cSocket(xSocket a_Socket, eFamily a_family);
+	
+	#ifdef _WIN32
+	static bool IsVistaOrLater();
+	#endif
 };

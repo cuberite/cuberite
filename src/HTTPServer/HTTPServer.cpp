@@ -121,8 +121,7 @@ class cDebugCallbacks :
 // cHTTPServer:
 
 cHTTPServer::cHTTPServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer IPv4"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer IPv6"),
+	m_ListenThread(*this, "WebServer"),
 	m_Callbacks(NULL)
 {
 }
@@ -140,17 +139,10 @@ cHTTPServer::~cHTTPServer()
 
 
 
-bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_PortsIPv6)
+bool cHTTPServer::Initialize(const AString & a_PortsIPDual, const AString & a_PortsIPv4, const AString & a_PortsIPv6)
 {
-	bool HasAnyPort;
-	HasAnyPort = m_ListenThreadIPv4.Initialize(a_PortsIPv4);
-	HasAnyPort = m_ListenThreadIPv6.Initialize(a_PortsIPv6) || HasAnyPort;
-	if (!HasAnyPort)
-	{
-		return false;
-	}
-	
-	return true;
+
+	return !m_ListenThread.Initialize(a_PortsIPDual, a_PortsIPv4, a_PortsIPv6);
 }
 
 
@@ -160,16 +152,7 @@ bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_Port
 bool cHTTPServer::Start(cCallbacks & a_Callbacks)
 {
 	m_Callbacks = &a_Callbacks;
-	if (!m_ListenThreadIPv4.Start())
-	{
-		return false;
-	}
-	if (!m_ListenThreadIPv6.Start())
-	{
-		m_ListenThreadIPv4.Stop();
-		return false;
-	}
-	return true;
+	return !m_ListenThread.Start();
 }
 
 
@@ -178,8 +161,7 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks)
 
 void cHTTPServer::Stop(void)
 {
-	m_ListenThreadIPv4.Stop();
-	m_ListenThreadIPv6.Stop();
+	m_ListenThread.Stop();
 	
 	// Drop all current connections:
 	cCSLock Lock(m_CSConnections);

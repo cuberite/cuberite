@@ -16,11 +16,10 @@
 
 
 
-cSocket::cSocket(xSocket a_Socket)
-	: m_Socket(a_Socket)
+cSocket::cSocket(xSocket a_Socket, eFamily a_family)
+	: m_Socket(a_Socket), m_family(a_family)
 {
 }
-
 
 
 
@@ -29,25 +28,6 @@ cSocket::~cSocket()
 {
 	// Do NOT close the socket; this class is an API wrapper, not a RAII!
 }
-
-
-
-
-
-cSocket::operator cSocket::xSocket() const
-{
-	return m_Socket;
-}
-
-
-
-
-
-cSocket::xSocket cSocket::GetSocket() const
-{
-	return m_Socket;
-}
-
 
 
 
@@ -126,7 +106,7 @@ bool cSocket::SetReuseAddress(void)
 	#else
 		int yes = 1;
 	#endif
-	return (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == 0);
+	return (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == 0);
 }
 
 
@@ -150,39 +130,89 @@ int cSocket::WSAStartup(void)
 
 cSocket cSocket::CreateSocket(eFamily a_Family)
 {
-	return socket((int)a_Family, SOCK_STREAM, 0);
+	switch(a_Family)
+	{
+		case IPv4:
+		case IPv6:
+		{
+			xSocket Socket = socket((int)a_Family, SOCK_STREAM, 0);
+			return cSocket(Socket, a_Family);
+		}
+		case IPDual:
+		{
+			xSocket Socket = socket((int)IPv6, SOCK_STREAM, 0);
+			#if defined(_WIN32)
+			if (!IsVistaOrLater())
+			{
+				LOGWARNING("Dual Stack requires windows Vista or greater, server will only be accessible by IPv6");
+				return cSocket(Socket, IPv6);
+			}
+			else
+			{
+			#endif
+			#if defined(_WIN32) || defined(ANDROID_NDK)
+				char no = 0;
+			#else
+				int no = 0;
+			#endif
+			if (setsockopt(Socket, IPPROTO_IPV6, IPV6_V6ONLY, &no, sizeof(no)) == -1)
+			{
+				LOGWARNING("Failed to set dual stack, server may not be accessible on IPv4");
+				ASSERT(false);
+			}
+			return cSocket(Socket, a_Family);
+			#if defined(_WIN32)
+			}
+			#endif
+		}
+		case INVALID_PROTOCOL:
+		{
+			LOGWARNING("Invalid protocol specified, using IPv4 instead. Server may be inaccessible");
+			ASSERT(!"Invalid protocol");
+			xSocket Socket = socket((int)IPv4, SOCK_STREAM, 0);
+			return cSocket(Socket, a_Family);
+		}
+	}
 }
 
 
 
 
 
-bool cSocket::BindToAnyIPv4(unsigned short a_Port)
+bool cSocket::BindToAny(unsigned short a_Port)
 {
-	sockaddr_in local;
-	memset(&local, 0, sizeof(local));
+	switch(m_family)
+	{
+		case IPv4:
+		{
+			sockaddr_in local;
+			memset(&local, 0, sizeof(local));
 
-	local.sin_family = AF_INET;
-	local.sin_port = htons((u_short)a_Port);
+			local.sin_family = AF_INET;
+			local.sin_port = htons((u_short)a_Port);
 
-	return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
+			return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
+		}
+		case IPv6:
+		case IPDual:
+		{
+			sockaddr_in6 local6;
+			memset(&local6, 0, sizeof(local6));
+
+			local6.sin6_family = AF_INET6;
+			local6.sin6_port = htons((u_short)a_Port);
+
+			return (bind(m_Socket, (sockaddr *)&local6, sizeof(local6)) == 0);
+		}
+		case INVALID_PROTOCOL:
+		{
+			LOGWARNING("cannot bind to Invalid Protocol");
+			ASSERT(!"Invalid protocol");
+			return false;
+		}
+	}
+
 }
-
-
-
-
-
-bool cSocket::BindToAnyIPv6(unsigned short a_Port)
-{
-	sockaddr_in6 local;
-	memset(&local, 0, sizeof(local));
-
-	local.sin6_family = AF_INET6;
-	local.sin6_port = htons((u_short)a_Port);
-
-	return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
-}
-
 
 
 
@@ -212,69 +242,78 @@ bool cSocket::Listen(int a_Backlog)
 
 
 
-cSocket cSocket::AcceptIPv4(void)
+cSocket cSocket::Accept(void)
 {
-	sockaddr_in from;
-	socklen_t fromlen = sizeof(from);
-
-	cSocket SClient = accept(m_Socket, (sockaddr *)&from, &fromlen);
-
-	if (SClient.IsValid() && (from.sin_addr.s_addr != 0))  // Get IP in string form
+	cSocket SClient;
+	switch(m_family)
 	{
-		SClient.m_IPString = inet_ntoa(from.sin_addr);
+		case IPv4:
+		{
+			sockaddr_in from;
+			socklen_t fromlen = sizeof(from);
+
+			SClient = cSocket(accept(m_Socket, (sockaddr *)&from, &fromlen), m_family);
+
+			if (SClient.IsValid() && (from.sin_addr.s_addr != 0))  // Get IP in string form
+			{
+				SClient.m_IPString = inet_ntoa(from.sin_addr);
+			}
+			break;
+		}
+		case IPv6:
+		case IPDual:
+		{
+			sockaddr_in6 from6;
+			socklen_t fromlen6 = sizeof(from6);
+
+			SClient = cSocket(accept(m_Socket, (sockaddr *)&from6, &fromlen6), m_family);
+
+			// Get IP in string form:
+			if (SClient.IsValid())
+			{
+				#if defined(_WIN32)
+					// Windows XP doesn't have inet_ntop, so we need to improvise. And MSVC has different headers than GCC
+					#ifdef _MSC_VER
+						// MSVC version
+						Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+							from6.sin6_addr.u.Word[0],
+							from6.sin6_addr.u.Word[1],
+							from6.sin6_addr.u.Word[2],
+							from6.sin6_addr.u.Word[3],
+							from6.sin6_addr.u.Word[4],
+							from6.sin6_addr.u.Word[5],
+							from6.sin6_addr.u.Word[6],
+							from6.sin6_addr.u.Word[7]
+						);
+					#else  // _MSC_VER
+						// MinGW
+						Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+							from6.sin6_addr.s6_addr16[0],
+							from6.sin6_addr.s6_addr16[1],
+							from6.sin6_addr.s6_addr16[2],
+							from6.sin6_addr.s6_addr16[3],
+							from6.sin6_addr.s6_addr16[4],
+							from6.sin6_addr.s6_addr16[5],
+							from6.sin6_addr.s6_addr16[6],
+							from6.sin6_addr.s6_addr16[7]
+						);
+					#endif  // else _MSC_VER
+				#else
+					char buffer[INET6_ADDRSTRLEN];
+					inet_ntop(AF_INET6, &(from6.sin6_addr), buffer, sizeof(buffer));
+					SClient.m_IPString.assign(buffer);
+				#endif  // _WIN32
+			}
+			break;
+		}
+		case INVALID_PROTOCOL:
+		{
+			ASSERT(!"Invalid protocol");
+		}
 	}
 	return SClient;
 }
 
-
-
-
-
-cSocket cSocket::AcceptIPv6(void)
-{
-	sockaddr_in6 from;
-	socklen_t fromlen = sizeof(from);
-
-	cSocket SClient = accept(m_Socket, (sockaddr *)&from, &fromlen);
-
-	// Get IP in string form:
-	if (SClient.IsValid())
-	{
-		#if defined(_WIN32)
-			// Windows XP doesn't have inet_ntop, so we need to improvise. And MSVC has different headers than GCC
-			#ifdef _MSC_VER
-				// MSVC version
-				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
-					from.sin6_addr.u.Word[0],
-					from.sin6_addr.u.Word[1],
-					from.sin6_addr.u.Word[2],
-					from.sin6_addr.u.Word[3],
-					from.sin6_addr.u.Word[4],
-					from.sin6_addr.u.Word[5],
-					from.sin6_addr.u.Word[6],
-					from.sin6_addr.u.Word[7]
-				);
-			#else  // _MSC_VER
-				// MinGW
-				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
-					from.sin6_addr.s6_addr16[0],
-					from.sin6_addr.s6_addr16[1],
-					from.sin6_addr.s6_addr16[2],
-					from.sin6_addr.s6_addr16[3],
-					from.sin6_addr.s6_addr16[4],
-					from.sin6_addr.s6_addr16[5],
-					from.sin6_addr.s6_addr16[6],
-					from.sin6_addr.s6_addr16[7]
-				);
-			#endif  // else _MSC_VER
-		#else
-			char buffer[INET6_ADDRSTRLEN];
-			inet_ntop(AF_INET6, &(from.sin6_addr), buffer, sizeof(buffer));
-			SClient.m_IPString.assign(buffer);
-		#endif  // _WIN32
-	}
-	return SClient;
-}
 
 
 
@@ -373,6 +412,21 @@ void cSocket::SetNonBlocking(void)
 		abort();
 	}
 }
+
+
+
+#ifdef _WIN32
+bool cSocket::IsVistaOrLater()
+{
+	DWORD version = GetVersion();
+	DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
+	DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
+
+	// Vista is Windows NT 6.0
+
+	return (major >= 6);
+}
+#endif
 
 
 

@@ -89,11 +89,8 @@ protected:
 	/// The thread(s) that take care of all the traffic on the RCON ports
 	cSocketThreads m_SocketThreads;
 	
-	/// The thread for accepting IPv4 RCON connections
-	cListenThread  m_ListenThread4;
-	
-	/// The thread for accepting IPv6 RCON connections
-	cListenThread  m_ListenThread6;
+	/// The thread for accepting RCON connections
+	cListenThread  m_ListenThread;
 	
 	/// Password for authentication
 	AString m_Password;
