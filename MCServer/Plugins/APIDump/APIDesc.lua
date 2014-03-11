@@ -423,6 +423,7 @@ g_APIDesc =
 				SetUseDefaultFinish       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default finishers or not" },
 				SetUseDefaultHeight       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default height generator or not" },
 				SetUseDefaultStructures   = { Params = "bool", Return = "", Notes = "Sets the chunk to use default structures or not" },
+				UpdateHeightmap           = { Params = "",     Return = "", Notes = "Updates the heightmap to match current contents. The plugins should do that if they modify the contents and don't modify the heightmap accordingly; MCServer expects (and checks in Debug mode) that the heightmap matches the contents when the cChunkDesc is returned from a plugin." },
 				WriteBlockArea            = { Params = "{{cBlockArea|BlockArea}}, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
 			},
 			AdditionalInfo =
@@ -472,6 +473,7 @@ end
 
 			Functions =
 			{
+				GetLocale = { Params = "", Return = "Locale", Notes = "Returns the locale string that the client sends as part of the protocol handshake. Can be used to provide localized strings." },
 				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
 				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client. Note that this may be nil, for example if the player object is not yet spawned." },
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the UniqueID of the client used to identify the client in the server" },
@@ -480,6 +482,7 @@ end
 				HasPluginChannel = { Params = "ChannelName", Return = "bool", Notes = "Returns true if the client has registered to receive messages on the specified plugin channel." },
 				Kick = { Params = "Reason", Return = "", Notes = "Kicks the user with the specified reason" },
 				SendPluginMessage = { Params = "Channel, Message", Return = "", Notes = "Sends the plugin message on the specified channel." },
+				SetLocale = { Params = "Locale", Return = "", Notes = "Sets the locale that MCServer keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects)." },
 				SetUsername = { Params = "Name", Return = "", Notes = "Sets the username" },
 				SetViewDistance = { Params = "ViewDistance", Return = "", Notes = "Sets the viewdistance (number of chunks loaded for the player in each direction)" },
 				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player." },
@@ -883,7 +886,6 @@ cFile:Delete("/usr/bin/virus.exe");
 				SetColor = { Return = "" },
 				GetColor = { Return = "string" },
 				AddCommand = { Return = "" },
-				HasCommand = { Return = "bool" },
 				AddPermission = { Return = "" },
 				InheritFrom = { Return = "" },
 			},
@@ -1150,7 +1152,6 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				IsEnchantable = { Params = "", Return = "bool", Notes = "Returns true if the item is enchantable" },
 				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
 				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object. This is true even if the two items have different enchantments" },
-				IsStackableWith = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is stackable with the one stored in the object. Two items with different enchantments cannot be stacked" },
 				IsBothNameAndLoreEmpty = { Params = "", Return = "bool", Notes = "Returns if both the custom name and lore are not set." },
 				IsCustomNameEmpty = { Params = "", Return = "bool", Notes = "Returns if the custom name of the cItem is empty." },
 				IsLoreEmpty = { Params = "", Return = "", Notes = "Returns if the lore of the cItem is empty." },
@@ -1656,7 +1657,6 @@ a_Player:OpenWindow(Window);
 				AddToGroup = { Params = "GroupName", Return = "", Notes = "Temporarily adds the player to the specified group. The assignment is lost when the player disconnects." },
 				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "(STATIC) Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
 				CanFly = { Return = "bool", Notes = "Returns if the player is able to fly." },
-				CanUseCommand = { Params = "Command", Return = "bool", Notes = "Returns true if the player is allowed to use the specified command." },
 				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
 				CloseWindowIfID = { Params = "WindowID, [CanRefuse]", Return = "", Notes = "Closes the currently open UI window if its ID matches the given ID. If CanRefuse is true (default), the window may refuse the closing." },
 				DeltaExperience = { Params = "DeltaXP", Return = "", Notes = "Adds or removes XP from the current XP amount. Won't allow XP to go negative. Returns the new experience, -1 on error (XP overflow)." },
@@ -1733,7 +1733,6 @@ a_Player:OpenWindow(Window);
 				SetSprint = { Params = "IsSprinting", Return = "", Notes = "Sets whether the player is sprinting or not." },
 				SetSprintingMaxSpeed = { Params = "SprintingMaxSpeed", Return = "", Notes = "Sets the sprinting maximum speed (as reported by the 1.6.1+ protocols)" },
 				SetVisible = { Params = "IsVisible", Return = "", Notes = "Sets the player visibility to other players" },
-				TossItem = { Params = "DraggedItem, [Amount], [CreateType], [CreateDamage]", Return = "", Notes = "FIXME: This function will be rewritten, avoid it. It tosses an item, either from the inventory, dragged in hand (while in UI window) or a newly created one." },
 				XpForLevel = { Params = "XPLevel", Return = "number", Notes = "(STATIC) Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp()." },
 			},
 			Constants =
@@ -2630,7 +2629,8 @@ end
 			]],
 			Functions =
 			{
-				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, [IsInverse]", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFace|face}}"},
+				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, [IsInverse]", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}"},
+				BlockFaceToString = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "string", Notes = "Returns the string representation of the {{Globals#BlockFaces|eBlockFace}} constant. Uses the axis-direction-based names, such as BLOCK_FACE_XP." },
 				BlockStringToType = {Params = "BlockTypeString", Return = "BLOCKTYPE", Notes = "Returns the block type parsed from the given string"},
 				ClickActionToString = {Params = "{{Globals#ClickAction|ClickAction}}", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
 				DamageTypeToString = {Params = "{{Globals#DamageType|DamageType}}", Return = "string", Notes = "Converts the {{Globals#DamageType|DamageType}} enumerated value to a string representation "},
@@ -2649,9 +2649,12 @@ end
 				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
 				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
 				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+				MirrorBlockFaceY = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it)." },
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
 				NormalizeAngleDegrees = { Params = "AngleDegrees", Return = "AngleDegrees", Notes = "Returns the angle, wrapped into the [-180, +180) range." },
 				ReplaceString = {Params = "full-string, to-be-replaced-string, to-replace-string", Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string"},
+				RotateBlockFaceCCW = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees counter-clockwise." },
+				RotateBlockFaceCW = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees clockwise." },
 				StringSplit = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered."},
 				StringSplitAndTrim = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Each of the separate strings is trimmed (whitespace removed from the beginning and end of the string)"},
 				StringToBiome = {Params = "string", Return = "{{Globals#BiomeTypes|BiomeType}}", Notes = "Converts a string representation to a {{Globals#BiomeTypes|BiomeType}} enumerated value"},
@@ -2698,7 +2701,13 @@ end
 					Include = "^BLOCK_FACE_.*",
 					TextBefore = [[
 						These constants are used to describe individual faces of the block. They are used when the
-						client is interacting with a block, or when the {{cLineBlockTracer}} hits a block, etc.
+						client is interacting with a block in the {{OnPlayerBreakingBlock|HOOK_PLAYER_BREAKING_BLOCK}},
+						{{OnPlayerBrokenBlock|HOOK_PLAYER_BROKEN_BLOCK}}, {{OnPlayerLeftClick|HOOK_PLAYER_LEFT_CLICK}},
+						{{OnPlayerPlacedBlock|HOOK_PLAYER_PLACED_BLOCK}}, {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}},
+						{{OnPlayerRightClick|HOOK_PLAYER_RIGHT_CLICK}}, {{OnPlayerUsedBlock|HOOK_PLAYER_USED_BLOCK}},
+						{{OnPlayerUsedItem|HOOK_PLAYER_USED_ITEM}}, {{OnPlayerUsingBlock|HOOK_PLAYER_USING_BLOCK}},
+						and {{OnPlayerUsingItem|HOOK_PLAYER_USING_ITEM}} hooks, or when the {{cLineBlockTracer}} hits a
+						block, etc.
 					]],
 				},
 				ClickAction =
