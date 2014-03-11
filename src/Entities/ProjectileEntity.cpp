@@ -655,9 +655,31 @@ cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, double a_X, do
 
 void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
-	// TODO: Apply damage to certain mobs (blaze etc.) and anger all mobs
-	
 	Destroy();
+}
+
+
+
+
+
+void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+{
+	int TotalDamage = 0;
+	if (a_EntityHit.IsMob())
+	{
+		cMonster::eType MobType = ((cMonster &) a_EntityHit).GetMobType();
+		if (MobType == cMonster::mtBlaze)
+		{
+			TotalDamage = 3;
+		}
+		else if (MobType == cMonster::mtEnderDragon)
+		{
+			TotalDamage = 1;
+		}
+	}
+	a_EntityHit.TakeDamage(dtRangedAttack, m_Creator, TotalDamage, 1);
+
+	Destroy(true);
 }
 
 
