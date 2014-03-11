@@ -112,7 +112,7 @@ public:
 	}
 
 
-	inline static unsigned int MakeIndex(int x, int y, int z )
+	inline static int MakeIndex(int x, int y, int z )
 	{
 		if (
 			(x < Width)  && (x > -1) &&
@@ -271,7 +271,7 @@ public:
 		}
 
 		int Index = MakeIndexNoCheck(x, y, z);
-		a_Buffer[Index / 2] = (
+		a_Buffer[Index / 2] = static_cast<NIBBLETYPE>(
 			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 		);
