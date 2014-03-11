@@ -51,7 +51,7 @@ void cLogCommandOutputCallback::Finished(void)
 		{
 			case '\n':
 			{
-				LOG(m_Buffer.substr(last, i - last).c_str());
+				LOG("%s",m_Buffer.substr(last, i - last).c_str());
 				last = i + 1;
 				break;
 			}
@@ -59,7 +59,7 @@ void cLogCommandOutputCallback::Finished(void)
 	}  // for i - m_Buffer[]
 	if (last < len)
 	{
-		LOG(m_Buffer.substr(last).c_str());
+		LOG("%s",m_Buffer.substr(last).c_str());
 	}
 	
 	// Clear the buffer for the next command output:

@@ -1281,7 +1281,9 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
 	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
 	
-	LOGD((a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
+	
+	// Format string consisting only of %s is used to appease the compiler
+	LOGD("%s",(a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;

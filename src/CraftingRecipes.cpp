@@ -340,7 +340,7 @@ void cCraftingRecipes::LoadRecipes(void)
 		}
 		AddRecipeLine(LineNum, Recipe);
 	}  // for itr - Split[]
-	LOG("Loaded %d crafting recipes", m_Recipes.size());
+	LOG("Loaded %zu crafting recipes", m_Recipes.size());
 }
 
 

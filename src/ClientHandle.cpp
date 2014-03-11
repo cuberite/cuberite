@@ -882,7 +882,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		LOGD("Prevented a dig/aim bug in the client (finish {%d, %d, %d} vs start {%d, %d, %d}, HSD: %s)",
 			a_BlockX, a_BlockY, a_BlockZ,
 			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
-			m_HasStartedDigging
+			(m_HasStartedDigging ? "True" : "False")
 		);
 		return;
 	}

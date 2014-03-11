@@ -57,10 +57,10 @@ private:
 
 
 
-extern void LOG(const char* a_Format, ...);
-extern void LOGINFO(const char* a_Format, ...);
-extern void LOGWARN(const char* a_Format, ...);
-extern void LOGERROR(const char* a_Format, ...);
+extern void LOG(const char* a_Format, ...) FORMATSTRING(1,2);
+extern void LOGINFO(const char* a_Format, ...) FORMATSTRING(1,2);
+extern void LOGWARN(const char* a_Format, ...) FORMATSTRING(1,2);
+extern void LOGERROR(const char* a_Format, ...) FORMATSTRING(1,2);
 
 
 

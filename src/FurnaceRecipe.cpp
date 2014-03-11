@@ -175,7 +175,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	{
 		LOGERROR("ERROR: FurnaceRecipe, syntax error" );
 	}
-	LOG("Loaded %u furnace recipes and %u fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
+	LOG("Loaded %zu furnace recipes and %zu fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
 }
 
 

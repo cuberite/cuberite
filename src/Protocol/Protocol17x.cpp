@@ -1344,7 +1344,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
-			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read %u bytes, packet contained %u bytes",
+			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
 				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
 			);
 
@@ -2062,7 +2062,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	{
 		AString HexDump;
 		CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
-		LOGWARNING("Cannot unGZIP item metadata (%u bytes):\n%s", a_Metadata.size(), HexDump.c_str());
+		LOGWARNING("Cannot unGZIP item metadata (%zu bytes):\n%s", a_Metadata.size(), HexDump.c_str());
 		return;
 	}
 	
@@ -2072,7 +2072,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	{
 		AString HexDump;
 		CreateHexDump(HexDump, Uncompressed.data(), Uncompressed.size(), 16);
-		LOGWARNING("Cannot parse NBT item metadata: (%u bytes)\n%s", Uncompressed.size(), HexDump.c_str());
+		LOGWARNING("Cannot parse NBT item metadata: (%zu bytes)\n%s", Uncompressed.size(), HexDump.c_str());
 		return;
 	}
 	
