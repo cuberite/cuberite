@@ -677,7 +677,7 @@ void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & 
 			TotalDamage = 1;
 		}
 	}
-	a_EntityHit.TakeDamage(dtRangedAttack, m_Creator, TotalDamage, 1);
+	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
 
 	Destroy(true);
 }
