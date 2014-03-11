@@ -22,7 +22,7 @@ public:
 	T x, y, z;
 
 
-	inline Vector3() : x(0), y(0), z(0) {}
+	inline Vector3(void) : x(0), y(0), z(0) {}
 	inline Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
 
 

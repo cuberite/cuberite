@@ -62,7 +62,6 @@ if (NOT MSVC)
 		Inventory.h
 		Item.h
 		ItemGrid.h
-		Matrix4f.h
 		Mobs/Monster.h
 		OSSupport/File.h
 		Root.h
