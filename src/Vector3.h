@@ -10,10 +10,6 @@
 
 
 
-
-
-
-
 template <typename T>
 // tolua_begin
 class Vector3
@@ -196,6 +192,11 @@ public:
 		);
 	}
 
+	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified Z coord.
+	The result satisfies the following equation:
+	(*this + Result * (a_OtherEnd - *this)).z = a_Z
+	If the line is too close to being parallel, this function returns NO_INTERSECTION
+	*/
 	inline double LineCoeffToXYPlane(const Vector3<T> & a_OtherEnd, T a_Z) const
 	{
 		if (abs(z - a_OtherEnd.z) < EPS)
@@ -206,6 +207,11 @@ public:
 		return (a_Z - z) / (a_OtherEnd.z - z);
 	}
 
+	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified Y coord.
+	The result satisfies the following equation:
+	(*this + Result * (a_OtherEnd - *this)).y = a_Y
+	If the line is too close to being parallel, this function returns NO_INTERSECTION
+	*/
 	inline double LineCoeffToXZPlane(const Vector3<T> & a_OtherEnd, T a_Y) const
 	{
 		if (abs(y - a_OtherEnd.y) < EPS)
@@ -216,6 +222,11 @@ public:
 		return (a_Y - y) / (a_OtherEnd.y - y);
 	}
 
+	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified X coord.
+	The result satisfies the following equation:
+	(*this + Result * (a_OtherEnd - *this)).x = a_X
+	If the line is too close to being parallel, this function returns NO_INTERSECTION
+	*/
 	inline double LineCoeffToYZPlane(const Vector3<T> & a_OtherEnd, T a_X) const
 	{
 		if (abs(x - a_OtherEnd.x) < EPS)
@@ -231,8 +242,13 @@ public:
 
 	/** Return value of LineCoeffToPlane() if the line is parallel to the plane. */
 	static const double NO_INTERSECTION;
+
 };
 // tolua_end
+
+
+
+
 
 template <typename T>
 const double Vector3<T>::EPS = 0.000001;
