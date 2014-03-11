@@ -31,14 +31,14 @@ public:
 		Gen.PlacePieces(500, 50, 500, 3, OutPieces);
 		
 		// Print out the pieces:
-		printf("OutPieces.size() = %u\n", OutPieces.size());
+		printf("OutPieces.size() = %zu\n", OutPieces.size());
 		size_t idx = 0;
 		for (cPlacedPieces::const_iterator itr = OutPieces.begin(), end = OutPieces.end(); itr != end; ++itr, ++idx)
 		{
 			const Vector3i & Coords = (*itr)->GetCoords();
 			cCuboid Hitbox = (*itr)->GetHitBox();
 			Hitbox.Sort();
-			printf("%u: {%d, %d, %d}, rot %d, hitbox {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n", idx,
+			printf("%zu: {%d, %d, %d}, rot %d, hitbox {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n", idx,
 				Coords.x, Coords.y, Coords.z,
 				(*itr)->GetNumCCWRotations(),
 				Hitbox.p1.x, Hitbox.p1.y, Hitbox.p1.z,
@@ -183,7 +183,6 @@ cPiece::cConnector cPiece::RotateMoveConnector(const cConnector & a_Connector, i
 	cPiece::cConnector res(a_Connector);
 	
 	// Rotate the res connector:
-	Vector3i Size = GetSize();
 	switch (a_NumCCWRotations)
 	{
 		case 0:
@@ -338,7 +337,7 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, i
 	// Choose a random supported rotation:
 	int Rotations[4] = {0};
 	int NumRotations = 1;
-	for (int i = 1; i < ARRAYCOUNT(Rotations); i++)
+	for (size_t i = 1; i < ARRAYCOUNT(Rotations); i++)
 	{
 		if (StartingPiece->CanRotateCCW(i))
 		{
@@ -378,7 +377,7 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 	static const int DirectionRotationTable[6][6] =
 	{
 		/*         YM, YP, ZM, ZP, XM, XP
-		/* YM */ { 0,  0,  0,  0,  0,  0},
+		   YM */ { 0,  0,  0,  0,  0,  0},
 		/* YP */ { 0,  0,  0,  0,  0,  0},
 		/* ZM */ { 0,  0,  2,  0,  1,  3},
 		/* ZP */ { 0,  0,  0,  2,  3,  1},
@@ -503,11 +502,12 @@ bool cPieceGenerator::CheckConnection(
 // DEBUG:
 void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors & a_ConnectorPool, size_t a_NumProcessed)
 {
-	printf("  Connector pool: %u items\n", a_ConnectorPool.size() - a_NumProcessed);
+	printf("  Connector pool: %zu items\n", a_ConnectorPool.size() - a_NumProcessed);
 	size_t idx = 0;
 	for (cPieceGenerator::cFreeConnectors::const_iterator itr = a_ConnectorPool.begin() + a_NumProcessed, end = a_ConnectorPool.end(); itr != end; ++itr, ++idx)
 	{
-		printf("    %u: {%d, %d, %d}, type %d, direction %s, depth %d\n",
+		// Format specifier for size_t is zu
+		printf("    %zu: {%d, %d, %d}, type %d, direction %s, depth %d\n",
 			idx,
 			itr->m_Connector.m_Pos.x, itr->m_Connector.m_Pos.y, itr->m_Connector.m_Pos.z,
 			itr->m_Connector.m_Type,
