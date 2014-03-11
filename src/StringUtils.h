@@ -22,13 +22,13 @@ typedef std::list<AString>   AStringList;
 
 
 /** Add the formated string to the existing data in the string */
-extern AString & AppendVPrintf(AString & str, const char * format, va_list args);
+extern AString & AppendVPrintf(AString & str, const char * format, va_list args) FORMATSTRING(2,0);
 
 /// Output the formatted text into the string
-extern AString & Printf       (AString & str, const char * format, ...);
+extern AString & Printf       (AString & str, const char * format, ...) FORMATSTRING(2,3);
 
 /// Output the formatted text into string, return string by value
-extern AString Printf(const char * format, ...);
+extern AString Printf(const char * format, ...) FORMATSTRING(1,2);
 
 /// Add the formatted string to the existing data in the string
 extern AString & AppendPrintf (AString & str, const char * format, ...);

@@ -38,6 +38,8 @@
 	// No alignment needed in MSVC
 	#define ALIGN_8
 	#define ALIGN_16
+	
+	#define FORMATSTRING(formatIndex,va_argsIndex)
 
 #elif defined(__GNUC__)
 
@@ -56,6 +58,8 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
+	
+	#define FORMATSTRING(formatIndex,va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 #else
 
