@@ -21,10 +21,10 @@ public:																// tolua_export
 	
 	~cMCLogger();													// tolua_export
 
-	void Log(const char* a_Format, va_list a_ArgList);
-	void Info(const char* a_Format, va_list a_ArgList);
-	void Warn(const char* a_Format, va_list a_ArgList);
-	void Error(const char* a_Format, va_list a_ArgList);
+	void Log(const char* a_Format, va_list a_ArgList)   FORMATSTRING(2,0);
+	void Info(const char* a_Format, va_list a_ArgList)  FORMATSTRING(2,0);
+	void Warn(const char* a_Format, va_list a_ArgList)  FORMATSTRING(2,0);
+	void Error(const char* a_Format, va_list a_ArgList) FORMATSTRING(2,0);
 
 	void LogSimple(const char* a_Text, int a_LogType = 0 );			// tolua_export
 
@@ -57,9 +57,9 @@ private:
 
 
 
-extern void LOG(const char* a_Format, ...) FORMATSTRING(1,2);
-extern void LOGINFO(const char* a_Format, ...) FORMATSTRING(1,2);
-extern void LOGWARN(const char* a_Format, ...) FORMATSTRING(1,2);
+extern void LOG(const char* a_Format, ...)      FORMATSTRING(1,2);
+extern void LOGINFO(const char* a_Format, ...)  FORMATSTRING(1,2);
+extern void LOGWARN(const char* a_Format, ...)  FORMATSTRING(1,2);
 extern void LOGERROR(const char* a_Format, ...) FORMATSTRING(1,2);
 
 

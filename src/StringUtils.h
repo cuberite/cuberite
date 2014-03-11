@@ -31,7 +31,7 @@ extern AString & Printf       (AString & str, const char * format, ...) FORMATST
 extern AString Printf(const char * format, ...) FORMATSTRING(1,2);
 
 /// Add the formatted string to the existing data in the string
-extern AString & AppendPrintf (AString & str, const char * format, ...);
+extern AString & AppendPrintf (AString & str, const char * format, ...) FORMATSTRING(2,3);
 
 /// Split the string at any of the listed delimiters, return as a stringvector
 extern AStringVector StringSplit(const AString & str, const AString & delim);

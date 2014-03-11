@@ -459,7 +459,7 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 	}
 	if (Size > MAX_STRING_SIZE)
 	{
-		LOGWARNING("%s: String too large: %llu (%llu KiB)", __FUNCTION__, Size, Size / 1024);
+		LOGWARNING("%s: String too large: %u (%u KiB)", __FUNCTION__, Size, Size / 1024);
 	}
 	return ReadString(a_Value, (int)Size);
 }
