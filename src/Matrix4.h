@@ -23,14 +23,6 @@ public:
 
 	T cell[16];
 
-	enum
-	{
-		TX=3, TY=7, TZ=11,
-		D0=0, D1=5, D2=10, D3=15,
-		SX=D0, SY=D1, SZ=D2,
-		W=D3
-	};
-
 	// tolua_begin
 
 	inline Matrix4(void)
@@ -60,9 +52,11 @@ public:
 
 	inline void Identity()
 	{
-		cell[1] = cell[2] = cell[TX] = cell[4] = cell[6] = cell[TY] =
-		cell[8] = cell[9] = cell[TZ] = cell[12] = cell[13] = cell[14] = 0;
-		cell[D0] = cell[D1] = cell[D2] = cell[W] = 1;
+		cell[1]  = cell[2]  = cell[3]  = cell[4]  = 0;
+		cell[6]  = cell[7]  = cell[8]  = cell[9]  = 0;
+		cell[11] = cell[12] = cell[13] = cell[14] = 0;
+
+		cell[0] = cell[5] = cell[10] = cell[15] = 1;
 	}
 
 	inline void Init(const Vector3<T> & a_Pos, T a_RX, T a_RY, T a_RZ)
@@ -83,7 +77,8 @@ public:
 
 		Identity();
 
-		cell[5] = cx, cell[6] = sx, cell[9] = -sx, cell[10] = cx;
+		cell[5] = cx;  cell[6]  = sx;
+		cell[9] = -sx; cell[10] = cx;
 	}
 
 	inline void RotateY(T a_RY)
@@ -93,7 +88,8 @@ public:
 
 		Identity();
 
-		cell[0] = cy, cell[2] = -sy, cell[8] = sy, cell[10] = cy;
+		cell[0] = cy; cell[2] = -sy;
+		cell[8] = sy; cell[10] = cy;
 	}
 
 	inline void RotateZ(T a_RZ)
@@ -109,16 +105,16 @@ public:
 
 	inline void Translate(const Vector3<T> & a_Pos)
 	{ 
-		cell[TX] += a_Pos.x;
-		cell[TY] += a_Pos.y;
-		cell[TZ] += a_Pos.z;
+		cell[3]  += a_Pos.x;
+		cell[7]  += a_Pos.y;
+		cell[11] += a_Pos.z;
 	}
 
 	inline void SetTranslation(const Vector3<T> & a_Pos)
 	{
-		cell[TX] = a_Pos.x;
-		cell[TY] = a_Pos.y;
-		cell[TZ] = a_Pos.z;
+		cell[3]  = a_Pos.x;
+		cell[7]  = a_Pos.y;
+		cell[11] = a_Pos.z;
 	}
 
 	inline void Concatenate(const Matrix4 & m2)
@@ -130,7 +126,7 @@ public:
 			for (unsigned int r = 0; r < 4; ++r)
 			{
 				res.cell[r * 4 + c] = (
-					cell[r * 4]     * m2.cell[c] +
+					cell[r * 4 + 0] * m2.cell[c + 0] +
 					cell[r * 4 + 1] * m2.cell[c + 4] +
 					cell[r * 4 + 2] * m2.cell[c + 8] +
 					cell[r * 4 + 3] * m2.cell[c + 12]
@@ -207,8 +203,8 @@ public:
 
 	inline void SetZColumn(const Vector3<T> & a_Z)
 	{
-		cell[8] = a_Z.x;
-		cell[9] = a_Z.y;
+		cell[8]  = a_Z.x;
+		cell[9]  = a_Z.y;
 		cell[10] = a_Z.z;
 	}
 };

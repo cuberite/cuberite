@@ -26,6 +26,12 @@ public:
 	inline Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
 
 
+	// Hardcoded copy constructors (tolua++ does not support function templates .. yet)
+	Vector3(const Vector3<float>  & a_Rhs) : x(a_Rhs.x), y(a_Rhs.y), z(a_Rhs.z) {}
+	Vector3(const Vector3<double> & a_Rhs) : x(a_Rhs.x), y(a_Rhs.y), z(a_Rhs.z) {}
+	Vector3(const Vector3<int>    & a_Rhs) : x(a_Rhs.x), y(a_Rhs.y), z(a_Rhs.z) {}
+
+
 	// tolua_end
 	template <typename _T>
 	Vector3(const Vector3<_T> & a_Rhs) : x(a_Rhs.x), y(a_Rhs.y), z(a_Rhs.z) {}
