@@ -37,7 +37,8 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-
+	
+	#define FORMATSTRING(formatIndex,va_argsIndex)
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
@@ -58,6 +59,8 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	*/
+	
+	#define FORMATSTRING(formatIndex,va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 #endif
 
