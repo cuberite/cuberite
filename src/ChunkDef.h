@@ -62,16 +62,12 @@ typedef unsigned char HEIGHTTYPE;
 class cChunkDef
 {
 public:
-	enum
-	{
-		// Chunk dimensions:
-		Width = 16U,
-		Height = 256U,
-		NumBlocks = Width * Height * Width,
-		
-		/// If the data is collected into a single buffer, how large it needs to be:
-		BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2),  // 2.5 * numblocks
-	} ;
+	// Chunk dimensions:
+	static const int Width = 16;
+	static const int Height = 256;
+	static const int NumBlocks = Width * Height * Width;
+	/// If the data is collected into a single buffer, how large it needs to be:
+	static const int BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2);  // 2.5 * numblocks
 
 	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
@@ -132,13 +128,13 @@ public:
 	}
 
 
-	inline static unsigned int MakeIndexNoCheck(int x, int y, int z)
+	inline static int MakeIndexNoCheck(int x, int y, int z)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
-			return static_cast<unsigned int>(x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width)); // 1.2 is XZY
+			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width); // 1.2 is XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return static_cast<unsigned int>(y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width)); // 1.1 is YZX
+			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width); // 1.1 is YZX
 		#endif
 	}
 
@@ -240,7 +236,7 @@ public:
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			unsigned int Index = MakeIndexNoCheck(x, y, z);
+			int Index = MakeIndexNoCheck(x, y, z);
 			return (a_Buffer[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
@@ -274,8 +270,8 @@ public:
 			return;
 		}
 
-		unsigned int Index = MakeIndexNoCheck(x, y, z);
-		a_Buffer[Index / 2] = static_cast<NIBBLETYPE>(
+		int Index = MakeIndexNoCheck(x, y, z);
+		a_Buffer[Index / 2] = (
 			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 		);
