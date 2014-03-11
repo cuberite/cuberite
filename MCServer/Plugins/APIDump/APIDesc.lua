@@ -173,7 +173,7 @@ g_APIDesc =
 				{ 
 					{ Params = "{{Vector3i|Offset}}", Return = "", Notes = "Sets the offset of the cBlockArea. Mostly used for WorldEdit." },
 					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Sets the offset of the cBlockArea. Mostly used for WorldEdit." },
-				}
+				},
 				SetOrigin =
 				{
 					{ Params = "{{Vector3i|Origin}}", Return = "", Notes = "Resets the origin for the absolute coords. Only affects how absolute coords are translated into relative coords." },
