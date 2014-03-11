@@ -13,13 +13,13 @@
 #pragma once
 
 #include "ForEachChunkProvider.h"
+#include "Vector3.h"
 
 
 
 
 // fwd:
 class cCuboid;
-class Vector3i;
 
 
 

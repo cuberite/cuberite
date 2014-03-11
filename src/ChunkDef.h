@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Vector3i.h"
+#include "Vector3.h"
 #include "BiomeDef.h"
 
 

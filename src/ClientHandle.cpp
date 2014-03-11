@@ -22,9 +22,6 @@
 #include "Blocks/BlockSlab.h"
 #include "Blocks/ChunkInterface.h"
 
-#include "Vector3f.h"
-#include "Vector3d.h"
-
 #include "Root.h"
 
 #include "Authenticator.h"

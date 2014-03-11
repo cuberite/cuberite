@@ -29,6 +29,8 @@ extern "C"
 	#include "lua/src/lauxlib.h"
 }
 
+#include "../Vector3.h"
+
 
 
 
@@ -52,7 +54,6 @@ class cWebAdmin;
 struct HTTPTemplateRequest;
 class cTNTEntity;
 class cCreeper;
-class Vector3i;
 class cHopperEntity;
 class cBlockEntity;
 

@@ -70,9 +70,7 @@ if (NOT MSVC)
 		StringUtils.h
 		Tracer.h
 		UI/Window.h
-		Vector3d.h
-		Vector3f.h
-		Vector3i.h
+		Vector3.h
 		WebAdmin.h
 		World.h
 	)

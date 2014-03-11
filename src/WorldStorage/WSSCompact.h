@@ -12,7 +12,7 @@
 #define WSSCOMPACT_H_INCLUDED
 
 #include "WorldStorage.h"
-#include "../Vector3i.h"
+#include "../Vector3.h"
 #include "json/json.h"
 
 
