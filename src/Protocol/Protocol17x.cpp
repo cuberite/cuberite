@@ -1251,7 +1251,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
 			AString Hex;
 			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-			m_CommLogFile.Printf("Incoming data, %d (0x%x) unparsed bytes already present in buffer:\n%s\n",
+			m_CommLogFile.Printf("Incoming data, %zu (0x%zx) unparsed bytes already present in buffer:\n%s\n",
 				AllData.size(), AllData.size(), Hex.c_str()
 			);
 		}
@@ -1351,7 +1351,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 			// Put a message in the comm log:
 			if (g_ShouldLogCommIn)
 			{
-				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %d left) ^^^^^^\n\n\n",
+				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %zu left) ^^^^^^\n\n\n",
 					1, bb.GetReadableSpace()
 				);
 				m_CommLogFile.Flush();
@@ -1373,7 +1373,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
 		AString Hex;
 		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-		m_CommLogFile.Printf("There are %d (0x%x) bytes of non-parse-able data left in the buffer:\n%s",
+		m_CommLogFile.Printf("There are %zu (0x%zx) bytes of non-parse-able data left in the buffer:\n%s",
 			m_ReceivedData.GetReadableSpace(), m_ReceivedData.GetReadableSpace(), Hex.c_str()
 		);
 		m_CommLogFile.Flush();
