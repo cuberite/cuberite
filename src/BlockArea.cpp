@@ -264,7 +264,7 @@ void cBlockArea::SetOffset(int a_OffsetX, int a_OffsetY, int a_OffsetZ)
 
 
 
-void cBlockArea::SetOffset(Vector3i a_Offset)
+void cBlockArea::SetOffset(const Vector3i & a_Offset)
 {
 	m_Offset.Set(a_Offset.x, a_Offset.y, a_Offset.z);
 }

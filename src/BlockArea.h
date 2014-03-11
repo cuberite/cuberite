@@ -210,7 +210,7 @@ public:
 	void SetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE a_BlockSkyLight);
 	void SetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockSkyLight);
 	void SetOffset          (int a_OffsetX, int a_OffsetY, int a_OffsetZ);
-	void SetOffset          (Vector3i a_Offset);
+	void SetOffset          (const Vector3i & a_Offset);
 
 	// Getters:
 	BLOCKTYPE  GetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ)   const;
@@ -221,7 +221,7 @@ public:
 	NIBBLETYPE GetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ) const;
 	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ)   const;
 	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ) const;
-	Vector3i   GetOffset          (void)                                     const {return m_Offset;}
+	const Vector3i & GetOffset    (void)                                     const {return m_Offset;}
 
 	void SetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
 	void SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
