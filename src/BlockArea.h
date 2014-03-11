@@ -221,7 +221,7 @@ public:
 	NIBBLETYPE GetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ) const;
 	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ)   const;
 	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ) const;
-	const Vector3i & GetOffset    (void)                                     const {return m_Offset;}
+	const Vector3i & GetOffset    (void)                                     const {return m_WEOffset;}
 
 	void SetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
 	void SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
@@ -302,7 +302,8 @@ protected:
 	int m_SizeY;
 	int m_SizeZ;
 	
-	Vector3i m_Offset;
+	// Used for schematics that are created by the WorldEdit plugin. The offset is used for player-relative pasting.
+	Vector3i m_WEOffset;
 
 	BLOCKTYPE *  m_BlockTypes;
 	NIBBLETYPE * m_BlockMetas;     // Each meta is stored as a separate byte for faster access

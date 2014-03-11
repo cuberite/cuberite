@@ -253,9 +253,9 @@ AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockA
 		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
 	}
 	
-	Writer.AddInt("WEOffsetX", a_BlockArea.m_Offset.x);
-	Writer.AddInt("WEOffsetY", a_BlockArea.m_Offset.y);
-	Writer.AddInt("WEOffsetZ", a_BlockArea.m_Offset.z);
+	Writer.AddInt("WEOffsetX", a_BlockArea.m_WEOffset.x);
+	Writer.AddInt("WEOffsetY", a_BlockArea.m_WEOffset.y);
+	Writer.AddInt("WEOffsetZ", a_BlockArea.m_WEOffset.z);
 
 	// TODO: Save entities and block entities
 	Writer.BeginList("Entities", TAG_Compound);
