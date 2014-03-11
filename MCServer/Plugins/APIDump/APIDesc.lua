@@ -115,6 +115,7 @@ g_APIDesc =
 				GetBlockType = { Params = "BlockX, BlockY, BlockZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified absolute coords" },
 				GetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified absolute coords" },
 				GetDataTypes = { Params = "", Return = "number", Notes = "Returns the mask of datatypes that the objectis currently holding" },
+				GetOffset = { Params = "", Returns = "Vector3i", Notes = "Returns the offset wich are sometimes saved in schematic files if created by WorldEdit (Bukkit) for player-relative pasting. The default is 0, 0, 0"},
 				GetOrigin = { Params = "", Return = "OriginX, OriginY, OriginZ", Notes = "Returns the origin coords of where the area was read from." },
 				GetOriginX = { Params = "", Return = "number", Notes = "Returns the origin x-coord" },
 				GetOriginY = { Params = "", Return = "number", Notes = "Returns the origin y-coord" },
@@ -168,6 +169,11 @@ g_APIDesc =
 				SetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ, SkyLight", Return = "", Notes = "Sets the skylight at the specified absolute coords" },
 				SetBlockType = { Params = "BlockX, BlockY, BlockZ, BlockType", Return = "", Notes = "Sets the block type at the specified absolute coords" },
 				SetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified absolute coords" },
+				SetOffset = 
+				{ 
+					{ Params = "{{Vector3i|Offset}}", Return = "", Notes = "Sets the offset of the cBlockArea. Mostly used for WorldEdit." },
+					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Sets the offset of the cBlockArea. Mostly used for WorldEdit." },
+				}
 				SetOrigin =
 				{
 					{ Params = "{{Vector3i|Origin}}", Return = "", Notes = "Resets the origin for the absolute coords. Only affects how absolute coords are translated into relative coords." },
