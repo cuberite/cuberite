@@ -3,7 +3,7 @@
 
 
 
-
+#define _USE_MATH_DEFINES // Enable non-standard math defines (MSVC)
 #include <math.h>
 
 
