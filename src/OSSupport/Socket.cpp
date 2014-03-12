@@ -307,7 +307,8 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 			CloseSocket();
 			return false;
 		}
-		addr = *((unsigned long*)hp->h_addr);
+		// Should be optimised to a single word copy
+		memcpy(&addr, hp->h_addr, hp->h_length);
 	}
 
 	sockaddr_in server;

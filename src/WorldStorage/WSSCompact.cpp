@@ -39,7 +39,7 @@ struct cWSSCompact::sChunkHeader
 
 
 /// The maximum number of PAK files that are cached
-const int MAX_PAK_FILES = 16;
+const size_t MAX_PAK_FILES = 16;
 
 /// The maximum number of unsaved chunks before the cPAKFile saves them to disk
 const int MAX_DIRTY_CHUNKS = 16;
@@ -764,7 +764,6 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		// Cannot use cChunk::MakeIndex because it might change again?????????
 		// For compatibility, use what we know is current
-		#define MAKE_2_INDEX( x, y, z ) ( y + (z * 256) + (x * 256 * 16) )
 		#define MAKE_3_INDEX( x, y, z ) ( x + (z * 16) + (y * 16 * 16) )
 
 		unsigned int InChunkOffset = 0;
