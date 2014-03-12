@@ -39,7 +39,7 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	
-	#define FORMATSTRING(formatIndex,va_argsIndex)
+	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
 	#define SIZE_T_FMT "%Iu"
@@ -64,7 +64,7 @@
 	// Some portability macros :)
 	#define stricmp strcasecmp
 	
-	#define FORMATSTRING(formatIndex,va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
+	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 	#define SIZE_T_FMT "%zu"
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
