@@ -38,6 +38,9 @@
 	// No alignment needed in MSVC
 	#define ALIGN_8
 	#define ALIGN_16
+	
+	// MSVC has its own custom version of zu format
+	#define SIZE_T_FMT "%Iu"
 
 #elif defined(__GNUC__)
 
@@ -56,6 +59,8 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
+	
+	#define SIZE_T_FMT "%zu"
 
 #else
 

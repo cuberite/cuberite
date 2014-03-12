@@ -31,14 +31,14 @@ public:
 		Gen.PlacePieces(500, 50, 500, 3, OutPieces);
 		
 		// Print out the pieces:
-		printf("OutPieces.size() = %zu\n", OutPieces.size());
+		printf("OutPieces.size() = " SIZE_T_FMT "\n", OutPieces.size());
 		size_t idx = 0;
 		for (cPlacedPieces::const_iterator itr = OutPieces.begin(), end = OutPieces.end(); itr != end; ++itr, ++idx)
 		{
 			const Vector3i & Coords = (*itr)->GetCoords();
 			cCuboid Hitbox = (*itr)->GetHitBox();
 			Hitbox.Sort();
-			printf("%zu: {%d, %d, %d}, rot %d, hitbox {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n", idx,
+			printf(SIZE_T_FMT ": {%d, %d, %d}, rot %d, hitbox {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n", idx,
 				Coords.x, Coords.y, Coords.z,
 				(*itr)->GetNumCCWRotations(),
 				Hitbox.p1.x, Hitbox.p1.y, Hitbox.p1.z,
@@ -502,12 +502,11 @@ bool cPieceGenerator::CheckConnection(
 // DEBUG:
 void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors & a_ConnectorPool, size_t a_NumProcessed)
 {
-	printf("  Connector pool: %zu items\n", a_ConnectorPool.size() - a_NumProcessed);
+	printf("  Connector pool: " SIZE_T_FMT " items\n", a_ConnectorPool.size() - a_NumProcessed);
 	size_t idx = 0;
 	for (cPieceGenerator::cFreeConnectors::const_iterator itr = a_ConnectorPool.begin() + a_NumProcessed, end = a_ConnectorPool.end(); itr != end; ++itr, ++idx)
 	{
-		// Format specifier for size_t is zu
-		printf("    %zu: {%d, %d, %d}, type %d, direction %s, depth %d\n",
+		printf("    " SIZE_T_FMT ": {%d, %d, %d}, type %d, direction %s, depth %d\n",
 			idx,
 			itr->m_Connector.m_Pos.x, itr->m_Connector.m_Pos.y, itr->m_Connector.m_Pos.z,
 			itr->m_Connector.m_Type,
