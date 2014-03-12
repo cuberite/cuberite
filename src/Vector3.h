@@ -27,9 +27,9 @@ public:
 
 
 	// Hardcoded copy constructors (tolua++ does not support function templates .. yet)
-	Vector3(const Vector3<float>  & a_Rhs) : x(a_Rhs.x), y(a_Rhs.y), z(a_Rhs.z) {}
-	Vector3(const Vector3<double> & a_Rhs) : x(a_Rhs.x), y(a_Rhs.y), z(a_Rhs.z) {}
-	Vector3(const Vector3<int>    & a_Rhs) : x(a_Rhs.x), y(a_Rhs.y), z(a_Rhs.z) {}
+	Vector3(const Vector3<float>  & a_Rhs) : x((T) a_Rhs.x), y((T) a_Rhs.y), z((T) a_Rhs.z) {}
+	Vector3(const Vector3<double> & a_Rhs) : x((T) a_Rhs.x), y((T) a_Rhs.y), z((T) a_Rhs.z) {}
+	Vector3(const Vector3<int>    & a_Rhs) : x((T) a_Rhs.x), y((T) a_Rhs.y), z((T) a_Rhs.z) {}
 
 
 	// tolua_end
@@ -50,7 +50,7 @@ public:
 
 	inline void Normalize(void)
 	{
-		T Len = 1.0 / Length();
+		double Len = 1.0 / Length();
 
 		x *= Len;
 		y *= Len;
@@ -59,7 +59,7 @@ public:
 
 	inline Vector3<T> NormalizeCopy(void) const
 	{
-		T Len = 1.0 / Length();
+		double Len = 1.0 / Length();
 
 		return Vector3<T>(
 			x * Len,
@@ -70,7 +70,7 @@ public:
 
 	inline void NormalizeCopy(Vector3<T> & a_Rhs) const
 	{
-		T Len = 1.0 / Length();
+		double Len = 1.0 / Length();
 
 		a_Rhs.Set(
 			x * Len,
@@ -79,12 +79,12 @@ public:
 		);
 	}
 
-	inline T Length(void) const
+	inline double Length(void) const
 	{
-		return sqrt(x * x + y * y + z * z);
+		return sqrt((double)(x * x + y * y + z * z));
 	}
 
-	inline T SqrLength(void) const
+	inline double SqrLength(void) const
 	{
 		return x * x + y * y + z * z;
 	}
