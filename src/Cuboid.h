@@ -1,8 +1,7 @@
 
 #pragma once
 
-#include "Vector3i.h"
-#include "Vector3d.h"
+#include "Vector3.h"
 
 
 
