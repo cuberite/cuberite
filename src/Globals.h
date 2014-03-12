@@ -236,7 +236,7 @@ template class SizeChecker<UInt16, 2>;
 
 // Same as assert but in all Self test builds
 #ifdef SELF_TEST
-#define assert_test(x) ( !!(x) || (assert(0), exit(1), 0))
+#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
 /// A generic interface used mainly in ForEach() functions
