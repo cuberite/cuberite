@@ -189,11 +189,11 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	)
 	{
 		// Not every schematic file has an offset, so we shoudn't give a warn message.
-		a_BlockArea.SetOffset(0, 0, 0);
+		a_BlockArea.SetWEOffset(0, 0, 0);
 	}
 	else
 	{
-		a_BlockArea.SetOffset(a_NBT.GetInt(TOffsetX), a_NBT.GetInt(TOffsetY), a_NBT.GetInt(TOffsetZ));
+		a_BlockArea.SetWEOffset(a_NBT.GetInt(TOffsetX), a_NBT.GetInt(TOffsetY), a_NBT.GetInt(TOffsetZ));
 	}
 
 	// Copy the block types and metas:

@@ -209,8 +209,8 @@ public:
 	void SetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockLight);
 	void SetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE a_BlockSkyLight);
 	void SetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockSkyLight);
-	void SetOffset          (int a_OffsetX, int a_OffsetY, int a_OffsetZ);
-	void SetOffset          (const Vector3i & a_Offset);
+	void SetWEOffset        (int a_OffsetX, int a_OffsetY, int a_OffsetZ);
+	void SetWEOffset        (const Vector3i & a_Offset);
 
 	// Getters:
 	BLOCKTYPE  GetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ)   const;
@@ -221,7 +221,7 @@ public:
 	NIBBLETYPE GetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ) const;
 	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ)   const;
 	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ) const;
-	const Vector3i & GetOffset    (void)                                     const {return m_WEOffset;}
+	const Vector3i & GetWEOffset  (void)                                     const {return m_WEOffset;}
 
 	void SetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
 	void SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
@@ -302,7 +302,8 @@ protected:
 	int m_SizeY;
 	int m_SizeZ;
 	
-	// Used for schematics that are created by the WorldEdit plugin. The offset is used for player-relative pasting.
+	/** An extra data value sometimes stored in the .schematic file. Used mainly by the WorldEdit plugin.
+	cBlockArea doesn't use this value in any way. */
 	Vector3i m_WEOffset;
 
 	BLOCKTYPE *  m_BlockTypes;
