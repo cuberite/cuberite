@@ -377,7 +377,7 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 	// You need DirectionRotationTable[rot1][rot2] CCW turns to connect rot1 to rot2 (they are opposite)
 	static const int DirectionRotationTable[6][6] =
 	{
-		/*         YM, YP, ZM, ZP, XM, XP
+		/*         YM, YP, ZM, ZP, XM, XP */
 		/* YM */ { 0,  0,  0,  0,  0,  0},
 		/* YP */ { 0,  0,  0,  0,  0,  0},
 		/* ZM */ { 0,  0,  2,  0,  1,  3},
