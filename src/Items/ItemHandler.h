@@ -21,6 +21,9 @@ class cItemHandler
 public:
 	cItemHandler(int a_ItemType);
 	
+	// Force virtual destructor
+	virtual ~cItemHandler() {}
+	
 	/// Called when the player tries to use the item (right mouse button). Return false to make the item unusable. DEFAULT: False
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir);
 	

@@ -40,7 +40,7 @@ public:
 	virtual ~cProtocol132();
 
 	/// Called when client sends some data:
-	virtual void DataReceived(const char * a_Data, int a_Size) override;
+	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 	
 	// Sending commands (alphabetically sorted):
 	virtual void SendBlockAction         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;

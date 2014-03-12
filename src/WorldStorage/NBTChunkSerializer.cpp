@@ -28,6 +28,7 @@
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/ProjectileEntity.h"
+#include "../Entities/TNTEntity.h"
 
 #include "../Mobs/Monster.h"
 #include "../Mobs/Bat.h"
@@ -91,11 +92,19 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 	}
 	
 	// Write the enchantments:
-	if (!a_Item.m_Enchantments.IsEmpty())
+	if (!a_Item.m_Enchantments.IsEmpty() || ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)))
 	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
 		m_Writer.BeginCompound("tag");
-			EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, m_Writer, TagName);
+			if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+			{
+				cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, m_Writer, (ENUM_ITEM_ID)a_Item.m_ItemType);
+			}
+			
+			if (!a_Item.m_Enchantments.IsEmpty())
+			{
+				const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+				EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, m_Writer, TagName);
+			}
 		m_Writer.EndCompound();
 	}
 	
@@ -583,6 +592,18 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 
 
 
+void cNBTChunkSerializer::AddTNTEntity(cTNTEntity * a_TNT)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_TNT, "PrimedTnt");
+		m_Writer.AddByte("Fuse", (unsigned char)a_TNT->GetFuseTicks());
+	m_Writer.EndCompound();
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Minecart)
 {
 	m_Writer.BeginList("Items", TAG_Compound);
@@ -662,7 +683,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etMonster:      AddMonsterEntity     ((cMonster *)         a_Entity); break;
 		case cEntity::etPickup:       AddPickupEntity      ((cPickup *)          a_Entity); break;
 		case cEntity::etProjectile:   AddProjectileEntity  ((cProjectileEntity *)a_Entity); break;
-		case cEntity::etTNT: /* TODO */ break;
+		case cEntity::etTNT:          AddTNTEntity         ((cTNTEntity *)       a_Entity); break;
 		case cEntity::etExpOrb: /* TODO */ break;
 		case cEntity::etItemFrame: /* TODO */ break;
 		case cEntity::etPainting: /* TODO */ break;

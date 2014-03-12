@@ -42,8 +42,6 @@ cBlockInfo::~cBlockInfo()
 
 cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
 {
-	ASSERT(a_Type < 256);
-
 	return ms_Info[a_Type];
 }
 

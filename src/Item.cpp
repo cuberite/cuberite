@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Item.h"
@@ -139,6 +139,16 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 		{
 			a_OutValue["Lore"] = m_Lore;
 		}
+
+		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
+		{
+			a_OutValue["Flicker"] = m_FireworkItem.m_HasFlicker;
+			a_OutValue["Trail"] = m_FireworkItem.m_HasTrail;
+			a_OutValue["Type"] = m_FireworkItem.m_Type;
+			a_OutValue["FlightTimeInTicks"] = m_FireworkItem.m_FlightTimeInTicks;
+			a_OutValue["Colours"] = m_FireworkItem.ColoursToString(m_FireworkItem);
+			a_OutValue["FadeColours"] = m_FireworkItem.FadeColoursToString(m_FireworkItem);
+		}
 	}
 }
 
@@ -157,6 +167,16 @@ void cItem::FromJson(const Json::Value & a_Value)
 		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
 		m_CustomName = a_Value.get("Name", "").asString();
 		m_Lore = a_Value.get("Lore", "").asString();
+
+		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
+		{
+			m_FireworkItem.m_HasFlicker = a_Value.get("Flicker", false).asBool();
+			m_FireworkItem.m_HasTrail = a_Value.get("Trail", false).asBool();
+			m_FireworkItem.m_Type = (NIBBLETYPE)a_Value.get("Type", 0).asInt();
+			m_FireworkItem.m_FlightTimeInTicks = (short)a_Value.get("FlightTimeInTicks", 0).asInt();
+			m_FireworkItem.ColoursFromString(a_Value.get("Colours", "").asString(), m_FireworkItem);
+			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
+		}
 	}
 }
 

@@ -214,7 +214,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 
 
 
-cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d * a_Speed)
+cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item, const Vector3d * a_Speed)
 {
 	Vector3d Speed;
 	if (a_Speed != NULL)
@@ -231,8 +231,15 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkFirework:      return new cFireworkEntity        (a_Creator, a_X, a_Y, a_Z       );
-		// TODO: the rest
+		case pkFirework:
+		{
+			if (a_Item.m_FireworkItem.m_Colours.empty())
+			{
+				return NULL;
+			}
+
+			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, a_Item);
+		}
 	}
 	
 	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);
@@ -276,6 +283,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkExpBottle:     return "ThrownExpBottle";
 		case pkSplashPotion:  return "ThrownPotion";
 		case pkWitherSkull:   return "WitherSkull";
+		case pkFirework:      return "Firework";
 		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
 	}
 	ASSERT(!"Unhandled projectile entity kind!");
@@ -693,28 +701,11 @@ void cExpBottleEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_H
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFireworkEntity :
 
-cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z) :
-super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item) :
+super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+	m_ExplodeTimer(0),
+	m_FireworkItem(a_Item)
 {
-}
-
-
-
-
-
-void cFireworkEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
-{
-	if ((a_HitFace != BLOCK_FACE_BOTTOM) && (a_HitFace != BLOCK_FACE_NONE))
-	{
-		return;
-	}
-
-	SetSpeed(0, 0, 0);
-	SetPosition(GetPosX(), GetPosY() - 0.5, GetPosZ());
-
-	m_IsInGround = true;
-
-	BroadcastMovementUpdate();
 }
 
 
@@ -723,9 +714,18 @@ void cFireworkEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_Hi
 
 void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 {
+	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int PosY = POSY_TOINT;
+
+	if ((PosY < 0) || (PosY >= cChunkDef::Height))
+	{
+		goto setspeed;
+	}
+
 	if (m_IsInGround)
 	{
-		if (a_Chunk.GetBlock((int)GetPosX(), (int)GetPosY() + 1, (int)GetPosZ()) == E_BLOCK_AIR)
+		if (a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ) == E_BLOCK_AIR)
 		{
 			m_IsInGround = false;
 		}
@@ -734,28 +734,35 @@ void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			return;
 		}
 	}
-
-	Vector3d PerTickSpeed = GetSpeed() / 20;
-	Vector3d Pos = GetPosition();
-
-	// Trace the tick's worth of movement as a line:
-	Vector3d NextPos = Pos + PerTickSpeed;
-	cProjectileTracerCallback TracerCallback(this);
-	if (!cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
+	else
 	{
-		// Something has been hit, abort all other processing
-		return;
+		if (a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ) != E_BLOCK_AIR)
+		{
+			OnHitSolidBlock(GetPosition(), BLOCK_FACE_YM);
+			return;
+		}
 	}
-	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later in its SlowdownCoeff
 
-	// Update the position:
-	SetPosition(NextPos);
+setspeed:
+	AddSpeedY(1);
+	AddPosition(GetSpeed() * (a_Dt / 1000));
+}
 
-	// Add slowdown and gravity effect to the speed:
-	Vector3d NewSpeed(GetSpeed());
-	NewSpeed.y += 2;
-	NewSpeed *= TracerCallback.GetSlowdownCoeff();
-	SetSpeed(NewSpeed);
+
+
+
+
+void cFireworkEntity::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	super::Tick(a_Dt, a_Chunk);
+
+	if (m_ExplodeTimer == m_FireworkItem.m_FireworkItem.m_FlightTimeInTicks)
+	{
+		m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_FIREWORK_EXPLODE);
+		Destroy();
+	}
+
+	m_ExplodeTimer++;
 }
 
 

@@ -3,17 +3,18 @@
 
 #include "BlockHandler.h"
 #include "BlockRedstoneRepeater.h"
+#include "MetaRotater.h"
 
 
 
 
 
 class cBlockComparatorHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
 {
 public:
 	cBlockComparatorHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotater<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
 	{
 	}
 

@@ -10,17 +10,10 @@
 #include "../BlockEntities/BlockEntity.h"
 #include "../GroupManager.h"
 #include "../Group.h"
-#include "../ChatColor.h"
-#include "../Item.h"
-#include "../Tracer.h"
 #include "../Root.h"
 #include "../OSSupport/Timer.h"
-#include "../MersenneTwister.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
-
-#include "../Vector3d.h"
-#include "../Vector3f.h"
 
 #include "inifile/iniFile.h"
 #include "json/json.h"
@@ -45,10 +38,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_Inventory(*this)
 	, m_CurrentWindow(NULL)
 	, m_InventoryWindow(NULL)
-	, m_TimeLastPickupCheck(0.f)
 	, m_Color('-')
-	, m_LastBlockActionTime(0)
-	, m_LastBlockActionCnt(0)
 	, m_GameMode(eGameMode_NotSet)
 	, m_IP("")
 	, m_ClientHandle(a_Client)
@@ -86,7 +76,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_LastPlayerListTime = t1.GetNowTime();
 
 	m_TimeLastTeleportPacket = 0;
-	m_TimeLastPickupCheck = 0;
 	
 	m_PlayerName = a_PlayerName;
 	m_bDirtyPosition = true; // So chunks are streamed to player at spawn
@@ -1041,27 +1030,6 @@ void cPlayer::CloseWindowIfID(char a_WindowID, bool a_CanRefuse)
 		return;
 	}
 	CloseWindow();
-}
-
-
-
-
-
-void cPlayer::SetLastBlockActionTime()
-{
-	if (m_World != NULL)
-	{
-		m_LastBlockActionTime = m_World->GetWorldAge() / 20.0f;
-	}
-}
-
-
-
-
-
-void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
-{
-	m_LastBlockActionCnt = a_LastBlockActionCnt;
 }
 
 

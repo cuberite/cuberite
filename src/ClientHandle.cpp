@@ -52,6 +52,9 @@
 /** Maximum number of explosions to send this tick, server will start dropping if exceeded */
 #define MAX_EXPLOSIONS_PER_TICK 20
 
+/** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
+#define MAX_BLOCK_CHANGE_INTERACTIONS 20
+
 /** How many ticks before the socket is closed after the client is destroyed (#31) */
 static const int TICKS_BEFORE_CLOSE = 20;
 
@@ -96,8 +99,8 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
 	m_UniqueID(0),
-	m_Locale("en_GB"),
-	m_HasSentPlayerChunk(false)
+	m_HasSentPlayerChunk(false),
+	m_Locale("en_GB")
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -555,11 +558,24 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 	}
 	else if (a_Channel == "REGISTER")
 	{
+		if (HasPluginChannel(a_Channel))
+		{
+			SendPluginMessage("UNREGISTER", a_Channel);
+			return; // Can't register again if already taken - kinda defeats the point of plugin messaging!
+		}
+
 		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
 	}
 	else if (a_Channel == "UNREGISTER")
 	{
 		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
+	}
+	else if (!HasPluginChannel(a_Channel))
+	{
+		// Ignore if client sent something but didn't register the channel first
+		LOGD("Player %s sent a plugin message on channel \"%s\", but didn't REGISTER it first", GetUsername().c_str(), a_Channel.c_str());
+		SendPluginMessage("UNREGISTER", a_Channel);
+		return;
 	}
 
 	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
@@ -687,17 +703,19 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
 	);
 
+	m_NumBlockChangeInteractionsThisTick++;
+
+	if (!CheckBlockInteractionsRate())
+	{
+		Kick("Too many blocks were destroyed per unit time - hacked client?");
+		return;
+	}
+
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
-	}
-	
-	if (!CheckBlockInteractionsRate())
-	{
-		// Too many interactions per second, simply ignore. Probably a hacked client, so don't even send bak the block
 		return;
 	}
 
@@ -931,7 +949,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		
-		if (a_BlockFace > -1)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -942,7 +960,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	if (!CheckBlockInteractionsRate())
 	{
-		LOGD("Too many block interactions, aborting placement");
+		Kick("Too many blocks were placed/interacted with per unit time - hacked client?");
 		return;
 	}
 	
@@ -1453,7 +1471,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
-void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
+void cClientHandle::HandleEntityCrouch(int a_EntityID, bool a_IsCrouching)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -1461,35 +1479,37 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 		return;
 	}
 
-	switch (a_ActionID)
+	m_Player->SetCrouch(a_IsCrouching);
+}
+
+
+
+
+
+void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
+{
+	if (a_EntityID != m_Player->GetUniqueID())
 	{
-		case 1:  // Crouch
-		{
-			m_Player->SetCrouch(true);
-			break;
-		}
-		case 2:  // Uncrouch
-		{
-			m_Player->SetCrouch(false);
-			break;
-		}
-		case 3:  // Leave bed
-		{
-			m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
-			break;
-		}
-		case 4:  // Start sprinting
-		{
-			m_Player->SetSprint(true);
-			break;
-		}
-		case 5:  // Stop sprinting
-		{
-			m_Player->SetSprint(false);
-			SendPlayerMaxSpeed();
-			break;
-		}
+		// We should only receive entity actions from the entity that is performing the action
+		return;
 	}
+
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
+}
+
+
+
+
+
+void cClientHandle::HandleEntitySprinting(int a_EntityID, bool a_IsSprinting)
+{
+	if (a_EntityID != m_Player->GetUniqueID())
+	{
+		// We should only receive entity actions from the entity that is performing the action
+		return;
+	}
+
+	m_Player->SetSprint(a_IsSprinting);
 }
 
 
@@ -1619,28 +1639,12 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 {
 	ASSERT(m_Player != NULL);
 	ASSERT(m_Player->GetWorld() != NULL);
-	/*
-	// TODO: _X 2012_11_01: This needs a total re-thinking and rewriting
-	int LastActionCnt = m_Player->GetLastBlockActionCnt();
-	if ((m_Player->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1)
+
+	if (m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS)
 	{
-		// Limit the number of block interactions per tick
-		m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-		m_Player->SetLastBlockActionCnt(LastActionCnt + 1);
-		if (m_Player->GetLastBlockActionCnt() > MAXBLOCKCHANGEINTERACTIONS)
-		{
-			// Kick if more than MAXBLOCKCHANGEINTERACTIONS per tick
-			LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", m_Username.c_str());
-			Kick("You're a baaaaaad boy!");
-			return false;
-		}
+		return false;
 	}
-	else
-	{
-		m_Player->SetLastBlockActionCnt(0);  // Reset count 
-		m_Player->SetLastBlockActionTime();  // Player tried to interact with a block. Reset last block interation time.
-	}
-	*/
+
 	return true;
 }
 
@@ -1713,8 +1717,9 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 	
-	// Reset explosion counter:
+	// Reset explosion & block change counters:
 	m_NumExplosionsThisTick = 0;
+	m_NumBlockChangeInteractionsThisTick = 0;
 }
 
 

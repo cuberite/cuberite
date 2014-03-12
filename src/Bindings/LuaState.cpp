@@ -677,6 +677,7 @@ void cLuaState::Push(Vector3i * a_Vector)
 
 void cLuaState::Push(void * a_Ptr)
 {
+	UNUSED(a_Ptr);
 	ASSERT(IsValid());
 
 	// Investigate the cause of this - what is the callstack?
