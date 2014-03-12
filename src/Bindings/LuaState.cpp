@@ -742,10 +742,6 @@ void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 	{
 		a_Value.assign(data, len);
 	}
-	else
-	{
-		a_Value.clear();
-	}
 }
 
 
