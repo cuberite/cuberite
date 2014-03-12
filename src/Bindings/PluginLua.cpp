@@ -75,6 +75,7 @@ bool cPluginLua::Initialize(void)
 	if (!m_LuaState.IsValid())
 	{	
 		m_LuaState.Create();
+		m_LuaState.RegisterAPILibs();
 		
 		// Inject the identification global variables into the state:
 		lua_pushlightuserdata(m_LuaState, this);

@@ -62,7 +62,6 @@ if (NOT MSVC)
 		Inventory.h
 		Item.h
 		ItemGrid.h
-		Matrix4f.h
 		Mobs/Monster.h
 		OSSupport/File.h
 		Root.h
@@ -70,9 +69,7 @@ if (NOT MSVC)
 		StringUtils.h
 		Tracer.h
 		UI/Window.h
-		Vector3d.h
-		Vector3f.h
-		Vector3i.h
+		Vector3.h
 		WebAdmin.h
 		World.h
 	)

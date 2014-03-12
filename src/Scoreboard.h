@@ -150,6 +150,8 @@ public:
 	/** Removes all registered players */
 	void Reset(void);
 
+	// tolua_begin
+
 	/** Returns the number of registered players */
 	unsigned int GetNumPlayers(void) const;
 

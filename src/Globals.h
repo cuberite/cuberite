@@ -261,6 +261,14 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 
+#ifndef TOLUA_TEMPLATE_BIND
+#define TOLUA_TEMPLATE_BIND(x)
+#endif
+
+
+
+
+
 // Common headers (part 2, with macros):
 #include "ChunkDef.h"
 #include "BiomeDef.h"

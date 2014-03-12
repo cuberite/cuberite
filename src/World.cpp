@@ -46,7 +46,6 @@
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
-#include "Vector3d.h"
 
 #include "Tracer.h"
 

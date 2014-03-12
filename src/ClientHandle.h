@@ -12,7 +12,7 @@
 #define CCLIENTHANDLE_H_INCLUDED
 
 #include "Defines.h"
-#include "Vector3d.h"
+#include "Vector3.h"
 #include "OSSupport/SocketThreads.h"
 #include "ChunkDef.h"
 #include "ByteBuffer.h"

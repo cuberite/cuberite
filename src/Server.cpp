@@ -24,7 +24,7 @@
 #include "MersenneTwister.h"
 
 #include "inifile/iniFile.h"
-#include "Vector3f.h"
+#include "Vector3.h"
 
 #include <fstream>
 #include <sstream>
