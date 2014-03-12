@@ -4,10 +4,6 @@
 #include "Tracer.h"
 #include "World.h"
 
-#include "Vector3f.h"
-#include "Vector3i.h"
-#include "Vector3d.h"
-
 #include "Entities/Entity.h"
 
 #ifndef _WIN32

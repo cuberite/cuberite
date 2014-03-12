@@ -2772,7 +2772,7 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 	{
 		int Index = ((unsigned)((unsigned char)a_Metadata[pos])) & 0x1f;  // Lower 5 bits = index
 		int Type  = ((unsigned)((unsigned char)a_Metadata[pos])) >> 5;    // Upper 3 bits = type
-		//int Length = 0;
+		// int Length = 0;
 		switch (Type)
 		{
 			case 0:
@@ -2827,7 +2827,7 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 					ASSERT(!"Cannot parse item description from metadata");
 					return;
 				}
-				//int After = bb.GetReadableSpace();
+				// int After = bb.GetReadableSpace();
 				int BytesConsumed = BytesLeft - bb.GetReadableSpace();
 
 				Log("%sslot[%d] = %s (%d bytes)", Indent.c_str(), Index, ItemDesc.c_str(), BytesConsumed);

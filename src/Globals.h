@@ -41,6 +41,9 @@
 	
 	#define FORMATSTRING(formatIndex,va_argsIndex)
 
+	// MSVC has its own custom version of zu format
+	#define SIZE_T_FMT "%Iu"
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -60,6 +63,8 @@
 	#define stricmp strcasecmp
 	
 	#define FORMATSTRING(formatIndex,va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
+
+	#define SIZE_T_FMT "%zu"
 
 #else
 
@@ -240,7 +245,7 @@ template class SizeChecker<UInt16, 2>;
 
 // Same as assert but in all Self test builds
 #ifdef SELF_TEST
-#define assert_test(x) ( !!(x) || (assert(0), exit(1), 0))
+#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
 /// A generic interface used mainly in ForEach() functions
@@ -260,6 +265,14 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 {
 	return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
 }
+
+
+
+
+
+#ifndef TOLUA_TEMPLATE_BIND
+#define TOLUA_TEMPLATE_BIND(x)
+#endif
 
 
 
