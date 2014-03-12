@@ -569,7 +569,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 		if( ChunksConverted % 32 == 0 )
 		{
-			LOGINFO("Updating \"%s\" version 1 to version 2: %zu %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
+			LOGINFO("Updating \"%s\" version 1 to version 2: " SIZE_T_FMT  " %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
 		ChunksConverted++;
 
@@ -607,7 +607,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 		if (UncompressedSize != (int)UncompressedData.size())
 		{
-			LOGWARNING("Uncompressed data size differs (exp %d bytes, got %zu) for chunk [%d, %d]",
+			LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 				UncompressedSize, UncompressedData.size(),
 				Header->m_ChunkX, Header->m_ChunkZ
 				);
@@ -713,7 +713,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		if( ChunksConverted % 32 == 0 )
 		{
-			LOGINFO("Updating \"%s\" version 2 to version 3: %zu %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
+			LOGINFO("Updating \"%s\" version 2 to version 3: " SIZE_T_FMT  " %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
 		ChunksConverted++;
 
@@ -751,7 +751,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		if (UncompressedSize != (int)UncompressedData.size())
 		{
-			LOGWARNING("Uncompressed data size differs (exp %d bytes, got %zu) for chunk [%d, %d]",
+			LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 				UncompressedSize, UncompressedData.size(),
 				Header->m_ChunkX, Header->m_ChunkZ
 				);
@@ -866,7 +866,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 	
 	if (a_UncompressedSize != (int)UncompressedData.size())
 	{
-		LOGWARNING("Uncompressed data size differs (exp %d bytes, got %zu) for chunk [%d, %d]",
+		LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 			a_UncompressedSize, UncompressedData.size(),
 			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
 		);

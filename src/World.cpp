@@ -102,7 +102,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("%zu chunks to load, %d chunks to generate", 
+			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate", 
 				m_World->GetStorage().GetLoadQueueLength(),
 				m_World->GetGenerator().GetQueueLength()
 			);
@@ -154,7 +154,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("%zu chunks remaining to light", m_Lighting->GetQueueLength()
+			LOG("" SIZE_T_FMT  " chunks remaining to light", m_Lighting->GetQueueLength()
 			);
 			
 			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish

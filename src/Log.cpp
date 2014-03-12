@@ -118,7 +118,7 @@ void cLog::Log(const char * a_Format, va_list argList)
 
 	AString Line;
 	#ifdef _DEBUG
-	Printf(Line, "[%04zu|%02d:%02d:%02d] %s", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
+	Printf(Line, "[" SIZE_T_FMT_PRECISION(04) "|%02d:%02d:%02d] %s", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
 	#else
 	Printf(Line, "[%02d:%02d:%02d] %s", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
 	#endif

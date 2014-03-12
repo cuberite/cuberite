@@ -43,6 +43,8 @@
 
 	// MSVC has its own custom version of zu format
 	#define SIZE_T_FMT "%Iu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
+	#define SIZE_T_FMT_HEX "%Ix"
 
 #elif defined(__GNUC__)
 
@@ -65,6 +67,8 @@
 	#define FORMATSTRING(formatIndex,va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 	#define SIZE_T_FMT "%zu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
+	#define SIZE_T_FMT_HEX "%zx"
 
 #else
 
