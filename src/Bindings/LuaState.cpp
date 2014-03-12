@@ -94,12 +94,20 @@ void cLuaState::Create(void)
 	}
 	m_LuaState = lua_open();
 	luaL_openlibs(m_LuaState);
+	m_IsOwned = true;
+}
+
+
+
+
+
+void cLuaState::RegisterAPILibs(void)
+{
 	tolua_AllToLua_open(m_LuaState);
 	ManualBindings::Bind(m_LuaState);
 	DeprecatedBindings::Bind(m_LuaState);
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
-	m_IsOwned = true;
 }
 
 

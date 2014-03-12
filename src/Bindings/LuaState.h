@@ -139,8 +139,13 @@ public:
 	/** Allows this object to be used in the same way as a lua_State *, for example in the LuaLib functions */
 	operator lua_State * (void) { return m_LuaState; }
 	
-	/** Creates the m_LuaState, if not closed already. This state will be automatically closed in the destructor */
+	/** Creates the m_LuaState, if not closed already. This state will be automatically closed in the destructor.
+	The regular Lua libs are registered, but the MCS API is not registered (so that Lua can be used as
+	lite-config as well), use RegisterAPILibs() to do that. */
 	void Create(void);
+	
+	/** Registers all the API libraries that MCS provides into m_LuaState. */
+	void RegisterAPILibs(void);
 	
 	/** Closes the m_LuaState, if not closed already */
 	void Close(void);
