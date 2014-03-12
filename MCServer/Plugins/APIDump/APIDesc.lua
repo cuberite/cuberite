@@ -114,8 +114,7 @@ g_APIDesc =
 				GetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ", Return = "NIBBLETYPE", Notes = "Returns the skylight at the specified absolute coords" },
 				GetBlockType = { Params = "BlockX, BlockY, BlockZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified absolute coords" },
 				GetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified absolute coords" },
-				GetDataTypes = { Params = "", Return = "number", Notes = "Returns the mask of datatypes that the objectis currently holding" },
-				GetOffset = { Params = "", Returns = "Vector3i", Notes = "Returns the offset wich are sometimes saved in schematic files if created by WorldEdit (Bukkit) for player-relative pasting. The default is 0, 0, 0"},
+				GetDataTypes = { Params = "", Return = "number", Notes = "Returns the mask of datatypes that the object is currently holding" },
 				GetOrigin = { Params = "", Return = "OriginX, OriginY, OriginZ", Notes = "Returns the origin coords of where the area was read from." },
 				GetOriginX = { Params = "", Return = "number", Notes = "Returns the origin x-coord" },
 				GetOriginY = { Params = "", Return = "number", Notes = "Returns the origin y-coord" },
@@ -130,6 +129,7 @@ g_APIDesc =
 				GetSizeY = { Params = "", Return = "number", Notes = "Returns the size of the held data in the y-axis" },
 				GetSizeZ = { Params = "", Return = "number", Notes = "Returns the size of the held data in the z-axis" },
 				GetVolume = { Params = "", Return = "number", Notes = "Returns the volume of the area - the total number of blocks stored within." },
+				GetWEOffset = { Params = "", Return = "{{Vector3i}}", Notes = "Returns the WE offset, a data value sometimes stored in the schematic files. MCServer doesn't use this value, but provides access to it using this method. The default is {0, 0, 0}."},
 				HasBlockLights = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include blocklight" },
 				HasBlockMetas = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include block metas" },
 				HasBlockSkyLights = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include skylight" },
@@ -169,11 +169,6 @@ g_APIDesc =
 				SetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ, SkyLight", Return = "", Notes = "Sets the skylight at the specified absolute coords" },
 				SetBlockType = { Params = "BlockX, BlockY, BlockZ, BlockType", Return = "", Notes = "Sets the block type at the specified absolute coords" },
 				SetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified absolute coords" },
-				SetOffset = 
-				{ 
-					{ Params = "{{Vector3i|Offset}}", Return = "", Notes = "Sets the offset of the cBlockArea. Mostly used for WorldEdit." },
-					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Sets the offset of the cBlockArea. Mostly used for WorldEdit." },
-				},
 				SetOrigin =
 				{
 					{ Params = "{{Vector3i|Origin}}", Return = "", Notes = "Resets the origin for the absolute coords. Only affects how absolute coords are translated into relative coords." },
@@ -184,6 +179,11 @@ g_APIDesc =
 				SetRelBlockSkyLight = { Params = "RelBlockX, RelBlockY, RelBlockZ, SkyLight", Return = "", Notes = "Sets the skylight at the specified relative coords" },
 				SetRelBlockType = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockType", Return = "", Notes = "Sets the block type at the specified relative coords" },
 				SetRelBlockTypeMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified relative coords" },
+				SetWEOffset =
+				{
+					{ Params = "{{Vector3i|Offset}}", Return = "", Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. MCServer doesn't use this value, but provides access to it using this method." },
+					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. MCServer doesn't use this value, but provides access to it using this method." },
+				},
 				Write =
 				{
 					{ Params = "World, {{Vector3i|MinPoint}}, DataTypes", Return = "bool", Notes = "Writes the area into World at the specified coords, returns true if successful" },
