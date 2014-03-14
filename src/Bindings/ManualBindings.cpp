@@ -1497,7 +1497,8 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 	}
 	
 	Plugin->BindCommand(Command, FnRef);
-	return 0;
+	lua_pushboolean(L, true);
+	return 1;
 }
 
 
@@ -1561,7 +1562,8 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	}
 	
 	Plugin->BindConsoleCommand(Command, FnRef);
-	return 0;
+	lua_pushboolean(L, true);
+	return 1;
 }
 
 
