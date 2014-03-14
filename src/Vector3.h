@@ -52,9 +52,9 @@ public:
 	{
 		double Len = 1.0 / Length();
 
-		x *= Len;
-		y *= Len;
-		z *= Len;
+		x = (T)(x * Len);
+		y = (T)(y * Len);
+		z = (T)(z * Len);
 	}
 
 	inline Vector3<T> NormalizeCopy(void) const
@@ -62,9 +62,9 @@ public:
 		double Len = 1.0 / Length();
 
 		return Vector3<T>(
-			x * Len,
-			y * Len,
-			z * Len
+			(T)(x * Len),
+			(T)(y * Len),
+			(T)(z * Len)
 		);
 	}
 
@@ -73,9 +73,9 @@ public:
 		double Len = 1.0 / Length();
 
 		a_Rhs.Set(
-			x * Len,
-			y * Len,
-			z * Len
+			(T)(x * Len),
+			(T)(y * Len),
+			(T)(z * Len)
 		);
 	}
 
