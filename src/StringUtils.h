@@ -22,16 +22,16 @@ typedef std::list<AString>   AStringList;
 
 
 /** Add the formated string to the existing data in the string */
-extern AString & AppendVPrintf(AString & str, const char * format, va_list args);
+extern AString & AppendVPrintf(AString & str, const char * format, va_list args) FORMATSTRING(2, 0);
 
 /// Output the formatted text into the string
-extern AString & Printf       (AString & str, const char * format, ...);
+extern AString & Printf       (AString & str, const char * format, ...) FORMATSTRING(2, 3);
 
 /// Output the formatted text into string, return string by value
-extern AString Printf(const char * format, ...);
+extern AString Printf(const char * format, ...) FORMATSTRING(1, 2);
 
 /// Add the formatted string to the existing data in the string
-extern AString & AppendPrintf (AString & str, const char * format, ...);
+extern AString & AppendPrintf (AString & str, const char * format, ...) FORMATSTRING(2, 3);
 
 /// Split the string at any of the listed delimiters, return as a stringvector
 extern AStringVector StringSplit(const AString & str, const AString & delim);
@@ -58,7 +58,7 @@ extern unsigned int RateCompareString(const AString & s1, const AString & s2 );
 extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);  // tolua_export
 
 /// Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
-extern AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8);
+extern AString & RawBEToUTF8(const char * a_RawData, int a_NumShorts, AString & a_UTF8);
 
 /// Converts a UTF-8 string into a UTF-16 BE string, packing that back into AString; return a ref to a_UTF16
 extern AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16);

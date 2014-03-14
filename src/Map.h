@@ -64,7 +64,7 @@ public:
 	unsigned int GetPixelX(void) const { return m_PixelX; }
 	unsigned int GetPixelZ(void) const { return m_PixelZ; }
 
-	int GetRot(void) const { return m_Rot; }
+	unsigned int GetRot(void) const { return m_Rot; }
 
 	eType GetType(void) const { return m_Type; }
 

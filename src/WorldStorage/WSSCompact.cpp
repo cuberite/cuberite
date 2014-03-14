@@ -39,7 +39,7 @@ struct cWSSCompact::sChunkHeader
 
 
 /// The maximum number of PAK files that are cached
-const int MAX_PAK_FILES = 16;
+const size_t MAX_PAK_FILES = 16;
 
 /// The maximum number of unsaved chunks before the cPAKFile saves them to disk
 const int MAX_DIRTY_CHUNKS = 16;
@@ -569,7 +569,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 		if( ChunksConverted % 32 == 0 )
 		{
-			LOGINFO("Updating \"%s\" version 1 to version 2: %d %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
+			LOGINFO("Updating \"%s\" version 1 to version 2: " SIZE_T_FMT  " %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
 		ChunksConverted++;
 
@@ -607,7 +607,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 		if (UncompressedSize != (int)UncompressedData.size())
 		{
-			LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+			LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 				UncompressedSize, UncompressedData.size(),
 				Header->m_ChunkX, Header->m_ChunkZ
 				);
@@ -713,7 +713,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		if( ChunksConverted % 32 == 0 )
 		{
-			LOGINFO("Updating \"%s\" version 2 to version 3: %d %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
+			LOGINFO("Updating \"%s\" version 2 to version 3: " SIZE_T_FMT  " %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
 		ChunksConverted++;
 
@@ -751,7 +751,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		if (UncompressedSize != (int)UncompressedData.size())
 		{
-			LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+			LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 				UncompressedSize, UncompressedData.size(),
 				Header->m_ChunkX, Header->m_ChunkZ
 				);
@@ -764,7 +764,6 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		// Cannot use cChunk::MakeIndex because it might change again?????????
 		// For compatibility, use what we know is current
-		#define MAKE_2_INDEX( x, y, z ) ( y + (z * 256) + (x * 256 * 16) )
 		#define MAKE_3_INDEX( x, y, z ) ( x + (z * 16) + (y * 16 * 16) )
 
 		unsigned int InChunkOffset = 0;
@@ -867,7 +866,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 	
 	if (a_UncompressedSize != (int)UncompressedData.size())
 	{
-		LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+		LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 			a_UncompressedSize, UncompressedData.size(),
 			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
 		);

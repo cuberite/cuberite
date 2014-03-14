@@ -507,10 +507,10 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_Bio
 		// The biomes stored don't match in size
 		return NULL;
 	}
-	const int * BiomeData = (const int *)(a_NBT.GetData(a_TagIdx));
+	const char * BiomeData = (a_NBT.GetData(a_TagIdx));
 	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
 	{
-		(*a_BiomeMap)[i] = (EMCSBiome)(ntohl(BiomeData[i]));
+		(*a_BiomeMap)[i] = (EMCSBiome)(GetBEInt(&BiomeData[i * 4]));
 		if ((*a_BiomeMap)[i] == 0xff)
 		{
 			// Unassigned biomes
