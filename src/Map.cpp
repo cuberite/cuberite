@@ -243,7 +243,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 			{
 				for (unsigned int Z = m_RelZ; Z < m_RelZ + PixelWidth; ++Z)
 				{
-					unsigned int WaterDepth = 0;
+					// unsigned int WaterDepth = 0;
 
 					BLOCKTYPE TargetBlock = E_BLOCK_AIR;
 					NIBBLETYPE TargetMeta = 0;
@@ -261,12 +261,14 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 							continue;
 						}
 						// TODO 2014-02-22 xdot: Check if block is liquid
+						/*
 						else if (false)
 						{
 							--Height;
 							++WaterDepth;
 							continue;
 						}
+						*/
 
 						break;
 					}
