@@ -2453,14 +2453,14 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 {
 	cTracer LineOfSight(this);
 
-	float ClosestDistance = a_SightLimit;
-	cPlayer* ClosestPlayer = NULL;
+	double ClosestDistance = a_SightLimit;
+	cPlayer * ClosestPlayer = NULL;
 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		Vector3f Pos = (*itr)->GetPosition();
-		float Distance = (Pos - a_Pos).Length();
+		double Distance = (Pos - a_Pos).Length();
 
 		if (Distance < ClosestDistance)
 		{
