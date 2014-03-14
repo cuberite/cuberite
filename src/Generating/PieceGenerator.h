@@ -122,9 +122,9 @@ public:
 	
 	const cPiece &   GetPiece          (void) const { return *m_Piece; }
 	const Vector3i & GetCoords         (void) const { return m_Coords; }
-	      int        GetNumCCWRotations(void) const { return m_NumCCWRotations; }
+	int              GetNumCCWRotations(void) const { return m_NumCCWRotations; }
 	const cCuboid &  GetHitBox         (void) const { return m_HitBox; }
-	      int        GetDepth          (void) const { return m_Depth; }
+	int              GetDepth          (void) const { return m_Depth; }
 	
 protected:
 	const cPlacedPiece * m_Parent;

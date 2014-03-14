@@ -114,7 +114,8 @@ template <typename T, size_t Size, bool x = sizeof(T) == Size>
 class SizeChecker;
 
 template <typename T, size_t Size>
-class SizeChecker<T, Size, true> {
+class SizeChecker<T, Size, true>
+{
   T v;
 };
 
