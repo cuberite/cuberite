@@ -387,8 +387,6 @@ bool cConnection::RelayFromServer(void)
 			return CLIENTSEND(Buffer, res);
 		}
 	}
-	
-	return true;
 }
 
 
@@ -425,8 +423,6 @@ bool cConnection::RelayFromClient(void)
 			return SERVERSEND(Buffer, res);
 		}
 	}
-	
-	return true;
 }
 
 
