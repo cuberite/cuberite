@@ -34,7 +34,11 @@ public:
 		if (Block == E_BLOCK_AIR)
 		{
 			cItemFrame * ItemFrame = new cItemFrame(a_Dir, a_BlockX, a_BlockY, a_BlockZ);
-			ItemFrame->Initialize(a_World);
+			if (!ItemFrame->Initialize(a_World))
+			{
+				delete ItemFrame;
+				return false;
+			}
 
 			if (!a_Player->IsGameModeCreative())
 			{
