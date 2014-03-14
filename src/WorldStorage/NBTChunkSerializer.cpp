@@ -519,8 +519,8 @@ void cNBTChunkSerializer::AddPickupEntity(cPickup * a_Pickup)
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Pickup, "Item");
 		AddItem(a_Pickup->GetItem(), -1, "Item");
-		m_Writer.AddShort("Health", a_Pickup->GetHealth());
-		m_Writer.AddShort("Age",    a_Pickup->GetAge());
+		m_Writer.AddShort("Health", (Int16)(unsigned char)a_Pickup->GetHealth());
+		m_Writer.AddShort("Age",    (Int16)a_Pickup->GetAge());
 	m_Writer.EndCompound();
 }
 
@@ -601,9 +601,9 @@ void cNBTChunkSerializer::AddExpOrbEntity(cExpOrb* a_ExpOrb)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_ExpOrb, "XPOrb");
-		m_Writer.AddShort("Health", (short)(unsigned char)a_ExpOrb->GetHealth());
-		m_Writer.AddShort("Age", (short)a_ExpOrb->GetAge());
-		m_Writer.AddShort("Value", (short)a_ExpOrb->GetReward());
+		m_Writer.AddShort("Health", (Int16)(unsigned char)a_ExpOrb->GetHealth());
+		m_Writer.AddShort("Age", (Int16)a_ExpOrb->GetAge());
+		m_Writer.AddShort("Value", (Int16)a_ExpOrb->GetReward());
 	m_Writer.EndCompound();
 }
 

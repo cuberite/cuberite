@@ -1383,6 +1383,7 @@ void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
+	// Load item:
 	int ItemTag = a_NBT.FindChildByName(a_TagIdx, "Item");
 	if ((ItemTag < 0) || (a_NBT.GetType(ItemTag) != TAG_Compound))
 	{
@@ -1393,13 +1394,26 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		return;
 	}
+	
 	std::auto_ptr<cPickup> Pickup(new cPickup(0, 0, 0, Item, false)); // Pickup delay doesn't matter, just say false
 	if (!LoadEntityBaseFromNBT(*Pickup.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
-	// TODO: Add health and age
+	// Load health:
+	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
+	if (Health > 0)
+	{
+		Pickup->SetHealth((int) (a_NBT.GetShort(Health) & 0xFF));
+	}
+	
+	// Load age:
+	int Age = a_NBT.FindChildByName(a_TagIdx, "Age");
+	if (Age > 0)
+	{
+		Pickup->SetAge(a_NBT.GetShort(Age));
+	}
 
 	a_Entities.push_back(Pickup.release());
 }
