@@ -30,8 +30,6 @@ AString cObjective::TypeToString(eType a_Type)
 		case otStatBlockMine:      return "stat.mineBlock";
 		case otStatEntityKill:     return "stat.killEntity";
 		case otStatEntityKilledBy: return "stat.entityKilledBy";
-
-		default: return "";
 	}
 }
 
