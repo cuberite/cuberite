@@ -29,6 +29,7 @@
 #include "../Entities/Pickup.h"
 #include "../Entities/ProjectileEntity.h"
 #include "../Entities/TNTEntity.h"
+#include "../Entities/ExpOrb.h"
 
 #include "../Mobs/Monster.h"
 #include "../Mobs/Bat.h"
@@ -596,6 +597,20 @@ void cNBTChunkSerializer::AddTNTEntity(cTNTEntity * a_TNT)
 
 
 
+void cNBTChunkSerializer::AddExpOrbEntity(cExpOrb* a_ExpOrb)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_ExpOrb, "XPOrb");
+		m_Writer.AddShort("Health", (short)(unsigned char)a_ExpOrb->GetHealth());
+		m_Writer.AddShort("Age", (short)a_ExpOrb->GetAge());
+		m_Writer.AddShort("Value", (short)a_ExpOrb->GetReward());
+	m_Writer.EndCompound();
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Minecart)
 {
 	m_Writer.BeginList("Items", TAG_Compound);
@@ -676,7 +691,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etPickup:       AddPickupEntity      ((cPickup *)          a_Entity); break;
 		case cEntity::etProjectile:   AddProjectileEntity  ((cProjectileEntity *)a_Entity); break;
 		case cEntity::etTNT:          AddTNTEntity         ((cTNTEntity *)       a_Entity); break;
-		case cEntity::etExpOrb: /* TODO */ break;
+		case cEntity::etExpOrb:       AddExpOrbEntity      ((cExpOrb *)          a_Entity); break;
 		case cEntity::etItemFrame: /* TODO */ break;
 		case cEntity::etPainting: /* TODO */ break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world

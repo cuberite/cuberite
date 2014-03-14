@@ -37,6 +37,7 @@
 #include "../Entities/Pickup.h"
 #include "../Entities/ProjectileEntity.h"
 #include "../Entities/TNTEntity.h"
+#include "../Entities/ExpOrb.h"
 
 
 
@@ -1092,6 +1093,14 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadPickupFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "PrimedTnt", a_IDTagLength) == 0)
+	{
+		LoadTNTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "XPOrb", a_IDTagLength) == 0)
+	{
+		LoadExpOrbFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "Arrow", a_IDTagLength) == 0)
 	{
 		LoadArrowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1231,10 +1240,6 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	else if (strncmp(a_IDTag, "PigZombie", a_IDTagLength) == 0)
 	{
 		LoadPigZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "PrimedTnt", a_IDTagLength) == 0)
-	{
-		LoadTNTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 	// TODO: other entities
 }
@@ -1393,7 +1398,68 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		return;
 	}
+
+	// TODO: Add health and age
+
 	a_Entities.push_back(Pickup.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cTNTEntity> TNT(new cTNTEntity(0.0, 0.0, 0.0, 0));
+	if (!LoadEntityBaseFromNBT(*TNT.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Load Fuse Ticks:
+	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
+	if (FuseTicks > 0)
+	{
+		TNT->SetFuseTicks((int) a_NBT.GetByte(FuseTicks));
+	}
+	
+	a_Entities.push_back(TNT.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cExpOrb> ExpOrb(new cExpOrb(0.0, 0.0, 0.0, 0));
+	if (!LoadEntityBaseFromNBT(*ExpOrb.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	// Load Health:
+	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
+	if (Health > 0)
+	{
+		ExpOrb->SetHealth((int) (a_NBT.GetShort(Health) & 0xFF));
+	}
+
+	// Load Age:
+	int Age = a_NBT.FindChildByName(a_TagIdx, "Age");
+	if (Age > 0)
+	{
+		ExpOrb->SetAge(a_NBT.GetShort(Age));
+	}
+
+	// Load Reward (Value):
+	int Reward = a_NBT.FindChildByName(a_TagIdx, "Value");
+	if (Reward > 0)
+	{
+		ExpOrb->SetReward(a_NBT.GetShort(Reward));
+	}
+
+	a_Entities.push_back(ExpOrb.release());
 }
 
 
@@ -2166,28 +2232,6 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 
 	a_Entities.push_back(Monster.release());
-}
-
-
-
-
-
-void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
-{
-	std::auto_ptr<cTNTEntity> TNT(new cTNTEntity(0.0, 0.0, 0.0, 0));
-	if (!LoadEntityBaseFromNBT(*TNT.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	// Load Fuse Ticks:
-	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
-	if (FuseTicks > 0)
-	{
-		TNT->SetFuseTicks((int) a_NBT.GetByte(FuseTicks));
-	}
-	
-	a_Entities.push_back(TNT.release());
 }
 
 
