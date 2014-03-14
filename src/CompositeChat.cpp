@@ -10,7 +10,7 @@
 
 
 
-#if SELF_TEST
+#ifdef SELF_TEST
 
 /** A simple self-test that verifies that the composite chat parser is working properly. */
 class SelfTest_CompositeChat
