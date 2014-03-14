@@ -198,7 +198,7 @@ macro(set_exe_flags)
 			add_flags_cxx("-Wno-error=covered-switch-default -Wno-error=shadow")
 			add_flags_cxx("-Wno-error=exit-time-destructors -Wno-error=missing-variable-declarations")
 			add_flags_cxx("-Wno-error=global-constructors -Wno-implicit-fallthrough")
-			add_flags_cxx("-Wno-missing-noreturn -Wno-error=unreachable-code -Wno-error=undef")
+			add_flags_cxx("-Wno-error=unreachable-code -Wno-error=undef")
 		endif()
 	endif()
 
