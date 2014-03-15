@@ -30,6 +30,8 @@
 #include "../Entities/ProjectileEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
+#include "../Entities/HangingEntity.h"
+#include "../Entities/ItemFrame.h"
 
 #include "../Mobs/Monster.h"
 #include "../Mobs/Bat.h"
@@ -585,6 +587,25 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 
 
 
+void cNBTChunkSerializer::AddHangingEntity(cHangingEntity * a_Hanging)
+{
+	m_Writer.AddByte("Direction", (unsigned char)a_Hanging->GetDirection());
+	m_Writer.AddInt("TileX", a_Hanging->GetTileX());
+	m_Writer.AddInt("TileY", a_Hanging->GetTileY());
+	m_Writer.AddInt("TileZ", a_Hanging->GetTileZ());
+	switch (a_Hanging->GetDirection())
+	{
+		case 0:    m_Writer.AddByte("Dir", (unsigned char)2); break;
+		case 1:    m_Writer.AddByte("Dir", (unsigned char)1); break;
+		case 2:    m_Writer.AddByte("Dir", (unsigned char)0); break;
+		case 3:    m_Writer.AddByte("Dir", (unsigned char)3); break;
+	}
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddTNTEntity(cTNTEntity * a_TNT)
 {
 	m_Writer.BeginCompound("");
@@ -597,13 +618,28 @@ void cNBTChunkSerializer::AddTNTEntity(cTNTEntity * a_TNT)
 
 
 
-void cNBTChunkSerializer::AddExpOrbEntity(cExpOrb* a_ExpOrb)
+void cNBTChunkSerializer::AddExpOrbEntity(cExpOrb * a_ExpOrb)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_ExpOrb, "XPOrb");
 		m_Writer.AddShort("Health", (Int16)(unsigned char)a_ExpOrb->GetHealth());
 		m_Writer.AddShort("Age", (Int16)a_ExpOrb->GetAge());
 		m_Writer.AddShort("Value", (Int16)a_ExpOrb->GetReward());
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_ItemFrame, "ItemFrame");
+		AddHangingEntity(a_ItemFrame);
+		AddItem(a_ItemFrame->GetItem(), -1, "Item");
+		m_Writer.AddByte("ItemRotation", (unsigned char)a_ItemFrame->GetRotation());
+		m_Writer.AddFloat("ItemDropChance", 1.0F);
 	m_Writer.EndCompound();
 }
 
@@ -692,7 +728,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etProjectile:   AddProjectileEntity  ((cProjectileEntity *)a_Entity); break;
 		case cEntity::etTNT:          AddTNTEntity         ((cTNTEntity *)       a_Entity); break;
 		case cEntity::etExpOrb:       AddExpOrbEntity      ((cExpOrb *)          a_Entity); break;
-		case cEntity::etItemFrame: /* TODO */ break;
+		case cEntity::etItemFrame:    AddItemFrameEntity   ((cItemFrame *)       a_Entity); break;
 		case cEntity::etPainting: /* TODO */ break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world
 		default:

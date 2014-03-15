@@ -60,6 +60,8 @@ if (NOT MSVC)
 		Entities/ProjectileEntity.h
 		Entities/TNTEntity.h
 		Entities/ExpOrb.h
+		Entities/HangingEntity.h
+		Entities/ItemFrame.h
 		Generating/ChunkDesc.h
 		Group.h
 		Inventory.h

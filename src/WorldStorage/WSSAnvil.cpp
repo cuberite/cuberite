@@ -38,6 +38,8 @@
 #include "../Entities/ProjectileEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
+#include "../Entities/HangingEntity.h"
+#include "../Entities/ItemFrame.h"
 
 
 
@@ -1101,6 +1103,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadExpOrbFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "ItemFrame", a_IDTagLength) == 0)
+	{
+		LoadItemFrameFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "Arrow", a_IDTagLength) == 0)
 	{
 		LoadArrowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1474,6 +1480,85 @@ void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	}
 
 	a_Entities.push_back(ExpOrb.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int Direction = a_NBT.FindChildByName(a_TagIdx, "Direction");
+	if (Direction > 0)
+	{
+		a_Hanging.SetDirection(static_cast<eBlockFace>((int)a_NBT.GetByte(Direction)));
+	}
+	else
+	{
+		Direction = a_NBT.FindChildByName(a_TagIdx, "Dir");
+		if (Direction > 0)
+		{
+			switch ((int)a_NBT.GetByte(Direction))
+			{
+				case 0:   a_Hanging.SetDirection(BLOCK_FACE_NORTH);  break;
+				case 1:   a_Hanging.SetDirection(BLOCK_FACE_TOP);    break;
+				case 2:   a_Hanging.SetDirection(BLOCK_FACE_BOTTOM); break;
+				case 3:   a_Hanging.SetDirection(BLOCK_FACE_SOUTH);  break;
+			}
+		}
+	}
+
+	LOG("LALALAL.");
+	int TileX = a_NBT.FindChildByName(a_TagIdx, "TileX");
+	int TileY = a_NBT.FindChildByName(a_TagIdx, "TileY");
+	int TileZ = a_NBT.FindChildByName(a_TagIdx, "TileZ");
+	if ((TileX > 0) && (TileY > 0) && (TileZ > 0))
+	{
+		LOG("YO!");
+		a_Hanging.SetPosition(
+			(double)a_NBT.GetInt(TileX),
+			(double)a_NBT.GetInt(TileY),
+			(double)a_NBT.GetInt(TileZ)
+		);
+	}
+}
+
+
+
+
+
+void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	// Load item:
+	int ItemTag = a_NBT.FindChildByName(a_TagIdx, "Item");
+	if ((ItemTag < 0) || (a_NBT.GetType(ItemTag) != TAG_Compound))
+	{
+		return;
+	}
+	cItem Item;
+	if (!LoadItemFromNBT(Item, a_NBT, ItemTag))
+	{
+		return;
+	}
+	
+	std::auto_ptr<cItemFrame> ItemFrame(new cItemFrame(BLOCK_FACE_NONE, 0.0, 0.0, 0.0));
+	if (!LoadEntityBaseFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	ItemFrame->SetItem(Item);
+
+	LOG("BAUM! %d", Item.m_ItemType);
+	LoadHangingFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx);
+	
+	// Load Rotation:
+	int Rotation = a_NBT.FindChildByName(a_TagIdx, "ItemRotation");
+	if (Rotation > 0)
+	{
+		ItemFrame->SetRotation((Byte)a_NBT.GetByte(Rotation));
+	}
+	
+	a_Entities.push_back(ItemFrame.release());
 }
 
 
