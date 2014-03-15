@@ -248,7 +248,7 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
 		ASSERT(!Split.empty());  // This should not happen - we know there's at least one char in the message so the split needs to be at least one item long
-		a_Player->SendMessageInfo(Printf("Unknown command: \"%s\"", Split[0].c_str()));
+		a_Player->SendMessageInfo(Printf("Unknown command: \"%s\"", a_Message.c_str()));
 		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player->GetName().c_str(), a_Message.c_str());
 		return true;  // Cancel sending
 	}

@@ -38,6 +38,20 @@ void cCuboid::Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2)
 
 
 
+void cCuboid::Assign(const cCuboid & a_SrcCuboid)
+{
+	p1.x = a_SrcCuboid.p1.x;
+	p1.y = a_SrcCuboid.p1.y;
+	p1.z = a_SrcCuboid.p1.z;
+	p2.x = a_SrcCuboid.p2.x;
+	p2.y = a_SrcCuboid.p2.y;
+	p2.z = a_SrcCuboid.p2.z;
+}
+
+
+
+
+
 void cCuboid::Sort(void)
 {
 	if (p1.x > p2.x)

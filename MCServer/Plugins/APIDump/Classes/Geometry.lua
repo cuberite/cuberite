@@ -53,7 +53,7 @@ return
 	{
 		Desc = [[
 			cCuboid offers some native support for integral-boundary cuboids. A cuboid internally consists of
-			two {{Vector3i}}s. By default the cuboid doesn't make any assumptions about the defining points,
+			two {{Vector3i}}-s. By default the cuboid doesn't make any assumptions about the defining points,
 			but for most of the operations in the cCuboid class, the p1 member variable is expected to be the
 			minima and the p2 variable the maxima. The Sort() function guarantees this condition.</p>
 			<p>
@@ -63,12 +63,17 @@ return
 		{
 			constructor =
 			{
-				{ Params = "OtheCuboid", Return = "cCuboid", Notes = "Creates a new Cuboid object as a copy of OtherCuboid" },
+				{ Params = "", Return = "cCuboid", Notes = "Creates a new Cuboid object with all-zero coords" },
+				{ Params = "OtherCuboid", Return = "cCuboid", Notes = "Creates a new Cuboid object as a copy of OtherCuboid" },
 				{ Params = "{{Vector3i|Point1}}, {{Vector3i|Point2}}", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified points as its corners." },
 				{ Params = "X, Y, Z", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified point as both its corners (the cuboid has a size of 1 in each direction)." },
 				{ Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified points as its corners." },
 			},
-			Assign = { Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "", Notes = "Assigns all the coords stored in the cuboid. Sort-state is ignored." },
+			Assign =
+			{
+				{ Params = "SrcCuboid", Return = "", Notes = "Copies all the coords from the src cuboid to this cuboid. Sort-state is ignored." },
+				{ Params = "X1, Y1, Z1, X2, Y2, Z2", Return = "", Notes = "Assigns all the coords to the specified values. Sort-state is ignored." },
+			},
 			ClampX = { Params = "MinX, MaxX", Return = "", Notes = "Clamps both X coords into the range provided. Sortedness-agnostic." },
 			ClampY = { Params = "MinY, MaxY", Return = "", Notes = "Clamps both Y coords into the range provided. Sortedness-agnostic." },
 			ClampZ = { Params = "MinZ, MaxZ", Return = "", Notes = "Clamps both Z coords into the range provided. Sortedness-agnostic." },
