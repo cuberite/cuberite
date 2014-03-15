@@ -16,7 +16,7 @@ if(UNIX)
 					COMMAND xxd -i lua/enumerate.lua >enumerate_lua.h
 					WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/bin/
 					DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/lua/enumerate.lua)
-					add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/src/bin/function_lua.h
+	add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/src/bin/function_lua.h
 					COMMAND xxd -i lua/function.lua >function_lua.h
 					WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/bin/
 					DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/lua/function.lua)
