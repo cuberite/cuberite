@@ -33,6 +33,7 @@ end
 
 function HandleCmdApi(a_Split)
 	DumpApi()
+	return true
 end
 
 
