@@ -1497,7 +1497,8 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 	}
 	
 	Plugin->BindCommand(Command, FnRef);
-	return 0;
+	lua_pushboolean(L, true);
+	return 1;
 }
 
 
@@ -1521,7 +1522,10 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	// Read the arguments to this API call:
 	tolua_Error tolua_err;
 	int idx = 1;
-	if (tolua_isusertype(L, 1, "cPluginManager", 0, &tolua_err))
+	if (
+		tolua_isusertype(L, 1, "cPluginManager", 0, &tolua_err) ||
+		tolua_isusertable(L, 1, "cPluginManager", 0, &tolua_err)
+	)
 	{
 		idx++;
 	}
@@ -1561,7 +1565,8 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	}
 	
 	Plugin->BindConsoleCommand(Command, FnRef);
-	return 0;
+	lua_pushboolean(L, true);
+	return 1;
 }
 
 

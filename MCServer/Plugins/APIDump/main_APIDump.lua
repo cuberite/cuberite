@@ -9,22 +9,6 @@
 -- Global variables:
 g_Plugin = nil;
 g_PluginFolder = "";
-g_TrackedPages = {};  -- List of tracked pages, to be checked later whether they exist. Each item is an array of referring pagenames.
-g_Stats =  -- Statistics about the documentation
-{
-	NumTotalClasses = 0,
-	NumUndocumentedClasses = 0,
-	NumTotalFunctions = 0,
-	NumUndocumentedFunctions = 0,
-	NumTotalConstants = 0,
-	NumUndocumentedConstants = 0,
-	NumTotalVariables = 0,
-	NumUndocumentedVariables = 0,
-	NumTotalHooks = 0,
-	NumUndocumentedHooks = 0,
-	NumTrackedLinks = 0,
-	NumInvalidLinks = 0,
-}
 
 
 
@@ -33,15 +17,34 @@ g_Stats =  -- Statistics about the documentation
 
 function Initialize(Plugin)
 	g_Plugin = Plugin;
-	
-	Plugin:SetName("APIDump");
-	Plugin:SetVersion(1);
+	g_PluginFolder = Plugin:GetLocalFolder();
 	
 	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	
-	g_PluginFolder = Plugin:GetLocalFolder();
+	cPluginManager:BindConsoleCommand("api", HandleCmdApi, "Dumps the Lua API docs into the API/ subfolder")
+	g_Plugin:AddWebTab("APIDump", HandleWebAdminDump)
+	-- TODO: Add a WebAdmin tab that has a Dump button
+	return true
+end
+
+
+
+
+
+function HandleCmdApi(a_Split)
+	DumpApi()
+end
+
+
+
+
+
+function DumpApi()
+	LOG("Dumping the API...")
 	
 	-- Load the API descriptions from the Classes and Hooks subfolders:
+	-- This needs to be done each time the command is invoked because the export modifies the tables' contents
+	dofile(g_PluginFolder .. "/APIDesc.lua")
 	if (g_APIDesc.Classes == nil) then
 		g_APIDesc.Classes = {};
 	end
@@ -51,6 +54,24 @@ function Initialize(Plugin)
 	LoadAPIFiles("/Classes/", g_APIDesc.Classes);
 	LoadAPIFiles("/Hooks/",   g_APIDesc.Hooks);
 
+	-- Reset the stats:
+	g_TrackedPages = {};  -- List of tracked pages, to be checked later whether they exist. Each item is an array of referring pagenames.
+	g_Stats =  -- Statistics about the documentation
+	{
+		NumTotalClasses = 0,
+		NumUndocumentedClasses = 0,
+		NumTotalFunctions = 0,
+		NumUndocumentedFunctions = 0,
+		NumTotalConstants = 0,
+		NumUndocumentedConstants = 0,
+		NumTotalVariables = 0,
+		NumUndocumentedVariables = 0,
+		NumTotalHooks = 0,
+		NumUndocumentedHooks = 0,
+		NumTrackedLinks = 0,
+		NumInvalidLinks = 0,
+	}
+	
 	-- dump all available API functions and objects:
 	-- DumpAPITxt();
 	
@@ -58,7 +79,6 @@ function Initialize(Plugin)
 	DumpAPIHtml();
 	
 	LOG("APIDump finished");
-	
 	return true
 end
 
@@ -67,6 +87,9 @@ end
 
 
 function LoadAPIFiles(a_Folder, a_DstTable)
+	assert(type(a_Folder) == "string")
+	assert(type(a_DstTable) == "table")
+	
 	local Folder = g_PluginFolder .. a_Folder;
 	for idx, fnam in ipairs(cFile:GetFolderContents(Folder)) do
 		local FileName = Folder .. fnam;
@@ -317,6 +340,11 @@ end
 function DumpAPIHtml()
 	LOG("Dumping all available functions and constants to API subfolder...");
 	
+	-- Create the output folder
+	if not(cFile:IsFolder("API")) then
+		cFile:CreateFolder("API");
+	end
+
 	LOG("Copying static files..");
 	cFile:CreateFolder("API/Static");
 	local localFolder = g_Plugin:GetLocalFolder();
@@ -366,11 +394,6 @@ function DumpAPIHtml()
 	ReadDescriptions(API);
 	ReadHooks(Hooks);
 	
-	-- Create the output folder
-	if not(cFile:IsFolder("API")) then
-		cFile:CreateFolder("API");
-	end
-
 	-- Create a "class index" file, write each class as a link to that file,
 	-- then dump class contents into class-specific file
 	LOG("Writing HTML files...");
@@ -1423,6 +1446,21 @@ function WriteStats(f)
 		</table>
 		<p>There are ]], g_Stats.NumTrackedLinks, " internal links, ", g_Stats.NumInvalidLinks, " of them are invalid.</p>"
 	);
+end
+
+
+
+
+
+function HandleWebAdminDump(a_Request)
+	if (a_Request.PostParams["Dump"] ~= nil) then
+		DumpApi()
+	end
+	return
+	[[
+	<p>Pressing the button will generate the API dump on the server. Note that this can take some time.</p>
+	<form method="POST"><input type="submit" name="Dump" value="Dump the API"/></form>
+	]]
 end
 
 

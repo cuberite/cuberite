@@ -510,10 +510,10 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_Bio
 		// The biomes stored don't match in size
 		return NULL;
 	}
-	const int * BiomeData = (const int *)(a_NBT.GetData(a_TagIdx));
+	const char * BiomeData = (a_NBT.GetData(a_TagIdx));
 	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
 	{
-		(*a_BiomeMap)[i] = (EMCSBiome)(ntohl(BiomeData[i]));
+		(*a_BiomeMap)[i] = (EMCSBiome)(GetBEInt(&BiomeData[i * 4]));
 		if ((*a_BiomeMap)[i] == 0xff)
 		{
 			// Unassigned biomes
@@ -666,6 +666,12 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	if (EnchTag > 0)
 	{
 		EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, a_NBT, EnchTag);
+	}
+
+	int FireworksTag = a_NBT.FindChildByName(TagTag, ((a_Item.m_ItemType == E_ITEM_FIREWORK_STAR) ? "Fireworks" : "Explosion"));
+	if (EnchTag > 0)
+	{
+		cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, a_NBT, FireworksTag, (ENUM_ITEM_ID)a_Item.m_ItemType);
 	}
 	
 	return true;

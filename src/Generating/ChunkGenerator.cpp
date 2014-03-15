@@ -116,7 +116,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_Chunk
 		// Add to queue, issue a warning if too many:
 		if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
 		{
-			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (%i)", a_ChunkX, a_ChunkZ, m_Queue.size());
+			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (" SIZE_T_FMT ")", a_ChunkX, a_ChunkZ, m_Queue.size());
 		}
 		m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	}
@@ -180,7 +180,7 @@ BLOCKTYPE cChunkGenerator::GetIniBlock(cIniFile & a_IniFile, const AString & a_S
 	BLOCKTYPE Block = BlockStringToType(BlockType);
 	if (Block < 0)
 	{
-		LOGWARN("[&s].%s Could not parse block value \"%s\". Using default: \"%s\".", a_SectionName.c_str(), a_ValueName.c_str(), BlockType.c_str(),a_Default.c_str());
+		LOGWARN("[%s].%s Could not parse block value \"%s\". Using default: \"%s\".", a_SectionName.c_str(), a_ValueName.c_str(), BlockType.c_str(),a_Default.c_str());
 		return BlockStringToType(a_Default);
 	}
 	return Block;

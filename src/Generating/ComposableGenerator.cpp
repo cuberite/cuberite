@@ -22,6 +22,7 @@
 #include "EndGen.h"
 #include "MineShafts.h"
 #include "Noise3DGenerator.h"
+#include "POCPieceGenerator.h"
 #include "Ravines.h"
 
 
@@ -363,6 +364,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{
 			m_FinishGens.push_back(new cStructGenOreNests(Seed));
+		}
+		else if (NoCaseCompare(*itr, "POCPieces") == 0)
+		{
+			m_FinishGens.push_back(new cPOCPieceGenerator(Seed));
 		}
 		else if (NoCaseCompare(*itr, "PreSimulator") == 0)
 		{

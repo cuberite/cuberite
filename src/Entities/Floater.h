@@ -11,7 +11,7 @@
 class cFloater :
 	public cEntity
 {
-	typedef cFloater super;
+	typedef cEntity super;
 	
 public:
 	//tolua_end

@@ -12,7 +12,7 @@
 #define CCLIENTHANDLE_H_INCLUDED
 
 #include "Defines.h"
-#include "Vector3d.h"
+#include "Vector3.h"
 #include "OSSupport/SocketThreads.h"
 #include "ChunkDef.h"
 #include "ByteBuffer.h"
@@ -46,7 +46,6 @@ class cClientHandle :  // tolua_export
 	public cSocketThreads::cCallback
 {											// tolua_export
 public:
-	static const int MAXBLOCKCHANGEINTERACTIONS = 20; // 5 didn't help, 10 still doesn't work in Creative, 20 seems to have done the trick
 	
 #if defined(ANDROID_NDK)
 	static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
@@ -188,7 +187,9 @@ public:
 	void HandleChat             (const AString & a_Message);
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
 	void HandleDisconnect       (const AString & a_Reason);
-	void HandleEntityAction     (int a_EntityID, char a_ActionID);
+	void HandleEntityCrouch     (int a_EntityID, bool a_IsCrouching);
+	void HandleEntityLeaveBed   (int a_EntityID);
+	void HandleEntitySprinting  (int a_EntityID, bool a_IsSprinting);
 	
 	/** Called when the protocol handshake has been received (for protocol versions that support it;
 	otherwise the first instant when a username is received).
@@ -319,6 +320,9 @@ private:
 
 	/** Number of explosions sent this tick */
 	int m_NumExplosionsThisTick;
+
+	/** Number of place or break interactions this tick */
+	int m_NumBlockChangeInteractionsThisTick;
 	
 	static int s_ClientCount;
 	int m_UniqueID;

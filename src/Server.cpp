@@ -24,7 +24,7 @@
 #include "MersenneTwister.h"
 
 #include "inifile/iniFile.h"
-#include "Vector3f.h"
+#include "Vector3.h"
 
 #include <fstream>
 #include <sstream>
@@ -550,7 +550,7 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
 	{
 		const AStringPair & cmd = *itr;
-		a_Output.Out(Printf("%-*s%s\n", Callback.m_MaxLen, cmd.first.c_str(), cmd.second.c_str()));
+		a_Output.Out(Printf("%-*s%s\n", static_cast<int>(Callback.m_MaxLen), cmd.first.c_str(), cmd.second.c_str()));
 	}  // for itr - Callback.m_Commands[]
 	a_Output.Finished();
 }

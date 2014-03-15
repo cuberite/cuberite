@@ -68,17 +68,28 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 
 void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	// The sheep should not move when he's eating so only handle the physics.
+	super::Tick(a_Dt, a_Chunk);
+	int PosX = POSX_TOINT;
+	int PosY = POSY_TOINT - 1;
+	int PosZ = POSZ_TOINT;
+
+	if ((PosY <= 0) || (PosY > cChunkDef::Height))
+	{
+		return;
+	}
+
 	if (m_TimeToStopEating > 0)
 	{
-		HandlePhysics(a_Dt, a_Chunk);
+		m_bMovingToDestination = false; // The sheep should not move when he's eating
 		m_TimeToStopEating--;
+
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock((int) GetPosX(), (int) GetPosY() - 1, (int) GetPosZ()) == E_BLOCK_GRASS)
+			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS) // Make sure grass hasn't been destroyed in the meantime
 			{
-				// The sheep ate the grass so we change it to dirt.
-				m_World->SetBlock((int) GetPosX(), (int) GetPosY() - 1, (int) GetPosZ(), E_BLOCK_DIRT, 0);
+				// The sheep ate the grass so we change it to dirt
+				m_World->SetBlock(PosX, PosY, PosZ, E_BLOCK_DIRT, 0);
+				GetWorld()->BroadcastSoundParticleEffect(2001, PosX, PosY, PosX, E_BLOCK_GRASS);
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}
@@ -86,12 +97,11 @@ void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		super::Tick(a_Dt, a_Chunk);
 		if (m_World->GetTickRandomNumber(600) == 1)
 		{
-			if (m_World->GetBlock((int) GetPosX(), (int) GetPosY() - 1, (int) GetPosZ()) == E_BLOCK_GRASS)
+			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)
 			{
-				m_World->BroadcastEntityStatus(*this, 10);
+				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_SHEEP_EATING);
 				m_TimeToStopEating = 40;
 			}
 		}

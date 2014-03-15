@@ -309,7 +309,7 @@ protected:
 		eTagType m_ItemType;  // for TAG_List, the element type
 	} ;
 	
-	static const int MAX_STACK = 50;  // Highliy doubtful that an NBT would be constructed this many levels deep
+	static const int MAX_STACK = 50;  // Highly doubtful that an NBT would be constructed this many levels deep
 	
 	// These two fields emulate a stack. A raw array is used due to speed issues - no reallocations are allowed.
 	sParent m_Stack[MAX_STACK];

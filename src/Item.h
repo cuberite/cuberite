@@ -11,6 +11,7 @@
 
 #include "Defines.h"
 #include "Enchantments.h"
+#include "WorldStorage/FireworksSerializer.h"
 
 
 
@@ -38,7 +39,8 @@ public:
 		m_ItemCount(0),
 		m_ItemDamage(0),
 		m_CustomName(""),
-		m_Lore("")
+		m_Lore(""),
+		m_FireworkItem()
 	{
 	}
 	
@@ -57,7 +59,8 @@ public:
 		m_ItemDamage  (a_ItemDamage),
 		m_Enchantments(a_Enchantments),
 		m_CustomName  (a_CustomName),
-		m_Lore        (a_Lore)
+		m_Lore        (a_Lore),
+		m_FireworkItem()
 	{
 		if (!IsValidItem(m_ItemType))
 		{
@@ -77,7 +80,8 @@ public:
 		m_ItemDamage  (a_CopyFrom.m_ItemDamage),
 		m_Enchantments(a_CopyFrom.m_Enchantments),
 		m_CustomName  (a_CopyFrom.m_CustomName),
-		m_Lore        (a_CopyFrom.m_Lore)
+		m_Lore        (a_CopyFrom.m_Lore),
+		m_FireworkItem(a_CopyFrom.m_FireworkItem)
 	{
 	}
 	
@@ -90,6 +94,7 @@ public:
 		m_Enchantments.Clear();
 		m_CustomName = "";
 		m_Lore = "";
+		m_FireworkItem.EmptyData();
 	}
 	
 	
@@ -115,7 +120,8 @@ public:
 			(m_ItemDamage == a_Item.m_ItemDamage) &&
 			(m_Enchantments == a_Item.m_Enchantments) &&
 			(m_CustomName == a_Item.m_CustomName) &&
-			(m_Lore == a_Item.m_Lore)
+			(m_Lore == a_Item.m_Lore) &&
+			m_FireworkItem.IsEqualTo(a_Item.m_FireworkItem)
 		);
 	}
 	
@@ -177,6 +183,8 @@ public:
 	cEnchantments m_Enchantments;
 	AString       m_CustomName;
 	AString       m_Lore;
+
+	cFireworkItem m_FireworkItem;
 };
 // tolua_end
 
