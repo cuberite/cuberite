@@ -1514,13 +1514,11 @@ void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT 
 		}
 	}
 
-	LOG("LALALAL.");
 	int TileX = a_NBT.FindChildByName(a_TagIdx, "TileX");
 	int TileY = a_NBT.FindChildByName(a_TagIdx, "TileY");
 	int TileZ = a_NBT.FindChildByName(a_TagIdx, "TileZ");
 	if ((TileX > 0) && (TileY > 0) && (TileZ > 0))
 	{
-		LOG("YO!");
 		a_Hanging.SetPosition(
 			(double)a_NBT.GetInt(TileX),
 			(double)a_NBT.GetInt(TileY),
@@ -1554,7 +1552,6 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 	ItemFrame->SetItem(Item);
 
-	LOG("BAUM! %d", Item.m_ItemType);
 	LoadHangingFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx);
 	
 	// Load Rotation:
