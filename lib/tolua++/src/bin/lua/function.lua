@@ -50,7 +50,6 @@ end
 -- Write binding function
 -- Outputs C/C++ binding function.
 function classFunction:supcode (local_constructor)
-
  local overload = strsub(self.cname,-2,-1) - 1  -- indicate overloaded func
  local nret = 0      -- number of returned values
  local class = self:inclass()
