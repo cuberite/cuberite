@@ -53,7 +53,7 @@ return
 	{
 		Desc = [[
 			cCuboid offers some native support for integral-boundary cuboids. A cuboid internally consists of
-			two {{Vector3i}}s. By default the cuboid doesn't make any assumptions about the defining points,
+			two {{Vector3i}}-s. By default the cuboid doesn't make any assumptions about the defining points,
 			but for most of the operations in the cCuboid class, the p1 member variable is expected to be the
 			minima and the p2 variable the maxima. The Sort() function guarantees this condition.</p>
 			<p>
@@ -63,6 +63,7 @@ return
 		{
 			constructor =
 			{
+				{ Params = "", Return = "cCuboid", Notes = "Creates a new Cuboid object with all-zero coords" },
 				{ Params = "OtherCuboid", Return = "cCuboid", Notes = "Creates a new Cuboid object as a copy of OtherCuboid" },
 				{ Params = "{{Vector3i|Point1}}, {{Vector3i|Point2}}", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified points as its corners." },
 				{ Params = "X, Y, Z", Return = "cCuboid", Notes = "Creates a new Cuboid object with the specified point as both its corners (the cuboid has a size of 1 in each direction)." },
