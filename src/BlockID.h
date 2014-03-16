@@ -872,11 +872,11 @@ enum eShrapnelLevel
 
 enum eSpreadSource
 {
-	esFireSpread,
-	esGrassSpread,
-	esMushroomSpread,
-	esMycelSpread,
-	esVineSpread,
+	ssFireSpread,
+	ssGrassSpread,
+	ssMushroomSpread,
+	ssMycelSpread,
+	ssVineSpread,
 } ;
 
 // tolua_end
