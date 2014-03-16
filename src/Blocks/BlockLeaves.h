@@ -87,7 +87,7 @@ public:
 			return;
 		}
 
-		if ((Meta & 0x8) == 0)
+		if ((Meta & 0x8) != 0)
 		{
 			// These leaves have been checked for decay lately and nothing around them changed
 			return;
