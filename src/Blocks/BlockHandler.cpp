@@ -10,6 +10,7 @@
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
 #include "BlockCactus.h"
+#include "BlockCake.h"
 #include "BlockCarpet.h"
 #include "BlockCauldron.h"
 #include "BlockChest.h"
@@ -91,6 +92,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_BRICK_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BROWN_MUSHROOM:        return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_CACTUS:                return new cBlockCactusHandler          (a_BlockType);
+		case E_BLOCK_CAKE:                  return new cBlockCakeHandler            (a_BlockType);
 		case E_BLOCK_CARROTS:               return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_CARPET:                return new cBlockCarpetHandler          (a_BlockType);
 		case E_BLOCK_CAULDRON:              return new cBlockCauldronHandler        (a_BlockType);

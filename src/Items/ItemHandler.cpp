@@ -13,6 +13,7 @@
 #include "ItemBow.h"
 #include "ItemBrewingStand.h"
 #include "ItemBucket.h"
+#include "ItemCake.h"
 #include "ItemCauldron.h"
 #include "ItemCloth.h"
 #include "ItemComparator.h"
@@ -101,6 +102,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
 		case E_ITEM_BOW:               return new cItemBowHandler;
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
+		case E_ITEM_CAKE:              return new cItemCakeHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
 		case E_ITEM_COMPARATOR:        return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
@@ -337,6 +339,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_BREWING_STAND:        return 64;
 		case E_ITEM_BUCKET:               return 16;
 		case E_ITEM_CARROT:               return 64;
+		case E_ITEM_CAKE:                 return 1;
 		case E_ITEM_CAULDRON:             return 64;
 		case E_ITEM_CLAY:                 return 64;
 		case E_ITEM_CLAY_BRICK:           return 64;
