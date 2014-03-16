@@ -6,6 +6,8 @@
 #include "../BlockID.h"
 #include "../Defines.h"
 #include "../Chunk.h"
+#include "Root.h"
+#include "PluginManager.h"
 
 
 
@@ -315,9 +317,15 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 				*/
 				if (CanStartFireInBlock(a_Chunk, x, y, z))
 				{
-					FLOG("FS: Starting new fire at {%d, %d, %d}.", 
-						x + a_Chunk->GetPosX() * cChunkDef::Width, y, z + a_Chunk->GetPosZ() * cChunkDef::Width
-					);
+					int a_PosX = x + a_Chunk->GetPosX() * cChunkDef::Width;
+					int a_PosZ = z + a_Chunk->GetPosZ() * cChunkDef::Width;
+					
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(&m_World, a_PosX, y, a_PosZ))
+					{
+						return;
+					}
+					
+					FLOG("FS: Starting new fire at {%d, %d, %d}.", a_PosX, y, a_PosZ);
 					a_Chunk->UnboundedRelSetBlock(x, y, z, E_BLOCK_FIRE, 0);
 				}
 			}  // for y
