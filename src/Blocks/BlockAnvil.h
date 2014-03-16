@@ -20,7 +20,7 @@ public:
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta));
+		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta >> 2));
 	}
 	
 	virtual bool GetPlacementBlockTypeMeta(
