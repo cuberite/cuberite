@@ -9,15 +9,15 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 
 if(UNIX)
 	add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/src/bin/basic_lua.h
-					COMMAND xxd -i lua/basic.lua >basic_lua.h
+					COMMAND xxd -i lua/basic.lua | sed 's/unsigned char/static const unsigned char/g' >basic_lua.h
 					WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/bin/
 					DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/lua/basic.lua)
 	add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/src/bin/enumerate_lua.h
-					COMMAND xxd -i lua/enumerate.lua >enumerate_lua.h
+					COMMAND xxd -i lua/enumerate.lua | sed 's/unsigned char/static const unsigned char/g' >enumerate_lua.h
 					WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/bin/
 					DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/lua/enumerate.lua)
 	add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/src/bin/function_lua.h
-					COMMAND xxd -i lua/function.lua >function_lua.h
+					COMMAND xxd -i lua/function.lua | sed 's/unsigned char/static const unsigned char/g' >function_lua.h
 					WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/bin/
 					DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/lua/function.lua)
 	set_property(SOURCE src/bin/toluabind.c APPEND PROPERTY OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/enumerate_lua.h ${PROJECT_SOURCE_DIR}/src/bin/basic_lua.h ${PROJECT_SOURCE_DIR}/src/bin/function_lua.h)
