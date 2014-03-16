@@ -6,6 +6,7 @@
 #include "../Root.h"
 #include "../Bindings/PluginManager.h"
 #include "../Chunk.h"
+#include "BlockAnvil.h"
 #include "BlockBed.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
@@ -85,6 +86,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		// Block handlers, alphabetically sorted:
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
 		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:     return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BREWING_STAND:         return new cBlockBrewingStandHandler    (a_BlockType);

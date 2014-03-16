@@ -1497,7 +1497,15 @@ void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT 
 	int Direction = a_NBT.FindChildByName(a_TagIdx, "Direction");
 	if (Direction > 0)
 	{
-		a_Hanging.SetDirection(static_cast<eBlockFace>((int)a_NBT.GetByte(Direction)));
+		Direction = (int)a_NBT.GetByte(Direction);
+		if ((Direction < 0) || (Direction > 5))
+		{
+			a_Hanging.SetDirection(BLOCK_FACE_NORTH);
+		}
+		else
+		{
+			a_Hanging.SetDirection(static_cast<eBlockFace>(Direction));
+		}
 	}
 	else
 	{
