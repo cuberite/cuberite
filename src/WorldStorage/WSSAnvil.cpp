@@ -366,6 +366,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				{
 					case E_BLOCK_AIR:
 					case E_BLOCK_LEAVES:
+					case E_BLOCK_NEW_LEAVES:
 					{
 						// nothing needed
 						break;

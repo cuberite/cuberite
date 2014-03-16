@@ -95,6 +95,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		
 		// Single item per handler, alphabetically sorted:
 		case E_BLOCK_LEAVES:           return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_NEW_LEAVES:       return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_SAPLING:          return new cItemSaplingHandler(a_ItemType);
 		case E_BLOCK_WOOL:             return new cItemClothHandler(a_ItemType);
 		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
