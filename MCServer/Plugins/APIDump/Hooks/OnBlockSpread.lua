@@ -12,11 +12,11 @@ return
 			depends on the source kind:
 			<table>
 			<tr><th>Source</th><th>Notes</th></tr>
-			<tr><td>esFireSpread</td><td>Fire spreading</td></tr>
-			<tr><td>esGrassSpread</td><td>Grass spreading</td></tr>
-			<tr><td>esMushroomSpread</td><td>Mushroom spreading</td></tr>
-			<tr><td>esMycelSpread</td><td>Mycel spreading</td></tr>
-			<tr><td>esVineSpread</td><td>Vine spreading</td></tr>
+			<tr><td>ssFireSpread</td><td>Fire spreading</td></tr>
+			<tr><td>ssGrassSpread</td><td>Grass spreading</td></tr>
+			<tr><td>ssMushroomSpread</td><td>Mushroom spreading</td></tr>
+			<tr><td>ssMycelSpread</td><td>Mycel spreading</td></tr>
+			<tr><td>ssVineSpread</td><td>Vine spreading</td></tr>
 			</table></p>
 		]],
 		Params =
