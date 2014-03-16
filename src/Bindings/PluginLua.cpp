@@ -195,14 +195,14 @@ void cPluginLua::Tick(float a_Dt)
 
 
 
-bool cPluginLua::OnBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cPluginLua::OnBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_BLOCK_SPREAD];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source, cLuaState::Return, res);
 		if (res)
 		{
 			return true;

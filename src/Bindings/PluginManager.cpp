@@ -205,7 +205,7 @@ void cPluginManager::Tick(float a_Dt)
 
 
 
-bool cPluginManager::CallHookBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cPluginManager::CallHookBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_SPREAD);
 	if (Plugins == m_Hooks.end())
@@ -214,7 +214,7 @@ bool cPluginManager::CallHookBlockSpread(cWorld * a_World, int a_BlockX, int a_B
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnBlockSpread(a_World, a_BlockX, a_BlockY, a_BlockZ))
+		if ((*itr)->OnBlockSpread(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source))
 		{
 			return true;
 		}

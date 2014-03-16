@@ -320,7 +320,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 					int a_PosX = x + a_Chunk->GetPosX() * cChunkDef::Width;
 					int a_PosZ = z + a_Chunk->GetPosZ() * cChunkDef::Width;
 					
-					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(&m_World, a_PosX, y, a_PosZ))
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(&m_World, a_PosX, y, a_PosZ, esFireSpread))
 					{
 						return;
 					}
