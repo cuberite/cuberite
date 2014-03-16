@@ -24,7 +24,7 @@ public:
 			return;
 		}
 		
-		if ((Meta + 1) >= 6)
+		if (Meta >= 5)
 		{
 			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 		}
