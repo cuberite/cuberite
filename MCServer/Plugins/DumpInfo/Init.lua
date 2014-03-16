@@ -34,7 +34,7 @@ function HandleDumpPluginRequest(a_Request)
 	for PluginName, k in pairs(cPluginManager:Get():GetAllPlugins()) do
 		
 		-- Check if there is a file called 'Info.lua' or 'info.lua'
-		if (cFile:Exists("Plugins/" .. PluginName .. "/Info.lua") or cFile:Exists("Plugins/" .. PluginName .. "/info.lua")) then
+		if (cFile:Exists("Plugins/" .. PluginName .. "/Info.lua")) then
 			Content = Content .. "<tr>"
 			Content = Content .. "<td>" .. PluginName .. "</td>"
 			Content = Content .. "<td> <form method='POST'> <input type='hidden' value='" .. PluginName .. "' name='DumpInfo'> <input type='submit' value='DumpInfo'> </form>"
