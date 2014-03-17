@@ -52,7 +52,7 @@ _global_output_enums = {}
 
 -- write support code
 function classEnumerate:supcode ()
-	if _global_output_enums[self.name] ~= nil then
+	if _global_output_enums[self.name] == nil then
 		_global_output_enums[self.name] = 1
 		output("int tolua_is" .. self.name .. " (lua_State* L, int lo, int def, tolua_Error* err)")
 		output("{")
