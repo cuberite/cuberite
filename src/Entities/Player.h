@@ -270,6 +270,9 @@ public:
 	/// Returns true if the player is currently flying.
 	bool IsFlying(void) const { return m_IsFlying; }
 
+	/** Returns if a player is sleeping in a bed */
+	bool IsInBed(void) const { return m_bIsInBed; }
+
 	/// returns true if the player has thrown out a floater.
 	bool IsFishing(void) const { return m_IsFishing; }
 
@@ -278,6 +281,9 @@ public:
 	int GetFloaterID(void) const { return m_FloaterID; }
 
 	// tolua_end
+
+	/** Sets a player's in-bed state; we can't be sure plugins will keep this value updated, so no exporting */
+	void SetIsInBed(bool a_Flag) { m_bIsInBed = a_Flag; }
 	
 	/// Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet
 	void StartEating(void);
@@ -371,8 +377,8 @@ protected:
 	GroupList m_ResolvedGroups;
 	GroupList m_Groups;
 
-	std::string m_PlayerName;
-	std::string m_LoadedWorldName;
+	AString m_PlayerName;
+	AString m_LoadedWorldName;
 
 	/// Xp Level stuff
 	enum 
@@ -456,7 +462,7 @@ protected:
 
 	int m_FloaterID;
 
-	cTeam* m_Team;
+	cTeam * m_Team;
 
 
 
@@ -479,6 +485,11 @@ protected:
 
 	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
 	void ApplyFoodExhaustionFromMovement();
+
+	/** Flag representing whether the player is currently in a bed
+	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
+	bool m_bIsInBed;
+
 } ; // tolua_export
 
 

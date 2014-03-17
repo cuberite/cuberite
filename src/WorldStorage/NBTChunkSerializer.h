@@ -42,6 +42,9 @@ class cPickup;
 class cItemGrid;
 class cProjectileEntity;
 class cTNTEntity;
+class cExpOrb;
+class cHangingEntity;
+class cItemFrame;
 
 
 
@@ -108,7 +111,10 @@ protected:
 	void AddMonsterEntity     (cMonster * a_Monster);
 	void AddPickupEntity      (cPickup * a_Pickup);
 	void AddProjectileEntity  (cProjectileEntity * a_Projectile);
+	void AddHangingEntity     (cHangingEntity * a_Hanging);
 	void AddTNTEntity         (cTNTEntity * a_TNT);
+	void AddExpOrbEntity      (cExpOrb * a_ExpOrb);
+	void AddItemFrameEntity   (cItemFrame * a_ItemFrame);
 	
 	void AddMinecartChestContents(cMinecartWithChest * a_Minecart);
 	

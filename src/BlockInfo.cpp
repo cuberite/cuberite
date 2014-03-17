@@ -93,6 +93,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_IRON_BARS           ].m_SpreadLightFalloff = 1;
 	ms_Info[E_BLOCK_IRON_DOOR           ].m_SpreadLightFalloff = 1;
 	ms_Info[E_BLOCK_LEAVES              ].m_SpreadLightFalloff = 1;
+	ms_Info[E_BLOCK_NEW_LEAVES          ].m_SpreadLightFalloff = 1;
 	ms_Info[E_BLOCK_SIGN_POST           ].m_SpreadLightFalloff = 1;
 	ms_Info[E_BLOCK_TORCH               ].m_SpreadLightFalloff = 1;
 	ms_Info[E_BLOCK_VINES               ].m_SpreadLightFalloff = 1;
