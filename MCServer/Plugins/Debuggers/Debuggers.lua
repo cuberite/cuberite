@@ -217,7 +217,7 @@ function TestBlockAreasString()
 		return
 	end
 	cFile:CreateFolder("schematics")
-	local f = io.open("schematics/StringTest.schematic", "w")
+	local f = io.open("schematics/StringTest.schematic", "wb")
 	f:write(Data)
 	f:close()
 	
@@ -230,7 +230,7 @@ function TestBlockAreasString()
 	BA2:Clear()
 	
 	-- Load another area from a string in that file:
-	f = io.open("schematics/StringTest.schematic", "r")
+	f = io.open("schematics/StringTest.schematic", "rb")
 	Data = f:read("*all")
 	if not(BA2:LoadFromSchematicString(Data)) then
 		LOG("Cannot load schematic from string")
