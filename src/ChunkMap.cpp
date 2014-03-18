@@ -1832,13 +1832,17 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
 							m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
 						}
-						else if (m_World->IsTNTShrapnelEnabled() && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
+						else if ((m_World->GetTNTShrapnelLevel() > 0) && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
 						{
-							if (!cBlockInfo::FullyOccupiesVoxel(area.GetBlockType(bx + x, by + y, bz + z)))
+							if (!cBlockInfo::FullyOccupiesVoxel(Block))
 							{
 								break;
 							}
-							m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, area.GetBlockType(bx + x, by + y, bz + z), area.GetBlockMeta(bx + x, by + y, bz + z));
+							else if ((m_World->GetTNTShrapnelLevel() == 1) && ((Block != E_BLOCK_SAND) && (Block != E_BLOCK_GRAVEL)))
+							{
+								break;
+							}
+							m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
 						}
 						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
 						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));

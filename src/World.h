@@ -605,8 +605,8 @@ public:
 	bool AreCommandBlocksEnabled(void) const { return m_bCommandBlocksEnabled; }
 	void SetCommandBlocksEnabled(bool a_Flag) { m_bCommandBlocksEnabled = a_Flag; }
 
-	bool IsTNTShrapnelEnabled(void) const { return m_bTNTSpawnsShrapnel; }
-	void SetTNTShrapnelEnabled(bool a_Flag) { m_bTNTSpawnsShrapnel = a_Flag; }
+	unsigned char GetTNTShrapnelLevel(void) const { return m_TNTShrapnelLevel; }
+	void SetTNTShrapnelLevel(int a_Flag) { m_TNTShrapnelLevel = a_Flag; }
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
@@ -866,8 +866,12 @@ private:
 	/** Whether prefixes such as [INFO] are prepended to SendMessageXXX() / BroadcastChatXXX() functions */
 	bool m_bUseChatPrefixes;
 
-	/** Whether TNT explosions, done via cWorld::DoExplosionAt(), should project random affected blocks as FallingBlock entities */
-	bool m_bTNTSpawnsShrapnel;
+	/** The level of DoExplosionAt() projecting random affected blocks as FallingBlock entities
+	0 = None
+	1 = Only sand and gravel
+	2 = All blocks
+	*/
+	int m_TNTShrapnelLevel;
 	
 
 	cChunkGenerator  m_Generator;
