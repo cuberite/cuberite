@@ -14,6 +14,7 @@
 #include "../OSSupport/Timer.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
+#include "../Vector3.h"
 
 #include "inifile/iniFile.h"
 #include "json/json.h"

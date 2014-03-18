@@ -20,8 +20,14 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 			a_Writer.AddByte("Flicker", a_FireworkItem.m_HasFlicker);
 			a_Writer.AddByte("Trail", a_FireworkItem.m_HasTrail);
 			a_Writer.AddByte("Type", a_FireworkItem.m_Type);
-			a_Writer.AddIntArray("Colors", &(a_FireworkItem.m_Colours[0]), a_FireworkItem.m_Colours.size());
-			a_Writer.AddIntArray("FadeColors", &(a_FireworkItem.m_FadeColours[0]), a_FireworkItem.m_FadeColours.size());
+			if (!a_FireworkItem.m_Colours.empty())
+			{
+				a_Writer.AddIntArray("Colors", &(a_FireworkItem.m_Colours[0]), a_FireworkItem.m_Colours.size());
+			}
+			if (!a_FireworkItem.m_FadeColours.empty())
+			{
+				a_Writer.AddIntArray("FadeColors", &(a_FireworkItem.m_FadeColours[0]), a_FireworkItem.m_FadeColours.size());
+			}
 			a_Writer.EndCompound();
 			a_Writer.EndList();
 			a_Writer.EndCompound();
@@ -90,30 +96,34 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 					if (ExplosionName == "Colors")
 					{
 						// Divide by four as data length returned in bytes
-						int DataLength = a_NBT.GetDataLength(explosiontag) / 4;
+						int DataLength = a_NBT.GetDataLength(explosiontag);
+						// round to the next highest multiple of four
+						DataLength -= DataLength % 4; 
 						if (DataLength == 0)
 						{
 							continue;
 						}
 
-						const int * ColourData = (const int *)(a_NBT.GetData(explosiontag));
-						for (int i = 0; i < DataLength; i++)
+						const char * ColourData = (a_NBT.GetData(explosiontag));
+						for (int i = 0; i < DataLength; i += 4 /* Size of network int*/)
 						{
-							a_FireworkItem.m_Colours.push_back(ntohl(ColourData[i]));
+							a_FireworkItem.m_Colours.push_back(GetBEInt(ColourData + i));
 						}
 					}
 					else if (ExplosionName == "FadeColors")
 					{
 						int DataLength = a_NBT.GetDataLength(explosiontag) / 4;
+						// round to the next highest multiple of four
+						DataLength -= DataLength % 4; 
 						if (DataLength == 0)
 						{
 							continue;
 						}
 
-						const int * FadeColourData = (const int *)(a_NBT.GetData(explosiontag));
-						for (int i = 0; i < DataLength; i++)
+						const char * FadeColourData = (a_NBT.GetData(explosiontag));
+						for (int i = 0; i < DataLength; i += 4 /* Size of network int*/)
 						{
-							a_FireworkItem.m_FadeColours.push_back(ntohl(FadeColourData[i]));
+							a_FireworkItem.m_FadeColours.push_back(GetBEInt(FadeColourData + i));
 						}
 					}
 				}

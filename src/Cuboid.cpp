@@ -38,6 +38,20 @@ void cCuboid::Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2)
 
 
 
+void cCuboid::Assign(const cCuboid & a_SrcCuboid)
+{
+	p1.x = a_SrcCuboid.p1.x;
+	p1.y = a_SrcCuboid.p1.y;
+	p1.z = a_SrcCuboid.p1.z;
+	p2.x = a_SrcCuboid.p2.x;
+	p2.y = a_SrcCuboid.p2.y;
+	p2.z = a_SrcCuboid.p2.z;
+}
+
+
+
+
+
 void cCuboid::Sort(void)
 {
 	if (p1.x > p2.x)
@@ -72,6 +86,9 @@ int cCuboid::GetVolume(void) const
 
 bool cCuboid::DoesIntersect(const cCuboid & a_Other) const
 {
+	ASSERT(IsSorted());
+	ASSERT(a_Other.IsSorted());
+	
 	// In order for cuboids to intersect, each of their coord intervals need to intersect
 	return (
 		DoIntervalsIntersect(p1.x, p2.x, a_Other.p1.x, a_Other.p2.x) &&
@@ -86,6 +103,9 @@ bool cCuboid::DoesIntersect(const cCuboid & a_Other) const
 
 bool cCuboid::IsCompletelyInside(const cCuboid & a_Outer) const
 {
+	ASSERT(IsSorted());
+	ASSERT(a_Outer.IsSorted());
+	
 	return (
 		(p1.x >= a_Outer.p1.x) &&
 		(p2.x <= a_Outer.p2.x) &&
@@ -192,6 +212,40 @@ bool cCuboid::IsSorted(void) const
 		(p1.y <= p2.y) &&
 		(p1.z <= p2.z)
 	);
+}
+
+
+
+
+
+void cCuboid::Engulf(const Vector3i & a_Point)
+{
+	if (a_Point.x < p1.x)
+	{
+		p1.x = a_Point.x;
+	}
+	else if (a_Point.x > p2.x)
+	{
+		p2.x = a_Point.x;
+	}
+
+	if (a_Point.y < p1.y)
+	{
+		p1.y = a_Point.y;
+	}
+	else if (a_Point.y > p2.y)
+	{
+		p2.y = a_Point.y;
+	}
+
+	if (a_Point.z < p1.z)
+	{
+		p1.z = a_Point.z;
+	}
+	else if (a_Point.z > p2.z)
+	{
+		p2.z = a_Point.z;
+	}
 }
 
 

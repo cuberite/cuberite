@@ -39,6 +39,7 @@ public:
 			case E_BLOCK_CACTUS:
 			case E_BLOCK_ICE:
 			case E_BLOCK_LEAVES:
+			case E_BLOCK_NEW_LEAVES:
 			case E_BLOCK_AIR:
 			{
 				return false;

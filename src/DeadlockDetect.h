@@ -60,7 +60,7 @@ protected:
 	void CheckWorldAge(const AString & a_WorldName, Int64 a_Age);
 	
 	/// Called when a deadlock is detected. Aborts the server.
-	void DeadlockDetected(void);
+	NORETURN void DeadlockDetected(void);
 } ;
 
 

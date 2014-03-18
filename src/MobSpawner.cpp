@@ -169,7 +169,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
 					(
-						(BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES)
+						(BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES) || (BlockBelow == E_BLOCK_NEW_LEAVES)
 					) &&
 					(a_RelY >= 62) &&
 					(m_Random.NextInt(3, a_Biome) != 0)

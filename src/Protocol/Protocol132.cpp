@@ -100,7 +100,7 @@ cProtocol132::~cProtocol132()
 {
 	if (!m_DataToSend.empty())
 	{
-		LOGD("There are %d unsent bytes while deleting cProtocol132", m_DataToSend.size());
+		LOGD("There are " SIZE_T_FMT " unsent bytes while deleting cProtocol132", m_DataToSend.size());
 	}
 }
 

@@ -46,7 +46,6 @@
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
-#include "Vector3d.h"
 
 #include "Tracer.h"
 
@@ -103,7 +102,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("%d chunks to load, %d chunks to generate", 
+			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate", 
 				m_World->GetStorage().GetLoadQueueLength(),
 				m_World->GetGenerator().GetQueueLength()
 			);
@@ -155,7 +154,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("%d chunks remaining to light", m_Lighting->GetQueueLength()
+			LOG("" SIZE_T_FMT  " chunks remaining to light", m_Lighting->GetQueueLength()
 			);
 			
 			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
@@ -2459,14 +2458,14 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 {
 	cTracer LineOfSight(this);
 
-	float ClosestDistance = a_SightLimit;
-	cPlayer* ClosestPlayer = NULL;
+	double ClosestDistance = a_SightLimit;
+	cPlayer * ClosestPlayer = NULL;
 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		Vector3f Pos = (*itr)->GetPosition();
-		float Distance = (Pos - a_Pos).Length();
+		double Distance = (Pos - a_Pos).Length();
 
 		if (Distance < ClosestDistance)
 		{

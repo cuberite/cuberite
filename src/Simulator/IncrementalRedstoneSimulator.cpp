@@ -1062,7 +1062,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 				{
 					Vector3f EntityPos = a_Entity->GetPosition();
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
-					float Distance = (EntityPos - BlockPos).Length();
+					double Distance = (EntityPos - BlockPos).Length();
 
 					if (Distance <= 0.7)
 					{

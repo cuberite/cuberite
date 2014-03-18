@@ -182,14 +182,23 @@ macro(set_exe_flags)
 		string(REPLACE "-w" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
 		string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
 		string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
-		add_flags_cxx("-Wall -Wextra")
+		add_flags_cxx("-Wall -Wextra -Wno-unused-parameter -Wno-error=switch")
 		
 		# we support non-IEEE 754 fpus so can make no guarentees about error
 		add_flags_cxx("-ffast-math")
 		
-		# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")
+			add_flags_cxx("-Werror -Weverything -Wno-c++98-compat-pedantic -Wno-string-conversion")
+			add_flags_cxx("-Wno-extra-semi -Wno-error=switch-enum -Wno-documentation")
+			add_flags_cxx("-Wno-error=sign-conversion -Wno-error=conversion -Wno-padded")
+			add_flags_cxx("-Wno-error=deprecated -Wno-error=weak-vtables -Wno-error=float-equal")
+			add_flags_cxx("-Wno-error=missing-prototypes -Wno-error=non-virtual-dtor")
+			add_flags_cxx("-Wno-error=covered-switch-default -Wno-error=shadow")
+			add_flags_cxx("-Wno-error=exit-time-destructors -Wno-error=missing-variable-declarations")
+			add_flags_cxx("-Wno-error=global-constructors -Wno-implicit-fallthrough")
+			add_flags_cxx("-Wno-error=unreachable-code")
 		endif()
 	endif()
 

@@ -56,7 +56,8 @@ function Initialize(Plugin)
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
 	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings")
-	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
+	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one")
+	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z")
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -216,7 +217,7 @@ function TestBlockAreasString()
 		return
 	end
 	cFile:CreateFolder("schematics")
-	local f = io.open("schematics/StringTest.schematic", "w")
+	local f = io.open("schematics/StringTest.schematic", "wb")
 	f:write(Data)
 	f:close()
 	
@@ -229,7 +230,7 @@ function TestBlockAreasString()
 	BA2:Clear()
 	
 	-- Load another area from a string in that file:
-	f = io.open("schematics/StringTest.schematic", "r")
+	f = io.open("schematics/StringTest.schematic", "rb")
 	Data = f:read("*all")
 	if not(BA2:LoadFromSchematicString(Data)) then
 		LOG("Cannot load schematic from string")
@@ -1291,6 +1292,43 @@ function HandleSetBiome(a_Split, a_Player)
 		"} - {" .. (BlockX + Size) .. ", " .. (BlockZ + Size) ..
 		"} set to biome #" .. tostring(Biome) .. "."
 	)
+	return true
+end
+
+
+
+
+
+function HandleWESel(a_Split, a_Player)
+	-- Check if the selection is a cuboid:
+	local IsCuboid = cPluginManager:CallPlugin("WorldEdit", "IsPlayerSelectionCuboid")
+	if (IsCuboid == nil) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit is not loaded"))
+		return true
+	elseif (IsCuboid == false) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, the selection is not a cuboid"))
+		return true
+	end
+	
+	-- Get the selection:
+	local SelCuboid = cCuboid()
+	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "GetPlayerCuboidSelection", a_Player, SelCuboid)
+	if not(IsSuccess) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while getting current selection"))
+		return true
+	end
+	
+	-- Adjust the selection:
+	local NumBlocks = tonumber(a_Split[2] or "1") or 1
+	SelCuboid:Expand(NumBlocks, NumBlocks, 0, 0, NumBlocks, NumBlocks)
+	
+	-- Set the selection:
+	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "SetPlayerCuboidSelection", a_Player, SelCuboid)
+	if not(IsSuccess) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while setting new selection"))
+		return true
+	end
+	a_Player:SendMessage(cCompositeChat():SetMessageType(mtInformation):AddTextPart("Successfully adjusted the selection by " .. NumBlocks .. " block(s)"))
 	return true
 end
 

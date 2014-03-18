@@ -168,6 +168,7 @@ cBlockArea::cBlockArea(void) :
 	m_SizeX(0),
 	m_SizeY(0),
 	m_SizeZ(0),
+	m_WEOffset(0, 0, 0),
 	m_BlockTypes(NULL),
 	m_BlockMetas(NULL),
 	m_BlockLight(NULL),
@@ -248,6 +249,24 @@ void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	m_OriginX = 0;
 	m_OriginY = 0;
 	m_OriginZ = 0;
+}
+
+
+
+
+
+void cBlockArea::SetWEOffset(int a_OffsetX, int a_OffsetY, int a_OffsetZ)
+{
+	m_WEOffset.Set(a_OffsetX, a_OffsetY, a_OffsetZ);
+}
+
+
+
+
+
+void cBlockArea::SetWEOffset(const Vector3i & a_Offset)
+{
+	m_WEOffset.Set(a_Offset.x, a_Offset.y, a_Offset.z);
 }
 
 

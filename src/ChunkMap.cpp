@@ -1376,8 +1376,9 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 				break;
 			}
 			case E_BLOCK_LEAVES:
+			case E_BLOCK_NEW_LEAVES:
 			{
-				if (itr->BlockType == E_BLOCK_LOG)
+				if ((itr->BlockType == E_BLOCK_LOG) || (itr->BlockType == E_BLOCK_NEW_LOG))
 				{
 					Chunk->SetBlock(itr->x, itr->y, itr->z, itr->BlockType, itr->BlockMeta);
 				}
@@ -1784,70 +1785,73 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					BLOCKTYPE Block = area.GetBlockType(bx + x, by + y, bz + z);
 					switch (Block)
 					{
-					case E_BLOCK_TNT:
-					{
-						// Activate the TNT, with a random fuse between 10 to 30 game ticks
-						double FuseTime = (double)(10 + m_World->GetTickRandomNumber(20)) / 20;
-						m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
-						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
-						break;
-					}
-					case E_BLOCK_OBSIDIAN:
-					case E_BLOCK_BEDROCK:
-					case E_BLOCK_WATER:
-					case E_BLOCK_LAVA:
-					{
-						// These blocks are not affected by explosions
-						break;
-					}
-
-					case E_BLOCK_STATIONARY_WATER:
-					{
-						// Turn into simulated water:
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
-						break;
-					}
-
-					case E_BLOCK_STATIONARY_LAVA:
-					{
-						// Turn into simulated lava:
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
-						break;
-					}
-
-					case E_BLOCK_AIR:
-					{
-						// No pickups for air
-						break;
-					}
-
-					default:
-					{
-						if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
+						case E_BLOCK_TNT:
 						{
-							cItems Drops;
-							cBlockHandler * Handler = BlockHandler(Block);
-
-							Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
-							m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
+							// Activate the TNT, with a random fuse between 10 to 30 game ticks
+							int FuseTime = 10 + m_World->GetTickRandomNumber(20);
+							m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
+							break;
 						}
-						else if ((m_World->GetTNTShrapnelLevel() > 0) && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
+						
+						case E_BLOCK_OBSIDIAN:
+						case E_BLOCK_BEDROCK:
+						case E_BLOCK_WATER:
+						case E_BLOCK_LAVA:
 						{
-							if (!cBlockInfo::FullyOccupiesVoxel(Block))
-							{
-								break;
-							}
-							else if ((m_World->GetTNTShrapnelLevel() == 1) && ((Block != E_BLOCK_SAND) && (Block != E_BLOCK_GRAVEL)))
-							{
-								break;
-							}
-							m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
+							// These blocks are not affected by explosions
+							break;
 						}
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
-						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
-						break;
-					}
+
+						case E_BLOCK_STATIONARY_WATER:
+						{
+							// Turn into simulated water:
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
+							break;
+						}
+
+						case E_BLOCK_STATIONARY_LAVA:
+						{
+							// Turn into simulated lava:
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
+							break;
+						}
+
+						case E_BLOCK_AIR:
+						{
+							// No pickups for air
+							break;
+						}
+
+						default:
+						{
+							if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
+							{
+								cItems Drops;
+								cBlockHandler * Handler = BlockHandler(Block);
+
+								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
+								m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
+							}
+							else if ((m_World->GetTNTShrapnelLevel() > 0) && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
+							{
+								if (!cBlockInfo::FullyOccupiesVoxel(Block))
+								{
+									break;
+								}
+								else if ((m_World->GetTNTShrapnelLevel() == 1) && ((Block != E_BLOCK_SAND) && (Block != E_BLOCK_GRAVEL)))
+								{
+									break;
+								}
+								m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
+							}
+
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
+							break;
+							
+						}
 					}  // switch (BlockType)
 				}  // for z
 			}  // for y
@@ -1902,7 +1906,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			else if (FinalDamage < 0)
 				FinalDamage = 0;
 
-			if (!a_Entity->IsTNT() && !a_Entity->IsFallingBlock()) // Don't apply damage to other TNT entities, they should be invincible
+			if (!a_Entity->IsTNT() && !a_Entity->IsFallingBlock()) // Don't apply damage to other TNT entities and falling blocks, they should be invincible
 			{
 				a_Entity->TakeDamage(dtExplosion, NULL, (int)FinalDamage, 0);
 			}

@@ -10,7 +10,7 @@
 
 
 
-#if SELF_TEST
+#ifdef SELF_TEST
 
 /** A simple self-test that is executed on program start, used to verify bbox functionality */
 static class SelfTest_BoundingBox

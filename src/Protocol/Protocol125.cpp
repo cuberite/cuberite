@@ -1269,19 +1269,6 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 
 
 
-#define HANDLE_PACKET_PARSE(Packet) \
-	{ \
-		int res = Packet.Parse(m_ReceivedData); \
-		if (res < 0) \
-		{ \
-			return res; \
-		} \
-	}
-
-
-
-
-
 int cProtocol125::ParseArmAnim(void)
 {
 	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);

@@ -19,10 +19,8 @@ schematics
 *.pdb
 memdump*
 *.grab
-Galleries.cfg
-Galleries.example.cfg
-Galleries.sqlite
-ProtectionAreas.sqlite
+*.cfg
+*.sqlite
 helgrind.log
 valgrind.log
 motd.txt

@@ -94,12 +94,20 @@ void cLuaState::Create(void)
 	}
 	m_LuaState = lua_open();
 	luaL_openlibs(m_LuaState);
+	m_IsOwned = true;
+}
+
+
+
+
+
+void cLuaState::RegisterAPILibs(void)
+{
 	tolua_AllToLua_open(m_LuaState);
 	ManualBindings::Bind(m_LuaState);
 	DeprecatedBindings::Bind(m_LuaState);
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
-	m_IsOwned = true;
 }
 
 
@@ -734,10 +742,6 @@ void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 	{
 		a_Value.assign(data, len);
 	}
-	else
-	{
-		a_Value.clear();
-	}
 }
 
 
@@ -1281,7 +1285,9 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
 	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
 	
-	LOGD((a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
+	
+	// Format string consisting only of %s is used to appease the compiler
+	LOGD("%s",(a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;

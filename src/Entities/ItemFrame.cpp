@@ -10,43 +10,10 @@
 
 
 cItemFrame::cItemFrame(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z)
-	: cEntity(etItemFrame, a_X, a_Y, a_Z, 0.8, 0.8),
-	m_BlockFace(a_BlockFace),
-	m_Item(E_BLOCK_AIR),
-	m_Rotation(0)
+	:	cHangingEntity(etItemFrame, a_BlockFace, a_X, a_Y, a_Z)
+	, m_Item(E_BLOCK_AIR)
+	, m_Rotation(0)
 {
-	SetMaxHealth(1);
-	SetHealth(1);
-}
-
-
-
-
-
-void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
-{
-	int Dir = 0;
-			
-	// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
-	switch (m_BlockFace)
-	{
-		case BLOCK_FACE_ZP: break; // Initialised to zero
-		case BLOCK_FACE_ZM: Dir = 2; break;
-		case BLOCK_FACE_XM: Dir = 1; break;
-		case BLOCK_FACE_XP: Dir = 3; break;
-		default: ASSERT(!"Unhandled block face when trying to spawn item frame!"); return;
-	}
-
-	if ((Dir == 0) || (Dir == 2)) // Probably a client bug, but two directions are flipped and contrary to the norm, so we do -180
-	{
-		SetYaw((Dir * 90) - 180);
-	}
-	else
-	{
-		SetYaw(Dir * 90);
-	}
-
-	a_ClientHandle.SendSpawnObject(*this, 71, Dir, (Byte)GetYaw(), (Byte)GetPitch());
 }
 
 
