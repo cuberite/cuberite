@@ -1541,9 +1541,12 @@ function Initialize(Plugin)
 	
 	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	
+	-- Bind a console command to dump the API:
 	cPluginManager:BindConsoleCommand("api", HandleCmdApi, "Dumps the Lua API docs into the API/ subfolder")
+
+	-- Add a WebAdmin tab that has a Dump button
 	g_Plugin:AddWebTab("APIDump", HandleWebAdminDump)
-	-- TODO: Add a WebAdmin tab that has a Dump button
+	
 	return true
 end
 
