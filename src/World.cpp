@@ -577,15 +577,15 @@ void cWorld::Start(void)
 	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
 	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  true);
 	m_ShouldLavaSpawnFire       = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",       true);
-	m_TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",          2);
+	m_TNTShrapnelLevel          = (eShrapnelLevel)IniFile.GetValueSetI("Physics", "TNTShrapnelLevel", 2);
 	m_bCommandBlocksEnabled     = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",      false);
 	m_bEnabledPVP               = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                true);
 	m_bUseChatPrefixes          = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",           true);
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",    "VillagersShouldHarvestCrops", true);
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("General", "Gamemode", m_GameMode);
-	if (m_TNTShrapnelLevel > 2)
-		m_TNTShrapnelLevel = 2;
+	if (m_TNTShrapnelLevel > slAll)
+		m_TNTShrapnelLevel = slAll;
 
 	// Load allowed mobs:
 	const char * DefaultMonsters = "";

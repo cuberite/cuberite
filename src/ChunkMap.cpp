@@ -1834,13 +1834,13 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
 								m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
 							}
-							else if ((m_World->GetTNTShrapnelLevel() > 0) && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
+							else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
 							{
 								if (!cBlockInfo::FullyOccupiesVoxel(Block))
 								{
 									break;
 								}
-								else if ((m_World->GetTNTShrapnelLevel() == 1) && ((Block != E_BLOCK_SAND) && (Block != E_BLOCK_GRAVEL)))
+								else if ((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block != E_BLOCK_SAND) && (Block != E_BLOCK_GRAVEL)))
 								{
 									break;
 								}

@@ -605,8 +605,8 @@ public:
 	bool AreCommandBlocksEnabled(void) const { return m_bCommandBlocksEnabled; }
 	void SetCommandBlocksEnabled(bool a_Flag) { m_bCommandBlocksEnabled = a_Flag; }
 
-	unsigned char GetTNTShrapnelLevel(void) const { return m_TNTShrapnelLevel; }
-	void SetTNTShrapnelLevel(int a_Flag) { m_TNTShrapnelLevel = a_Flag; }
+	eShrapnelLevel GetTNTShrapnelLevel(void) const { return m_TNTShrapnelLevel; }
+	void SetTNTShrapnelLevel(eShrapnelLevel a_Flag) { m_TNTShrapnelLevel = a_Flag; }
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
@@ -867,11 +867,9 @@ private:
 	bool m_bUseChatPrefixes;
 
 	/** The level of DoExplosionAt() projecting random affected blocks as FallingBlock entities
-	0 = None
-	1 = Only sand and gravel
-	2 = All blocks
+	See the eShrapnelLevel enumeration for details
 	*/
-	int m_TNTShrapnelLevel;
+	eShrapnelLevel m_TNTShrapnelLevel;
 	
 
 	cChunkGenerator  m_Generator;

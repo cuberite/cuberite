@@ -852,10 +852,14 @@ enum eExplosionSource
 	esWitherSkullBlack,
 	esWitherSkullBlue,
 	esWitherBirth,
-	esPlugin,
-	
-	// Obsolete constants, kept for compatibility, will be removed after some time:
-	esCreeper = esMonster,
+	esPlugin
+} ;
+
+enum eShrapnelLevel
+{
+	slNone,
+	slGravityAffectedOnly,
+	slAll
 } ;
 
 // tolua_end
