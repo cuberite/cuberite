@@ -148,6 +148,9 @@ end
 -- check if basic type
 function isbasic (type)
  local t = gsub(type,'const ','')
+ if _enum_is_functions[t] then
+ 	return nil
+ end
  local m,t = applytypedef('', t)
  local b = _basic[t]
  if b then
@@ -382,6 +385,7 @@ end
 
 _push_functions = {}
 _is_functions = {}
+_enum_is_functions = {}
 _to_functions = {}
 
 _base_push_functions = {}
@@ -410,5 +414,5 @@ function get_to_function(t)
 end
 
 function get_is_function(t)
-	return _is_functions[t] or search_base(t, _base_is_functions) or "tolua_isusertype"
+	return _enum_is_functions[t] or _is_functions[t] or search_base(t, _base_is_functions) or "tolua_isusertype"
 end

@@ -130,8 +130,8 @@ function Enumerate (n,b,varname)
 	e.min = min
 	e.max = max
 	if n ~= "" then
+		_enum_is_functions[n] = ("tolua_is" .. n)
 		Typedef("int "..n)
-		_is_functions[n] = "tolua_is" .. n
 	end
 	return _Enumerate(e, varname)
 end
