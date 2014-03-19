@@ -733,22 +733,19 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if( NextSpeed.SqrLength() > 0.f )
 	{
 		cTracer Tracer( GetWorld() );
-		int Ret = Tracer.Trace( NextPos, NextSpeed, 2 );
-		if( Ret ) // Oh noez! we hit something
+		bool HasHit = Tracer.Trace( NextPos, NextSpeed, 2 );
+		if (HasHit) // Oh noez! we hit something
 		{
 			// Set to hit position
-			if( (Tracer.RealHit - NextPos).SqrLength() <= ( NextSpeed * a_Dt ).SqrLength() )
+			if ((Tracer.RealHit - NextPos).SqrLength() <= (NextSpeed * a_Dt).SqrLength())
 			{
-				if( Ret == 1 )
-				{
-					if( Tracer.HitNormal.x != 0.f ) NextSpeed.x = 0.f;
-					if( Tracer.HitNormal.y != 0.f ) NextSpeed.y = 0.f;
-					if( Tracer.HitNormal.z != 0.f ) NextSpeed.z = 0.f;
+				if (Tracer.HitNormal.x != 0.f) NextSpeed.x = 0.f;
+				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
+				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
 
-					if( Tracer.HitNormal.y > 0 ) // means on ground
-					{
-						m_bOnGround = true;
-					}
+				if (Tracer.HitNormal.y > 0) // means on ground
+				{
+					m_bOnGround = true;
 				}
 				NextPos.Set(Tracer.RealHit.x,Tracer.RealHit.y,Tracer.RealHit.z);
 				NextPos.x += Tracer.HitNormal.x * 0.3f;
