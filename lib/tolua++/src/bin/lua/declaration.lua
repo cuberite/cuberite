@@ -229,6 +229,8 @@ function classDeclaration:outchecktype (narg)
  	--end
  elseif t then
 	return '!tolua_is'..t..'(tolua_S,'..narg..','..def..',&tolua_err)'
+ elseif isenum(self.type) then
+ 	return '!tolua_is'..self.type..'(tolua_S,'..narg..','..def..',&tolua_err)'
  else
   local is_func = get_is_function(self.type)
   if self.ptr == '&' or self.ptr == '' then
