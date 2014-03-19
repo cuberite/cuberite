@@ -585,7 +585,9 @@ void cWorld::Start(void)
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("General", "Gamemode", m_GameMode);
 	if (m_TNTShrapnelLevel > slAll)
+	{
 		m_TNTShrapnelLevel = slAll;
+	}
 
 	// Load allowed mobs:
 	const char * DefaultMonsters = "";
