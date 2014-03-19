@@ -1080,20 +1080,20 @@ bool cLuaState::ReportErrors(lua_State * a_LuaState, int a_Status)
 
 
 
-void cLuaState::LogStackTrace(void)
+void cLuaState::LogStackTrace(int a_StartingDepth)
 {
-	LogStackTrace(m_LuaState);
+	LogStackTrace(m_LuaState, a_StartingDepth);
 }
 
 
 
 
 
-void cLuaState::LogStackTrace(lua_State * a_LuaState)
+void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 {
 	LOGWARNING("Stack trace:");
 	lua_Debug entry;
-	int depth = 0;
+	int depth = a_StartingDepth;
 	while (lua_getstack(a_LuaState, depth, &entry))
 	{
 		lua_getinfo(a_LuaState, "Sln", &entry);
@@ -1312,7 +1312,7 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 {
 	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
-	LogStackTrace(a_LuaState);
+	LogStackTrace(a_LuaState, 1);
 	return 1;  // We left the error message on the stack as the return value
 }
 
