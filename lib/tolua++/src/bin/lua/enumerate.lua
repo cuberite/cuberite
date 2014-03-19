@@ -54,11 +54,11 @@ _global_output_enums = {}
 function classEnumerate:supcode ()
 	if _global_output_enums[self.name] == nil then
 		_global_output_enums[self.name] = 1
-		output("int tolua_is" .. self.name .. " (lua_State* L, int lo, int def, tolua_Error* err)")
+		output("lua_Number tolua_is" .. self.name .. " (lua_State* L, int lo, int def, tolua_Error* err)")
 		output("{")
 		output("if (!tolua_isnumber(L,lo,def,err)) return 0;")
-		output("int val = tolua_tonumber(L,lo,def);")
-		output("return val >= " .. self.min .. " && val <= " ..self.max .. ";")
+		output("lua_Number val = tolua_tonumber(L,lo,def);")
+		output("return val >= " .. self.min .. ".0 && val <= " ..self.max .. ".0;")
 		output("}")
 	end
 end
