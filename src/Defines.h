@@ -290,6 +290,10 @@ inline AString BlockFaceToString(eBlockFace a_BlockFace)
 		case BLOCK_FACE_ZP: return "BLOCK_FACE_ZP";
 		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
 	}
+	// clang optimisises this line away then warns that it has done so.
+	#if !defined(__clang__)
+	return Printf("Unknown BLOCK_FACE: %d", a_BlockFace);
+	#endif
 }
 
 
