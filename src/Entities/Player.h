@@ -331,13 +331,13 @@ public:
 	
 	// tolua_begin
 	
-	/// Returns the current maximum speed, as reported in the 1.6.1+ protocol (takes current sprinting state into account)
+	/// Returns the current relative maximum speed (takes current sprinting state into account)
 	double GetMaxSpeed(void) const;
 	
-	/// Gets the normal maximum speed, as reported in the 1.6.1+ protocol, in the protocol units
+	/// Gets the normal relative maximum speed
 	double GetNormalMaxSpeed(void) const { return m_NormalMaxSpeed; }
 	
-	/// Gets the sprinting maximum speed, as reported in the 1.6.1+ protocol, in the protocol units
+	/// Gets the sprinting relative maximum speed
 	double GetSprintingMaxSpeed(void) const { return m_SprintingMaxSpeed; }
 	
 	/// Sets the normal maximum speed, as reported in the 1.6.1+ protocol. Sends the update to player, if needed.
@@ -432,10 +432,14 @@ protected:
 	
 	cSlotNums m_InventoryPaintSlots;
 	
-	/// Max speed, in ENTITY_PROPERTIES packet's units, when the player is walking. 0.1 by default
+	/** Max speed, relative to the game default.
+	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
+	Default value is 1. */
 	double m_NormalMaxSpeed;
 	
-	/// Max speed, in ENTITY_PROPERTIES packet's units, when the player is sprinting. 0.13 by default
+	/** Max speed, relative to the game default max speed.
+	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
+	Default value is 1.3 */
 	double m_SprintingMaxSpeed;
 	
 	bool m_IsCrouched;

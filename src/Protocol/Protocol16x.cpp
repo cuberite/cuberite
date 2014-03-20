@@ -135,7 +135,7 @@ void cProtocol161::SendPlayerMaxSpeed(void)
 	WriteInt(m_Client->GetPlayer()->GetUniqueID());
 	WriteInt(1);
 	WriteString("generic.movementSpeed");
-	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
+	WriteDouble(0.1 * m_Client->GetPlayer()->GetMaxSpeed());
 	Flush();
 }
 
@@ -267,7 +267,7 @@ void cProtocol162::SendPlayerMaxSpeed(void)
 	WriteInt(m_Client->GetPlayer()->GetUniqueID());
 	WriteInt(1);
 	WriteString("generic.movementSpeed");
-	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
+	WriteDouble(0.1 * m_Client->GetPlayer()->GetMaxSpeed());
 	WriteShort(0);
 	Flush();
 }
