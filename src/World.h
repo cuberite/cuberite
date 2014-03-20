@@ -605,6 +605,9 @@ public:
 	bool AreCommandBlocksEnabled(void) const { return m_bCommandBlocksEnabled; }
 	void SetCommandBlocksEnabled(bool a_Flag) { m_bCommandBlocksEnabled = a_Flag; }
 
+	eShrapnelLevel GetTNTShrapnelLevel(void) const { return m_TNTShrapnelLevel; }
+	void SetTNTShrapnelLevel(eShrapnelLevel a_Flag) { m_TNTShrapnelLevel = a_Flag; }
+
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
 	
@@ -862,6 +865,11 @@ private:
 	
 	/** Whether prefixes such as [INFO] are prepended to SendMessageXXX() / BroadcastChatXXX() functions */
 	bool m_bUseChatPrefixes;
+
+	/** The level of DoExplosionAt() projecting random affected blocks as FallingBlock entities
+	See the eShrapnelLevel enumeration for details
+	*/
+	eShrapnelLevel m_TNTShrapnelLevel;
 	
 
 	cChunkGenerator  m_Generator;

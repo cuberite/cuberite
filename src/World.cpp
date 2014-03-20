@@ -250,8 +250,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
-	m_bCommandBlocksEnabled(false),
-	m_bUseChatPrefixes(true),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -579,12 +577,17 @@ void cWorld::Start(void)
 	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
 	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  true);
 	m_ShouldLavaSpawnFire       = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",       true);
+	m_TNTShrapnelLevel          = (eShrapnelLevel)IniFile.GetValueSetI("Physics", "TNTShrapnelLevel", 2);
 	m_bCommandBlocksEnabled     = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",      false);
 	m_bEnabledPVP               = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                true);
 	m_bUseChatPrefixes          = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",           true);
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",    "VillagersShouldHarvestCrops", true);
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("General", "Gamemode", m_GameMode);
+	if (m_TNTShrapnelLevel > slAll)
+	{
+		m_TNTShrapnelLevel = slAll;
+	}
 
 	// Load allowed mobs:
 	const char * DefaultMonsters = "";
@@ -1730,7 +1733,11 @@ void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks,
 	UNUSED(a_InitialVelocityCoeff);
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
 	TNT->Initialize(this);
-	// TODO: Add a bit of speed in horiz and vert axes, based on the a_InitialVelocityCoeff
+	TNT->SetSpeed(
+		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /** -1, 0, 1 */
+		a_InitialVelocityCoeff * 2,
+		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1)
+		);
 }
 
 
