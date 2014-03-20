@@ -58,7 +58,7 @@ function classFunction:supcode (local_constructor)
  if self.args[1].type ~= 'void' then
   local i=1
   while self.args[i] do
-   if isenum(self.args[i].type) then
+   if isenumtype(self.args[i].type) then
      emitenumprototype(self.args[i].type)
    end
    i = i+1

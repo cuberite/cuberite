@@ -66,6 +66,8 @@ _global_enums = {}
 
 -- List of auto renaming
 _renaming = {}
+
+_enums = {}
 function appendrenaming (s)
  local b,e,old,new = strfind(s,"%s*(.-)%s*@%s*(.-)%s*$")
 	if not b then
@@ -146,7 +148,7 @@ function typevar(type)
 end
 
 -- is enum
-function isenum (type)
+function isenumtype (type) 
   return _enums[type]
 end
 
