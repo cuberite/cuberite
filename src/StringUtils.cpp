@@ -454,7 +454,6 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 		if (!isLegalUTF8(source, extraBytesToRead + 1))
 		{
 			return a_UTF16;
-			break;
 		}
 		
 		// The cases all fall through. See "Note A" below.
