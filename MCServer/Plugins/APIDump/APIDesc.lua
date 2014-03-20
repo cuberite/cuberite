@@ -2792,11 +2792,11 @@ end
 		"Globals.xpcall",
 		"Globals.decoda_output",  -- When running under Decoda, this function gets added to the global namespace
 		"sqlite3.__newindex",
-		"%a+\.__%a+",        -- AnyClass.__Anything
-		"%a+\.\.collector",  -- AnyClass..collector
-		"%a+\.new",          -- AnyClass.new
-		"%a+.new_local",     -- AnyClass.new_local
-		"%a+.delete",        -- AnyClass.delete
+		"%a+%.__%a+",        -- AnyClass.__Anything
+		"%a+%.%.collector",  -- AnyClass..collector
+		"%a+%.new",          -- AnyClass.new
+		"%a+%.new_local",    -- AnyClass.new_local
+		"%a+%.delete",       -- AnyClass.delete
 
 		-- Functions global in the APIDump plugin:
 		"CreateAPITables",
