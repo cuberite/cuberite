@@ -687,8 +687,7 @@ void cProtocol172::SendPlayerAbilities(void)
 		Flags |= 0x04;
 	}
 	Pkt.WriteByte(Flags);
-	// TODO: Pkt.WriteFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
-	Pkt.WriteFloat(0.05f);
+	Pkt.WriteFloat((float)(0.05 * m_Client->GetPlayer()->GetFlyingMaxSpeed()));
 	Pkt.WriteFloat((float)(0.1 * m_Client->GetPlayer()->GetMaxSpeed()));
 }
 
