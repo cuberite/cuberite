@@ -689,9 +689,10 @@ void cLuaState::Push(void * a_Ptr)
 	ASSERT(IsValid());
 
 	// Investigate the cause of this - what is the callstack?
-	LOGWARNING("Lua engine encountered an error - attempting to push a plain pointer");
+	// One code path leading here is the OnHookExploding / OnHookExploded with exotic parameters. Need to decide what to do with them
+	LOGWARNING("Lua engine: attempting to push a plain pointer, pushing nil instead.");
+	LOGWARNING("This indicates an unimplemented part of MCS bindings");
 	LogStackTrace();
-	ASSERT(!"A plain pointer should never be pushed on Lua stack");
 	
 	lua_pushnil(m_LuaState);
 	m_NumCurrentFunctionArgs += 1;
