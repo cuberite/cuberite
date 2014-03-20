@@ -227,6 +227,8 @@ function classDeclaration:outchecktype (narg)
 	--else
 	return '!tolua_istable(tolua_S,'..narg..',0,&tolua_err)'
  	--end
+ elseif isenumtype(self.type) ~= nil then
+ 	return '!tolua_is'..self.type..'(tolua_S,'..narg..','..def..',&tolua_err)'
  elseif t then
 	return '!tolua_is'..t..'(tolua_S,'..narg..','..def..',&tolua_err)'
  else

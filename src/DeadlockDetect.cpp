@@ -121,7 +121,6 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 		if (itr->second.m_NumCyclesSame > (1000 * m_IntervalSec) / CYCLE_MILLISECONDS)
 		{
 			DeadlockDetected();
-			return;
 		}
 	}
 	else

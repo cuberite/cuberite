@@ -16,6 +16,7 @@ if (NOT MSVC)
 	#lib dependecies are not included
 	
 	set(BINDING_DEPENDECIES
+		tolua
 		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
 		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
 		Bindings/LuaFunctions.h
