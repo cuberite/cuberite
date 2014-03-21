@@ -18,7 +18,7 @@ Therefore, there is no cpp file.
 
 InPlace upscaling works on a single array and assumes that the values to work on have already
 been interspersed into the array to the cell boundaries.
-Specifically, a_Array[x * a_AnchorStepX + y * a_AnchorStepY] contains the anchor value.
+Specifically, a_Array[x * AnchorStepX + y * AnchorStepY] contains the anchor value.
 
 Regular upscaling takes two arrays and "moves" the input from src to dst; src is expected packed.
 */
@@ -29,46 +29,48 @@ Regular upscaling takes two arrays and "moves" the input from src to dst; src is
 /**
 Linearly interpolates values in the array between the equidistant anchor points (upscales).
 Works in-place (input is already present at the correct output coords)
+Uses templates to make it possible for the compiler to further optimizer the loops
 */
-template<typename TYPE> void LinearUpscale2DArrayInPlace(
-	TYPE * a_Array,
-	int a_SizeX, int a_SizeY,  // Dimensions of the array
-	int a_AnchorStepX, int a_AnchorStepY  // Distances between the anchor points in each direction
-)
+template<
+	int SizeX, int SizeY,  // Dimensions of the array
+	int AnchorStepX, int AnchorStepY,
+	typename TYPE
+>
+void LinearUpscale2DArrayInPlace(TYPE * a_Array)
 {
 	// First interpolate columns where the anchor points are:
-	int LastYCell = a_SizeY - a_AnchorStepY;
-	for (int y = 0; y < LastYCell; y += a_AnchorStepY)
+	int LastYCell = SizeY - AnchorStepY;
+	for (int y = 0; y < LastYCell; y += AnchorStepY)
 	{
-		int Idx = a_SizeX * y;
-		for (int x = 0; x < a_SizeX; x += a_AnchorStepX)
+		int Idx = SizeX * y;
+		for (int x = 0; x < SizeX; x += AnchorStepX)
 		{
 			TYPE StartValue = a_Array[Idx];
-			TYPE EndValue   = a_Array[Idx + a_SizeX * a_AnchorStepY];
+			TYPE EndValue   = a_Array[Idx + SizeX * AnchorStepY];
 			TYPE Diff = EndValue - StartValue;
-			for (int CellY = 1; CellY < a_AnchorStepY; CellY++)
+			for (int CellY = 1; CellY < AnchorStepY; CellY++)
 			{
-				a_Array[Idx + a_SizeX * CellY] = StartValue + Diff * CellY / a_AnchorStepY;
+				a_Array[Idx + SizeX * CellY] = StartValue + Diff * CellY / AnchorStepY;
 			}  // for CellY
-			Idx += a_AnchorStepX;
+			Idx += AnchorStepX;
 		}  // for x
 	}  // for y
 
 	// Now interpolate in rows, each row has values in the anchor columns
-	int LastXCell = a_SizeX - a_AnchorStepX;
-	for (int y = 0; y < a_SizeY; y++)
+	int LastXCell = SizeX - AnchorStepX;
+	for (int y = 0; y < SizeY; y++)
 	{
-		int Idx = a_SizeX * y;
-		for (int x = 0; x < LastXCell; x += a_AnchorStepX)
+		int Idx = SizeX * y;
+		for (int x = 0; x < LastXCell; x += AnchorStepX)
 		{
 			TYPE StartValue = a_Array[Idx];
-			TYPE EndValue   = a_Array[Idx + a_AnchorStepX];
+			TYPE EndValue   = a_Array[Idx + AnchorStepX];
 			TYPE Diff = EndValue - StartValue;
-			for (int CellX = 1; CellX < a_AnchorStepX; CellX++)
+			for (int CellX = 1; CellX < AnchorStepX; CellX++)
 			{
-				a_Array[Idx + CellX] = StartValue + CellX * Diff / a_AnchorStepX;
+				a_Array[Idx + CellX] = StartValue + CellX * Diff / AnchorStepX;
 			}  // for CellY
-			Idx += a_AnchorStepX;
+			Idx += AnchorStepX;
 		}
 	}
 }

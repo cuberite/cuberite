@@ -371,8 +371,8 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z]);
 	}
 	
-	LinearUpscale2DArrayInPlace(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
-	LinearUpscale2DArrayInPlace(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortZ[0][0]);
 	
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -477,8 +477,8 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 	{
 		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z], DistortSize);
 	}
-	LinearUpscale2DArrayInPlace(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
-	LinearUpscale2DArrayInPlace(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortZ[0][0]);
 	
 	// Prepare a 9x9 area of neighboring cell seeds
 	// (assuming that 7x7 cell area is larger than a chunk being generated)
@@ -651,8 +651,8 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 			HumidityMap[x + 17 * z] = NoiseH;
 		}  // for x
 	}  // for z
-	LinearUpscale2DArrayInPlace(TemperatureMap, 17, 17, 8, 8);
-	LinearUpscale2DArrayInPlace(HumidityMap,    17, 17, 8, 8);
+	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(TemperatureMap);
+	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(HumidityMap);
 	
 	// Re-map into integral values in [0 .. 255] range:
 	for (size_t idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
@@ -778,8 +778,8 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 		DistortZ[4 * x][4 * z] = BlockZ + (int)(64 * NoiseZ);
 	}
 	
-	LinearUpscale2DArrayInPlace(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
-	LinearUpscale2DArrayInPlace(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortZ[0][0]);
 	
 	// Apply distortion to each block coord, then query the voronoi maps for biome group and biome index and choose biome based on that:
 	for (int z = 0; z < cChunkDef::Width; z++)
