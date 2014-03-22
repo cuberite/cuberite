@@ -606,14 +606,15 @@ function classContainer:doparse (s)
  -- try function
  do
   --local b,e,decl,arg,const = strfind(s,"^%s*([~_%w][_@%w%s%*&:<>]*[_%w])%s*(%b())%s*(c?o?n?s?t?)%s*=?%s*0?%s*;%s*")
-  local b,e,decl,arg,const,virt = strfind(s,"^%s*([^%(\n]+)%s*(%b())%s*(c?o?n?s?t?)%s*(=?%s*0?)%s*;%s*")
+  local b,e,decl,arg,const,virt = strfind(s,"^%s*([^%(\n]+)%s*(%b())%s*(c?o?n?s?t?)%s*o?v?e?r?i?d?e?%s*(=?%s*0?)%s*;%s*")
+  warning("trace" .. b .. "," .. e "," .. decl)
   if not b then
   	-- try function with template
-  	b,e,decl,arg,const = strfind(s,"^%s*([~_%w][_@%w%s%*&:<>]*[_%w]%b<>)%s*(%b())%s*(c?o?n?s?t?)%s*=?%s*0?%s*;%s*")
+  	b,e,decl,arg,const = strfind(s,"^%s*([~_%w][_@%w%s%*&:<>]*[_%w]%b<>)%s*(%b())%s*(c?o?n?s?t?)%s*o?v?e?r?i?d?e?%s*=?%s*0?%s*;%s*")
   end
   if not b then
    -- try a single letter function name
-   b,e,decl,arg,const = strfind(s,"^%s*([_%w])%s*(%b())%s*(c?o?n?s?t?)%s*;%s*")
+   b,e,decl,arg,const = strfind(s,"^%s*([_%w])%s*(%b())%s*(c?o?n?s?t?)%s*o?v?e?r?i?d?e?%s*;%s*")
   end
   if not b then
    -- try function pointer
@@ -636,11 +637,11 @@ function classContainer:doparse (s)
 
  -- try inline function
  do
-  local b,e,decl,arg,const = strfind(s,"^%s*([^%(\n]+)%s*(%b())%s*(c?o?n?s?t?)[^;{]*%b{}%s*;?%s*")
+  local b,e,decl,arg,const = strfind(s,"^%s*([^%(\n]+)%s*(%b())%s*(c?o?n?s?t?)%s*o?v?e?r?i?d?e?[^;{]*%b{}%s*;?%s*")
   --local b,e,decl,arg,const = strfind(s,"^%s*([~_%w][_@%w%s%*&:<>]*[_%w>])%s*(%b())%s*(c?o?n?s?t?)[^;]*%b{}%s*;?%s*")
   if not b then
    -- try a single letter function name
-   b,e,decl,arg,const = strfind(s,"^%s*([_%w])%s*(%b())%s*(c?o?n?s?t?).-%b{}%s*;?%s*")
+   b,e,decl,arg,const = strfind(s,"^%s*([_%w])%s*(%b())%s*(c?o?n?s?t?)%s*o?v?e?r?i?d?e?.-%b{}%s*;?%s*")
   end
   if b then
    _curr_code = strsub(s,b,e)
