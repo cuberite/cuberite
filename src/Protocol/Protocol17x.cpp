@@ -687,9 +687,8 @@ void cProtocol172::SendPlayerAbilities(void)
 		Flags |= 0x04;
 	}
 	Pkt.WriteByte(Flags);
-	// TODO: Pkt.WriteFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
-	Pkt.WriteFloat(0.05f);
-	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetMaxSpeed());
+	Pkt.WriteFloat((float)(0.05 * m_Client->GetPlayer()->GetFlyingMaxSpeed()));
+	Pkt.WriteFloat((float)(0.1 * m_Client->GetPlayer()->GetMaxSpeed()));
 }
 
 
@@ -743,13 +742,14 @@ void cProtocol172::SendPlayerMaxSpeed(void)
 	Pkt.WriteInt(m_Client->GetPlayer()->GetUniqueID());
 	Pkt.WriteInt(1);  // Count
 	Pkt.WriteString("generic.movementSpeed");
-	Pkt.WriteDouble(0.1);
+	// The default game speed is 0.1, multiply that value by the relative speed:
+	Pkt.WriteDouble(0.1 * m_Client->GetPlayer()->GetNormalMaxSpeed());
 	if (m_Client->GetPlayer()->IsSprinting())
 	{
 		Pkt.WriteShort(1);  // Modifier count
 		Pkt.WriteInt64(0x662a6b8dda3e4c1c);
 		Pkt.WriteInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteDouble(0.3);
+		Pkt.WriteDouble(m_Client->GetPlayer()->GetSprintingMaxSpeed() - m_Client->GetPlayer()->GetNormalMaxSpeed());
 		Pkt.WriteByte(2);
 	}
 	else

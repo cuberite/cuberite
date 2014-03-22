@@ -43,8 +43,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_GameMode(eGameMode_NotSet)
 	, m_IP("")
 	, m_ClientHandle(a_Client)
-	, m_NormalMaxSpeed(0.1)
-	, m_SprintingMaxSpeed(0.13)
+	, m_NormalMaxSpeed(1.0)
+	, m_SprintingMaxSpeed(1.3)
+	, m_FlyingMaxSpeed(1.0)
 	, m_IsCrouched(false)
 	, m_IsSprinting(false)
 	, m_IsFlying(false)
@@ -684,7 +685,21 @@ const cSlotNums & cPlayer::GetInventoryPaintSlots(void) const
 
 double cPlayer::GetMaxSpeed(void) const
 {
-	return m_IsSprinting ? m_SprintingMaxSpeed : m_NormalMaxSpeed;
+	if (m_IsFlying)
+	{
+		return m_FlyingMaxSpeed;
+	}
+	else
+	{
+		if (m_IsSprinting)
+		{
+			return m_SprintingMaxSpeed;
+		}
+		else
+		{
+			return m_NormalMaxSpeed;
+		}
+	}
 }
 
 
@@ -694,7 +709,7 @@ double cPlayer::GetMaxSpeed(void) const
 void cPlayer::SetNormalMaxSpeed(double a_Speed)
 {
 	m_NormalMaxSpeed = a_Speed;
-	if (!m_IsSprinting)
+	if (!m_IsSprinting && !m_IsFlying)
 	{
 		m_ClientHandle->SendPlayerMaxSpeed();
 	}
@@ -707,10 +722,22 @@ void cPlayer::SetNormalMaxSpeed(double a_Speed)
 void cPlayer::SetSprintingMaxSpeed(double a_Speed)
 {
 	m_SprintingMaxSpeed = a_Speed;
-	if (m_IsSprinting)
+	if (m_IsSprinting && !m_IsFlying)
 	{
 		m_ClientHandle->SendPlayerMaxSpeed();
 	}
+}
+
+
+
+
+
+void cPlayer::SetFlyingMaxSpeed(double a_Speed)
+{
+	m_FlyingMaxSpeed = a_Speed;
+	
+	// Update the flying speed, always:
+	m_ClientHandle->SendPlayerAbilities();
 }
 
 

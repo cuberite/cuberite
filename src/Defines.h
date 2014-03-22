@@ -290,6 +290,10 @@ inline AString BlockFaceToString(eBlockFace a_BlockFace)
 		case BLOCK_FACE_ZP: return "BLOCK_FACE_ZP";
 		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
 	}
+	// clang optimisises this line away then warns that it has done so.
+	#if !defined(__clang__)
+	return Printf("Unknown BLOCK_FACE: %d", a_BlockFace);
+	#endif
 }
 
 
@@ -529,16 +533,22 @@ enum eMessageType
 	// http://forum.mc-server.org/showthread.php?tid=1212
 	// MessageType...
 
-	mtCustom, // Send raw data without any processing
-	mtFailure, // Something could not be done (i.e. command not executed due to insufficient privilege)
-	mtInformation, // Informational message (i.e. command usage)
-	mtSuccess, // Something executed successfully
-	mtWarning, // Something concerning (i.e. reload) is about to happen
-	mtFatal, // Something catastrophic occured (i.e. plugin crash)
-	mtDeath, // Denotes death of player
-	mtPrivateMessage, // Player to player messaging identifier
-	mtJoin, // A player has joined the server
-	mtLeave, // A player has left the server
+	mtCustom,          // Send raw data without any processing
+	mtFailure,         // Something could not be done (i.e. command not executed due to insufficient privilege)
+	mtInformation,     // Informational message (i.e. command usage)
+	mtSuccess,         // Something executed successfully
+	mtWarning,         // Something concerning (i.e. reload) is about to happen
+	mtFatal,           // Something catastrophic occured (i.e. plugin crash)
+	mtDeath,           // Denotes death of player
+	mtPrivateMessage,  // Player to player messaging identifier
+	mtJoin,            // A player has joined the server
+	mtLeave,           // A player has left the server
+	
+	// Common aliases:
+	mtFail  = mtFailure,
+	mtError = mtFailure,
+	mtInfo  = mtInformation,
+	mtPM    = mtPrivateMessage,
 };
 
 

@@ -16,6 +16,7 @@
 	{ \
 		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, (BLOCKTYPE)(E_BLOCK_SPONGE + i + 1)); break; \
 		case E_BLOCK_LOG: return true; \
+		case E_BLOCK_NEW_LOG: return true; \
 	}
 
 bool HasNearLog(cBlockArea &a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);

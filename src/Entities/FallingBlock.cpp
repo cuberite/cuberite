@@ -33,20 +33,16 @@ void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	float MilliDt = a_Dt * 0.001f;
-	AddSpeedY(MilliDt * -9.8f);
-	AddPosY(GetSpeedY() * MilliDt);
-
 	// GetWorld()->BroadcastTeleportEntity(*this);  // Test position
 	
-	int BlockX = m_OriginalPosition.x;
+	int BlockX = POSX_TOINT;
 	int BlockY = (int)(GetPosY() - 0.5);
-	int BlockZ = m_OriginalPosition.z;
+	int BlockZ = POSZ_TOINT;
 	
 	if (BlockY < 0)
 	{
 		// Fallen out of this world, just continue falling until out of sight, then destroy:
-		if (BlockY < 100)
+		if (BlockY < VOID_BOUNDARY)
 		{
 			Destroy(true);
 		}
@@ -85,6 +81,15 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 		cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
 		Destroy(true);
 		return;
+	}
+	
+	float MilliDt = a_Dt * 0.001f;
+	AddSpeedY(MilliDt * -9.8f);
+	AddPosition(GetSpeed() * MilliDt);
+
+	if ((GetSpeedX() != 0) || (GetSpeedZ() != 0))
+	{
+		BroadcastMovementUpdate();
 	}
 }
 

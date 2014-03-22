@@ -48,17 +48,21 @@ function classEnumerate:print (ident,close)
  print(ident.."}"..close)
 end
 
+function emitenumprototype(type)
+ output("int tolua_is" .. string.gsub(type,"::","_") .. " (lua_State* L, int lo, int def, tolua_Error* err);")
+end
+
 _global_output_enums = {}
 
 -- write support code
 function classEnumerate:supcode ()
-	if _global_output_enums[self.name] ~= nil then
+	if _global_output_enums[self.name] == nil then
 		_global_output_enums[self.name] = 1
-		output("int tolua_is" .. self.name .. " (lua_State* L, int lo, int def, tolua_Error* err)")
+		output("int tolua_is" .. string.gsub(self.name,"::","_") .. " (lua_State* L, int lo, int def, tolua_Error* err)")
 		output("{")
 		output("if (!tolua_isnumber(L,lo,def,err)) return 0;")
-		output("int val = tolua_tonumber(L,lo,def);")
-		output("return val >= " .. self.min .. " && val <= " ..self.max .. ";")
+		output("lua_Number val = tolua_tonumber(L,lo,def);")
+		output("return val >= " .. self.min .. ".0 && val <= " ..self.max .. ".0;")
 		output("}")
 	end
 end
@@ -130,8 +134,8 @@ function Enumerate (n,b,varname)
 	e.min = min
 	e.max = max
 	if n ~= "" then
+		_enums[n] = true
 		Typedef("int "..n)
-		_is_functions[n] = "tolua_is" .. n
 	end
 	return _Enumerate(e, varname)
 end

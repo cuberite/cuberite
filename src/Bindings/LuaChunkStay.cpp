@@ -131,9 +131,6 @@ void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, int a_OnChunkAvailableStackPo
 
 void cLuaChunkStay::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
-	// DEBUG:
-	LOGD("LuaChunkStay: Chunk [%d, %d] is now available, calling the callback...", a_ChunkX, a_ChunkZ);
-	
 	cPluginLua::cOperation Op(m_Plugin);
 	Op().Call((int)m_OnChunkAvailable, a_ChunkX, a_ChunkZ);
 }

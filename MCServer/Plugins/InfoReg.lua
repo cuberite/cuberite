@@ -59,13 +59,13 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 		return true;
 	end
 	
-	-- Check if the handler is valid:
+	-- If the handler is not valid, check the next sublevel:
 	if (Subcommand.Handler == nil) then
 		if (Subcommand.Subcommands == nil) then
 			LOG("Cannot find handler for command " .. a_CmdString .. " " .. Verb);
 			return false;
 		end
-		ListSubcommands(a_Player, Subcommand.Subcommands, a_CmdString .. " " .. Verb);
+		MultiCommandHandler(a_Split, a_Player, a_CmdString .. " " .. Verb, Subcommand, a_Level + 1);
 		return true;
 	end
 	

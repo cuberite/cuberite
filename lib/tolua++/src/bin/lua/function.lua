@@ -54,6 +54,16 @@ function classFunction:supcode (local_constructor)
  local nret = 0      -- number of returned values
  local class = self:inclass()
  local _,_,static = strfind(self.mod,'^%s*(static)')
+ -- prototypes for enum functions
+ if self.args[1].type ~= 'void' then
+  local i=1
+  while self.args[i] do
+   if isenumtype(self.args[i].type) then
+     emitenumprototype(self.args[i].type)
+   end
+   i = i+1
+  end
+ end
  if class then
 
  	if self.name == 'new' and self.parent.flags.pure_virtual then

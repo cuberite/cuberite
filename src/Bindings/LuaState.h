@@ -200,7 +200,7 @@ public:
 	void Push(const HTTPTemplateRequest * a_Request);
 	void Push(cTNTEntity * a_TNTEntity);
 	void Push(Vector3i * a_Vector);
-	NORETURNDEBUG void Push(void * a_Ptr);
+	void Push(void * a_Ptr);
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cBlockEntity * a_BlockEntity);
 	
@@ -868,10 +868,10 @@ public:
 	static bool ReportErrors(lua_State * a_LuaState, int status);
 	
 	/** Logs all items in the current stack trace to the server console */
-	void LogStackTrace(void);
+	void LogStackTrace(int a_StartingDepth = 0);
 	
 	/** Logs all items in the current stack trace to the server console */
-	static void LogStackTrace(lua_State * a_LuaState);
+	static void LogStackTrace(lua_State * a_LuaState, int a_StartingDepth = 0);
 	
 	/** Returns the type of the item on the specified position in the stack */
 	AString GetTypeText(int a_StackPos);
