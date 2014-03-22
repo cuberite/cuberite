@@ -23,6 +23,7 @@ _basic = {
  ['unsigned'] = 'number',
  ['float'] = 'number',
  ['double'] = 'number',
+ ['size_t'] = 'number',
  ['_cstring'] = 'string',
  ['_userdata'] = 'userdata',
  ['char*'] = 'string',
