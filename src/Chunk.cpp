@@ -239,8 +239,18 @@ void cChunk::MarkLoadFailed(void)
 void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 {
 	a_Callback.HeightMap    (&m_HeightMap);
-	a_Callback.BiomeData    (&m_BiomeMap);
-	a_Callback.BlockTypes   (m_BlockTypes);
+	a_Callback.BiomeData(&m_BiomeMap);
+
+	std::vector<BLOCKTYPE> Blocks;
+	Blocks.reserve(cChunkDef::NumBlocks);
+	for (std::vector<std::vector<BLOCKTYPE>>::const_iterator itr = m_BlockTypes.begin(); itr != m_BlockTypes.end(); ++itr)
+	{
+		for (std::vector<BLOCKTYPE>::const_iterator dataitr = itr->begin(); dataitr != itr->end(); ++dataitr)
+		{
+			Blocks.push_back(*dataitr);
+		}
+	}
+	a_Callback.BlockTypes   (Blocks.data());
 	a_Callback.BlockMeta    (m_BlockMeta);
 	a_Callback.LightIsValid (m_IsLightValid);
 	a_Callback.BlockLight   (m_BlockLight);
@@ -277,8 +287,42 @@ void cChunk::SetAllData(
 	{
 		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
 	}
+
+	bool FoundNonAir = false;
+	m_BlockTypes.clear();
+	for (int y = cChunkDef::Height - 1; y >= 0; y--)
+	{
+		if (!FoundNonAir)
+		{
+			for (int x = 0; x < cChunkDef::Width; x++) 
+			{
+				for (int z = 0; z < cChunkDef::Width; z++)
+				{
+					int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+
+					if (!FoundNonAir && (a_BlockTypes[Index] != E_BLOCK_AIR))
+					{
+						FoundNonAir = true;
+					}
+				}
+			}
+		}
+
+		if (FoundNonAir)
+		{
+			std::vector<BLOCKTYPE> Blocks;
+			for (int x = 0; x < cChunkDef::Width; x++)
+			{
+				for (int z = 0; z < cChunkDef::Width; z++)
+				{
+					int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+					Blocks.insert(Blocks.begin(), a_BlockTypes[Index]);
+				}
+			}
+			m_BlockTypes.insert(m_BlockTypes.begin(), Blocks);
+		}
+	}  // for y
 	
-	memcpy(m_BlockTypes, a_BlockTypes, sizeof(m_BlockTypes));
 	memcpy(m_BlockMeta,  a_BlockMeta,  sizeof(m_BlockMeta));
 	if (a_BlockLight != NULL)
 	{
@@ -343,7 +387,17 @@ void cChunk::SetLight(
 
 void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 {
-	memcpy(a_BlockTypes, m_BlockTypes, NumBlocks);
+	std::vector<BLOCKTYPE> Blocks;
+	Blocks.reserve(cChunkDef::NumBlocks);
+	for (std::vector<std::vector<BLOCKTYPE>>::const_iterator itr = m_BlockTypes.begin(); itr != m_BlockTypes.end(); ++itr)
+	{
+		for (std::vector<BLOCKTYPE>::const_iterator dataitr = itr->begin(); dataitr != itr->end(); ++dataitr)
+		{
+			Blocks.push_back(*dataitr);
+		}
+	}
+
+	memcpy(a_BlockTypes, Blocks.data(), NumBlocks);
 }
 
 
@@ -630,7 +684,7 @@ void cChunk::Tick(float a_Dt)
 void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
 	unsigned Index = MakeIndex(a_RelX, a_RelY, a_RelZ);
-	cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
+	cBlockHandler * Handler = BlockHandler(GetBlock(Index));
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
@@ -811,7 +865,7 @@ void cChunk::TickBlocks(void)
 		}
 
 		unsigned int Index = MakeIndexNoCheck(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
-		cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
+		cBlockHandler * Handler = BlockHandler(GetBlock(Index));
 		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 	}  // for i - tickblocks
@@ -1296,7 +1350,7 @@ void cChunk::CreateBlockEntities(void)
 		{
 			for (int y = 0; y < Height; y++)
 			{
-				BLOCKTYPE BlockType = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
+				BLOCKTYPE BlockType = GetBlock(x, y, z);
 				switch (BlockType)
 				{
 					case E_BLOCK_CHEST:
@@ -1348,7 +1402,7 @@ void cChunk::WakeUpSimulators(void)
 			int BlockZ = z + BaseZ;
 			for (int y = GetHeight(x, z); y >= 0; y--)
 			{
-				BLOCKTYPE Block = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
+				BLOCKTYPE Block = GetBlock(x, y, z);
 
 				// The redstone sim takes multiple blocks, use the inbuilt checker
 				if (RedstoneSimulator->IsAllowedBlock(Block))
@@ -1392,7 +1446,7 @@ void cChunk::CalculateHeightmap()
 			for (int y = Height - 1; y > -1; y--)
 			{
 				int index = MakeIndex( x, y, z );
-				if (m_BlockTypes[index] != E_BLOCK_AIR)
+				if (GetBlock(index) != E_BLOCK_AIR)
 				{
 					m_HeightMap[x + z * Width] = (unsigned char)y;
 					break;
@@ -1515,7 +1569,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	ASSERT(IsValid());
 	
 	const int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	const BLOCKTYPE OldBlockType = cChunkDef::GetBlock(m_BlockTypes, index);
+	const BLOCKTYPE OldBlockType = GetBlock(index);
 	const BLOCKTYPE OldBlockMeta = GetNibble(m_BlockMeta, index);
 	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
@@ -1524,7 +1578,20 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	MarkDirty();
 	
-	m_BlockTypes[index] = a_BlockType;
+	int Layer = (int)index / (cChunkDef::Width * cChunkDef::Width);
+	int SubBlock = index % ((cChunkDef::Width * cChunkDef::Width) - 1);
+
+	if (m_BlockTypes.empty() || (Layer > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
+	{
+		m_BlockTypes.reserve(Layer - ((int)m_BlockTypes.size() - 1));
+		std::vector<BLOCKTYPE> EmptyBlocks(cChunkDef::Width * cChunkDef::Width);
+		for (int lyr = ((int)m_BlockTypes.size() - 1); lyr <= Layer; ++lyr)
+		{
+			m_BlockTypes.push_back(EmptyBlocks);
+		}
+	}
+
+	m_BlockTypes[Layer][SubBlock] = a_BlockType;
 
 	// The client doesn't need to distinguish between stationary and nonstationary fluids:
 	if (
@@ -1563,7 +1630,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		{
 			for (int y = a_RelY - 1; y > 0; --y)
 			{
-				if (m_BlockTypes[MakeIndexNoCheck(a_RelX, y, a_RelZ)] != E_BLOCK_AIR)
+				if (GetBlock(MakeIndexNoCheck(a_RelX, y, a_RelZ)) != E_BLOCK_AIR)
 				{
 					m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)y;
 					break;
@@ -2450,7 +2517,7 @@ BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 		return 0; // Clip
 	}
 
-	return m_BlockTypes[MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ)];
+	return GetBlock(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ));
 }
 
 
@@ -2464,8 +2531,16 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 		ASSERT(!"GetBlock(idx) out of bounds!");
 		return 0;
 	}
-	
-	return m_BlockTypes[ a_BlockIdx ];
+
+	int Layer = (int)a_BlockIdx / (cChunkDef::Width * cChunkDef::Width);
+	int SubBlock = a_BlockIdx % ((cChunkDef::Width * cChunkDef::Width) - 1);
+
+	if (m_BlockTypes.empty() || (Layer > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
+	{
+		return E_BLOCK_AIR;
+	}
+
+	return m_BlockTypes[Layer][SubBlock];
 }
 
 
@@ -2475,7 +2550,7 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
 	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	a_BlockType = cChunkDef::GetBlock (m_BlockTypes, Idx);
+	a_BlockType = GetBlock(Idx);
 	a_BlockMeta = cChunkDef::GetNibble(m_BlockMeta,  Idx);
 }
 
@@ -2486,7 +2561,7 @@ void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_
 void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
 	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	a_BlockType  = cChunkDef::GetBlock (m_BlockTypes,    Idx);
+	a_BlockType = GetBlock(Idx);
 	a_Meta       = cChunkDef::GetNibble(m_BlockMeta,     Idx);
 	a_SkyLight   = cChunkDef::GetNibble(m_BlockSkyLight, Idx);
 	a_BlockLight = cChunkDef::GetNibble(m_BlockLight,    Idx);
