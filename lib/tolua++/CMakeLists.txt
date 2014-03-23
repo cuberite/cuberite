@@ -9,7 +9,7 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 
 find_program(XXD_EXECUTABLE xxd)
 
-if(NOT XXD_EXECUTABLE STREQUAL "xxd-NOTFOUND")
+if(NOT XXD_EXECUTABLE STREQUAL "XXD_EXECUTABLE-NOTFOUND")
 	add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/src/bin/basic_lua.h
 					COMMAND ${XXD_EXECUTABLE} -i lua/basic.lua | sed 's/unsigned char/static const unsigned char/g' >basic_lua.h
 					WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/bin/
