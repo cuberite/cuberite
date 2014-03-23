@@ -988,7 +988,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
-	if (ItemHandler->IsPlaceable() && (a_BlockFace > -1))
+	if (ItemHandler->IsPlaceable() && ((a_BlockFace > -1) || (Equipped.m_ItemType == E_BLOCK_LILY_PAD)))
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
@@ -1026,7 +1026,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler)
 {
-	if (a_BlockFace < 0)
+	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
+	if ((a_BlockFace < 0) && (EquippedBlock != E_BLOCK_LILY_PAD))
 	{
 		// Clicked in air
 		return;
@@ -1036,7 +1037,6 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 	BLOCKTYPE ClickedBlock;
 	NIBBLETYPE ClickedBlockMeta;
-	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
 	NIBBLETYPE EquippedBlockDamage = (NIBBLETYPE)(m_Player->GetEquippedItem().m_ItemDamage);
 
 	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
@@ -1085,7 +1085,10 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		}
 		else
 		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			if (EquippedBlock != E_BLOCK_LILY_PAD)
+			{
+				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			}
 			
 			if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 			{
@@ -1106,6 +1109,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			else
 			{
 				if (
+					(EquippedBlock != E_BLOCK_LILY_PAD) &&
 					!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision() &&
 					!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(m_Player, PlaceMeta)
 					)
