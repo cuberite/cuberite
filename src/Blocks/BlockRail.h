@@ -434,6 +434,141 @@ public:
 		}
 		return true;
 	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		// Bit 0x08 is a flag when a_Meta is in the range 0x00--0x05 and 0x0A--0x0F.
+		// Bit 0x08 specifies direction when a_Meta is in the range 0x06-0x09.
+		if ((a_Meta < 0x06) || (a_Meta > 0x09))
+		{
+			//  Save powered rail flag.
+			NIBBLETYPE OtherMeta = a_Meta & 0x08;
+			// Rotates according to table; 0x07 == 0111.
+			// Rails can either be flat (North/South) or Ascending (Asc. East)
+			switch (a_Meta & 0x07)
+			{
+				case 0x00: return 0x01 + OtherMeta;  // North/South -> East/West
+				case 0x01: return 0x00 + OtherMeta;  // East/West   -> North/South
+
+				case 0x02: return 0x04 + OtherMeta;  // Asc. East   -> Asc. North
+				case 0x04: return 0x03 + OtherMeta;  // Asc. North  -> Asc. West
+				case 0x03: return 0x05 + OtherMeta;	 // Asc. West   -> Asc. South
+				case 0x05: return 0x02 + OtherMeta;	 // Asc. South  -> Asc. East
+			}
+		}
+		else
+		{
+			switch (a_Meta)
+			{
+				// Corner Directions
+				case 0x06: return 0x09;  // Northwest Cnr. -> Southwest Cnr.
+				case 0x07: return 0x06;  // Northeast Cnr. -> Northwest Cnr.
+				case 0x08: return 0x07;  // Southeast Cnr. -> Northeast Cnr.
+				case 0x09: return 0x08;  // Southwest Cnr. -> Southeast Cnr.
+			}
+		}
+		// To avoid a compiler warning;
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
+		if ((a_Meta < 0x06) || (a_Meta > 0x09))
+		{
+			//  Save powered rail flag.
+			NIBBLETYPE OtherMeta = a_Meta & 0x08;
+			// Rotates according to table; 0x07 == 0111.
+			// Rails can either be flat (North/South) or Ascending (Asc. East)
+			switch (a_Meta & 0x07)
+			{
+				case 0x00: return 0x01 + OtherMeta;  // North/South -> East/West
+				case 0x01: return 0x00 + OtherMeta;  // East/West   -> North/South
+
+				case 0x02: return 0x05 + OtherMeta;  // Asc. East   -> Asc. South
+				case 0x05: return 0x03 + OtherMeta;  // Asc. South  -> Asc. West
+				case 0x03: return 0x04 + OtherMeta;	 // Asc. West   -> Asc. North
+				case 0x04: return 0x02 + OtherMeta;	 // Asc. North  -> Asc. East
+			}
+		}
+		else
+		{
+			switch (a_Meta)
+			{
+				// Corner Directions
+				case 0x06: return 0x07;  // Northwest Cnr. -> Northeast Cnr.
+				case 0x07: return 0x08;  // Northeast Cnr. -> Southeast Cnr.
+				case 0x08: return 0x09;  // Southeast Cnr. -> Southwest Cnr.
+				case 0x09: return 0x06;  // Southwest Cnr. -> Northwest Cnr.
+			}
+		}
+		// To avoid a compiler warning;
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
+		if ((a_Meta < 0x06) || (a_Meta > 0x09))
+		{
+			//  Save powered rail flag.
+			NIBBLETYPE OtherMeta = a_Meta & 0x08;
+			// Mirrors according to table; 0x07 == 0111.
+			// Rails can either be flat (North/South) or Ascending (Asc. East)
+			switch (a_Meta & 0x07)
+			{
+				case 0x05: return 0x04 + OtherMeta;  // Asc. South  -> Asc. North
+				case 0x04: return 0x05 + OtherMeta;	 // Asc. North  -> Asc. South
+			}
+		}
+		else
+		{
+			switch (a_Meta)
+			{
+				// Corner Directions
+				case 0x06: return 0x09;  // Northwest Cnr. -> Southwest Cnr.
+				case 0x07: return 0x08;  // Northeast Cnr. -> Southeast Cnr.
+				case 0x08: return 0x07;  // Southeast Cnr. -> Northeast Cnr.
+				case 0x09: return 0x06;  // Southwest Cnr. -> Northwest Cnr.
+			}
+		}
+		// To avoid a compiler warning;
+		return a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
+		if ((a_Meta < 0x06) || (a_Meta > 0x09))
+		{
+			//  Save powered rail flag.
+			NIBBLETYPE OtherMeta = a_Meta & 0x08;
+			// Mirrors according to table; 0x07 == 0111.
+			// Rails can either be flat (North/South) or Ascending (Asc. East)
+			switch (a_Meta & 0x07)
+			{
+				case 0x02: return 0x03 + OtherMeta;  // Asc. East   -> Asc. West
+				case 0x03: return 0x02 + OtherMeta;	 // Asc. West   -> Asc. East
+			}
+		}
+		else
+		{
+			switch (a_Meta)
+			{
+				// Corner Directions
+				case 0x06: return 0x07;  // Northwest Cnr. -> Northeast Cnr.
+				case 0x07: return 0x06;  // Northeast Cnr. -> Northwest Cnr.
+				case 0x08: return 0x09;  // Southeast Cnr. -> Southwest Cnr.
+				case 0x09: return 0x08;  // Southwest Cnr. -> Southeast Cnr.
+			}
+		}
+		// To avoid a compiler warning;
+		return a_Meta;
+	}
 } ;
 
 

@@ -110,3 +110,78 @@ const char * cBlockDoorHandler::GetStepSound(void)
 
 
 
+
+NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
+{
+	if (a_Meta & 0x08)
+	{
+		return a_Meta;
+	}
+	else
+	{
+		return super::MetaRotateCCW(a_Meta);
+	}
+}
+
+
+
+NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
+{
+	if (a_Meta & 0x08)
+	{
+		return a_Meta;
+	}
+	else
+	{
+		return super::MetaRotateCW(a_Meta);
+	}
+}
+
+
+
+NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
+{
+	// Top bit (0x08) contains door panel type (Top/Bottom panel)  Only Bottom panels contain position data
+	// Return a_Meta if panel is a top panel (0x08 bit is set to 1)
+	LOG("Test MirrorXY");
+	if (a_Meta & 0x08) return a_Meta;
+
+	// Holds open/closed meta data. 0x0C == 1100.
+	NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+
+	// Mirrors according to a table.  0x03 == 0011.
+	switch (a_Meta & 0x03)
+	{
+		case 0x03: return 0x01 + OtherMeta;  // South -> North
+		case 0x01: return 0x03 + OtherMeta;  // North -> South
+	}
+
+	// Not Facing North or South; No change.
+	return a_Meta;
+}
+
+
+
+NIBBLETYPE cBlockDoorHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
+{
+	// Top bit (0x08) contains door panel type (Top/Bottom panel)  Only Bottom panels contain position data
+	// Return a_Meta if panel is a top panel (0x08 bit is set to 1)
+	LOG("Test MirrorYZ");
+	if (a_Meta & 0x08) return a_Meta;
+
+	// Holds open/closed meta data. 0x0C == 1100.
+	NIBBLETYPE OtherMeta = a_Meta & 0x0C;
+
+	// Mirrors according to a table.  0x03 == 0011.
+	switch (a_Meta & 0x03)
+	{
+		case 0x00: return 0x02 + OtherMeta;  // West  -> East
+		case 0x02: return 0x00 + OtherMeta;  // East  -> West
+	}
+
+	// Not Facing North or South; No change.
+	return a_Meta;
+}
+
+
+

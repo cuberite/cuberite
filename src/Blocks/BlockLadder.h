@@ -9,11 +9,11 @@
 
 
 class cBlockLadderHandler :
-	public cBlockHandler
+	public cMetaRotater<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
 public:
 	cBlockLadderHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotater<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}	
 
