@@ -7,8 +7,8 @@ return
 		Desc = [[
 			This hook is called when a block spreads.</p>
 			<p>
-			The explosion carries with it the type of its source - whether it's a creeper exploding, or TNT,
-			etc. It also carries the identification of the actual source. The exact type of the identification
+			The spread carries with it the type of its source - whether it's a block spreads.
+			It also carries the identification of the actual source. The exact type of the identification
 			depends on the source kind:
 			<table>
 			<tr><th>Source</th><th>Notes</th></tr>

@@ -2773,8 +2773,8 @@ end
 				{
 					Include = "^ss.*",
 					TextBefore = [[
-						These constants are used to differentiate the various sources of spreads. They are used in
-						the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
+						These constants are used to differentiate the various sources of spreads, such as grass growing.
+						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
 					]],
 				}
 			},
