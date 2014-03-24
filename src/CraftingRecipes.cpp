@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-﻿
+
 // CraftingRecipes.cpp
 
 // Interfaces to the cCraftingRecipes class representing the storage of crafting recipes
