@@ -758,6 +758,7 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtSquid:        return mfWater;
 		case mtVillager:     return mfPassive;
 		case mtWitch:        return mfHostile;
+		case mtWither:       return mfHostile;
 		case mtWolf:         return mfHostile;
 		case mtZombie:       return mfHostile;
 		case mtZombiePigman: return mfHostile;
