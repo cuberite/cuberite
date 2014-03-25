@@ -21,17 +21,16 @@ public:
 
 	void SetNumInvulnerableTicks(unsigned int a_Ticks) { m_InvulnerableTicks = a_Ticks; }
 	
-	// Override functions
+	// cEntity overrides
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
-
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
-
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
 private:
 
 	/** The number of ticks of invulnerability left after being initially created. Zero once invulnerability has expired. */
 	unsigned int m_InvulnerableTicks;
+
 } ;
 
 
