@@ -59,9 +59,10 @@
 
 
 
-
+#ifndef __APPLE__
 /// Up to this many m_SpreadQueue elements are handled each world tick
 const int MAX_LIGHTING_SPREAD_PER_TICK = 10;
+#endif
 
 const int TIME_SUNSET        = 12000;
 const int TIME_NIGHT_START   = 13187;
