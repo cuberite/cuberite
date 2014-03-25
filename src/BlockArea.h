@@ -43,6 +43,8 @@ public:
 		baSkyLight = 8,
 	} ;
 	
+	/** The per-block strategy to use when merging another block area into this object.
+	See the Merge function for the description of these */
 	enum eMergeStrategy
 	{
 		msOverwrite,
@@ -232,18 +234,24 @@ public:
 	void GetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	
+	// GetSize() is already exported manually to return 3 numbers, can't auto-export
+	const Vector3i & GetSize(void) const { return m_Size; }
+	
+	// GetOrigin() is already exported manually to return 3 numbers, can't auto-export
+	const Vector3i & GetOrigin(void) const { return m_Origin; }
+	
 	// tolua_begin
 	
-	int GetSizeX(void) const { return m_SizeX; }
-	int GetSizeY(void) const { return m_SizeY; }
-	int GetSizeZ(void) const { return m_SizeZ; }
+	int GetSizeX(void) const { return m_Size.x; }
+	int GetSizeY(void) const { return m_Size.y; }
+	int GetSizeZ(void) const { return m_Size.z; }
 	
 	/** Returns the volume of the area, as number of blocks */
-	int GetVolume(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
+	int GetVolume(void) const { return m_Size.x * m_Size.y * m_Size.z; }
 	
-	int GetOriginX(void) const { return m_OriginX; }
-	int GetOriginY(void) const { return m_OriginY; }
-	int GetOriginZ(void) const { return m_OriginZ; }
+	int GetOriginX(void) const { return m_Origin.x; }
+	int GetOriginY(void) const { return m_Origin.y; }
+	int GetOriginZ(void) const { return m_Origin.z; }
 	
 	/** Returns the datatypes that are stored in the object (bitmask of baXXX values) */
 	int GetDataTypes(void) const;
@@ -261,7 +269,7 @@ public:
 	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas; }     // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight; }     // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight; }  // NOTE: one byte per block!
-	int          GetBlockCount(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
+	int          GetBlockCount(void) const { return m_Size.x * m_Size.y * m_Size.z; }
 	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
 
 protected:
@@ -276,9 +284,7 @@ protected:
 		
 	protected:
 		cBlockArea & m_Area;
-		int m_OriginX;
-		int m_OriginY;
-		int m_OriginZ;
+		Vector3i m_Origin;
 		int m_CurrentChunkX;
 		int m_CurrentChunkZ;
 		
@@ -295,12 +301,8 @@ protected:
 	typedef NIBBLETYPE * NIBBLEARRAY;
 	
 	
-	int m_OriginX;
-	int m_OriginY;
-	int m_OriginZ;
-	int m_SizeX;
-	int m_SizeY;
-	int m_SizeZ;
+	Vector3i m_Origin;
+	Vector3i m_Size;
 	
 	/** An extra data value sometimes stored in the .schematic file. Used mainly by the WorldEdit plugin.
 	cBlockArea doesn't use this value in any way. */

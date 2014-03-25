@@ -197,7 +197,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	}
 
 	// Copy the block types and metas:
-	int NumBytes = a_BlockArea.m_SizeX * a_BlockArea.m_SizeY * a_BlockArea.m_SizeZ;
+	int NumBytes = a_BlockArea.GetBlockCount();
 	if (a_NBT.GetDataLength(TBlockTypes) < NumBytes)
 	{
 		LOG("BlockTypes truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
@@ -209,7 +209,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	
 	if (AreMetasPresent)
 	{
-		int NumBytes = a_BlockArea.m_SizeX * a_BlockArea.m_SizeY * a_BlockArea.m_SizeZ;
+		int NumBytes = a_BlockArea.GetBlockCount();
 		if (a_NBT.GetDataLength(TBlockMetas) < NumBytes)
 		{
 			LOG("BlockMetas truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
@@ -230,9 +230,9 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockArea)
 {
 	cFastNBTWriter Writer("Schematic");
-	Writer.AddShort("Width",  a_BlockArea.m_SizeX);
-	Writer.AddShort("Height", a_BlockArea.m_SizeY);
-	Writer.AddShort("Length", a_BlockArea.m_SizeZ);
+	Writer.AddShort("Width",  a_BlockArea.m_Size.x);
+	Writer.AddShort("Height", a_BlockArea.m_Size.y);
+	Writer.AddShort("Length", a_BlockArea.m_Size.z);
 	Writer.AddString("Materials", "Alpha");
 	if (a_BlockArea.HasBlockTypes())
 	{
