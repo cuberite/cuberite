@@ -71,6 +71,18 @@ public:
 	{
 		a_Player->GetClientHandle()->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		return ++a_Meta;
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		return --a_Meta;
+	}
 } ;
 
 
