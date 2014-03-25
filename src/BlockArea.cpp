@@ -240,6 +240,15 @@ void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 
 
 
+void cBlockArea::Create(const Vector3i & a_Size, int a_DataTypes)
+{
+	Create(a_Size.x, a_Size.y, a_Size.z, a_DataTypes);
+}
+
+
+
+
+
 void cBlockArea::SetWEOffset(int a_OffsetX, int a_OffsetY, int a_OffsetZ)
 {
 	m_WEOffset.Set(a_OffsetX, a_OffsetY, a_OffsetZ);

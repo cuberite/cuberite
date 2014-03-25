@@ -59,11 +59,17 @@ public:
 	/** Clears the data stored to reclaim memory */
 	void Clear(void);
 	
-	/** Creates a new area of the specified size and contents. 
-	Origin is set to all zeroes. 
+	/** Creates a new area of the specified size and contents.
+	Origin is set to all zeroes.
 	BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.
 	*/
 	void Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes = baTypes | baMetas);
+	
+	/** Creates a new area of the specified size and contents.
+	Origin is set to all zeroes.
+	BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.
+	*/
+	void Create(const Vector3i & a_Size, int a_DataTypes = baTypes | baMetas);
 	
 	/** Resets the origin. No other changes are made, contents are untouched. */
 	void SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ);
