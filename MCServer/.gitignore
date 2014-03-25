@@ -6,6 +6,7 @@
 MCServer
 MCServer_debug
 CommLogs/
+GalExports/
 logs
 players
 world*
