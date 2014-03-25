@@ -23,6 +23,7 @@
 #include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Entities/Entity.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
@@ -328,6 +329,17 @@ void cNBTChunkSerializer::AddBoatEntity(cBoat * a_Boat)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Boat, "Boat");
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddEnderCrystalEntity(cEnderCrystal * a_EnderCrystal)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_EnderCrystal, "EnderCrystal");
 	m_Writer.EndCompound();
 }
 
@@ -729,6 +741,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 	switch (a_Entity->GetEntityType())
 	{
 		case cEntity::etBoat:         AddBoatEntity        ((cBoat *)            a_Entity); break;
+		case cEntity::etEnderCrystal: AddEnderCrystalEntity((cEnderCrystal *)    a_Entity); break;
 		case cEntity::etFallingBlock: AddFallingBlockEntity((cFallingBlock *)    a_Entity); break;
 		case cEntity::etMinecart:     AddMinecartEntity    ((cMinecart *)        a_Entity); break;
 		case cEntity::etMonster:      AddMonsterEntity     ((cMonster *)         a_Entity); break;
