@@ -20,6 +20,9 @@ public:
 	unsigned int GetNumInvulnerableTicks(void) const { return m_InvulnerableTicks; }
 
 	void SetNumInvulnerableTicks(unsigned int a_Ticks) { m_InvulnerableTicks = a_Ticks; }
+
+	/** Returns whether the wither is invulnerable to arrows. */
+	bool IsArmored(void) const;
 	
 	// cEntity overrides
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
