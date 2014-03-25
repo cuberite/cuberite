@@ -143,7 +143,10 @@ NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 {
 	// Top bit (0x08) contains door panel type (Top/Bottom panel)  Only Bottom panels contain position data
 	// Return a_Meta if panel is a top panel (0x08 bit is set to 1)
-	LOG("Test MirrorXY");
+
+	// Note: Currently, you can not properly mirror the hinges on a double door.  The orientation of the door is stored
+	// in only the bottom tile while the hinge position is in the top tile.  This function only operates on one tile at a time, 
+	// so the function can only see either the hinge position or orientation, but not both, at any given time.
 	if (a_Meta & 0x08) return a_Meta;
 
 	// Holds open/closed meta data. 0x0C == 1100.
@@ -166,7 +169,10 @@ NIBBLETYPE cBlockDoorHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
 {
 	// Top bit (0x08) contains door panel type (Top/Bottom panel)  Only Bottom panels contain position data
 	// Return a_Meta if panel is a top panel (0x08 bit is set to 1)
-	LOG("Test MirrorYZ");
+
+	// Note: Currently, you can not properly mirror the hinges on a double door.  The orientation of the door is stored
+	// in only the bottom tile while the hinge position is in the top tile.  This function only operates on one tile at a time, 
+	// so the function can only see either the hinge position or orientation, but not both, at any given time.
 	if (a_Meta & 0x08) return a_Meta;
 
 	// Holds open/closed meta data. 0x0C == 1100.
