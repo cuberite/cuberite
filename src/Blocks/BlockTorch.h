@@ -2,17 +2,17 @@
 
 #include "BlockHandler.h"
 #include "../Chunk.h"
-#include "MetaRotater.h"
+#include "MetaRotator.h"
 
 
 
 
 class cBlockTorchHandler :
-	public cMetaRotater<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
+	public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
 {
 public:
 	cBlockTorchHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotater<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>(a_BlockType)
 	{
 	}
 	

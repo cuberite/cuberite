@@ -4,15 +4,15 @@
 #include "BlockHandler.h"
 #include "../Entities/Player.h"
 #include "Chunk.h"
-#include "MetaRotater.h"
+#include "MetaRotator.h"
 
 
 
 
 class cBlockDoorHandler :
-	public cMetaRotater<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>
+	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>
 {
-	typedef cMetaRotater<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true> super;
+	typedef cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true> super;
 public:
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 

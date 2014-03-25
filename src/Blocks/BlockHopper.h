@@ -8,11 +8,11 @@
 
 
 class cBlockHopperHandler :
-	public cMetaRotater<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
+	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
 public:
 	cBlockHopperHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotater<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}
 

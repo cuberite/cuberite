@@ -4,17 +4,17 @@
 #include "BlockEntity.h"
 #include "../World.h"
 #include "../Piston.h"
-#include "MetaRotater.h"
+#include "MetaRotator.h"
 
 
 
 
 class cBlockFurnaceHandler :
-	public cMetaRotater<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
+	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
 public:
 	cBlockFurnaceHandler(BLOCKTYPE a_BlockType) 
-		: cMetaRotater<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}
 
