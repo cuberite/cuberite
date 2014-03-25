@@ -28,7 +28,7 @@ bool cWither::IsArmored(void) const
 
 
 
-bool cWither::Initialize(cWorld * a_World) override
+bool cWither::Initialize(cWorld * a_World)
 {
 	// Set health before BroadcastSpawnEntity()
 	SetHealth(GetMaxHealth() / 3);

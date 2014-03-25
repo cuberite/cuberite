@@ -160,21 +160,24 @@ public:
 		World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
 
-		static const Vector3i Coords[] =
+		if (a_BlockMeta == SKULL_TYPE_WITHER)
 		{
-			Vector3i( 0, 0,  0),
-			Vector3i( 1, 0,  0),
-			Vector3i(-1, 0,  0),
-			Vector3i( 0, 0,  1),
-			Vector3i( 0, 0, -1),
-		};
-		for (size_t i = 0; i < ARRAYCOUNT(Coords); ++i)
-		{
-			if (TrySpawnWither(a_ChunkInterface, World, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z))
+			static const Vector3i Coords[] =
 			{
-				break;
-			}
-		}  // for i - Coords[]
+				Vector3i( 0, 0,  0),
+				Vector3i( 1, 0,  0),
+				Vector3i(-1, 0,  0),
+				Vector3i( 0, 0,  1),
+				Vector3i( 0, 0, -1),
+			};
+			for (size_t i = 0; i < ARRAYCOUNT(Coords); ++i)
+			{
+				if (TrySpawnWither(a_ChunkInterface, World, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z))
+				{
+					break;
+				}
+			}  // for i - Coords[]
+		}
 	}
 } ;
 
