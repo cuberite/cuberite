@@ -17,7 +17,9 @@
 const int CYCLE_MILLISECONDS = 100;
 
 /// When the number of cycles for the same world age hits this value, it is considered a deadlock
+#ifndef __APPLE__
 const int NUM_CYCLES_LIMIT = 200;  // 200 = twenty seconds
+#endif
 
 
 

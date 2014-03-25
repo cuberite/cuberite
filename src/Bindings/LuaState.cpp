@@ -11,6 +11,7 @@ extern "C"
 	#include "lua/src/lualib.h"
 }
 
+#undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 #include "Bindings.h"
 #include "ManualBindings.h"
