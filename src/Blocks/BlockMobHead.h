@@ -47,6 +47,15 @@ public:
 
 			void Reset(void) { m_IsWither = false; }
 		} CallbackA, CallbackB;
+
+		a_World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, CallbackA);
+
+		if (!CallbackA.IsWither())
+		{
+			return false;
+		}
+
+		CallbackA.Reset();
 		
 		BLOCKTYPE BlockY1 = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
 		BLOCKTYPE BlockY2 = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ);
@@ -151,7 +160,21 @@ public:
 		World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
 
-		TrySpawnWither(a_ChunkInterface, World, a_BlockX, a_BlockY, a_BlockZ);
+		static const Vector3i Coords[] =
+		{
+			Vector3i( 0, 0,  0),
+			Vector3i( 1, 0,  0),
+			Vector3i(-1, 0,  0),
+			Vector3i( 0, 0,  1),
+			Vector3i( 0, 0, -1),
+		};
+		for (size_t i = 0; i < ARRAYCOUNT(Coords); ++i)
+		{
+			if (TrySpawnWither(a_ChunkInterface, World, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z))
+			{
+				break;
+			}
+		}  // for i - Coords[]
 	}
 } ;
 
