@@ -121,6 +121,13 @@ public:
 		z += a_Z;
 	}
 
+	inline void Move(const Vector3<T> & a_Diff)
+	{
+		x += a_Diff.x;
+		y += a_Diff.y;
+		z += a_Diff.z;
+	}
+
 	// tolua_end
 
 	inline void operator += (const Vector3<T> & a_Rhs)
