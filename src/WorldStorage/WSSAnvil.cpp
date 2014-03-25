@@ -1238,7 +1238,7 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadWitchFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
-	else if (strncmp(a_IDTag, "Wither", a_IDTagLength) == 0)
+	else if (strncmp(a_IDTag, "WitherBoss", a_IDTagLength) == 0)
 	{
 		LoadWitherFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
@@ -2248,6 +2248,12 @@ void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
+	}
+
+	int CurrLine = a_NBT.FindChildByName(a_TagIdx, "Invul");
+	if (CurrLine > 0)
+	{
+		Monster->SetNumInvulnerableTicks(a_NBT.GetInt(CurrLine));
 	}
 
 	a_Entities.push_back(Monster.release());

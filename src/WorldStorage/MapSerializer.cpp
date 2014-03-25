@@ -141,7 +141,11 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	{
 		eDimension Dimension = (eDimension) a_NBT.GetByte(CurrLine);
 		
-		ASSERT(Dimension == m_Map->m_World->GetDimension());
+		if (Dimension != m_Map->m_World->GetDimension())
+		{
+			// TODO 2014-03-20 xdot: We should store nether maps in nether worlds, e.t.c.
+			return false;
+		}
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "width");

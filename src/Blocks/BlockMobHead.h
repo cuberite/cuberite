@@ -21,6 +21,18 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_ITEM_HEAD, 1, 0));
 	}
+
+	bool TrySpawnWither(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		if (a_BlockY < 2)
+		{
+			return false;
+		}
+		
+		// TODO 2014-03-24 xdot
+
+		return false;
+	}
 	
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, 
@@ -62,6 +74,8 @@ public:
 		cWorld * World = (cWorld *) &a_WorldInterface;
 		World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
+
+		TrySpawnWither(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 	}
 } ;
 
