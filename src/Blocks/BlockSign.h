@@ -75,13 +75,13 @@ public:
 
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
-		return ++a_Meta;
+		return (++a_Meta) & 0x0F;
 	}
 
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
-		return --a_Meta;
+		return (--a_Meta) & 0x0F;
 	}
 } ;
 
