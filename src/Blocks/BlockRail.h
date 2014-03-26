@@ -453,8 +453,8 @@ public:
 
 				case 0x02: return 0x04 + OtherMeta;  // Asc. East   -> Asc. North
 				case 0x04: return 0x03 + OtherMeta;  // Asc. North  -> Asc. West
-				case 0x03: return 0x05 + OtherMeta;	 // Asc. West   -> Asc. South
-				case 0x05: return 0x02 + OtherMeta;	 // Asc. South  -> Asc. East
+				case 0x03: return 0x05 + OtherMeta;  // Asc. West   -> Asc. South
+				case 0x05: return 0x02 + OtherMeta;  // Asc. South  -> Asc. East
 			}
 		}
 		else
@@ -489,8 +489,8 @@ public:
 
 				case 0x02: return 0x05 + OtherMeta;  // Asc. East   -> Asc. South
 				case 0x05: return 0x03 + OtherMeta;  // Asc. South  -> Asc. West
-				case 0x03: return 0x04 + OtherMeta;	 // Asc. West   -> Asc. North
-				case 0x04: return 0x02 + OtherMeta;	 // Asc. North  -> Asc. East
+				case 0x03: return 0x04 + OtherMeta;  // Asc. West   -> Asc. North
+				case 0x04: return 0x02 + OtherMeta;  // Asc. North  -> Asc. East
 			}
 		}
 		else
@@ -521,7 +521,7 @@ public:
 			switch (a_Meta & 0x07)
 			{
 				case 0x05: return 0x04 + OtherMeta;  // Asc. South  -> Asc. North
-				case 0x04: return 0x05 + OtherMeta;	 // Asc. North  -> Asc. South
+				case 0x04: return 0x05 + OtherMeta;  // Asc. North  -> Asc. South
 			}
 		}
 		else
@@ -552,7 +552,7 @@ public:
 			switch (a_Meta & 0x07)
 			{
 				case 0x02: return 0x03 + OtherMeta;  // Asc. East   -> Asc. West
-				case 0x03: return 0x02 + OtherMeta;	 // Asc. West   -> Asc. East
+				case 0x03: return 0x02 + OtherMeta;  // Asc. West   -> Asc. East
 			}
 		}
 		else

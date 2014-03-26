@@ -146,7 +146,8 @@ NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 
 	// Note: Currently, you can not properly mirror the hinges on a double door.  The orientation of the door is stored
 	// in only the bottom tile while the hinge position is in the top tile.  This function only operates on one tile at a time, 
-	// so the function can only see either the hinge position or orientation, but not both, at any given time.
+	// so the function can only see either the hinge position or orientation, but not both, at any given time.  The class itself
+	// needs extra datamembers.
 	if (a_Meta & 0x08) return a_Meta;
 
 	// Holds open/closed meta data. 0x0C == 1100.
@@ -172,7 +173,9 @@ NIBBLETYPE cBlockDoorHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
 
 	// Note: Currently, you can not properly mirror the hinges on a double door.  The orientation of the door is stored
 	// in only the bottom tile while the hinge position is in the top tile.  This function only operates on one tile at a time, 
-	// so the function can only see either the hinge position or orientation, but not both, at any given time.
+	// so the function can only see either the hinge position or orientation, but not both, at any given time.The class itself
+	// needs extra datamembers.
+
 	if (a_Meta & 0x08) return a_Meta;
 
 	// Holds open/closed meta data. 0x0C == 1100.
