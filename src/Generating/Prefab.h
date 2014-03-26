@@ -33,13 +33,18 @@ public:
 		int m_SizeZ;
 		const char * m_CharMap;
 		const char * m_Image;
-		// TODO: Connectors
+		const char * m_Connectors;
+		int m_AllowedRotations;
+		cBlockArea::eMergeStrategy m_MergeStrategy;
 	};
 	
 	cPrefab(const sDef & a_Def);
 	
 	/** Draws the prefab into the specified block area, according to the placement stored in the PlacedPiece. */
 	void Draw(cBlockArea & a_Dest, const cPlacedPiece * a_Placement);
+	
+	/** Returns true if the prefab has any connector of the specified type. */
+	bool HasConnectorType(int a_ConnectorType) const;
 
 protected:
 	/** Maps letters in the sDef::m_Image onto a number, BlockType * 16 | BlockMeta */
@@ -76,6 +81,9 @@ protected:
 	
 	/** Parses the Image in the definition into m_BlockArea's block types and metas, using the specified CharMap. */
 	void ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockImage);
+	
+	/** Parses the connectors definition text into m_Connectors member. */
+	void ParseConnectors(const char * a_ConnectorsDef);
 };
 
 

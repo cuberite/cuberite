@@ -17,13 +17,14 @@ uses a prefabricate in a cBlockArea for drawing itself.
 cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_Size(a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
 	m_HitBox(0, 0, 0, a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
-	m_AllowedRotations(7),  // TODO: All rotations allowed (not in the definition yet)
-	m_MergeStrategy(cBlockArea::msImprint)
+	m_AllowedRotations(a_Def.m_AllowedRotations),
+	m_MergeStrategy(a_Def.m_MergeStrategy)
 {
 	m_BlockArea.Create(m_Size);
 	CharMap cm;
 	ParseCharMap(cm, a_Def.m_CharMap);
 	ParseBlockImage(cm, a_Def.m_Image);
+	ParseConnectors(a_Def.m_Connectors);
 }
 
 
@@ -36,6 +37,22 @@ void cPrefab::Draw(cBlockArea & a_Dest, const cPlacedPiece * a_Placement)
 	Placement.Move(a_Dest.GetOrigin() * (-1));
 	a_Dest.Merge(m_BlockArea, Placement, m_MergeStrategy);
 	
+}
+
+
+
+
+
+bool cPrefab::HasConnectorType(int a_ConnectorType) const
+{
+	for (cConnectors::const_iterator itr = m_Connectors.begin(), end = m_Connectors.end(); itr != end; ++itr)
+	{
+		if (itr->m_Type == a_ConnectorType)
+		{
+			return true;
+		}
+	}  // for itr - m_Connectors[]
+	return false;
 }
 
 
@@ -96,6 +113,50 @@ void cPrefab::ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockIma
 			}
 		}
 	}
+}
+
+
+
+
+
+void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
+{
+	AStringVector Lines = StringSplitAndTrim(a_ConnectorsDef, "\n");
+	for (AStringVector::const_iterator itr = Lines.begin(), end = Lines.end(); itr != end; ++itr)
+	{
+		if (itr->empty())
+		{
+			continue;
+		}
+		// Split into components: "Type: X, Y, Z: Face":
+		AStringVector Defs = StringSplitAndTrim(*itr, ":");
+		if (Defs.size() != 3)
+		{
+			LOGWARNING("Bad prefab Connector definition line: \"%s\", skipping.", itr->c_str());
+			continue;
+		}
+		AStringVector Coords = StringSplitAndTrim(Defs[1], ",");
+		if (Coords.size() != 3)
+		{
+			LOGWARNING("Bad prefab Connector coords definition: \"%s\", skipping.", Defs[1].c_str());
+			continue;
+		}
+		
+		// Check that the BlockFace is within range:
+		int BlockFace = atoi(Defs[2].c_str());
+		if ((BlockFace < 0) || (BlockFace >= 6))
+		{
+			LOGWARNING("Bad prefab Connector Blockface: \"%s\", skipping.", Defs[2].c_str());
+			continue;
+		}
+
+		// Add the connector:
+		m_Connectors.push_back(cPiece::cConnector(
+			atoi(Coords[0].c_str()), atoi(Coords[1].c_str()), atoi(Coords[2].c_str()),  // Connector pos
+			atoi(Defs[0].c_str()),  // Connector type
+			(eBlockFace)BlockFace
+		));
+	}  // for itr - Lines[]
 }
 
 
