@@ -1384,13 +1384,6 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 				}
 				break;
 			}
-			case E_BLOCK_NEW_LEAVES:
-			{
-				if (itr->BlockType == E_BLOCK_NEW_LOG)
-				{
-					Chunk->SetBlock(itr->x, itr->y, itr->z, itr->BlockType, itr->BlockMeta);
-				}
-			}
 		}
 	}  // for itr - a_Blocks[]
 }
