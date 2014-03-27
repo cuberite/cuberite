@@ -9,6 +9,7 @@ uses a prefabricate in a cBlockArea for drawing itself.
 #include "Globals.h"
 #include "Prefab.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
+#include "ChunkDesc.h"
 
 
 
@@ -16,7 +17,7 @@ uses a prefabricate in a cBlockArea for drawing itself.
 
 cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_Size(a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
-	m_HitBox(0, 0, 0, a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
+	m_HitBox(0, 0, 0, a_Def.m_SizeX - 1, a_Def.m_SizeY - 1, a_Def.m_SizeZ - 1),
 	m_AllowedRotations(a_Def.m_AllowedRotations),
 	m_MergeStrategy(a_Def.m_MergeStrategy)
 {
@@ -31,11 +32,13 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 
 
 
-void cPrefab::Draw(cBlockArea & a_Dest, const cPlacedPiece * a_Placement)
+void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 {
 	Vector3i Placement = a_Placement->GetCoords();
-	Placement.Move(a_Dest.GetOrigin() * (-1));
-	a_Dest.Merge(m_BlockArea, Placement, m_MergeStrategy);
+	int ChunkStartX = a_Dest.GetChunkX() * cChunkDef::Width;
+	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
+	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
+	a_Dest.WriteBlockArea(m_BlockArea, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
 }
 
