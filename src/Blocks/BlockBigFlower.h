@@ -69,7 +69,7 @@ public:
 
 		if (OldMeta & 0x8)
 		{
-			// Was upper part of door
+			// Was upper part of flower
 			if (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == m_BlockType)
 			{
 				a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
