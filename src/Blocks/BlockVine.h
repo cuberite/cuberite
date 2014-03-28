@@ -175,7 +175,10 @@ public:
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY - 1, a_RelZ, Block);
 		if (Block == E_BLOCK_AIR)
 		{
-			a_Chunk.UnboundedRelSetBlock(a_RelX, a_RelY - 1, a_RelZ, E_BLOCK_VINES, a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, a_RelX * cChunkDef::Width, a_RelY - 1, a_RelZ * cChunkDef::Width, ssVineSpread))
+			{
+				a_Chunk.UnboundedRelSetBlock(a_RelX, a_RelY - 1, a_RelZ, E_BLOCK_VINES, a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+			}
 		}
 	}
 	

@@ -205,6 +205,27 @@ void cPluginManager::Tick(float a_Dt)
 
 
 
+bool cPluginManager::CallHookBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_SPREAD);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBlockSpread(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookBlockToPickups(
 	cWorld * a_World, cEntity * a_Digger,
 	int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,

@@ -58,6 +58,7 @@ public:																	// tolua_export
 	// tolua_begin
 	enum PluginHook
 	{
+		HOOK_BLOCK_SPREAD,
 		HOOK_BLOCK_TO_PICKUPS,
 		HOOK_CHAT,
 		HOOK_CHUNK_AVAILABLE,
@@ -154,6 +155,7 @@ public:																	// tolua_export
 	unsigned int GetNumPlugins() const;  // tolua_export
 	
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
+	bool CallHookBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
 	bool CallHookBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
 	bool CallHookChat                     (cPlayer * a_Player, AString & a_Message);
 	bool CallHookChunkAvailable           (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
