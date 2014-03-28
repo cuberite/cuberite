@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "ItemHandler.h"
@@ -36,7 +35,9 @@ public:
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LILY_PAD, 0);
 			if (!a_Player->IsGameModeCreative())
+			{
 				a_Player->GetInventory().RemoveOneEquippedItem();
+			}
 			return true;
 		}
 
@@ -93,7 +94,9 @@ public:
 		{
 			a_World->SetBlock(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z, E_BLOCK_LILY_PAD, 0);
 			if (!a_Player->IsGameModeCreative())
+			{
 				a_Player->GetInventory().RemoveOneEquippedItem();
+			}
 			return true;
 		}
 
