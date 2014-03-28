@@ -128,6 +128,8 @@ public:																	// tolua_export
 	class cCommandEnumCallback
 	{
 	public:
+		virtual ~cCommandEnumCallback() {}
+		
 		/** Called for each command; return true to abort enumeration
 		For console commands, a_Permission is not used (set to empty string)
 		*/
