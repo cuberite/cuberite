@@ -29,7 +29,7 @@ class cRCONServer :
 {
 public:
 	cRCONServer(cServer & a_Server);
-	~cRCONServer();
+	virtual ~cRCONServer();
 	
 	void Initialize(cIniFile & a_IniFile);
 	
