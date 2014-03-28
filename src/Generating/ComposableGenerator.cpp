@@ -21,6 +21,7 @@
 #include "DistortedHeightmap.h"
 #include "EndGen.h"
 #include "MineShafts.h"
+#include "NetherFortGen.h"
 #include "Noise3DGenerator.h"
 #include "POCPieceGenerator.h"
 #include "Ravines.h"
@@ -191,9 +192,11 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 		m_HeightGen->GenHeightMap(a_ChunkX, a_ChunkZ, a_ChunkDesc.GetHeightMap());
 	}
 	
+	bool ShouldUpdateHeightmap = false;
 	if (a_ChunkDesc.IsUsingDefaultComposition())
 	{
 		m_CompositionGen->ComposeTerrain(a_ChunkDesc);
+		ShouldUpdateHeightmap = true;
 	}
 
 	if (a_ChunkDesc.IsUsingDefaultFinish())
@@ -202,6 +205,12 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 		{
 			(*itr)->GenFinish(a_ChunkDesc);
 		}  // for itr - m_FinishGens[]
+		ShouldUpdateHeightmap = true;
+	}
+	
+	if (ShouldUpdateHeightmap)
+	{
+		a_ChunkDesc.UpdateHeightmap();
 	}
 }
 
@@ -349,7 +358,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int ChanceCrossing  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCrossing",  200);
 			int ChanceStaircase = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceStaircase", 200);
 			m_FinishGens.push_back(new cStructGenMineShafts(
-				Seed, GridSize, MaxSystemSize, 
+				Seed, GridSize, MaxSystemSize,
 				ChanceCorridor, ChanceCrossing, ChanceStaircase
 			));
 		}
@@ -360,6 +369,12 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenNetherClumpFoliage(Seed));
+		}
+		else if (NoCaseCompare(*itr, "NetherForts") == 0)
+		{
+			int GridSize = a_IniFile.GetValueSetI("Generator", "NetherFortsGridSize", 512);
+			int MaxDepth = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 6);
+			m_FinishGens.push_back(new cNetherFortGen(Seed, GridSize, MaxDepth));
 		}
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{
