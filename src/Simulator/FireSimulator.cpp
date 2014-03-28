@@ -7,7 +7,7 @@
 #include "../Defines.h"
 #include "../Chunk.h"
 #include "Root.h"
-#include "PluginManager.h"
+#include "../Bindings/PluginManager.h"
 
 
 
