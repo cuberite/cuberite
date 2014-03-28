@@ -79,7 +79,10 @@ public:
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
 			if ((cBlockInfo::IsOneHitDig(AboveDest) || cBlockInfo::IsTransparent(AboveDest)) && !IsBlockWater(AboveDest))
 			{
-				Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
+				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, BlockX * cChunkDef::Width, BlockY, BlockZ * cChunkDef::Width, ssGrassSpread))
+				{
+					Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
+				}
 			}
 		}  // for i - repeat twice
 	}

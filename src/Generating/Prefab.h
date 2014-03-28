@@ -21,7 +21,6 @@ declared in this file as well; the Gallery server exports areas in this format.
 
 
 
-
 // fwd:
 class cChunkDesc;
 

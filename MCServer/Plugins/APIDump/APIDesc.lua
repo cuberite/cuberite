@@ -1826,6 +1826,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			Constants =
 			{
+				HOOK_BLOCK_SPREAD = { Notes = "Called when a block spreads based on world conditions" },
 				HOOK_BLOCK_TO_PICKUPS = { Notes = "Called when a block has been dug and is being converted to pickups. The server has provided the default pickups and the plugins may modify them." },
 				HOOK_CHAT = { Notes = "Called when a client sends a chat message that is not a command. The plugin may modify the chat message" },
 				HOOK_CHUNK_AVAILABLE = { Notes = "Called when a chunk is loaded or generated and becomes available in the {{cWorld|world}}." },
@@ -2766,6 +2767,14 @@ end
 						{{cWorld}}:DoExplosionAt() function. These constants also dictate the type of the additional
 						data provided with the explosions, such as the exploding {{cCreeper|creeper}} entity or the
 						{{Vector3i|coords}} of the exploding bed.
+					]],
+				},
+				SpreadSource =
+				{
+					Include = "^ss.*",
+					TextBefore = [[
+						These constants are used to differentiate the various sources of spreads, such as grass growing.
+						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
 					]],
 				}
 			},
