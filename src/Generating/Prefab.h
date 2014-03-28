@@ -16,7 +16,7 @@ declared in this file as well; the Gallery server exports areas in this format.
 
 #include "PieceGenerator.h"
 #include "../BlockArea.h"
-
+#include "ChunkDesc.h"
 
 
 
