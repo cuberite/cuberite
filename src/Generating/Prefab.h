@@ -22,6 +22,13 @@ declared in this file as well; the Gallery server exports areas in this format.
 
 
 
+// fwd:
+class cChunkDesc;
+
+
+
+
+
 class cPrefab :
 	public cPiece
 {
@@ -51,8 +58,9 @@ protected:
 	typedef int CharMap[256];
 	
 	
-	/** The cBlockArea that contains the block definitions for the prefab */
-	cBlockArea m_BlockArea;
+	/** The cBlockArea that contains the block definitions for the prefab.
+	The index identifies the number of CCW rotations applied (0 = no rotation, 1 = 1 CCW rotation, ...). */
+	cBlockArea m_BlockArea[4];
 	
 	/** The size of the prefab */
 	Vector3i m_Size;
@@ -79,7 +87,7 @@ protected:
 	/** Parses the CharMap in the definition into a CharMap binary data used for translating the definition into BlockArea. */
 	void ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef);
 	
-	/** Parses the Image in the definition into m_BlockArea's block types and metas, using the specified CharMap. */
+	/** Parses the Image in the definition into m_BlockArea[0]'s block types and metas, using the specified CharMap. */
 	void ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockImage);
 	
 	/** Parses the connectors definition text into m_Connectors member. */

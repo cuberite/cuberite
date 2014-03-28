@@ -21,11 +21,33 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_AllowedRotations(a_Def.m_AllowedRotations),
 	m_MergeStrategy(a_Def.m_MergeStrategy)
 {
-	m_BlockArea.Create(m_Size);
+	m_BlockArea[0].Create(m_Size);
 	CharMap cm;
 	ParseCharMap(cm, a_Def.m_CharMap);
 	ParseBlockImage(cm, a_Def.m_Image);
 	ParseConnectors(a_Def.m_Connectors);
+	
+	// 1 CCW rotation:
+	if ((m_AllowedRotations & 0x01) != 0)
+	{
+		m_BlockArea[1].CopyFrom(m_BlockArea[0]);
+		m_BlockArea[1].RotateCCW();
+	}
+	
+	// 2 rotations are the same as mirroring twice; mirroring is faster because it has no reallocations
+	if ((m_AllowedRotations & 0x02) != 0)
+	{
+		m_BlockArea[2].CopyFrom(m_BlockArea[0]);
+		m_BlockArea[2].MirrorXY();
+		m_BlockArea[2].MirrorYZ();
+	}	
+	
+	// 3 CCW rotations = 1 CW rotation:
+	if ((m_AllowedRotations & 0x04) != 0)
+	{
+		m_BlockArea[3].CopyFrom(m_BlockArea[0]);
+		m_BlockArea[3].RotateCW();
+	}
 }
 
 
@@ -38,7 +60,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 	int ChunkStartX = a_Dest.GetChunkX() * cChunkDef::Width;
 	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
 	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
-	a_Dest.WriteBlockArea(m_BlockArea, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
+	a_Dest.WriteBlockArea(m_BlockArea[a_Placement->GetNumCCWRotations()], Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
 }
 
@@ -112,7 +134,7 @@ void cPrefab::ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockIma
 				ASSERT(MappedValue != -1);  // Using a letter not defined in the CharMap?
 				BLOCKTYPE BlockType = MappedValue >> 4;
 				NIBBLETYPE BlockMeta = MappedValue & 0x0f;
-				m_BlockArea.SetRelBlockTypeMeta(x, y, z, BlockType, BlockMeta);
+				m_BlockArea[0].SetRelBlockTypeMeta(x, y, z, BlockType, BlockMeta);
 			}
 		}
 	}
@@ -195,7 +217,9 @@ cCuboid cPrefab::GetHitBox(void) const
 
 bool cPrefab::CanRotateCCW(int a_NumRotations) const
 {
-	return ((m_AllowedRotations & (1 << (a_NumRotations % 4))) != 0);
+	// Either zero rotations
+	// Or the proper bit in m_AllowedRotations is set
+	return (a_NumRotations == 0) || ((m_AllowedRotations & (1 << ((a_NumRotations + 3) % 4))) != 0);
 }
 
 
