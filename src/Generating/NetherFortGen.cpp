@@ -29,6 +29,7 @@ public:
 	int m_Seed;
 	cPlacedPieces m_Pieces;
 
+
 	cNetherFort(cNetherFortGen & a_ParentGen, int a_BlockX, int a_BlockZ, int a_GridSize, int a_MaxDepth, int a_Seed) :
 		m_ParentGen(a_ParentGen),
 		m_BlockX(a_BlockX),
@@ -42,6 +43,12 @@ public:
 		// Generate pieces:
 		cBFSPieceGenerator pg(m_ParentGen, a_Seed);
 		pg.PlacePieces(a_BlockX, BlockY, a_BlockZ, a_MaxDepth, m_Pieces);
+	}
+
+	
+	~cNetherFort()
+	{
+		cPieceGenerator::FreePieces(m_Pieces);
 	}
 	
 		
