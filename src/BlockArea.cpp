@@ -54,7 +54,7 @@ template<typename Combinator> void InternalMergeBlocks(
 
 
 /// Combinator used for cBlockArea::msOverwrite merging
-static void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static inline void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	a_DstType = a_SrcType;
 	a_DstMeta = a_SrcMeta;
@@ -65,7 +65,7 @@ static void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType,
 
 
 /// Combinator used for cBlockArea::msFillAir merging
-static void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static inline void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if (a_DstType == E_BLOCK_AIR)
 	{
@@ -80,7 +80,7 @@ static void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, N
 
 
 /// Combinator used for cBlockArea::msImprint merging
-static void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static inline void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if (a_SrcType != E_BLOCK_AIR)
 	{
@@ -95,7 +95,7 @@ static void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, N
 
 
 /// Combinator used for cBlockArea::msLake merging
-static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static inline void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// Sponge is the NOP block
 	if (a_SrcType == E_BLOCK_SPONGE)
@@ -152,6 +152,21 @@ static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 		}
 	}
 	// Everything else is left as it is
+}
+
+
+
+
+
+/** Combinator used for cBlockArea::msSpongePrint merging */
+static inline void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+{
+	// Sponge overwrites nothing, everything else overwrites anything
+	if (a_SrcType != E_BLOCK_SPONGE)
+	{
+		a_DstType = a_SrcType;
+		a_DstMeta = a_SrcMeta;
+	}
 }
 
 
@@ -679,6 +694,21 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 			);
 			break;
 		}  // case msLake
+		
+		case msSpongePrint:
+		{
+			InternalMergeBlocks(
+				m_BlockTypes, a_Src.GetBlockTypes(),
+				DstMetas, SrcMetas,
+				SizeX, SizeY, SizeZ,
+				SrcOffX, SrcOffY, SrcOffZ,
+				DstOffX, DstOffY, DstOffZ,
+				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+				m_Size.x, m_Size.y, m_Size.z,
+				MergeCombinatorSpongePrint
+			);
+			break;
+		}  // case msSpongePrint
 		
 		default:
 		{

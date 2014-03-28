@@ -51,6 +51,7 @@ public:
 		msFillAir,
 		msImprint,
 		msLake,
+		msSpongePrint,
 	} ;
 	
 	cBlockArea(void);
@@ -127,8 +128,8 @@ public:
 	- msFillAir overwrites only those blocks that were air
 	- msImprint overwrites with only those blocks that are non-air
 
-	Special strategies:
-	msLake (evaluate top-down, first match wins):
+	Special strategies (evaluate top-down, first match wins):
+	msLake:
 	|    area block     |        |
 	|   this   | Src    | result |
 	+----------+--------+--------+
@@ -143,6 +144,14 @@ public:
 	| mycelium | stone  | stone  |    ... and mycelium
 	| A        | stone  | A      |    ... but nothing else
 	| A        | *      | A      |  Everything else is left as it is
+	
+	msSpongePrint:
+	Used for most generators, it allows carving out air pockets, too, and uses the Sponge as the NOP block
+	|    area block     |        |
+	|   this   | Src    | result |
+	+----------+--------+--------+
+	| A        | sponge | A      |  Sponge is the NOP block
+	| *        | B      | B      |  Everything else overwrites anything
 
 	*/
 	void Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy);

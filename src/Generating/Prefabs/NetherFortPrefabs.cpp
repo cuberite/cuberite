@@ -127,7 +127,7 @@ const cPrefab::sDef g_NetherFortPrefabs1[] =
 		7,  /* 1, 2, 3 CCW rotations */
 		
 		// Merge strategy:
-		cBlockArea::msImprint,
+		cBlockArea::msSpongePrint,
 	},  // BalconyCorridor
 
 
@@ -253,7 +253,7 @@ const cPrefab::sDef g_NetherFortPrefabs1[] =
 		7,  /* 1, 2, 3 CCW rotations */
 		
 		// Merge strategy:
-		cBlockArea::msImprint,
+		cBlockArea::msSpongePrint,
 	},
 
 } ;  // g_NetherFortPrefabs1
@@ -421,7 +421,7 @@ const cPrefab::sDef g_NetherFortStartingPrefabs1[] =
 		7,  /* 1, 2, 3 CCW rotations */
 		
 		// Merge strategy:
-		cBlockArea::msImprint,
+		cBlockArea::msSpongePrint,
 	},
 } ;  // g_NetherFortStartingPrefabs1
 
