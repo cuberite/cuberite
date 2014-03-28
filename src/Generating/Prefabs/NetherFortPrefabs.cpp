@@ -28,7 +28,7 @@ const cPrefab::sDef g_NetherFortPrefabs1[] =
 
 		// Block definitions:
 		"a:112: 0\n"  /* netherbrick */
-		"b:  0: 0\n"  /* air */
+		"b: 19: 0\n"  /* sponge */
 		"c:114: 4\n"  /* netherbrickstairs */
 		"d:114: 7\n"  /* netherbrickstairs */
 		"e:114: 5\n"  /* netherbrickstairs */
@@ -37,7 +37,8 @@ const cPrefab::sDef g_NetherFortPrefabs1[] =
 		"h:114: 2\n"  /* netherbrickstairs */
 		"i:114: 3\n"  /* netherbrickstairs */
 		"j:114: 0\n"  /* netherbrickstairs */
-		"k:114: 1\n"  /* netherbrickstairs */,
+		"k:114: 1\n"  /* netherbrickstairs */
+		"l:  0: 0\n"  /* air */,
 
 		// Block data:
 		// Level 1
@@ -56,7 +57,7 @@ const cPrefab::sDef g_NetherFortPrefabs1[] =
 		"aaaaaaaaaaaaa"
 		"aaaaaaaaaaaaa"
 		"aaaaaaaaaaaaa"
-		"aaaabaaabaaaa"
+		"aaaalaaalaaaa"
 		"bbcdaaaaadebb"
 		"bbbcdddddebbb"
 		"bbbbbbbbbbbbb"
@@ -64,10 +65,10 @@ const cPrefab::sDef g_NetherFortPrefabs1[] =
 
 		// Level 3
 		"aaaaaaaaaaaaa"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"aaaabfffbaaaa"
+		"lllllllllllll"
+		"lllllllllllll"
+		"lllllllllllll"
+		"aaaalffflaaaa"
 		"bbaaaaaaaaabb"
 		"bbaaaaaaaaabb"
 		"bbaaaaaaaaabb"
@@ -75,36 +76,36 @@ const cPrefab::sDef g_NetherFortPrefabs1[] =
 
 		// Level 4
 		"agagagagagaga"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"agaabbbbbaaga"
-		"bbaaabbbaaabb"
-		"bbgbbbbbbbgbb"
-		"bbgbbbbbbbgbb"
+		"lllllllllllll"
+		"lllllllllllll"
+		"lllllllllllll"
+		"agaalllllaaga"
+		"bbaaalllaaabb"
+		"bbglllllllgbb"
+		"bbglllllllgbb"
 		"bbgggggggggbb"
 
 		// Level 5
 		"agagagagagaga"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"agaabbbbbaaga"
-		"bbaaabbbaaabb"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
+		"lllllllllllll"
+		"lllllllllllll"
+		"lllllllllllll"
+		"agaalllllaaga"
+		"bbaaalllaaabb"
+		"bblllllllllbb"
+		"bblllllllllbb"
+		"bblllllllllbb"
 
 		// Level 6
 		"agagagagagaga"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"agaabbbbbaaga"
-		"bbaaabbbaaabb"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
-		"bbbbbbbbbbbbb"
+		"lllllllllllll"
+		"lllllllllllll"
+		"lllllllllllll"
+		"agaalllllaaga"
+		"bbaaalllaaabb"
+		"bblllllllllbb"
+		"bblllllllllbb"
+		"bblllllllllbb"
 
 		// Level 7
 		"hhhhhhhhhhhhh"
