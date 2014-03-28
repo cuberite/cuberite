@@ -373,7 +373,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "NetherForts") == 0)
 		{
 			int GridSize = a_IniFile.GetValueSetI("Generator", "NetherFortsGridSize", 512);
-			int MaxDepth = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 6);
+			int MaxDepth = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 12);
 			m_FinishGens.push_back(new cNetherFortGen(Seed, GridSize, MaxDepth));
 		}
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
