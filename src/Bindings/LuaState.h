@@ -38,6 +38,7 @@ extern "C"
 class cWorld;
 class cPlayer;
 class cEntity;
+class cProjectileEntity;
 class cMonster;
 class cItem;
 class cItems;
@@ -183,6 +184,7 @@ public:
 	void Push(cPlayer * a_Player);
 	void Push(const cPlayer * a_Player);
 	void Push(cEntity * a_Entity);
+	void Push(cProjectileEntity * a_ProjectileEntity);
 	void Push(cMonster * a_Monster);
 	void Push(cItem * a_Item);
 	void Push(cItems * a_Items);

@@ -148,7 +148,6 @@ public:
 		}
 
 		// TODO: Some entities don't interact with the projectiles (pickups, falling blocks)
-		// TODO: Allow plugins to interfere about which entities can be hit
 		if (cPluginManager::Get()->CallHookProjectileHitEntity(*m_Projectile, *a_Entity))
 		{
 			// A plugin disagreed.
