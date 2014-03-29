@@ -105,6 +105,7 @@ public:																	// tolua_export
 		HOOK_PLUGINS_LOADED,
 		HOOK_POST_CRAFTING,
 		HOOK_PRE_CRAFTING,
+		HOOK_PROJECTILE_HIT_BLOCK,
 		HOOK_PROJECTILE_HIT_ENTITY,
 		HOOK_SPAWNED_ENTITY,
 		HOOK_SPAWNED_MONSTER,
@@ -205,6 +206,7 @@ public:																	// tolua_export
 	bool CallHookPluginsLoaded            (void);
 	bool CallHookPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile);
 	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
 	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
 	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
