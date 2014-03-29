@@ -4,6 +4,7 @@
 // Implements the cProjectileEntity class representing the common base class for projectiles, as well as individual projectile types
 
 #include "Globals.h"
+#include "../Bindings/PluginManager.h"
 #include "ProjectileEntity.h"
 #include "../ClientHandle.h"
 #include "Player.h"
@@ -66,6 +67,11 @@ protected:
 			eBlockFace Face;
 			if (bb.CalcLineIntersection(Line1, Line2, LineCoeff, Face))
 			{
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile))
+				{
+					return false;
+				}
+
 				Vector3d Intersection = Line1 + m_Projectile->GetSpeed() * LineCoeff;
 				m_Projectile->OnHitSolidBlock(Intersection, Face);
 				return true;
@@ -147,7 +153,11 @@ public:
 		}
 
 		// TODO: Some entities don't interact with the projectiles (pickups, falling blocks)
-		// TODO: Allow plugins to interfere about which entities can be hit
+		if (cPluginManager::Get()->CallHookProjectileHitEntity(*m_Projectile, *a_Entity))
+		{
+			// A plugin disagreed.
+			return false;
+		}
 		
 		if (LineCoeff < m_MinCoeff)
 		{

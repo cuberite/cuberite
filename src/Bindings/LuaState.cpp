@@ -479,6 +479,18 @@ void cLuaState::Push(cEntity * a_Entity)
 
 
 
+void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(cMonster * a_Monster)
 {
 	ASSERT(IsValid());
