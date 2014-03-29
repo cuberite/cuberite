@@ -69,7 +69,7 @@ protected:
 			{
 				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile))
 				{
-					return true;
+					return false;
 				}
 
 				Vector3d Intersection = Line1 + m_Projectile->GetSpeed() * LineCoeff;
