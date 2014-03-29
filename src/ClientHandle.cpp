@@ -933,7 +933,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		
-		if (a_BlockFace > BLOCK_FACE_NONE)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -962,7 +962,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		);
 		
 		// Let's send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
-		if (a_BlockFace > BLOCK_FACE_NONE)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -990,7 +990,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
-	if (ItemHandler->IsPlaceable() && (a_BlockFace > BLOCK_FACE_NONE))
+	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
