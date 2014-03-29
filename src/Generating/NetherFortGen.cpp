@@ -41,9 +41,9 @@ public:
 		int BlockY = 64;
 		
 		// Generate pieces:
-		for (int i = 0; m_Pieces.size() < (size_t)(a_MaxDepth * a_MaxDepth / 16 + a_MaxDepth); i++)
+		for (int i = 0; m_Pieces.size() < (size_t)(a_MaxDepth * a_MaxDepth / 8 + a_MaxDepth); i++)
 		{
-			cBFSPieceGenerator pg(m_ParentGen, a_Seed + 1);
+			cBFSPieceGenerator pg(m_ParentGen, a_Seed + i);
 			pg.PlacePieces(a_BlockX, BlockY, a_BlockZ, a_MaxDepth, m_Pieces);
 		}
 	}
