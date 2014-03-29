@@ -172,6 +172,8 @@ bool cPrefab::HasConnectorType(int a_ConnectorType) const
 
 void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 {
+	ASSERT(a_CharMapDef != NULL);
+	
 	// Initialize the charmap to all-invalid values:
 	for (size_t i = 0; i < ARRAYCOUNT(a_CharMapOut); i++)
 	{
@@ -231,6 +233,8 @@ void cPrefab::ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockIma
 
 void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 {
+	ASSERT(a_ConnectorsDef != NULL);
+	
 	AStringVector Lines = StringSplitAndTrim(a_ConnectorsDef, "\n");
 	for (AStringVector::const_iterator itr = Lines.begin(), end = Lines.end(); itr != end; ++itr)
 	{
