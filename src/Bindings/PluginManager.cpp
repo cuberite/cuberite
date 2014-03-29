@@ -1154,6 +1154,27 @@ bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCrafti
 
 
 
+bool cPluginManager::CallHookProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity & a_HitEntity)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PROJECTILE_HIT_ENTITY);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnProjectileHitEntity(a_Projectile, a_HitEntity))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNED_ENTITY);
