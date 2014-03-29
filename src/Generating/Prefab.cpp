@@ -15,6 +15,92 @@ uses a prefabricate in a cBlockArea for drawing itself.
 
 
 
+#ifdef SELF_TEST
+
+// Create one static prefab to test the parser:
+static const cPrefab::sDef g_TestPrefabDef =
+{
+	// Size:
+	7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
+
+	// Block definitions:
+	".:  0: 0\n"  /* 0 */
+	"a:112: 0\n"  /* netherbrick */
+	"b:113: 0\n"  /* netherbrickfence */,
+
+	// Block data:
+	// Level 1
+	"aaaaaaa"
+	"aaaaaaa"
+	"aaaaaaa"
+	"aaaaaaa"
+	"aaaaaaa"
+	"aaaaaaa"
+	"aaaaaaa"
+
+	// Level 2
+	"aa...aa"
+	"a.....a"
+	"......."
+	"......."
+	"......."
+	"a.....a"
+	"aa...aa"
+
+	// Level 3
+	"aa...aa"
+	"a.....a"
+	"......."
+	"......."
+	"......."
+	"a.....a"
+	"aa...aa"
+
+	// Level 4
+	"aa...aa"
+	"a.....a"
+	"......."
+	"......."
+	"......."
+	"a.....a"
+	"aa...aa"
+
+	// Level 5
+	"aabbbaa"
+	"a.....a"
+	"b.....b"
+	"b.....b"
+	"b.....b"
+	"a.....a"
+	"aabbbaa"
+
+	// Level 6
+	"aaaaaaa"
+	"a.....a"
+	"a.....a"
+	"a.....a"
+	"a.....a"
+	"a.....a"
+	"aaaaaaa",
+	
+	// Connections:
+	"0: 0, 3, 2: 4\n"
+	"0: 2, 3, 0: 2\n",
+	
+	// AllowedRotations:
+	7,  /* 1, 2, 3 CCW rotations */
+	
+	// Merge strategy:
+	cBlockArea::msImprint
+};
+
+static cPrefab g_TestPrefab(g_TestPrefabDef);
+#endif
+
+
+
+
+
 cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_Size(a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
 	m_HitBox(0, 0, 0, a_Def.m_SizeX - 1, a_Def.m_SizeY - 1, a_Def.m_SizeZ - 1),
@@ -89,7 +175,8 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 	// Initialize the charmap to all-invalid values:
 	for (size_t i = 0; i < ARRAYCOUNT(a_CharMapOut); i++)
 	{
-		a_CharMapOut[i] = -1;
+		a_CharMapOut[i].m_BlockType = 0;
+		a_CharMapOut[i].m_BlockMeta = 16;  // Mark unassigned entries with a meta that is impossible otherwise
 	}
 	
 	// Process the lines in the definition:
@@ -104,15 +191,15 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 			continue;
 		}
 		unsigned char Src = (unsigned char)CharDef[0][0];
-		BLOCKTYPE BlockType = (BLOCKTYPE)atoi(CharDef[1].c_str());
+		ASSERT(a_CharMapOut[Src].m_BlockMeta == 16);  // This letter has not been assigned yet?
+		a_CharMapOut[Src].m_BlockType = (BLOCKTYPE)atoi(CharDef[1].c_str());
 		NIBBLETYPE BlockMeta = 0;
 		if ((NumElements >= 3) && !CharDef[2].empty())
 		{
 			BlockMeta = (NIBBLETYPE)atoi(CharDef[2].c_str());
 			ASSERT((BlockMeta >= 0) && (BlockMeta <= 15));
 		}
-		ASSERT(a_CharMapOut[Src] == -1);  // Any duplicates letter-wise?
-		a_CharMapOut[Src] = (BlockType << 4) | BlockMeta;
+		a_CharMapOut[Src].m_BlockMeta = BlockMeta;
 	}  // for itr - Lines[]
 }
 
@@ -130,11 +217,9 @@ void cPrefab::ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockIma
 			const unsigned char * BlockImage = (const unsigned char *)a_BlockImage + y * m_Size.x * m_Size.z + z * m_Size.x;
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				int MappedValue = a_CharMap[BlockImage[x]];
-				ASSERT(MappedValue != -1);  // Using a letter not defined in the CharMap?
-				BLOCKTYPE BlockType = MappedValue >> 4;
-				NIBBLETYPE BlockMeta = MappedValue & 0x0f;
-				m_BlockArea[0].SetRelBlockTypeMeta(x, y, z, BlockType, BlockMeta);
+				const sBlockTypeDef & MappedValue = a_CharMap[BlockImage[x]];
+				ASSERT(MappedValue.m_BlockMeta != 16);  // Using a letter not defined in the CharMap?
+				m_BlockArea[0].SetRelBlockTypeMeta(x, y, z, MappedValue.m_BlockType, MappedValue.m_BlockMeta);
 			}
 		}
 	}
