@@ -53,8 +53,15 @@ public:
 	bool HasConnectorType(int a_ConnectorType) const;
 
 protected:
+	/** Packs complete definition of a single block, for per-letter assignment. */
+	struct sBlockTypeDef
+	{
+		BLOCKTYPE  m_BlockType;
+		NIBBLETYPE m_BlockMeta;
+	};
+	
 	/** Maps letters in the sDef::m_Image onto a number, BlockType * 16 | BlockMeta */
-	typedef int CharMap[256];
+	typedef sBlockTypeDef CharMap[256];
 	
 	
 	/** The cBlockArea that contains the block definitions for the prefab.
