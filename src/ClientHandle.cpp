@@ -1606,10 +1606,8 @@ void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
 	
-	// Do NOT stream new chunks, the new world runs its own tick thread and may deadlock
-	// Instead, the chunks will be streamed when the client is moved to the new world's Tick list,
-	// by setting state to csAuthenticated
-	m_State = csAuthenticated;
+	// StreamChunks() called in cPlayer::MoveToWorld() after new world has been set
+	// Meanwhile here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
 	m_HasSentPlayerChunk = false;
