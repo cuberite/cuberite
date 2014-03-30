@@ -1,16 +1,16 @@
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "MetaRotator.h"
 
 
 
 class cBlockPumpkinHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false>
 {
 public:
 	cBlockPumpkinHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false>(a_BlockType)
 	{
 	}
 	

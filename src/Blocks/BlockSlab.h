@@ -14,8 +14,6 @@
 
 
 
-
-
 class cBlockSlabHandler :
 	public cBlockHandler
 {
@@ -183,6 +181,15 @@ public:
 		}
 		ASSERT(!"Unhandled double slab type!");
 		return "";
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	{
+		NIBBLETYPE OtherMeta = a_Meta & 0x07;  // Contains unrelated meta data.
+
+		// 8th bit is up/down.  1 right-side-up, 0 is up-side-down.
+		return (a_Meta & 0x08) ? 0x00 + OtherMeta : 0x01 + OtherMeta;
 	}
 } ;
 
