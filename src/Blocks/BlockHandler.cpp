@@ -41,6 +41,7 @@
 #include "BlockIce.h"
 #include "BlockLadder.h"
 #include "BlockLeaves.h"
+#include "BlockLilypad.h"
 #include "BlockNewLeaves.h"
 #include "BlockLever.h"
 #include "BlockMelon.h"
@@ -142,6 +143,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_LAVA:                  return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
+		case E_BLOCK_LILY_PAD:              return new cBlockLilypadHandler         (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
 		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);

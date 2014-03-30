@@ -884,7 +884,7 @@ void cChunk::ApplyWeatherToTop()
 					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
 				}
 			}
-			else if (cBlockInfo::IsSnowable(TopBlock))
+			else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
 			{
 				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
 			}

@@ -365,7 +365,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_WOODEN_SLAB         ].m_IsSolid = false;
 
 
-	// Torch placeable blocks:
+	// Blocks that fully occupy their voxel - used as a guide for torch placeable blocks, amongst other things:
 	ms_Info[E_BLOCK_NEW_LOG             ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_BEDROCK             ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_BLOCK_OF_COAL       ].m_FullyOccupiesVoxel = true;
@@ -397,6 +397,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_HAY_BALE            ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_HUGE_BROWN_MUSHROOM ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_HUGE_RED_MUSHROOM   ].m_FullyOccupiesVoxel = true;
+	ms_Info[E_BLOCK_ICE                 ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_IRON_BLOCK          ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_IRON_ORE            ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_JACK_O_LANTERN      ].m_FullyOccupiesVoxel = true;
