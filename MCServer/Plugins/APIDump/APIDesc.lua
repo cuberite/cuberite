@@ -258,12 +258,11 @@ g_APIDesc =
 						</ol>
 						</p>
 
-						<p>
-						Special strategies:
-						</p>
+						<h3>Special strategies</h3>
+						<p>For each strategy, evaluate the table rows from top downwards, the first match wins.</p>
 
 						<p>
-						<strong>msLake</strong> (evaluate top-down, first match wins):
+						<strong>msLake</strong> - used for merging areas with lava and water lakes, in the appropriate generator.
 						</p>
 						<table><tbody><tr>
 						<th colspan="2"> area block </th><th> </th><th> Notes </th>
@@ -291,6 +290,23 @@ g_APIDesc =
 						<td> A        </td><td> stone  </td><td> A      </td><td> ... but nothing else </td>
 						</tr><tr>
 						<td> A        </td><td> *      </td><td> A      </td><td> Everything else is left as it is </td>
+						</tr>
+						</tbody></table>
+
+
+						<p>
+						<strong>msSpongePrint</strong> - used for most prefab-generators to merge the prefabs. Similar to
+						msImprint, but uses the sponge block as the NOP block instead, so that the prefabs may carve out air
+						pockets, too.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> sponge </td><td> A </td><td> Sponge is the NOP block </td>
+						</tr><tr>
+						<td> *        </td><td> B    </td><td> B    </td><td> Everything else overwrites anything </td>
 						</tr>
 						</tbody></table>
 					]],
