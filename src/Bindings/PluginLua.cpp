@@ -1108,14 +1108,14 @@ bool cPluginLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a
 
 
 
-bool cPluginLua::OnProjectileHitBlock(cProjectileEntity & a_Projectile)
+bool cPluginLua::OnProjectileHitBlock(cProjectileEntity & a_Projectile, eBlockFace a_Face)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PROJECTILE_HIT_BLOCK];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Projectile, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Projectile, a_Face, cLuaState::Return, res);
 		if (res)
 		{
 			return true;

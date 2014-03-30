@@ -67,7 +67,7 @@ protected:
 			eBlockFace Face;
 			if (bb.CalcLineIntersection(Line1, Line2, LineCoeff, Face))
 			{
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile))
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, Face))
 				{
 					return false;
 				}
