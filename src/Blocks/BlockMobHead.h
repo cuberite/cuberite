@@ -62,8 +62,8 @@ public:
 			}
 		
 		public:
-			cCallback (cPlayer * a_Player, NIBBLETYPE a_OldBlockMeta, NIBBLETYPE a_NewBlockMeta) :
-				m_Player(a_Player),
+			cCallback (cPlayer * a_CBPlayer, NIBBLETYPE a_OldBlockMeta, NIBBLETYPE a_NewBlockMeta) :
+				m_Player(a_CBPlayer),
 				m_OldBlockMeta(a_OldBlockMeta),
 				m_NewBlockMeta(a_NewBlockMeta)
 			{}

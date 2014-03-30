@@ -431,6 +431,7 @@ public:
 				}
 				break;
 			}
+			default: break;
 		}
 		return true;
 	}

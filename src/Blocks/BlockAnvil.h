@@ -33,16 +33,16 @@ public:
 		a_BlockType = m_BlockType;
 		
 		int Direction = (int)floor(a_Player->GetYaw() * 4.0 / 360.0 + 0.5) & 0x3;
-		int RawMeta = a_BlockMeta >> 2;
+		NIBBLETYPE RawMeta = a_BlockMeta >> 2;
 		
 		Direction++;
 		Direction %= 4;
 		switch (Direction)
 		{
-			case 0:      a_BlockMeta = 0x2 | RawMeta << 2; break;
-			case 1:      a_BlockMeta = 0x3 | RawMeta << 2; break;
-			case 2:      a_BlockMeta = 0x0 | RawMeta << 2; break;
-			case 3:      a_BlockMeta = 0x1 | RawMeta << 2; break;
+			case 0: a_BlockMeta = 0x2 | (RawMeta << 2); break;
+			case 1: a_BlockMeta = 0x3 | (RawMeta << 2); break;
+			case 2: a_BlockMeta = 0x0 | (RawMeta << 2); break;
+			case 3: a_BlockMeta = 0x1 | (RawMeta << 2); break;
 			default:
 			{
 				return false;

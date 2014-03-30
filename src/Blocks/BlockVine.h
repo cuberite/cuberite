@@ -83,7 +83,7 @@ public:
 		static const struct
 		{
 			int x, z;
-			int Bit;
+			NIBBLETYPE Bit;
 		} Coords[] =
 		{
 			{ 0,  1, 1},  // south, ZP
@@ -91,7 +91,7 @@ public:
 			{ 0, -1, 4},  // north, ZM
 			{ 1,  0, 8},  // east,  XP
 		} ;
-		int res = 0;
+		NIBBLETYPE res = 0;
 		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
 			BLOCKTYPE  BlockType;

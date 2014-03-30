@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../MersenneTwister.h"
+#include "../FastRandom.h"
 
 
 
@@ -21,7 +21,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
 	{
-		MTRand rand;
+		cFastRandom rand;
 
 		if (a_Meta == 0x7)
 		{
@@ -31,18 +31,18 @@ public:
 				case E_BLOCK_CROPS:
 				{
 					a_Pickups.push_back(cItem(E_ITEM_WHEAT, 1, 0));
-					a_Pickups.push_back(cItem(E_ITEM_SEEDS, 1 + (int)(rand.randInt(2) + rand.randInt(2)) / 2, 0));  // [1 .. 3] with high preference of 2
+					a_Pickups.push_back(cItem(E_ITEM_SEEDS, (char)(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
 					break;
 				}
 				case E_BLOCK_CARROTS:
 				{
-					a_Pickups.push_back(cItem(E_ITEM_CARROT, 1 + (int)(rand.randInt(2) + rand.randInt(2)) / 2, 0));  // [1 .. 3] with high preference of 2
+					a_Pickups.push_back(cItem(E_ITEM_CARROT, (char)(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
 					break;
 				}
 				case E_BLOCK_POTATOES:
 				{
-					a_Pickups.push_back(cItem(E_ITEM_POTATO, 1 + (int)(rand.randInt(2) + rand.randInt(2)) / 2, 0));  // [1 .. 3] with high preference of 2
-					if (rand.randInt(20) == 0)
+					a_Pickups.push_back(cItem(E_ITEM_POTATO, (char)(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
+					if (rand.NextInt(21) == 0)
 					{
 						// With a 5% chance, drop a poisonous potato as well
 						a_Pickups.push_back(cItem(E_ITEM_POISONOUS_POTATO, 1, 0));
