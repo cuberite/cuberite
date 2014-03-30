@@ -206,7 +206,7 @@ public:																	// tolua_export
 	bool CallHookPluginsLoaded            (void);
 	bool CallHookPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, eBlockFace a_Face, Vector3d * a_BlockHitPos);
+	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, eBlockFace a_Face, const Vector3i * a_BlockHitPos);
 	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
 	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
 	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);

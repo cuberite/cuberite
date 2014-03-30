@@ -1108,7 +1108,7 @@ bool cPluginLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a
 
 
 
-bool cPluginLua::OnProjectileHitBlock(cProjectileEntity & a_Projectile, eBlockFace a_Face, Vector3d * a_BlockHitPos)
+bool cPluginLua::OnProjectileHitBlock(cProjectileEntity & a_Projectile, eBlockFace a_Face, const Vector3i * a_BlockHitPos)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;

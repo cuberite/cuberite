@@ -113,7 +113,7 @@ public:
 	virtual bool OnPluginsLoaded            (void) override;
 	virtual bool OnPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
-	virtual bool OnProjectileHitBlock       (cProjectileEntity & a_Projectile, eBlockFace a_Face, Vector3d * a_BlockHitPos) override;
+	virtual bool OnProjectileHitBlock       (cProjectileEntity & a_Projectile, eBlockFace a_Face, const Vector3i * a_BlockHitPos) override;
 	virtual bool OnProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity) override;
 	virtual bool OnSpawnedEntity            (cWorld & a_World, cEntity & a_Entity) override;
 	virtual bool OnSpawnedMonster           (cWorld & a_World, cMonster & a_Monster) override;
