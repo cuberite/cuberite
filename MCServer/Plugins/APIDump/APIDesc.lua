@@ -247,6 +247,9 @@ g_APIDesc =
 						<tr>
 						<td> A </td><td> B </td><td> B </td><td> A </td><td> B </td><td> B </td>
 						</tr>
+						<tr>
+						<td> A </td><td> A </td><td> A </td><td> A </td><td> B </td><td> air </td>
+						</td>
 						</tbody></table>
 
 						<p>
@@ -255,7 +258,6 @@ g_APIDesc =
 						<li class="level1">msOverwrite completely overwrites all blocks with the Src's blocks</li>
 						<li class="level1">msFillAir overwrites only those blocks that were air</li>
 						<li class="level1">msImprint overwrites with only those blocks that are non-air</li>
-						<li class="level1">msSpongePrint Sponge overwrites nothing, everything else overwrites anything</li>
 						<li class="level1">msDifference changes all the blocks which are the same to air. Otherwise the source block gets placed.</li>
 						</ol>
 						</p>
