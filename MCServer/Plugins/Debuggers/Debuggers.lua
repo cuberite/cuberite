@@ -75,6 +75,15 @@ function Initialize(Plugin)
 	-- TestPluginCalls();
 	
 	TestBlockAreasString()
+
+	--[[
+	-- Test cCompositeChat usage in console-logging:
+	LOGINFO(cCompositeChat("This is a simple message with some @2 color formatting @4 and http://links.to .")
+		:AddSuggestCommandPart("(Suggested command)", "cmd")
+		:AddRunCommandPart("(Run command)", "cmd")
+		:SetMessageType(mtInfo)
+	)
+	--]]
 	
 	return true
 end;

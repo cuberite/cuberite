@@ -115,10 +115,35 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 
 
 
-static int tolua_LOG(lua_State* tolua_S)
+/** Retrieves the log message from the first param on the Lua stack.
+Can take either a string or a cCompositeChat.
+*/
+static AString GetLogMessage(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 0 );
+	tolua_Error err;
+	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	{
+		return ((cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL))->ExtractText();
+	}
+	else
+	{
+		size_t len = 0;
+		const char * str = lua_tolstring(tolua_S, 1, &len);
+		if (str != NULL)
+		{
+			return AString(str, len);
+		}
+	}
+	return "";
+}
+
+
+
+
+
+static int tolua_LOG(lua_State * tolua_S)
+{
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), 0);
 	return 0;
 }
 
@@ -126,10 +151,9 @@ static int tolua_LOG(lua_State* tolua_S)
 
 
 
-static int tolua_LOGINFO(lua_State* tolua_S)
+static int tolua_LOGINFO(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 1 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), 1);
 	return 0;
 }
 
@@ -137,10 +161,9 @@ static int tolua_LOGINFO(lua_State* tolua_S)
 
 
 
-static int tolua_LOGWARN(lua_State* tolua_S)
+static int tolua_LOGWARN(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 2 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), 2);
 	return 0;
 }
 
@@ -148,10 +171,9 @@ static int tolua_LOGWARN(lua_State* tolua_S)
 
 
 
-static int tolua_LOGERROR(lua_State* tolua_S)
+static int tolua_LOGERROR(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 3 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), 3);
 	return 0;
 }
 

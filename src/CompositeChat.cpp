@@ -314,6 +314,35 @@ void cCompositeChat::UnderlineUrls(void)
 
 
 
+AString cCompositeChat::ExtractText(void) const
+{
+	AString Msg;
+	for (cParts::const_iterator itr = m_Parts.begin(), end = m_Parts.end(); itr != end; ++itr)
+	{
+		switch ((*itr)->m_PartType)
+		{
+			case ptText:
+			case ptClientTranslated:
+			case ptRunCommand:
+			case ptSuggestCommand:
+			{
+				Msg.append((*itr)->m_Text);
+				break;
+			}
+			case ptUrl:
+			{
+				Msg.append(((cUrlPart *)(*itr))->m_Url);
+				break;
+			}
+		}  // switch (PartType)
+	}  // for itr - m_Parts[]
+	return Msg;
+}
+
+
+
+
+
 void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
 {
 	if (a_AddStyle.empty())

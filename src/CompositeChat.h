@@ -164,6 +164,11 @@ public:
 	/** Returns the message type set previously by SetMessageType(). */
 	eMessageType GetMessageType(void) const { return m_MessageType; }
 	
+	/** Returns the text from the parts that comprises the human-readable data.
+	Used for older protocols that don't support composite chat
+	and for console-logging. */
+	AString ExtractText(void) const;
+	
 	// tolua_end
 	
 	const cParts & GetParts(void) const { return m_Parts; }
