@@ -2663,11 +2663,31 @@ end
 				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
 				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
 				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
-				LOG = {Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text) "},
-				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
-				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
-				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
-				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+				LOG =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text) "},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'normal' severity (gray text) "},
+				},
+				LOGERROR =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'error' severity (black text on red background)"},
+				},
+				LOGINFO =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'info' severity (yellow text)"},
+				},
+				LOGWARN =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+				},
+				LOGWARNING =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text)"},
+				},
 				MirrorBlockFaceY = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it)." },
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
 				NormalizeAngleDegrees = { Params = "AngleDegrees", Return = "AngleDegrees", Notes = "Returns the angle, wrapped into the [-180, +180) range." },
