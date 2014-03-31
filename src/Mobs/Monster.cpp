@@ -130,14 +130,16 @@ void cMonster::TickPathFinding()
 		{ 0, 1},
 		{ 0,-1},
 	} ;
+	
+	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
+	{
+		// Too low/high, can't really do anything
+		FinishPathFinding();
+		return;
+	}
 
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 	{
-		if ((PosY - 1 < 0) || (PosY + 1 > cChunkDef::Height) || (PosY + 2 > cChunkDef::Height))
-		{
-			break;
-		}
-
 		if (IsCoordinateInTraversedList(Vector3i(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ)))
 		{
 			continue;
