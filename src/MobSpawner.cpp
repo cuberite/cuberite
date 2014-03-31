@@ -129,6 +129,11 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 	BLOCKTYPE TargetBlock = E_BLOCK_AIR;
 	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end() && a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
+		if ((a_RelY + 1 > cChunkDef::Height) || (a_RelY - 1 < 0))
+		{
+			return false;
+		}
+
 		NIBBLETYPE BlockLight = a_Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
 		NIBBLETYPE SkyLight = a_Chunk->GetSkyLight(a_RelX, a_RelY, a_RelZ);
 		BLOCKTYPE BlockAbove = a_Chunk->GetBlock(a_RelX, a_RelY + 1, a_RelZ);
@@ -212,11 +217,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 							return false;
 						}
 						HaveFloor = (
-							HaveFloor ||
-							(
-								a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock) &&
-								!cBlockInfo::IsTransparent(TargetBlock)
-							)
+							a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1 /* Checked at start of function */, a_RelZ + z, TargetBlock) &&
+							!cBlockInfo::IsTransparent(TargetBlock)
 						);
 					}
 				}

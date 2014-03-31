@@ -93,8 +93,8 @@ public:
 		// Check if it's fuel:
 		BLOCKTYPE BlockType;
 		if (
-			!a_Chunk.UnboundedRelGetBlockType(a_RelX + x, a_RelY + y, a_RelZ + z, BlockType) ||
-			!cFireSimulator::IsFuel(BlockType)
+			((a_RelY + y < 0) || (a_RelY + y > cChunkDef::Height)) ||
+			(!a_Chunk.UnboundedRelGetBlockType(a_RelX + x, a_RelY + y, a_RelZ + z, BlockType) || !cFireSimulator::IsFuel(BlockType))
 		)
 		{
 			return false;
@@ -119,6 +119,7 @@ public:
 		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 		{
 			if (
+				((RelY + CrossCoords[i].y >= 0) && (RelY + CrossCoords[i].y <= cChunkDef::Height)) &&
 				a_Chunk.UnboundedRelGetBlockType(RelX + CrossCoords[i].x, RelY + CrossCoords[i].y, RelZ + CrossCoords[i].z, BlockType) &&
 				(BlockType == E_BLOCK_AIR)
 			)

@@ -111,9 +111,9 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 void cMonster::TickPathFinding()
 {
-	int PosX = (int)floor(GetPosX());
-	int PosY = (int)floor(GetPosY());
-	int PosZ = (int)floor(GetPosZ());
+	const int PosX = (int)floor(GetPosX());
+	const int PosY = (int)floor(GetPosY());
+	const int PosZ = (int)floor(GetPosZ());
 
 	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
 
@@ -133,9 +133,9 @@ void cMonster::TickPathFinding()
 
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 	{
-		if ((gCrossCoords[i].x + PosX == PosX) && (gCrossCoords[i].z + PosZ == PosZ))
+		if ((PosY - 1 < 0) || (PosY + 1 > cChunkDef::Height) || (PosY + 2 > cChunkDef::Height))
 		{
-			continue;
+			break;
 		}
 
 		if (IsCoordinateInTraversedList(Vector3i(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ)))
