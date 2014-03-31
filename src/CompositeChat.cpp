@@ -112,8 +112,8 @@ cCompositeChat::cCompositeChat(void) :
 
 
 
-cCompositeChat::cCompositeChat(const AString & a_ParseText) :
-	m_MessageType(mtCustom)
+cCompositeChat::cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType) :
+	m_MessageType(a_MessageType)
 {
 	ParseText(a_ParseText);
 }
