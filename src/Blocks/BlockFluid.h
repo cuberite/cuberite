@@ -94,7 +94,10 @@ public:
 		BLOCKTYPE BlockType;
 		if (
 			((a_RelY + y < 0) || (a_RelY + y > cChunkDef::Height)) ||
-			(!a_Chunk.UnboundedRelGetBlockType(a_RelX + x, a_RelY + y, a_RelZ + z, BlockType) || !cFireSimulator::IsFuel(BlockType))
+			(
+				!a_Chunk.UnboundedRelGetBlockType(a_RelX + x, a_RelY + y, a_RelZ + z, BlockType) ||
+				!cFireSimulator::IsFuel(BlockType)
+			)
 		)
 		{
 			return false;

@@ -205,7 +205,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			case cMonster::mtSpider:
 			{
 				bool CanSpawn = true;
-				bool HaveFloor = false;
+				bool HasFloor = false;
 				for (int x = 0; x < 2; ++x)
 				{
 					for(int z = 0; z < 2; ++z)
@@ -216,13 +216,16 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 						{
 							return false;
 						}
-						HaveFloor = (
-							a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1 /* Checked at start of function */, a_RelZ + z, TargetBlock) &&
-							!cBlockInfo::IsTransparent(TargetBlock)
+						HasFloor = (
+							HasFloor ||
+							(
+								a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock) &&
+								!cBlockInfo::IsTransparent(TargetBlock)
+							)
 						);
 					}
 				}
-				return CanSpawn && HaveFloor && (SkyLight <= 7) && (BlockLight <= 7);
+				return CanSpawn && HasFloor && (SkyLight <= 7) && (BlockLight <= 7);
 			}
 			
 			case cMonster::mtCreeper:
