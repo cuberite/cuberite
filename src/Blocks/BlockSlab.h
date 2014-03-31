@@ -11,6 +11,7 @@
 
 #include "BlockHandler.h"
 #include "../Items/ItemHandler.h"
+#include "Root.h"
 
 
 
@@ -38,41 +39,9 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		BLOCKTYPE  Type = (BLOCKTYPE) (a_Player->GetEquippedItem().m_ItemType);
 		NIBBLETYPE Meta = (NIBBLETYPE) a_Player->GetEquippedItem().m_ItemDamage;
 		
-		// HandlePlaceBlock wants a cItemHandler pointer thing, so let's give it one
-		cItemHandler * ItemHandler = cItemHandler::GetItemHandler(GetDoubleSlabType(Type));
-
-		// Check if the block at the coordinates is a slab. Eligibility for combining has already been processed in ClientHandle
-		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
-		{
-			// Call the function in ClientHandle that places a block when the client sends the packet,
-			// so that plugins may interfere with the placement.
-			
-			if ((a_BlockFace == BLOCK_FACE_TOP) || (a_BlockFace == BLOCK_FACE_BOTTOM))
-			{
-				// Top and bottom faces need no parameter modification
-				a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-			}
-			else
-			{
-				// The other faces need to distinguish between top and bottom cursor positions
-				if (a_CursorY > 7)
-				{
-					// Edit the call to use BLOCK_FACE_BOTTOM, otherwise it places incorrectly
-					a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_TOP, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-				}
-				else
-				{
-					// Edit the call to use BLOCK_FACE_TOP, otherwise it places incorrectly
-					a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_BOTTOM, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-				}
-			}
-			return false;  // Cancel the event, because dblslabs were already placed, nothing else needed
-		}
-		
-		// Place the single-slab with correct metas:
+		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_TOP:
@@ -104,6 +73,14 @@ public:
 				}
 			}
 		}  // switch (a_BlockFace)
+
+		// Check if the block at the coordinates is a single slab. Eligibility for combining has already been processed in ClientHandle
+		// Changed to-be-placed to a double slab if we are clicking on a single slab, as opposed to placing one for the first time
+		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
+		{
+			a_BlockType = GetDoubleSlabType(m_BlockType);
+		}
+
 		return true;
 	}
 	
