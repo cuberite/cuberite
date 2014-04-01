@@ -117,11 +117,6 @@ void cMCLogger::LogSimple(const char * a_Text, eLogLevel a_LogLevel)
 			LOGERROR("%s", a_Text);
 			break;
 		}
-		default:
-		{
-			LOG("(#%d#: %s", (int)a_LogLevel, a_Text);
-			break;
-		}
 	}
 }
 
