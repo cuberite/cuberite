@@ -18,10 +18,12 @@ public:
 	{
 	}
 	
+	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta >> 2));
 	}
+	
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
@@ -31,26 +33,22 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		
-		int Direction = (int)floor(a_Player->GetYaw() * 4.0 / 360.0 + 0.5) & 0x3;
-		NIBBLETYPE RawMeta = a_BlockMeta >> 2;
-		
-		Direction++;
-		Direction %= 4;
+		NIBBLETYPE HighBits = a_BlockMeta & 0x0c;  // Only highest two bits are preserved
+		int Direction = (int)floor(a_Player->GetYaw() * 4.0 / 360.0 + 1.5) & 0x3;
 		switch (Direction)
 		{
-			case 0: a_BlockMeta = 0x2 | (RawMeta << 2); break;
-			case 1: a_BlockMeta = 0x3 | (RawMeta << 2); break;
-			case 2: a_BlockMeta = 0x0 | (RawMeta << 2); break;
-			case 3: a_BlockMeta = 0x1 | (RawMeta << 2); break;
+			case 0: a_BlockMeta = 0x2 | HighBits; break;
+			case 1: a_BlockMeta = 0x3 | HighBits; break;
+			case 2: a_BlockMeta = 0x0 | HighBits; break;
+			case 3: a_BlockMeta = 0x1 | HighBits; break;
 			default:
 			{
 				return false;
 			}
 		}
-		
 		return true;
 	}
+
 
 	virtual bool IsUseable() override
 	{
