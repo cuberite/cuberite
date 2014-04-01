@@ -232,7 +232,7 @@ int cFile::GetSize(void) const
 		return -1;
 	}
 	int res = Tell();
-	if (fseek(m_File, (size_t)CurPos, SEEK_SET) != 0)
+	if (fseek(m_File, (long)CurPos, SEEK_SET) != 0)
 	{
 		return -1;
 	}
