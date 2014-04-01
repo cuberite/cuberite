@@ -200,6 +200,8 @@ g_APIDesc =
 				msFillAir = { Notes = "Dst is overwritten by Src only where Src has air blocks" },
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
+				msSpongePrint = { Notes = "Similar to msImprint, sponge block doesn't overwrite anything, all other blocks overwrite everything"},
+				msMask = { Notes = "The blocks that are exactly the same are kept in Dst, all differing blocks are replaced by air"},
 			},
 			ConstantGroups =
 			{
@@ -293,7 +295,6 @@ g_APIDesc =
 						</tr>
 						</tbody></table>
 
-
 						<p>
 						<strong>msSpongePrint</strong> - used for most prefab-generators to merge the prefabs. Similar to
 						msImprint, but uses the sponge block as the NOP block instead, so that the prefabs may carve out air
@@ -306,10 +307,26 @@ g_APIDesc =
 						</tr><tr>
 						<td> A </td><td> sponge </td><td> A </td><td> Sponge is the NOP block </td>
 						</tr><tr>
-						<td> *        </td><td> B    </td><td> B    </td><td> Everything else overwrites anything </td>
+						<td> * </td><td> B </td><td> B </td><td> Everything else overwrites anything </td>
 						</tr>
 						</tbody></table>
-					]],
+
+						<p>
+						<strong>msMask</strong> - the blocks that are the same in the other area are kept, all the
+						differing blocks are replaced with air. Meta is used in the comparison, too, two blocks of the
+						same type but different meta are considered different and thus replaced with air.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> A </td><td> A </td><td> Same blocks are kept </td>
+						</tr><tr>
+						<td> A </td><td> non-A </td><td> air </td><td> Differing blocks are replaced with air </td>
+						</tr>
+						</tbody></table>
+]],
 				},  -- Merge strategies
 			},  -- AdditionalInfo
 		},  -- cBlockArea

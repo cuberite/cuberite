@@ -52,6 +52,7 @@ public:
 		msImprint,
 		msLake,
 		msSpongePrint,
+		msMask,
 	} ;
 	
 	cBlockArea(void);
@@ -152,6 +153,14 @@ public:
 	+----------+--------+--------+
 	| A        | sponge | A      |  Sponge is the NOP block
 	| *        | B      | B      |  Everything else overwrites anything
+	
+	msMask:
+	Combines two areas, the blocks that are the same are kept, differing ones are reset to air
+	|  area block  |        |
+	| this | Src   | result |
+	+------+-------+--------+
+	| A    | A     | A      |  Same blocks are kept
+	| A    | non-A | air    |  Everything else is replaced with air
 
 	*/
 	void Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy);

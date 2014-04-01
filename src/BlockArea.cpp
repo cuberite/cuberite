@@ -173,6 +173,21 @@ static inline void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a
 
 
 
+/** Combinator used for cBlockArea::msMask merging */
+static inline void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+{
+	// If the blocks are the same, keep the dest; otherwise replace with air
+	if ((a_SrcType != a_DstType) || (a_SrcMeta != a_DstMeta))
+	{
+		a_DstType = E_BLOCK_AIR;
+		a_DstMeta = 0;
+	}
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBlockArea:
 
@@ -709,6 +724,21 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 			);
 			break;
 		}  // case msSpongePrint
+		
+		case msMask:
+		{
+			InternalMergeBlocks(
+				m_BlockTypes, a_Src.GetBlockTypes(),
+				DstMetas, SrcMetas,
+				SizeX, SizeY, SizeZ,
+				SrcOffX, SrcOffY, SrcOffZ,
+				DstOffX, DstOffY, DstOffZ,
+				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+				m_Size.x, m_Size.y, m_Size.z,
+				MergeCombinatorMask
+			);
+			break;
+		}  // case msMask
 		
 		default:
 		{
