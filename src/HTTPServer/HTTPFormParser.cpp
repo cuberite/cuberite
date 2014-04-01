@@ -243,7 +243,7 @@ void cHTTPFormParser::OnPartHeader(const AString & a_Key, const AString & a_Valu
 
 
 
-void cHTTPFormParser::OnPartData(const char * a_Data, int a_Size)
+void cHTTPFormParser::OnPartData(const char * a_Data, size_t a_Size)
 {
 	if (m_CurrentPartName.empty())
 	{

@@ -40,7 +40,7 @@ public:
 		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) = 0;
 		
 		/// Called when more file data has come for the current file in the form data
-		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, int a_Size) = 0;
+		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, size_t a_Size) = 0;
 		
 		/// Called when the current file part has ended in the form data
 		virtual void OnFileEnd(cHTTPFormParser & a_Parser) = 0;
@@ -103,7 +103,7 @@ protected:
 	// cMultipartParser::cCallbacks overrides:
 	virtual void OnPartStart (void) override;
 	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) override;
-	virtual void OnPartData  (const char * a_Data, int a_Size) override;
+	virtual void OnPartData  (const char * a_Data, size_t a_Size) override;
 	virtual void OnPartEnd   (void) override;
 } ;
 
