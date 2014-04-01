@@ -230,25 +230,25 @@ g_APIDesc =
 						</p>
 						<table class="inline">
 						<tbody><tr>
-						<th colspan="2">area block</th><th colspan="4">result</th>
+						<th colspan="2">area block</th><th colspan="3">result</th>
 						</tr>
 						<tr>
-						<th> this </th><th> Src </th><th> msOverwrite </th><th> msFillAir </th><th> msImprint </th><th> msDifference </th>
+						<th> this </th><th> Src </th><th> msOverwrite </th><th> msFillAir </th><th> msImprint </th>
 						</tr>
 						<tr>
-						<td> air </td><td> air </td><td> air </td><td> air </td><td> air </td><td> air </td>
+						<td> air </td><td> air </td><td> air </td><td> air </td><td> air </td>
 						</tr>
 						<tr>
-						<td> A </td><td> air </td><td> air </td><td> A </td><td> A </td><td> air </td>
+						<td> A </td><td> air </td><td> air </td><td> A </td><td> A </td>
 						</tr>
 						<tr>
-						<td> air </td><td> B </td><td> B </td><td> B </td><td> B </td><td> B </td>
+						<td> air </td><td> B </td><td> B </td><td> B </td><td> B </td>
 						</tr>
 						<tr>
-						<td> A </td><td> B </td><td> B </td><td> A </td><td> B </td><td> B </td>
+						<td> A </td><td> B </td><td> B </td><td> A </td><td> B </td>
 						</tr>
 						<tr>
-						<td> A </td><td> A </td><td> A </td><td> A </td><td> B </td><td> air </td>
+						<td> A </td><td> A </td><td> A </td><td> A </td><td> A </td>
 						</td>
 						</tbody></table>
 
@@ -258,13 +258,25 @@ g_APIDesc =
 						<li class="level1">msOverwrite completely overwrites all blocks with the Src's blocks</li>
 						<li class="level1">msFillAir overwrites only those blocks that were air</li>
 						<li class="level1">msImprint overwrites with only those blocks that are non-air</li>
-						<li class="level1">msDifference changes all the blocks which are the same to air. Otherwise the source block gets placed.</li>
 						</ol>
 						</p>
 
 						<h3>Special strategies</h3>
 						<p>For each strategy, evaluate the table rows from top downwards, the first match wins.</p>
-
+						
+						<p>
+						<strong>msDifference</strong> - changes all the blocks which are the same to air. Otherwise the source block gets placed.
+						</p>
+						<table><tbody<tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<td> * </td><td> B </td><td> B </td><td> The blocks are different so we use block B </td>
+						</tr><tr>
+						<td> B </td><td> B </td><td> Air </td><td> The blocks are the same so we get air. </td>
+						</tr>
+						</tbody></table>
+						
+						
 						<p>
 						<strong>msLake</strong> - used for merging areas with lava and water lakes, in the appropriate generator.
 						</p>
