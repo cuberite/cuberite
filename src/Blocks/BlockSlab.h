@@ -103,6 +103,7 @@ public:
 					a_BlockMeta = Meta & 0x7; break;
 				}
 			}
+			case BLOCK_FACE_NONE: return false;
 		}  // switch (a_BlockFace)
 		return true;
 	}

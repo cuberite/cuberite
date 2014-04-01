@@ -70,7 +70,7 @@ public:
 		};
 		cCallback Callback(a_Player, a_BlockMeta, static_cast<NIBBLETYPE>(a_BlockFace));
 		
-		a_BlockMeta = a_BlockFace;
+		a_BlockMeta = (NIBBLETYPE)a_BlockFace;
 		cWorld * World = (cWorld *) &a_WorldInterface;
 		World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
