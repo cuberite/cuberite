@@ -343,6 +343,29 @@ AString cCompositeChat::ExtractText(void) const
 
 
 
+cMCLogger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
+{
+	switch (a_MessageType)
+	{
+		case mtCustom:         return cMCLogger::llRegular;
+		case mtFailure:        return cMCLogger::llWarning;
+		case mtInformation:    return cMCLogger::llInfo;
+		case mtSuccess:        return cMCLogger::llRegular;
+		case mtWarning:        return cMCLogger::llWarning;
+		case mtFatal:          return cMCLogger::llError;
+		case mtDeath:          return cMCLogger::llRegular;
+		case mtPrivateMessage: return cMCLogger::llRegular;
+		case mtJoin:           return cMCLogger::llRegular;
+		case mtLeave:          return cMCLogger::llRegular;
+	}
+	ASSERT(!"Unhandled MessageType");
+	return cMCLogger::llError;
+}
+
+
+
+
+
 void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
 {
 	if (a_AddStyle.empty())

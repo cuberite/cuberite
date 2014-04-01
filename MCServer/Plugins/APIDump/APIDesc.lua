@@ -2665,8 +2665,8 @@ end
 				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
 				LOG =
 				{
-					{Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text) "},
-					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'normal' severity (gray text) "},
+					{Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType."},
 				},
 				LOGERROR =
 				{

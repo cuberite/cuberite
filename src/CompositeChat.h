@@ -173,6 +173,10 @@ public:
 	
 	const cParts & GetParts(void) const { return m_Parts; }
 	
+	/** Converts the MessageType to a LogLevel value.
+	Used by the logging bindings when logging a cCompositeChat object. */
+	static cMCLogger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
+	
 protected:
 	/** All the parts that */
 	cParts m_Parts;

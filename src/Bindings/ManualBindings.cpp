@@ -143,7 +143,16 @@ static AString GetLogMessage(lua_State * tolua_S)
 
 static int tolua_LOG(lua_State * tolua_S)
 {
-	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), 0);
+	// If the param is a cCompositeChat, read the log level from it:
+	cMCLogger::eLogLevel LogLevel = cMCLogger::llRegular;
+	tolua_Error err;
+	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	{
+		LogLevel = cCompositeChat::MessageTypeToLogLevel(((cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL))->GetMessageType());
+	}
+	
+	// Log the message:
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), LogLevel);
 	return 0;
 }
 
@@ -153,7 +162,7 @@ static int tolua_LOG(lua_State * tolua_S)
 
 static int tolua_LOGINFO(lua_State * tolua_S)
 {
-	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), 1);
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llInfo);
 	return 0;
 }
 
@@ -163,7 +172,7 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 
 static int tolua_LOGWARN(lua_State * tolua_S)
 {
-	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), 2);
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llWarning);
 	return 0;
 }
 
@@ -173,7 +182,7 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 
 static int tolua_LOGERROR(lua_State * tolua_S)
 {
-	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), 3);
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llError);
 	return 0;
 }
 

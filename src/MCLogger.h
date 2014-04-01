@@ -10,25 +10,36 @@ class cLog;
 
 
 
-class cMCLogger														// tolua_export
-{																	// tolua_export
-public:																// tolua_export
-	/// Creates a logger with the default filename, "logs/LOG_<timestamp>.log"
+// tolua_begin
+class cMCLogger
+{
+public:
+	enum eLogLevel
+	{
+		llRegular,
+		llInfo,
+		llWarning,
+		llError,
+	};
+	// tolua_end
+	
+	/** Creates a logger with the default filename, "logs/LOG_<timestamp>.log" */
 	cMCLogger(void);
 	
-	/// Creates a logger with the specified filename inside "logs" folder
+	/** Creates a logger with the specified filename inside "logs" folder */
 	cMCLogger(const AString & a_FileName);  // tolua_export
 	
 	~cMCLogger();													// tolua_export
 
-	void Log(const char* a_Format, va_list a_ArgList)   FORMATSTRING(2, 0);
-	void Info(const char* a_Format, va_list a_ArgList)  FORMATSTRING(2, 0);
-	void Warn(const char* a_Format, va_list a_ArgList)  FORMATSTRING(2, 0);
-	void Error(const char* a_Format, va_list a_ArgList) FORMATSTRING(2, 0);
+	void Log  (const char * a_Format, va_list a_ArgList) FORMATSTRING(2, 0);
+	void Info (const char * a_Format, va_list a_ArgList) FORMATSTRING(2, 0);
+	void Warn (const char * a_Format, va_list a_ArgList) FORMATSTRING(2, 0);
+	void Error(const char * a_Format, va_list a_ArgList) FORMATSTRING(2, 0);
 
-	void LogSimple(const char* a_Text, int a_LogType = 0 );			// tolua_export
+	/** Logs the simple text message at the specified log level. */
+	void LogSimple(const char * a_Text, eLogLevel a_LogLevel = llRegular);  // tolua_export
 
-	static cMCLogger* GetInstance();
+	static cMCLogger * GetInstance();
 private:
 	enum eColorScheme
 	{
