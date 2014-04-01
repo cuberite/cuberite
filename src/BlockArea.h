@@ -52,6 +52,7 @@ public:
 		msImprint,
 		msLake,
 		msSpongePrint,
+		msDifference,
 		msMask,
 	} ;
 	
