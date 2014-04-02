@@ -22,14 +22,99 @@ public:
 		a_Pickups.push_back(cItem(E_ITEM_HEAD, 1, 0));
 	}
 
-	bool TrySpawnWither(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	bool TrySpawnWither(cChunkInterface & a_ChunkInterface, cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		if (a_BlockY < 2)
 		{
 			return false;
 		}
+
+		class cCallback : public cMobHeadCallback
+		{
+			bool m_IsWither;
+			
+			virtual bool Item (cMobHeadEntity * a_MobHeadEntity)
+			{
+				m_IsWither = (a_MobHeadEntity->GetType() == SKULL_TYPE_WITHER);
+
+				return false;
+			}
 		
-		// TODO 2014-03-24 xdot
+		public:
+			cCallback () : m_IsWither(false) {}
+
+			bool IsWither(void) const { return m_IsWither; }
+
+			void Reset(void) { m_IsWither = false; }
+		} CallbackA, CallbackB;
+
+		a_World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, CallbackA);
+
+		if (!CallbackA.IsWither())
+		{
+			return false;
+		}
+
+		CallbackA.Reset();
+		
+		BLOCKTYPE BlockY1 = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
+		BLOCKTYPE BlockY2 = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 2, a_BlockZ);
+
+		if ((BlockY1 != E_BLOCK_SOULSAND) || (BlockY2 != E_BLOCK_SOULSAND))
+		{
+			return false;
+		}
+		
+		a_World->DoWithMobHeadAt(a_BlockX - 1, a_BlockY, a_BlockZ, CallbackA);
+		a_World->DoWithMobHeadAt(a_BlockX + 1, a_BlockY, a_BlockZ, CallbackB);
+
+		BLOCKTYPE Block1 = a_ChunkInterface.GetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ);
+		BLOCKTYPE Block2 = a_ChunkInterface.GetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ);
+
+		if ((Block1 == E_BLOCK_SOULSAND) && (Block2 == E_BLOCK_SOULSAND) && CallbackA.IsWither() && CallbackB.IsWither())
+		{
+			a_ChunkInterface.FastSetBlock(a_BlockX,     a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(a_BlockX + 1, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(a_BlockX - 1, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(a_BlockX,     a_BlockY - 2, a_BlockZ, E_BLOCK_AIR, 0);
+
+			// Block entities
+			a_World->SetBlock(a_BlockX + 1, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+			a_World->SetBlock(a_BlockX,     a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+			a_World->SetBlock(a_BlockX - 1, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+
+			// Spawn the wither:
+			a_World->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtWither);
+
+			return true;
+		}
+
+		CallbackA.Reset();
+		CallbackB.Reset();
+		
+		a_World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ - 1, CallbackA);
+		a_World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ + 1, CallbackB);
+
+		Block1 = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1);
+		Block2 = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1);
+
+		if ((Block1 == E_BLOCK_SOULSAND) && (Block2 == E_BLOCK_SOULSAND) && CallbackA.IsWither() && CallbackB.IsWither())
+		{
+			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ,     E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ + 1, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ - 1, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 2, a_BlockZ,     E_BLOCK_AIR, 0);
+
+			// Block entities
+			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ + 1, E_BLOCK_AIR, 0);
+			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ,     E_BLOCK_AIR, 0);
+			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ - 1, E_BLOCK_AIR, 0);
+
+			// Spawn the wither:
+			a_World->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtWither);
+
+			return true;
+		}
 
 		return false;
 	}
@@ -75,7 +160,24 @@ public:
 		World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
 
-		TrySpawnWither(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		if (a_BlockMeta == SKULL_TYPE_WITHER)
+		{
+			static const Vector3i Coords[] =
+			{
+				Vector3i( 0, 0,  0),
+				Vector3i( 1, 0,  0),
+				Vector3i(-1, 0,  0),
+				Vector3i( 0, 0,  1),
+				Vector3i( 0, 0, -1),
+			};
+			for (size_t i = 0; i < ARRAYCOUNT(Coords); ++i)
+			{
+				if (TrySpawnWither(a_ChunkInterface, World, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z))
+				{
+					break;
+				}
+			}  // for i - Coords[]
+		}
 	}
 } ;
 

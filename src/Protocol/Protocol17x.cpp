@@ -2535,6 +2535,7 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteByte(Frame.GetRotation());
 			break;
 		}
+		default: break;
 	}
 }
 
@@ -2657,6 +2658,15 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		{
 			WriteByte(0x15);
 			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);
+			break;
+		}
+
+		case cMonster::mtWither:
+		{
+			WriteByte(0x54); // Int at index 20
+			WriteInt(((const cWither &)a_Mob).GetNumInvulnerableTicks());
+			WriteByte(0x66); // Float at index 6
+			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
 		}
 		

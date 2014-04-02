@@ -13,8 +13,27 @@ cWither::cWither(void) :
 	m_InvulnerableTicks(220)
 {
 	SetMaxHealth(300);
+}
 
+
+
+
+
+bool cWither::IsArmored(void) const
+{
+	return GetHealth() <= (GetMaxHealth() / 2);
+}
+
+
+
+
+
+bool cWither::Initialize(cWorld * a_World)
+{
+	// Set health before BroadcastSpawnEntity()
 	SetHealth(GetMaxHealth() / 3);
+
+	return super::Initialize(a_World);
 }
 
 
@@ -29,6 +48,11 @@ void cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 
 	if (m_InvulnerableTicks > 0)
+	{
+		return;
+	}
+
+	if (IsArmored() && (a_TDI.DamageType == dtRangedAttack))
 	{
 		return;
 	}
@@ -60,6 +84,8 @@ void cWither::Tick(float a_Dt, cChunk & a_Chunk)
 			Heal(10);
 		}
 	}
+
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 

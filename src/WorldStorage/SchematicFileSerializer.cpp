@@ -14,6 +14,39 @@
 
 
 
+#ifdef SELF_TEST
+
+static class cSchematicStringSelfTest
+{
+public:
+	cSchematicStringSelfTest(void)
+	{
+		cBlockArea ba;
+		ba.Create(21, 256, 21);
+		ba.RelLine(0, 0, 0, 9, 8, 7, cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_WOODEN_STAIRS, 1);
+		AString Schematic;
+		if (!cSchematicFileSerializer::SaveToSchematicString(ba, Schematic))
+		{
+			assert_test(!"Schematic failed to save!");
+		}
+		cBlockArea ba2;
+		if (!cSchematicFileSerializer::LoadFromSchematicString(ba2, Schematic))
+		{
+			assert_test(!"Schematic failed to load!");
+		}
+	}
+} g_SelfTest;
+
+#endif
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSchematicFileSerializer:
+
 bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
 {
 	// Un-GZip the contents:
