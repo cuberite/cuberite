@@ -122,5 +122,3 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 
 	AddSpeed(ToAddSpeed);
 }
-
-	

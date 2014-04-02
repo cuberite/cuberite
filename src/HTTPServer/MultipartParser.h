@@ -22,6 +22,7 @@ public:
 	class cCallbacks
 	{
 	public:
+		// Force a virtual destructor in descendants:
 		virtual ~cCallbacks() {}
 		
 		/** Called when a new part starts */
