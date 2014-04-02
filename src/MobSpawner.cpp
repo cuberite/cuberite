@@ -129,6 +129,11 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 	BLOCKTYPE TargetBlock = E_BLOCK_AIR;
 	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end() && a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
+		if ((a_RelY + 1 > cChunkDef::Height) || (a_RelY - 1 < 0))
+		{
+			return false;
+		}
+
 		NIBBLETYPE BlockLight = a_Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
 		NIBBLETYPE SkyLight = a_Chunk->GetSkyLight(a_RelX, a_RelY, a_RelZ);
 		BLOCKTYPE BlockAbove = a_Chunk->GetBlock(a_RelX, a_RelY + 1, a_RelZ);
@@ -200,7 +205,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			case cMonster::mtSpider:
 			{
 				bool CanSpawn = true;
-				bool HaveFloor = false;
+				bool HasFloor = false;
 				for (int x = 0; x < 2; ++x)
 				{
 					for(int z = 0; z < 2; ++z)
@@ -211,8 +216,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 						{
 							return false;
 						}
-						HaveFloor = (
-							HaveFloor ||
+						HasFloor = (
+							HasFloor ||
 							(
 								a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock) &&
 								!cBlockInfo::IsTransparent(TargetBlock)
@@ -220,7 +225,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 						);
 					}
 				}
-				return CanSpawn && HaveFloor && (SkyLight <= 7) && (BlockLight <= 7);
+				return CanSpawn && HasFloor && (SkyLight <= 7) && (BlockLight <= 7);
 			}
 			
 			case cMonster::mtCreeper:

@@ -1064,7 +1064,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		// If clicked top face and slab occupies the top voxel, we want a slab to be placed above it (therefore increment Y)
 		// Else if clicked bottom face and slab occupies the bottom voxel, decrement Y for the same reason
 		// Don't touch coordinates if anything else because a dblslab opportunity is present
-		if((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
+		if ((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
 		{
 			++a_BlockY;
 		}
