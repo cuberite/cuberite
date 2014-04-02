@@ -82,11 +82,11 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_AttackRange(2)
 	, m_AttackInterval(0)
 	, m_SightDistance(25)
-	, m_DropChanceWeapon(0.085)
-	, m_DropChanceHelmet(0.085)
-	, m_DropChanceChestplate(0.085)
-	, m_DropChanceLeggings(0.085)
-	, m_DropChanceBoots(0.085)
+	, m_DropChanceWeapon(0.085f)
+	, m_DropChanceHelmet(0.085f)
+	, m_DropChanceChestplate(0.085f)
+	, m_DropChanceLeggings(0.085f)
+	, m_DropChanceBoots(0.085f)
 	, m_CanPickUpLoot(true)
 	, m_BurnsInDaylight(false)
 {
@@ -758,6 +758,7 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtSquid:        return mfWater;
 		case mtVillager:     return mfPassive;
 		case mtWitch:        return mfHostile;
+		case mtWither:       return mfHostile;
 		case mtWolf:         return mfHostile;
 		case mtZombie:       return mfHostile;
 		case mtZombiePigman: return mfHostile;

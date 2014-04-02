@@ -264,11 +264,17 @@ template class SizeChecker<UInt16, 2>;
 #define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
-/// A generic interface used mainly in ForEach() functions
+
+
+
+
+/** A generic interface used mainly in ForEach() functions */
 template <typename Type> class cItemCallback
 {
 public:
-	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating
+	virtual ~cItemCallback() {}
+	
+	/** Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
 	virtual bool Item(Type * a_Type) = 0;
 } ;
 

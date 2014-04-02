@@ -9,16 +9,30 @@
 
 --- Lists all the subcommands that the player has permissions for
 local function ListSubcommands(a_Player, a_Subcommands, a_CmdString)
-	a_Player:SendMessage("The " .. a_CmdString .. " command requires another verb:");
+	if (a_Player == nil) then
+		LOGINFO("The " .. a_CmdString .. " command requires another verb:")
+	else
+		a_Player:SendMessage("The " .. a_CmdString .. " command requires another verb:")
+	end
+	
+	-- Enum all the subcommands:
 	local Verbs = {};
 	for cmd, info in pairs(a_Subcommands) do
 		if (a_Player:HasPermission(info.Permission or "")) then
-			table.insert(Verbs, a_CmdString .. " " .. cmd);
+			table.insert(Verbs, "  " .. a_CmdString .. " " .. cmd);
 		end
 	end
 	table.sort(Verbs);
-	for idx, verb in ipairs(Verbs) do
-		a_Player:SendMessage(verb);
+	
+	-- Send the list:
+	if (a_Player == nil) then
+		for idx, verb in ipairs(Verbs) do
+			LOGINFO(verb);
+		end
+	else
+		for idx, verb in ipairs(Verbs) do
+			a_Player:SendMessage(verb);
+		end
 	end
 end
 
@@ -28,6 +42,7 @@ end
 
 --- This is a generic command callback used for handling multicommands' parent commands
 -- For example, if there are "/gal save" and "/gal load" commands, this callback handles the "/gal" command
+-- It is used for both console and in-game commands; the console version has a_Player set to nil
 local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_Level)
 	local Verb = a_Split[a_Level + 1];
 	if (Verb == nil) then
@@ -46,7 +61,11 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 		if (a_Level > 1) then
 			-- This is a true subcommand, display the message and make MCS think the command was handled
 			-- Otherwise we get weird behavior: for "/cmd verb" we get "unknown command /cmd" although "/cmd" is valid
-			a_Player:SendMessage("The " .. a_CmdString .. " command doesn't support verb " .. Verb);
+			if (a_Player == nil) then
+				LOGWARNING("The " .. a_CmdString .. " command doesn't support verb " .. Verb)
+			else
+				a_Player:SendMessage("The " .. a_CmdString .. " command doesn't support verb " .. Verb)
+			end
 			return true;
 		end
 		-- This is a top-level command, let MCS handle the unknown message
@@ -54,18 +73,20 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 	end
 	
 	-- Check the permission:
-	if not(a_Player:HasPermission(Subcommand.Permission or "")) then
-		a_Player:SendMessage("You don't have permission to execute this command");
-		return true;
+	if (a_Player ~= nil) then
+		if not(a_Player:HasPermission(Subcommand.Permission or "")) then
+			a_Player:SendMessage("You don't have permission to execute this command");
+			return true;
+		end
 	end
 	
-	-- Check if the handler is valid:
+	-- If the handler is not valid, check the next sublevel:
 	if (Subcommand.Handler == nil) then
 		if (Subcommand.Subcommands == nil) then
 			LOG("Cannot find handler for command " .. a_CmdString .. " " .. Verb);
 			return false;
 		end
-		ListSubcommands(a_Player, Subcommand.Subcommands, a_CmdString .. " " .. Verb);
+		MultiCommandHandler(a_Split, a_Player, a_CmdString .. " " .. Verb, Subcommand, a_Level + 1);
 		return true;
 	end
 	
@@ -149,21 +170,27 @@ end
 function RegisterPluginInfoConsoleCommands()
 	-- A sub-function that registers all subcommands of a single command, using the command's Subcommands table
 	-- The a_Prefix param already contains the space after the previous command
-	local function RegisterSubcommands(a_Prefix, a_Subcommands)
+	local function RegisterSubcommands(a_Prefix, a_Subcommands, a_Level)
 		assert(a_Subcommands ~= nil);
 		
 		for cmd, info in pairs(a_Subcommands) do
 			local CmdName = a_Prefix .. cmd;
-			cPluginManager.BindConsoleCommand(cmd, info.Handler, info.HelpString or "");
+			local Handler = info.Handler
+			if (Handler == nil) then
+				Handler = function(a_Split)
+					return MultiCommandHandler(a_Split, nil, CmdName, info, a_Level);
+				end
+			end
+			cPluginManager.BindConsoleCommand(CmdName, Handler, info.HelpString or "");
 			-- Recursively register any subcommands:
 			if (info.Subcommands ~= nil) then
-				RegisterSubcommands(a_Prefix .. cmd .. " ", info.Subcommands);
+				RegisterSubcommands(a_Prefix .. cmd .. " ", info.Subcommands, a_Level + 1);
 			end
 		end
 	end
 	
 	-- Loop through all commands in the plugin info, register each:
-	RegisterSubcommands("", g_PluginInfo.ConsoleCommands);
+	RegisterSubcommands("", g_PluginInfo.ConsoleCommands, 1);
 end
 
 

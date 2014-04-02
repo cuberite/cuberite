@@ -3,17 +3,17 @@
 
 #include "BlockHandler.h"
 #include "Chunk.h"
-
+#include "MetaRotator.h"
 
 
 
 
 class cBlockRedstoneRepeaterHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
 {
 public:
 	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
 	{
 	}
 

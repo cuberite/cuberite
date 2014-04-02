@@ -32,11 +32,15 @@
 #include "../Mobs/IncludeAllMonsters.h"
 
 #include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/ProjectileEntity.h"
 #include "../Entities/TNTEntity.h"
+#include "../Entities/ExpOrb.h"
+#include "../Entities/HangingEntity.h"
+#include "../Entities/ItemFrame.h"
 
 
 
@@ -366,6 +370,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				{
 					case E_BLOCK_AIR:
 					case E_BLOCK_LEAVES:
+					case E_BLOCK_NEW_LEAVES:
 					{
 						// nothing needed
 						break;
@@ -1053,6 +1058,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadBoatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "EnderCrystal", a_IDTagLength) == 0)
+	{
+		LoadEnderCrystalFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "FallingBlock", a_IDTagLength) == 0)
 	{
 		LoadFallingBlockFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1097,6 +1106,18 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	else if (strncmp(a_IDTag, "Item", a_IDTagLength) == 0)
 	{
 		LoadPickupFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "PrimedTnt", a_IDTagLength) == 0)
+	{
+		LoadTNTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "XPOrb", a_IDTagLength) == 0)
+	{
+		LoadExpOrbFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "ItemFrame", a_IDTagLength) == 0)
+	{
+		LoadItemFrameFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 	else if (strncmp(a_IDTag, "Arrow", a_IDTagLength) == 0)
 	{
@@ -1222,7 +1243,7 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadWitchFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
-	else if (strncmp(a_IDTag, "Wither", a_IDTagLength) == 0)
+	else if (strncmp(a_IDTag, "WitherBoss", a_IDTagLength) == 0)
 	{
 		LoadWitherFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
@@ -1237,10 +1258,6 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	else if (strncmp(a_IDTag, "PigZombie", a_IDTagLength) == 0)
 	{
 		LoadPigZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "PrimedTnt", a_IDTagLength) == 0)
-	{
-		LoadTNTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 	// TODO: other entities
 }
@@ -1257,6 +1274,20 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		return;
 	}
 	a_Entities.push_back(Boat.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cEnderCrystal> EnderCrystal(new cEnderCrystal(0, 0, 0));
+	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	a_Entities.push_back(EnderCrystal.release());
 }
 
 
@@ -1384,6 +1415,7 @@ void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
+	// Load item:
 	int ItemTag = a_NBT.FindChildByName(a_TagIdx, "Item");
 	if ((ItemTag < 0) || (a_NBT.GetType(ItemTag) != TAG_Compound))
 	{
@@ -1394,12 +1426,170 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		return;
 	}
+	
 	std::auto_ptr<cPickup> Pickup(new cPickup(0, 0, 0, Item, false)); // Pickup delay doesn't matter, just say false
 	if (!LoadEntityBaseFromNBT(*Pickup.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	// Load health:
+	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
+	if (Health > 0)
+	{
+		Pickup->SetHealth((int) (a_NBT.GetShort(Health) & 0xFF));
+	}
+	
+	// Load age:
+	int Age = a_NBT.FindChildByName(a_TagIdx, "Age");
+	if (Age > 0)
+	{
+		Pickup->SetAge(a_NBT.GetShort(Age));
+	}
+
 	a_Entities.push_back(Pickup.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cTNTEntity> TNT(new cTNTEntity(0.0, 0.0, 0.0, 0));
+	if (!LoadEntityBaseFromNBT(*TNT.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// Load Fuse Ticks:
+	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
+	if (FuseTicks > 0)
+	{
+		TNT->SetFuseTicks((int) a_NBT.GetByte(FuseTicks));
+	}
+	
+	a_Entities.push_back(TNT.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cExpOrb> ExpOrb(new cExpOrb(0.0, 0.0, 0.0, 0));
+	if (!LoadEntityBaseFromNBT(*ExpOrb.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	// Load Health:
+	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
+	if (Health > 0)
+	{
+		ExpOrb->SetHealth((int) (a_NBT.GetShort(Health) & 0xFF));
+	}
+
+	// Load Age:
+	int Age = a_NBT.FindChildByName(a_TagIdx, "Age");
+	if (Age > 0)
+	{
+		ExpOrb->SetAge(a_NBT.GetShort(Age));
+	}
+
+	// Load Reward (Value):
+	int Reward = a_NBT.FindChildByName(a_TagIdx, "Value");
+	if (Reward > 0)
+	{
+		ExpOrb->SetReward(a_NBT.GetShort(Reward));
+	}
+
+	a_Entities.push_back(ExpOrb.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int Direction = a_NBT.FindChildByName(a_TagIdx, "Direction");
+	if (Direction > 0)
+	{
+		Direction = (int)a_NBT.GetByte(Direction);
+		if ((Direction < 0) || (Direction > 5))
+		{
+			a_Hanging.SetDirection(BLOCK_FACE_NORTH);
+		}
+		else
+		{
+			a_Hanging.SetDirection(static_cast<eBlockFace>(Direction));
+		}
+	}
+	else
+	{
+		Direction = a_NBT.FindChildByName(a_TagIdx, "Dir");
+		if (Direction > 0)
+		{
+			switch ((int)a_NBT.GetByte(Direction))
+			{
+				case 0:   a_Hanging.SetDirection(BLOCK_FACE_NORTH);  break;
+				case 1:   a_Hanging.SetDirection(BLOCK_FACE_TOP);    break;
+				case 2:   a_Hanging.SetDirection(BLOCK_FACE_BOTTOM); break;
+				case 3:   a_Hanging.SetDirection(BLOCK_FACE_SOUTH);  break;
+			}
+		}
+	}
+
+	int TileX = a_NBT.FindChildByName(a_TagIdx, "TileX");
+	int TileY = a_NBT.FindChildByName(a_TagIdx, "TileY");
+	int TileZ = a_NBT.FindChildByName(a_TagIdx, "TileZ");
+	if ((TileX > 0) && (TileY > 0) && (TileZ > 0))
+	{
+		a_Hanging.SetPosition(
+			(double)a_NBT.GetInt(TileX),
+			(double)a_NBT.GetInt(TileY),
+			(double)a_NBT.GetInt(TileZ)
+		);
+	}
+}
+
+
+
+
+
+void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	// Load item:
+	int ItemTag = a_NBT.FindChildByName(a_TagIdx, "Item");
+	if ((ItemTag < 0) || (a_NBT.GetType(ItemTag) != TAG_Compound))
+	{
+		return;
+	}
+	cItem Item;
+	if (!LoadItemFromNBT(Item, a_NBT, ItemTag))
+	{
+		return;
+	}
+	
+	std::auto_ptr<cItemFrame> ItemFrame(new cItemFrame(BLOCK_FACE_NONE, 0.0, 0.0, 0.0));
+	if (!LoadEntityBaseFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	ItemFrame->SetItem(Item);
+
+	LoadHangingFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx);
+	
+	// Load Rotation:
+	int Rotation = a_NBT.FindChildByName(a_TagIdx, "ItemRotation");
+	if (Rotation > 0)
+	{
+		ItemFrame->SetRotation((Byte)a_NBT.GetByte(Rotation));
+	}
+	
+	a_Entities.push_back(ItemFrame.release());
 }
 
 
@@ -2079,6 +2269,12 @@ void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
+	int CurrLine = a_NBT.FindChildByName(a_TagIdx, "Invul");
+	if (CurrLine > 0)
+	{
+		Monster->SetNumInvulnerableTicks(a_NBT.GetInt(CurrLine));
+	}
+
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2172,28 +2368,6 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 
 	a_Entities.push_back(Monster.release());
-}
-
-
-
-
-
-void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
-{
-	std::auto_ptr<cTNTEntity> TNT(new cTNTEntity(0.0, 0.0, 0.0, 0));
-	if (!LoadEntityBaseFromNBT(*TNT.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	// Load Fuse Ticks:
-	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
-	if (FuseTicks > 0)
-	{
-		TNT->SetFuseTicks((int) a_NBT.GetByte(FuseTicks));
-	}
-	
-	a_Entities.push_back(TNT.release());
 }
 
 

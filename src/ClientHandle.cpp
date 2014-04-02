@@ -941,6 +941,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		}
 		return;
 	}
+
+	m_NumBlockChangeInteractionsThisTick++;
 	
 	if (!CheckBlockInteractionsRate())
 	{
@@ -960,7 +962,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		);
 		
 		// Let's send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
-		if (a_BlockFace > -1)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -988,7 +990,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
-	if (ItemHandler->IsPlaceable() && (a_BlockFace > -1))
+	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
@@ -1026,6 +1028,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler)
 {
+	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
 	if (a_BlockFace < 0)
 	{
 		// Clicked in air
@@ -1036,7 +1039,6 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 	BLOCKTYPE ClickedBlock;
 	NIBBLETYPE ClickedBlockMeta;
-	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
 	NIBBLETYPE EquippedBlockDamage = (NIBBLETYPE)(m_Player->GetEquippedItem().m_ItemDamage);
 
 	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
@@ -1053,8 +1055,8 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		cBlockSlabHandler::IsAnySlabType(EquippedBlock) &&              // Is the player placing another slab?
 		((ClickedBlockMeta & 0x07) == EquippedBlockDamage) &&           // Is it the same slab type?
 		(
-			(a_BlockFace == BLOCK_FACE_TOP) ||                            // Clicking the top of a bottom slab
-			(a_BlockFace == BLOCK_FACE_BOTTOM)                            // Clicking the bottom of a top slab
+			(a_BlockFace == BLOCK_FACE_TOP) ||                          // Clicking the top of a bottom slab
+			(a_BlockFace == BLOCK_FACE_BOTTOM)                          // Clicking the bottom of a top slab
 		)
 	)
 	{
@@ -1138,7 +1140,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	// The actual block placement:
 	World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	if (m_Player->GetGameMode() != gmCreative)
+	if (!m_Player->IsGameModeCreative())
 	{
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
@@ -1606,10 +1608,8 @@ void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
 	
-	// Do NOT stream new chunks, the new world runs its own tick thread and may deadlock
-	// Instead, the chunks will be streamed when the client is moved to the new world's Tick list,
-	// by setting state to csAuthenticated
-	m_State = csAuthenticated;
+	// StreamChunks() called in cPlayer::MoveToWorld() after new world has been set
+	// Meanwhile here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
 	m_HasSentPlayerChunk = false;

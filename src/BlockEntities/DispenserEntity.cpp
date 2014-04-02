@@ -138,6 +138,12 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 		
+		case E_ITEM_FIRE_CHARGE:
+		{
+			// TODO: Spawn fireball entity
+			break;
+		}
+		
 		default:
 		{
 			DropFromSlot(a_Chunk, a_SlotNum);

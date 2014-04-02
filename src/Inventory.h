@@ -52,6 +52,8 @@ public:
 	
 	cInventory(cPlayer & a_Owner);
 	
+	virtual ~cInventory() {}
+	
 	// tolua_begin
 
 	/// Removes all items from the entire inventory

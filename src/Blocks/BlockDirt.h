@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../MersenneTwister.h"
+#include "../FastRandom.h"
 
 
 
@@ -44,12 +44,12 @@ public:
 		}
 		
 		// Grass spreads to adjacent dirt blocks:
-		MTRand rand;  // TODO: Replace with cFastRandom
+		cFastRandom rand;
 		for (int i = 0; i < 2; i++)  // Pick two blocks to grow to
 		{
-			int OfsX = rand.randInt(2) - 1;  // [-1 .. 1]
-			int OfsY = rand.randInt(4) - 3;  // [-3 .. 1]
-			int OfsZ = rand.randInt(2) - 1;  // [-1 .. 1]
+			int OfsX = rand.NextInt(3, a_RelX) - 1;  // [-1 .. 1]
+			int OfsY = rand.NextInt(5, a_RelY) - 3;  // [-3 .. 1]
+			int OfsZ = rand.NextInt(3, a_RelZ) - 1;  // [-1 .. 1]
 	
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;
@@ -79,7 +79,10 @@ public:
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
 			if ((cBlockInfo::IsOneHitDig(AboveDest) || cBlockInfo::IsTransparent(AboveDest)) && !IsBlockWater(AboveDest))
 			{
-				Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
+				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, BlockX * cChunkDef::Width, BlockY, BlockZ * cChunkDef::Width, ssGrassSpread))
+				{
+					Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
+				}
 			}
 		}  // for i - repeat twice
 	}

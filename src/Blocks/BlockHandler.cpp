@@ -6,10 +6,12 @@
 #include "../Root.h"
 #include "../Bindings/PluginManager.h"
 #include "../Chunk.h"
+#include "BlockAnvil.h"
 #include "BlockBed.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
 #include "BlockCactus.h"
+#include "BlockCake.h"
 #include "BlockCarpet.h"
 #include "BlockCauldron.h"
 #include "BlockChest.h"
@@ -39,6 +41,7 @@
 #include "BlockIce.h"
 #include "BlockLadder.h"
 #include "BlockLeaves.h"
+#include "BlockLilypad.h"
 #include "BlockNewLeaves.h"
 #include "BlockLever.h"
 #include "BlockMelon.h"
@@ -85,12 +88,14 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		// Block handlers, alphabetically sorted:
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
 		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:     return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BREWING_STAND:         return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BROWN_MUSHROOM:        return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_CACTUS:                return new cBlockCactusHandler          (a_BlockType);
+		case E_BLOCK_CAKE:                  return new cBlockCakeHandler            (a_BlockType);
 		case E_BLOCK_CARROTS:               return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_CARPET:                return new cBlockCarpetHandler          (a_BlockType);
 		case E_BLOCK_CAULDRON:              return new cBlockCauldronHandler        (a_BlockType);
@@ -138,6 +143,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_LAVA:                  return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
+		case E_BLOCK_LILY_PAD:              return new cBlockLilypadHandler         (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
 		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);

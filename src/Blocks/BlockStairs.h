@@ -2,17 +2,17 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "MetaRotater.h"
+#include "MetaRotator.h"
 
 
 
 
 class cBlockStairsHandler :
-	public cMetaRotater<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>
+	public cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>
 {
 public:
 	cBlockStairsHandler(BLOCKTYPE a_BlockType) :
-		cMetaRotater<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>(a_BlockType)
+		cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>(a_BlockType)
 	{
 
 	}
@@ -30,9 +30,7 @@ public:
 		UNUSED(a_BlockY);
 		UNUSED(a_BlockZ);
 		UNUSED(a_CursorX);
-		UNUSED(a_CursorY);
 		UNUSED(a_CursorZ);
-		UNUSED(a_BlockMeta);
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RotationToMetaData(a_Player->GetYaw());
 		switch (a_BlockFace)
@@ -51,9 +49,11 @@ public:
 				}
 				break;
 			}
+			case BLOCK_FACE_NONE: return false;
 		}
 		return true;
 	}
+	
 	
 	virtual const char * GetStepSound(void) override
 	{

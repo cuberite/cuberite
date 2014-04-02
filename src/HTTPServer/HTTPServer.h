@@ -37,6 +37,8 @@ public:
 	class cCallbacks
 	{
 	public:
+		virtual ~cCallbacks() {}
+		
 		/** Called when a new request arrives over a connection and its headers have been parsed.
 		The request body needn't have arrived yet.
 		*/
@@ -50,7 +52,7 @@ public:
 	} ;
 	
 	cHTTPServer(void);
-	~cHTTPServer();
+	virtual ~cHTTPServer();
 	
 	/// Initializes the server on the specified ports
 	bool Initialize(const AString & a_PortsIPv4, const AString & a_PortsIPv6);

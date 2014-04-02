@@ -26,7 +26,26 @@ public:
 			return false;
 		}
 		
-		a_Player->UseEquippedItem();
+		if (!a_Player->IsGameModeCreative())
+		{
+			switch (m_ItemType)
+			{
+				case E_ITEM_FLINT_AND_STEEL:
+				{
+					a_Player->UseEquippedItem();
+					break;
+				}
+				case E_ITEM_FIRE_CHARGE:
+				{
+					a_Player->GetInventory().RemoveOneEquippedItem();
+					break;
+				}
+				default:
+				{
+					ASSERT(!"Unknown Lighter Item!");
+				}
+			}
+		}
 
 		switch (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))
 		{
@@ -34,8 +53,8 @@ public:
 			{
 				// Activate the TNT:
 				a_World->BroadcastSoundEffect("game.tnt.primed", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 1.0f);
-				a_World->SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);  // 80 ticks to boom
 				a_World->SetBlock(a_BlockX,a_BlockY,a_BlockZ, E_BLOCK_AIR, 0);
+				a_World->SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);  // 80 ticks to boom
 				break;
 			}
 			default:
@@ -49,6 +68,7 @@ public:
 				if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
 				{
 					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);
+					a_World->BroadcastSoundEffect("fire.ignite", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0F, 1.04F);
 					break;
 				}
 			}

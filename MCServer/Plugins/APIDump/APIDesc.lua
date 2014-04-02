@@ -200,6 +200,8 @@ g_APIDesc =
 				msFillAir = { Notes = "Dst is overwritten by Src only where Src has air blocks" },
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
+				msSpongePrint = { Notes = "Similar to msImprint, sponge block doesn't overwrite anything, all other blocks overwrite everything"},
+				msMask = { Notes = "The blocks that are exactly the same are kept in Dst, all differing blocks are replaced by air"},
 			},
 			ConstantGroups =
 			{
@@ -247,6 +249,9 @@ g_APIDesc =
 						<tr>
 						<td> A </td><td> B </td><td> B </td><td> A </td><td> B </td>
 						</tr>
+						<tr>
+						<td> A </td><td> A </td><td> A </td><td> A </td><td> A </td>
+						</td>
 						</tbody></table>
 
 						<p>
@@ -258,12 +263,24 @@ g_APIDesc =
 						</ol>
 						</p>
 
+						<h3>Special strategies</h3>
+						<p>For each strategy, evaluate the table rows from top downwards, the first match wins.</p>
+						
 						<p>
-						Special strategies:
+						<strong>msDifference</strong> - changes all the blocks which are the same to air. Otherwise the source block gets placed.
 						</p>
-
+						<table><tbody<tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<td> * </td><td> B </td><td> B </td><td> The blocks are different so we use block B </td>
+						</tr><tr>
+						<td> B </td><td> B </td><td> Air </td><td> The blocks are the same so we get air. </td>
+						</tr>
+						</tbody></table>
+						
+						
 						<p>
-						<strong>msLake</strong> (evaluate top-down, first match wins):
+						<strong>msLake</strong> - used for merging areas with lava and water lakes, in the appropriate generator.
 						</p>
 						<table><tbody><tr>
 						<th colspan="2"> area block </th><th> </th><th> Notes </th>
@@ -293,7 +310,39 @@ g_APIDesc =
 						<td> A        </td><td> *      </td><td> A      </td><td> Everything else is left as it is </td>
 						</tr>
 						</tbody></table>
-					]],
+
+						<p>
+						<strong>msSpongePrint</strong> - used for most prefab-generators to merge the prefabs. Similar to
+						msImprint, but uses the sponge block as the NOP block instead, so that the prefabs may carve out air
+						pockets, too.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> sponge </td><td> A </td><td> Sponge is the NOP block </td>
+						</tr><tr>
+						<td> * </td><td> B </td><td> B </td><td> Everything else overwrites anything </td>
+						</tr>
+						</tbody></table>
+
+						<p>
+						<strong>msMask</strong> - the blocks that are the same in the other area are kept, all the
+						differing blocks are replaced with air. Meta is used in the comparison, too, two blocks of the
+						same type but different meta are considered different and thus replaced with air.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> A </td><td> A </td><td> Same blocks are kept </td>
+						</tr><tr>
+						<td> A </td><td> non-A </td><td> air </td><td> Differing blocks are replaced with air </td>
+						</tr>
+						</tbody></table>
+]],
 				},  -- Merge strategies
 			},  -- AdditionalInfo
 		},  -- cBlockArea
@@ -1666,25 +1715,26 @@ a_Player:OpenWindow(Window);
 				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
 				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player (based on the first group). Prefix player messages with this code." },
 				GetCurrentXp = { Params = "", Return = "number", Notes = "Returns the current amount of XP" },
-				GetEffectiveGameMode = { Params = "", Return = "{{eGameMode|GameMode}}", Notes = "Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions." },
+				GetEffectiveGameMode = { Params = "", Return = "{{Globals#GameMode|GameMode}}", Notes = "(OBSOLETE) Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions. Note that this function is the same as GetGameMode(), use that function instead." },
 				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
 				GetEyeHeight = { Return = "number", Notes = "Returns the height of the player's eyes, in absolute coords" },
 				GetEyePosition = { Return = "{{Vector3d|EyePositionVector}}", Notes = "Returns the position of the player's eyes, as a {{Vector3d}}" },
 				GetFloaterID = { Params = "", Return = "number", Notes = "Returns the Entity ID of the fishing hook floater that belongs to the player. Returns -1 if no floater is associated with the player. FIXME: Undefined behavior when the player has used multiple fishing rods simultanously." },
+				GetFlyingMaxSpeed = { Params = "", Return = "number", Notes = "Returns the maximum flying speed, relative to the default game flying speed. Defaults to 1, but plugins may modify it for faster or slower flying." },
 				GetFoodExhaustionLevel = { Params = "", Return = "number", Notes = "Returns the food exhaustion level" },
 				GetFoodLevel = { Params = "", Return = "number", Notes = "Returns the food level (number of half-drumsticks on-screen)" },
 				GetFoodPoisonedTicksRemaining = { Params = "", Return = "", Notes = "Returns the number of ticks left for the food posoning effect" },
 				GetFoodSaturationLevel = { Params = "", Return = "number", Notes = "Returns the food saturation (overcharge of the food level, is depleted before food level)" },
 				GetFoodTickTimer = { Params = "", Return = "", Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
-				GetGameMode = { Return = "{{eGameMode|GameMode}}", Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically."},
+				GetGameMode = { Return = "{{Globals#GameMode|GameMode}}", Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically."},
 				GetGroups = { Return = "array-table of {{cGroup}}", Notes = "Returns all the groups that this player is member of, as a table. The groups are stored in the array part of the table, beginning with index 1."},
 				GetIP = { Return = "string", Notes = "Returns the IP address of the player, if available. Returns an empty string if there's no IP to report."},
 				GetInventory = { Return = "{{cInventory|Inventory}}", Notes = "Returns the player's inventory"},
-				GetMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's current maximum speed (as reported by the 1.6.1+ protocols)" },
+				GetMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's current maximum speed, relative to the game default speed. Takes into account the sprinting / flying status." },
 				GetName = { Return = "string", Notes = "Returns the player's name" },
-				GetNormalMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's maximum walking speed (as reported by the 1.6.1+ protocols)" },
+				GetNormalMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's maximum walking speed, relative to the game default speed. Defaults to 1, but plugins may modify it for faster or slower walking." },
 				GetResolvedPermissions = { Return = "array-table of string", Notes = "Returns all the player's permissions, as a table. The permissions are stored in the array part of the table, beginning with index 1." },
-				GetSprintingMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's maximum sprinting speed (as reported by the 1.6.1+ protocols)" },
+				GetSprintingMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's maximum sprinting speed, relative to the game default speed. Defaults to 1.3, but plugins may modify it for faster or slower sprinting." },
 				GetStance = { Return = "number", Notes = "Returns the player's stance (Y-pos of player's eyes)" },
 				GetThrowSpeed = { Params = "SpeedCoeff", Return = "{{Vector3d}}", Notes = "Returns the speed vector for an object thrown with the specified speed coeff. Basically returns the normalized look vector multiplied by the coeff, with a slight random variation." },
 				GetThrowStartPos = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the position where the projectiles should start when thrown by this player." },
@@ -1721,17 +1771,18 @@ a_Player:OpenWindow(Window);
 				SetCrouch = { Params = "IsCrouched", Return = "", Notes = "Sets the crouch state, broadcasts the change to other players." },
 				SetCurrentExperience = { Params = "XPAmount", Return = "", Notes = "Sets the current amount of experience (and indirectly, the XP level)." },
 				SetFlying = { Params = "IsFlying", Notes = "Sets if the player is flying or not." },
+				SetFlyingMaxSpeed = { Params = "FlyingMaxSpeed", Return = "", Notes = "Sets the flying maximum speed, relative to the game default speed. The default value is 1. Sends the updated speed to the client." },
 				SetFoodExhaustionLevel = { Params = "ExhaustionLevel", Return = "", Notes = "Sets the food exhaustion to the specified level." },
 				SetFoodLevel = { Params = "FoodLevel", Return = "", Notes = "Sets the food level (number of half-drumsticks on-screen)" },
 				SetFoodPoisonedTicksRemaining = { Params = "FoodPoisonedTicksRemaining", Return = "", Notes = "Sets the number of ticks remaining for food poisoning. Doesn't send foodpoisoning effect to the client, use FoodPoison() for that." },
 				SetFoodSaturationLevel = { Params = "FoodSaturationLevel", Return = "", Notes = "Sets the food saturation (overcharge of the food level)." },
 				SetFoodTickTimer = { Params = "FoodTickTimer", Return = "", Notes = "Sets the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
-				SetGameMode = { Params = "{{eGameMode|NewGameMode}}", Return = "", Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit." },
+				SetGameMode = { Params = "{{Globals#GameMode|NewGameMode}}", Return = "", Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit." },
 				SetIsFishing = { Params = "IsFishing, [FloaterEntityID]", Return = "", Notes = "Sets the 'IsFishing' flag for the player. The floater entity ID is expected for the true variant, it can be omitted when IsFishing is false. FIXME: Undefined behavior when multiple fishing rods are used simultanously" },
 				SetName = { Params = "Name", Return = "", Notes = "Sets the player name. This rename will NOT be visible to any players already in the server who are close enough to see this player." },
-				SetNormalMaxSpeed = { Params = "NormalMaxSpeed", Return = "", Notes = "Sets the normal (walking) maximum speed (as reported by the 1.6.1+ protocols)" },
+				SetNormalMaxSpeed = { Params = "NormalMaxSpeed", Return = "", Notes = "Sets the normal (walking) maximum speed, relative to the game default speed. The default value is 1. Sends the updated speed to the client, if appropriate." },
 				SetSprint = { Params = "IsSprinting", Return = "", Notes = "Sets whether the player is sprinting or not." },
-				SetSprintingMaxSpeed = { Params = "SprintingMaxSpeed", Return = "", Notes = "Sets the sprinting maximum speed (as reported by the 1.6.1+ protocols)" },
+				SetSprintingMaxSpeed = { Params = "SprintingMaxSpeed", Return = "", Notes = "Sets the sprinting maximum speed, relative to the game default speed. The default value is 1.3. Sends the updated speed to the client, if appropriate." },
 				SetVisible = { Params = "IsVisible", Return = "", Notes = "Sets the player visibility to other players" },
 				XpForLevel = { Params = "XPLevel", Return = "number", Notes = "(STATIC) Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp()." },
 			},
@@ -1824,6 +1875,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			Constants =
 			{
+				HOOK_BLOCK_SPREAD = { Notes = "Called when a block spreads based on world conditions" },
 				HOOK_BLOCK_TO_PICKUPS = { Notes = "Called when a block has been dug and is being converted to pickups. The server has provided the default pickups and the plugins may modify them." },
 				HOOK_CHAT = { Notes = "Called when a client sends a chat message that is not a command. The plugin may modify the chat message" },
 				HOOK_CHUNK_AVAILABLE = { Notes = "Called when a chunk is loaded or generated and becomes available in the {{cWorld|world}}." },
@@ -2644,11 +2696,31 @@ end
 				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
 				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
 				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
-				LOG = {Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text) "},
-				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
-				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
-				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
-				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+				LOG =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType."},
+				},
+				LOGERROR =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'error' severity (black text on red background)"},
+				},
+				LOGINFO =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'info' severity (yellow text)"},
+				},
+				LOGWARN =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+				},
+				LOGWARNING =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text)"},
+				},
 				MirrorBlockFaceY = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it)." },
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
 				NormalizeAngleDegrees = { Params = "AngleDegrees", Return = "AngleDegrees", Notes = "Returns the angle, wrapped into the [-180, +180) range." },
@@ -2765,6 +2837,14 @@ end
 						data provided with the explosions, such as the exploding {{cCreeper|creeper}} entity or the
 						{{Vector3i|coords}} of the exploding bed.
 					]],
+				},
+				SpreadSource =
+				{
+					Include = "^ss.*",
+					TextBefore = [[
+						These constants are used to differentiate the various sources of spreads, such as grass growing.
+						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
+					]],
 				}
 			},
 		},  -- Globals
@@ -2792,11 +2872,11 @@ end
 		"Globals.xpcall",
 		"Globals.decoda_output",  -- When running under Decoda, this function gets added to the global namespace
 		"sqlite3.__newindex",
-		"%a+\.__%a+",        -- AnyClass.__Anything
-		"%a+\.\.collector",  -- AnyClass..collector
-		"%a+\.new",          -- AnyClass.new
-		"%a+.new_local",     -- AnyClass.new_local
-		"%a+.delete",        -- AnyClass.delete
+		"%a+%.__%a+",        -- AnyClass.__Anything
+		"%a+%.%.collector",  -- AnyClass..collector
+		"%a+%.new",          -- AnyClass.new
+		"%a+%.new_local",    -- AnyClass.new_local
+		"%a+%.delete",       -- AnyClass.delete
 
 		-- Functions global in the APIDump plugin:
 		"CreateAPITables",
@@ -2834,6 +2914,7 @@ end
 		-- No sorting is provided for these, they will be output in the same order as defined here
 		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
 		{ FileName = "SettingUpDecoda.html", Title = "Setting up the Decoda Lua IDE" },
+		{ FileName = "SettingUpZeroBrane.html", Title = "Setting up the ZeroBrane Studio Lua IDE" },
 		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
 	}
 } ;

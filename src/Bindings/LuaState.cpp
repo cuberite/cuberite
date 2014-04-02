@@ -479,6 +479,18 @@ void cLuaState::Push(cEntity * a_Entity)
 
 
 
+void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(cMonster * a_Monster)
 {
 	ASSERT(IsValid());
@@ -689,9 +701,10 @@ void cLuaState::Push(void * a_Ptr)
 	ASSERT(IsValid());
 
 	// Investigate the cause of this - what is the callstack?
-	LOGWARNING("Lua engine encountered an error - attempting to push a plain pointer");
+	// One code path leading here is the OnHookExploding / OnHookExploded with exotic parameters. Need to decide what to do with them
+	LOGWARNING("Lua engine: attempting to push a plain pointer, pushing nil instead.");
+	LOGWARNING("This indicates an unimplemented part of MCS bindings");
 	LogStackTrace();
-	ASSERT(!"A plain pointer should never be pushed on Lua stack");
 	
 	lua_pushnil(m_LuaState);
 	m_NumCurrentFunctionArgs += 1;
@@ -1080,20 +1093,20 @@ bool cLuaState::ReportErrors(lua_State * a_LuaState, int a_Status)
 
 
 
-void cLuaState::LogStackTrace(void)
+void cLuaState::LogStackTrace(int a_StartingDepth)
 {
-	LogStackTrace(m_LuaState);
+	LogStackTrace(m_LuaState, a_StartingDepth);
 }
 
 
 
 
 
-void cLuaState::LogStackTrace(lua_State * a_LuaState)
+void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 {
 	LOGWARNING("Stack trace:");
 	lua_Debug entry;
-	int depth = 0;
+	int depth = a_StartingDepth;
 	while (lua_getstack(a_LuaState, depth, &entry))
 	{
 		lua_getinfo(a_LuaState, "Sln", &entry);
@@ -1312,7 +1325,7 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 {
 	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
-	LogStackTrace(a_LuaState);
+	LogStackTrace(a_LuaState, 1);
 	return 1;  // We left the error message on the stack as the return value
 }
 

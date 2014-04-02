@@ -115,10 +115,44 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 
 
 
-static int tolua_LOG(lua_State* tolua_S)
+/** Retrieves the log message from the first param on the Lua stack.
+Can take either a string or a cCompositeChat.
+*/
+static AString GetLogMessage(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 0 );
+	tolua_Error err;
+	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	{
+		return ((cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL))->ExtractText();
+	}
+	else
+	{
+		size_t len = 0;
+		const char * str = lua_tolstring(tolua_S, 1, &len);
+		if (str != NULL)
+		{
+			return AString(str, len);
+		}
+	}
+	return "";
+}
+
+
+
+
+
+static int tolua_LOG(lua_State * tolua_S)
+{
+	// If the param is a cCompositeChat, read the log level from it:
+	cMCLogger::eLogLevel LogLevel = cMCLogger::llRegular;
+	tolua_Error err;
+	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	{
+		LogLevel = cCompositeChat::MessageTypeToLogLevel(((cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL))->GetMessageType());
+	}
+	
+	// Log the message:
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), LogLevel);
 	return 0;
 }
 
@@ -126,10 +160,9 @@ static int tolua_LOG(lua_State* tolua_S)
 
 
 
-static int tolua_LOGINFO(lua_State* tolua_S)
+static int tolua_LOGINFO(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 1 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llInfo);
 	return 0;
 }
 
@@ -137,10 +170,9 @@ static int tolua_LOGINFO(lua_State* tolua_S)
 
 
 
-static int tolua_LOGWARN(lua_State* tolua_S)
+static int tolua_LOGWARN(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 2 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llWarning);
 	return 0;
 }
 
@@ -148,11 +180,54 @@ static int tolua_LOGWARN(lua_State* tolua_S)
 
 
 
-static int tolua_LOGERROR(lua_State* tolua_S)
+static int tolua_LOGERROR(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 3 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llError);
 	return 0;
+}
+
+
+
+
+
+static int tolua_Base64Encode(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamString(1) ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	
+	AString Src;
+	L.GetStackValue(1, Src);
+	AString res = Base64Encode(Src);
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
+static int tolua_Base64Decode(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamString(1) ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	
+	AString Src;
+	L.GetStackValue(1, Src);
+	AString res = Base64Decode(Src);
+	L.Push(res);
+	return 1;
 }
 
 
@@ -2838,6 +2913,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGWARN",            tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGWARNING",         tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",           tolua_LOGERROR);
+		tolua_function(tolua_S, "Base64Encode",       tolua_Base64Encode);
+		tolua_function(tolua_S, "Base64Decode",       tolua_Base64Decode);
 		
 		tolua_beginmodule(tolua_S, "cFile");
 			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);

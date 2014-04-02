@@ -72,7 +72,6 @@ void NonCtrlHandler(int a_Signal)
 			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
 			LOGERROR("Details | SIGABRT: Server self-terminated due to an internal fault");
 			exit(EXIT_FAILURE);
-			break;
 		}
 		case SIGINT:
 		case SIGTERM:

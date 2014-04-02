@@ -69,6 +69,7 @@ public:
 	enum eEntityType
 	{
 		etEntity,  // For all other types
+		etEnderCrystal,
 		etPlayer,
 		etPickup,
 		etMonster,
@@ -117,6 +118,7 @@ public:
 		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
 		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
 		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
+		VOID_BOUNDARY = -46          ///< At what position Y to begin applying void damage
 	} ;
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
@@ -129,18 +131,19 @@ public:
 	
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 	
-	bool IsPlayer      (void) const { return (m_EntityType == etPlayer); }
-	bool IsPickup      (void) const { return (m_EntityType == etPickup); }
-	bool IsMob         (void) const { return (m_EntityType == etMonster); }
+	bool IsEnderCrystal(void) const { return (m_EntityType == etEnderCrystal); }
+	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
+	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
+	bool IsMob         (void) const { return (m_EntityType == etMonster);      }
 	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
-	bool IsMinecart    (void) const { return (m_EntityType == etMinecart); }
-	bool IsBoat        (void) const { return (m_EntityType == etBoat); }
-	bool IsTNT         (void) const { return (m_EntityType == etTNT); }
-	bool IsProjectile  (void) const { return (m_EntityType == etProjectile); }
-	bool IsExpOrb      (void) const { return (m_EntityType == etExpOrb); }
-	bool IsFloater     (void) const { return (m_EntityType == etFloater); }
-	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame); }
-	bool IsPainting    (void) const { return (m_EntityType == etPainting); }
+	bool IsMinecart    (void) const { return (m_EntityType == etMinecart);     }
+	bool IsBoat        (void) const { return (m_EntityType == etBoat);         }
+	bool IsTNT         (void) const { return (m_EntityType == etTNT);          }
+	bool IsProjectile  (void) const { return (m_EntityType == etProjectile);   }
+	bool IsExpOrb      (void) const { return (m_EntityType == etExpOrb);       }
+	bool IsFloater     (void) const { return (m_EntityType == etFloater);      }
+	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame);    }
+	bool IsPainting    (void) const { return (m_EntityType == etPainting);     }
 	
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;

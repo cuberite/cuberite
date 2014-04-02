@@ -17,6 +17,9 @@ public:
 	}
 
 
+	// TODO: Add Mushroom Spread
+
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to 0
@@ -39,6 +42,7 @@ public:
 			case E_BLOCK_CACTUS:
 			case E_BLOCK_ICE:
 			case E_BLOCK_LEAVES:
+			case E_BLOCK_NEW_LEAVES:
 			case E_BLOCK_AIR:
 			{
 				return false;

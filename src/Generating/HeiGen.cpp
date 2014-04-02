@@ -428,7 +428,7 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 			Height[x + 17 * z] = GetHeightAt(x, z, a_ChunkX, a_ChunkZ, Biomes);
 		}
 	}
-	LinearUpscale2DArrayInPlace(Height, 17, 17, STEPX, STEPZ);
+	LinearUpscale2DArrayInPlace<17, 17, STEPX, STEPZ>(Height);
 	
 	// Copy into the heightmap
 	for (int z = 0; z < cChunkDef::Width; z++)

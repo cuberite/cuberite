@@ -884,7 +884,7 @@ void cChunk::ApplyWeatherToTop()
 					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
 				}
 			}
-			else if (cBlockInfo::IsSnowable(TopBlock))
+			else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
 			{
 				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
 			}
@@ -2510,6 +2510,17 @@ cChunk * cChunk::GetNeighborChunk(int a_BlockX, int a_BlockZ)
 
 cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 {
+	// If the relative coords are too far away, use the parent's chunk lookup instead:
+	if ((a_RelX < 128) || (a_RelX > 128) || (a_RelZ < -128) || (a_RelZ > 128))
+	{
+		int BlockX = m_PosX * cChunkDef::Width + a_RelX;
+		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
+		int BlockY, ChunkX, ChunkZ;
+		AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+		return m_ChunkMap->GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	}
+
+	// Walk the neighbors:
 	bool ReturnThis = true;
 	if (a_RelX < 0)
 	{
