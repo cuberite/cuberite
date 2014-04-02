@@ -79,7 +79,7 @@ public:
 	size_t ParseHeaders(const char * a_Data, size_t a_Size);
 	
 	/** Returns true if the request did contain a Content-Length header */
-	bool HasReceivedContentLength(void) const { return (m_ContentLength >= 0); }
+	bool HasReceivedContentLength(void) const { return (m_ContentLength != AString::npos); }
 	
 	/** Returns the method used in the request */
 	const AString & GetMethod(void) const { return m_Method; }
