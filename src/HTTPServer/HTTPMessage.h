@@ -39,7 +39,7 @@ public:
 	void AddHeader(const AString & a_Key, const AString & a_Value);
 	
 	void SetContentType  (const AString & a_ContentType) { m_ContentType   = a_ContentType; }
-	void SetContentLength(int a_ContentLength)           { m_ContentLength = a_ContentLength; }
+	void SetContentLength(size_t a_ContentLength)        { m_ContentLength = a_ContentLength; }
 	
 	const AString & GetContentType  (void) const { return m_ContentType; }
 	size_t          GetContentLength(void) const { return m_ContentLength; }

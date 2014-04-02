@@ -144,7 +144,7 @@ void cHTTPConnection::Terminate(void)
 
 
 
-void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
+void cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 {
 	switch (m_State)
 	{
@@ -181,9 +181,9 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 			}
 			
 			// Process the rest of the incoming data into the request body:
-			if (a_Size > (int)BytesConsumed)
+			if (a_Size > BytesConsumed)
 			{
-				DataReceived(a_Data + BytesConsumed, a_Size - (int)BytesConsumed);
+				DataReceived(a_Data + BytesConsumed, a_Size - BytesConsumed);
 			}
 			else
 			{

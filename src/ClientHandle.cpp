@@ -2633,7 +2633,7 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 
 
 
-void cClientHandle::DataReceived(const char * a_Data, int a_Size)
+void cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
 	m_TimeSinceLastPacket = 0;

@@ -36,6 +36,9 @@ public:
 	class cCallbacks
 	{
 	public:
+	
+		virtual ~cCallbacks() {};
+		
 		/// Called when a new file part is encountered in the form data
 		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) = 0;
 		
@@ -51,10 +54,10 @@ public:
 	cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callbacks);
 	
 	/// Creates a parser with the specified content type that reads data from a string
-	cHTTPFormParser(eKind a_Kind, const char * a_Data, int a_Size, cCallbacks & a_Callbacks);
+	cHTTPFormParser(eKind a_Kind, const char * a_Data, size_t a_Size, cCallbacks & a_Callbacks);
 	
 	/// Adds more data into the parser, as the request body is received
-	void Parse(const char * a_Data, int a_Size);
+	void Parse(const char * a_Data, size_t a_Size);
 	
 	/** Notifies that there's no more data incoming and the parser should finish its parsing.
 	Returns true if parsing successful

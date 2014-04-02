@@ -64,7 +64,7 @@ public:
 		virtual ~cCallback() {}
 		
 		/** Called when data is received from the remote party */
-		virtual void DataReceived(const char * a_Data, int a_Size) = 0;
+		virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 		
 		/** Called when data can be sent to remote party
 		The function is supposed to *set* outgoing data to a_Data (overwrite) */
