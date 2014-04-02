@@ -19,6 +19,9 @@ public:
 	class cCallbacks
 	{
 	public:
+		// Force a virtual destructor in descendants:
+		virtual ~cCallbacks() {}
+		
 		/// Called when a full header line is parsed
 		virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) = 0;
 	} ;

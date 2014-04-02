@@ -36,6 +36,9 @@ public:
 	class cCallbacks
 	{
 	public:
+		// Force a virtual destructor in descendants:
+		virtual ~cCallbacks() {}
+		
 		/// Called when a new file part is encountered in the form data
 		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) = 0;
 		
