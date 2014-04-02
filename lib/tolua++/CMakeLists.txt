@@ -24,8 +24,11 @@ if(UNIX)
 					COMMAND xxd -i lua/declaration.lua | sed 's/unsigned char/static const unsigned char/g' >declaration_lua.h
 					WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/bin/
 					DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/lua/declaration.lua)
-	set_property(SOURCE src/bin/toluabind.c APPEND PROPERTY OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/enumerate_lua.h ${PROJECT_SOURCE_DIR}/src/bin/basic_lua.h ${PROJECT_SOURCE_DIR}/src/bin/function_lua.h ${PROJECT_SOURCE_DIR}/src/bin/declaration_lua.h)
-	message(hello)
+	add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/src/bin/container_lua.h
+					COMMAND xxd -i lua/container.lua | sed 's/unsigned char/static const unsigned char/g' >container_lua.h
+					WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/bin/
+					DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/lua/container.lua)
+	set_property(SOURCE src/bin/toluabind.c APPEND PROPERTY OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/src/bin/enumerate_lua.h ${PROJECT_SOURCE_DIR}/src/bin/basic_lua.h ${PROJECT_SOURCE_DIR}/src/bin/function_lua.h ${PROJECT_SOURCE_DIR}/src/bin/declaration_lua.h ${PROJECT_SOURCE_DIR}/src/bin/container_lua.h)
 endif()
 
 
