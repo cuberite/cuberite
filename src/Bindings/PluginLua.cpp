@@ -5,7 +5,11 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#ifdef __APPLE__
+#define LUA_USE_MACOSX
+#else
 #define LUA_USE_POSIX
+#endif
 #include "PluginLua.h"
 #include "../CommandOutput.h"
 
@@ -14,6 +18,7 @@ extern "C"
 	#include "lua/src/lualib.h"
 }
 
+#undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 
 
