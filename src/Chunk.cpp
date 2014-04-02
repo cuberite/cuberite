@@ -239,17 +239,15 @@ void cChunk::MarkLoadFailed(void)
 void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 {
 	a_Callback.HeightMap    (&m_HeightMap);
-	a_Callback.BiomeData(&m_BiomeMap);
+	a_Callback.BiomeData    (&m_BiomeMap);
 
 	std::vector<BLOCKTYPE> Blocks;
 	Blocks.reserve(cChunkDef::NumBlocks);
 	for (std::vector<std::vector<BLOCKTYPE>>::const_iterator itr = m_BlockTypes.begin(); itr != m_BlockTypes.end(); ++itr)
 	{
-		for (std::vector<BLOCKTYPE>::const_iterator dataitr = itr->begin(); dataitr != itr->end(); ++dataitr)
-		{
-			Blocks.push_back(*dataitr);
-		}
+		Blocks.insert(Blocks.end(), itr->begin(), itr->end());
 	}
+
 	a_Callback.BlockTypes   (Blocks.data());
 	a_Callback.BlockMeta    (m_BlockMeta);
 	a_Callback.LightIsValid (m_IsLightValid);
@@ -272,56 +270,63 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 
 void cChunk::SetAllData(
-	const BLOCKTYPE *  a_BlockTypes, 
+	const BLOCKTYPE *  a_BlockTypes,
 	const NIBBLETYPE * a_BlockMeta,
 	const NIBBLETYPE * a_BlockLight,
 	const NIBBLETYPE * a_BlockSkyLight,
 	const HeightMap *  a_HeightMap,
 	const BiomeMap &   a_BiomeMap,
 	cBlockEntityList & a_BlockEntities
-)
+	)
 {
 	memcpy(m_BiomeMap, a_BiomeMap, sizeof(m_BiomeMap));
-	
+
 	if (a_HeightMap != NULL)
 	{
 		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
 	}
 
 	bool FoundNonAir = false;
+	int PosYWhereNonEmptyStarts = 0;
 	m_BlockTypes.clear();
-	for (int y = cChunkDef::Height - 1; y >= 0; y--)
-	{
-		if (!FoundNonAir)
-		{
-			for (int x = 0; x < cChunkDef::Width; x++) 
-			{
-				for (int z = 0; z < cChunkDef::Width; z++)
-				{
-					int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+	m_BlockTypes.reserve(Height / 2);
 
-					if (!FoundNonAir && (a_BlockTypes[Index] != E_BLOCK_AIR))
-					{
-						FoundNonAir = true;
-					}
+	for (int y = Height; y >= 0; y--)
+	{
+		for (int z = 0; z < Width; z++)
+		{
+			for (int x = 0; x < Width; x++)
+			{
+				int Index = MakeIndexNoCheck(x, y, z);
+
+				if (!FoundNonAir && (a_BlockTypes[Index] != E_BLOCK_AIR))
+				{
+					FoundNonAir = true;
+					PosYWhereNonEmptyStarts = y;
+					goto foundair;
 				}
 			}
 		}
+	}
 
-		if (FoundNonAir)
+foundair:
+	if (FoundNonAir)
+	{
+		for (int y = 0; y <= PosYWhereNonEmptyStarts; y++)
 		{
 			std::vector<BLOCKTYPE> Blocks;
-			for (int x = 0; x < cChunkDef::Width; x++)
+			Blocks.reserve(Width * Width);
+			for (int z = 0; z < Width; z++)
 			{
-				for (int z = 0; z < cChunkDef::Width; z++)
+				for (int x = 0; x < Width; x++)
 				{
-					int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
-					Blocks.insert(Blocks.begin(), a_BlockTypes[Index]);
+					int Index = MakeIndexNoCheck(x, y, z);
+					Blocks.push_back(a_BlockTypes[Index]);
 				}
 			}
-			m_BlockTypes.insert(m_BlockTypes.begin(), Blocks);
-		}
-	}  // for y
+			m_BlockTypes.push_back(Blocks);
+		}  // for y
+	}
 	
 	memcpy(m_BlockMeta,  a_BlockMeta,  sizeof(m_BlockMeta));
 	if (a_BlockLight != NULL)
@@ -391,10 +396,7 @@ void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 	Blocks.reserve(cChunkDef::NumBlocks);
 	for (std::vector<std::vector<BLOCKTYPE>>::const_iterator itr = m_BlockTypes.begin(); itr != m_BlockTypes.end(); ++itr)
 	{
-		for (std::vector<BLOCKTYPE>::const_iterator dataitr = itr->begin(); dataitr != itr->end(); ++dataitr)
-		{
-			Blocks.push_back(*dataitr);
-		}
+		Blocks.insert(Blocks.end(), itr->begin(), itr->end());
 	}
 
 	memcpy(a_BlockTypes, Blocks.data(), NumBlocks);
