@@ -29,6 +29,9 @@
 	
 	// Disabling this warning, because we know what we're doing when we're doing this:
 	#pragma warning(disable: 4355)  // 'this' used in initializer list
+
+	// Disabled because it's useless:
+	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
 	
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
 	// #pragma warning(3 : 4244) // Conversion from 'type1' to 'type2', possible loss of data
