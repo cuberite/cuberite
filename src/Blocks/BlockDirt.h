@@ -88,12 +88,6 @@ public:
 	}
 
 
-	bool IsGrowAble(BLOCKTYPE a_Block, NIBBLETYPE a_Meta)
-	{
-		
-	}
-
-
 	virtual const char * GetStepSound(void) override
 	{
 		return "step.gravel";
