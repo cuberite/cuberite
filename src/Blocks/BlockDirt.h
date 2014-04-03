@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "../MersenneTwister.h"
+#include "BlockSlab.h"
 
 
 
@@ -35,8 +36,10 @@ public:
 		// Grass becomes dirt if there is something on top of it:
 		if (a_RelY < cChunkDef::Height - 1)
 		{
-			BLOCKTYPE Above = a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
-			if ((!g_BlockTransparent[Above] && !g_BlockOneHitDig[Above]) || IsBlockWater(Above))
+			BLOCKTYPE Above;
+			NIBBLETYPE AboveMeta;
+			a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY + 1, a_RelZ, Above, AboveMeta);
+			if ((!g_BlockTransparent[Above] && !g_BlockOneHitDig[Above] && !(cBlockSlabHandler::IsAnySlabType(Above) && (AboveMeta & 0x8))) || IsBlockWater(Above))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
@@ -77,11 +80,17 @@ public:
 			BLOCKTYPE AboveDest;
 			NIBBLETYPE AboveMeta;
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
-			if ((g_BlockOneHitDig[AboveDest] || g_BlockTransparent[AboveDest]) && !IsBlockWater(AboveDest))
+			if ((g_BlockOneHitDig[AboveDest] || g_BlockTransparent[AboveDest] || ((cBlockSlabHandler::IsAnySlabType(AboveDest)) && (AboveMeta & 0x8))) && !IsBlockWater(AboveDest))
 			{
 				Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
 			}
 		}  // for i - repeat twice
+	}
+
+
+	bool IsGrowAble(BLOCKTYPE a_Block, NIBBLETYPE a_Meta)
+	{
+		
 	}
 
 
