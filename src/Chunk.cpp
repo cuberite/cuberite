@@ -242,11 +242,12 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 	a_Callback.BiomeData    (&m_BiomeMap);
 
 	std::vector<BLOCKTYPE> Blocks;
-	Blocks.reserve(cChunkDef::NumBlocks);
+	Blocks.reserve(NumBlocks);
 	for (std::vector<std::vector<BLOCKTYPE>>::const_iterator itr = m_BlockTypes.begin(); itr != m_BlockTypes.end(); ++itr)
 	{
 		Blocks.insert(Blocks.end(), itr->begin(), itr->end());
 	}
+	Blocks.resize(NumBlocks);
 
 	a_Callback.BlockTypes   (Blocks.data());
 	a_Callback.BlockMeta    (m_BlockMeta);
@@ -291,7 +292,7 @@ void cChunk::SetAllData(
 	m_BlockTypes.clear();
 	m_BlockTypes.reserve(Height / 2);
 
-	for (int y = Height; y >= 0; y--)
+	for (int y = Height - 1; y >= 0; y--)
 	{
 		for (int z = 0; z < Width; z++)
 		{
@@ -393,11 +394,12 @@ void cChunk::SetLight(
 void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 {
 	std::vector<BLOCKTYPE> Blocks;
-	Blocks.reserve(cChunkDef::NumBlocks);
+	Blocks.reserve(NumBlocks);
 	for (std::vector<std::vector<BLOCKTYPE>>::const_iterator itr = m_BlockTypes.begin(); itr != m_BlockTypes.end(); ++itr)
 	{
 		Blocks.insert(Blocks.end(), itr->begin(), itr->end());
 	}
+	Blocks.resize(NumBlocks);
 
 	memcpy(a_BlockTypes, Blocks.data(), NumBlocks);
 }
