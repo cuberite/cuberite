@@ -69,6 +69,7 @@ public:
 
 	virtual void Tick(float a_Dt) override;
 
+	virtual bool OnBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) override;
 	virtual bool OnBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) override;
 	virtual bool OnChat                     (cPlayer * a_Player, AString & a_Message) override;
 	virtual bool OnChunkAvailable           (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
@@ -112,6 +113,8 @@ public:
 	virtual bool OnPluginsLoaded            (void) override;
 	virtual bool OnPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
+	virtual bool OnProjectileHitBlock       (cProjectileEntity & a_Projectile) override;
+	virtual bool OnProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity) override;
 	virtual bool OnSpawnedEntity            (cWorld & a_World, cEntity & a_Entity) override;
 	virtual bool OnSpawnedMonster           (cWorld & a_World, cMonster & a_Monster) override;
 	virtual bool OnSpawningEntity           (cWorld & a_World, cEntity & a_Entity) override;

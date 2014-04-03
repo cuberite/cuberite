@@ -27,10 +27,12 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
 	PM:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
 	PM:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
-	PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
 	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 	PM:AddHook(cPluginManager.HOOK_PLAYER_JOINED,                OnPlayerJoined)
+
+	-- _X: Disabled so that the normal operation doesn't interfere with anything
+	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
@@ -67,12 +69,22 @@ function Initialize(Plugin)
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
-	-- TestBlockAreas();
-	-- TestSQLiteBindings();
-	-- TestExpatBindings();
-	-- TestPluginCalls();
+	-- TestBlockAreas()
+	-- TestSQLiteBindings()
+	-- TestExpatBindings()
+	-- TestPluginCalls()
 	
 	TestBlockAreasString()
+	TestStringBase64()
+
+	--[[
+	-- Test cCompositeChat usage in console-logging:
+	LOGINFO(cCompositeChat("This is a simple message with some @2 color formatting @4 and http://links.to .")
+		:AddSuggestCommandPart("(Suggested command)", "cmd")
+		:AddRunCommandPart("(Run command)", "cmd")
+		:SetMessageType(mtInfo)
+	)
+	--]]
 	
 	return true
 end;
@@ -235,6 +247,24 @@ function TestBlockAreasString()
 	if not(BA2:LoadFromSchematicString(Data)) then
 		LOG("Cannot load schematic from string")
 	end
+end
+
+
+
+
+
+function TestStringBase64()
+	-- Create a binary string:
+	local s = ""
+	for i = 0, 255 do
+		s = s .. string.char(i)
+	end
+	
+	-- Roundtrip through Base64:
+	local Base64 = Base64Encode(s)
+	local UnBase64 = Base64Decode(Base64)
+	
+	assert(UnBase64 == s)
 end
 
 

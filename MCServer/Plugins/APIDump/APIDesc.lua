@@ -200,6 +200,8 @@ g_APIDesc =
 				msFillAir = { Notes = "Dst is overwritten by Src only where Src has air blocks" },
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
+				msSpongePrint = { Notes = "Similar to msImprint, sponge block doesn't overwrite anything, all other blocks overwrite everything"},
+				msMask = { Notes = "The blocks that are exactly the same are kept in Dst, all differing blocks are replaced by air"},
 			},
 			ConstantGroups =
 			{
@@ -247,6 +249,9 @@ g_APIDesc =
 						<tr>
 						<td> A </td><td> B </td><td> B </td><td> A </td><td> B </td>
 						</tr>
+						<tr>
+						<td> A </td><td> A </td><td> A </td><td> A </td><td> A </td>
+						</td>
 						</tbody></table>
 
 						<p>
@@ -258,12 +263,24 @@ g_APIDesc =
 						</ol>
 						</p>
 
+						<h3>Special strategies</h3>
+						<p>For each strategy, evaluate the table rows from top downwards, the first match wins.</p>
+						
 						<p>
-						Special strategies:
+						<strong>msDifference</strong> - changes all the blocks which are the same to air. Otherwise the source block gets placed.
 						</p>
-
+						<table><tbody<tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<td> * </td><td> B </td><td> B </td><td> The blocks are different so we use block B </td>
+						</tr><tr>
+						<td> B </td><td> B </td><td> Air </td><td> The blocks are the same so we get air. </td>
+						</tr>
+						</tbody></table>
+						
+						
 						<p>
-						<strong>msLake</strong> (evaluate top-down, first match wins):
+						<strong>msLake</strong> - used for merging areas with lava and water lakes, in the appropriate generator.
 						</p>
 						<table><tbody><tr>
 						<th colspan="2"> area block </th><th> </th><th> Notes </th>
@@ -293,7 +310,39 @@ g_APIDesc =
 						<td> A        </td><td> *      </td><td> A      </td><td> Everything else is left as it is </td>
 						</tr>
 						</tbody></table>
-					]],
+
+						<p>
+						<strong>msSpongePrint</strong> - used for most prefab-generators to merge the prefabs. Similar to
+						msImprint, but uses the sponge block as the NOP block instead, so that the prefabs may carve out air
+						pockets, too.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> sponge </td><td> A </td><td> Sponge is the NOP block </td>
+						</tr><tr>
+						<td> * </td><td> B </td><td> B </td><td> Everything else overwrites anything </td>
+						</tr>
+						</tbody></table>
+
+						<p>
+						<strong>msMask</strong> - the blocks that are the same in the other area are kept, all the
+						differing blocks are replaced with air. Meta is used in the comparison, too, two blocks of the
+						same type but different meta are considered different and thus replaced with air.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> A </td><td> A </td><td> Same blocks are kept </td>
+						</tr><tr>
+						<td> A </td><td> non-A </td><td> air </td><td> Differing blocks are replaced with air </td>
+						</tr>
+						</tbody></table>
+]],
 				},  -- Merge strategies
 			},  -- AdditionalInfo
 		},  -- cBlockArea
@@ -1826,6 +1875,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			Constants =
 			{
+				HOOK_BLOCK_SPREAD = { Notes = "Called when a block spreads based on world conditions" },
 				HOOK_BLOCK_TO_PICKUPS = { Notes = "Called when a block has been dug and is being converted to pickups. The server has provided the default pickups and the plugins may modify them." },
 				HOOK_CHAT = { Notes = "Called when a client sends a chat message that is not a command. The plugin may modify the chat message" },
 				HOOK_CHUNK_AVAILABLE = { Notes = "Called when a chunk is loaded or generated and becomes available in the {{cWorld|world}}." },
@@ -2646,11 +2696,31 @@ end
 				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
 				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
 				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
-				LOG = {Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text) "},
-				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
-				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
-				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
-				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+				LOG =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType."},
+				},
+				LOGERROR =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'error' severity (black text on red background)"},
+				},
+				LOGINFO =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'info' severity (yellow text)"},
+				},
+				LOGWARN =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+				},
+				LOGWARNING =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text)"},
+				},
 				MirrorBlockFaceY = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it)." },
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
 				NormalizeAngleDegrees = { Params = "AngleDegrees", Return = "AngleDegrees", Notes = "Returns the angle, wrapped into the [-180, +180) range." },
@@ -2767,6 +2837,14 @@ end
 						data provided with the explosions, such as the exploding {{cCreeper|creeper}} entity or the
 						{{Vector3i|coords}} of the exploding bed.
 					]],
+				},
+				SpreadSource =
+				{
+					Include = "^ss.*",
+					TextBefore = [[
+						These constants are used to differentiate the various sources of spreads, such as grass growing.
+						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
+					]],
 				}
 			},
 		},  -- Globals
@@ -2836,6 +2914,7 @@ end
 		-- No sorting is provided for these, they will be output in the same order as defined here
 		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
 		{ FileName = "SettingUpDecoda.html", Title = "Setting up the Decoda Lua IDE" },
+		{ FileName = "SettingUpZeroBrane.html", Title = "Setting up the ZeroBrane Studio Lua IDE" },
 		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
 	}
 } ;

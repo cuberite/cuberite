@@ -5,7 +5,11 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#ifdef __APPLE__
+#define LUA_USE_MACOSX
+#else
 #define LUA_USE_POSIX
+#endif
 #include "PluginLua.h"
 #include "../CommandOutput.h"
 
@@ -14,6 +18,7 @@ extern "C"
 	#include "lua/src/lualib.h"
 }
 
+#undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 
 
@@ -189,6 +194,26 @@ void cPluginLua::Tick(float a_Dt)
 	{
 		m_LuaState.Call((int)(**itr), a_Dt);
 	}
+}
+
+
+
+
+
+bool cPluginLua::OnBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_BLOCK_SPREAD];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -1088,6 +1113,46 @@ bool cPluginLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a
 
 
 
+bool cPluginLua::OnProjectileHitBlock(cProjectileEntity & a_Projectile)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PROJECTILE_HIT_BLOCK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Projectile, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity & a_HitEntity)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PROJECTILE_HIT_ENTITY];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Projectile, &a_HitEntity, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1430,6 +1495,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 {
 	switch (a_HookType)
 	{
+		case cPluginManager::HOOK_BLOCK_SPREAD:                 return "OnBlockSpread";
 		case cPluginManager::HOOK_BLOCK_TO_PICKUPS:             return "OnBlockToPickups";
 		case cPluginManager::HOOK_CHAT:                         return "OnChat";
 		case cPluginManager::HOOK_CHUNK_AVAILABLE:              return "OnChunkAvailable";

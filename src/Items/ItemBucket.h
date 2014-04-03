@@ -172,12 +172,12 @@ public:
 			
 			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 			{
-				if (a_BlockMeta != 0)  // Even if it was a water block it would not be a source.
-				{
-					return false;
-				}
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
+					if (a_BlockMeta != 0) // GetBlockFromTrace is called for scooping up fluids; the hit block should be a source
+					{
+						return false;
+					}
 					m_HasHitFluid = true;
 					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
 					return true;

@@ -497,16 +497,16 @@ public:
 	
 	/** Does an explosion with the specified strength at the specified coordinate
 	a_SourceData exact type depends on the a_Source:
-	| esOther | void * |
-	| esPrimedTNT | cTNTEntity * |
-	| esMonster | cMonster * |
-	| esBed | cVector3i * |
-	| esEnderCrystal | Vector3i * |
-	| esGhastFireball | cGhastFireball * |
-	| esWitherSkullBlack | TBD |
-	| esWitherSkullBlue | TBD |
-	| esWitherBirth | TBD |
-	| esPlugin | void * |
+	| esOther            | void *           |
+	| esPrimedTNT        | cTNTEntity *     |
+	| esMonster          | cMonster *       |
+	| esBed              | cVector3i *      |
+	| esEnderCrystal     | Vector3i *       |
+	| esGhastFireball    | cGhastFireball * |
+	| esWitherSkullBlack | TBD              |
+	| esWitherSkullBlue  | TBD              |
+	| esWitherBirth      | cMonster *       |
+	| esPlugin           | void *           |
 	*/
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData);  // tolua_export  // override, cannot specify due to tolua
 
@@ -646,9 +646,9 @@ public:
 
 	// Various queues length queries (cannot be const, they lock their CS):
 	inline int GetGeneratorQueueLength  (void) { return m_Generator.GetQueueLength();   }    // tolua_export
-	inline int GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
-	inline int GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
-	inline int GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
+	inline size_t GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
+	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
+	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
 
 	void InitializeSpawn(void);
 	

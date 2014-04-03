@@ -117,7 +117,7 @@ public:
 	/** Creates a new chat message and parses the text into parts.
 	Recognizes "http:" and "https:" links and @color-codes.
 	Uses ParseText() for the actual parsing. */
-	cCompositeChat(const AString & a_ParseText);
+	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
 	
 	~cCompositeChat();
 	
@@ -164,9 +164,18 @@ public:
 	/** Returns the message type set previously by SetMessageType(). */
 	eMessageType GetMessageType(void) const { return m_MessageType; }
 	
+	/** Returns the text from the parts that comprises the human-readable data.
+	Used for older protocols that don't support composite chat
+	and for console-logging. */
+	AString ExtractText(void) const;
+	
 	// tolua_end
 	
 	const cParts & GetParts(void) const { return m_Parts; }
+	
+	/** Converts the MessageType to a LogLevel value.
+	Used by the logging bindings when logging a cCompositeChat object. */
+	static cMCLogger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
 	
 protected:
 	/** All the parts that */

@@ -11,6 +11,7 @@ extern "C"
 	#include "lua/src/lualib.h"
 }
 
+#undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 #include "Bindings.h"
 #include "ManualBindings.h"
@@ -472,6 +473,18 @@ void cLuaState::Push(cEntity * a_Entity)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
 	m_NumCurrentFunctionArgs += 1;
 }
 

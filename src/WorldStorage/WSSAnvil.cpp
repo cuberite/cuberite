@@ -32,6 +32,7 @@
 #include "../Mobs/IncludeAllMonsters.h"
 
 #include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
@@ -1057,6 +1058,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadBoatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "EnderCrystal", a_IDTagLength) == 0)
+	{
+		LoadEnderCrystalFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "FallingBlock", a_IDTagLength) == 0)
 	{
 		LoadFallingBlockFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1238,7 +1243,7 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadWitchFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
-	else if (strncmp(a_IDTag, "Wither", a_IDTagLength) == 0)
+	else if (strncmp(a_IDTag, "WitherBoss", a_IDTagLength) == 0)
 	{
 		LoadWitherFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
@@ -1269,6 +1274,20 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		return;
 	}
 	a_Entities.push_back(Boat.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cEnderCrystal> EnderCrystal(new cEnderCrystal(0, 0, 0));
+	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	a_Entities.push_back(EnderCrystal.release());
 }
 
 
@@ -2248,6 +2267,12 @@ void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
+	}
+
+	int CurrLine = a_NBT.FindChildByName(a_TagIdx, "Invul");
+	if (CurrLine > 0)
+	{
+		Monster->SetNumInvulnerableTicks(a_NBT.GetInt(CurrLine));
 	}
 
 	a_Entities.push_back(Monster.release());

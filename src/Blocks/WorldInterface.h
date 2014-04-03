@@ -9,7 +9,8 @@ class cItems;
 class cWorldInterface
 {
 public:
-
+	virtual ~cWorldInterface() {}
+	
 	virtual Int64 GetTimeOfDay(void) const = 0;
 	virtual Int64 GetWorldAge(void)  const = 0;
 	

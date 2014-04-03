@@ -1,6 +1,6 @@
 #pragma once
 #include "BlockHandler.h"
-#include "../MersenneTwister.h"
+#include "../FastRandom.h"
 #include "../World.h"
 #include "../BlockArea.h"
 
@@ -37,16 +37,18 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		MTRand rand;
+		cFastRandom rand;
 
 		// Only the first 2 bits contain the display information, the others are for growing
-		if (rand.randInt(5) == 0)
+		if (rand.NextInt(6) == 0)
 		{
 			a_Pickups.push_back(cItem(E_BLOCK_SAPLING, 1, a_BlockMeta & 3));
 		}
-		if ((a_BlockMeta & 3) == E_META_SAPLING_APPLE)
+		
+		// 1 % chance of dropping an apple, if the leaves' type is Apple Leaves
+		if ((a_BlockMeta & 3) == E_META_LEAVES_APPLE)
 		{
-			if (rand.rand(100) == 0)
+			if (rand.NextInt(101) == 0)
 			{
 				a_Pickups.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
 			}
@@ -58,11 +60,10 @@ public:
 	{
 		cBlockHandler::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
 		
-		//0.5% chance of dropping an apple
+		// 0.5% chance of dropping an apple, if the leaves' type is Apple Leaves:
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		//check if Oak (0x1 and 0x2 bit not set)
-		MTRand rand;
-		if(!(Meta & 3) && rand.randInt(200) == 100)
+		cFastRandom rand;
+		if (((Meta & 3) == E_META_LEAVES_APPLE) && (rand.NextInt(201) == 100))
 		{
 			cItems Drops;
 			Drops.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));

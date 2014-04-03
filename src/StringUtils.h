@@ -79,10 +79,10 @@ extern AString URLDecode(const AString & a_String);  // Cannot export to Lua aut
 extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
 
 /// Decodes a Base64-encoded string into the raw data
-extern AString Base64Decode(const AString & a_Base64String);
+extern AString Base64Decode(const AString & a_Base64String);  // Exported manually due to embedded NULs and extra parameter
 
 /// Encodes a string into Base64
-extern AString Base64Encode(const AString & a_Input);
+extern AString Base64Encode(const AString & a_Input);  // Exported manually due to embedded NULs and extra parameter
 
 /// Reads two bytes from the specified memory location and interprets them as BigEndian short
 extern short GetBEShort(const char * a_Mem);
