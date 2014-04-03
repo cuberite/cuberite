@@ -9,11 +9,11 @@
 
 
 class cBlockLadderHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
 public:
 	cBlockLadderHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}	
 
@@ -91,7 +91,7 @@ public:
 
 		AddFaceDirection( a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
 
-		return g_BlockIsSolid[a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)];
+		return cBlockInfo::IsSolid(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ));
 	}
 
 

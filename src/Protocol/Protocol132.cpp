@@ -100,7 +100,7 @@ cProtocol132::~cProtocol132()
 {
 	if (!m_DataToSend.empty())
 	{
-		LOGD("There are %d unsent bytes while deleting cProtocol132", m_DataToSend.size());
+		LOGD("There are " SIZE_T_FMT " unsent bytes while deleting cProtocol132", m_DataToSend.size());
 	}
 }
 
@@ -108,7 +108,7 @@ cProtocol132::~cProtocol132()
 
 
 
-void cProtocol132::DataReceived(const char * a_Data, int a_Size)
+void cProtocol132::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{

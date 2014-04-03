@@ -54,7 +54,7 @@ public:
 			NIBBLETYPE BlockMeta;
 			if (
 				a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta) &&
-				(g_BlockIsSolid[BlockType])
+				cBlockInfo::IsSolid(BlockType)
 			)
 			{
 				return false;

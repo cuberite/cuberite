@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ManualBindings.h"
+#undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 
 #include "Plugin.h"
@@ -23,9 +24,11 @@
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 #include "md5/md5.h"
 #include "../LineBlockTracer.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
+#include "../CompositeChat.h"
 
 
 
@@ -113,10 +116,44 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 
 
 
-static int tolua_LOG(lua_State* tolua_S)
+/** Retrieves the log message from the first param on the Lua stack.
+Can take either a string or a cCompositeChat.
+*/
+static AString GetLogMessage(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 0 );
+	tolua_Error err;
+	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	{
+		return ((cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL))->ExtractText();
+	}
+	else
+	{
+		size_t len = 0;
+		const char * str = lua_tolstring(tolua_S, 1, &len);
+		if (str != NULL)
+		{
+			return AString(str, len);
+		}
+	}
+	return "";
+}
+
+
+
+
+
+static int tolua_LOG(lua_State * tolua_S)
+{
+	// If the param is a cCompositeChat, read the log level from it:
+	cMCLogger::eLogLevel LogLevel = cMCLogger::llRegular;
+	tolua_Error err;
+	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	{
+		LogLevel = cCompositeChat::MessageTypeToLogLevel(((cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL))->GetMessageType());
+	}
+	
+	// Log the message:
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), LogLevel);
 	return 0;
 }
 
@@ -124,10 +161,9 @@ static int tolua_LOG(lua_State* tolua_S)
 
 
 
-static int tolua_LOGINFO(lua_State* tolua_S)
+static int tolua_LOGINFO(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 1 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llInfo);
 	return 0;
 }
 
@@ -135,10 +171,9 @@ static int tolua_LOGINFO(lua_State* tolua_S)
 
 
 
-static int tolua_LOGWARN(lua_State* tolua_S)
+static int tolua_LOGWARN(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 2 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llWarning);
 	return 0;
 }
 
@@ -146,11 +181,54 @@ static int tolua_LOGWARN(lua_State* tolua_S)
 
 
 
-static int tolua_LOGERROR(lua_State* tolua_S)
+static int tolua_LOGERROR(lua_State * tolua_S)
 {
-	const char* str = tolua_tocppstring(tolua_S,1,0);
-	cMCLogger::GetInstance()->LogSimple( str, 3 );
+	cMCLogger::GetInstance()->LogSimple(GetLogMessage(tolua_S).c_str(), cMCLogger::llError);
 	return 0;
+}
+
+
+
+
+
+static int tolua_Base64Encode(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamString(1) ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	
+	AString Src;
+	L.GetStackValue(1, Src);
+	AString res = Base64Encode(Src);
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
+static int tolua_Base64Decode(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamString(1) ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	
+	AString Src;
+	L.GetStackValue(1, Src);
+	AString res = Base64Decode(Src);
+	L.Push(res);
+	return 1;
 }
 
 
@@ -1495,7 +1573,8 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 	}
 	
 	Plugin->BindCommand(Command, FnRef);
-	return 0;
+	lua_pushboolean(L, true);
+	return 1;
 }
 
 
@@ -1519,7 +1598,10 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	// Read the arguments to this API call:
 	tolua_Error tolua_err;
 	int idx = 1;
-	if (tolua_isusertype(L, 1, "cPluginManager", 0, &tolua_err))
+	if (
+		tolua_isusertype(L, 1, "cPluginManager", 0, &tolua_err) ||
+		tolua_isusertable(L, 1, "cPluginManager", 0, &tolua_err)
+	)
 	{
 		idx++;
 	}
@@ -1559,7 +1641,8 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	}
 	
 	Plugin->BindConsoleCommand(Command, FnRef);
-	return 0;
+	lua_pushboolean(L, true);
+	return 1;
 }
 
 
@@ -2455,7 +2538,7 @@ static int tolua_cBlockArea_GetSize(lua_State * tolua_S)
 static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 {
 	// function cBlockArea::LoadFromSchematicFile
-	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cBlockArea") ||
@@ -2482,10 +2565,41 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 
 
 
+static int tolua_cBlockArea_LoadFromSchematicString(lua_State * tolua_S)
+{
+	// function cBlockArea::LoadFromSchematicString
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cBlockArea") ||
+		!L.CheckParamString  (2) ||
+		!L.CheckParamEnd     (3)
+	)
+	{
+		return 0;
+	}
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::LoadFromSchematicFile'", NULL);
+		return 0;
+	}
+
+	AString Data;
+	L.GetStackValue(2, Data);
+	bool res = cSchematicFileSerializer::LoadFromSchematicString(*self, Data);
+	tolua_pushboolean(tolua_S, res);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 {
 	// function cBlockArea::SaveToSchematicFile
-	// Exported manually because function has been moved to SchematicFileSerilizer.cpp
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cBlockArea") ||
@@ -2511,6 +2625,285 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 
 
 
+static int tolua_cBlockArea_SaveToSchematicString(lua_State * tolua_S)
+{
+	// function cBlockArea::SaveToSchematicString
+	// Exported manually because function has been moved to SchematicFileSerializer.cpp
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cBlockArea") ||
+		!L.CheckParamEnd     (2)
+	)
+	{
+		return 0;
+	}
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::SaveToSchematicFile'", NULL);
+		return 0;
+	}
+	
+	AString Data;
+	if (cSchematicFileSerializer::SaveToSchematicString(*self, Data))
+	{
+		L.Push(Data);
+		return 1;
+	}
+	return 0;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddRunCommandPart(Message, Command, [Style])
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2, 3)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddRunCommandPart'", NULL);
+		return 0;
+	}
+	
+	// Add the part:
+	AString Text, Command, Style;
+	L.GetStackValue(2, Text);
+	L.GetStackValue(3, Command);
+	L.GetStackValue(4, Style);
+	self->AddRunCommandPart(Text, Command, Style);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_AddSuggestCommandPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddSuggestCommandPart(Message, Command, [Style])
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2, 3)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddSuggestCommandPart'", NULL);
+		return 0;
+	}
+	
+	// Add the part:
+	AString Text, Command, Style;
+	L.GetStackValue(2, Text);
+	L.GetStackValue(3, Command);
+	L.GetStackValue(4, Style);
+	self->AddSuggestCommandPart(Text, Command, Style);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_AddTextPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddTextPart(Message, [Style])
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddTextPart'", NULL);
+		return 0;
+	}
+	
+	// Add the part:
+	AString Text, Style;
+	L.GetStackValue(2, Text);
+	L.GetStackValue(3, Style);
+	self->AddTextPart(Text, Style);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_AddUrlPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddTextPart(Message, Url, [Style])
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2, 3)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddUrlPart'", NULL);
+		return 0;
+	}
+	
+	// Add the part:
+	AString Text, Url, Style;
+	L.GetStackValue(2, Text);
+	L.GetStackValue(3, Url);
+	L.GetStackValue(4, Style);
+	self->AddUrlPart(Text, Url, Style);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_ParseText(lua_State * tolua_S)
+{
+	// function cCompositeChat:ParseText(TextMessage)
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:ParseText'", NULL);
+		return 0;
+	}
+	
+	// Parse the text:
+	AString Text;
+	L.GetStackValue(2, Text);
+	self->ParseText(Text);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_SetMessageType(lua_State * tolua_S)
+{
+	// function cCompositeChat:SetMessageType(MessageType)
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamNumber(2)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:SetMessageType'", NULL);
+		return 0;
+	}
+	
+	// Set the type:
+	int MessageType;
+	L.GetStackValue(1, MessageType);
+	self->SetMessageType((eMessageType)MessageType);
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
+{
+	// function cCompositeChat:UnderlineUrls()
+	// Exported manually to support call-chaining (return *this)
+	
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cCompositeChat"))
+	{
+		return 0;
+	}
+	cCompositeChat * self = (cCompositeChat *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:UnderlineUrls'", NULL);
+		return 0;
+	}
+	
+	// Call the processing
+	self->UnderlineUrls();
+	
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
 void ManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, NULL);
@@ -2521,18 +2914,32 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGWARN",            tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGWARNING",         tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",           tolua_LOGERROR);
+		tolua_function(tolua_S, "Base64Encode",       tolua_Base64Encode);
+		tolua_function(tolua_S, "Base64Decode",       tolua_Base64Decode);
 		
 		tolua_beginmodule(tolua_S, "cFile");
 			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cBlockArea");
-			tolua_function(tolua_S, "GetBlockTypeMeta",      tolua_cBlockArea_GetBlockTypeMeta);
-			tolua_function(tolua_S, "GetOrigin",             tolua_cBlockArea_GetOrigin);
-			tolua_function(tolua_S, "GetRelBlockTypeMeta",   tolua_cBlockArea_GetRelBlockTypeMeta);
-			tolua_function(tolua_S, "GetSize",               tolua_cBlockArea_GetSize);
-			tolua_function(tolua_S, "LoadFromSchematicFile", tolua_cBlockArea_LoadFromSchematicFile);
-			tolua_function(tolua_S, "SaveToSchematicFile",   tolua_cBlockArea_SaveToSchematicFile);
+			tolua_function(tolua_S, "GetBlockTypeMeta",        tolua_cBlockArea_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetOrigin",               tolua_cBlockArea_GetOrigin);
+			tolua_function(tolua_S, "GetRelBlockTypeMeta",     tolua_cBlockArea_GetRelBlockTypeMeta);
+			tolua_function(tolua_S, "GetSize",                 tolua_cBlockArea_GetSize);
+			tolua_function(tolua_S, "LoadFromSchematicFile",   tolua_cBlockArea_LoadFromSchematicFile);
+			tolua_function(tolua_S, "LoadFromSchematicString", tolua_cBlockArea_LoadFromSchematicString);
+			tolua_function(tolua_S, "SaveToSchematicFile",     tolua_cBlockArea_SaveToSchematicFile);
+			tolua_function(tolua_S, "SaveToSchematicString",   tolua_cBlockArea_SaveToSchematicString);
+		tolua_endmodule(tolua_S);
+		
+		tolua_beginmodule(tolua_S, "cCompositeChat");
+			tolua_function(tolua_S, "AddRunCommandPart",     tolua_cCompositeChat_AddRunCommandPart);
+			tolua_function(tolua_S, "AddSuggestCommandPart", tolua_cCompositeChat_AddSuggestCommandPart);
+			tolua_function(tolua_S, "AddTextPart",           tolua_cCompositeChat_AddTextPart);
+			tolua_function(tolua_S, "AddUrlPart",            tolua_cCompositeChat_AddUrlPart);
+			tolua_function(tolua_S, "ParseText",             tolua_cCompositeChat_ParseText);
+			tolua_function(tolua_S, "SetMessageType",        tolua_cCompositeChat_SetMessageType);
+			tolua_function(tolua_S, "UnderlineUrls",         tolua_cCompositeChat_UnderlineUrls);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cHopperEntity");
@@ -2561,7 +2968,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithFurnaceAt",           tolua_DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
 			tolua_function(tolua_S, "DoWithNoteBlockAt",         tolua_DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
 			tolua_function(tolua_S, "DoWithCommandBlockAt",      tolua_DoWithXYZ<cWorld, cCommandBlockEntity, &cWorld::DoWithCommandBlockAt>);
-			tolua_function(tolua_S, "DoWithMobHeadBlockAt",      tolua_DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadBlockAt>);
+			tolua_function(tolua_S, "DoWithMobHeadAt",           tolua_DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
+			tolua_function(tolua_S, "DoWithFlowerPotAt",         tolua_DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
 			tolua_function(tolua_S, "DoWithPlayer",              tolua_DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",       tolua_DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk", tolua_ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
@@ -2582,6 +2990,11 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		
 		tolua_beginmodule(tolua_S, "cMapManager");
 			tolua_function(tolua_S, "DoWithMap", tolua_DoWithID<cMapManager, cMap, &cMapManager::DoWithMap>);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cScoreboard");
+			tolua_function(tolua_S, "ForEachObjective", tolua_ForEach<cScoreboard, cObjective, &cScoreboard::ForEachObjective>);
+			tolua_function(tolua_S, "ForEachTeam",      tolua_ForEach<cScoreboard, cTeam,      &cScoreboard::ForEachTeam>);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin");

@@ -4,20 +4,27 @@
 #include "BlockHandler.h"
 #include "../Entities/Player.h"
 #include "Chunk.h"
+#include "MetaRotator.h"
 
 
 
 
 class cBlockDoorHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>
 {
+	typedef cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true> super;
 public:
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override;
 	virtual const char * GetStepSound(void) override;
 	
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override;
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  override;
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  override;
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  override;
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
@@ -139,14 +146,14 @@ public:
 	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_X, int a_Y, int a_Z)
 	{
 		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_X, a_Y, a_Z);
-		
+
 		a_ChunkInterface.SetBlockMeta(a_X, a_Y, a_Z, ChangeStateMetaData(OldMetaData));
-		
+
 		if (OldMetaData & 8)
 		{
 			// Current block is top of the door
 			BLOCKTYPE  BottomBlock = a_ChunkInterface.GetBlock(a_X, a_Y - 1, a_Z);
-			NIBBLETYPE BottomMeta  = a_ChunkInterface.GetBlockMeta(a_X, a_Y - 1, a_Z);
+			NIBBLETYPE BottomMeta = a_ChunkInterface.GetBlockMeta(a_X, a_Y - 1, a_Z);
 
 			if (IsDoor(BottomBlock) && !(BottomMeta & 8))
 			{
@@ -165,8 +172,6 @@ public:
 			}
 		}
 	}
-	
-	
 } ;
 
 

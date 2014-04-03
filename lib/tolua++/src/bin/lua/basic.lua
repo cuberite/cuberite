@@ -23,6 +23,7 @@ _basic = {
  ['unsigned'] = 'number',
  ['float'] = 'number',
  ['double'] = 'number',
+ ['size_t'] = 'number',
  ['_cstring'] = 'string',
  ['_userdata'] = 'userdata',
  ['char*'] = 'string',
@@ -66,6 +67,8 @@ _global_enums = {}
 
 -- List of auto renaming
 _renaming = {}
+
+_enums = {}
 function appendrenaming (s)
  local b,e,old,new = strfind(s,"%s*(.-)%s*@%s*(.-)%s*$")
 	if not b then
@@ -143,6 +146,11 @@ function typevar(type)
 		_usertype[type] = type
 		return type
 	end
+end
+
+-- is enum
+function isenumtype (type) 
+  return _enums[type]
 end
 
 -- check if basic type
@@ -382,6 +390,7 @@ end
 
 _push_functions = {}
 _is_functions = {}
+_enums = {}
 _to_functions = {}
 
 _base_push_functions = {}
@@ -410,5 +419,8 @@ function get_to_function(t)
 end
 
 function get_is_function(t)
+	if _enums[t] then
+		return "tolua_is" .. t
+	end
 	return _is_functions[t] or search_base(t, _base_is_functions) or "tolua_isusertype"
 end

@@ -242,7 +242,7 @@ bool cPiston::CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 bool cPiston::CanBreakPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	UNUSED(a_BlockMeta);
-	return g_BlockPistonBreakable[a_BlockType];
+	return cBlockInfo::IsPistonBreakable(a_BlockType);
 }
 
 

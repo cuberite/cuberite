@@ -10,7 +10,7 @@
 
 
 
-#if SELF_TEST
+#ifdef SELF_TEST
 
 /** A simple self-test that verifies that the composite chat parser is working properly. */
 class SelfTest_CompositeChat
@@ -32,15 +32,15 @@ public:
 		cCompositeChat Msg;
 		Msg.ParseText("Testing @2color codes and http://links parser");
 		const cCompositeChat::cParts & Parts = Msg.GetParts();
-		assert(Parts.size() == 4);
-		assert(Parts[0]->m_PartType == cCompositeChat::ptText);
-		assert(Parts[1]->m_PartType == cCompositeChat::ptText);
-		assert(Parts[2]->m_PartType == cCompositeChat::ptUrl);
-		assert(Parts[3]->m_PartType == cCompositeChat::ptText);
-		assert(Parts[0]->m_Style == "");
-		assert(Parts[1]->m_Style == "@2");
-		assert(Parts[2]->m_Style == "@2");
-		assert(Parts[3]->m_Style == "@2");
+		assert_test(Parts.size() == 4);
+		assert_test(Parts[0]->m_PartType == cCompositeChat::ptText);
+		assert_test(Parts[1]->m_PartType == cCompositeChat::ptText);
+		assert_test(Parts[2]->m_PartType == cCompositeChat::ptUrl);
+		assert_test(Parts[3]->m_PartType == cCompositeChat::ptText);
+		assert_test(Parts[0]->m_Style == "");
+		assert_test(Parts[1]->m_Style == "@2");
+		assert_test(Parts[2]->m_Style == "@2");
+		assert_test(Parts[3]->m_Style == "@2");
 	}
 	
 	void TestParser2(void)
@@ -48,15 +48,15 @@ public:
 		cCompositeChat Msg;
 		Msg.ParseText("@3Advanced stuff: @5overriding color codes and http://links.with/@4color-in-them handling");
 		const cCompositeChat::cParts & Parts = Msg.GetParts();
-		assert(Parts.size() == 4);
-		assert(Parts[0]->m_PartType == cCompositeChat::ptText);
-		assert(Parts[1]->m_PartType == cCompositeChat::ptText);
-		assert(Parts[2]->m_PartType == cCompositeChat::ptUrl);
-		assert(Parts[3]->m_PartType == cCompositeChat::ptText);
-		assert(Parts[0]->m_Style == "@3");
-		assert(Parts[1]->m_Style == "@5");
-		assert(Parts[2]->m_Style == "@5");
-		assert(Parts[3]->m_Style == "@5");
+		assert_test(Parts.size() == 4);
+		assert_test(Parts[0]->m_PartType == cCompositeChat::ptText);
+		assert_test(Parts[1]->m_PartType == cCompositeChat::ptText);
+		assert_test(Parts[2]->m_PartType == cCompositeChat::ptUrl);
+		assert_test(Parts[3]->m_PartType == cCompositeChat::ptText);
+		assert_test(Parts[0]->m_Style == "@3");
+		assert_test(Parts[1]->m_Style == "@5");
+		assert_test(Parts[2]->m_Style == "@5");
+		assert_test(Parts[3]->m_Style == "@5");
 	}
 	
 	void TestParser3(void)
@@ -64,11 +64,11 @@ public:
 		cCompositeChat Msg;
 		Msg.ParseText("http://links.starting the text");
 		const cCompositeChat::cParts & Parts = Msg.GetParts();
-		assert(Parts.size() == 2);
-		assert(Parts[0]->m_PartType == cCompositeChat::ptUrl);
-		assert(Parts[1]->m_PartType == cCompositeChat::ptText);
-		assert(Parts[0]->m_Style == "");
-		assert(Parts[1]->m_Style == "");
+		assert_test(Parts.size() == 2);
+		assert_test(Parts[0]->m_PartType == cCompositeChat::ptUrl);
+		assert_test(Parts[1]->m_PartType == cCompositeChat::ptText);
+		assert_test(Parts[0]->m_Style == "");
+		assert_test(Parts[1]->m_Style == "");
 	}
 	
 	void TestParser4(void)
@@ -76,11 +76,11 @@ public:
 		cCompositeChat Msg;
 		Msg.ParseText("links finishing the text: http://some.server");
 		const cCompositeChat::cParts & Parts = Msg.GetParts();
-		assert(Parts.size() == 2);
-		assert(Parts[0]->m_PartType == cCompositeChat::ptText);
-		assert(Parts[1]->m_PartType == cCompositeChat::ptUrl);
-		assert(Parts[0]->m_Style == "");
-		assert(Parts[1]->m_Style == "");
+		assert_test(Parts.size() == 2);
+		assert_test(Parts[0]->m_PartType == cCompositeChat::ptText);
+		assert_test(Parts[1]->m_PartType == cCompositeChat::ptUrl);
+		assert_test(Parts[0]->m_Style == "");
+		assert_test(Parts[1]->m_Style == "");
 	}
 	
 	void TestParser5(void)
@@ -88,9 +88,9 @@ public:
 		cCompositeChat Msg;
 		Msg.ParseText("http://only.links");
 		const cCompositeChat::cParts & Parts = Msg.GetParts();
-		assert(Parts.size() == 1);
-		assert(Parts[0]->m_PartType == cCompositeChat::ptUrl);
-		assert(Parts[0]->m_Style == "");
+		assert_test(Parts.size() == 1);
+		assert_test(Parts[0]->m_PartType == cCompositeChat::ptUrl);
+		assert_test(Parts[0]->m_Style == "");
 	}
 	
 } gTest;
@@ -112,8 +112,8 @@ cCompositeChat::cCompositeChat(void) :
 
 
 
-cCompositeChat::cCompositeChat(const AString & a_ParseText) :
-	m_MessageType(mtCustom)
+cCompositeChat::cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType) :
+	m_MessageType(a_MessageType)
 {
 	ParseText(a_ParseText);
 }
@@ -308,6 +308,58 @@ void cCompositeChat::UnderlineUrls(void)
 			(*itr)->m_Style.append("u");
 		}
 	}  // for itr - m_Parts[]
+}
+
+
+
+
+
+AString cCompositeChat::ExtractText(void) const
+{
+	AString Msg;
+	for (cParts::const_iterator itr = m_Parts.begin(), end = m_Parts.end(); itr != end; ++itr)
+	{
+		switch ((*itr)->m_PartType)
+		{
+			case ptText:
+			case ptClientTranslated:
+			case ptRunCommand:
+			case ptSuggestCommand:
+			{
+				Msg.append((*itr)->m_Text);
+				break;
+			}
+			case ptUrl:
+			{
+				Msg.append(((cUrlPart *)(*itr))->m_Url);
+				break;
+			}
+		}  // switch (PartType)
+	}  // for itr - m_Parts[]
+	return Msg;
+}
+
+
+
+
+
+cMCLogger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
+{
+	switch (a_MessageType)
+	{
+		case mtCustom:         return cMCLogger::llRegular;
+		case mtFailure:        return cMCLogger::llWarning;
+		case mtInformation:    return cMCLogger::llInfo;
+		case mtSuccess:        return cMCLogger::llRegular;
+		case mtWarning:        return cMCLogger::llWarning;
+		case mtFatal:          return cMCLogger::llError;
+		case mtDeath:          return cMCLogger::llRegular;
+		case mtPrivateMessage: return cMCLogger::llRegular;
+		case mtJoin:           return cMCLogger::llRegular;
+		case mtLeave:          return cMCLogger::llRegular;
+	}
+	ASSERT(!"Unhandled MessageType");
+	return cMCLogger::llError;
 }
 
 

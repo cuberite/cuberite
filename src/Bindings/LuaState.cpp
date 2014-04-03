@@ -11,9 +11,11 @@ extern "C"
 	#include "lua/src/lualib.h"
 }
 
+#undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 #include "Bindings.h"
 #include "ManualBindings.h"
+#include "DeprecatedBindings.h"
 
 // fwd: SQLite/lsqlite3.c
 extern "C"
@@ -93,11 +95,20 @@ void cLuaState::Create(void)
 	}
 	m_LuaState = lua_open();
 	luaL_openlibs(m_LuaState);
+	m_IsOwned = true;
+}
+
+
+
+
+
+void cLuaState::RegisterAPILibs(void)
+{
 	tolua_AllToLua_open(m_LuaState);
 	ManualBindings::Bind(m_LuaState);
+	DeprecatedBindings::Bind(m_LuaState);
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
-	m_IsOwned = true;
 }
 
 
@@ -469,6 +480,18 @@ void cLuaState::Push(cEntity * a_Entity)
 
 
 
+void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(cMonster * a_Monster)
 {
 	ASSERT(IsValid());
@@ -675,12 +698,14 @@ void cLuaState::Push(Vector3i * a_Vector)
 
 void cLuaState::Push(void * a_Ptr)
 {
+	UNUSED(a_Ptr);
 	ASSERT(IsValid());
 
 	// Investigate the cause of this - what is the callstack?
-	LOGWARNING("Lua engine encountered an error - attempting to push a plain pointer");
+	// One code path leading here is the OnHookExploding / OnHookExploded with exotic parameters. Need to decide what to do with them
+	LOGWARNING("Lua engine: attempting to push a plain pointer, pushing nil instead.");
+	LOGWARNING("This indicates an unimplemented part of MCS bindings");
 	LogStackTrace();
-	ASSERT(!"A plain pointer should never be pushed on Lua stack");
 	
 	lua_pushnil(m_LuaState);
 	m_NumCurrentFunctionArgs += 1;
@@ -714,7 +739,7 @@ void cLuaState::Push(cBlockEntity * a_BlockEntity)
 
 
 
-void cLuaState::GetReturn(int a_StackPos, bool & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 {
 	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
 }
@@ -723,11 +748,13 @@ void cLuaState::GetReturn(int a_StackPos, bool & a_ReturnedVal)
 
 
 
-void cLuaState::GetReturn(int a_StackPos, AString & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 {
-	if (lua_isstring(m_LuaState, a_StackPos))
+	size_t len = 0;
+	const char * data = lua_tolstring(m_LuaState, a_StackPos, &len);
+	if (data != NULL)
 	{
-		a_ReturnedVal = tolua_tocppstring(m_LuaState, a_StackPos, a_ReturnedVal.c_str());
+		a_Value.assign(data, len);
 	}
 }
 
@@ -735,7 +762,7 @@ void cLuaState::GetReturn(int a_StackPos, AString & a_ReturnedVal)
 
 
 
-void cLuaState::GetReturn(int a_StackPos, int & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, int & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
@@ -747,7 +774,7 @@ void cLuaState::GetReturn(int a_StackPos, int & a_ReturnedVal)
 
 
 
-void cLuaState::GetReturn(int a_StackPos, double & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
@@ -1067,20 +1094,20 @@ bool cLuaState::ReportErrors(lua_State * a_LuaState, int a_Status)
 
 
 
-void cLuaState::LogStackTrace(void)
+void cLuaState::LogStackTrace(int a_StartingDepth)
 {
-	LogStackTrace(m_LuaState);
+	LogStackTrace(m_LuaState, a_StartingDepth);
 }
 
 
 
 
 
-void cLuaState::LogStackTrace(lua_State * a_LuaState)
+void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 {
 	LOGWARNING("Stack trace:");
 	lua_Debug entry;
-	int depth = 0;
+	int depth = a_StartingDepth;
 	while (lua_getstack(a_LuaState, depth, &entry))
 	{
 		lua_getinfo(a_LuaState, "Sln", &entry);
@@ -1272,7 +1299,9 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
 	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
 	
-	LOGD((a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
+	
+	// Format string consisting only of %s is used to appease the compiler
+	LOGD("%s",(a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;
@@ -1297,7 +1326,7 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 {
 	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
-	LogStackTrace(a_LuaState);
+	LogStackTrace(a_LuaState, 1);
 	return 1;  // We left the error message on the stack as the return value
 }
 

@@ -4,17 +4,18 @@
 #include "BlockEntity.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
+#include "MetaRotator.h"
 
 
 
 
 
 class cBlockChestHandler :
-	public cBlockEntityHandler
+	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
 public:
 	cBlockChestHandler(BLOCKTYPE a_BlockType)
-		: cBlockEntityHandler(a_BlockType)
+		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}
 

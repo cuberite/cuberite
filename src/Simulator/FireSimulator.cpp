@@ -6,6 +6,8 @@
 #include "../BlockID.h"
 #include "../Defines.h"
 #include "../Chunk.h"
+#include "Root.h"
+#include "../Bindings/PluginManager.h"
 
 
 
@@ -252,7 +254,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		{
 			return m_BurnStepTimeFuel;
 		}
-		IsBlockBelowSolid = g_BlockIsSolid[BlockBelow];
+		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
 	
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
@@ -315,9 +317,15 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 				*/
 				if (CanStartFireInBlock(a_Chunk, x, y, z))
 				{
-					FLOG("FS: Starting new fire at {%d, %d, %d}.", 
-						x + a_Chunk->GetPosX() * cChunkDef::Width, y, z + a_Chunk->GetPosZ() * cChunkDef::Width
-					);
+					int a_PosX = x + a_Chunk->GetPosX() * cChunkDef::Width;
+					int a_PosZ = z + a_Chunk->GetPosZ() * cChunkDef::Width;
+					
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(&m_World, a_PosX, y, a_PosZ, ssFireSpread))
+					{
+						return;
+					}
+					
+					FLOG("FS: Starting new fire at {%d, %d, %d}.", a_PosX, y, a_PosZ);
 					a_Chunk->UnboundedRelSetBlock(x, y, z, E_BLOCK_FIRE, 0);
 				}
 			}  // for y
@@ -334,21 +342,33 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 	for (size_t i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
 		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
+		int X = a_RelX + gNeighborCoords[i].x;
+		int Z = a_RelZ + gNeighborCoords[i].z;
+
+		cChunkPtr Neighbour = a_Chunk->GetRelNeighborChunkAdjustCoords(X, Z);
+		if (Neighbour == NULL)
 		{
-			// Neighbor not accessible, ignore it
 			continue;
 		}
+		BlockType = Neighbour->GetBlock(X, a_RelY + gCrossCoords[i].y, Z);
+
 		if (!IsFuel(BlockType))
 		{
 			continue;
 		}
+
+		if (BlockType == E_BLOCK_TNT)
+		{
+			int AbsX = X + Neighbour->GetPosX() * cChunkDef::Width;
+			int AbsZ = Z + Neighbour->GetPosZ() * cChunkDef::Width;
+
+			m_World.SpawnPrimedTNT(AbsX, a_RelY + gNeighborCoords[i].y, AbsZ, 0);
+			Neighbour->SetBlock(X, a_RelY + gNeighborCoords[i].y, Z, E_BLOCK_AIR, 0);
+			return;
+		}
+
 		bool ShouldReplaceFuel = (m_World.GetTickRandomNumber(MAX_CHANCE_REPLACE_FUEL) < m_ReplaceFuelChance);
-		a_Chunk->UnboundedRelSetBlock(
-			a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z,
-			ShouldReplaceFuel ? E_BLOCK_FIRE : E_BLOCK_AIR, 0
-		);
+		Neighbour->SetBlock(X, a_RelY + gNeighborCoords[i].y, Z, ShouldReplaceFuel ? E_BLOCK_FIRE : E_BLOCK_AIR, 0);
 	}  // for i - Coords[]
 }
 

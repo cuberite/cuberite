@@ -17,7 +17,7 @@
 
 
 class cStructGenMineShafts :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenMineShafts(
@@ -52,8 +52,8 @@ protected:
 	*/
 	void GetMineShaftSystemsForChunk(int a_ChunkX, int a_ChunkZ, cMineShaftSystems & a_MineShaftSystems);
 
-	// cStructureGen overrides:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen overrides:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 

@@ -3,14 +3,6 @@
 
 #include "Noise.h"
 
-
-
-
-
-#if NOISE_USE_SSE
-	#include <smmintrin.h> //_mm_mul_epi32
-#endif
-
 #define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
 
 

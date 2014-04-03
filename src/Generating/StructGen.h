@@ -21,7 +21,7 @@
 
 
 class cStructGenTrees :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenTrees(int a_Seed, cBiomeGen * a_BiomeGen, cTerrainHeightGen * a_HeightGen, cTerrainCompositionGen * a_CompositionGen) :
@@ -64,8 +64,8 @@ protected:
 		const cChunkDef::BiomeMap & a_Biomes
 	);
 	
-	// cStructureGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -73,7 +73,7 @@ protected:
 
 
 class cStructGenOreNests :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenOreNests(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
@@ -82,8 +82,8 @@ protected:
 	cNoise m_Noise;
 	int    m_Seed;
 	
-	// cStructureGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 	
 	void GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, int a_Seq);
 } ;
@@ -93,7 +93,7 @@ protected:
 
 
 class cStructGenLakes :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid, cTerrainHeightGen & a_HeiGen, int a_Probability) :
@@ -112,8 +112,8 @@ protected:
 	cTerrainHeightGen & m_HeiGen;
 	int                 m_Probability;  ///< Chance, 0 .. 100, of a chunk having the lake
 	
-	// cStructureGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 	
 	/// Creates a lake image for the specified chunk into a_Lake
 	void CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a_Lake);
@@ -125,7 +125,7 @@ protected:
 
 
 class cStructGenDirectOverhangs :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenDirectOverhangs(int a_Seed);
@@ -134,8 +134,8 @@ protected:
 	cNoise    m_Noise1;
 	cNoise    m_Noise2;
 	
-	// cStructureGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	bool HasWantedBiome(cChunkDesc & a_ChunkDesc) const;
 } ;
@@ -145,7 +145,7 @@ protected:
 
 
 class cStructGenDistortedMembraneOverhangs :
-	public cStructureGen
+	public cFinishGen
 {
 public:
 	cStructGenDistortedMembraneOverhangs(int a_Seed);
@@ -156,8 +156,8 @@ protected:
 	cNoise m_NoiseZ;
 	cNoise m_NoiseH;
 	
-	// cStructureGen override:
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 

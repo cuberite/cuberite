@@ -566,14 +566,14 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 		{
 			if ((i >= 4) && (i <= 7)) // If we are currently checking for wire surrounding ourself one block above...
 			{
-				if (g_BlockIsSolid[m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)]) // If there is something solid above us (wire cut off)...
+				if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))) // If there is something solid above us (wire cut off)...
 				{
 					continue; // We don't receive power from that wire
 				}
 			}
 			else if ((i >= 8) && (i <= 11)) // See above, but this is for wire below us
 			{
-				if (g_BlockIsSolid[m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y + 1, a_BlockZ + gCrossCoords[i].z)])
+				if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y + 1, a_BlockZ + gCrossCoords[i].z)))
 				{
 					continue;
 				}
@@ -838,8 +838,8 @@ void cIncrementalRedstoneSimulator::HandleTNT(int a_BlockX, int a_BlockY, int a_
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
 		m_World.BroadcastSoundEffect("game.tnt.primed", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.6f);
-		m_World.SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 4);  // 4 seconds to boom
 		m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+		m_World.SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);  // 80 ticks to boom
 	}
 }
 
@@ -1062,7 +1062,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 				{
 					Vector3f EntityPos = a_Entity->GetPosition();
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
-					float Distance = (EntityPos - BlockPos).Length();
+					double Distance = (EntityPos - BlockPos).Length();
 
 					if (Distance <= 0.7)
 					{

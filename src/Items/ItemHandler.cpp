@@ -13,6 +13,7 @@
 #include "ItemBow.h"
 #include "ItemBrewingStand.h"
 #include "ItemBucket.h"
+#include "ItemCake.h"
 #include "ItemCauldron.h"
 #include "ItemCloth.h"
 #include "ItemComparator.h"
@@ -26,6 +27,7 @@
 #include "ItemHoe.h"
 #include "ItemLeaves.h"
 #include "ItemLighter.h"
+#include "ItemLilypad.h"
 #include "ItemMap.h"
 #include "ItemMinecart.h"
 #include "ItemNetherWart.h"
@@ -94,6 +96,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		
 		// Single item per handler, alphabetically sorted:
 		case E_BLOCK_LEAVES:           return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_NEW_LEAVES:       return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_SAPLING:          return new cItemSaplingHandler(a_ItemType);
 		case E_BLOCK_WOOL:             return new cItemClothHandler(a_ItemType);
 		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
@@ -101,16 +104,19 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
 		case E_ITEM_BOW:               return new cItemBowHandler;
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
+		case E_ITEM_CAKE:              return new cItemCakeHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
 		case E_ITEM_COMPARATOR:        return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:               return new cItemEggHandler();
 		case E_ITEM_EMPTY_MAP:         return new cItemEmptyMapHandler();
 		case E_ITEM_ENDER_PEARL:       return new cItemEnderPearlHandler();
+		case E_ITEM_FIRE_CHARGE:       return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FIREWORK_ROCKET:   return new cItemFireworkHandler();
 		case E_ITEM_FISHING_ROD:       return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
+		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
@@ -248,6 +254,14 @@ cItemHandler::cItemHandler(int a_ItemType)
 
 bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
 {
+	UNUSED(a_World);
+	UNUSED(a_Player);
+	UNUSED(a_Item);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_Dir);
+
 	return false;
 }
 
@@ -257,6 +271,14 @@ bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem &
 
 bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
 {
+	UNUSED(a_World);
+	UNUSED(a_Player);
+	UNUSED(a_Item);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_Dir);
+	
 	return false;
 }
 
@@ -266,8 +288,10 @@ bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cI
 
 void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	UNUSED(a_Item);
+	
 	BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(Block);
+	cBlockHandler * Handler = cBlockInfo::GetHandler(Block);
 
 	if (a_Player->IsGameModeSurvival())
 	{
@@ -288,7 +312,9 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 
 void cItemHandler::OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_Item)
 {
-
+	UNUSED(a_World);
+	UNUSED(a_Player);
+	UNUSED(a_Item);
 }
 
 
@@ -317,6 +343,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_BREWING_STAND:        return 64;
 		case E_ITEM_BUCKET:               return 16;
 		case E_ITEM_CARROT:               return 64;
+		case E_ITEM_CAKE:                 return 1;
 		case E_ITEM_CAULDRON:             return 64;
 		case E_ITEM_CLAY:                 return 64;
 		case E_ITEM_CLAY_BRICK:           return 64;
@@ -461,6 +488,8 @@ bool cItemHandler::IsPlaceable(void)
 
 bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 {
+	UNUSED(a_BlockType);
+	
 	return false;
 }
 
@@ -499,6 +528,8 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
+	UNUSED(a_Item);
+	
 	FoodInfo Info = GetFoodInfo();
 
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))

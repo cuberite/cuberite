@@ -135,7 +135,7 @@ void cProtocol161::SendPlayerMaxSpeed(void)
 	WriteInt(m_Client->GetPlayer()->GetUniqueID());
 	WriteInt(1);
 	WriteString("generic.movementSpeed");
-	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
+	WriteDouble(0.1 * m_Client->GetPlayer()->GetMaxSpeed());
 	Flush();
 }
 
@@ -184,7 +184,16 @@ int cProtocol161::ParseEntityAction(void)
 	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
 	HANDLE_PACKET_READ(ReadChar,  char, ActionID);
 	HANDLE_PACKET_READ(ReadBEInt, int,  UnknownHorseVal);
-	m_Client->HandleEntityAction(EntityID, ActionID);
+	
+	switch (ActionID)
+	{
+		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break; // Crouch
+		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break; // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break; // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break; // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(EntityID, false); break; // Stop sprinting
+	}
+
 	return PARSE_OK;
 }
 
@@ -258,7 +267,7 @@ void cProtocol162::SendPlayerMaxSpeed(void)
 	WriteInt(m_Client->GetPlayer()->GetUniqueID());
 	WriteInt(1);
 	WriteString("generic.movementSpeed");
-	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
+	WriteDouble(0.1 * m_Client->GetPlayer()->GetMaxSpeed());
 	WriteShort(0);
 	Flush();
 }

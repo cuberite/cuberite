@@ -70,7 +70,7 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 		}
 	}
 
-	server.sin_addr.s_addr = *((unsigned long *)hp->h_addr);
+	memcpy(&server.sin_addr.s_addr,hp->h_addr, hp->h_length);
 	server.sin_family = AF_INET;
 	server.sin_port = htons( (unsigned short)iPort);
 	if (connect(m_Socket, (struct sockaddr *)&server, sizeof(server)))
@@ -89,6 +89,8 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 
 int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 0 */ )
 {
+	UNUSED(a_Flags);
+	
 	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{
@@ -104,6 +106,8 @@ int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 
 
 int cBlockingTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ )
 {
+	UNUSED(a_Flags);
+	
 	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{

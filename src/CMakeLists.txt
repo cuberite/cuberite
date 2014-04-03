@@ -1,4 +1,3 @@
-
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
@@ -7,17 +6,17 @@ include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
 
 set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating) 
-set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities)
-
+set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs)
 
 
 if (NOT MSVC)
 
-	#Bindings needs to reference other folders so are done here
+	# Bindings need to reference other folders, so they are done here instead
 	
-	#lib dependecies are not included
+	# lib dependencies are not included
 	
 	set(BINDING_DEPENDECIES
+		tolua
 		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
 		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
 		Bindings/LuaFunctions.h
@@ -40,6 +39,7 @@ if (NOT MSVC)
 		BlockEntities/NoteEntity.h
 		BlockEntities/SignEntity.h
 		BlockEntities/MobHeadEntity.h
+		BlockEntities/FlowerPotEntity.h
 		BlockID.h
 		BoundingBox.h
 		ChatColor.h
@@ -58,12 +58,14 @@ if (NOT MSVC)
 		Entities/Player.h
 		Entities/ProjectileEntity.h
 		Entities/TNTEntity.h
+		Entities/ExpOrb.h
+		Entities/HangingEntity.h
+		Entities/ItemFrame.h
 		Generating/ChunkDesc.h
 		Group.h
 		Inventory.h
 		Item.h
 		ItemGrid.h
-		Matrix4f.h
 		Mobs/Monster.h
 		OSSupport/File.h
 		Root.h
@@ -71,9 +73,7 @@ if (NOT MSVC)
 		StringUtils.h
 		Tracer.h
 		UI/Window.h
-		Vector3d.h
-		Vector3f.h
-		Vector3i.h
+		Vector3.h
 		WebAdmin.h
 		World.h
 	)
@@ -95,6 +95,7 @@ if (NOT MSVC)
 	#add cpp files here
 	add_library(Bindings
 		Bindings/Bindings
+		Bindings/DeprecatedBindings
 		Bindings/LuaChunkStay
 		Bindings/LuaState
 		Bindings/LuaWindow
@@ -102,7 +103,6 @@ if (NOT MSVC)
 		Bindings/Plugin
 		Bindings/PluginLua
 		Bindings/PluginManager
-		Bindings/WebPlugin
 		Bindings/WebPlugin
 	)
 
@@ -137,6 +137,7 @@ if (NOT MSVC)
 
 
 else ()
+	# MSVC-specific handling: Put all files into one project, separate by the folders:
 
 	# Generate the Bindings if they don't exist:
 	if (NOT EXISTS "${PROJECT_SOURCE_DIR}/Bindings/Bindings.cpp")
@@ -148,6 +149,14 @@ else ()
 		)
 	endif()
 
+	# Get all files in this folder:
+	file(GLOB_RECURSE SOURCE
+		"*.cpp"
+		"*.h"
+		"*.pkg"
+	)
+	source_group("" FILES ${SOURCE})
+
 	# Add all subfolders as solution-folders:
 	list(APPEND FOLDERS "Resources")
 	list(APPEND FOLDERS "Bindings")
@@ -158,22 +167,15 @@ else ()
 			"${PATH}/*.rc"
 			"${PATH}/*.pkg"
 		)
-		source_group("${PATH}" FILES ${FOLDER_FILES})
+		string(REPLACE "/" "\\" PROJECT_PATH ${PATH})
+		source_group("${PROJECT_PATH}" FILES ${FOLDER_FILES})
 	endfunction(includefolder)
 
 	foreach(folder ${FOLDERS})
 		includefolder(${folder})
 	endforeach(folder)
 
-	file(GLOB_RECURSE SOURCE
-		"*.cpp"
-		"*.h"
-		"*.pkg"
-	)
-
 	include_directories("${PROJECT_SOURCE_DIR}")
-
-	source_group("" FILES ${SOURCE})
 
 	# Precompiled headers (1st part)
 	SET_SOURCE_FILES_PROPERTIES(
@@ -230,7 +232,7 @@ endif ()
 
 if (NOT MSVC)
 	target_link_libraries(${EXECUTABLE} OSSupport HTTPServer Bindings Items Blocks)
-	target_link_libraries(${EXECUTABLE} Protocol Generating WorldStorage)
+	target_link_libraries(${EXECUTABLE} Protocol Generating Generating_Prefabs WorldStorage)
 	target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI BlockEntities)
 endif ()
 if (WIN32)

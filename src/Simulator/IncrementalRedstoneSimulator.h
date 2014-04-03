@@ -170,7 +170,7 @@ private:
 
 	/* ====== Misc Functions ====== */
 	/** Returns if a block is viable to be the MiddleBlock of a SetLinkedPowered operation */
-	inline static bool IsViableMiddleBlock(BLOCKTYPE Block) { return g_BlockFullyOccupiesVoxel[Block]; }
+	inline static bool IsViableMiddleBlock(BLOCKTYPE Block) { return cBlockInfo::FullyOccupiesVoxel(Block); }
 
 	/** Returns if a block is a mechanism (something that accepts power and does something) */
 	inline static bool IsMechanism(BLOCKTYPE Block)

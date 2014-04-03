@@ -27,9 +27,12 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
 	PM:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
 	PM:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
-	PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
 	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_JOINED,                OnPlayerJoined)
+
+	-- _X: Disabled so that the normal operation doesn't interfere with anything
+	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
@@ -55,7 +58,8 @@ function Initialize(Plugin)
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
 	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings")
-	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
+	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one")
+	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z")
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -65,10 +69,22 @@ function Initialize(Plugin)
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
-	-- TestBlockAreas();
-	-- TestSQLiteBindings();
-	-- TestExpatBindings();
-	-- TestPluginCalls();
+	-- TestBlockAreas()
+	-- TestSQLiteBindings()
+	-- TestExpatBindings()
+	-- TestPluginCalls()
+	
+	TestBlockAreasString()
+	TestStringBase64()
+
+	--[[
+	-- Test cCompositeChat usage in console-logging:
+	LOGINFO(cCompositeChat("This is a simple message with some @2 color formatting @4 and http://links.to .")
+		:AddSuggestCommandPart("(Suggested command)", "cmd")
+		:AddRunCommandPart("(Run command)", "cmd")
+		:SetMessageType(mtInfo)
+	)
+	--]]
 	
 	return true
 end;
@@ -198,6 +214,60 @@ end
 
 
 	
+
+
+
+function TestBlockAreasString()
+	-- Write one area to string, then to file:
+	local BA1 = cBlockArea()
+	BA1:Create(5, 5, 5, cBlockArea.baTypes + cBlockArea.baMetas)
+	BA1:Fill(cBlockArea.baTypes, E_BLOCK_DIAMOND_BLOCK)
+	BA1:FillRelCuboid(1, 3, 1, 3, 1, 3, cBlockArea.baTypes, E_BLOCK_GOLD_BLOCK)
+	local Data = BA1:SaveToSchematicString()
+	if ((type(Data) ~= "string") or (Data == "")) then
+		LOG("Cannot save schematic to string")
+		return
+	end
+	cFile:CreateFolder("schematics")
+	local f = io.open("schematics/StringTest.schematic", "wb")
+	f:write(Data)
+	f:close()
+	
+	-- Load a second area from that file:
+	local BA2 = cBlockArea()
+	if not(BA2:LoadFromSchematicFile("schematics/StringTest.schematic")) then
+		LOG("Cannot read schematic from string test file")
+		return
+	end
+	BA2:Clear()
+	
+	-- Load another area from a string in that file:
+	f = io.open("schematics/StringTest.schematic", "rb")
+	Data = f:read("*all")
+	if not(BA2:LoadFromSchematicString(Data)) then
+		LOG("Cannot load schematic from string")
+	end
+end
+
+
+
+
+
+function TestStringBase64()
+	-- Create a binary string:
+	local s = ""
+	for i = 0, 255 do
+		s = s .. string.char(i)
+	end
+	
+	-- Roundtrip through Base64:
+	local Base64 = Base64Encode(s)
+	local UnBase64 = Base64Decode(Base64)
+	
+	assert(UnBase64 == s)
+end
+
+
 
 
 
@@ -1253,6 +1323,57 @@ function HandleSetBiome(a_Split, a_Player)
 		"} set to biome #" .. tostring(Biome) .. "."
 	)
 	return true
+end
+
+
+
+
+
+function HandleWESel(a_Split, a_Player)
+	-- Check if the selection is a cuboid:
+	local IsCuboid = cPluginManager:CallPlugin("WorldEdit", "IsPlayerSelectionCuboid")
+	if (IsCuboid == nil) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit is not loaded"))
+		return true
+	elseif (IsCuboid == false) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, the selection is not a cuboid"))
+		return true
+	end
+	
+	-- Get the selection:
+	local SelCuboid = cCuboid()
+	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "GetPlayerCuboidSelection", a_Player, SelCuboid)
+	if not(IsSuccess) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while getting current selection"))
+		return true
+	end
+	
+	-- Adjust the selection:
+	local NumBlocks = tonumber(a_Split[2] or "1") or 1
+	SelCuboid:Expand(NumBlocks, NumBlocks, 0, 0, NumBlocks, NumBlocks)
+	
+	-- Set the selection:
+	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "SetPlayerCuboidSelection", a_Player, SelCuboid)
+	if not(IsSuccess) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while setting new selection"))
+		return true
+	end
+	a_Player:SendMessage(cCompositeChat():SetMessageType(mtInformation):AddTextPart("Successfully adjusted the selection by " .. NumBlocks .. " block(s)"))
+	return true
+end
+
+
+
+
+
+function OnPlayerJoined(a_Player)
+	-- Test composite chat chaining:
+	a_Player:SendMessage(cCompositeChat()
+		:AddTextPart("Hello, ")
+		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")
+		:AddSuggestCommandPart(", and welcome.", "/help", "u")
+		:AddRunCommandPart(" SetDay", "/time set 0")
+	)
 end
 
 

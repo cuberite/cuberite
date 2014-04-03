@@ -2,8 +2,8 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../MersenneTwister.h"
 #include "BlockSlab.h"
+#include "../FastRandom.h"
 
 
 
@@ -39,7 +39,7 @@ public:
 			BLOCKTYPE Above;
 			NIBBLETYPE AboveMeta;
 			a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY + 1, a_RelZ, Above, AboveMeta);
-			if ((!g_BlockTransparent[Above] && !g_BlockOneHitDig[Above] && !(cBlockSlabHandler::IsAnySlabType(Above) && (AboveMeta & 0x8))) || IsBlockWater(Above))
+			if ((!cBlockInfo::IsTransparent(Above) && !cBlockInfo::IsOneHitDig(Above) && !(cBlockSlabHandler::IsAnySlabType(Above) && (AboveMeta & 0x8))) || IsBlockWater(Above))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
@@ -47,12 +47,12 @@ public:
 		}
 		
 		// Grass spreads to adjacent dirt blocks:
-		MTRand rand;  // TODO: Replace with cFastRandom
+		cFastRandom rand;
 		for (int i = 0; i < 2; i++)  // Pick two blocks to grow to
 		{
-			int OfsX = rand.randInt(2) - 1;  // [-1 .. 1]
-			int OfsY = rand.randInt(4) - 3;  // [-3 .. 1]
-			int OfsZ = rand.randInt(2) - 1;  // [-1 .. 1]
+			int OfsX = rand.NextInt(3, a_RelX) - 1;  // [-1 .. 1]
+			int OfsY = rand.NextInt(5, a_RelY) - 3;  // [-3 .. 1]
+			int OfsZ = rand.NextInt(3, a_RelZ) - 1;  // [-1 .. 1]
 	
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;
@@ -80,9 +80,12 @@ public:
 			BLOCKTYPE AboveDest;
 			NIBBLETYPE AboveMeta;
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
-			if ((g_BlockOneHitDig[AboveDest] || g_BlockTransparent[AboveDest] || ((cBlockSlabHandler::IsAnySlabType(AboveDest)) && (AboveMeta & 0x8))) && !IsBlockWater(AboveDest))
+			if ((cBlockInfo::IsOneHitDig(AboveDest) || cBlockInfo::IsTransparent(AboveDest) || ((cBlockSlabHandler::IsAnySlabType(AboveDest)) && (AboveMeta & 0x8))) && !IsBlockWater(AboveDest))
 			{
-				Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
+				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, BlockX * cChunkDef::Width, BlockY, BlockZ * cChunkDef::Width, ssGrassSpread))
+				{
+					Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
+				}
 			}
 		}  // for i - repeat twice
 	}

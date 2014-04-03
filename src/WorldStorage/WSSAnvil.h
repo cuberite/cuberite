@@ -20,6 +20,7 @@
 class cItemGrid;
 
 class cProjectileEntity;
+class cHangingEntity;
 
 
 
@@ -135,6 +136,7 @@ protected:
 	void LoadChestFromNBT       (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDispenserFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDropperFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadFlowerPotFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFurnaceFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
 	void LoadHopperFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadJukeboxFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -146,8 +148,13 @@ protected:
 	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength);
 	
 	void LoadBoatFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadEnderCrystalFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFallingBlockFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPickupFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadTNTFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadExpOrbFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadHangingFromNBT         (cHangingEntity & a_Hanging,const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadItemFrameFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	void LoadMinecartRFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartCFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);

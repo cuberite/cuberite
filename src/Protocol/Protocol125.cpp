@@ -239,32 +239,11 @@ void cProtocol125::SendChat(const AString & a_Message)
 void cProtocol125::SendChat(const cCompositeChat & a_Message)
 {
 	// This version doesn't support composite messages, just extract each part's text and use it:
-	AString Msg;
-	const cCompositeChat::cParts & Parts = a_Message.GetParts();
-	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
-	{
-		switch ((*itr)->m_PartType)
-		{
-			case cCompositeChat::ptText:
-			case cCompositeChat::ptClientTranslated:
-			case cCompositeChat::ptRunCommand:
-			case cCompositeChat::ptSuggestCommand:
-			{
-				Msg.append((*itr)->m_Text);
-				break;
-			}
-			case cCompositeChat::ptUrl:
-			{
-				Msg.append(((cCompositeChat::cUrlPart *)(*itr))->m_Url);
-				break;
-			}
-		}  // switch (PartType)
-	}  // for itr - Parts[]
 	
 	// Send the message:
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_CHAT);
-	WriteString(Msg);
+	WriteString(a_Message.ExtractText());
 	Flush();
 }
 
@@ -1186,7 +1165,7 @@ void cProtocol125::SendData(const char * a_Data, int a_Size)
 
 
 
-void cProtocol125::DataReceived(const char * a_Data, int a_Size)
+void cProtocol125::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
@@ -1264,19 +1243,6 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 		case PACKET_WINDOW_CLOSE:              return ParseWindowClose();
 	}
 }
-
-
-
-
-
-#define HANDLE_PACKET_PARSE(Packet) \
-	{ \
-		int res = Packet.Parse(m_ReceivedData); \
-		if (res < 0) \
-		{ \
-			return res; \
-		} \
-	}
 
 
 
@@ -1375,7 +1341,16 @@ int cProtocol125::ParseEntityAction(void)
 {
 	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
 	HANDLE_PACKET_READ(ReadChar,  char, ActionID);
-	m_Client->HandleEntityAction(EntityID, ActionID);
+
+	switch (ActionID)
+	{
+		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break; // Crouch
+		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break; // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break; // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break; // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(EntityID, false); break; // Stop sprinting
+	}
+
 	return PARSE_OK;
 }
 
@@ -1974,6 +1949,14 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 		{
 			WriteByte(0x15);
 			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0); // Aggravated? Doesn't seem to do anything
+			break;
+		}
+		case cMonster::mtWither:
+		{
+			WriteByte(0x54); // Int at index 20
+			WriteInt(((const cWither &)a_Mob).GetNumInvulnerableTicks());
+			WriteByte(0x66); // Float at index 6
+			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
 		}
 		case cMonster::mtSlime:

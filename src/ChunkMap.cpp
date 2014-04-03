@@ -1376,8 +1376,9 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 				break;
 			}
 			case E_BLOCK_LEAVES:
+			case E_BLOCK_NEW_LEAVES:
 			{
-				if (itr->BlockType == E_BLOCK_LOG)
+				if ((itr->BlockType == E_BLOCK_LOG) || (itr->BlockType == E_BLOCK_NEW_LOG))
 				{
 					Chunk->SetBlock(itr->x, itr->y, itr->z, itr->BlockType, itr->BlockMeta);
 				}
@@ -1784,57 +1785,73 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					BLOCKTYPE Block = area.GetBlockType(bx + x, by + y, bz + z);
 					switch (Block)
 					{
-					case E_BLOCK_TNT:
-					{
-						// Activate the TNT, with a random fuse between 10 to 30 game ticks
-						double FuseTime = (double)(10 + m_World->GetTickRandomNumber(20)) / 20;
-						m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
-						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
-						break;
-					}
-					case E_BLOCK_OBSIDIAN:
-					case E_BLOCK_BEDROCK:
-					case E_BLOCK_WATER:
-					case E_BLOCK_LAVA:
-					{
-						// These blocks are not affected by explosions
-						break;
-					}
-
-					case E_BLOCK_STATIONARY_WATER:
-					{
-						// Turn into simulated water:
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
-						break;
-					}
-
-					case E_BLOCK_STATIONARY_LAVA:
-					{
-						// Turn into simulated lava:
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
-						break;
-					}
-
-					case E_BLOCK_AIR:
-					{
-						// No pickups for air
-						break;
-					}
-
-					default:
-					{
-						if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
+						case E_BLOCK_TNT:
 						{
-							cItems Drops;
-							cBlockHandler * Handler = BlockHandler(Block);
-
-							Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
-							m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
+							// Activate the TNT, with a random fuse between 10 to 30 game ticks
+							int FuseTime = 10 + m_World->GetTickRandomNumber(20);
+							m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
+							break;
 						}
-						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
-						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
-					}
+						
+						case E_BLOCK_OBSIDIAN:
+						case E_BLOCK_BEDROCK:
+						case E_BLOCK_WATER:
+						case E_BLOCK_LAVA:
+						{
+							// These blocks are not affected by explosions
+							break;
+						}
+
+						case E_BLOCK_STATIONARY_WATER:
+						{
+							// Turn into simulated water:
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
+							break;
+						}
+
+						case E_BLOCK_STATIONARY_LAVA:
+						{
+							// Turn into simulated lava:
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
+							break;
+						}
+
+						case E_BLOCK_AIR:
+						{
+							// No pickups for air
+							break;
+						}
+
+						default:
+						{
+							if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
+							{
+								cItems Drops;
+								cBlockHandler * Handler = BlockHandler(Block);
+
+								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
+								m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
+							}
+							else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
+							{
+								if (!cBlockInfo::FullyOccupiesVoxel(Block))
+								{
+									break;
+								}
+								else if ((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block != E_BLOCK_SAND) && (Block != E_BLOCK_GRAVEL)))
+								{
+									break;
+								}
+								m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
+							}
+
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
+							break;
+							
+						}
 					}  // switch (BlockType)
 				}  // for z
 			}  // for y
@@ -1846,11 +1863,10 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		public cEntityCallback
 	{
 	public:
-		cTNTDamageCallback(cBoundingBox & a_bbTNT, Vector3d a_ExplosionPos, int a_ExplosionSize, int a_ExplosionSizeSq) :
+		cTNTDamageCallback(cBoundingBox & a_bbTNT, Vector3d a_ExplosionPos, int a_ExplosionSize) :
 			m_bbTNT(a_bbTNT),
 			m_ExplosionPos(a_ExplosionPos),
-			m_ExplosionSize(a_ExplosionSize),
-			m_ExplosionSizeSq(a_ExplosionSizeSq)
+			m_ExplosionSize(a_ExplosionSize)
 		{
 		}
 
@@ -1873,14 +1889,16 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			}
 			
 			Vector3d AbsoluteEntityPos(abs(EntityPos.x), abs(EntityPos.y), abs(EntityPos.z));
-			Vector3d MaxExplosionBoundary(m_ExplosionSizeSq, m_ExplosionSizeSq, m_ExplosionSizeSq);
 
 			// Work out how far we are from the edge of the TNT's explosive effect
 			AbsoluteEntityPos -= m_ExplosionPos;
-			AbsoluteEntityPos = MaxExplosionBoundary - AbsoluteEntityPos;
 
-			double FinalDamage = ((AbsoluteEntityPos.x + AbsoluteEntityPos.y + AbsoluteEntityPos.z) / 3) * m_ExplosionSize;
-			FinalDamage = a_Entity->GetMaxHealth() - abs(FinalDamage);
+			// All to positive
+			AbsoluteEntityPos.x = abs(AbsoluteEntityPos.x);
+			AbsoluteEntityPos.y = abs(AbsoluteEntityPos.y);
+			AbsoluteEntityPos.z = abs(AbsoluteEntityPos.z);
+
+			double FinalDamage = (((1 / AbsoluteEntityPos.x) + (1 / AbsoluteEntityPos.y) + (1 / AbsoluteEntityPos.z)) * 2) * m_ExplosionSize;
 
 			// Clip damage values
 			if (FinalDamage > a_Entity->GetMaxHealth())
@@ -1888,7 +1906,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			else if (FinalDamage < 0)
 				FinalDamage = 0;
 
-			if (!a_Entity->IsTNT()) // Don't apply damage to other TNT entities, they should be invincible
+			if (!a_Entity->IsTNT() && !a_Entity->IsFallingBlock()) // Don't apply damage to other TNT entities and falling blocks, they should be invincible
 			{
 				a_Entity->TakeDamage(dtExplosion, NULL, (int)FinalDamage, 0);
 			}
@@ -1898,7 +1916,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			if (distance_explosion.SqrLength() < 4096.0)
 			{
 				distance_explosion.Normalize();
-				distance_explosion *= m_ExplosionSizeSq;
+				distance_explosion *= m_ExplosionSize * m_ExplosionSize;
 
 				a_Entity->AddSpeed(distance_explosion);
 			}
@@ -1910,14 +1928,13 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		cBoundingBox & m_bbTNT;
 		Vector3d m_ExplosionPos;
 		int m_ExplosionSize;
-		int m_ExplosionSizeSq;
 	};
 
 	cBoundingBox bbTNT(Vector3d(a_BlockX, a_BlockY, a_BlockZ), 0.5, 1);
 	bbTNT.Expand(ExplosionSizeInt * 2, ExplosionSizeInt * 2, ExplosionSizeInt * 2);
 
 
-	cTNTDamageCallback TNTDamageCallback(bbTNT, Vector3d(a_BlockX, a_BlockY, a_BlockZ), ExplosionSizeInt, ExplosionSizeSq);
+	cTNTDamageCallback TNTDamageCallback(bbTNT, Vector3d(a_BlockX, a_BlockY, a_BlockZ), ExplosionSizeInt);
 	ForEachEntity(TNTDamageCallback);
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
@@ -2182,7 +2199,7 @@ bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-bool cChunkMap::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+bool cChunkMap::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2193,7 +2210,25 @@ bool cChunkMap::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	{
 		return false;
 	}
-	return Chunk->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cChunkMap::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback)
+{
+	int ChunkX, ChunkZ;
+	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk == NULL) && !Chunk->IsValid())
+	{
+		return false;
+	}
+	return Chunk->DoWithFlowerPotAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 

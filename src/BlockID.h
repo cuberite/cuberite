@@ -853,9 +853,30 @@ enum eExplosionSource
 	esWitherSkullBlue,
 	esWitherBirth,
 	esPlugin,
-	
-	// Obsolete constants, kept for compatibility, will be removed after some time:
-	esCreeper = esMonster,
+} ;
+
+
+
+
+
+enum eShrapnelLevel
+{
+	slNone,
+	slGravityAffectedOnly,
+	slAll
+} ;
+
+
+
+
+
+enum eSpreadSource
+{
+	ssFireSpread,
+	ssGrassSpread,
+	ssMushroomSpread,
+	ssMycelSpread,
+	ssVineSpread,
 } ;
 
 // tolua_end
@@ -905,20 +926,6 @@ extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const c
 
 // tolua_end
 
-
-
-
-
-// Block properties:
-extern NIBBLETYPE g_BlockLightValue[256];
-extern NIBBLETYPE g_BlockSpreadLightFalloff[256];
-extern bool       g_BlockTransparent[256];
-extern bool       g_BlockOneHitDig[256];
-extern bool       g_BlockPistonBreakable[256];
-extern bool       g_BlockIsSnowable[256];
-extern bool       g_BlockRequiresSpecialTool[256];
-extern bool       g_BlockIsSolid[256];
-extern bool       g_BlockFullyOccupiesVoxel[256];
 
 
 

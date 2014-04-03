@@ -24,12 +24,14 @@ class cChestEntity;
 class cCommandBlockEntity;
 class cDispenserEntity;
 class cDropperEntity;
+class cEnderCrystal;
 class cFurnaceEntity;
 class cHopperEntity;
 class cJukeboxEntity;
 class cNoteEntity;
 class cSignEntity;
 class cMobHeadEntity;
+class cFlowerPotEntity;
 class cFallingBlock;
 class cMinecart;
 class cMinecartWithChest;
@@ -40,6 +42,10 @@ class cMonster;
 class cPickup;
 class cItemGrid;
 class cProjectileEntity;
+class cTNTEntity;
+class cExpOrb;
+class cHangingEntity;
+class cItemFrame;
 
 
 
@@ -96,15 +102,21 @@ protected:
 	void AddSignEntity     (cSignEntity *      a_Sign);
 	void AddMobHeadEntity  (cMobHeadEntity *     a_MobHead);
 	void AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock);
+	void AddFlowerPotEntity(cFlowerPotEntity * a_FlowerPot);
 	
 	// Entities:
 	void AddBasicEntity       (cEntity * a_Entity, const AString & a_ClassName);
 	void AddBoatEntity        (cBoat * a_Boat);
+	void AddEnderCrystalEntity(cEnderCrystal * a_EnderCrystal);
 	void AddFallingBlockEntity(cFallingBlock * a_FallingBlock);
 	void AddMinecartEntity    (cMinecart * a_Minecart);
 	void AddMonsterEntity     (cMonster * a_Monster);
 	void AddPickupEntity      (cPickup * a_Pickup);
 	void AddProjectileEntity  (cProjectileEntity * a_Projectile);
+	void AddHangingEntity     (cHangingEntity * a_Hanging);
+	void AddTNTEntity         (cTNTEntity * a_TNT);
+	void AddExpOrbEntity      (cExpOrb * a_ExpOrb);
+	void AddItemFrameEntity   (cItemFrame * a_ItemFrame);
 	
 	void AddMinecartChestContents(cMinecartWithChest * a_Minecart);
 	

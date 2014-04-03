@@ -34,6 +34,7 @@
 #include "Simulator/NoopRedstoneSimulator.h"
 #include "Simulator/SandSimulator.h"
 #include "Simulator/IncrementalRedstoneSimulator.h"
+#include "Simulator/VanillaFluidSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
 
 // Mobs:
@@ -45,7 +46,6 @@
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
-#include "Vector3d.h"
 
 #include "Tracer.h"
 
@@ -59,9 +59,6 @@
 
 
 
-
-/// Up to this many m_SpreadQueue elements are handled each world tick
-const int MAX_LIGHTING_SPREAD_PER_TICK = 10;
 
 const int TIME_SUNSET        = 12000;
 const int TIME_NIGHT_START   = 13187;
@@ -102,7 +99,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("%d chunks to load, %d chunks to generate", 
+			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate", 
 				m_World->GetStorage().GetLoadQueueLength(),
 				m_World->GetGenerator().GetQueueLength()
 			);
@@ -154,7 +151,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("%d chunks remaining to light", m_Lighting->GetQueueLength()
+			LOG("" SIZE_T_FMT  " chunks remaining to light", m_Lighting->GetQueueLength()
 			);
 			
 			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
@@ -250,8 +247,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_SkyDarkness(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
-	m_bCommandBlocksEnabled(false),
-	m_bUseChatPrefixes(true),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -264,8 +259,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
 	Serializer.Load();
-
-	m_MapManager.LoadMapData();
 }
 
 
@@ -325,8 +318,8 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 		}
 		default:
 		{
-			LOGWARNING("Missing default weather interval for weather %d.", a_Weather);
-			return 1200;
+			LOGWARNING("%s: Missing default weather interval for weather %d.", __FUNCTION__, a_Weather);
+			return -1;
 		}
 	}  // switch (Weather)
 }
@@ -348,7 +341,7 @@ void cWorld::SetWeather(eWeather a_NewWeather)
 	m_WeatherInterval = GetDefaultWeatherInterval(a_NewWeather);
 	
 	// The weather can't be found:
-	if (m_WeatherInterval == 1200)
+	if (m_WeatherInterval < 0)
 	{
 		return;
 	}
@@ -564,29 +557,33 @@ void cWorld::Start(void)
 		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
 	}
 
-	m_StorageSchema             = IniFile.GetValueSet ("Storage",       "Schema",                    m_StorageSchema);
-	m_StorageCompressionFactor  = IniFile.GetValueSetI("Storage",       "CompressionFactor",         m_StorageCompressionFactor);
-	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
-	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
-	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
-	m_IsCarrotsBonemealable     = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",     true);
-	m_IsCropsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",       true);
-	m_IsGrassBonemealable       = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",       true);
-	m_IsMelonStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",   true);
-	m_IsMelonBonemealable       = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",       false);
-	m_IsPotatoesBonemealable    = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",    true);
-	m_IsPumpkinStemBonemealable = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable", true);
-	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
-	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
-	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
-	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  true);
-	m_ShouldLavaSpawnFire       = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",       true);
-	m_bCommandBlocksEnabled     = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",      false);
-	m_bEnabledPVP               = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                true);
-	m_bUseChatPrefixes          = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",           true);
-	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",    "VillagersShouldHarvestCrops", true);
-
-	m_GameMode = (eGameMode)IniFile.GetValueSetI("General", "Gamemode", m_GameMode);
+	m_StorageSchema               = IniFile.GetValueSet ("Storage",       "Schema",                      m_StorageSchema);
+	m_StorageCompressionFactor    = IniFile.GetValueSetI("Storage",       "CompressionFactor",           m_StorageCompressionFactor);
+	m_MaxCactusHeight             = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",             3);
+	m_MaxSugarcaneHeight          = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",          3);
+	m_IsCactusBonemealable        = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",        false);
+	m_IsCarrotsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",       true);
+	m_IsCropsBonemealable         = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",         true);
+	m_IsGrassBonemealable         = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",         true);
+	m_IsMelonStemBonemealable     = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",     true);
+	m_IsMelonBonemealable         = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",         false);
+	m_IsPotatoesBonemealable      = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",      true);
+	m_IsPumpkinStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable",   true);
+	m_IsPumpkinBonemealable       = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",       false);
+	m_IsSaplingBonemealable       = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",       true);
+	m_IsSugarcaneBonemealable     = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",     false);
+	m_IsDeepSnowEnabled           = IniFile.GetValueSetB("Physics",       "DeepSnow",                    true);
+	m_ShouldLavaSpawnFire         = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",         true);
+	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            (int)slNone);
+	m_bCommandBlocksEnabled       = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",        false);
+	m_bEnabledPVP                 = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                  true);
+	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
+	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
+	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
+	
+	// Adjust the enum-backed variables into their respective bounds:
+	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmAdventure);
+	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
 
 	// Load allowed mobs:
 	const char * DefaultMonsters = "";
@@ -652,13 +649,13 @@ void cWorld::Start(void)
 	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfAmbient, 0));
 	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfWater, 0));
 
+	m_MapManager.LoadMapData();
 
 	// Save any changes that the defaults may have done to the ini file:
 	if (!IniFile.WriteFile(m_IniFileName))
 	{
 		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
 	}
-
 }
 
 
@@ -1199,9 +1196,18 @@ bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
-bool cWorld::DoWithMobHeadBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadBlockCallback & a_Callback)
+bool cWorld::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
 {
-	return m_ChunkMap->DoWithMobHeadBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return m_ChunkMap->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithFlowerPotAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -1718,12 +1724,15 @@ int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType
 
 
 
-void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec, double a_InitialVelocityCoeff)
+void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
-	UNUSED(a_InitialVelocityCoeff);
-	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTimeInSec);
+	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
 	TNT->Initialize(this);
-	// TODO: Add a bit of speed in horiz and vert axes, based on the a_InitialVelocityCoeff
+	TNT->SetSpeed(
+		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /** -1, 0, 1 */
+		a_InitialVelocityCoeff * 2,
+		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1)
+	);
 }
 
 
@@ -1750,7 +1759,7 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
 {
-	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(GetBlock(a_X, a_Y, a_Z));
+	cBlockHandler * Handler = cBlockInfo::GetHandler(GetBlock(a_X, a_Y, a_Z));
 	cChunkInterface ChunkInterface(GetChunkMap());
 	Handler->OnDestroyed(ChunkInterface, *this, a_X, a_Y, a_Z);
 	return m_ChunkMap->DigBlock(a_X, a_Y, a_Z);
@@ -2446,14 +2455,14 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 {
 	cTracer LineOfSight(this);
 
-	float ClosestDistance = a_SightLimit;
-	cPlayer* ClosestPlayer = NULL;
+	double ClosestDistance = a_SightLimit;
+	cPlayer * ClosestPlayer = NULL;
 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		Vector3f Pos = (*itr)->GetPosition();
-		float Distance = (Pos - a_Pos).Length();
+		double Distance = (Pos - a_Pos).Length();
 
 		if (Distance < ClosestDistance)
 		{
@@ -2972,9 +2981,9 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 
 
-int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const Vector3d * a_Speed)
+int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem a_Item, const Vector3d * a_Speed)
 {
-	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Speed);
+	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
 	if (Projectile == NULL)
 	{
 		return -1;
@@ -2997,18 +3006,18 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
-		size_t LastSpace = a_Text.find_last_of(" "); //Find the position of the last space
+		size_t LastSpace = a_Text.find_last_of(" "); // Find the position of the last space
 		
-		std::string LastWord = a_Text.substr(LastSpace + 1, a_Text.length()); //Find the last word
-		std::string PlayerName ((*itr)->GetName());
-		std::size_t Found = PlayerName.find(LastWord); //Try to find last word in playername
+		AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length()); // Find the last word
+		AString PlayerName ((*itr)->GetName());
+		size_t Found = PlayerName.find(LastWord); // Try to find last word in playername
 		
-		if (Found!=0)
+		if (Found == AString::npos)
 		{
-			continue; //No match
+			continue; // No match
 		}
 		
-		a_Results.push_back((*itr)->GetName()); //Match!
+		a_Results.push_back(PlayerName); // Match!
 	}
 }
 
@@ -3055,8 +3064,8 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "");
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Floody\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
-		SimulatorName = "Floody";
+		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Vanilla\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
+		SimulatorName = "Vanilla";
 	}
 	
 	cFluidSimulator * res = NULL;
@@ -3080,15 +3089,24 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	}
 	else
 	{
-		if (NoCaseCompare(SimulatorName, "floody") != 0)
-		{
-			// The simulator name doesn't match anything we have, issue a warning:
-			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Floody\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
-		}
 		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
 		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
 		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
-		res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+
+		if (NoCaseCompare(SimulatorName, "floody") == 0)
+		{
+			res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
+		else if (NoCaseCompare(SimulatorName, "vanilla") == 0)
+		{
+			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
+		else
+		{
+			// The simulator name doesn't match anything we have, issue a warning:
+			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Vanilla\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
+			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		}
 	}
 	
 	m_SimulatorManager->RegisterSimulator(res, Rate);

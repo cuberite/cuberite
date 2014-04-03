@@ -33,6 +33,10 @@ public:
 	{
 	}
 	
+	virtual ~cWindowOwner()
+	{
+	}
+	
 	void CloseWindow(void)
 	{
 		m_Window = NULL;

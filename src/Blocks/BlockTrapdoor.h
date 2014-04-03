@@ -2,17 +2,17 @@
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "MetaRotator.h"
 
 
 
 
 class cBlockTrapdoorHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>
 {
 public:
 	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>(a_BlockType)
 	{
 	}
 
@@ -40,6 +40,12 @@ public:
 		
 		cWorld * World = (cWorld *) &a_WorldInterface;
 		World->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
+	}
+
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	{
+		UNUSED(a_ChunkInterface);
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
@@ -99,7 +105,7 @@ public:
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
 		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
+		return (a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn);
 	}
 };
 

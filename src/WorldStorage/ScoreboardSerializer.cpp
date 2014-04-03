@@ -173,13 +173,13 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginCompound("DisplaySlots");
 
-	cObjective * Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::E_DISPLAY_SLOT_LIST);
+	cObjective * Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsList);
 	a_Writer.AddString("slot_0", (Objective == NULL) ? "" : Objective->GetName());
 
-	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::E_DISPLAY_SLOT_SIDEBAR);
+	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsSidebar);
 	a_Writer.AddString("slot_1", (Objective == NULL) ? "" : Objective->GetName());
 
-	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::E_DISPLAY_SLOT_NAME);
+	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsName);
 	a_Writer.AddString("slot_2", (Objective == NULL) ? "" : Objective->GetName());
 
 	a_Writer.EndCompound(); // DisplaySlots
@@ -280,7 +280,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 	{
 		AString Name, DisplayName, Prefix, Suffix;
 
-		bool AllowsFriendlyFire = false, CanSeeFriendlyInvisible = false;
+		bool AllowsFriendlyFire = true, CanSeeFriendlyInvisible = false;
 
 		int CurrLine = a_NBT.FindChildByName(Child, "Name");
 		if (CurrLine >= 0)
@@ -346,7 +346,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 	{
 		AString Name = a_NBT.GetString(CurrLine);
 
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::E_DISPLAY_SLOT_LIST);
+		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsList);
 	}
 
 	CurrLine = a_NBT.FindChildByName(DisplaySlots, "slot_1");
@@ -354,7 +354,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 	{
 		AString Name = a_NBT.GetString(CurrLine);
 
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::E_DISPLAY_SLOT_SIDEBAR);
+		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsSidebar);
 	}
 
 	CurrLine = a_NBT.FindChildByName(DisplaySlots, "slot_2");
@@ -362,7 +362,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 	{
 		AString Name = a_NBT.GetString(CurrLine);
 
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::E_DISPLAY_SLOT_NAME);
+		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsName);
 	}
 
 	return true;

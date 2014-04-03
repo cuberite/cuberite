@@ -317,26 +317,19 @@ local function WriteCommandsCategoryGithub(a_Category, f)
 	if (CategoryName == "") then
 		CategoryName = "General";
 	end
-	f:write("\n## ", GithubizeString(a_Category.DisplayName or CategoryName), "\n");
+	f:write("\n### ", GithubizeString(a_Category.DisplayName or CategoryName), "\n");
 	
 	-- Write description:
 	if (a_Category.Description ~= "") then
-		f:write(GithubizeString(a_Category.Description), "\n");
+		f:write(GithubizeString(a_Category.Description), "\n\n");
 	end
 	
+	f:write("| Command | Permission | Description | \n")
+	f:write("| ------- | ---------- | ----------- | \n")
+	
 	-- Write commands:
-	f:write("\n");
 	for idx2, cmd in ipairs(a_Category.Commands) do
-		f:write("\n### ", cmd.CommandString, "\n", GithubizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "\n\n");
-		if (cmd.Info.Permission ~= nil) then
-			f:write("Permission required: **", cmd.Info.Permission, "**\n\n");
-		end
-		if (cmd.Info.DetailedDescription ~= nil) then
-			f:write(GithubizeString(cmd.Info.DetailedDescription));
-		end
-		if (cmd.Info.ParameterCombinations ~= nil) then
-			WriteCommandParameterCombinationsGithub(cmd.CommandString, cmd.Info.ParameterCombinations, f);
-		end
+		f:write("|", cmd.CommandString, " | ", cmd.Info.Permission or "", " | ", GithubizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "| \n")
 	end
 	f:write("\n\n")
 end
@@ -537,12 +530,13 @@ local function DumpPermissionsGithub(a_PluginInfo, f)
 
 	-- Dump the permissions:
 	f:write("\n# Permissions\n");
+	f:write("| Permissions | Description | Commands | Recommended groups |\n")
+	f:write("| ----------- | ----------- | -------- | ------------------ |\n")
 	for idx, perm in ipairs(Permissions) do
-		f:write("### ", perm.Name, "\n");
-		f:write(GithubizeString(perm.Info.Description or ""));
+		f:write(perm.Name, " | ");
+		f:write(GithubizeString(perm.Info.Description or ""), " | ");
 		local CommandsAffected = perm.Info.CommandsAffected or {};
 		if (#CommandsAffected > 0) then
-			f:write("\n\nCommands affected:\n  - ");
 			local Affects = {};
 			for idx2, cmd in ipairs(CommandsAffected) do
 				if (type(cmd) == "string") then
@@ -551,11 +545,10 @@ local function DumpPermissionsGithub(a_PluginInfo, f)
 					table.insert(Affects, GetCommandRefGithub(cmd.Name, cmd));
 				end
 			end
-			f:write(table.concat(Affects, "\n  - "));
-			f:write("\n");
+			f:write(table.concat(Affects, ", "), " | ");
 		end
 		if (perm.Info.RecommendedGroups ~= nil) then
-			f:write("\n\nRecommended groups: ", perm.Info.RecommendedGroups, "\n");
+			f:write(perm.Info.RecommendedGroups, " |");
 		end
 		f:write("\n");
 	end
@@ -578,7 +571,10 @@ local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
 	DumpAdditionalInfoForum(a_PluginInfo, f);
 	DumpCommandsForum(a_PluginInfo, f);
 	DumpPermissionsForum(a_PluginInfo, f);
-
+	if (a_PluginInfo.SourceLocation ~= nil) then
+		f:write("[b][color=blue]Source:[/color] [url=", a_PluginInfo.SourceLocation, "]Link[/url][/b]");
+	end
+	
 	f:close();
 end
 

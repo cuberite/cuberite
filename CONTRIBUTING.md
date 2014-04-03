@@ -1,7 +1,7 @@
 Code Stuff
 ----------
 
- * We use C++03
+ * We use C++03 with some C++11 extensions (ask if you think that something would be useful)
  * Use the provided wrappers for OS stuff:
   - Threading is done by inheriting from `cIsThread`, thread synchronization through `cCriticalSection`, `cSemaphore` and `cEvent`, file access and filesystem operations through the `cFile` class, high-precision timers through `cTimer`, high-precision sleep through `cSleep`
  * No magic numbers, use named constants:
@@ -22,8 +22,10 @@ Code Stuff
   - This helps prevent mistakes such as `if (a & 1 == 0)`
  * White space is free, so use it freely
   - "freely" as in "plentifully", not "arbitrarily"
+ * All `case` statements inside a `switch` need an extra indent.
  * Each and every control statement deserves its braces. This helps maintainability later on when the file is edited, lines added or removed - the control logic doesn't break so easily.
   - The only exception: a `switch` statement with all `case` statements being a single short statement is allowed to use the short brace-less form.
+  - These two rules really mean that indent is governed by braces
  * Add an empty last line in all source files (GCC and GIT can complain otherwise)
  * Use doxy-comments for functions in the header file, format as `/** Description */`
  * Use spaces after the comment markers: `// Comment` instead of `//Comment`
