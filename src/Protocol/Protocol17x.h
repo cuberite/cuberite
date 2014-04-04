@@ -196,7 +196,7 @@ protected:
 			m_Out.WriteVarUTF8String(a_Value);
 		}
 		
-		void WriteBuf(const char * a_Data, int a_Size)
+		void WriteBuf(const char * a_Data, size_t a_Size)
 		{
 			m_Out.Write(a_Data, a_Size);
 		}
@@ -243,7 +243,7 @@ protected:
 	
 	
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	void AddReceivedData(const char * a_Data, int a_Size);
+	void AddReceivedData(const char * a_Data, size_t a_Size);
 	
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet

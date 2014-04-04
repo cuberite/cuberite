@@ -854,7 +854,7 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	// This must be a lengthed protocol, try if it has the entire initial handshake packet:
 	m_Buffer.ResetRead();
 	UInt32 PacketLen;
-	UInt32 ReadSoFar = m_Buffer.GetReadableSpace();
+	UInt32 ReadSoFar = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketLen))
 	{
 		// Not enough bytes for the packet length, keep waiting
@@ -931,7 +931,7 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
 {
 	UInt32 PacketType;
-	UInt32 NumBytesRead = m_Buffer.GetReadableSpace();
+	UInt32 NumBytesRead = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketType))
 	{
 		return false;
@@ -962,7 +962,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			m_Buffer.ReadBEShort(ServerPort);
 			m_Buffer.ReadVarInt(NextState);
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
 		}
 	}

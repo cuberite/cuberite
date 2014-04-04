@@ -119,7 +119,7 @@ void cProtocol161::SendHealth(void)
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_HEALTH);
 	WriteFloat((float)m_Client->GetPlayer()->GetHealth());
-	WriteShort(m_Client->GetPlayer()->GetFoodLevel());
+	WriteShort((short)m_Client->GetPlayer()->GetFoodLevel());
 	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
 	Flush();
 }
@@ -163,10 +163,10 @@ void cProtocol161::SendWindowOpen(const cWindow & a_Window)
 	}
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_WINDOW_OPEN);
-	WriteByte  (a_Window.GetWindowID());
-	WriteByte  (a_Window.GetWindowType());
+	WriteChar  (a_Window.GetWindowID());
+	WriteByte  ((Byte)a_Window.GetWindowType());
 	WriteString(a_Window.GetWindowTitle());
-	WriteByte  (a_Window.GetNumNonInventorySlots());
+	WriteByte  ((Byte)a_Window.GetNumNonInventorySlots());
 	WriteByte  (1);  // Use title
 	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
 	{

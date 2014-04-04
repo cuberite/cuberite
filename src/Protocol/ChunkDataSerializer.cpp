@@ -105,7 +105,7 @@ void cChunkDataSerializer::Serialize29(AString & a_Data)
 	a_Data.append((const char *)&BitMap1, sizeof(short));
 	a_Data.append((const char *)&BitMap2, sizeof(short));
 	
-	Int32 CompressedSizeBE = htonl(CompressedSize);
+	UInt32 CompressedSizeBE = htonl((UInt32)CompressedSize);
 	a_Data.append((const char *)&CompressedSizeBE, sizeof(CompressedSizeBE));
 	
 	Int32 UnusedInt32 = 0;
@@ -163,7 +163,7 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	a_Data.append((const char *)&BitMap1, sizeof(short));
 	a_Data.append((const char *)&BitMap2, sizeof(short));
 	
-	Int32 CompressedSizeBE = htonl(CompressedSize);
+	UInt32 CompressedSizeBE = htonl((UInt32)CompressedSize);
 	a_Data.append((const char *)&CompressedSizeBE, sizeof(CompressedSizeBE));
 	
 	// Unlike 29, 39 doesn't have the "unused" int

@@ -1236,7 +1236,7 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 
 
-void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
+void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 {
 	// Write the incoming data into the comm log file:
 	if (g_ShouldLogCommIn)
