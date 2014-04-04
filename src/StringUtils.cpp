@@ -548,9 +548,9 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		}
 		#ifdef _MSC_VER
 		// MSVC provides a "secure" version of sprintf()
-		int Count = sprintf_s(line, sizeof(line), "%08x:", i);
+		int Count = sprintf_s(line, sizeof(line), "%08x:", (unsigned)i);
 		#else
-		int Count = sprintf(line, "%08x:", i);
+		int Count = sprintf(line, "%08x:", (unsigned)i);
 		#endif
 		// Remove the terminating NULL / leftover garbage in line, after the sprintf-ed value
 		memset(line + Count, 32, sizeof(line) - Count);
