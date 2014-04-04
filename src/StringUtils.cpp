@@ -531,7 +531,7 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 format binary data this way:
 00001234: 31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66    1234567890abcdef
 */
-AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_LineLength)
+AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, int a_LineLength)
 {
 	ASSERT(a_LineLength <= 120);  // Due to using a fixed size line buffer; increase line[]'s size to lift this max
 	char line[512];
