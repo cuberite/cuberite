@@ -216,7 +216,7 @@ protected:
 	{
 		// A 32-bit integer can be encoded by at most 5 bytes:
 		unsigned char b[5];
-		int idx = 0;
+		size_t idx = 0;
 		do
 		{
 			b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
