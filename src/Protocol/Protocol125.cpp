@@ -1156,7 +1156,7 @@ AString cProtocol125::GetAuthServerID(void)
 
 
 
-void cProtocol125::SendData(const char * a_Data, int a_Size)
+void cProtocol125::SendData(const char * a_Data, size_t a_Size)
 {
 	m_Client->SendData(a_Data, a_Size);
 }

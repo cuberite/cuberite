@@ -605,7 +605,7 @@ int cProtocol132::ParseTabCompletion(void)
 
 
 
-void cProtocol132::SendData(const char * a_Data, int a_Size)
+void cProtocol132::SendData(const char * a_Data, size_t a_Size)
 {
 	m_DataToSend.append(a_Data, a_Size);
 }

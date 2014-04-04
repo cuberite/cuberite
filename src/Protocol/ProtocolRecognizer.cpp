@@ -794,7 +794,7 @@ AString cProtocolRecognizer::GetAuthServerID(void)
 
 
 
-void cProtocolRecognizer::SendData(const char * a_Data, int a_Size)
+void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 {
 	// This is used only when handling the server ping
 	m_Client->SendData(a_Data, a_Size);

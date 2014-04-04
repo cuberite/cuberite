@@ -87,7 +87,7 @@ protected:
 	/// The ServerID used for session authentication; set in StartEncryption(), used in GetAuthServerID()
 	AString m_AuthServerID;
 	
-	virtual void SendData(const char * a_Data, int a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 	
 	// DEBUG:
 	virtual void Flush(void) override;

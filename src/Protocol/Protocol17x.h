@@ -287,7 +287,7 @@ protected:
 	void WritePacket(cByteBuffer & a_Packet);
 
 	/** Sends the data to the client, encrypting them if needed. */
-	virtual void SendData(const char * a_Data, int a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 	void SendCompass(const cWorld & a_World);
 	
