@@ -161,8 +161,8 @@ void cProtocol125::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 	WriteInt  (a_BlockX);
 	WriteShort((short)a_BlockY);
 	WriteInt  (a_BlockZ);
-	WriteByte (a_Byte1);
-	WriteByte (a_Byte2);
+	WriteChar (a_Byte1);
+	WriteChar (a_Byte2);
 	Flush();
 }
 
@@ -209,12 +209,12 @@ void cProtocol125::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	WriteByte (PACKET_MULTI_BLOCK);
 	WriteInt  (a_ChunkX);
 	WriteInt  (a_ChunkZ);
-	WriteShort((unsigned short)a_Changes.size());
-	WriteUInt (sizeof(int) * a_Changes.size());
+	WriteShort((short)a_Changes.size());
+	WriteUInt ((UInt32)(4 * a_Changes.size()));
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
-		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
-		unsigned int Blocks = itr->BlockMeta | (itr->BlockType << 4);
+		UInt32 Coords = ((UInt32)itr->y) | ((UInt32)(itr->z << 8)) | ((UInt32)(itr->x << 12));
+		UInt32 Blocks = ((UInt32)itr->BlockMeta) | ((UInt32)(itr->BlockType << 4));
 		WriteUInt(Coords << 16 | Blocks);
 	}
 	Flush();
@@ -325,8 +325,8 @@ void cProtocol125::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, in
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_ENTITY_EFFECT);
 	WriteInt  (a_Entity.GetUniqueID());
-	WriteByte (a_EffectID);
-	WriteByte (a_Amplifier);
+	WriteByte ((Byte)a_EffectID);
+	WriteByte ((Byte)a_Amplifier);
 	WriteShort(a_Duration);
 	Flush();
 }
@@ -357,7 +357,7 @@ void cProtocol125::SendEntityHeadLook(const cEntity & a_Entity)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENT_HEAD_LOOK);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte((char)((a_Entity.GetHeadYaw() / 360.f) * 256));
+	WriteChar((char)((a_Entity.GetHeadYaw() / 360.f) * 256));
 	Flush();
 }
 
@@ -372,8 +372,8 @@ void cProtocol125::SendEntityLook(const cEntity & a_Entity)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENT_LOOK);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte((char)((a_Entity.GetYaw()   / 360.f) * 256));
-	WriteByte((char)((a_Entity.GetPitch() / 360.f) * 256));
+	WriteChar((char)((a_Entity.GetYaw()   / 360.f) * 256));
+	WriteChar((char)((a_Entity.GetPitch() / 360.f) * 256));
 	Flush();
 }
 
@@ -421,9 +421,9 @@ void cProtocol125::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENT_REL_MOVE);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_RelX);
-	WriteByte(a_RelY);
-	WriteByte(a_RelZ);
+	WriteChar(a_RelX);
+	WriteChar(a_RelY);
+	WriteChar(a_RelZ);
 	Flush();
 }
 
@@ -438,11 +438,11 @@ void cProtocol125::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, 
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENT_REL_MOVE_LOOK);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_RelX);
-	WriteByte(a_RelY);
-	WriteByte(a_RelZ);
-	WriteByte((char)((a_Entity.GetYaw()   / 360.f) * 256));
-	WriteByte((char)((a_Entity.GetPitch() / 360.f) * 256));
+	WriteChar(a_RelX);
+	WriteChar(a_RelY);
+	WriteChar(a_RelZ);
+	WriteChar((char)((a_Entity.GetYaw()   / 360.f) * 256));
+	WriteChar((char)((a_Entity.GetPitch() / 360.f) * 256));
 	Flush();
 }
 
@@ -455,7 +455,7 @@ void cProtocol125::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENT_STATUS);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_Status);
+	WriteChar(a_Status);
 	Flush();
 }
 
@@ -488,7 +488,7 @@ void cProtocol125::SendExplosion(double a_BlockX, double a_BlockY, double a_Bloc
 	WriteDouble (a_BlockY);
 	WriteDouble (a_BlockZ);
 	WriteFloat  (a_Radius);
-	WriteInt    (a_BlocksAffected.size());
+	WriteInt    ((Int32)a_BlocksAffected.size());
 	int BlockX = (int)a_BlockX;
 	int BlockY = (int)a_BlockY;
 	int BlockZ = (int)a_BlockZ;
@@ -513,7 +513,7 @@ void cProtocol125::SendGameMode(eGameMode a_GameMode)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_CHANGE_GAME_STATE);
 	WriteByte(3);
-	WriteByte((char)a_GameMode);
+	WriteChar((char)a_GameMode);
 	Flush();
 }
 
@@ -538,7 +538,7 @@ void cProtocol125::SendHealth(void)
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_HEALTH);
 	WriteShort((short)m_Client->GetPlayer()->GetHealth());
-	WriteShort(m_Client->GetPlayer()->GetFoodLevel());
+	WriteShort((short)m_Client->GetPlayer()->GetFoodLevel());
 	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
 	Flush();
 }
@@ -551,7 +551,7 @@ void cProtocol125::SendInventorySlot(char a_WindowID, short a_SlotNum, const cIt
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_INVENTORY_SLOT);
-	WriteByte (a_WindowID);
+	WriteChar (a_WindowID);
 	WriteShort(a_SlotNum);
 	WriteItem (a_Item);
 	Flush();
@@ -600,17 +600,14 @@ void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 
 	WriteByte (PACKET_ITEM_DATA);
 	WriteShort(E_ITEM_MAP);
-	WriteShort(a_ID);
-	WriteShort(3 + a_Length);
+	WriteShort((short)a_ID);
+	WriteShort((short)(3 + a_Length));
 
 	WriteByte(0);
-	WriteByte(a_X);
-	WriteByte(a_Y);
+	WriteChar((char)a_X);
+	WriteChar((char)a_Y);
 	
-	for (unsigned int i = 0; i < a_Length; ++i)
-	{
-		WriteByte(a_Colors[i]);
-	}
+	SendData((const char *)a_Colors, a_Length);
 
 	Flush();
 }
@@ -625,16 +622,16 @@ void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decor
 
 	WriteByte (PACKET_ITEM_DATA);
 	WriteShort(E_ITEM_MAP);
-	WriteShort(a_ID);
-	WriteShort(1 + (3 * a_Decorators.size()));
+	WriteShort((short)a_ID);
+	WriteShort((short)(1 + (3 * a_Decorators.size())));
 
 	WriteByte(1);
 	
 	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
 	{
-		WriteByte((it->GetType() << 4) | (it->GetRot() & 0xf));
-		WriteByte(it->GetPixelX());
-		WriteByte(it->GetPixelZ());
+		WriteByte((Byte)(it->GetType() << 4) | (it->GetRot() & 0xf));
+		WriteByte((Byte)it->GetPixelX());
+		WriteByte((Byte)it->GetPixelZ());
 	}
 
 	Flush();
@@ -651,7 +648,7 @@ void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 	WriteByte   (PACKET_PICKUP_SPAWN);
 	WriteInt    (a_Pickup.GetUniqueID());
 	WriteShort  (a_Pickup.GetItem().m_ItemType);
-	WriteByte   (a_Pickup.GetItem().m_ItemCount);
+	WriteChar   (a_Pickup.GetItem().m_ItemCount);
 	WriteShort  (a_Pickup.GetItem().m_ItemDamage);
 	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
 	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
@@ -669,7 +666,7 @@ void cProtocol125::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ANIMATION);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_Animation);
+	WriteChar(a_Animation);
 	Flush();
 }
 
@@ -763,8 +760,8 @@ void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 	WriteInt   ((int)(a_Player.GetPosX() * 32));
 	WriteInt   ((int)(a_Player.GetPosY() * 32));
 	WriteInt   ((int)(a_Player.GetPosZ() * 32));
-	WriteByte  ((char)((a_Player.GetYaw()   / 360.f) * 256));
-	WriteByte  ((char)((a_Player.GetPitch() / 360.f) * 256));
+	WriteChar  ((char)((a_Player.GetYaw()   / 360.f) * 256));
+	WriteChar  ((char)((a_Player.GetPitch() / 360.f) * 256));
 	WriteShort (HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType);
 	Flush();
 }
@@ -790,9 +787,9 @@ void cProtocol125::SendPluginMessage(const AString & a_Channel, const AString & 
 void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	cCSLock Lock(m_CSPacket);
-	WriteByte  (PACKET_REMOVE_ENTITY_EFFECT);
-	WriteInt   (a_Entity.GetUniqueID());
-	WriteByte  (a_EffectID);
+	WriteByte(PACKET_REMOVE_ENTITY_EFFECT);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteChar((char)a_EffectID);
 	Flush();
 }
 
@@ -806,7 +803,7 @@ void cProtocol125::SendRespawn(void)
 	WriteByte  (PACKET_RESPAWN);
 	WriteInt   ((int)(m_Client->GetPlayer()->GetWorld()->GetDimension()));
 	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
-	WriteByte  ((char)m_Client->GetPlayer()->GetGameMode());
+	WriteChar  ((char)m_Client->GetPlayer()->GetGameMode());
 	WriteShort (256);  // Current world height
 	WriteString("default");
 }
@@ -837,7 +834,7 @@ void cProtocol125::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	WriteInt((int) a_ExpOrb.GetPosX());
 	WriteInt((int) a_ExpOrb.GetPosY());
 	WriteInt((int) a_ExpOrb.GetPosZ());
-	WriteShort(a_ExpOrb.GetReward());
+	WriteShort((short)a_ExpOrb.GetReward());
 	Flush();
 }
 
@@ -878,7 +875,7 @@ void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_SPAWN_MOB);
 	WriteInt    (a_Mob.GetUniqueID());
-	WriteByte   (a_Mob.GetMobType());
+	WriteByte   ((Byte)a_Mob.GetMobType());
 	WriteVectorI((Vector3i)(a_Mob.GetPosition() * 32));
 	WriteByte   (0);
 	WriteByte   (0);
@@ -903,7 +900,7 @@ void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_SPAWN_OBJECT);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_ObjectType);
+	WriteChar(a_ObjectType);
 	WriteInt ((int)(a_Entity.GetPosX() * 32));
 	WriteInt ((int)(a_Entity.GetPosY() * 32));
 	WriteInt ((int)(a_Entity.GetPosZ() * 32));
@@ -928,7 +925,7 @@ void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_SPAWN_OBJECT);
 	WriteInt  (a_Vehicle.GetUniqueID());
-	WriteByte (a_VehicleType);
+	WriteChar (a_VehicleType);
 	WriteInt  ((int)(a_Vehicle.GetPosX() * 32));
 	WriteInt  ((int)(a_Vehicle.GetPosY() * 32));
 	WriteInt  ((int)(a_Vehicle.GetPosZ() * 32));
@@ -966,8 +963,8 @@ void cProtocol125::SendTeleportEntity(const cEntity & a_Entity)
 	WriteInt    ((int)(floor(a_Entity.GetPosX() * 32)));
 	WriteInt    ((int)(floor(a_Entity.GetPosY() * 32)));
 	WriteInt    ((int)(floor(a_Entity.GetPosZ() * 32)));
-	WriteByte   ((char)((a_Entity.GetYaw() / 360.f) * 256));
-	WriteByte   ((char)((a_Entity.GetPitch() / 360.f) * 256));
+	WriteChar   ((char)((a_Entity.GetYaw() / 360.f) * 256));
+	WriteChar   ((char)((a_Entity.GetPitch() / 360.f) * 256));
 	Flush();
 }
 
@@ -1042,7 +1039,7 @@ void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 	WriteInt (a_Entity.GetUniqueID());
 	WriteByte(0);	// Unknown byte only 0 has been observed
 	WriteInt (a_BlockX);
-	WriteByte(a_BlockY);
+	WriteByte((Byte)a_BlockY);
 	WriteInt (a_BlockZ);
 	Flush();
 }
@@ -1086,7 +1083,7 @@ void cProtocol125::SendWholeInventory(const cWindow & a_Window)
 	cCSLock Lock(m_CSPacket);
 	cItems Slots;
 	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
-	SendWindowSlots(a_Window.GetWindowID(), Slots.size(), &(Slots[0]));
+	SendWindowSlots(a_Window.GetWindowID(), (int)Slots.size(), &(Slots[0]));
 }
 
 
@@ -1103,7 +1100,7 @@ void cProtocol125::SendWindowClose(const cWindow & a_Window)
 	
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_WINDOW_CLOSE);
-	WriteByte(a_Window.GetWindowID());
+	WriteChar(a_Window.GetWindowID());
 	Flush();
 }
 
@@ -1120,10 +1117,10 @@ void cProtocol125::SendWindowOpen(const cWindow & a_Window)
 	}
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_WINDOW_OPEN);
-	WriteByte  (a_Window.GetWindowID());
-	WriteByte  (a_Window.GetWindowType());
+	WriteChar  (a_Window.GetWindowID());
+	WriteByte  ((Byte)a_Window.GetWindowType());
 	WriteString(a_Window.GetWindowTitle());
-	WriteByte  (a_Window.GetNumNonInventorySlots());
+	WriteByte  ((Byte)a_Window.GetNumNonInventorySlots());
 	Flush();
 }
 
@@ -1135,7 +1132,7 @@ void cProtocol125::SendWindowProperty(const cWindow & a_Window, short a_Property
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_WINDOW_PROPERTY);
-	WriteByte (a_Window.GetWindowID());
+	WriteChar (a_Window.GetWindowID());
 	WriteShort(a_Property);
 	WriteShort(a_Value);
 	Flush();
@@ -1156,7 +1153,7 @@ AString cProtocol125::GetAuthServerID(void)
 
 
 
-void cProtocol125::SendData(const char * a_Data, int a_Size)
+void cProtocol125::SendData(const char * a_Data, size_t a_Size)
 {
 	m_Client->SendData(a_Data, a_Size);
 }
@@ -1527,7 +1524,7 @@ int cProtocol125::ParsePluginMessage(void)
 	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, ChannelName);
 	HANDLE_PACKET_READ(ReadBEShort,         short,   Length);
 	AString Data;
-	if (!m_ReceivedData.ReadString(Data, Length))
+	if (!m_ReceivedData.ReadString(Data, (size_t)Length))
 	{
 		m_ReceivedData.CheckValid();
 		return PARSE_INCOMPLETE;
@@ -1688,7 +1685,7 @@ void cProtocol125::SendPreChunk(int a_ChunkX, int a_ChunkZ, bool a_ShouldLoad)
 void cProtocol125::SendWindowSlots(char a_WindowID, int a_NumItems, const cItem * a_Items)
 {
 	WriteByte (PACKET_INVENTORY_WHOLE);
-	WriteByte (a_WindowID);
+	WriteChar (a_WindowID);
 	WriteShort((short)a_NumItems);
 
 	for (int j = 0; j < a_NumItems; j++)
@@ -1718,7 +1715,7 @@ void cProtocol125::WriteItem(const cItem & a_Item)
 		return;
 	}
 	
-	WriteByte (a_Item.m_ItemCount);
+	WriteChar (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
 	if (cItem::IsEnchantable(a_Item.m_ItemType))
@@ -1765,7 +1762,7 @@ int cProtocol125::ParseItem(cItem & a_Item)
 	}
 		
 	// TODO: Enchantment not implemented yet!
-	if (!m_ReceivedData.SkipRead(EnchantNumBytes))
+	if (!m_ReceivedData.SkipRead((size_t)EnchantNumBytes))
 	{
 		return PARSE_INCOMPLETE;
 	}
@@ -1850,7 +1847,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtCreeper:
 		{
 			WriteByte(0x10);
-			WriteByte(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1); // Blowing up?
+			WriteChar(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1); // Blowing up?
 			WriteByte(0x11);
 			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0); // Lightning-charged?
 			break;
@@ -1920,9 +1917,9 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 
 			WriteByte(0x10);
 			Byte SheepMetadata = 0;
-			SheepMetadata = ((const cSheep &)a_Mob).GetFurColor(); // Fur colour
+			SheepMetadata = (Byte)((const cSheep &)a_Mob).GetFurColor();
 
-			if (((const cSheep &)a_Mob).IsSheared()) // Is sheared?
+			if (((const cSheep &)a_Mob).IsSheared())
 			{
 				SheepMetadata |= 0x16;
 			}
@@ -1954,7 +1951,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtWither:
 		{
 			WriteByte(0x54); // Int at index 20
-			WriteInt(((const cWither &)a_Mob).GetNumInvulnerableTicks());
+			WriteInt((Int32)((const cWither &)a_Mob).GetNumInvulnerableTicks());
 			WriteByte(0x66); // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
@@ -1965,11 +1962,11 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(0x10);
 			if (a_Mob.GetMobType() == cMonster::mtSlime)
 			{
-				WriteByte(((const cSlime &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+				WriteByte((Byte)((const cSlime &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
 			}
 			else
 			{
-				WriteByte(((const cMagmaCube &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+				WriteByte((Byte)((const cMagmaCube &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
 			}
 			break;
 		}
@@ -2008,7 +2005,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteInt(Flags);
 
 			WriteByte(0x13);
-			WriteByte(((const cHorse &)a_Mob).GetHorseType()); // Type of horse (donkey, chestnut, etc.)
+			WriteByte((Byte)((const cHorse &)a_Mob).GetHorseType()); // Type of horse (donkey, chestnut, etc.)
 
 			WriteByte(0x54);
 			int Appearance = 0;
@@ -2018,6 +2015,10 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 
 			WriteByte(0x56);
 			WriteInt(((const cHorse &)a_Mob).GetHorseArmour()); // Horshey armour
+			break;
+		}
+		default:
+		{
 			break;
 		}
 	}

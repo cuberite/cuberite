@@ -530,7 +530,7 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 	f.Write(&SizeX, 4);
 	f.Write(&SizeY, 4);
 	f.Write(&SizeZ, 4);
-	unsigned char DataTypes = GetDataTypes();
+	unsigned char DataTypes = (unsigned char)GetDataTypes();
 	f.Write(&DataTypes, 1);
 	int NumBlocks = GetBlockCount();
 	if (HasBlockTypes())

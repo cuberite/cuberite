@@ -1236,7 +1236,7 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 
 
-void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
+void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 {
 	// Write the incoming data into the comm log file:
 	if (g_ShouldLogCommIn)
@@ -1258,7 +1258,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		AString Hex;
 		CreateHexDump(Hex, a_Data, a_Size, 16);
 		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
-			a_Size, a_Size, Hex.c_str()
+			(unsigned)a_Size, (unsigned)a_Size, Hex.c_str()
 		);
 		m_CommLogFile.Flush();
 	}
@@ -1988,14 +1988,14 @@ void cProtocol172::WritePacket(cByteBuffer & a_Packet)
 
 
 
-void cProtocol172::SendData(const char * a_Data, int a_Size)
+void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
 		Byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
-			size_t NumBytes = ((size_t)a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : (size_t)a_Size;
+			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
 			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
 			m_Client->SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;

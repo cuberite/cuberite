@@ -225,15 +225,15 @@ public:
 	*/
 	bool HandleLogin(int a_ProtocolVersion, const AString & a_Username);
 	
-	void SendData(const char * a_Data, int a_Size);
+	void SendData(const char * a_Data, size_t a_Size);
 	
 	/** Called when the player moves into a different world; queues sreaming the new chunks */
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
+private:
+
 	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
 	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
-	
-private:
 
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;

@@ -1064,7 +1064,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		// If clicked top face and slab occupies the top voxel, we want a slab to be placed above it (therefore increment Y)
 		// Else if clicked bottom face and slab occupies the bottom voxel, decrement Y for the same reason
 		// Don't touch coordinates if anything else because a dblslab opportunity is present
-		if((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
+		if ((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
 		{
 			++a_BlockY;
 		}
@@ -1532,7 +1532,7 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 
 
-void cClientHandle::SendData(const char * a_Data, int a_Size)
+void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_HasSentDC)
 	{
@@ -1547,7 +1547,7 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 		if (m_OutgoingDataOverflow.empty())
 		{
 			// No queued overflow data; if this packet fits into the ringbuffer, put it in, otherwise put it in the overflow buffer:
-			int CanFit = m_OutgoingData.GetFreeSpace();
+			size_t CanFit = m_OutgoingData.GetFreeSpace();
 			if (CanFit > a_Size)
 			{
 				CanFit = a_Size;

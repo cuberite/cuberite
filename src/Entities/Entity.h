@@ -159,7 +159,7 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	double           GetHeadYaw   (void) const { return m_HeadYaw; }
+	double           GetHeadYaw   (void) const { return m_HeadYaw; }  // In degrees
 	double           GetHeight    (void) const { return m_Height;  }
 	double           GetMass      (void) const { return m_Mass;    }
 	const Vector3d & GetPosition  (void) const { return m_Pos;     }
@@ -167,9 +167,9 @@ public:
 	double           GetPosY      (void) const { return m_Pos.y;   }
 	double           GetPosZ      (void) const { return m_Pos.z;   }
 	const Vector3d & GetRot       (void) const { return m_Rot;     }  // OBSOLETE, use individual GetYaw(), GetPitch, GetRoll() components
-	double           GetYaw       (void) const { return m_Rot.x;   }
-	double           GetPitch     (void) const { return m_Rot.y;   }
-	double           GetRoll      (void) const { return m_Rot.z;   }
+	double           GetYaw       (void) const { return m_Rot.x;   }  // In degrees, [-180, +180)
+	double           GetPitch     (void) const { return m_Rot.y;   }  // In degrees, [-180, +180), but normal client clips to [-90, +90]
+	double           GetRoll      (void) const { return m_Rot.z;   }  // In degrees, unused in current client
 	Vector3d         GetLookVector(void) const;
 	const Vector3d & GetSpeed     (void) const { return m_Speed;   }
 	double           GetSpeedX    (void) const { return m_Speed.x; }
@@ -189,9 +189,9 @@ public:
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
 	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
 	void SetRot     (const Vector3f & a_Rot);  // OBSOLETE, use individual SetYaw(), SetPitch(), SetRoll() components
-	void SetYaw     (double a_Yaw);
-	void SetPitch   (double a_Pitch);
-	void SetRoll    (double a_Roll);
+	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
+	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
+	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
 	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
 	void SetSpeedX  (double a_SpeedX);

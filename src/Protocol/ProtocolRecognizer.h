@@ -133,7 +133,7 @@ public:
 	
 	virtual AString GetAuthServerID(void) override;
 
-	virtual void SendData(const char * a_Data, int a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 protected:
 	cProtocol * m_Protocol;  //< The recognized protocol

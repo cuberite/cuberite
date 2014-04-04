@@ -64,7 +64,7 @@ extern AString & RawBEToUTF8(const char * a_RawData, int a_NumShorts, AString & 
 extern AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16);
 
 /// Creates a nicely formatted HEX dump of the given memory block. Max a_BytesPerLine is 120
-extern AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_BytesPerLine);
+extern AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine);
 
 /// Returns a copy of a_Message with all quotes and backslashes escaped by a backslash
 extern AString EscapeString(const AString & a_Message);  // tolua_export
