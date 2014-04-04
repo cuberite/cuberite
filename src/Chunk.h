@@ -422,7 +422,7 @@ private:
 
 	// TODO: Make these pointers and don't allocate what isn't needed
 	std::vector<BLOCKTYPE> m_BlockTypes;
-	NIBBLETYPE m_BlockMeta    [cChunkDef::NumBlocks / 2];
+	std::vector<NIBBLETYPE> m_BlockMeta;
 	NIBBLETYPE m_BlockLight   [cChunkDef::NumBlocks / 2];
 	NIBBLETYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
 

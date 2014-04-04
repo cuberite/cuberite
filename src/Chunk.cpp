@@ -243,9 +243,12 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 	std::vector<BLOCKTYPE> Blocks = m_BlockTypes;
 	Blocks.resize(NumBlocks);
-
 	a_Callback.BlockTypes   (Blocks.data());
-	a_Callback.BlockMeta    (m_BlockMeta);
+
+	std::vector<NIBBLETYPE> Metas = m_BlockMeta;
+	Metas.resize(NumBlocks / 2);
+	a_Callback.BlockMeta    (Metas.data());
+
 	a_Callback.LightIsValid (m_IsLightValid);
 	a_Callback.BlockLight   (m_BlockLight);
 	a_Callback.BlockSkyLight(m_BlockSkyLight);
@@ -282,23 +285,40 @@ void cChunk::SetAllData(
 		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
 	}
 
-	bool FoundNonAir = false;
-	int IdxWhereNonEmptyStarts = 0;
-	m_BlockTypes.clear();
+	{ // Blocktype compression
+		bool FoundNonAir = false;
+		int IdxWhereNonEmptyStarts = 0;
+		m_BlockTypes.clear();
 
-	for (int Idx = NumBlocks - 1; Idx >= 0; Idx--)
-	{
-		if (a_BlockTypes[Idx] != E_BLOCK_AIR)
+		for (int Idx = NumBlocks - 1; Idx >= 0; Idx--)
 		{
-			FoundNonAir = true;
-			IdxWhereNonEmptyStarts = Idx;
-			break;
+			if (a_BlockTypes[Idx] != E_BLOCK_AIR)
+			{
+				FoundNonAir = true;
+				IdxWhereNonEmptyStarts = Idx;
+				break;
+			}
 		}
+		m_BlockTypes.insert(m_BlockTypes.end(), &a_BlockTypes[0], &a_BlockTypes[IdxWhereNonEmptyStarts + 1]);
 	}
 
-	m_BlockTypes.insert(m_BlockTypes.end(), &a_BlockTypes[0], &a_BlockTypes[IdxWhereNonEmptyStarts + 1]);
+	{ // Blockmeta compression
+		bool FoundNonEmpty = false;
+		int IdxWhereNonEmptyStarts = 0;
+		m_BlockMeta.clear();
+
+		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
+		{
+			if (a_BlockMeta[Idx] != 0)
+			{
+				FoundNonEmpty = true;
+				IdxWhereNonEmptyStarts = Idx;
+				break;
+			}
+		}
+		m_BlockMeta.insert(m_BlockMeta.end(), &a_BlockMeta[0], &a_BlockMeta[IdxWhereNonEmptyStarts + 1]);
+	}
 	
-	memcpy(m_BlockMeta,  a_BlockMeta,  sizeof(m_BlockMeta));
 	if (a_BlockLight != NULL)
 	{
 		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
@@ -1548,9 +1568,8 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	if (m_BlockTypes.empty() || (index > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
 	{
-		m_BlockTypes.resize(index);
+		m_BlockTypes.resize(index + 1);
 	}
-
 	m_BlockTypes[index] = a_BlockType;
 
 	// The client doesn't need to distinguish between stationary and nonstationary fluids:
