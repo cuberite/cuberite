@@ -1258,7 +1258,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		AString Hex;
 		CreateHexDump(Hex, a_Data, a_Size, 16);
 		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
-			a_Size, a_Size, Hex.c_str()
+			(unsigned)a_Size, (unsigned)a_Size, Hex.c_str()
 		);
 		m_CommLogFile.Flush();
 	}
