@@ -421,7 +421,7 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	// TODO: Make these pointers and don't allocate what isn't needed
-	std::vector<std::vector<BLOCKTYPE>> m_BlockTypes;
+	std::vector<BLOCKTYPE> m_BlockTypes;
 	NIBBLETYPE m_BlockMeta    [cChunkDef::NumBlocks / 2];
 	NIBBLETYPE m_BlockLight   [cChunkDef::NumBlocks / 2];
 	NIBBLETYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
