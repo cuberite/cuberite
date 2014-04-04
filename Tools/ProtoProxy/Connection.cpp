@@ -387,6 +387,8 @@ bool cConnection::RelayFromServer(void)
 			return CLIENTSEND(Buffer, res);
 		}
 	}
+	ASSERT(!"Unhandled server state while relaying from server");
+	return false;
 }
 
 
@@ -423,6 +425,8 @@ bool cConnection::RelayFromClient(void)
 			return SERVERSEND(Buffer, res);
 		}
 	}
+	ASSERT(!"Unhandled server state while relaying from client");
+	return false;
 }
 
 
@@ -438,11 +442,11 @@ double cConnection::GetRelativeTime(void)
 
 
 
-bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, int a_Size, const char * a_Peer)
+bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, size_t a_Size, const char * a_Peer)
 {
-	DataLog(a_Data, a_Size, "Sending data to %s, %d bytes", a_Peer, a_Size);
+	DataLog(a_Data, a_Size, "Sending data to %s, %u bytes", a_Peer, (unsigned)a_Size);
 	
-	int res = send(a_Socket, a_Data, a_Size, 0);
+	int res = send(a_Socket, a_Data, (int)a_Size, 0);
 	if (res <= 0)
 	{
 		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, SocketError);
