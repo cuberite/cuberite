@@ -49,7 +49,7 @@ inline double NetworkToHostDouble8(const void * a_Value)
 inline Int64 NetworkToHostLong8(const void * a_Value)
 {
 	UInt64 buf;
-	memcpy(&buf, &a_Value, 8);
+	memcpy(&buf, a_Value, 8);
 	buf = ntohll(buf);
 	return *reinterpret_cast<Int64 *>(&buf);
 }
@@ -62,7 +62,7 @@ inline float NetworkToHostFloat4(const void * a_Value)
 {
 	UInt32 buf;
 	float x;
-	memcpy(&buf, &a_Value, 4);
+	memcpy(&buf, a_Value, 4);
 	buf = ntohl(buf);
 	memcpy(&x, &buf, sizeof(float));
 	return x;
