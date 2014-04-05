@@ -551,7 +551,22 @@ end
 				{{cPlayer}}:SendMessage(), {{cWorld}}:BroadcastChat() and {{cRoot}}:BroadcastChat().</p>
 				<p>
 				Note that most of the functions in this class are so-called modifiers - they modify the object and
-				then return the object itself, so that they can be chained one after another.
+				then return the object itself, so that they can be chained one after another. See the Chaining
+				example below for details.</p>
+				<p>
+				Each part of the composite chat message takes a "Style" parameter, this is a string that describes
+				the formatting. It uses the following strings, concatenated together:
+				<table>
+				<tr><th>String</th><th>Style</th></tr>
+				<tr><td>b</td><td>Bold text</td></tr>
+				<tr><td>i</td><td>Italic text</td></tr>
+				<tr><td>u</td><td>Underlined text</td></tr>
+				<tr><td>s</td><td>Strikethrough text</td></tr>
+				<tr><td>o</td><td>Obfuscated text</td></tr>
+				<tr><td>@X</td><td>color X (X is 0 - 9 or a - f, same as dye meta</td></tr>
+				</table>
+				The following picture, taken from MineCraft Wiki, illustrates the color codes:</p>
+				<img src="http://hydra-media.cursecdn.com/minecraft.gamepedia.com/4/4c/Colors.png?version=34a0f56789a95326e1f7d82047b12232" />
 			]],
 			Functions =
 			{
@@ -565,6 +580,7 @@ end
 				AddTextPart = { Params = "Text, [Style]", Return = "self", Notes = "Adds a regular text. Chaining." },
 				AddUrlPart = { Params = "Text, Url, [Style]", Return = "self", Notes = "Adds a text which, when clicked, opens up a browser at the specified URL. Chaining." },
 				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
+				ExtractText = { Params = "", Return = "string", Notes = "Returns the text from the parts that comprises the human-readable data. Used for older protocols that don't support composite chat and for console-logging." },
 				GetMessageType = { Params = "", Return = "MessageType", Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)" },
 				ParseText = { Params = "Text", Return = "self", Notes = "Adds text, while recognizing http and https URLs and old-style formatting codes (\"@2\"). Chaining." },
 				SetMessageType = { Params = "MessageType", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.) Chaining." },
