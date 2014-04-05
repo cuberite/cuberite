@@ -160,7 +160,7 @@ bool cCommandBlockEntity::LoadFromJson(const Json::Value & a_Value)
 
 	m_Command    = a_Value.get("Command",     "").asString();
 	m_LastOutput = a_Value.get("LastOutput",  "").asString();
-	m_Result     = a_Value.get("SuccessCount", 0).asInt();
+	m_Result     = (NIBBLETYPE)a_Value.get("SuccessCount", 0).asInt();
 
 	return true;
 }

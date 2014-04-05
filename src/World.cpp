@@ -60,9 +60,6 @@
 
 
 
-/// Up to this many m_SpreadQueue elements are handled each world tick
-const int MAX_LIGHTING_SPREAD_PER_TICK = 10;
-
 const int TIME_SUNSET        = 12000;
 const int TIME_NIGHT_START   = 13187;
 const int TIME_NIGHT_END     = 22812;
@@ -2996,7 +2993,6 @@ int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProje
 		delete Projectile;
 		return -1;
 	}
-	BroadcastSpawnEntity(*Projectile);
 	return Projectile->GetUniqueID();
 }
 

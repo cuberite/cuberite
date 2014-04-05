@@ -97,8 +97,6 @@ cMultipartParser::cMultipartParser(const AString & a_ContentType, cCallbacks & a
 	m_EnvelopeParser(*this),
 	m_HasHadData(false)
 {
-	static AString s_Multipart = "multipart/";
-	
 	// Check that the content type is multipart:
 	AString ContentType(a_ContentType);
 	if (strncmp(ContentType.c_str(), "multipart/", 10) != 0)
@@ -146,7 +144,7 @@ cMultipartParser::cMultipartParser(const AString & a_ContentType, cCallbacks & a
 
 
 
-void cMultipartParser::Parse(const char * a_Data, int a_Size)
+void cMultipartParser::Parse(const char * a_Data, size_t a_Size)
 {
 	// Skip parsing if invalid
 	if (!m_IsValid)
@@ -160,8 +158,8 @@ void cMultipartParser::Parse(const char * a_Data, int a_Size)
 	{
 		if (m_EnvelopeParser.IsInHeaders())
 		{
-			int BytesConsumed = m_EnvelopeParser.Parse(m_IncomingData.data(), m_IncomingData.size());
-			if (BytesConsumed < 0)
+			size_t BytesConsumed = m_EnvelopeParser.Parse(m_IncomingData.data(), m_IncomingData.size());
+			if (BytesConsumed == AString::npos)
 			{
 				m_IsValid = false;
 				return;

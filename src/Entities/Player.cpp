@@ -1124,6 +1124,17 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 
 
+void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
+{
+	SetYaw(a_YawDegrees);
+	SetPitch(a_PitchDegrees);
+	m_ClientHandle->SendPlayerMoveLook();
+}
+
+
+
+
+
 Vector3d cPlayer::GetThrowStartPos(void) const
 {
 	Vector3d res = GetEyePosition();
@@ -1489,6 +1500,7 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 
 	// Add player to all the necessary parts of the new world
 	SetWorld(World);
+	m_ClientHandle->StreamChunks();
 	World->AddEntity(this);
 	World->AddPlayer(this);
 

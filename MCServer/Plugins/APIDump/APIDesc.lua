@@ -200,6 +200,8 @@ g_APIDesc =
 				msFillAir = { Notes = "Dst is overwritten by Src only where Src has air blocks" },
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
+				msSpongePrint = { Notes = "Similar to msImprint, sponge block doesn't overwrite anything, all other blocks overwrite everything"},
+				msMask = { Notes = "The blocks that are exactly the same are kept in Dst, all differing blocks are replaced by air"},
 			},
 			ConstantGroups =
 			{
@@ -247,6 +249,9 @@ g_APIDesc =
 						<tr>
 						<td> A </td><td> B </td><td> B </td><td> A </td><td> B </td>
 						</tr>
+						<tr>
+						<td> A </td><td> A </td><td> A </td><td> A </td><td> A </td>
+						</td>
 						</tbody></table>
 
 						<p>
@@ -258,12 +263,24 @@ g_APIDesc =
 						</ol>
 						</p>
 
+						<h3>Special strategies</h3>
+						<p>For each strategy, evaluate the table rows from top downwards, the first match wins.</p>
+						
 						<p>
-						Special strategies:
+						<strong>msDifference</strong> - changes all the blocks which are the same to air. Otherwise the source block gets placed.
 						</p>
-
+						<table><tbody<tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<td> * </td><td> B </td><td> B </td><td> The blocks are different so we use block B </td>
+						</tr><tr>
+						<td> B </td><td> B </td><td> Air </td><td> The blocks are the same so we get air. </td>
+						</tr>
+						</tbody></table>
+						
+						
 						<p>
-						<strong>msLake</strong> (evaluate top-down, first match wins):
+						<strong>msLake</strong> - used for merging areas with lava and water lakes, in the appropriate generator.
 						</p>
 						<table><tbody><tr>
 						<th colspan="2"> area block </th><th> </th><th> Notes </th>
@@ -293,7 +310,39 @@ g_APIDesc =
 						<td> A        </td><td> *      </td><td> A      </td><td> Everything else is left as it is </td>
 						</tr>
 						</tbody></table>
-					]],
+
+						<p>
+						<strong>msSpongePrint</strong> - used for most prefab-generators to merge the prefabs. Similar to
+						msImprint, but uses the sponge block as the NOP block instead, so that the prefabs may carve out air
+						pockets, too.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> sponge </td><td> A </td><td> Sponge is the NOP block </td>
+						</tr><tr>
+						<td> * </td><td> B </td><td> B </td><td> Everything else overwrites anything </td>
+						</tr>
+						</tbody></table>
+
+						<p>
+						<strong>msMask</strong> - the blocks that are the same in the other area are kept, all the
+						differing blocks are replaced with air. Meta is used in the comparison, too, two blocks of the
+						same type but different meta are considered different and thus replaced with air.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> this </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> A </td><td> A </td><td> Same blocks are kept </td>
+						</tr><tr>
+						<td> A </td><td> non-A </td><td> air </td><td> Differing blocks are replaced with air </td>
+						</tr>
+						</tbody></table>
+]],
 				},  -- Merge strategies
 			},  -- AdditionalInfo
 		},  -- cBlockArea
@@ -502,7 +551,22 @@ end
 				{{cPlayer}}:SendMessage(), {{cWorld}}:BroadcastChat() and {{cRoot}}:BroadcastChat().</p>
 				<p>
 				Note that most of the functions in this class are so-called modifiers - they modify the object and
-				then return the object itself, so that they can be chained one after another.
+				then return the object itself, so that they can be chained one after another. See the Chaining
+				example below for details.</p>
+				<p>
+				Each part of the composite chat message takes a "Style" parameter, this is a string that describes
+				the formatting. It uses the following strings, concatenated together:
+				<table>
+				<tr><th>String</th><th>Style</th></tr>
+				<tr><td>b</td><td>Bold text</td></tr>
+				<tr><td>i</td><td>Italic text</td></tr>
+				<tr><td>u</td><td>Underlined text</td></tr>
+				<tr><td>s</td><td>Strikethrough text</td></tr>
+				<tr><td>o</td><td>Obfuscated text</td></tr>
+				<tr><td>@X</td><td>color X (X is 0 - 9 or a - f, same as dye meta</td></tr>
+				</table>
+				The following picture, taken from MineCraft Wiki, illustrates the color codes:</p>
+				<img src="http://hydra-media.cursecdn.com/minecraft.gamepedia.com/4/4c/Colors.png?version=34a0f56789a95326e1f7d82047b12232" />
 			]],
 			Functions =
 			{
@@ -516,6 +580,7 @@ end
 				AddTextPart = { Params = "Text, [Style]", Return = "self", Notes = "Adds a regular text. Chaining." },
 				AddUrlPart = { Params = "Text, Url, [Style]", Return = "self", Notes = "Adds a text which, when clicked, opens up a browser at the specified URL. Chaining." },
 				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
+				ExtractText = { Params = "", Return = "string", Notes = "Returns the text from the parts that comprises the human-readable data. Used for older protocols that don't support composite chat and for console-logging." },
 				GetMessageType = { Params = "", Return = "MessageType", Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)" },
 				ParseText = { Params = "Text", Return = "self", Notes = "Adds text, while recognizing http and https URLs and old-style formatting codes (\"@2\"). Chaining." },
 				SetMessageType = { Params = "MessageType", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.) Chaining." },
@@ -728,14 +793,14 @@ end</pre>
 				GetMass = { Params = "", Return = "number", Notes = "Returns the mass of the entity. Currently unused." },
 				GetMaxHealth = { Params = "", Return = "number", Notes = "Returns the maximum number of hitpoints this entity is allowed to have." },
 				GetParentClass = { Params = "", Return = "string", Notes = "Returns the name of the direct parent class for this entity" },
-				GetPitch = { Params = "", Return = "number", Notes = "Returns the pitch (nose-down rotation) of the entity" },
+				GetPitch = { Params = "", Return = "number", Notes = "Returns the pitch (nose-down rotation) of the entity. Measured in degrees, normal values range from -90 to +90. +90 means looking down, 0 means looking straight ahead, -90 means looking up." },
 				GetPosition = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the entity's pivot position as a 3D vector" },
 				GetPosX = { Params = "", Return = "number", Notes = "Returns the X-coord of the entity's pivot" },
 				GetPosY = { Params = "", Return = "number", Notes = "Returns the Y-coord of the entity's pivot" },
 				GetPosZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the entity's pivot" },
 				GetRawDamageAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the raw damage that this entity's equipment would cause when attacking the ReceiverEntity. This includes this entity's weapon {{cEnchantments|enchantments}}, but excludes the receiver's armor or potion effects. See {{TakeDamageInfo}} for more information on attack damage." },
 				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity. Currently unused." },
-				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the entire rotation vector (Yaw, Pitch, Roll)" },
+				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "(OBSOLETE) Returns the entire rotation vector (Yaw, Pitch, Roll)" },
 				GetSpeed = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the complete speed vector of the entity" },
 				GetSpeedX = { Params = "", Return = "number", Notes = "Returns the X-part of the speed vector" },
 				GetSpeedY = { Params = "", Return = "number", Notes = "Returns the Y-part of the speed vector" },
@@ -743,7 +808,7 @@ end</pre>
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity within the running server. Note that this ID is not persisted to the data files." },
 				GetWidth = { Params = "", Return = "number", Notes = "Returns the width (X and Z size) of the entity." },
 				GetWorld = { Params = "", Return = "{{cWorld}}", Notes = "Returns the world where the entity resides" },
-				GetYaw = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity." },
+				GetYaw = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. Measured in degrees, values range from -180 to +180. 0 means ZP, 90 means XM, -180 means ZM, -90 means XP." },
 				Heal = { Params = "Hitpoints", Return = "", Notes = "Heals the specified number of hitpoints. Hitpoints is expected to be a positive number." },
 				IsA = { Params = "ClassName", Return = "bool", Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself" },
 				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
@@ -1826,6 +1891,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			Constants =
 			{
+				HOOK_BLOCK_SPREAD = { Notes = "Called when a block spreads based on world conditions" },
 				HOOK_BLOCK_TO_PICKUPS = { Notes = "Called when a block has been dug and is being converted to pickups. The server has provided the default pickups and the plugins may modify them." },
 				HOOK_CHAT = { Notes = "Called when a client sends a chat message that is not a command. The plugin may modify the chat message" },
 				HOOK_CHUNK_AVAILABLE = { Notes = "Called when a chunk is loaded or generated and becomes available in the {{cWorld|world}}." },
@@ -2646,11 +2712,31 @@ end
 				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
 				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
 				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
-				LOG = {Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text) "},
-				LOGERROR = {Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
-				LOGINFO = {Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
-				LOGWARN = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
-				LOGWARNING = {Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+				LOG =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType."},
+				},
+				LOGERROR =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'error' severity (black text on red background)"},
+				},
+				LOGINFO =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'info' severity (yellow text)"},
+				},
+				LOGWARN =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+				},
+				LOGWARNING =
+				{
+					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
+					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text)"},
+				},
 				MirrorBlockFaceY = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it)." },
 				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
 				NormalizeAngleDegrees = { Params = "AngleDegrees", Return = "AngleDegrees", Notes = "Returns the angle, wrapped into the [-180, +180) range." },
@@ -2767,6 +2853,14 @@ end
 						data provided with the explosions, such as the exploding {{cCreeper|creeper}} entity or the
 						{{Vector3i|coords}} of the exploding bed.
 					]],
+				},
+				SpreadSource =
+				{
+					Include = "^ss.*",
+					TextBefore = [[
+						These constants are used to differentiate the various sources of spreads, such as grass growing.
+						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
+					]],
 				}
 			},
 		},  -- Globals
@@ -2836,6 +2930,7 @@ end
 		-- No sorting is provided for these, they will be output in the same order as defined here
 		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
 		{ FileName = "SettingUpDecoda.html", Title = "Setting up the Decoda Lua IDE" },
+		{ FileName = "SettingUpZeroBrane.html", Title = "Setting up the ZeroBrane Studio Lua IDE" },
 		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
 	}
 } ;

@@ -25,7 +25,7 @@
 class cNoise
 {
 public:
-	cNoise(unsigned int a_Seed);
+	cNoise(int a_Seed);
 	cNoise(const cNoise & a_Noise);
 
 	// The following functions, if not marked INLINE, are about 20 % slower
@@ -47,14 +47,14 @@ public:
 
 	NOISE_DATATYPE CubicNoise3D (NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z) const;
 
-	void SetSeed(unsigned int a_Seed) { m_Seed = a_Seed; }
+	void SetSeed(int a_Seed) { m_Seed = a_Seed; }
 
 	INLINE static NOISE_DATATYPE CubicInterpolate (NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct);
 	INLINE static NOISE_DATATYPE CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
 	INLINE static NOISE_DATATYPE LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
 
 private:
-	unsigned int m_Seed;
+	int m_Seed;
 } ;
 
 

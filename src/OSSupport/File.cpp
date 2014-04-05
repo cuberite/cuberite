@@ -152,7 +152,7 @@ int cFile::Read (void * iBuffer, int iNumBytes)
 		return -1;
 	}
 	
-	return fread(iBuffer, 1, iNumBytes, m_File);  // fread() returns the portion of Count parameter actually read, so we need to send iNumBytes as Count
+	return (int)fread(iBuffer, 1, (size_t)iNumBytes, m_File);  // fread() returns the portion of Count parameter actually read, so we need to send iNumBytes as Count
 }
 
 
@@ -168,7 +168,7 @@ int cFile::Write(const void * iBuffer, int iNumBytes)
 		return -1;
 	}
 
-	int res = fwrite(iBuffer, 1, iNumBytes, m_File);  // fwrite() returns the portion of Count parameter actually written, so we need to send iNumBytes as Count
+	int res = (int)fwrite(iBuffer, 1, (size_t)iNumBytes, m_File);  // fwrite() returns the portion of Count parameter actually written, so we need to send iNumBytes as Count
 	return res;
 }
 
@@ -189,7 +189,7 @@ int cFile::Seek (int iPosition)
 	{
 		return -1;
 	}
-	return ftell(m_File);
+	return (int)ftell(m_File);
 }
 
 
@@ -206,7 +206,7 @@ int cFile::Tell (void) const
 		return -1;
 	}
 	
-	return ftell(m_File);
+	return (int)ftell(m_File);
 }
 
 
@@ -222,7 +222,7 @@ int cFile::GetSize(void) const
 		return -1;
 	}
 	
-	int CurPos = ftell(m_File);
+	int CurPos = Tell();
 	if (CurPos < 0)
 	{
 		return -1;
@@ -231,8 +231,8 @@ int cFile::GetSize(void) const
 	{
 		return -1;
 	}
-	int res = ftell(m_File);
-	if (fseek(m_File, CurPos, SEEK_SET) != 0)
+	int res = Tell();
+	if (fseek(m_File, (long)CurPos, SEEK_SET) != 0)
 	{
 		return -1;
 	}
@@ -255,7 +255,7 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 	int DataSize = GetSize() - Tell();
 	
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
-	a_Contents.assign(DataSize, '\0');
+	a_Contents.assign((size_t)DataSize, '\0');
 	return Read((void *)a_Contents.data(), DataSize);
 }
 
@@ -350,7 +350,7 @@ int cFile::GetSize(const AString & a_FileName)
 	struct stat st;
 	if (stat(a_FileName.c_str(), &st) == 0)
 	{
-		return st.st_size;
+		return (int)st.st_size;
 	}
 	return -1;
 }
@@ -456,7 +456,7 @@ int cFile::Printf(const char * a_Fmt, ...)
 	va_start(args, a_Fmt);
 	AppendVPrintf(buf, a_Fmt, args);
 	va_end(args);
-	return Write(buf.c_str(), buf.length());
+	return Write(buf.c_str(), (int)buf.length());
 }
 
 

@@ -169,7 +169,7 @@ cRCONServer::cConnection::cConnection(cRCONServer & a_RCONServer, cSocket & a_So
 
 
 
-void cRCONServer::cConnection::DataReceived(const char * a_Data, int a_Size)
+void cRCONServer::cConnection::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// Append data to the buffer:
 	m_Buffer.append(a_Data, a_Size);

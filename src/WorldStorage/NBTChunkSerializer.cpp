@@ -23,6 +23,7 @@
 #include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Entities/Entity.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
@@ -43,6 +44,7 @@
 #include "../Mobs/Slime.h"
 #include "../Mobs/Skeleton.h"
 #include "../Mobs/Villager.h"
+#include "../Mobs/Wither.h"
 #include "../Mobs/Wolf.h"
 #include "../Mobs/Zombie.h"
 
@@ -335,6 +337,17 @@ void cNBTChunkSerializer::AddBoatEntity(cBoat * a_Boat)
 
 
 
+void cNBTChunkSerializer::AddEnderCrystalEntity(cEnderCrystal * a_EnderCrystal)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_EnderCrystal, "EnderCrystal");
+	m_Writer.EndCompound();
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddFallingBlockEntity(cFallingBlock * a_FallingBlock)
 {
 	m_Writer.BeginCompound("");
@@ -422,7 +435,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 		case cMonster::mtSquid:         EntityClass = "Squid";          break;
 		case cMonster::mtVillager:      EntityClass = "Villager";       break;
 		case cMonster::mtWitch:         EntityClass = "Witch";          break;
-		case cMonster::mtWither:        EntityClass = "Wither";         break;
+		case cMonster::mtWither:        EntityClass = "WitherBoss";     break;
 		case cMonster::mtWolf:          EntityClass = "Wolf";           break;
 		case cMonster::mtZombie:        EntityClass = "Zombie";         break;
 		case cMonster::mtZombiePigman:  EntityClass = "PigZombie";      break;
@@ -499,6 +512,11 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			case cMonster::mtVillager:
 			{
 				m_Writer.AddInt("Profession", ((const cVillager *)a_Monster)->GetVilType());
+				break;
+			}
+			case cMonster::mtWither:
+			{
+				m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetNumInvulnerableTicks());
 				break;
 			}
 			case cMonster::mtWolf:
@@ -729,6 +747,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 	switch (a_Entity->GetEntityType())
 	{
 		case cEntity::etBoat:         AddBoatEntity        ((cBoat *)            a_Entity); break;
+		case cEntity::etEnderCrystal: AddEnderCrystalEntity((cEnderCrystal *)    a_Entity); break;
 		case cEntity::etFallingBlock: AddFallingBlockEntity((cFallingBlock *)    a_Entity); break;
 		case cEntity::etMinecart:     AddMinecartEntity    ((cMinecart *)        a_Entity); break;
 		case cEntity::etMonster:      AddMonsterEntity     ((cMonster *)         a_Entity); break;

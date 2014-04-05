@@ -27,6 +27,7 @@
 #include "ItemHoe.h"
 #include "ItemLeaves.h"
 #include "ItemLighter.h"
+#include "ItemLilypad.h"
 #include "ItemMap.h"
 #include "ItemMinecart.h"
 #include "ItemNetherWart.h"
@@ -115,6 +116,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FISHING_ROD:       return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
+		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
@@ -504,13 +506,13 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 {
 	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers
 	
-	if (m_ItemType > 256)
+	if (m_ItemType >= 256)
 	{
-		LOGERROR("%s: Item %d has no valid block!", __FUNCTION__, m_ItemType);
+		LOGERROR("%s: Item %d is not eligible for direct block placement!", __FUNCTION__, m_ItemType);
 		return false;
 	}
 	
-	cBlockHandler * BlockH = BlockHandler(m_ItemType);
+	cBlockHandler * BlockH = BlockHandler((BLOCKTYPE)m_ItemType);
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
 		ChunkInterface, a_Player,

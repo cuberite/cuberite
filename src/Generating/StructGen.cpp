@@ -578,7 +578,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) /
 			256;
 	}  // for x, z - FloorLo[]
-	LinearUpscale2DArrayInPlace(FloorLo, 17, 17, INTERPOL_X, INTERPOL_Z);
+	LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorLo);
 	
 	// Interpolate segments:
 	for (int Segment = BaseY; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
@@ -591,7 +591,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
 				256;
 		}  // for x, z - FloorLo[]
-		LinearUpscale2DArrayInPlace(FloorHi, 17, 17, INTERPOL_X, INTERPOL_Z);
+		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
 		
 		// Interpolate between FloorLo and FloorHi:
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)

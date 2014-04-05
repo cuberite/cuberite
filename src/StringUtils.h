@@ -64,7 +64,7 @@ extern AString & RawBEToUTF8(const char * a_RawData, int a_NumShorts, AString & 
 extern AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16);
 
 /// Creates a nicely formatted HEX dump of the given memory block. Max a_BytesPerLine is 120
-extern AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_BytesPerLine);
+extern AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine);
 
 /// Returns a copy of a_Message with all quotes and backslashes escaped by a backslash
 extern AString EscapeString(const AString & a_Message);  // tolua_export
@@ -79,10 +79,10 @@ extern AString URLDecode(const AString & a_String);  // Cannot export to Lua aut
 extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
 
 /// Decodes a Base64-encoded string into the raw data
-extern AString Base64Decode(const AString & a_Base64String);
+extern AString Base64Decode(const AString & a_Base64String);  // Exported manually due to embedded NULs and extra parameter
 
 /// Encodes a string into Base64
-extern AString Base64Encode(const AString & a_Input);
+extern AString Base64Encode(const AString & a_Input);  // Exported manually due to embedded NULs and extra parameter
 
 /// Reads two bytes from the specified memory location and interprets them as BigEndian short
 extern short GetBEShort(const char * a_Mem);

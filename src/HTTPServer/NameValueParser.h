@@ -21,10 +21,10 @@ public:
 	cNameValueParser(bool a_AllowsKeyOnly = true);
 	
 	/// Creates an empty parser, then parses the data given. Doesn't call Finish(), so more data can be parsed later
-	cNameValueParser(const char * a_Data, int a_Size, bool a_AllowsKeyOnly = true);
+	cNameValueParser(const char * a_Data, size_t a_Size, bool a_AllowsKeyOnly = true);
 	
 	/// Parses the data given
-	void Parse(const char * a_Data, int a_Size);
+	void Parse(const char * a_Data, size_t a_Size);
 	
 	/// Notifies the parser that no more data will be coming. Returns true if the parser state is valid
 	bool Finish(void);

@@ -18,6 +18,9 @@ class cChunkDesc;
 // fwd: Entities/Entity.h
 class cEntity;
 
+// fwd: Entities/ProjectileEntity.h
+class cProjectileEntity;
+
 // fwd: Mobs/Monster.h
 class cMonster;
 
@@ -58,6 +61,7 @@ public:																	// tolua_export
 	// tolua_begin
 	enum PluginHook
 	{
+		HOOK_BLOCK_SPREAD,
 		HOOK_BLOCK_TO_PICKUPS,
 		HOOK_CHAT,
 		HOOK_CHUNK_AVAILABLE,
@@ -101,6 +105,8 @@ public:																	// tolua_export
 		HOOK_PLUGINS_LOADED,
 		HOOK_POST_CRAFTING,
 		HOOK_PRE_CRAFTING,
+		HOOK_PROJECTILE_HIT_BLOCK,
+		HOOK_PROJECTILE_HIT_ENTITY,
 		HOOK_SPAWNED_ENTITY,
 		HOOK_SPAWNED_MONSTER,
 		HOOK_SPAWNING_ENTITY,
@@ -127,6 +133,8 @@ public:																	// tolua_export
 	class cCommandEnumCallback
 	{
 	public:
+		virtual ~cCommandEnumCallback() {}
+		
 		/** Called for each command; return true to abort enumeration
 		For console commands, a_Permission is not used (set to empty string)
 		*/
@@ -154,6 +162,7 @@ public:																	// tolua_export
 	unsigned int GetNumPlugins() const;  // tolua_export
 	
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
+	bool CallHookBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
 	bool CallHookBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
 	bool CallHookChat                     (cPlayer * a_Player, AString & a_Message);
 	bool CallHookChunkAvailable           (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
@@ -197,6 +206,8 @@ public:																	// tolua_export
 	bool CallHookPluginsLoaded            (void);
 	bool CallHookPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile);
+	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
 	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
 	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
 	bool CallHookSpawningEntity           (cWorld & a_World, cEntity & a_Entity);

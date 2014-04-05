@@ -112,8 +112,8 @@ cCompositeChat::cCompositeChat(void) :
 
 
 
-cCompositeChat::cCompositeChat(const AString & a_ParseText) :
-	m_MessageType(mtCustom)
+cCompositeChat::cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType) :
+	m_MessageType(a_MessageType)
 {
 	ParseText(a_ParseText);
 }
@@ -308,6 +308,58 @@ void cCompositeChat::UnderlineUrls(void)
 			(*itr)->m_Style.append("u");
 		}
 	}  // for itr - m_Parts[]
+}
+
+
+
+
+
+AString cCompositeChat::ExtractText(void) const
+{
+	AString Msg;
+	for (cParts::const_iterator itr = m_Parts.begin(), end = m_Parts.end(); itr != end; ++itr)
+	{
+		switch ((*itr)->m_PartType)
+		{
+			case ptText:
+			case ptClientTranslated:
+			case ptRunCommand:
+			case ptSuggestCommand:
+			{
+				Msg.append((*itr)->m_Text);
+				break;
+			}
+			case ptUrl:
+			{
+				Msg.append(((cUrlPart *)(*itr))->m_Url);
+				break;
+			}
+		}  // switch (PartType)
+	}  // for itr - m_Parts[]
+	return Msg;
+}
+
+
+
+
+
+cMCLogger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
+{
+	switch (a_MessageType)
+	{
+		case mtCustom:         return cMCLogger::llRegular;
+		case mtFailure:        return cMCLogger::llWarning;
+		case mtInformation:    return cMCLogger::llInfo;
+		case mtSuccess:        return cMCLogger::llRegular;
+		case mtWarning:        return cMCLogger::llWarning;
+		case mtFatal:          return cMCLogger::llError;
+		case mtDeath:          return cMCLogger::llRegular;
+		case mtPrivateMessage: return cMCLogger::llRegular;
+		case mtJoin:           return cMCLogger::llRegular;
+		case mtLeave:          return cMCLogger::llRegular;
+	}
+	ASSERT(!"Unhandled MessageType");
+	return cMCLogger::llError;
 }
 
 

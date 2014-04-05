@@ -53,7 +53,7 @@ int UncompressString(const char * a_Data, int a_Length, AString & a_Uncompressed
 
 
 
-int CompressStringGZIP(const char * a_Data, int a_Length, AString & a_Compressed)
+int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Compressed)
 {
 	// Compress a_Data into a_Compressed using GZIP; return Z_XXX error constants same as zlib's compress2()
 
@@ -83,6 +83,7 @@ int CompressStringGZIP(const char * a_Data, int a_Length, AString & a_Compressed
 			{
 				// Some data has been compressed. Consume the buffer and continue compressing
 				a_Compressed.append(Buffer, sizeof(Buffer) - strm.avail_out);
+				strm.next_out = (Bytef *)Buffer;
 				strm.avail_out = sizeof(Buffer);
 				if (strm.avail_in == 0)
 				{
@@ -116,7 +117,7 @@ int CompressStringGZIP(const char * a_Data, int a_Length, AString & a_Compressed
 
 
 
-extern int UncompressStringGZIP(const char * a_Data, int a_Length, AString & a_Uncompressed)
+extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Uncompressed)
 {
 	// Uncompresses a_Data into a_Uncompressed using GZIP; returns Z_OK for success or Z_XXX error constants same as zlib
 
@@ -139,13 +140,14 @@ extern int UncompressStringGZIP(const char * a_Data, int a_Length, AString & a_U
 	
 	for (;;)
 	{
-		res = inflate(&strm, Z_FINISH);
+		res = inflate(&strm, Z_NO_FLUSH);
 		switch (res)
 		{
 			case Z_OK:
 			{
 				// Some data has been uncompressed. Consume the buffer and continue uncompressing
 				a_Uncompressed.append(Buffer, sizeof(Buffer) - strm.avail_out);
+				strm.next_out = (Bytef *)Buffer;
 				strm.avail_out = sizeof(Buffer);
 				if (strm.avail_in == 0)
 				{

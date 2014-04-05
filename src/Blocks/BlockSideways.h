@@ -29,7 +29,13 @@ public:
 		return true;
 	}
 
-	
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		a_Pickups.Add(m_BlockType, 1, a_BlockMeta & 0x3);
+	}
+
+
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace, NIBBLETYPE a_WoodMeta)
 	{
 		switch (a_BlockFace)

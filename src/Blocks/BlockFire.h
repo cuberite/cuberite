@@ -17,25 +17,27 @@ public:
 	}
 
 	/// Portal boundary and direction variables
-	int XZP, XZM, Dir; // For wont of a better name...
+	// 2014_03_30 _X: What are these used for? Why do we need extra variables?
+	int XZP, XZM;
+	NIBBLETYPE Dir;
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
 		/*
 		PORTAL FINDING ALGORITH
 		=======================
-		-Get clicked base block
-		-Trace upwards to find first obsidian block; aborts if anything other than obsidian or air is encountered.
-		 Uses this value as a reference (the 'ceiling')
-		-For both directions (if one fails, try the other), BASE (clicked) block:
-		 -Go in one direction, only stop if a non obsidian block is encountered (abort) OR a portal border is encountered (FindObsidianCeiling returns -1)
-		 -If a border was encountered, go the other direction and repeat above
-		 -Write borders to XZP and XZM, write direction portal faces to Dir
-		-Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir		
+		- Get clicked base block
+		- Trace upwards to find first obsidian block; aborts if anything other than obsidian or air is encountered.
+			Uses this value as a reference (the 'ceiling')
+		- For both directions (if one fails, try the other), BASE (clicked) block:
+			- Go in one direction, only stop if a non obsidian block is encountered (abort) OR a portal border is encountered (FindObsidianCeiling returns -1)
+			- If a border was encountered, go the other direction and repeat above
+			- Write borders to XZP and XZM, write direction portal faces to Dir
+		- Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir
 		*/
 
 		a_BlockY--; // Because we want the block below the fire
-		FindAndSetPortalFrame(a_BlockX, a_BlockY, a_BlockZ, a_ChunkInterface, a_WorldInterface); // Brought to you by Aperture Science
+		FindAndSetPortalFrame(a_BlockX, a_BlockY, a_BlockZ, a_ChunkInterface, a_WorldInterface);
 	}
 
 	virtual void OnDigging(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override

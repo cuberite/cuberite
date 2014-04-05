@@ -111,9 +111,9 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 void cMonster::TickPathFinding()
 {
-	int PosX = (int)floor(GetPosX());
-	int PosY = (int)floor(GetPosY());
-	int PosZ = (int)floor(GetPosZ());
+	const int PosX = (int)floor(GetPosX());
+	const int PosY = (int)floor(GetPosY());
+	const int PosZ = (int)floor(GetPosZ());
 
 	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
 
@@ -130,14 +130,16 @@ void cMonster::TickPathFinding()
 		{ 0, 1},
 		{ 0,-1},
 	} ;
+	
+	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
+	{
+		// Too low/high, can't really do anything
+		FinishPathFinding();
+		return;
+	}
 
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 	{
-		if ((gCrossCoords[i].x + PosX == PosX) && (gCrossCoords[i].z + PosZ == PosZ))
-		{
-			continue;
-		}
-
 		if (IsCoordinateInTraversedList(Vector3i(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ)))
 		{
 			continue;
@@ -758,6 +760,7 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtSquid:        return mfWater;
 		case mtVillager:     return mfPassive;
 		case mtWitch:        return mfHostile;
+		case mtWither:       return mfHostile;
 		case mtWolf:         return mfHostile;
 		case mtZombie:       return mfHostile;
 		case mtZombiePigman: return mfHostile;

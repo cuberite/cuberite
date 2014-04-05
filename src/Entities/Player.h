@@ -129,6 +129,12 @@ public:
 
 	// tolua_begin
 	
+	/** Sends the "look" packet to the player, forcing them to set their rotation to the specified values.
+	a_YawDegrees is clipped to range [-180, +180),
+	a_PitchDegrees is clipped to range [-180, +180) but the client only uses [-90, +90]
+	*/
+	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
+	
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
 	Vector3d GetThrowStartPos(void) const;
 	

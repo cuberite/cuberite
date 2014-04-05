@@ -160,14 +160,12 @@ protected:
 	
 	inline void PropagateLight(
 		NIBBLETYPE * a_Light, 
-		int a_SrcIdx, int a_DstIdx,
+		unsigned int a_SrcIdx, unsigned int a_DstIdx,
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	)
 	{
-		ASSERT(a_SrcIdx >= 0);
-		ASSERT(a_SrcIdx < (int)ARRAYCOUNT(m_SkyLight));
-		ASSERT(a_DstIdx >= 0);
-		ASSERT(a_DstIdx < (int)ARRAYCOUNT(m_BlockTypes));
+		ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));
+		ASSERT(a_DstIdx < ARRAYCOUNT(m_BlockTypes));
 		
 		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]))
 		{

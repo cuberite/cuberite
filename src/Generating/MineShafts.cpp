@@ -1340,7 +1340,7 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 	BaseX -= NEIGHBORHOOD_SIZE / 2;
 	BaseZ -= NEIGHBORHOOD_SIZE / 2;
 
-	// Walk the cache, move each cave system that we want into a_Caves:
+	// Walk the cache, move each cave system that we want into a_Mineshafts:
 	int StartX = BaseX * m_GridSize;
 	int EndX = (BaseX + NEIGHBORHOOD_SIZE + 1) * m_GridSize;
 	int StartZ = BaseZ * m_GridSize;

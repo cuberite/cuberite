@@ -1,4 +1,3 @@
-
 // ItemMinecart.h
 
 // Declares the various minecart ItemHandlers
@@ -72,6 +71,11 @@ public:
 			}
 		}  // switch (m_ItemType)
 		Minecart->Initialize(a_World);
+
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
 		return true;
 	}
 	

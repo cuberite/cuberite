@@ -420,7 +420,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 			}
 		}
 		// Linear-interpolate this XZ floor:
-		LinearUpscale2DArrayInPlace(CurFloor, 17, 17, UPSCALE_X, UPSCALE_Z);
+		LinearUpscale2DArrayInPlace<17, 17, UPSCALE_X, UPSCALE_Z>(CurFloor);
 	}
 
 	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis

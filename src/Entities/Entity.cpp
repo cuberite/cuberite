@@ -1469,7 +1469,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 Vector3d cEntity::GetLookVector(void) const
 {
 	Matrix4d m;
-	m.Init(Vector3f(), 0, m_Rot.x, -m_Rot.y);
+	m.Init(Vector3d(), 0, m_Rot.x, -m_Rot.y);
 	Vector3d Look = m.Transform(Vector3d(0, 0, 1));
 	return Look;
 }
