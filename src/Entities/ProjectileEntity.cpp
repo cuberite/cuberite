@@ -371,13 +371,14 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 
-	// DEBUG:
+	/*
 	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}, rot {%.02f, %.02f}",
 		m_UniqueID,
 		GetPosX(), GetPosY(), GetPosZ(),
 		GetSpeedX(), GetSpeedY(), GetSpeedZ(),
 		GetYaw(), GetPitch()
 	);
+	*/
 }
 
 
