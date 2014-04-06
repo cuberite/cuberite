@@ -714,33 +714,40 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_B
 					m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // For performance
 				}
 
+				int bxm, bym, bzm = 0;
+				eBlockFace bf;
+
 				switch (a_Meta & 0x3) // We only want the direction (bottom) bits
 				{
 					case 0x0:
 					{
-						SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
-						SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_REDSTONE_REPEATER_ON);
+						bzm = -1;
+						bf = BLOCK_FACE_ZM;
 						break;
 					}
 					case 0x1:
 					{
-						SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
-						SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XP, E_BLOCK_REDSTONE_REPEATER_ON);
+						bxm = 1;
+						bf = BLOCK_FACE_XP;
 						break;
 					}
 					case 0x2:
 					{
-						SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
-						SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_REDSTONE_REPEATER_ON);
+						bzm = 1;
+						bf = BLOCK_FACE_ZP;
 						break;
 					}
 					case 0x3:
 					{
-						SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
-						SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XM, E_BLOCK_REDSTONE_REPEATER_ON);
+						bxm = -1;
+						bf = BLOCK_FACE_XM;
 						break;
 					}
 				}
+
+				// Set blocks powered according to the data gained in the switch above.
+				SetBlockPowered(a_BlockX + bxm, a_BlockY + bym, a_BlockZ + bzm, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_REPEATER_ON);
+				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, bf, E_BLOCK_REDSTONE_REPEATER_ON);
 
 				// Removal of the data entry will be handled in SimChunk - we still want to continue trying to power blocks, even if our delay time has reached
 				// Otherwise, the power state of blocks in front won't update after we have powered on
@@ -1155,70 +1162,56 @@ bool cIncrementalRedstoneSimulator::AreCoordsLinkedPowered(int a_BlockX, int a_B
 bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
 	// Repeaters cannot be powered by any face except their back; verify that this is true for a source
-
 	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
-
-		switch (a_Meta)
-		{
-			case 0x0:
-			{
-				// Flip the coords to check the back of the repeater
-				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
-				break;
-			}
-			case 0x1:
-			{
-				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
-			case 0x2:
-			{
-				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
-				break;
-			}
-			case 0x3:
-			{
-				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) && isBehindRepeater(a_BlockX, a_BlockY, a_BlockZ, a_Meta))
+		{ 
+			return true;
 		}
 	}
 
 	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
-
-		switch (a_Meta)
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) && isBehindRepeater(a_BlockX, a_BlockY, a_BlockZ, a_Meta))
 		{
-			case 0x0:
-			{
-				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
-				break;
-			}
-			case 0x1:
-			{
-				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
-			case 0x2:
-			{
-				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
-				break;
-			}
-			case 0x3:
-			{
-				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
+			return true;
 		}
 	}
+
 	return false; // Couldn't find power source behind repeater
 }
 
-
-
+bool isBehindRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+{
+	switch (a_Meta & 0x3)
+	{
+		case 0x0:
+		{
+			if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
+			break;
+		}
+		case 0x1:
+		{
+			if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
+			break;
+		}
+		case 0x2:
+		{
+			if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
+			break;
+		}
+		case 0x3:
+		{
+			if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
+			break;
+		}
+		default:
+		{
+			return false;
+			break;
+		}
+	}	
+}
 
 bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
