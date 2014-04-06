@@ -1532,7 +1532,7 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 
 
-void cClientHandle::SendData(const char * a_Data, int a_Size)
+void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_HasSentDC)
 	{
@@ -1547,7 +1547,7 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 		if (m_OutgoingDataOverflow.empty())
 		{
 			// No queued overflow data; if this packet fits into the ringbuffer, put it in, otherwise put it in the overflow buffer:
-			int CanFit = m_OutgoingData.GetFreeSpace();
+			size_t CanFit = m_OutgoingData.GetFreeSpace();
 			if (CanFit > a_Size)
 			{
 				CanFit = a_Size;
@@ -2633,7 +2633,7 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 
 
 
-void cClientHandle::DataReceived(const char * a_Data, int a_Size)
+void cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
 	m_TimeSinceLastPacket = 0;

@@ -39,10 +39,10 @@ public:
 	void AddHeader(const AString & a_Key, const AString & a_Value);
 	
 	void SetContentType  (const AString & a_ContentType) { m_ContentType   = a_ContentType; }
-	void SetContentLength(int a_ContentLength)           { m_ContentLength = a_ContentLength; }
+	void SetContentLength(size_t a_ContentLength)        { m_ContentLength = a_ContentLength; }
 	
 	const AString & GetContentType  (void) const { return m_ContentType; }
-	int             GetContentLength(void) const { return m_ContentLength; }
+	size_t          GetContentLength(void) const { return m_ContentLength; }
 
 protected:
 	typedef std::map<AString, AString> cNameValueMap;
@@ -54,8 +54,10 @@ protected:
 	/** Type of the content; parsed by AddHeader(), set directly by SetContentLength() */
 	AString m_ContentType;
 
-	/** Length of the content that is to be received. -1 when the object is created, parsed by AddHeader() or set directly by SetContentLength() */
-	int m_ContentLength;
+	/** Length of the content that is to be received.
+	AString::npos when the object is created.
+	Parsed by AddHeader() or set directly by SetContentLength() */
+	size_t m_ContentLength;
 } ;
 
 
@@ -72,12 +74,12 @@ public:
 	cHTTPRequest(void);
 	
 	/** Parses the request line and then headers from the received data.
-	Returns the number of bytes consumed or a negative number for error
+	Returns the number of bytes consumed or AString::npos number for error
 	*/
-	int ParseHeaders(const char * a_Data, int a_Size);
+	size_t ParseHeaders(const char * a_Data, size_t a_Size);
 	
 	/** Returns true if the request did contain a Content-Length header */
-	bool HasReceivedContentLength(void) const { return (m_ContentLength >= 0); }
+	bool HasReceivedContentLength(void) const { return (m_ContentLength != AString::npos); }
 	
 	/** Returns the method used in the request */
 	const AString & GetMethod(void) const { return m_Method; }
@@ -145,7 +147,7 @@ protected:
 	/** Parses the incoming data for the first line (RequestLine)
 	Returns the number of bytes consumed, or -1 for an error
 	*/
-	int ParseRequestLine(const char * a_Data, int a_Size);
+	size_t ParseRequestLine(const char * a_Data, size_t a_Size);
 	
 	// cEnvelopeParser::cCallbacks overrides:
 	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) override;

@@ -20,7 +20,7 @@ cEnvelopeParser::cEnvelopeParser(cCallbacks & a_Callbacks) :
 
 
 
-int cEnvelopeParser::Parse(const char * a_Data, int a_Size)
+size_t cEnvelopeParser::Parse(const char * a_Data, size_t a_Size)
 {
 	if (!m_IsInHeaders)
 	{
@@ -55,7 +55,7 @@ int cEnvelopeParser::Parse(const char * a_Data, int a_Size)
 		{
 			// An error has occurred
 			m_IsInHeaders = false;
-			return -1;
+			return AString::npos;
 		}
 		Last = idxCRLF + 2;
 		idxCRLF = m_IncomingData.find("\r\n", idxCRLF + 2);

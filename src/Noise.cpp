@@ -425,7 +425,7 @@ void cCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cNoise:
 
-cNoise::cNoise(unsigned int a_Seed) :
+cNoise::cNoise(int a_Seed) :
 	m_Seed(a_Seed)
 {
 }

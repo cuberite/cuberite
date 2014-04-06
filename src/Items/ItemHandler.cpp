@@ -506,13 +506,13 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 {
 	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers
 	
-	if (m_ItemType > 256)
+	if (m_ItemType >= 256)
 	{
-		LOGERROR("%s: Item %d has no valid block!", __FUNCTION__, m_ItemType);
+		LOGERROR("%s: Item %d is not eligible for direct block placement!", __FUNCTION__, m_ItemType);
 		return false;
 	}
 	
-	cBlockHandler * BlockH = BlockHandler(m_ItemType);
+	cBlockHandler * BlockH = BlockHandler((BLOCKTYPE)m_ItemType);
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
 		ChunkInterface, a_Player,

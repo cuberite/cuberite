@@ -38,7 +38,7 @@ class cDebugCallbacks :
 		}
 		
 		
-		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size) override
+		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override
 		{
 			UNUSED(a_Connection);
 			
@@ -100,7 +100,7 @@ class cDebugCallbacks :
 		}
 		
 		
-		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, int a_Size) override
+		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, size_t a_Size) override
 		{
 			// TODO
 		}
@@ -242,7 +242,7 @@ void cHTTPServer::NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Re
 
 
 
-void cHTTPServer::RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size)
+void cHTTPServer::RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	m_Callbacks->OnRequestBody(a_Connection, a_Request, a_Data, a_Size);
 }

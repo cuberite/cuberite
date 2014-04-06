@@ -2993,7 +2993,6 @@ int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProje
 		delete Projectile;
 		return -1;
 	}
-	BroadcastSpawnEntity(*Projectile);
 	return Projectile->GetUniqueID();
 }
 

@@ -43,7 +43,7 @@ public:
 		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) = 0;
 		
 		/// Called when more file data has come for the current file in the form data
-		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, int a_Size) = 0;
+		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, size_t a_Size) = 0;
 		
 		/// Called when the current file part has ended in the form data
 		virtual void OnFileEnd(cHTTPFormParser & a_Parser) = 0;
@@ -54,10 +54,10 @@ public:
 	cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callbacks);
 	
 	/// Creates a parser with the specified content type that reads data from a string
-	cHTTPFormParser(eKind a_Kind, const char * a_Data, int a_Size, cCallbacks & a_Callbacks);
+	cHTTPFormParser(eKind a_Kind, const char * a_Data, size_t a_Size, cCallbacks & a_Callbacks);
 	
 	/// Adds more data into the parser, as the request body is received
-	void Parse(const char * a_Data, int a_Size);
+	void Parse(const char * a_Data, size_t a_Size);
 	
 	/** Notifies that there's no more data incoming and the parser should finish its parsing.
 	Returns true if parsing successful
@@ -106,7 +106,7 @@ protected:
 	// cMultipartParser::cCallbacks overrides:
 	virtual void OnPartStart (void) override;
 	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) override;
-	virtual void OnPartData  (const char * a_Data, int a_Size) override;
+	virtual void OnPartData  (const char * a_Data, size_t a_Size) override;
 	virtual void OnPartEnd   (void) override;
 } ;
 

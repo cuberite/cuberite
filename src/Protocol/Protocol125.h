@@ -125,7 +125,7 @@ protected:
 	
 	AString m_Username;  ///< Stored in ParseHandshake(), compared to Login username
 	
-	virtual void SendData(const char * a_Data, int a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 	
 	/// Sends the Handshake packet
 	void SendHandshake(const AString & a_ConnectionHash);
