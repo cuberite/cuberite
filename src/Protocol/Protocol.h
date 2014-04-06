@@ -177,7 +177,7 @@ protected:
 	void WriteInt64 (Int64 a_Value)
 	{
 		UInt64 Value = HostToNetwork8(&a_Value);
-		SendData((const char *)Value, 8);
+		SendData((const char *)&Value, 8);
 	}
 	
 	void WriteFloat (float a_Value)
