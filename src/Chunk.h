@@ -326,9 +326,9 @@ public:
 	inline void       SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta)                     {       cChunkDef::SetNibble(m_BlockMeta, a_BlockIdx, a_Meta); }
 
 	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ, true); }
 	inline NIBBLETYPE GetBlockLight(int a_Idx) const {return cChunkDef::GetNibble(m_BlockLight, a_Idx); }
-	inline NIBBLETYPE GetSkyLight  (int a_Idx) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_Idx); }
+	inline NIBBLETYPE GetSkyLight  (int a_Idx) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_Idx, true); }
 	
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
@@ -423,8 +423,8 @@ private:
 	// TODO: Make these pointers and don't allocate what isn't needed
 	std::vector<BLOCKTYPE> m_BlockTypes;
 	std::vector<NIBBLETYPE> m_BlockMeta;
-	NIBBLETYPE m_BlockLight   [cChunkDef::NumBlocks / 2];
-	NIBBLETYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
+	std::vector<NIBBLETYPE> m_BlockLight;
+	std::vector<NIBBLETYPE> m_BlockSkyLight;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;

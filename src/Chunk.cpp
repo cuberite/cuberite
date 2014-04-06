@@ -250,8 +250,14 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 	a_Callback.BlockMeta    (Metas.data());
 
 	a_Callback.LightIsValid (m_IsLightValid);
-	a_Callback.BlockLight   (m_BlockLight);
-	a_Callback.BlockSkyLight(m_BlockSkyLight);
+
+	std::vector<NIBBLETYPE> BlockLights = m_BlockLight;
+	BlockLights.resize(NumBlocks / 2);
+	a_Callback.BlockLight   (BlockLights.data());
+
+	std::vector<NIBBLETYPE> BlockSkyLights = m_BlockSkyLight;
+	BlockSkyLights.resize(NumBlocks / 2, 0xff);
+	a_Callback.BlockSkyLight(BlockSkyLights.data());
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
@@ -285,47 +291,66 @@ void cChunk::SetAllData(
 		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
 	}
 
-	{ // Blocktype compression
-		bool FoundNonAir = false;
+	{
 		int IdxWhereNonEmptyStarts = 0;
-		m_BlockTypes.clear();
+		{ // Blocktype compression
+			bool FoundNonAir = false;
+			m_BlockTypes.clear();
 
-		for (int Idx = NumBlocks - 1; Idx >= 0; Idx--)
-		{
-			if (a_BlockTypes[Idx] != E_BLOCK_AIR)
+			for (int Idx = NumBlocks - 1; Idx >= 0; Idx--)
 			{
-				FoundNonAir = true;
-				IdxWhereNonEmptyStarts = Idx;
-				break;
+				if (a_BlockTypes[Idx] != E_BLOCK_AIR)
+				{
+					FoundNonAir = true;
+					IdxWhereNonEmptyStarts = Idx;
+					break;
+				}
 			}
+			m_BlockTypes.insert(m_BlockTypes.end(), &a_BlockTypes[0], &a_BlockTypes[IdxWhereNonEmptyStarts + 1]);
 		}
-		m_BlockTypes.insert(m_BlockTypes.end(), &a_BlockTypes[0], &a_BlockTypes[IdxWhereNonEmptyStarts + 1]);
-	}
 
-	{ // Blockmeta compression
+		{ // Blockmeta compression
+			m_BlockMeta.clear();
+			m_BlockMeta.insert(m_BlockMeta.end(), &a_BlockMeta[0], &a_BlockMeta[(IdxWhereNonEmptyStarts + 1) / 2]);
+		}
+	}
+	
+	if (a_BlockLight != NULL)
+	{
+		// Compress blocklight
 		bool FoundNonEmpty = false;
 		int IdxWhereNonEmptyStarts = 0;
-		m_BlockMeta.clear();
+		m_BlockLight.clear();
 
 		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
 		{
-			if (a_BlockMeta[Idx] != 0)
+			if (a_BlockLight[Idx] != 0)
 			{
 				FoundNonEmpty = true;
 				IdxWhereNonEmptyStarts = Idx;
 				break;
 			}
 		}
-		m_BlockMeta.insert(m_BlockMeta.end(), &a_BlockMeta[0], &a_BlockMeta[IdxWhereNonEmptyStarts + 1]);
+		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[IdxWhereNonEmptyStarts + 1]);
 	}
-	
-	if (a_BlockLight != NULL)
-	{
-		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
-	}
+
 	if (a_BlockSkyLight != NULL)
 	{
-		memcpy(m_BlockSkyLight, a_BlockSkyLight, sizeof(m_BlockSkyLight));
+		 // Compress skylight
+		bool FoundNonEmpty = false;
+		int IdxWhereNonEmptyStarts = 0;
+		m_BlockSkyLight.clear();
+
+		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
+		{
+			if (a_BlockSkyLight[Idx] != 0xff)
+			{
+				FoundNonEmpty = true;
+				IdxWhereNonEmptyStarts = Idx;
+				break;
+			}
+		}
+		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_BlockSkyLight[0], &a_BlockSkyLight[IdxWhereNonEmptyStarts + 1]);
 	}
 	
 	m_IsLightValid = (a_BlockLight != NULL) && (a_BlockSkyLight != NULL);
@@ -371,8 +396,41 @@ void cChunk::SetLight(
 {
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
-	memcpy(m_BlockLight,    a_BlockLight, sizeof(m_BlockLight));
-	memcpy(m_BlockSkyLight, a_SkyLight,   sizeof(m_BlockSkyLight));
+
+	{ // Compress blocklight
+		bool FoundNonEmpty = false;
+		int IdxWhereNonEmptyStarts = 0;
+		m_BlockLight.clear();
+
+		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
+		{
+			if (a_BlockLight[Idx] != 0)
+			{
+				FoundNonEmpty = true;
+				IdxWhereNonEmptyStarts = Idx;
+				break;
+			}
+		}
+		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[IdxWhereNonEmptyStarts + 1]);
+	}
+
+	{ // Compress skylight
+		bool FoundNonEmpty = false;
+		int IdxWhereNonEmptyStarts = 0;
+		m_BlockSkyLight.clear();
+
+		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
+		{
+			if (a_SkyLight[Idx] != 0xff)
+			{
+				FoundNonEmpty = true;
+				IdxWhereNonEmptyStarts = Idx;
+				break;
+			}
+		}
+		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[IdxWhereNonEmptyStarts + 1]);
+	}
+
 	m_IsLightValid = true;
 }
 

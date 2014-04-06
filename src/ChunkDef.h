@@ -232,13 +232,13 @@ public:
 	}
 
 
-	static NIBBLETYPE GetNibble(const std::vector<NIBBLETYPE> & a_Buffer, int a_BlockIdx)
+	static NIBBLETYPE GetNibble(const std::vector<NIBBLETYPE> & a_Buffer, int a_BlockIdx, bool a_IsSkyLightNibble = false)
 	{
 		if ((a_BlockIdx > -1) && (a_BlockIdx < NumBlocks))
 		{
 			if (a_Buffer.empty() || (a_BlockIdx / 2 > a_Buffer.size() - 1))
 			{
-				return 0;
+				return (a_IsSkyLightNibble ? 0xff : 0);
 			}
 			return (a_Buffer[a_BlockIdx / 2] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
 		}
@@ -259,14 +259,14 @@ public:
 	}
 
 
-	static NIBBLETYPE GetNibble(const std::vector<NIBBLETYPE> & a_Buffer, int x, int y, int z)
+	static NIBBLETYPE GetNibble(const std::vector<NIBBLETYPE> & a_Buffer, int x, int y, int z, bool a_IsSkyLightNibble = false)
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
 			int Index = MakeIndexNoCheck(x, y, z);
 			if (a_Buffer.empty() || (Index / 2 > a_Buffer.size() - 1))
 			{
-				return 0;
+				return (a_IsSkyLightNibble ? 0xff : 0);
 			}
 			return (a_Buffer[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
 		}
