@@ -154,6 +154,8 @@ private:
 	bool AreCoordsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool IsCurrentStatePowered);
 	/** Returns if a repeater is powered */
 	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
+	/** Returns if a repeater is locked */
+	bool IsRepeaterLocked(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
 	/** Returns if a piston is powered */
 	bool IsPistonPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
 	/** Returns if a wire is powered
