@@ -28,3 +28,5 @@ motd.txt
 *.deuser
 *.dmp
 *.xml
+mcserver_api.lua
+
