@@ -39,6 +39,13 @@ public:
 	}
 
 
+	virtual bool CanChangeDirtToGrass(BLOCKTYPE a_Block, NIBBLETYPE a_Meta) override
+	{
+		return true;
+	}
+
+
+
 	// Bed specific helper functions
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{

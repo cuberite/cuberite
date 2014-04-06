@@ -396,6 +396,15 @@ bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, in
 
 
 
+bool cBlockHandler::CanChangeDirtToGrass(BLOCKTYPE a_Block, NIBBLETYPE a_Meta)
+{
+	return ((cBlockInfo::IsTransparent(a_Block)) || (cBlockInfo::IsOneHitDig(a_Block)));
+}
+
+
+
+
+
 bool cBlockHandler::IsUseable()
 {
 	return false;
