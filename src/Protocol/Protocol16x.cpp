@@ -18,6 +18,7 @@ Implements the 1.6.x protocol classes:
 #include "../Entities/Entity.h"
 #include "../Entities/Player.h"
 #include "../UI/Window.h"
+#include "../CompositeChat.h"
 
 
 
@@ -83,6 +84,18 @@ void cProtocol161::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_
 void cProtocol161::SendChat(const AString & a_Message)
 {
 	super::SendChat(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()));
+}
+
+
+
+
+
+void cProtocol161::SendChat(const cCompositeChat & a_Message)
+{
+	// This protocol version doesn't support composite messages to the full
+	// Just extract each part's text and use it:
+	
+	super::SendChat(Printf("{\"text\":\"%s\"}", EscapeString(a_Message.ExtractText()).c_str()));
 }
 
 

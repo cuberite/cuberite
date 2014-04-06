@@ -37,6 +37,7 @@ protected:
 	// cProtocol150 overrides:
 	virtual void SendAttachEntity  (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
 	virtual void SendChat          (const AString & a_Message) override;
+	virtual void SendChat          (const cCompositeChat & a_Message) override;
 	virtual void SendEditSign      (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendGameMode      (eGameMode a_GameMode) override;
 	virtual void SendHealth        (void) override;
