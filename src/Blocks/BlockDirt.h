@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "BlockSlab.h"
 #include "../FastRandom.h"
 
 
@@ -67,7 +66,7 @@ public:
 			cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(BlockX, BlockZ);
 			if (Chunk == NULL)
 			{
-				// Unloaded chunks
+				// Unloaded chunk
 				continue;
 			}
 			Chunk->GetBlockTypeMeta(BlockX, BlockY, BlockZ, DestBlock, DestMeta);
