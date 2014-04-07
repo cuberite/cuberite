@@ -1601,8 +1601,8 @@ int cProtocol125::ParseUseEntity(void)
 
 int cProtocol125::ParseEnchantItem(void)
 {
-	HANDLE_PACKET_READ(ReadByte, byte, WindowID);
-	HANDLE_PACKET_READ(ReadByte, byte, Enchantment);
+	HANDLE_PACKET_READ(ReadByte, Byte, WindowID);
+	HANDLE_PACKET_READ(ReadByte, Byte, Enchantment);
 
 	LOGWARN("Older Protocol: Enchantment Packet received!");
 
