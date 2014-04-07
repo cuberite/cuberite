@@ -684,12 +684,9 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState)
 {
 	// Create a variable holding my meta to avoid multiple lookups.
-	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ); 
+	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	
-
-	
-    	if (IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
+    	if (!IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
     	{
     		// Create a variable holding being on or self powered to avoid multiple lookups.
     		bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
@@ -703,7 +700,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_B
 			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
 		}
 	}
-	
+
 	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
