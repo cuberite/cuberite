@@ -688,12 +688,13 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_B
 
 	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false); // Cache if repeater is on
 	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is pwoered
+	bool IsLocked = IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3);
 
-	if (IsSelfPowered && !IsOn) // Queue a power change if I am receiving power but not on
+	if (IsSelfPowered && !IsOn && !IsLocked) // Queue a power change if I am receiving power but not on
 	{
 		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
 	}
-	else if (!IsSelfPowered && IsOn) // Queue a power change if I am not receiving power but on
+	else if (!IsSelfPowered && IsOn && !IsLocked) // Queue a power change if I am not receiving power but on
 	{
 		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
 	}
@@ -1210,6 +1211,66 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 			case 0x3:
 			{
 				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
+				break;
+			}
+		}
+	}
+	return false; // Couldn't find power source behind repeater
+}
+
+
+
+
+
+bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+{
+	// Repeaters can be locked by either of their sides
+
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
+	{
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+
+		switch (a_Meta)
+		{
+			// If N/S check E/W
+			case 0x0:
+			case 0x2:
+			{
+				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
+				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
+				break;
+			}
+			// If E/W check N/S
+			case 0x1:
+			case 0x3:
+			{
+				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
+				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
+				break;
+			}
+		}
+	}
+
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)
+	{
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+
+		switch (a_Meta)
+		{
+			// If N/S check E/W
+			case 0x0:
+			case 0x2:
+			{
+				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
+				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
+				break;
+			}
+			// If E/W check N/S
+			case 0x1:
+			case 0x3:
+			{
+				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
+				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
 				break;
 			}
 		}
