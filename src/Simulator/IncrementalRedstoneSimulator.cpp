@@ -1223,57 +1223,48 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 
 bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
-	// Repeaters can be locked by either of their sides
-	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
+	// Change checking direction according to meta rotation.
+	switch (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x3) //compare my direction to my neighbor's
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+		// If N/S check E/W  <<<<<
 
-		switch (a_Meta)
-		{
-			// If N/S check E/W
-			case 0x0:
-			case 0x2:
-			{
-				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
-				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
-			// If E/W check N/S
-			case 0x1:
-			case 0x3:
-			{
-				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
-				if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
-				break;
-			}
-		}
+	  	case 0x0: 
+	    case 0x2:
+	  	{
+	            if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) // Is right neighbor a
+	            { 
+	              	NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX + 1, a_BlockY, a_BlockZ) & 0x3;
+	                if (otherRepeaterDir == 0x1) { return true; }
+	            }
+	  
+	            if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
+	            { 
+	              	NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
+	                if (otherRepeaterDir == 0x3) { return true; }
+	            }
+	  
+			break;
+	    }
+	  
+		// If E/W check N/S
+		case 0x1:
+		case 0x3:
+
+	              if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == E_BLOCK_REDSTONE_REPEATER_ON) 
+	            { 
+	              	NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ + 1) & 0x3;
+	                if (otherRepeaterDir == 0x0) { return true; }
+	            }
+	  
+	            if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ -1) == E_BLOCK_REDSTONE_REPEATER_ON) 
+	            { 
+	              	NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ - 1) & 0x3;
+	                if (otherRepeaterDir == 0x2) { return true; }
+	            }
+		break;
 	}
 
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)
-	{
-		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
-
-		switch (a_Meta)
-		{
-			// If N/S check E/W
-			case 0x0:
-			case 0x2:
-			{
-				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX + 1, a_BlockY, a_BlockZ))) { return true; }
-				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX - 1, a_BlockY, a_BlockZ))) { return true; }
-				break;
-			}
-			// If E/W check N/S
-			case 0x1:
-			case 0x3:
-			{
-				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ + 1))) { return true; }
-				if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ - 1))) { return true; }
-				break;
-			}
-		}
-	}
-	return false; // Repeater is not being powered from either side, therefore it is not locked.
+	return false;
 }
 
 
