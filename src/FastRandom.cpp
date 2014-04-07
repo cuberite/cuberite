@@ -172,3 +172,13 @@ float cFastRandom::NextFloat(float a_Range, int a_Salt)
 
 
 
+
+int cFastRandom::GenerateRandomInteger(int a_Begin, int a_End)
+{
+	cFastRandom Random;
+	return Random.NextInt(a_End - a_Begin + 1) + a_Begin;
+}
+
+
+
+

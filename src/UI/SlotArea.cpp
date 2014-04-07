@@ -13,6 +13,8 @@
 #include "Window.h"
 #include "../CraftingRecipes.h"
 #include "../Root.h"
+#include "../FastRandom.h"
+#include "../BlockArea.h"
 
 
 
@@ -615,23 +617,31 @@ void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 	if (a_Player.GetDraggingItem().IsEmpty())
 	{
 		LOGWARN("EMPTY");
-		this->m_ParentWindow.SetProperty(0, 0);
-		this->m_ParentWindow.SetProperty(1, 0);
-		this->m_ParentWindow.SetProperty(2, 0);
+		m_ParentWindow.SetProperty(0, 0);
+		m_ParentWindow.SetProperty(1, 0);
+		m_ParentWindow.SetProperty(2, 0);
 	}
 	else if (a_Player.GetDraggingItem().IsEnchantable)
 	{
+		int bookshelves = 15; // TODO: Check Bookshelves
+
+		cFastRandom Random;
+		int base = (Random.GenerateRandomInteger(1, 8) + floor(bookshelves / 2) + Random.GenerateRandomInteger(0, bookshelves));
+		int topSlot = std::max(base / 3, 1);
+		int middleSlot = (base * 2) / 3 + 1;
+		int bottomSlot = std::max(base, bookshelves * 2);
+
 		LOGWARN("Enchantable");
-		this->m_ParentWindow.SetProperty(0, 30);
-		this->m_ParentWindow.SetProperty(1, 20);
-		this->m_ParentWindow.SetProperty(2, 10);
+		m_ParentWindow.SetProperty(0, topSlot);
+		m_ParentWindow.SetProperty(1, middleSlot);
+		m_ParentWindow.SetProperty(2, bottomSlot);
 	}
 	else
 	{
 		LOGWARN("Not Enchantable");
-		this->m_ParentWindow.SetProperty(0, 0);
-		this->m_ParentWindow.SetProperty(1, 0);
-		this->m_ParentWindow.SetProperty(2, 0);
+		m_ParentWindow.SetProperty(0, 0);
+		m_ParentWindow.SetProperty(1, 0);
+		m_ParentWindow.SetProperty(2, 0);
 	}
 }
 
