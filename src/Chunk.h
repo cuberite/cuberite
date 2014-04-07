@@ -267,7 +267,7 @@ public:
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
 	void CalculateLighting(); // Recalculate right now
-	void CalculateHeightmap();
+	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 
 	// Broadcast various packets to all clients of this chunk:
 	// (Please keep these alpha-sorted)

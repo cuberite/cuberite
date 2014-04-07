@@ -291,74 +291,55 @@ void cChunk::SetAllData(
 		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
 	}
 
+	if (a_HeightMap == NULL)
 	{
-		int IdxWhereNonEmptyStarts = 0;
-		{ // Blocktype compression
-			bool FoundNonAir = false;
-			m_BlockTypes.clear();
+		CalculateHeightmap(a_BlockTypes);
+	}
 
-			for (int Idx = NumBlocks - 1; Idx >= 0; Idx--)
+	int IdxWhereNonEmptyStarts = 0;
+	{ // Blocktype compression
+		unsigned char Highest = 0;
+		int X = 0, Z = 0;
+		m_BlockTypes.clear();
+			
+		for (int x = 0; x < Width; x++)
+		{
+			for (int z = 0; z < Width; z++)
 			{
-				if (a_BlockTypes[Idx] != E_BLOCK_AIR)
+				unsigned char Height = m_HeightMap[x + z * Width];
+				if (Height > Highest)
 				{
-					FoundNonAir = true;
-					IdxWhereNonEmptyStarts = Idx;
-					break;
+					Highest = Height;
+					X = x; Z = z;
 				}
 			}
-			m_BlockTypes.insert(m_BlockTypes.end(), &a_BlockTypes[0], &a_BlockTypes[IdxWhereNonEmptyStarts + 1]);
 		}
 
-		{ // Blockmeta compression
-			m_BlockMeta.clear();
-			m_BlockMeta.insert(m_BlockMeta.end(), &a_BlockMeta[0], &a_BlockMeta[(IdxWhereNonEmptyStarts + 1) / 2]);
-		}
+		IdxWhereNonEmptyStarts = MakeIndexNoCheck(X, Highest + 1, Z);
+
+		m_BlockTypes.insert(m_BlockTypes.end(), &a_BlockTypes[0], &a_BlockTypes[IdxWhereNonEmptyStarts]);
+	}
+
+	{ // Blockmeta compression
+		m_BlockMeta.clear();
+		m_BlockMeta.insert(m_BlockMeta.end(), &a_BlockMeta[0], &a_BlockMeta[IdxWhereNonEmptyStarts / 2]);
 	}
 	
 	if (a_BlockLight != NULL)
 	{
 		// Compress blocklight
-		bool FoundNonEmpty = false;
-		int IdxWhereNonEmptyStarts = 0;
 		m_BlockLight.clear();
-
-		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
-		{
-			if (a_BlockLight[Idx] != 0)
-			{
-				FoundNonEmpty = true;
-				IdxWhereNonEmptyStarts = Idx;
-				break;
-			}
-		}
-		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[IdxWhereNonEmptyStarts + 1]);
+		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[IdxWhereNonEmptyStarts / 2]);
 	}
 
 	if (a_BlockSkyLight != NULL)
 	{
 		 // Compress skylight
-		bool FoundNonEmpty = false;
-		int IdxWhereNonEmptyStarts = 0;
 		m_BlockSkyLight.clear();
-
-		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
-		{
-			if (a_BlockSkyLight[Idx] != 0xff)
-			{
-				FoundNonEmpty = true;
-				IdxWhereNonEmptyStarts = Idx;
-				break;
-			}
-		}
-		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_BlockSkyLight[0], &a_BlockSkyLight[IdxWhereNonEmptyStarts + 1]);
+		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_BlockSkyLight[0], &a_BlockSkyLight[IdxWhereNonEmptyStarts / 2]);
 	}
 	
 	m_IsLightValid = (a_BlockLight != NULL) && (a_BlockSkyLight != NULL);
-	
-	if (a_HeightMap == NULL)
-	{
-		CalculateHeightmap();
-	}
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
@@ -1483,7 +1464,7 @@ void cChunk::WakeUpSimulators(void)
 
 
 
-void cChunk::CalculateHeightmap()
+void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 {
 	for (int x = 0; x < Width; x++)
 	{
@@ -1492,7 +1473,7 @@ void cChunk::CalculateHeightmap()
 			for (int y = Height - 1; y > -1; y--)
 			{
 				int index = MakeIndex( x, y, z );
-				if (GetBlock(index) != E_BLOCK_AIR)
+				if (a_BlockTypes[index] != E_BLOCK_AIR)
 				{
 					m_HeightMap[x + z * Width] = (unsigned char)y;
 					break;
