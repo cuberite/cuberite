@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "IncrementalRedstoneSimulator.h"
@@ -686,15 +685,15 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_B
 {
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false); // Cache if repeater is on
-	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is pwoered
-	bool IsLocked = IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3);
+	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false); // Cache if repeater is on.
+	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is powered.
+	bool IsLocked = IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is locked.
 
-	if (IsSelfPowered && !IsOn && !IsLocked) // Queue a power change if I am receiving power but not on
+	if (IsSelfPowered && !IsOn && !IsLocked) // Queue a power change if powered, but not on and not locked.
 	{
 		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
 	}
-	else if (!IsSelfPowered && IsOn && !IsLocked) // Queue a power change if I am not receiving power but on
+	else if (!IsSelfPowered && IsOn && !IsLocked) // Queue a power change if unpowered, on, and not locked.
 	{
 		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
 	}
@@ -1225,7 +1224,6 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
 	// Repeaters can be locked by either of their sides
-
 	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
@@ -1275,7 +1273,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY,
 			}
 		}
 	}
-	return false; // Couldn't find power source behind repeater
+	return false; // Repeater is not being powered from either side, therefore it is not locked.
 }
 
 
