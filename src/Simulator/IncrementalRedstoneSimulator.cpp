@@ -685,19 +685,19 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_B
 {
 	// Create a variable holding my meta to avoid multiple lookups.
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-
-	// Do the same for being on, self powered or locked.
-	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
-	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
-	bool IsLocked = IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
-
-	if (IsSelfPowered && !IsOn && !IsLocked) // Queue a power change if powered, but not on and not locked.
-	{
-		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
-	}
-	else if (!IsSelfPowered && IsOn && !IsLocked) // Queue a power change if unpowered, on, and not locked.
-	{
-		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
+    	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
+    	
+    	if (!IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
+    	{
+		bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
+		if (IsSelfPowered && !IsOn) // Queue a power change if powered, but not on and not locked.
+		{
+			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
+		}
+		else if (!IsSelfPowered && IsOn) // Queue a power change if unpowered, on, and not locked.
+		{
+			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
+		}
 	}
 
 	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
