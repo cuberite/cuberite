@@ -46,6 +46,7 @@ public:
 	 * On all these functions, return true if you want to override default behavior and not call other plugins on that callback.
 	 * You can also return false, so default behavior is used.
 	 **/
+	virtual bool OnBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) = 0;
 	virtual bool OnBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) = 0;
 	virtual bool OnChat                     (cPlayer * a_Player, AString & a_Message) = 0;
 	virtual bool OnChunkAvailable           (cWorld * a_World, int a_ChunkX, int a_ChunkZ) = 0;
@@ -67,6 +68,7 @@ public:
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) = 0;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
+	virtual bool OnPlayerDestroyed          (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerFished             (cPlayer & a_Player, const cItems & a_Reward) = 0;
 	virtual bool OnPlayerFishing            (cPlayer & a_Player, cItems & a_Reward) = 0;
@@ -88,6 +90,8 @@ public:
 	virtual bool OnPluginsLoaded            (void) = 0;
 	virtual bool OnPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) = 0;
 	virtual bool OnPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) = 0;
+	virtual bool OnProjectileHitBlock       (cProjectileEntity & a_Projectile) = 0;
+	virtual bool OnProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity) = 0;
 	virtual bool OnSpawnedEntity            (cWorld & a_World, cEntity & a_Entity) = 0;
 	virtual bool OnSpawnedMonster           (cWorld & a_World, cMonster & a_Monster) = 0;
 	virtual bool OnSpawningEntity           (cWorld & a_World, cEntity & a_Entity) = 0;

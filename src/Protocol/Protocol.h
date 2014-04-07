@@ -12,6 +12,8 @@
 
 #include "../Defines.h"
 #include "../Endianness.h"
+#include "../Scoreboard.h"
+#include "../Map.h"
 
 
 
@@ -23,10 +25,12 @@ class cWindow;
 class cInventory;
 class cPawn;
 class cPickup;
+class cPainting;
 class cWorld;
 class cMonster;
 class cChunkDataSerializer;
 class cFallingBlock;
+class cCompositeChat;
 
 
 
@@ -48,7 +52,7 @@ public:
 	virtual ~cProtocol() {}
 	
 	/// Called when client sends some data
-	virtual void DataReceived(const char * a_Data, int a_Size) = 0;
+	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 	
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity        (const cEntity & a_Entity, const cEntity * a_Vehicle) = 0;
@@ -57,6 +61,7 @@ public:
 	virtual void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
 	virtual void SendChat                (const AString & a_Message) = 0;
+	virtual void SendChat                (const cCompositeChat & a_Message) = 0;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
 	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) = 0;
@@ -78,6 +83,10 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive           (int a_PingID) = 0;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) = 0;
+	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) = 0;
+	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) = 0;
+	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) = 0;
+	virtual void SendPaintingSpawn       (const cPainting & a_Painting) = 0;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) = 0;
 	virtual void SendPlayerAbilities     (void) = 0;
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) = 0;
@@ -92,6 +101,9 @@ public:
 	virtual void SendRespawn             (void) = 0;
 	virtual void SendExperience          (void) = 0;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) = 0;
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;
+	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) = 0;
+	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) = 0;
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) = 0;  // a_Src coords are Block * 8
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) = 0;
@@ -120,7 +132,7 @@ protected:
 	cCriticalSection m_CSPacket;  //< Each SendXYZ() function must acquire this CS in order to send the whole packet at once
 	
 	/// A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it
-	virtual void SendData(const char * a_Data, int a_Size) = 0;
+	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
 	
 	/// Called after writing each packet, enables descendants to flush their buffers
 	virtual void Flush(void) {};
@@ -131,10 +143,15 @@ protected:
 		SendData((const char *)&a_Value, 1);
 	}
 	
+	void WriteChar(char a_Value)
+	{
+		SendData(&a_Value, 1);
+	}
+	
 	void WriteShort(short a_Value)
 	{
-		a_Value = htons(a_Value);
-		SendData((const char *)&a_Value, 2);
+		u_short Value = htons((u_short)a_Value);
+		SendData((const char *)&Value, 2);
 	}
 	
 	/*
@@ -147,8 +164,8 @@ protected:
 	
 	void WriteInt(int a_Value)
 	{
-		a_Value = htonl(a_Value);
-		SendData((const char *)&a_Value, 4);
+		u_long Value = htonl((u_long)a_Value);
+		SendData((const char *)&Value, 4);
 	}
 	
 	void WriteUInt(unsigned int a_Value)
@@ -159,19 +176,19 @@ protected:
 	
 	void WriteInt64 (Int64 a_Value)
 	{
-		a_Value = HostToNetwork8(&a_Value);
-		SendData((const char *)&a_Value, 8);
+		UInt64 Value = HostToNetwork8(&a_Value);
+		SendData((const char *)&Value, 8);
 	}
 	
 	void WriteFloat (float a_Value)
 	{
-		unsigned int val = HostToNetwork4(&a_Value);
+		UInt32 val = HostToNetwork4(&a_Value);
 		SendData((const char *)&val, 4);
 	}
 	
 	void WriteDouble(double a_Value)
 	{
-		unsigned long long val = HostToNetwork8(&a_Value);
+		UInt64 val = HostToNetwork8(&a_Value);
 		SendData((const char *)&val, 8);
 	}
 	
@@ -179,7 +196,7 @@ protected:
 	{
 		AString UTF16;
 		UTF8ToRawBEUTF16(a_Value.c_str(), a_Value.length(), UTF16);
-		WriteShort((unsigned short)(UTF16.size() / 2));
+		WriteShort((short)(UTF16.size() / 2));
 		SendData(UTF16.data(), UTF16.size());
 	}
 	
@@ -199,7 +216,7 @@ protected:
 	{
 		// A 32-bit integer can be encoded by at most 5 bytes:
 		unsigned char b[5];
-		int idx = 0;
+		size_t idx = 0;
 		do
 		{
 			b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
@@ -212,7 +229,7 @@ protected:
 	
 	void WriteVarUTF8String(const AString & a_String)
 	{
-		WriteVarInt(a_String.size());
+		WriteVarInt((UInt32)a_String.size());
 		SendData(a_String.data(), a_String.size());
 	}
 } ;

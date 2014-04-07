@@ -3,14 +3,6 @@
 
 #include "Noise.h"
 
-
-
-
-
-#if NOISE_USE_SSE
-	#include <smmintrin.h> //_mm_mul_epi32
-#endif
-
 #define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
 
 
@@ -433,7 +425,7 @@ void cCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cNoise:
 
-cNoise::cNoise(unsigned int a_Seed) :
+cNoise::cNoise(int a_Seed) :
 	m_Seed(a_Seed)
 {
 }

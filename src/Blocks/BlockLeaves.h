@@ -1,6 +1,6 @@
 #pragma once
 #include "BlockHandler.h"
-#include "../MersenneTwister.h"
+#include "../FastRandom.h"
 #include "../World.h"
 #include "../BlockArea.h"
 
@@ -16,6 +16,7 @@
 	{ \
 		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, (BLOCKTYPE)(E_BLOCK_SPONGE + i + 1)); break; \
 		case E_BLOCK_LOG: return true; \
+		case E_BLOCK_NEW_LOG: return true; \
 	}
 
 bool HasNearLog(cBlockArea &a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -36,16 +37,18 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		MTRand rand;
+		cFastRandom rand;
 
 		// Only the first 2 bits contain the display information, the others are for growing
-		if (rand.randInt(5) == 0)
+		if (rand.NextInt(6) == 0)
 		{
 			a_Pickups.push_back(cItem(E_BLOCK_SAPLING, 1, a_BlockMeta & 3));
 		}
-		if ((a_BlockMeta & 3) == E_META_SAPLING_APPLE)
+		
+		// 1 % chance of dropping an apple, if the leaves' type is Apple Leaves
+		if ((a_BlockMeta & 3) == E_META_LEAVES_APPLE)
 		{
-			if (rand.rand(100) == 0)
+			if (rand.NextInt(101) == 0)
 			{
 				a_Pickups.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
 			}
@@ -53,31 +56,30 @@ public:
 	}
 
 
-	void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		cBlockHandler::OnDestroyed(a_World, a_BlockX, a_BlockY, a_BlockZ);
+		cBlockHandler::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
 		
-		//0.5% chance of dropping an apple
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		//check if Oak (0x1 and 0x2 bit not set)
-		MTRand rand;
-		if(!(Meta & 3) && rand.randInt(200) == 100)
+		// 0.5% chance of dropping an apple, if the leaves' type is Apple Leaves:
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		cFastRandom rand;
+		if (((Meta & 3) == E_META_LEAVES_APPLE) && (rand.NextInt(201) == 100))
 		{
 			cItems Drops;
 			Drops.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
-			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
+			a_WorldInterface.SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 	
 	
-	virtual void OnNeighborChanged(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);	 // Unset 0x8 bit so it gets checked for decay
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);	 // Unset 0x8 bit so it gets checked for decay
 	}
 	
 	
-	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		if ((Meta & 0x04) != 0)
@@ -116,8 +118,8 @@ public:
 		}
 
 		// Decay the leaves:
-		DropBlock(a_Chunk.GetWorld(), NULL, BlockX, a_RelY, BlockZ);
-		a_Chunk.GetWorld()->DigBlock(BlockX, a_RelY, BlockZ);
+		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
+		a_ChunkInterface.DigBlock(a_WorldInterface, BlockX, a_RelY, BlockZ);
 	}
 
 
@@ -139,6 +141,8 @@ bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		switch (Types[i])
 		{
+			case E_BLOCK_NEW_LEAVES:
+			case E_BLOCK_NEW_LOG:
 			case E_BLOCK_LEAVES:
 			case E_BLOCK_LOG:
 			{

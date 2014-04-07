@@ -47,8 +47,12 @@ if (WIN32)
 		)
 	endif()
 
+	set_target_properties(lua PROPERTIES OUTPUT_NAME "lua51")
+
 	# NOTE: The DLL for each configuration is stored at the same place, thus overwriting each other.
-	# This is known, however such behavior is needed for LuaRocks - they always load "lua.dll"
+	# This is known, however such behavior is needed for LuaRocks - they always load "lua5.1.dll" or "lua51.dll"
+	# We make it work by compiling to "lua51.dll" and providing a proxy-DLL "lua5.1.dll"
+	# See http://lua-users.org/wiki/LuaProxyDllFour for details
 else()
 	add_library(lua ${SOURCE})
 endif()

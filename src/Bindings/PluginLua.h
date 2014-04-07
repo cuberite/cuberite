@@ -35,7 +35,33 @@ class cPluginLua :
 public:
 	// tolua_end
 	
-	cPluginLua( const AString & a_PluginDirectory );
+	/** A RAII-style mutex lock for accessing the internal LuaState.
+	This will be the only way to retrieve the plugin's LuaState;
+	therefore it directly supports accessing the LuaState of the locked plugin.
+	Usage:
+		cPluginLua::cOperation Op(SomePlugin);
+		Op().Call(...)  // Call a function in the plugin's LuaState
+	*/
+	class cOperation
+	{
+	public:
+		cOperation(cPluginLua & a_Plugin) :
+			m_Plugin(a_Plugin),
+			m_Lock(a_Plugin.m_CriticalSection)
+		{
+		}
+
+		cLuaState & operator ()(void) { return m_Plugin.m_LuaState; }
+		
+	protected:
+		cPluginLua & m_Plugin;
+		
+		/** RAII lock for m_Plugin.m_CriticalSection */
+		cCSLock m_Lock;
+	} ;
+	
+	
+	cPluginLua(const AString & a_PluginDirectory);
 	~cPluginLua();
 
 	virtual void OnDisable(void) override;
@@ -43,6 +69,7 @@ public:
 
 	virtual void Tick(float a_Dt) override;
 
+	virtual bool OnBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) override;
 	virtual bool OnBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) override;
 	virtual bool OnChat                     (cPlayer * a_Player, AString & a_Message) override;
 	virtual bool OnChunkAvailable           (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
@@ -64,6 +91,7 @@ public:
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) override;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual bool OnPlayerDestroyed          (cPlayer & a_Player) override;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) override;
 	virtual bool OnPlayerFished             (cPlayer & a_Player, const cItems & a_Reward) override;
 	virtual bool OnPlayerFishing            (cPlayer & a_Player, cItems & a_Reward) override;
@@ -85,6 +113,8 @@ public:
 	virtual bool OnPluginsLoaded            (void) override;
 	virtual bool OnPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
+	virtual bool OnProjectileHitBlock       (cProjectileEntity & a_Projectile) override;
+	virtual bool OnProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity) override;
 	virtual bool OnSpawnedEntity            (cWorld & a_World, cEntity & a_Entity) override;
 	virtual bool OnSpawnedMonster           (cWorld & a_World, cMonster & a_Monster) override;
 	virtual bool OnSpawningEntity           (cWorld & a_World, cEntity & a_Entity) override;
@@ -105,7 +135,7 @@ public:
 	
 	virtual void ClearConsoleCommands(void) override;
 
-	/// Returns true if the plugin contains the function for the specified hook type, using the old-style registration (#121)
+	/** Returns true if the plugin contains the function for the specified hook type, using the old-style registration (#121) */
 	bool CanAddOldStyleHook(int a_HookType);
 	
 	// cWebPlugin override
@@ -115,26 +145,26 @@ public:
 	virtual AString HandleWebRequest(const HTTPRequest * a_Request ) override;
 	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);	// >> EXPORTED IN MANUALBINDINGS <<
 	
-	/// Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap.
+	/** Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
 	void BindCommand(const AString & a_Command, int a_FnRef);
 
-	/// Binds the console command to call the function specified by a Lua function reference. Simply adds to CommandMap.
+	/** Binds the console command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
 	void BindConsoleCommand(const AString & a_Command, int a_FnRef);
 
 	cLuaState & GetLuaState(void) { return m_LuaState; }
 
 	cCriticalSection & GetCriticalSection(void) { return m_CriticalSection; }
 	
-	/// Removes a previously referenced object (luaL_unref())
+	/** Removes a previously referenced object (luaL_unref()) */
 	void Unreference(int a_LuaRef);
 	
-	/// Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true
+	/** Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true */
 	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse);
 	
-	/// Calls the plugin-specified "cLuaWindow slot changed" callback.
+	/** Calls the plugin-specified "cLuaWindow slot changed" callback. */
 	void CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum);
 	
-	/// Returns the name of Lua function that should handle the specified hook type in the older (#121) API
+	/** Returns the name of Lua function that should handle the specified hook type in the older (#121) API */
 	static const char * GetHookFnName(int a_HookType);
 	
 	/** Adds a Lua function to be called for the specified hook.
@@ -143,37 +173,47 @@ public:
 	*/
 	bool AddHookRef(int a_HookType, int a_FnRefIdx);
 	
+	/** Calls a function in this plugin's LuaState with parameters copied over from a_ForeignState.
+	The values that the function returns are placed onto a_ForeignState.
+	Returns the number of values returned, if successful, or negative number on failure. */
+	int CallFunctionFromForeignState(
+		const AString & a_FunctionName,
+		cLuaState & a_ForeignState,
+		int a_ParamStart,
+		int a_ParamEnd
+	);
+	
 	// The following templates allow calls to arbitrary Lua functions residing in the plugin:
 	
-	/// Call a Lua function with 0 args
+	/** Call a Lua function with 0 args */
 	template <typename FnT> bool Call(FnT a_Fn)
 	{
 		cCSLock Lock(m_CriticalSection);
 		return m_LuaState.Call(a_Fn);
 	}
 
-	/// Call a Lua function with 1 arg
+	/** Call a Lua function with 1 arg */
 	template <typename FnT, typename ArgT0> bool Call(FnT a_Fn, ArgT0 a_Arg0)
 	{
 		cCSLock Lock(m_CriticalSection);
 		return m_LuaState.Call(a_Fn, a_Arg0);
 	}
 
-	/// Call a Lua function with 2 args
+	/** Call a Lua function with 2 args */
 	template <typename FnT, typename ArgT0, typename ArgT1> bool Call(FnT a_Fn, ArgT0 a_Arg0, ArgT1 a_Arg1)
 	{
 		cCSLock Lock(m_CriticalSection);
 		return m_LuaState.Call(a_Fn, a_Arg0, a_Arg1);
 	}
 
-	/// Call a Lua function with 3 args
+	/** Call a Lua function with 3 args */
 	template <typename FnT, typename ArgT0, typename ArgT1, typename ArgT2> bool Call(FnT a_Fn, ArgT0 a_Arg0, ArgT1 a_Arg1, ArgT2 a_Arg2)
 	{
 		cCSLock Lock(m_CriticalSection);
 		return m_LuaState.Call(a_Fn, a_Arg0, a_Arg1, a_Arg2);
 	}
 
-	/// Call a Lua function with 4 args
+	/** Call a Lua function with 4 args */
 	template <typename FnT, typename ArgT0, typename ArgT1, typename ArgT2, typename ArgT3> bool Call(FnT a_Fn, ArgT0 a_Arg0, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3)
 	{
 		cCSLock Lock(m_CriticalSection);
@@ -181,13 +221,13 @@ public:
 	}
 
 protected:
-	/// Maps command name into Lua function reference
+	/** Maps command name into Lua function reference */
 	typedef std::map<AString, int> CommandMap;
 	
-	/// Provides an array of Lua function references
+	/** Provides an array of Lua function references */
 	typedef std::vector<cLuaState::cRef *> cLuaRefs;
 	
-	/// Maps hook types into arrays of Lua function references to call for each hook type
+	/** Maps hook types into arrays of Lua function references to call for each hook type */
 	typedef std::map<int, cLuaRefs> cHookMap;
 	
 	cCriticalSection m_CriticalSection;
@@ -198,7 +238,7 @@ protected:
 	
 	cHookMap m_HookMap;
 	
-	/// Releases all Lua references and closes the LuaState
+	/** Releases all Lua references and closes the LuaState */
 	void Close(void);
 } ;  // tolua_export
 

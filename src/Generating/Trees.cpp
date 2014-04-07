@@ -382,6 +382,24 @@ void GetBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 
 
 
+void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+{
+	// TODO
+}
+
+
+
+
+
+void GetDarkoakTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+{
+	// TODO
+}
+
+
+
+
+
 void GetTallBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	int Height = 9 + (a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) % 3);
@@ -577,7 +595,7 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 		{
 			break;
 		}
-		ASSERT(LayerSize < ARRAYCOUNT(BigOs));
+		ASSERT((size_t)LayerSize < ARRAYCOUNT(BigOs));
 		PushCoordBlocks(a_BlockX, h, a_BlockZ, a_OtherBlocks, BigOs[LayerSize].Coords, BigOs[LayerSize].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 		h--;
 	}

@@ -28,7 +28,7 @@ long long cTimer::GetNowTime(void)
 	#else
 		struct timeval  now;
 		gettimeofday(&now, NULL);
-		return (long long)(now.tv_sec * 1000 + now.tv_usec / 1000);
+		return (long long)now.tv_sec * 1000 + (long long)now.tv_usec / 1000;
 	#endif
 }
 

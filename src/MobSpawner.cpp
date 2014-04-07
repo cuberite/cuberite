@@ -126,9 +126,14 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome)
 {
-	BLOCKTYPE TargetBlock;
+	BLOCKTYPE TargetBlock = E_BLOCK_AIR;
 	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end() && a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
+		if ((a_RelY + 1 > cChunkDef::Height) || (a_RelY - 1 < 0))
+		{
+			return false;
+		}
+
 		NIBBLETYPE BlockLight = a_Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
 		NIBBLETYPE SkyLight = a_Chunk->GetSkyLight(a_RelX, a_RelY, a_RelZ);
 		BLOCKTYPE BlockAbove = a_Chunk->GetBlock(a_RelX, a_RelY + 1, a_RelZ);
@@ -145,7 +150,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 			case cMonster::mtBat:
 			{
-				return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4) && (TargetBlock == E_BLOCK_AIR) && (!g_BlockTransparent[BlockAbove]);
+				return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4) && (TargetBlock == E_BLOCK_AIR) && !cBlockInfo::IsTransparent(BlockAbove);
 			}
 
 			case cMonster::mtChicken:
@@ -157,7 +162,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
-					(!g_BlockTransparent[BlockBelow]) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(BlockBelow == E_BLOCK_GRASS) &&
 					(SkyLight >= 9)
 				);
@@ -169,7 +174,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
 					(
-						(BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES)
+						(BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES) || (BlockBelow == E_BLOCK_NEW_LEAVES)
 					) &&
 					(a_RelY >= 62) &&
 					(m_Random.NextInt(3, a_Biome) != 0)
@@ -188,7 +193,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 							(TargetBlock == E_BLOCK_AIR) &&
 							(BlockAbove == E_BLOCK_AIR) &&
 							(BlockTop == E_BLOCK_AIR) &&
-							(!g_BlockTransparent[BlockBelow]) &&
+							(!cBlockInfo::IsTransparent(BlockBelow)) &&
 							(SkyLight <= 7) &&
 							(BlockLight <= 7)
 						);
@@ -200,7 +205,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			case cMonster::mtSpider:
 			{
 				bool CanSpawn = true;
-				bool HaveFloor = false;
+				bool HasFloor = false;
 				for (int x = 0; x < 2; ++x)
 				{
 					for(int z = 0; z < 2; ++z)
@@ -211,16 +216,16 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 						{
 							return false;
 						}
-						HaveFloor = (
-							HaveFloor ||
+						HasFloor = (
+							HasFloor ||
 							(
 								a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock) &&
-								!g_BlockTransparent[TargetBlock]
+								!cBlockInfo::IsTransparent(TargetBlock)
 							)
 						);
 					}
 				}
-				return CanSpawn && HaveFloor && (SkyLight <= 7) && (BlockLight <= 7);
+				return CanSpawn && HasFloor && (SkyLight <= 7) && (BlockLight <= 7);
 			}
 			
 			case cMonster::mtCreeper:
@@ -230,7 +235,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
-					(!g_BlockTransparent[BlockBelow]) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(SkyLight <= 7) &&
 					(BlockLight <= 7) &&
 					(m_Random.NextInt(2, a_Biome) == 0)
@@ -242,7 +247,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
-					(!g_BlockTransparent[BlockBelow]) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(
 						(a_RelY <= 40) || (a_Biome == biSwampland)
 					)
@@ -255,7 +260,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				return (
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
-					(!g_BlockTransparent[BlockBelow]) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(m_Random.NextInt(20, a_Biome) == 0)
 				);
 			}

@@ -2,17 +2,17 @@
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "MetaRotator.h"
 
 
 
 
 class cBlockTrapdoorHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>
 {
 public:
 	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>(a_BlockType)
 	{
 	}
 
@@ -32,17 +32,25 @@ public:
 		return true;
 	}
 
-	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		// Flip the ON bit on/off using the XOR bitwise operation
-		NIBBLETYPE Meta = (a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x04);
+		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x04);
+		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+		
+		cWorld * World = (cWorld *) &a_WorldInterface;
+		World->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
+	}
 
-		a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	{
+		UNUSED(a_ChunkInterface);
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 		) override
@@ -57,7 +65,7 @@ public:
 		return true;
 	}
 	
-	inline static NIBBLETYPE BlockFaceToMetaData(char a_BlockFace)
+	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
 		switch (a_BlockFace)
 		{
@@ -68,12 +76,12 @@ public:
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
-				return 0x0;
+				return 0;
 			}
 		}
 	}
 
-	inline static NIBBLETYPE BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
+	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x3)
 		{
@@ -89,7 +97,7 @@ public:
 		}
 	}
 
-	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		NIBBLETYPE Meta;
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
@@ -97,7 +105,7 @@ public:
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
 		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
+		return (a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn);
 	}
 };
 

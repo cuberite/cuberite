@@ -11,8 +11,7 @@
 
 #include "BlockHandler.h"
 #include "../Items/ItemHandler.h"
-
-
+#include "Root.h"
 
 
 
@@ -28,53 +27,21 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta));
+		a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta & 0x7));
 	}
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		a_BlockType = m_BlockType;
-		BLOCKTYPE  Type = (BLOCKTYPE) (a_Player->GetEquippedItem().m_ItemType);
-		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x07);
+		NIBBLETYPE Meta = (NIBBLETYPE) a_Player->GetEquippedItem().m_ItemDamage;
 		
-		// HandlePlaceBlock wants a cItemHandler pointer thing, so let's give it one
-		cItemHandler * ItemHandler = cItemHandler::GetItemHandler(GetDoubleSlabType(Type));
-
-		// Check if the block at the coordinates is a slab. Eligibility for combining has already been processed in ClientHandle
-		if (IsAnySlabType(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
-		{
-			// Call the function in ClientHandle that places a block when the client sends the packet,
-			// so that plugins may interfere with the placement.
-			
-			if ((a_BlockFace == BLOCK_FACE_TOP) || (a_BlockFace == BLOCK_FACE_BOTTOM))
-			{
-				// Top and bottom faces need no parameter modification
-				a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-			}
-			else
-			{
-				// The other faces need to distinguish between top and bottom cursor positions
-				if (a_CursorY > 7)
-				{
-					// Edit the call to use BLOCK_FACE_BOTTOM, otherwise it places incorrectly
-					a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_TOP, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-				}
-				else
-				{
-					// Edit the call to use BLOCK_FACE_TOP, otherwise it places incorrectly
-					a_Player->GetClientHandle()->HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_BOTTOM, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
-				}
-			}
-			return false;  // Cancel the event, because dblslabs were already placed, nothing else needed
-		}
-		
-		// Place the single-slab with correct metas:
+		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_TOP:
@@ -105,7 +72,16 @@ public:
 					a_BlockMeta = Meta & 0x7; break;
 				}
 			}
+			case BLOCK_FACE_NONE: return false;
 		}  // switch (a_BlockFace)
+
+		// Check if the block at the coordinates is a single slab. Eligibility for combining has already been processed in ClientHandle
+		// Changed to-be-placed to a double slab if we are clicking on a single slab, as opposed to placing one for the first time
+		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
+		{
+			a_BlockType = GetDoubleSlabType(m_BlockType);
+		}
+
 		return true;
 	}
 	
@@ -159,21 +135,39 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		if (m_BlockType ==  E_BLOCK_DOUBLE_STONE_SLAB)
-		{
-			m_BlockType = E_BLOCK_STONE_SLAB;
-		}
-		else
-		{
-			m_BlockType = E_BLOCK_WOODEN_SLAB;
-		}
-		a_Pickups.push_back(cItem(m_BlockType, 2, a_BlockMeta));
+		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
+		a_Pickups.push_back(cItem(Block, 2, a_BlockMeta & 0x7));
 	}
-
+	
+	inline static BLOCKTYPE GetSingleSlabType(BLOCKTYPE a_BlockType)
+	{
+		switch (a_BlockType)
+		{
+			case E_BLOCK_DOUBLE_STONE_SLAB:  return E_BLOCK_STONE_SLAB;
+			case E_BLOCK_DOUBLE_WOODEN_SLAB: return E_BLOCK_WOODEN_SLAB;
+		}
+		ASSERT(!"Unhandled double slab type!");
+		return a_BlockType;
+	}
 	
 	virtual const char * GetStepSound(void) override
-	{		
-		return ((m_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB) || (m_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB)) ?  "step.wood" : "step.stone";
+	{
+		switch (m_BlockType)
+		{
+			case E_BLOCK_DOUBLE_STONE_SLAB:  return "step.stone";
+			case E_BLOCK_DOUBLE_WOODEN_SLAB: return "step.wood";
+		}
+		ASSERT(!"Unhandled double slab type!");
+		return "";
+	}
+
+
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	{
+		NIBBLETYPE OtherMeta = a_Meta & 0x07;  // Contains unrelated meta data.
+
+		// 8th bit is up/down.  1 right-side-up, 0 is up-side-down.
+		return (a_Meta & 0x08) ? 0x00 + OtherMeta : 0x01 + OtherMeta;
 	}
 } ;
 

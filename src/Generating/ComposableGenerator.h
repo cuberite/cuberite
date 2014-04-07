@@ -43,16 +43,16 @@ class cBiomeGen
 public:
 	virtual ~cBiomeGen() {}  // Force a virtual destructor in descendants
 	
-	/// Generates biomes for the given chunk
+	/** Generates biomes for the given chunk */
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) = 0;
 	
-	/// Reads parameters from the ini file, prepares generator for use.
+	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) {}
 
-	/// Creates the correct BiomeGen descendant based on the ini file settings and the seed provided.
-	/// a_CacheOffByDefault gets set to whether the cache should be disabled by default
-	/// Used in BiomeVisualiser, too.
-	/// Implemented in BioGen.cpp!
+	/** Creates the correct BiomeGen descendant based on the ini file settings and the seed provided.
+	a_CacheOffByDefault gets set to whether the cache should be disabled by default.
+	Used in BiomeVisualiser, too.
+	Implemented in BioGen.cpp! */
 	static cBiomeGen * CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault);
 
 } ;
@@ -72,10 +72,10 @@ class cTerrainHeightGen
 public:
 	virtual ~cTerrainHeightGen() {}  // Force a virtual destructor in descendants
 	
-	/// Generates heightmap for the given chunk
+	/** Generates heightmap for the given chunk */
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) = 0;
 	
-	/// Reads parameters from the ini file, prepares generator for use.
+	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) {}
 	
 	/** Creates the correct TerrainHeightGen descendant based on the ini file settings and the seed provided.
@@ -102,7 +102,7 @@ public:
 	
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) = 0;
 	
-	/// Reads parameters from the ini file, prepares generator for use.
+	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) {}
 	
 	/** Creates the correct TerrainCompositionGen descendant based on the ini file settings and the seed provided.
@@ -116,28 +116,12 @@ public:
 
 
 
-/** The interface that a structure generator must implement
-Structures are generated after the terrain composition took place. It should modify the blocktype data to account
-for whatever structures the generator is generating.
-Note that ores are considered structures too, at least from the interface point of view.
-Also note that a worldgenerator may contain multiple structure generators, one for each type of structure
-*/
-class cStructureGen
-{
-public:
-	virtual ~cStructureGen() {}  // Force a virtual destructor in descendants
-	
-	virtual void GenStructures(cChunkDesc & a_ChunkDesc) = 0;
-} ;
-
-typedef std::list<cStructureGen *> cStructureGenList;
-
-
-
-
-
 /** The interface that a finisher must implement
-Finisher implements small additions after all structures have been generated.
+Finisher implements changes to the chunk after the rough terrain has been generated.
+Examples of finishers are trees, snow, ore, lilypads and others.
+Note that a worldgenerator may contain multiple finishers.
+Also note that previously we used to distinguish between a structuregen and a finisher; this distinction is
+no longer relevant, all structure generators are considered finishers now (#398)
 */
 class cFinishGen
 {
@@ -171,7 +155,6 @@ protected:
 	cBiomeGen *              m_BiomeGen;
 	cTerrainHeightGen *      m_HeightGen;
 	cTerrainCompositionGen * m_CompositionGen;
-	cStructureGenList        m_StructureGens;
 	cFinishGenList           m_FinishGens;
 	
 	// Generators underlying the caches:
@@ -180,19 +163,16 @@ protected:
 	cTerrainCompositionGen * m_UnderlyingCompositionGen;
 	
 	
-	/// Reads the biome gen settings from the ini and initializes m_BiomeGen accordingly
+	/** Reads the biome gen settings from the ini and initializes m_BiomeGen accordingly */
 	void InitBiomeGen(cIniFile & a_IniFile);
 	
-	/// Reads the HeightGen settings from the ini and initializes m_HeightGen accordingly
+	/** Reads the HeightGen settings from the ini and initializes m_HeightGen accordingly */
 	void InitHeightGen(cIniFile & a_IniFile);
 	
-	/// Reads the CompositionGen settings from the ini and initializes m_CompositionGen accordingly
+	/** Reads the CompositionGen settings from the ini and initializes m_CompositionGen accordingly */
 	void InitCompositionGen(cIniFile & a_IniFile);
 	
-	/// Reads the structures to generate from the ini and initializes m_StructureGens accordingly
-	void InitStructureGens(cIniFile & a_IniFile);
-	
-	/// Reads the finishers from the ini and initializes m_FinishGens accordingly
+	/** Reads the finishers from the ini and initializes m_FinishGens accordingly */
 	void InitFinishGens(cIniFile & a_IniFile);
 } ;
 

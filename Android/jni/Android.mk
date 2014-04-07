@@ -5,7 +5,7 @@ LOCAL_MODULE := mcserver
 
 
 
-LOCAL_SRC_FILES := $(shell find ../CryptoPP ../lua ../jsoncpp ../zlib ../src ../tolua++ ../iniFile ../expat ../md5 ../sqlite ../luaexpat '(' -name '*.cpp' -o -name '*.c' ')')
+LOCAL_SRC_FILES := $(shell find ../lib/polarssl ../lib/lua ../lib/jsoncpp ../lib/zlib ../src ../lib/tolua++ ../lib/iniFile ../lib/expat ../lib/md5 ../lib/sqlite ../lib/luaexpat '(' -name '*.cpp' -o -name '*.c' ')')
 LOCAL_SRC_FILES := $(filter-out %SquirrelFunctions.cpp %SquirrelBindings.cpp %cPlugin_Squirrel.cpp %cSquirrelCommandBinder.cpp %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp %StackWalker.cpp %example.c,$(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES := $(patsubst %.cpp,../%.cpp,$(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES := $(patsubst %.c,../%.c,$(LOCAL_SRC_FILES))
@@ -24,17 +24,17 @@ LOCAL_C_INCLUDES := ../src \
 					../src/packets \
 					../src/items \
 					../src/blocks \
-					../tolua++/src/lib \
-					../lua/src \
-					../zlib-1.2.7 \
-					../iniFile \
-					../tolua++/include \
-					../jsoncpp/include \
-					../jsoncpp/src/lib_json \
-					../expat/ \
-					../md5/ \
-					../sqlite/ \
-					../luaexpat/ \
+					../lib/tolua++/src/lib \
+					../lib/lua/src \
+					../lib/zlib-1.2.7 \
+					../lib/iniFile \
+					../lib/tolua++/include \
+					../lib/jsoncpp/include \
+					../lib/jsoncpp/src/lib_json \
+					../lib/expat/ \
+					../lib/md5/ \
+					../lib/sqlite/ \
+					../lib/luaexpat/ \
 					.. \
 
 

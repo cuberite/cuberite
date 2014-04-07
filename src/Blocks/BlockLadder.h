@@ -9,25 +9,25 @@
 
 
 class cBlockLadderHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
 public:
 	cBlockLadderHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}	
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		if (!LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+		if (!LadderCanBePlacedAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 		{
-			a_BlockFace = FindSuitableBlockFace(a_World, a_BlockX, a_BlockY, a_BlockZ);
+			a_BlockFace = FindSuitableBlockFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 			
 			if (a_BlockFace == BLOCK_FACE_BOTTOM)
 			{
@@ -41,38 +41,39 @@ public:
 	}
 
 
-	static NIBBLETYPE DirectionToMetaData(char a_Direction)  // tolua_export
+	static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)  // tolua_export
 	{  // tolua_export
 		switch (a_Direction)
 		{
-			case 0x2: return 0x2;
-			case 0x3: return 0x3;
-			case 0x4: return 0x4;
-			case 0x5: return 0x5;
+			case BLOCK_FACE_ZM: return 0x2;
+			case BLOCK_FACE_ZP: return 0x3;
+			case BLOCK_FACE_XM: return 0x4;
+			case BLOCK_FACE_XP: return 0x5;
 			default:  return 0x2;
 		}
 	}  // tolua_export
 
 
-	static char MetaDataToDirection(NIBBLETYPE a_MetaData)  // tolua_export
+	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)  // tolua_export
 	{														// tolua_export
 		switch (a_MetaData)
 		{
-			case 0x2: return 0x2;
-			case 0x3: return 0x3;
-			case 0x4: return 0x4;
-			case 0x5: return 0x5;
-			default:  return 0x2;
+			case 0x2: return BLOCK_FACE_ZM;
+			case 0x3: return BLOCK_FACE_ZP;
+			case 0x4: return BLOCK_FACE_XM;
+			case 0x5: return BLOCK_FACE_XP;
+			default:  return BLOCK_FACE_ZM;
 		}
 	}  // tolua_export
 
 
 	/// Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_BOTTOM on failure
-	static char FindSuitableBlockFace(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+	static eBlockFace FindSuitableBlockFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		for (int Face = 2; Face <= 5; Face++)
+		for (int FaceInt = BLOCK_FACE_ZM; FaceInt <= BLOCK_FACE_XP; FaceInt++)
 		{
-			if (LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, Face))
+			eBlockFace Face = static_cast<eBlockFace>(FaceInt);
+			if (LadderCanBePlacedAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, Face))
 			{
 				return Face;
 			}
@@ -81,7 +82,7 @@ public:
 	}
 	
 
-	static bool LadderCanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+	static bool LadderCanBePlacedAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 	{
 		if ((a_BlockFace == BLOCK_FACE_BOTTOM) || (a_BlockFace == BLOCK_FACE_TOP))
 		{
@@ -90,17 +91,17 @@ public:
 
 		AddFaceDirection( a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
 
-		return g_BlockIsSolid[a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ)];
+		return cBlockInfo::IsSolid(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ));
 	}
 
 
-	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface,int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		// TODO: Use AdjustCoordsByMeta(), then cChunk::UnboundedRelGetBlock() and finally some comparison
-		char BlockFace = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+		eBlockFace BlockFace = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-		return LadderCanBePlacedAt(a_Chunk.GetWorld(), BlockX, a_RelY, BlockZ, BlockFace);
+		return LadderCanBePlacedAt(a_ChunkInterface, BlockX, a_RelY, BlockZ, BlockFace);
 	}
 
 

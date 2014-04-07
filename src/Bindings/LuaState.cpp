@@ -11,9 +11,11 @@ extern "C"
 	#include "lua/src/lualib.h"
 }
 
+#undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 #include "Bindings.h"
 #include "ManualBindings.h"
+#include "DeprecatedBindings.h"
 
 // fwd: SQLite/lsqlite3.c
 extern "C"
@@ -93,11 +95,20 @@ void cLuaState::Create(void)
 	}
 	m_LuaState = lua_open();
 	luaL_openlibs(m_LuaState);
+	m_IsOwned = true;
+}
+
+
+
+
+
+void cLuaState::RegisterAPILibs(void)
+{
 	tolua_AllToLua_open(m_LuaState);
 	ManualBindings::Bind(m_LuaState);
+	DeprecatedBindings::Bind(m_LuaState);
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
-	m_IsOwned = true;
 }
 
 
@@ -173,6 +184,31 @@ void cLuaState::Detach(void)
 
 
 
+void cLuaState::AddPackagePath(const AString & a_PathVariable, const AString & a_Path)
+{
+	// Get the current path:
+	lua_getfield(m_LuaState, LUA_GLOBALSINDEX, "package");                           // Stk: <package>
+	lua_getfield(m_LuaState, -1, a_PathVariable.c_str());                            // Stk: <package> <package.path>
+	size_t len = 0;
+	const char * PackagePath = lua_tolstring(m_LuaState, -1, &len);
+	
+	// Append the new path:
+	AString NewPackagePath(PackagePath, len);
+	NewPackagePath.append(LUA_PATHSEP);
+	NewPackagePath.append(a_Path);
+	
+	// Set the new path to the environment:
+	lua_pop(m_LuaState, 1);                                                          // Stk: <package>
+	lua_pushlstring(m_LuaState, NewPackagePath.c_str(), NewPackagePath.length());    // Stk: <package> <NewPackagePath>
+	lua_setfield(m_LuaState, -2, a_PathVariable.c_str());                            // Stk: <package>
+	lua_pop(m_LuaState, 1);
+	lua_pop(m_LuaState, 1);                                                          // Stk: -
+}
+
+
+
+
+
 bool cLuaState::LoadFile(const AString & a_FileName)
 {
 	ASSERT(IsValid());
@@ -235,7 +271,7 @@ bool cLuaState::PushFunction(const char * a_FunctionName)
 	if (!lua_isfunction(m_LuaState, -1))
 	{
 		LOGWARNING("Error in %s: Could not find function %s()", m_SubsystemName.c_str(), a_FunctionName);
-		lua_pop(m_LuaState, 1);
+		lua_pop(m_LuaState, 2);
 		return false;
 	}
 	m_CurrentFunctionName.assign(a_FunctionName);
@@ -258,7 +294,7 @@ bool cLuaState::PushFunction(int a_FnRef)
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // same as lua_getref()
 	if (!lua_isfunction(m_LuaState, -1))
 	{
-		lua_pop(m_LuaState, 1);
+		lua_pop(m_LuaState, 2);
 		return false;
 	}
 	m_CurrentFunctionName = "<callback>";
@@ -282,16 +318,20 @@ bool cLuaState::PushFunction(const cTableRef & a_TableRef)
 	if (!lua_istable(m_LuaState, -1))
 	{
 		// Not a table, bail out
-		lua_pop(m_LuaState, 1);
+		lua_pop(m_LuaState, 2);
 		return false;
 	}
 	lua_getfield(m_LuaState, -1, a_TableRef.GetFnName());
 	if (lua_isnil(m_LuaState, -1) || !lua_isfunction(m_LuaState, -1))
 	{
 		// Not a valid function, bail out
-		lua_pop(m_LuaState, 2);
+		lua_pop(m_LuaState, 3);
 		return false;
 	}
+	
+	// Pop the table off the stack:
+	lua_remove(m_LuaState, -2);
+	
 	Printf(m_CurrentFunctionName, "<table-callback %s>", a_TableRef.GetFnName());
 	m_NumCurrentFunctionArgs = 0;
 	return true;
@@ -433,6 +473,18 @@ void cLuaState::Push(cEntity * a_Entity)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -646,8 +698,15 @@ void cLuaState::Push(Vector3i * a_Vector)
 
 void cLuaState::Push(void * a_Ptr)
 {
+	UNUSED(a_Ptr);
 	ASSERT(IsValid());
 
+	// Investigate the cause of this - what is the callstack?
+	// One code path leading here is the OnHookExploding / OnHookExploded with exotic parameters. Need to decide what to do with them
+	LOGWARNING("Lua engine: attempting to push a plain pointer, pushing nil instead.");
+	LOGWARNING("This indicates an unimplemented part of MCS bindings");
+	LogStackTrace();
+	
 	lua_pushnil(m_LuaState);
 	m_NumCurrentFunctionArgs += 1;
 }
@@ -680,7 +739,7 @@ void cLuaState::Push(cBlockEntity * a_BlockEntity)
 
 
 
-void cLuaState::GetReturn(int a_StackPos, bool & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 {
 	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
 }
@@ -689,11 +748,13 @@ void cLuaState::GetReturn(int a_StackPos, bool & a_ReturnedVal)
 
 
 
-void cLuaState::GetReturn(int a_StackPos, AString & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 {
-	if (lua_isstring(m_LuaState, a_StackPos))
+	size_t len = 0;
+	const char * data = lua_tolstring(m_LuaState, a_StackPos, &len);
+	if (data != NULL)
 	{
-		a_ReturnedVal = tolua_tocppstring(m_LuaState, a_StackPos, a_ReturnedVal.c_str());
+		a_Value.assign(data, len);
 	}
 }
 
@@ -701,7 +762,7 @@ void cLuaState::GetReturn(int a_StackPos, AString & a_ReturnedVal)
 
 
 
-void cLuaState::GetReturn(int a_StackPos, int & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, int & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
@@ -713,7 +774,7 @@ void cLuaState::GetReturn(int a_StackPos, int & a_ReturnedVal)
 
 
 
-void cLuaState::GetReturn(int a_StackPos, double & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
@@ -731,17 +792,24 @@ bool cLuaState::CallFunction(int a_NumResults)
 	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 1));  // The function to call
 	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 2));  // The error handler
 	
-	int s = lua_pcall(m_LuaState, m_NumCurrentFunctionArgs, a_NumResults, -m_NumCurrentFunctionArgs - 2);
+	// Save the current "stack" state and reset, in case the callback calls another function:
+	AString CurrentFunctionName;
+	std::swap(m_CurrentFunctionName, CurrentFunctionName);
+	int NumArgs = m_NumCurrentFunctionArgs;
+	m_NumCurrentFunctionArgs = -1;
+	
+	// Call the function:
+	int s = lua_pcall(m_LuaState, NumArgs, a_NumResults, -NumArgs - 2);
 	if (s != 0)
 	{
 		// The error has already been printed together with the stacktrace
-		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), m_CurrentFunctionName.c_str());
-		m_NumCurrentFunctionArgs = -1;
-		m_CurrentFunctionName.clear();
+		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), CurrentFunctionName.c_str());
 		return false;
 	}
-	m_NumCurrentFunctionArgs = -1;
-	m_CurrentFunctionName.clear();
+	
+	// Remove the error handler from the stack:
+	lua_remove(m_LuaState, -a_NumResults - 1);
+	
 	return true;
 }
 
@@ -933,10 +1001,42 @@ bool cLuaState::CheckParamFunction(int a_StartParam, int a_EndParam)
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = Printf("Error in function '%s' parameter #%d. Function expected, got %s",
+		luaL_error(m_LuaState, "Error in function '%s' parameter #%d. Function expected, got %s",
 			(entry.name != NULL) ? entry.name : "?", i, GetTypeText(i).c_str()
 		);
-		LogStackTrace();
+		return false;
+	}  // for i - Param
+	
+	// All params checked ok
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
+{
+	ASSERT(IsValid());
+	
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+	
+	for (int i = a_StartParam; i <= a_EndParam; i++)
+	{
+		if (lua_isfunction(m_LuaState, i) || lua_isnil(m_LuaState, i))
+		{
+			continue;
+		}
+		// Not the correct parameter
+		lua_Debug entry;
+		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+		luaL_error(m_LuaState, "Error in function '%s' parameter #%d. Function expected, got %s",
+			(entry.name != NULL) ? entry.name : "?", i, GetTypeText(i).c_str()
+		);
 		return false;
 	}  // for i - Param
 	
@@ -994,25 +1094,23 @@ bool cLuaState::ReportErrors(lua_State * a_LuaState, int a_Status)
 
 
 
-void cLuaState::LogStackTrace(void)
+void cLuaState::LogStackTrace(int a_StartingDepth)
 {
-	LogStackTrace(m_LuaState);
+	LogStackTrace(m_LuaState, a_StartingDepth);
 }
 
 
 
 
 
-void cLuaState::LogStackTrace(lua_State * a_LuaState)
+void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 {
 	LOGWARNING("Stack trace:");
 	lua_Debug entry;
-	int depth = 0;
+	int depth = a_StartingDepth;
 	while (lua_getstack(a_LuaState, depth, &entry))
 	{
-		int status = lua_getinfo(a_LuaState, "Sln", &entry);
-		assert(status);
-
+		lua_getinfo(a_LuaState, "Sln", &entry);
 		LOGWARNING("  %s(%d): %s", entry.short_src, entry.currentline, entry.name ? entry.name : "(no name)");
 		depth++;
 	}
@@ -1025,21 +1123,200 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState)
 
 AString cLuaState::GetTypeText(int a_StackPos)
 {
-	int Type = lua_type(m_LuaState, a_StackPos);
-	switch (Type)
+	return lua_typename(m_LuaState, lua_type(m_LuaState, a_StackPos));
+}
+
+
+
+
+
+int cLuaState::CallFunctionWithForeignParams(
+	const AString & a_FunctionName,
+	cLuaState & a_SrcLuaState,
+	int a_SrcParamStart,
+	int a_SrcParamEnd
+)
+{
+	ASSERT(IsValid());
+	ASSERT(a_SrcLuaState.IsValid());
+	
+	// Store the stack position before any changes
+	int OldTop = lua_gettop(m_LuaState);
+	
+	// Push the function to call, including the error handler:
+	if (!PushFunction(a_FunctionName.c_str()))
 	{
-		case LUA_TNONE:          return "TNONE";
-		case LUA_TNIL:           return "TNIL";
-		case LUA_TBOOLEAN:       return "TBOOLEAN";
-		case LUA_TLIGHTUSERDATA: return "TLIGHTUSERDATA";
-		case LUA_TNUMBER:        return "TNUMBER";
-		case LUA_TSTRING:        return "TSTRING";
-		case LUA_TTABLE:         return "TTABLE";
-		case LUA_TFUNCTION:      return "TFUNCTION";
-		case LUA_TUSERDATA:      return "TUSERDATA";
-		case LUA_TTHREAD:        return "TTHREAD";
+		LOGWARNING("Function '%s' not found", a_FunctionName.c_str());
+		lua_pop(m_LuaState, 2);
+		return -1;
 	}
-	return Printf("Unknown (%d)", Type);
+
+	// Copy the function parameters to the target state
+	if (CopyStackFrom(a_SrcLuaState, a_SrcParamStart, a_SrcParamEnd) < 0)
+	{
+		// Something went wrong, fix the stack and exit
+		lua_pop(m_LuaState, 2);
+		m_NumCurrentFunctionArgs = -1;
+		m_CurrentFunctionName.clear();
+		return -1;
+	}
+	
+	// Call the function, with an error handler:
+	int s = lua_pcall(m_LuaState, a_SrcParamEnd - a_SrcParamStart + 1, LUA_MULTRET, OldTop + 1);
+	if (ReportErrors(s))
+	{
+		LOGWARN("Error while calling function '%s' in '%s'", a_FunctionName.c_str(), m_SubsystemName.c_str());
+		// Fix the stack.
+		// We don't know how many values have been pushed, so just get rid of any that weren't there initially
+		int CurTop = lua_gettop(m_LuaState);
+		if (CurTop > OldTop)
+		{
+			lua_pop(m_LuaState, CurTop - OldTop);
+		}
+		
+		// Reset the internal checking mechanisms:
+		m_NumCurrentFunctionArgs = -1;
+		m_CurrentFunctionName.clear();
+		
+		// Make Lua think everything is okay and return 0 values, so that plugins continue executing.
+		// The failure is indicated by the zero return values.
+		return 0;
+	}
+	
+	// Reset the internal checking mechanisms:
+	m_NumCurrentFunctionArgs = -1;
+	m_CurrentFunctionName.clear();
+	
+	// Remove the error handler from the stack:
+	lua_remove(m_LuaState, OldTop + 1);
+	
+	// Return the number of return values:
+	return lua_gettop(m_LuaState) - OldTop;
+}
+
+
+
+
+
+int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd)
+{
+	/*
+	// DEBUG:
+	LOGD("Copying stack values from %d to %d", a_SrcStart, a_SrcEnd);
+	a_SrcLuaState.LogStack("Src stack before copying:");
+	LogStack("Dst stack before copying:");
+	*/
+	for (int i = a_SrcStart; i <= a_SrcEnd; ++i)
+	{
+		int t = lua_type(a_SrcLuaState, i);
+		switch (t)
+		{
+			case LUA_TNIL:
+			{
+				lua_pushnil(m_LuaState);
+				break;
+			}
+			case LUA_TSTRING:
+			{
+				AString s;
+				a_SrcLuaState.ToString(i, s);
+				Push(s);
+				break;
+			}
+			case LUA_TBOOLEAN:
+			{
+				bool b = (tolua_toboolean(a_SrcLuaState, i, false) != 0);
+				Push(b);
+				break;
+			}
+			case LUA_TNUMBER:
+			{
+				lua_Number d = tolua_tonumber(a_SrcLuaState, i, 0);
+				Push(d);
+				break;
+			}
+			case LUA_TUSERDATA:
+			{
+				// Get the class name:
+				const char * type = NULL;
+				if (lua_getmetatable(a_SrcLuaState, i) == 0)
+				{
+					LOGWARNING("%s: Unknown class in pos %d, cannot copy.", __FUNCTION__, i);
+					lua_pop(m_LuaState, i - a_SrcStart);
+					return -1;
+				}
+				lua_rawget(a_SrcLuaState, LUA_REGISTRYINDEX);  // Stack +1
+				type = lua_tostring(a_SrcLuaState, -1);
+				lua_pop(a_SrcLuaState, 1);                     // Stack -1
+				
+				// Copy the value:
+				void * ud = tolua_touserdata(a_SrcLuaState, i, NULL);
+				tolua_pushusertype(m_LuaState, ud, type);
+				break;
+			}
+			default:
+			{
+				LOGWARNING("%s: Unsupported value: '%s' at stack position %d. Can only copy numbers, strings, bools and classes!",
+					__FUNCTION__, lua_typename(a_SrcLuaState, t), i
+				);
+				a_SrcLuaState.LogStack("Stack where copying failed:");
+				lua_pop(m_LuaState, i - a_SrcStart);
+				return -1;
+			}
+		}
+	}
+	return a_SrcEnd - a_SrcStart + 1;
+}
+
+
+
+
+
+void cLuaState::ToString(int a_StackPos, AString & a_String)
+{
+	size_t len;
+	const char * s = lua_tolstring(m_LuaState, a_StackPos, &len);
+	if (s != NULL)
+	{
+		a_String.assign(s, len);
+	}
+}
+
+
+
+
+
+void cLuaState::LogStack(const char * a_Header)
+{
+	LogStack(m_LuaState, a_Header);
+}
+
+
+
+
+
+void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
+{
+	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
+	
+	
+	// Format string consisting only of %s is used to appease the compiler
+	LOGD("%s",(a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
+	for (int i = lua_gettop(a_LuaState); i > 0; i--)
+	{
+		AString Value;
+		int Type = lua_type(a_LuaState, i);
+		switch (Type)
+		{
+			case LUA_TBOOLEAN: Value.assign((lua_toboolean(a_LuaState, i) != 0) ? "true" : "false"); break;
+			case LUA_TLIGHTUSERDATA: Printf(Value, "%p", lua_touserdata(a_LuaState, i)); break;
+			case LUA_TNUMBER:        Printf(Value, "%f", (double)lua_tonumber(a_LuaState, i)); break;
+			case LUA_TSTRING:        Printf(Value, "%s", lua_tostring(a_LuaState, i)); break;
+			case LUA_TTABLE:         Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
+			default: break;
+		}
+		LOGD("  Idx %d: type %d (%s) %s", i, Type, lua_typename(a_LuaState, Type), Value.c_str());
+	}  // for i - stack idx
 }
 
 
@@ -1049,7 +1326,7 @@ AString cLuaState::GetTypeText(int a_StackPos)
 int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 {
 	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
-	LogStackTrace(a_LuaState);
+	LogStackTrace(a_LuaState, 1);
 	return 1;  // We left the error message on the stack as the return value
 }
 
@@ -1060,13 +1337,21 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cRef:
 
-cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
-	m_LuaState(a_LuaState)
+cLuaState::cRef::cRef(void) :
+	m_LuaState(NULL),
+	m_Ref(LUA_REFNIL)
 {
-	ASSERT(m_LuaState.IsValid());
-	
-	lua_pushvalue(m_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
-	m_Ref = luaL_ref(m_LuaState, LUA_REGISTRYINDEX);
+}
+
+
+
+
+
+cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
+	m_LuaState(NULL),
+	m_Ref(LUA_REFNIL)
+{
+	RefStack(a_LuaState, a_StackPos);
 }
 
 
@@ -1075,12 +1360,42 @@ cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
 
 cLuaState::cRef::~cRef()
 {
-	ASSERT(m_LuaState.IsValid());
+	if (m_LuaState != NULL)
+	{
+		UnRef();
+	}
+}
+
+
+
+
+
+void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	ASSERT(a_LuaState.IsValid());
+	if (m_LuaState != NULL)
+	{
+		UnRef();
+	}
+	m_LuaState = &a_LuaState;
+	lua_pushvalue(a_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
+	m_Ref = luaL_ref(a_LuaState, LUA_REGISTRYINDEX);
+}
+
+
+
+
+
+void cLuaState::cRef::UnRef(void)
+{
+	ASSERT(m_LuaState->IsValid());  // The reference should be destroyed before destroying the LuaState
 	
 	if (IsValid())
 	{
-		luaL_unref(m_LuaState, LUA_REGISTRYINDEX, m_Ref);
+		luaL_unref(*m_LuaState, LUA_REGISTRYINDEX, m_Ref);
 	}
+	m_LuaState = NULL;
+	m_Ref = LUA_REFNIL;
 }
 
 

@@ -42,6 +42,7 @@ public:
 
 cWebAdmin::cWebAdmin(void) :
 	m_IsInitialized(false),
+	m_IsRunning(false),
 	m_TemplateScript("<webadmin_template>")
 {
 }
@@ -52,29 +53,26 @@ cWebAdmin::cWebAdmin(void) :
 
 cWebAdmin::~cWebAdmin()
 {
-	if (m_IsInitialized)
-	{
-		LOGD("Stopping WebAdmin...");
-	}
+	ASSERT(!m_IsRunning);  // Was the HTTP server stopped properly?
 }
 
 
 
 
 
-void cWebAdmin::AddPlugin( cWebPlugin * a_Plugin )
+void cWebAdmin::AddPlugin(cWebPlugin * a_Plugin)
 {
-	m_Plugins.remove( a_Plugin );
-	m_Plugins.push_back( a_Plugin );
+	m_Plugins.remove(a_Plugin);
+	m_Plugins.push_back(a_Plugin);
 }
 
 
 
 
 
-void cWebAdmin::RemovePlugin( cWebPlugin * a_Plugin )
+void cWebAdmin::RemovePlugin(cWebPlugin * a_Plugin)
 {
-	m_Plugins.remove( a_Plugin );
+	m_Plugins.remove(a_Plugin);
 }
 
 
@@ -87,7 +85,8 @@ bool cWebAdmin::Init(void)
 	{
 		LOGWARN("Regenerating webadmin.ini, all settings will be reset");
 		m_IniFile.AddHeaderComment(" This file controls the webadmin feature of MCServer");
-		m_IniFile.AddHeaderComment(" Username format: [User:*username*] | Password format: Password=*password*; for example:");
+		m_IniFile.AddHeaderComment(" Username format: [User:*username*]");
+		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
 		m_IniFile.AddHeaderComment(" [User:admin]");
 		m_IniFile.AddHeaderComment(" Password=admin");
 	}
@@ -128,13 +127,31 @@ bool cWebAdmin::Start(void)
 
 	// Initialize the WebAdmin template script and load the file
 	m_TemplateScript.Create();
+	m_TemplateScript.RegisterAPILibs();
 	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
 	{
 		LOGWARN("Could not load WebAdmin template \"%s\", using default template.", FILE_IO_PREFIX "webadmin/template.lua");
 		m_TemplateScript.Close();
 	}
 
-	return m_HTTPServer.Start(*this);
+	m_IsRunning = m_HTTPServer.Start(*this);
+	return m_IsRunning;
+}
+
+
+
+
+
+void cWebAdmin::Stop(void)
+{
+	if (!m_IsRunning)
+	{
+		return;
+	}
+	
+	LOGD("Stopping WebAdmin...");
+	m_HTTPServer.Stop();
+	m_IsRunning = false;
 }
 
 
@@ -473,7 +490,7 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 
 
 
-void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size)
+void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	UNUSED(a_Connection);
 	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
@@ -520,7 +537,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWebAdmin::cWebadminRequestData
 
-void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, int a_Size)
+void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, size_t a_Size)
 {
 	m_Form.Parse(a_Data, a_Size);
 }

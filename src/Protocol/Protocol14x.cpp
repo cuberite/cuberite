@@ -33,8 +33,6 @@ Implements the 1.4.x protocol classes representing these protocols:
 	#pragma warning(disable:4702)
 #endif
 
-#include "cryptopp/randpool.h"
-
 #ifdef _MSC_VER
 	#pragma warning(pop)
 #endif
@@ -87,7 +85,7 @@ int cProtocol142::ParseLocaleViewDistance(void)
 	HANDLE_PACKET_READ(ReadChar,            char,    ChatFlags);
 	HANDLE_PACKET_READ(ReadChar,            char,    ClientDifficulty);
 	HANDLE_PACKET_READ(ReadChar,            char,    ShouldShowCape);  // <-- new in 1.4.2
-	// TODO: m_Client->HandleLocale(Locale);
+	m_Client->SetLocale(Locale);
 	// TODO: m_Client->HandleViewDistance(ViewDistance);
 	// TODO: m_Client->HandleChatFlags(ChatFlags);
 	// Ignoring client difficulty
@@ -105,9 +103,9 @@ void cProtocol142::SendPickupSpawn(const cPickup & a_Pickup)
 	WriteInt    (a_Pickup.GetUniqueID());
 	WriteItem   (a_Pickup.GetItem());
 	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
-	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
-	WriteByte   ((char)(a_Pickup.GetSpeed().y * 8));
-	WriteByte   ((char)(a_Pickup.GetSpeed().z * 8));
+	WriteChar   ((char)(a_Pickup.GetSpeed().x * 8));
+	WriteChar   ((char)(a_Pickup.GetSpeed().y * 8));
+	WriteChar   ((char)(a_Pickup.GetSpeed().z * 8));
 	Flush();
 }
 
@@ -121,7 +119,7 @@ void cProtocol142::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 	WriteByte(PACKET_SOUND_PARTICLE_EFFECT);
 	WriteInt (a_EffectID);
 	WriteInt (a_SrcX);
-	WriteByte(a_SrcY);
+	WriteByte((Byte)a_SrcY);
 	WriteInt (a_SrcZ);
 	WriteInt (a_Data);
 	WriteBool(0);
@@ -220,7 +218,7 @@ void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_SPAWN_OBJECT);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_ObjectType);
+	WriteChar(a_ObjectType);
 	WriteInt ((int)(a_Entity.GetPosX() * 32));
 	WriteInt ((int)(a_Entity.GetPosY() * 32));
 	WriteInt ((int)(a_Entity.GetPosZ() * 32));
@@ -245,7 +243,7 @@ void cProtocol146::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_SPAWN_OBJECT);
 	WriteInt  (a_Vehicle.GetUniqueID());
-	WriteByte (a_VehicleType);
+	WriteChar (a_VehicleType);
 	WriteInt  ((int)(a_Vehicle.GetPosX() * 32));
 	WriteInt  ((int)(a_Vehicle.GetPosY() * 32));
 	WriteInt  ((int)(a_Vehicle.GetPosZ() * 32));

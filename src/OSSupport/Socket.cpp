@@ -6,7 +6,8 @@
 #ifndef _WIN32
 	#include <netdb.h>
 	#include <unistd.h>
-	#include <arpa/inet.h>		//inet_ntoa()
+	#include <arpa/inet.h>  // inet_ntoa()
+	#include <sys/ioctl.h>  // ioctl()
 #else
 	#define socklen_t int
 #endif
@@ -100,58 +101,6 @@ void cSocket::ShutdownReadWrite(void)
 			__FUNCTION__, m_Socket, m_IPString.c_str(), this->GetLastError(), GetLastErrorString().c_str()
 		);
 	}
-}
-
-
-
-
-
-AString cSocket::GetErrorString( int a_ErrNo )
-{
-	char buffer[ 1024 ];
-	AString Out;
-
-	#ifdef _WIN32
-
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, a_ErrNo, 0, buffer, ARRAYCOUNT(buffer), NULL);
-	Printf(Out, "%d: %s", a_ErrNo, buffer);
-	if (!Out.empty() && (Out[Out.length() - 1] == '\n'))
-	{
-		Out.erase(Out.length() - 2);
-	}
-	return Out;
-	
-	#else  // _WIN32
-	
-	// According to http://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
-	
-	#if ( _GNU_SOURCE ) && !defined(ANDROID_NDK)  // GNU version of strerror_r()
-	
-	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
-	if( res != NULL )
-	{
-		Printf(Out, "%d: %s", a_ErrNo, res);
-		return Out;
-	}
-	
-	#else  // XSI version of strerror_r():
-	
-	int res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
-	if( res == 0 )
-	{
-		Printf(Out, "%d: %s", a_ErrNo, buffer);
-		return Out;
-	}
-	
-	#endif  // strerror_r() version
-	
-	else
-	{
-		Printf(Out, "Error %d while getting error string for error #%d!", errno, a_ErrNo);
-		return Out;
-	}
-	
-	#endif  // else _WIN32
 }
 
 
@@ -358,7 +307,8 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 			CloseSocket();
 			return false;
 		}
-		addr = *((unsigned long*)hp->h_addr);
+		// Should be optimised to a single word copy
+		memcpy(&addr, hp->h_addr, hp->h_length);
 	}
 
 	sockaddr_in server;
@@ -372,7 +322,7 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 
 
 
-int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags)
+int cSocket::Receive(char * a_Buffer, unsigned int a_Length, unsigned int a_Flags)
 {
 	return recv(m_Socket, a_Buffer, a_Length, a_Flags);
 }
@@ -401,6 +351,28 @@ unsigned short cSocket::GetPort(void) const
 		return 0;
 	}
 	return ntohs(Addr.sin_port);
+}
+
+
+
+
+
+void cSocket::SetNonBlocking(void)
+{
+	#ifdef _WIN32
+		u_long NonBlocking = 1;
+		int res = ioctlsocket(m_Socket, FIONBIO, &NonBlocking);
+	#else
+		int NonBlocking = 1;
+		int res = ioctl(m_Socket, FIONBIO, (char *)&NonBlocking);
+	#endif
+	if (res != 0)
+	{
+		LOGERROR("Cannot set socket to non-blocking. This would make the server deadlock later on, aborting.\nErr: %d, %d, %s",
+			res, GetLastError(), GetLastErrorString().c_str()
+		);
+		abort();
+	}
 }
 
 

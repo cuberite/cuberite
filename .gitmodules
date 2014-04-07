@@ -7,3 +7,6 @@
 [submodule "MCServer/Plugins/TransAPI"]
 	path = MCServer/Plugins/TransAPI
 	url = https://github.com/bearbin/transapi.git
+[submodule "lib/polarssl"]
+	path = lib/polarssl
+	url = https://github.com/polarssl/polarssl

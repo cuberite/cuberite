@@ -266,7 +266,7 @@ enum ENUM_ITEM_ID
 	E_ITEM_FLINT = 318,
 	E_ITEM_RAW_PORKCHOP = 319,
 	E_ITEM_COOKED_PORKCHOP = 320,
-	E_ITEM_PAINTINGS = 321,
+	E_ITEM_PAINTING = 321,
 	E_ITEM_GOLDEN_APPLE = 322,
 	E_ITEM_SIGN = 323,
 	E_ITEM_WOODEN_DOOR = 324,
@@ -466,6 +466,10 @@ enum
 	E_META_FLOWER_PINK_TULIP      = 7,
 	E_META_FLOWER_OXEYE_DAISY     = 8,
 	
+	// E_BLOCK_JUKEBOX metas
+	E_META_JUKEBOX_OFF            = 0,
+	E_META_JUKEBOX_ON             = 1,
+	
 	// E_BLOCK_HOPPER metas:
 	E_META_HOPPER_FACING_YM  = 0,
 	E_META_HOPPER_UNATTACHED = 1,  // Hopper doesn't move items up, there's no YP
@@ -500,6 +504,11 @@ enum
 	E_META_PLANKS_BIRCH   = 2,
 	E_META_PLANKS_JUNGLE  = 3,
 	
+	// E_BLOCK_QUARTZ_BLOCK metas:
+	E_META_QUARTZ_NORMAL = 0,
+	E_META_QUARTZ_CHISELLED = 1,
+	E_META_QUARTZ_PILLAR = 2,
+
 	// E_BLOCK_RAIL metas
 	E_META_RAIL_ZM_ZP              = 0,
 	E_META_RAIL_XM_XP              = 1,
@@ -522,10 +531,12 @@ enum
 	E_META_SANDSTONE_SMOOTH   = 2,
 	
 	// E_BLOCK_SAPLING metas (lowest 3 bits):
-	E_META_SAPLING_APPLE   = 0,
-	E_META_SAPLING_CONIFER = 1,
-	E_META_SAPLING_BIRCH   = 2,
-	E_META_SAPLING_JUNGLE  = 3,
+	E_META_SAPLING_APPLE    = 0,
+	E_META_SAPLING_CONIFER  = 1,
+	E_META_SAPLING_BIRCH    = 2,
+	E_META_SAPLING_JUNGLE   = 3,
+	E_META_SAPLING_ACACIA   = 4,
+	E_META_SAPLING_DARK_OAK = 5,
 	
 	// E_BLOCK_SILVERFISH_EGG metas:
 	E_META_SILVERFISH_EGG_STONE       = 0,
@@ -801,6 +812,7 @@ enum eDamageType
 	dtPotionOfHarming,
 	dtEnderPearl,       // Thrown an ender pearl, teleported by it
 	dtAdmin,            // Damage applied by an admin command
+	dtExplosion,        // Damage applied by an explosion
 	
 	// Some common synonyms:
 	dtPawnAttack   = dtAttack,
@@ -841,9 +853,30 @@ enum eExplosionSource
 	esWitherSkullBlue,
 	esWitherBirth,
 	esPlugin,
-	
-	// Obsolete constants, kept for compatibility, will be removed after some time:
-	esCreeper = esMonster,
+} ;
+
+
+
+
+
+enum eShrapnelLevel
+{
+	slNone,
+	slGravityAffectedOnly,
+	slAll
+} ;
+
+
+
+
+
+enum eSpreadSource
+{
+	ssFireSpread,
+	ssGrassSpread,
+	ssMushroomSpread,
+	ssMycelSpread,
+	ssVineSpread,
 } ;
 
 // tolua_end
@@ -893,20 +926,6 @@ extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const c
 
 // tolua_end
 
-
-
-
-
-// Block properties:
-extern NIBBLETYPE g_BlockLightValue[256];
-extern NIBBLETYPE g_BlockSpreadLightFalloff[256];
-extern bool       g_BlockTransparent[256];
-extern bool       g_BlockOneHitDig[256];
-extern bool       g_BlockPistonBreakable[256];
-extern bool       g_BlockIsSnowable[256];
-extern bool       g_BlockRequiresSpecialTool[256];
-extern bool       g_BlockIsSolid[256];
-extern bool       g_BlockFullyOccupiesVoxel[256];
 
 
 

@@ -10,7 +10,6 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-#include "../UI/WindowOwner.h"
 
 
 
@@ -18,8 +17,7 @@
 
 // tolua_begin
 class cHopperEntity :
-	public cBlockEntityWithItems,
-	public cBlockEntityWindowOwner
+	public cBlockEntityWithItems
 {
 	typedef cBlockEntityWithItems super;
 

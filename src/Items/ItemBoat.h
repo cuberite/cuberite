@@ -1,4 +1,3 @@
-
 // ItemBoat.h
 
 // Declares the various boat ItemHandlers
@@ -29,9 +28,9 @@ public:
 	
 	
 	
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
-		if (a_Dir > 0)
+		if ((a_Dir != BLOCK_FACE_YM) && (a_Dir != BLOCK_FACE_NONE))
 		{
 			return false;
 		}
@@ -40,12 +39,20 @@ public:
 			public cBlockTracer::cCallbacks
 		{
 		public:
-			Vector3d Pos;
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+			Vector3d m_Pos;
+			bool m_HasFound;
+			
+			cCallbacks(void) :
+				m_HasFound(false)
 			{
-				if (a_BlockType != E_BLOCK_AIR)
+			}
+			
+			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, char a_CBEntryFace) override
+			{
+				if (a_CBBlockType != E_BLOCK_AIR)
 				{
-					Pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
+					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
+					m_HasFound = true;
 					return true;
 				}
 				return false;
@@ -58,15 +65,15 @@ public:
 
 		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
 
-		double x = Callbacks.Pos.x;
-		double y = Callbacks.Pos.y;
-		double z = Callbacks.Pos.z;
-		
-		if ((x == 0) && (y == 0) && (z == 0))
+		if (!Callbacks.m_HasFound)
 		{
 			return false;
 		}
 
+		double x = Callbacks.m_Pos.x;
+		double y = Callbacks.m_Pos.y;
+		double z = Callbacks.m_Pos.z;
+		
 		cBoat * Boat = new cBoat(x + 0.5, y + 1, z + 0.5);
 		Boat->Initialize(a_World);
 

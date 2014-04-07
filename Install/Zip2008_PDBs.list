@@ -1,8 +1,2 @@
 MCServer\*.pdb
-VC2008\Release\*.pdb
-VC2008\Release\JsonCpp\*.pdb
-VC2008\Release\Lua\*.pdb
-VC2008\Release\ToLua\*.pdb
-VC2008\Release\webserver\*.pdb
-VC2008\Release\zlib\*.pdb
-src\Bindings.*
+src\Bindings\Bindings.*

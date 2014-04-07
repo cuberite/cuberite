@@ -1,102 +1,33 @@
-
 cmake_minimum_required (VERSION 2.6)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
-macro (add_flags_lnk FLAGS)
-	set(CMAKE_EXE_LINKER_FLAGS            "${CMAKE_EXE_LINKER_FLAGS}            ${FLAGS}")
-	set(CMAKE_EXE_LINKER_FLAGS_DEBUG      "${CMAKE_EXE_LINKER_FLAGS_DEBUG}      ${FLAGS}")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE    "${CMAKE_EXE_LINKER_FLAGS_RELEASE}    ${FLAGS}")
-	set(CMAKE_SHARED_LINKER_FLAGS         "${CMAKE_SHARED_LINKER_FLAGS}         ${FLAGS}")
-	set(CMAKE_SHARED_LINKER_FLAGS_DEBUG   "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}   ${FLAGS}")
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${FLAGS}")
-	set(CMAKE_MODULE_LINKER_FLAGS         "${CMAKE_MODULE_LINKER_FLAGS}         ${FLAGS}")
-	set(CMAKE_MODULE_LINKER_FLAGS_DEBUG   "${CMAKE_MODULE_LINKER_FLAGS_DEBUG}   ${FLAGS}")
-	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} ${FLAGS}")
-endmacro()
-
-macro(add_flags_cxx FLAGS)
-	set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}         ${FLAGS}")
-	set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}           ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   ${FLAGS}")
-	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FLAGS}")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   ${FLAGS}")
-endmacro()
-
-# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
-if (NOT MSVC)
-	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG")
-	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -D_DEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -DNDEBUG")
+# These env variables are used for configuring Travis CI builds.
+# See https://github.com/mc-server/MCServer/pull/767
+if(DEFINED ENV{TRAVIS_MCSERVER_BUILD_TYPE})
+	message("Setting build type to $ENV{TRAVIS_MCSERVER_BUILD_TYPE}")
+	set(CMAKE_BUILD_TYPE $ENV{TRAVIS_MCSERVER_BUILD_TYPE})
 endif()
 
-if(MSVC)
-	# Make build use multiple threads under MSVC:
-	add_flags_cxx("/MP")
-
-	# Make release builds use link-time code generation:
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   /GL")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE    "${CMAKE_EXE_LINKER_FLAGS_RELEASE}    /LTCG")
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
-	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /LTCG")
-elseif(APPLE)
-	#on os x clang adds pthread for us but we need to add it for gcc
-	if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		add_flags_cxx("-pthread")
-		add_flags_cxx("-std=c++11")
-	endif()
-else()
-	# Let gcc / clang know that we're compiling a multi-threaded app:
-	add_flags_cxx("-pthread")
+if(DEFINED ENV{TRAVIS_MCSERVER_FORCE32})
+	set(FORCE32 $ENV{TRAVIS_MCSERVER_FORCE32})
 endif()
 
-
-# Allow for a forced 32-bit build under 64-bit OS:
-if (FORCE_32)
-	add_flags_cxx("-m32")
-	add_flags_lnk("-m32")
+# This has to be done before any flags have been set up.
+if(${BUILD_TOOLS})
+	add_subdirectory(Tools/MCADefrag/)
+	add_subdirectory(Tools/ProtoProxy/)
 endif()
 
-
-# Have the compiler generate code specifically targeted at the current machine on Linux
-if(LINUX AND NOT CROSSCOMPILE)
-	add_flags_cxx("-march=native")
+if(${BUILD_UNSTABLE_TOOLS})
+	add_subdirectory(Tools/GeneratorPerformanceTest/)
 endif()
 
-
-# Use static CRT in MSVC builds:
-if (MSVC)
-	string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-	string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
-	string(REPLACE "/MDd" "/MTd" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
-	string(REPLACE "/MDd" "/MTd" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
-endif()
-
-
-# Set lower warnings-level for the libraries:
-if (MSVC)
-	# Remove /W3 from command line -- cannot just cancel it later with /w like in unix, MSVC produces a D9025 warning (option1 overriden by option2)
-	string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-	string(REPLACE "/W3" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
-	string(REPLACE "/W3" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
-	string(REPLACE "/W3" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
-else()
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -w")
-	set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -w")
-	set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -w")
-	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -w")
-endif()
-
-
-# Under clang, we need to disable ASM support in CryptoPP:
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_definitions(-DCRYPTOPP_DISABLE_ASM)
-endif()
-
+include(SetFlags.cmake)
+set_flags()
+set_lib_flags()
+enable_profile()
 
 # Under Windows, we need Lua as DLL; on *nix we need it linked statically:
 if (WIN32)
@@ -104,86 +35,23 @@ if (WIN32)
 endif()
 
 
-# On Unix we use two dynamic loading libraries dl and ltdl.
-# Preference is for dl on unknown systems as it is specified in POSIX
-# the dynamic loader is used by lua and sqllite.
-if (UNIX)
-	if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
-		set(DYNAMIC_LOADER ltdl)
-	else()
-		set(DYNAMIC_LOADER dl)
-	endif()
-endif()
-
-
 # The Expat library is linked in statically, make the source files aware of that:
 add_definitions(-DXML_STATIC)
 
-
-# Declare the flags used for profiling builds:
-if (MSVC)
-	set (CXX_PROFILING "")
-	set (LNK_PROFILING "/PROFILE")
-else()
-	set (CXX_PROFILING "-pg")
-	set (LNK_PROFILING "-pg")
+# Self Test Mode enables extra checks at startup
+if(${SELF_TEST})
+	add_definitions(-DSELF_TEST)
 endif()
 
 
-# Declare the profiling configurations:
-SET(CMAKE_CXX_FLAGS_DEBUGPROFILE
-    "${CMAKE_CXX_FLAGS_DEBUG} ${PCXX_ROFILING}"
-    CACHE STRING "Flags used by the C++ compiler during profile builds."
-    FORCE )
-SET(CMAKE_C_FLAGS_DEBUGPROFILE
-    "${CMAKE_C_FLAGS_DEBUG} ${CXX_PROFILING}"
-    CACHE STRING "Flags used by the C compiler during profile builds."
-    FORCE )
-SET(CMAKE_EXE_LINKER_FLAGS_DEBUGPROFILE
-    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${LNK_PROFILING}"
-    CACHE STRING "Flags used for linking binaries during profile builds."
-    FORCE )
-SET(CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE
-    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${LNK_PROFILING}"
-    CACHE STRING "Flags used by the shared libraries linker during profile builds."
-    FORCE )
-MARK_AS_ADVANCED(
-    CMAKE_CXX_FLAGS_DEBUGPROFILE
-    CMAKE_C_FLAGS_DEBUGPROFILE
-    CMAKE_EXE_LINKER_FLAGS_DEBUGPROFILE
-    CMAKE_SHARED_LINKER_FLAGS_DEBUGPROFILE )
-
-SET(CMAKE_CXX_FLAGS_RELEASEPROFILE
-    "${CMAKE_CXX_FLAGS_RELEASE} ${CXX_PROFILING}"
-    CACHE STRING "Flags used by the C++ compiler during profile builds."
-    FORCE )
-SET(CMAKE_C_FLAGS_RELEASEPROFILE
-    "${CMAKE_C_FLAGS_RELEASE} ${CXX_PROFILING}"
-    CACHE STRING "Flags used by the C compiler during profile builds."
-    FORCE )
-SET(CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
-    "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${LNK_PROFILING}"
-    CACHE STRING "Flags used for linking binaries during profile builds."
-    FORCE )
-SET(CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE
-    "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${LNK_PROFILING}"
-    CACHE STRING "Flags used by the shared libraries linker during profile builds."
-    FORCE )
-MARK_AS_ADVANCED(
-    CMAKE_CXX_FLAGS_RELEASEPROFILE
-    CMAKE_C_FLAGS_RELEASEPROFILE
-    CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
-    CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE )
 
 
-# The configuration types need to be set after their respective c/cxx/linker flags and before the project directive
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release;DebugProfile;ReleaseProfile" CACHE STRING "" FORCE)
+
 project (MCServer)
 
 # Include all the libraries:
 add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
-add_subdirectory(lib/cryptopp/)
 add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)
 add_subdirectory(lib/tolua++/)
@@ -192,16 +60,12 @@ add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/md5/)
 
-# Remove disabling the maximum warning level:
-# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
-# We do not do that for MSVC since MSVC produces an awful lot of warnings for its own STL headers;
-# the important warnings are turned on using #pragma in Globals.h
-if (NOT MSVC)
-	string(REPLACE "-w" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-	string(REPLACE "-w" "" CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}")
-	string(REPLACE "-w" "" CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}")
-	string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}")
-endif()
+
+# We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
+# (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
+include(lib/polarssl.cmake)
+
+set_exe_flags()
 
 add_subdirectory (src)
 

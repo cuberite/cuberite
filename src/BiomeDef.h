@@ -20,6 +20,9 @@ BiomeIDs over 255 are used by MCServer internally and are translated to MC biome
 */
 enum EMCSBiome
 {
+	biInvalidBiome     = -1,
+
+	biFirstBiome       = 0,
 	biOcean            = 0,
 	biPlains           = 1,
 	biDesert           = 2,
@@ -74,6 +77,7 @@ enum EMCSBiome
 	biVariant = 128,
 	
 	// Release 1.7 biome variants:
+	biFirstVariantBiome    = 129,
 	biSunflowerPlains      = 129,
 	biDesertM              = 130,
 	biExtremeHillsM        = 131,
@@ -95,9 +99,12 @@ enum EMCSBiome
 	biMesaBryce            = 165,
 	biMesaPlateauFM        = 166,
 	biMesaPlateauM         = 167,
+	// Automatically capture the maximum consecutive biome value into biVarientMaxBiome:
+	biNumVariantBiomes,  // True number of biomes, since they are zero-based
+	biMaxVariantBiome = biNumVariantBiomes - 1,  // The maximum biome value
 } ;
 
-/// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns -1 on failure.
+/// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns biInvalidBiome on failure.
 extern EMCSBiome StringToBiome(const AString & a_BiomeString);
 
 /// Returns true if the biome has no downfall - deserts and savannas

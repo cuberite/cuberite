@@ -20,8 +20,15 @@ cSlime::cSlime(int a_Size) :
 
 void cSlime::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	// TODO: only when tiny
-	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_SLIMEBALL);
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+	}
+	if (GetSize() == 1)
+	{
+		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_SLIMEBALL);
+	}
 }
 
 

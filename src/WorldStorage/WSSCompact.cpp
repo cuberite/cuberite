@@ -10,9 +10,12 @@
 #include "json/json.h"
 #include "../StringCompression.h"
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
 
@@ -36,7 +39,7 @@ struct cWSSCompact::sChunkHeader
 
 
 /// The maximum number of PAK files that are cached
-const int MAX_PAK_FILES = 16;
+const size_t MAX_PAK_FILES = 16;
 
 /// The maximum number of unsaved chunks before the cPAKFile saves them to disk
 const int MAX_DIRTY_CHUNKS = 16;
@@ -71,14 +74,17 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 	const char * SaveInto = NULL;
 	switch (a_BlockEntity->GetBlockType())
 	{
-		case E_BLOCK_CHEST:      SaveInto = "Chests";      break;
-		case E_BLOCK_DISPENSER:  SaveInto = "Dispensers";  break;
-		case E_BLOCK_DROPPER:    SaveInto = "Droppers";    break;
-		case E_BLOCK_FURNACE:    SaveInto = "Furnaces";    break;
-		case E_BLOCK_SIGN_POST:  SaveInto = "Signs";       break;
-		case E_BLOCK_WALLSIGN:   SaveInto = "Signs";       break;
-		case E_BLOCK_NOTE_BLOCK: SaveInto = "Notes";       break;
-		case E_BLOCK_JUKEBOX:    SaveInto = "Jukeboxes";   break;
+		case E_BLOCK_CHEST:         SaveInto = "Chests";        break;
+		case E_BLOCK_DISPENSER:     SaveInto = "Dispensers";    break;
+		case E_BLOCK_DROPPER:       SaveInto = "Droppers";      break;
+		case E_BLOCK_FLOWER_POT:    SaveInto = "FlowerPots";    break;
+		case E_BLOCK_FURNACE:       SaveInto = "Furnaces";      break;
+		case E_BLOCK_SIGN_POST:     SaveInto = "Signs";         break;
+		case E_BLOCK_WALLSIGN:      SaveInto = "Signs";         break;
+		case E_BLOCK_NOTE_BLOCK:    SaveInto = "Notes";         break;
+		case E_BLOCK_JUKEBOX:       SaveInto = "Jukeboxes";     break;
+		case E_BLOCK_COMMAND_BLOCK: SaveInto = "CommandBlocks"; break;
+		case E_BLOCK_HEAD:          SaveInto = "MobHeads";      break;
 
 		default:
 		{
@@ -263,126 +269,144 @@ bool cWSSCompact::EraseChunkData(const cChunkCoords & a_Chunk)
 
 void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWorld * a_World)
 {
-	// Load chests
+	// Load chests:
 	Json::Value AllChests = a_Value.get("Chests", Json::nullValue);
 	if (!AllChests.empty())
 	{
 		for (Json::Value::iterator itr = AllChests.begin(); itr != AllChests.end(); ++itr )
 		{
-			Json::Value & Chest = *itr;
-			cChestEntity * ChestEntity = new cChestEntity(0,0,0, a_World);
-			if (!ChestEntity->LoadFromJson( Chest ) )
+			std::auto_ptr<cChestEntity> ChestEntity(new cChestEntity(0, 0, 0, a_World));
+			if (!ChestEntity->LoadFromJson(*itr))
 			{
-				LOGERROR("ERROR READING CHEST FROM JSON!" );
-				delete ChestEntity;
+				LOGWARNING("ERROR READING CHEST FROM JSON!" );
 			}
 			else
 			{
-				a_BlockEntities.push_back( ChestEntity );
+				a_BlockEntities.push_back(ChestEntity.release());
 			}
 		}  // for itr - AllChests[]
 	}
 
-	// Load dispensers
+	// Load dispensers:
 	Json::Value AllDispensers = a_Value.get("Dispensers", Json::nullValue);
-	if( !AllDispensers.empty() )
+	for (Json::Value::iterator itr = AllDispensers.begin(); itr != AllDispensers.end(); ++itr)
 	{
-		for( Json::Value::iterator itr = AllDispensers.begin(); itr != AllDispensers.end(); ++itr )
+		std::auto_ptr<cDispenserEntity> DispenserEntity(new cDispenserEntity(0, 0, 0, a_World));
+		if (!DispenserEntity->LoadFromJson(*itr))
 		{
-			Json::Value & Dispenser = *itr;
-			cDispenserEntity * DispenserEntity = new cDispenserEntity(0,0,0, a_World);
-			if( !DispenserEntity->LoadFromJson( Dispenser ) )
-			{
-				LOGERROR("ERROR READING DISPENSER FROM JSON!" );
-				delete DispenserEntity;
-			}
-			else
-			{
-				a_BlockEntities.push_back( DispenserEntity );
-			}
-		}  // for itr - AllDispensers[]
-	}
+			LOGWARNING("ERROR READING DISPENSER FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(DispenserEntity.release());
+		}
+	}  // for itr - AllDispensers[]
 
-	// Load furnaces
+	// Load Flowerpots:
+	Json::Value AllFlowerPots = a_Value.get("FlowerPots", Json::nullValue);
+	for (Json::Value::iterator itr = AllFlowerPots.begin(); itr != AllFlowerPots.end(); ++itr)
+	{
+		std::auto_ptr<cFlowerPotEntity> FlowerPotEntity(new cFlowerPotEntity(0, 0, 0, a_World));
+		if (!FlowerPotEntity->LoadFromJson(*itr))
+		{
+			LOGWARNING("ERROR READING FLOWERPOT FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(FlowerPotEntity.release());
+		}
+	}  // for itr - AllFlowerPots[]
+
+	// Load furnaces:
 	Json::Value AllFurnaces = a_Value.get("Furnaces", Json::nullValue);
-	if( !AllFurnaces.empty() )
+	for (Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr)
 	{
-		for( Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr )
+		// TODO: The block type and meta aren't correct, there's no way to get them here
+		std::auto_ptr<cFurnaceEntity> FurnaceEntity(new cFurnaceEntity(0, 0, 0, E_BLOCK_FURNACE, 0, a_World));
+		if (!FurnaceEntity->LoadFromJson(*itr))
 		{
-			Json::Value & Furnace = *itr;
-			// TODO: The block type and meta aren't correct, there's no way to get them here
-			cFurnaceEntity * FurnaceEntity = new cFurnaceEntity(0, 0, 0, E_BLOCK_FURNACE, 0, a_World);
-			if (!FurnaceEntity->LoadFromJson(Furnace))
-			{
-				LOGERROR("ERROR READING FURNACE FROM JSON!" );
-				delete FurnaceEntity;
-			}
-			else
-			{
-				a_BlockEntities.push_back(FurnaceEntity);
-			}
-		}  // for itr - AllFurnaces[]
-	}
+			LOGWARNING("ERROR READING FURNACE FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(FurnaceEntity.release());
+		}
+	}  // for itr - AllFurnaces[]
 
-	// Load signs
+	// Load signs:
 	Json::Value AllSigns = a_Value.get("Signs", Json::nullValue);
-	if( !AllSigns.empty() )
+	for (Json::Value::iterator itr = AllSigns.begin(); itr != AllSigns.end(); ++itr)
 	{
-		for( Json::Value::iterator itr = AllSigns.begin(); itr != AllSigns.end(); ++itr )
+		std::auto_ptr<cSignEntity> SignEntity(new cSignEntity(E_BLOCK_SIGN_POST, 0, 0, 0, a_World));
+		if (!SignEntity->LoadFromJson(*itr))
 		{
-			Json::Value & Sign = *itr;
-			cSignEntity * SignEntity = new cSignEntity( E_BLOCK_SIGN_POST, 0,0,0, a_World);
-			if ( !SignEntity->LoadFromJson( Sign ) )
-			{
-				LOGERROR("ERROR READING SIGN FROM JSON!" );
-				delete SignEntity;
-			}
-			else
-			{
-				a_BlockEntities.push_back( SignEntity );
-			}
-		}  // for itr - AllSigns[]
-	}
+			LOGWARNING("ERROR READING SIGN FROM JSON!");
+		}
+		else
+		{
+			a_BlockEntities.push_back(SignEntity.release());
+		}
+	}  // for itr - AllSigns[]
 
-	// Load note blocks
+	// Load note blocks:
 	Json::Value AllNotes = a_Value.get("Notes", Json::nullValue);
-	if( !AllNotes.empty() )
+	for (Json::Value::iterator itr = AllNotes.begin(); itr != AllNotes.end(); ++itr)
 	{
-		for( Json::Value::iterator itr = AllNotes.begin(); itr != AllNotes.end(); ++itr )
+		std::auto_ptr<cNoteEntity> NoteEntity(new cNoteEntity(0, 0, 0, a_World));
+		if (!NoteEntity->LoadFromJson(*itr))
 		{
-			Json::Value & Note = *itr;
-			cNoteEntity * NoteEntity = new cNoteEntity(0, 0, 0, a_World);
-			if ( !NoteEntity->LoadFromJson( Note ) )
-			{
-				LOGERROR("ERROR READING NOTE BLOCK FROM JSON!" );
-				delete NoteEntity;
-			}
-			else
-			{
-				a_BlockEntities.push_back( NoteEntity );
-			}
-		}  // for itr - AllNotes[]
-	}
+			LOGWARNING("ERROR READING NOTE BLOCK FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(NoteEntity.release());
+		}
+	}  // for itr - AllNotes[]
 
-	// Load jukeboxes
+	// Load jukeboxes:
 	Json::Value AllJukeboxes = a_Value.get("Jukeboxes", Json::nullValue);
-	if( !AllJukeboxes.empty() )
+	for (Json::Value::iterator itr = AllJukeboxes.begin(); itr != AllJukeboxes.end(); ++itr)
 	{
-		for( Json::Value::iterator itr = AllJukeboxes.begin(); itr != AllJukeboxes.end(); ++itr )
+		std::auto_ptr<cJukeboxEntity> JukeboxEntity(new cJukeboxEntity(0, 0, 0, a_World));
+		if (!JukeboxEntity->LoadFromJson(*itr))
 		{
-			Json::Value & Jukebox = *itr;
-			cJukeboxEntity * JukeboxEntity = new cJukeboxEntity(0, 0, 0, a_World);
-			if ( !JukeboxEntity->LoadFromJson( Jukebox ) )
-			{
-				LOGERROR("ERROR READING JUKEBOX FROM JSON!" );
-				delete JukeboxEntity;
-			}
-			else
-			{
-				a_BlockEntities.push_back( JukeboxEntity );
-			}
-		}  // for itr - AllJukeboxes[]
-	}
+			LOGWARNING("ERROR READING JUKEBOX FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(JukeboxEntity.release());
+		}
+	}  // for itr - AllJukeboxes[]
+
+	// Load command blocks:
+	Json::Value AllCommandBlocks = a_Value.get("CommandBlocks", Json::nullValue);
+	for (Json::Value::iterator itr = AllCommandBlocks.begin(); itr != AllCommandBlocks.end(); ++itr)
+	{
+		std::auto_ptr<cCommandBlockEntity> CommandBlockEntity(new cCommandBlockEntity(0, 0, 0, a_World));
+		if (!CommandBlockEntity->LoadFromJson(*itr))
+		{
+			LOGWARNING("ERROR READING COMMAND BLOCK FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(CommandBlockEntity.release());
+		}
+	}  // for itr - AllCommandBlocks[]
+
+	// Load mob heads:
+	Json::Value AllMobHeads = a_Value.get("MobHeads", Json::nullValue);
+	for (Json::Value::iterator itr = AllMobHeads.begin(); itr != AllMobHeads.end(); ++itr)
+	{
+		std::auto_ptr<cMobHeadEntity> MobHeadEntity(new cMobHeadEntity(0, 0, 0, a_World));
+		if (!MobHeadEntity->LoadFromJson(*itr))
+		{
+			LOGWARNING("ERROR READING MOB HEAD FROM JSON!" );
+		}
+		else
+		{
+			a_BlockEntities.push_back(MobHeadEntity.release());
+		}
+	}  // for itr - AllMobHeads[]
 }
 
 
@@ -545,7 +569,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 		if( ChunksConverted % 32 == 0 )
 		{
-			LOGINFO("Updating \"%s\" version 1 to version 2: %d %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
+			LOGINFO("Updating \"%s\" version 1 to version 2: " SIZE_T_FMT  " %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
 		ChunksConverted++;
 
@@ -583,7 +607,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 		if (UncompressedSize != (int)UncompressedData.size())
 		{
-			LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+			LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 				UncompressedSize, UncompressedData.size(),
 				Header->m_ChunkX, Header->m_ChunkZ
 				);
@@ -689,7 +713,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		if( ChunksConverted % 32 == 0 )
 		{
-			LOGINFO("Updating \"%s\" version 2 to version 3: %d %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
+			LOGINFO("Updating \"%s\" version 2 to version 3: " SIZE_T_FMT  " %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
 		ChunksConverted++;
 
@@ -727,7 +751,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		if (UncompressedSize != (int)UncompressedData.size())
 		{
-			LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+			LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 				UncompressedSize, UncompressedData.size(),
 				Header->m_ChunkX, Header->m_ChunkZ
 				);
@@ -740,7 +764,6 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		// Cannot use cChunk::MakeIndex because it might change again?????????
 		// For compatibility, use what we know is current
-		#define MAKE_2_INDEX( x, y, z ) ( y + (z * 256) + (x * 256 * 16) )
 		#define MAKE_3_INDEX( x, y, z ) ( x + (z * 16) + (y * 16 * 16) )
 
 		unsigned int InChunkOffset = 0;
@@ -843,7 +866,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 	
 	if (a_UncompressedSize != (int)UncompressedData.size())
 	{
-		LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+		LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
 			a_UncompressedSize, UncompressedData.size(),
 			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
 		);

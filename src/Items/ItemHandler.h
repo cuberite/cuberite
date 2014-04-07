@@ -21,20 +21,31 @@ class cItemHandler
 public:
 	cItemHandler(int a_ItemType);
 	
+	// Force virtual destructor
+	virtual ~cItemHandler() {}
+	
 	/// Called when the player tries to use the item (right mouse button). Return false to make the item unusable. DEFAULT: False
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir);
 	
 	/// Called when the client sends the SHOOT status in the lclk packet
-	virtual void OnItemShoot(cPlayer *, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) 
+	virtual void OnItemShoot(cPlayer *, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) 
 	{
 		UNUSED(a_BlockX);
 		UNUSED(a_BlockY);
 		UNUSED(a_BlockZ);
 		UNUSED(a_BlockFace);
 	}
+
+	/// Called every tick while the item is on the player's inventory (Used by maps) - For now, called only for equipped items
+	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item)
+	{
+		UNUSED(a_World);
+		UNUSED(a_Player);
+		UNUSED(a_Item);
+	}
 	
 	/// Called while the player diggs a block using this item
-	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
+	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
 	
 	/// Called when the player destroys a block using this item. This also calls the drop function for the destroyed block
 	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_X, int a_Y, int a_Z);
@@ -80,7 +91,7 @@ public:
 	*/
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	);

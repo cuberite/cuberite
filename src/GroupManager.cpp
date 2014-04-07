@@ -44,6 +44,66 @@ cGroupManager::cGroupManager()
 	: m_pState( new sGroupManagerState )
 {
 	LOGD("-- Loading Groups --");
+	
+	LoadGroups();
+	CheckUsers();
+	
+	LOGD("-- Groups Successfully Loaded --");
+}
+
+
+
+
+
+void cGroupManager::GenerateDefaultUsersIni(cIniFile & a_IniFile)
+{
+	LOGWARN("Regenerating users.ini, all users will be reset");
+	a_IniFile.AddHeaderComment(" This file stores the players' groups.");
+	a_IniFile.AddHeaderComment(" The format is:");
+	a_IniFile.AddHeaderComment(" [PlayerName]");
+	a_IniFile.AddHeaderComment(" Groups = GroupName1, GroupName2, ...");
+
+	a_IniFile.WriteFile("users.ini");
+}
+
+
+
+
+
+void cGroupManager::CheckUsers(void)
+{
+	cIniFile IniFile;
+	if (!IniFile.ReadFile("users.ini"))
+	{
+		GenerateDefaultUsersIni(IniFile);
+		return;
+	}
+	
+	unsigned int NumKeys = IniFile.GetNumKeys();
+	for (size_t i = 0; i < NumKeys; i++)
+	{
+		AString Player = IniFile.GetKeyName( i );
+		AString Groups = IniFile.GetValue(Player, "Groups", "");
+		if (!Groups.empty())
+		{
+			AStringVector Split = StringSplit( Groups, "," );
+			for( unsigned int i = 0; i < Split.size(); i++ )
+			{
+				if (!ExistsGroup(Split[i]))
+				{
+					LOGWARNING("The group %s for player %s was not found!", Split[i].c_str(), Player.c_str());
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+void cGroupManager::LoadGroups()
+{
 	cIniFile IniFile;
 	if (!IniFile.ReadFile("groups.ini"))
 	{
@@ -58,62 +118,77 @@ cGroupManager::cGroupManager()
 		IniFile.SetValue("Moderator", "Color", "2", true);
 		IniFile.SetValue("Moderator", "Inherits", "Player", true);
 
-		IniFile.SetValue("Player", "Permissions", "core.build", true);
+		IniFile.SetValue("Player", "Permissions", "core.portal", true);
 		IniFile.SetValue("Player", "Color", "f", true);
 		IniFile.SetValue("Player", "Inherits", "Default", true);
 
-		IniFile.SetValue("Default", "Permissions", "core.help,core.playerlist,core.pluginlist,core.spawn,core.listworlds,core.back,core.motd,core.gotoworld,core.coords,core.viewdistance", true);
+		IniFile.SetValue("Default", "Permissions", "core.help,core.plugins,core.spawn,core.worlds,core.back,core.motd,core.build,core.locate,core.viewdistance", true);
 		IniFile.SetValue("Default", "Color", "f", true);
 
 		IniFile.WriteFile("groups.ini");
 	}
 
 	unsigned int NumKeys = IniFile.GetNumKeys();
-	for( unsigned int i = 0; i < NumKeys; i++ )
+	for (size_t i = 0; i < NumKeys; i++)
 	{
-		std::string KeyName = IniFile.GetKeyName( i );
+		AString KeyName = IniFile.GetKeyName( i );
 		cGroup* Group = GetGroup( KeyName.c_str() );
+		
+		Group->ClearPermission(); // Needed in case the groups are reloaded.
 
 		LOGD("Loading group: %s", KeyName.c_str() );
 
-		Group->SetName( KeyName );
-		char Color = IniFile.GetValue( KeyName, "Color", "-" )[0];
-		if( Color != '-' )
-			Group->SetColor( cChatColor::Color + Color );
+		Group->SetName(KeyName);
+		AString Color = IniFile.GetValue(KeyName, "Color", "-");
+		if ((Color != "-") && (Color.length() >= 1))
+		{
+			Group->SetColor(cChatColor::Color + Color[0]);
+		}
 		else
-			Group->SetColor( cChatColor::White );
-
-		AString Commands = IniFile.GetValue( KeyName, "Commands", "" );
-		if( Commands.size() > 0 )
 		{
-			AStringVector Split = StringSplit( Commands, "," );
-			for( unsigned int i = 0; i < Split.size(); i++)
+			Group->SetColor(cChatColor::White);
+		}
+
+		AString Commands = IniFile.GetValue(KeyName, "Commands", "");
+		if (!Commands.empty())
+		{
+			AStringVector Split = StringSplitAndTrim(Commands, ",");
+			for (size_t i = 0; i < Split.size(); i++)
 			{
-				Group->AddCommand( Split[i] );
+				Group->AddCommand(Split[i]);
 			}
 		}
 
-		AString Permissions = IniFile.GetValue( KeyName, "Permissions", "" );
-		if( Permissions.size() > 0 )
+		AString Permissions = IniFile.GetValue(KeyName, "Permissions", "");
+		if (!Permissions.empty())
 		{
-			AStringVector Split = StringSplit( Permissions, "," );
-			for( unsigned int i = 0; i < Split.size(); i++)
+			AStringVector Split = StringSplitAndTrim(Permissions, ",");
+			for (size_t i = 0; i < Split.size(); i++)
 			{
-				Group->AddPermission( Split[i] );
+				Group->AddPermission(Split[i]);
 			}
 		}
 
-		std::string Groups = IniFile.GetValue( KeyName, "Inherits", "" );
-		if( Groups.size() > 0 )
+		AString Groups = IniFile.GetValue(KeyName, "Inherits", "");
+		if (!Groups.empty())
 		{
-			AStringVector Split = StringSplit( Groups, "," );
-			for( unsigned int i = 0; i < Split.size(); i++)
+			AStringVector Split = StringSplitAndTrim(Groups, ",");
+			for (size_t i = 0; i < Split.size(); i++)
 			{
-				Group->InheritFrom( GetGroup( Split[i].c_str() ) );
+				Group->InheritFrom(GetGroup(Split[i].c_str()));
 			}
 		}
 	}
-	LOGD("-- Groups Successfully Loaded --");
+}
+
+
+
+
+
+bool cGroupManager::ExistsGroup( const AString & a_Name )
+{
+	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
+	return ( itr != m_pState->Groups.end() );
 }
 
 

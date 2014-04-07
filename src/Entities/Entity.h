@@ -2,8 +2,7 @@
 #pragma once
 
 #include "../Item.h"
-#include "../Vector3d.h"
-#include "../Vector3f.h"
+#include "../Vector3.h"
 
 
 
@@ -28,12 +27,16 @@
 		return super::GetClass(); \
 	}
 
+#define POSX_TOINT (int)floor(GetPosX())
+#define POSY_TOINT (int)floor(GetPosY())
+#define POSZ_TOINT (int)floor(GetPosZ())
+#define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
+
 
 
 
 
 class cWorld;
-class cReferenceManager;
 class cClientHandle;
 class cPlayer;
 class cChunk;
@@ -66,6 +69,7 @@ public:
 	enum eEntityType
 	{
 		etEntity,  // For all other types
+		etEnderCrystal,
 		etPlayer,
 		etPickup,
 		etMonster,
@@ -76,6 +80,8 @@ public:
 		etProjectile,
 		etExpOrb,
 		etFloater,
+		etItemFrame,
+		etPainting,
 		
 		// Common variations
 		etMob = etMonster,  // DEPRECATED, use etMonster instead!
@@ -110,6 +116,9 @@ public:
 		BURN_TICKS_PER_DAMAGE = 20,  ///< How many ticks to wait between damaging an entity when it is burning
 		BURN_DAMAGE = 1,             ///< How much damage to deal when the entity is burning
 		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
+		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
+		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
+		VOID_BOUNDARY = -46          ///< At what position Y to begin applying void damage
 	} ;
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
@@ -122,16 +131,19 @@ public:
 	
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 	
-	bool IsPlayer      (void) const { return (m_EntityType == etPlayer); }
-	bool IsPickup      (void) const { return (m_EntityType == etPickup); }
-	bool IsMob         (void) const { return (m_EntityType == etMonster); }
+	bool IsEnderCrystal(void) const { return (m_EntityType == etEnderCrystal); }
+	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
+	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
+	bool IsMob         (void) const { return (m_EntityType == etMonster);      }
 	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
-	bool IsMinecart    (void) const { return (m_EntityType == etMinecart); }
-	bool IsBoat        (void) const { return (m_EntityType == etBoat); }
-	bool IsTNT         (void) const { return (m_EntityType == etTNT); }
-	bool IsProjectile  (void) const { return (m_EntityType == etProjectile); }
-	bool IsExpOrb      (void) const { return (m_EntityType == etExpOrb); }
-	bool IsFloater     (void) const { return (m_EntityType == etFloater); }
+	bool IsMinecart    (void) const { return (m_EntityType == etMinecart);     }
+	bool IsBoat        (void) const { return (m_EntityType == etBoat);         }
+	bool IsTNT         (void) const { return (m_EntityType == etTNT);          }
+	bool IsProjectile  (void) const { return (m_EntityType == etProjectile);   }
+	bool IsExpOrb      (void) const { return (m_EntityType == etExpOrb);       }
+	bool IsFloater     (void) const { return (m_EntityType == etFloater);      }
+	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame);    }
+	bool IsPainting    (void) const { return (m_EntityType == etPainting);     }
 	
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;
@@ -147,7 +159,7 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	double           GetHeadYaw   (void) const { return m_HeadYaw; }
+	double           GetHeadYaw   (void) const { return m_HeadYaw; }  // In degrees
 	double           GetHeight    (void) const { return m_Height;  }
 	double           GetMass      (void) const { return m_Mass;    }
 	const Vector3d & GetPosition  (void) const { return m_Pos;     }
@@ -155,9 +167,9 @@ public:
 	double           GetPosY      (void) const { return m_Pos.y;   }
 	double           GetPosZ      (void) const { return m_Pos.z;   }
 	const Vector3d & GetRot       (void) const { return m_Rot;     }  // OBSOLETE, use individual GetYaw(), GetPitch, GetRoll() components
-	double           GetYaw       (void) const { return m_Rot.x;   }
-	double           GetPitch     (void) const { return m_Rot.y;   }
-	double           GetRoll      (void) const { return m_Rot.z;   }
+	double           GetYaw       (void) const { return m_Rot.x;   }  // In degrees, [-180, +180)
+	double           GetPitch     (void) const { return m_Rot.y;   }  // In degrees, [-180, +180), but normal client clips to [-90, +90]
+	double           GetRoll      (void) const { return m_Rot.z;   }  // In degrees, unused in current client
 	Vector3d         GetLookVector(void) const;
 	const Vector3d & GetSpeed     (void) const { return m_Speed;   }
 	double           GetSpeedX    (void) const { return m_Speed.x; }
@@ -177,9 +189,9 @@ public:
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
 	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
 	void SetRot     (const Vector3f & a_Rot);  // OBSOLETE, use individual SetYaw(), SetPitch(), SetRoll() components
-	void SetYaw     (double a_Yaw);
-	void SetPitch   (double a_Pitch);
-	void SetRoll    (double a_Roll);
+	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
+	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
+	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
 	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
 	void SetSpeedX  (double a_SpeedX);
@@ -344,7 +356,14 @@ public:
 	virtual bool IsRiding   (void) const {return false; }
 	virtual bool IsSprinting(void) const {return false; }
 	virtual bool IsRclking  (void) const {return false; }
-	virtual bool IsInvisible(void) const {return false; }
+	virtual bool IsInvisible(void) const { return false; }
+
+	/** Returns whether the player is swimming or not */
+	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
+	/** Return whether the player is under water or not */
+	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+	/** Gets remaining air of a monster */
+	int GetAirLevel(void) const { return m_AirLevel; }
 	
 	// tolua_end
 	
@@ -372,9 +391,6 @@ protected:
 	
 	/// The entity which is attached to this entity (rider), NULL if none
 	cEntity * m_Attachee;
-
-	cReferenceManager* m_Referencers;
-	cReferenceManager* m_References;
 
 	// Flags that signal that we haven't updated the clients with the latest.
 	bool     m_bDirtyHead;
@@ -415,11 +431,18 @@ protected:
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
-	
-	friend class cReferenceManager;
-	void AddReference( cEntity*& a_EntityPtr );
-	void ReferencedBy( cEntity*& a_EntityPtr );
-	void Dereference( cEntity*& a_EntityPtr );
+
+	/** Called in each tick to handle air-related processing i.e. drowning */
+	virtual void HandleAir();
+	/** Called once per tick to set IsSwimming and IsSubmerged */
+	virtual void SetSwimState(cChunk & a_Chunk);
+
+	/** If an entity is currently swimming in or submerged under water */
+	bool m_IsSwimming, m_IsSubmerged;
+
+	/** Air level of a mobile */
+	int m_AirLevel;
+	int m_AirTickTimer;
 	
 private:
 	// Measured in degrees, [-180, +180)

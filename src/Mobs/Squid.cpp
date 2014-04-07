@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Squid.h"
-#include "../Vector3d.h"
+#include "../Vector3.h"
 #include "../Chunk.h"
 
 
@@ -21,7 +21,12 @@ cSquid::cSquid(void) :
 void cSquid::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	// Drops 0-3 Ink Sacs
-	AddRandomDropItem(a_Drops, 0, 3, E_ITEM_DYE, E_META_DYE_BLACK);
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+	}
+	AddRandomDropItem(a_Drops, 0, 3 + LootingLevel, E_ITEM_DYE, E_META_DYE_BLACK);
 }
 
 
@@ -43,7 +48,8 @@ void cSquid::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	int RelX = (int)floor(Pos.x) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = (int)floor(Pos.z) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	if (!IsBlockWater(a_Chunk.GetBlock(RelX, RelY, RelZ)) && !IsOnFire())
+	BLOCKTYPE BlockType;
+	if (a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockType) && !IsBlockWater(BlockType) && !IsOnFire())
 	{
 		// Burn for 10 ticks, then decide again
 		StartBurning(10);

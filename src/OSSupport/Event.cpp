@@ -7,7 +7,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Event.h"
-
+#include "Errors.h"
 
 
 
@@ -35,14 +35,16 @@ cEvent::cEvent(void)
 		m_Event = sem_open(EventName.c_str(), O_CREAT, 777, 0 );
 		if (m_Event == SEM_FAILED)
 		{
-			LOGERROR("cEvent: Cannot create event, errno = %i. Aborting server.", errno);
+			AString error = GetOSErrorString(errno);
+			LOGERROR("cEvent: Cannot create event, err = %s. Aborting server.", error.c_str());
 			abort();
 		}
 		// Unlink the semaphore immediately - it will continue to function but will not pollute the namespace
 		// We don't store the name, so can't call this in the destructor
 		if (sem_unlink(EventName.c_str()) != 0)
 		{
-			LOGWARN("ERROR: Could not unlink cEvent. (%i)", errno);
+			AString error = GetOSErrorString(errno);
+			LOGWARN("ERROR: Could not unlink cEvent. (%s)", error.c_str());
 		}
 	}
 #endif  // *nix
@@ -61,7 +63,8 @@ cEvent::~cEvent()
 	{
 		if (sem_close(m_Event) != 0)
 		{
-			LOGERROR("ERROR: Could not close cEvent. (%i)", errno);
+			AString error = GetOSErrorString(errno);
+			LOGERROR("ERROR: Could not close cEvent. (%s)", error.c_str());
 		}
 	}
 	else
@@ -88,7 +91,8 @@ void cEvent::Wait(void)
 		int res = sem_wait(m_Event);
 		if (res != 0 )
 		{
-			LOGWARN("cEvent: waiting for the event failed: %i, errno = %i. Continuing, but server may be unstable.", res, errno);
+			AString error = GetOSErrorString(errno);
+			LOGWARN("cEvent: waiting for the event failed: %i, err = %s. Continuing, but server may be unstable.", res, error.c_str());
 		}
 	#endif
 }
@@ -108,7 +112,8 @@ void cEvent::Set(void)
 		int res = sem_post(m_Event);
 		if (res != 0)
 		{
-			LOGWARN("cEvent: Could not set cEvent: %i, errno = %d", res, errno);
+			AString error = GetOSErrorString(errno);
+			LOGWARN("cEvent: Could not set cEvent: %i, err = %s", res, error.c_str());
 		}
 	#endif
 }

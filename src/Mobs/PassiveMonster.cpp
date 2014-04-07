@@ -2,9 +2,8 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "PassiveMonster.h"
-#include "../MersenneTwister.h"
 #include "../World.h"
-
+#include "../Entities/Player.h"
 
 
 
@@ -36,19 +35,22 @@ void cPassiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	m_SeePlayerInterval += a_Dt;
-
-	if (m_SeePlayerInterval > 1)  // Check every second
+	if (m_EMState == ESCAPING)
 	{
-		int rem = m_World->GetTickRandomNumber(3) + 1;  // Check most of the time but miss occasionally
-
-		m_SeePlayerInterval = 0.0;
-		if (rem >= 2)
+		CheckEventLostPlayer();
+	}
+	cItem FollowedItem = GetFollowedItem();
+	if (FollowedItem.IsEmpty())
+	{
+		return;
+	}
+	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
+	if (a_Closest_Player != NULL)
+	{
+		if (a_Closest_Player->GetEquippedItem().IsEqual(FollowedItem))
 		{
-			if (m_EMState == ESCAPING)
-			{
-				CheckEventLostPlayer();
-			} 
+			Vector3d PlayerPos = a_Closest_Player->GetPosition();
+			MoveToPosition(PlayerPos);
 		}
 	}
 }

@@ -19,18 +19,21 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
 	--]]
 	
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
-	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
-	cPluginManager:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
-	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
-	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
-	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
+	local PM = cPluginManager;
+	PM:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
+	PM:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,                  OnTakeDamage);
+	PM:AddHook(cPluginManager.HOOK_TICK,                         OnTick);
+	PM:AddHook(cPluginManager.HOOK_CHAT,                         OnChat);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
+	PM:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
+	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
+	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_JOINED,                OnPlayerJoined)
 
-	PM = cRoot:Get():GetPluginManager();
+	-- _X: Disabled so that the normal operation doesn't interfere with anything
+	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
+
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -53,21 +56,71 @@ function Initialize(Plugin)
 	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
+	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
+	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings")
+	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one")
+	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z")
 
-	Plugin:AddWebTab("Debuggers", HandleRequest_Debuggers);
+	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
+	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
-	-- TestBlockAreas();
-	-- TestSQLiteBindings();
-	-- TestExpatBindings();
+	-- TestBlockAreas()
+	-- TestSQLiteBindings()
+	-- TestExpatBindings()
+	-- TestPluginCalls()
+	
+	TestBlockAreasString()
+	TestStringBase64()
 
+	--[[
+	-- Test cCompositeChat usage in console-logging:
+	LOGINFO(cCompositeChat("This is a simple message with some @2 color formatting @4 and http://links.to .")
+		:AddSuggestCommandPart("(Suggested command)", "cmd")
+		:AddRunCommandPart("(Run command)", "cmd")
+		:SetMessageType(mtInfo)
+	)
+	--]]
+	
 	return true
 end;
 
+
+
+
+
+function TestPluginCalls()
+	-- In order to test the inter-plugin communication, we're going to call Core's ReturnColorFromChar() function
+	-- It is a rather simple function that doesn't need any tables as its params and returns a value, too
+	-- Note the signature: function ReturnColorFromChar( Split, char ) ... return cChatColog.Gray ... end
+	-- The Split parameter should be a table, but it is not used in that function anyway,
+	-- so we can get away with passing nil to it.
+	
+	-- Use the old, deprecated and unsafe method:
+	local Core = cPluginManager:Get():GetPlugin("Core")
+	if (Core ~= nil) then
+		LOGINFO("Calling Core::ReturnColorFromChar() the old-fashioned way...")
+		local Gray = Core:Call("ReturnColorFromChar", nil, "8")
+		if (Gray ~= cChatColor.Gray) then
+			LOGWARNING("Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
+		else
+			LOGINFO("Call succeeded")
+		end
+	end
+	
+	-- Use the new method:
+	LOGINFO("Calling Core::ReturnColorFromChar() the recommended way...")
+	local Gray = cPluginManager:CallPlugin("Core", "ReturnColorFromChar", nil, "8")
+	if (Gray ~= cChatColor.Gray) then
+		LOGWARNING("Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
+	else
+		LOGINFO("Call succeeded")
+	end
+end
 
 
 
@@ -161,6 +214,60 @@ end
 
 
 	
+
+
+
+function TestBlockAreasString()
+	-- Write one area to string, then to file:
+	local BA1 = cBlockArea()
+	BA1:Create(5, 5, 5, cBlockArea.baTypes + cBlockArea.baMetas)
+	BA1:Fill(cBlockArea.baTypes, E_BLOCK_DIAMOND_BLOCK)
+	BA1:FillRelCuboid(1, 3, 1, 3, 1, 3, cBlockArea.baTypes, E_BLOCK_GOLD_BLOCK)
+	local Data = BA1:SaveToSchematicString()
+	if ((type(Data) ~= "string") or (Data == "")) then
+		LOG("Cannot save schematic to string")
+		return
+	end
+	cFile:CreateFolder("schematics")
+	local f = io.open("schematics/StringTest.schematic", "wb")
+	f:write(Data)
+	f:close()
+	
+	-- Load a second area from that file:
+	local BA2 = cBlockArea()
+	if not(BA2:LoadFromSchematicFile("schematics/StringTest.schematic")) then
+		LOG("Cannot read schematic from string test file")
+		return
+	end
+	BA2:Clear()
+	
+	-- Load another area from a string in that file:
+	f = io.open("schematics/StringTest.schematic", "rb")
+	Data = f:read("*all")
+	if not(BA2:LoadFromSchematicString(Data)) then
+		LOG("Cannot load schematic from string")
+	end
+end
+
+
+
+
+
+function TestStringBase64()
+	-- Create a binary string:
+	local s = ""
+	for i = 0, 255 do
+		s = s .. string.char(i)
+	end
+	
+	-- Roundtrip through Base64:
+	local Base64 = Base64Encode(s)
+	local UnBase64 = Base64Decode(Base64)
+	
+	assert(UnBase64 == s)
+end
+
+
 
 
 
@@ -1004,6 +1111,68 @@ end
 
 
 
+local g_Counter = 0
+local g_JavaScript =
+[[
+<script>
+function createXHR()
+{
+	var request = false;
+	try {
+		request = new ActiveXObject('Msxml2.XMLHTTP');
+	}
+	catch (err2)
+	{
+		try
+		{
+			request = new ActiveXObject('Microsoft.XMLHTTP');
+		}
+		catch (err3)
+		{
+			try
+			{
+				request = new XMLHttpRequest();
+			}
+			catch (err1)
+			{
+				request = false;
+			}
+		}
+	}
+	return request;
+}
+
+function RefreshCounter()
+{
+	var xhr = createXHR();
+	xhr.onreadystatechange = function()
+	{
+		if (xhr.readyState == 4)
+		{
+			document.getElementById("cnt").innerHTML = xhr.responseText;
+		}
+	};
+	xhr.open("POST", "/~webadmin/Debuggers/StressTest", true);
+	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xhr.send("counter=true");
+}
+
+setInterval(RefreshCounter, 10)
+</script>
+]]
+
+function HandleRequest_StressTest(a_Request)
+	if (a_Request.PostParams["counter"]) then
+		g_Counter = g_Counter + 1
+		return tostring(g_Counter)
+	end
+	return g_JavaScript .. "<p>The counter below should be reloading as fast as possible</p><div id='cnt'>0</div>"
+end
+
+
+
+
+
 function OnPluginMessage(a_Client, a_Channel, a_Message)
 	LOGINFO("Received a plugin message from client " .. a_Client:GetUsername() .. ": channel '" .. a_Channel .. "', message '" .. a_Message .. "'");
 	
@@ -1023,6 +1192,188 @@ function OnPluginMessage(a_Client, a_Channel, a_Message)
 			a_Client:SendPluginMessage("WECUI", "p|1|100|100|100|132651");  -- 132651 = 51 * 51 * 51
 		end
 	end
+end
+
+
+
+
+
+function HandleChunkStay(a_Split, a_Player)
+	-- As an example of using ChunkStay, this call will load 3x3 chunks around the specified chunk coords,
+	-- then build an obsidian pillar in the middle of each one.
+	-- Once complete, the player will be teleported to the middle pillar
+	
+	if (#a_Split ~= 3) then
+		a_Player:SendMessageInfo("Usage: /cs <ChunkX> <ChunkZ>")
+		return true
+	end
+	
+	local ChunkX = tonumber(a_Split[2])
+	local ChunkZ = tonumber(a_Split[3])
+	if ((ChunkX == nil) or (ChunkZ == nil)) then
+		a_Player:SendMessageFailure("Invalid chunk coords.")
+		return true
+	end
+	
+	local World = a_Player:GetWorld()
+	local PlayerID = a_Player:GetUniqueID()
+	a_Player:SendMessageInfo("Loading chunks, stand by...");
+	
+	-- Set the wanted chunks:
+	local Chunks = {}
+	for z = -1, 1 do for x = -1, 1 do
+		table.insert(Chunks, {ChunkX + x, ChunkZ + z})
+	end end
+	
+	-- The function that is called when all chunks are available
+	-- Will perform the actual action with all those chunks
+	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before the chunks load
+	local OnAllChunksAvailable = function()
+		LOGINFO("ChunkStay all chunks now available")
+		-- Build something on the neighboring chunks, to verify:
+		for z = -1, 1 do for x = -1, 1 do
+			local BlockX = (ChunkX + x) * 16 + 8
+			local BlockZ = (ChunkZ + z) * 16 + 8
+			for y = 20, 80 do
+				World:SetBlock(BlockX, y, BlockZ, E_BLOCK_OBSIDIAN, 0)
+			end
+		end end
+		
+		-- Teleport the player there for visual inspection:
+		World:DoWithEntityByID(PlayerID,
+			function (a_CallbackPlayer)
+				a_CallbackPlayer:TeleportToCoords(ChunkX * 16 + 8, 85, ChunkZ * 16 + 8)
+				a_CallbackPlayer:SendMessageSuccess("ChunkStay fully available")
+			end
+		)
+	end
+	
+	-- This function will be called for each chunk that is made available
+	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before the chunks load
+	local OnChunkAvailable = function(a_ChunkX, a_ChunkZ)
+		LOGINFO("ChunkStay now has chunk [" .. a_ChunkX .. ", " .. a_ChunkZ .. "]")
+		World:DoWithEntityByID(PlayerID,
+			function (a_CallbackPlayer)
+				a_CallbackPlayer:SendMessageInfo("ChunkStay now has chunk [" .. a_ChunkX .. ", " .. a_ChunkZ .. "]")
+			end
+		)
+	end
+	
+	-- Process the ChunkStay:
+	World:ChunkStay(Chunks, OnChunkAvailable, OnAllChunksAvailable)
+	return true
+end
+
+
+
+
+
+function HandleCompo(a_Split, a_Player)
+	-- Send one composite message to self:
+	local msg = cCompositeChat()
+	msg:AddTextPart("Hello! ", "b@e")  -- bold yellow
+	msg:AddUrlPart("MCServer", "http://mc-server.org")
+	msg:AddTextPart(" rules! ")
+	msg:AddRunCommandPart("Set morning", "/time set 0")
+	a_Player:SendMessage(msg)
+	
+	-- Broadcast another one to the world:
+	local msg2 = cCompositeChat()
+	msg2:AddSuggestCommandPart(a_Player:GetName(), "/tell " .. a_Player:GetName() .. " ")
+	msg2:AddTextPart(" knows how to use cCompositeChat!");
+	a_Player:GetWorld():BroadcastChat(msg2)
+	
+	return true
+end
+
+
+
+
+
+function HandleSetBiome(a_Split, a_Player)
+	local Biome = biJungle
+	local Size = 20
+	local SplitSize = #a_Split
+	if (SplitSize > 3) then
+		a_Player:SendMessage("Too many parameters. Usage: " .. a_Split[1] .. " <BiomeType>")
+		return true
+	end
+
+	if (SplitSize >= 2) then
+		Biome = StringToBiome(a_Split[2])
+		if (Biome == biInvalidBiome) then
+			a_Player:SendMessage("Unknown biome: '" .. a_Split[2] .. "'. Command ignored.")
+			return true
+		end
+	end
+	if (SplitSize >= 3) then
+		Size = tostring(a_Split[3])
+		if (Size == nil) then
+			a_Player:SendMessage("Unknown size: '" .. a_Split[3] .. "'. Command ignored.")
+			return true
+		end
+	end
+	
+	local BlockX = math.floor(a_Player:GetPosX())
+	local BlockZ = math.floor(a_Player:GetPosZ())
+	a_Player:GetWorld():SetAreaBiome(BlockX - Size, BlockX + Size, BlockZ - Size, BlockZ + Size, Biome)
+	a_Player:SendMessage(
+		"Blocks {" .. (BlockX - Size) .. ", " .. (BlockZ - Size) ..
+		"} - {" .. (BlockX + Size) .. ", " .. (BlockZ + Size) ..
+		"} set to biome #" .. tostring(Biome) .. "."
+	)
+	return true
+end
+
+
+
+
+
+function HandleWESel(a_Split, a_Player)
+	-- Check if the selection is a cuboid:
+	local IsCuboid = cPluginManager:CallPlugin("WorldEdit", "IsPlayerSelectionCuboid")
+	if (IsCuboid == nil) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit is not loaded"))
+		return true
+	elseif (IsCuboid == false) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, the selection is not a cuboid"))
+		return true
+	end
+	
+	-- Get the selection:
+	local SelCuboid = cCuboid()
+	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "GetPlayerCuboidSelection", a_Player, SelCuboid)
+	if not(IsSuccess) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while getting current selection"))
+		return true
+	end
+	
+	-- Adjust the selection:
+	local NumBlocks = tonumber(a_Split[2] or "1") or 1
+	SelCuboid:Expand(NumBlocks, NumBlocks, 0, 0, NumBlocks, NumBlocks)
+	
+	-- Set the selection:
+	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "SetPlayerCuboidSelection", a_Player, SelCuboid)
+	if not(IsSuccess) then
+		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while setting new selection"))
+		return true
+	end
+	a_Player:SendMessage(cCompositeChat():SetMessageType(mtInformation):AddTextPart("Successfully adjusted the selection by " .. NumBlocks .. " block(s)"))
+	return true
+end
+
+
+
+
+
+function OnPlayerJoined(a_Player)
+	-- Test composite chat chaining:
+	a_Player:SendMessage(cCompositeChat()
+		:AddTextPart("Hello, ")
+		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")
+		:AddSuggestCommandPart(", and welcome.", "/help", "u")
+		:AddRunCommandPart(" SetDay", "/time set 0")
+	)
 end
 
 

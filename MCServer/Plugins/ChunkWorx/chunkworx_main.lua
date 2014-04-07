@@ -122,7 +122,7 @@ function OnTick( DeltaTime )
 				end
 			end
 			WW_instance:QueueSaveAllChunks()
-			WW_instance:UnloadUnusedChunks()
+			WW_instance:QueueUnloadUnusedChunks()
 		end
 	end
 end

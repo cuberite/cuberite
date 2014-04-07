@@ -28,7 +28,7 @@ public:
 	}
 
 
-	void OnUpdate(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		bool Found = false;
 		
@@ -90,6 +90,8 @@ public:
 		switch (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ))
 		{
 			case E_BLOCK_CROPS:
+			case E_BLOCK_POTATOES:
+			case E_BLOCK_CARROTS:
 			case E_BLOCK_MELON_STEM:
 			case E_BLOCK_PUMPKIN_STEM:
 			{

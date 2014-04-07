@@ -22,6 +22,8 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	
+	#define FORMATSTRING(formatIndex, va_argsIndex)
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -37,6 +39,8 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
+	
+	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 #else
 
@@ -59,6 +63,9 @@
 	#define ALIGN_16
 	*/
 
+	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
+
+
 #endif
 
 
@@ -73,6 +80,8 @@ typedef short     Int16;
 typedef unsigned long long UInt64;
 typedef unsigned int       UInt32;
 typedef unsigned short     UInt16;
+
+typedef unsigned char Byte;
 
 
 
@@ -223,12 +232,8 @@ public:
 
 
 
-#include "cryptopp/randpool.h"
-#include "cryptopp/aes.h"
-#include "cryptopp/rsa.h"
-#include "cryptopp/modes.h"
+#include "../../src/Crypto.h"
 
-using namespace CryptoPP;
 
 
 

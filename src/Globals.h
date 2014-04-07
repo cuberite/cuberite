@@ -29,6 +29,9 @@
 	
 	// Disabling this warning, because we know what we're doing when we're doing this:
 	#pragma warning(disable: 4355)  // 'this' used in initializer list
+
+	// Disabled because it's useless:
+	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
 	
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
 	// #pragma warning(3 : 4244) // Conversion from 'type1' to 'type2', possible loss of data
@@ -38,14 +41,25 @@
 	// No alignment needed in MSVC
 	#define ALIGN_8
 	#define ALIGN_16
+	
+	#define FORMATSTRING(formatIndex, va_argsIndex)
+
+	// MSVC has its own custom version of zu format
+	#define SIZE_T_FMT "%Iu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
+	#define SIZE_T_FMT_HEX "%Ix"
+	
+	#define NORETURN      __declspec(noreturn)
 
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
 
-	// TODO: Can GCC mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
-	#define override
+	// override is part of c++11
+	#if __cplusplus < 201103L
+  		#define override
+	#endif	
 
 	#define OBSOLETE __attribute__((deprecated))
 
@@ -54,6 +68,14 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
+	
+	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
+
+	#define SIZE_T_FMT "%zu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
+	#define SIZE_T_FMT_HEX "%zx"
+	
+	#define NORETURN      __attribute((__noreturn__))
 
 #else
 
@@ -79,7 +101,14 @@
 #endif
 
 
+#ifdef  _DEBUG
+	#define NORETURNDEBUG NORETURN
+#else
+	#define NORETURNDEBUG
+#endif
 
+
+#include <stddef.h>
 
 
 // Integral types with predefined sizes:
@@ -91,8 +120,26 @@ typedef unsigned long long UInt64;
 typedef unsigned int       UInt32;
 typedef unsigned short     UInt16;
 
+typedef unsigned char Byte;
 
 
+// If you get an error about specialization check the size of integral types
+template <typename T, size_t Size, bool x = sizeof(T) == Size>
+class SizeChecker;
+
+template <typename T, size_t Size>
+class SizeChecker<T, Size, true>
+{
+  T v;
+};
+
+template class SizeChecker<Int64, 8>;
+template class SizeChecker<Int32, 4>;
+template class SizeChecker<Int16, 2>;
+
+template class SizeChecker<UInt64, 8>;
+template class SizeChecker<UInt32, 4>;
+template class SizeChecker<UInt16, 2>;
 
 // A macro to disallow the copy constructor and operator= functions
 // This should be used in the private: declarations for any class that shouldn't allow copying itself
@@ -174,7 +221,7 @@ typedef unsigned short     UInt16;
 #include <memory>
 #include <set>
 #include <queue>
-
+#include <limits>
 
 
 
@@ -215,17 +262,42 @@ typedef unsigned short     UInt16;
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
 
+// Same as assert but in all Self test builds
+#ifdef SELF_TEST
+#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
+#endif
 
 
 
 
-/// A generic interface used mainly in ForEach() functions
+
+/** A generic interface used mainly in ForEach() functions */
 template <typename Type> class cItemCallback
 {
 public:
-	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating
+	virtual ~cItemCallback() {}
+	
+	/** Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
 	virtual bool Item(Type * a_Type) = 0;
 } ;
+
+
+
+
+/** Clamp X to the specified range. */
+template <typename T>
+T Clamp(T a_Value, T a_Min, T a_Max)
+{
+	return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
+}
+
+
+
+
+
+#ifndef TOLUA_TEMPLATE_BIND
+#define TOLUA_TEMPLATE_BIND(x)
+#endif
 
 
 
@@ -235,8 +307,7 @@ public:
 #include "ChunkDef.h"
 #include "BiomeDef.h"
 #include "BlockID.h"
+#include "BlockInfo.h"
 #include "Entities/Effects.h"
-
-
 
 

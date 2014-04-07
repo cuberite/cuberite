@@ -1,6 +1,7 @@
 Debug
 Release
 Logs/
+lib/
 *.log
 *.nbt
 *.sln

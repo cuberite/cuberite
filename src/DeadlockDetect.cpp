@@ -7,7 +7,7 @@
 #include "DeadlockDetect.h"
 #include "Root.h"
 #include "World.h"
-# include <cstdlib>
+#include <cstdlib>
 
 
 
@@ -15,9 +15,6 @@
 
 /// Number of milliseconds per cycle
 const int CYCLE_MILLISECONDS = 100;
-
-/// When the number of cycles for the same world age hits this value, it is considered a deadlock
-const int NUM_CYCLES_LIMIT = 200;  // 200 = twenty seconds
 
 
 
@@ -121,7 +118,6 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 		if (itr->second.m_NumCyclesSame > (1000 * m_IntervalSec) / CYCLE_MILLISECONDS)
 		{
 			DeadlockDetected();
-			return;
 		}
 	}
 	else

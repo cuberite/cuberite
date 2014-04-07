@@ -5,20 +5,26 @@
 #include "../ClientHandle.h"
 
 
-cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward) :
-	cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98),
-	m_Reward(a_Reward)
+cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
+	:	cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
+	, m_Reward(a_Reward)
+	, m_Timer(0.f)
 {
+	SetMaxHealth(5);
+	SetHealth(5);
 }
 
 
 
 
 
-cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward) :
-	cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98),
-	m_Reward(a_Reward)
+cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
+	:	cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
+	, m_Reward(a_Reward)
+	, m_Timer(0.f)
 {
+	SetMaxHealth(5);
+	SetHealth(5);
 }
 
 
@@ -51,7 +57,10 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
 			a_ClosestPlayer->DeltaExperience(m_Reward);
-			Destroy(true);
+			
+			m_World->BroadcastSoundEffect("random.orb", (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+			
+			Destroy();
 		}
 		a_Distance.Normalize();
 		a_Distance *= ((float) (5.5 - Distance));
@@ -61,4 +70,10 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 		BroadcastMovementUpdate();
 	}
 	HandlePhysics(a_Dt, a_Chunk);
+	
+	m_Timer += a_Dt;
+	if (m_Timer >= 1000 * 60 * 5)  // 5 minutes
+	{
+		Destroy(true);
+	}
 }

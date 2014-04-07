@@ -5,10 +5,14 @@
 #include "../World.h"
 #include "../Root.h"
 #include "../Bindings/PluginManager.h"
+#include "../Chunk.h"
+#include "BlockAnvil.h"
 #include "BlockBed.h"
+#include "BlockBigFlower.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
 #include "BlockCactus.h"
+#include "BlockCake.h"
 #include "BlockCarpet.h"
 #include "BlockCauldron.h"
 #include "BlockChest.h"
@@ -34,10 +38,13 @@
 #include "BlockGlass.h"
 #include "BlockGlowstone.h"
 #include "BlockGravel.h"
+#include "BlockMobHead.h"
 #include "BlockHopper.h"
 #include "BlockIce.h"
 #include "BlockLadder.h"
 #include "BlockLeaves.h"
+#include "BlockLilypad.h"
+#include "BlockNewLeaves.h"
 #include "BlockLever.h"
 #include "BlockMelon.h"
 #include "BlockMushroom.h"
@@ -49,13 +56,16 @@
 #include "BlockPlanks.h"
 #include "BlockPortal.h"
 #include "BlockPumpkin.h"
+#include "BlockQuartz.h"
 #include "BlockRail.h"
 #include "BlockRedstone.h"
 #include "BlockRedstoneLamp.h"
 #include "BlockRedstoneRepeater.h"
 #include "BlockRedstoneTorch.h"
+#include "BlockTNT.h"
 #include "BlockSand.h"
 #include "BlockSapling.h"
+#include "BlockSideways.h"
 #include "BlockSign.h"
 #include "BlockSlab.h"
 #include "BlockSnow.h"
@@ -67,35 +77,7 @@
 #include "BlockTorch.h"
 #include "BlockTrapdoor.h"
 #include "BlockVine.h"
-#include "BlockWood.h"
 #include "BlockWorkbench.h"
-
-
-
-
-
-bool            cBlockHandler::m_HandlerInitialized = false;
-cBlockHandler * cBlockHandler::m_BlockHandler[256];
-
-
-
-
-
-cBlockHandler * cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
-{
-	if (!m_HandlerInitialized)
-	{
-		// We have to initialize
-		memset(m_BlockHandler, 0, sizeof(m_BlockHandler));
-		m_HandlerInitialized = true;
-	}
-	if (m_BlockHandler[a_BlockType] != NULL)
-	{
-		return m_BlockHandler[a_BlockType];
-	}
-
-	return m_BlockHandler[a_BlockType] = CreateBlockHandler(a_BlockType);
-}
 
 
 
@@ -106,13 +88,17 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 	switch(a_BlockType)
 	{
 		// Block handlers, alphabetically sorted:
+		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
 		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
+		case E_BLOCK_BIG_FLOWER:            return new cBlockBigFlowerHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:     return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BREWING_STAND:         return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BROWN_MUSHROOM:        return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_CACTUS:                return new cBlockCactusHandler          (a_BlockType);
+		case E_BLOCK_CAKE:                  return new cBlockCakeHandler            (a_BlockType);
 		case E_BLOCK_CARROTS:               return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_CARPET:                return new cBlockCarpetHandler          (a_BlockType);
 		case E_BLOCK_CAULDRON:              return new cBlockCauldronHandler        (a_BlockType);
@@ -124,6 +110,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COBBLESTONE_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_COBWEB:                return new cBlockCobWebHandler          (a_BlockType);
 		case E_BLOCK_CROPS:                 return new cBlockCropsHandler           (a_BlockType);
+		case E_BLOCK_DARK_OAK_WOOD_STAIRS:  return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_DEAD_BUSH:             return new cBlockDeadBushHandler        (a_BlockType);
 		case E_BLOCK_DETECTOR_RAIL:         return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_DIAMOND_ORE:           return new cBlockOreHandler             (a_BlockType);
@@ -145,6 +132,8 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GLASS:                 return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
+		case E_BLOCK_HAY_BALE:              return new cBlockSidewaysHandler        (a_BlockType);
+		case E_BLOCK_HEAD:                  return new cBlockMobHeadHandler         (a_BlockType);
 		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);
 		case E_BLOCK_ICE:                   return new cBlockIceHandler             (a_BlockType);
 		case E_BLOCK_INACTIVE_COMPARATOR:   return new cBlockComparatorHandler      (a_BlockType);
@@ -158,14 +147,18 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_LAVA:                  return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
+		case E_BLOCK_LILY_PAD:              return new cBlockLilypadHandler         (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
-		case E_BLOCK_LOG:                   return new cBlockWoodHandler            (a_BlockType);
+		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
 		case E_BLOCK_MYCELIUM:              return new cBlockMyceliumHandler        (a_BlockType);
 		case E_BLOCK_NETHER_BRICK_STAIRS:   return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_NETHER_PORTAL:         return new cBlockPortalHandler          (a_BlockType);
 		case E_BLOCK_NETHER_WART:           return new cBlockNetherWartHandler      (a_BlockType);
+		case E_BLOCK_NETHER_QUARTZ_ORE:     return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_NEW_LEAVES:            return new cBlockNewLeavesHandler       (a_BlockType);
+		case E_BLOCK_NEW_LOG:               return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      (           );
@@ -174,6 +167,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_PUMPKIN:               return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_QUARTZ_BLOCK:          return new cBlockQuartzHandler          (a_BlockType);
 		case E_BLOCK_QUARTZ_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_REDSTONE_LAMP_ON:      return new cBlockRedstoneLampHandler    (a_BlockType); // We need this to change pickups to an off lamp; else 1.7+ clients crash
@@ -183,7 +177,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_REDSTONE_REPEATER_ON:  return new cBlockRedstoneRepeaterHandler(a_BlockType);
 		case E_BLOCK_REDSTONE_TORCH_OFF:    return new cBlockRedstoneTorchHandler   (a_BlockType);
 		case E_BLOCK_REDSTONE_TORCH_ON:     return new cBlockRedstoneTorchHandler   (a_BlockType);
-		case E_BLOCK_REDSTONE_WIRE:	        return new cBlockRedstoneHandler        (a_BlockType);
+		case E_BLOCK_REDSTONE_WIRE:         return new cBlockRedstoneHandler        (a_BlockType);
 		case E_BLOCK_RED_MUSHROOM:          return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_RED_ROSE:              return new cBlockFlowerHandler          (a_BlockType);
 		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
@@ -203,6 +197,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_TALL_GRASS:            return new cBlockTallGrassHandler       (a_BlockType);
 		case E_BLOCK_TORCH:                 return new cBlockTorchHandler           (a_BlockType);
 		case E_BLOCK_TRAPDOOR:              return new cBlockTrapdoorHandler        (a_BlockType);
+		case E_BLOCK_TNT:                   return new cBlockTNTHandler             (a_BlockType);
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);
@@ -222,20 +217,6 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 
 
 
-void cBlockHandler::Deinit()
-{
-	for (int i = 0; i < 256; i++)
-	{
-		delete m_BlockHandler[i];
-	}
-	memset(m_BlockHandler, 0, sizeof(m_BlockHandler));  // Don't leave any dangling pointers around, just in case
-	m_HandlerInitialized = false;
-}
-
-
-
-
-
 cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 {
 	m_BlockType = a_BlockType;
@@ -246,8 +227,8 @@ cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 
 
 bool cBlockHandler::GetPlacementBlockTypeMeta(
-	cWorld * a_World, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+	cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )
@@ -262,7 +243,7 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 
 
 
-void cBlockHandler::OnUpdate(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -270,7 +251,7 @@ void cBlockHandler::OnUpdate(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a
 
 
 
-void cBlockHandler::OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cBlockHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 }
 
@@ -278,7 +259,7 @@ void cBlockHandler::OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a
 
 
 
-void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -286,41 +267,41 @@ void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int
 
 
 
-void cBlockHandler::OnPlaced(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	// Notify the neighbors
-	NeighborChanged(a_World, a_BlockX - 1, a_BlockY, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX + 1, a_BlockY, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ - 1);
-	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ + 1);
-}
-
-
-
-
-
-void cBlockHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	// Notify the neighbors
-	NeighborChanged(a_World, a_BlockX - 1, a_BlockY, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX + 1, a_BlockY, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ);
-	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ - 1);
-	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ + 1);
+	NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ - 1);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ + 1);
 }
 
 
 
 
 
-void cBlockHandler::NeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	// Notify the neighbors
+	NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ - 1);
+	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ + 1);
+}
+
+
+
+
+
+void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	if ((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height))
 	{
-		GetBlockHandler(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ);
+		cBlockInfo::GetHandler(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 	}
 }
 
@@ -328,7 +309,7 @@ void cBlockHandler::NeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY,
 
 
 
-void cBlockHandler::OnNeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -336,7 +317,7 @@ void cBlockHandler::OnNeighborChanged(cWorld *a_World, int a_BlockX, int a_Block
 
 
 
-void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnDigging(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -344,7 +325,15 @@ void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, 
 
 
 
-void cBlockHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+void cBlockHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+}
+
+
+
+
+
+void cBlockHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 {
 }
 
@@ -362,14 +351,14 @@ void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 
 
 
-void cBlockHandler::DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cItems Pickups;
-	NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 	ConvertToPickups(Pickups, Meta);
 	
 	// Allow plugins to modify the pickups:
-	cRoot::Get()->GetPluginManager()->CallHookBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
+	a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
 	
 	if (!Pickups.empty())
 	{
@@ -385,7 +374,7 @@ void cBlockHandler::DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX
 		MicroX += r1.rand(1) - 0.5;
 		MicroZ += r1.rand(1) - 0.5;
 
-		a_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
+		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}
 }
 
@@ -402,7 +391,7 @@ const char * cBlockHandler::GetStepSound()
 
 
 
-bool cBlockHandler::CanBeAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
+bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
 {
 	return true;
 }
@@ -447,15 +436,15 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 
-void cBlockHandler::Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
+void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
 {
-	if (!CanBeAt(a_RelX, a_RelY, a_RelZ, a_Chunk))
+	if (!CanBeAt(a_ChunkInterface, a_RelX, a_RelY, a_RelZ, a_Chunk))
 	{
 		if (DoesDropOnUnsuitable())
 		{
 			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-			DropBlock(a_Chunk.GetWorld(), NULL, BlockX, a_RelY, BlockZ);
+			DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
 		}
 		
 		a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);

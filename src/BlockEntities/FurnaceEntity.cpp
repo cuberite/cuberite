@@ -94,6 +94,8 @@ bool cFurnaceEntity::ContinueCooking(void)
 
 bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	if (m_FuelBurnTime <= 0)
 	{
 		// No fuel is burning, reset progressbars and bail out
@@ -110,7 +112,7 @@ bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		if (m_TimeCooked >= m_NeedCookTime)
 		{
 			// Finished smelting one item
-			FinishOne(a_Chunk);
+			FinishOne();
 		}
 	}
 	
@@ -208,7 +210,7 @@ void cFurnaceEntity::BroadcastProgress(int a_ProgressbarID, short a_Value)
 
 
 /// One item finished cooking
-void cFurnaceEntity::FinishOne(cChunk & a_Chunk)
+void cFurnaceEntity::FinishOne()
 {
 	m_TimeCooked = 0;
 

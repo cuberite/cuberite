@@ -12,6 +12,7 @@
 #include "../CommandOutput.h"
 #include "../Root.h"
 #include "../Server.h" // ExecuteConsoleCommand()
+#include "../Chunk.h"
 
 
 
@@ -126,6 +127,8 @@ void cCommandBlockEntity::SetRedstonePower(bool a_IsPowered)
 
 bool cCommandBlockEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	if (!m_ShouldExecute)
 	{
 		return false;
@@ -151,9 +154,13 @@ void cCommandBlockEntity::SendTo(cClientHandle & a_Client)
 
 bool cCommandBlockEntity::LoadFromJson(const Json::Value & a_Value)
 {
-	m_Command = a_Value.get("Command", "").asString();
+	m_PosX = a_Value.get("x", 0).asInt();
+	m_PosY = a_Value.get("y", 0).asInt();
+	m_PosZ = a_Value.get("z", 0).asInt();
 
-	m_LastOutput = a_Value.get("LastOutput", "").asString();
+	m_Command    = a_Value.get("Command",     "").asString();
+	m_LastOutput = a_Value.get("LastOutput",  "").asString();
+	m_Result     = (NIBBLETYPE)a_Value.get("SuccessCount", 0).asInt();
 
 	return true;
 }
@@ -164,9 +171,13 @@ bool cCommandBlockEntity::LoadFromJson(const Json::Value & a_Value)
 
 void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 {
-	a_Value["Command"] = m_Command;
+	a_Value["x"] = m_PosX;
+	a_Value["y"] = m_PosY;
+	a_Value["z"] = m_PosZ;
 
-	a_Value["LastOutput"] = m_LastOutput;
+	a_Value["Command"]      = m_Command;
+	a_Value["LastOutput"]   = m_LastOutput;
+	a_Value["SuccessCount"] = m_Result;
 }
 
 
@@ -175,18 +186,24 @@ void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 
 void cCommandBlockEntity::Execute()
 {
+	if (m_World != NULL)
+	{
+		if (!m_World->AreCommandBlocksEnabled())
+		{
+			return;
+		}
+	}
+
 	class CommandBlockOutCb :
 		public cCommandOutputCallback
 	{
-		cCommandBlockEntity* m_CmdBlock;
+		cCommandBlockEntity * m_CmdBlock;
 
 	public:
-		CommandBlockOutCb(cCommandBlockEntity* a_CmdBlock) : m_CmdBlock(a_CmdBlock) {}
+		CommandBlockOutCb(cCommandBlockEntity * a_CmdBlock) : m_CmdBlock(a_CmdBlock) {}
 
 		virtual void Out(const AString & a_Text)
 		{
-			ASSERT(m_CmdBlock != NULL);
-
 			// Overwrite field
 			m_CmdBlock->SetLastOutput(a_Text);
 		}
@@ -194,7 +211,7 @@ void cCommandBlockEntity::Execute()
 
 	LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
 
-	cServer* Server = cRoot::Get()->GetServer();
+	cServer * Server = cRoot::Get()->GetServer();
 
 	Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
 

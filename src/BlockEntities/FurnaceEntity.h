@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-#include "../UI/WindowOwner.h"
 #include "../FurnaceRecipe.h"
 
 
@@ -23,8 +22,7 @@ class cServer;
 
 // tolua_begin
 class cFurnaceEntity :
-	public cBlockEntityWithItems,
-	public cBlockEntityWindowOwner
+	public cBlockEntityWithItems
 {
 	typedef cBlockEntityWithItems super;
 	
@@ -128,7 +126,7 @@ protected:
 	void BroadcastProgress(int a_ProgressbarID, short a_Value);
 	
 	/// One item finished cooking
-	void FinishOne(cChunk & a_Chunk);
+	void FinishOne();
 	
 	/// Starts burning a new fuel, if possible
 	void BurnNewFuel(void);

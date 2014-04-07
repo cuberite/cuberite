@@ -20,9 +20,7 @@
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/BlockSlab.h"
-
-#include "Vector3f.h"
-#include "Vector3d.h"
+#include "Blocks/ChunkInterface.h"
 
 #include "Root.h"
 
@@ -30,29 +28,18 @@
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
+#include "CompositeChat.h"
+#include "Items/ItemSword.h"
 
 
 
+/** Maximum number of explosions to send this tick, server will start dropping if exceeded */
+#define MAX_EXPLOSIONS_PER_TICK 20
 
+/** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
+#define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
-#define AddPistonDir(x, y, z, dir, amount) switch (dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
-													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
-													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
-
-
-
-
-
-/// If the number of queued outgoing packets reaches this, the client will be kicked
-#define MAX_OUTGOING_PACKETS 2000
-
-/// How many explosions per single game tick are allowed
-static const int MAX_EXPLOSIONS_PER_TICK = 100;
-
-/// How many explosions in the recent history are allowed
-static const int MAX_RUNNING_SUM_EXPLOSIONS = cClientHandle::NUM_CHECK_EXPLOSIONS_TICKS * MAX_EXPLOSIONS_PER_TICK / 8;
-
-/// How many ticks before the socket is closed after the client is destroyed (#31)
+/** How many ticks before the socket is closed after the client is destroyed (#31) */
 static const int TICKS_BEFORE_CLOSE = 20;
 
 
@@ -94,10 +81,10 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_TicksSinceDestruction(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),
-	m_CurrentExplosionTick(0),
-	m_RunningSumExplosions(0),
+	m_NumExplosionsThisTick(0),
 	m_UniqueID(0),
-	m_HasSentPlayerChunk(false)
+	m_HasSentPlayerChunk(false),
+	m_Locale("en_GB")
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -146,15 +133,6 @@ cClientHandle::~cClientHandle()
 	if (!m_HasSentDC)
 	{
 		SendDisconnect("Server shut down? Kthnxbai");
-	}
-	
-	// Queue all remaining outgoing packets to cSocketThreads:
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		AString Data;
-		m_OutgoingData.ReadAll(Data);
-		m_OutgoingData.CommitRead();
-		cRoot::Get()->GetServer()->WriteToClient(this, Data);
 	}
 	
 	// Close the socket as soon as it sends all outgoing data:
@@ -235,7 +213,11 @@ void cClientHandle::Authenticate(void)
 
 	m_Player->SetIP (m_IPString);
 
-	cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player);
+	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
+	{
+		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
+		LOGINFO("Player %s has joined the game.", m_Username.c_str());
+	}
 	
 	m_ConfirmPosition = m_Player->GetPosition();
 
@@ -262,6 +244,12 @@ void cClientHandle::Authenticate(void)
 	
 	m_Player->Initialize(World);
 	m_State = csAuthenticated;
+
+	// Query player team
+	m_Player->UpdateTeam();
+
+	// Send scoreboard data
+	World->GetScoreBoard().SendTo(*this);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -542,18 +530,35 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	if (a_Channel == "MC|AdvCdm") // Command block, set text, Client -> Server
+	if (a_Channel == "MC|AdvCdm")
 	{
-		const char* Data = a_Message.c_str();
-		HandleCommandBlockMessage(Data, a_Message.size());
-		return;
+		// Command block, set text, Client -> Server
+		HandleCommandBlockMessage(a_Message.c_str(), a_Message.size());
 	}
-	else if (a_Channel == "MC|Brand") // Client <-> Server branding exchange
+	else if (a_Channel == "MC|Brand")
 	{
-		// We are custom,
-		// We are awesome,
-		// We are MCServer.
+		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
+	}
+	else if (a_Channel == "REGISTER")
+	{
+		if (HasPluginChannel(a_Channel))
+		{
+			SendPluginMessage("UNREGISTER", a_Channel);
+			return; // Can't register again if already taken - kinda defeats the point of plugin messaging!
+		}
+
+		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
+	}
+	else if (a_Channel == "UNREGISTER")
+	{
+		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
+	}
+	else if (!HasPluginChannel(a_Channel))
+	{
+		// Ignore if client sent something but didn't register the channel first
+		LOGD("Player %s sent a plugin message on channel \"%s\", but didn't REGISTER it first", GetUsername().c_str(), a_Channel.c_str());
+		SendPluginMessage("UNREGISTER", a_Channel);
 		return;
 	}
 
@@ -564,11 +569,65 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a_Length)
+AStringVector cClientHandle::BreakApartPluginChannels(const AString & a_PluginChannels)
+{
+	// Break the string on each NUL character.
+	// Note that StringSplit() doesn't work on this because NUL is a special char - string terminator
+	size_t len = a_PluginChannels.size();
+	size_t first = 0;
+	AStringVector res;
+	for (size_t i = 0; i < len; i++)
+	{
+		if (a_PluginChannels[i] != 0)
+		{
+			continue;
+		}
+		if (i > first)
+		{
+			res.push_back(a_PluginChannels.substr(first, i - first));
+		}
+		first = i + 1;
+	}  // for i - a_PluginChannels[]
+	if (first < len)
+	{
+		res.push_back(a_PluginChannels.substr(first, len - first));
+	}
+	return res;
+}
+
+
+
+
+
+void cClientHandle::RegisterPluginChannels(const AStringVector & a_ChannelList)
+{
+	for (AStringVector::const_iterator itr = a_ChannelList.begin(), end = a_ChannelList.end(); itr != end; ++itr)
+	{
+		m_PluginChannels.insert(*itr);
+	}  // for itr - a_ChannelList[]
+}
+
+
+
+
+
+void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList)
+{
+	for (AStringVector::const_iterator itr = a_ChannelList.begin(), end = a_ChannelList.end(); itr != end; ++itr)
+	{
+		m_PluginChannels.erase(*itr);
+	}  // for itr - a_ChannelList[]
+}
+
+
+
+
+
+void cClientHandle::HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length)
 {
 	if (a_Length < 14)
 	{
-		SendChat(Printf("%s[INFO]%s Failure setting command block command; bad request", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+		SendChat("Failure setting command block command; bad request", mtFailure);
 		LOGD("Malformed MC|AdvCdm packet.");
 		return;
 	}
@@ -598,54 +657,49 @@ void cClientHandle::HandleCommandBlockMessage(const char* a_Data, unsigned int a
 
 		default:
 		{
-			SendChat(Printf("%s[INFO]%s Failure setting command block command; unhandled mode", cChatColor::Red.c_str(), cChatColor::White.c_str()));
+			SendChat("Failure setting command block command; unhandled mode", mtFailure);
 			LOGD("Unhandled MC|AdvCdm packet mode.");
 			return;
 		}
 	}
 
-	class cUpdateCommandBlock :
-		public cCommandBlockCallback
-	{
-		AString m_Command;
-	public:
-		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
-			
-		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
-		{
-			a_CommandBlock->SetCommand(m_Command);
-			return false;
-		}
-	} CmdBlockCB (Command);
-
 	cWorld * World = m_Player->GetWorld();
 
-	World->DoWithCommandBlockAt(BlockX, BlockY, BlockZ, CmdBlockCB);
-
-	SendChat(Printf("%s[INFO]%s Successfully set command block command", cChatColor::Green.c_str(), cChatColor::White.c_str()));
+	if (World->AreCommandBlocksEnabled())
+	{
+		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
+		
+		SendChat("Successfully set command block command", mtSuccess);
+	}
+	else
+	{
+		SendChat("Command blocks are not enabled on this server", mtFailure);
+	}
 }
 
 
 
 
 
-void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status)
 {
 	LOGD("HandleLeftClick: {%i, %i, %i}; Face: %i; Stat: %i",
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
 	);
+
+	m_NumBlockChangeInteractionsThisTick++;
+
+	if (!CheckBlockInteractionsRate())
+	{
+		Kick("Too many blocks were destroyed per unit time - hacked client?");
+		return;
+	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
-	}
-	
-	if (!CheckBlockInteractionsRate())
-	{
-		// Too many interactions per second, simply ignore. Probably a hacked client, so don't even send bak the block
 		return;
 	}
 
@@ -658,7 +712,8 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
 			}
-			m_Player->TossItem(false);
+
+			m_Player->TossEquippedItem();
 			return;
 		}
 
@@ -713,7 +768,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
 			}
-			m_Player->TossItem(false, 64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
+			m_Player->TossEquippedItem(64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
 			return;
 		}
 
@@ -729,7 +784,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 
 
 
-void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
 	if (
 		m_HasStartedDigging &&
@@ -739,6 +794,15 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	)
 	{
 		// It is a duplicate packet, drop it right away
+		return;
+	}
+	
+	if (
+		m_Player->IsGameModeCreative() &&
+		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType)
+	)
+	{
+		// Players can't destroy blocks with a Sword in the hand.
 		return;
 	}
 	
@@ -757,7 +821,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
-		g_BlockOneHitDig[a_OldBlock]                        // One-hit blocks get destroyed immediately, too
+		cBlockInfo::IsOneHitDig(a_OldBlock)  // One-hit blocks get destroyed immediately, too
 	)
 	{
 		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
@@ -775,9 +839,9 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 0, this);
 
 	cWorld * World = m_Player->GetWorld();
-	
-	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(a_OldBlock);
-	Handler->OnDigging(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+	cChunkInterface ChunkInterface(World->GetChunkMap());
+	cBlockHandler * Handler = cBlockInfo::GetHandler(a_OldBlock);
+	Handler->OnDigging(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
@@ -790,11 +854,11 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		int pZ = a_BlockZ;
 
 		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
-		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
+		Handler = cBlockInfo::GetHandler(World->GetBlock(pX, pY, pZ));
 
 		if (Handler->IsClickedThrough())
 		{
-			Handler->OnDigging(World, m_Player, pX, pY, pZ);
+			Handler->OnDigging(ChunkInterface, *World, m_Player, pX, pY, pZ);
 		}
 	}
 }
@@ -803,7 +867,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
 	if (
 		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
@@ -815,7 +879,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		LOGD("Prevented a dig/aim bug in the client (finish {%d, %d, %d} vs start {%d, %d, %d}, HSD: %s)",
 			a_BlockX, a_BlockY, a_BlockZ,
 			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
-			m_HasStartedDigging
+			(m_HasStartedDigging ? "True" : "False")
 		);
 		return;
 	}
@@ -840,8 +904,8 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	cWorld * World = m_Player->GetWorld();
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
-	
-	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+	cChunkInterface ChunkInterface(World->GetChunkMap());
+	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	World->BroadcastSoundParticleEffect(2001, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
@@ -852,27 +916,37 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 
 
-void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem)
+void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem)
 {
 	LOGD("HandleRightClick: {%d, %d, %d}, face %d, HeldItem: %s",
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
 	
+	cWorld * World = m_Player->GetWorld();
+	
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		if (a_BlockFace > -1)
+		cChunkInterface ChunkInterface(World->GetChunkMap());
+		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player); //2 block high things
 		}
 		return;
 	}
+
+	m_NumBlockChangeInteractionsThisTick++;
 	
 	if (!CheckBlockInteractionsRate())
 	{
-		LOGD("Too many block interactions, aborting placement");
+		Kick("Too many blocks were placed/interacted with per unit time - hacked client?");
 		return;
 	}
 	
@@ -888,20 +962,18 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		);
 		
 		// Let's send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
-		if (a_BlockFace > -1)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		}
 		return;
 	}
-	
-	cWorld * World = m_Player->GetWorld();
 
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	cBlockHandler * BlockHandler = cBlockHandler::GetBlockHandler(BlockType);
+	cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 	
 	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 	{
@@ -910,14 +982,15 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			// A plugin doesn't agree with using the block, abort
 			return;
 		}
-		BlockHandler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+		cChunkInterface ChunkInterface(World->GetChunkMap());
+		BlockHandler->OnUse(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 		PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 		return;
 	}
 	
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
-	if (ItemHandler->IsPlaceable())
+	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
@@ -953,8 +1026,9 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler)
+void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler)
 {
+	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
 	if (a_BlockFace < 0)
 	{
 		// Clicked in air
@@ -965,7 +1039,6 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 	BLOCKTYPE ClickedBlock;
 	NIBBLETYPE ClickedBlockMeta;
-	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
 	NIBBLETYPE EquippedBlockDamage = (NIBBLETYPE)(m_Player->GetEquippedItem().m_ItemDamage);
 
 	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
@@ -980,10 +1053,10 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	if (
 		cBlockSlabHandler::IsAnySlabType(ClickedBlock) &&               // Is there a slab already?
 		cBlockSlabHandler::IsAnySlabType(EquippedBlock) &&              // Is the player placing another slab?
-		((ClickedBlockMeta & 0x07) == (EquippedBlockDamage & 0x07)) &&  // Is it the same slab type?
+		((ClickedBlockMeta & 0x07) == EquippedBlockDamage) &&           // Is it the same slab type?
 		(
-			(a_BlockFace == BLOCK_FACE_TOP) ||                            // Clicking the top of a bottom slab
-			(a_BlockFace == BLOCK_FACE_BOTTOM)                            // Clicking the bottom of a top slab
+			(a_BlockFace == BLOCK_FACE_TOP) ||                          // Clicking the top of a bottom slab
+			(a_BlockFace == BLOCK_FACE_BOTTOM)                          // Clicking the bottom of a top slab
 		)
 	)
 	{
@@ -991,7 +1064,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		// If clicked top face and slab occupies the top voxel, we want a slab to be placed above it (therefore increment Y)
 		// Else if clicked bottom face and slab occupies the bottom voxel, decrement Y for the same reason
 		// Don't touch coordinates if anything else because a dblslab opportunity is present
-		if((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
+		if ((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
 		{
 			++a_BlockY;
 		}
@@ -1009,7 +1082,8 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(m_Player, ClickedBlockMeta)
 			)
 		{
-			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+			cChunkInterface ChunkInterface(World->GetChunkMap());
+			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 		}
 		else
 		{
@@ -1066,11 +1140,12 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	
 	// The actual block placement:
 	World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	if (m_Player->GetGameMode() != gmCreative)
+	if (!m_Player->IsGameModeCreative())
 	{
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
-	NewBlock->OnPlacedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+	cChunkInterface ChunkInterface(World->GetChunkMap());
+	NewBlock->OnPlacedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
 	// Step sound with 0.8f pitch is used as block placement sound
 	World->BroadcastSoundEffect(NewBlock->GetStepSound(), a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
@@ -1092,14 +1167,20 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		return;
 	}
 	
-	// Not a command, broadcast as a simple message:
-	AString Msg;
-	Printf(Msg, "%s<%s>%s %s",
-		m_Player->GetColor().c_str(),
-		m_Player->GetName().c_str(),
-		cChatColor::White.c_str(),
-		Message.c_str()
-	);
+	// Not a command, broadcast as a message:
+	cCompositeChat Msg;
+	AString Color = m_Player->GetColor();
+	if (Color.length() == 3)
+	{
+		Color = AString("@") + Color[2];
+	}
+	else
+	{
+		Color.empty();
+	}
+	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
+	Msg.ParseText(a_Message);
+	Msg.UnderlineUrls();
 	m_Player->GetWorld()->BroadcastChat(Msg);
 }
 
@@ -1335,13 +1416,9 @@ void cClientHandle::HandleRespawn(void)
 void cClientHandle::HandleDisconnect(const AString & a_Reason)
 {
 	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
-	if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason))
-	{
-		AString DisconnectMessage;
-		Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
-		cRoot::Get()->BroadcastChat(DisconnectMessage);
-		LOGINFO("Player %s has left the game.", m_Username.c_str());
-	}
+
+	cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason);
+
 	m_HasSentDC = true;
 	Destroy();
 }
@@ -1380,7 +1457,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
-void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
+void cClientHandle::HandleEntityCrouch(int a_EntityID, bool a_IsCrouching)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -1388,35 +1465,37 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 		return;
 	}
 
-	switch (a_ActionID)
+	m_Player->SetCrouch(a_IsCrouching);
+}
+
+
+
+
+
+void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
+{
+	if (a_EntityID != m_Player->GetUniqueID())
 	{
-		case 1:  // Crouch
-		{
-			m_Player->SetCrouch(true);
-			break;
-		}
-		case 2:  // Uncrouch
-		{
-			m_Player->SetCrouch(false);
-			break;
-		}
-		case 3:  // Leave bed
-		{
-			m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
-			break;
-		}
-		case 4:  // Start sprinting
-		{
-			m_Player->SetSprint(true);
-			break;
-		}
-		case 5:  // Stop sprinting
-		{
-			m_Player->SetSprint(false);
-			SendPlayerMaxSpeed();
-			break;
-		}
+		// We should only receive entity actions from the entity that is performing the action
+		return;
 	}
+
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
+}
+
+
+
+
+
+void cClientHandle::HandleEntitySprinting(int a_EntityID, bool a_IsSprinting)
+{
+	if (a_EntityID != m_Player->GetUniqueID())
+	{
+		// We should only receive entity actions from the entity that is performing the action
+		return;
+	}
+
+	m_Player->SetSprint(a_IsSprinting);
 }
 
 
@@ -1453,7 +1532,7 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 
 
-void cClientHandle::SendData(const char * a_Data, int a_Size)
+void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_HasSentDC)
 	{
@@ -1468,7 +1547,7 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 		if (m_OutgoingDataOverflow.empty())
 		{
 			// No queued overflow data; if this packet fits into the ringbuffer, put it in, otherwise put it in the overflow buffer:
-			int CanFit = m_OutgoingData.GetFreeSpace();
+			size_t CanFit = m_OutgoingData.GetFreeSpace();
 			if (CanFit > a_Size)
 			{
 				CanFit = a_Size;
@@ -1529,10 +1608,8 @@ void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
 	
-	// Do NOT stream new chunks, the new world runs its own tick thread and may deadlock
-	// Instead, the chunks will be streamed when the client is moved to the new world's Tick list,
-	// by setting state to csAuthenticated
-	m_State = csAuthenticated;
+	// StreamChunks() called in cPlayer::MoveToWorld() after new world has been set
+	// Meanwhile here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
 	m_HasSentPlayerChunk = false;
@@ -1546,28 +1623,12 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 {
 	ASSERT(m_Player != NULL);
 	ASSERT(m_Player->GetWorld() != NULL);
-	/*
-	// TODO: _X 2012_11_01: This needs a total re-thinking and rewriting
-	int LastActionCnt = m_Player->GetLastBlockActionCnt();
-	if ((m_Player->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1)
+
+	if (m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS)
 	{
-		// Limit the number of block interactions per tick
-		m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-		m_Player->SetLastBlockActionCnt(LastActionCnt + 1);
-		if (m_Player->GetLastBlockActionCnt() > MAXBLOCKCHANGEINTERACTIONS)
-		{
-			// Kick if more than MAXBLOCKCHANGEINTERACTIONS per tick
-			LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", m_Username.c_str());
-			Kick("You're a baaaaaad boy!");
-			return false;
-		}
+		return false;
 	}
-	else
-	{
-		m_Player->SetLastBlockActionCnt(0);  // Reset count 
-		m_Player->SetLastBlockActionTime();  // Player tried to interact with a block. Reset last block interation time.
-	}
-	*/
+
 	return true;
 }
 
@@ -1640,10 +1701,9 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 	
-	// Update the explosion statistics:
-	m_CurrentExplosionTick = (m_CurrentExplosionTick + 1) % ARRAYCOUNT(m_NumExplosionsPerTick);
-	m_RunningSumExplosions -= m_NumExplosionsPerTick[m_CurrentExplosionTick];
-	m_NumExplosionsPerTick[m_CurrentExplosionTick] = 0;
+	// Reset explosion & block change counters:
+	m_NumExplosionsThisTick = 0;
+	m_NumBlockChangeInteractionsThisTick = 0;
 }
 
 
@@ -1740,7 +1800,118 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
-void cClientHandle::SendChat(const AString & a_Message)
+void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
+{
+	bool ShouldAppendChatPrefixes = true;
+
+	if (GetPlayer()->GetWorld() == NULL)
+	{
+		cWorld * World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
+		if (World == NULL)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+
+		if (!World->ShouldUseChatPrefixes())
+		{
+			ShouldAppendChatPrefixes = false;
+		}
+	}
+	else if (!GetPlayer()->GetWorld()->ShouldUseChatPrefixes())
+	{
+		ShouldAppendChatPrefixes = false;
+	}
+
+	AString Message;
+
+	switch (a_ChatPrefix)
+	{
+		case mtCustom: break;
+		case mtFailure:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Rose.c_str());
+			break;
+		}
+		case mtInformation:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		case mtSuccess:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Green.c_str());
+			break;
+		}
+		case mtWarning:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Rose.c_str());
+			break;
+		}
+		case mtFatal:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Red.c_str());
+			break;
+		}
+		case mtDeath:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Gray.c_str());
+			break;
+		}
+		case mtPrivateMessage:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+			else
+				Message = Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
+			break;
+		}
+		case mtJoin:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[JOIN] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		case mtLeave:
+		{
+			if (ShouldAppendChatPrefixes)
+				Message = Printf("%s[LEAVE] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				Message = Printf("%s", cChatColor::Yellow.c_str());
+			break;
+		}
+		default: ASSERT(!"Unhandled chat prefix type!"); return;
+	}
+
+	Message.append(a_Message);
+
+	m_Protocol->SendChat(Message);
+}
+
+
+
+
+
+void cClientHandle::SendChat(const cCompositeChat & a_Message)
 {
 	m_Protocol->SendChat(a_Message);
 }
@@ -1923,18 +2094,14 @@ void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 
 void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
-	if (
-		(m_NumExplosionsPerTick[m_CurrentExplosionTick] > MAX_EXPLOSIONS_PER_TICK) ||  // Too many explosions in this tick
-		(m_RunningSumExplosions > MAX_RUNNING_SUM_EXPLOSIONS)  // Too many explosions in the recent history
-	)
+	if (m_NumExplosionsThisTick > MAX_EXPLOSIONS_PER_TICK)
 	{
-		LOGD("Dropped %u explosions", a_BlocksAffected.size());
+		LOGD("Dropped an explosion!");
 		return;
 	}
 	
 	// Update the statistics:
-	m_NumExplosionsPerTick[m_CurrentExplosionTick] += a_BlocksAffected.size();
-	m_RunningSumExplosions += a_BlocksAffected.size();
+	m_NumExplosionsThisTick += 1;
 	
 	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
@@ -1970,6 +2137,33 @@ void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cI
 
 
 
+void cClientHandle::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+}
+
+
+
+
+
+void cClientHandle::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
+}
+
+
+
+
+
+void cClientHandle::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	m_Protocol->SendMapInfo(a_ID, a_Scale);
+}
+
+
+
+
+
 void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
 {
 	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
@@ -1982,6 +2176,14 @@ void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_S
 void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	m_Protocol->SendPickupSpawn(a_Pickup);
+}
+
+
+
+
+void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	m_Protocol->SendPaintingSpawn(a_Painting);
 }
 
 
@@ -2105,6 +2307,33 @@ void cClientHandle::SendExperience(void)
 void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	m_Protocol->SendExperienceOrb(a_ExpOrb);
+}
+
+
+
+
+
+void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+}
+
+
+
+
+
+void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+}
+
+
+
+
+
+void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
 }
 
 
@@ -2324,6 +2553,15 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 
 
 
+bool cClientHandle::HasPluginChannel(const AString & a_PluginChannel)
+{
+	return (m_PluginChannels.find(a_PluginChannel) != m_PluginChannels.end());
+}
+
+
+
+
+
 bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	if (m_State >= csDestroying)
@@ -2395,7 +2633,7 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 
 
 
-void cClientHandle::DataReceived(const char * a_Data, int a_Size)
+void cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
 	m_TimeSinceLastPacket = 0;
@@ -2437,13 +2675,7 @@ void cClientHandle::SocketClosed(void)
 
 	if (m_Username != "") // Ignore client pings
 	{
-		if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected"))
-		{
-			AString DisconnectMessage;
-			Printf(DisconnectMessage, "%s[LEAVE] %s%s has left the game", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), m_Username.c_str());
-			cRoot::Get()->BroadcastChat(DisconnectMessage);
-			LOGINFO("Player %s has left the game.", m_Username.c_str());
-		}
+		cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected");
 	}
 
 	Destroy();

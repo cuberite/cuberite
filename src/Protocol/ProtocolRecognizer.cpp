@@ -68,7 +68,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 
 
 
-void cProtocolRecognizer::DataReceived(const char * a_Data, int a_Size)
+void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_Protocol == NULL)
 	{
@@ -150,6 +150,16 @@ void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSe
 
 
 void cProtocolRecognizer::SendChat(const AString & a_Message)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendChat(a_Message);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendChat(a_Message);
@@ -386,10 +396,48 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 
 
 
+void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendMapInfo(a_ID, a_Scale);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
+}
+
+
+
+
+void cProtocolRecognizer::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	m_Protocol->SendPaintingSpawn(a_Painting);
 }
 
 
@@ -520,6 +568,36 @@ void cProtocolRecognizer::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendExperienceOrb(a_ExpOrb);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
 }
 
 
@@ -716,7 +794,7 @@ AString cProtocolRecognizer::GetAuthServerID(void)
 
 
 
-void cProtocolRecognizer::SendData(const char * a_Data, int a_Size)
+void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 {
 	// This is used only when handling the server ping
 	m_Client->SendData(a_Data, a_Size);
@@ -776,7 +854,7 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	// This must be a lengthed protocol, try if it has the entire initial handshake packet:
 	m_Buffer.ResetRead();
 	UInt32 PacketLen;
-	UInt32 ReadSoFar = m_Buffer.GetReadableSpace();
+	UInt32 ReadSoFar = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketLen))
 	{
 		// Not enough bytes for the packet length, keep waiting
@@ -807,7 +885,7 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 	}
 	switch (ch)
 	{
-	 case PROTO_VERSION_1_3_2:
+		case PROTO_VERSION_1_3_2:
 		{
 			m_Protocol = new cProtocol132(m_Client);
 			return true;
@@ -853,7 +931,7 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
 {
 	UInt32 PacketType;
-	UInt32 NumBytesRead = m_Buffer.GetReadableSpace();
+	UInt32 NumBytesRead = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketType))
 	{
 		return false;
@@ -884,7 +962,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			m_Buffer.ReadBEShort(ServerPort);
 			m_Buffer.ReadVarInt(NextState);
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
 		}
 	}
@@ -935,7 +1013,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			m_Buffer.ResetRead();
 			if (m_Buffer.CanReadBytes(2))
 			{
-				byte val;
+				Byte val;
 				m_Buffer.ReadByte(val);  // Packet type - Serverlist ping
 				m_Buffer.ReadByte(val);  // 0x01 magic value
 				ASSERT(val == 0x01);

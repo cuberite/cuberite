@@ -14,7 +14,7 @@
 #endif
 
 
-
+#include "Errors.h"
 
 
 class cSocket
@@ -24,6 +24,12 @@ public:
 	{
 		IPv4 = AF_INET,
 		IPv6 = AF_INET6,
+		
+		#ifdef _WIN32
+		ErrWouldBlock = WSAEWOULDBLOCK,
+		#else
+		ErrWouldBlock = EWOULDBLOCK,
+		#endif
 	} ;
 	
 #ifdef _WIN32
@@ -57,11 +63,10 @@ public:
 	/// Initializes the network stack. Returns 0 on success, or another number as an error code.
 	static int WSAStartup(void);
 
-	static AString GetErrorString(int a_ErrNo);
 	static int     GetLastError();
 	static AString GetLastErrorString(void)
 	{
-		return GetErrorString(GetLastError());
+		return GetOSErrorString(GetLastError());
 	}
 	
 	/// Creates a new socket of the specified address family
@@ -111,6 +116,9 @@ public:
 	unsigned short GetPort(void) const;  // Returns 0 on failure
 
 	const AString & GetIPString(void) const { return m_IPString; }
+	
+	/** Sets the socket into non-blocking mode */
+	void SetNonBlocking(void);
 
 private:
 	xSocket m_Socket;

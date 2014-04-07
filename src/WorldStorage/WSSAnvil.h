@@ -10,6 +10,7 @@
 
 #include "WorldStorage.h"
 #include "FastNBT.h"
+#include "../Mobs/Monster.h"
 
 
 
@@ -19,6 +20,7 @@
 class cItemGrid;
 
 class cProjectileEntity;
+class cHangingEntity;
 
 
 
@@ -134,18 +136,25 @@ protected:
 	void LoadChestFromNBT       (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDispenserFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDropperFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadFlowerPotFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFurnaceFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
 	void LoadHopperFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadJukeboxFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadNoteFromNBT        (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSignFromNBT        (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMobHeadFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadCommandBlockFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength);
 	
 	void LoadBoatFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadEnderCrystalFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFallingBlockFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPickupFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadTNTFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadExpOrbFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadHangingFromNBT         (cHangingEntity & a_Hanging,const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadItemFrameFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	void LoadMinecartRFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartCFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -193,11 +202,17 @@ protected:
 	/// Loads entity common data from the NBT compound; returns true if successful
 	bool LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx);
 	
+	/// Loads monster common data from the NBT compound; returns true if successful
+	bool LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx);
+	
 	/// Loads projectile common data from the NBT compound; returns true if successful
 	bool LoadProjectileBaseFromNBT(cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIx);
 	
 	/// Loads an array of doubles of the specified length from the specified NBT list tag a_TagIdx; returns true if successful
 	bool LoadDoublesListFromNBT(double * a_Doubles, int a_NumDoubles, const cParsedNBT & a_NBT, int a_TagIdx);
+
+	/// Loads an array of floats of the specified length from the specified NBT list tag a_TagIdx; returns true if successful
+	bool LoadFloatsListFromNBT(float * a_Floats, int a_NumFloats, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/// Helper function for extracting the X, Y, and Z int subtags of a NBT compound; returns true if successful
 	bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int & a_X, int & a_Y, int & a_Z);

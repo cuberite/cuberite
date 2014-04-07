@@ -288,13 +288,13 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 // Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
-AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8)
+AString & RawBEToUTF8(const char * a_RawData, int a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
 	a_UTF8.reserve(3 * a_NumShorts / 2);  // a quick guess of the resulting size
 	for (int i = 0; i < a_NumShorts; i++)
 	{
-		int c = ntohs(*(a_RawData + i));
+		int c = GetBEShort(&a_RawData[i * 2]);
 		if (c < 0x80)
 		{
 			a_UTF8.push_back((char)c);
@@ -364,10 +364,7 @@ Notice from the original file:
 
 #define UNI_MAX_BMP         0x0000FFFF
 #define UNI_MAX_UTF16       0x0010FFFF
-#define UNI_MAX_UTF32       0x7FFFFFFF
-#define UNI_MAX_LEGAL_UTF32 0x0010FFFF
 #define UNI_SUR_HIGH_START  0xD800
-#define UNI_SUR_HIGH_END    0xDBFF
 #define UNI_SUR_LOW_START   0xDC00
 #define UNI_SUR_LOW_END     0xDFFF
 
@@ -457,7 +454,6 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 		if (!isLegalUTF8(source, extraBytesToRead + 1))
 		{
 			return a_UTF16;
-			break;
 		}
 		
 		// The cases all fall through. See "Note A" below.
@@ -535,32 +531,32 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 format binary data this way:
 00001234: 31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66    1234567890abcdef
 */
-AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_LineLength)
+AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine)
 {
-	ASSERT(a_LineLength <= 120);  // Due to using a fixed size line buffer; increase line[]'s size to lift this max
+	ASSERT(a_BytesPerLine <= 120);  // Due to using a fixed size line buffer; increase line[]'s size to lift this max
 	char line[512];
 	char * p;
 	char * q;
 	
-	a_Out.reserve(a_Size / a_LineLength * (18 + 6 * a_LineLength));
-	for (int i = 0; i < a_Size; i += a_LineLength)
+	a_Out.reserve(a_Size / a_BytesPerLine * (18 + 6 * a_BytesPerLine));
+	for (size_t i = 0; i < a_Size; i += a_BytesPerLine)
 	{
-		int k = a_Size - i;
-		if (k > a_LineLength)
+		size_t k = a_Size - i;
+		if (k > a_BytesPerLine)
 		{
-			k = a_LineLength;
+			k = a_BytesPerLine;
 		}
 		#ifdef _MSC_VER
 		// MSVC provides a "secure" version of sprintf()
-		int Count = sprintf_s(line, sizeof(line), "%08x:", i);
+		int Count = sprintf_s(line, sizeof(line), "%08x:", (unsigned)i);
 		#else
-		int Count = sprintf(line, "%08x:", i);
+		int Count = sprintf(line, "%08x:", (unsigned)i);
 		#endif
 		// Remove the terminating NULL / leftover garbage in line, after the sprintf-ed value
 		memset(line + Count, 32, sizeof(line) - Count);
 		p = line + 10;
-		q = p + 2 + a_LineLength * 3 + 1;
-		for (int j = 0; j < k; j++)
+		q = p + 2 + a_BytesPerLine * 3 + 1;
+		for (size_t j = 0; j < k; j++)
 		{
 			unsigned char c = ((unsigned char *)a_Data)[i + j];
 			p[0] = HEX(c >> 4);
@@ -833,7 +829,8 @@ AString Base64Encode(const AString & a_Input)
 
 short GetBEShort(const char * a_Mem)
 {
-	return (((short)a_Mem[0]) << 8) | a_Mem[1];
+	const Byte * Bytes = (const Byte *)a_Mem;
+	return (Bytes[0] << 8) | Bytes[1];
 }
 
 
@@ -842,7 +839,8 @@ short GetBEShort(const char * a_Mem)
 
 int GetBEInt(const char * a_Mem)
 {
-	return (((int)a_Mem[0]) << 24) | (((int)a_Mem[1]) << 16) | (((int)a_Mem[2]) << 8) | a_Mem[3];
+	const Byte * Bytes = (const Byte *)a_Mem;
+	return (Bytes[0] << 24) | (Bytes[1] << 16) | (Bytes[2] << 8) | Bytes[3];
 }
 
 

@@ -226,6 +226,24 @@ void cSlotArea::DblClicked(cPlayer & a_Player, int a_SlotNum)
 
 
 
+void cSlotArea::OnPlayerAdded(cPlayer & a_Player)
+{
+	UNUSED(a_Player);
+}
+
+
+
+
+
+void cSlotArea::OnPlayerRemoved(cPlayer & a_Player)
+{
+	UNUSED(a_Player);
+}
+
+
+
+
+
 void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
 {
 	for (int i = 0; i < m_NumSlots; i++)
@@ -445,6 +463,18 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 	// Player not found - that is acceptable
 }
 
+
+
+
+
+
+void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	UNUSED(a_ItemStack);
+	UNUSED(a_Player);
+	UNUSED(a_ShouldApply);
+	UNUSED(a_KeepEmptySlots);
+}
 
 
 

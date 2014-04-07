@@ -23,9 +23,19 @@ cZombie::cZombie(bool a_IsVillagerZombie) :
 
 void cZombie::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_ROTTEN_FLESH);
-	
-	// TODO: Rare drops
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+	}
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ROTTEN_FLESH);
+	cItems RareDrops;
+	RareDrops.Add(cItem(E_ITEM_IRON));
+	RareDrops.Add(cItem(E_ITEM_CARROT));
+	RareDrops.Add(cItem(E_ITEM_POTATO));
+	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
+	AddRandomArmorDropItem(a_Drops, LootingLevel);
+	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
 
 
@@ -34,15 +44,18 @@ void cZombie::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cZombie::MoveToPosition(const Vector3f & a_Position)
 {
-	m_Destination = a_Position;
-
-	// If the destination is in the sun and if it is not night AND the skeleton isn't on fire then block the movement.
-	if ((m_World->GetBlockSkyLight((int) a_Position.x, (int) a_Position.y, (int) a_Position.z) == 15) && (m_World->GetTimeOfDay() < 13187) && !IsOnFire())
+	// If the destination is in the sun and if it is not night AND the zombie isn't on fire then block the movement.
+	if (
+		!IsOnFire() &&
+		(m_World->GetTimeOfDay() < 13187) &&
+		(m_World->GetBlockSkyLight((int)a_Position.x, (int)a_Position.y, (int)a_Position.z) == 15)
+		)
 	{
 		m_bMovingToDestination = false;
 		return;
 	}
-	m_bMovingToDestination = true;
+
+	super::MoveToPosition(a_Position);
 }
 
 

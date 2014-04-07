@@ -18,7 +18,7 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2, 1.6.1, 1.6.2, 1.6.3, 1.6.4, 1.7.2"
+#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2, 1.6.1, 1.6.2, 1.6.3, 1.6.4, 1.7.2, 1.7.4"
 #define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49, 51, 60, 61, 73, 74, 77, 78, 4"
 
 
@@ -59,7 +59,7 @@ public:
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
 	
 	/// Called when client sends some data:
-	virtual void DataReceived(const char * a_Data, int a_Size) override;
+	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 	
 	/// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity        (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
@@ -68,6 +68,7 @@ public:
 	virtual void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendChat                (const AString & a_Message) override;
+	virtual void SendChat                (const cCompositeChat & a_Message) override;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) override;
@@ -89,7 +90,11 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) override;
+	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
+	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
 	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
+	virtual void SendPaintingSpawn       (const cPainting & a_Painting) override;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override;
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
@@ -103,6 +108,9 @@ public:
 	virtual void SendRespawn             (void) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
+	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
@@ -125,7 +133,7 @@ public:
 	
 	virtual AString GetAuthServerID(void) override;
 
-	virtual void SendData(const char * a_Data, int a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 protected:
 	cProtocol * m_Protocol;  //< The recognized protocol

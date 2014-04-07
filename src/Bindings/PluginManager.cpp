@@ -56,7 +56,7 @@ void cPluginManager::ReloadPlugins(void)
 
 void cPluginManager::FindPlugins(void)
 {
-	AString PluginsPath = FILE_IO_PREFIX + AString( "Plugins/" );
+	AString PluginsPath = GetPluginsPath() + "/";
 
 	// First get a clean list of only the currently running plugins, we don't want to mess those up
 	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
@@ -205,6 +205,27 @@ void cPluginManager::Tick(float a_Dt)
 
 
 
+bool cPluginManager::CallHookBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_SPREAD);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBlockSpread(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookBlockToPickups(
 	cWorld * a_World, cEntity * a_Digger,
 	int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
@@ -248,7 +269,7 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
 		ASSERT(!Split.empty());  // This should not happen - we know there's at least one char in the message so the split needs to be at least one item long
-		a_Player->SendMessage(Printf("%s[INFO] %sUnknown command: \"%s\"", cChatColor::Yellow.c_str(), cChatColor::White.c_str(), Split[0].c_str()));
+		a_Player->SendMessageInfo(Printf("Unknown command: \"%s\"", a_Message.c_str()));
 		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player->GetName().c_str(), a_Message.c_str());
 		return true;  // Cancel sending
 	}
@@ -662,6 +683,27 @@ bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX,
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerBrokenBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerDestroyed(cPlayer & a_Player)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_DESTROYED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerDestroyed(a_Player))
 		{
 			return true;
 		}
@@ -1112,6 +1154,48 @@ bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCrafti
 
 
 
+bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PROJECTILE_HIT_BLOCK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnProjectileHitBlock(a_Projectile))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity & a_HitEntity)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PROJECTILE_HIT_ENTITY);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnProjectileHitEntity(a_Projectile, a_HitEntity))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNED_ENTITY);
@@ -1371,7 +1455,7 @@ bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command
 		!a_Player->HasPermission(cmd->second.m_Permission)
 	)
 	{
-		a_Player->SendMessage(Printf("%s[INFO] %sForbidden command; insufficient privileges: \"%s\"", cChatColor::Rose.c_str(), cChatColor::White.c_str(), Split[0].c_str()));
+		a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", Split[0].c_str()));
 		LOGINFO("Player %s tried to execute forbidden command: \"%s\"", a_Player->GetName().c_str(), Split[0].c_str());
 		a_WasCommandForbidden = true;
 		return false;
@@ -1730,6 +1814,21 @@ void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & 
 bool cPluginManager::IsValidHookType(int a_HookType)
 {
 	return ((a_HookType >= 0) && (a_HookType <= HOOK_MAX));
+}
+
+
+
+
+
+bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback)
+{
+	// TODO: Implement locking for plugins
+	PluginMap::iterator itr = m_Plugins.find(a_PluginName);
+	if ((itr == m_Plugins.end()) || (itr->second == NULL))
+	{
+		return false;
+	}
+	return a_Callback.Item(itr->second);
 }
 
 

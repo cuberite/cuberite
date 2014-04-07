@@ -97,7 +97,7 @@ void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 {
 	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "Plains");
 	m_Biome = StringToBiome(Biome);
-	if (m_Biome == -1)
+	if (m_Biome == biInvalidBiome)
 	{
 		LOGWARN("[Generator]::ConstantBiome value \"%s\" not recognized, using \"Plains\".", Biome.c_str());
 		m_Biome = biPlains;
@@ -233,7 +233,7 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 			}
 		}
 		EMCSBiome Biome = StringToBiome(Split2[0]);
-		if (Biome != -1)
+		if (Biome != biInvalidBiome)
 		{
 			for (int i = 0; i < Count; i++)
 			{
@@ -371,8 +371,8 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z]);
 	}
 	
-	LinearUpscale2DArrayInPlace(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
-	LinearUpscale2DArrayInPlace(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortZ[0][0]);
 	
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -477,8 +477,8 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 	{
 		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z], DistortSize);
 	}
-	LinearUpscale2DArrayInPlace(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
-	LinearUpscale2DArrayInPlace(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortZ[0][0]);
 	
 	// Prepare a 9x9 area of neighboring cell seeds
 	// (assuming that 7x7 cell area is larger than a chunk being generated)
@@ -500,7 +500,7 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 			int OffsetZ = (m_Noise4.IntNoise3DInt(RealCellX, 32 * RealCellX - 16 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
 			SeedX[xc][zc] = CellBlockX + OffsetX;
 			SeedZ[xc][zc] = CellBlockZ + OffsetZ;
-			SeedV[xc][zc] = (((m_Noise6.IntNoise3DInt(RealCellX, RealCellX - RealCellZ + 1000, RealCellZ) / 11) % 256) > 90) ? biOcean : ((EMCSBiome)(-1));
+			SeedV[xc][zc] = (((m_Noise6.IntNoise3DInt(RealCellX, RealCellX - RealCellZ + 1000, RealCellZ) / 11) % 256) > 90) ? biOcean : (biInvalidBiome);
 		}  // for z
 	}  // for x
 	
@@ -573,7 +573,7 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 		float NoiseCoordZ = (float)(a_ChunkZ * cChunkDef::Width + z) / m_RiverCellSize;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != -1)
+			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biInvalidBiome)
 			{
 				// Biome already set, skip this column
 				continue;
@@ -651,8 +651,8 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 			HumidityMap[x + 17 * z] = NoiseH;
 		}  // for x
 	}  // for z
-	LinearUpscale2DArrayInPlace(TemperatureMap, 17, 17, 8, 8);
-	LinearUpscale2DArrayInPlace(HumidityMap,    17, 17, 8, 8);
+	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(TemperatureMap);
+	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(HumidityMap);
 	
 	// Re-map into integral values in [0 .. 255] range:
 	for (size_t idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
@@ -693,7 +693,7 @@ void cBioGenMultiStepMap::DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, con
 		int idxZ = 17 * z;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != -1)
+			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biInvalidBiome)
 			{
 				// Already set before
 				continue;
@@ -778,8 +778,8 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 		DistortZ[4 * x][4 * z] = BlockZ + (int)(64 * NoiseZ);
 	}
 	
-	LinearUpscale2DArrayInPlace(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
-	LinearUpscale2DArrayInPlace(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
+	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortZ[0][0]);
 	
 	// Apply distortion to each block coord, then query the voronoi maps for biome group and biome index and choose biome based on that:
 	for (int z = 0; z < cChunkDef::Width; z++)

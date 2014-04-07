@@ -6,7 +6,7 @@ function Initialize( Plugin )
 	Plugin:SetVersion( 2 )
 
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
-	cPluginManager.AddHook(cPluginManager.HOOK_DISCONNECT,    OnDisconnect)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnDisconnect)
 	
 	local PluginManager = cPluginManager:Get()
 	PluginManager:BindCommand("/mc", "magiccarpet", HandleCarpetCommand, " - Spawns a magical carpet");
@@ -37,12 +37,12 @@ function HandleCarpetCommand( Split, Player )
 	
 	if( Carpet == nil ) then
 		Carpets[ Player ] = cCarpet:new()
-		SendMessageSuccess(Player, "You're on a magic carpet!")
-		SendMessage(Player, "Look straight down to descend. Jump to ascend.")
+		Player:SendMessageSuccess("You're on a magic carpet!")
+		Player:SendMessageInfo("Look straight down to descend. Jump to ascend.")
 	else
 		Carpet:remove()
 		Carpets[ Player ] = nil
-		SendMessageSuccess(Player, "The carpet vanished!")
+		Player:SendMessageSuccess("The carpet vanished!")
 	end
 
 	return true

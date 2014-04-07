@@ -19,7 +19,8 @@ cSnowGolem::cSnowGolem(void) :
 
 void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 0, 5, E_ITEM_SNOWBALL);
+	UNUSED(a_Killer);
+	AddRandomDropItem(a_Drops, 0, 15, E_ITEM_SNOWBALL);
 }
 
 
@@ -29,7 +30,7 @@ void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 void cSnowGolem::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	if (IsBiomeNoDownfall((EMCSBiome) m_World->GetBiomeAt((int) floor(GetPosX()), (int) floor(GetPosZ())) ))
+	if (IsBiomeNoDownfall(m_World->GetBiomeAt((int) floor(GetPosX()), (int) floor(GetPosZ())) ))
 	{
 		TakeDamage(*this);
 	}
@@ -37,7 +38,7 @@ void cSnowGolem::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		BLOCKTYPE BlockBelow = m_World->GetBlock((int) floor(GetPosX()), (int) floor(GetPosY()) - 1, (int) floor(GetPosZ()));
 		BLOCKTYPE Block = m_World->GetBlock((int) floor(GetPosX()), (int) floor(GetPosY()), (int) floor(GetPosZ()));
-		if (Block == E_BLOCK_AIR && g_BlockIsSolid[BlockBelow])
+		if (Block == E_BLOCK_AIR && cBlockInfo::IsSolid(BlockBelow))
 		{
 			m_World->SetBlock((int) floor(GetPosX()), (int) floor(GetPosY()), (int) floor(GetPosZ()), E_BLOCK_SNOW, 0);
 		}

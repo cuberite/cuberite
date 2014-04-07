@@ -1,4 +1,3 @@
-
 // Protocol17x.cpp
 
 /*
@@ -9,6 +8,7 @@ Implements the 1.7.x protocol classes:
 */
 
 #include "Globals.h"
+#include "json/json.h"
 #include "Protocol17x.h"
 #include "ChunkDataSerializer.h"
 #include "../ClientHandle.h"
@@ -21,11 +21,16 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
+#include "../Entities/Painting.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
+#include "../Entities/ItemFrame.h"
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
 #include "../BlockEntities/CommandBlockEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
+#include "../CompositeChat.h"
 
 
 
@@ -54,6 +59,22 @@ Implements the 1.7.x protocol classes:
 
 
 
+const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
+
+
+
+
+
+// fwd: main.cpp:
+extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol172:
+
 cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client),
 	m_ServerAddress(a_ServerAddress),
@@ -64,21 +85,28 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
 	m_IsEncrypted(false)
 {
+	// Create the comm log file, if so requested:
+	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
+	{
+		cFile::CreateFolder("CommLogs");
+		AString FileName = Printf("CommLogs/%x__%s.log", (unsigned)time(NULL), a_Client->GetIPString().c_str());
+		m_CommLogFile.Open(FileName, cFile::fmWrite);
+	}
 }
 
 
 
 
 
-void cProtocol172::DataReceived(const char * a_Data, int a_Size)
+void cProtocol172::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
-		byte Decrypted[512];
+		Byte Decrypted[512];
 		while (a_Size > 0)
 		{
-			int NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, (byte *)a_Data, NumBytes);
+			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
+			m_Decryptor.ProcessData(Decrypted, (Byte *)a_Data, NumBytes);
 			AddReceivedData((const char *)Decrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -124,7 +152,7 @@ void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
 	cPacketizer Pkt(*this, 0x25);  // Block Break Animation packet
-	Pkt.WriteInt(a_EntityID);
+	Pkt.WriteVarInt(a_EntityID);
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteInt(a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
@@ -172,6 +200,78 @@ void cProtocol172::SendChat(const AString & a_Message)
 {
 	cPacketizer Pkt(*this, 0x02);  // Chat Message packet
 	Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()));
+}
+
+
+
+
+
+void cProtocol172::SendChat(const cCompositeChat & a_Message)
+{
+	// Compose the complete Json string to send:
+	Json::Value msg;
+	msg["text"] = "";  // The client crashes without this
+	const cCompositeChat::cParts & Parts = a_Message.GetParts();
+	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
+	{
+		Json::Value Part;
+		switch ((*itr)->m_PartType)
+		{
+			case cCompositeChat::ptText:
+			{
+				Part["text"] = (*itr)->m_Text;
+				AddChatPartStyle(Part, (*itr)->m_Style);
+				break;
+			}
+			
+			case cCompositeChat::ptClientTranslated:
+			{
+				const cCompositeChat::cClientTranslatedPart & p = (const cCompositeChat::cClientTranslatedPart &)**itr;
+				Part["translate"] = p.m_Text;
+				Json::Value With;
+				for (AStringVector::const_iterator itrW = p.m_Parameters.begin(), endW = p.m_Parameters.end(); itrW != endW; ++itr)
+				{
+					With.append(*itrW);
+				}
+				if (!p.m_Parameters.empty())
+				{
+					Part["with"] = With;
+				}
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
+			
+			case cCompositeChat::ptUrl:
+			{
+				const cCompositeChat::cUrlPart & p = (const cCompositeChat::cUrlPart &)**itr;
+				Part["text"] = p.m_Text;
+				Json::Value Url;
+				Url["action"] = "open_url";
+				Url["value"] = p.m_Url;
+				Part["clickEvent"] = Url;
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
+			
+			case cCompositeChat::ptSuggestCommand:
+			case cCompositeChat::ptRunCommand:
+			{
+				const cCompositeChat::cCommandPart & p = (const cCompositeChat::cCommandPart &)**itr;
+				Part["text"] = p.m_Text;
+				Json::Value Cmd;
+				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
+				Cmd["value"] = p.m_Command;
+				Part["clickEvent"] = Cmd;
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
+		}
+		msg["extra"].append(Part);
+	}  // for itr - Parts[]
+	
+	// Send the message to the client:
+	cPacketizer Pkt(*this, 0x02);
+	Pkt.WriteString(msg.toStyledString());
 }
 
 
@@ -454,7 +554,7 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (cRoot::Get()->GetServer()->IsHardcore() ? 0x08 : 0)); // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteByte(cRoot::Get()->GetServer()->GetMaxPlayers());
+		Pkt.WriteByte(std::min(cRoot::Get()->GetServer()->GetMaxPlayers(), 60));
 		Pkt.WriteString("default");  // Level type - wtf?
 	}
 	
@@ -469,6 +569,75 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send player abilities:
 	SendPlayerAbilities();
 }
+
+
+
+
+void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
+	Pkt.WriteVarInt(a_Painting.GetUniqueID());
+	Pkt.WriteString(a_Painting.GetName().c_str());
+	Pkt.WriteInt((int)a_Painting.GetPosX());
+	Pkt.WriteInt((int)a_Painting.GetPosY());
+	Pkt.WriteInt((int)a_Painting.GetPosZ());
+	Pkt.WriteInt(a_Painting.GetDirection());
+}
+
+
+
+
+
+void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+{
+	cPacketizer Pkt(*this, 0x34);
+	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteShort (3 + a_Length);
+
+	Pkt.WriteByte(0);
+	Pkt.WriteByte(a_X);
+	Pkt.WriteByte(a_Y);
+	
+	for (unsigned int i = 0; i < a_Length; ++i)
+	{
+		Pkt.WriteByte(a_Colors[i]);
+	}
+}
+
+
+
+
+
+void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+{
+	cPacketizer Pkt(*this, 0x34);
+	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteShort (1 + (3 * a_Decorators.size()));
+
+	Pkt.WriteByte(1);
+	
+	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
+	{
+		Pkt.WriteByte((it->GetType() << 4) | (it->GetRot() & 0xf));
+		Pkt.WriteByte(it->GetPixelX());
+		Pkt.WriteByte(it->GetPixelZ());
+	}
+}
+
+
+
+
+
+void cProtocol172::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	cPacketizer Pkt(*this, 0x34);
+	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteShort (2);
+
+	Pkt.WriteByte(2);
+	Pkt.WriteByte(a_Scale);
+}
+
 
 
 
@@ -518,9 +687,8 @@ void cProtocol172::SendPlayerAbilities(void)
 		Flags |= 0x04;
 	}
 	Pkt.WriteByte(Flags);
-	// TODO: Pkt.WriteFloat(m_Client->GetPlayer()->GetMaxFlyingSpeed());
-	Pkt.WriteFloat(0.05f);
-	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetMaxSpeed());
+	Pkt.WriteFloat((float)(0.05 * m_Client->GetPlayer()->GetFlyingMaxSpeed()));
+	Pkt.WriteFloat((float)(0.1 * m_Client->GetPlayer()->GetMaxSpeed()));
 }
 
 
@@ -574,13 +742,14 @@ void cProtocol172::SendPlayerMaxSpeed(void)
 	Pkt.WriteInt(m_Client->GetPlayer()->GetUniqueID());
 	Pkt.WriteInt(1);  // Count
 	Pkt.WriteString("generic.movementSpeed");
-	Pkt.WriteDouble(0.1);
+	// The default game speed is 0.1, multiply that value by the relative speed:
+	Pkt.WriteDouble(0.1 * m_Client->GetPlayer()->GetNormalMaxSpeed());
 	if (m_Client->GetPlayer()->IsSprinting())
 	{
 		Pkt.WriteShort(1);  // Modifier count
 		Pkt.WriteInt64(0x662a6b8dda3e4c1c);
 		Pkt.WriteInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteDouble(0.3);
+		Pkt.WriteDouble(m_Client->GetPlayer()->GetSprintingMaxSpeed() - m_Client->GetPlayer()->GetNormalMaxSpeed());
 		Pkt.WriteByte(2);
 	}
 	else
@@ -707,6 +876,46 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
+void cProtocol172::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	cPacketizer Pkt(*this, 0x3B);
+	Pkt.WriteString(a_Name);
+	Pkt.WriteString(a_DisplayName);
+	Pkt.WriteByte(a_Mode);
+}
+
+
+
+
+
+void cProtocol172::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+{
+	cPacketizer Pkt(*this, 0x3C);
+	Pkt.WriteString(a_Player);
+	Pkt.WriteByte(a_Mode);
+
+	if (a_Mode != 1)
+	{
+		Pkt.WriteString(a_Objective);
+		Pkt.WriteInt((int) a_Score);
+	}
+}
+
+
+
+
+
+void cProtocol172::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+{
+	cPacketizer Pkt(*this, 0x3D);
+	Pkt.WriteByte((int) a_Display);
+	Pkt.WriteString(a_Objective);
+}
+
+
+
+
+
 void cProtocol172::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)  // a_Src coords are Block * 8
 {
 	cPacketizer Pkt(*this, 0x29);  // Sound Effect packet
@@ -787,8 +996,8 @@ void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	Pkt.WriteFPInt(a_Entity.GetPosX());
 	Pkt.WriteFPInt(a_Entity.GetPosY());
 	Pkt.WriteFPInt(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteInt(a_ObjectData);
 	if (a_ObjectData != 0)
 	{
@@ -810,8 +1019,8 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	Pkt.WriteFPInt(a_Vehicle.GetPosX());
 	Pkt.WriteFPInt(a_Vehicle.GetPosY());
 	Pkt.WriteFPInt(a_Vehicle.GetPosZ());
-	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
+	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteInt(a_VehicleSubType);
 	if (a_VehicleSubType != 0)
 	{
@@ -906,6 +1115,8 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	{
 		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
+		case E_BLOCK_HEAD:          Action = 4; break; // Update Mobhead entity
+		case E_BLOCK_FLOWER_POT:    Action = 5; break; // Update flower pot
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteByte(Action);
@@ -923,10 +1134,11 @@ void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteShort((short)a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
-	Pkt.WriteString(a_Line1);
-	Pkt.WriteString(a_Line2);
-	Pkt.WriteString(a_Line3);
-	Pkt.WriteString(a_Line4);
+	// Need to send only up to 15 chars, otherwise the client crashes (#598)
+	Pkt.WriteString(a_Line1.substr(0, 15));
+	Pkt.WriteString(a_Line2.substr(0, 15));
+	Pkt.WriteString(a_Line3.substr(0, 15));
+	Pkt.WriteString(a_Line4.substr(0, 15));
 }
 
 
@@ -1024,8 +1236,33 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 
 
-void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
+void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 {
+	// Write the incoming data into the comm log file:
+	if (g_ShouldLogCommIn)
+	{
+		if (m_ReceivedData.GetReadableSpace() > 0)
+		{
+			AString AllData;
+			size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
+			m_ReceivedData.ReadAll(AllData);
+			m_ReceivedData.ResetRead();
+			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
+			ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
+			AString Hex;
+			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+			m_CommLogFile.Printf("Incoming data, " SIZE_T_FMT " (0x" SIZE_T_FMT_HEX ") unparsed bytes already present in buffer:\n%s\n",
+				AllData.size(), AllData.size(), Hex.c_str()
+			);
+		}
+		AString Hex;
+		CreateHexDump(Hex, a_Data, a_Size, 16);
+		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
+			(unsigned)a_Size, (unsigned)a_Size, Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
+	
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
@@ -1040,12 +1277,14 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (!m_ReceivedData.ReadVarInt(PacketLen))
 		{
 			// Not enough data
-			return;
+			m_ReceivedData.ResetRead();
+			break;
 		}
 		if (!m_ReceivedData.CanReadBytes(PacketLen))
 		{
 			// The full packet hasn't been received yet
-			return;
+			m_ReceivedData.ResetRead();
+			break;
 		}
 		cByteBuffer bb(PacketLen + 1);
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
@@ -1058,9 +1297,25 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 		if (!bb.ReadVarInt(PacketType))
 		{
 			// Not enough data
-			return;
+			break;
 		}
 
+		// Log the packet info into the comm log file:
+		if (g_ShouldLogCommIn)
+		{
+			AString PacketData;
+			bb.ReadAll(PacketData);
+			bb.ResetRead();
+			bb.ReadVarInt(PacketType);
+			ASSERT(PacketData.size() > 0);
+			PacketData.resize(PacketData.size() - 1);
+			AString PacketDataHex;
+			CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
+			m_CommLogFile.Printf("Next incoming packet is type %u (0x%x), length %u (0x%x) at state %d. Payload:\n%s\n",
+				PacketType, PacketType, PacketLen, PacketLen, m_State, PacketDataHex.c_str()
+			);
+		}
+		
 		if (!HandlePacket(bb, PacketType))
 		{
 			// Unknown packet, already been reported, but without the length. Log the length here:
@@ -1077,19 +1332,52 @@ void cProtocol172::AddReceivedData(const char * a_Data, int a_Size)
 				LOGD("Packet contents:\n%s", Out.c_str());
 			#endif  // _DEBUG
 			
+			// Put a message in the comm log:
+			if (g_ShouldLogCommIn)
+			{
+				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
+			}
+			
 			return;
 		}
 		
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
-			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read %u bytes, packet contained %u bytes",
+			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read " SIZE_T_FMT " bytes, packet contained %u bytes",
 				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
 			);
+
+			// Put a message in the comm log:
+			if (g_ShouldLogCommIn)
+			{
+				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got " SIZE_T_FMT " left) ^^^^^^\n\n\n",
+					1, bb.GetReadableSpace()
+				);
+				m_CommLogFile.Flush();
+			}
+
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
 		}
-	}  // while (true)
+	}  // for(ever)
+	
+	// Log any leftover bytes into the logfile:
+	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
+	{
+		AString AllData;
+		size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
+		m_ReceivedData.ReadAll(AllData);
+		m_ReceivedData.ResetRead();
+		m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
+		ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
+		AString Hex;
+		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+		m_CommLogFile.Printf("There are " SIZE_T_FMT " (0x" SIZE_T_FMT_HEX ") bytes of non-parse-able data left in the buffer:\n%s",
+			m_ReceivedData.GetReadableSpace(), m_ReceivedData.GetReadableSpace(), Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
 }
 
 
@@ -1220,7 +1508,64 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {
-	// TODO: Add protocol encryption
+	short EncKeyLength, EncNonceLength;
+	a_ByteBuffer.ReadBEShort(EncKeyLength);
+	AString EncKey;
+	if (!a_ByteBuffer.ReadString(EncKey, EncKeyLength))
+	{
+		return;
+	}
+	a_ByteBuffer.ReadBEShort(EncNonceLength);
+	AString EncNonce;
+	if (!a_ByteBuffer.ReadString(EncNonce, EncNonceLength))
+	{
+		return;
+	}
+	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
+	{
+		LOGD("Too long encryption");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+
+	// Decrypt EncNonce using privkey
+	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+	int res = rsaDecryptor.Decrypt((const Byte *)EncNonce.data(), EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
+	if (res != 4)
+	{
+		LOGD("Bad nonce length: got %d, exp %d", res, 4);
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	if (ntohl(DecryptedNonce[0]) != (unsigned)(uintptr_t)this)
+	{
+		LOGD("Bad nonce value");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	
+	// Decrypt the symmetric encryption key using privkey:
+	Byte DecryptedKey[MAX_ENC_LEN];
+	res = rsaDecryptor.Decrypt((const Byte *)EncKey.data(), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
+	if (res != 16)
+	{
+		LOGD("Bad key length");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	
+	StartEncryption(DecryptedKey);
+
+	// Send login success:
+	{
+		cPacketizer Pkt(*this, 0x02);  // Login success packet
+		Pkt.WriteString(Printf("%d", m_Client->GetUniqueID()));  // TODO: proper UUID
+		Pkt.WriteString(m_Client->GetUsername());
+	}
+
+	m_State = 3;  // State = Game
+	m_Client->HandleLogin(4, m_Client->GetUsername());
 }
 
 
@@ -1232,11 +1577,23 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 	AString Username;
 	a_ByteBuffer.ReadVarUTF8String(Username);
 	
-	// TODO: Protocol encryption should be set up here if not localhost / auth
-	
 	if (!m_Client->HandleHandshake(Username))
 	{
 		// The client is not welcome here, they have been sent a Kick packet already
+		return;
+	}
+	
+	// If auth is required, then send the encryption request:
+	if (cRoot::Get()->GetServer()->ShouldAuthenticate())
+	{
+		cPacketizer Pkt(*this, 0x01);
+		Pkt.WriteString(cRoot::Get()->GetServer()->GetServerID());
+		const AString & PubKeyDer = cRoot::Get()->GetServer()->GetPublicKeyDER();
+		Pkt.WriteShort(PubKeyDer.size());
+		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
+		Pkt.WriteShort(4);
+		Pkt.WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+		m_Client->SetUsername(Username);
 		return;
 	}
 	
@@ -1272,8 +1629,8 @@ void cProtocol172::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockX);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, BlockY);
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockZ);
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, Face, Status);
+	HANDLE_READ(a_ByteBuffer, ReadChar,  char, Face);
+	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), Status);
 }
 
 
@@ -1285,14 +1642,14 @@ void cProtocol172::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockX);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, BlockY);
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockZ);
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
+	HANDLE_READ(a_ByteBuffer, ReadChar,  char, Face);
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
 
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
 
@@ -1317,6 +1674,8 @@ void cProtocol172::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    Difficulty);
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ShowCape);
+	
+	m_Client->SetLocale(Locale);
 	// TODO: handle in m_Client
 }
 
@@ -1374,7 +1733,15 @@ void cProtocol172::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  PlayerID);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Action);
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  JumpBoost);
-	m_Client->HandleEntityAction(PlayerID, Action);
+
+	switch (Action)
+	{
+		case 1: m_Client->HandleEntityCrouch(PlayerID, true);     break; // Crouch
+		case 2: m_Client->HandleEntityCrouch(PlayerID, false);    break; // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(PlayerID);         break; // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(PlayerID, true);  break; // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(PlayerID, false); break; // Stop sprinting
+	}
 }
 
 
@@ -1637,15 +2004,15 @@ void cProtocol172::WritePacket(cByteBuffer & a_Packet)
 
 
 
-void cProtocol172::SendData(const char * a_Data, int a_Size)
+void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
-		byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
+		Byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
-			int NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, (byte *)a_Data, NumBytes);
+			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
+			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
 			m_Client->SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -1711,7 +2078,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	{
 		AString HexDump;
 		CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
-		LOGWARNING("Cannot unGZIP item metadata (%u bytes):\n%s", a_Metadata.size(), HexDump.c_str());
+		LOGWARNING("Cannot unGZIP item metadata (" SIZE_T_FMT " bytes):\n%s", a_Metadata.size(), HexDump.c_str());
 		return;
 	}
 	
@@ -1721,45 +2088,156 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	{
 		AString HexDump;
 		CreateHexDump(HexDump, Uncompressed.data(), Uncompressed.size(), 16);
-		LOGWARNING("Cannot parse NBT item metadata: (%u bytes)\n%s", Uncompressed.size(), HexDump.c_str());
+		LOGWARNING("Cannot parse NBT item metadata: (" SIZE_T_FMT " bytes)\n%s", Uncompressed.size(), HexDump.c_str());
 		return;
 	}
 	
 	// Load enchantments and custom display names from the NBT data:
 	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
 	{
-		if (
-			(NBT.GetType(tag) == TAG_List) &&
-			(
-				(NBT.GetName(tag) == "ench") ||
-				(NBT.GetName(tag) == "StoredEnchantments")
-			)
-		)
+		AString TagName = NBT.GetName(tag);
+		switch (NBT.GetType(tag))
 		{
-			EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
-		}
-		else if ((NBT.GetType(tag) == TAG_Compound) && (NBT.GetName(tag) == "display")) // Custom name and lore tag
-		{
-			for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+			case TAG_List:
 			{
-				if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name")) // Custon name tag
+				if ((TagName == "ench") || (TagName == "StoredEnchantments")) // Enchantments tags
 				{
-					a_Item.m_CustomName = NBT.GetString(displaytag);
+					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 				}
-				else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore")) // Lore tag
-				{
-					AString Lore;
-
-					for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
-					{
-						AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
-					}
-
-					a_Item.m_Lore = Lore;
-				}
+				break;
 			}
+			case TAG_Compound:
+			{
+				if (TagName == "display") // Custom name and lore tag
+				{
+					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+					{
+						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name")) // Custon name tag
+						{
+							a_Item.m_CustomName = NBT.GetString(displaytag);
+						}
+						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore")) // Lore tag
+						{
+							AString Lore;
+
+							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
+							{
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+							}
+
+							a_Item.m_Lore = Lore;
+						}
+					}
+				}
+				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
+				{
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, (ENUM_ITEM_ID)a_Item.m_ItemType);
+				}
+				break;
+			}
+			default: LOGD("Unimplemented NBT data when parsing!"); break;
 		}
 	}
+}
+
+
+
+
+
+void cProtocol172::StartEncryption(const Byte * a_Key)
+{
+	m_Encryptor.Init(a_Key, a_Key);
+	m_Decryptor.Init(a_Key, a_Key);
+	m_IsEncrypted = true;
+	
+	// Prepare the m_AuthServerID:
+	cSHA1Checksum Checksum;
+	const AString & ServerID = cRoot::Get()->GetServer()->GetServerID();
+	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
+	Checksum.Update(a_Key, 16);
+	Checksum.Update((const Byte *)cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	Byte Digest[20];
+	Checksum.Finalize(Digest);
+	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
+}
+
+
+
+
+
+void cProtocol172::AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle)
+{
+	size_t len = a_PartStyle.length();
+	for (size_t i = 0; i < len; i++)
+	{
+		switch (a_PartStyle[i])
+		{
+			case 'b':
+			{
+				// bold
+				a_Value["bold"] = Json::Value(true);
+				break;
+			}
+			
+			case 'i':
+			{
+				// italic
+				a_Value["italic"] = Json::Value(true);
+				break;
+			}
+			
+			case 'u':
+			{
+				// Underlined
+				a_Value["underlined"] = Json::Value(true);
+				break;
+			}
+			
+			case 's':
+			{
+				// strikethrough
+				a_Value["strikethrough"] = Json::Value(true);
+				break;
+			}
+			
+			case 'o':
+			{
+				// obfuscated
+				a_Value["obfuscated"] = Json::Value(true);
+				break;
+			}
+			
+			case '@':
+			{
+				// Color, specified by the next char:
+				i++;
+				if (i >= len)
+				{
+					// String too short, didn't contain a color
+					break;
+				}
+				switch (a_PartStyle[i])
+				{
+					case '0': a_Value["color"] = Json::Value("black");        break;
+					case '1': a_Value["color"] = Json::Value("dark_blue");    break;
+					case '2': a_Value["color"] = Json::Value("dark_green");   break;
+					case '3': a_Value["color"] = Json::Value("dark_aqua");    break;
+					case '4': a_Value["color"] = Json::Value("dark_red");     break;
+					case '5': a_Value["color"] = Json::Value("dark_purple");  break;
+					case '6': a_Value["color"] = Json::Value("gold");         break;
+					case '7': a_Value["color"] = Json::Value("gray");         break;
+					case '8': a_Value["color"] = Json::Value("dark_gray");    break;
+					case '9': a_Value["color"] = Json::Value("blue");         break;
+					case 'a': a_Value["color"] = Json::Value("green");        break;
+					case 'b': a_Value["color"] = Json::Value("aqua");         break;
+					case 'c': a_Value["color"] = Json::Value("red");          break;
+					case 'd': a_Value["color"] = Json::Value("light_purple"); break;
+					case 'e': a_Value["color"] = Json::Value("yellow");       break;
+					case 'f': a_Value["color"] = Json::Value("white");        break;
+				}  // switch (color)
+			}  // case '@'
+		}  // switch (Style[i])
+	}  // for i - a_PartStyle[]
 }
 
 
@@ -1784,6 +2262,17 @@ cProtocol172::cPacketizer::~cPacketizer()
 	m_Out.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
 	m_Out.CommitRead();
+	
+	// Log the comm into logfile:
+	if (g_ShouldLogCommOut)
+	{
+		AString Hex;
+		ASSERT(DataToSend.size() > 0);
+		CreateHexDump(Hex, DataToSend.data() + 1, DataToSend.size() - 1, 16);
+		m_Protocol.m_CommLogFile.Printf("Outgoing packet: type %d (0x%x), length %u (0x%x), state %d. Payload:\n%s\n",
+			DataToSend[0], DataToSend[0], PacketLen, PacketLen, m_Protocol.m_State, Hex.c_str()
+		);
+	}
 }
 
 
@@ -1810,7 +2299,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	WriteByte (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR))
 	{
 		WriteShort(-1);
 		return;
@@ -1848,6 +2337,10 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 			Writer.EndList();
 		}
 		Writer.EndCompound();
+	}
+	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	{
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, (ENUM_ITEM_ID)a_Item.m_ItemType);
 	}
 	Writer.Finish();
 	AString Compressed;
@@ -1888,6 +2381,31 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 
 				Writer.AddString("LastOutput", Output.c_str());
 			}
+			break;
+		}
+		case E_BLOCK_HEAD:
+		{
+			cMobHeadEntity & MobHeadEntity = (cMobHeadEntity &)a_BlockEntity;
+
+			Writer.AddInt("x", MobHeadEntity.GetPosX());
+			Writer.AddInt("y", MobHeadEntity.GetPosY());
+			Writer.AddInt("z", MobHeadEntity.GetPosZ());
+			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
+			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
+			Writer.AddString("ExtraType", MobHeadEntity.GetOwner().c_str());
+			Writer.AddString("id", "Skull"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
+		case E_BLOCK_FLOWER_POT:
+		{
+			cFlowerPotEntity & FlowerPotEntity = (cFlowerPotEntity &)a_BlockEntity;
+
+			Writer.AddInt("x", FlowerPotEntity.GetPosX());
+			Writer.AddInt("y", FlowerPotEntity.GetPosY());
+			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
+			Writer.AddInt("Item", (Int32) FlowerPotEntity.GetItem().m_ItemType);
+			Writer.AddInt("Data", (Int32) FlowerPotEntity.GetItem().m_ItemDamage);
+			Writer.AddString("id", "FlowerPot"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
 		default: break;
@@ -2000,10 +2518,22 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 		}
 		case cEntity::etProjectile:
 		{
-			if (((cProjectileEntity &)a_Entity).GetProjectileKind() == cProjectileEntity::pkArrow)
+			cProjectileEntity & Projectile = (cProjectileEntity &)a_Entity;
+			switch (Projectile.GetProjectileKind())
 			{
-				WriteByte(0x10);
-				WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0);
+				case cProjectileEntity::pkArrow:
+				{
+					WriteByte(0x10);
+					WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0);
+					break;
+				}
+				case cProjectileEntity::pkFirework:
+				{
+					WriteByte(0xA8);
+					WriteItem(((const cFireworkEntity &)a_Entity).GetItem());
+					break;
+				}
+				default: break;
 			}
 			break;
 		}
@@ -2012,6 +2542,16 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteMobMetadata((const cMonster &)a_Entity);
 			break;
 		}
+		case cEntity::etItemFrame:
+		{
+			cItemFrame & Frame = (cItemFrame &)a_Entity;
+			WriteByte(0xA2);
+			WriteItem(Frame.GetItem());
+			WriteByte(0x3);
+			WriteByte(Frame.GetRotation());
+			break;
+		}
+		default: break;
 	}
 }
 
@@ -2136,6 +2676,15 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);
 			break;
 		}
+
+		case cMonster::mtWither:
+		{
+			WriteByte(0x54); // Int at index 20
+			WriteInt(((const cWither &)a_Mob).GetNumInvulnerableTicks());
+			WriteByte(0x66); // Float at index 6
+			WriteFloat((float)(a_Mob.GetHealth()));
+			break;
+		}
 		
 		case cMonster::mtSlime:
 		{
@@ -2211,7 +2760,8 @@ void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
 		WriteInt(0);
 		return;
 	}
-	const cMonster & Mob = (const cMonster &)a_Entity;
+
+	//const cMonster & Mob = (const cMonster &)a_Entity;
 
 	// TODO: Send properties and modifiers based on the mob type
 	

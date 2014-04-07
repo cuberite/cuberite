@@ -26,36 +26,46 @@ Declares the 1.7.x protocol classes:
 	#pragma warning(disable:4702)
 #endif
 
-#include "cryptopp/modes.h"
-#include "cryptopp/aes.h"
-
 #ifdef _MSC_VER
 	#pragma warning(pop)
 #endif
+
+#include "../Crypto.h"
+
+
+
+
+
+// fwd:
+namespace Json
+{
+	class Value;
+}
 
 
 
 
 
 class cProtocol172 :
-	public cProtocol  // TODO
+	public cProtocol
 {
-	typedef cProtocol super;  // TODO
+	typedef cProtocol super;
 	
 public:
 
 	cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 	
-	/// Called when client sends some data:
-	virtual void DataReceived(const char * a_Data, int a_Size) override;
+	/** Called when client sends some data: */
+	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 
-	/// Sending stuff to clients (alphabetically sorted):
+	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity        (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
 	virtual void SendBlockAction         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim	     (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendChat                (const AString & a_Message) override;
+	virtual void SendChat                (const cCompositeChat & a_Message) override;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) override;
@@ -77,6 +87,10 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) override;
+	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
+	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
+	virtual void SendPaintingSpawn       (const cPainting & a_Painting) override;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override;
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
@@ -92,6 +106,9 @@ public:
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
+	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) override;
@@ -115,7 +132,7 @@ public:
 
 protected:
 
-	/// Composes individual packets in the protocol's m_OutPacketBuffer; sends them upon being destructed
+	/** Composes individual packets in the protocol's m_OutPacketBuffer; sends them upon being destructed */
 	class cPacketizer
 	{
 	public:
@@ -179,7 +196,7 @@ protected:
 			m_Out.WriteVarUTF8String(a_Value);
 		}
 		
-		void WriteBuf(const char * a_Data, int a_Size)
+		void WriteBuf(const char * a_Data, size_t a_Size)
 		{
 			m_Out.Write(a_Data, a_Size);
 		}
@@ -204,25 +221,29 @@ protected:
 	
 	AString m_AuthServerID;
 	
-	/// State of the protocol. 1 = status, 2 = login, 3 = game
+	/** State of the protocol. 1 = status, 2 = login, 3 = game */
 	UInt32 m_State;
 
-	/// Buffer for the received data
+	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
 	
-	/// Buffer for composing the outgoing packets, through cPacketizer
+	/** Buffer for composing the outgoing packets, through cPacketizer */
 	cByteBuffer m_OutPacketBuffer;
 	
-	/// Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer)
+	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
 	cByteBuffer m_OutPacketLenBuffer;
 	
 	bool m_IsEncrypted;
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor;
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
+	
+	cAESCFBDecryptor m_Decryptor;
+	cAESCFBEncryptor m_Encryptor;
+
+	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
+	cFile m_CommLogFile;
 	
 	
-	/// Adds the received (unencrypted) data to m_ReceivedData, parses complete packets
-	void AddReceivedData(const char * a_Data, int a_Size);
+	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
+	void AddReceivedData(const char * a_Data, size_t a_Size);
 	
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
@@ -263,19 +284,24 @@ protected:
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 	
 	
-	/// Writes an entire packet into the output stream. a_Packet is expected to start with the packet type; data length is prepended here.
+	/** Writes an entire packet into the output stream. a_Packet is expected to start with the packet type; data length is prepended here. */
 	void WritePacket(cByteBuffer & a_Packet);
 
-	/// Sends the data to the client, encrypting them if needed.
-	virtual void SendData(const char * a_Data, int a_Size) override;
+	/** Sends the data to the client, encrypting them if needed. */
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 	void SendCompass(const cWorld & a_World);
 	
-	/// Reads an item out of the received data, sets a_Item to the values read. Returns false if not enough received data
+	/** Reads an item out of the received data, sets a_Item to the values read. Returns false if not enough received data */
 	bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item);
 	
-	/// Parses item metadata as read by ReadItem(), into the item enchantments.
+	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
+	
+	void StartEncryption(const Byte * a_Key);
+	
+	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
+	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle);
 } ;
 
 

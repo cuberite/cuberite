@@ -1,4 +1,3 @@
-
 // SignEntity.h
 
 // Declares the cSignEntity class representing a single sign in the world
@@ -56,6 +55,8 @@ public:
 	
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
+
+	static const char * GetClassStatic(void) { return "cSignEntity"; }
 	
 private:
 

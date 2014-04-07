@@ -99,13 +99,6 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	}
 	m_World->BroadcastSoundParticleEffect(2000, m_PosX, m_PosY, m_PosZ, SmokeDir);
 	m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.0f);
-	
-	// Update the UI window, if open:
-	cWindow * Window = GetWindow();
-	if (Window != NULL)
-	{
-		Window->BroadcastWholeWindow();
-	}
 }	
 
 
@@ -136,6 +129,7 @@ void cDropSpenserEntity::SetRedstonePower(bool a_IsPowered)
 
 bool cDropSpenserEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
 	if (!m_ShouldDropSpense)
 	{
 		return false;

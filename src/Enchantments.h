@@ -21,7 +21,6 @@ class cParsedNBT;
 
 
 
-
 /** Class that stores item enchantments or stored-enchantments
 The enchantments may be serialized to a stringspec and read back from such stringspec.
 The format for the stringspec is "id=lvl;id=lvl;id=lvl...", with an optional semicolon at the end,

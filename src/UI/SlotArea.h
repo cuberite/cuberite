@@ -48,10 +48,10 @@ public:
 	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum);
 	
 	/// Called when a new player opens the same parent window. The window already tracks the player. CS-locked.
-	virtual void OnPlayerAdded(cPlayer & a_Player) {} ;
+	virtual void OnPlayerAdded(cPlayer & a_Player);
 	
 	/// Called when one of the players closes the parent window. The window already doesn't track the player. CS-locked.
-	virtual void OnPlayerRemoved(cPlayer & a_Player) {} ;
+	virtual void OnPlayerRemoved(cPlayer & a_Player);
 	
 	/** Called to store as much of a_ItemStack in the area as possible. a_ItemStack is modified to reflect the change.
 	The default implementation searches each slot for available space and distributes the stack there.
@@ -226,7 +226,7 @@ public:
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 	
 	// Distributing items into this area is completely disabled
-	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override {}
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
 
 protected:
 	/// Maps player's EntityID -> current recipe; not a std::map because cCraftingGrid needs proper constructor params

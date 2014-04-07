@@ -2,7 +2,9 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../World.h"
+#include "ChunkInterface.h"
+#include "WorldInterface.h"
+#include "MetaRotator.h"
 #include "../Entities/Player.h"
 
 
@@ -10,18 +12,18 @@
 
 
 class cBlockBedHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01, true>
 {
 public:
 	cBlockBedHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01,true>(a_BlockType)
 	{
 	}
 
 
-	virtual void OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
-	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual void OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 
 
 	virtual bool IsUseable(void) override

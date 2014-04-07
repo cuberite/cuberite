@@ -1,4 +1,3 @@
-
 // ItemMinecart.h
 
 // Declares the various minecart ItemHandlers
@@ -28,7 +27,7 @@ public:
 	
 	
 	
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
 		if (a_Dir < 0)
 		{
@@ -72,6 +71,11 @@ public:
 			}
 		}  // switch (m_ItemType)
 		Minecart->Initialize(a_World);
+
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
 		return true;
 	}
 	

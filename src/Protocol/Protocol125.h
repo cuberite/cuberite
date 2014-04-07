@@ -11,6 +11,7 @@
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+#include "../Entities/Painting.h"
 
 
 
@@ -24,7 +25,7 @@ public:
 	cProtocol125(cClientHandle * a_Client);
 	
 	/// Called when client sends some data:
-	virtual void DataReceived(const char * a_Data, int a_Size) override;
+	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 	
 	/// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity        (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
@@ -33,6 +34,7 @@ public:
 	virtual void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendChat                (const AString & a_Message) override;
+	virtual void SendChat                (const cCompositeChat & a_Message) override;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) override;
@@ -54,7 +56,19 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) override;
+	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
+	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override 
+	{
+		// This protocol doesn't support such message
+		UNUSED(a_ID);
+		UNUSED(a_Scale);
+	} 
 	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
+	virtual void SendPaintingSpawn       (const cPainting & a_Painting) override 
+	{
+		UNUSED(a_Painting);
+	};
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override {}  // This protocol doesn't support such message
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
@@ -68,6 +82,14 @@ public:
 	virtual void SendRespawn             (void) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb &  a_ExpOrb) override;
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)                            override 
+	{
+		UNUSED(a_Name);
+		UNUSED(a_DisplayName);
+		UNUSED(a_Mode);
+	} // This protocol doesn't support such message
+	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override {} // This protocol doesn't support such message
+	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)                              override {} // This protocol doesn't support such message
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
@@ -83,8 +105,8 @@ public:
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
 	virtual void SendWeather             (eWeather a_Weather) override;
-	virtual void SendWholeInventory      (const cWindow    & a_Window) override;
-	virtual void SendWindowClose         (const cWindow    & a_Window) override;
+	virtual void SendWholeInventory      (const cWindow & a_Window) override;
+	virtual void SendWindowClose         (const cWindow & a_Window) override;
 	virtual void SendWindowOpen          (const cWindow & a_Window) override;
 	virtual void SendWindowProperty      (const cWindow & a_Window, short a_Property, short a_Value) override;
 	
@@ -103,7 +125,7 @@ protected:
 	
 	AString m_Username;  ///< Stored in ParseHandshake(), compared to Login username
 	
-	virtual void SendData(const char * a_Data, int a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 	
 	/// Sends the Handshake packet
 	void SendHandshake(const AString & a_ConnectionHash);

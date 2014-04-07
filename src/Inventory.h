@@ -52,6 +52,8 @@ public:
 	
 	cInventory(cPlayer & a_Owner);
 	
+	virtual ~cInventory() {}
+	
 	// tolua_begin
 
 	/// Removes all items from the entire inventory
@@ -149,6 +151,9 @@ public:
 	
 	/// Sends the slot contents to the owner
 	void SendSlot(int a_SlotNum);
+
+	/// Update items (e.g. Maps)
+	void UpdateItems(void);
 
 	/// Converts an armor slot number into the ID for the EntityEquipment packet
 	static int ArmorSlotNumToEntityEquipmentID(short a_ArmorSlotNum);

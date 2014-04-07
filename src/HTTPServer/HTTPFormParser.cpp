@@ -52,7 +52,7 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callba
 
 
 
-cHTTPFormParser::cHTTPFormParser(eKind a_Kind, const char * a_Data, int a_Size, cCallbacks & a_Callbacks) :
+cHTTPFormParser::cHTTPFormParser(eKind a_Kind, const char * a_Data, size_t a_Size, cCallbacks & a_Callbacks) :
 	m_Callbacks(a_Callbacks),
 	m_Kind(a_Kind),
 	m_IsValid(true)
@@ -64,7 +64,7 @@ cHTTPFormParser::cHTTPFormParser(eKind a_Kind, const char * a_Data, int a_Size, 
 
 
 
-void cHTTPFormParser::Parse(const char * a_Data, int a_Size)
+void cHTTPFormParser::Parse(const char * a_Data, size_t a_Size)
 {
 	if (!m_IsValid)
 	{
@@ -243,7 +243,7 @@ void cHTTPFormParser::OnPartHeader(const AString & a_Key, const AString & a_Valu
 
 
 
-void cHTTPFormParser::OnPartData(const char * a_Data, int a_Size)
+void cHTTPFormParser::OnPartData(const char * a_Data, size_t a_Size)
 {
 	if (m_CurrentPartName.empty())
 	{

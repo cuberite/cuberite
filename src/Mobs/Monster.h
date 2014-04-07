@@ -5,12 +5,12 @@
 #include "../Defines.h"
 #include "../BlockID.h"
 #include "../Item.h"
+#include "../Enchantments.h"
 
 
 
 
 
-class Vector3f;
 class cClientHandle;
 class cWorld;
 
@@ -74,8 +74,6 @@ public:
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
 	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
 	
-	float m_SightDistance;
-	
 	/** Creates the mob object.
 	* If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
 	* a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs , 2012_12_22))
@@ -94,20 +92,16 @@ public:
 	virtual void KilledBy(cEntity * a_Killer) override;
 
 	virtual void MoveToPosition(const Vector3f & a_Position);
+	virtual void MoveToPosition(const Vector3d & a_Position); // tolua_export
 	virtual bool ReachedDestination(void);
 	
 	// tolua_begin
 	eType GetMobType(void) const {return m_MobType; }
 	eFamily GetMobFamily(void) const;
 	// tolua_end
-
-
-	const char * GetState();
-	void SetState(const AString & str);
 	
 	virtual void CheckEventSeePlayer(void);
 	virtual void EventSeePlayer(cEntity * a_Player);
-	virtual cPlayer * FindClosestPlayer();		// non static is easier. also virtual so other mobs can implement their own searching algo 
 	
 	/// Reads the monster configuration for the specified monster name and assigns it to this object.
 	void GetMonsterConfig(const AString & a_Name);
@@ -119,13 +113,24 @@ public:
 	virtual void InStateChasing (float a_Dt);
 	virtual void InStateEscaping(float a_Dt);
 	
-	virtual void Attack(float a_Dt);
+	int GetAttackRate() { return (int)m_AttackRate; }
+	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
+	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
+	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
+	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
 	
-	int GetAttackRate(){return (int)m_AttackRate;}
-	void SetAttackRate(int ar);
-	void SetAttackRange(float ar);
-	void SetAttackDamage(float ad);
-	void SetSightDistance(float sd);
+	float GetDropChanceWeapon() { return m_DropChanceWeapon; }
+	float GetDropChanceHelmet() { return m_DropChanceHelmet; }
+	float GetDropChanceChestplate() { return m_DropChanceChestplate; }
+	float GetDropChanceLeggings() { return m_DropChanceLeggings; }
+	float GetDropChanceBoots() { return m_DropChanceBoots; }
+	bool CanPickUpLoot() { return m_CanPickUpLoot; }
+	void SetDropChanceWeapon(float a_DropChanceWeapon) { m_DropChanceWeapon = a_DropChanceWeapon; }
+	void SetDropChanceHelmet(float a_DropChanceHelmet) { m_DropChanceHelmet = a_DropChanceHelmet; }
+	void SetDropChanceChestplate(float a_DropChanceChestplate) { m_DropChanceChestplate = a_DropChanceChestplate; }
+	void SetDropChanceLeggings(float a_DropChanceLeggings) { m_DropChanceLeggings = a_DropChanceLeggings; }
+	void SetDropChanceBoots(float a_DropChanceBoots) { m_DropChanceBoots = a_DropChanceBoots; }
+	void SetCanPickUpLoot(bool a_CanPickUpLoot) { m_CanPickUpLoot = a_CanPickUpLoot; }
 	
 	/// Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick
 	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
@@ -159,34 +164,101 @@ public:
 
 protected:
 	
+	/* ======= PATHFINDING ======= */
+
+	/** A pointer to the entity this mobile is aiming to reach */
 	cEntity * m_Target;
-	float m_AttackRate;
-	float m_IdleInterval;
+	/** Coordinates of the next position that should be reached */
+	Vector3d m_Destination;
+	/** Coordinates for the ultimate, final destination. */
+	Vector3d m_FinalDestination;
+	/** Returns if the ultimate, final destination has been reached */
+	bool ReachedFinalDestination(void);
 
-	Vector3f m_Destination;
+	/** Stores if mobile is currently moving towards the ultimate, final destination */
 	bool m_bMovingToDestination;
-	bool m_bPassiveAggressive;
+	/** Finds the first non-air block position (not the highest, as cWorld::GetHeight does)
+		If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
+		If current Y is solid, goes up to find first nonsolid block, and returns that */
+	int FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ);
+	/** Returns if a monster can actually reach a given height by jumping or walking */
+	inline bool IsNextYPosReachable(int a_PosY)
+	{
+		return (
+			(a_PosY <= (int)floor(GetPosY())) ||
+			DoesPosYRequireJump(a_PosY)
+			);
+	}
+	/** Returns if a monster can reach a given height by jumping */
+	inline bool DoesPosYRequireJump(int a_PosY)
+	{
+		return ((a_PosY > (int)floor(GetPosY())) && (a_PosY == (int)floor(GetPosY()) + 1));
+	}
 
-	float m_DestinationTime;
+	/** A semi-temporary list to store the traversed coordinates during active pathfinding so we don't visit them again */
+	std::vector<Vector3i> m_TraversedCoordinates;
+	/** Returns if coordinate is in the traversed list */
+	bool IsCoordinateInTraversedList(Vector3i a_Coords);
 
+	/** Finds the next place to go
+		This is based on the ultimate, final destination and the current position, as well as the traversed coordinates, and any environmental hazards */
+	void TickPathFinding(void);
+	/** Finishes a pathfinding task, be it due to failure or something else */
+	inline void FinishPathFinding(void)
+	{
+		m_TraversedCoordinates.clear();
+		m_bMovingToDestination = false;
+	}
+	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
+	void SetPitchAndYawFromDestination(void);
+
+	/* =========================== */
+	/* ========= FALLING ========= */
+
+	virtual void HandleFalling(void);
+	int m_LastGroundHeight;
+
+	/* =========================== */
+
+	float m_IdleInterval;
 	float m_DestroyTimer;
-	float m_Jump;
 
 	eType m_MobType;
 
 	AString m_SoundHurt;
 	AString m_SoundDeath;
 
-	float m_SeePlayerInterval;
-	float m_AttackDamage;
-	float m_AttackRange;
+	float m_AttackRate;	
+	int m_AttackDamage;
+	int m_AttackRange;
 	float m_AttackInterval;
+	int m_SightDistance;
 	
-	bool m_BurnsInDaylight;
-
-	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
+	float m_DropChanceWeapon;
+	float m_DropChanceHelmet;
+	float m_DropChanceChestplate;
+	float m_DropChanceLeggings;
+	float m_DropChanceBoots;
+	bool m_CanPickUpLoot;
 	
 	void HandleDaylightBurning(cChunk & a_Chunk);
+	bool m_BurnsInDaylight;
+
+	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops*/
+	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);	
+	
+	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops*/
+	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);	
+	
+	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops*/
+	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel); 
+	
+	/** Adds armor that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
+	void AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel);
+	
+	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
+	void AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel);
+	
 
 } ; // tolua_export
 

@@ -18,8 +18,8 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -28,7 +28,7 @@ public:
 
 		BLOCKTYPE BlockBeforePlacement;
 		NIBBLETYPE MetaBeforePlacement;
-		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockBeforePlacement, MetaBeforePlacement);
+		a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockBeforePlacement, MetaBeforePlacement);
 
 		if ((BlockBeforePlacement == E_BLOCK_SNOW) && (MetaBeforePlacement < 7))
 		{
@@ -65,14 +65,14 @@ public:
 	}
 
 
-	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY > 0)
 		{
 			BLOCKTYPE BlockBelow = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 			NIBBLETYPE MetaBelow = a_Chunk.GetMeta(a_RelX, a_RelY - 1, a_RelZ);
 			
-			if (g_BlockIsSnowable[BlockBelow] || ((BlockBelow == E_BLOCK_SNOW) && (MetaBelow == 7)))
+			if (cBlockInfo::IsSnowable(BlockBelow) || ((BlockBelow == E_BLOCK_SNOW) && (MetaBelow == 7)))
 			{
 				// If block below is snowable, or it is a thin slow block and has a meta of 7 (full thin snow block), say yay
 				return true;

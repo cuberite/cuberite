@@ -27,7 +27,7 @@ public:
 	}
 	
 	
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
 		ASSERT(a_Player != NULL);
 		
@@ -42,7 +42,7 @@ public:
 	}
 	
 	
-	virtual void OnItemShoot(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
+	virtual void OnItemShoot(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
 	{
 		// Actual shot - produce the arrow with speed based on the ticks that the bow was charged
 		ASSERT(a_Player != NULL);

@@ -4,6 +4,7 @@
 #include "Wolf.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "../Items/ItemHandler.h"
 
 
 
@@ -37,6 +38,26 @@ void cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
+void cWolf::Attack(float a_Dt)
+{
+	UNUSED(a_Dt);
+
+	if ((m_Target != NULL) && (m_Target->IsPlayer()))
+	{
+		if (((cPlayer *)m_Target)->GetName() != m_OwnerName)
+		{
+			super::Attack(a_Dt);
+		}
+	}
+	else
+	{
+		super::Attack(a_Dt);
+	}
+}
+
+
+
+
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
@@ -55,32 +76,55 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				SetIsTame(true);
 				SetOwner(a_Player.GetName());
 				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_WOLF_TAMED);
+				m_World->BroadcastParticleEffect("heart", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
 			}
 			else
 			{
 				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_WOLF_TAMING);
+				m_World->BroadcastParticleEffect("smoke", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
 			}
 		}
 	}
 	else if (IsTame())
 	{
-		if (a_Player.GetName() == m_OwnerName) // Is the player the owner of the dog?
+		switch (a_Player.GetEquippedItem().m_ItemType)
 		{
-			if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE)
+			case E_ITEM_RAW_BEEF:
+			case E_ITEM_STEAK:
+			case E_ITEM_RAW_PORKCHOP:
+			case E_ITEM_COOKED_PORKCHOP:
+			case E_ITEM_RAW_CHICKEN:
+			case E_ITEM_COOKED_CHICKEN:
+			case E_ITEM_ROTTEN_FLESH:
 			{
-				SetCollarColor(15 - a_Player.GetEquippedItem().m_ItemDamage);
-				if (!a_Player.IsGameModeCreative())
+				if (m_Health < m_MaxHealth)
 				{
-					a_Player.GetInventory().RemoveOneEquippedItem();
+					Heal(ItemHandler(a_Player.GetEquippedItem().m_ItemType)->GetFoodInfo().FoodLevel);
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
 				}
-			} 
-			else if (IsSitting()) 
-			{
-				SetIsSitting(false);
+				break;
 			}
-			else
+			case E_ITEM_DYE:
 			{
-				SetIsSitting(true);
+				if (a_Player.GetName() == m_OwnerName) // Is the player the owner of the dog?
+				{
+					SetCollarColor(15 - a_Player.GetEquippedItem().m_ItemDamage);
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
+				}
+				break;
+			}
+			default:
+			{
+				if (a_Player.GetName() == m_OwnerName) // Is the player the owner of the dog?
+				{
+					SetIsSitting(!IsSitting());
+				}
 			}
 		}
 	}
@@ -103,12 +147,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		super::Tick(a_Dt, a_Chunk);
 	}
 
-	if (IsSitting())
-	{
-		m_bMovingToDestination = false;
-	}
-
-	cPlayer * a_Closest_Player = FindClosestPlayer();
+	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
 	if (a_Closest_Player != NULL)
 	{
 		switch (a_Closest_Player->GetEquippedItem().m_ItemType)
@@ -119,16 +158,23 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 			case E_ITEM_RAW_CHICKEN:
 			case E_ITEM_COOKED_CHICKEN:
 			case E_ITEM_ROTTEN_FLESH:
+			case E_ITEM_RAW_PORKCHOP:
+			case E_ITEM_COOKED_PORKCHOP:
 			{
 				if (!IsBegging())
 				{
 					SetIsBegging(true);
 					m_World->BroadcastEntityMetadata(*this);
 				}
-				Vector3f a_NewDestination = a_Closest_Player->GetPosition();
-				a_NewDestination.y = a_NewDestination.y + 1; // Look at the head of the player, not his feet.
-				m_Destination = Vector3f(a_NewDestination);
-				m_bMovingToDestination = false;
+
+				m_FinalDestination = a_Closest_Player->GetPosition(); // So that we will look at a player holding food
+
+				// Don't move to the player if the wolf is sitting.
+				if (!IsSitting())
+				{
+					MoveToPosition(a_Closest_Player->GetPosition());
+				}
+
 				break;
 			}
 			default:
@@ -142,9 +188,13 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (IsTame())
+	if (IsTame() && !IsSitting())
 	{
 		TickFollowPlayer();
+	}
+	else if (IsSitting())
+	{
+		m_bMovingToDestination = false;
 	}
 }
 
@@ -163,23 +213,21 @@ void cWolf::TickFollowPlayer()
 			return false;
 		}
 	public:
-		Vector3f OwnerPos;
+		Vector3d OwnerPos;
 	} Callback;
+
 	if (m_World->DoWithPlayer(m_OwnerName, Callback))
 	{
-		// The player is present in the world, follow them:
+		// The player is present in the world, follow him:
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();
-		if (Distance < 3)
+		if (Distance > 30)
 		{
-			m_bMovingToDestination = false;
-		}
-		else if ((Distance > 30) && (!IsSitting()))
-		{
+			Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
 			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
 		}
 		else
 		{
-			m_Destination = Callback.OwnerPos;
+			MoveToPosition(Callback.OwnerPos);
 		}
 	}
 }

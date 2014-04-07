@@ -13,8 +13,16 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 	int res = atoi(a_BiomeString.c_str());
 	if ((res != 0) || (a_BiomeString.compare("0") == 0))
 	{
-		// It was a valid number
-		return (EMCSBiome)res;
+		if ((res >= biFirstBiome) && (res < biNumBiomes))
+		{
+			return (EMCSBiome)res;
+		}
+		else if ((res >= biFirstVariantBiome) && (res < biNumVariantBiomes))
+		{
+			return (EMCSBiome)res;
+		}
+		// It was an invalid number
+		return biInvalidBiome;
 	}
 	
 	// Convert using the built-in map:
@@ -100,7 +108,7 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 			return BiomeMap[i].m_Biome;
 		}
 	}  // for i - BiomeMap[]
-	return (EMCSBiome)-1;
+	return biInvalidBiome;
 }
 
 

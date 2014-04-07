@@ -204,6 +204,12 @@ void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 		return;
 	}
 	Grid->SetSlot(GridSlotNum, a_Item);
+
+	// Broadcast the Equipped Item, if the Slot is changed.
+	if ((Grid == &m_HotbarSlots) && (m_EquippedSlotNum == (a_SlotNum - invHotbarOffset)))
+	{
+		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, 0, a_Item, m_Owner.GetClientHandle());
+	}
 }
 
 
@@ -510,6 +516,31 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 	return true;
 }
 #endif
+
+
+
+
+
+void cInventory::UpdateItems(void)
+{
+	const cItem & Slot = GetEquippedItem();
+
+	if (Slot.IsEmpty())
+	{
+		return;
+	}
+
+	switch (Slot.m_ItemType)
+	{
+		case E_ITEM_MAP:
+		{
+			ItemHandler(Slot.m_ItemType)->OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
+			break;
+		}
+
+		default: break;
+	}
+}
 
 
 

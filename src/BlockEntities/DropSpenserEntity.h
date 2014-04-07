@@ -11,7 +11,6 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-#include "../UI/WindowOwner.h"
 
 
 
@@ -31,8 +30,7 @@ class cServer;
 
 // tolua_begin
 class cDropSpenserEntity :
-	public cBlockEntityWithItems,
-	public cBlockEntityWindowOwner
+	public cBlockEntityWithItems
 {
 	typedef cBlockEntityWithItems super;
 

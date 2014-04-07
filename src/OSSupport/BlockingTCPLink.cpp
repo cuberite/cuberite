@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockingTCPLink.h"
-
+#include "Errors.h"
 
 
 
@@ -70,12 +70,12 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 		}
 	}
 
-	server.sin_addr.s_addr = *((unsigned long *)hp->h_addr);
+	memcpy(&server.sin_addr.s_addr,hp->h_addr, hp->h_length);
 	server.sin_family = AF_INET;
 	server.sin_port = htons( (unsigned short)iPort);
 	if (connect(m_Socket, (struct sockaddr *)&server, sizeof(server)))
 	{
-		LOGWARN("cTCPLink: Connection to \"%s:%d\" failed (%s)", iAddress, iPort, cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
+		LOGWARN("cTCPLink: Connection to \"%s:%d\" failed (%s)", iAddress, iPort,GetOSErrorString( cSocket::GetLastError() ).c_str() );
 		CloseSocket();
 		return false;
 	}
@@ -89,6 +89,8 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 
 int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 0 */ )
 {
+	UNUSED(a_Flags);
+	
 	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{
@@ -104,6 +106,8 @@ int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 
 
 int cBlockingTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ )
 {
+	UNUSED(a_Flags);
+	
 	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{

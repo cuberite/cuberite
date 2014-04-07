@@ -4,9 +4,7 @@
 #include "../World.h"
 #include "../Server.h"
 #include "../Root.h"
-#include "../Vector3d.h"
-#include "../Matrix4f.h"
-#include "../ReferenceManager.h"
+#include "../Matrix4.h"
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "../Simulator/FluidSimulator.h"
@@ -32,8 +30,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_MaxHealth(1)
 	, m_AttachedTo(NULL)
 	, m_Attachee(NULL)
-	, m_Referencers(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCERS))
-	, m_References(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCES))
 	, m_bDirtyHead(true)
 	, m_bDirtyOrientation(true)
 	, m_bDirtyPosition(true)
@@ -54,6 +50,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_TicksSinceLastFireDamage(0)
 	, m_TicksLeftBurning(0)
 	, m_TicksSinceLastVoidDamage(0)
+	, m_IsSwimming(false)
+	, m_IsSubmerged(false)
 	, m_HeadYaw( 0.0 )
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
@@ -73,7 +71,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 
 cEntity::~cEntity()
 {
-	ASSERT(!m_World->HasEntity(m_UniqueID));  // Before deleting, the entity needs to have been removed from the world
+	// Before deleting, the entity needs to have been removed from the world, if ever added
+	ASSERT((m_World == NULL) || !m_World->HasEntity(m_UniqueID));
 	
 	/*
 	// DEBUG:
@@ -99,8 +98,6 @@ cEntity::~cEntity()
 		LOGWARNING("ERROR: Entity deallocated without being destroyed");
 		ASSERT(!"Entity deallocated without being destroyed or unlinked");
 	}
-	delete m_Referencers;
-	delete m_References;
 }
 
 
@@ -400,6 +397,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case dtPotionOfHarming:
 		case dtFalling:
 		case dtLightning:
+		case dtPlugin:
 		{
 			return 0;
 		}
@@ -476,7 +474,7 @@ void cEntity::KilledBy(cEntity * a_Killer)
 		return;
 	}
 
-	// Drop loot:	
+	// Drop loot:
 	cItems Drops;
 	GetDrops(Drops, a_Killer);
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
@@ -523,18 +521,36 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (a_Chunk.IsValid())
 		{
-			HandlePhysics(a_Dt, a_Chunk);
+			cChunk * NextChunk = a_Chunk.GetNeighborChunk(POSX_TOINT, POSZ_TOINT);
+
+			if ((NextChunk == NULL) || !NextChunk->IsValid())
+			{
+				return;
+			}
+
+			TickBurning(*NextChunk);
+
+			if (GetPosY() < VOID_BOUNDARY)
+			{
+				TickInVoid(*NextChunk);
+			}
+			else
+			{
+				m_TicksSinceLastVoidDamage = 0;
+			}
+
+			if (IsMob() || IsPlayer())
+			{
+				// Set swimming state
+				SetSwimState(*NextChunk);
+
+				// Handle drowning
+				HandleAir();
+			}
+
+			HandlePhysics(a_Dt, *NextChunk);
 		}
 	}
-	if (a_Chunk.IsValid())
-	{
-		TickBurning(a_Chunk);
-	}
-	if ((a_Chunk.IsValid())  && (GetPosY() < -46))
-	{
-		TickInVoid(a_Chunk);
-	}
-	else { m_TicksSinceLastVoidDamage = 0; }
 }
 
 
@@ -554,7 +570,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
 		// Outside of the world
-
+		
 		cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
 		// See if we can commit our changes. If not, we will discard them.
 		if (NextChunk != NULL)
@@ -563,209 +579,204 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			NextPos += (NextSpeed * a_Dt);
 			SetPosition(NextPos);
 		}
+
 		return;
 	}
 	
-	// Make sure we got the correct chunk and a valid one. No one ever knows...
-	cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
-	if (NextChunk != NULL)
+	int RelBlockX = BlockX - (a_Chunk.GetPosX() * cChunkDef::Width);
+	int RelBlockZ = BlockZ - (a_Chunk.GetPosZ() * cChunkDef::Width);
+	BLOCKTYPE BlockIn = a_Chunk.GetBlock( RelBlockX, BlockY, RelBlockZ );
+	BLOCKTYPE BlockBelow = (BlockY > 0) ? a_Chunk.GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
+	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
-		int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
-		int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
-		BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
-		BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
-		if (!g_BlockIsSolid[BlockIn])  // Making sure we are not inside a solid block
+		if (m_bOnGround)  // check if it's still on the ground
 		{
-			if (m_bOnGround)  // check if it's still on the ground
+			if (!cBlockInfo::IsSolid(BlockBelow))  // Check if block below is air or water.
 			{
-				if (!g_BlockIsSolid[BlockBelow])  // Check if block below is air or water.
-				{
-					m_bOnGround = false;
-				}
+				m_bOnGround = false;
 			}
 		}
-		else
+	}
+	else
+	{
+		// Push out entity.
+		BLOCKTYPE GotBlock;
+
+		static const struct
 		{
-			// Push out entity.
-			BLOCKTYPE GotBlock;
+			int x, y, z;
+		} gCrossCoords[] =
+		{
+			{ 1, 0,  0},
+			{-1, 0,  0},
+			{ 0, 0,  1},
+			{ 0, 0, -1},
+		} ;
 
-			static const struct
+		bool IsNoAirSurrounding = true;
+		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+		{
+			if (!a_Chunk.UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
 			{
-				int x, y, z;
-			} gCrossCoords[] =
+				// The pickup is too close to an unloaded chunk, bail out of any physics handling
+				return;
+			}
+			if (!cBlockInfo::IsSolid(GotBlock))
 			{
-				{ 1, 0,  0},
-				{-1, 0,  0},
-				{ 0, 0,  1},
-				{ 0, 0, -1},
-			} ;
-
-			bool IsNoAirSurrounding = true;
-			for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
-			{
-				if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
-				{
-					// The pickup is too close to an unloaded chunk, bail out of any physics handling
-					return;
-				}
-				if (!g_BlockIsSolid[GotBlock])
-				{
-					NextPos.x += gCrossCoords[i].x;
-					NextPos.z += gCrossCoords[i].z;
-					IsNoAirSurrounding = false;
-					break;
-				}
-			}  // for i - gCrossCoords[]
+				NextPos.x += gCrossCoords[i].x;
+				NextPos.z += gCrossCoords[i].z;
+				IsNoAirSurrounding = false;
+				break;
+			}
+		}  // for i - gCrossCoords[]
 			
-			if (IsNoAirSurrounding)
-			{
-				NextPos.y += 0.5;
-			}
-
-			m_bOnGround = true;
-
-			/*
-			// DEBUG:
-			LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
-				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ
-			);
-			*/
+		if (IsNoAirSurrounding)
+		{
+			NextPos.y += 0.5;
 		}
 
-		if (!m_bOnGround)
+		m_bOnGround = true;
+
+		/*
+		// DEBUG:
+		LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
+			m_UniqueID, GetClass(), BlockX, BlockY, BlockZ
+		);
+		*/
+	}
+
+	if (!m_bOnGround)
+	{
+		float fallspeed;
+		if (IsBlockWater(BlockIn))
 		{
-			float fallspeed;
-			if (IsBlockWater(BlockIn))
-			{
-				fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
-			}
-			else if (BlockIn == E_BLOCK_COBWEB)
-			{
-				NextSpeed.y *= 0.05;  // Reduce overall falling speed
-				fallspeed = 0;  // No falling.
-			}
-			else
-			{
-				// Normal gravity
-				fallspeed = m_Gravity * a_Dt;
-			}
-			NextSpeed.y += fallspeed;
+			fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
+		}
+		else if (BlockIn == E_BLOCK_COBWEB)
+		{
+			NextSpeed.y *= 0.05;  // Reduce overall falling speed
+			fallspeed = 0;  // No falling.
 		}
 		else
 		{
-			// Friction
-			if (NextSpeed.SqrLength() > 0.0004f)
+			// Normal gravity
+			fallspeed = m_Gravity * a_Dt;
+		}
+		NextSpeed.y += fallspeed;
+	}
+	else
+	{
+		// Friction
+		if (NextSpeed.SqrLength() > 0.0004f)
+		{
+			NextSpeed.x *= 0.7f / (1 + a_Dt);
+			if (fabs(NextSpeed.x) < 0.05)
 			{
-				NextSpeed.x *= 0.7f / (1 + a_Dt);
-				if (fabs(NextSpeed.x) < 0.05)
-				{
-					NextSpeed.x = 0;
-				}
-				NextSpeed.z *= 0.7f / (1 + a_Dt);
-				if (fabs(NextSpeed.z) < 0.05)
-				{
-					NextSpeed.z = 0;
-				}
+				NextSpeed.x = 0;
+			}
+			NextSpeed.z *= 0.7f / (1 + a_Dt);
+			if (fabs(NextSpeed.z) < 0.05)
+			{
+				NextSpeed.z = 0;
 			}
 		}
+	}
 
-		// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
-		// might have different speed modifiers according to terrain.
-		if (BlockIn == E_BLOCK_COBWEB)
-		{
-			NextSpeed.x *= 0.25;
-			NextSpeed.z *= 0.25;
-		}
+	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
+	// might have different speed modifiers according to terrain.
+	if (BlockIn == E_BLOCK_COBWEB)
+	{
+		NextSpeed.x *= 0.25;
+		NextSpeed.z *= 0.25;
+	}
 					
-		//Get water direction
-		Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+	//Get water direction
+	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
-		m_WaterSpeed *= 0.9f;		//Reduce speed each tick
+	m_WaterSpeed *= 0.9f;		//Reduce speed each tick
 
-		switch(WaterDir)
-		{
-			case X_PLUS:
-				m_WaterSpeed.x = 0.2f;
-				m_bOnGround = false;
-				break;
-			case X_MINUS:
-				m_WaterSpeed.x = -0.2f;
-				m_bOnGround = false;
-				break;
-			case Z_PLUS:
-				m_WaterSpeed.z = 0.2f;
-				m_bOnGround = false;
-				break;
-			case Z_MINUS:
-				m_WaterSpeed.z = -0.2f;
-				m_bOnGround = false;
-				break;
-			
-		default:
+	switch(WaterDir)
+	{
+		case X_PLUS:
+			m_WaterSpeed.x = 0.2f;
+			m_bOnGround = false;
 			break;
-		}
+		case X_MINUS:
+			m_WaterSpeed.x = -0.2f;
+			m_bOnGround = false;
+			break;
+		case Z_PLUS:
+			m_WaterSpeed.z = 0.2f;
+			m_bOnGround = false;
+			break;
+		case Z_MINUS:
+			m_WaterSpeed.z = -0.2f;
+			m_bOnGround = false;
+			break;
+			
+	default:
+		break;
+	}
 
-		if (fabs(m_WaterSpeed.x) < 0.05)
+	if (fabs(m_WaterSpeed.x) < 0.05)
+	{
+		m_WaterSpeed.x = 0;
+	}
+
+	if (fabs(m_WaterSpeed.z) < 0.05)
+	{
+		m_WaterSpeed.z = 0;
+	}
+
+	NextSpeed += m_WaterSpeed;
+
+	if( NextSpeed.SqrLength() > 0.f )
+	{
+		cTracer Tracer( GetWorld() );
+		bool HasHit = Tracer.Trace( NextPos, NextSpeed, 2 );
+		if (HasHit) // Oh noez! we hit something
 		{
-			m_WaterSpeed.x = 0;
-		}
-
-		if (fabs(m_WaterSpeed.z) < 0.05)
-		{
-			m_WaterSpeed.z = 0;
-		}
-
-		NextSpeed += m_WaterSpeed;
-
-		if( NextSpeed.SqrLength() > 0.f )
-		{
-			cTracer Tracer( GetWorld() );
-			int Ret = Tracer.Trace( NextPos, NextSpeed, 2 );
-			if( Ret ) // Oh noez! we hit something
+			// Set to hit position
+			if ((Tracer.RealHit - NextPos).SqrLength() <= (NextSpeed * a_Dt).SqrLength())
 			{
-				// Set to hit position
-				if( (Tracer.RealHit - NextPos).SqrLength() <= ( NextSpeed * a_Dt ).SqrLength() )
-				{
-					if( Ret == 1 )
-					{
-						if( Tracer.HitNormal.x != 0.f ) NextSpeed.x = 0.f;
-						if( Tracer.HitNormal.y != 0.f ) NextSpeed.y = 0.f;
-						if( Tracer.HitNormal.z != 0.f ) NextSpeed.z = 0.f;
+				if (Tracer.HitNormal.x != 0.f) NextSpeed.x = 0.f;
+				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
+				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
 
-						if( Tracer.HitNormal.y > 0 ) // means on ground
-						{
-							m_bOnGround = true;
-						}
-					}
-					NextPos.Set(Tracer.RealHit.x,Tracer.RealHit.y,Tracer.RealHit.z);
-					NextPos.x += Tracer.HitNormal.x * 0.3f;
-					NextPos.y += Tracer.HitNormal.y * 0.05f; // Any larger produces entity vibration-upon-the-spot
-					NextPos.z += Tracer.HitNormal.z * 0.3f;
-				}
-				else
+				if (Tracer.HitNormal.y > 0) // means on ground
 				{
-					NextPos += (NextSpeed * a_Dt);
+					m_bOnGround = true;
 				}
+				NextPos.Set(Tracer.RealHit.x,Tracer.RealHit.y,Tracer.RealHit.z);
+				NextPos.x += Tracer.HitNormal.x * 0.3f;
+				NextPos.y += Tracer.HitNormal.y * 0.05f; // Any larger produces entity vibration-upon-the-spot
+				NextPos.z += Tracer.HitNormal.z * 0.3f;
 			}
 			else
 			{
-				// We didn't hit anything, so move =]
 				NextPos += (NextSpeed * a_Dt);
 			}
 		}
-		BlockX = (int) floor(NextPos.x);
-		BlockZ = (int) floor(NextPos.z);
-		NextChunk = NextChunk->GetNeighborChunk(BlockX,BlockZ);
-		// See if we can commit our changes. If not, we will discard them.
-		if (NextChunk != NULL)
+		else
 		{
-			if (NextPos.x != GetPosX()) SetPosX(NextPos.x);
-			if (NextPos.y != GetPosY()) SetPosY(NextPos.y);
-			if (NextPos.z != GetPosZ()) SetPosZ(NextPos.z);
-			if (NextSpeed.x != GetSpeedX()) SetSpeedX(NextSpeed.x);
-			if (NextSpeed.y != GetSpeedY()) SetSpeedY(NextSpeed.y);
-			if (NextSpeed.z != GetSpeedZ()) SetSpeedZ(NextSpeed.z);
+			// We didn't hit anything, so move =]
+			NextPos += (NextSpeed * a_Dt);
 		}
+	}
+
+	BlockX = (int) floor(NextPos.x);
+	BlockZ = (int) floor(NextPos.z);
+
+	cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
+	// See if we can commit our changes. If not, we will discard them.
+	if (NextChunk != NULL)
+	{
+		if (NextPos.x != GetPosX()) SetPosX(NextPos.x);
+		if (NextPos.y != GetPosY()) SetPosY(NextPos.y);
+		if (NextPos.z != GetPosZ()) SetPosZ(NextPos.z);
+		if (NextSpeed.x != GetSpeedX()) SetSpeedX(NextSpeed.x);
+		if (NextSpeed.y != GetSpeedY()) SetSpeedY(NextSpeed.y);
+		if (NextSpeed.z != GetSpeedZ()) SetSpeedZ(NextSpeed.z);
 	}
 }
 
@@ -807,14 +818,13 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		{
 			int RelX = x;
 			int RelZ = z;
-			cChunk * CurChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelX, RelZ);
-			if (CurChunk == NULL)
-			{
-				continue;
-			}
+
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				switch (CurChunk->GetBlock(RelX, y, RelZ))
+				BLOCKTYPE Block;
+				a_Chunk.UnboundedRelGetBlockType(RelX, y, RelZ, Block);
+				
+				switch (Block)
 				{
 					case E_BLOCK_FIRE:
 					{
@@ -905,6 +915,86 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 	else
 	{
 		m_TicksSinceLastVoidDamage++;
+	}
+}
+
+
+
+
+
+void cEntity::SetSwimState(cChunk & a_Chunk)
+{
+	int RelY = (int)floor(GetPosY() + 0.1);
+	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
+	{
+		m_IsSwimming = false;
+		m_IsSubmerged = false;
+		return;
+	}
+
+	BLOCKTYPE BlockIn;
+	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
+
+	// Check if the player is swimming:
+	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
+	{
+		// This sometimes happens on Linux machines
+		// Ref.: http://forum.mc-server.org/showthread.php?tid=1244
+		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, LastPos = {%.02f, %.02f}, Pos = %.02f, %.02f}",
+			RelX, RelY, m_LastPosX, m_LastPosZ, GetPosX(), GetPosZ()
+			);
+		m_IsSwimming = false;
+		m_IsSubmerged = false;
+		return;
+	}
+	m_IsSwimming = IsBlockWater(BlockIn);
+
+	// Check if the player is submerged:
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
+	m_IsSubmerged = IsBlockWater(BlockIn);
+}
+
+
+
+
+
+void cEntity::HandleAir(void)
+{
+	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
+	// See if the entity is /submerged/ water (block above is water)
+	// Get the type of block the entity is standing in:
+
+	if (IsSubmerged())
+	{
+		SetSpeedY(1); // Float in the water
+
+		// Either reduce air level or damage player
+		if (m_AirLevel < 1)
+		{
+			if (m_AirTickTimer < 1)
+			{
+				// Damage player 
+				TakeDamage(dtDrowning, NULL, 1, 1, 0);
+				// Reset timer
+				m_AirTickTimer = DROWNING_TICKS;
+			}
+			else
+			{
+				m_AirTickTimer -= 1;
+			}
+		}
+		else
+		{
+			// Reduce air supply
+			m_AirLevel -= 1;
+		}
+	}
+	else
+	{
+		// Set the air back to maximum
+		m_AirLevel = MAX_AIR_LEVEL;
+		m_AirTickTimer = DROWNING_TICKS;
 	}
 }
 
@@ -1379,7 +1469,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 Vector3d cEntity::GetLookVector(void) const
 {
 	Matrix4d m;
-	m.Init(Vector3f(), 0, m_Rot.x, -m_Rot.y);
+	m.Init(Vector3d(), 0, m_Rot.x, -m_Rot.y);
 	Vector3d Look = m.Transform(Vector3d(0, 0, 1));
 	return Look;
 }
@@ -1424,36 +1514,6 @@ void cEntity::SetPosZ(double a_PosZ)
 {
 	m_Pos.z = a_PosZ;
 	m_bDirtyPosition = true;
-}
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
-// Reference stuffs
-void cEntity::AddReference(cEntity * & a_EntityPtr)
-{
-	m_References->AddReference(a_EntityPtr);
-	a_EntityPtr->ReferencedBy(a_EntityPtr);
-}
-
-
-
-
-
-void cEntity::ReferencedBy(cEntity * & a_EntityPtr)
-{
-	m_Referencers->AddReference(a_EntityPtr);
-}
-
-
-
-
-
-void cEntity::Dereference(cEntity * & a_EntityPtr)
-{
-	m_Referencers->Dereference(a_EntityPtr);
 }
 
 

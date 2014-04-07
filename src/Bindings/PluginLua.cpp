@@ -5,7 +5,11 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#ifdef __APPLE__
+#define LUA_USE_MACOSX
+#else
 #define LUA_USE_POSIX
+#endif
 #include "PluginLua.h"
 #include "../CommandOutput.h"
 
@@ -14,6 +18,7 @@ extern "C"
 	#include "lua/src/lualib.h"
 }
 
+#undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 
 
@@ -75,6 +80,7 @@ bool cPluginLua::Initialize(void)
 	if (!m_LuaState.IsValid())
 	{	
 		m_LuaState.Create();
+		m_LuaState.RegisterAPILibs();
 		
 		// Inject the identification global variables into the state:
 		lua_pushlightuserdata(m_LuaState, this);
@@ -82,42 +88,69 @@ bool cPluginLua::Initialize(void)
 		lua_pushstring(m_LuaState, GetName().c_str());
 		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
 		
+		// Add the plugin's folder to the package.path and package.cpath variables (#693):
+		m_LuaState.AddPackagePath("path", FILE_IO_PREFIX + GetLocalFolder() + "/?.lua");
+		#ifdef _WIN32
+			m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "\\?.dll");
+		#else
+			m_LuaState.AddPackagePath("cpath", FILE_IO_PREFIX + GetLocalFolder() + "/?.so");
+		#endif
+		
 		tolua_pushusertype(m_LuaState, this, "cPluginLua");
 		lua_setglobal(m_LuaState, "g_Plugin");
 	}
 
 	std::string PluginPath = FILE_IO_PREFIX + GetLocalFolder() + "/";
 
-	// Load all files for this plugin, and execute them
+	// List all Lua files for this plugin. Info.lua has a special handling - make it the last to load:
 	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
-
-	int numFiles = 0;
-	for (AStringVector::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
+	AStringVector LuaFiles;
+	bool HasInfoLua = false;
+	for (AStringVector::const_iterator itr = Files.begin(), end = Files.end(); itr != end; ++itr)
 	{
-		if (itr->rfind(".lua") == AString::npos)
+		if (itr->rfind(".lua") != AString::npos)
 		{
-			continue;
+			if (*itr == "Info.lua")
+			{
+				HasInfoLua = true;
+			}
+			else
+			{
+				LuaFiles.push_back(*itr);
+			}
 		}
-		AString Path = PluginPath + *itr;
-		if (!m_LuaState.LoadFile(Path))
-		{
-			Close();
-			return false;
-		} 
-		else 
-		{
-			numFiles++;
-		}
-	}  // for itr - Files[]
-
-	if (numFiles == 0)
+	}
+	std::sort(LuaFiles.begin(), LuaFiles.end());
+	
+	// Warn if there are no Lua files in the plugin folder:
+	if (LuaFiles.empty())
 	{
 		LOGWARNING("No lua files found: plugin %s is missing.", GetName().c_str());
 		Close();
 		return false;
 	}
 
-	// Call intialize function
+	// Load all files in the list, including the Info.lua as last, if it exists:
+	for (AStringVector::const_iterator itr = LuaFiles.begin(), end = LuaFiles.end(); itr != end; ++itr)
+	{
+		AString Path = PluginPath + *itr;
+		if (!m_LuaState.LoadFile(Path))
+		{
+			Close();
+			return false;
+		}
+	}  // for itr - Files[]
+	if (HasInfoLua)
+	{
+		AString Path = PluginPath + "Info.lua";
+		if (!m_LuaState.LoadFile(Path))
+		{
+			Close();
+			return false;
+		}
+	}
+
+	// Call the Initialize function:
 	bool res = false;
 	if (!m_LuaState.Call("Initialize", this, cLuaState::Return, res))
 	{
@@ -125,7 +158,6 @@ bool cPluginLua::Initialize(void)
 		Close();
 		return false;
 	}
-
 	if (!res)
 	{
 		LOGINFO("Plugin %s: Initialize() call failed, plugin is temporarily disabled.", GetName().c_str());
@@ -162,6 +194,26 @@ void cPluginLua::Tick(float a_Dt)
 	{
 		m_LuaState.Call((int)(**itr), a_Dt);
 	}
+}
+
+
+
+
+
+bool cPluginLua::OnBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_BLOCK_SPREAD];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -623,6 +675,26 @@ bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_Blo
 
 
 
+bool cPluginLua::OnPlayerDestroyed(cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_DESTROYED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1041,6 +1113,46 @@ bool cPluginLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a
 
 
 
+bool cPluginLua::OnProjectileHitBlock(cProjectileEntity & a_Projectile)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PROJECTILE_HIT_BLOCK];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Projectile, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity & a_HitEntity)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PROJECTILE_HIT_ENTITY];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Projectile, &a_HitEntity, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1383,6 +1495,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 {
 	switch (a_HookType)
 	{
+		case cPluginManager::HOOK_BLOCK_SPREAD:                 return "OnBlockSpread";
 		case cPluginManager::HOOK_BLOCK_TO_PICKUPS:             return "OnBlockToPickups";
 		case cPluginManager::HOOK_CHAT:                         return "OnChat";
 		case cPluginManager::HOOK_CHUNK_AVAILABLE:              return "OnChunkAvailable";
@@ -1463,6 +1576,40 @@ bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 	
 	m_HookMap[a_HookType].push_back(Ref);
 	return true;
+}
+
+
+
+
+
+int cPluginLua::CallFunctionFromForeignState(
+	const AString & a_FunctionName,
+	cLuaState & a_ForeignState,
+	int a_ParamStart,
+	int a_ParamEnd
+)
+{
+	cCSLock Lock(m_CriticalSection);
+	
+	// Call the function:
+	int NumReturns = m_LuaState.CallFunctionWithForeignParams(a_FunctionName, a_ForeignState, a_ParamStart, a_ParamEnd);
+	if (NumReturns < 0)
+	{
+		// The call has failed, an error has already been output to the log, so just silently bail out with the same error
+		return NumReturns;
+	}
+	
+	// Copy all the return values:
+	int Top = lua_gettop(m_LuaState);
+	int res = a_ForeignState.CopyStackFrom(m_LuaState, Top - NumReturns + 1, Top);
+	
+	// Remove the return values off this stack:
+	if (NumReturns > 0)
+	{
+		lua_pop(m_LuaState, NumReturns);
+	}
+	
+	return res;
 }
 
 

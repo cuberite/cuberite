@@ -118,9 +118,9 @@ void cChunkDesc::SetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_B
 
 
 
-void cChunkDesc::SetBiome(int a_RelX, int a_RelZ, int a_BiomeID)
+void cChunkDesc::SetBiome(int a_RelX, int a_RelZ, EMCSBiome a_BiomeID)
 {
-	cChunkDef::SetBiome(m_BiomeMap, a_RelX, a_RelZ, (EMCSBiome)a_BiomeID);
+	cChunkDef::SetBiome(m_BiomeMap, a_RelX, a_RelZ, a_BiomeID);
 }
 
 
@@ -209,6 +209,7 @@ bool cChunkDesc::IsUsingDefaultComposition(void) const
 
 void cChunkDesc::SetUseDefaultStructures(bool a_bUseDefaultStructures)
 {
+	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
 	m_bUseDefaultStructures = a_bUseDefaultStructures;
 }
 
@@ -218,6 +219,7 @@ void cChunkDesc::SetUseDefaultStructures(bool a_bUseDefaultStructures)
 
 bool cChunkDesc::IsUsingDefaultStructures(void) const
 {
+	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
 	return m_bUseDefaultStructures;
 }
 
@@ -341,9 +343,9 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 	int SizeY = a_MaxRelY - a_MinRelY;
 	int SizeZ = a_MaxRelZ - a_MinRelZ;
 	a_Dest.Clear();
-	a_Dest.m_OriginX = m_ChunkX * cChunkDef::Width + a_MinRelX;
-	a_Dest.m_OriginY = a_MinRelY;
-	a_Dest.m_OriginZ = m_ChunkZ * cChunkDef::Width + a_MinRelZ;
+	a_Dest.m_Origin.x = m_ChunkX * cChunkDef::Width + a_MinRelX;
+	a_Dest.m_Origin.y = a_MinRelY;
+	a_Dest.m_Origin.z = m_ChunkZ * cChunkDef::Width + a_MinRelZ;
 	a_Dest.SetSize(SizeX, SizeY, SizeZ, cBlockArea::baTypes | cBlockArea::baMetas);
 
 	for (int y = 0; y < SizeY; y++)
@@ -556,6 +558,31 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 	}
 	m_BlockEntities.push_back(be);
 	return be;
+}
+
+
+
+
+
+void cChunkDesc::UpdateHeightmap(void)
+{
+	for (int x = 0; x < cChunkDef::Width; x++)
+	{
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			int Height = 0;
+			for (int y = cChunkDef::Height - 1; y > 0; y--)
+			{
+				BLOCKTYPE BlockType = GetBlockType(x, y, z);
+				if (BlockType != E_BLOCK_AIR)
+				{
+					Height = y;
+					break;
+				}
+			}  // for y
+			SetHeight(x, z, Height);
+		}  // for z
+	}  // for x
 }
 
 

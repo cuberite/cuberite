@@ -11,6 +11,7 @@ typedef unsigned int       UInt32;
 typedef unsigned short     UInt16;
 
 
+$cfile "../Vector3.h"
 $cfile "../ChunkDef.h"
 $cfile "../BiomeDef.h"
 
@@ -26,6 +27,7 @@ $cfile "WebPlugin.h"
 $cfile "LuaWindow.h"
 
 $cfile "../BlockID.h"
+$cfile "../BlockInfo.h"
 $cfile "../StringUtils.h"
 $cfile "../Defines.h"
 $cfile "../ChatColor.h"
@@ -34,6 +36,7 @@ $cfile "../Entities/Entity.h"
 $cfile "../Entities/Floater.h"
 $cfile "../Entities/Pawn.h"
 $cfile "../Entities/Player.h"
+$cfile "../Entities/Painting.h"
 $cfile "../Entities/Pickup.h"
 $cfile "../Entities/ProjectileEntity.h"
 $cfile "../Entities/TNTEntity.h"
@@ -47,6 +50,7 @@ $cfile "../ItemGrid.h"
 $cfile "../BlockEntities/BlockEntity.h"
 $cfile "../BlockEntities/BlockEntityWithItems.h"
 $cfile "../BlockEntities/ChestEntity.h"
+$cfile "../BlockEntities/CommandBlockEntity.h"
 $cfile "../BlockEntities/DropSpenserEntity.h"
 $cfile "../BlockEntities/DispenserEntity.h"
 $cfile "../BlockEntities/DropperEntity.h"
@@ -55,12 +59,10 @@ $cfile "../BlockEntities/HopperEntity.h"
 $cfile "../BlockEntities/JukeboxEntity.h"
 $cfile "../BlockEntities/NoteEntity.h"
 $cfile "../BlockEntities/SignEntity.h"
+$cfile "../BlockEntities/MobHeadEntity.h"
+$cfile "../BlockEntities/FlowerPotEntity.h"
 $cfile "../WebAdmin.h"
 $cfile "../Root.h"
-$cfile "../Vector3f.h"
-$cfile "../Vector3d.h"
-$cfile "../Vector3i.h"
-$cfile "../Matrix4f.h"
 $cfile "../Cuboid.h"
 $cfile "../BoundingBox.h"
 $cfile "../Tracer.h"
@@ -70,6 +72,10 @@ $cfile "../Generating/ChunkDesc.h"
 $cfile "../CraftingRecipes.h"
 $cfile "../UI/Window.h"
 $cfile "../Mobs/Monster.h"
+$cfile "../CompositeChat.h"
+$cfile "../Map.h"
+$cfile "../MapManager.h"
+$cfile "../Scoreboard.h"
 
 
 
@@ -79,6 +85,19 @@ $cfile "../Mobs/Monster.h"
 // it seems impossible to register a usertype in ManualBindings.cpp
 class cLineBlockTracer;
 
+
+
+
+
+// To avoid tolua treating Byte as a class, and avoid the need to $cfile entire Globals.h:
+typedef unsigned char Byte;
+
+
+
+// Aliases
+$renaming Vector3<double> @ Vector3d
+$renaming Vector3<float>  @ Vector3f
+$renaming Vector3<int>    @ Vector3i
 
 
 

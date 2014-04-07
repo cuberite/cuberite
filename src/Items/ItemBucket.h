@@ -6,6 +6,7 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../Blocks/BlockHandler.h"
 #include "../LineBlockTracer.h"
+#include "../BlockInServerPluginInterface.h"
 
 
 
@@ -21,7 +22,7 @@ public:
 
 	}
 
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
 		switch (m_ItemType)
 		{
@@ -92,7 +93,7 @@ public:
 	}
 
 
-	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_FluidBlock)
+	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock)
 	{			
 		if (a_BlockFace < 0)
 		{
@@ -142,7 +143,9 @@ public:
 			cBlockHandler * Handler = BlockHandler(CurrentBlock);
 			if (Handler->DoesDropOnUnsuitable())
 			{
-				Handler->DropBlock(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+				cChunkInterface ChunkInterface(a_World->GetChunkMap());
+				cBlockInServerPluginInterface PluginInterface(*a_World);
+				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 			}
 		}
 
@@ -169,12 +172,12 @@ public:
 			
 			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 			{
-				if (a_BlockMeta != 0)  // Even if it was a water block it would not be a source.
-				{
-					return false;
-				}
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
+					if (a_BlockMeta != 0) // GetBlockFromTrace is called for scooping up fluids; the hit block should be a source
+					{
+						return false;
+					}
 					m_HasHitFluid = true;
 					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
 					return true;

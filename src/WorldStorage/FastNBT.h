@@ -106,6 +106,10 @@ public:
 /** Parses and contains the parsed data
 Also implements data accessor functions for tree traversal and value getters
 The data pointer passed in the constructor is assumed to be valid throughout the object's life. Care must be taken not to initialize from a temporary.
+The parser decomposes the input data into a tree of tags that is stored as an array of cFastNBTTag items,
+and accessing the tree is done by using the array indices for tags. Each tag stores the indices for its parent,
+first child, last child, prev sibling and next sibling, a value of -1 indicates that the indice is not valid.
+Each primitive tag also stores the length of the contained data, in bytes.
 */
 class cParsedNBT
 {
@@ -114,86 +118,134 @@ public:
 	
 	bool IsValid(void) const {return m_IsValid; }
 	
+	/** Returns the root tag of the hierarchy. */
 	int GetRoot(void) const {return 0; }
-	int GetFirstChild (int a_Tag) const { return m_Tags[a_Tag].m_FirstChild; }
-	int GetLastChild  (int a_Tag) const { return m_Tags[a_Tag].m_LastChild; }
-	int GetNextSibling(int a_Tag) const { return m_Tags[a_Tag].m_NextSibling; }
-	int GetPrevSibling(int a_Tag) const { return m_Tags[a_Tag].m_PrevSibling; }
-	int GetDataLength (int a_Tag) const { return m_Tags[a_Tag].m_DataLength; }
 
+	/** Returns the first child of the specified tag, or -1 if none / not applicable. */
+	int GetFirstChild (int a_Tag) const { return m_Tags[(size_t)a_Tag].m_FirstChild; }
+	
+	/** Returns the last child of the specified tag, or -1 if none / not applicable. */
+	int GetLastChild  (int a_Tag) const { return m_Tags[(size_t)a_Tag].m_LastChild; }
+	
+	/** Returns the next sibling of the specified tag, or -1 if none. */
+	int GetNextSibling(int a_Tag) const { return m_Tags[(size_t)a_Tag].m_NextSibling; }
+	
+	/** Returns the previous sibling of the specified tag, or -1 if none. */
+	int GetPrevSibling(int a_Tag) const { return m_Tags[(size_t)a_Tag].m_PrevSibling; }
+	
+	/** Returns the length of the tag's data, in bytes.
+	Not valid for Compound or List tags! */
+	int GetDataLength (int a_Tag) const
+	{
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_List);
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_Compound);
+		return m_Tags[(size_t)a_Tag].m_DataLength;
+	}
+
+	/** Returns the data stored in this tag.
+	Not valid for Compound or List tags! */
 	const char * GetData(int a_Tag) const
 	{
-		ASSERT(m_Tags[a_Tag].m_Type != TAG_List);
-		ASSERT(m_Tags[a_Tag].m_Type != TAG_Compound);
-		return m_Data + m_Tags[a_Tag].m_DataStart;
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_List);
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_Compound);
+		return m_Data + m_Tags[(size_t)a_Tag].m_DataStart;
 	}
 	
+	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
 	int FindChildByName(int a_Tag, const AString & a_Name) const
 	{
 		return FindChildByName(a_Tag, a_Name.c_str(), a_Name.length());
 	}
 	
+	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
 	int FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLength = 0) const;
-	int FindTagByPath  (int a_Tag, const AString & a_Path) const;
+
+	/** Returns the child tag of the specified path (Name1\Name2\Name3...), or -1 if no such tag. */
+	int FindTagByPath(int a_Tag, const AString & a_Path) const;
 	
-	eTagType GetType(int a_Tag) const { return m_Tags[a_Tag].m_Type; }
+	eTagType GetType(int a_Tag) const { return m_Tags[(size_t)a_Tag].m_Type; }
 	
-	/// Returns the children type for a list tag; undefined on other tags. If list empty, returns TAG_End
+	/** Returns the children type for a List tag; undefined on other tags. If list empty, returns TAG_End. */
 	eTagType GetChildrenType(int a_Tag) const
 	{
-		ASSERT(m_Tags[a_Tag].m_Type == TAG_List);
-		return (m_Tags[a_Tag].m_FirstChild < 0) ? TAG_End : m_Tags[m_Tags[a_Tag].m_FirstChild].m_Type;
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_List);
+		return (m_Tags[(size_t)a_Tag].m_FirstChild < 0) ? TAG_End : m_Tags[(size_t)m_Tags[(size_t)a_Tag].m_FirstChild].m_Type;
 	}
 	
+	/** Returns the value stored in a Byte tag. Not valid for any other tag type. */
 	inline unsigned char GetByte(int a_Tag) const 
 	{
-		ASSERT(m_Tags[a_Tag].m_Type == TAG_Byte);
-		return (unsigned char)(m_Data[m_Tags[a_Tag].m_DataStart]);
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Byte);
+		return (unsigned char)(m_Data[(size_t)m_Tags[(size_t)a_Tag].m_DataStart]);
 	}
 	
+	/** Returns the value stored in a Short tag. Not valid for any other tag type. */
 	inline Int16 GetShort(int a_Tag) const
 	{
-		ASSERT(m_Tags[a_Tag].m_Type == TAG_Short);
-		return GetBEShort(m_Data + m_Tags[a_Tag].m_DataStart);
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Short);
+		return GetBEShort(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
 	}
 
+	/** Returns the value stored in an Int tag. Not valid for any other tag type. */
 	inline Int32 GetInt(int a_Tag) const
 	{
-		ASSERT(m_Tags[a_Tag].m_Type == TAG_Int);
-		return GetBEInt(m_Data + m_Tags[a_Tag].m_DataStart);
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Int);
+		return GetBEInt(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
 	}
 
+	/** Returns the value stored in a Long tag. Not valid for any other tag type. */
 	inline Int64 GetLong(int a_Tag) const
 	{
-		ASSERT(m_Tags[a_Tag].m_Type == TAG_Long);
-		return NetworkToHostLong8(m_Data + m_Tags[a_Tag].m_DataStart);
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Long);
+		return NetworkToHostLong8(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
 	}
 
+	/** Returns the value stored in a Float tag. Not valid for any other tag type. */
 	inline float GetFloat(int a_Tag) const
 	{
-		ASSERT(m_Tags[a_Tag].m_Type == TAG_Float);
-		Int32 tmp = GetBEInt(m_Data + m_Tags[a_Tag].m_DataStart);
-		return *((float *)&tmp);
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Float);
+		
+		// Cause a compile-time error if sizeof(float) != 4
+		// If your platform produces a compiler error here, you'll need to add code that manually decodes 32-bit floats
+		char Check1[5 - sizeof(float)];  // Fails if sizeof(float) > 4
+		char Check2[sizeof(float) - 3];  // Fails if sizeof(float) < 4
+		UNUSED(Check1);
+		UNUSED(Check2);
+		
+		Int32 i = GetBEInt(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
+		float f;
+		memcpy(&f, &i, sizeof(f));
+		return f;
 	}
 	
+	/** Returns the value stored in a Double tag. Not valid for any other tag type. */
 	inline double GetDouble(int a_Tag) const
 	{
-		ASSERT(m_Tags[a_Tag].m_Type == TAG_Double);
-		return NetworkToHostDouble8(m_Data + m_Tags[a_Tag].m_DataStart);
+		// Cause a compile-time error if sizeof(double) != 8
+		// If your platform produces a compiler error here, you'll need to add code that manually decodes 64-bit doubles
+		char Check1[9 - sizeof(double)];  // Fails if sizeof(double) > 8
+		char Check2[sizeof(double) - 7];  // Fails if sizeof(double) < 8
+		UNUSED(Check1);
+		UNUSED(Check2);
+
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Double);
+		return NetworkToHostDouble8(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
 	}
 	
+	/** Returns the value stored in a String tag. Not valid for any other tag type. */
 	inline AString GetString(int a_Tag) const
 	{
-		ASSERT(m_Tags[a_Tag].m_Type == TAG_String);
+		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_String);
 		AString res;
-		res.assign(m_Data + m_Tags[a_Tag].m_DataStart, m_Tags[a_Tag].m_DataLength);
+		res.assign(m_Data + m_Tags[(size_t)a_Tag].m_DataStart, m_Tags[(size_t)a_Tag].m_DataLength);
 		return res;
 	}
 	
+	/** Returns the tag's name. For tags that are not named, returns an empty string. */
 	inline AString GetName(int a_Tag) const
 	{
 		AString res;
-		res.assign(m_Data + m_Tags[a_Tag].m_NameStart, m_Tags[a_Tag].m_NameLength);
+		res.assign(m_Data + m_Tags[(size_t)a_Tag].m_NameStart, m_Tags[(size_t)a_Tag].m_NameLength);
 		return res;
 	}
 	
@@ -257,7 +309,7 @@ protected:
 		eTagType m_ItemType;  // for TAG_List, the element type
 	} ;
 	
-	static const int MAX_STACK = 50;  // Highliy doubtful that an NBT would be constructed this many levels deep
+	static const int MAX_STACK = 50;  // Highly doubtful that an NBT would be constructed this many levels deep
 	
 	// These two fields emulate a stack. A raw array is used due to speed issues - no reallocations are allowed.
 	sParent m_Stack[MAX_STACK];

@@ -58,7 +58,7 @@ function classContainer:hasvar ()
  while self[i] do
   if self[i]:isvariable() then
 		 return 1
-		end
+	end
   i = i+1
  end
 	return 0
@@ -568,7 +568,7 @@ function classContainer:doparse (s)
 --   Enumerate(name,body)
 --  return strsub(s,e+1)
 --  end
--- end
+-- end 
 
  do
   local b,e,body,name = strfind(s,"^%s*typedef%s+enum[^{]*(%b{})%s*([%w_][^%s]*)%s*;%s*")
@@ -606,14 +606,14 @@ function classContainer:doparse (s)
  -- try function
  do
   --local b,e,decl,arg,const = strfind(s,"^%s*([~_%w][_@%w%s%*&:<>]*[_%w])%s*(%b())%s*(c?o?n?s?t?)%s*=?%s*0?%s*;%s*")
-  local b,e,decl,arg,const,virt = strfind(s,"^%s*([^%(\n]+)%s*(%b())%s*(c?o?n?s?t?)%s*(=?%s*0?)%s*;%s*")
+  local b,e,decl,arg,const,virt = strfind(s,"^%s*([^%(\n]+)%s*(%b())%s*(c?o?n?s?t?)v?e?r?r?i?d?e?%s*o?v?e?r?r?i?d?e?%s*(=?%s*0?)%s*;%s*")
   if not b then
   	-- try function with template
-  	b,e,decl,arg,const = strfind(s,"^%s*([~_%w][_@%w%s%*&:<>]*[_%w]%b<>)%s*(%b())%s*(c?o?n?s?t?)%s*=?%s*0?%s*;%s*")
+  	b,e,decl,arg,const = strfind(s,"^%s*([~_%w][_@%w%s%*&:<>]*[_%w]%b<>)%s*(%b())%s*(c?o?n?s?t?)v?e?r?r?i?d?e?%s*o?v?e?r?r?i?d?e?%s*=?%s*0?%s*;%s*")
   end
   if not b then
    -- try a single letter function name
-   b,e,decl,arg,const = strfind(s,"^%s*([_%w])%s*(%b())%s*(c?o?n?s?t?)%s*;%s*")
+   b,e,decl,arg,const = strfind(s,"^%s*([_%w])%s*(%b())%s*(c?o?n?s?t?)v?e?r?r?i?d?e?%s*o?v?e?r?r?i?d?e?%s*;%s*")
   end
   if not b then
    -- try function pointer
@@ -629,6 +629,9 @@ function classContainer:doparse (s)
   		end
   	end
    _curr_code = strsub(s,b,e)
+   if const == 'o' then
+     const = ''
+   end
    Function(decl,arg,const)
    return strsub(s,e+1)
   end
@@ -636,14 +639,17 @@ function classContainer:doparse (s)
 
  -- try inline function
  do
-  local b,e,decl,arg,const = strfind(s,"^%s*([^%(\n]+)%s*(%b())%s*(c?o?n?s?t?)[^;{]*%b{}%s*;?%s*")
+  local b,e,decl,arg,const = strfind(s,"^%s*([^%(\n]+)%s*(%b())%s*(c?o?n?s?t?)v?e?r?r?i?d?e?%s*o?v?e?r?r?i?d?e?[^;{]*%b{}%s*;?%s*")
   --local b,e,decl,arg,const = strfind(s,"^%s*([~_%w][_@%w%s%*&:<>]*[_%w>])%s*(%b())%s*(c?o?n?s?t?)[^;]*%b{}%s*;?%s*")
   if not b then
    -- try a single letter function name
-   b,e,decl,arg,const = strfind(s,"^%s*([_%w])%s*(%b())%s*(c?o?n?s?t?).-%b{}%s*;?%s*")
+   b,e,decl,arg,const = strfind(s,"^%s*([_%w])%s*(%b())%s*(c?o?n?s?t?)v?e?r?r?i?d?e?%s*o?v?e?r?r?i?d?e?.-%b{}%s*;?%s*")
   end
   if b then
    _curr_code = strsub(s,b,e)
+   if const == 'o' then
+     const = ''
+   end
    Function(decl,arg,const)
    return strsub(s,e+1)
   end

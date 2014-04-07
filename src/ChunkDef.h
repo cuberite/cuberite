@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Vector3i.h"
+#include "Vector3.h"
 #include "BiomeDef.h"
 
 
@@ -62,16 +62,12 @@ typedef unsigned char HEIGHTTYPE;
 class cChunkDef
 {
 public:
-	enum
-	{
-		// Chunk dimensions:
-		Width = 16,
-		Height = 256,
-		NumBlocks = Width * Height * Width,
-		
-		/// If the data is collected into a single buffer, how large it needs to be:
-		BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2),  // 2.5 * numblocks
-	} ;
+	// Chunk dimensions:
+	static const int Width = 16;
+	static const int Height = 256;
+	static const int NumBlocks = Width * Height * Width;
+	/// If the data is collected into a single buffer, how large it needs to be:
+	static const int BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2);  // 2.5 * numblocks
 
 	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
@@ -116,7 +112,7 @@ public:
 	}
 
 
-	inline static unsigned int MakeIndex(int x, int y, int z )
+	inline static int MakeIndex(int x, int y, int z )
 	{
 		if (
 			(x < Width)  && (x > -1) &&
@@ -132,7 +128,7 @@ public:
 	}
 
 
-	inline static unsigned int MakeIndexNoCheck(int x, int y, int z)
+	inline static int MakeIndexNoCheck(int x, int y, int z)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
@@ -255,7 +251,7 @@ public:
 			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
 			return;
 		}
-		a_Buffer[a_BlockIdx / 2] = (
+		a_Buffer[a_BlockIdx / 2] = static_cast<NIBBLETYPE>(
 			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
 		);
@@ -275,20 +271,20 @@ public:
 		}
 
 		int Index = MakeIndexNoCheck(x, y, z);
-		a_Buffer[Index / 2] = (
+		a_Buffer[Index / 2] = static_cast<NIBBLETYPE>(
 			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 		);
 	}
 
 
-	inline static char GetNibble(const NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos )
+	inline static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos )
 	{
 		return GetNibble(a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
 	}
 	
 	
-	inline static void SetNibble(NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos, char a_Value )
+	inline static void SetNibble(NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos, NIBBLETYPE a_Value )
 	{
 		SetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Value );
 	}
@@ -306,6 +302,9 @@ The virtual methods are called in the same order as they're declared here.
 class cChunkDataCallback abstract
 {
 public:
+
+	virtual ~cChunkDataCallback() {}
+
 	/** Called before any other callbacks to inform of the current coords 
 	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()). 
 	If false is returned, the chunk is skipped.
@@ -432,6 +431,9 @@ Used primarily for entity moving while both chunks are locked.
 class cClientDiffCallback
 {
 public:
+
+	virtual ~cClientDiffCallback() {}
+
 	/// Called for clients that are in Chunk1 and not in Chunk2,
 	virtual void Removed(cClientHandle * a_Client) = 0;
 	
@@ -482,6 +484,7 @@ public:
 } ;
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
+typedef std::vector<cChunkCoords> cChunkCoordsVector;
 
 
 
@@ -491,6 +494,9 @@ typedef std::list<cChunkCoords> cChunkCoordsList;
 class cChunkCoordCallback
 {
 public:
+
+	virtual ~cChunkCoordCallback() {}
+
 	virtual void Call(int a_ChunkX, int a_ChunkZ) = 0;
 } ;
 
@@ -498,7 +504,7 @@ public:
 
 
 
-/// Generic template that can store any kind of data together with a triplet of 3 coords:
+/** Generic template that can store any kind of data together with a triplet of 3 coords*/
 template <typename X> class cCoordWithData
 {
 public:
@@ -518,12 +524,40 @@ public:
 	}
 } ;
 
-// Illegal in C++03: typedef std::list< cCoordWithData<X> > cCoordWithDataList<X>;
 typedef cCoordWithData<int>        cCoordWithInt;
 typedef cCoordWithData<BLOCKTYPE>  cCoordWithBlock;
+
 typedef std::list<cCoordWithInt>   cCoordWithIntList;
 typedef std::vector<cCoordWithInt> cCoordWithIntVector;
-typedef std::vector<cCoordWithBlock> cCoordWithBlockVector;
+
+
+
+
+
+/** Generic template that can store two types of any kind of data together with a triplet of 3 coords */
+template <typename X, typename Z> class cCoordWithDoubleData
+{
+public:
+	int x;
+	int y;
+	int z;
+	X   Data;
+	Z   DataTwo;
+
+	cCoordWithDoubleData(int a_X, int a_Y, int a_Z) :
+		x(a_X), y(a_Y), z(a_Z)
+	{
+	}
+
+	cCoordWithDoubleData(int a_X, int a_Y, int a_Z, const X & a_Data, const Z & a_DataTwo) :
+		x(a_X), y(a_Y), z(a_Z), Data(a_Data), DataTwo(a_DataTwo)
+	{
+	}
+};
+
+typedef cCoordWithDoubleData <BLOCKTYPE, bool> cCoordWithBlockAndBool;
+
+typedef std::vector<cCoordWithBlockAndBool> cCoordWithBlockAndBoolVector;
 
 
 

@@ -19,6 +19,8 @@
 #include "BlockEntities/JukeboxEntity.h"
 #include "BlockEntities/NoteEntity.h"
 #include "BlockEntities/SignEntity.h"
+#include "BlockEntities/MobHeadEntity.h"
+#include "BlockEntities/FlowerPotEntity.h"
 #include "Entities/Pickup.h"
 #include "Item.h"
 #include "Noise.h"
@@ -31,7 +33,7 @@
 #include "Simulator/FluidSimulator.h"
 #include "MobCensus.h"
 #include "MobSpawner.h"
-
+#include "BlockInServerPluginInterface.h"
 
 #include "json/json.h"
 
@@ -422,7 +424,6 @@ bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-/// Sets or resets the internal flag that prevents chunk from being unloaded
 void cChunk::Stay(bool a_Stay)
 {
 	m_StayCount += (a_Stay ? 1 : -1);
@@ -562,13 +563,6 @@ void cChunk::Tick(float a_Dt)
 {
 	BroadcastPendingBlockChanges();
 
-	// Unload the chunk from all clients that have queued unloading:
-	for (cClientHandleList::iterator itr = m_UnloadQuery.begin(), end = m_UnloadQuery.end(); itr != end; ++itr)
-	{
-		(*itr)->SendUnloadChunk(m_PosX, m_PosZ);
-	}
-	m_UnloadQuery.clear();
-	
 	// Set all blocks that have been queued for setting later:
 	ProcessQueuedSetBlocks();
 
@@ -638,7 +632,9 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 	unsigned Index = MakeIndex(a_RelX, a_RelY, a_RelZ);
 	cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-	Handler->OnUpdate(*this, a_RelX, a_RelY, a_RelZ);
+	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
+	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
+	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface,*this, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -753,7 +749,7 @@ void cChunk::BroadcastPendingBlockChanges(void)
 
 
 
-void cChunk::CheckBlocks(void)
+void cChunk::CheckBlocks()
 {
 	if (m_ToTickBlocks.size() == 0)
 	{
@@ -762,13 +758,16 @@ void cChunk::CheckBlocks(void)
 	std::vector<unsigned int> ToTickBlocks;
 	std::swap(m_ToTickBlocks, ToTickBlocks);
 	
+	cChunkInterface ChunkInterface(m_World->GetChunkMap());
+	cBlockInServerPluginInterface PluginInterface(*m_World);
+	
 	for (std::vector<unsigned int>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
 	{
 		unsigned int index = (*itr);
 		Vector3i BlockPos = IndexToCoordinate(index);
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(index));
-		Handler->Check(BlockPos.x, BlockPos.y, BlockPos.z, *this);
+		Handler->Check(ChunkInterface, PluginInterface, BlockPos.x, BlockPos.y, BlockPos.z, *this);
 	}  // for itr - ToTickBlocks[]
 }
 
@@ -786,6 +785,9 @@ void cChunk::TickBlocks(void)
 	int TickX = m_BlockTickX;
 	int TickY = m_BlockTickY;
 	int TickZ = m_BlockTickZ;
+	
+	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
+	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
 
 	// This for loop looks disgusting, but it actually does a simple thing - first processes m_BlockTick, then adds random to it
 	// This is so that SetNextBlockTick() works
@@ -811,7 +813,7 @@ void cChunk::TickBlocks(void)
 		unsigned int Index = MakeIndexNoCheck(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 		cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
 		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-		Handler->OnUpdate(*this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
+		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 	}  // for i - tickblocks
 }
 
@@ -882,7 +884,7 @@ void cChunk::ApplyWeatherToTop()
 					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
 				}
 			}
-			else if (g_BlockIsSnowable[TopBlock])
+			else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
 			{
 				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
 			}
@@ -1307,8 +1309,10 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_HOPPER:
 					case E_BLOCK_SIGN_POST:
 					case E_BLOCK_WALLSIGN:
+					case E_BLOCK_HEAD:
 					case E_BLOCK_NOTE_BLOCK:
 					case E_BLOCK_JUKEBOX:
+					case E_BLOCK_FLOWER_POT:
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
@@ -1435,8 +1439,10 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_HOPPER:
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
+		case E_BLOCK_HEAD:
 		case E_BLOCK_NOTE_BLOCK:
 		case E_BLOCK_JUKEBOX:
+		case E_BLOCK_FLOWER_POT:
 		{
 			AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
@@ -1537,10 +1543,10 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	SetNibble(m_BlockMeta, index, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
-	if(
-		(g_BlockLightValue[OldBlockType ]        != g_BlockLightValue[a_BlockType]) ||
-		(g_BlockSpreadLightFalloff[OldBlockType] != g_BlockSpreadLightFalloff[a_BlockType]) ||
-		(g_BlockTransparent[OldBlockType]        != g_BlockTransparent[a_BlockType])
+	if (
+		(cBlockInfo::GetLightValue        (OldBlockType) != cBlockInfo::GetLightValue        (a_BlockType)) ||
+		(cBlockInfo::GetSpreadLightFalloff(OldBlockType) != cBlockInfo::GetSpreadLightFalloff(a_BlockType)) ||
+		(cBlockInfo::IsTransparent        (OldBlockType) != cBlockInfo::IsTransparent        (a_BlockType))
 	)
 	{
 		m_IsLightValid = false;
@@ -1639,6 +1645,38 @@ void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 	{
 		be->UsedBy(a_Player);
 	}
+}
+
+
+
+
+
+void cChunk::SetBiomeAt(int a_RelX, int a_RelZ, EMCSBiome a_Biome)
+{
+	cChunkDef::SetBiome(m_BiomeMap, a_RelX, a_RelZ, a_Biome);
+	MarkDirty();
+}
+
+
+
+
+
+void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome)
+{
+	for (int z = a_MinRelZ; z <= a_MaxRelZ; z++)
+	{
+		for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+		{
+			cChunkDef::SetBiome(m_BiomeMap, x, z, a_Biome);
+		}
+	}
+	MarkDirty();
+	
+	// Re-send the chunk to all clients:
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	{
+		m_World->ForceSendChunkTo(m_PosX, m_PosZ, (*itr));
+	}  // for itr - m_LoadedByClient[]
 }
 
 
@@ -2302,6 +2340,70 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
+bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_HEAD)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here, 
+		if (a_Callback.Item((cMobHeadEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_FLOWER_POT)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here, 
+		if (a_Callback.Item((cFlowerPotEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
 bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
@@ -2408,6 +2510,17 @@ cChunk * cChunk::GetNeighborChunk(int a_BlockX, int a_BlockZ)
 
 cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 {
+	// If the relative coords are too far away, use the parent's chunk lookup instead:
+	if ((a_RelX < 128) || (a_RelX > 128) || (a_RelZ < -128) || (a_RelZ > 128))
+	{
+		int BlockX = m_PosX * cChunkDef::Width + a_RelX;
+		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
+		int BlockY, ChunkX, ChunkZ;
+		AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+		return m_ChunkMap->GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	}
+
+	// Walk the neighbors:
 	bool ReturnThis = true;
 	if (a_RelX < 0)
 	{

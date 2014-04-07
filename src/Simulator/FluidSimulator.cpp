@@ -36,6 +36,7 @@ bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COBWEB:
 		case E_BLOCK_CROPS:
 		case E_BLOCK_DEAD_BUSH:
+		case E_BLOCK_LILY_PAD:
 		case E_BLOCK_RAIL:
 		case E_BLOCK_REDSTONE_TORCH_OFF:
 		case E_BLOCK_REDSTONE_TORCH_ON:
@@ -166,14 +167,12 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 			{
 				LowestPoint = Meta;
 				X = Pos->x;
-				Pos->y; //Remove if no side effects
 				Z = Pos->z;
 			}
 		}else if(BlockID == E_BLOCK_AIR)
 		{
 			LowestPoint = 9;		//This always dominates
 			X = Pos->x;
-			Pos->y; //Remove if no side effects
 			Z = Pos->z;
 		
 		}

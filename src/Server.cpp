@@ -24,7 +24,7 @@
 #include "MersenneTwister.h"
 
 #include "inifile/iniFile.h"
-#include "Vector3f.h"
+#include "Vector3.h"
 
 #include <fstream>
 #include <sstream>
@@ -39,7 +39,9 @@ extern "C" {
 
 // For the "dumpmem" server command:
 /// Synchronize this with main.cpp - the leak finder needs initialization before it can be used to dump memory
-#define ENABLE_LEAK_FINDER
+// _X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
+// and we haven't had a memory leak for over a year anyway.
+// #define ENABLE_LEAK_FINDER
 
 #if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	#pragma warning(push)
@@ -194,7 +196,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
-	m_FaviconData = Base64Encode(cFile::ReadWholeFile("favicon.png")); // Will return empty string if file nonexistant; client doesn't mind
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png"))); // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{
@@ -237,7 +239,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_bIsConnected = true;
 
 	m_ServerID = "-";
-	if (a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true))
+	m_ShouldAuthenticate = a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true);
+	if (m_ShouldAuthenticate)
 	{
 		MTRand mtrand1;
 		unsigned int r1 = (mtrand1.randInt() % 1147483647) + 1000000000;
@@ -284,17 +287,9 @@ int cServer::GetNumPlayers(void)
 
 void cServer::PrepareKeys(void)
 {
-	// TODO: Save and load key for persistence across sessions
-	// But generating the key takes only a moment, do we even need that?
-	
 	LOGD("Generating protocol encryption keypair...");
-	
-	time_t CurTime = time(NULL);
-	CryptoPP::RandomPool rng;
-	rng.Put((const byte *)&CurTime, sizeof(CurTime));
-	m_PrivateKey.GenerateRandomWithKeySize(rng, 1024);
-	CryptoPP::RSA::PublicKey pk(m_PrivateKey);
-	m_PublicKey = pk;
+	VERIFY(m_PrivateKey.Generate(1024));
+	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
 }
 
 
@@ -466,6 +461,19 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	if (split[0] == "reload")
 	{
 		cPluginManager::Get()->ReloadPlugins();
+		cRoot::Get()->ReloadGroups();
+		return;
+	}
+	if (split[0] == "reloadplugins")
+	{
+		cPluginManager::Get()->ReloadPlugins();
+		return;
+	}
+	if (split[0] == "reloadgroups")
+	{
+		cRoot::Get()->ReloadGroups();
+		a_Output.Out("Groups reloaded!");
+		a_Output.Finished();
 		return;
 	}
 	
@@ -492,7 +500,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		}
 	}
 	#endif
-	
+
 	if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
 	{
 		a_Output.Finished();
@@ -542,7 +550,7 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
 	{
 		const AStringPair & cmd = *itr;
-		a_Output.Out(Printf("%-*s%s\n", Callback.m_MaxLen, cmd.first.c_str(), cmd.second.c_str()));
+		a_Output.Out(Printf("%-*s%s\n", static_cast<int>(Callback.m_MaxLen), cmd.first.c_str(), cmd.second.c_str()));
 	}  // for itr - Callback.m_Commands[]
 	a_Output.Finished();
 }

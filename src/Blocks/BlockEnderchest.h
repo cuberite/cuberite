@@ -2,17 +2,17 @@
 #pragma once
 
 #include "BlockEntity.h"
-
+#include "MetaRotator.h"
 
 
 
 
 class cBlockEnderchestHandler :
-	public cBlockEntityHandler
+	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
 public:
 	cBlockEnderchestHandler(BLOCKTYPE a_BlockType)
-		: cBlockEntityHandler(a_BlockType)
+		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}
 
@@ -23,8 +23,8 @@ public:
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
+		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 		) override

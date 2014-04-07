@@ -88,7 +88,7 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			continue;
 		}
-		if (!g_BlockIsSolid[a_ChunkDesc.GetBlockType(PosX, y - 1, PosZ)])  // Only place on solid blocks
+		if (!cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(PosX, y - 1, PosZ)))  // Only place on solid blocks
 		{
 			continue;
 		}
@@ -131,7 +131,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 				}
 
 				BLOCKTYPE BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
-				if (!g_BlockIsSolid[BlockBelow])  // Only place on solid blocks
+				if (!cBlockInfo::IsSolid(BlockBelow))  // Only place on solid blocks
 				{
 					continue;
 				}
@@ -329,7 +329,7 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 				case biFrozenOcean:
 				{
 					int Height = a_ChunkDesc.GetHeight(x, z);
-					if (g_BlockIsSnowable[a_ChunkDesc.GetBlockType(x, Height, z)])
+					if (cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)))
 					{
 						a_ChunkDesc.SetBlockType(x, Height + 1, z, E_BLOCK_SNOW);
 						a_ChunkDesc.SetHeight(x, z, Height + 1);
