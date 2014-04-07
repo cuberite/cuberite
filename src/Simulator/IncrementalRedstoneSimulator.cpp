@@ -691,11 +691,11 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_B
     		// Create a variable holding being on or self powered to avoid multiple lookups.
     		bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
 		bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
-		if (IsSelfPowered && !IsOn && !IsLocked) // Queue a power change if powered, but not on and not locked.
+		if (IsSelfPowered && !IsOn) // Queue a power change if powered, but not on and not locked.
 		{
 			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
 		}
-		else if (!IsSelfPowered && IsOn && !IsLocked) // Queue a power change if unpowered, on, and not locked.
+		else if (!IsSelfPowered && IsOn) // Queue a power change if unpowered, on, and not locked.
 		{
 			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
 		}
