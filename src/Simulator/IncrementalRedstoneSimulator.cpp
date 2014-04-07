@@ -1224,7 +1224,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
 	// Change checking direction according to meta rotation.
-	switch (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x3) //compare my direction to my neighbor's
+	switch (a_Meta & 0x3) //compare my direction to my neighbor's
 	{
 		// If N/S check E/W  <<<<<
 
