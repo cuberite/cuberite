@@ -683,11 +683,13 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 
 void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState)
 {
+	// Create a variable holding my meta to avoid multiple lookups.
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false); // Cache if repeater is on.
-	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is powered.
-	bool IsLocked = IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is locked.
+	// Do the same for being on, self powered or locked.
+	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
+	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
+	bool IsLocked = IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
 
 	if (IsSelfPowered && !IsOn && !IsLocked) // Queue a power change if powered, but not on and not locked.
 	{
@@ -1151,7 +1153,8 @@ bool cIncrementalRedstoneSimulator::AreCoordsLinkedPowered(int a_BlockX, int a_B
 
 
 
-
+// IsRepeaterPowered tests if a repeater should be powered by testing for power sources behind the repeater.
+// It takes the coordinates of the repeater the the meta value.
 bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
 	// Repeaters cannot be powered by any face except their back; verify that this is true for a source
@@ -1160,7 +1163,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		switch (a_Meta)
+		switch (a_Meta & 0x3)
 		{
 			case 0x0:
 			{
@@ -1190,7 +1193,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		switch (a_Meta)
+		switch (a_Meta & 0x3)
 		{
 			case 0x0:
 			{
@@ -1226,42 +1229,44 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY,
 	// Change checking direction according to meta rotation.
 	switch (a_Meta & 0x3) //compare my direction to my neighbor's
 	{
-		// If N/S check E/W  <<<<<
 
-	  	case 0x0: 
-	    case 0x2:
-	  	{
-	            if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) // Is right neighbor a
-	            { 
-	              	NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX + 1, a_BlockY, a_BlockZ) & 0x3;
-	                if (otherRepeaterDir == 0x1) { return true; }
-	            }
+		// If the repeater is facing one direction, do one thing.
+		case 0x0: 
+		case 0x2:
+		{
+			if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) // Is right neighbor a
+			{ 
+				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX + 1, a_BlockY, a_BlockZ) & 0x3;
+				if (otherRepeaterDir == 0x1) { return true; }
+			}
 	  
-	            if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
-	            { 
-	              	NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
-	                if (otherRepeaterDir == 0x3) { return true; }
-	            }
+	  		if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{ 
+				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
+				if (otherRepeaterDir == 0x3) { return true; }
+			}
 	  
 			break;
-	    }
+		}
 	  
-		// If E/W check N/S
+		// If another, do the other.
 		case 0x1:
 		case 0x3:
+		{
+			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{ 
+				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ + 1) & 0x3;
+				if (otherRepeaterDir == 0x0) { return true; }
+			}
+			
+			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ -1) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{ 
+				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ - 1) & 0x3;
+				if (otherRepeaterDir == 0x2) { return true; }
+			}
 
-	              if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == E_BLOCK_REDSTONE_REPEATER_ON) 
-	            { 
-	              	NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ + 1) & 0x3;
-	                if (otherRepeaterDir == 0x0) { return true; }
-	            }
-	  
-	            if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ -1) == E_BLOCK_REDSTONE_REPEATER_ON) 
-	            { 
-	              	NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ - 1) & 0x3;
-	                if (otherRepeaterDir == 0x2) { return true; }
-	            }
-		break;
+			break;
+		}
 	}
 
 	return false;
