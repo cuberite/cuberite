@@ -685,11 +685,10 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_B
 {
 	// Create a variable holding my meta to avoid multiple lookups.
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-
+    	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
+    	
     	if (!IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
     	{
-    		// Create a variable holding being on or self powered to avoid multiple lookups.
-    		bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
 		bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
 		if (IsSelfPowered && !IsOn) // Queue a power change if powered, but not on and not locked.
 		{
