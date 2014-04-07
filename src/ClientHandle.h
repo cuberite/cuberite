@@ -230,6 +230,9 @@ public:
 	/** Called when the player moves into a different world; queues sreaming the new chunks */
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
+	///Handle item enchanting
+	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
+	
 private:
 
 	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
