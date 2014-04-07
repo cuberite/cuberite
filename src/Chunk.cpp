@@ -1624,7 +1624,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	MarkDirty();
 
-	if (m_BlockTypes.empty() || (index > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
+	if (m_BlockTypes.empty() || ((size_t)index > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
 	{
 		m_BlockTypes.resize(index + 1);
 	}
@@ -2569,7 +2569,7 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 		return 0;
 	}
 
-	if (m_BlockTypes.empty() || (a_BlockIdx > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
+	if (m_BlockTypes.empty() || ((size_t)a_BlockIdx > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
 	{
 		return E_BLOCK_AIR;
 	}

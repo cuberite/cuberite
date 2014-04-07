@@ -236,11 +236,11 @@ public:
 	{
 		if ((a_BlockIdx > -1) && (a_BlockIdx < NumBlocks))
 		{
-			if (a_Buffer.empty() || (a_BlockIdx / 2 > a_Buffer.size() - 1))
+			if (a_Buffer.empty() || ((size_t)(a_BlockIdx / 2) > a_Buffer.size() - 1))
 			{
 				return (a_IsSkyLightNibble ? 0xff : 0);
 			}
-			return (a_Buffer[a_BlockIdx / 2] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
+			return (a_Buffer[(size_t)(a_BlockIdx / 2)] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): index out of chunk range!");
 		return 0;
@@ -264,11 +264,11 @@ public:
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
 			int Index = MakeIndexNoCheck(x, y, z);
-			if (a_Buffer.empty() || (Index / 2 > a_Buffer.size() - 1))
+			if (a_Buffer.empty() || ((size_t)(Index / 2) > a_Buffer.size() - 1))
 			{
 				return (a_IsSkyLightNibble ? 0xff : 0);
 			}
-			return (a_Buffer[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
+			return (a_Buffer[(size_t)(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
 		return 0;
@@ -296,11 +296,11 @@ public:
 			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
 			return;
 		}
-		if (a_Buffer.empty() || (a_BlockIdx / 2 > a_Buffer.size() - 1))
+		if (a_Buffer.empty() || ((size_t)(a_BlockIdx / 2) > a_Buffer.size() - 1))
 		{
-			a_Buffer.resize((a_BlockIdx / 2) + 1);
+			a_Buffer.resize((size_t)((a_BlockIdx / 2) + 1));
 		}
-		a_Buffer[a_BlockIdx / 2] = static_cast<NIBBLETYPE>(
+		a_Buffer[(size_t)(a_BlockIdx / 2)] = static_cast<NIBBLETYPE>(
 			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
 			);
@@ -340,11 +340,11 @@ public:
 		}
 
 		int Index = MakeIndexNoCheck(x, y, z);
-		if (a_Buffer.empty() || (Index / 2 > a_Buffer.size() - 1))
+		if (a_Buffer.empty() || ((size_t)(Index / 2) > a_Buffer.size() - 1))
 		{
-			a_Buffer.resize((Index / 2) + 1);
+			a_Buffer.resize((size_t)((Index / 2) + 1));
 		}
-		a_Buffer[Index / 2] = static_cast<NIBBLETYPE>(
+		a_Buffer[(size_t)(Index / 2)] = static_cast<NIBBLETYPE>(
 			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 			);
