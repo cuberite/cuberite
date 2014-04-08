@@ -1210,39 +1210,40 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY,
 	switch (a_Meta & 0x3) //compare my direction to my neighbor's
 	{
 
-		// If the repeater is facing one direction, do one thing.
+		//Question: is the server axes the same as client's?
+		// The repeater is parallel to the Z axes, check out neighbors on X+1 and x-1.
 		case 0x0: 
 		case 0x2:
 		{
 			if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) // Is right neighbor a
 			{ 
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX + 1, a_BlockY, a_BlockZ) & 0x3;
-				if (otherRepeaterDir == 0x1) { return true; }
-			}
+				if (otherRepeaterDir == 0x3) { return true; }
+			}	
 	  
 	  		if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
 			{ 
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
-				if (otherRepeaterDir == 0x3) { return true; }
+				if (otherRepeaterDir == 0x1) { return true; }
 			}
 	  
 			break;
 		}
 	  
-		// If another, do the other.
+		// The repeater is parallel to the x axes, check out neighbors on z+1 and z-1.
 		case 0x1:
 		case 0x3:
 		{
 			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == E_BLOCK_REDSTONE_REPEATER_ON) 
 			{ 
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ + 1) & 0x3;
-				if (otherRepeaterDir == 0x2) { return true; }
+				if (otherRepeaterDir == 0x0) { return true; }
 			}
 			
 			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ -1) == E_BLOCK_REDSTONE_REPEATER_ON) 
 			{ 
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ - 1) & 0x3;
-				if (otherRepeaterDir == 0x0) { return true; }
+				if (otherRepeaterDir == 0x2) { return true; }
 			}
 
 			break;
