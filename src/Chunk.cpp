@@ -2511,7 +2511,7 @@ cChunk * cChunk::GetNeighborChunk(int a_BlockX, int a_BlockZ)
 cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 {
 	// If the relative coords are too far away, use the parent's chunk lookup instead:
-	if ((a_RelX < 128) || (a_RelX > 128) || (a_RelZ < -128) || (a_RelZ > 128))
+	if ((a_RelX < -128) || (a_RelX > 128) || (a_RelZ < -128) || (a_RelZ > 128))
 	{
 		int BlockX = m_PosX * cChunkDef::Width + a_RelX;
 		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
