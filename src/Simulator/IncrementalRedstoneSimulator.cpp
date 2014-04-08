@@ -14,21 +14,22 @@
 
 	// Orientation mini guide:
 	/*
-		^
+		
 		|
 		| Z Axis
+		V
 		
 		X Axis ---->
 		
 		Block Direction, and value of _World.GetBlockMeta(a_BlockX , a_BlockY, a_BlockZ):
 		
-		Right (X+): 0x1
-		Left (X-): 0x3
-		Up (z+): 0x2
-		Down (z-): 0x0
+		East (Right) (X+): 0x1
+		West (Left) (X-): 0x3
+		North (Up) (Z-): 0x2
+		South (Down) (Z+): 0x0
 		
 		//TODO: Define those in preprocessor and replace them everywhere in the entire project.
-		Sun rises from right (X+)
+		Sun rises from East (X+)
 	*/
 	
 
@@ -1232,14 +1233,14 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY,
 		case 0x0:
 		case 0x2:
 		{
-			//Check if right neighbor is a powered on repeater who is facing us.
+			//Check if eastern(right) neighbor is a powered on repeater who is facing us.
 			if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) // Is right neighbor a
 			{
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX + 1, a_BlockY, a_BlockZ) & 0x3;
 				if (otherRepeaterDir == 0x3) { return true; } //If so, I am latched/locked.
 			}
 
-			//Check if left neighbor is a powered on repeater who is facing us.
+			//Check if western(left) neighbor is a powered on repeater who is facing us.
 	  		if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
 			{
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
@@ -1253,14 +1254,14 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY,
 		case 0x1:
 		case 0x3:
 		{
-			//Check if upper neighbor is a powered on repeater who is facing us.
+			//Check if southern(down) neighbor is a powered on repeater who is facing us.
 			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == E_BLOCK_REDSTONE_REPEATER_ON) 
 			{ 
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ + 1) & 0x3;
 				if (otherRepeaterDir == 0x0) { return true; } //If so,  am latched/locked.
 			}
 			
-			//Check if bottom neighbor is a powered on repeater who is facing us.
+			//Check if northern(up) neighbor is a powered on repeater who is facing us.
 			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ -1) == E_BLOCK_REDSTONE_REPEATER_ON) 
 			{ 
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ - 1) & 0x3;
