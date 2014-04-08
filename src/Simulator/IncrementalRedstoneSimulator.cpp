@@ -25,11 +25,11 @@
 		
 		East (Right) (X+): 0x1
 		West (Left) (X-): 0x3
-		North (Up) (z-): 0x2
-		South (Down) (z+): 0x0
+		North (Up) (Z-): 0x2
+		South (Down) (Z+): 0x0
 		
 		//TODO: Define those in preprocessor and replace them everywhere in the entire project.
-		Sun rises from right (X+)
+		Sun rises from East (X+)
 	*/
 	
 
