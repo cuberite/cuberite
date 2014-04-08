@@ -1211,24 +1211,24 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY,
 	{
 
 		// If the repeater is facing one direction, do one thing.
-		case 0x0: 
+		case 0x0:
 		case 0x2:
 		{
 			if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) // Is right neighbor a
-			{ 
+			{
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX + 1, a_BlockY, a_BlockZ) & 0x3;
-				if (otherRepeaterDir == 0x1) { return true; }
-			}
-	  
-	  		if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
-			{ 
-				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
 				if (otherRepeaterDir == 0x3) { return true; }
 			}
-	  
+
+	  		if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{
+				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
+				if (otherRepeaterDir == 0x1) { return true; }
+			}
+
 			break;
 		}
-	  
+
 		// If another, do the other.
 		case 0x1:
 		case 0x3:
