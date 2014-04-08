@@ -1236,13 +1236,13 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY,
 			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == E_BLOCK_REDSTONE_REPEATER_ON) 
 			{ 
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ + 1) & 0x3;
-				if (otherRepeaterDir == 0x0) { return true; }
+				if (otherRepeaterDir == 0x2) { return true; }
 			}
 			
 			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ -1) == E_BLOCK_REDSTONE_REPEATER_ON) 
 			{ 
 				NIBBLETYPE otherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ - 1) & 0x3;
-				if (otherRepeaterDir == 0x2) { return true; }
+				if (otherRepeaterDir == 0x0) { return true; }
 			}
 
 			break;
