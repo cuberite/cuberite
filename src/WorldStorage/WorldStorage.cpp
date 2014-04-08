@@ -150,7 +150,7 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate)
 {
-	m_LoadQueue.EnqueueItemIfNotPresent(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
+	m_LoadQueue.EnqueueItem(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
 	m_Event.Set();
 }
 
