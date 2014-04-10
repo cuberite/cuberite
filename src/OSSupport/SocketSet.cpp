@@ -94,7 +94,7 @@ bool cSocketSet::SelectRead(int timeout)
 	timeval tv;
 	tv.tv_sec = timeout;
 	tv.tv_usec = 0;
-	return (select(Highest.m_Socket + 1, &m_SelectedSockets, NULL, NULL, &tv) != -1);
+	return m_Selected = (select(Highest.m_Socket + 1, &m_SelectedSockets, NULL, NULL, &tv) != -1);
 }
 
 
@@ -117,6 +117,12 @@ bool cSocketSet::SelectReadWrite(cSocketSet & a_ReadSockets, cSocketSet & a_Writ
 	tv.tv_sec = timeout;
 	tv.tv_usec = 0;
 	int highest = std::max(a_ReadSockets.Highest.m_Socket, a_WriteSockets.Highest.m_Socket) + 1;
-	return (select(highest, &a_ReadSockets.m_SelectedSockets, &a_WriteSockets.m_SelectedSockets, NULL, &tv) != -1);
+	bool success = (select(highest, &a_ReadSockets.m_SelectedSockets, &a_WriteSockets.m_SelectedSockets, NULL, &tv) != -1);
+	
+	if (!success) return false;
+
+	a_ReadSockets.m_Selected = true;
+	a_WriteSockets.m_Selected = true;
+	return true;
 }
 

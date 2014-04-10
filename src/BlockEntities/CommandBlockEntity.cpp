@@ -12,6 +12,7 @@
 #include "../CommandOutput.h"
 #include "../Root.h"
 #include "../Server.h" // ExecuteConsoleCommand()
+#include "../Chunk.h"
 
 
 
@@ -126,6 +127,8 @@ void cCommandBlockEntity::SetRedstonePower(bool a_IsPowered)
 
 bool cCommandBlockEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	if (!m_ShouldExecute)
 	{
 		return false;
@@ -157,7 +160,7 @@ bool cCommandBlockEntity::LoadFromJson(const Json::Value & a_Value)
 
 	m_Command    = a_Value.get("Command",     "").asString();
 	m_LastOutput = a_Value.get("LastOutput",  "").asString();
-	m_Result     = a_Value.get("SuccessCount", 0).asInt();
+	m_Result     = (NIBBLETYPE)a_Value.get("SuccessCount", 0).asInt();
 
 	return true;
 }

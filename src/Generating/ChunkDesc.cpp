@@ -209,6 +209,7 @@ bool cChunkDesc::IsUsingDefaultComposition(void) const
 
 void cChunkDesc::SetUseDefaultStructures(bool a_bUseDefaultStructures)
 {
+	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
 	m_bUseDefaultStructures = a_bUseDefaultStructures;
 }
 
@@ -218,6 +219,7 @@ void cChunkDesc::SetUseDefaultStructures(bool a_bUseDefaultStructures)
 
 bool cChunkDesc::IsUsingDefaultStructures(void) const
 {
+	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
 	return m_bUseDefaultStructures;
 }
 
@@ -341,9 +343,9 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 	int SizeY = a_MaxRelY - a_MinRelY;
 	int SizeZ = a_MaxRelZ - a_MinRelZ;
 	a_Dest.Clear();
-	a_Dest.m_OriginX = m_ChunkX * cChunkDef::Width + a_MinRelX;
-	a_Dest.m_OriginY = a_MinRelY;
-	a_Dest.m_OriginZ = m_ChunkZ * cChunkDef::Width + a_MinRelZ;
+	a_Dest.m_Origin.x = m_ChunkX * cChunkDef::Width + a_MinRelX;
+	a_Dest.m_Origin.y = a_MinRelY;
+	a_Dest.m_Origin.z = m_ChunkZ * cChunkDef::Width + a_MinRelZ;
 	a_Dest.SetSize(SizeX, SizeY, SizeZ, cBlockArea::baTypes | cBlockArea::baMetas);
 
 	for (int y = 0; y < SizeY; y++)

@@ -1,17 +1,18 @@
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "MetaRotator.h"
 
 
 
 
 class cBlockLeverHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x02, 0x03, 0x01, false>
 {
+	typedef cMetaRotator<cBlockHandler, 0x07, 0x04, 0x02, 0x03, 0x01, false> super;
 public:
 	cBlockLeverHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x07, 0x04, 0x02, 0x03, 0x01, false>(a_BlockType)
 	{
 	}
 	
@@ -102,7 +103,37 @@ public:
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
 		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && (g_BlockIsSolid[BlockIsOn]);
+		return (a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn);
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		switch (a_Meta)
+		{
+			case 0x00: return 0x07;  // Ceiling rotation
+			case 0x07: return 0x00;
+
+			case 0x05: return 0x06;  // Ground rotation
+			case 0x06: return 0x05;
+
+			default:  return super::MetaRotateCCW(a_Meta);  // Wall Rotation
+		}
+	}
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		switch (a_Meta)
+		{
+			case 0x00: return 0x07;  // Ceiling rotation
+			case 0x07: return 0x00;
+
+			case 0x05: return 0x06;  // Ground rotation
+			case 0x06: return 0x05;
+
+			default:  return super::MetaRotateCCW(a_Meta);  // Wall Rotation
+		}
 	}
 } ;
 

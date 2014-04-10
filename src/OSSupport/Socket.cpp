@@ -35,7 +35,15 @@ cSocket::~cSocket()
 bool cSocket::IsValidSocket(cSocket::xSocket a_Socket)
 {
 	#ifdef _WIN32
+	#ifndef DEBUG
 	return (a_Socket != INVALID_SOCKET);
+	#else
+	// lets be parinoid in debug builds
+	if (a_Socket != INVALID_SOCKET) return false;
+	struct stat statbuf;
+	fstat(fd, &statbuf);
+	return S_ISSOCK(statbuf.st_mode);
+	#endif
 	#else  // _WIN32
 	return (a_Socket >= 0);
 	#endif  // else _WIN32
@@ -346,7 +354,8 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 			CloseSocket();
 			return false;
 		}
-		addr = *((unsigned long*)hp->h_addr);
+		// Should be optimised to a single word copy
+		memcpy(&addr, hp->h_addr, hp->h_length);
 	}
 
 	sockaddr_in server;

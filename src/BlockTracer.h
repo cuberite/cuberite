@@ -28,6 +28,9 @@ public:
 	class cCallbacks abstract
 	{
 	public:
+		// Force a virtual destructor in descendants:
+		virtual ~cCallbacks() {}
+		
 		/** Called on each block encountered along the path, including the first block (path start)
 		When this callback returns true, the tracing is aborted.
 		*/

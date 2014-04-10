@@ -82,11 +82,11 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_AttackRange(2)
 	, m_AttackInterval(0)
 	, m_SightDistance(25)
-	, m_DropChanceWeapon(0.085)
-	, m_DropChanceHelmet(0.085)
-	, m_DropChanceChestplate(0.085)
-	, m_DropChanceLeggings(0.085)
-	, m_DropChanceBoots(0.085)
+	, m_DropChanceWeapon(0.085f)
+	, m_DropChanceHelmet(0.085f)
+	, m_DropChanceChestplate(0.085f)
+	, m_DropChanceLeggings(0.085f)
+	, m_DropChanceBoots(0.085f)
 	, m_CanPickUpLoot(true)
 	, m_BurnsInDaylight(false)
 {
@@ -111,9 +111,9 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 void cMonster::TickPathFinding()
 {
-	int PosX = (int)floor(GetPosX());
-	int PosY = (int)floor(GetPosY());
-	int PosZ = (int)floor(GetPosZ());
+	const int PosX = (int)floor(GetPosX());
+	const int PosY = (int)floor(GetPosY());
+	const int PosZ = (int)floor(GetPosZ());
 
 	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
 
@@ -130,14 +130,16 @@ void cMonster::TickPathFinding()
 		{ 0, 1},
 		{ 0,-1},
 	} ;
+	
+	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
+	{
+		// Too low/high, can't really do anything
+		FinishPathFinding();
+		return;
+	}
 
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 	{
-		if ((gCrossCoords[i].x + PosX == PosX) && (gCrossCoords[i].z + PosZ == PosZ))
-		{
-			continue;
-		}
-
 		if (IsCoordinateInTraversedList(Vector3i(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ)))
 		{
 			continue;
@@ -148,11 +150,11 @@ void cMonster::TickPathFinding()
 		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYM = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY - 1, gCrossCoords[i].z + PosZ);
 
-		if ((!g_BlockIsSolid[BlockAtY]) && (!g_BlockIsSolid[BlockAtYP]) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
+		if ((!cBlockInfo::IsSolid(BlockAtY)) && (!cBlockInfo::IsSolid(BlockAtYP)) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY, gCrossCoords[i].z + PosZ));
 		}
-		else if ((g_BlockIsSolid[BlockAtY]) && (!g_BlockIsSolid[BlockAtYP]) && (!g_BlockIsSolid[BlockAtYPP]) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
+		else if ((cBlockInfo::IsSolid(BlockAtY)) && (!cBlockInfo::IsSolid(BlockAtYP)) && (!cBlockInfo::IsSolid(BlockAtYPP)) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY + 1, gCrossCoords[i].z + PosZ));
 		}
@@ -416,9 +418,9 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	else if (PosY > cChunkDef::Height)
 		PosY = cChunkDef::Height;
 
-	if (!g_BlockIsSolid[m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))])
+	if (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
 	{
-		while (!g_BlockIsSolid[m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))] && (PosY > 0))
+		while (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))) && (PosY > 0))
 		{
 			PosY--;
 		}
@@ -427,7 +429,7 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	}
 	else
 	{
-		while (g_BlockIsSolid[m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))] && (PosY < cChunkDef::Height))
+		while (cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))) && (PosY < cChunkDef::Height))
 		{
 			PosY++;
 		}
@@ -758,6 +760,7 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtSquid:        return mfWater;
 		case mtVillager:     return mfPassive;
 		case mtWitch:        return mfHostile;
+		case mtWither:       return mfHostile;
 		case mtWolf:         return mfHostile;
 		case mtZombie:       return mfHostile;
 		case mtZombiePigman: return mfHostile;

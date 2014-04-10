@@ -103,13 +103,13 @@ protected:
 	double GetRelativeTime(void);
 	
 	/// Sends data to the specified socket. If sending fails, prints a fail message using a_Peer and returns false.
-	bool SendData(SOCKET a_Socket, const char * a_Data, int a_Size, const char * a_Peer);
+	bool SendData(SOCKET a_Socket, const char * a_Data, size_t a_Size, const char * a_Peer);
 	
 	/// Sends data to the specified socket. If sending fails, prints a fail message using a_Peer and returns false.
 	bool SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a_Peer);
 	
 	/// Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false
-	bool SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, int a_Size, const char * a_Peer);
+	bool SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer);
 	
 	/// Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false
 	bool SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer);

@@ -93,25 +93,30 @@ void cMCLogger::InitLog(const AString & a_FileName)
 
 
 
-void cMCLogger::LogSimple(const char* a_Text, int a_LogType /* = 0 */ )
+void cMCLogger::LogSimple(const char * a_Text, eLogLevel a_LogLevel)
 {
-	switch( a_LogType )
+	switch (a_LogLevel)
 	{
-		case 0:
+		case llRegular:
+		{
 			LOG("%s", a_Text);
 			break;
-		case 1:
+		}
+		case llInfo:
+		{
 			LOGINFO("%s", a_Text);
 			break;
-		case 2:
+		}
+		case llWarning:
+		{
 			LOGWARN("%s", a_Text);
 			break;
-		case 3:
+		}
+		case llError:
+		{
 			LOGERROR("%s", a_Text);
 			break;
-		default:
-			LOG("(#%d#: %s", a_LogType, a_Text);
-			break;
+		}
 	}
 }
 

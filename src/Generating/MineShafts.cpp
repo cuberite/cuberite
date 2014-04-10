@@ -69,6 +69,8 @@ public:
 		m_BoundingBox(a_BoundingBox)
 	{
 	}
+	
+	virtual ~cMineShaft() {}
 
 	/// Returns true if this mineshaft intersects the specified cuboid
 	bool DoesIntersect(const cCuboid & a_Other)
@@ -1338,7 +1340,7 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 	BaseX -= NEIGHBORHOOD_SIZE / 2;
 	BaseZ -= NEIGHBORHOOD_SIZE / 2;
 
-	// Walk the cache, move each cave system that we want into a_Caves:
+	// Walk the cache, move each cave system that we want into a_Mineshafts:
 	int StartX = BaseX * m_GridSize;
 	int EndX = (BaseX + NEIGHBORHOOD_SIZE + 1) * m_GridSize;
 	int StartZ = BaseZ * m_GridSize;
@@ -1407,7 +1409,7 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 
 
 
-void cStructGenMineShafts::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenMineShafts::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();

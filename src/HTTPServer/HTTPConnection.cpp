@@ -67,10 +67,10 @@ void cHTTPConnection::Send(const cHTTPResponse & a_Response)
 
 
 
-void cHTTPConnection::Send(const void * a_Data, int a_Size)
+void cHTTPConnection::Send(const void * a_Data, size_t a_Size)
 {
 	ASSERT(m_State == wcsSendingResp);
-	AppendPrintf(m_OutgoingData, "%x\r\n", a_Size);
+	AppendPrintf(m_OutgoingData, SIZE_T_FMT_HEX "\r\n", a_Size);
 	m_OutgoingData.append((const char *)a_Data, a_Size);
 	m_OutgoingData.append("\r\n");
 	m_HTTPServer.NotifyConnectionWrite(*this);
@@ -144,7 +144,7 @@ void cHTTPConnection::Terminate(void)
 
 
 
-void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
+void cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 {
 	switch (m_State)
 	{
@@ -155,8 +155,8 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 				m_CurrentRequest = new cHTTPRequest;
 			}
 
-			int BytesConsumed = m_CurrentRequest->ParseHeaders(a_Data, a_Size);
-			if (BytesConsumed < 0)
+			size_t BytesConsumed = m_CurrentRequest->ParseHeaders(a_Data, a_Size);
+			if (BytesConsumed == AString::npos)
 			{
 				delete m_CurrentRequest;
 				m_CurrentRequest = NULL;
@@ -174,7 +174,7 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 			m_State = wcsRecvBody;
 			m_HTTPServer.NewRequest(*this, *m_CurrentRequest);
 			m_CurrentRequestBodyRemaining = m_CurrentRequest->GetContentLength();
-			if (m_CurrentRequestBodyRemaining < 0)
+			if (m_CurrentRequestBodyRemaining == AString::npos)
 			{
 				// The body length was not specified in the request, assume zero
 				m_CurrentRequestBodyRemaining = 0;
@@ -197,7 +197,7 @@ void cHTTPConnection::DataReceived(const char * a_Data, int a_Size)
 			ASSERT(m_CurrentRequest != NULL);
 			if (m_CurrentRequestBodyRemaining > 0)
 			{
-				int BytesToConsume = std::min(m_CurrentRequestBodyRemaining, a_Size);
+				size_t BytesToConsume = std::min(m_CurrentRequestBodyRemaining, (size_t)a_Size);
 				m_HTTPServer.RequestBody(*this, *m_CurrentRequest, a_Data, BytesToConsume);
 				m_CurrentRequestBodyRemaining -= BytesToConsume;
 			}

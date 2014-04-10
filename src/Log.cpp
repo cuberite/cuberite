@@ -42,7 +42,7 @@ cLog::~cLog()
 
 
 
-cLog* cLog::GetInstance()
+cLog * cLog::GetInstance()
 {
 	if (s_Log != NULL)
 	{
@@ -92,7 +92,7 @@ void cLog::ClearLog()
 	if( m_File )
 		fclose (m_File);
 	#endif
-	m_File = 0;
+	m_File = NULL;
 }
 
 
@@ -118,7 +118,7 @@ void cLog::Log(const char * a_Format, va_list argList)
 
 	AString Line;
 	#ifdef _DEBUG
-	Printf(Line, "[%04x|%02d:%02d:%02d] %s", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
+	Printf(Line, "[%04lx|%02d:%02d:%02d] %s", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
 	#else
 	Printf(Line, "[%02d:%02d:%02d] %s", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
 	#endif

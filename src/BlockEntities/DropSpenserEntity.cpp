@@ -129,6 +129,7 @@ void cDropSpenserEntity::SetRedstonePower(bool a_IsPowered)
 
 bool cDropSpenserEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
 	if (!m_ShouldDropSpense)
 	{
 		return false;

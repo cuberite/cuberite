@@ -51,7 +51,7 @@ public:
 	void Send(const cHTTPResponse & a_Response);
 	
 	/** Sends the data as the response (may be called multiple times) */
-	void Send(const void * a_Data, int a_Size);
+	void Send(const void * a_Data, size_t a_Size);
 
 	/** Sends the data as the response (may be called multiple times) */
 	void Send(const AString & a_Data) { Send(a_Data.data(), a_Data.size()); }
@@ -87,11 +87,11 @@ protected:
 
 	/** Number of bytes that remain to read for the complete body of the message to be received.
 	Valid only in wcsRecvBody */
-	int m_CurrentRequestBodyRemaining;
+	size_t m_CurrentRequestBodyRemaining;
 	
 	
 	// cSocketThreads::cCallback overrides:
-	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client
+	virtual void DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
 } ;

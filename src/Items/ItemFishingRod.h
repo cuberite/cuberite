@@ -123,7 +123,7 @@ public:
 						}
 						case 2:
 						{
-							Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, a_World->GetTickRandomNumber(50))); // Fishing rod with durability. TODO: Enchantments on it
+							Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, (short)a_World->GetTickRandomNumber(50)));  // Fishing rod with durability. TODO: Enchantments on it
 							break;
 						}
 						case 3:
@@ -152,7 +152,7 @@ public:
 					}
 					else if (Junk <= 4)
 					{
-						Drops.Add(cItem(E_ITEM_BOW, 1, a_World->GetTickRandomNumber(64)));
+						Drops.Add(cItem(E_ITEM_BOW, 1, (short)a_World->GetTickRandomNumber(64)));
 					}
 					else if (Junk <= 9)
 					{

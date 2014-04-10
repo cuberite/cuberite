@@ -22,16 +22,16 @@ typedef std::list<AString>   AStringList;
 
 
 /** Add the formated string to the existing data in the string */
-extern AString & AppendVPrintf(AString & str, const char * format, va_list args);
+extern AString & AppendVPrintf(AString & str, const char * format, va_list args) FORMATSTRING(2, 0);
 
 /// Output the formatted text into the string
-extern AString & Printf       (AString & str, const char * format, ...);
+extern AString & Printf       (AString & str, const char * format, ...) FORMATSTRING(2, 3);
 
 /// Output the formatted text into string, return string by value
-extern AString Printf(const char * format, ...);
+extern AString Printf(const char * format, ...) FORMATSTRING(1, 2);
 
 /// Add the formatted string to the existing data in the string
-extern AString & AppendPrintf (AString & str, const char * format, ...);
+extern AString & AppendPrintf (AString & str, const char * format, ...) FORMATSTRING(2, 3);
 
 /// Split the string at any of the listed delimiters, return as a stringvector
 extern AStringVector StringSplit(const AString & str, const AString & delim);
@@ -58,13 +58,13 @@ extern unsigned int RateCompareString(const AString & s1, const AString & s2 );
 extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);  // tolua_export
 
 /// Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
-extern AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8);
+extern AString & RawBEToUTF8(const char * a_RawData, int a_NumShorts, AString & a_UTF8);
 
 /// Converts a UTF-8 string into a UTF-16 BE string, packing that back into AString; return a ref to a_UTF16
 extern AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16);
 
 /// Creates a nicely formatted HEX dump of the given memory block. Max a_BytesPerLine is 120
-extern AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_BytesPerLine);
+extern AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine);
 
 /// Returns a copy of a_Message with all quotes and backslashes escaped by a backslash
 extern AString EscapeString(const AString & a_Message);  // tolua_export
@@ -79,10 +79,10 @@ extern AString URLDecode(const AString & a_String);  // Cannot export to Lua aut
 extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
 
 /// Decodes a Base64-encoded string into the raw data
-extern AString Base64Decode(const AString & a_Base64String);
+extern AString Base64Decode(const AString & a_Base64String);  // Exported manually due to embedded NULs and extra parameter
 
 /// Encodes a string into Base64
-extern AString Base64Encode(const AString & a_Input);
+extern AString Base64Encode(const AString & a_Input);  // Exported manually due to embedded NULs and extra parameter
 
 /// Reads two bytes from the specified memory location and interprets them as BigEndian short
 extern short GetBEShort(const char * a_Mem);

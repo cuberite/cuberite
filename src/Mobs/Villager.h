@@ -29,7 +29,7 @@ public:
 
 	CLASS_PROTODEF(cVillager);
 
-	// Override functions
+	// cEntity overrides
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void Tick        (float a_Dt, cChunk & a_Chunk) override;
 

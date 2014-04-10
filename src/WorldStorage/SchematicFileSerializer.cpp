@@ -1,10 +1,51 @@
 
+// SchematicFileSerializer.cpp
+
+// Implements the cSchematicFileSerializer class representing the interface to load and save cBlockArea to a .schematic file
+
 #include "Globals.h"
 
 #include "OSSupport/GZipFile.h"
 #include "FastNBT.h"
-
 #include "SchematicFileSerializer.h"
+#include "../StringCompression.h"
+
+
+
+
+
+#ifdef SELF_TEST
+
+static class cSchematicStringSelfTest
+{
+public:
+	cSchematicStringSelfTest(void)
+	{
+		cBlockArea ba;
+		ba.Create(21, 256, 21);
+		ba.RelLine(0, 0, 0, 9, 8, 7, cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_WOODEN_STAIRS, 1);
+		AString Schematic;
+		if (!cSchematicFileSerializer::SaveToSchematicString(ba, Schematic))
+		{
+			assert_test(!"Schematic failed to save!");
+		}
+		cBlockArea ba2;
+		if (!cSchematicFileSerializer::LoadFromSchematicString(ba2, Schematic))
+		{
+			assert_test(!"Schematic failed to load!");
+		}
+	}
+} g_SelfTest;
+
+#endif
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSchematicFileSerializer:
 
 bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
 {
@@ -40,53 +81,80 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, c
 
 
 
-bool cSchematicFileSerializer::SaveToSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
+bool cSchematicFileSerializer::LoadFromSchematicString(cBlockArea & a_BlockArea, const AString & a_SchematicData)
 {
-	cFastNBTWriter Writer("Schematic");
-	Writer.AddShort("Width",  a_BlockArea.m_SizeX);
-	Writer.AddShort("Height", a_BlockArea.m_SizeY);
-	Writer.AddShort("Length", a_BlockArea.m_SizeZ);
-	Writer.AddString("Materials", "Alpha");
-	if (a_BlockArea.HasBlockTypes())
+	// Uncompress the data:
+	AString UngzippedData;
+	if (UncompressStringGZIP(a_SchematicData.data(), a_SchematicData.size(), UngzippedData) != Z_OK)
 	{
-		Writer.AddByteArray("Blocks", (const char *)a_BlockArea.m_BlockTypes, a_BlockArea.GetBlockCount());
+		LOG("%s: Cannot unGZip the schematic data.", __FUNCTION__);
+		return false;
 	}
-	else
+
+	// Parse the NBT:
+	cParsedNBT NBT(UngzippedData.data(), UngzippedData.size());
+	if (!NBT.IsValid())
 	{
-		AString Dummy(a_BlockArea.GetBlockCount(), 0);
-		Writer.AddByteArray("Blocks", Dummy.data(), Dummy.size());
+		LOG("%s: Cannot parse the NBT in the schematic data.", __FUNCTION__);
+		return false;
 	}
-	if (a_BlockArea.HasBlockMetas())
+	
+	return LoadFromSchematicNBT(a_BlockArea, NBT);
+}
+
+
+
+
+
+bool cSchematicFileSerializer::SaveToSchematicFile(const cBlockArea & a_BlockArea, const AString & a_FileName)
+{
+	// Serialize into NBT data:
+	AString NBT = SaveToSchematicNBT(a_BlockArea);
+	if (NBT.empty())
 	{
-		Writer.AddByteArray("Data", (const char *)a_BlockArea.m_BlockMetas, a_BlockArea.GetBlockCount());
+		LOG("%s: Cannot serialize the area into an NBT representation for file \"%s\".", __FUNCTION__, a_FileName.c_str());
+		return false;
 	}
-	else
-	{
-		AString Dummy(a_BlockArea.GetBlockCount(), 0);
-		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
-	}
-	// TODO: Save entities and block entities
-	Writer.BeginList("Entities", TAG_Compound);
-	Writer.EndList();
-	Writer.BeginList("TileEntities", TAG_Compound);
-	Writer.EndList();
-	Writer.Finish();
 	
 	// Save to file
 	cGZipFile File;
 	if (!File.Open(a_FileName, cGZipFile::fmWrite))
 	{
-		LOG("Cannot open file \"%s\" for writing.", a_FileName.c_str());
+		LOG("%s: Cannot open file \"%s\" for writing.", __FUNCTION__, a_FileName.c_str());
 		return false;
 	}
-	if (!File.Write(Writer.GetResult()))
+	if (!File.Write(NBT))
 	{
-		LOG("Cannot write data to file \"%s\".", a_FileName.c_str());
+		LOG("%s: Cannot write data to file \"%s\".", __FUNCTION__, a_FileName.c_str());
 		return false;
 	}
 	return true;
 }
 
+
+
+
+
+
+bool cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_BlockArea, AString & a_Out)
+{
+	// Serialize into NBT data:
+	AString NBT = SaveToSchematicNBT(a_BlockArea);
+	if (NBT.empty())
+	{
+		LOG("%s: Cannot serialize the area into an NBT representation.", __FUNCTION__);
+		return false;
+	}
+	
+	// Gzip the data:
+	int res = CompressStringGZIP(NBT.data(), NBT.size(), a_Out);
+	if (res != Z_OK)
+	{
+		LOG("%s: Cannot Gzip the area data NBT representation: %d", __FUNCTION__, res);
+		return false;
+	}
+	return true;
+}
 
 
 
@@ -142,8 +210,27 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	a_BlockArea.Clear();
 	a_BlockArea.SetSize(SizeX, SizeY, SizeZ, AreMetasPresent ? (cBlockArea::baTypes | cBlockArea::baMetas) : cBlockArea::baTypes);
 	
+	int TOffsetX = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetX");
+	int TOffsetY = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetY");
+	int TOffsetZ = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetZ");
+	
+	if (
+		(TOffsetX < 0) || (TOffsetY < 0) || (TOffsetZ < 0) ||
+		(a_NBT.GetType(TOffsetX) != TAG_Int) ||
+		(a_NBT.GetType(TOffsetY) != TAG_Int) ||
+		(a_NBT.GetType(TOffsetZ) != TAG_Int)
+	)
+	{
+		// Not every schematic file has an offset, so we shoudn't give a warn message.
+		a_BlockArea.SetWEOffset(0, 0, 0);
+	}
+	else
+	{
+		a_BlockArea.SetWEOffset(a_NBT.GetInt(TOffsetX), a_NBT.GetInt(TOffsetY), a_NBT.GetInt(TOffsetZ));
+	}
+
 	// Copy the block types and metas:
-	int NumBytes = a_BlockArea.m_SizeX * a_BlockArea.m_SizeY * a_BlockArea.m_SizeZ;
+	int NumBytes = a_BlockArea.GetBlockCount();
 	if (a_NBT.GetDataLength(TBlockTypes) < NumBytes)
 	{
 		LOG("BlockTypes truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
@@ -155,7 +242,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	
 	if (AreMetasPresent)
 	{
-		int NumBytes = a_BlockArea.m_SizeX * a_BlockArea.m_SizeY * a_BlockArea.m_SizeZ;
+		int NumBytes = a_BlockArea.GetBlockCount();
 		if (a_NBT.GetDataLength(TBlockMetas) < NumBytes)
 		{
 			LOG("BlockMetas truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
@@ -168,5 +255,51 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	
 	return true;
 }
+
+
+
+
+
+AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockArea)
+{
+	cFastNBTWriter Writer("Schematic");
+	Writer.AddShort("Width",  a_BlockArea.m_Size.x);
+	Writer.AddShort("Height", a_BlockArea.m_Size.y);
+	Writer.AddShort("Length", a_BlockArea.m_Size.z);
+	Writer.AddString("Materials", "Alpha");
+	if (a_BlockArea.HasBlockTypes())
+	{
+		Writer.AddByteArray("Blocks", (const char *)a_BlockArea.m_BlockTypes, a_BlockArea.GetBlockCount());
+	}
+	else
+	{
+		AString Dummy(a_BlockArea.GetBlockCount(), 0);
+		Writer.AddByteArray("Blocks", Dummy.data(), Dummy.size());
+	}
+	if (a_BlockArea.HasBlockMetas())
+	{
+		Writer.AddByteArray("Data", (const char *)a_BlockArea.m_BlockMetas, a_BlockArea.GetBlockCount());
+	}
+	else
+	{
+		AString Dummy(a_BlockArea.GetBlockCount(), 0);
+		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
+	}
+	
+	Writer.AddInt("WEOffsetX", a_BlockArea.m_WEOffset.x);
+	Writer.AddInt("WEOffsetY", a_BlockArea.m_WEOffset.y);
+	Writer.AddInt("WEOffsetZ", a_BlockArea.m_WEOffset.z);
+
+	// TODO: Save entities and block entities
+	Writer.BeginList("Entities", TAG_Compound);
+	Writer.EndList();
+	Writer.BeginList("TileEntities", TAG_Compound);
+	Writer.EndList();
+	Writer.Finish();
+	
+	return Writer.GetResult();
+}
+
+
 
 

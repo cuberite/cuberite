@@ -73,12 +73,15 @@ int cGZipFile::ReadRestOfFile(AString & a_Contents)
 	
 	// Since the gzip format doesn't really support getting the uncompressed length, we need to read incrementally. Yuck!
 	int NumBytesRead = 0;
+	int TotalBytes = 0;
 	char Buffer[64 KiB];
 	while ((NumBytesRead = gzread(m_File, Buffer, sizeof(Buffer))) > 0)
 	{
-		a_Contents.append(Buffer, NumBytesRead);
+		TotalBytes += NumBytesRead;
+		a_Contents.append(Buffer, (size_t)NumBytesRead);
 	}
-	return NumBytesRead;
+	// NumBytesRead is < 0 on error
+	return (NumBytesRead >= 0) ? TotalBytes : NumBytesRead;
 }
 
 
@@ -99,7 +102,7 @@ bool cGZipFile::Write(const char * a_Contents, int a_Size)
 		return false;
 	}
 
-	return (gzwrite(m_File, a_Contents, a_Size) != 0);
+	return (gzwrite(m_File, a_Contents, (unsigned int)a_Size) != 0);
 }
 
 

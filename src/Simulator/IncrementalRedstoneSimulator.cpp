@@ -13,7 +13,7 @@
 
 
 
-
+	
 
 cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulator(cWorld & a_World)
 	: super(a_World)
@@ -95,26 +95,6 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 			PoweredBlocks->erase(itr);
 			break;
-		}
-		else if (Block == E_BLOCK_DAYLIGHT_SENSOR)
-		{
-			if (!a_Chunk->IsLightValid())
-			{
-				m_World.QueueLightChunk(a_Chunk->GetPosX(), a_Chunk->GetPosZ());
-				break;
-			}
-			else
-			{
-				NIBBLETYPE SkyLight;
-				a_Chunk->UnboundedRelGetBlockSkyLight(RelX, itr->a_SourcePos.y + 1, RelZ, SkyLight);
-
-				if (a_Chunk->GetTimeAlteredLight(SkyLight) <= 8) // Could use SkyLight - m_World.GetSkyDarkness();
-				{
-					LOGD("cIncrementalRedstoneSimulator: Erased daylight sensor from powered blocks list due to insufficient light level");
-					PoweredBlocks->erase(itr);
-					break;
-				}
-			}
 		}
 	}
 
@@ -558,22 +538,22 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 	}
 	else
 	{
-		NIBBLETYPE MetaToSet = 0;
 		NIBBLETYPE MyMeta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE MetaToSet = MyMeta;
 		int TimesMetaSmaller = 0, TimesFoundAWire = 0;
 
 		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through all directions to transfer or receive power
 		{
 			if ((i >= 4) && (i <= 7)) // If we are currently checking for wire surrounding ourself one block above...
 			{
-				if (g_BlockIsSolid[m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)]) // If there is something solid above us (wire cut off)...
+				if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))) // If there is something solid above us (wire cut off)...
 				{
 					continue; // We don't receive power from that wire
 				}
 			}
 			else if ((i >= 8) && (i <= 11)) // See above, but this is for wire below us
 			{
-				if (g_BlockIsSolid[m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y + 1, a_BlockZ + gCrossCoords[i].z)])
+				if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y + 1, a_BlockZ + gCrossCoords[i].z)))
 				{
 					continue;
 				}
@@ -589,9 +569,9 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 
 				if (SurroundMeta > 1) // Wires of power 1 or 0 cannot transfer power TO ME, don't bother checking
 				{
-					// Does surrounding wire have a higher power level than self?
+					// Does surrounding wire have a higher power level than the highest so far (MetaToSet)?
 					// >= to fix a bug where wires bordering each other with the same power level will appear (in terms of meta) to power each other, when they aren't actually in the powered list
-					if (SurroundMeta >= MyMeta)
+					if (SurroundMeta >= MetaToSet)
 					{
 						MetaToSet = SurroundMeta - 1; // To improve performance
 					}
@@ -684,18 +664,42 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 
 void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState)
 {
+	/* Repeater Orientation Mini Guide:
+	===================================
+
+	|
+	| Z Axis
+	V
+
+	X Axis ---->
+
+	Repeater directions, values from a cWorld::GetBlockMeta(a_BlockX , a_BlockY, a_BlockZ) lookup:
+
+	East (Right) (X+): 0x1
+	West (Left) (X-): 0x3
+	North (Up) (Z-): 0x2
+	South (Down) (Z+): 0x0
+	// TODO: Add E_META_XXX enum entries for all meta values and update project with them
+
+	Sun rises from East (X+)
+
+	*/
+
+	// Create a variable holding my meta to avoid multiple lookups.
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-
-	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false); // Cache if repeater is on
-	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is pwoered
-
-	if (IsSelfPowered && !IsOn) // Queue a power change if I am receiving power but not on
+	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
+    	
+	if (!IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
 	{
-		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
-	}
-	else if (!IsSelfPowered && IsOn) // Queue a power change if I am not receiving power but on
-	{
-		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
+		bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
+		if (IsSelfPowered && !IsOn) // Queue a power change if powered, but not on and not locked.
+		{
+			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
+		}
+		else if (!IsSelfPowered && IsOn) // Queue a power change if unpowered, on, and not locked.
+		{
+			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
+		}
 	}
 
 	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
@@ -838,8 +842,8 @@ void cIncrementalRedstoneSimulator::HandleTNT(int a_BlockX, int a_BlockY, int a_
 	if (AreCoordsPowered(a_BlockX, a_BlockY, a_BlockZ))
 	{
 		m_World.BroadcastSoundEffect("game.tnt.primed", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.6f);
-		m_World.SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 4);  // 4 seconds to boom
 		m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+		m_World.SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);  // 80 ticks to boom
 	}
 }
 
@@ -937,17 +941,15 @@ void cIncrementalRedstoneSimulator::HandleTrapdoor(int a_BlockX, int a_BlockY, i
 	{
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, true))
 		{
-			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x4);
-			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
+			m_World.SetTrapdoorOpen(a_BlockX, a_BlockY, a_BlockZ, true);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, true);
-		}		
+		}
 	}
 	else
 	{
 		if (!AreCoordsSimulated(a_BlockX, a_BlockY, a_BlockZ, false))
 		{
-			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0xB); // Take into account that the fourth bit is needed for trapdoors too
-			m_World.BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0);
+			m_World.SetTrapdoorOpen(a_BlockX, a_BlockY, a_BlockZ, false);
 			SetPlayerToggleableBlockAsSimulated(a_BlockX, a_BlockY, a_BlockZ, false);
 		}
 	}
@@ -1064,7 +1066,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 				{
 					Vector3f EntityPos = a_Entity->GetPosition();
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
-					float Distance = (EntityPos - BlockPos).Length();
+					double Distance = (EntityPos - BlockPos).Length();
 
 					if (Distance <= 0.7)
 					{
@@ -1153,7 +1155,8 @@ bool cIncrementalRedstoneSimulator::AreCoordsLinkedPowered(int a_BlockX, int a_B
 
 
 
-
+// IsRepeaterPowered tests if a repeater should be powered by testing for power sources behind the repeater.
+// It takes the coordinates of the repeater the the meta value.
 bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
 	// Repeaters cannot be powered by any face except their back; verify that this is true for a source
@@ -1162,7 +1165,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		switch (a_Meta)
+		switch (a_Meta & 0x3)
 		{
 			case 0x0:
 			{
@@ -1192,7 +1195,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		switch (a_Meta)
+		switch (a_Meta & 0x3)
 		{
 			case 0x0:
 			{
@@ -1217,6 +1220,60 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 		}
 	}
 	return false; // Couldn't find power source behind repeater
+}
+
+
+
+
+
+bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+{	
+	switch (a_Meta & 0x3) // We only want the 'direction' part of our metadata
+	{
+		// If the repeater is looking up or down (If parallel to the Z axis)
+		case 0x0:
+		case 0x2:
+		{
+			// Check if eastern(right) neighbor is a powered on repeater who is facing us.
+			if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) // Is right neighbor a powered repeater?
+			{
+				NIBBLETYPE OtherRepeaterDir = m_World.GetBlockMeta(a_BlockX + 1, a_BlockY, a_BlockZ) & 0x3;
+				if (OtherRepeaterDir == 0x3) { return true; } // If so, I am latched/locked.
+			}
+
+			// Check if western(left) neighbor is a powered on repeater who is facing us.
+	  		if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{
+				NIBBLETYPE OtherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
+				if (OtherRepeaterDir == 0x1) { return true; } // If so, I am latched/locked.
+			}
+
+			break;
+		}
+
+		// If the repeater is looking left or right (If parallel to the x axis)
+		case 0x1:
+		case 0x3:
+		{
+			// Check if southern(down) neighbor is a powered on repeater who is facing us.
+			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{ 
+				NIBBLETYPE OtherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ + 1) & 0x3;
+				if (OtherRepeaterDir == 0x0) { return true; } // If so,  am latched/locked.
+			}
+			
+			// Check if northern(up) neighbor is a powered on repeater who is facing us.
+			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ -1) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{ 
+				NIBBLETYPE OtherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ - 1) & 0x3;
+				if (OtherRepeaterDir == 0x2) { return true; } // If so, I am latched/locked.
+			}
+
+			break;
+		}
+	}
+
+	return false; //  None of the checks succeeded, I am not a locked repeater.
 }
 
 

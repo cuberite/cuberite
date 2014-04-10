@@ -16,10 +16,10 @@ extern int CompressString(const char * a_Data, int a_Length, AString & a_Compres
 extern int UncompressString(const char * a_Data, int a_Length, AString & a_Uncompressed, int a_UncompressedSize);
 
 /// Compresses a_Data into a_Compressed using GZIP; returns Z_OK for success or Z_XXX error constants same as zlib
-extern int CompressStringGZIP(const char * a_Data, int a_Length, AString & a_Compressed);
+extern int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Compressed);
 
 /// Uncompresses a_Data into a_Uncompressed using GZIP; returns Z_OK for success or Z_XXX error constants same as zlib
-extern int UncompressStringGZIP(const char * a_Data, int a_Length, AString & a_Uncompressed);
+extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Uncompressed);
 
 
 

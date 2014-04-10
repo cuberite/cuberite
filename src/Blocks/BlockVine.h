@@ -1,8 +1,7 @@
-
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "MetaRotator.h"
 
 
 
@@ -24,6 +23,10 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
+		UNUSED(a_Player);
+		UNUSED(a_CursorX);
+		UNUSED(a_CursorY);
+		UNUSED(a_CursorZ);
 		// TODO: Disallow placement where the vine doesn't attach to something properly
 		BLOCKTYPE BlockType = 0;
 		NIBBLETYPE BlockMeta;
@@ -70,7 +73,7 @@ public:
 	/// Returns true if the specified block type is good for vines to attach to
 	static bool IsBlockAttachable(BLOCKTYPE a_BlockType)
 	{
-		return (a_BlockType == E_BLOCK_LEAVES) || g_BlockIsSolid[a_BlockType];
+		return (a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES) || cBlockInfo::IsSolid(a_BlockType);
 	}
 
 
@@ -80,7 +83,7 @@ public:
 		static const struct
 		{
 			int x, z;
-			int Bit;
+			NIBBLETYPE Bit;
 		} Coords[] =
 		{
 			{ 0,  1, 1},  // south, ZP
@@ -88,7 +91,7 @@ public:
 			{ 0, -1, 4},  // north, ZM
 			{ 1,  0, 8},  // east,  XP
 		} ;
-		int res = 0;
+		NIBBLETYPE res = 0;
 		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
 			BLOCKTYPE  BlockType;
@@ -162,11 +165,20 @@ public:
 		return false;
 	}
 	
-	virtual void OnUpdate(cWorld * a_World, int X, int Y, int Z)
+	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 	{
-		if (a_World->GetBlock(X, Y - 1, Z) == E_BLOCK_AIR)
+		UNUSED(a_ChunkInterface);
+		UNUSED(a_WorldInterface);
+		UNUSED(a_BlockPluginInterface);
+
+		BLOCKTYPE Block;
+		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY - 1, a_RelZ, Block);
+		if (Block == E_BLOCK_AIR)
 		{
-			a_World->SetBlock(X, Y - 1, Z, E_BLOCK_VINES, a_World->GetBlockMeta(X, Y, Z));
+			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, a_RelX * cChunkDef::Width, a_RelY - 1, a_RelZ * cChunkDef::Width, ssVineSpread))
+			{
+				a_Chunk.UnboundedRelSetBlock(a_RelX, a_RelY - 1, a_RelZ, E_BLOCK_VINES, a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+			}
 		}
 	}
 	
@@ -180,20 +192,21 @@ public:
 	{
 		return ((a_Meta << 1) | (a_Meta >> 3)) & 0x0f;  // Rotate bits to the left
 	}
-	
-	
+
+
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
 		// Bits 2 and 4 stay, bits 1 and 3 swap
-		return ((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
+		return (NIBBLETYPE)((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
 	}
 
 
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
 		// Bits 1 and 3 stay, bits 2 and 4 swap
-		return ((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
+		return (NIBBLETYPE)((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
 	}
+
 } ;
 
 

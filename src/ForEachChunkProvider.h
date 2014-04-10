@@ -24,6 +24,8 @@ class cBlockArea;
 class cForEachChunkProvider
 {
 public:
+	virtual ~cForEachChunkProvider() {}
+	
 	/** Calls the callback for each chunk in the specified range. */
 	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback) = 0;
 	

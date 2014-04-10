@@ -10,17 +10,11 @@
 #include "../BlockEntities/BlockEntity.h"
 #include "../GroupManager.h"
 #include "../Group.h"
-#include "../ChatColor.h"
-#include "../Item.h"
-#include "../Tracer.h"
 #include "../Root.h"
 #include "../OSSupport/Timer.h"
-#include "../MersenneTwister.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
-
-#include "../Vector3d.h"
-#include "../Vector3f.h"
+#include "../Vector3.h"
 
 #include "inifile/iniFile.h"
 #include "json/json.h"
@@ -45,15 +39,13 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_Inventory(*this)
 	, m_CurrentWindow(NULL)
 	, m_InventoryWindow(NULL)
-	, m_TimeLastPickupCheck(0.f)
 	, m_Color('-')
-	, m_LastBlockActionTime(0)
-	, m_LastBlockActionCnt(0)
 	, m_GameMode(eGameMode_NotSet)
 	, m_IP("")
 	, m_ClientHandle(a_Client)
-	, m_NormalMaxSpeed(0.1)
-	, m_SprintingMaxSpeed(0.13)
+	, m_NormalMaxSpeed(1.0)
+	, m_SprintingMaxSpeed(1.3)
+	, m_FlyingMaxSpeed(1.0)
 	, m_IsCrouched(false)
 	, m_IsSprinting(false)
 	, m_IsFlying(false)
@@ -86,7 +78,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_LastPlayerListTime = t1.GetNowTime();
 
 	m_TimeLastTeleportPacket = 0;
-	m_TimeLastPickupCheck = 0;
 	
 	m_PlayerName = a_PlayerName;
 	m_bDirtyPosition = true; // So chunks are streamed to player at spawn
@@ -694,7 +685,21 @@ const cSlotNums & cPlayer::GetInventoryPaintSlots(void) const
 
 double cPlayer::GetMaxSpeed(void) const
 {
-	return m_IsSprinting ? m_SprintingMaxSpeed : m_NormalMaxSpeed;
+	if (m_IsFlying)
+	{
+		return m_FlyingMaxSpeed;
+	}
+	else
+	{
+		if (m_IsSprinting)
+		{
+			return m_SprintingMaxSpeed;
+		}
+		else
+		{
+			return m_NormalMaxSpeed;
+		}
+	}
 }
 
 
@@ -704,7 +709,7 @@ double cPlayer::GetMaxSpeed(void) const
 void cPlayer::SetNormalMaxSpeed(double a_Speed)
 {
 	m_NormalMaxSpeed = a_Speed;
-	if (!m_IsSprinting)
+	if (!m_IsSprinting && !m_IsFlying)
 	{
 		m_ClientHandle->SendPlayerMaxSpeed();
 	}
@@ -717,10 +722,22 @@ void cPlayer::SetNormalMaxSpeed(double a_Speed)
 void cPlayer::SetSprintingMaxSpeed(double a_Speed)
 {
 	m_SprintingMaxSpeed = a_Speed;
-	if (m_IsSprinting)
+	if (m_IsSprinting && !m_IsFlying)
 	{
 		m_ClientHandle->SendPlayerMaxSpeed();
 	}
+}
+
+
+
+
+
+void cPlayer::SetFlyingMaxSpeed(double a_Speed)
+{
+	m_FlyingMaxSpeed = a_Speed;
+	
+	// Update the flying speed, always:
+	m_ClientHandle->SendPlayerAbilities();
 }
 
 
@@ -858,6 +875,8 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	else if (a_Killer->IsPlayer())
 	{
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
+
+		m_World->GetScoreBoard().AddPlayerScore(((cPlayer *)a_Killer)->GetName(), cObjective::otPlayerKillCount, 1);
 	}
 	else
 	{
@@ -867,24 +886,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
 
-	class cIncrementCounterCB
-		: public cObjectiveCallback
-	{
-		AString m_Name;
-	public:
-		cIncrementCounterCB(const AString & a_Name) : m_Name(a_Name) {}
-
-		virtual bool Item(cObjective * a_Objective) override
-		{
-			a_Objective->AddScore(m_Name, 1);
-			return true;
-		}
-	} IncrementCounter (GetName());
-
-	cScoreboard & Scoreboard = m_World->GetScoreBoard();
-
-	// Update scoreboard objectives
-	Scoreboard.ForEachObjectiveWith(cObjective::E_TYPE_DEATH_COUNT, IncrementCounter);
+	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
 
 
@@ -1062,27 +1064,6 @@ void cPlayer::CloseWindowIfID(char a_WindowID, bool a_CanRefuse)
 
 
 
-void cPlayer::SetLastBlockActionTime()
-{
-	if (m_World != NULL)
-	{
-		m_LastBlockActionTime = m_World->GetWorldAge() / 20.0f;
-	}
-}
-
-
-
-
-
-void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
-{
-	m_LastBlockActionCnt = a_LastBlockActionCnt;
-}
-
-
-
-
-
 void cPlayer::SetGameMode(eGameMode a_GameMode)
 {
 	if ((a_GameMode < gmMin) || (a_GameMode >= gmMax))
@@ -1136,6 +1117,17 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	m_LastJumpHeight = (float)a_PosY;
 
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
+	m_ClientHandle->SendPlayerMoveLook();
+}
+
+
+
+
+
+void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
+{
+	SetYaw(a_YawDegrees);
+	SetPitch(a_PitchDegrees);
 	m_ClientHandle->SendPlayerMoveLook();
 }
 
@@ -1508,6 +1500,7 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 
 	// Add player to all the necessary parts of the new world
 	SetWorld(World);
+	m_ClientHandle->StreamChunks();
 	World->AddEntity(this);
 	World->AddPlayer(this);
 
@@ -1529,10 +1522,14 @@ void cPlayer::LoadPermissionsFromDisk()
 		std::string Groups = IniFile.GetValue(m_PlayerName, "Groups", "");
 		if (!Groups.empty())
 		{
-			AStringVector Split = StringSplit( Groups, "," );
-			for( unsigned int i = 0; i < Split.size(); i++ )
+			AStringVector Split = StringSplitAndTrim(Groups, ",");
+			for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
 			{
-				AddToGroup( Split[i].c_str() );
+				if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
+				{
+					LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
+				}
+				AddToGroup(*itr);
 			}
 		}
 		else
@@ -1540,16 +1537,15 @@ void cPlayer::LoadPermissionsFromDisk()
 			AddToGroup("Default");
 		}
 
-		m_Color = IniFile.GetValue(m_PlayerName, "Color", "-")[0];
+		AString Color = IniFile.GetValue(m_PlayerName, "Color", "-");
+		if (!Color.empty())
+		{
+			m_Color = Color[0];
+		}
 	}
 	else
 	{
-		LOGWARN("Regenerating users.ini, player %s will be added to the \"Default\" group", m_PlayerName.c_str());
-		IniFile.AddHeaderComment(" This is the file in which the group the player belongs to is stored");
-		IniFile.AddHeaderComment(" The format is: [PlayerName] | Groups=GroupName");
-
-		IniFile.SetValue(m_PlayerName, "Groups", "Default");
-		IniFile.WriteFile("users.ini");
+		cGroupManager::GenerateDefaultUsersIni(IniFile);
 		AddToGroup("Default");
 	}
 	ResolvePermissions();
@@ -1916,7 +1912,7 @@ void cPlayer::Detach()
 		{
 			for (int z = PosZ - 2; z <= (PosZ + 2); ++z)
 			{
-				if (!g_BlockIsSolid[m_World->GetBlock(x, y, z)] && g_BlockIsSolid[m_World->GetBlock(x, y - 1, z)])
+				if (!cBlockInfo::IsSolid(m_World->GetBlock(x, y, z)) && cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z)))
 				{
 					TeleportToCoords(x, y, z);
 					return;

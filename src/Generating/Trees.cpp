@@ -595,7 +595,7 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 		{
 			break;
 		}
-		ASSERT(LayerSize < ARRAYCOUNT(BigOs));
+		ASSERT((size_t)LayerSize < ARRAYCOUNT(BigOs));
 		PushCoordBlocks(a_BlockX, h, a_BlockZ, a_OtherBlocks, BigOs[LayerSize].Coords, BigOs[LayerSize].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 		h--;
 	}

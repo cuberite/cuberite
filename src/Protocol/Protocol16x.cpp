@@ -18,6 +18,7 @@ Implements the 1.6.x protocol classes:
 #include "../Entities/Entity.h"
 #include "../Entities/Player.h"
 #include "../UI/Window.h"
+#include "../CompositeChat.h"
 
 
 
@@ -89,6 +90,18 @@ void cProtocol161::SendChat(const AString & a_Message)
 
 
 
+void cProtocol161::SendChat(const cCompositeChat & a_Message)
+{
+	// This protocol version doesn't support composite messages to the full
+	// Just extract each part's text and use it:
+	
+	super::SendChat(Printf("{\"text\":\"%s\"}", EscapeString(a_Message.ExtractText()).c_str()));
+}
+
+
+
+
+
 void cProtocol161::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cCSLock Lock(m_CSPacket);
@@ -119,7 +132,7 @@ void cProtocol161::SendHealth(void)
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_HEALTH);
 	WriteFloat((float)m_Client->GetPlayer()->GetHealth());
-	WriteShort(m_Client->GetPlayer()->GetFoodLevel());
+	WriteShort((short)m_Client->GetPlayer()->GetFoodLevel());
 	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
 	Flush();
 }
@@ -135,7 +148,7 @@ void cProtocol161::SendPlayerMaxSpeed(void)
 	WriteInt(m_Client->GetPlayer()->GetUniqueID());
 	WriteInt(1);
 	WriteString("generic.movementSpeed");
-	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
+	WriteDouble(0.1 * m_Client->GetPlayer()->GetMaxSpeed());
 	Flush();
 }
 
@@ -163,10 +176,10 @@ void cProtocol161::SendWindowOpen(const cWindow & a_Window)
 	}
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_WINDOW_OPEN);
-	WriteByte  (a_Window.GetWindowID());
-	WriteByte  (a_Window.GetWindowType());
+	WriteChar  (a_Window.GetWindowID());
+	WriteByte  ((Byte)a_Window.GetWindowType());
 	WriteString(a_Window.GetWindowTitle());
-	WriteByte  (a_Window.GetNumNonInventorySlots());
+	WriteByte  ((Byte)a_Window.GetNumNonInventorySlots());
 	WriteByte  (1);  // Use title
 	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
 	{
@@ -184,7 +197,16 @@ int cProtocol161::ParseEntityAction(void)
 	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
 	HANDLE_PACKET_READ(ReadChar,  char, ActionID);
 	HANDLE_PACKET_READ(ReadBEInt, int,  UnknownHorseVal);
-	m_Client->HandleEntityAction(EntityID, ActionID);
+	
+	switch (ActionID)
+	{
+		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break; // Crouch
+		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break; // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break; // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break; // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(EntityID, false); break; // Stop sprinting
+	}
+
 	return PARSE_OK;
 }
 
@@ -258,7 +280,7 @@ void cProtocol162::SendPlayerMaxSpeed(void)
 	WriteInt(m_Client->GetPlayer()->GetUniqueID());
 	WriteInt(1);
 	WriteString("generic.movementSpeed");
-	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
+	WriteDouble(0.1 * m_Client->GetPlayer()->GetMaxSpeed());
 	WriteShort(0);
 	Flush();
 }

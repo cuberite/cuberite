@@ -4,6 +4,7 @@
 #include "Painting.h"
 #include "ClientHandle.h"
 #include "Player.h"
+#include "../Chunk.h"
 
 
 
@@ -24,6 +25,16 @@ cPainting::cPainting(const AString & a_Name, int a_Direction, double a_X, double
 void cPainting::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendPaintingSpawn(*this);
+}
+
+
+
+
+
+void cPainting::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 }
 
 

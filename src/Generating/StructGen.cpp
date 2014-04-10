@@ -54,7 +54,7 @@ const int NEST_SIZE_GRAVEL = 32;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenTrees:
 
-void cStructGenTrees::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -306,7 +306,7 @@ int cStructGenTrees::GetNumTrees(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenOreNests:
 
-void cStructGenOreNests::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenOreNests::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -413,7 +413,7 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenLakes:
 
-void cStructGenLakes::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -545,7 +545,7 @@ cStructGenDirectOverhangs::cStructGenDirectOverhangs(int a_Seed) :
 
 
 
-void cStructGenDirectOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// If there is no column of the wanted biome, bail out:
 	if (!HasWantedBiome(a_ChunkDesc))
@@ -578,7 +578,7 @@ void cStructGenDirectOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
 			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) /
 			256;
 	}  // for x, z - FloorLo[]
-	LinearUpscale2DArrayInPlace(FloorLo, 17, 17, INTERPOL_X, INTERPOL_Z);
+	LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorLo);
 	
 	// Interpolate segments:
 	for (int Segment = BaseY; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
@@ -591,7 +591,7 @@ void cStructGenDirectOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
 				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
 				256;
 		}  // for x, z - FloorLo[]
-		LinearUpscale2DArrayInPlace(FloorHi, 17, 17, INTERPOL_X, INTERPOL_Z);
+		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
 		
 		// Interpolate between FloorLo and FloorHi:
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
@@ -665,7 +665,7 @@ cStructGenDistortedMembraneOverhangs::cStructGenDistortedMembraneOverhangs(int a
 
 
 
-void cStructGenDistortedMembraneOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
+void cStructGenDistortedMembraneOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	const NOISE_DATATYPE Frequency = (NOISE_DATATYPE)16;
 	const NOISE_DATATYPE Amount = (NOISE_DATATYPE)1;

@@ -13,6 +13,16 @@
 #pragma once
 
 #include "ForEachChunkProvider.h"
+#include "Vector3.h"
+
+
+
+
+// fwd:
+class cCuboid;
+
+
+
 
 
 // tolua_begin
@@ -33,12 +43,17 @@ public:
 		baSkyLight = 8,
 	} ;
 	
+	/** The per-block strategy to use when merging another block area into this object.
+	See the Merge function for the description of these */
 	enum eMergeStrategy
 	{
 		msOverwrite,
 		msFillAir,
 		msImprint,
 		msLake,
+		msSpongePrint,
+		msDifference,
+		msMask,
 	} ;
 	
 	cBlockArea(void);
@@ -47,23 +62,41 @@ public:
 	/** Clears the data stored to reclaim memory */
 	void Clear(void);
 	
-	/** Creates a new area of the specified size and contents. 
-	Origin is set to all zeroes. 
+	/** Creates a new area of the specified size and contents.
+	Origin is set to all zeroes.
 	BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.
 	*/
 	void Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes = baTypes | baMetas);
 	
+	/** Creates a new area of the specified size and contents.
+	Origin is set to all zeroes.
+	BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.
+	*/
+	void Create(const Vector3i & a_Size, int a_DataTypes = baTypes | baMetas);
+	
 	/** Resets the origin. No other changes are made, contents are untouched. */
 	void SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ);
 	
+	/** Resets the origin. No other changes are made, contents are untouched. */
+	void SetOrigin(const Vector3i & a_Origin);
+	
 	/** Reads an area of blocks specified. Returns true if successful. All coords are inclusive. */
 	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
+	
+	/** Reads an area of blocks specified. Returns true if successful. The bounds are included in the read area. */
+	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, const cCuboid & a_Bounds, int a_DataTypes = baTypes | baMetas);
+	
+	/** Reads an area of blocks specified. Returns true if successful. The bounds are included in the read area. */
+	bool Read(cForEachChunkProvider * a_ForEachChunkProvider, const Vector3i & a_Point1, const Vector3i & a_Point2, int a_DataTypes = baTypes | baMetas);
 	
 	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
 	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
 	
 	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all */
 	bool Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
+	
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all */
+	bool Write(cForEachChunkProvider * a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes = baTypes | baMetas);
 	
 	/** Copies this object's contents into the specified BlockArea. */
 	void CopyTo(cBlockArea & a_Into) const;
@@ -97,8 +130,8 @@ public:
 	- msFillAir overwrites only those blocks that were air
 	- msImprint overwrites with only those blocks that are non-air
 
-	Special strategies:
-	msLake (evaluate top-down, first match wins):
+	Special strategies (evaluate top-down, first match wins):
+	msLake:
 	|    area block     |        |
 	|   this   | Src    | result |
 	+----------+--------+--------+
@@ -113,9 +146,29 @@ public:
 	| mycelium | stone  | stone  |    ... and mycelium
 	| A        | stone  | A      |    ... but nothing else
 	| A        | *      | A      |  Everything else is left as it is
+	
+	msSpongePrint:
+	Used for most generators, it allows carving out air pockets, too, and uses the Sponge as the NOP block
+	|    area block     |        |
+	|   this   | Src    | result |
+	+----------+--------+--------+
+	| A        | sponge | A      |  Sponge is the NOP block
+	| *        | B      | B      |  Everything else overwrites anything
+	
+	msMask:
+	Combines two areas, the blocks that are the same are kept, differing ones are reset to air
+	|  area block  |        |
+	| this | Src   | result |
+	+------+-------+--------+
+	| A    | A     | A      |  Same blocks are kept
+	| A    | non-A | air    |  Everything else is replaced with air
 
 	*/
 	void Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy);
+	
+	/** Merges another block area into this one, using the specified block combinating strategy.
+	See Merge() above for details. */
+	void Merge(const cBlockArea & a_Src, const Vector3i & a_RelMinCoords, eMergeStrategy a_Strategy);
 	
 	/** Fills the entire block area with the specified data */
 	void Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0, NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f);
@@ -126,8 +179,20 @@ public:
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 	
+	/** Fills a cuboid inside the block area with the specified data. a_Cuboid must be sorted. */
+	void FillRelCuboid(const cCuboid & a_RelCuboid,
+		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	);
+	
 	/** Draws a line from between two points with the specified data */
 	void RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int a_RelY2, int a_RelZ2,
+		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	);
+	
+	/** Draws a line from between two points with the specified data */
+	void RelLine(const Vector3i & a_Point1, const Vector3i & a_Point2,
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
@@ -171,6 +236,8 @@ public:
 	void SetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockLight);
 	void SetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE a_BlockSkyLight);
 	void SetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockSkyLight);
+	void SetWEOffset        (int a_OffsetX, int a_OffsetY, int a_OffsetZ);
+	void SetWEOffset        (const Vector3i & a_Offset);
 
 	// Getters:
 	BLOCKTYPE  GetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ)   const;
@@ -181,6 +248,7 @@ public:
 	NIBBLETYPE GetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ) const;
 	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ)   const;
 	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ) const;
+	const Vector3i & GetWEOffset  (void)                                     const {return m_WEOffset;}
 
 	void SetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
 	void SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
@@ -191,18 +259,24 @@ public:
 	void GetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	
+	// GetSize() is already exported manually to return 3 numbers, can't auto-export
+	const Vector3i & GetSize(void) const { return m_Size; }
+	
+	// GetOrigin() is already exported manually to return 3 numbers, can't auto-export
+	const Vector3i & GetOrigin(void) const { return m_Origin; }
+	
 	// tolua_begin
 	
-	int GetSizeX(void) const { return m_SizeX; }
-	int GetSizeY(void) const { return m_SizeY; }
-	int GetSizeZ(void) const { return m_SizeZ; }
+	int GetSizeX(void) const { return m_Size.x; }
+	int GetSizeY(void) const { return m_Size.y; }
+	int GetSizeZ(void) const { return m_Size.z; }
 	
 	/** Returns the volume of the area, as number of blocks */
-	int GetVolume(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
+	int GetVolume(void) const { return m_Size.x * m_Size.y * m_Size.z; }
 	
-	int GetOriginX(void) const { return m_OriginX; }
-	int GetOriginY(void) const { return m_OriginY; }
-	int GetOriginZ(void) const { return m_OriginZ; }
+	int GetOriginX(void) const { return m_Origin.x; }
+	int GetOriginY(void) const { return m_Origin.y; }
+	int GetOriginZ(void) const { return m_Origin.z; }
 	
 	/** Returns the datatypes that are stored in the object (bitmask of baXXX values) */
 	int GetDataTypes(void) const;
@@ -220,7 +294,7 @@ public:
 	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas; }     // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight; }     // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight; }  // NOTE: one byte per block!
-	int          GetBlockCount(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
+	int          GetBlockCount(void) const { return m_Size.x * m_Size.y * m_Size.z; }
 	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
 
 protected:
@@ -235,9 +309,7 @@ protected:
 		
 	protected:
 		cBlockArea & m_Area;
-		int m_OriginX;
-		int m_OriginY;
-		int m_OriginZ;
+		Vector3i m_Origin;
 		int m_CurrentChunkX;
 		int m_CurrentChunkZ;
 		
@@ -254,13 +326,13 @@ protected:
 	typedef NIBBLETYPE * NIBBLEARRAY;
 	
 	
-	int m_OriginX;
-	int m_OriginY;
-	int m_OriginZ;
-	int m_SizeX;
-	int m_SizeY;
-	int m_SizeZ;
+	Vector3i m_Origin;
+	Vector3i m_Size;
 	
+	/** An extra data value sometimes stored in the .schematic file. Used mainly by the WorldEdit plugin.
+	cBlockArea doesn't use this value in any way. */
+	Vector3i m_WEOffset;
+
 	BLOCKTYPE *  m_BlockTypes;
 	NIBBLETYPE * m_BlockMetas;     // Each meta is stored as a separate byte for faster access
 	NIBBLETYPE * m_BlockLight;     // Each light value is stored as a separate byte for faster access

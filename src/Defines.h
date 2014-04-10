@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ChatColor.h"
+#include <limits>
 
 
 
@@ -16,33 +17,6 @@ typedef std::vector<int> cSlotNums;
 
 
 // tolua_begin
-
-/// How much light do the blocks emit on their own?
-extern unsigned char g_BlockLightValue[];
-
-/// How much light do the block consume?
-extern unsigned char g_BlockSpreadLightFalloff[];
-
-/// Is a block completely transparent? (light doesn't get decreased(?))
-extern bool g_BlockTransparent[];
-
-/// Is a block destroyed after a single hit?
-extern bool g_BlockOneHitDig[];
-
-/// Can a piston break this block?
-extern bool g_BlockPistonBreakable[256];
-
-/// Can this block hold snow atop?
-extern bool g_BlockIsSnowable[256];
-
-/// Does this block require a tool to drop?
-extern bool g_BlockRequiresSpecialTool[256];
-
-/// Is this block solid (player cannot walk through)?
-extern bool g_BlockIsSolid[256];
-
-/// Does this block fully occupy it's voxel - is it a 'full' block?
-extern bool g_BlockFullyOccupiesVoxel[256];
 
 /// Experience Orb setup
 enum
@@ -253,6 +227,79 @@ inline const char * ClickActionToString(eClickAction a_ClickAction)
 
 
 
+/** Returns a blockface mirrored around the Y axis (doesn't change up/down). */
+inline eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
+		default: return a_BlockFace;
+	}
+}
+
+
+
+
+
+/** Returns a blockface rotated around the Y axis counter-clockwise. */
+inline eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_XP;
+		default: return a_BlockFace;
+	}
+}
+
+
+
+
+
+inline eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_XP: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_XM;
+		default: return a_BlockFace;
+	}
+}
+
+
+
+
+
+/** Returns the textual representation of the BlockFace constant. */
+inline AString BlockFaceToString(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return "BLOCK_FACE_XM";
+		case BLOCK_FACE_XP: return "BLOCK_FACE_XP";
+		case BLOCK_FACE_YM: return "BLOCK_FACE_YM";
+		case BLOCK_FACE_YP: return "BLOCK_FACE_YP";
+		case BLOCK_FACE_ZM: return "BLOCK_FACE_ZM";
+		case BLOCK_FACE_ZP: return "BLOCK_FACE_ZP";
+		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
+	}
+	// clang optimisises this line away then warns that it has done so.
+	#if !defined(__clang__)
+	return Printf("Unknown BLOCK_FACE: %d", a_BlockFace);
+	#endif
+}
+
+
+
+
+
 inline bool IsValidBlock(int a_BlockType)
 {
 	if (
@@ -446,7 +493,7 @@ inline void EulerToVector(double a_Pan, double a_Pitch, double & a_X, double & a
 
 inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, double & a_Pitch)
 {
-	if (a_X != 0)
+	if (fabs(a_X) < std::numeric_limits<double>::epsilon())
 	{
 		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
 	}
@@ -486,16 +533,22 @@ enum eMessageType
 	// http://forum.mc-server.org/showthread.php?tid=1212
 	// MessageType...
 
-	mtCustom, // Send raw data without any processing
-	mtFailure, // Something could not be done (i.e. command not executed due to insufficient privilege)
-	mtInformation, // Informational message (i.e. command usage)
-	mtSuccess, // Something executed successfully
-	mtWarning, // Something concerning (i.e. reload) is about to happen
-	mtFatal, // Something catastrophic occured (i.e. plugin crash)
-	mtDeath, // Denotes death of player
-	mtPrivateMessage, // Player to player messaging identifier
-	mtJoin, // A player has joined the server
-	mtLeave, // A player has left the server
+	mtCustom,          // Send raw data without any processing
+	mtFailure,         // Something could not be done (i.e. command not executed due to insufficient privilege)
+	mtInformation,     // Informational message (i.e. command usage)
+	mtSuccess,         // Something executed successfully
+	mtWarning,         // Something concerning (i.e. reload) is about to happen
+	mtFatal,           // Something catastrophic occured (i.e. plugin crash)
+	mtDeath,           // Denotes death of player
+	mtPrivateMessage,  // Player to player messaging identifier
+	mtJoin,            // A player has joined the server
+	mtLeave,           // A player has left the server
+	
+	// Common aliases:
+	mtFail  = mtFailure,
+	mtError = mtFailure,
+	mtInfo  = mtInformation,
+	mtPM    = mtPrivateMessage,
 };
 
 
@@ -654,7 +707,7 @@ namespace ItemCategory
 inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
 {
 	if(!IsValidBlock(a_BlockType)) return false;
-	return g_BlockRequiresSpecialTool[a_BlockType];
+	return cBlockInfo::RequiresSpecialTool(a_BlockType);
 }
 
 

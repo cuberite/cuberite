@@ -131,8 +131,6 @@
 		} \
 	}
 	
-	
-#define MAX_ENC_LEN 1024
 
 
 
@@ -389,8 +387,8 @@ bool cConnection::RelayFromServer(void)
 			return CLIENTSEND(Buffer, res);
 		}
 	}
-	
-	return true;
+	ASSERT(!"Unhandled server state while relaying from server");
+	return false;
 }
 
 
@@ -427,8 +425,8 @@ bool cConnection::RelayFromClient(void)
 			return SERVERSEND(Buffer, res);
 		}
 	}
-	
-	return true;
+	ASSERT(!"Unhandled server state while relaying from client");
+	return false;
 }
 
 
@@ -444,11 +442,11 @@ double cConnection::GetRelativeTime(void)
 
 
 
-bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, int a_Size, const char * a_Peer)
+bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, size_t a_Size, const char * a_Peer)
 {
-	DataLog(a_Data, a_Size, "Sending data to %s, %d bytes", a_Peer, a_Size);
+	DataLog(a_Data, a_Size, "Sending data to %s, %u bytes", a_Peer, (unsigned)a_Size);
 	
-	int res = send(a_Socket, a_Data, a_Size, 0);
+	int res = send(a_Socket, a_Data, (int)a_Size, 0);
 	if (res <= 0)
 	{
 		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, SocketError);
@@ -473,14 +471,14 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, int a_Size, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer)
 {
 	DataLog(a_Data, a_Size, "Encrypting %d bytes to %s", a_Size, a_Peer);
 	const Byte * Data = (const Byte *)a_Data;
 	while (a_Size > 0)
 	{
 		Byte Buffer[64 KiB];
-		int NumBytes = (a_Size > sizeof(Buffer)) ? sizeof(Buffer) : a_Size;
+		size_t NumBytes = (a_Size > sizeof(Buffer)) ? sizeof(Buffer) : a_Size;
 		a_Encryptor.ProcessData(Buffer, Data, NumBytes);
 		bool res = SendData(a_Socket, (const char *)Buffer, NumBytes, a_Peer);
 		if (!res)
@@ -2263,7 +2261,9 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Yaw);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    DataIndicator);
 	AString ExtraData;
-	short VelocityX, VelocityY, VelocityZ;
+	short VelocityX = 0;
+	short VelocityY = 0;
+	short VelocityZ = 0;
 	if (DataIndicator != 0)
 	{
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedX);
@@ -2697,7 +2697,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 	a_Metadata.push_back(x);
 	while (x != 0x7f)
 	{
-		int Index = ((unsigned)((unsigned char)x)) & 0x1f;  // Lower 5 bits = index
+		// int Index = ((unsigned)((unsigned char)x)) & 0x1f;  // Lower 5 bits = index
 		int Type  = ((unsigned)((unsigned char)x)) >> 5;    // Upper 3 bits = type
 		int Length = 0;
 		switch (Type)
@@ -2772,7 +2772,7 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 	{
 		int Index = ((unsigned)((unsigned char)a_Metadata[pos])) & 0x1f;  // Lower 5 bits = index
 		int Type  = ((unsigned)((unsigned char)a_Metadata[pos])) >> 5;    // Upper 3 bits = type
-		int Length = 0;
+		// int Length = 0;
 		switch (Type)
 		{
 			case 0:
@@ -2827,7 +2827,7 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 					ASSERT(!"Cannot parse item description from metadata");
 					return;
 				}
-				int After = bb.GetReadableSpace();
+				// int After = bb.GetReadableSpace();
 				int BytesConsumed = BytesLeft - bb.GetReadableSpace();
 
 				Log("%sslot[%d] = %s (%d bytes)", Indent.c_str(), Index, ItemDesc.c_str(), BytesConsumed);

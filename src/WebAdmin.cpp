@@ -102,7 +102,7 @@ bool cWebAdmin::Init(void)
 	
 	m_Ports = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
 	m_PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "PortIPv4", "");
-	m_PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");
+	m_PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortIPv6", "");
 
 	if (!m_HTTPServer.Initialize(m_Ports, m_PortsIPv4, m_PortsIPv6))
 	{
@@ -129,6 +129,7 @@ bool cWebAdmin::Start(void)
 
 	// Initialize the WebAdmin template script and load the file
 	m_TemplateScript.Create();
+	m_TemplateScript.RegisterAPILibs();
 	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
 	{
 		LOGWARN("Could not load WebAdmin template \"%s\", using default template.", FILE_IO_PREFIX "webadmin/template.lua");
@@ -491,7 +492,7 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 
 
 
-void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size)
+void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	UNUSED(a_Connection);
 	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
@@ -538,7 +539,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWebAdmin::cWebadminRequestData
 
-void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, int a_Size)
+void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, size_t a_Size)
 {
 	m_Form.Parse(a_Data, a_Size);
 }

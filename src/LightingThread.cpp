@@ -13,12 +13,6 @@
 
 
 
-/// If more than this many chunks are in the queue, a warning is printed to the log
-#define WARN_ON_QUEUE_SIZE 800
-
-
-
-
 
 /// Chunk data callback that takes the chunk data and puts them into cLightingThread's m_BlockTypes[] / m_HeightMap[]:
 class cReader :
@@ -391,7 +385,7 @@ void cLightingThread::PrepareBlockLight(void)
 			int idx = BaseZ + x;
 			for (int y = m_HeightMap[idx], Index = idx + y * BlocksPerYLayer; y >= 0; y--, Index -= BlocksPerYLayer)
 			{
-				if (g_BlockLightValue[m_BlockTypes[Index]] == 0)
+				if (cBlockInfo::GetLightValue(m_BlockTypes[Index]) == 0)
 				{
 					continue;
 				}
@@ -401,7 +395,7 @@ void cLightingThread::PrepareBlockLight(void)
 				m_SeedIdx1[m_NumSeeds++] = Index;
 
 				// Light it up:
-				m_BlockLight[Index] = g_BlockLightValue[m_BlockTypes[Index]];
+				m_BlockLight[Index] = cBlockInfo::GetLightValue(m_BlockTypes[Index]);
 			}
 		}
 	}

@@ -28,6 +28,10 @@ public:
 			m_end(a_end),
 			m_Selected(a_Selected)
 		{
+			while(m_itr != m_end && !FD_ISSET(m_itr->m_Socket, &m_Selected))
+			{
+				m_itr++;
+			}
 		}
 		~cEventIterator() {}
 		
@@ -45,9 +49,13 @@ public:
 
 		cEventIterator & operator++()
 		{
-			while(m_itr != m_end && !FD_ISSET(m_itr->m_Socket, &m_Selected))
+			while(m_itr != m_end)
 			{
 				m_itr++;
+				if (FD_ISSET(m_itr->m_Socket, &m_Selected))
+				{
+					break;
+				}
 			}
 			return *this;
 		}
@@ -61,11 +69,13 @@ public:
 
 		cSocket & operator* ()
 		{
+			ASSERT(FD_ISSET(m_itr->m_Socket, &m_Selected));
 			return *m_itr;
 		}
 
 		cSocket * operator-> ()
 		{
+			ASSERT(FD_ISSET(m_itr->m_Socket, &m_Selected));
 			return &*m_itr;
 		}
 	

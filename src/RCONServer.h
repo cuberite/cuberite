@@ -29,7 +29,7 @@ class cRCONServer :
 {
 public:
 	cRCONServer(cServer & a_Server);
-	~cRCONServer();
+	virtual ~cRCONServer();
 	
 	void Initialize(cIniFile & a_IniFile);
 	
@@ -65,7 +65,7 @@ protected:
 		
 
 		// cSocketThreads::cCallback overrides:
-		virtual void DataReceived(const char * a_Data, int a_Size) override;
+		virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 		virtual void GetOutgoingData(AString & a_Data) override;
 		virtual void SocketClosed(void) override;
 		

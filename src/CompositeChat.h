@@ -117,21 +117,22 @@ public:
 	/** Creates a new chat message and parses the text into parts.
 	Recognizes "http:" and "https:" links and @color-codes.
 	Uses ParseText() for the actual parsing. */
-	cCompositeChat(const AString & a_ParseText);
+	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
 	
 	~cCompositeChat();
 	
 	/** Removes all parts from the object. */
 	void Clear(void);
 	
+	// tolua_end
+
+	// The following are exported in ManualBindings in order to support chaining - they return *this in Lua (#755)
+	
 	/** Adds a plain text part, with optional style.
 	The default style is plain white text. */
 	void AddTextPart(const AString & a_Message, const AString & a_Style = "");
 	
-	// tolua_end
-	
-	/** Adds a part that is translated client-side, with the formatting parameters and optional style.
-	Exported in ManualBindings due to AStringVector usage - Lua uses an array-table of strings. */
+	/** Adds a part that is translated client-side, with the formatting parameters and optional style. */
 	void AddClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style = "");
 	
 	// tolua_begin
@@ -155,15 +156,26 @@ public:
 	/** Sets the message type, which is indicated by prefixes added to the message when serializing. */
 	void SetMessageType(eMessageType a_MessageType);
 	
+	/** Adds the "underline" style to each part that is an URL. */
+	void UnderlineUrls(void);
+	
+	// tolua_begin
+
 	/** Returns the message type set previously by SetMessageType(). */
 	eMessageType GetMessageType(void) const { return m_MessageType; }
 	
-	/** Adds the "underline" style to each part that is an URL. */
-	void UnderlineUrls(void);
+	/** Returns the text from the parts that comprises the human-readable data.
+	Used for older protocols that don't support composite chat
+	and for console-logging. */
+	AString ExtractText(void) const;
 	
 	// tolua_end
 	
 	const cParts & GetParts(void) const { return m_Parts; }
+	
+	/** Converts the MessageType to a LogLevel value.
+	Used by the logging bindings when logging a cCompositeChat object. */
+	static cMCLogger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
 	
 protected:
 	/** All the parts that */

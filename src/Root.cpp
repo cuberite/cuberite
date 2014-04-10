@@ -194,7 +194,7 @@ void cRoot::Start(void)
 		#if !defined(ANDROID_NDK)
 		LOGD("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
-		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
+		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
 		#endif
 
 		long long finishmseconds = Time.GetNowTime();
@@ -245,7 +245,6 @@ void cRoot::Start(void)
 		delete m_PluginManager; m_PluginManager = NULL;
 
 		cItemHandler::Deinit();
-		cBlockHandler::Deinit();
 
 		LOG("Cleaning up...");
 		delete m_Server; m_Server = NULL;
@@ -305,6 +304,7 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 	{
 		if (IniFile.GetKeyComment("Worlds", 0) != " World=secondworld")
 		{
+			IniFile.DeleteKeyComment("Worlds", 0);
 			IniFile.AddKeyComment("Worlds", " World=secondworld");
 		}
 	}
@@ -536,7 +536,9 @@ void cRoot::SaveAllChunks(void)
 
 void cRoot::ReloadGroups(void)
 {
+	LOG("Reload groups ...");
 	m_GroupManager->LoadGroups();
+	m_GroupManager->CheckUsers();
 }
 
 
@@ -592,7 +594,6 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 		unsigned      m_NameLength;
 		const AString m_PlayerName;
 
-		cPlayerListCallback & m_Callback;
 		virtual bool Item (cPlayer * a_pPlayer)
 		{
 			unsigned int Rating = RateCompareString (m_PlayerName, a_pPlayer->GetName());
@@ -614,18 +615,17 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 		}
 
 	public:
-		cCallback (const AString & a_PlayerName, cPlayerListCallback & a_Callback) :
+		cCallback (const AString & a_PlayerName) :
 			m_BestRating(0),
 			m_NameLength(a_PlayerName.length()),
 			m_PlayerName(a_PlayerName),
-			m_Callback(a_Callback),
 			m_BestMatch(NULL),
 			m_NumMatches(0)
 		{}
 
 		cPlayer * m_BestMatch;
 		unsigned  m_NumMatches;
-	} Callback (a_PlayerName, a_Callback);
+	} Callback (a_PlayerName);
 	ForEachPlayer( Callback );
 
 	if (Callback.m_NumMatches == 1)
@@ -779,11 +779,11 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		int Mem = NumValid * sizeof(cChunk);
 		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
 		a_Output.Out("  Per-chunk memory size breakdown:");
-		a_Output.Out("    block types:    %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);
-		a_Output.Out("    block metadata: %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
-		a_Output.Out("    block lighting: %6d bytes (%3d KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
-		a_Output.Out("    heightmap:      %6d bytes (%3d KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
-		a_Output.Out("    biomemap:       %6d bytes (%3d KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
+		a_Output.Out("    block types:    " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);
+		a_Output.Out("    block metadata: " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
+		a_Output.Out("    block lighting: " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
+		a_Output.Out("    heightmap:      " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+		a_Output.Out("    biomemap:       " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
 		int Rest = sizeof(cChunk) - sizeof(cChunkDef::BlockTypes) - 3 * sizeof(cChunkDef::BlockNibbles) - sizeof(cChunkDef::HeightMap) - sizeof(cChunkDef::BiomeMap);
 		a_Output.Out("    other:          %6d bytes (%3d KiB)", Rest, (Rest + 1023) / 1024);
 		SumNumValid += NumValid;

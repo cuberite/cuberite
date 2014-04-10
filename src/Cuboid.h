@@ -1,8 +1,7 @@
 
 #pragma once
 
-#include "Vector3i.h"
-#include "Vector3d.h"
+#include "Vector3.h"
 
 
 
@@ -22,6 +21,7 @@ public:
 	cCuboid(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2) : p1(a_X1, a_Y1, a_Z1), p2(a_X2, a_Y2, a_Z2) {}
 
 	void Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2);
+	void Assign(const cCuboid & a_SrcCuboid);
 
 	void Sort(void);
 	
@@ -29,7 +29,13 @@ public:
 	int DifY(void) const { return p2.y - p1.y; }
 	int DifZ(void) const { return p2.z - p1.z; }
 	
-	/// Returns true if the cuboids have at least one voxel in common. Both coords are considered inclusive.
+	/** Returns the volume of the cuboid, in blocks.
+	Note that the volume considers both coords inclusive.
+	Works on unsorted cuboids, too. */
+	int GetVolume(void) const;
+	
+	/** Returns true if the cuboids have at least one voxel in common. Both coords are considered inclusive.
+	Assumes both cuboids are sorted. */
 	bool DoesIntersect(const cCuboid & a_Other) const;
 
 	bool IsInside(const Vector3i & v)	const
@@ -59,14 +65,32 @@ public:
 		);
 	}
 	
-	/// Returns true if this cuboid is completely inside the specifie cuboid (in all 6 coords)
+	/** Returns true if this cuboid is completely inside the specifie cuboid (in all 6 coords).
+	Assumes both cuboids are sorted. */
 	bool IsCompletelyInside(const cCuboid & a_Outer) const;
 	
-	/// Moves the cuboid by the specified offsets in each direction
+	/** Moves the cuboid by the specified offsets in each direction */
 	void Move(int a_OfsX, int a_OfsY, int a_OfsZ);
+	
+	/** Expands the cuboid by the specified amount in each direction.
+	Works on unsorted cuboids as well.
+	Note that this function doesn't check for underflows when using negative amounts. */
+	void Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
+	
+	/** Clamps both X coords to the specified range. Works on unsorted cuboids, too. */
+	void ClampX(int a_MinX, int a_MaxX);
 
-	/// Returns true if the coords are properly sorted (lesser in p1, greater in p2)
+	/** Clamps both Y coords to the specified range. Works on unsorted cuboids, too. */
+	void ClampY(int a_MinY, int a_MaxY);
+
+	/** Clamps both Z coords to the specified range. Works on unsorted cuboids, too. */
+	void ClampZ(int a_MinZ, int a_MaxZ);
+
+	/** Returns true if the coords are properly sorted (lesser in p1, greater in p2) */
 	bool IsSorted(void) const;
+	
+	/** If needed, expands the cuboid so that it contains the specified point. Assumes sorted. Doesn't contract. */
+	void Engulf(const Vector3i & a_Point);
 } ;
 // tolua_end
 

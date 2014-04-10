@@ -13,6 +13,7 @@
 #include "DropSpenserEntity.h"
 #include "FurnaceEntity.h"
 #include "../BoundingBox.h"
+#include "json/json.h"
 
 
 
@@ -58,6 +59,7 @@ bool cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, i
 
 bool cHopperEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
 	Int64 CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
 	
 	bool res = false;
@@ -73,6 +75,7 @@ bool cHopperEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cHopperEntity::SaveToJson(Json::Value & a_Value)
 {
+	UNUSED(a_Value);
 	// TODO
 	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 }
@@ -216,7 +219,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 			Vector3f EntityPos = a_Entity->GetPosition();
 			Vector3f BlockPos(m_Pos.x + 0.5f, (float)m_Pos.y + 1, m_Pos.z + 0.5f); // One block above hopper, and search from center outwards
-			float Distance = (EntityPos - BlockPos).Length();
+			double Distance = (EntityPos - BlockPos).Length();
 
 			if (Distance < 0.5)
 			{

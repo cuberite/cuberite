@@ -4,6 +4,7 @@
 #include "BlockHandler.h"
 #include "ChunkInterface.h"
 #include "WorldInterface.h"
+#include "MetaRotator.h"
 #include "../Entities/Player.h"
 
 
@@ -11,11 +12,11 @@
 
 
 class cBlockBedHandler :
-	public cBlockHandler
+	public cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01, true>
 {
 public:
 	cBlockBedHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01,true>(a_BlockType)
 	{
 	}
 
