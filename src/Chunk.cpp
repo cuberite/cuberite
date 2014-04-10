@@ -243,21 +243,21 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 	std::vector<BLOCKTYPE> Blocks = m_BlockTypes;
 	Blocks.resize(NumBlocks);
-	a_Callback.BlockTypes   (Blocks.data());
+	a_Callback.BlockTypes   (&Blocks[0]);
 
 	std::vector<NIBBLETYPE> Metas = m_BlockMeta;
 	Metas.resize(NumBlocks / 2);
-	a_Callback.BlockMeta    (Metas.data());
+	a_Callback.BlockMeta    (&Metas[0]);
 
 	a_Callback.LightIsValid (m_IsLightValid);
 
 	std::vector<NIBBLETYPE> BlockLights = m_BlockLight;
 	BlockLights.resize(NumBlocks / 2);
-	a_Callback.BlockLight   (BlockLights.data());
+	a_Callback.BlockLight   (&BlockLights[0]);
 
 	std::vector<NIBBLETYPE> BlockSkyLights = m_BlockSkyLight;
 	BlockSkyLights.resize(NumBlocks / 2, 0xff);
-	a_Callback.BlockSkyLight(BlockSkyLights.data());
+	a_Callback.BlockSkyLight(&BlockSkyLights[0]);
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
@@ -424,7 +424,7 @@ void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 	std::vector<BLOCKTYPE> Blocks = m_BlockTypes;
 	Blocks.resize(NumBlocks);
 
-	memcpy(a_BlockTypes, Blocks.data(), NumBlocks);
+	memcpy(a_BlockTypes, &Blocks[0], NumBlocks);
 }
 
 
