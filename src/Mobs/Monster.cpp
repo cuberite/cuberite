@@ -526,7 +526,10 @@ void cMonster::KilledBy(cEntity * a_Killer)
 			break;
 		}
 	}
-	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
+	if (a_Killer != NULL)
+	{
+		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
+	}
 	m_DestroyTimer = 0;
 }
 
