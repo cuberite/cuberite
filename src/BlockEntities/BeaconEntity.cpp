@@ -35,25 +35,17 @@ int cBeaconEntity::GetPyramidLevel()
 
 	for (int Y = Area.GetSizeY() - 1; Y > 0; Y--)
 	{
-		bool FullLayer = true;
 		for (int X = MiddleXZ - Layer; X <= (MiddleXZ + Layer); X++)
 		{
 			for (int Z = MiddleXZ - Layer; Z <= (MiddleXZ + Layer); Z++)
 			{
 				if (!IsMineralBlock(Area.GetRelBlockType(X, Y, Z)))
 				{
-					FullLayer = false;
+					return Layer;
 				}
 			}
 		}
-		if (!FullLayer)
-		{
-			break;
-		}
-		else
-		{
-			Layer++;
-		}
+		Layer++;
 	}
 
 	return Layer;
@@ -84,6 +76,7 @@ bool cBeaconEntity::IsMineralBlock(BLOCKTYPE a_BlockType)
 
 bool cBeaconEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	std::cout << GetPyramidLevel() << "\n";
 	return false;
 }
 
