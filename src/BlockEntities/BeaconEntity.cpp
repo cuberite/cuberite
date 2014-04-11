@@ -20,14 +20,26 @@ cBeaconEntity::cBeaconEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * 
 int cBeaconEntity::GetPyramidLevel()
 {
 	cBlockArea Area;
+	int MinY = GetPosY() - 4;
+	if (MinY < 0)
+	{
+		MinY = 0;
+	}
+	int MaxY = GetPosY() - 1;
+	if (MaxY < 0)
+	{
+		MaxY = 0;
+	}
+
 	Area.Read(
 		m_World, 
 		GetPosX() - 4, 
 		GetPosX() + 4, 
-		GetPosY() - 5, 
-		GetPosY() - 1, 
+		MinY, 
+		MaxY, 
 		GetPosZ() - 4, 
-		GetPosZ() + 4
+		GetPosZ() + 4,
+		cBlockArea::baTypes
 	);
 
 	int Layer = 1;
@@ -41,14 +53,14 @@ int cBeaconEntity::GetPyramidLevel()
 			{
 				if (!IsMineralBlock(Area.GetRelBlockType(X, Y, Z)))
 				{
-					return Layer;
+					return Layer - 1;
 				}
 			}
 		}
 		Layer++;
 	}
 
-	return Layer;
+	return Layer - 1;
 }
 
 
