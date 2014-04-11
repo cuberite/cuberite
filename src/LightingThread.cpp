@@ -76,9 +76,9 @@ public:
 	HEIGHTTYPE * m_HeightMap;  // 3x3 chunks of height map,  organized as a single XZY blob of data (instead of 3x3 XZY blobs)
 	
 	cReader(BLOCKTYPE * a_BlockTypes, HEIGHTTYPE * a_HeightMap) :
+		m_MaxHeight(0),
 		m_BlockTypes(a_BlockTypes),
-		m_HeightMap(a_HeightMap),
-		m_MaxHeight(0)
+		m_HeightMap(a_HeightMap)
 	{
 	}
 } ;
