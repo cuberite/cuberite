@@ -76,7 +76,6 @@ bool cBeaconEntity::IsMineralBlock(BLOCKTYPE a_BlockType)
 
 bool cBeaconEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	std::cout << GetPyramidLevel() << "\n";
 	return false;
 }
 
