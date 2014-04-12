@@ -658,17 +658,20 @@ void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 		cBlockArea Area;
 		Area.Read(a_Player.GetWorld(), PosX - 2, PosX + 2, PosY, PosY + 1, PosZ - 2, PosZ + 2);
 
-		for (int x = 0; x < 7; x++)
+		for (int x = 0; x < 6; x++)
 		{
-			for (int y = 0; y < 2; y++)
+			for (int y = 0; y < 3; y++)
 			{
-				for (int z = 0; z < 7; z++)
+				for (int z = 0; z < 6; z++)
 				{
-					LOG(Printf("%i", Area.GetBlockType(x, y, z)).c_str());
-
-					if (Area.GetBlockType(x, y, z) == E_BLOCK_BOOKCASE)
+					if ((((x == 0) || (x == 5)) || ((z == 0) || (z == 5))) && ((y == 0) || y == 1))
 					{
-						LOG("BookShelf");
+						LOG("%i", Area.GetRelBlockType(x, y, z));
+
+						if (Area.GetRelBlockType(x, y, z) == E_BLOCK_BOOKCASE)
+						{
+							LOG("BookShelf");
+						}
 					}
 				}
 			}
