@@ -75,12 +75,12 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				SetMaxHealth(20);
 				SetIsTame(true);
 				SetOwner(a_Player.GetName());
-				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_WOLF_TAMED);
+				m_World->BroadcastEntityStatus(*this, esWolfTamed);
 				m_World->BroadcastParticleEffect("heart", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
 			}
 			else
 			{
-				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_WOLF_TAMING);
+				m_World->BroadcastEntityStatus(*this, esWolfTaming);
 				m_World->BroadcastParticleEffect("smoke", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
 			}
 		}

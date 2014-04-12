@@ -101,7 +101,7 @@ void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)
 			{
-				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_SHEEP_EATING);
+				m_World->BroadcastEntityStatus(*this, esSheepEating);
 				m_TimeToStopEating = 40;
 			}
 		}

@@ -590,7 +590,7 @@ void cPlayer::FinishEating(void)
 	m_EatingFinishTick = -1;
 	
 	// Send the packets:
-	m_ClientHandle->SendEntityStatus(*this, ENTITY_STATUS_EATING_ACCEPTED);
+	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
 	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
