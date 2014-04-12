@@ -31,10 +31,7 @@ cChunkStay::~cChunkStay()
 
 void cChunkStay::Clear(void)
 {
-	if (m_ChunkMap != NULL)
-	{
-		Disable();
-	}
+	ASSERT(m_ChunkMap == NULL);
 	m_Chunks.clear();
 }
 
