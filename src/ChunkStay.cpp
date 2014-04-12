@@ -97,8 +97,9 @@ void cChunkStay::Disable(void)
 {
 	ASSERT(m_ChunkMap != NULL);
 	
-	m_ChunkMap->DelChunkStay(*this);
+	cChunkMap * ChunkMap = m_ChunkMap;
 	m_ChunkMap = NULL;
+	ChunkMap->DelChunkStay(*this);
 }
 
 
