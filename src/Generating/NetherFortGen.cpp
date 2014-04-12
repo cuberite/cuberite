@@ -80,9 +80,9 @@ cNetherFortGen::cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxDepth) :
 	m_MaxDepth(a_MaxDepth)
 {
 	// Initialize the prefabs:
-	for (size_t i = 0; i < g_NetherFortPrefabs1Count; i++)
+	for (size_t i = 0; i < g_NetherFortPrefabsCount; i++)
 	{
-		cPrefab * Prefab = new cPrefab(g_NetherFortPrefabs1[i]);
+		cPrefab * Prefab = new cPrefab(g_NetherFortPrefabs[i]);
 		m_AllPieces.push_back(Prefab);
 		if (Prefab->HasConnectorType(0))
 		{
@@ -95,15 +95,17 @@ cNetherFortGen::cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxDepth) :
 	}
 	
 	// Initialize the starting piece prefabs:
-	for (size_t i = 0; i < g_NetherFortStartingPrefabs1Count; i++)
+	for (size_t i = 0; i < g_NetherFortStartingPrefabsCount; i++)
 	{
-		m_StartingPieces.push_back(new cPrefab(g_NetherFortStartingPrefabs1[i]));
+		m_StartingPieces.push_back(new cPrefab(g_NetherFortStartingPrefabs[i]));
 	}
 
+	/*
 	// DEBUG: Try one round of placement:
 	cPlacedPieces Pieces;
 	cBFSPieceGenerator pg(*this, a_Seed);
 	pg.PlacePieces(0, 64, 0, a_MaxDepth, Pieces);
+	*/
 }
 
 
