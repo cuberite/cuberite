@@ -18,6 +18,7 @@
 #include "ByteBuffer.h"
 #include "Scoreboard.h"
 #include "Map.h"
+#include "Enchantments.h"
 
 
 
@@ -230,8 +231,10 @@ public:
 	/** Called when the player moves into a different world; queues sreaming the new chunks */
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
-	///Handle item enchanting
+	/** Called when the player will enchant a Item */
 	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
+	cEnchantmentsVector AddEnchantmentWeight(cEnchantmentsVector a_Map, int a_Weight, cEnchantments a_Enchantment);
+	cEnchantmentsVector CheckEnchantmentConflicts(cEnchantmentsVector a_Map, cEnchantments a_FirstEnchantment);
 	
 private:
 

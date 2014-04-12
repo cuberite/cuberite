@@ -29,7 +29,7 @@ Level value of 0 means no such enchantment, and it will not be stored in the m_E
 Serialization will never put zero-level enchantments into the stringspec and will always use numeric IDs.
 */
 
-typedef std::vector<cEnchantments> cEnchantmentsArray;
+typedef std::vector<cEnchantments> cEnchantmentsVector;
 
 // tolua_begin
 class cEnchantments
@@ -105,7 +105,7 @@ public:
 	
 	/// Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments)
 	friend void EnchantmentSerializer::ParseFromNBT(cEnchantments& a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx);
-	
+
 protected:
 	/// Maps enchantment ID -> enchantment level
 	typedef std::map<int, int> cMap;

@@ -608,7 +608,6 @@ cSlotAreaTemporary(a_NumSlots, a_ParentWindow)
 
 void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
-	LOGWARN("Clicked");
 	// Check if Slot is in the Enchantment Table
 	if (a_SlotNum == 0)
 	{
@@ -642,17 +641,39 @@ void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 {
-	LOGWARN("Click!");
-
 	if (a_Player.GetDraggingItem().IsEmpty())
 	{
-		LOGWARN("EMPTY");
-		m_ParentWindow.SetProperty(0, 0);
-		m_ParentWindow.SetProperty(1, 0);
-		m_ParentWindow.SetProperty(2, 0);
+		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SetProperty(1, 0, a_Player);
+		m_ParentWindow.SetProperty(2, 0, a_Player);
 	}
 	else if (a_Player.GetDraggingItem().IsEnchantable)
 	{
+		int PosX = 0;
+		int PosY = 0;
+		int PosZ = 0;
+		cEnchantingWindow * Window = (cEnchantingWindow*)&m_ParentWindow;
+		Window->GetBlockPos(PosX, PosY, PosZ);
+
+		cBlockArea Area;
+		Area.Read(a_Player.GetWorld(), PosX - 2, PosX + 2, PosY, PosY + 1, PosZ - 2, PosZ + 2);
+
+		for (int x = 0; x < 7; x++)
+		{
+			for (int y = 0; y < 2; y++)
+			{
+				for (int z = 0; z < 7; z++)
+				{
+					LOG(Printf("%i", Area.GetBlockType(x, y, z)).c_str());
+
+					if (Area.GetBlockType(x, y, z) == E_BLOCK_BOOKCASE)
+					{
+						LOG("BookShelf");
+					}
+				}
+			}
+		}
+
 		int bookshelves = 15; // TODO: Check Bookshelves
 
 		cFastRandom Random;
@@ -661,17 +682,15 @@ void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 		int middleSlot = (base * 2) / 3 + 1;
 		int bottomSlot = std::max(base, bookshelves * 2);
 
-		LOGWARN("Enchantable");
-		m_ParentWindow.SetProperty(0, topSlot);
-		m_ParentWindow.SetProperty(1, middleSlot);
-		m_ParentWindow.SetProperty(2, bottomSlot);
+		m_ParentWindow.SetProperty(0, topSlot, a_Player);
+		m_ParentWindow.SetProperty(1, middleSlot, a_Player);
+		m_ParentWindow.SetProperty(2, bottomSlot, a_Player);
 	}
 	else
 	{
-		LOGWARN("Not Enchantable");
-		m_ParentWindow.SetProperty(0, 0);
-		m_ParentWindow.SetProperty(1, 0);
-		m_ParentWindow.SetProperty(2, 0);
+		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SetProperty(1, 0, a_Player);
+		m_ParentWindow.SetProperty(2, 0, a_Player);
 	}
 }
 

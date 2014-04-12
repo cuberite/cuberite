@@ -175,9 +175,6 @@ public:
 	/** Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements) */
 	static bool IsEnchantable(short a_ItemType); // tolua_export
 
-	/** Fills a_Enchantments with the list of enchantments applicable to the specified item type */
-	static void cItem::GetApplicableEnchantmentsForType(short a_ItemType, cEnchantmentsArray & a_Enchantments);
-
 	// tolua_begin
 	
 	short         m_ItemType;

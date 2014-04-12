@@ -31,6 +31,8 @@
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
 
+#include "FastRandom.h"
+
 
 
 /** Maximum number of explosions to send this tick, server will start dropping if exceeded */
@@ -2687,34 +2689,679 @@ void cClientHandle::SocketClosed(void)
 
 void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 {
-	//Get Item
-	cItem EnchantItem = m_Player->GetDraggingItem();
-	
-	cEnchantmentsArray enchantments;
-	cItem::GetApplicableEnchantmentsForType(EnchantItem.m_ItemType, enchantments);
+	cItem Item = m_Player->GetDraggingItem();
+	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
+	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
 
-	m_Player->SendMessage(Printf("ItemType: %d", EnchantItem.m_ItemType));
+	// Step 1 from Enchanting
+	int Enchantability = 1;
+
+	if (Item.m_ItemType == E_ITEM_WOODEN_SWORD || Item.m_ItemType == E_ITEM_WOODEN_PICKAXE || Item.m_ItemType == E_ITEM_WOODEN_SHOVEL || Item.m_ItemType == E_ITEM_WOODEN_AXE || Item.m_ItemType == E_ITEM_WOODEN_HOE)
+	{
+		Enchantability = 15;
+	}
+	else if (Item.m_ItemType == E_ITEM_LEATHER_CAP || Item.m_ItemType == E_ITEM_LEATHER_TUNIC || Item.m_ItemType == E_ITEM_LEATHER_PANTS || Item.m_ItemType == E_ITEM_LEATHER_BOOTS)
+	{
+		Enchantability = 15;
+	}
+	else if (Item.m_ItemType == E_ITEM_STONE_SWORD || Item.m_ItemType == E_ITEM_STONE_PICKAXE || Item.m_ItemType == E_ITEM_STONE_SHOVEL || Item.m_ItemType == E_ITEM_STONE_AXE || Item.m_ItemType == E_ITEM_STONE_HOE)
+	{
+		Enchantability = 5;
+	}
+	else if (Item.m_ItemType == E_ITEM_IRON_HELMET || Item.m_ItemType == E_ITEM_IRON_CHESTPLATE || Item.m_ItemType == E_ITEM_IRON_LEGGINGS || Item.m_ItemType == E_ITEM_IRON_BOOTS)
+	{
+		Enchantability = 9;
+	}
+	else if (Item.m_ItemType == E_ITEM_IRON_SWORD || Item.m_ItemType == E_ITEM_IRON_PICKAXE || Item.m_ItemType == E_ITEM_IRON_SHOVEL || Item.m_ItemType == E_ITEM_IRON_AXE || Item.m_ItemType == E_ITEM_IRON_HOE)
+	{
+		Enchantability = 14;
+	}
+	else if (Item.m_ItemType == E_ITEM_CHAIN_HELMET || Item.m_ItemType == E_ITEM_CHAIN_CHESTPLATE || Item.m_ItemType == E_ITEM_CHAIN_LEGGINGS || Item.m_ItemType == E_ITEM_CHAIN_BOOTS)
+	{
+		Enchantability = 12;
+	}
+	else if (Item.m_ItemType == E_ITEM_DIAMOND_HELMET || Item.m_ItemType == E_ITEM_DIAMOND_CHESTPLATE || Item.m_ItemType == E_ITEM_DIAMOND_LEGGINGS || Item.m_ItemType == E_ITEM_DIAMOND_BOOTS)
+	{
+		Enchantability = 10;
+	}
+	else if (Item.m_ItemType == E_ITEM_DIAMOND_SWORD || Item.m_ItemType == E_ITEM_DIAMOND_PICKAXE || Item.m_ItemType == E_ITEM_DIAMOND_SHOVEL || Item.m_ItemType == E_ITEM_DIAMOND_AXE || Item.m_ItemType == E_ITEM_DIAMOND_HOE)
+	{
+		Enchantability = 10;
+	}
+	else if (Item.m_ItemType == E_ITEM_GOLD_HELMET || Item.m_ItemType == E_ITEM_GOLD_CHESTPLATE || Item.m_ItemType == E_ITEM_GOLD_LEGGINGS || Item.m_ItemType == E_ITEM_GOLD_BOOTS)
+	{
+		Enchantability = 25;
+	}
+	else if (Item.m_ItemType == E_ITEM_GOLD_SWORD || Item.m_ItemType == E_ITEM_GOLD_PICKAXE || Item.m_ItemType == E_ITEM_GOLD_SHOVEL || Item.m_ItemType == E_ITEM_GOLD_AXE || Item.m_ItemType == E_ITEM_GOLD_HOE)
+	{
+		Enchantability = 22;
+	}
+
+	cFastRandom Random;
+	int ModifiedEnchantmentLevel = BaseEnchantmentLevel + Random.NextInt(Enchantability / 4) + Random.NextInt(Enchantability / 4) + 1;
+	float RandomBonus = 1.0F + (Random.NextFloat(1) + Random.NextFloat(1) - 1.0F) * 0.15F;
+
+	int FinalEnchantmentLevel = (int)(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
+
+	// Step 2 and 3 from Enchanting
+	cEnchantmentsVector enchantments;
+
+	if (ItemCategory::IsSword(Item.m_ItemType))
+	{
+		// Sharpness
+		if (FinalEnchantmentLevel >= 34 && FinalEnchantmentLevel <= 54)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Sharpness=4"));
+		}
+		else if (FinalEnchantmentLevel >= 23 && FinalEnchantmentLevel <= 43)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Sharpness=3"));
+		}
+		else if (FinalEnchantmentLevel >= 12 && FinalEnchantmentLevel <= 32)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Sharpness=2"));
+		}
+		else if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 21)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Sharpness=1"));
+		}
+
+		// Smite
+		if (FinalEnchantmentLevel >= 29 && FinalEnchantmentLevel <= 49)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Smite=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 41)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Smite=3"));
+		}
+		else if (FinalEnchantmentLevel >= 13 && FinalEnchantmentLevel <= 33)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Smite=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 25)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Smite=1"));
+		}
+
+		// Bane of Arthropods
+		if (FinalEnchantmentLevel >= 29 && FinalEnchantmentLevel <= 49)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("BaneOfArthropods=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 41)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("BaneOfArthropods=3"));
+		}
+		else if (FinalEnchantmentLevel >= 13 && FinalEnchantmentLevel <= 33)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("BaneOfArthropods=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 25)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("BaneOfArthropods=1"));
+		}
+
+		// Knockback
+		if (FinalEnchantmentLevel >= 25 && FinalEnchantmentLevel <= 75)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Knockback=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 55)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Knockback=1"));
+		}
+
+		// Fire Aspect
+		if (FinalEnchantmentLevel >= 30 && FinalEnchantmentLevel <= 80)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("FireAspect=2"));
+		}
+		else if (FinalEnchantmentLevel >= 10 && FinalEnchantmentLevel <= 60)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("FireAspect=1"));
+		}
+
+		// Looting
+		if (FinalEnchantmentLevel >= 33 && FinalEnchantmentLevel <= 83)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Looting=3"));
+		}
+		else if (FinalEnchantmentLevel >= 24 && FinalEnchantmentLevel <= 74)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Looting=2"));
+		}
+		else if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 65)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Looting=1"));
+		}
+	}
+
+	else if (ItemCategory::IsTool(Item.m_ItemType))
+	{
+		// Efficiency
+		if (FinalEnchantmentLevel >= 31 && FinalEnchantmentLevel <= 81)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Efficiency=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 71)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Efficiency=3"));
+		}
+		else if (FinalEnchantmentLevel >= 11 && FinalEnchantmentLevel <= 61)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Efficiency=2"));
+		}
+		else if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 51)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Efficiency=1"));
+		}
+
+		// Silk Touch
+		if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 65)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("SilkTouch=1"));
+		}
+
+		// Fortune
+		if (FinalEnchantmentLevel >= 33 && FinalEnchantmentLevel <= 83)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Fortune=3"));
+		}
+		else if (FinalEnchantmentLevel >= 24 && FinalEnchantmentLevel <= 74)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Fortune=2"));
+		}
+		else if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 65)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Fortune=1"));
+		}
+	}
+
+	else if (ItemCategory::IsArmor(Item.m_ItemType))
+	{
+		// Protection
+		if (FinalEnchantmentLevel >= 34 && FinalEnchantmentLevel <= 54)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Protection=4"));
+		}
+		else if (FinalEnchantmentLevel >= 23 && FinalEnchantmentLevel <= 43)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Protection=3"));
+		}
+		else if (FinalEnchantmentLevel >= 12 && FinalEnchantmentLevel <= 32)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Protection=2"));
+		}
+		else if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 21)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Protection=1"));
+		}
+
+		// Fire Protection
+		if (FinalEnchantmentLevel >= 34 && FinalEnchantmentLevel <= 46)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FireProtection=4"));
+		}
+		else if (FinalEnchantmentLevel >= 26 && FinalEnchantmentLevel <= 38)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FireProtection=3"));
+		}
+		else if (FinalEnchantmentLevel >= 18 && FinalEnchantmentLevel <= 30)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FireProtection=2"));
+		}
+		else if (FinalEnchantmentLevel >= 10 && FinalEnchantmentLevel <= 22)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FireProtection=1"));
+		}
+
+		// Blast Protection
+		if (FinalEnchantmentLevel >= 29 && FinalEnchantmentLevel <= 41)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("BlastProtection=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 33)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("BlastProtection=3"));
+		}
+		else if (FinalEnchantmentLevel >= 13 && FinalEnchantmentLevel <= 25)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("BlastProtection=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 17)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("BlastProtection=1"));
+		}
+
+		// Projectile Protection
+		if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 36)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("ProjectileProtection=4"));
+		}
+		else if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 30)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("ProjectileProtection=3"));
+		}
+		else if (FinalEnchantmentLevel >= 9 && FinalEnchantmentLevel <= 24)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("ProjectileProtection=2"));
+		}
+		else if (FinalEnchantmentLevel >= 3 && FinalEnchantmentLevel <= 18)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("ProjectileProtection=1"));
+		}
+
+		// Thorns
+		if (FinalEnchantmentLevel >= 50 && FinalEnchantmentLevel <= 100)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Thorns=3"));
+		}
+		else if (FinalEnchantmentLevel >= 30 && FinalEnchantmentLevel <= 80)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Thorns=2"));
+		}
+		else if (FinalEnchantmentLevel >= 10 && FinalEnchantmentLevel <= 60)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Thorns=1"));
+		}
 
 
-	m_Player->SendMessage(enchantments[1].ToString());
+		if (ItemCategory::IsHelmet(Item.m_ItemType))
+		{
+			// Respiration
+			if (FinalEnchantmentLevel >= 30 && FinalEnchantmentLevel <= 60)
+			{
+				enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Respiration=3"));
+			}
+			else if (FinalEnchantmentLevel >= 20 && FinalEnchantmentLevel <= 50)
+			{
+				enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Respiration=2"));
+			}
+			else if (FinalEnchantmentLevel >= 10 && FinalEnchantmentLevel <= 40)
+			{
+				enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Respiration=1"));
+			}
 
-	//shuffle enchantments (i don't know if this is good)
-	std::random_shuffle(enchantments.begin(), enchantments.end());
+			// Aqua Affinity
+			if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 41)
+			{
+				enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("AquaAffinity=1"));
+			}
+		}
 
-	m_Player->SendMessage(enchantments[1].ToString());
+		else if (ItemCategory::IsBoots(Item.m_ItemType))
+		{
+			// Feather Fall
+			if (FinalEnchantmentLevel >= 23 && FinalEnchantmentLevel <= 33)
+			{
+				enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FeatherFalling=4"));
+			}
+			else if (FinalEnchantmentLevel >= 17 && FinalEnchantmentLevel <= 27)
+			{
+				enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FeatherFalling=3"));
+			}
+			else if (FinalEnchantmentLevel >= 11 && FinalEnchantmentLevel <= 21)
+			{
+				enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FeatherFalling=2"));
+			}
+			else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 15)
+			{
+				enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FeatherFalling=1"));
+			}
+		}
+	}
+
+	else if (Item.m_ItemType == E_ITEM_BOW)
+	{
+		// Power
+		if (FinalEnchantmentLevel >= 31 && FinalEnchantmentLevel <= 46)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Power=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 36)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Power=3"));
+		}
+		else if (FinalEnchantmentLevel >= 11 && FinalEnchantmentLevel <= 26)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Power=2"));
+		}
+		else if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 16)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Power=1"));
+		}
+
+		// Punch
+		if (FinalEnchantmentLevel >= 32 && FinalEnchantmentLevel <= 57)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Punch=2"));
+		}
+		else if (FinalEnchantmentLevel >= 12 && FinalEnchantmentLevel <= 37)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Punch=1"));
+		}
+
+		// Flame and Infinity
+		if (FinalEnchantmentLevel >= 20 && FinalEnchantmentLevel <= 50)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Flame=1"));
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Infinity=1"));
+		}
+	}
+
+	else if (Item.m_ItemType == E_ITEM_FISHING_ROD)
+	{
+		// Luck of the Sea and Lure
+		if (FinalEnchantmentLevel >= 33 && FinalEnchantmentLevel <= 83)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("LuckOfTheSea=3"));
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Lure=3"));
+		}
+		else if (FinalEnchantmentLevel >= 24 && FinalEnchantmentLevel <= 74)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("LuckOfTheSea=2"));
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Lure=2"));
+		}
+		else if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 65)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("LuckOfTheSea=1"));
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Lure=1"));
+		}
+	}
+
+	// Unbreaking
+	if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 71)
+	{
+		enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Unbreaking=3"));
+	}
+	else if (FinalEnchantmentLevel >= 13 && FinalEnchantmentLevel <= 63)
+	{
+		enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Unbreaking=2"));
+	}
+	else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 55)
+	{
+		enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Unbreaking=1"));
+	}
+
+	int RandomEnchantment1 = floor(Random.NextFloat(1) * enchantments.size());
+	cEnchantments Enchantment1 = enchantments[RandomEnchantment1];
+	Item.m_Enchantments.AddFromString(Enchantment1.ToString());
+	enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment1), enchantments.end());
+
+	// TODO: Don't add every time so much enchantments
+
+	// Checking for conflicting enchantments
+	enchantments = CheckEnchantmentConflicts(enchantments, Enchantment1);
+
+	int RandomEnchantment2 = floor(Random.NextFloat(1) * enchantments.size());
+	cEnchantments Enchantment2 = enchantments[RandomEnchantment2];
+	Item.m_Enchantments.AddFromString(Enchantment2.ToString());
+	enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment2), enchantments.end());
+
+	// Checking for conflicting enchantments
+	enchantments = CheckEnchantmentConflicts(enchantments, Enchantment2);
+
+	int RandomEnchantment3 = floor(Random.NextFloat(1) * enchantments.size());
+	cEnchantments Enchantment3 = enchantments[RandomEnchantment3];
+	Item.m_Enchantments.AddFromString(Enchantment3.ToString());
+	enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment3), enchantments.end());
+
+	m_Player->GetWindow()->SetSlot(*m_Player, 0, Item);
+}
 
 
 
 
 
+cEnchantmentsVector cClientHandle::AddEnchantmentWeight(cEnchantmentsVector a_Map, int a_Weight, cEnchantments a_Enchantment)
+{
+	for (int i = 0; i < a_Weight; i++)
+	{
+		a_Map.push_back(a_Enchantment);
+	}
 
-	//Enchant Item
-	EnchantItem.m_Enchantments.AddFromString(enchantments[1].ToString());
+	return a_Map;
+}
 
-	//Set Enchanted Item to Window Slot
-	m_Player->GetWindow()->SetSlot(*m_Player, 0, EnchantItem);
 
-	LOGWARN("Item enchanted!");
+
+
+
+cEnchantmentsVector cClientHandle::CheckEnchantmentConflicts(cEnchantmentsVector a_Map, cEnchantments a_FirstEnchantment)
+{
+	int FirstEnchantmentID = std::stoi(StringSplit(a_FirstEnchantment.ToString(), "=")[0]);
+
+	if (FirstEnchantmentID == cEnchantments::enchProtection)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchFireProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchBlastProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchProjectileProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+	else if (FirstEnchantmentID == cEnchantments::enchFireProtection)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchBlastProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchProjectileProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+	else if (FirstEnchantmentID == cEnchantments::enchBlastProtection)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchFireProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchProjectileProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+	else if (FirstEnchantmentID == cEnchantments::enchProjectileProtection)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchFireProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchBlastProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+
+	else if (FirstEnchantmentID == cEnchantments::enchSharpness)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchSmite)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchBaneOfArthropods)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+	else if (FirstEnchantmentID == cEnchantments::enchSmite)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchSharpness)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchBaneOfArthropods)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+	else if (FirstEnchantmentID == cEnchantments::enchBaneOfArthropods)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchSharpness)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchSmite)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+	else if (FirstEnchantmentID == cEnchantments::enchSilkTouch)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchFortune)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+	else if (FirstEnchantmentID == cEnchantments::enchFortune)
+	{
+		for (cEnchantments enchantment : a_Map)
+		{
+			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+
+			if (EnchantmentID == cEnchantments::enchSilkTouch)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				break;
+			}
+		}
+	}
+
+	return a_Map;
 }
 
 

@@ -808,11 +808,95 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 // cEnchantingWindow:
 
 cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
-cWindow(wtEnchantment, "Enchant")
+	cWindow(wtEnchantment, "Enchant"),
+	m_BlockX(a_BlockX),
+	m_BlockY(a_BlockY),
+	m_BlockZ(a_BlockZ)
 {
 	m_SlotAreas.push_back(new cSlotAreaEnchanting(1, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
+{
+	if (a_Property == 0)
+	{
+		m_PropertyValue0 = a_Value;
+	}
+	else if (a_Property == 1)
+	{
+		m_PropertyValue1 = a_Value;
+	}
+	else if (a_Property == 2)
+	{
+		m_PropertyValue2 = a_Value;
+	}
+
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
+	{
+		(*itr)->GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
+	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
+void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
+{
+	if (a_Property == 0)
+	{
+		m_PropertyValue0 = a_Value;
+	}
+	else if (a_Property == 1)
+	{
+		m_PropertyValue1 = a_Value;
+	}
+	else if (a_Property == 2)
+	{
+		m_PropertyValue2 = a_Value;
+	}
+
+	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
+}
+
+
+
+
+
+int cEnchantingWindow::GetPropertyValue(int a_Property)
+{
+	if (a_Property == 0)
+	{
+		return m_PropertyValue0;
+	}
+	else if (a_Property == 1)
+	{
+		return m_PropertyValue1;
+	}
+	else if (a_Property == 2)
+	{
+		return m_PropertyValue2;
+	}
+
+	return -1;
+}
+
+
+
+
+
+void cEnchantingWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
+{
+	a_PosX = m_BlockX;
+	a_PosY = m_BlockY;
+	a_PosZ = m_BlockZ;
 }
 
 
