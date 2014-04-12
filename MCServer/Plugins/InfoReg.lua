@@ -16,22 +16,22 @@ local function ListSubcommands(a_Player, a_Subcommands, a_CmdString)
 	end
 	
 	-- Enum all the subcommands:
-	local Verbs = {};
+	local Verbs = {}
 	for cmd, info in pairs(a_Subcommands) do
-		if (a_Player:HasPermission(info.Permission or "")) then
-			table.insert(Verbs, "  " .. a_CmdString .. " " .. cmd);
+		if ((a_Player == nil) or (a_Player:HasPermission(info.Permission or ""))) then
+			table.insert(Verbs, a_CmdString .. " " .. cmd)
 		end
 	end
-	table.sort(Verbs);
+	table.sort(Verbs)
 	
 	-- Send the list:
 	if (a_Player == nil) then
 		for idx, verb in ipairs(Verbs) do
-			LOGINFO(verb);
+			LOGINFO("  " .. verb)
 		end
 	else
 		for idx, verb in ipairs(Verbs) do
-			a_Player:SendMessage(verb);
+			a_Player:SendMessage(cCompositeChat("  ", mtInfo):AddSuggestCommandPart(verb, verb))
 		end
 	end
 end

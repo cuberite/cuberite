@@ -49,21 +49,17 @@ void cEnchantments::AddFromString(const AString & a_StringSpec)
 			LOG("%s: Malformed enchantment decl: \"%s\", skipping.", __FUNCTION__, itr->c_str());
 			continue;
 		}
-		int id = atoi(Split[0].c_str());
-		if ((id == 0) && (Split[0] != "0"))
+		int id = StringToEnchantmentID(Split[0]);
+		if (id < 0)
 		{
-			id = StringToEnchantmentID(Split[0]);
+			LOG("%s: Failed to parse enchantment \"%s\", skipping.", __FUNCTION__, Split[0].c_str());
+			continue;
 		}
 		int lvl = atoi(Split[1].c_str());
-		if (
-			((id  <= 0) && (Split[0] != "0")) ||
-			((lvl == 0) && (Split[1] != "0"))
-		)
+		if ((lvl == 0) && (Split[1] != "0"))
 		{
-			// Numbers failed to parse
-			LOG("%s: Failed to parse enchantment declaration for numbers: \"%s\" and \"%s\", skipping.",
-				__FUNCTION__, Split[0].c_str(), Split[1].c_str()
-			);
+			// Level failed to parse
+			LOG("%s: Failed to parse enchantment level \"%s\", skipping.", __FUNCTION__, Split[1].c_str());
 			continue;
 		}
 		SetLevel(id, lvl);
@@ -150,7 +146,7 @@ bool cEnchantments::IsEmpty(void) const
 
 int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 {
-	struct
+	static const struct
 	{
 		int m_Value;
 		const char * m_Name;
@@ -181,6 +177,15 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 		{ enchLuckOfTheSea,         "LuckOfTheSea"},
 		{ enchLure,                 "Lure"},
 	} ;
+
+	// First try to parse as a number:
+	int id = atoi(a_EnchantmentName.c_str());
+	if ((id != 0) || (a_EnchantmentName == "0"))
+	{
+		return id;
+	}
+
+	// It wasn't a number, do a lookup:
 	for (size_t i = 0; i < ARRAYCOUNT(EnchantmentNames); i++)
 	{
 		if (NoCaseCompare(EnchantmentNames[i].m_Name, a_EnchantmentName) == 0)
