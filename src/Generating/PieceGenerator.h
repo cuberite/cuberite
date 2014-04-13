@@ -85,6 +85,13 @@ typedef std::vector<cPiece *> cPieces;
 
 
 
+// fwd:
+class cPlacedPiece;
+
+
+
+
+
 /** This class is an interface that provides pieces for the generator. It can keep track of what pieces were
 placed and adjust the returned piece vectors. */
 class cPiecePool
@@ -100,6 +107,16 @@ public:
 	/** Returns the pieces that should be used as the starting point.
 	Multiple starting points are supported, one of the returned piece will be chosen. */
 	virtual cPieces GetStartingPieces(void) = 0;
+	
+	/** Returns the relative weight with which the a_NewPiece is to be selected for placing under a_PlacedPiece through a_ExistingConnector.
+	This allows the pool to tweak the piece's chances, based on the previous pieces in the tree and the connector used.
+	The higher the number returned, the higher the chance the piece will be chosen. 0 means the piece will never be chosen.
+	*/
+	virtual int GetPieceWeight(
+		const cPlacedPiece & a_PlacedPiece,
+		const cPiece::cConnector & a_ExistingConnector,
+		const cPiece & a_NewPiece
+	) { return 1; }
 	
 	/** Called after a piece is placed, to notify the pool that it has been used.
 	The pool may adjust the pieces it will return the next time. */
@@ -157,8 +174,9 @@ protected:
 		cPiece * m_Piece;                  // The piece being connected
 		cPiece::cConnector m_Connector;    // The piece's connector being used (relative non-rotated coords)
 		int m_NumCCWRotations;             // Number of rotations necessary to match the two connectors
+		int m_Weight;                      // Relative chance that this connection will be chosen
 		
-		cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations);
+		cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations, int a_Weight);
 	};
 	typedef std::vector<cConnection> cConnections;
 	
