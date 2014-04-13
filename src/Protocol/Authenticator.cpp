@@ -26,7 +26,6 @@
 
 #define DEFAULT_AUTH_SERVER "sessionserver.mojang.com"
 #define DEFAULT_AUTH_ADDRESS "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%"
-#define MAX_REDIRECTS 10
 
 
 
@@ -146,8 +145,9 @@ void cAuthenticator::Execute(void)
 bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID)
 {
 	AString REQUEST;
-	int ret, len, server_fd = -1;
-	unsigned char buf[1024];
+	int ret, server_fd = -1;
+	size_t len = -1;
+	unsigned char * buf;
 	const char *pers = "cAuthenticator";
 
 	entropy_context entropy;
@@ -221,7 +221,8 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	REQUEST += "Connection: close\r\n";
 	REQUEST += "\r\n";
 
-	len = sprintf_s((char *)buf, sizeof(buf), REQUEST.c_str());
+	len = REQUEST.size();
+	buf = (unsigned char *)REQUEST.c_str();
 
 	while ((ret = ssl_write(&ssl, buf, len)) <= 0)
 	{
