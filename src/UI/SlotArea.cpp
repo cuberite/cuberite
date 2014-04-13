@@ -647,7 +647,7 @@ void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 		m_ParentWindow.SetProperty(1, 0, a_Player);
 		m_ParentWindow.SetProperty(2, 0, a_Player);
 	}
-	else if (a_Player.GetDraggingItem().IsEnchantable)
+	else if (cItem::IsEnchantable(a_Player.GetDraggingItem().m_ItemType))
 	{
 		int PosX = 0;
 		int PosY = 0;
