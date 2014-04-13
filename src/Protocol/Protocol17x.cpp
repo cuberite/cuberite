@@ -1559,7 +1559,7 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	// Send login success:
 	{
 		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(Printf("%d", m_Client->GetUniqueID()));  // TODO: proper UUID
+		Pkt.WriteString(m_Client->GetUUID());
 		Pkt.WriteString(m_Client->GetUsername());
 	}
 

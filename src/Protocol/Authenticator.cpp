@@ -146,7 +146,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 {
 	AString REQUEST;
 	int ret, server_fd = -1;
-	size_t len = -1;
+	size_t len = 0;
 	unsigned char buf[1024];
 	const char *pers = "cAuthenticator";
 
