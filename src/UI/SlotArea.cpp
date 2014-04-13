@@ -600,6 +600,8 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 cSlotAreaEnchanting::cSlotAreaEnchanting(int a_NumSlots, cWindow & a_ParentWindow) :
 cSlotAreaTemporary(a_NumSlots, a_ParentWindow)
 {
+	cEnchantingWindow * Window = (cEnchantingWindow *)&m_ParentWindow;
+	Window->m_SlotArea = this;
 }
 
 

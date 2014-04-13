@@ -246,6 +246,8 @@ public:
 	/** Set the Position Values to the Position of the Enchantment Table */
 	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
 
+	cSlotArea * m_SlotArea;
+
 protected:
 	int m_PropertyValue0, m_PropertyValue1, m_PropertyValue2;
 	int m_BlockX, m_BlockY, m_BlockZ;

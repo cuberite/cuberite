@@ -19,6 +19,7 @@
 #include "Scoreboard.h"
 #include "Map.h"
 #include "Enchantments.h"
+#include "UI/SlotArea.h"
 
 
 

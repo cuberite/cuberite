@@ -3115,7 +3115,9 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 
 	if (m_Player->DeltaExperience(-m_Player->XpForLevel(Window->GetPropertyValue(Enchantment))) >= 0 || m_Player->IsGameModeCreative())
 	{
-		m_Player->GetWindow()->SetSlot(*m_Player, 0, Item);
+		Window->m_SlotArea->SetSlot(0, *m_Player, Item);
+		Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
+		Window->BroadcastWholeWindow();
 
 		Window->SetProperty(0, 0, *m_Player);
 		Window->SetProperty(1, 0, *m_Player);
