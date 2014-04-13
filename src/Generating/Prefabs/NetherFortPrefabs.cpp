@@ -3367,7 +3367,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 12, 1, 6: 5\n"  /* Type 1, direction X+ */
-		"1: -1, 1, 6: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 6: 4\n"  /* Type 1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotations */
