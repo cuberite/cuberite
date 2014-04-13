@@ -147,7 +147,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	AString REQUEST;
 	int ret, server_fd = -1;
 	size_t len = -1;
-	unsigned char * buf;
+	unsigned char buf[1024];
 	const char *pers = "cAuthenticator";
 
 	entropy_context entropy;
@@ -222,7 +222,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	REQUEST += "\r\n";
 
 	len = REQUEST.size();
-	buf = (unsigned char *)REQUEST.c_str();
+	strcpy((char *)buf, REQUEST.c_str());
 
 	while ((ret = ssl_write(&ssl, buf, len)) <= 0)
 	{
