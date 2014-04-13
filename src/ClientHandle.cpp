@@ -3113,7 +3113,7 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 	Item.m_Enchantments.AddFromString(Enchantment3.ToString());
 	enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment3), enchantments.end());
 
-	if (m_Player->DeltaExperience(Window->GetPropertyValue(Enchantment)) >= 0 || m_Player->IsGameModeCreative())
+	if (m_Player->DeltaExperience(-m_Player->XpForLevel(Window->GetPropertyValue(Enchantment))) >= 0 || m_Player->IsGameModeCreative())
 	{
 		m_Player->GetWindow()->SetSlot(*m_Player, 0, Item);
 
