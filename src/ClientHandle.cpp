@@ -2699,6 +2699,8 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 
 	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
 
+	LOG("499");
+
 	// Step 1 from Enchanting
 	int Enchantability = 1;
 
@@ -2744,7 +2746,7 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 	}
 
 	cFastRandom Random;
-	int ModifiedEnchantmentLevel = BaseEnchantmentLevel + Random.NextInt(Enchantability / 4) + Random.NextInt(Enchantability / 4) + 1;
+	int ModifiedEnchantmentLevel = BaseEnchantmentLevel + (int)Random.NextFloat((float)Enchantability / 4) + (int)Random.NextFloat((float)Enchantability / 4) + 1;
 	float RandomBonus = 1.0F + (Random.NextFloat(1) + Random.NextFloat(1) - 1.0F) * 0.15F;
 
 	int FinalEnchantmentLevel = (int)(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
@@ -3090,28 +3092,64 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 		enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Unbreaking=1"));
 	}
 
-	int RandomEnchantment1 = floor(Random.NextFloat(1) * enchantments.size());
+	int RandomEnchantment1 = (int) floor(Random.NextFloat(1) * enchantments.size());
 	cEnchantments Enchantment1 = enchantments[RandomEnchantment1];
 	Item.m_Enchantments.AddFromString(Enchantment1.ToString());
 	enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment1), enchantments.end());
 
-	// TODO: Don't add every time so much enchantments
+	float NewEnchantmentLevel = (float) BaseEnchantmentLevel;
 
-	// Checking for conflicting enchantments
-	enchantments = CheckEnchantmentConflicts(enchantments, Enchantment1);
+	// Next Enchantment (Second)
+	NewEnchantmentLevel = NewEnchantmentLevel / 2;
+	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
+	if (Random.NextFloat(100) <= SecondEnchantmentChance)
+	{
+		// Checking for conflicting enchantments
+		enchantments = CheckEnchantmentConflicts(enchantments, Enchantment1);
 
-	int RandomEnchantment2 = floor(Random.NextFloat(1) * enchantments.size());
-	cEnchantments Enchantment2 = enchantments[RandomEnchantment2];
-	Item.m_Enchantments.AddFromString(Enchantment2.ToString());
-	enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment2), enchantments.end());
+		if (enchantments.size() > 0)
+		{
+			int RandomEnchantment2 = (int) floor(Random.NextFloat(1) * enchantments.size());
 
-	// Checking for conflicting enchantments
-	enchantments = CheckEnchantmentConflicts(enchantments, Enchantment2);
+			cEnchantments Enchantment2 = enchantments[RandomEnchantment2];
+			Item.m_Enchantments.AddFromString(Enchantment2.ToString());
+			enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment2), enchantments.end());
 
-	int RandomEnchantment3 = floor(Random.NextFloat(1) * enchantments.size());
-	cEnchantments Enchantment3 = enchantments[RandomEnchantment3];
-	Item.m_Enchantments.AddFromString(Enchantment3.ToString());
-	enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment3), enchantments.end());
+			// Checking for conflicting enchantments
+			enchantments = CheckEnchantmentConflicts(enchantments, Enchantment2);
+		}
+	}
+
+	// Next Enchantment (Third)
+	NewEnchantmentLevel = NewEnchantmentLevel / 2;
+	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
+	if (Random.NextFloat(100) <= ThirdEnchantmentChance)
+	{
+		if (enchantments.size() > 0)
+		{
+			int RandomEnchantment3 = (int) floor(Random.NextFloat(1) * enchantments.size());
+			cEnchantments Enchantment3 = enchantments[RandomEnchantment3];
+			Item.m_Enchantments.AddFromString(Enchantment3.ToString());
+			enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment3), enchantments.end());
+
+			// Checking for conflicting enchantments
+			enchantments = CheckEnchantmentConflicts(enchantments, Enchantment3);
+		}
+	}
+
+	// Next Enchantment (Fourth)
+	NewEnchantmentLevel = NewEnchantmentLevel / 2;
+	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
+	if (Random.NextFloat(100) <= FourthEnchantmentChance)
+	{
+		if (enchantments.size() > 0)
+		{
+			int RandomEnchantment4 = (int) floor(Random.NextFloat(1) * enchantments.size());
+			cEnchantments Enchantment4 = enchantments[RandomEnchantment4];
+			Item.m_Enchantments.AddFromString(Enchantment4.ToString());
+			enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment4), enchantments.end());
+		}
+	}
 
 	if (m_Player->DeltaExperience(-m_Player->XpForLevel(Window->GetPropertyValue(Enchantment))) >= 0 || m_Player->IsGameModeCreative())
 	{
