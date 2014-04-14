@@ -2699,8 +2699,6 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 
 	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
 
-	LOG("499");
-
 	// Step 1 from Enchanting
 	int Enchantability = 1;
 
