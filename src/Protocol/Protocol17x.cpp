@@ -574,6 +574,21 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 
 
+void cProtocol172::SendLoginSuccess(void)
+{
+	ASSERT(m_State == 2);  // State: login?
+	
+	cPacketizer Pkt(*this, 0x02);  // Login success packet
+	Pkt.WriteString(m_Client->GetUUID());
+	Pkt.WriteString(m_Client->GetUsername());
+
+	m_State = 3;  // State = Game
+}
+
+
+
+
+
 void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
 {
 	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
@@ -1556,18 +1571,7 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	}
 	
 	StartEncryption(DecryptedKey);
-
-	/*
-	// Send login success:
-	{
-		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(m_Client->GetUUID());
-		Pkt.WriteString(m_Client->GetUsername());
-	}
-
-	m_State = 3;  // State = Game
 	m_Client->HandleLogin(4, m_Client->GetUsername());
-	*/
 }
 
 
@@ -1599,17 +1603,6 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 	
-	// Generate an offline UUID for the player:
-	m_Client->GenerateOfflineUUID();
-	
-	// Send login success:
-	{
-		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(m_Client->GetUUID());
-		Pkt.WriteString(Username);
-	}
-
-	m_State = 3;  // State = Game
 	m_Client->HandleLogin(4, Username);
 }
 
@@ -2793,6 +2786,31 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteFloat((float)a_Player.GetHealth());
 	Pkt.WriteByte(0x7f);  // Metadata: end
 }
+
+
+
+
+
+void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+{
+	// Send the response:
+	AString Response = "{\"version\":{\"name\":\"1.7.6\",\"protocol\":5},\"players\":{";
+	AppendPrintf(Response, "\"max\":%u,\"online\":%u,\"sample\":[]},",
+		cRoot::Get()->GetServer()->GetMaxPlayers(),
+		cRoot::Get()->GetServer()->GetNumPlayers()
+	);
+	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
+		cRoot::Get()->GetServer()->GetDescription().c_str()
+	);
+	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+		cRoot::Get()->GetServer()->GetFaviconData().c_str()
+	);
+	Response.append("}");
+	
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Response);
+}
+
 
 
 

@@ -87,6 +87,7 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendLoginSuccess        (void) override;
 	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) override;
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
 	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
@@ -252,7 +253,7 @@ protected:
 	
 	// Packet handlers while in the Status state (m_State == 1):
 	void HandlePacketStatusPing   (cByteBuffer & a_ByteBuffer);
-	void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
 	
 	// Packet handlers while in the Login state (m_State == 2):
 	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
@@ -318,6 +319,8 @@ public:
 	
 	// cProtocol172 overrides:
 	virtual void SendPlayerSpawn(const cPlayer & a_Player) override;
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+
 } ;
 
 

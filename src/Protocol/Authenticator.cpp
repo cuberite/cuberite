@@ -2,9 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Authenticator.h"
-#include "OSSupport/BlockingTCPLink.h"
-#include "Root.h"
-#include "Server.h"
+#include "../OSSupport/BlockingTCPLink.h"
+#include "../Root.h"
+#include "../Server.h"
+#include "../ClientHandle.h"
 
 #include "inifile/iniFile.h"
 #include "json/json.h"
@@ -32,10 +33,10 @@
 
 
 cAuthenticator::cAuthenticator(void) :
-super("cAuthenticator"),
-m_Server(DEFAULT_AUTH_SERVER),
-m_Address(DEFAULT_AUTH_ADDRESS),
-m_ShouldAuthenticate(true)
+	super("cAuthenticator"),
+	m_Server(DEFAULT_AUTH_SERVER),
+	m_Address(DEFAULT_AUTH_ADDRESS),
+	m_ShouldAuthenticate(true)
 {
 }
 
@@ -67,7 +68,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 {
 	if (!m_ShouldAuthenticate)
 	{
-		cRoot::Get()->AuthenticateUser(a_ClientID, a_UserName, Printf("%d", a_ClientID));
+		cRoot::Get()->AuthenticateUser(a_ClientID, a_UserName, cClientHandle::GenerateOfflineUUID(a_UserName));
 		return;
 	}
 
@@ -144,9 +145,9 @@ void cAuthenticator::Execute(void)
 
 bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID)
 {
-	AString REQUEST;
+	LOGD("Trying to auth user %s", a_UserName.c_str());
+	
 	int ret, server_fd = -1;
-	size_t len = 0;
 	unsigned char buf[1024];
 	const char *pers = "cAuthenticator";
 
@@ -162,36 +163,31 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	entropy_init(&entropy);
 	if ((ret = ctr_drbg_init(&ctr_drbg, entropy_func, &entropy, (const unsigned char *)pers, strlen(pers))) != 0)
 	{
-		LOGERROR("cAuthenticator: ctr_drbg_init returned %d", ret);
+		LOGWARNING("cAuthenticator: ctr_drbg_init returned %d", ret);
 		return false;
 	}
 
 	/* Initialize certificates */
-
-#if defined(POLARSSL_CERTS_C)
+	// TODO: Grab the sessionserver's root CA and any intermediates and hard-code them here, instead of test_ca_list
 	ret = x509_crt_parse(&cacert, (const unsigned char *)test_ca_list, strlen(test_ca_list));
-#else
-	ret = 1;
-	LOGWARNING("cAuthenticator: POLARSSL_CERTS_C is not defined.");
-#endif
 
 	if (ret < 0)
 	{
-		LOGERROR("cAuthenticator: x509_crt_parse returned -0x%x", -ret);
+		LOGWARNING("cAuthenticator: x509_crt_parse returned -0x%x", -ret);
 		return false;
 	}
 
 	/* Connect */
 	if ((ret = net_connect(&server_fd, m_Server.c_str(), 443)) != 0)
 	{
-		LOGERROR("cAuthenticator: Can't connect to %s: %d", m_Server.c_str(), ret);
+		LOGWARNING("cAuthenticator: Can't connect to %s: %d", m_Server.c_str(), ret);
 		return false;
 	}
 
 	/* Setup */
 	if ((ret = ssl_init(&ssl)) != 0)
 	{
-		LOGERROR("cAuthenticator: ssl_init returned %d", ret);
+		LOGWARNING("cAuthenticator: ssl_init returned %d", ret);
 		return false;
 	}
 	ssl_set_endpoint(&ssl, SSL_IS_CLIENT);
@@ -203,9 +199,9 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	/* Handshake */
 	while ((ret = ssl_handshake(&ssl)) != 0)
 	{
-		if (ret != POLARSSL_ERR_NET_WANT_READ && ret != POLARSSL_ERR_NET_WANT_WRITE)
+		if ((ret != POLARSSL_ERR_NET_WANT_READ) && (ret != POLARSSL_ERR_NET_WANT_WRITE))
 		{
-			LOGERROR("cAuthenticator: ssl_handshake returned -0x%x", -ret);
+			LOGWARNING("cAuthenticator: ssl_handshake returned -0x%x", -ret);
 			return false;
 		}
 	}
@@ -215,54 +211,47 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	ReplaceString(ActualAddress, "%USERNAME%", a_UserName);
 	ReplaceString(ActualAddress, "%SERVERID%", a_ServerId);
 
-	REQUEST += "GET " + ActualAddress + " HTTP/1.1\r\n";
-	REQUEST += "Host: " + m_Server + "\r\n";
-	REQUEST += "User-Agent: MCServer\r\n";
-	REQUEST += "Connection: close\r\n";
-	REQUEST += "\r\n";
+	AString Request;
+	Request += "GET " + ActualAddress + " HTTP/1.1\r\n";
+	Request += "Host: " + m_Server + "\r\n";
+	Request += "User-Agent: MCServer\r\n";
+	Request += "Connection: close\r\n";
+	Request += "\r\n";
 
-	len = REQUEST.size();
-	strcpy((char *)buf, REQUEST.c_str());
-
-	while ((ret = ssl_write(&ssl, buf, len)) <= 0)
+	ret = ssl_write(&ssl, (const unsigned char *)Request.c_str(), Request.size());
+	if (ret <= 0)
 	{
-		if (ret != POLARSSL_ERR_NET_WANT_READ && ret != POLARSSL_ERR_NET_WANT_WRITE)
-		{
-			LOGERROR("cAuthenticator: ssl_write returned %d", ret);
-			return false;
-		}
+		LOGWARNING("cAuthenticator: ssl_write returned %d", ret);
+		return false;
 	}
 
 	/* Read the HTTP response */
-	std::string Builder;
+	std::string Response;
 	for (;;)
 	{
-		len = sizeof(buf)-1;
 		memset(buf, 0, sizeof(buf));
-		ret = ssl_read(&ssl, buf, len);
-		if (ret > 0)
-		{
-			buf[ret] = '\0';
-		}
+		ret = ssl_read(&ssl, buf, sizeof(buf));
 
-		if (ret == POLARSSL_ERR_NET_WANT_READ || ret == POLARSSL_ERR_NET_WANT_WRITE)
+		if ((ret == POLARSSL_ERR_NET_WANT_READ) || (ret == POLARSSL_ERR_NET_WANT_WRITE))
+		{
 			continue;
+		}
 		if (ret == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY)
+		{
 			break;
+		}
 		if (ret < 0)
 		{
-			LOGERROR("cAuthenticator: ssl_read returned %d", ret);
+			LOGWARNING("cAuthenticator: ssl_read returned %d", ret);
 			break;
 		}
 		if (ret == 0)
 		{
-			LOGERROR("cAuthenticator: EOF");
+			LOGWARNING("cAuthenticator: EOF");
 			break;
 		}
 
-		std::string str;
-		str.append(reinterpret_cast<const char*>(buf));
-		Builder += str;
+		Response.append((const char *)buf, ret);
 	} 
 
 	ssl_close_notify(&ssl);
@@ -272,51 +261,49 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	entropy_free(&entropy);
 	memset(&ssl, 0, sizeof(ssl));
 
-	std::string prefix("HTTP/1.1 200 OK");
-	if (Builder.compare(0, prefix.size(), prefix))
-		return false;
-
-	std::stringstream ResponseBuilder;
-	bool NewLine = false;
-	bool IsNewLine = false;
-	for (std::string::const_iterator i = Builder.begin(); i <= Builder.end(); ++i)
+	// Check the HTTP status line:
+	AString prefix("HTTP/1.1 200 OK");
+	AString HexDump;
+	if (Response.compare(0, prefix.size(), prefix))
 	{
-		if (NewLine)
-		{
-			ResponseBuilder << *i;
-		}
-		else if (!NewLine && *i == '\n')
-		{
-			if (IsNewLine)
-			{
-				NewLine = true;
-			}
-			else
-			{
-				IsNewLine = true;
-			}
-		}
-		else if (*i != '\r')
-		{
-			IsNewLine = false;
-		}
+		LOGINFO("User \"%s\" failed to auth, bad http status line received", a_UserName.c_str());
+		LOG("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+		return false;
 	}
 
-	AString RESPONSE = ResponseBuilder.str();
-
-	if (RESPONSE.empty())
+	// Erase the HTTP headers from the response:
+	size_t idxHeadersEnd = Response.find("\r\n\r\n");
+	if (idxHeadersEnd == AString::npos)
+	{
+		LOGINFO("User \"%s\" failed to authenticate, bad http response header received", a_UserName.c_str());
+		LOG("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return false;
+	}
+	Response.erase(0, idxHeadersEnd + 4);
 
+	// Parse the Json response:
+	if (Response.empty())
+	{
+		return false;
+	}
 	Json::Value root;
 	Json::Reader reader;
-	if (!reader.parse(RESPONSE, root, false))
+	if (!reader.parse(Response, root, false))
 	{
 		LOGWARNING("cAuthenticator: Cannot parse Received Data to json!");
 		return false;
 	}
-
 	a_UserName = root.get("name", "Unknown").asString();
 	a_UUID = root.get("id", "").asString();
+	
+	// If the UUID doesn't contain the hashes, insert them at the proper places:
+	if (a_UUID.size() == 32)
+	{
+		a_UUID.insert(8, "-");
+		a_UUID.insert(13, "-");
+		a_UUID.insert(18, "-");
+		a_UUID.insert(23, "-");
+	}
 	return true;
 }
 

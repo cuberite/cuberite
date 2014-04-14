@@ -179,20 +179,31 @@ void cClientHandle::Destroy(void)
 
 void cClientHandle::GenerateOfflineUUID(void)
 {
+	m_UUID = GenerateOfflineUUID(m_Username);
+}
+
+
+
+
+
+AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
+{
 	// Proper format for a version 3 UUID is:
 	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
 	
 	// Generate an md5 checksum, and use it as base for the ID:
-	MD5 Checksum(m_Username);
-	m_UUID = Checksum.hexdigest();
-	m_UUID[12] = '3';  // Version 3 UUID
-	m_UUID[16] = '8';  // Variant 1 UUID
+	MD5 Checksum(a_Username);
+	AString UUID = Checksum.hexdigest();
+	UUID[12] = '3';  // Version 3 UUID
+	UUID[16] = '8';  // Variant 1 UUID
 	
 	// Now the digest doesn't have the UUID slashes, but the client requires them, so add them into the appropriate positions:
-	m_UUID.insert(8, "-");
-	m_UUID.insert(13, "-");
-	m_UUID.insert(18, "-");
-	m_UUID.insert(23, "-");
+	UUID.insert(8, "-");
+	UUID.insert(13, "-");
+	UUID.insert(18, "-");
+	UUID.insert(23, "-");
+	
+	return UUID;
 }
 
 
@@ -223,6 +234,9 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 
 	m_Username = a_Name;
 	m_UUID = a_UUID;
+	
+	// Send login success (if the protocol supports it):
+	m_Protocol->SendLoginSuccess();
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());

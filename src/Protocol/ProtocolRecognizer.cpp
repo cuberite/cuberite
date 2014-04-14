@@ -397,6 +397,16 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 
 
 
+void cProtocolRecognizer::SendLoginSuccess(void)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendLoginSuccess();
+}
+
+
+
+
+
 void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
 {
 	ASSERT(m_Protocol != NULL);
