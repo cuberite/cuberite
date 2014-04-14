@@ -2202,6 +2202,28 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  EntityID);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, EntityUUID);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, EntityName);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  DataCount);
+	struct sData
+	{
+		AString m_Name;
+		AString m_Value;
+		AString m_Signature;
+		sData(const AString & a_Name, const AString & a_Value, const AString & a_Signature) :
+			m_Name(a_Name),
+			m_Value(a_Value),
+			m_Signature(a_Signature)
+		{
+		}
+	};
+	typedef std::vector<sData> sDataVec;
+	sDataVec Data;
+	for (UInt32 i = 0; i < DataCount; i++)
+	{
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Name)
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Value)
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature)
+		Data.push_back(sData(Name, Value, Signature));
+	}
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosX);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosZ);
@@ -2219,6 +2241,13 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
 	Log("  UUID = \"%s\"", EntityUUID.c_str());
 	Log("  Name = \"%s\"", EntityName.c_str());
+	Log("  NumData = %u", DataCount);
+	for (sDataVec::const_iterator itr = Data.begin(), end = Data.end(); itr != end; ++itr)
+	{
+		Log("    Name = \"%s\", Value = \"%s\", Signature = \"%s\"",
+			itr->m_Name.c_str(), itr->m_Value.c_str(), itr->m_Signature.c_str()
+		);
+	}  // for itr - Data[]
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
 	Log("  CurrentItem = %d", CurrentItem);
