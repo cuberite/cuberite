@@ -266,10 +266,10 @@ public:
 
 protected:
 	/// Handles a click in the item slot.
-	void ClickedResult(cPlayer & a_Player);
+	void ClickedSlot(cPlayer & a_Player);
 
 	/// Handles a shift-click in the item slot.
-	void ShiftClickedResult(cPlayer & a_Player);
+	void ShiftClickedSlot(cPlayer & a_Player);
 };
 
 

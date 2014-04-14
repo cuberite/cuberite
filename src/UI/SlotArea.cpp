@@ -628,11 +628,11 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	{
 		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
 		{
-			ShiftClickedResult(a_Player);
+			ShiftClickedSlot(a_Player);
 		}
 		else
 		{
-			ClickedResult(a_Player);
+			ClickedSlot(a_Player);
 		}
 	}
 }
@@ -641,7 +641,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 
 
 
-void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
+void cSlotAreaEnchanting::ClickedSlot(cPlayer & a_Player)
 {
 	cItem Item = *GetSlot(0, a_Player);
 
@@ -651,7 +651,7 @@ void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 		m_ParentWindow.SetProperty(1, 0, a_Player);
 		m_ParentWindow.SetProperty(2, 0, a_Player);
 	}
-	else if (cItem::IsEnchantable(Item.m_ItemType))
+	else if (cItem::IsEnchantable(Item.m_ItemType) && Item.m_Enchantments.IsEmpty())
 	{
 		int PosX = 0;
 		int PosY = 0;
@@ -707,9 +707,11 @@ void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 
 
 
-void cSlotAreaEnchanting::ShiftClickedResult(cPlayer & a_Player)
+void cSlotAreaEnchanting::ShiftClickedSlot(cPlayer & a_Player)
 {
-	LOGWARN("Shift Click!");
+	m_ParentWindow.SetProperty(0, 0, a_Player);
+	m_ParentWindow.SetProperty(1, 0, a_Player);
+	m_ParentWindow.SetProperty(2, 0, a_Player);
 }
 
 
