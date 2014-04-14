@@ -3181,136 +3181,146 @@ cEnchantmentsVector cClientHandle::AddEnchantmentWeight(cEnchantmentsVector a_Ma
 
 cEnchantmentsVector cClientHandle::CheckEnchantmentConflicts(cEnchantmentsVector a_Map, cEnchantments a_FirstEnchantment)
 {
-	int FirstEnchantmentID = std::stoi(StringSplit(a_FirstEnchantment.ToString(), "=")[0]);
+	int FirstEnchantmentID = atoi(StringSplit(a_FirstEnchantment.ToString(), "=")[0].c_str());
 
 	if (FirstEnchantmentID == cEnchantments::enchProtection)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchFireProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
+
+			if (EnchantmentID == cEnchantments::enchFireProtection)
+			{
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
+				break;
+			}
+		}
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
+		{
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchBlastProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchProjectileProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchFireProtection)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchBlastProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchProjectileProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchBlastProtection)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchFireProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchProjectileProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchProjectileProtection)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchFireProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchBlastProtection)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
@@ -3318,95 +3328,95 @@ cEnchantmentsVector cClientHandle::CheckEnchantmentConflicts(cEnchantmentsVector
 
 	else if (FirstEnchantmentID == cEnchantments::enchSharpness)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchSmite)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchBaneOfArthropods)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchSmite)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchSharpness)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchBaneOfArthropods)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchBaneOfArthropods)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchSharpness)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchSmite)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchSilkTouch)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchFortune)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchFortune)
 	{
-		for (cEnchantments enchantment : a_Map)
+		for (cEnchantmentsVector::iterator it = a_Map.begin(); it != a_Map.end(); ++it)
 		{
-			int EnchantmentID = std::stoi(StringSplit(enchantment.ToString(), "=")[0]);
+			int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 			if (EnchantmentID == cEnchantments::enchSilkTouch)
 			{
-				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), enchantment), a_Map.end());
+				a_Map.erase(std::remove(a_Map.begin(), a_Map.end(), *it), a_Map.end());
 				break;
 			}
 		}
