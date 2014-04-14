@@ -608,8 +608,21 @@ cSlotAreaTemporary(a_NumSlots, a_ParentWindow)
 
 
 
+void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
+{
+	// Toss the item in the enchanting slot
+	TossItems(a_Player, 0, 1);
+	// Player not found - that is acceptable
+}
+
+
+
+
+
 void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+
 	// Check if Slot is in the Enchantment Table
 	if (a_SlotNum == 0)
 	{
@@ -621,20 +634,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		{
 			ClickedResult(a_Player);
 		}
-		return;
 	}
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
-}
-
-
-
-
-
-void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
-{
-	// Toss the item in the enchanting slot
-	TossItems(a_Player, 0, 0);
-	// Player not found - that is acceptable
 }
 
 
@@ -643,13 +643,15 @@ void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 {
-	if (a_Player.GetDraggingItem().IsEmpty())
+	cItem Item = *GetSlot(0, a_Player);
+
+	if (Item.IsEmpty())
 	{
 		m_ParentWindow.SetProperty(0, 0, a_Player);
 		m_ParentWindow.SetProperty(1, 0, a_Player);
 		m_ParentWindow.SetProperty(2, 0, a_Player);
 	}
-	else if (cItem::IsEnchantable(a_Player.GetDraggingItem().m_ItemType))
+	else if (cItem::IsEnchantable(Item.m_ItemType))
 	{
 		int PosX = 0;
 		int PosY = 0;

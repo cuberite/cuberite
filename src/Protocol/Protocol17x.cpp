@@ -1918,10 +1918,7 @@ void cProtocol172::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, WindowID);
 	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Enchantment);
 
-	LOGWARN("Protocol 1.7: Enchantment Packet received!");
-
 	m_Client->HandleEnchantItem(WindowID, Enchantment);
-
 }
 
 

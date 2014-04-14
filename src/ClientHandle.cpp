@@ -2689,14 +2689,14 @@ void cClientHandle::SocketClosed(void)
 
 void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 {
-	cItem Item = m_Player->GetDraggingItem();
+	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
+	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
 
 	if (!cItem::IsEnchantable(Item.m_ItemType))
 	{
 		return;
 	}
 
-	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
 	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
 
 	// Step 1 from Enchanting
