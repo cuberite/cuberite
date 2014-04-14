@@ -135,6 +135,12 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				cItem tmp(DraggingItem);
 				DraggingItem = Slot;
 				Slot = tmp;
+				int ItemPlaceCount = GetItemPlaceCount(Slot);
+				if (Slot.m_ItemCount > ItemPlaceCount)
+				{
+					DraggingItem.m_ItemCount += Slot.m_ItemCount - ItemPlaceCount;
+					Slot.m_ItemCount = ItemPlaceCount;
+				}
 			}
 			else
 			{
@@ -147,6 +153,13 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 					FreeSlots = 0;
 				}
 				int Filling = (FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots;
+
+				int ItemPlaceCount = GetItemPlaceCount(DraggingItem);
+				if (Filling > ItemPlaceCount)
+				{
+					Filling = ItemPlaceCount;
+				}
+
 				Slot.m_ItemCount += (char)Filling;
 				DraggingItem.m_ItemCount -= (char)Filling;
 				if (DraggingItem.m_ItemCount <= 0)
@@ -309,6 +322,16 @@ bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool 
 	}  // for i - Slots[]
 	// a_Dragging may be full if there were exactly the number of items needed to fill it
 	return a_Dragging.IsFullStack();
+}
+
+
+
+
+
+int cSlotArea::GetItemPlaceCount(cItem & a_Item)
+{
+	cItemHandler * Handler = ItemHandler(a_Item.m_ItemType);
+	return Handler->GetMaxStackSize();
 }
 
 
@@ -712,6 +735,15 @@ void cSlotAreaEnchanting::ShiftClickedSlot(cPlayer & a_Player)
 	m_ParentWindow.SetProperty(0, 0, a_Player);
 	m_ParentWindow.SetProperty(1, 0, a_Player);
 	m_ParentWindow.SetProperty(2, 0, a_Player);
+}
+
+
+
+
+
+int cSlotAreaEnchanting::GetItemPlaceCount(cItem & a_Item)
+{
+	return 1;
 }
 
 

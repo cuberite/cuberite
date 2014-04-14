@@ -66,6 +66,8 @@ public:
 	/// If a_CollectFullStacks is false, slots with full stacks are skipped while collecting.
 	/// Returns true if full stack has been collected in a_Dragging, false if there's space remaining to fill.
 	virtual bool CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool a_CollectFullStacks);
+
+	virtual int GetItemPlaceCount(cItem & a_Item);
 	
 protected:
 	int       m_NumSlots;
@@ -263,6 +265,7 @@ public:
 	// cSlotAreaTemporary overrides:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+	virtual int GetItemPlaceCount(cItem & a_Item) override;
 
 protected:
 	/// Handles a click in the item slot.
