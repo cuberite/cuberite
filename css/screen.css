@@ -141,6 +141,7 @@ img.center
 {
 	background:url(../images/bg_top_inner.jpg) repeat-x top;
 	padding-bottom:20px;
+	max-width: 1500px;
 }
 
 
