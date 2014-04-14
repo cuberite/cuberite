@@ -63,7 +63,12 @@ public:
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 
 	const AString & GetUUID(void) const { return m_UUID; } // tolua_export
-	void setUUID(const AString & a_UUID) { m_UUID = a_UUID; }
+	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
+	
+	/** Generates an UUID based on the player name provided.
+	This is used for the offline (non-auth) mode, when there's no UUID source.
+	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. */
+	void GenerateOfflineUUID(void);
 
 	void Kick(const AString & a_Reason);		// tolua_export
 	void Authenticate(const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator when the user passes authentication

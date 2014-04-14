@@ -31,6 +31,8 @@
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
 
+#include "md5/md5.h"
+
 
 
 /** Maximum number of explosions to send this tick, server will start dropping if exceeded */
@@ -169,6 +171,28 @@ void cClientHandle::Destroy(void)
 		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
 	}
 	m_State = csDestroyedWaiting;
+}
+
+
+
+
+
+void cClientHandle::GenerateOfflineUUID(void)
+{
+	// Proper format for a version 3 UUID is:
+	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
+	
+	// Generate an md5 checksum, and use it as base for the ID:
+	MD5 Checksum(m_Username);
+	m_UUID = Checksum.hexdigest();
+	m_UUID[12] = '3';  // Version 3 UUID
+	m_UUID[16] = '8';  // Variant 1 UUID
+	
+	// Now the digest doesn't have the UUID slashes, but the client requires them, so add them into the appropriate positions:
+	m_UUID.insert(8, "-");
+	m_UUID.insert(13, "-");
+	m_UUID.insert(18, "-");
+	m_UUID.insert(23, "-");
 }
 
 

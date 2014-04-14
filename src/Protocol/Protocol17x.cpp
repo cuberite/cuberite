@@ -88,8 +88,9 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	// Create the comm log file, if so requested:
 	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
 	{
+		static int sCounter = 0;
 		cFile::CreateFolder("CommLogs");
-		AString FileName = Printf("CommLogs/%x__%s.log", (unsigned)time(NULL), a_Client->GetIPString().c_str());
+		AString FileName = Printf("CommLogs/%x_%d__%s.log", (unsigned)time(NULL), sCounter++, a_Client->GetIPString().c_str());
 		m_CommLogFile.Open(FileName, cFile::fmWrite);
 	}
 }
@@ -796,7 +797,7 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
 	Pkt.WriteVarInt(a_Player.GetUniqueID());
-	Pkt.WriteString(Printf("%d", a_Player.GetUniqueID()));  // TODO: Proper UUID
+	Pkt.WriteString(a_Player.GetClientHandle()->GetUUID());
 	Pkt.WriteString(a_Player.GetName());
 	Pkt.WriteFPInt(a_Player.GetPosX());
 	Pkt.WriteFPInt(a_Player.GetPosY());
@@ -1556,6 +1557,7 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	
 	StartEncryption(DecryptedKey);
 
+	/*
 	// Send login success:
 	{
 		cPacketizer Pkt(*this, 0x02);  // Login success packet
@@ -1565,6 +1567,7 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 
 	m_State = 3;  // State = Game
 	m_Client->HandleLogin(4, m_Client->GetUsername());
+	*/
 }
 
 
@@ -1596,10 +1599,13 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 	
+	// Generate an offline UUID for the player:
+	m_Client->GenerateOfflineUUID();
+	
 	// Send login success:
 	{
 		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(Printf("%d", m_Client->GetUniqueID()));  // TODO: proper UUID
+		Pkt.WriteString(m_Client->GetUUID());
 		Pkt.WriteString(Username);
 	}
 
@@ -2773,7 +2779,7 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
 	Pkt.WriteVarInt(a_Player.GetUniqueID());
-	Pkt.WriteString(Printf("00000000-0000-3000-8000-aaaa%08x", a_Player.GetUniqueID()));  // TODO: Proper UUID
+	Pkt.WriteString(a_Player.GetClientHandle()->GetUUID());
 	Pkt.WriteString(a_Player.GetName());
 	Pkt.WriteVarInt(0);  // We have no data to send here
 	Pkt.WriteFPInt(a_Player.GetPosX());
