@@ -2755,3 +2755,39 @@ void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol176:
+
+cProtocol176::cProtocol176(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+{
+}
+
+
+
+
+
+void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
+{
+	// Called to spawn another player for the client
+	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
+	Pkt.WriteVarInt(a_Player.GetUniqueID());
+	Pkt.WriteString(Printf("00000000-0000-3000-8000-aaaa%08x", a_Player.GetUniqueID()));  // TODO: Proper UUID
+	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteVarInt(0);  // We have no data to send here
+	Pkt.WriteFPInt(a_Player.GetPosX());
+	Pkt.WriteFPInt(a_Player.GetPosY());
+	Pkt.WriteFPInt(a_Player.GetPosZ());
+	Pkt.WriteByteAngle(a_Player.GetYaw());
+	Pkt.WriteByteAngle(a_Player.GetPitch());
+	short ItemType = a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType;
+	Pkt.WriteShort(ItemType);
+	Pkt.WriteByte((3 << 5) | 6);  // Metadata: float + index 6
+	Pkt.WriteFloat((float)a_Player.GetHealth());
+	Pkt.WriteByte(0x7f);  // Metadata: end
+}
+
+
+
+

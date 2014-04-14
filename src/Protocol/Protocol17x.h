@@ -306,3 +306,20 @@ protected:
 
 
 
+
+/** The version 5 lengthed protocol, used by 1.7.6 through 1.7.9. */
+class cProtocol176 :
+	public cProtocol172
+{
+	typedef cProtocol172 super;
+	
+public:
+	cProtocol176(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	
+	// cProtocol172 overrides:
+	virtual void SendPlayerSpawn(const cPlayer & a_Player) override;
+} ;
+
+
+
+
