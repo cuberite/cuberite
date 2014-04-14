@@ -651,7 +651,8 @@ html[xmlns] .clearfix {
 #gallery ul a:hover { color: #fff; }
 
 .sourcebox {
-	width: 540px;
-	margin-left: 200px !important;
-	margin-right: 200px !important;
+	max-width: 540px;
+	width: 90%;
+	margin-left: auto !important;
+	margin-right: auto !important;
 }
