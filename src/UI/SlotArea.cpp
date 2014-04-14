@@ -659,29 +659,31 @@ void cSlotAreaEnchanting::ClickedResult(cPlayer & a_Player)
 		cEnchantingWindow * Window = (cEnchantingWindow*)&m_ParentWindow;
 		Window->GetBlockPos(PosX, PosY, PosZ);
 
+		int bookshelves = 0;
 		cBlockArea Area;
 		Area.Read(a_Player.GetWorld(), PosX - 2, PosX + 2, PosY, PosY + 1, PosZ - 2, PosZ + 2);
 
-		for (int x = 0; x < 6; x++)
+		for (int y = 0; y <= 2; y++)
 		{
-			for (int y = 0; y < 3; y++)
+			for (int x = 0; x <= 4; x++)
 			{
-				for (int z = 0; z < 6; z++)
+				for (int z = 0; z <= 4; z++)
 				{
-					if ((((x == 0) || (x == 5)) || ((z == 0) || (z == 5))) && ((y == 0) || y == 1))
+					if ((((x == 0) || (x == 4)) || ((z == 0) || (z == 4))) && ((y == 0) || y == 1))
 					{
-						LOG("%i", Area.GetRelBlockType(x, y, z));
-
 						if (Area.GetRelBlockType(x, y, z) == E_BLOCK_BOOKCASE)
 						{
-							LOG("BookShelf");
+							bookshelves++;
 						}
 					}
 				}
 			}
 		}
 
-		int bookshelves = 15; // TODO: Check Bookshelves
+		if (bookshelves > 15)
+		{
+			bookshelves = 15;
+		}
 
 		cFastRandom Random;
 		int base = (Random.GenerateRandomInteger(1, 8) + floor(bookshelves / 2) + Random.GenerateRandomInteger(0, bookshelves));
