@@ -24,7 +24,7 @@
 
 #include "Root.h"
 
-#include "Authenticator.h"
+#include "Protocol/Authenticator.h"
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
@@ -188,7 +188,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(void)
+void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 {
 	if (m_State != csAuthenticating)
 	{
@@ -196,6 +196,9 @@ void cClientHandle::Authenticate(void)
 	}
 	
 	ASSERT( m_Player == NULL );
+
+	m_Username = a_Name;
+	m_UUID = a_UUID;
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());
