@@ -538,6 +538,13 @@ void cProtocol172::SendInventorySlot(char a_WindowID, short a_SlotNum, const cIt
 
 void cProtocol172::SendKeepAlive(int a_PingID)
 {
+	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
+	if (m_State != 3)
+	{
+		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		return;
+	}
+	
 	cPacketizer Pkt(*this, 0x00);  // Keep Alive packet
 	Pkt.WriteInt(a_PingID);
 }

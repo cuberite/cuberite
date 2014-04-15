@@ -1718,13 +1718,16 @@ void cClientHandle::Tick(float a_Dt)
 	}
 
 	// Send a ping packet:
-	cTimer t1;
-	if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+	if (m_State == csPlaying)
 	{
-		m_PingID++;
-		m_PingStartTime = t1.GetNowTime();
-		m_Protocol->SendKeepAlive(m_PingID);
-		m_LastPingTime = m_PingStartTime;
+		cTimer t1;
+		if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+		{
+			m_PingID++;
+			m_PingStartTime = t1.GetNowTime();
+			m_Protocol->SendKeepAlive(m_PingID);
+			m_LastPingTime = m_PingStartTime;
+		}
 	}
 
 	// Handle block break animation:
