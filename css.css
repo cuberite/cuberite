@@ -1,0 +1,86 @@
+body
+{
+	padding: 0px 20px 20px 20px;
+	font-family: Calibri, Helvetica;
+	min-width: 1250px;
+}
+
+hr { margin-top: -8px; }
+
+h1
+{
+	font-family: Segoe UI, Helvetica;
+	font-size: 40px;
+	font-weight: normal;
+}
+
+h2
+{
+	margin-top: -30px;
+	font-family: Segoe UI Light, Helvetica;
+	font-size: 20px;
+	font-weight: normal;	
+}
+
+img.logo
+{
+	float: left;
+	margin-right: 20px;
+}
+
+nav { float: right; }
+ul.nav { margin-top: -32.5px; list-style: none; }
+li.nav
+{
+	padding-left: 10px;
+	padding-right: 10px;
+	border: 1px solid black;
+	border-bottom: none;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	display: inline;
+	transition: all 200ms;
+	font-size: 20px;
+}
+li.nav:hover { background-color: lightgrey; }
+a.navlink:link, a.buildstatusanddonatelink:link { text-decoration: none; }
+
+table.downloadbox
+{
+	border: 2px solid lightblue;
+	background-color: lightblue;
+	border-radius: 5px;
+	display: inline-table;
+	min-width: 480px;
+	max-width: 480px;
+	min-height: 285px;
+	max-height: 285px;
+	vertical-align: middle;
+}
+img.downloadosimage
+{
+	width: 70px;
+	height: auto;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+img.downloadicon
+{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 30px;
+	height: auto;
+}
+
+footer
+{
+	border-top: 1px dotted black;
+	position: relative;
+	bottom: -40px;
+}
+
+img.buildstatusanddonatebutton { display: inline; }

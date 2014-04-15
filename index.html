@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html>
 
@@ -7,107 +7,137 @@
 		<meta charset="UTF-8">
 		<meta name="description" content="A high performance custom Minecraft server written entirely in C++.">
 
-		<link type="text/css" href="css/screen.css" media="screen" rel="stylesheet">
-		<link type="text/css" href="css/print.css" media="print" rel="stylesheet">
+		<link type="text/css" href="css.css" rel="stylesheet">
 
 		<title>MCServer - A Custom Minecraft Server</title>
 
 	</head>
 
 	<body>
-
-		<div id="outer">
-		<div class="contentwidth main">
-
-		<div class="logo">
-			<h1><a href="http://www.mc-server.org/">MCServer</a></h1>
-		</div>
-
-		<div class="menu">
-			<ul class="clearfix">
-				<li><a href="index.php">Home</a></li>
-				<li><a href="https://github.com/mc-server/MCServer">GitHub</a></li>
-				<li><a href="http://forum.mc-server.org">Forums</a></li>
-				<li><a href="http://mc-server.xoft.cz/LuaAPI/">API Documentation</a></li>
-			</ul>
-		</div>
-
-		<div class="clearfix">
+	
+		<header>
+			<img src="https://raw.githubusercontent.com/mc-server/MCServer/master/src/Resources/icon_256.png" alt="MCServer Logo" class="logo"/>
+			<h1>MCServer</h1>
 			<h2>MCServer - A Custom Minecraft Server</h2>
-			<hr>
-			<p>What is MCServer? MCServer is a custom Minecraft server, written completely in C++. It's designed to be a fast, lightweight and easy to use replacement for the original server.</p>
-
-			<h2>Download Current Dev Build</h2>
-			<hr>
-			<p>Below you can download the current version for your operating system.  MCServer supports Windows, Linux, and MacOSX.  If your platform is not in the list below, then there is probably a bug, and is being worked on.</p>
-			
-			<ul class="large sourcebox">
-
-				<li class="line">
-					<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86/lastSuccessfulBuild/artifact/MCServer.tar" class="linux32">
-						<span class="heading">Linux 32-bit</span>
-						<strong>Requirements:</strong>&nbsp;Linux 32-bit
-					</a>
-				</li>
-										
-				<li class="line">
-					<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86-64/lastSuccessfulBuild/artifact/MCServer.tar" class="linux64">
-						<span class="heading">Linux 64-bit</span>
-						<strong>Requirements:</strong>&nbsp;Linux 64-bit
-					</a>
-				</li>
-
-				<li class="line">
-					<a href="http://mc-server.xoft.cz" class="windows">
-						<span class="heading">Windows</span>
-						<strong>Requirements:</strong>&nbsp;Windows XP SP3, Windows Server 2003, Windows Vista, Windows 7 or Windows 8
-					</a>
-				</li>
-
-				<li class="line">
-					<a href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&id=EAC2A6E3A23C4250%21109" class="mac">
-						<span class="heading">Mac</span>
-						<strong>Requirements:</strong>&nbsp;Intel Mac OS X 64-bit
-					</a>
-				</li>
-										
-				<li class="line">
-					<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20HardFloat/lastSuccessfulBuild/artifact/MCServer.tar" class="raspi">
-						<span class="heading">Raspberry Pi Hard Float</span>
-						<span><strong>Requirements:</strong>&nbsp;Raspbian HF (default OS)</span>
-					</a>
-				</li>
-				
-				<li class="line">
-					<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20SoftFloat/lastSuccessfulBuild/artifact/MCServer.tar" class="raspi">
-						<span class="heading">Raspberry Pi Soft Float</span>
-						<span><strong>Requirements:</strong>&nbsp;Raspbian Soft Float or Debian Soft Float</span>
-					</a>
-				</li>
-								
+		</header>
+		
+		<nav>
+			<ul class="nav">
+				<li class="nav"><a href="index.html" class="navlink">Home</a></li>
+				<li class="nav"><a href="https://github.com/mc-server/MCServer" class="navlink">GitHub</a></li>
+				<li class="nav"><a href="http://forum.mc-server.org" class="navlink">Forums</a></li>
+				<li class="nav"><a href="http://mc-server.xoft.cz/LuaAPI/" class="navlink">API Documentation</a></li>
 			</ul>
+		</nav>
+
+		<hr>
+		
+		<content>
+		
+			<p>MCServer is a custom Minecraft server, written completely in C++.
+			It's designed to be a fast, lightweight, awesome and easy to use replacement for the original server.</p>
+			<p>Below you can download the current version for your operating system.
+			MCServer supports Windows, Linux, and MacOSX. 
+			If your platform is not in the list below, then there is probably a bug, and is being worked on.</p>
 			
-			<h2>Source Code</h2>
-			<hr>
-			<p>MCServer is an Open-Source project, and thus you can always download the latest version from GitHub and compile the binaries yourself.</p>
-			<ul class="large sourcebox">
-				<li class="line">
-					<a href="https://github.com/mc-server/MCServer" class="source">
-						<span class="heading">All Platforms</span>
-						<strong>For *nix users:</strong> cmake . -DCMAKE_BUILD_TYPE=RELEASE; make.<br>
-						<strong>For Windows users:</strong> Open the solution file in the VC2008 folder.
-					</a>
-				</li>
-			</ul>
-				
-        </div>
-    	
-    	</div>
-    	</div>
+			<hr><br/>
+			
+			<table class="downloadbox">
+				<tr>
+					<td>					
+						<div align="center"><b>Linux 32-bit</b></div>
+						<img src="images/linux.png" alt="Linux" class="downloadosimage"/>
+						<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86/lastSuccessfulBuild/artifact/MCServer.tar">
+							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+						</a>
+					</td>
+					<td>
+						<div align="center"><b>Linux 64-bit</b></div>
+						<img src="images/linux.png" alt="Linux" class="downloadosimage"/>
+						<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86-64/lastSuccessfulBuild/artifact/MCServer.tar">
+							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+						</a>
+					</td>
+					<td>
+						<div align="center"><b>Windows 32-bit</b></div>
+						<img src="https://www.snelserver.com/media/images/windows.png" alt="Windows" class="downloadosimage"/>
+						<a href="http://mc-server.xoft.cz">
+							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+						</a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div align="center"><b>Macintosh 64-bit</b></div>
+						<img src="images/mac.png" alt="Macintosh" class="downloadosimage"/>
+						<a href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&id=EAC2A6E3A23C4250%21109">
+							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+						</a>
+					</td>
+					<td>
+						<div align="center"><b>Raspbian Hard Float</b></div>
+						<img src="images/raspi.png" alt="Raspbian" class="downloadosimage"/>
+						<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20HardFloat/lastSuccessfulBuild/artifact/MCServer.tar">
+							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+						</a>
+					</td>
+					<td>
+						<div align="center"><b>Raspbian Soft Float&nbsp;</b></div>
+						<img src="images/raspi.png" alt="Raspbian" class="downloadosimage"/>
+						<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20SoftFloat/lastSuccessfulBuild/artifact/MCServer.tar">
+							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+						</a>
+					</td>			
+				</tr>
+			</table>
+			
+			&nbsp;
+			
+			<table class="downloadbox">
+				<tr>
+					<td>
+						<div align="center"><b>Source Download</b><br/>
+						MCServer is an Open-Source project, and thus you can always download the latest version from
+						<a href="https://github.com/mc-server/MCServer">our GitHub repository</a> and compile the binaries yourself.<br/>
+						See GitHub repository for compiling instructions
+						</div>
+						<img src="http://cssnerd.com/wp-content/plugins/better-github-widget/octocat.png" alt="Source Code" class="downloadosimage"/>
+						<a href="http://github.com/mc-server/MCServer/archive/master.zip">
+							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+						</a>
+					</td>
+					<td>
+						<div align="center"><b>GitHub for Windows Clone</b><br/>
+						Use this link if you have <a href="windows.github.com">GitHub for Windows</a> installed.
+						</div>
+						<img src="images/github.png" alt="Github for Windows" class="downloadosimage"/>
+						<a href="github-windows://github.com/mc-server/MCServer.git">
+							<img src="http://simpleicon.com/wp-content/uploads/cloud-download-2.png" alt="Download Icon" class="downloadicon"/>
+						</a>						
+					</td>
+					<td>
+						<div align="center"><b>GitHub for Command Line Clone Address</b><br/>
+						Use this link if you have hate all things colourful and chiefly use command line Git.
+						</div>
+						<img src="http://d3e07c52qqws8e.cloudfront.net/wp-content/uploads/2009/11/Terminalicon2.png" alt="Github for Haters of Art (HoF - as in Astrid HoFferson)" class="downloadosimage"/>
+						<a href="github-windows://github.com/mc-server/MCServer.git">
+							<img src="http://simpleicon.com/wp-content/uploads/cloud-download-2.png" alt="Download Icon" class="downloadicon"/>
+						</a>						
+					</td>
+				</tr>
+			</table>
+		
+		</content>
     
-		<footer class="footer">
-			<div class="contentwidth">
-				<strong>&copy; 2013 Ae][AlterEgo and FakeTruth, &copy; 2014 Bearbin</strong>
+		<footer>
+			<p style="text-align: center;">&copy; MCServer Contributors</p>
+			<div align="center">
+				<a href="https://travis-ci.org/mc-server/MCServer" class="buildstatusanddonatelink">
+					<img src="https://travis-ci.org/mc-server/MCServer.svg?branch=master" alt="Build Status" class="buildstatusanddonatebutton"/>
+				</a>
+				<a href="http://tip4commit.com/projects/74" class="buildstatusanddonatelink">
+					<img src="http://tip4commit.com/projects/74.svg" alt="Donate Bitcoins!" class="buildstatusanddonatebutton"/>
+				</a>
 			</div>
 		</footer>
 
