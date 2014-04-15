@@ -813,7 +813,7 @@ cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 	m_BlockY(a_BlockY),
 	m_BlockZ(a_BlockZ)
 {
-	m_SlotAreas.push_back(new cSlotAreaEnchanting(1, *this));
+	m_SlotAreas.push_back(new cSlotAreaEnchanting(*this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }

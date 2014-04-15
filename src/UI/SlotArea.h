@@ -19,6 +19,8 @@ class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cCraftingRecipe;
+class cEnchantingWindow;
+class cWorld;
 
 
 
@@ -67,8 +69,6 @@ public:
 	/// Returns true if full stack has been collected in a_Dragging, false if there's space remaining to fill.
 	virtual bool CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool a_CollectFullStacks);
 
-	virtual int GetItemPlaceCount(cItem & a_Item);
-	
 protected:
 	int       m_NumSlots;
 	cWindow & m_ParentWindow;
@@ -260,19 +260,22 @@ class cSlotAreaEnchanting :
 	typedef cSlotAreaTemporary super;
 
 public:
-	cSlotAreaEnchanting(int a_NumSlots, cWindow & a_ParentWindow);
+	cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow);
+
+	// cSlotArea overrides:
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum) override;
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
 
 	// cSlotAreaTemporary overrides:
-	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
-	virtual int GetItemPlaceCount(cItem & a_Item) override;
+
+	/* Get the count of bookshelves who stand in the near of the enchanting table */
+	int GetBookshelvesCount(cWorld * a_World);
 
 protected:
-	/// Handles a click in the item slot.
-	void ClickedSlot(cPlayer & a_Player);
-
-	/// Handles a shift-click in the item slot.
-	void ShiftClickedSlot(cPlayer & a_Player);
+	/** Handles a click in the item slot. */
+	void UpdateResult(cPlayer & a_Player);
 };
 
 

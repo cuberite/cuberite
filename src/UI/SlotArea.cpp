@@ -135,12 +135,6 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				cItem tmp(DraggingItem);
 				DraggingItem = Slot;
 				Slot = tmp;
-				int ItemPlaceCount = GetItemPlaceCount(Slot);
-				if (Slot.m_ItemCount > ItemPlaceCount)
-				{
-					DraggingItem.m_ItemCount += Slot.m_ItemCount - ItemPlaceCount;
-					Slot.m_ItemCount = ItemPlaceCount;
-				}
 			}
 			else
 			{
@@ -153,12 +147,6 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 					FreeSlots = 0;
 				}
 				int Filling = (FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots;
-
-				int ItemPlaceCount = GetItemPlaceCount(DraggingItem);
-				if (Filling > ItemPlaceCount)
-				{
-					Filling = ItemPlaceCount;
-				}
 
 				Slot.m_ItemCount += (char)Filling;
 				DraggingItem.m_ItemCount -= (char)Filling;
@@ -182,7 +170,6 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 	{
 		m_ParentWindow.BroadcastWholeWindow();
 	}
-	
 }
 
 
@@ -322,16 +309,6 @@ bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool 
 	}  // for i - Slots[]
 	// a_Dragging may be full if there were exactly the number of items needed to fill it
 	return a_Dragging.IsFullStack();
-}
-
-
-
-
-
-int cSlotArea::GetItemPlaceCount(cItem & a_Item)
-{
-	cItemHandler * Handler = ItemHandler(a_Item.m_ItemType);
-	return Handler->GetMaxStackSize();
 }
 
 
@@ -620,11 +597,182 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnchanting:
 
-cSlotAreaEnchanting::cSlotAreaEnchanting(int a_NumSlots, cWindow & a_ParentWindow) :
-cSlotAreaTemporary(a_NumSlots, a_ParentWindow)
+cSlotAreaEnchanting::cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow) :
+	cSlotAreaTemporary(1, a_ParentWindow)
 {
-	cEnchantingWindow * Window = (cEnchantingWindow *)&m_ParentWindow;
-	Window->m_SlotArea = this;
+	a_ParentWindow.m_SlotArea = this;
+}
+
+
+
+
+
+void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
+
+	bool bAsync = false;
+	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	{
+		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		return;
+	}
+	
+	switch (a_ClickAction)
+	{
+		case caShiftLeftClick:
+		case caShiftRightClick:
+		{
+			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			return;
+		}
+		
+		case caDblClick:
+		{
+			DblClicked(a_Player, a_SlotNum);
+			return;
+		}
+		default:
+		{
+			break;
+		}
+	}
+	
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	if (!Slot.IsSameType(a_ClickedItem))
+	{
+		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+		LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+		bAsync = true;
+	}
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+	switch (a_ClickAction)
+	{
+		case caRightClick:
+		{
+			// Right-clicked
+			if (DraggingItem.IsEmpty())
+			{
+				DraggingItem = Slot.CopyOne();
+				Slot.Empty();
+				break;
+			}
+			
+			if (Slot.IsEmpty())
+			{
+				Slot = DraggingItem.CopyOne();
+				DraggingItem.m_ItemCount -= 1;
+				if (DraggingItem.m_ItemCount <= 0)
+				{
+					DraggingItem.Empty();
+				}
+			}
+			else if ((!DraggingItem.IsEqual(Slot)) && (DraggingItem.m_ItemCount == 1))
+			{
+				// Swap contents
+				cItem tmp(DraggingItem);
+				DraggingItem = Slot;
+				Slot = tmp;
+			}
+			break;
+		}
+		
+		case caLeftClick:
+		{	
+			// Left-clicked
+			if (DraggingItem.IsEmpty())
+			{
+				DraggingItem = Slot.CopyOne();
+				Slot.Empty();
+				break;
+			}
+			
+			if (DraggingItem.IsEqual(Slot))
+			{
+				// Do nothing
+				break;
+			}
+			
+			if (!Slot.IsEmpty())
+			{
+				if (DraggingItem.m_ItemCount == 1)
+				{
+					// Swap contents
+					cItem tmp(DraggingItem);
+					DraggingItem = Slot;
+					Slot = tmp;
+				}
+			}
+			else
+			{
+				Slot = DraggingItem.CopyOne();
+				DraggingItem.m_ItemCount -= 1;
+				if (DraggingItem.m_ItemCount <= 0)
+				{
+					DraggingItem.Empty();
+				}
+			}
+			break;
+		}
+		default:
+		{
+			LOGWARNING("SlotArea: Unhandled click action: %d (%s)", a_ClickAction, ClickActionToString(a_ClickAction));
+			m_ParentWindow.BroadcastWholeWindow();
+			return;
+		}
+	}  // switch (a_ClickAction
+	
+	SetSlot(a_SlotNum, a_Player, Slot);
+	if (bAsync)
+	{
+		m_ParentWindow.BroadcastWholeWindow();
+	}
+	UpdateResult(a_Player);
+}
+
+
+
+
+
+void cSlotAreaEnchanting::DblClicked(cPlayer & a_Player, int a_SlotNum)
+{
+	cItem & Dragging = a_Player.GetDraggingItem();
+	if ((!Dragging.IsEmpty()) || (a_SlotNum != 0))
+	{
+		return;
+	}
+	
+	cItem Item = *GetSlot(0, a_Player);
+	if (!m_ParentWindow.CollectItemsToHand(Item, *this, a_Player, false))
+	{
+		m_ParentWindow.CollectItemsToHand(Item, *this, a_Player, true);
+	}
+}
+
+
+
+
+
+void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
+{
+	const cItem * Slot = GetSlot(0, a_Player);
+	if (!Slot->IsEmpty())
+	{
+		return;
+	}
+
+	if (a_Apply)
+	{
+		SetSlot(0, a_Player, a_ItemStack.CopyOne());
+	}
+	a_ItemStack.m_ItemCount -= 1;
+	if (a_ItemStack.m_ItemCount <= 0)
+	{
+		a_ItemStack.Empty();
+	}
+
+	UpdateResult(a_Player);
 }
 
 
@@ -642,29 +790,7 @@ void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
-{
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
-
-	// Check if Slot is in the Enchantment Table
-	if (a_SlotNum == 0)
-	{
-		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
-		{
-			ShiftClickedSlot(a_Player);
-		}
-		else
-		{
-			ClickedSlot(a_Player);
-		}
-	}
-}
-
-
-
-
-
-void cSlotAreaEnchanting::ClickedSlot(cPlayer & a_Player)
+void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 {
 	cItem Item = *GetSlot(0, a_Player);
 
@@ -676,43 +802,13 @@ void cSlotAreaEnchanting::ClickedSlot(cPlayer & a_Player)
 	}
 	else if (cItem::IsEnchantable(Item.m_ItemType) && Item.m_Enchantments.IsEmpty())
 	{
-		int PosX = 0;
-		int PosY = 0;
-		int PosZ = 0;
-		cEnchantingWindow * Window = (cEnchantingWindow*)&m_ParentWindow;
-		Window->GetBlockPos(PosX, PosY, PosZ);
-
-		int bookshelves = 0;
-		cBlockArea Area;
-		Area.Read(a_Player.GetWorld(), PosX - 2, PosX + 2, PosY, PosY + 1, PosZ - 2, PosZ + 2);
-
-		for (int y = 0; y <= 2; y++)
-		{
-			for (int x = 0; x <= 4; x++)
-			{
-				for (int z = 0; z <= 4; z++)
-				{
-					if ((((x == 0) || (x == 4)) || ((z == 0) || (z == 4))) && ((y == 0) || y == 1))
-					{
-						if (Area.GetRelBlockType(x, y, z) == E_BLOCK_BOOKCASE)
-						{
-							bookshelves++;
-						}
-					}
-				}
-			}
-		}
-
-		if (bookshelves > 15)
-		{
-			bookshelves = 15;
-		}
+		int Bookshelves = GetBookshelvesCount(a_Player.GetWorld());
 
 		cFastRandom Random;
-		int base = (Random.GenerateRandomInteger(1, 8) + floor(bookshelves / 2) + Random.GenerateRandomInteger(0, bookshelves));
+		int base = (Random.GenerateRandomInteger(1, 8) + floor(Bookshelves / 2) + Random.GenerateRandomInteger(0, Bookshelves));
 		int topSlot = std::max(base / 3, 1);
 		int middleSlot = (base * 2) / 3 + 1;
-		int bottomSlot = std::max(base, bookshelves * 2);
+		int bottomSlot = std::max(base, Bookshelves * 2);
 
 		m_ParentWindow.SetProperty(0, topSlot, a_Player);
 		m_ParentWindow.SetProperty(1, middleSlot, a_Player);
@@ -730,20 +826,34 @@ void cSlotAreaEnchanting::ClickedSlot(cPlayer & a_Player)
 
 
 
-void cSlotAreaEnchanting::ShiftClickedSlot(cPlayer & a_Player)
+int cSlotAreaEnchanting::GetBookshelvesCount(cWorld * a_World)
 {
-	m_ParentWindow.SetProperty(0, 0, a_Player);
-	m_ParentWindow.SetProperty(1, 0, a_Player);
-	m_ParentWindow.SetProperty(2, 0, a_Player);
-}
+	int PosX, PosY, PosZ;
+	((cEnchantingWindow*)&m_ParentWindow)->GetBlockPos(PosX, PosY, PosZ);
 
+	int Bookshelves = 0;
+	cBlockArea Area;
+	Area.Read(a_World, PosX - 2, PosX + 2, PosY, PosY + 1, PosZ - 2, PosZ + 2);
 
-
-
-
-int cSlotAreaEnchanting::GetItemPlaceCount(cItem & a_Item)
-{
-	return 1;
+	for (int y = 0; y <= 2; y++)
+	{
+		for (int x = 0; x <= 4; x++)
+		{
+			for (int z = 0; z <= 4; z++)
+			{
+				if ((((x == 0) || (x == 4)) || ((z == 0) || (z == 4))) && ((y == 0) || y == 1))
+				{
+					if (Area.GetRelBlockType(x, y, z) == E_BLOCK_BOOKCASE)
+					{
+						Bookshelves++;
+					}
+				}
+			}
+		}
+	}
+	
+	Bookshelves = std::min(Bookshelves, 15);
+	return Bookshelves;
 }
 
 
