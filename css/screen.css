@@ -63,7 +63,7 @@ a:hover
 	border-bottom:1px dotted #ccc;
 	float: left;
 	width: 400px;
-	height: 130px;
+	min-height: 130px;
 	margin-left: 10px !important;
 }
 
