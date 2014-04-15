@@ -64,6 +64,7 @@ a:hover
 	float: left;
 	width: 400px;
 	height: 130px;
+	margin-left: 10px !important;
 }
 
 .pod
