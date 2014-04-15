@@ -40,27 +40,29 @@ private:
 	{
 		Vector3i a_BlockPos; // Position of powered block
 		Vector3i a_SourcePos; // Position of source powering the block at a_BlockPos
+		unsigned char a_PowerLevel;
 	};
 
 	struct sLinkedPoweredBlocks // Define structure of the indirectly powered blocks list (i.e. repeaters powering through a block to the block at the other side)
 	{
 		Vector3i a_BlockPos;
-		Vector3i a_MiddlePos;
+		Vector3i a_MiddlePos; // Position of block that is betwixt a source and the destination
 		Vector3i a_SourcePos;
+		unsigned char a_PowerLevel;
 	};
 
-	struct sSimulatedPlayerToggleableList
+	struct sSimulatedPlayerToggleableList // Define structure of the list containing simulate-on-update blocks (such as trapdoors that respond once to a block update, and can be toggled by a player)
 	{
 		Vector3i a_BlockPos;
-		bool WasLastStatePowered;
+		bool WasLastStatePowered; // Was the last state powered or not? Determines whether a source update has happened and if I should resimulate
 	};
 
-	struct sRepeatersDelayList
+	struct sRepeatersDelayList // Define structure of list containing repeaters' delay states
 	{
 		Vector3i a_BlockPos;
-		unsigned char a_DelayTicks;
-		unsigned char a_ElapsedTicks;
-		bool ShouldPowerOn;
+		unsigned char a_DelayTicks; // For how many ticks should the repeater delay
+		unsigned char a_ElapsedTicks; // How much of the previous has been elapsed?
+		bool ShouldPowerOn; // What happens when the delay time is fulfilled?
 	};
 
 public:
@@ -132,13 +134,13 @@ private:
 
 	/* ====== Helper functions ====== */
 	/** Marks a block as powered */
-	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock);
+	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = 15);
 	/** Marks a block as being powered through another block */
-	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock);
+	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock, unsigned char a_PowerLevel = 15);
 	/** Marks a block as simulated, who should not be simulated further unless their power state changes, to accomodate a player manually toggling the block without triggering the simulator toggling it back */
 	void SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool WasLastStatePowered);
 	/** Marks the second block in a direction as linked powered */
-	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock);
+	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = 15);
 	/** Marks all blocks immediately surrounding a coordinate as powered */
 	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock);
 	/** Queues a repeater to be powered or unpowered */
@@ -159,15 +161,14 @@ private:
 	/** Returns if a piston is powered */
 	bool IsPistonPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
 	/** Returns if a wire is powered
-		The only diffence between this and a normal AreCoordsPowered is that this function checks for a wire powering another wire
-	*/
-	bool IsWirePowered(int a_BlockX, int a_BlockY, int a_BlockZ);
+	The only diffence between this and a normal AreCoordsPowered is that this function checks for a wire powering another wire */
+	bool IsWirePowered(int a_BlockX, int a_BlockY, int a_BlockZ, unsigned char & a_PowerLevel);
 
 
 	/** Returns if lever metadata marks it as emitting power */
-	bool IsLeverOn(NIBBLETYPE a_BlockMeta);
+	inline bool IsLeverOn(NIBBLETYPE a_BlockMeta);
 	/** Returns if button metadata marks it as emitting power */
-	bool IsButtonOn(NIBBLETYPE a_BlockMeta);
+	inline bool IsButtonOn(NIBBLETYPE a_BlockMeta) { return IsLeverOn(a_BlockMeta); }
 	/* ============================== */
 
 	/* ====== Misc Functions ====== */

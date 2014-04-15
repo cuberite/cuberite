@@ -231,7 +231,7 @@ void cFireworkItem::FadeColoursFromString(const AString & a_String, cFireworkIte
 
 
 
-int cFireworkItem::GetVanillaColourCodeFromDye(short a_DyeMeta)
+int cFireworkItem::GetVanillaColourCodeFromDye(NIBBLETYPE a_DyeMeta)
 {
 	/*
 	Colours are supposed to be calculated via: R << 16 + G << 8 + B
