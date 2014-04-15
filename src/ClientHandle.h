@@ -234,8 +234,8 @@ public:
 	
 	/** Called when the player will enchant a Item */
 	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
-	cEnchantmentsVector AddEnchantmentWeight(cEnchantmentsVector a_Map, int a_Weight, cEnchantments a_Enchantment);
-	cEnchantmentsVector CheckEnchantmentConflicts(cEnchantmentsVector a_Map, cEnchantments a_FirstEnchantment);
+	cEnchantmentsVector AddEnchantmentWeight(cEnchantmentsVector a_Enchantments, int a_Weight, cEnchantments a_Enchantment);
+	cEnchantmentsVector CheckEnchantmentConflicts(cEnchantmentsVector a_Enchantments, cEnchantments a_FirstEnchantment);
 	
 private:
 
