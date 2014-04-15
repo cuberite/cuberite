@@ -2692,7 +2692,7 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
 	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
 
-	if (!cItem::IsEnchantable(Item.m_ItemType))
+	if (!cItem::IsEnchantable(Item.m_ItemType) && Item.m_ItemType != E_ITEM_BOOK)
 	{
 		return;
 	}
@@ -3074,6 +3074,315 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("LuckOfTheSea=1"));
 			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Lure=1"));
 		}
+	}
+
+	else if (Item.m_ItemType == E_ITEM_BOOK)
+	{
+		// All enchantments
+
+		// Sharpness
+		if (FinalEnchantmentLevel >= 34 && FinalEnchantmentLevel <= 54)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Sharpness=4"));
+		}
+		else if (FinalEnchantmentLevel >= 23 && FinalEnchantmentLevel <= 43)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Sharpness=3"));
+		}
+		else if (FinalEnchantmentLevel >= 12 && FinalEnchantmentLevel <= 32)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Sharpness=2"));
+		}
+		else if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 21)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Sharpness=1"));
+		}
+
+		// Smite
+		if (FinalEnchantmentLevel >= 29 && FinalEnchantmentLevel <= 49)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Smite=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 41)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Smite=3"));
+		}
+		else if (FinalEnchantmentLevel >= 13 && FinalEnchantmentLevel <= 33)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Smite=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 25)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Smite=1"));
+		}
+
+		// Bane of Arthropods
+		if (FinalEnchantmentLevel >= 29 && FinalEnchantmentLevel <= 49)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("BaneOfArthropods=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 41)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("BaneOfArthropods=3"));
+		}
+		else if (FinalEnchantmentLevel >= 13 && FinalEnchantmentLevel <= 33)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("BaneOfArthropods=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 25)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("BaneOfArthropods=1"));
+		}
+
+		// Knockback
+		if (FinalEnchantmentLevel >= 25 && FinalEnchantmentLevel <= 75)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Knockback=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 55)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("Knockback=1"));
+		}
+
+		// Fire Aspect
+		if (FinalEnchantmentLevel >= 30 && FinalEnchantmentLevel <= 80)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("FireAspect=2"));
+		}
+		else if (FinalEnchantmentLevel >= 10 && FinalEnchantmentLevel <= 60)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("FireAspect=1"));
+		}
+
+		// Looting
+		if (FinalEnchantmentLevel >= 33 && FinalEnchantmentLevel <= 83)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Looting=3"));
+		}
+		else if (FinalEnchantmentLevel >= 24 && FinalEnchantmentLevel <= 74)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Looting=2"));
+		}
+		else if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 65)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Looting=1"));
+		}
+
+		// Efficiency
+		if (FinalEnchantmentLevel >= 31 && FinalEnchantmentLevel <= 81)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Efficiency=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 71)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Efficiency=3"));
+		}
+		else if (FinalEnchantmentLevel >= 11 && FinalEnchantmentLevel <= 61)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Efficiency=2"));
+		}
+		else if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 51)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Efficiency=1"));
+		}
+
+		// Silk Touch
+		if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 65)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("SilkTouch=1"));
+		}
+
+		// Fortune
+		if (FinalEnchantmentLevel >= 33 && FinalEnchantmentLevel <= 83)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Fortune=3"));
+		}
+		else if (FinalEnchantmentLevel >= 24 && FinalEnchantmentLevel <= 74)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Fortune=2"));
+		}
+		else if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 65)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Fortune=1"));
+		}
+
+		// Protection
+		if (FinalEnchantmentLevel >= 34 && FinalEnchantmentLevel <= 54)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Protection=4"));
+		}
+		else if (FinalEnchantmentLevel >= 23 && FinalEnchantmentLevel <= 43)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Protection=3"));
+		}
+		else if (FinalEnchantmentLevel >= 12 && FinalEnchantmentLevel <= 32)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Protection=2"));
+		}
+		else if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 21)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Protection=1"));
+		}
+
+		// Fire Protection
+		if (FinalEnchantmentLevel >= 34 && FinalEnchantmentLevel <= 46)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FireProtection=4"));
+		}
+		else if (FinalEnchantmentLevel >= 26 && FinalEnchantmentLevel <= 38)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FireProtection=3"));
+		}
+		else if (FinalEnchantmentLevel >= 18 && FinalEnchantmentLevel <= 30)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FireProtection=2"));
+		}
+		else if (FinalEnchantmentLevel >= 10 && FinalEnchantmentLevel <= 22)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FireProtection=1"));
+		}
+
+		// Blast Protection
+		if (FinalEnchantmentLevel >= 29 && FinalEnchantmentLevel <= 41)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("BlastProtection=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 33)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("BlastProtection=3"));
+		}
+		else if (FinalEnchantmentLevel >= 13 && FinalEnchantmentLevel <= 25)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("BlastProtection=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 17)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("BlastProtection=1"));
+		}
+
+		// Projectile Protection
+		if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 36)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("ProjectileProtection=4"));
+		}
+		else if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 30)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("ProjectileProtection=3"));
+		}
+		else if (FinalEnchantmentLevel >= 9 && FinalEnchantmentLevel <= 24)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("ProjectileProtection=2"));
+		}
+		else if (FinalEnchantmentLevel >= 3 && FinalEnchantmentLevel <= 18)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("ProjectileProtection=1"));
+		}
+
+		// Thorns
+		if (FinalEnchantmentLevel >= 50 && FinalEnchantmentLevel <= 100)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Thorns=3"));
+		}
+		else if (FinalEnchantmentLevel >= 30 && FinalEnchantmentLevel <= 80)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Thorns=2"));
+		}
+		else if (FinalEnchantmentLevel >= 10 && FinalEnchantmentLevel <= 60)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Thorns=1"));
+		}
+
+		// Respiration
+		if (FinalEnchantmentLevel >= 30 && FinalEnchantmentLevel <= 60)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Respiration=3"));
+		}
+		else if (FinalEnchantmentLevel >= 20 && FinalEnchantmentLevel <= 50)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Respiration=2"));
+		}
+		else if (FinalEnchantmentLevel >= 10 && FinalEnchantmentLevel <= 40)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Respiration=1"));
+		}
+
+		// Aqua Affinity
+		if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 41)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("AquaAffinity=1"));
+		}
+
+		// Feather Fall
+		if (FinalEnchantmentLevel >= 23 && FinalEnchantmentLevel <= 33)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FeatherFalling=4"));
+		}
+		else if (FinalEnchantmentLevel >= 17 && FinalEnchantmentLevel <= 27)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FeatherFalling=3"));
+		}
+		else if (FinalEnchantmentLevel >= 11 && FinalEnchantmentLevel <= 21)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FeatherFalling=2"));
+		}
+		else if (FinalEnchantmentLevel >= 5 && FinalEnchantmentLevel <= 15)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 5, cEnchantments("FeatherFalling=1"));
+		}
+
+		// Power
+		if (FinalEnchantmentLevel >= 31 && FinalEnchantmentLevel <= 46)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Power=4"));
+		}
+		else if (FinalEnchantmentLevel >= 21 && FinalEnchantmentLevel <= 36)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Power=3"));
+		}
+		else if (FinalEnchantmentLevel >= 11 && FinalEnchantmentLevel <= 26)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Power=2"));
+		}
+		else if (FinalEnchantmentLevel >= 1 && FinalEnchantmentLevel <= 16)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 10, cEnchantments("Power=1"));
+		}
+
+		// Punch
+		if (FinalEnchantmentLevel >= 32 && FinalEnchantmentLevel <= 57)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Punch=2"));
+		}
+		else if (FinalEnchantmentLevel >= 12 && FinalEnchantmentLevel <= 37)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Punch=1"));
+		}
+
+		// Flame and Infinity
+		if (FinalEnchantmentLevel >= 20 && FinalEnchantmentLevel <= 50)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 2, cEnchantments("Flame=1"));
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Infinity=1"));
+		}
+
+		// Luck of the Sea and Lure
+		if (FinalEnchantmentLevel >= 33 && FinalEnchantmentLevel <= 83)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("LuckOfTheSea=3"));
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Lure=3"));
+		}
+		else if (FinalEnchantmentLevel >= 24 && FinalEnchantmentLevel <= 74)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("LuckOfTheSea=2"));
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Lure=2"));
+		}
+		else if (FinalEnchantmentLevel >= 15 && FinalEnchantmentLevel <= 65)
+		{
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("LuckOfTheSea=1"));
+			enchantments = AddEnchantmentWeight(enchantments, 1, cEnchantments("Lure=1"));
+		}
+
+		Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
 	}
 
 	// Unbreaking
