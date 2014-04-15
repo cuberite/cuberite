@@ -655,5 +655,6 @@ html[xmlns] .clearfix {
 
 .sourcebox {
 	margin-left: 5% !important;
+	overflow: auto;
 
 }
