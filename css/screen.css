@@ -61,6 +61,9 @@ a:hover
 .line
 {
 	border-bottom:1px dotted #ccc;
+	float: left;
+	width: 400px;
+	height: 130px;
 }
 
 .pod
@@ -141,7 +144,6 @@ img.center
 {
 	background:url(../images/bg_top_inner.jpg) repeat-x top;
 	padding-bottom:20px;
-	max-width: 1500px;
 }
 
 
@@ -652,8 +654,6 @@ html[xmlns] .clearfix {
 #gallery ul a:hover { color: #fff; }
 
 .sourcebox {
-	max-width: 540px;
-	width: 90%;
-	margin-left: auto !important;
-	margin-right: auto !important;
+	margin-left: 5% !important;
+
 }
