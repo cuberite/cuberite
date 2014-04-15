@@ -59,6 +59,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_6_3: return "1.6.3";
 		case PROTO_VERSION_1_6_4: return "1.6.4";
 		case PROTO_VERSION_1_7_2: return "1.7.2";
+		case PROTO_VERSION_1_7_6: return "1.7.6";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -390,6 +391,16 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendLogin(a_Player, a_World);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendLoginSuccess(void)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendLoginSuccess();
 }
 
 
@@ -963,6 +974,18 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			m_Buffer.ReadVarInt(NextState);
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_7_6:
+		{
+			AString ServerAddress;
+			short ServerPort;
+			UInt32 NextState;
+			m_Buffer.ReadVarUTF8String(ServerAddress);
+			m_Buffer.ReadBEShort(ServerPort);
+			m_Buffer.ReadVarInt(NextState);
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
 		}
 	}
