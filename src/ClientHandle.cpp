@@ -24,12 +24,14 @@
 
 #include "Root.h"
 
-#include "Authenticator.h"
+#include "Protocol/Authenticator.h"
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
+
+#include "md5/md5.h"
 
 
 
@@ -175,6 +177,39 @@ void cClientHandle::Destroy(void)
 
 
 
+void cClientHandle::GenerateOfflineUUID(void)
+{
+	m_UUID = GenerateOfflineUUID(m_Username);
+}
+
+
+
+
+
+AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
+{
+	// Proper format for a version 3 UUID is:
+	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
+	
+	// Generate an md5 checksum, and use it as base for the ID:
+	MD5 Checksum(a_Username);
+	AString UUID = Checksum.hexdigest();
+	UUID[12] = '3';  // Version 3 UUID
+	UUID[16] = '8';  // Variant 1 UUID
+	
+	// Now the digest doesn't have the UUID slashes, but the client requires them, so add them into the appropriate positions:
+	UUID.insert(8, "-");
+	UUID.insert(13, "-");
+	UUID.insert(18, "-");
+	UUID.insert(23, "-");
+	
+	return UUID;
+}
+
+
+
+
+
 void cClientHandle::Kick(const AString & a_Reason)
 {
 	if (m_State >= csAuthenticating)  // Don't log pings
@@ -188,7 +223,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(void)
+void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 {
 	if (m_State != csAuthenticating)
 	{
@@ -196,6 +231,12 @@ void cClientHandle::Authenticate(void)
 	}
 	
 	ASSERT( m_Player == NULL );
+
+	m_Username = a_Name;
+	m_UUID = a_UUID;
+	
+	// Send login success (if the protocol supports it):
+	m_Protocol->SendLoginSuccess();
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());
@@ -1677,13 +1718,16 @@ void cClientHandle::Tick(float a_Dt)
 	}
 
 	// Send a ping packet:
-	cTimer t1;
-	if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+	if (m_State == csPlaying)
 	{
-		m_PingID++;
-		m_PingStartTime = t1.GetNowTime();
-		m_Protocol->SendKeepAlive(m_PingID);
-		m_LastPingTime = m_PingStartTime;
+		cTimer t1;
+		if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+		{
+			m_PingID++;
+			m_PingStartTime = t1.GetNowTime();
+			m_Protocol->SendKeepAlive(m_PingID);
+			m_LastPingTime = m_PingStartTime;
+		}
 	}
 
 	// Handle block break animation:

@@ -88,8 +88,9 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	// Create the comm log file, if so requested:
 	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
 	{
+		static int sCounter = 0;
 		cFile::CreateFolder("CommLogs");
-		AString FileName = Printf("CommLogs/%x__%s.log", (unsigned)time(NULL), a_Client->GetIPString().c_str());
+		AString FileName = Printf("CommLogs/%x_%d__%s.log", (unsigned)time(NULL), sCounter++, a_Client->GetIPString().c_str());
 		m_CommLogFile.Open(FileName, cFile::fmWrite);
 	}
 }
@@ -537,6 +538,13 @@ void cProtocol172::SendInventorySlot(char a_WindowID, short a_SlotNum, const cIt
 
 void cProtocol172::SendKeepAlive(int a_PingID)
 {
+	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
+	if (m_State != 3)
+	{
+		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		return;
+	}
+	
 	cPacketizer Pkt(*this, 0x00);  // Keep Alive packet
 	Pkt.WriteInt(a_PingID);
 }
@@ -569,6 +577,21 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send player abilities:
 	SendPlayerAbilities();
 }
+
+
+
+
+void cProtocol172::SendLoginSuccess(void)
+{
+	ASSERT(m_State == 2);  // State: login?
+	
+	cPacketizer Pkt(*this, 0x02);  // Login success packet
+	Pkt.WriteString(m_Client->GetUUID());
+	Pkt.WriteString(m_Client->GetUsername());
+
+	m_State = 3;  // State = Game
+}
+
 
 
 
@@ -796,7 +819,7 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
 	Pkt.WriteVarInt(a_Player.GetUniqueID());
-	Pkt.WriteString(Printf("%d", a_Player.GetUniqueID()));  // TODO: Proper UUID
+	Pkt.WriteString(a_Player.GetClientHandle()->GetUUID());
 	Pkt.WriteString(a_Player.GetName());
 	Pkt.WriteFPInt(a_Player.GetPosX());
 	Pkt.WriteFPInt(a_Player.GetPosY());
@@ -1556,15 +1579,6 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	}
 	
 	StartEncryption(DecryptedKey);
-
-	// Send login success:
-	{
-		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(Printf("%d", m_Client->GetUniqueID()));  // TODO: proper UUID
-		Pkt.WriteString(m_Client->GetUsername());
-	}
-
-	m_State = 3;  // State = Game
 	m_Client->HandleLogin(4, m_Client->GetUsername());
 }
 
@@ -1597,14 +1611,6 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 	
-	// Send login success:
-	{
-		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(Printf("%d", m_Client->GetUniqueID()));  // TODO: proper UUID
-		Pkt.WriteString(Username);
-	}
-
-	m_State = 3;  // State = Game
 	m_Client->HandleLogin(4, Username);
 }
 
@@ -2764,6 +2770,67 @@ void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
 	
 	WriteInt(0);  // NumProperties
 }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol176:
+
+cProtocol176::cProtocol176(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+{
+}
+
+
+
+
+
+void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
+{
+	// Called to spawn another player for the client
+	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
+	Pkt.WriteVarInt(a_Player.GetUniqueID());
+	Pkt.WriteString(a_Player.GetClientHandle()->GetUUID());
+	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteVarInt(0);  // We have no data to send here
+	Pkt.WriteFPInt(a_Player.GetPosX());
+	Pkt.WriteFPInt(a_Player.GetPosY());
+	Pkt.WriteFPInt(a_Player.GetPosZ());
+	Pkt.WriteByteAngle(a_Player.GetYaw());
+	Pkt.WriteByteAngle(a_Player.GetPitch());
+	short ItemType = a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType;
+	Pkt.WriteShort(ItemType);
+	Pkt.WriteByte((3 << 5) | 6);  // Metadata: float + index 6
+	Pkt.WriteFloat((float)a_Player.GetHealth());
+	Pkt.WriteByte(0x7f);  // Metadata: end
+}
+
+
+
+
+
+void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+{
+	// Send the response:
+	AString Response = "{\"version\":{\"name\":\"1.7.6\",\"protocol\":5},\"players\":{";
+	AppendPrintf(Response, "\"max\":%u,\"online\":%u,\"sample\":[]},",
+		cRoot::Get()->GetServer()->GetMaxPlayers(),
+		cRoot::Get()->GetServer()->GetNumPlayers()
+	);
+	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
+		cRoot::Get()->GetServer()->GetDescription().c_str()
+	);
+	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+		cRoot::Get()->GetServer()->GetFaviconData().c_str()
+	);
+	Response.append("}");
+	
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Response);
+}
+
 
 
 

@@ -916,19 +916,21 @@ void cChunkMap::SetChunkData(
 		}
 		
 		// Notify relevant ChunkStays:
-		for (cChunkStays::iterator itr = m_ChunkStays.begin(); itr != m_ChunkStays.end(); )
+		cChunkStays ToBeDisabled;
+		for (cChunkStays::iterator itr = m_ChunkStays.begin(), end = m_ChunkStays.end(); itr != end; ++itr)
 		{
 			if ((*itr)->ChunkAvailable(a_ChunkX, a_ChunkZ))
 			{
-				cChunkStays::iterator cur = itr;
-				++itr;
-				m_ChunkStays.erase(cur);
-			}
-			else
-			{
-				++itr;
+				// The chunkstay wants to be disabled, add it to a list of to-be-disabled chunkstays for later processing:
+				ToBeDisabled.push_back(*itr);
 			}
 		}  // for itr - m_ChunkStays[]
+		
+		// Disable (and possibly remove) the chunkstays that chose to get disabled:
+		for (cChunkStays::iterator itr = ToBeDisabled.begin(), end = ToBeDisabled.end(); itr != end; ++itr)
+		{
+			(*itr)->Disable();
+		}
 	}
 
 	// Notify plugins of the chunk becoming available
@@ -2974,7 +2976,12 @@ void cChunkMap::AddChunkStay(cChunkStay & a_ChunkStay)
 		Chunk->Stay(true);
 		if (Chunk->IsValid())
 		{
-			a_ChunkStay.ChunkAvailable(itr->m_ChunkX, itr->m_ChunkZ);
+			if (a_ChunkStay.ChunkAvailable(itr->m_ChunkX, itr->m_ChunkZ))
+			{
+				// The chunkstay wants to be deactivated, disable it and bail out:
+				a_ChunkStay.Disable();
+				return;
+			}
 		}
 	}  // for itr - WantedChunks[]
 }
@@ -3017,6 +3024,7 @@ void cChunkMap::DelChunkStay(cChunkStay & a_ChunkStay)
 		}
 		Chunk->Stay(false);
 	}  // for itr - Chunks[]
+	a_ChunkStay.OnDisabled();
 }
 
 
