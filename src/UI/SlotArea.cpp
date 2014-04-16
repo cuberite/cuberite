@@ -794,13 +794,13 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 {
 	cItem Item = *GetSlot(0, a_Player);
 
-	if (Item.IsEmpty())
+	if (Item.IsEmpty() || !Item.m_Enchantments.IsEmpty())
 	{
 		m_ParentWindow.SetProperty(0, 0, a_Player);
 		m_ParentWindow.SetProperty(1, 0, a_Player);
 		m_ParentWindow.SetProperty(2, 0, a_Player);
 	}
-	else if (cItem::IsEnchantable(Item.m_ItemType) || Item.m_ItemType == E_ITEM_BOOK && Item.m_Enchantments.IsEmpty())
+	else if (cItem::IsEnchantable(Item.m_ItemType) || Item.m_ItemType == E_ITEM_BOOK)
 	{
 		int Bookshelves = GetBookshelvesCount(a_Player.GetWorld());
 
