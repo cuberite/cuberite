@@ -3530,15 +3530,15 @@ void cClientHandle::AddEnchantmentWeight(cEnchantmentsVector & a_Enchantments, i
 
 
 
-void cClientHandle::RemoveEnchantmentFromVector(cEnchantmentsVector & a_Enchantments, int a_EnchantmentID)
+void cClientHandle::RemoveEnchantmentFromVector(cEnchantmentsVector * a_Enchantments, int a_EnchantmentID)
 {
-	for (cEnchantmentsVector::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	for (cEnchantmentsVector::iterator it = a_Enchantments->begin(); it != a_Enchantments->end(); ++it)
 	{
 		int EnchantmentID = atoi(StringSplit((*it).ToString(), "=")[0].c_str());
 
 		if (EnchantmentID == a_EnchantmentID)
 		{
-			a_Enchantments.erase(std::remove(a_Enchantments.begin(), a_Enchantments.end(), *it), a_Enchantments.end());
+			a_Enchantments->erase(std::remove(a_Enchantments->begin(), a_Enchantments->end(), *it), a_Enchantments->end());
 			break;
 		}
 	}
@@ -3554,51 +3554,51 @@ void cClientHandle::CheckEnchantmentConflicts(cEnchantmentsVector & a_Enchantmen
 
 	if (FirstEnchantmentID == cEnchantments::enchProtection)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchFireProtection);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchBlastProtection);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchProjectileProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchFireProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchBlastProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchProjectileProtection);
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchFireProtection)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchProtection);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchBlastProtection);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchProjectileProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchBlastProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchProjectileProtection);
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchBlastProtection)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchProtection);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchFireProtection);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchProjectileProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchFireProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchProjectileProtection);
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchProjectileProtection)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchProtection);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchFireProtection);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchBlastProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchFireProtection);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchBlastProtection);
 	}
 
 	else if (FirstEnchantmentID == cEnchantments::enchSharpness)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchSmite);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchBaneOfArthropods);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchSmite);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchBaneOfArthropods);
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchSmite)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchSharpness);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchBaneOfArthropods);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchSharpness);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchBaneOfArthropods);
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchBaneOfArthropods)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchSharpness);
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchSmite);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchSharpness);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchSmite);
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchSilkTouch)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchFortune);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchFortune);
 	}
 	else if (FirstEnchantmentID == cEnchantments::enchFortune)
 	{
-		RemoveEnchantmentFromVector(a_Enchantments, cEnchantments::enchSilkTouch);
+		RemoveEnchantmentFromVector(&a_Enchantments, cEnchantments::enchSilkTouch);
 	}
 }
 
