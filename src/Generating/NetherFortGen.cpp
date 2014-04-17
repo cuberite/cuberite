@@ -258,6 +258,15 @@ cPieces cNetherFortGen::GetStartingPieces(void)
 
 
 
+int cNetherFortGen::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
+{
+	return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
+}
+
+
+
+
+
 void cNetherFortGen::PiecePlaced(const cPiece & a_Piece)
 {
 	UNUSED(a_Piece);

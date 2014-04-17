@@ -37,11 +37,47 @@ public:
 		int m_SizeX;
 		int m_SizeY;
 		int m_SizeZ;
+		
+		/** The mapping between characters in m_Image and the blocktype / blockmeta.
+		Format: "Char: BlockType: BlockMeta \n Char: BlockType : BlockMeta \n ..." */
 		const char * m_CharMap;
+		
+		/** The actual image to be used for the prefab. Organized YZX (Y changes the least often).
+		Each character represents a single block, the type is mapped through m_CharMap. */
 		const char * m_Image;
+		
+		/** List of connectors.
+		Format: "Type: X, Y, Z : Direction \n Type : X, Y, Z : Direction \n ...".
+		Type is an arbitrary number, Direction is the BlockFace constant value (0 .. 5). */
 		const char * m_Connectors;
+		
+		/** Bitmask specifying the allowed rotations.
+		N rotations CCW are allowed if bit N is set. */
 		int m_AllowedRotations;
+		
+		/** The merge strategy to use while drawing the prefab. */
 		cBlockArea::eMergeStrategy m_MergeStrategy;
+		
+		/** If set to true, the prefab will extend its lowermost blocks until a solid block is found,
+		thus creating a foundation for the prefab. This is used for houses to be "on the ground", as well as
+		nether fortresses not to float. */
+		bool m_ShouldExtendFloor;
+
+		/** Chance of this piece being used, if no other modifier is active. */
+		int m_DefaultWeight;
+		
+		/** Chances of this piece being used, per depth of the generated piece tree.
+		The starting piece has a depth of 0, the pieces connected to it are depth 1, etc.
+		The specified depth stands for the depth of the new piece (not the existing already-placed piece),
+		so valid depths start at 1.
+		Format: "Depth : Weight | Depth : Weight | Depth : Weight ..."
+		Depths that are not specified will use the m_DefaultWeight value. */
+		const char * m_DepthWeight;
+		
+		/** The weight to add to this piece's base per-depth chance if the previous piece is the same.
+		Can be positive or negative.
+		This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each other. */
+		int m_AddWeightIfSame;
 	};
 	
 	cPrefab(const sDef & a_Def);
@@ -51,6 +87,10 @@ public:
 	
 	/** Returns true if the prefab has any connector of the specified type. */
 	bool HasConnectorType(int a_ConnectorType) const;
+	
+	/** Returns the weight (chance) of this prefab generating as the next piece after the specified placed piece.
+	PiecePool implementations can use this for their GetPieceWeight() implementations. */
+	int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector) const;
 
 protected:
 	/** Packs complete definition of a single block, for per-letter assignment. */
@@ -60,8 +100,11 @@ protected:
 		NIBBLETYPE m_BlockMeta;
 	};
 	
-	/** Maps letters in the sDef::m_Image onto a number, BlockType * 16 | BlockMeta */
+	/** Maps letters in the sDef::m_Image onto a sBlockTypeDef block type definition. */
 	typedef sBlockTypeDef CharMap[256];
+	
+	/** Maps generator tree depth to weight. */
+	typedef std::map<int, int> cDepthWeight;
 	
 	
 	/** The cBlockArea that contains the block definitions for the prefab.
@@ -82,6 +125,26 @@ protected:
 	
 	/** The merge strategy to use when drawing the prefab into a block area */
 	cBlockArea::eMergeStrategy m_MergeStrategy;
+
+	/** If set to true, the prefab will extend its lowermost blocks until a solid block is found,
+	thus creating a foundation for the prefab. This is used for houses to be "on the ground", as well as
+	nether fortresses not to float. */
+	bool m_ShouldExtendFloor;
+
+	/** Chance of this piece being used, if no other modifier is active. */
+	int m_DefaultWeight;
+	
+	/** Chances of this piece being used, per depth of the generated piece tree.
+	The starting piece has a depth of 0, the pieces connected to it are depth 1, etc.
+	The specified depth stands for the depth of the new piece (not the existing already-placed piece),
+	so valid depths start at 1.
+	Depths that are not specified will use the m_DefaultWeight value. */
+	cDepthWeight m_DepthWeight;
+	
+	/** The weight to add to this piece's base per-depth chance if the previous piece is the same.
+	Can be positive or negative.
+	This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each other. */
+	int m_AddWeightIfSame;
 	
 	
 	// cPiece overrides:	
@@ -98,6 +161,9 @@ protected:
 	
 	/** Parses the connectors definition text into m_Connectors member. */
 	void ParseConnectors(const char * a_ConnectorsDef);
+	
+	/** Parses the per-depth weight into m_DepthWeight member. */
+	void ParseDepthWeight(const char * a_DepthWeightDef);
 };
 
 
