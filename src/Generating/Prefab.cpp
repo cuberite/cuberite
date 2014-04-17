@@ -158,12 +158,53 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 
 void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 {
+	// Draw the basic image:
 	Vector3i Placement = a_Placement->GetCoords();
 	int ChunkStartX = a_Dest.GetChunkX() * cChunkDef::Width;
 	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
 	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
-	a_Dest.WriteBlockArea(m_BlockArea[a_Placement->GetNumCCWRotations()], Placement.x, Placement.y, Placement.z, m_MergeStrategy);
+	const cBlockArea & Image = m_BlockArea[a_Placement->GetNumCCWRotations()];
+	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
+	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
+	int MaxX = Image.GetSizeX();
+	int MaxZ = Image.GetSizeZ();
+	for (int z = 0; z < MaxZ; z++)
+	{
+		int RelZ = Placement.z + z;
+		if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
+		{
+			// Z coord outside the chunk
+			continue;
+		}
+		for (int x = 0; x < MaxX; x++)
+		{
+			int RelX = Placement.x + x;
+			if ((RelX < 0) || (RelX >= cChunkDef::Width))
+			{
+				// X coord outside the chunk
+				continue;
+			}
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+			Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
+			if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+			{
+				// Do not expand air nor sponge blocks
+				continue;
+			}
+			for (int y = Placement.y - 1; y >= 0; y--)
+			{
+				BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
+				if (ExistingBlock != E_BLOCK_AIR)
+				{
+					// End the expansion for this column, reached the end
+					break;
+				}
+				a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
+			}  // for y
+		}  // for x
+	}  // for z
 }
 
 
