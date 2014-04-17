@@ -493,15 +493,17 @@ inline void EulerToVector(double a_Pan, double a_Pitch, double & a_X, double & a
 
 inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, double & a_Pitch)
 {
-	if (fabs(a_X) < std::numeric_limits<double>::epsilon())
-	{
-		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
-	}
-	else
+	double r = sqrt((a_X * a_X) + (a_Z * a_Z));
+	if (r < std::numeric_limits<double>::epsilon())
 	{
 		a_Pan = 0;
 	}
-	a_Pitch = atan2(a_Y, sqrt((a_X * a_X) + (a_Z * a_Z))) * 180 / PI;
+	else
+	{
+		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;		
+	}
+
+	a_Pitch = atan2(a_Y, r) * 180 / PI;
 }
 
 
