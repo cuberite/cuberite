@@ -168,9 +168,9 @@ private:
 
 
 	/** Returns if lever metadata marks it as emitting power */
-	inline bool IsLeverOn(NIBBLETYPE a_BlockMeta);
+	bool IsLeverOn(NIBBLETYPE a_BlockMeta);
 	/** Returns if button metadata marks it as emitting power */
-	inline bool IsButtonOn(NIBBLETYPE a_BlockMeta) { return IsLeverOn(a_BlockMeta); }
+	bool IsButtonOn(NIBBLETYPE a_BlockMeta) { return IsLeverOn(a_BlockMeta); }
 	/* ============================== */
 
 	/* ====== Misc Functions ====== */
