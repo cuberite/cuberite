@@ -36,6 +36,8 @@ public:
 
 private:
 
+	#define MAX_POWER_LEVEL 15
+
 	struct sPoweredBlocks // Define structure of the directly powered blocks list
 	{
 		Vector3i a_BlockPos; // Position of powered block
@@ -134,15 +136,15 @@ private:
 
 	/* ====== Helper functions ====== */
 	/** Marks a block as powered */
-	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = 15);
+	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Marks a block as being powered through another block */
-	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock, unsigned char a_PowerLevel = 15);
+	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Marks a block as simulated, who should not be simulated further unless their power state changes, to accomodate a player manually toggling the block without triggering the simulator toggling it back */
 	void SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool WasLastStatePowered);
 	/** Marks the second block in a direction as linked powered */
-	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = 15);
+	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Marks all blocks immediately surrounding a coordinate as powered */
-	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock);
+	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Queues a repeater to be powered or unpowered */
 	void QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
 

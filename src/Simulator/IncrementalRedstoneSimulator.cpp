@@ -537,13 +537,14 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 	unsigned char MyPower;
 	if (!IsWirePowered(a_BlockX, a_BlockY, a_BlockZ, MyPower))
 	{
-		m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, 0);
+		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
+		m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 		return;
 	}
 	
-	m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MyPower); // Maximum power
+	m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MyPower);
 
-	if (MyPower < 2)
+	if (MyPower < 1)
 	{
 		return;
 	}
@@ -1015,16 +1016,13 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 			break;
 		}
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		{
 			class cPressurePlateCallback :
 				public cEntityCallback
 			{
 			public:
-				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-					m_Entity(NULL),
-					m_World(a_World),
+				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+					m_NumberOfEntities(0),
 					m_X(a_BlockX),
 					m_Y(a_BlockY),
 					m_Z(a_BlockZ)
@@ -1039,7 +1037,140 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 
 					if (Distance <= 0.7)
 					{
-						m_Entity = a_Entity;
+						m_NumberOfEntities++;
+					}
+					return false;
+				}
+
+				bool GetPowerLevel(unsigned char & a_PowerLevel) const
+				{
+					a_PowerLevel = std::min(m_NumberOfEntities, MAX_POWER_LEVEL);
+					return (a_PowerLevel > 0);
+				}
+
+			protected:
+				int m_NumberOfEntities;
+
+				int m_X;
+				int m_Y;
+				int m_Z;
+			};
+
+			cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ);
+			m_World.ForEachEntity(PressurePlateCallback);
+
+			unsigned char Power;
+			NIBBLETYPE Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+			if (PressurePlateCallback.GetPowerLevel(Power))
+			{
+				if (Meta == E_META_PRESSURE_PLATE_RAISED)
+				{
+					m_World.BroadcastSoundEffect("random.click", (int)((a_BlockX + 0.5) * 8.0), (int)((a_BlockY + 0.1) * 8.0), (int)((a_BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
+				}
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
+				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, a_MyType, Power);
+			}
+			else
+			{
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+				{
+					m_World.BroadcastSoundEffect("random.click", (int)((a_BlockX + 0.5) * 8.0), (int)((a_BlockY + 0.1) * 8.0), (int)((a_BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
+				}
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_RAISED);
+				m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+			}
+
+			break;
+		}
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+		{class cPressurePlateCallback :
+			public cEntityCallback
+		{
+		public:
+			cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+				m_NumberOfEntities(0),
+				m_X(a_BlockX),
+				m_Y(a_BlockY),
+				m_Z(a_BlockZ)
+			{
+			}
+
+			virtual bool Item(cEntity * a_Entity) override
+			{
+				Vector3f EntityPos = a_Entity->GetPosition();
+				Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+				double Distance = (EntityPos - BlockPos).Length();
+
+				if (Distance <= 0.7)
+				{
+					m_NumberOfEntities++;
+				}
+				return false;
+			}
+
+			bool GetPowerLevel(unsigned char & a_PowerLevel) const
+			{
+				a_PowerLevel = std::min((int)ceil(m_NumberOfEntities / (float)10), MAX_POWER_LEVEL);
+				return (a_PowerLevel > 0);
+			}
+
+		protected:
+			int m_NumberOfEntities;
+
+			int m_X;
+			int m_Y;
+			int m_Z;
+		};
+
+		cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ);
+		m_World.ForEachEntity(PressurePlateCallback);
+
+		unsigned char Power;
+		NIBBLETYPE Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		if (PressurePlateCallback.GetPowerLevel(Power))
+		{
+			if (Meta == E_META_PRESSURE_PLATE_RAISED)
+			{
+				m_World.BroadcastSoundEffect("random.click", (int)((a_BlockX + 0.5) * 8.0), (int)((a_BlockY + 0.1) * 8.0), (int)((a_BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
+			}
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
+			SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, a_MyType, Power);
+		}
+		else
+		{
+			if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+			{
+				m_World.BroadcastSoundEffect("random.click", (int)((a_BlockX + 0.5) * 8.0), (int)((a_BlockY + 0.1) * 8.0), (int)((a_BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
+			}
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_RAISED);
+			m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+		}
+
+			break;
+		}
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		{
+			class cPressurePlateCallback :
+				public cEntityCallback
+			{
+			public:
+				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+					m_FoundEntity(false),
+					m_X(a_BlockX),
+					m_Y(a_BlockY),
+					m_Z(a_BlockZ)
+				{
+				}
+
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					Vector3f EntityPos = a_Entity->GetPosition();
+					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+					double Distance = (EntityPos - BlockPos).Length();
+
+					if (Distance <= 0.7)
+					{
+						m_FoundEntity = true;
 						return true; // Break out, we only need to know for plates that at least one entity is on top
 					}
 					return false;
@@ -1047,45 +1178,46 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 
 				bool FoundEntity(void) const
 				{
-					return m_Entity != NULL;
+					return m_FoundEntity;
 				}
 
 			protected:
-				cEntity * m_Entity;
-				cWorld * m_World;
+				bool m_FoundEntity;
 
 				int m_X;
 				int m_Y;
 				int m_Z;
 			} ;
 
-			cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ, &m_World);
+			cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ);
 			m_World.ForEachEntity(PressurePlateCallback);
 
 			NIBBLETYPE Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 			if (PressurePlateCallback.FoundEntity())
 			{
-				if (Meta == 0x0)
+				if (Meta == E_META_PRESSURE_PLATE_RAISED)
 				{
 					m_World.BroadcastSoundEffect("random.click", (int) ((a_BlockX + 0.5) * 8.0), (int) ((a_BlockY + 0.1) * 8.0), (int) ((a_BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
 				}
-				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x1);
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
 				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, a_MyType);
 			}
 			else
 			{
-				if (Meta == 0x1)
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
 				{
 					m_World.BroadcastSoundEffect("random.click", (int) ((a_BlockX + 0.5) * 8.0), (int) ((a_BlockY + 0.1) * 8.0), (int) ((a_BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
 				}
-				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_RAISED);
 				m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 			}
 			break;
 		}
 		default:
+		{
 			LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(a_MyType).c_str());
 			break;
+		}
 	}
 }
 
@@ -1426,7 +1558,7 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int 
 
 
 
-void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock)
+void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel)
 {
 	static const struct
 	{
@@ -1443,7 +1575,7 @@ void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_Bloc
 
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through struct to power all directions
 	{
-		SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, a_SourceBlock);
+		SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, a_SourceBlock, a_PowerLevel);
 	}
 }
 
@@ -1460,21 +1592,25 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, 
 		return;
 	}
 
-	PoweredBlocksList * Powered = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorPoweredBlocksList();
-	for (PoweredBlocksList::const_iterator itr = Powered->begin(); itr != Powered->end(); ++itr) // Check powered list
+	auto Powered = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorPoweredBlocksList();
+	for (auto itr = Powered->begin(); itr != Powered->end(); ++itr) // Check powered list
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
 			itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
 			)
 		{
-			// Check for duplicates
+			// Check for duplicates, update power level if everything else the same but either way, don't add a new listing
+			if (itr->a_PowerLevel != a_PowerLevel)
+			{
+				itr->a_PowerLevel = a_PowerLevel;
+			}
 			return;
 		}
 	}
 
-	PoweredBlocksList * OtherPowered = m_Chunk->GetNeighborChunk(a_SourceX, a_SourceZ)->GetRedstoneSimulatorPoweredBlocksList();
-	for (PoweredBlocksList::const_iterator itr = OtherPowered->begin(); itr != OtherPowered->end(); ++itr) // Check powered list
+	auto OtherPowered = m_Chunk->GetNeighborChunk(a_SourceX, a_SourceZ)->GetRedstoneSimulatorPoweredBlocksList();
+	for (auto itr = OtherPowered->cbegin(); itr != OtherPowered->cend(); ++itr) // Check powered list
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ)) &&
@@ -1515,8 +1651,8 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 		return;
 	}
 
-	LinkedBlocksList * Linked = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorLinkedBlocksList();
-	for (LinkedBlocksList::const_iterator itr = Linked->begin(); itr != Linked->end(); ++itr) // Check linked powered list
+	auto Linked = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorLinkedBlocksList();
+	for (auto itr = Linked->begin(); itr != Linked->end(); ++itr) // Check linked powered list
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
@@ -1524,7 +1660,11 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 			itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
 			)
 		{
-			// Check for duplicates
+			// Check for duplicates, update power level if everything else the same but either way, don't add a new listing
+			if (itr->a_PowerLevel != a_PowerLevel)
+			{
+				itr->a_PowerLevel = a_PowerLevel;
+			}
 			return;
 		}
 	}
