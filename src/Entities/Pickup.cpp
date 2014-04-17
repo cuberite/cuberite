@@ -98,45 +98,44 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 	
 	if (!m_bCollected)
 	{
-		int BlockY = (int) floor(GetPosY());
+		int BlockY = POSY_TOINT;
+		int BlockX = POSX_TOINT;
+		int BlockZ = POSZ_TOINT;
+
 		if ((BlockY >= 0) && (BlockY < cChunkDef::Height))  // Don't do anything except for falling when outside the world
 		{
-			int BlockX = (int) floor(GetPosX());
-			int BlockZ = (int) floor(GetPosZ());
 			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
-			cChunk * CurrentChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
-			if (CurrentChunk != NULL)  // Make sure the chunk is loaded
-			{
-				int RelBlockX = BlockX - (CurrentChunk->GetPosX() * cChunkDef::Width);
-				int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
+			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ)
+			
+			int RelBlockX = BlockX - (CurrentChunk->GetPosX() * cChunkDef::Width);
+			int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
 				
-				// If the pickup is on the bottommost block position, make it think the void is made of air: (#131)
-				BLOCKTYPE BlockBelow = (BlockY > 0) ? CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
-				BLOCKTYPE BlockIn = CurrentChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
+			// If the pickup is on the bottommost block position, make it think the void is made of air: (#131)
+			BLOCKTYPE BlockBelow = (BlockY > 0) ? CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
+			BLOCKTYPE BlockIn = CurrentChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
 
-				if (
-					IsBlockLava(BlockBelow) || (BlockBelow == E_BLOCK_FIRE) ||
-					IsBlockLava(BlockIn) || (BlockIn == E_BLOCK_FIRE)
-				)
+			if (
+				IsBlockLava(BlockBelow) || (BlockBelow == E_BLOCK_FIRE) ||
+				IsBlockLava(BlockIn) || (BlockIn == E_BLOCK_FIRE)
+			)
+			{
+				m_bCollected = true;
+				m_Timer = 0;  // We have to reset the timer.
+				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
+				if (m_Timer > 500.f)  
 				{
-					m_bCollected = true;
-					m_Timer = 0;  // We have to reset the timer.
-					m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
-					if (m_Timer > 500.f)  
-					{
-						Destroy(true);
-						return;
-					}
+					Destroy(true);
+					return;
 				}
+			}
 
-				if (!IsDestroyed()) // Don't try to combine if someone has tried to combine me
+			if (!IsDestroyed()) // Don't try to combine if someone has tried to combine me
+			{
+				cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
+				m_World->ForEachEntity(PickupCombiningCallback); // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
+				if (PickupCombiningCallback.FoundMatchingPickup())
 				{
-					cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
-					m_World->ForEachEntity(PickupCombiningCallback); // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
-					if (PickupCombiningCallback.FoundMatchingPickup())
-					{
-						m_World->BroadcastEntityMetadata(*this);
-					}
+					m_World->BroadcastEntityMetadata(*this);
 				}
 			}
 		}
@@ -156,7 +155,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (GetPosY() < -8) // Out of this world and no more visible!
+	if (GetPosY() < VOID_BOUNDARY) // Out of this world and no more visible!
 	{
 		Destroy(true);
 		return;

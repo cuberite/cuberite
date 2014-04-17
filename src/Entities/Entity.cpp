@@ -330,7 +330,7 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		AddSpeed(a_TDI.Knockback * 2);
 	}
 
-	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_HURT);
+	m_World->BroadcastEntityStatus(*this, esGenericHurt);
 
 	if (m_Health <= 0)
 	{
@@ -479,7 +479,7 @@ void cEntity::KilledBy(cEntity * a_Killer)
 	GetDrops(Drops, a_Killer);
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 
-	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_DEAD);
+	m_World->BroadcastEntityStatus(*this, esGenericDead);
 }
 
 
@@ -519,37 +519,36 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		if (a_Chunk.IsValid())
+		if (!a_Chunk.IsValid())
 		{
-			cChunk * NextChunk = a_Chunk.GetNeighborChunk(POSX_TOINT, POSZ_TOINT);
-
-			if ((NextChunk == NULL) || !NextChunk->IsValid())
-			{
-				return;
-			}
-
-			TickBurning(*NextChunk);
-
-			if (GetPosY() < VOID_BOUNDARY)
-			{
-				TickInVoid(*NextChunk);
-			}
-			else
-			{
-				m_TicksSinceLastVoidDamage = 0;
-			}
-
-			if (IsMob() || IsPlayer())
-			{
-				// Set swimming state
-				SetSwimState(*NextChunk);
-
-				// Handle drowning
-				HandleAir();
-			}
-
-			HandlePhysics(a_Dt, *NextChunk);
+			return;
 		}
+
+		// Position changed -> super::Tick() called
+		GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, POSX_TOINT, POSZ_TOINT)
+
+		TickBurning(*NextChunk);
+
+		if (GetPosY() < VOID_BOUNDARY)
+		{
+			TickInVoid(*NextChunk);
+		}
+		else
+		{
+			m_TicksSinceLastVoidDamage = 0;
+		}
+
+		if (IsMob() || IsPlayer())
+		{
+			// Set swimming state
+			SetSwimState(*NextChunk);
+
+			// Handle drowning
+			HandleAir();
+		}
+
+		// None of the above functions change position, we remain in the chunk of NextChunk
+		HandlePhysics(a_Dt, *NextChunk);
 	}
 }
 
@@ -559,34 +558,30 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 {
+	int BlockX = POSX_TOINT;
+	int BlockY = POSY_TOINT;
+	int BlockZ = POSZ_TOINT;
+
+	// Position changed -> super::HandlePhysics() called
+	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ)
+
 	// TODO Add collision detection with entities.
 	a_Dt /= 1000;  // Convert from msec to sec
-	Vector3d NextPos = Vector3d(GetPosX(),GetPosY(),GetPosZ());
-	Vector3d NextSpeed = Vector3d(GetSpeedX(),GetSpeedY(),GetSpeedZ());
-	int BlockX = (int) floor(NextPos.x);
-	int BlockY = (int) floor(NextPos.y);
-	int BlockZ = (int) floor(NextPos.z);
+	Vector3d NextPos = Vector3d(GetPosX(), GetPosY(), GetPosZ());
+	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
 	
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
-		// Outside of the world
-		
-		cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
-		// See if we can commit our changes. If not, we will discard them.
-		if (NextChunk != NULL)
-		{
-			SetSpeed(NextSpeed);
-			NextPos += (NextSpeed * a_Dt);
-			SetPosition(NextPos);
-		}
-
+		// Outside of the world		
+		AddSpeedY(m_Gravity * a_Dt);
+		AddPosition(GetSpeed() * a_Dt);
 		return;
 	}
 	
-	int RelBlockX = BlockX - (a_Chunk.GetPosX() * cChunkDef::Width);
-	int RelBlockZ = BlockZ - (a_Chunk.GetPosZ() * cChunkDef::Width);
-	BLOCKTYPE BlockIn = a_Chunk.GetBlock( RelBlockX, BlockY, RelBlockZ );
-	BLOCKTYPE BlockBelow = (BlockY > 0) ? a_Chunk.GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
+	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
+	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
+	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
+	BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
 		if (m_bOnGround)  // check if it's still on the ground
@@ -616,7 +611,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		bool IsNoAirSurrounding = true;
 		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 		{
-			if (!a_Chunk.UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
+			if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
 			{
 				// The pickup is too close to an unloaded chunk, bail out of any physics handling
 				return;
@@ -764,20 +759,8 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	BlockX = (int) floor(NextPos.x);
-	BlockZ = (int) floor(NextPos.z);
-
-	cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
-	// See if we can commit our changes. If not, we will discard them.
-	if (NextChunk != NULL)
-	{
-		if (NextPos.x != GetPosX()) SetPosX(NextPos.x);
-		if (NextPos.y != GetPosY()) SetPosY(NextPos.y);
-		if (NextPos.z != GetPosZ()) SetPosZ(NextPos.z);
-		if (NextSpeed.x != GetSpeedX()) SetSpeedX(NextSpeed.x);
-		if (NextSpeed.y != GetSpeedY()) SetSpeedY(NextSpeed.y);
-		if (NextSpeed.z != GetSpeedZ()) SetSpeedZ(NextSpeed.z);
-	}
+	SetPosition(NextPos);
+	SetSpeed(NextSpeed);
 }
 
 
@@ -981,13 +964,13 @@ void cEntity::HandleAir(void)
 			}
 			else
 			{
-				m_AirTickTimer -= 1;
+				m_AirTickTimer--;
 			}
 		}
 		else
 		{
 			// Reduce air supply
-			m_AirLevel -= 1;
+			m_AirLevel--;
 		}
 	}
 	else
@@ -1099,15 +1082,15 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
-	//We need to keep updating the clients when there is movement or if there was a change in speed and after 2 ticks
-	if( (m_Speed.SqrLength() > 0.0004f || m_bDirtySpeed) && (m_World->GetWorldAge() - m_TimeLastSpeedPacket >= 2))
+	// Send velocity packet every two ticks if: speed is not negligible or speed was set (as indicated by the DirtySpeed flag)
+	if (((m_Speed.SqrLength() > 0.0004f) || m_bDirtySpeed) && ((m_World->GetWorldAge() - m_TimeLastSpeedPacket) >= 2))
 	{
 		m_World->BroadcastEntityVelocity(*this,a_Exclude);
 		m_bDirtySpeed = false;
 		m_TimeLastSpeedPacket = m_World->GetWorldAge();
 	}
 
-	//Have to process position related packets this every two ticks
+	// Have to process position related packets this every two ticks
 	if (m_World->GetWorldAge() % 2 == 0)
 	{
 		int DiffX = (int) (floor(GetPosX() * 32.0) - floor(m_LastPosX * 32.0));
