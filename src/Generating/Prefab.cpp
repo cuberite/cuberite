@@ -91,7 +91,19 @@ static const cPrefab::sDef g_TestPrefabDef =
 	7,  /* 1, 2, 3 CCW rotations */
 	
 	// Merge strategy:
-	cBlockArea::msImprint
+	cBlockArea::msImprint,
+	
+	// ShouldExtendFloor:
+	false,
+
+	// DefaultWeight:
+	10,
+
+	// DepthWeight:
+	"",
+
+	// AddWeightIfSame:
+	1000,
 };
 
 static cPrefab g_TestPrefab(g_TestPrefabDef);
