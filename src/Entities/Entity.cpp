@@ -806,7 +806,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	int MaxRelX = (int)floor(GetPosX() + m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int MinRelZ = (int)floor(GetPosZ() - m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int MaxRelZ = (int)floor(GetPosZ() + m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	int MinY = std::max(0, std::min(cChunkDef::Height - 1, (int)floor(GetPosY())));
+	int MinY = std::max(0, std::min(cChunkDef::Height - 1, POSY_TOINT));
 	int MaxY = std::max(0, std::min(cChunkDef::Height - 1, (int)ceil (GetPosY() + m_Height)));
 	bool HasWater = false;
 	bool HasLava = false;
