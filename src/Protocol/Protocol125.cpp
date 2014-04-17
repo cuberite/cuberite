@@ -1646,8 +1646,6 @@ int cProtocol125::ParseEnchantItem(void)
 	HANDLE_PACKET_READ(ReadByte, Byte, WindowID);
 	HANDLE_PACKET_READ(ReadByte, Byte, Enchantment);
 
-	LOGWARN("Older Protocol: Enchantment Packet received!");
-
 	m_Client->HandleEnchantItem(WindowID, Enchantment);
 
 	return PARSE_OK;

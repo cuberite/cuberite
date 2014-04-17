@@ -249,7 +249,7 @@ public:
 	cSlotArea * m_SlotArea;
 
 protected:
-	int m_PropertyValue0, m_PropertyValue1, m_PropertyValue2;
+	int m_PropertyValue[3];
 	int m_BlockX, m_BlockY, m_BlockZ;
 };
 

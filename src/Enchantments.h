@@ -8,7 +8,9 @@
 
 #pragma once
 
+#include "Defines.h"
 #include "WorldStorage/EnchantmentSerializer.h"
+#include "Entities/Player.h"
 
 
 
@@ -29,7 +31,6 @@ Level value of 0 means no such enchantment, and it will not be stored in the m_E
 Serialization will never put zero-level enchantments into the stringspec and will always use numeric IDs.
 */
 
-typedef std::vector<cEnchantments> cEnchantmentsVector;
 
 // tolua_begin
 class cEnchantments
@@ -94,9 +95,24 @@ public:
 	
 	/// Returns true if a_Other contains exactly the same enchantments and levels
 	bool operator ==(const cEnchantments & a_Other) const;
-	
+
 	// tolua_end
+
+	/** Add enchantment weights from item to the vector */
+	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short & a_ItemType, int a_EnchantmentLevel);
+
+	/** Add a enchantment weight to the vector */
+	static void AddEnchantmentWeightToVector(cWeightedEnchantments * a_Enchantments, int a_Weight, cEnchantments a_Enchantment);
+	/** Remove a enchantment weight from the vector */
+	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_Enchantments, int a_EnchantmentID);
+
+	/** Check enchantment conflicts from enchantments from the vector */
+	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
+
+	/** Gets random enchantment from Vector and returns it */
+	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);
 	
+
 	/// Returns true if a_Other doesn't contain exactly the same enchantments and levels
 	bool operator !=(const cEnchantments & a_Other) const;
 	
@@ -113,6 +129,16 @@ protected:
 	/// Currently stored enchantments
 	cMap m_Enchantments;
 } ;  // tolua_export
+
+
+/** Things below for the Enchanting System */
+struct cWeightedEnchantment
+{
+	int m_Weight;
+	cEnchantments m_Enchantments;
+};
+
+typedef std::vector<cWeightedEnchantment> cWeightedEnchantments;
 
 
 

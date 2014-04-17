@@ -824,18 +824,7 @@ cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
 {
-	if (a_Property == 0)
-	{
-		m_PropertyValue0 = a_Value;
-	}
-	else if (a_Property == 1)
-	{
-		m_PropertyValue1 = a_Value;
-	}
-	else if (a_Property == 2)
-	{
-		m_PropertyValue2 = a_Value;
-	}
+	m_PropertyValue[a_Property] = a_Value;
 
 	cCSLock Lock(m_CS);
 	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
@@ -850,18 +839,7 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
 
 void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
 {
-	if (a_Property == 0)
-	{
-		m_PropertyValue0 = a_Value;
-	}
-	else if (a_Property == 1)
-	{
-		m_PropertyValue1 = a_Value;
-	}
-	else if (a_Property == 2)
-	{
-		m_PropertyValue2 = a_Value;
-	}
+	m_PropertyValue[a_Property] = a_Value;
 
 	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
 }
@@ -872,20 +850,7 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Pla
 
 int cEnchantingWindow::GetPropertyValue(int a_Property)
 {
-	if (a_Property == 0)
-	{
-		return m_PropertyValue0;
-	}
-	else if (a_Property == 1)
-	{
-		return m_PropertyValue1;
-	}
-	else if (a_Property == 2)
-	{
-		return m_PropertyValue2;
-	}
-
-	return -1;
+	return m_PropertyValue[a_Property];
 }
 
 
