@@ -20,6 +20,11 @@ class cFastNBTWriter;
 class cParsedNBT;
 
 
+// fwd:
+struct cWeightedEnchantment;
+
+typedef std::vector<cWeightedEnchantment> cWeightedEnchantments;
+
 
 
 
@@ -111,7 +116,6 @@ public:
 
 	/** Gets random enchantment from Vector and returns it */
 	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);
-	
 
 	/// Returns true if a_Other doesn't contain exactly the same enchantments and levels
 	bool operator !=(const cEnchantments & a_Other) const;
@@ -131,15 +135,14 @@ protected:
 } ;  // tolua_export
 
 
-/** Things below for the Enchanting System */
+
+
+// Define the cWeightedEnchantment struct:
 struct cWeightedEnchantment
 {
 	int m_Weight;
 	cEnchantments m_Enchantments;
 };
-
-typedef std::vector<cWeightedEnchantment> cWeightedEnchantments;
-
 
 
 

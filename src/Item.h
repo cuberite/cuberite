@@ -180,7 +180,7 @@ public:
 
 	/** Enchants the item using the specified number of XP levels.
 	Returns true if item enchanted, false if not. */
-	bool EnchantByXPLevels(int a_NumXPLevels, cPlayer & a_Player, bool a_BlockConflictingEnchantments, bool a_DeleteLevelFromPlayer); // tolua_export
+	bool EnchantByXPLevels(int a_NumXPLevels); // tolua_export
 
 	// tolua_begin
 	

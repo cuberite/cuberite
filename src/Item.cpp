@@ -267,7 +267,7 @@ int cItem::GetEnchantability()
 
 
 
-bool cItem::EnchantByXPLevels(int a_NumXPLevels, cPlayer & a_Player, bool a_BlockConflictingEnchantments, bool a_DeleteLevelFromPlayer)
+bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 {
 	if (!cItem::IsEnchantable(m_ItemType) && m_ItemType != E_ITEM_BOOK)
 	{
@@ -338,12 +338,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels, cPlayer & a_Player, bool a_Bloc
 		}
 	}
 
-	if (a_Player.DeltaExperience(-a_Player.XpForLevel(a_NumXPLevels)) >= 0 || a_Player.IsGameModeCreative())
-	{
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
 
