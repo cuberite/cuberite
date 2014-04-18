@@ -1214,7 +1214,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	cCompositeChat Msg;
 	AString Color = m_Player->GetColor();
 	if (Color.length() == 3)
-	{ 
+	{
 		Color = AString("@") + Color[2];
 	}
 	else

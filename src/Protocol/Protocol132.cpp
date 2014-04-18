@@ -805,7 +805,7 @@ void cProtocol132::SendEncryptionKeyRequest(void)
 	WriteByte(0xfd);
 	WriteString(Server->GetServerID());
 	const AString & PublicKeyDER = Server->GetPublicKeyDER();
-	WriteShort((short) (PublicKeyDER.size()));
+	WriteShort((short)(PublicKeyDER.size()));
 	SendData(PublicKeyDER.data(), PublicKeyDER.size());
 	WriteShort(4);
 	WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
@@ -881,7 +881,7 @@ void cProtocol132::StartEncryption(const Byte * a_Key)
 	AString ServerID = Server->GetServerID();
 	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update((const Byte *) Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
+	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
