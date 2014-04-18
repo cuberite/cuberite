@@ -893,7 +893,23 @@ void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_
 
 		if (EnchantmentID == a_EnchantmentID)
 		{
-			a_Enchantments->erase(std::remove(a_Enchantments->begin(), a_Enchantments->end(), *it), a_Enchantments->end());
+			a_Enchantments->erase(it);
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_Enchantments, cEnchantments a_Enchantment)
+{
+	for (cWeightedEnchantments::iterator it = a_Enchantments->begin(); it != a_Enchantments->end(); ++it)
+	{
+		if ((*it).m_Enchantments == a_Enchantment)
+		{
+			a_Enchantments->erase(it);
 			break;
 		}
 	}
@@ -980,6 +996,8 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 			return (*it).m_Enchantments;
 		}
 	}
+
+	return cEnchantments();
 }
 
 

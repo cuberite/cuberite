@@ -286,7 +286,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 
 	cEnchantments Enchantment1 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
 	m_Enchantments.AddFromString(Enchantment1.ToString());
-	enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment1), enchantments.end());
+	cEnchantments::RemoveEnchantmentWeightFromVector(&enchantments, Enchantment1);
 
 	// Checking for conflicting enchantments
 	cEnchantments::CheckEnchantmentConflictsFromVector(enchantments, Enchantment1);
@@ -302,7 +302,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		{
 			cEnchantments Enchantment2 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
 			m_Enchantments.AddFromString(Enchantment2.ToString());
-			enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment2), enchantments.end());
+			cEnchantments::RemoveEnchantmentWeightFromVector(&enchantments, Enchantment2);
 
 			// Checking for conflicting enchantments
 			cEnchantments::CheckEnchantmentConflictsFromVector(enchantments, Enchantment2);
@@ -318,7 +318,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		{
 			cEnchantments Enchantment3 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
 			m_Enchantments.AddFromString(Enchantment3.ToString());
-			enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment3), enchantments.end());
+			cEnchantments::RemoveEnchantmentWeightFromVector(&enchantments, Enchantment3);
 
 			// Checking for conflicting enchantments
 			cEnchantments::CheckEnchantmentConflictsFromVector(enchantments, Enchantment3);
@@ -334,7 +334,6 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		{
 			cEnchantments Enchantment4 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
 			m_Enchantments.AddFromString(Enchantment4.ToString());
-			enchantments.erase(std::remove(enchantments.begin(), enchantments.end(), Enchantment4), enchantments.end());
 		}
 	}
 

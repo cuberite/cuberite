@@ -109,6 +109,7 @@ public:
 	static void AddEnchantmentWeightToVector(cWeightedEnchantments * a_Enchantments, int a_Weight, cEnchantments a_Enchantment);
 	/** Remove a enchantment weight from the vector */
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_Enchantments, int a_EnchantmentID);
+	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_Enchantments, cEnchantments a_Enchantment);
 
 	/** Check enchantment conflicts from enchantments from the vector */
 	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
