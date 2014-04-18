@@ -514,9 +514,10 @@ void cProtocol172::SendGameMode(eGameMode a_GameMode)
 void cProtocol172::SendHealth(void)
 {
 	cPacketizer Pkt(*this, 0x06);  // Update Health packet
-	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetHealth());
-	Pkt.WriteShort(m_Client->GetPlayer()->GetFoodLevel());
-	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteFloat((float)Player->GetHealth());
+	Pkt.WriteShort(Player->GetFoodLevel());
+	Pkt.WriteFloat((float)Player->GetFoodSaturationLevel());
 }
 
 
@@ -549,12 +550,13 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
 	{
+		cServer * Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, 0x01);  // Join Game packet
 		Pkt.WriteInt(a_Player.GetUniqueID());
-		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (cRoot::Get()->GetServer()->IsHardcore() ? 0x08 : 0)); // Hardcore flag bit 4
+		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0)); // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteByte(std::min(cRoot::Get()->GetServer()->GetMaxPlayers(), 60));
+		Pkt.WriteByte(std::min(Server->GetMaxPlayers(), 60));
 		Pkt.WriteString("default");  // Level type - wtf?
 	}
 	
@@ -673,22 +675,23 @@ void cProtocol172::SendPlayerAbilities(void)
 {
 	cPacketizer Pkt(*this, 0x39);  // Player Abilities packet
 	Byte Flags = 0;
-	if (m_Client->GetPlayer()->IsGameModeCreative())
+	cPlayer * Player = m_Client->GetPlayer();
+	if (Player->IsGameModeCreative())
 	{
 		Flags |= 0x01;
 		Flags |= 0x08; // Godmode, used for creative
 	}
-	if (m_Client->GetPlayer()->IsFlying())
+	if (Player->IsFlying())
 	{
 		Flags |= 0x02;
 	}
-	if (m_Client->GetPlayer()->CanFly())
+	if (Player->CanFly())
 	{
 		Flags |= 0x04;
 	}
 	Pkt.WriteByte(Flags);
-	Pkt.WriteFloat((float)(0.05 * m_Client->GetPlayer()->GetFlyingMaxSpeed()));
-	Pkt.WriteFloat((float)(0.1 * m_Client->GetPlayer()->GetMaxSpeed()));
+	Pkt.WriteFloat((float)(0.05 * Player->GetFlyingMaxSpeed()));
+	Pkt.WriteFloat((float)(0.1 * Player->GetMaxSpeed()));
 }
 
 
@@ -739,17 +742,18 @@ void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 void cProtocol172::SendPlayerMaxSpeed(void)
 {
 	cPacketizer Pkt(*this, 0x20);  // Entity Properties
-	Pkt.WriteInt(m_Client->GetPlayer()->GetUniqueID());
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteInt(Player->GetUniqueID());
 	Pkt.WriteInt(1);  // Count
 	Pkt.WriteString("generic.movementSpeed");
 	// The default game speed is 0.1, multiply that value by the relative speed:
-	Pkt.WriteDouble(0.1 * m_Client->GetPlayer()->GetNormalMaxSpeed());
-	if (m_Client->GetPlayer()->IsSprinting())
+	Pkt.WriteDouble(0.1 * Player->GetNormalMaxSpeed());
+	if (Player->IsSprinting())
 	{
 		Pkt.WriteShort(1);  // Modifier count
 		Pkt.WriteInt64(0x662a6b8dda3e4c1c);
 		Pkt.WriteInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteDouble(m_Client->GetPlayer()->GetSprintingMaxSpeed() - m_Client->GetPlayer()->GetNormalMaxSpeed());
+		Pkt.WriteDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
 		Pkt.WriteByte(2);
 	}
 	else
@@ -765,16 +769,17 @@ void cProtocol172::SendPlayerMaxSpeed(void)
 void cProtocol172::SendPlayerMoveLook(void)
 {
 	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
-	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosX());
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteDouble(Player->GetPosX());
 	
 	// Protocol docs say this is PosY, but #323 says this is eye-pos
 	// Moreover, the "+ 0.001" is there because otherwise the player falls through the block they were standing on.
-	Pkt.WriteDouble(m_Client->GetPlayer()->GetStance() + 0.001);
+	Pkt.WriteDouble(Player->GetStance() + 0.001);
 	
-	Pkt.WriteDouble(m_Client->GetPlayer()->GetPosZ());
-	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetYaw());
-	Pkt.WriteFloat((float)m_Client->GetPlayer()->GetPitch());
-	Pkt.WriteBool(m_Client->GetPlayer()->IsOnGround());
+	Pkt.WriteDouble(Player->GetPosZ());
+	Pkt.WriteFloat((float)Player->GetYaw());
+	Pkt.WriteFloat((float)Player->GetPitch());
+	Pkt.WriteBool(Player->IsOnGround());
 }
 
 
@@ -840,9 +845,10 @@ void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 void cProtocol172::SendRespawn(void)
 {
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
-	Pkt.WriteInt(m_Client->GetPlayer()->GetWorld()->GetDimension());
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteInt(Player->GetWorld()->GetDimension());
 	Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-	Pkt.WriteByte((Byte)m_Client->GetPlayer()->GetEffectiveGameMode());
+	Pkt.WriteByte((Byte)Player->GetEffectiveGameMode());
 	Pkt.WriteString("default");
 }
 
@@ -853,9 +859,10 @@ void cProtocol172::SendRespawn(void)
 void cProtocol172::SendExperience (void)
 {
 	cPacketizer Pkt(*this, 0x1F); //Experience Packet
-	Pkt.WriteFloat(m_Client->GetPlayer()->GetXpPercentage());
-	Pkt.WriteShort(m_Client->GetPlayer()->GetXpLevel());
-	Pkt.WriteShort(m_Client->GetPlayer()->GetCurrentXp());
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteFloat(Player->GetXpPercentage());
+	Pkt.WriteShort(Player->GetXpLevel());
+	Pkt.WriteShort(Player->GetCurrentXp());
 }
 
 
@@ -1485,15 +1492,16 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
 	// Send the response:
 	AString Response = "{\"version\":{\"name\":\"1.7.2\",\"protocol\":4},\"players\":{";
+	cServer * Server = cRoot::Get()->GetServer();
 	AppendPrintf(Response, "\"max\":%u,\"online\":%u,\"sample\":[]},",
-		cRoot::Get()->GetServer()->GetMaxPlayers(),
-		cRoot::Get()->GetServer()->GetNumPlayers()
+		Server->GetMaxPlayers(),
+		Server->GetNumPlayers()
 	);
 	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
-		cRoot::Get()->GetServer()->GetDescription().c_str()
+		Server->GetDescription().c_str()
 	);
 	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
-		cRoot::Get()->GetServer()->GetFaviconData().c_str()
+		Server->GetFaviconData().c_str()
 	);
 	Response.append("}");
 	
@@ -1582,12 +1590,13 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 	
+	cServer * Server = cRoot::Get()->GetServer();
 	// If auth is required, then send the encryption request:
-	if (cRoot::Get()->GetServer()->ShouldAuthenticate())
+	if (Server->ShouldAuthenticate())
 	{
 		cPacketizer Pkt(*this, 0x01);
-		Pkt.WriteString(cRoot::Get()->GetServer()->GetServerID());
-		const AString & PubKeyDer = cRoot::Get()->GetServer()->GetPublicKeyDER();
+		Pkt.WriteString(Server->GetServerID());
+		const AString & PubKeyDer = Server->GetPublicKeyDER();
 		Pkt.WriteShort(PubKeyDer.size());
 		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
 		Pkt.WriteShort(4);
@@ -2136,10 +2145,11 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 	
 	// Prepare the m_AuthServerID:
 	cSHA1Checksum Checksum;
-	const AString & ServerID = cRoot::Get()->GetServer()->GetServerID();
+	cServer * Server = cRoot::Get()->GetServer();
+	const AString & ServerID = Server->GetServerID();
 	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update((const Byte *)cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
@@ -2481,11 +2491,12 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpNone)
 			{
 				cRideableMinecart & RideableMinecart = ((cRideableMinecart &)a_Entity);
-				if (!RideableMinecart.GetContent().IsEmpty())
+				const cItem & MinecartContent = RideableMinecart.GetContent();
+				if (!MinecartContent.IsEmpty())
 				{
 					WriteByte(0x54);
-					int Content = RideableMinecart.GetContent().m_ItemType;
-					Content |= RideableMinecart.GetContent().m_ItemDamage << 8;
+					int Content = MinecartContent.m_ItemType;
+					Content |= MinecartContent.m_ItemDamage << 8;
 					WriteInt(Content);
 					WriteByte(0x55);
 					WriteInt(RideableMinecart.GetBlockHeight());

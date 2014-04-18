@@ -412,14 +412,16 @@ void cClientHandle::HandlePing(void)
 {
 	// Somebody tries to retrieve information about the server
 	AString Reply;
+	cServer * Server = cRoot::Get()->GetServer();
+
 	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetServer()->GetDescription().c_str(),
+		Server->GetDescription().c_str(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetNumPlayers(),
+		Server->GetNumPlayers(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetMaxPlayers()
+		Server->GetMaxPlayers()
 	);
-	Kick(Reply.c_str());
+	Kick(Reply);
 }
 
 
@@ -1171,12 +1173,12 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	cCompositeChat Msg;
 	AString Color = m_Player->GetColor();
 	if (Color.length() == 3)
-	{
+	{ 
 		Color = AString("@") + Color[2];
 	}
 	else
-	{
-		Color.empty();
+	{ 
+		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
 	Msg.ParseText(a_Message);
@@ -1678,7 +1680,7 @@ void cClientHandle::Tick(float a_Dt)
 
 	// Send a ping packet:
 	cTimer t1;
-	if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+	if (m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime())
 	{
 		m_PingID++;
 		m_PingStartTime = t1.GetNowTime();

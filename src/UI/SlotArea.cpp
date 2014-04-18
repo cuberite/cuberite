@@ -483,6 +483,7 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 
 	// Get the current recipe:
 	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
+	const cItem & Result = Recipe.GetResult();
 
 	cItem * PlayerSlots = GetPlayerSlots(a_Player) + 1;
 	cCraftingGrid Grid(PlayerSlots, m_GridSize, m_GridSize);
@@ -490,16 +491,16 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 	// If possible, craft:
 	if (DraggingItem.IsEmpty())
 	{
-		DraggingItem = Recipe.GetResult();
+		DraggingItem = Result;
 		Recipe.ConsumeIngredients(Grid);
 		Grid.CopyToItems(PlayerSlots);
 	}
-	else if (DraggingItem.IsEqual(Recipe.GetResult()))
+	else if (DraggingItem.IsEqual(Result))
 	{
-		cItemHandler * Handler = ItemHandler(Recipe.GetResult().m_ItemType);
-		if (DraggingItem.m_ItemCount + Recipe.GetResult().m_ItemCount <= Handler->GetMaxStackSize())
+		cItemHandler * Handler = ItemHandler(Result.m_ItemType);
+		if (DraggingItem.m_ItemCount + Result.m_ItemCount <= Handler->GetMaxStackSize())
 		{
-			DraggingItem.m_ItemCount += Recipe.GetResult().m_ItemCount;
+			DraggingItem.m_ItemCount += Result.m_ItemCount;
 			Recipe.ConsumeIngredients(Grid);
 			Grid.CopyToItems(PlayerSlots);
 		}

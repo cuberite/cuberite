@@ -413,19 +413,20 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 		return false;
 	}
 	
-	if (m_Contents.GetSlot(fsOutput).IsEmpty())
+	const cItem & Slot = m_Contents.GetSlot(fsOutput);
+	if (Slot.IsEmpty())
 	{
 		// The output is empty, can cook
 		return true;
 	}
 
-	if (!m_Contents.GetSlot(fsOutput).IsEqual(*m_CurrentRecipe->Out))
+	if (!Slot.IsEqual(*m_CurrentRecipe->Out))
 	{
 		// The output slot is blocked with something that cannot be stacked with the recipe's output
 		return false;
 	}
 	
-	if (m_Contents.GetSlot(fsOutput).IsFullStack())
+	if (Slot.IsFullStack())
 	{
 		// Cannot add any more items to the output slot
 		return false;

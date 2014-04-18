@@ -103,9 +103,9 @@ void cProtocol142::SendPickupSpawn(const cPickup & a_Pickup)
 	WriteInt    (a_Pickup.GetUniqueID());
 	WriteItem   (a_Pickup.GetItem());
 	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
-	WriteChar   ((char)(a_Pickup.GetSpeed().x * 8));
-	WriteChar   ((char)(a_Pickup.GetSpeed().y * 8));
-	WriteChar   ((char)(a_Pickup.GetSpeed().z * 8));
+	WriteChar((char) (a_Pickup.GetSpeedX() * 8));
+	WriteChar((char) (a_Pickup.GetSpeedY() * 8));
+	WriteChar((char) (a_Pickup.GetSpeedZ() * 8));
 	Flush();
 }
 
@@ -170,9 +170,9 @@ void cProtocol146::SendPickupSpawn(const cPickup & a_Pickup)
 	WriteInt ((int)(a_Pickup.GetPosY() * 32));
 	WriteInt ((int)(a_Pickup.GetPosZ() * 32));
 	WriteInt (1);
-	WriteShort((short)(a_Pickup.GetSpeed().x * 32));
-	WriteShort((short)(a_Pickup.GetSpeed().y * 32));
-	WriteShort((short)(a_Pickup.GetSpeed().z * 32));
+	WriteShort((short)(a_Pickup.GetSpeedX() * 32));
+	WriteShort((short) (a_Pickup.GetSpeedY() * 32));
+	WriteShort((short) (a_Pickup.GetSpeedZ() * 32));
 	WriteByte(0);
 	WriteByte(0);
 	

@@ -135,7 +135,7 @@ protected:
 	bool EraseChunkData(const cChunkCoords & a_Chunk);
 	
 	/// Loads the chunk from the data (no locking needed)
-	bool LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWorld * a_World);
+	bool LoadChunkFromData(const cChunkCoords & a_Chunk, int a_UncompressedSize, const AString & a_Data, cWorld * a_World);
 		
 	void LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWorld * a_World);
 

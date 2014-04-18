@@ -980,6 +980,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 void cProtocolRecognizer::SendLengthlessServerPing(void)
 {
 	AString Reply;
+	cServer * Server = cRoot::Get()->GetServer();
 	switch (cRoot::Get()->GetPrimaryServerVersion())
 	{
 		case PROTO_VERSION_1_2_5:
@@ -987,11 +988,11 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 		{
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
 			Printf(Reply, "%s%s%i%s%i", 
-				cRoot::Get()->GetServer()->GetDescription().c_str(),
+				Server->GetDescription().c_str(),
 				cChatColor::Delimiter.c_str(),
-				cRoot::Get()->GetServer()->GetNumPlayers(),
+				Server->GetNumPlayers(),
 				cChatColor::Delimiter.c_str(),
-				cRoot::Get()->GetServer()->GetMaxPlayers()
+				Server->GetMaxPlayers()
 			);
 			break;
 		}
@@ -1021,9 +1022,9 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			
 			// http://wiki.vg/wiki/index.php?title=Server_List_Ping&oldid=3100
 			AString NumPlayers;
-			Printf(NumPlayers, "%d", cRoot::Get()->GetServer()->GetNumPlayers());
+			Printf(NumPlayers, "%d", Server->GetNumPlayers());
 			AString MaxPlayers;
-			Printf(MaxPlayers, "%d", cRoot::Get()->GetServer()->GetMaxPlayers());
+			Printf(MaxPlayers, "%d", Server->GetMaxPlayers());
 			
 			AString ProtocolVersionNum;
 			Printf(ProtocolVersionNum, "%d", cRoot::Get()->GetPrimaryServerVersion());
@@ -1037,7 +1038,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			Reply.push_back(0);
 			Reply.append(ProtocolVersionTxt);
 			Reply.push_back(0);
-			Reply.append(cRoot::Get()->GetServer()->GetDescription());
+			Reply.append(Server->GetDescription());
 			Reply.push_back(0);
 			Reply.append(NumPlayers);
 			Reply.push_back(0);

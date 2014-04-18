@@ -58,8 +58,8 @@ public:
 
 	struct FoodInfo
 	{
-		int    FoodLevel;
 		double Saturation;
+		int    FoodLevel;
 		int    PoisonChance;	 // 0 - 100, in percent. 0 = no chance of poisoning, 100 = sure poisoning
 
 		FoodInfo(int a_FoodLevel, double a_Saturation, int a_PoisonChance = 0) :

@@ -795,7 +795,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		{
 			BLOCKTYPE BlockXM = m_World->GetBlock((int)floor(GetPosX()) - 1, (int)floor(GetPosY()), (int)floor(GetPosZ()));
 			BLOCKTYPE BlockXP = m_World->GetBlock((int)floor(GetPosX()) + 1, (int)floor(GetPosY()), (int)floor(GetPosZ()));
-			BLOCKTYPE BlockZM = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) + 1);
+			BLOCKTYPE BlockZM = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) - 1);
 			BLOCKTYPE BlockZP = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) + 1);
 			if (
 				(!IsBlockRail(BlockXM) && cBlockInfo::IsSolid(BlockXM)) ||

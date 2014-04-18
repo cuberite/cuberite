@@ -382,10 +382,10 @@ private:
 	
 	struct sSetBlockQueueItem
 	{
+		Int64 m_Tick;
 		int m_RelX, m_RelY, m_RelZ;
 		BLOCKTYPE m_BlockType;
 		NIBBLETYPE m_BlockMeta;
-		Int64 m_Tick;
 		BLOCKTYPE m_PreviousType;
 		
 		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType) :
