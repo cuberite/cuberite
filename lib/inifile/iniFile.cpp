@@ -154,7 +154,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			case ';':
 			case '#':
 			{
-				if (names.size() == 0)
+				if (names.empty())
 				{
 					AddHeaderComment(line.substr(pLeft + 1));
 				}
@@ -168,8 +168,9 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 	}  // while (getline())
 
 	f.close();
-	if (names.size() == 0)
+	if (keys.empty() && names.empty() && comments.empty())
 	{
+		// File be empty or unreadable, equivalent to nonexistant
 		return false;
 	}
 

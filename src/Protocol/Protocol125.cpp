@@ -595,6 +595,15 @@ void cProtocol125::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 
 
+void cProtocol125::SendLoginSuccess(void)
+{
+	// Not supported in this protocol version
+}
+
+
+
+
+
 void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
 {
 	cCSLock Lock(m_CSPacket);
@@ -643,6 +652,17 @@ void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decor
 
 
 
+void cProtocol125::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	// This protocol doesn't support such message
+	UNUSED(a_ID);
+	UNUSED(a_Scale);
+}
+
+
+
+
+
 void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	cCSLock Lock(m_CSPacket);
@@ -679,6 +699,16 @@ void cProtocol125::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 void cProtocol125::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
 {
 	// Not supported by this protocol version
+}
+
+
+
+
+
+void cProtocol125::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Painting);
 }
 
 
@@ -840,6 +870,18 @@ void cProtocol125::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	WriteInt((int) a_ExpOrb.GetPosZ());
 	WriteShort((short)a_ExpOrb.GetReward());
 	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	// This protocol version doesn't support such message
+	UNUSED(a_Name);
+	UNUSED(a_DisplayName);
+	UNUSED(a_Mode);
 }
 
 

@@ -133,10 +133,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 0, 2, 2: 4\n"  /* Type 1, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		20,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // BalconyCorridor
 
 
@@ -274,10 +286,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 0, 2, 4: 4\n"  /* Type 1, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		20,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // BalconyTee2
 
 
@@ -378,10 +402,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 0, 1, 3: 4\n"  /* Type 0, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // BlazePlatform
 
 
@@ -510,10 +546,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 0, 5, 3: 4\n"  /* Type 0, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // BlazePlatformOverhang
 
 
@@ -694,10 +742,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 7, 5, 14: 3\n"  /* Type 0, direction Z+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		5,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // BridgeCircleCrossing
 
 
@@ -879,10 +939,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 14, 5, 7: 5\n"  /* Type 0, direction X+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		10,
+
+		// DepthWeight:
+		"1:1000",
+
+		// AddWeightIfSame:
+		0,
 	},  // BridgeCrossing
 
 
@@ -957,10 +1029,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 0, 5, 2: 4\n"  /* Type 0, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"1:0",
+
+		// AddWeightIfSame:
+		0,
 	},  // BridgeCrumble1
 
 
@@ -1041,10 +1125,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 0, 5, 2: 4\n"  /* Type 1, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"1:0",
+
+		// AddWeightIfSame:
+		0,
 	},  // BridgeCrumble2
 
 
@@ -1204,11 +1300,259 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 2, 4, 15: 3\n"  /* Type 0, direction Z+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		10,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		1000,
 	},  // BridgeDoubleCrumble
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// BridgeFunnelDown:
+	// The data has been exported from the gallery Nether, area index 0, ID 2, created by Aloe_vera
+	{
+		// Size:
+		15, 12, 12,  // SizeX = 15, SizeY = 12, SizeZ = 12
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:112: 0\n"  /* netherbrick */
+		"b:114: 6\n"  /* netherbrickstairs */
+		"c:114: 4\n"  /* netherbrickstairs */
+		"d:114: 5\n"  /* netherbrickstairs */
+		"e: 44:14\n"  /* step */
+		"f:114: 7\n"  /* netherbrickstairs */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "aammmmmmmmmmmaa"
+		/*  2 */ "aammmmmmmmmmmaa"
+		/*  3 */ "aammmmmmmmmmmaa"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmaaammmmmm"
+		/* 10 */ "mmmmmmaaammmmmm"
+		/* 11 */ "mmmmmmaaammmmmm"
+
+		// Level 1
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "aammmmmmmmmmmaa"
+		/*  2 */ "aammmmmmmmmmmaa"
+		/*  3 */ "aammmmmmmmmmmaa"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmbbbmmmmmm"
+		/*  9 */ "mmmmmmaaammmmmm"
+		/* 10 */ "mmmmmmaaammmmmm"
+		/* 11 */ "mmmmmmaaammmmmm"
+
+		// Level 2
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "aammmmmmmmmmmaa"
+		/*  2 */ "aammmmmmmmmmmaa"
+		/*  3 */ "aammmmmmmmmmmaa"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmcbbbdmmmmm"
+		/*  8 */ "mmmmmcaaadmmmmm"
+		/*  9 */ "mmmmmcaaadmmmmm"
+		/* 10 */ "mmmmmcaaadmmmmm"
+		/* 11 */ "mmmmmcaaadmmmmm"
+
+		// Level 3
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "aammmmmmmmmmmaa"
+		/*  2 */ "aammmmmmmmmmmaa"
+		/*  3 */ "aammmmmmmmmmmaa"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmaaaaammmmm"
+		/*  8 */ "mmmmmaaaaammmmm"
+		/*  9 */ "mmmmmaaaaammmmm"
+		/* 10 */ "mmmmmaaaaammmmm"
+		/* 11 */ "mmmmmaaaaammmmm"
+
+		// Level 4
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "aammmmmmmmmmmaa"
+		/*  2 */ "aammmmmmmmmmmaa"
+		/*  3 */ "aammmmmmmmmmmaa"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmcbbbbbdmmmm"
+		/*  7 */ "mmmmaaaaaaammmm"
+		/*  8 */ "mmmma.....ammmm"
+		/*  9 */ "mmmmaa...aammmm"
+		/* 10 */ "mmmmma...ammmmm"
+		/* 11 */ "mmmmma...ammmmm"
+
+		// Level 5
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "aadmmmmmmmmmcaa"
+		/*  2 */ "aadmmmmmmmmmcaa"
+		/*  3 */ "aadmmmmmmmmmcaa"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmcbbbbbbbdmmm"
+		/*  6 */ "mmmaaaaaaaaaamm"
+		/*  7 */ "mmma.......ammm"
+		/*  8 */ "mmmaa.....aammm"
+		/*  9 */ "mmmmam...mammmm"
+		/* 10 */ "mmmmmm...mmmmmm"
+		/* 11 */ "mmmmmm...mmmmmm"
+
+		// Level 6
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "aaademmmmmecaaa"
+		/*  2 */ "aaademmmmmecaaa"
+		/*  3 */ "aaademmmmmecaaa"
+		/*  4 */ "mmaaabbbbbaaaam"
+		/*  5 */ "mmaaaaaaaaaaaam"
+		/*  6 */ "mma.........amm"
+		/*  7 */ "mmaa.......aamm"
+		/*  8 */ "mmmam.....mammm"
+		/*  9 */ "mmmmmm...mmmmmm"
+		/* 10 */ "mmmmmm...mmmmmm"
+		/* 11 */ "mmmmmm...mmmmmm"
+
+		// Level 7
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "bbbbbbbbbbbbbbb"
+		/*  1 */ "aaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaa"
+		/*  4 */ "faaaaaaaaaaaaaa"
+		/*  5 */ "ma...........am"
+		/*  6 */ "maa.........aam"
+		/*  7 */ "mmam.......mamm"
+		/*  8 */ "mmmmm.....mmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+
+		// Level 8
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "aaaaaaaaaaaaaaa"
+		/*  1 */ "aaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaa"
+		/*  4 */ "a.............a"
+		/*  5 */ "aa...........aa"
+		/*  6 */ "mam.........mam"
+		/*  7 */ "mmmm.......mmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+
+		// Level 9
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "aaaaaaaaaaaaaaa"
+		/*  1 */ "..............."
+		/*  2 */ "..............."
+		/*  3 */ "..............."
+		/*  4 */ "a.............a"
+		/*  5 */ "am............a"
+		/*  6 */ "mmm.........mmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+
+		// Level 10
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "..............."
+		/*  2 */ "..............."
+		/*  3 */ "..............."
+		/*  4 */ "m.............m"
+		/*  5 */ "mm............m"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+
+		// Level 11
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "..............."
+		/*  2 */ "..............."
+		/*  3 */ "..............."
+		/*  4 */ "m.............m"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm",
+
+		// Connectors:
+		"0: 7, 4, 11: 3\n"  /* Type 0, direction Z+ */
+		"0: 0, 9, 2: 4\n"  /* Type 0, direction X- */
+		"0: 14, 9, 2: 5\n"  /* Type 0, direction X+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		5,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+	},  // BridgeFunnelDown
 
 
 
@@ -1514,10 +1858,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"",
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // BridgeLevelCrossing
 
 
@@ -1617,10 +1973,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 14, 5, 2: 5\n"  /* Type 0, direction X+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		500,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		1000,
 	},  // BridgeSegment
 
 
@@ -1761,10 +2129,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 14, 5, 2: 5\n"  /* Type 0, direction X+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		10,
+
+		// DepthWeight:
+		"1:500",
+
+		// AddWeightIfSame:
+		0,
 	},  // BridgeTee
 
 
@@ -1844,10 +2224,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		200,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // Corridor11
 
 
@@ -1927,10 +2319,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		200,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // Corridor13
 
 
@@ -2048,10 +2452,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 10, 1, 2: 5\n"  /* Type 1, direction X+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // CorridorCorner5
 
 
@@ -2170,10 +2586,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 2, 1, 10: 3\n"  /* Type 1, direction Z+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // CorridorCornerChest5
 
 
@@ -2304,10 +2732,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 8, 8, 2: 5\n"  /* Type 1, direction X+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // CorridorStairs
 
 
@@ -2367,11 +2807,11 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Level 4
 		/* z\x*             1111 */
 		/*    *   01234567890123 */
-		/*  0 */ "aaaaaaaaaaaaaa"
+		/*  0 */ "aabaaaaaaaabaa"
 		/*  1 */ ".............."
 		/*  2 */ ".............."
 		/*  3 */ ".............."
-		/*  4 */ "aaaaaaaaaaaaaa"
+		/*  4 */ "aabaaaaaaaabaa"
 
 		// Level 5
 		/* z\x*             1111 */
@@ -2387,10 +2827,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 13, 1, 2: 5\n"  /* Type 1, direction X+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // DarkCorridor
 
 
@@ -2625,10 +3077,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 9, 1, 0: 2\n"  /* Type 1, direction Z- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // LavaStaircase
 
 
@@ -2938,10 +3402,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 0, 9, 7: 4\n"  /* Type 1, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // LavaStaircaseBig
 
 
@@ -3200,10 +3676,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"",
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // LavaStairsBridge
 
 
@@ -3367,13 +3855,25 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 12, 1, 6: 5\n"  /* Type 1, direction X+ */
-		"1: -1, 1, 6: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 6: 4\n"  /* Type 1, direction X- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // MidStaircase
 
 
@@ -3497,10 +3997,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 3, 1, 0: 2\n"  /* Type 0, direction Z- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // StairsToOpen1
 
 
@@ -3624,10 +4136,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 3, 1, 0: 2\n"  /* Type 0, direction Z- */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // StairsToOpen2
 
 
@@ -3722,10 +4246,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 12, 1, 4: 5\n"  /* Type 1, direction X+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // Tee2x4
 
 
@@ -3832,10 +4368,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 12, 1, 6: 5\n"  /* Type 1, direction X+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // Tee4x4
 
 
@@ -3921,10 +4469,22 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"0: 3, 1, 6: 3\n"  /* Type 0, direction Z+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		-99,
 	},  // Turret
 };  // g_NetherFortPrefabs
 
@@ -4108,10 +4668,22 @@ const cPrefab::sDef g_NetherFortStartingPrefabs[] =
 		"1: 6, 1, 12: 3\n"  /* Type 1, direction Z+ */,
 
 		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotations */
+		7,  /* 1, 2, 3 CCW rotation allowed */
 
 		// Merge strategy:
 		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
 	},  // CentralRoom
 };
 

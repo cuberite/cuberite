@@ -615,14 +615,14 @@ void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 
 
 
-void cServer::AuthenticateUser(int a_ClientID)
+void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID)
 {
 	cCSLock Lock(m_CSClients);
 	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
-			(*itr)->Authenticate();
+			(*itr)->Authenticate(a_Name, a_UUID);
 			return;
 		}
 	}  // for itr - m_Clients[]

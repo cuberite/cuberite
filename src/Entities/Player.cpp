@@ -438,7 +438,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		cWorld * World = GetWorld();
 		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
 		{
-			BLOCKTYPE BlockType = World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
+			BLOCKTYPE BlockType = World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 			if (BlockType != E_BLOCK_AIR)
 			{
 				m_bTouchGround = true;
@@ -467,7 +467,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 			
 			// Fall particles
-			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
+			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, (int)GetPosY() - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
 		}		
 
 		m_LastGroundHeight = (float)GetPosY();
@@ -591,7 +591,7 @@ void cPlayer::FinishEating(void)
 	m_EatingFinishTick = -1;
 	
 	// Send the packets:
-	m_ClientHandle->SendEntityStatus(*this, ENTITY_STATUS_EATING_ACCEPTED);
+	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
 	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
@@ -1520,22 +1520,16 @@ void cPlayer::LoadPermissionsFromDisk()
 	cIniFile IniFile;
 	if (IniFile.ReadFile("users.ini"))
 	{
-		std::string Groups = IniFile.GetValue(m_PlayerName, "Groups", "");
-		if (!Groups.empty())
+		AString Groups = IniFile.GetValueSet(m_PlayerName, "Groups", "Default");
+		AStringVector Split = StringSplitAndTrim(Groups, ",");
+
+		for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
 		{
-			AStringVector Split = StringSplitAndTrim(Groups, ",");
-			for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
+			if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
 			{
-				if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
-				{
-					LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
-				}
-				AddToGroup(*itr);
+				LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
 			}
-		}
-		else
-		{
-			AddToGroup("Default");
+			AddToGroup(*itr);
 		}
 
 		AString Color = IniFile.GetValue(m_PlayerName, "Color", "-");
@@ -1547,8 +1541,10 @@ void cPlayer::LoadPermissionsFromDisk()
 	else
 	{
 		cGroupManager::GenerateDefaultUsersIni(IniFile);
+		IniFile.AddValue("Groups", m_PlayerName, "Default");
 		AddToGroup("Default");
 	}
+	IniFile.WriteFile("users.ini");
 	ResolvePermissions();
 }
 
@@ -1900,9 +1896,9 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 void cPlayer::Detach()
 {
 	super::Detach();
-	int PosX = (int)floor(GetPosX());
-	int PosY = (int)floor(GetPosY());
-	int PosZ = (int)floor(GetPosZ());
+	int PosX = POSX_TOINT;
+	int PosY = POSY_TOINT;
+	int PosZ = POSZ_TOINT;
 
 	// Search for a position within an area to teleport player after detachment
 	// Position must be solid land, and occupied by a nonsolid block

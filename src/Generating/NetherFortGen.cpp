@@ -71,6 +71,40 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Performance test of the NetherFort generator:
+
+/*
+#include "OSSupport/Timer.h"
+static class cNetherFortPerfTest
+{
+public:
+	cNetherFortPerfTest(void)
+	{
+		cTimer Timer;
+		long long StartTime = Timer.GetNowTime();
+		
+		const int GridSize = 512;
+		const int MaxDepth = 12;
+		const int NumIterations = 100;
+		for (int i = 0; i < NumIterations; i++)
+		{
+			cNetherFortGen FortGen(i, GridSize, MaxDepth);
+			delete new cNetherFortGen::cNetherFort(FortGen, 0, 0, GridSize, MaxDepth, i);
+		}
+		
+		long long EndTime = Timer.GetNowTime();
+		printf("%d forts took %lld msec (%f sec) to generate\n", NumIterations, EndTime - StartTime, ((double)(EndTime - StartTime)) / 1000);
+		exit(0);
+	}
+	
+} g_PerfTest;
+//*/
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cNetherFortGen:
 
 cNetherFortGen::cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxDepth) :
@@ -252,6 +286,15 @@ cPieces cNetherFortGen::GetPiecesWithConnector(int a_ConnectorType)
 cPieces cNetherFortGen::GetStartingPieces(void)
 {
 	return m_StartingPieces;
+}
+
+
+
+
+
+int cNetherFortGen::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
+{
+	return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 }
 
 
