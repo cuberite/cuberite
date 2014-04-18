@@ -26,6 +26,7 @@ public:
 	virtual ~cNetherFortGen();
 	
 protected:
+	friend class cNetherFortPerfTest;  // fwd: NetherFortGen.cpp
 	class cNetherFort;  // fwd: NetherFortGen.cpp
 	typedef std::list<cNetherFort *> cNetherForts;
 	
