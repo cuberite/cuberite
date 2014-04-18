@@ -791,7 +791,7 @@ void cFireworkEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_ExplodeTimer == m_FireworkItem.m_FireworkItem.m_FlightTimeInTicks)
 	{
-		m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_FIREWORK_EXPLODE);
+		m_World->BroadcastEntityStatus(*this, esFireworkExploding);
 		Destroy();
 	}
 

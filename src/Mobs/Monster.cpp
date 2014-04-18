@@ -111,9 +111,9 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 void cMonster::TickPathFinding()
 {
-	const int PosX = (int)floor(GetPosX());
-	const int PosY = (int)floor(GetPosY());
-	const int PosZ = (int)floor(GetPosZ());
+	const int PosX = POSX_TOINT;
+	const int PosY = POSY_TOINT;
+	const int PosZ = POSZ_TOINT;
 
 	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
 
@@ -148,13 +148,27 @@ void cMonster::TickPathFinding()
 		BLOCKTYPE BlockAtY = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 1, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
-		BLOCKTYPE BlockAtYM = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY - 1, gCrossCoords[i].z + PosZ);
+		int LowestY = FindFirstNonAirBlockPosition(gCrossCoords[i].x + PosX, gCrossCoords[i].z + PosZ);
+		BLOCKTYPE BlockAtLowestY = m_World->GetBlock(gCrossCoords[i].x + PosX, LowestY, gCrossCoords[i].z + PosZ);
 
-		if ((!cBlockInfo::IsSolid(BlockAtY)) && (!cBlockInfo::IsSolid(BlockAtYP)) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
+		if (
+			(!cBlockInfo::IsSolid(BlockAtY)) &&
+			(!cBlockInfo::IsSolid(BlockAtYP)) &&
+			(!IsBlockLava(BlockAtLowestY)) &&
+			(BlockAtLowestY != E_BLOCK_CACTUS) &&
+			(PosY - LowestY < FALL_DAMAGE_HEIGHT)
+			)
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY, gCrossCoords[i].z + PosZ));
 		}
-		else if ((cBlockInfo::IsSolid(BlockAtY)) && (!cBlockInfo::IsSolid(BlockAtYP)) && (!cBlockInfo::IsSolid(BlockAtYPP)) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
+		else if (
+			(cBlockInfo::IsSolid(BlockAtY)) &&
+			(BlockAtY != E_BLOCK_CACTUS) &&
+			(!cBlockInfo::IsSolid(BlockAtYP)) &&
+			(!cBlockInfo::IsSolid(BlockAtYPP)) &&
+			(BlockAtY != E_BLOCK_FENCE) &&
+			(BlockAtY != E_BLOCK_FENCE_GATE)
+			)
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY + 1, gCrossCoords[i].z + PosZ));
 		}
@@ -402,7 +416,7 @@ void cMonster::HandleFalling()
 			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
 		}
 
-		m_LastGroundHeight = (int)floor(GetPosY());
+		m_LastGroundHeight = POSY_TOINT;
 	}
 }
 
@@ -411,7 +425,7 @@ void cMonster::HandleFalling()
 
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
-	int PosY = (int)floor(GetPosY());
+	int PosY = POSY_TOINT;
 
 	if (PosY < 0)
 		PosY = 0;
@@ -969,15 +983,15 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		return;
 	}
 	
-	int RelY = (int)floor(GetPosY());
+	int RelY = POSY_TOINT;
 	if ((RelY < 0) || (RelY >= cChunkDef::Height))
 	{
 		// Outside the world
 		return;
 	}
 	
-	int RelX = (int)floor(GetPosX()) - GetChunkX() * cChunkDef::Width;
-	int RelZ = (int)floor(GetPosZ()) - GetChunkZ() * cChunkDef::Width;
+	int RelX = POSX_TOINT - GetChunkX() * cChunkDef::Width;
+	int RelZ = POSZ_TOINT - GetChunkZ() * cChunkDef::Width;
 
 	if (!a_Chunk.IsLightValid())
 	{

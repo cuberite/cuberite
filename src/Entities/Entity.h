@@ -32,6 +32,8 @@
 #define POSZ_TOINT (int)floor(GetPosZ())
 #define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
 
+#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == NULL) || !ChunkVarName->IsValid()) { return; }
+
 
 
 
@@ -88,23 +90,42 @@ public:
 	} ;
 	
 	// tolua_end
-
-	enum
+	
+	enum eEntityStatus
 	{
-		ENTITY_STATUS_HURT            = 2,
-		ENTITY_STATUS_DEAD            = 3,
-		ENTITY_STATUS_WOLF_TAMING     = 6,
-		ENTITY_STATUS_WOLF_TAMED      = 7,
-		ENTITY_STATUS_WOLF_SHAKING    = 8,
-		ENTITY_STATUS_EATING_ACCEPTED = 9,
-		ENTITY_STATUS_SHEEP_EATING    = 10,
-		ENTITY_STATUS_GOLEM_ROSING    = 11,
-		ENTITY_STATUS_VILLAGER_HEARTS = 12,
-		ENTITY_STATUS_VILLAGER_ANGRY  = 13,
-		ENTITY_STATUS_VILLAGER_HAPPY  = 14,
-		ENTITY_STATUS_WITCH_MAGICKING = 15,
+		// TODO: Investiagate 0, 1, and 5 as Wiki.vg is not certain
+
+		// Entity becomes coloured red
+		esGenericHurt            = 2,
+		// Entity plays death animation (entity falls to ground)
+		esGenericDead            = 3,
+		// Iron Golem plays attack animation (arms lift and fall)
+		esIronGolemAttacking     = 4,
+		// Wolf taming particles spawn (smoke)
+		esWolfTaming             = 6,
+		// Wolf tamed particles spawn (hearts)
+		esWolfTamed              = 7,
+		// Wolf plays water removal animation (shaking and water particles)
+		esWolfDryingWater        = 8,
+		// Informs client that eating was accepted
+		esPlayerEatingAccepted   = 9,
+		// Sheep plays eating animation (head lowers to ground)
+		esSheepEating            = 10,
+		// Iron Golem holds gift to villager children
+		esIronGolemGivingPlant   = 11,
+		// Villager spawns heart particles
+		esVillagerBreeding       = 12,
+		// Villager spawns thunderclound particles
+		esVillagerAngry          = 13,
+		// Villager spawns green crosses
+		esVillagerHappy          = 14,
+		// Witch spawns magic particle (TODO: investigation into what this is)
+		esWitchMagicking         = 15,
+
 		// It seems 16 (zombie conversion) is now done with metadata
-		ENTITY_STATUS_FIREWORK_EXPLODE= 17,
+
+		// Informs client to explode a firework based on its metadata
+		esFireworkExploding      = 17,
 	} ;
 	
 	enum
@@ -118,7 +139,8 @@ public:
 		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
 		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
 		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
-		VOID_BOUNDARY = -46          ///< At what position Y to begin applying void damage
+		VOID_BOUNDARY = -46,         ///< At what position Y to begin applying void damage
+		FALL_DAMAGE_HEIGHT = 4       ///< At what position Y fall damage is applied
 	} ;
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
