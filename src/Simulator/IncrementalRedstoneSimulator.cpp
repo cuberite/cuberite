@@ -1428,15 +1428,21 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_BlockX, int a_BlockY, in
 {
 	a_PowerLevel = 0;
 
-	for (auto itr = m_PoweredBlocks->cbegin(); itr != m_PoweredBlocks->cend(); ++itr) // Check powered list
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr) // Check powered list
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		{
+			continue;
+		}
 		a_PowerLevel = std::max(a_PowerLevel, itr->a_PowerLevel);
 	}
 
-	for (auto itr = m_LinkedPoweredBlocks->cbegin(); itr != m_LinkedPoweredBlocks->cend(); ++itr) // Check linked powered list
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr) // Check linked powered list
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+		{
+			continue;
+		}
 		a_PowerLevel = std::max(a_PowerLevel, itr->a_PowerLevel);
 	}
 
@@ -1592,13 +1598,13 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, 
 		return;
 	}
 
-	auto Powered = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorPoweredBlocksList();
-	for (auto itr = Powered->begin(); itr != Powered->end(); ++itr) // Check powered list
+	PoweredBlocksList * Powered = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorPoweredBlocksList();
+	for (PoweredBlocksList::iterator itr = Powered->begin(); itr != Powered->end(); ++itr)  // Check powered list
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
 			itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
-			)
+		)
 		{
 			// Check for duplicates, update power level if everything else the same but either way, don't add a new listing
 			if (itr->a_PowerLevel != a_PowerLevel)
@@ -1609,13 +1615,13 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, 
 		}
 	}
 
-	auto OtherPowered = m_Chunk->GetNeighborChunk(a_SourceX, a_SourceZ)->GetRedstoneSimulatorPoweredBlocksList();
-	for (auto itr = OtherPowered->cbegin(); itr != OtherPowered->cend(); ++itr) // Check powered list
+	PoweredBlocksList * OtherPowered = m_Chunk->GetNeighborChunk(a_SourceX, a_SourceZ)->GetRedstoneSimulatorPoweredBlocksList();
+	for (PoweredBlocksList::const_iterator itr = OtherPowered->begin(); itr != OtherPowered->end(); ++itr)  // Check powered list
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ)) &&
 			itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))
-			)
+		)
 		{
 			// Powered wires try to power their source - don't let them!
 			return;
@@ -1651,14 +1657,14 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 		return;
 	}
 
-	auto Linked = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorLinkedBlocksList();
-	for (auto itr = Linked->begin(); itr != Linked->end(); ++itr) // Check linked powered list
+	LinkedBlocksList * Linked = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorLinkedBlocksList();
+	for (LinkedBlocksList::iterator itr = Linked->begin(); itr != Linked->end(); ++itr)  // Check linked powered list
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
 			itr->a_MiddlePos.Equals(Vector3i(a_MiddleX, a_MiddleY, a_MiddleZ)) &&
 			itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
-			)
+		)
 		{
 			// Check for duplicates, update power level if everything else the same but either way, don't add a new listing
 			if (itr->a_PowerLevel != a_PowerLevel)
