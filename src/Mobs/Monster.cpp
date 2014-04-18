@@ -540,7 +540,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 			break;
 		}
 	}
-	if ((a_Killer != NULL) && (!IsBaby())
+	if ((a_Killer != NULL) && (!IsBaby()))
 	{
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
