@@ -63,8 +63,8 @@ public:
 		int    PoisonChance;	 // 0 - 100, in percent. 0 = no chance of poisoning, 100 = sure poisoning
 
 		FoodInfo(int a_FoodLevel, double a_Saturation, int a_PoisonChance = 0) :
-			FoodLevel(a_FoodLevel),
 			Saturation(a_Saturation),
+			FoodLevel(a_FoodLevel),
 			PoisonChance(a_PoisonChance)
 		{
 		}
