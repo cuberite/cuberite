@@ -2737,7 +2737,7 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 
 	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
 	{
-		if (m_Player->IsGameModeCreative() | m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
+		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
 		{
 			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
 			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
