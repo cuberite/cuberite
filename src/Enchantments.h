@@ -105,10 +105,13 @@ public:
 	/** Add enchantment weights from item to the vector */
 	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel);
 
-	/** Add a enchantment weight to the vector */
-	static void AddEnchantmentWeightToVector(cWeightedEnchantments * a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel);
-	/** Remove a enchantment weight from the vector */
+	/** Add a enchantment with weight to the vector */
+	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel);
+	
+	/** Remove the entire enchantment (with weight) from the vector */
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, int a_EnchantmentID);
+	
+	/** Remove the entire enchantment (with weight) from the vector */
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment);
 
 	/** Check enchantment conflicts from enchantments from the vector */
@@ -137,7 +140,7 @@ protected:
 
 
 
-// Define the cWeightedEnchantment struct:
+// Define the cWeightedEnchantment struct for the Enchanting System to store the EnchantmentWeights:
 struct cWeightedEnchantment
 {
 	int m_Weight;
