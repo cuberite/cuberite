@@ -4,6 +4,7 @@
 // Implements the cBlockEntity class that is the common ancestor for all block entities
 
 #include "Globals.h"
+#include "BeaconEntity.h"
 #include "BlockEntity.h"
 #include "ChestEntity.h"
 #include "CommandBlockEntity.h"
@@ -26,6 +27,7 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 {
 	switch (a_BlockType)
 	{
+		case E_BLOCK_BEACON:        return new cBeaconEntity      (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_CHEST:         return new cChestEntity       (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_COMMAND_BLOCK: return new cCommandBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_DISPENSER:     return new cDispenserEntity   (a_BlockX, a_BlockY, a_BlockZ, a_World);

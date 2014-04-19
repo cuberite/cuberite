@@ -1299,6 +1299,7 @@ void cChunk::CreateBlockEntities(void)
 				BLOCKTYPE BlockType = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
 				switch (BlockType)
 				{
+					case E_BLOCK_BEACON:
 					case E_BLOCK_CHEST:
 					case E_BLOCK_COMMAND_BLOCK:
 					case E_BLOCK_DISPENSER:
@@ -1429,6 +1430,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	// If the new block is a block entity, create the entity object:
 	switch (a_BlockType)
 	{
+		case E_BLOCK_BEACON:
 		case E_BLOCK_CHEST:
 		case E_BLOCK_COMMAND_BLOCK:
 		case E_BLOCK_DISPENSER:
