@@ -540,7 +540,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 			break;
 		}
 	}
-	if (a_Killer != NULL)
+	if ((a_Killer != NULL) && (!IsBaby()))
 	{
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
@@ -1003,7 +1003,8 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		(a_Chunk.GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
 		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
-		!IsOnFire()                                                  // Not already burning
+		!IsOnFire() &&                                               // Not already burning
+		(GetWorld()->GetWeather() != eWeather_Rain)                  // Not raining
 	)
 	{
 		// Burn for 100 ticks, then decide again

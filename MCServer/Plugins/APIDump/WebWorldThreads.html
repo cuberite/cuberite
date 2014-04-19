@@ -39,31 +39,31 @@
 
 			<h2>Example</h2>
 			The Core has the facility to kick players using the web interface. It used the following code for the kicking (inside the webadmin handler):
-			<pre class="prettyprint lang-lua">
-			local KickPlayerName = Request.Params["players-kick"]
-			local FoundPlayerCallback = function(Player)
-			  if (Player:GetName() == KickPlayerName) then
-				Player:GetClientHandle():Kick("You were kicked from the game!")
-			  end
+<pre class="prettyprint lang-lua">
+local KickPlayerName = Request.Params["players-kick"]
+local FoundPlayerCallback = function(Player)
+	if (Player:GetName() == KickPlayerName) then
+	Player:GetClientHandle():Kick("You were kicked from the game!")
+	end
+end
+cRoot:Get():FindAndDoWithPlayer(KickPlayerName, FoundPlayerCallback)
+</pre>
+The cRoot:FindAndDoWithPlayer() is unsafe and could have caused a deadlock. The new solution is queue a task; but since we don't know in which world the player is, we need to queue the task to all worlds:
+<pre class="prettyprint lang-lua">
+cRoot:Get():ForEachWorld(    -- For each world...
+	function(World)
+	World:QueueTask(         -- ... queue a task...
+		function(a_World)
+		a_World:DoWithPlayer(KickPlayerName,  -- ... to walk the playerlist...
+			function (a_Player)
+			a_Player:GetClientHandle():Kick("You were kicked from the game!")  -- ... and kick the player
 			end
-			cRoot:Get():FindAndDoWithPlayer(KickPlayerName, FoundPlayerCallback)
-			</pre>
-			The cRoot:FindAndDoWithPlayer() is unsafe and could have caused a deadlock. The new solution is queue a task; but since we don't know in which world the player is, we need to queue the task to all worlds:
-			<pre class="prettyprint lang-lua">
-			cRoot:Get():ForEachWorld(    -- For each world...
-			  function(World)
-				World:QueueTask(         -- ... queue a task...
-				  function(a_World)
-					a_World:DoWithPlayer(KickPlayerName,  -- ... to walk the playerlist...
-					  function (a_Player)
-						a_Player:GetClientHandle():Kick("You were kicked from the game!")  -- ... and kick the player
-					  end
-					)
-				  end
-				)
-			  end
-			)
-			</pre>
+		)
+		end
+	)
+	end
+)
+</pre>
 			<script>
 				prettyPrint();
 			</script>

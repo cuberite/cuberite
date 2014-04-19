@@ -771,6 +771,16 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 {
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
+
+	if (GetWorld()->GetWeather() == eWeather_Rain)
+	{
+		if (HasBeenBurning)
+		{
+			m_TicksLeftBurning = 0;
+			OnFinishedBurning();
+		}
+		return;
+	}
 	
 	// Do the burning damage:
 	if (m_TicksLeftBurning > 0)

@@ -1691,6 +1691,11 @@ int cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NI
 
 int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 {
+	if (a_Reward < 1)
+	{
+		return -1;
+	}
+
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
 	ExpOrb->Initialize(this);
 	return ExpOrb->GetUniqueID();
