@@ -17,7 +17,7 @@ cBeaconEntity::cBeaconEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * 
 
 
 
-int cBeaconEntity::GetPyramidLevel()
+int cBeaconEntity::GetPyramidLevel(void)
 {
 	cBlockArea Area;
 	int MinY = GetPosY() - 4;
@@ -33,12 +33,9 @@ int cBeaconEntity::GetPyramidLevel()
 
 	Area.Read(
 		m_World, 
-		GetPosX() - 4, 
-		GetPosX() + 4, 
-		MinY, 
-		MaxY, 
-		GetPosZ() - 4, 
-		GetPosZ() + 4,
+		GetPosX() - 4, GetPosX() + 4,
+		MinY, MaxY,
+		GetPosZ() - 4, GetPosZ() + 4,
 		cBlockArea::baTypes
 	);
 
@@ -113,3 +110,7 @@ void cBeaconEntity::SendTo(cClientHandle & a_Client)
 void cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
 }
+
+
+
+
