@@ -219,270 +219,270 @@ bool cEnchantments::operator !=(const cEnchantments & a_Other) const
 
 
 
-void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short & a_ItemType, int a_EnchantmentLevel)
+void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel)
 {
 	if (ItemCategory::IsSword(a_ItemType))
 	{
 		// Sharpness
-		if (a_EnchantmentLevel >= 34 && a_EnchantmentLevel <= 54)
+		if ((a_EnchantmentLevel >= 34) && (a_EnchantmentLevel <= 54))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Sharpness=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchSharpness, 4);
 		}
-		else if (a_EnchantmentLevel >= 23 && a_EnchantmentLevel <= 43)
+		else if ((a_EnchantmentLevel >= 23) && (a_EnchantmentLevel <= 43))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Sharpness=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchSharpness, 3);
 		}
-		else if (a_EnchantmentLevel >= 12 && a_EnchantmentLevel <= 32)
+		else if ((a_EnchantmentLevel >= 12) && (a_EnchantmentLevel <= 32))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Sharpness=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchSharpness, 2);
 		}
-		else if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 21)
+		else if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 21))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Sharpness=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchSharpness, 1);
 		}
 
 		// Smite
-		if (a_EnchantmentLevel >= 29 && a_EnchantmentLevel <= 49)
+		if ((a_EnchantmentLevel >= 29) && (a_EnchantmentLevel <= 49))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Smite=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchSmite, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 41)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 41))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Smite=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchSmite, 3);
 		}
-		else if (a_EnchantmentLevel >= 13 && a_EnchantmentLevel <= 33)
+		else if ((a_EnchantmentLevel >= 13) && (a_EnchantmentLevel <= 33))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Smite=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchSmite, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 25)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 25))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Smite=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchSmite, 1);
 		}
 
 		// Bane of Arthropods
-		if (a_EnchantmentLevel >= 29 && a_EnchantmentLevel <= 49)
+		if ((a_EnchantmentLevel >= 29) && (a_EnchantmentLevel <= 49))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("BaneOfArthropods=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchBaneOfArthropods, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 41)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 41))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("BaneOfArthropods=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchBaneOfArthropods, 3);
 		}
-		else if (a_EnchantmentLevel >= 13 && a_EnchantmentLevel <= 33)
+		else if ((a_EnchantmentLevel >= 13) && (a_EnchantmentLevel <= 33))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("BaneOfArthropods=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchBaneOfArthropods, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 25)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 25))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("BaneOfArthropods=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchBaneOfArthropods, 1);
 		}
 
 		// Knockback
-		if (a_EnchantmentLevel >= 25 && a_EnchantmentLevel <= 75)
+		if ((a_EnchantmentLevel >= 25) && (a_EnchantmentLevel <= 75))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Knockback=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchKnockback, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 55)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 55))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Knockback=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchKnockback, 1);
 		}
 
 		// Fire Aspect
-		if (a_EnchantmentLevel >= 30 && a_EnchantmentLevel <= 80)
+		if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 80))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("FireAspect=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFireAspect, 2);
 		}
-		else if (a_EnchantmentLevel >= 10 && a_EnchantmentLevel <= 60)
+		else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 60))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("FireAspect=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFireAspect, 1);
 		}
 
 		// Looting
-		if (a_EnchantmentLevel >= 33 && a_EnchantmentLevel <= 83)
+		if ((a_EnchantmentLevel >= 33) && (a_EnchantmentLevel <= 83))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Looting=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchLooting, 3);
 		}
-		else if (a_EnchantmentLevel >= 24 && a_EnchantmentLevel <= 74)
+		else if ((a_EnchantmentLevel >= 24) && (a_EnchantmentLevel <= 74))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Looting=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchLooting, 2);
 		}
-		else if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 65)
+		else if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 65))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Looting=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchLooting, 1);
 		}
 	}
 
 	else if (ItemCategory::IsTool(a_ItemType))
 	{
 		// Efficiency
-		if (a_EnchantmentLevel >= 31 && a_EnchantmentLevel <= 81)
+		if ((a_EnchantmentLevel >= 31) && (a_EnchantmentLevel <= 81))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Efficiency=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchEfficiency, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 71)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 71))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Efficiency=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchEfficiency, 3);
 		}
-		else if (a_EnchantmentLevel >= 11 && a_EnchantmentLevel <= 61)
+		else if ((a_EnchantmentLevel >= 11) && (a_EnchantmentLevel <= 61))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Efficiency=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchEfficiency, 2);
 		}
-		else if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 51)
+		else if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 51))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Efficiency=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchEfficiency, 1);
 		}
 
 		// Silk Touch
-		if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 65)
+		if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 65))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("SilkTouch=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchSilkTouch, 1);
 		}
 
 		// Fortune
-		if (a_EnchantmentLevel >= 33 && a_EnchantmentLevel <= 83)
+		if ((a_EnchantmentLevel >= 33) && (a_EnchantmentLevel <= 83))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Fortune=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFortune, 3);
 		}
-		else if (a_EnchantmentLevel >= 24 && a_EnchantmentLevel <= 74)
+		else if ((a_EnchantmentLevel >= 24) && (a_EnchantmentLevel <= 74))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Fortune=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFortune, 2);
 		}
-		else if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 65)
+		else if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 65))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Fortune=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFortune, 1);
 		}
 	}
 
 	else if (ItemCategory::IsArmor(a_ItemType))
 	{
 		// Protection
-		if (a_EnchantmentLevel >= 34 && a_EnchantmentLevel <= 54)
+		if ((a_EnchantmentLevel >= 34) && (a_EnchantmentLevel <= 54))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Protection=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchProtection, 4);
 		}
-		else if (a_EnchantmentLevel >= 23 && a_EnchantmentLevel <= 43)
+		else if ((a_EnchantmentLevel >= 23) && (a_EnchantmentLevel <= 43))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Protection=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchProtection, 3);
 		}
-		else if (a_EnchantmentLevel >= 12 && a_EnchantmentLevel <= 32)
+		else if ((a_EnchantmentLevel >= 12) && (a_EnchantmentLevel <= 32))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Protection=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchProtection, 2);
 		}
-		else if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 21)
+		else if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 21))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Protection=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchProtection, 1);
 		}
 
 		// Fire Protection
-		if (a_EnchantmentLevel >= 34 && a_EnchantmentLevel <= 46)
+		if ((a_EnchantmentLevel >= 34) && (a_EnchantmentLevel <= 46))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FireProtection=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFireProtection, 4);
 		}
-		else if (a_EnchantmentLevel >= 26 && a_EnchantmentLevel <= 38)
+		else if ((a_EnchantmentLevel >= 26) && (a_EnchantmentLevel <= 38))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FireProtection=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFireProtection, 3);
 		}
-		else if (a_EnchantmentLevel >= 18 && a_EnchantmentLevel <= 30)
+		else if ((a_EnchantmentLevel >= 18) && (a_EnchantmentLevel <= 30))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FireProtection=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFireProtection, 2);
 		}
-		else if (a_EnchantmentLevel >= 10 && a_EnchantmentLevel <= 22)
+		else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 22))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FireProtection=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFireProtection, 1);
 		}
 
 		// Blast Protection
-		if (a_EnchantmentLevel >= 29 && a_EnchantmentLevel <= 41)
+		if ((a_EnchantmentLevel >= 29) && (a_EnchantmentLevel <= 41))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("BlastProtection=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchBlastProtection, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 33)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 33))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("BlastProtection=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchBlastProtection, 3);
 		}
-		else if (a_EnchantmentLevel >= 13 && a_EnchantmentLevel <= 25)
+		else if ((a_EnchantmentLevel >= 13) && (a_EnchantmentLevel <= 25))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("BlastProtection=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchBlastProtection, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 17)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 17))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("BlastProtection=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchBlastProtection, 1);
 		}
 
 		// Projectile Protection
-		if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 36)
+		if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 36))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("ProjectileProtection=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchProjectileProtection, 4);
 		}
-		else if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 30)
+		else if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 30))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("ProjectileProtection=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchProjectileProtection, 3);
 		}
-		else if (a_EnchantmentLevel >= 9 && a_EnchantmentLevel <= 24)
+		else if ((a_EnchantmentLevel >= 9) && (a_EnchantmentLevel <= 24))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("ProjectileProtection=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchProjectileProtection, 2);
 		}
-		else if (a_EnchantmentLevel >= 3 && a_EnchantmentLevel <= 18)
+		else if ((a_EnchantmentLevel >= 3) && (a_EnchantmentLevel <= 18))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("ProjectileProtection=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchProjectileProtection, 1);
 		}
 
 		// Thorns
-		if (a_EnchantmentLevel >= 50 && a_EnchantmentLevel <= 100)
+		if ((a_EnchantmentLevel >= 50) && (a_EnchantmentLevel <= 100))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Thorns=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchThorns, 3);
 		}
-		else if (a_EnchantmentLevel >= 30 && a_EnchantmentLevel <= 80)
+		else if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 80))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Thorns=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchThorns, 2);
 		}
-		else if (a_EnchantmentLevel >= 10 && a_EnchantmentLevel <= 60)
+		else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 60))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Thorns=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchThorns, 1);
 		}
 
 
 		if (ItemCategory::IsHelmet(a_ItemType))
 		{
 			// Respiration
-			if (a_EnchantmentLevel >= 30 && a_EnchantmentLevel <= 60)
+			if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 60))
 			{
-				AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Respiration=3"));
+				AddEnchantmentWeightToVector(&a_Enchantments, 2, enchRespiration, 3);
 			}
-			else if (a_EnchantmentLevel >= 20 && a_EnchantmentLevel <= 50)
+			else if ((a_EnchantmentLevel >= 20) && (a_EnchantmentLevel <= 50))
 			{
-				AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Respiration=2"));
+				AddEnchantmentWeightToVector(&a_Enchantments, 2, enchRespiration, 2);
 			}
-			else if (a_EnchantmentLevel >= 10 && a_EnchantmentLevel <= 40)
+			else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 40))
 			{
-				AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Respiration=1"));
+				AddEnchantmentWeightToVector(&a_Enchantments, 2, enchRespiration, 1);
 			}
 
 			// Aqua Affinity
-			if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 41)
+			if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 41))
 			{
-				AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("AquaAffinity=1"));
+				AddEnchantmentWeightToVector(&a_Enchantments, 2, enchAquaAffinity, 1);
 			}
 		}
 
 		else if (ItemCategory::IsBoots(a_ItemType))
 		{
 			// Feather Fall
-			if (a_EnchantmentLevel >= 23 && a_EnchantmentLevel <= 33)
+			if ((a_EnchantmentLevel >= 23) && (a_EnchantmentLevel <= 33))
 			{
-				AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FeatherFalling=4"));
+				AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFeatherFalling, 4);
 			}
-			else if (a_EnchantmentLevel >= 17 && a_EnchantmentLevel <= 27)
+			else if ((a_EnchantmentLevel >= 17) && (a_EnchantmentLevel <= 27))
 			{
-				AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FeatherFalling=3"));
+				AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFeatherFalling, 3);
 			}
-			else if (a_EnchantmentLevel >= 11 && a_EnchantmentLevel <= 21)
+			else if ((a_EnchantmentLevel >= 11) && (a_EnchantmentLevel <= 21))
 			{
-				AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FeatherFalling=2"));
+				AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFeatherFalling, 2);
 			}
-			else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 15)
+			else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 15))
 			{
-				AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FeatherFalling=1"));
+				AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFeatherFalling, 1);
 			}
 		}
 	}
@@ -490,382 +490,380 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 	else if (a_ItemType == E_ITEM_BOW)
 	{
 		// Power
-		if (a_EnchantmentLevel >= 31 && a_EnchantmentLevel <= 46)
+		if ((a_EnchantmentLevel >= 31) && (a_EnchantmentLevel <= 46))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Power=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchPower, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 36)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 36))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Power=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchPower, 3);
 		}
-		else if (a_EnchantmentLevel >= 11 && a_EnchantmentLevel <= 26)
+		else if ((a_EnchantmentLevel >= 11) && (a_EnchantmentLevel <= 26))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Power=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchPower, 2);
 		}
-		else if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 16)
+		else if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 16))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Power=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchPower, 1);
 		}
 
 		// Punch
-		if (a_EnchantmentLevel >= 32 && a_EnchantmentLevel <= 57)
+		if ((a_EnchantmentLevel >= 32) && (a_EnchantmentLevel <= 57))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Punch=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchPunch, 2);
 		}
-		else if (a_EnchantmentLevel >= 12 && a_EnchantmentLevel <= 37)
+		else if ((a_EnchantmentLevel >= 12) && (a_EnchantmentLevel <= 37))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Punch=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchPunch, 1);
 		}
 
 		// Flame and Infinity
-		if (a_EnchantmentLevel >= 20 && a_EnchantmentLevel <= 50)
+		if ((a_EnchantmentLevel >= 20) && (a_EnchantmentLevel <= 50))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Flame=1"));
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Infinity=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFlame, 1);
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchInfinity, 1);
 		}
 	}
 
 	else if (a_ItemType == E_ITEM_FISHING_ROD)
 	{
 		// Luck of the Sea and Lure
-		if (a_EnchantmentLevel >= 33 && a_EnchantmentLevel <= 83)
+		if ((a_EnchantmentLevel >= 33) && (a_EnchantmentLevel <= 83))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("LuckOfTheSea=3"));
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Lure=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLuckOfTheSea, 3);
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLure, 3);
 		}
-		else if (a_EnchantmentLevel >= 24 && a_EnchantmentLevel <= 74)
+		else if ((a_EnchantmentLevel >= 24) && (a_EnchantmentLevel <= 74))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("LuckOfTheSea=2"));
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Lure=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLuckOfTheSea, 2);
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLure, 2);
 		}
-		else if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 65)
+		else if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 65))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("LuckOfTheSea=1"));
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Lure=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLuckOfTheSea, 1);
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLure, 1);
 		}
 	}
 
 	else if (a_ItemType == E_ITEM_BOOK)
 	{
-		// All &a_Enchantments
+		// All Enchantments
 
 		// Sharpness
-		if (a_EnchantmentLevel >= 34 && a_EnchantmentLevel <= 54)
+		if ((a_EnchantmentLevel >= 34) && (a_EnchantmentLevel <= 54))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Sharpness=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchSharpness, 4);
 		}
-		else if (a_EnchantmentLevel >= 23 && a_EnchantmentLevel <= 43)
+		else if ((a_EnchantmentLevel >= 23) && (a_EnchantmentLevel <= 43))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Sharpness=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchSharpness, 3);
 		}
-		else if (a_EnchantmentLevel >= 12 && a_EnchantmentLevel <= 32)
+		else if ((a_EnchantmentLevel >= 12) && (a_EnchantmentLevel <= 32))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Sharpness=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchSharpness, 2);
 		}
-		else if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 21)
+		else if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 21))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Sharpness=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchSharpness, 1);
 		}
 
 		// Smite
-		if (a_EnchantmentLevel >= 29 && a_EnchantmentLevel <= 49)
+		if ((a_EnchantmentLevel >= 29) && (a_EnchantmentLevel <= 49))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Smite=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchSmite, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 41)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 41))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Smite=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchSmite, 3);
 		}
-		else if (a_EnchantmentLevel >= 13 && a_EnchantmentLevel <= 33)
+		else if ((a_EnchantmentLevel >= 13) && (a_EnchantmentLevel <= 33))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Smite=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchSmite, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 25)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 25))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Smite=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchSmite, 1);
 		}
 
 		// Bane of Arthropods
-		if (a_EnchantmentLevel >= 29 && a_EnchantmentLevel <= 49)
+		if ((a_EnchantmentLevel >= 29) && (a_EnchantmentLevel <= 49))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("BaneOfArthropods=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchBaneOfArthropods, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 41)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 41))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("BaneOfArthropods=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchBaneOfArthropods, 3);
 		}
-		else if (a_EnchantmentLevel >= 13 && a_EnchantmentLevel <= 33)
+		else if ((a_EnchantmentLevel >= 13) && (a_EnchantmentLevel <= 33))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("BaneOfArthropods=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchBaneOfArthropods, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 25)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 25))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("BaneOfArthropods=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchBaneOfArthropods, 1);
 		}
 
 		// Knockback
-		if (a_EnchantmentLevel >= 25 && a_EnchantmentLevel <= 75)
+		if ((a_EnchantmentLevel >= 25) && (a_EnchantmentLevel <= 75))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Knockback=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchKnockback, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 55)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 55))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Knockback=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchKnockback, 1);
 		}
 
 		// Fire Aspect
-		if (a_EnchantmentLevel >= 30 && a_EnchantmentLevel <= 80)
+		if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 80))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("FireAspect=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFireAspect, 2);
 		}
-		else if (a_EnchantmentLevel >= 10 && a_EnchantmentLevel <= 60)
+		else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 60))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("FireAspect=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFireAspect, 1);
 		}
 
 		// Looting
-		if (a_EnchantmentLevel >= 33 && a_EnchantmentLevel <= 83)
+		if ((a_EnchantmentLevel >= 33) && (a_EnchantmentLevel <= 83))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Looting=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchLooting, 3);
 		}
-		else if (a_EnchantmentLevel >= 24 && a_EnchantmentLevel <= 74)
+		else if ((a_EnchantmentLevel >= 24) && (a_EnchantmentLevel <= 74))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Looting=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchLooting, 2);
 		}
-		else if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 65)
+		else if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 65))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Looting=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchLooting, 1);
 		}
 
 		// Efficiency
-		if (a_EnchantmentLevel >= 31 && a_EnchantmentLevel <= 81)
+		if ((a_EnchantmentLevel >= 31) && (a_EnchantmentLevel <= 81))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Efficiency=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchEfficiency, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 71)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 71))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Efficiency=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchEfficiency, 3);
 		}
-		else if (a_EnchantmentLevel >= 11 && a_EnchantmentLevel <= 61)
+		else if ((a_EnchantmentLevel >= 11) && (a_EnchantmentLevel <= 61))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Efficiency=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchEfficiency, 2);
 		}
-		else if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 51)
+		else if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 51))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Efficiency=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchEfficiency, 1);
 		}
 
 		// Silk Touch
-		if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 65)
+		if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 65))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("SilkTouch=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchSilkTouch, 1);
 		}
 
 		// Fortune
-		if (a_EnchantmentLevel >= 33 && a_EnchantmentLevel <= 83)
+		if ((a_EnchantmentLevel >= 33) && (a_EnchantmentLevel <= 83))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Fortune=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFortune, 3);
 		}
-		else if (a_EnchantmentLevel >= 24 && a_EnchantmentLevel <= 74)
+		else if ((a_EnchantmentLevel >= 24) && (a_EnchantmentLevel <= 74))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Fortune=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFortune, 2);
 		}
-		else if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 65)
+		else if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 65))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Fortune=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFortune, 1);
 		}
 
 		// Protection
-		if (a_EnchantmentLevel >= 34 && a_EnchantmentLevel <= 54)
+		if ((a_EnchantmentLevel >= 34) && (a_EnchantmentLevel <= 54))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Protection=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchProtection, 4);
 		}
-		else if (a_EnchantmentLevel >= 23 && a_EnchantmentLevel <= 43)
+		else if ((a_EnchantmentLevel >= 23) && (a_EnchantmentLevel <= 43))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Protection=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchProtection, 3);
 		}
-		else if (a_EnchantmentLevel >= 12 && a_EnchantmentLevel <= 32)
+		else if ((a_EnchantmentLevel >= 12) && (a_EnchantmentLevel <= 32))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Protection=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchProtection, 2);
 		}
-		else if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 21)
+		else if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 21))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Protection=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchProtection, 1);
 		}
 
 		// Fire Protection
-		if (a_EnchantmentLevel >= 34 && a_EnchantmentLevel <= 46)
+		if ((a_EnchantmentLevel >= 34) && (a_EnchantmentLevel <= 46))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FireProtection=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFireProtection, 4);
 		}
-		else if (a_EnchantmentLevel >= 26 && a_EnchantmentLevel <= 38)
+		else if ((a_EnchantmentLevel >= 26) && (a_EnchantmentLevel <= 38))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FireProtection=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFireProtection, 3);
 		}
-		else if (a_EnchantmentLevel >= 18 && a_EnchantmentLevel <= 30)
+		else if ((a_EnchantmentLevel >= 18) && (a_EnchantmentLevel <= 30))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FireProtection=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFireProtection, 2);
 		}
-		else if (a_EnchantmentLevel >= 10 && a_EnchantmentLevel <= 22)
+		else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 22))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FireProtection=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFireProtection, 1);
 		}
 
 		// Blast Protection
-		if (a_EnchantmentLevel >= 29 && a_EnchantmentLevel <= 41)
+		if ((a_EnchantmentLevel >= 29) && (a_EnchantmentLevel <= 41))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("BlastProtection=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchBlastProtection, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 33)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 33))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("BlastProtection=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchBlastProtection, 3);
 		}
-		else if (a_EnchantmentLevel >= 13 && a_EnchantmentLevel <= 25)
+		else if ((a_EnchantmentLevel >= 13) && (a_EnchantmentLevel <= 25))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("BlastProtection=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchBlastProtection, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 17)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 17))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("BlastProtection=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchBlastProtection, 1);
 		}
 
 		// Projectile Protection
-		if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 36)
+		if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 36))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("ProjectileProtection=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchProjectileProtection, 4);
 		}
-		else if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 30)
+		else if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 30))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("ProjectileProtection=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchProjectileProtection, 3);
 		}
-		else if (a_EnchantmentLevel >= 9 && a_EnchantmentLevel <= 24)
+		else if ((a_EnchantmentLevel >= 9) && (a_EnchantmentLevel <= 24))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("ProjectileProtection=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchProjectileProtection, 2);
 		}
-		else if (a_EnchantmentLevel >= 3 && a_EnchantmentLevel <= 18)
+		else if ((a_EnchantmentLevel >= 3) && (a_EnchantmentLevel <= 18))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("ProjectileProtection=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchProjectileProtection, 1);
 		}
 
 		// Thorns
-		if (a_EnchantmentLevel >= 50 && a_EnchantmentLevel <= 100)
+		if ((a_EnchantmentLevel >= 50) && (a_EnchantmentLevel <= 100))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Thorns=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchThorns, 3);
 		}
-		else if (a_EnchantmentLevel >= 30 && a_EnchantmentLevel <= 80)
+		else if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 80))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Thorns=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchThorns, 2);
 		}
-		else if (a_EnchantmentLevel >= 10 && a_EnchantmentLevel <= 60)
+		else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 60))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Thorns=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchThorns, 1);
 		}
 
 		// Respiration
-		if (a_EnchantmentLevel >= 30 && a_EnchantmentLevel <= 60)
+		if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 60))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Respiration=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchRespiration, 3);
 		}
-		else if (a_EnchantmentLevel >= 20 && a_EnchantmentLevel <= 50)
+		else if ((a_EnchantmentLevel >= 20) && (a_EnchantmentLevel <= 50))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Respiration=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchRespiration, 2);
 		}
-		else if (a_EnchantmentLevel >= 10 && a_EnchantmentLevel <= 40)
+		else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 40))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Respiration=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchRespiration, 1);
 		}
 
 		// Aqua Affinity
-		if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 41)
+		if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 41))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("AquaAffinity=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchAquaAffinity, 1);
 		}
 
 		// Feather Fall
-		if (a_EnchantmentLevel >= 23 && a_EnchantmentLevel <= 33)
+		if ((a_EnchantmentLevel >= 23) && (a_EnchantmentLevel <= 33))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FeatherFalling=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFeatherFalling, 4);
 		}
-		else if (a_EnchantmentLevel >= 17 && a_EnchantmentLevel <= 27)
+		else if ((a_EnchantmentLevel >= 17) && (a_EnchantmentLevel <= 27))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FeatherFalling=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFeatherFalling, 3);
 		}
-		else if (a_EnchantmentLevel >= 11 && a_EnchantmentLevel <= 21)
+		else if ((a_EnchantmentLevel >= 11) && (a_EnchantmentLevel <= 21))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FeatherFalling=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFeatherFalling, 2);
 		}
-		else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 15)
+		else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 15))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("FeatherFalling=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 5, enchFeatherFalling, 1);
 		}
 
 		// Power
-		if (a_EnchantmentLevel >= 31 && a_EnchantmentLevel <= 46)
+		if ((a_EnchantmentLevel >= 31) && (a_EnchantmentLevel <= 46))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Power=4"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchPower, 4);
 		}
-		else if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 36)
+		else if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 36))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Power=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchPower, 3);
 		}
-		else if (a_EnchantmentLevel >= 11 && a_EnchantmentLevel <= 26)
+		else if ((a_EnchantmentLevel >= 11) && (a_EnchantmentLevel <= 26))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Power=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchPower, 2);
 		}
-		else if (a_EnchantmentLevel >= 1 && a_EnchantmentLevel <= 16)
+		else if ((a_EnchantmentLevel >= 1) && (a_EnchantmentLevel <= 16))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 10, cEnchantments("Power=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 10, enchPower, 1);
 		}
 
 		// Punch
-		if (a_EnchantmentLevel >= 32 && a_EnchantmentLevel <= 57)
+		if ((a_EnchantmentLevel >= 32) && (a_EnchantmentLevel <= 57))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Punch=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchPunch, 2);
 		}
-		else if (a_EnchantmentLevel >= 12 && a_EnchantmentLevel <= 37)
+		else if ((a_EnchantmentLevel >= 12) && (a_EnchantmentLevel <= 37))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Punch=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchPunch, 1);
 		}
 
 		// Flame and Infinity
-		if (a_EnchantmentLevel >= 20 && a_EnchantmentLevel <= 50)
+		if ((a_EnchantmentLevel >= 20) && (a_EnchantmentLevel <= 50))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 2, cEnchantments("Flame=1"));
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Infinity=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 2, enchFlame, 1);
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchInfinity, 1);
 		}
 
 		// Luck of the Sea and Lure
-		if (a_EnchantmentLevel >= 33 && a_EnchantmentLevel <= 83)
+		if ((a_EnchantmentLevel >= 33) && (a_EnchantmentLevel <= 83))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("LuckOfTheSea=3"));
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Lure=3"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLuckOfTheSea, 3);
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLure, 3);
 		}
-		else if (a_EnchantmentLevel >= 24 && a_EnchantmentLevel <= 74)
+		else if ((a_EnchantmentLevel >= 24) && (a_EnchantmentLevel <= 74))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("LuckOfTheSea=2"));
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Lure=2"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLuckOfTheSea, 2);
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLure, 2);
 		}
-		else if (a_EnchantmentLevel >= 15 && a_EnchantmentLevel <= 65)
+		else if ((a_EnchantmentLevel >= 15) && (a_EnchantmentLevel <= 65))
 		{
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("LuckOfTheSea=1"));
-			AddEnchantmentWeightToVector(&a_Enchantments, 1, cEnchantments("Lure=1"));
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLuckOfTheSea, 1);
+			AddEnchantmentWeightToVector(&a_Enchantments, 1, enchLure, 1);
 		}
-
-		a_ItemType = E_ITEM_ENCHANTED_BOOK;
 	}
 
 	// Unbreaking
-	if (a_EnchantmentLevel >= 21 && a_EnchantmentLevel <= 71)
+	if ((a_EnchantmentLevel >= 21) && (a_EnchantmentLevel <= 71))
 	{
-		AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Unbreaking=3"));
+		AddEnchantmentWeightToVector(&a_Enchantments, 5, enchUnbreaking, 3);
 	}
-	else if (a_EnchantmentLevel >= 13 && a_EnchantmentLevel <= 63)
+	else if ((a_EnchantmentLevel >= 13) && (a_EnchantmentLevel <= 63))
 	{
-		AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Unbreaking=2"));
+		AddEnchantmentWeightToVector(&a_Enchantments, 5, enchUnbreaking, 2);
 	}
-	else if (a_EnchantmentLevel >= 5 && a_EnchantmentLevel <= 55)
+	else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 55))
 	{
-		AddEnchantmentWeightToVector(&a_Enchantments, 5, cEnchantments("Unbreaking=1"));
+		AddEnchantmentWeightToVector(&a_Enchantments, 5, enchUnbreaking, 1);
 	}
 }
 
@@ -873,27 +871,27 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 
 
 
-void cEnchantments::AddEnchantmentWeightToVector(cWeightedEnchantments * a_Enchantments, int a_Weight, cEnchantments a_Enchantment)
+void cEnchantments::AddEnchantmentWeightToVector(cWeightedEnchantments * a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel)
 {
-	cWeightedEnchantment enchantment;
-	enchantment.m_Weight = a_Weight;
-	enchantment.m_Enchantments = a_Enchantment;
-	a_Enchantments->push_back(enchantment);
+	cWeightedEnchantment weightedenchantment;
+	weightedenchantment.m_Weight = a_Weight;
+	cEnchantments enchantment;
+	enchantment.SetLevel(a_EnchantmentID, a_EnchantmentLevel);
+	weightedenchantment.m_Enchantments = enchantment;
+	a_Enchantments->push_back(weightedenchantment);
 }
 
 
 
 
 
-void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_Enchantments, int a_EnchantmentID)
+void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, int a_EnchantmentID)
 {
-	for (cWeightedEnchantments::iterator it = a_Enchantments->begin(); it != a_Enchantments->end(); ++it)
+	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
 	{
-		int EnchantmentID = atoi(StringSplit((*it).m_Enchantments.ToString(), "=")[0].c_str());
-
-		if (EnchantmentID == a_EnchantmentID)
+		if ((*it).m_Enchantments.GetLevel(a_EnchantmentID) > 0)
 		{
-			a_Enchantments->erase(it);
+			a_Enchantments.erase(it);
 			break;
 		}
 	}
@@ -903,13 +901,13 @@ void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_
 
 
 
-void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_Enchantments, cEnchantments a_Enchantment)
+void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment)
 {
-	for (cWeightedEnchantments::iterator it = a_Enchantments->begin(); it != a_Enchantments->end(); ++it)
+	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
 	{
 		if ((*it).m_Enchantments == a_Enchantment)
 		{
-			a_Enchantments->erase(it);
+			a_Enchantments.erase(it);
 			break;
 		}
 	}
@@ -921,55 +919,53 @@ void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_
 
 void cEnchantments::CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment)
 {
-	int FirstEnchantmentID = atoi(StringSplit(a_FirstEnchantment.ToString(), "=")[0].c_str());
-
-	if (FirstEnchantmentID == cEnchantments::enchProtection)
+	if (a_FirstEnchantment.GetLevel(cEnchantments::enchProtection) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchFireProtection);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchBlastProtection);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchProjectileProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchFireProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchBlastProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchProjectileProtection);
 	}
-	else if (FirstEnchantmentID == cEnchantments::enchFireProtection)
+	else if (a_FirstEnchantment.GetLevel(cEnchantments::enchFireProtection) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchProtection);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchBlastProtection);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchProjectileProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchBlastProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchProjectileProtection);
 	}
-	else if (FirstEnchantmentID == cEnchantments::enchBlastProtection)
+	else if (a_FirstEnchantment.GetLevel(cEnchantments::enchBlastProtection) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchProtection);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchFireProtection);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchProjectileProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchFireProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchProjectileProtection);
 	}
-	else if (FirstEnchantmentID == cEnchantments::enchProjectileProtection)
+	else if (a_FirstEnchantment.GetLevel(cEnchantments::enchProjectileProtection) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchProtection);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchFireProtection);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchBlastProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchFireProtection);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchBlastProtection);
 	}
 
-	else if (FirstEnchantmentID == cEnchantments::enchSharpness)
+	else if (a_FirstEnchantment.GetLevel(cEnchantments::enchSharpness) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchSmite);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchBaneOfArthropods);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchSmite);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchBaneOfArthropods);
 	}
-	else if (FirstEnchantmentID == cEnchantments::enchSmite)
+	else if (a_FirstEnchantment.GetLevel(cEnchantments::enchSmite) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchSharpness);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchBaneOfArthropods);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchSharpness);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchBaneOfArthropods);
 	}
-	else if (FirstEnchantmentID == cEnchantments::enchBaneOfArthropods)
+	else if (a_FirstEnchantment.GetLevel(cEnchantments::enchBaneOfArthropods) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchSharpness);
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchSmite);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchSharpness);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchSmite);
 	}
-	else if (FirstEnchantmentID == cEnchantments::enchSilkTouch)
+	else if (a_FirstEnchantment.GetLevel(cEnchantments::enchSilkTouch) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchFortune);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchFortune);
 	}
-	else if (FirstEnchantmentID == cEnchantments::enchFortune)
+	else if (a_FirstEnchantment.GetLevel(cEnchantments::enchFortune) > 0)
 	{
-		RemoveEnchantmentWeightFromVector(&a_Enchantments, cEnchantments::enchSilkTouch);
+		RemoveEnchantmentWeightFromVector(a_Enchantments, cEnchantments::enchSilkTouch);
 	}
 }
 
@@ -987,7 +983,6 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 		AllWeights += (*it).m_Weight;
 	}
 	int RandomNumber = Random.GenerateRandomInteger(0, AllWeights - 1);
-	cEnchantments enchantment;
 	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
 	{
 		RandomNumber -= (*it).m_Weight;
@@ -999,13 +994,6 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 
 	return cEnchantments();
 }
-
-
-
-
-
-
-
 
 
 

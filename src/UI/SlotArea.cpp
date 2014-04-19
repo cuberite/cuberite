@@ -783,7 +783,8 @@ void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
 {
 	// Toss the item in the enchanting slot
 	TossItems(a_Player, 0, 1);
-	// Player not found - that is acceptable
+
+	super::OnPlayerRemoved(a_Player);
 }
 
 
@@ -838,7 +839,7 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld * a_World)
 	static const struct
 	{
 		int m_BookX, m_BookY, m_BookZ;  // Coords to check for bookcases
-		int m_AirX, m_AirY, m_AirZ;  // Coords to check for air; if not air, the bookcase won\'t be counted
+		int m_AirX, m_AirY, m_AirZ;  // Coords to check for air; if not air, the bookcase won't be counted
 	} CheckCoords[] =
 	{
 		{ 0, 0, 0, 1, 0, 1 },  // Bookcase at {0, 0, 0}, air at {1, 0, 1}

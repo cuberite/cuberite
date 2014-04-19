@@ -826,11 +826,7 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
 {
 	m_PropertyValue[a_Property] = a_Value;
 
-	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
-	{
-		(*itr)->GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
-	}  // for itr - m_OpenedBy[]
+	super::SetProperty(a_Property, a_Value);
 }
 
 
@@ -841,7 +837,7 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Pla
 {
 	m_PropertyValue[a_Property] = a_Value;
 
-	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
+	super::SetProperty(a_Property, a_Value, a_Player);
 }
 
 

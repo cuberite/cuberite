@@ -103,13 +103,13 @@ public:
 	// tolua_end
 
 	/** Add enchantment weights from item to the vector */
-	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short & a_ItemType, int a_EnchantmentLevel);
+	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel);
 
 	/** Add a enchantment weight to the vector */
-	static void AddEnchantmentWeightToVector(cWeightedEnchantments * a_Enchantments, int a_Weight, cEnchantments a_Enchantment);
+	static void AddEnchantmentWeightToVector(cWeightedEnchantments * a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel);
 	/** Remove a enchantment weight from the vector */
-	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_Enchantments, int a_EnchantmentID);
-	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments * a_Enchantments, cEnchantments a_Enchantment);
+	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, int a_EnchantmentID);
+	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment);
 
 	/** Check enchantment conflicts from enchantments from the vector */
 	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
