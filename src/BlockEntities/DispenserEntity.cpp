@@ -128,11 +128,11 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			if (DispChunk->GetBlock(DispX, DispY, DispZ) == E_BLOCK_AIR)
 			{
 				DispChunk->SetBlock(DispX, DispY, DispZ, E_BLOCK_FIRE, 0);
-				const cItem& slot = m_Contents.GetSlot(a_SlotNum);
-				m_Contents.SetSlot(a_SlotNum, slot.m_ItemType, slot.m_ItemCount, slot.m_ItemDamage + 1);
-				// If the durability has run out destroy the item.
-				if (m_Contents.GetSlot(a_SlotNum).m_ItemDamage > 64)
-				{				
+				
+				bool ItemBroke = m_Contents.DamageItem(a_SlotNum, 1);
+
+				if (ItemBroke)
+				{
 					m_Contents.ChangeSlotCount(a_SlotNum, -1);
 				}
 			}

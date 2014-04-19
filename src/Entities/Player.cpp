@@ -1166,9 +1166,9 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 
 
-void cPlayer::ForceSetSpeed(const Vector3d & a_Direction)
+void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 {
-	SetSpeed(a_Direction);
+	SetSpeed(a_Speed);
 	m_ClientHandle->SendEntityVelocity(*this);
 }
 
