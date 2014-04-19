@@ -275,7 +275,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 
 
-int cServer::GetNumPlayers(void)
+int cServer::GetNumPlayers(void) const
 {
 	cCSLock Lock(m_CSPlayerCount);
 	return m_PlayerCount;

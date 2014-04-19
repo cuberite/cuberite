@@ -453,14 +453,14 @@ void cClientHandle::HandlePing(void)
 {
 	// Somebody tries to retrieve information about the server
 	AString Reply;
-	cServer * Server = cRoot::Get()->GetServer();
+	const cServer & Server = *cRoot::Get()->GetServer();
 
 	Printf(Reply, "%s%s%i%s%i", 
-		Server->GetDescription().c_str(),
+		Server.GetDescription().c_str(),
 		cChatColor::Delimiter.c_str(),
-		Server->GetNumPlayers(),
+		Server.GetNumPlayers(),
 		cChatColor::Delimiter.c_str(),
-		Server->GetMaxPlayers()
+		Server.GetMaxPlayers()
 	);
 	Kick(Reply);
 }
