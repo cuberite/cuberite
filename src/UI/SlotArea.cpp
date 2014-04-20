@@ -806,7 +806,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		int Bookshelves = std::min(GetBookshelvesCount(a_Player.GetWorld()), 15);
 
 		cFastRandom Random;
-		int base = (Random.GenerateRandomInteger(1, 8) + floor(Bookshelves / 2) + Random.GenerateRandomInteger(0, Bookshelves));
+		int base = (Random.GenerateRandomInteger(1, 8) + (int)floor((float)Bookshelves / 2) + Random.GenerateRandomInteger(0, Bookshelves));
 		int topSlot = std::max(base / 3, 1);
 		int middleSlot = (base * 2) / 3 + 1;
 		int bottomSlot = std::max(base, Bookshelves * 2);
