@@ -318,7 +318,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Second)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2;
 	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if ((Random.NextFloat(100) > SecondEnchantmentChance) || (enchantments.size() == 0))
+	if (enchantments.empty() || (Random.NextFloat(100) > SecondEnchantmentChance))
 	{
 		return true;
 	}
@@ -333,7 +333,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Third)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2;
 	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if ((Random.NextFloat(100) > ThirdEnchantmentChance) || (enchantments.size() == 0))
+	if (enchantments.empty() || (Random.NextFloat(100) > ThirdEnchantmentChance))
 	{
 		return true;
 	}
@@ -348,7 +348,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Fourth)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2;
 	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if ((Random.NextFloat(100) > FourthEnchantmentChance) || (enchantments.size() == 0))
+	if (enchantments.empty() || (Random.NextFloat(100) > FourthEnchantmentChance))
 	{
 		return true;
 	}
