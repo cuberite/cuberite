@@ -175,6 +175,13 @@ public:
 	/** Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements) */
 	static bool IsEnchantable(short a_ItemType); // tolua_export
 
+	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
+	int GetEnchantability(); // tolua_export
+
+	/** Enchants the item using the specified number of XP levels.
+	Returns true if item enchanted, false if not. */
+	bool EnchantByXPLevels(int a_NumXPLevels); // tolua_export
+
 	// tolua_begin
 	
 	short         m_ItemType;

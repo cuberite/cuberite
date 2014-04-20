@@ -5,6 +5,8 @@
 #include "json/json.h"
 #include "Items/ItemHandler.h"
 
+#include "FastRandom.h"
+
 
 
 
@@ -203,6 +205,157 @@ bool cItem::IsEnchantable(short item)
 		return true;
 
 	return false;
+}
+
+
+
+
+
+int cItem::GetEnchantability()
+{
+	int Enchantability = 0;
+
+	switch (m_ItemType)
+	{
+		case E_ITEM_WOODEN_SWORD: Enchantability = 15; break;
+		case E_ITEM_WOODEN_PICKAXE: Enchantability = 15; break;
+		case E_ITEM_WOODEN_SHOVEL: Enchantability = 15; break;
+		case E_ITEM_WOODEN_AXE: Enchantability = 15; break;
+		case E_ITEM_WOODEN_HOE: Enchantability = 15; break;
+
+		case E_ITEM_LEATHER_CAP: Enchantability = 15; break;
+		case E_ITEM_LEATHER_TUNIC: Enchantability = 15; break;
+		case E_ITEM_LEATHER_PANTS: Enchantability = 15; break;
+		case E_ITEM_LEATHER_BOOTS: Enchantability = 15; break;
+
+		case E_ITEM_STONE_SWORD: Enchantability = 5; break;
+		case E_ITEM_STONE_PICKAXE: Enchantability = 5; break;
+		case E_ITEM_STONE_SHOVEL: Enchantability = 5; break;
+		case E_ITEM_STONE_AXE: Enchantability = 5; break;
+		case E_ITEM_STONE_HOE: Enchantability = 5; break;
+
+		case E_ITEM_IRON_HELMET: Enchantability = 9; break;
+		case E_ITEM_IRON_CHESTPLATE: Enchantability = 9; break;
+		case E_ITEM_IRON_LEGGINGS: Enchantability = 9; break;
+		case E_ITEM_IRON_BOOTS: Enchantability = 9; break;
+
+		case E_ITEM_IRON_SWORD: Enchantability = 14; break;
+		case E_ITEM_IRON_PICKAXE: Enchantability = 14; break;
+		case E_ITEM_IRON_SHOVEL: Enchantability = 14; break;
+		case E_ITEM_IRON_AXE: Enchantability = 14; break;
+		case E_ITEM_IRON_HOE: Enchantability = 14; break;
+
+		case E_ITEM_CHAIN_HELMET: Enchantability = 12; break;
+		case E_ITEM_CHAIN_CHESTPLATE: Enchantability = 12; break;
+		case E_ITEM_CHAIN_LEGGINGS: Enchantability = 12; break;
+		case E_ITEM_CHAIN_BOOTS: Enchantability = 12; break;
+
+		case E_ITEM_DIAMOND_HELMET: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_CHESTPLATE: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_LEGGINGS: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_BOOTS: Enchantability = 10; break;
+
+		case E_ITEM_DIAMOND_SWORD: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_PICKAXE: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_SHOVEL: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_AXE: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_HOE: Enchantability = 10; break;
+
+		case E_ITEM_GOLD_HELMET: Enchantability = 25; break;
+		case E_ITEM_GOLD_CHESTPLATE: Enchantability = 25; break;
+		case E_ITEM_GOLD_LEGGINGS: Enchantability = 25; break;
+		case E_ITEM_GOLD_BOOTS: Enchantability = 25; break;
+
+		case E_ITEM_GOLD_SWORD: Enchantability = 22; break;
+		case E_ITEM_GOLD_PICKAXE: Enchantability = 22; break;
+		case E_ITEM_GOLD_SHOVEL: Enchantability = 22; break;
+		case E_ITEM_GOLD_AXE: Enchantability = 22; break;
+		case E_ITEM_GOLD_HOE: Enchantability = 22; break;
+
+		case E_ITEM_FISHING_ROD: Enchantability = 1; break;
+		case E_ITEM_BOW: Enchantability = 1; break;
+		case E_ITEM_BOOK: Enchantability = 1; break;
+	}
+
+	return Enchantability;
+}
+
+
+
+
+
+bool cItem::EnchantByXPLevels(int a_NumXPLevels)
+{
+	if (!cItem::IsEnchantable(m_ItemType) && (m_ItemType != E_ITEM_BOOK))
+	{
+		return false;
+	}
+
+	int Enchantability = GetEnchantability();
+
+	cFastRandom Random;
+	int ModifiedEnchantmentLevel = a_NumXPLevels + (int)Random.NextFloat((float)Enchantability / 4) + (int)Random.NextFloat((float)Enchantability / 4) + 1;
+	float RandomBonus = 1.0F + (Random.NextFloat(1) + Random.NextFloat(1) - 1.0F) * 0.15F;
+	int FinalEnchantmentLevel = (int)(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
+
+	cWeightedEnchantments enchantments;
+	cEnchantments::AddItemEnchantmentWeights(enchantments, m_ItemType, FinalEnchantmentLevel);
+
+	if (m_ItemType == E_ITEM_BOOK)
+	{
+		m_ItemType = E_ITEM_ENCHANTED_BOOK;
+	}
+
+	cEnchantments Enchantment1 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
+	m_Enchantments.AddFromString(Enchantment1.ToString());
+	cEnchantments::RemoveEnchantmentWeightFromVector(enchantments, Enchantment1);
+
+	// Checking for conflicting enchantments
+	cEnchantments::CheckEnchantmentConflictsFromVector(enchantments, Enchantment1);
+
+	float NewEnchantmentLevel = (float)a_NumXPLevels;
+
+	// Next Enchantment (Second)
+	NewEnchantmentLevel = NewEnchantmentLevel / 2;
+	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
+	if ((Random.NextFloat(100) > SecondEnchantmentChance) || (enchantments.size() == 0))
+	{
+		return false;
+	}
+
+	cEnchantments Enchantment2 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
+	m_Enchantments.AddFromString(Enchantment2.ToString());
+	cEnchantments::RemoveEnchantmentWeightFromVector(enchantments, Enchantment2);
+
+	// Checking for conflicting enchantments
+	cEnchantments::CheckEnchantmentConflictsFromVector(enchantments, Enchantment2);
+
+	// Next Enchantment (Third)
+	NewEnchantmentLevel = NewEnchantmentLevel / 2;
+	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
+	if ((Random.NextFloat(100) > ThirdEnchantmentChance) || (enchantments.size() == 0))
+	{
+		return false;
+	}
+
+	cEnchantments Enchantment3 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
+	m_Enchantments.AddFromString(Enchantment3.ToString());
+	cEnchantments::RemoveEnchantmentWeightFromVector(enchantments, Enchantment3);
+
+	// Checking for conflicting enchantments
+	cEnchantments::CheckEnchantmentConflictsFromVector(enchantments, Enchantment3);
+
+	// Next Enchantment (Fourth)
+	NewEnchantmentLevel = NewEnchantmentLevel / 2;
+	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
+	if ((Random.NextFloat(100) > FourthEnchantmentChance) || (enchantments.size() == 0))
+	{
+		return false;
+	}
+	cEnchantments Enchantment4 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
+	m_Enchantments.AddFromString(Enchantment4.ToString());
+
+	return true;
 }
 
 

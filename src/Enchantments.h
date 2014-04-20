@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "Defines.h"
 #include "WorldStorage/EnchantmentSerializer.h"
 
 
@@ -17,6 +18,11 @@
 class cFastNBTWriter;
 class cParsedNBT;
 
+
+// fwd:
+struct cWeightedEnchantment;
+
+typedef std::vector<cWeightedEnchantment> cWeightedEnchantments;
 
 
 
@@ -28,6 +34,8 @@ mapping each enchantment's id onto its level. ID may be either a number or the e
 Level value of 0 means no such enchantment, and it will not be stored in the m_Enchantments.
 Serialization will never put zero-level enchantments into the stringspec and will always use numeric IDs.
 */
+
+
 // tolua_begin
 class cEnchantments
 {
@@ -61,7 +69,7 @@ public:
 		enchLuckOfTheSea         = 61,
 		enchLure                 = 62,
 	} ;
-	
+
 	/// Creates an empty enchantments container
 	cEnchantments(void);
 	
@@ -91,9 +99,27 @@ public:
 	
 	/// Returns true if a_Other contains exactly the same enchantments and levels
 	bool operator ==(const cEnchantments & a_Other) const;
-	
+
 	// tolua_end
+
+	/** Add enchantment weights from item to the vector */
+	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel);
+
+	/** Add a enchantment with weight to the vector */
+	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel);
 	
+	/** Remove the entire enchantment (with weight) from the vector */
+	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, int a_EnchantmentID);
+	
+	/** Remove the entire enchantment (with weight) from the vector */
+	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment);
+
+	/** Check enchantment conflicts from enchantments from the vector */
+	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
+
+	/** Gets random enchantment from Vector and returns it */
+	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);
+
 	/// Returns true if a_Other doesn't contain exactly the same enchantments and levels
 	bool operator !=(const cEnchantments & a_Other) const;
 	
@@ -102,7 +128,7 @@ public:
 	
 	/// Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments)
 	friend void EnchantmentSerializer::ParseFromNBT(cEnchantments& a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx);
-	
+
 protected:
 	/// Maps enchantment ID -> enchantment level
 	typedef std::map<int, int> cMap;
@@ -111,6 +137,15 @@ protected:
 	cMap m_Enchantments;
 } ;  // tolua_export
 
+
+
+
+// Define the cWeightedEnchantment struct for the Enchanting System to store the EnchantmentWeights:
+struct cWeightedEnchantment
+{
+	int m_Weight;
+	cEnchantments m_Enchantments;
+};
 
 
 
