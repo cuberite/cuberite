@@ -320,7 +320,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
 	if ((Random.NextFloat(100) > SecondEnchantmentChance) || (enchantments.size() == 0))
 	{
-		return false;
+		return true;
 	}
 
 	cEnchantments Enchantment2 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
@@ -335,7 +335,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
 	if ((Random.NextFloat(100) > ThirdEnchantmentChance) || (enchantments.size() == 0))
 	{
-		return false;
+		return true;
 	}
 
 	cEnchantments Enchantment3 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
@@ -350,7 +350,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
 	if ((Random.NextFloat(100) > FourthEnchantmentChance) || (enchantments.size() == 0))
 	{
-		return false;
+		return true;
 	}
 	cEnchantments Enchantment4 = cEnchantments::GetRandomEnchantmentFromVector(enchantments);
 	m_Enchantments.AddFromString(Enchantment4.ToString());
