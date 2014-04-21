@@ -22,6 +22,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		13, 7, 9,  // SizeX = 13, SizeY = 7, SizeZ = 9
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 6, 8,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -159,6 +163,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 7, 11,  // SizeX = 13, SizeY = 7, SizeZ = 11
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 6, 10,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -313,6 +321,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		10, 7, 7,  // SizeX = 10, SizeY = 7, SizeZ = 7
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		9, 6, 6,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -414,7 +426,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"",
+		"1:0|2:0|3:0|4:0|5:0",
 
 		// AddWeightIfSame:
 		0,
@@ -428,6 +440,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		14, 9, 7,  // SizeX = 14, SizeY = 9, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		13, 18, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -558,7 +574,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"",
+		"1:0|2:0|3:0|4:0|5:0",
 
 		// AddWeightIfSame:
 		0,
@@ -572,6 +588,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 8, 15,  // SizeX = 15, SizeY = 8, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 17, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -768,6 +788,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 8, 15,  // SizeX = 15, SizeY = 8, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 17, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -966,6 +990,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		9, 6, 5,  // SizeX = 9, SizeY = 6, SizeZ = 5
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		8, 15, 4,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -1041,7 +1069,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"1:0",
+		"1:0|2:0|3:0|4:0|5:0",
 
 		// AddWeightIfSame:
 		0,
@@ -1055,6 +1083,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 6, 5,  // SizeX = 13, SizeY = 6, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 15, 4,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1137,7 +1169,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"1:0",
+		"1:0|2:0|3:0|4:0|5:0",
 
 		// AddWeightIfSame:
 		0,
@@ -1151,6 +1183,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		5, 7, 16,  // SizeX = 5, SizeY = 7, SizeZ = 16
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		4, 6, 15,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1326,6 +1362,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 12, 12,  // SizeX = 15, SizeY = 12, SizeZ = 12
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 11, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1562,6 +1602,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 14, 16,  // SizeX = 15, SizeY = 14, SizeZ = 16
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 13, 15,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1885,6 +1929,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		15, 8, 5,  // SizeX = 15, SizeY = 8, SizeZ = 5
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 17, 4,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -1999,6 +2047,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 8, 10,  // SizeX = 15, SizeY = 8, SizeZ = 10
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 17, 9,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2156,6 +2208,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		11, 6, 5,  // SizeX = 11, SizeY = 6, SizeZ = 5
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 5, 4,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -2251,6 +2307,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		13, 6, 5,  // SizeX = 13, SizeY = 6, SizeZ = 5
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 5, 4,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -2345,6 +2405,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		11, 6, 11,  // SizeX = 11, SizeY = 6, SizeZ = 11
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 5, 10,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2479,6 +2543,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		11, 6, 11,  // SizeX = 11, SizeY = 6, SizeZ = 11
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 5, 10,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -2612,6 +2680,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		9, 13, 5,  // SizeX = 9, SizeY = 13, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		8, 12, 4,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2759,6 +2831,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		14, 6, 5,  // SizeX = 14, SizeY = 6, SizeZ = 5
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		13, 5, 4,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -2853,6 +2929,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 11, 15,  // SizeX = 15, SizeY = 11, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 10, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -3086,7 +3166,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		100,
+		10,
 
 		// DepthWeight:
 		"",
@@ -3103,6 +3183,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		12, 15, 15,  // SizeX = 12, SizeY = 15, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		11, 14, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -3411,7 +3495,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		100,
+		10,
 
 		// DepthWeight:
 		"",
@@ -3428,6 +3512,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		16, 12, 15,  // SizeX = 16, SizeY = 12, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		15, 11, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -3685,7 +3773,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		100,
+		10,
 
 		// DepthWeight:
 		"",
@@ -3702,6 +3790,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 8, 13,  // SizeX = 13, SizeY = 8, SizeZ = 13
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 7, 12,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -3885,6 +3977,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		7, 10, 7,  // SizeX = 7, SizeY = 10, SizeZ = 7
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 9, 6,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -4009,7 +4105,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"",
+		"1:0|3:0|5:0|7:0|9:0|11:0|13:0|15:0",
 
 		// AddWeightIfSame:
 		0,
@@ -4023,6 +4119,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		7, 10, 7,  // SizeX = 7, SizeY = 10, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 9, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -4148,7 +4248,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"",
+		"1:0|3:0|5:0|7:0|9:0|11:0|13:0|15:0",
 
 		// AddWeightIfSame:
 		0,
@@ -4162,6 +4262,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 6, 7,  // SizeX = 13, SizeY = 6, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 5, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -4272,6 +4376,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 6, 9,  // SizeX = 13, SizeY = 6, SizeZ = 9
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 5, 8,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -4395,6 +4503,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 5, 6,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -4501,6 +4613,10 @@ const cPrefab::sDef g_NetherFortStartingPrefabs[] =
 	{
 		// Size:
 		13, 9, 13,  // SizeX = 13, SizeY = 9, SizeZ = 13
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 8, 12,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
