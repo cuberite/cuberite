@@ -824,7 +824,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_DYE:
 				{
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
+					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye((NIBBLETYPE)(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
 					break;
 				}
 				case E_ITEM_GUNPOWDER: break;
