@@ -774,12 +774,19 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 
 	if (GetWorld()->GetWeather() == eWeather_Rain)
 	{
-		if (HasBeenBurning)
+
+		int PosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width,
+			PosY = POSY_TOINT,
+			PosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
+
+		if ((PosY > 0) || (PosY <= cChunkDef::Height))
 		{
-			m_TicksLeftBurning = 0;
-			OnFinishedBurning();
-		}
-		return;
+			// Inside the world
+			if (a_Chunk.GetSkyLight(PosX, PosY, PosZ) == 15)
+			{ 
+				m_TicksLeftBurning = 0;
+			}
+		}		
 	}
 	
 	// Do the burning damage:
