@@ -214,6 +214,25 @@ int cProtocol161::ParseEntityAction(void)
 
 
 
+int cProtocol161::ParseLogin(void)
+{
+	// The login packet is sent by Forge clients only
+	// Only parse the packet, do no extra processing
+	// Note that the types and the names have been only guessed and are not verified at all!
+	HANDLE_PACKET_READ(ReadBEInt, int, Int1);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, String1);
+	HANDLE_PACKET_READ(ReadChar, char, Char1);
+	HANDLE_PACKET_READ(ReadChar, char, Char2);
+	HANDLE_PACKET_READ(ReadChar, char, Char3);
+	HANDLE_PACKET_READ(ReadByte, Byte, Byte1);
+	HANDLE_PACKET_READ(ReadByte, Byte, Byte2);
+	return PARSE_OK;
+}
+
+
+
+
+
 int cProtocol161::ParsePlayerAbilities(void)
 {
 	HANDLE_PACKET_READ(ReadByte,    Byte,  Flags);

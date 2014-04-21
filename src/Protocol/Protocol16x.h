@@ -46,6 +46,7 @@ protected:
 	virtual void SendWindowOpen    (const cWindow & a_Window) override;
 	
 	virtual int ParseEntityAction   (void) override;
+	virtual int ParseLogin          (void) override;
 	virtual int ParsePlayerAbilities(void) override;
 	
 	// New packets:
