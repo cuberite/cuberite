@@ -788,7 +788,10 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastBurnDamage++;
 		if (m_TicksSinceLastBurnDamage >= BURN_TICKS_PER_DAMAGE)
 		{
-			TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0);
+            if (!m_Fireproof)
+            {
+                TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0);
+            }
 			m_TicksSinceLastBurnDamage = 0;
 		}
 		m_TicksLeftBurning--;
@@ -856,7 +859,10 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastLavaDamage++;
 		if (m_TicksSinceLastLavaDamage >= LAVA_TICKS_PER_DAMAGE)
 		{
-			TakeDamage(dtLavaContact, NULL, LAVA_DAMAGE, 0);
+            if (!m_Fireproof)
+            {
+                TakeDamage(dtLavaContact, NULL, LAVA_DAMAGE, 0);
+            }
 			m_TicksSinceLastLavaDamage = 0;
 		}
 	}
@@ -874,7 +880,10 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastFireDamage++;
 		if (m_TicksSinceLastFireDamage >= FIRE_TICKS_PER_DAMAGE)
 		{
-			TakeDamage(dtFireContact, NULL, FIRE_DAMAGE, 0);
+			if (!m_Fireproof)
+            {
+                TakeDamage(dtFireContact, NULL, FIRE_DAMAGE, 0);
+            }
 			m_TicksSinceLastFireDamage = 0;
 		}
 	}
