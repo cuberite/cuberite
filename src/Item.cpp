@@ -198,9 +198,6 @@ bool cItem::IsEnchantable(short item)
 		return true;
 	if ((item >= 298) && (item <= 317))
 		return true;
-	if ((item >= 290) && (item <= 294))
-		return true;
-
 	if ((item == 346) || (item == 359) || (item == 261))
 		return true;
 

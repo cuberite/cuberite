@@ -56,7 +56,6 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	std::ifstream f;
 	char a_File[] = "furnace.txt";
 	f.open(a_File, std::ios::in);
-	std::string input;
 
 	if (!f.good())
 	{

@@ -119,9 +119,10 @@ void cAuthenticator::Execute(void)
 		}
 		ASSERT(!m_Queue.empty());
 
-		int ClientID = m_Queue.front().m_ClientID;
-		AString UserName = m_Queue.front().m_Name;
-		AString ServerID = m_Queue.front().m_ServerID;
+		cAuthenticator::cUser & User = m_Queue.front();
+		int ClientID = User.m_ClientID;
+		AString UserName = User.m_Name;
+		AString ServerID = User.m_ServerID;
 		m_Queue.pop_front();
 		Lock.Unlock();
 

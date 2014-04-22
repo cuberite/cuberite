@@ -453,14 +453,16 @@ void cClientHandle::HandlePing(void)
 {
 	// Somebody tries to retrieve information about the server
 	AString Reply;
+	const cServer & Server = *cRoot::Get()->GetServer();
+
 	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetServer()->GetDescription().c_str(),
+		Server.GetDescription().c_str(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetNumPlayers(),
+		Server.GetNumPlayers(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetMaxPlayers()
+		Server.GetMaxPlayers()
 	);
-	Kick(Reply.c_str());
+	Kick(Reply);
 }
 
 
@@ -1216,8 +1218,8 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		Color = AString("@") + Color[2];
 	}
 	else
-	{
-		Color.empty();
+	{ 
+		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
 	Msg.ParseText(a_Message);

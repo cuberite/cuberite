@@ -112,18 +112,21 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 		ASSERT(!"Unknown world in cDeadlockDetect");
 		return;
 	}
-	if (itr->second.m_Age == a_Age)
+
+	cDeadlockDetect::sWorldAge & WorldAge = itr->second;
+
+	if (WorldAge.m_Age == a_Age)
 	{
-		itr->second.m_NumCyclesSame += 1;
-		if (itr->second.m_NumCyclesSame > (1000 * m_IntervalSec) / CYCLE_MILLISECONDS)
+		WorldAge.m_NumCyclesSame += 1;
+		if (WorldAge.m_NumCyclesSame > (1000 * m_IntervalSec) / CYCLE_MILLISECONDS)
 		{
 			DeadlockDetected();
 		}
 	}
 	else
 	{
-		itr->second.m_Age = a_Age;
-		itr->second.m_NumCyclesSame = 0;
+		WorldAge.m_Age = a_Age;
+		WorldAge.m_NumCyclesSame = 0;
 	}
 }
 

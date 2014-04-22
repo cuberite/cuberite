@@ -452,7 +452,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 		{
 			cMonster& Monster = (cMonster&)(**itr);
 			currentPosition = Monster.GetPosition();
-			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); itr2 ++)
+			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); ++itr2)
 			{
 				toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
 			}
@@ -600,7 +600,7 @@ void cChunk::Tick(float a_Dt)
 				delete ToDelete;
 				continue;
 			}
-			itr++;
+			++itr;
 	}  // for itr - m_Entitites[]
 	
 	// If any entity moved out of the chunk, move it to the neighbor:
