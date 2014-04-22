@@ -45,6 +45,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_IsInitialized(false)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
+	, m_IsFireproof(false)
 	, m_TicksSinceLastBurnDamage(0)
 	, m_TicksSinceLastLavaDamage(0)
 	, m_TicksSinceLastFireDamage(0)
@@ -1036,6 +1037,16 @@ void cEntity::SetMaxHealth(int a_MaxHealth)
 	{
 		m_Health = a_MaxHealth;
 	}
+}
+
+
+
+
+
+/// Sets whether the entity is fireproof
+void cEntity::SetFireproofStatus(bool a_IsFireproof)
+{
+	m_IsFireproof = a_IsFireproof;
 }
 
 
