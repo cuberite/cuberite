@@ -325,9 +325,32 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_Health = 0;
 	}
 
-	if (IsMob() || IsPlayer()) // Knockback for only players and mobs
+	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL)) // Knockback for only players and mobs
 	{
-		AddSpeed(a_TDI.Knockback * 2);
+		int KnockbackLevel = 0;
+		if (a_TDI.Attacker->GetEquippedWeapon().m_ItemType == E_ITEM_BOW)
+		{
+			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch);
+		}
+		else
+		{
+			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
+		}
+
+		Vector3d additionalSpeed(0, 0, 0);
+		switch (KnockbackLevel)
+		{
+		case 1:
+			additionalSpeed.Set(5, .2, 5);
+			break;
+		case 2:
+			additionalSpeed.Set(8, .2, 8);
+			break;
+		default:
+			additionalSpeed.Set(2, .2, 2);
+			break;
+		}
+		AddSpeed(a_TDI.Knockback * additionalSpeed);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -772,16 +795,14 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
-	if (GetWorld()->GetWeather() == eWeather_Rain)
+	if (m_World->IsWeatherWet())
 	{
+		int PosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
+		int PosY = POSY_TOINT;
+		int PosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 
-		int PosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width,
-			PosY = POSY_TOINT,
-			PosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
-
-		if ((PosY > 0) || (PosY <= cChunkDef::Height))
+		if((POSY_TOINT - 1) == m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
-			// Inside the world
 			if (a_Chunk.GetSkyLight(PosX, PosY, PosZ) == 15)
 			{ 
 				m_TicksLeftBurning = 0;
