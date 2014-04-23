@@ -38,6 +38,7 @@ nav { float: right; }
 	border-bottom: none;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
+	transition: all 200ms;
 	display: inline;
 	font-size: 20px;
 	margin-left: 1.5px;
