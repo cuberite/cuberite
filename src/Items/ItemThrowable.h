@@ -127,7 +127,10 @@ public:
 			return false;
 		}
 
-		a_World->CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, a_Player, a_Player->GetEquippedItem());
+		if (a_World->CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, a_Player, a_Player->GetEquippedItem()) == -1)
+		{
+			return false;
+		}
 
 		if (!a_Player->IsGameModeCreative())
 		{

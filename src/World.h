@@ -710,7 +710,9 @@ public:
 	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) override;  // tolua_export
 	int SpawnMobFinalize(cMonster* a_Monster);
 	
-	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise */
+	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
+	Item parameter used currently for Fireworks to correctly set entity metadata based on item metadata
+	*/
 	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem a_Item, const Vector3d * a_Speed = NULL);  // tolua_export
 	
 	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
