@@ -99,7 +99,7 @@ public:
 	/** Returns true if there are no enchantments */
 	bool IsEmpty(void) const;
 	
-	/** Converts enchantment name to the numeric representation; returns -1 if enchantment name not found; case insensitive */
+	/** Converts enchantment name or ID (number in string) to the numeric representation; returns -1 if enchantment name not found; case insensitive */
 	static int StringToEnchantmentID(const AString & a_EnchantmentName);
 	
 	/** Returns true if a_Other contains exactly the same enchantments and levels */
