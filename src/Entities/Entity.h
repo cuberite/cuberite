@@ -330,9 +330,9 @@ public:
 	int GetMaxHealth(void) const { return m_MaxHealth; }
 	
 	/// Sets whether the entity is fireproof
-	void SetFireproofStatus(bool a_IsFireproof);
+	void SetIsFireproof(bool a_IsFireproof);
 	
-	bool GetFireproofStatus(void) const { return m_IsFireproof; }
+	bool IsFireproof(void) const { return m_IsFireproof; }
 	
 	/// Puts the entity on fire for the specified amount of ticks
 	void StartBurning(int a_TicksLeftBurning);

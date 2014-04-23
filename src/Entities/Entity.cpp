@@ -1044,7 +1044,7 @@ void cEntity::SetMaxHealth(int a_MaxHealth)
 
 
 /// Sets whether the entity is fireproof
-void cEntity::SetFireproofStatus(bool a_IsFireproof)
+void cEntity::SetIsFireproof(bool a_IsFireproof)
 {
 	m_IsFireproof = a_IsFireproof;
 }

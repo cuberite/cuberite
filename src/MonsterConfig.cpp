@@ -94,7 +94,7 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 			a_Monster->SetSightDistance(itr->m_SightDistance);
 			a_Monster->SetAttackRate   ((float)itr->m_AttackRate);
 			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
-			a_Monster->SetFireproofStatus(itr->m_IsFireproof);
+			a_Monster->SetIsFireproof  (itr->m_IsFireproof);
 			return;
 		}
 	}  // for itr - m_pState->AttributesList[]
