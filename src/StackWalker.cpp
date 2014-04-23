@@ -935,7 +935,8 @@ BOOL StackWalker::LoadModules()
           break;
         }
       }  // for (search for path separator...)
-      if (strlen(szTemp) > 0)
+	  
+      if (szTemp[0] != '\0') // If szTemp is not empty (Note: This is more efficient than using strlen)
       {
         strcat_s(szSymPath, nSymPathLen, szTemp);
         strcat_s(szSymPath, nSymPathLen, ";");

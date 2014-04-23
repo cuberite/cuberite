@@ -29,6 +29,18 @@ cEnchantments::cEnchantments(const AString & a_StringSpec)
 
 
 
+void cEnchantments::Add(const cEnchantments & a_Other)
+{
+	for (cEnchantments::cMap::const_iterator itr = a_Other.m_Enchantments.begin(), end = a_Other.m_Enchantments.end(); itr != end; ++itr)
+	{
+		SetLevel(itr->first, itr->second);
+	}  // for itr - a_Other.m_Enchantments[]
+}
+
+
+
+
+
 void cEnchantments::AddFromString(const AString & a_StringSpec)
 {
 	// Add enchantments in the stringspec; if a specified enchantment already exists, overwrites it

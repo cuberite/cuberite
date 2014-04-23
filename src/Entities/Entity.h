@@ -329,6 +329,11 @@ public:
 
 	int GetMaxHealth(void) const { return m_MaxHealth; }
 	
+	/// Sets whether the entity is fireproof
+	void SetIsFireproof(bool a_IsFireproof);
+	
+	bool IsFireproof(void) const { return m_IsFireproof; }
+	
 	/// Puts the entity on fire for the specified amount of ticks
 	void StartBurning(int a_TicksLeftBurning);
 	
@@ -435,6 +440,9 @@ protected:
 	
 	cWorld * m_World;
 	
+	/// Whether the entity is capable of taking fire or lava damage.
+	bool m_IsFireproof;
+    
 	/// Time, in ticks, since the last damage dealt by being on fire. Valid only if on fire (IsOnFire())
 	int m_TicksSinceLastBurnDamage;
 	

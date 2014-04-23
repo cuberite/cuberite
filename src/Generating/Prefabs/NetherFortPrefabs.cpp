@@ -22,6 +22,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		13, 7, 9,  // SizeX = 13, SizeY = 7, SizeZ = 9
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 6, 8,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -159,6 +163,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 7, 11,  // SizeX = 13, SizeY = 7, SizeZ = 11
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 6, 10,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -313,6 +321,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		10, 7, 7,  // SizeX = 10, SizeY = 7, SizeZ = 7
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		9, 6, 6,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -414,7 +426,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"",
+		"1:0|2:0|3:0|4:0|5:0",
 
 		// AddWeightIfSame:
 		0,
@@ -428,6 +440,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		14, 9, 7,  // SizeX = 14, SizeY = 9, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		13, 18, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -558,7 +574,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"",
+		"1:0|2:0|3:0|4:0|5:0",
 
 		// AddWeightIfSame:
 		0,
@@ -572,6 +588,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 8, 15,  // SizeX = 15, SizeY = 8, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 17, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -757,7 +777,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"",
 
 		// AddWeightIfSame:
-		0,
+		-1000,
 	},  // BridgeCircleCrossing
 
 
@@ -768,6 +788,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 8, 15,  // SizeX = 15, SizeY = 8, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 17, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -966,6 +990,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		9, 6, 5,  // SizeX = 9, SizeY = 6, SizeZ = 5
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		8, 15, 4,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -1041,7 +1069,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"1:0",
+		"1:0|2:0|3:0|4:0|5:0",
 
 		// AddWeightIfSame:
 		0,
@@ -1055,6 +1083,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 6, 5,  // SizeX = 13, SizeY = 6, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 15, 4,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1137,7 +1169,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"1:0",
+		"1:0|2:0|3:0|4:0|5:0",
 
 		// AddWeightIfSame:
 		0,
@@ -1151,6 +1183,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		5, 7, 16,  // SizeX = 5, SizeY = 7, SizeZ = 16
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		4, 6, 15,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1326,6 +1362,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 12, 12,  // SizeX = 15, SizeY = 12, SizeZ = 12
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 21, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1558,304 +1598,311 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// BridgeLevelCrossing:
-	// The data has been exported from the gallery Nether, area index 45, ID 304, created by Aloe_vera
+	// The data has been exported from the gallery Nether, area index 61, ID 321, created by Aloe_vera
 	{
 		// Size:
-		15, 14, 16,  // SizeX = 15, SizeY = 14, SizeZ = 16
+		16, 14, 16,  // SizeX = 16, SizeY = 14, SizeZ = 16
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		15, 23, 15,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
-		"b:114: 6\n"  /* netherbrickstairs */
+		"b:114: 5\n"  /* netherbrickstairs */
 		"c:114: 4\n"  /* netherbrickstairs */
-		"d:114: 5\n"  /* netherbrickstairs */
-		"e: 44:14\n"  /* step */
+		"d: 44:14\n"  /* step */
+		"e:114: 6\n"  /* netherbrickstairs */
 		"f:114: 7\n"  /* netherbrickstairs */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
 		// Level 0
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "...........aaa."
-		/*  1 */ "aa.........aaaa"
-		/*  2 */ "aa...........aa"
-		/*  3 */ "aa...........aa"
-		/*  4 */ "..............."
-		/*  5 */ "..............."
-		/*  6 */ "..............."
-		/*  7 */ "..............."
-		/*  8 */ "..............."
-		/*  9 */ "..............."
-		/* 10 */ "..............."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "...........aaa."
-		/* 15 */ "...........aaa."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "aammmmmmmmmmmmaa"
+		/*  2 */ "aammmmmmmmmmmmaa"
+		/*  3 */ "aammmmmmmmmmmmaa"
+		/*  4 */ "mmmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
 
 		// Level 1
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "...........aaa."
-		/*  1 */ "aa.........aaaa"
-		/*  2 */ "aa...........aa"
-		/*  3 */ "aa...........aa"
-		/*  4 */ "..............."
-		/*  5 */ "..............."
-		/*  6 */ "..............."
-		/*  7 */ "..............."
-		/*  8 */ "..............."
-		/*  9 */ "..............."
-		/* 10 */ "..............."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "...........aaa."
-		/* 15 */ "...........aaa."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "aabmmmmmmmmmmcaa"
+		/*  2 */ "aabmmmmmmmmmmcaa"
+		/*  3 */ "aabmmmmmmmmmmcaa"
+		/*  4 */ "mmmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
 
 		// Level 2
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "...........aaa."
-		/*  1 */ "aa.........aaaa"
-		/*  2 */ "aa...........aa"
-		/*  3 */ "aa...........aa"
-		/*  4 */ "..............."
-		/*  5 */ "..............."
-		/*  6 */ "..............."
-		/*  7 */ "..............."
-		/*  8 */ "..............."
-		/*  9 */ "..............."
-		/* 10 */ "..............."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "...........bbb."
-		/* 14 */ "...........aaa."
-		/* 15 */ "...........aaa."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "aaabdmmmmmmdcaaa"
+		/*  2 */ "aaabdmmmmmmdcaaa"
+		/*  3 */ "aaabdmmmmmmdcaaa"
+		/*  4 */ "mmmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
 
 		// Level 3
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "..........caaad"
-		/*  1 */ "aa........caaaa"
-		/*  2 */ "aa........caaaa"
-		/*  3 */ "aa........caaaa"
-		/*  4 */ "...........aaad"
-		/*  5 */ "...........aaad"
-		/*  6 */ "...........aaad"
-		/*  7 */ "...........aaad"
-		/*  8 */ "...........aaad"
-		/*  9 */ "..........caaad"
-		/* 10 */ "..........caaad"
-		/* 11 */ "..........caaad"
-		/* 12 */ "..........caaad"
-		/* 13 */ "..........caaad"
-		/* 14 */ "..........caaad"
-		/* 15 */ "..........caaad"
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "eeeeeeeeeeeeeeee"
+		/*  1 */ "aaaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaaa"
+		/*  4 */ "ffffffffffffffff"
+		/*  5 */ "mmmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
 
 		// Level 4
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "..........aaaaa"
-		/*  1 */ "aa........aaaaa"
-		/*  2 */ "aa........aaaaa"
-		/*  3 */ "aa........aaaaa"
-		/*  4 */ "..........aaaaa"
-		/*  5 */ "..........aaaaa"
-		/*  6 */ "..........aaaaa"
-		/*  7 */ "..........aaaaa"
-		/*  8 */ "..........aaaaa"
-		/*  9 */ "..........aaaaa"
-		/* 10 */ "..........aaaaa"
-		/* 11 */ "..........aaaaa"
-		/* 12 */ "..........aaaaa"
-		/* 13 */ "..........aaaaa"
-		/* 14 */ "..........aaaaa"
-		/* 15 */ "..........aaaaa"
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "aaaaaaaaaaaaaaaa"
+		/*  1 */ "aaaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaaa"
+		/*  4 */ "aaaaaaaaaaaaaaaa"
+		/*  5 */ "faaabmmmmmmmmmmm"
+		/*  6 */ "caaabmmmmmmmmmmm"
+		/*  7 */ "caaabmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
 
 		// Level 5
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "..........a...a"
-		/*  1 */ "aa........a...a"
-		/*  2 */ "aa........a...a"
-		/*  3 */ "aa........a...a"
-		/*  4 */ "..........a...a"
-		/*  5 */ "..........a...a"
-		/*  6 */ "........aaa...a"
-		/*  7 */ "........aa....a"
-		/*  8 */ "........aa....a"
-		/*  9 */ "........aa....a"
-		/* 10 */ "........aaa...a"
-		/* 11 */ "..........a...a"
-		/* 12 */ "..........a...a"
-		/* 13 */ "..........a...a"
-		/* 14 */ "..........a...a"
-		/* 15 */ "..........a...a"
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "aaaaaaaaaaaaaaaa"
+		/*  1 */ "................"
+		/*  2 */ "................"
+		/*  3 */ "................"
+		/*  4 */ "a...aaaaaaaaaaaa"
+		/*  5 */ "a...ammmmmmmmmmm"
+		/*  6 */ "aaaaammmmmmmmmmm"
+		/*  7 */ "aaaaammmmmmmmmmm"
+		/*  8 */ "caaabmmmmmmmmmmm"
+		/*  9 */ "caaabmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
 
 		// Level 6
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "..............."
-		/*  1 */ "aa........a...a"
-		/*  2 */ "aa........a...a"
-		/*  3 */ "aa........a...a"
-		/*  4 */ "..............."
-		/*  5 */ "..............."
-		/*  6 */ "........aaa...."
-		/*  7 */ "....aaaaa......"
-		/*  8 */ "....aaaaa......"
-		/*  9 */ "....aaaaa......"
-		/* 10 */ "....aaaaaaa...."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "..............."
-		/* 15 */ "..............."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmaaam"
+		/*  1 */ "................"
+		/*  2 */ "................"
+		/*  3 */ "................"
+		/*  4 */ "m...mmmmmmmmaaam"
+		/*  5 */ "a...ammmmmmmmmmm"
+		/*  6 */ "a...ammmmmmmmmmm"
+		/*  7 */ "a...ammmmmmmmmmm"
+		/*  8 */ "aaaaammmmmmmmmmm"
+		/*  9 */ "aaaaammmmmmmmmmm"
+		/* 10 */ "caaabmmmmmmmmmmm"
+		/* 11 */ "caaabmmmmmmmmmmm"
+		/* 12 */ "maaabmmmmmmmmmmm"
+		/* 13 */ "maaabmmmmmmmmmmm"
+		/* 14 */ "maaafmmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
 
 		// Level 7
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "..............."
-		/*  1 */ "aad.......a...a"
-		/*  2 */ "aad.......a...a"
-		/*  3 */ "aad.......a...a"
-		/*  4 */ "..............."
-		/*  5 */ "..............."
-		/*  6 */ "....aaaaaa....."
-		/*  7 */ "....aaaa......."
-		/*  8 */ "....aaaa......."
-		/*  9 */ "....aaaa......."
-		/* 10 */ "....aaaaaa....."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "..............."
-		/* 15 */ "..............."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmaaam"
+		/*  1 */ "................"
+		/*  2 */ "................"
+		/*  3 */ "................"
+		/*  4 */ "m...mmmmmmmmaaam"
+		/*  5 */ "m...mmmmmmmmmmmm"
+		/*  6 */ "m...mmmmmmmmmmmm"
+		/*  7 */ "a...ammmmmmmmmmm"
+		/*  8 */ "a...ammmmmmmmmmm"
+		/*  9 */ "a...ammmmmmmmmmm"
+		/* 10 */ "aaaaammmmmmmmmmm"
+		/* 11 */ "aaaaaeemmmmmmmmm"
+		/* 12 */ "caaaaaammmmmmmmm"
+		/* 13 */ "caaaaaammmmmmmmm"
+		/* 14 */ "caaaaaammmmmaaam"
+		/* 15 */ "fffffffmmmmmaaam"
 
 		// Level 8
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "..............."
-		/*  1 */ "aaade.....a...a"
-		/*  2 */ "aaade.....a...a"
-		/*  3 */ "aaade.....a...a"
-		/*  4 */ "..............."
-		/*  5 */ "..............."
-		/*  6 */ "....aaaaa......"
-		/*  7 */ "....a.........."
-		/*  8 */ "....a.........."
-		/*  9 */ "....a.........."
-		/* 10 */ "....aaaa......."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "..............."
-		/* 15 */ "..............."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmaaam"
+		/*  1 */ "mmmmmmmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmmmmmmm"
+		/*  4 */ "m...mmmmmmmmaaam"
+		/*  5 */ "m...mmmmmmmmmmmm"
+		/*  6 */ "m...mmmmmmmmmmmm"
+		/*  7 */ "m...mmmmmmmmmmmm"
+		/*  8 */ "m...mmmmmmmmmmmm"
+		/*  9 */ "a...ammmmmmmmmmm"
+		/* 10 */ "a...ammmmmmmmmmm"
+		/* 11 */ "a...aaaeemmmmmmm"
+		/* 12 */ "a.....aaammmmmmm"
+		/* 13 */ "a.....aaammmmmmm"
+		/* 14 */ "a.....aaammmaaam"
+		/* 15 */ "aaaaaaaffmmmaaam"
 
 		// Level 9
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "bbbbbbbbbbbbbbb"
-		/*  1 */ "aaaaaaaaaaaaaaa"
-		/*  2 */ "aaaaaaaaaaaaaaa"
-		/*  3 */ "aaaaaaaaaaaaaaa"
-		/*  4 */ "ffffffaaaffffff"
-		/*  5 */ "....aaaaa......"
-		/*  6 */ "....a...a......"
-		/*  7 */ "....a.........."
-		/*  8 */ "..............."
-		/*  9 */ "..............."
-		/* 10 */ "..............."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "..............."
-		/* 15 */ "..............."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmcaaab"
+		/*  1 */ "mmmmmmmmmmmcaaab"
+		/*  2 */ "mmmmmmmmmmmcaaab"
+		/*  3 */ "mmmmmmmmmmmcaaab"
+		/*  4 */ "mmmmmmmmmmmcaaab"
+		/*  5 */ "mmmmmmmmmmmcaaab"
+		/*  6 */ "m...mmmmmmmcaaab"
+		/*  7 */ "m...mmmmmmmcaaab"
+		/*  8 */ "m...mmmmmmmcaaab"
+		/*  9 */ "m...mmmmmmmcaaab"
+		/* 10 */ "m...mmmmmmmcaaab"
+		/* 11 */ "m...maaaaeecaaab"
+		/* 12 */ "m.......aaaaaaab"
+		/* 13 */ "m.......aaaaaaab"
+		/* 14 */ "m.......aaaaaaab"
+		/* 15 */ "mmmmmaaaafffaaab"
 
 		// Level 10
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "aaaaaaaaaaaaaaa"
-		/*  1 */ "aaaaaaaaaaaaaaa"
-		/*  2 */ "aaaaaaaaaaaaaaa"
-		/*  3 */ "aaaaaaaaaaaaaaa"
-		/*  4 */ "aaaaaaaaaaaaaaa"
-		/*  5 */ "....a...a......"
-		/*  6 */ "....a...a......"
-		/*  7 */ "..............."
-		/*  8 */ "..............."
-		/*  9 */ "..............."
-		/* 10 */ "..............."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "..............."
-		/* 15 */ "..............."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmaaaaa"
+		/*  1 */ "mmmmmmmmmmmaaaaa"
+		/*  2 */ "mmmmmmmmmmmaaaaa"
+		/*  3 */ "mmmmmmmmmmmaaaaa"
+		/*  4 */ "mmmmmmmmmmmaaaaa"
+		/*  5 */ "mmmmmmmmmmmaaaaa"
+		/*  6 */ "mmmmmmmmmmmaaaaa"
+		/*  7 */ "mmmmmmmmmmmaaaaa"
+		/*  8 */ "m...mmmmmmmaaaaa"
+		/*  9 */ "m...mmmmmmmaaaaa"
+		/* 10 */ "m...mmmmmmmaaaaa"
+		/* 11 */ "m...mmmaaaaaaaaa"
+		/* 12 */ "m.........aaaaaa"
+		/* 13 */ "m.........aaaaaa"
+		/* 14 */ "m.........aaaaaa"
+		/* 15 */ "mmmmmmmaaaaaaaaa"
 
 		// Level 11
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "aaaaaaaaaaaaaaa"
-		/*  1 */ "..............."
-		/*  2 */ "..............."
-		/*  3 */ "..............."
-		/*  4 */ "aaaaa...aaaaaaa"
-		/*  5 */ "....a...a......"
-		/*  6 */ "..............."
-		/*  7 */ "..............."
-		/*  8 */ "..............."
-		/*  9 */ "..............."
-		/* 10 */ "..............."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "..............."
-		/* 15 */ "..............."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmma...a"
+		/*  1 */ "mmmmmmmmmmma...a"
+		/*  2 */ "mmmmmmmmmmma...a"
+		/*  3 */ "mmmmmmmmmmma...a"
+		/*  4 */ "mmmmmmmmmmma...a"
+		/*  5 */ "mmmmmmmmmmma...a"
+		/*  6 */ "mmmmmmmmmmma...a"
+		/*  7 */ "mmmmmmmmmmma...a"
+		/*  8 */ "mmmmmmmmmmma...a"
+		/*  9 */ "mmmmmmmmmmma...a"
+		/* 10 */ "mmmmmmmmmmma...a"
+		/* 11 */ "mmmmmmmmmaaa...a"
+		/* 12 */ "mmmm...........a"
+		/* 13 */ "mmmm...........a"
+		/* 14 */ "mmmm...........a"
+		/* 15 */ "mmmmmmmmmaaa...a"
 
 		// Level 12
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "..............."
-		/*  1 */ "..............."
-		/*  2 */ "..............."
-		/*  3 */ "..............."
-		/*  4 */ "..............."
-		/*  5 */ "..............."
-		/*  6 */ "..............."
-		/*  7 */ "..............."
-		/*  8 */ "..............."
-		/*  9 */ "..............."
-		/* 10 */ "..............."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "..............."
-		/* 15 */ "..............."
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmm...m"
+		/*  1 */ "mmmmmmmmmmmm...m"
+		/*  2 */ "mmmmmmmmmmmm...m"
+		/*  3 */ "mmmmmmmmmmmm...m"
+		/*  4 */ "mmmmmmmmmmmm...m"
+		/*  5 */ "mmmmmmmmmmmm...m"
+		/*  6 */ "mmmmmmmmmmmm...m"
+		/*  7 */ "mmmmmmmmmmmm...m"
+		/*  8 */ "mmmmmmmmmmmm...m"
+		/*  9 */ "mmmmmmmmmmmm...m"
+		/* 10 */ "mmmmmmmmmmmm...m"
+		/* 11 */ "mmmmmmmmmmmm...m"
+		/* 12 */ "mmmmmm.........m"
+		/* 13 */ "mmmmmm.........m"
+		/* 14 */ "mmmmmm.........m"
+		/* 15 */ "mmmmmmmmmmmm...m"
 
 		// Level 13
-		/* z\x*             11111 */
-		/*    *   012345678901234 */
-		/*  0 */ "..............."
-		/*  1 */ "..............."
-		/*  2 */ "..............."
-		/*  3 */ "..............."
-		/*  4 */ "..............."
-		/*  5 */ "..............."
-		/*  6 */ "..............."
-		/*  7 */ "..............."
-		/*  8 */ "..............."
-		/*  9 */ "..............."
-		/* 10 */ "..............."
-		/* 11 */ "..............."
-		/* 12 */ "..............."
-		/* 13 */ "..............."
-		/* 14 */ "..............."
-		/* 15 */ "...............",
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmm...m"
+		/*  1 */ "mmmmmmmmmmmm...m"
+		/*  2 */ "mmmmmmmmmmmm...m"
+		/*  3 */ "mmmmmmmmmmmm...m"
+		/*  4 */ "mmmmmmmmmmmm...m"
+		/*  5 */ "mmmmmmmmmmmm...m"
+		/*  6 */ "mmmmmmmmmmmm...m"
+		/*  7 */ "mmmmmmmmmmmm...m"
+		/*  8 */ "mmmmmmmmmmmm...m"
+		/*  9 */ "mmmmmmmmmmmm...m"
+		/* 10 */ "mmmmmmmmmmmm...m"
+		/* 11 */ "mmmmmmmmmmmm...m"
+		/* 12 */ "mmmmmmmm.......m"
+		/* 13 */ "mmmmmmmm.......m"
+		/* 14 */ "mmmmmmmm.......m"
+		/* 15 */ "mmmmmmmmmmmm...m",
 
 		// Connectors:
-		"",
+		"0: 0, 5, 2: 4\n"  /* Type 0, direction X- */
+		"0: 15, 5, 2: 5\n"  /* Type 0, direction X+ */
+		"0: 13, 11, 0: 2\n"  /* Type 0, direction Z- */
+		"0: 13, 11, 15: 3\n"  /* Type 0, direction Z+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1867,7 +1914,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		100,
+		20,
 
 		// DepthWeight:
 		"",
@@ -1884,6 +1931,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 8, 5,  // SizeX = 15, SizeY = 8, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 17, 4,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1985,7 +2036,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		500,
 
 		// DepthWeight:
-		"",
+		"4:-3000|8:-3000|12:-3000|16:-3000|20:-3000",
 
 		// AddWeightIfSame:
 		1000,
@@ -1999,6 +2050,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 8, 10,  // SizeX = 15, SizeY = 8, SizeZ = 10
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 17, 9,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2156,6 +2211,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		11, 6, 5,  // SizeX = 11, SizeY = 6, SizeZ = 5
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 5, 4,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -2233,7 +2292,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		200,
+		300,
 
 		// DepthWeight:
 		"",
@@ -2250,6 +2309,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 6, 5,  // SizeX = 13, SizeY = 6, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 5, 4,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2328,7 +2391,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		200,
+		300,
 
 		// DepthWeight:
 		"",
@@ -2340,11 +2403,108 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Corridor5:
+	// The data has been exported from the gallery Nether, area index 65, ID 330, created by xoft
+	{
+		// Size:
+		5, 6, 5,  // SizeX = 5, SizeY = 6, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		4, 5, 4,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:112: 0\n"  /* netherbrick */
+		"b:113: 0\n"  /* netherbrickfence */
+		"c:114: 2\n"  /* netherbrickstairs */
+		"d:114: 3\n"  /* netherbrickstairs */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   01234 */
+		/*  0 */ "aaaaa"
+		/*  1 */ "aaaaa"
+		/*  2 */ "aaaaa"
+		/*  3 */ "aaaaa"
+		/*  4 */ "aaaaa"
+
+		// Level 1
+		/* z\x*   01234 */
+		/*  0 */ "aaaaa"
+		/*  1 */ "....."
+		/*  2 */ "....."
+		/*  3 */ "....."
+		/*  4 */ "aaaaa"
+
+		// Level 2
+		/* z\x*   01234 */
+		/*  0 */ "ababa"
+		/*  1 */ "....."
+		/*  2 */ "....."
+		/*  3 */ "....."
+		/*  4 */ "ababa"
+
+		// Level 3
+		/* z\x*   01234 */
+		/*  0 */ "ababa"
+		/*  1 */ "....."
+		/*  2 */ "....."
+		/*  3 */ "....."
+		/*  4 */ "ababa"
+
+		// Level 4
+		/* z\x*   01234 */
+		/*  0 */ "ababa"
+		/*  1 */ "....."
+		/*  2 */ "....."
+		/*  3 */ "....."
+		/*  4 */ "ababa"
+
+		// Level 5
+		/* z\x*   01234 */
+		/*  0 */ "ccccc"
+		/*  1 */ "aaaaa"
+		/*  2 */ "aaaaa"
+		/*  3 */ "aaaaa"
+		/*  4 */ "ddddd",
+
+		// Connectors:
+		"1: 4, 1, 2: 5\n"  /* Type 1, direction X+ */
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		500,
+
+		// DepthWeight:
+		"6:0|12:0|18:0",
+
+		// AddWeightIfSame:
+		500,
+	},  // Corridor5
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CorridorCorner5:
 	// The data has been exported from the gallery Nether, area index 10, ID 40, created by xoft
 	{
 		// Size:
 		11, 6, 11,  // SizeX = 11, SizeY = 6, SizeZ = 11
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 5, 10,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2479,6 +2639,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Size:
 		11, 6, 11,  // SizeX = 11, SizeY = 6, SizeZ = 11
 
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 5, 10,  // MaxX, MaxY, MaxZ
+
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:112: 0\n"  /* netherbrick */
@@ -2607,11 +2771,136 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// CorridorCrossing:
+	// The data has been exported from the gallery Nether, area index 63, ID 328, created by xoft
+	{
+		// Size:
+		9, 6, 9,  // SizeX = 9, SizeY = 6, SizeZ = 9
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		8, 5, 8,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:112: 0\n"  /* netherbrick */
+		"b:113: 0\n"  /* netherbrickfence */
+		"c:114: 0\n"  /* netherbrickstairs */
+		"d:114: 1\n"  /* netherbrickstairs */
+		"e:114: 2\n"  /* netherbrickstairs */
+		"f:114: 3\n"  /* netherbrickstairs */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   012345678 */
+		/*  0 */ "mmaaaaamm"
+		/*  1 */ "mmaaaaamm"
+		/*  2 */ "aaaaaaaaa"
+		/*  3 */ "aaaaaaaaa"
+		/*  4 */ "aaaaaaaaa"
+		/*  5 */ "aaaaaaaaa"
+		/*  6 */ "aaaaaaaaa"
+		/*  7 */ "mmaaaaamm"
+		/*  8 */ "mmaaaaamm"
+
+		// Level 1
+		/* z\x*   012345678 */
+		/*  0 */ "mma...amm"
+		/*  1 */ "mma...amm"
+		/*  2 */ "aaa...aaa"
+		/*  3 */ "........."
+		/*  4 */ "........."
+		/*  5 */ "........."
+		/*  6 */ "aaa...aaa"
+		/*  7 */ "mma...amm"
+		/*  8 */ "mma...amm"
+
+		// Level 2
+		/* z\x*   012345678 */
+		/*  0 */ "mma...amm"
+		/*  1 */ "mmb...bmm"
+		/*  2 */ "aba...aba"
+		/*  3 */ "........."
+		/*  4 */ "........."
+		/*  5 */ "........."
+		/*  6 */ "aba...aba"
+		/*  7 */ "mmb...bmm"
+		/*  8 */ "mma...amm"
+
+		// Level 3
+		/* z\x*   012345678 */
+		/*  0 */ "mma...amm"
+		/*  1 */ "mmb...bmm"
+		/*  2 */ "aba...aba"
+		/*  3 */ "........."
+		/*  4 */ "........."
+		/*  5 */ "........."
+		/*  6 */ "aba...aba"
+		/*  7 */ "mmb...bmm"
+		/*  8 */ "mma...amm"
+
+		// Level 4
+		/* z\x*   012345678 */
+		/*  0 */ "mma...amm"
+		/*  1 */ "mmb...bmm"
+		/*  2 */ "aba...aba"
+		/*  3 */ "........."
+		/*  4 */ "........."
+		/*  5 */ "........."
+		/*  6 */ "aba...aba"
+		/*  7 */ "mmb...bmm"
+		/*  8 */ "mma...amm"
+
+		// Level 5
+		/* z\x*   012345678 */
+		/*  0 */ "mmcaaadmm"
+		/*  1 */ "mmcaaadmm"
+		/*  2 */ "eeeaaaeee"
+		/*  3 */ "aaaaaaaaa"
+		/*  4 */ "aaaaaaaaa"
+		/*  5 */ "aaaaaaaaa"
+		/*  6 */ "ffcaaadff"
+		/*  7 */ "mmcaaadmm"
+		/*  8 */ "mmcaaadmm",
+
+		// Connectors:
+		"1: 8, 1, 4: 5\n"  /* Type 1, direction X+ */
+		"1: 4, 1, 0: 2\n"  /* Type 1, direction Z- */
+		"1: 4, 1, 8: 3\n"  /* Type 1, direction Z+ */
+		"1: 0, 1, 4: 4\n"  /* Type 1, direction X- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		-50,
+	},  // CorridorCrossing
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CorridorStairs:
 	// The data has been exported from the gallery Nether, area index 12, ID 42, created by xoft
 	{
 		// Size:
 		9, 13, 5,  // SizeX = 9, SizeY = 13, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		8, 12, 4,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2741,10 +3030,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		100,
+		250,
 
 		// DepthWeight:
-		"",
+		"0:0|2:0|4:0|6:0|8:0|10:0|12:0|14:0|16:0|18:0",
 
 		// AddWeightIfSame:
 		0,
@@ -2758,6 +3047,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		14, 6, 5,  // SizeX = 14, SizeY = 6, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		13, 5, 4,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2853,6 +3146,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		15, 11, 15,  // SizeX = 15, SizeY = 11, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 10, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -3086,7 +3383,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		100,
+		10,
 
 		// DepthWeight:
 		"",
@@ -3103,6 +3400,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		12, 15, 15,  // SizeX = 12, SizeY = 15, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		11, 14, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -3411,13 +3712,13 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		100,
+		10,
 
 		// DepthWeight:
 		"",
 
 		// AddWeightIfSame:
-		0,
+		-1000,
 	},  // LavaStaircaseBig
 
 
@@ -3428,6 +3729,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		16, 12, 15,  // SizeX = 16, SizeY = 12, SizeZ = 15
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		15, 11, 14,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -3685,7 +3990,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		100,
+		10,
 
 		// DepthWeight:
 		"",
@@ -3702,6 +4007,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 8, 13,  // SizeX = 13, SizeY = 8, SizeZ = 13
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 7, 12,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -3873,7 +4182,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"",
 
 		// AddWeightIfSame:
-		0,
+		-1000,
 	},  // MidStaircase
 
 
@@ -3884,6 +4193,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		7, 10, 7,  // SizeX = 7, SizeY = 10, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 19, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -4009,7 +4322,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"",
+		"1:0|3:0|5:0|7:0|9:0|11:0|13:0|15:0",
 
 		// AddWeightIfSame:
 		0,
@@ -4023,6 +4336,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		7, 10, 7,  // SizeX = 7, SizeY = 10, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 19, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -4148,7 +4465,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		100,
 
 		// DepthWeight:
-		"",
+		"1:0|3:0|5:0|7:0|9:0|11:0|13:0|15:0",
 
 		// AddWeightIfSame:
 		0,
@@ -4162,6 +4479,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 6, 7,  // SizeX = 13, SizeY = 6, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 5, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -4272,6 +4593,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	{
 		// Size:
 		13, 6, 9,  // SizeX = 13, SizeY = 6, SizeZ = 9
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 5, 8,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -4389,11 +4714,299 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TinyCorridorCorner:
+	// The data has been exported from the gallery Nether, area index 66, ID 331, created by xoft
+	{
+		// Size:
+		5, 6, 5,  // SizeX = 5, SizeY = 6, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		4, 5, 4,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:112: 0\n"  /* netherbrick */
+		"b:113: 0\n"  /* netherbrickfence */
+		"c:114: 2\n"  /* netherbrickstairs */
+		"d:114: 1\n"  /* netherbrickstairs */
+		"e:114: 0\n"  /* netherbrickstairs */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   01234 */
+		/*  0 */ "aaaaa"
+		/*  1 */ "aaaaa"
+		/*  2 */ "aaaaa"
+		/*  3 */ "aaaaa"
+		/*  4 */ "aaaaa"
+
+		// Level 1
+		/* z\x*   01234 */
+		/*  0 */ "aaaaa"
+		/*  1 */ "....a"
+		/*  2 */ "....a"
+		/*  3 */ "....a"
+		/*  4 */ "a...a"
+
+		// Level 2
+		/* z\x*   01234 */
+		/*  0 */ "ababa"
+		/*  1 */ "....b"
+		/*  2 */ "....a"
+		/*  3 */ "....b"
+		/*  4 */ "a...a"
+
+		// Level 3
+		/* z\x*   01234 */
+		/*  0 */ "ababa"
+		/*  1 */ "....b"
+		/*  2 */ "....a"
+		/*  3 */ "....b"
+		/*  4 */ "a...a"
+
+		// Level 4
+		/* z\x*   01234 */
+		/*  0 */ "ababa"
+		/*  1 */ "....b"
+		/*  2 */ "....a"
+		/*  3 */ "....b"
+		/*  4 */ "a...a"
+
+		// Level 5
+		/* z\x*   01234 */
+		/*  0 */ "ccccc"
+		/*  1 */ "aaaad"
+		/*  2 */ "aaaad"
+		/*  3 */ "aaaad"
+		/*  4 */ "eaaad",
+
+		// Connectors:
+		"1: 2, 1, 4: 3\n"  /* Type 1, direction Z+ */
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		-50,
+	},  // TinyCorridorCorner
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TinyCorridorCornerChest:
+	// The data has been exported from the gallery Nether, area index 67, ID 332, created by Aloe_vera
+	{
+		// Size:
+		5, 6, 5,  // SizeX = 5, SizeY = 6, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		4, 5, 4,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:112: 0\n"  /* netherbrick */
+		"b: 54: 4\n"  /* chest */
+		"c:113: 0\n"  /* netherbrickfence */
+		"d:114: 2\n"  /* netherbrickstairs */
+		"e:114: 1\n"  /* netherbrickstairs */
+		"f:114: 0\n"  /* netherbrickstairs */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   01234 */
+		/*  0 */ "aaaaa"
+		/*  1 */ "aaaaa"
+		/*  2 */ "aaaaa"
+		/*  3 */ "aaaaa"
+		/*  4 */ "aaaaa"
+
+		// Level 1
+		/* z\x*   01234 */
+		/*  0 */ "aaaaa"
+		/*  1 */ "....a"
+		/*  2 */ "...ba"
+		/*  3 */ "....a"
+		/*  4 */ "a...a"
+
+		// Level 2
+		/* z\x*   01234 */
+		/*  0 */ "acaca"
+		/*  1 */ "....c"
+		/*  2 */ "....a"
+		/*  3 */ "....c"
+		/*  4 */ "a...a"
+
+		// Level 3
+		/* z\x*   01234 */
+		/*  0 */ "acaca"
+		/*  1 */ "....c"
+		/*  2 */ "....a"
+		/*  3 */ "....c"
+		/*  4 */ "a...a"
+
+		// Level 4
+		/* z\x*   01234 */
+		/*  0 */ "acaca"
+		/*  1 */ "....c"
+		/*  2 */ "....a"
+		/*  3 */ "....c"
+		/*  4 */ "a...a"
+
+		// Level 5
+		/* z\x*   01234 */
+		/*  0 */ "ddddd"
+		/*  1 */ "aaaae"
+		/*  2 */ "aaaae"
+		/*  3 */ "aaaae"
+		/*  4 */ "faaae",
+
+		// Connectors:
+		"1: 2, 1, 4: 3\n"  /* Type 1, direction Z+ */
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+	},  // TinyCorridorCornerChest
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TinyCorridorCrossing:
+	// The data has been exported from the gallery Nether, area index 64, ID 329, created by xoft
+	{
+		// Size:
+		5, 6, 5,  // SizeX = 5, SizeY = 6, SizeZ = 5
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		4, 5, 4,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:112: 0\n"  /* netherbrick */
+		"b:114: 2\n"  /* netherbrickstairs */
+		"c:114: 0\n"  /* netherbrickstairs */
+		"d:114: 1\n"  /* netherbrickstairs */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   01234 */
+		/*  0 */ "aaaaa"
+		/*  1 */ "aaaaa"
+		/*  2 */ "aaaaa"
+		/*  3 */ "aaaaa"
+		/*  4 */ "aaaaa"
+
+		// Level 1
+		/* z\x*   01234 */
+		/*  0 */ "a...a"
+		/*  1 */ "....."
+		/*  2 */ "....."
+		/*  3 */ "....."
+		/*  4 */ "a...a"
+
+		// Level 2
+		/* z\x*   01234 */
+		/*  0 */ "a...a"
+		/*  1 */ "....."
+		/*  2 */ "....."
+		/*  3 */ "....."
+		/*  4 */ "a...a"
+
+		// Level 3
+		/* z\x*   01234 */
+		/*  0 */ "a...a"
+		/*  1 */ "....."
+		/*  2 */ "....."
+		/*  3 */ "....."
+		/*  4 */ "a...a"
+
+		// Level 4
+		/* z\x*   01234 */
+		/*  0 */ "a...a"
+		/*  1 */ "....."
+		/*  2 */ "....."
+		/*  3 */ "....."
+		/*  4 */ "a...a"
+
+		// Level 5
+		/* z\x*   01234 */
+		/*  0 */ "baaab"
+		/*  1 */ "aaaaa"
+		/*  2 */ "aaaaa"
+		/*  3 */ "aaaaa"
+		/*  4 */ "caaad",
+
+		// Connectors:
+		"1: 4, 1, 2: 5\n"  /* Type 1, direction X+ */
+		"1: 2, 1, 4: 3\n"  /* Type 1, direction Z+ */
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
+		"1: 2, 1, 0: 2\n"  /* Type 1, direction Z- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"1:200|2:400|3:0|4:500",
+
+		// AddWeightIfSame:
+		-50,
+	},  // TinyCorridorCrossing
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Turret:
 	// The data has been exported from the gallery Nether, area index 7, ID 34, created by xoft
 	{
 		// Size:
-		7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
+		7, 7, 7,  // SizeX = 7, SizeY = 7, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 16, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -4460,7 +5073,17 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/*  3 */ "a.....a"
 		/*  4 */ "a.....a"
 		/*  5 */ "a.....a"
-		/*  6 */ "aaaaaaa",
+		/*  6 */ "aaaaaaa"
+
+		// Level 6
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "......."
+		/*  2 */ "......."
+		/*  3 */ "......."
+		/*  4 */ "......."
+		/*  5 */ "......."
+		/*  6 */ ".......",
 
 		// Connectors:
 		"0: 0, 1, 3: 4\n"  /* Type 0, direction X- */
@@ -4501,6 +5124,10 @@ const cPrefab::sDef g_NetherFortStartingPrefabs[] =
 	{
 		// Size:
 		13, 9, 13,  // SizeX = 13, SizeY = 9, SizeZ = 13
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		12, 8, 12,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */

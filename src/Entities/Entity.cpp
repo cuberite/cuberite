@@ -45,6 +45,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_IsInitialized(false)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
+	, m_IsFireproof(false)
 	, m_TicksSinceLastBurnDamage(0)
 	, m_TicksSinceLastLavaDamage(0)
 	, m_TicksSinceLastFireDamage(0)
@@ -816,7 +817,10 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastBurnDamage++;
 		if (m_TicksSinceLastBurnDamage >= BURN_TICKS_PER_DAMAGE)
 		{
-			TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0);
+			if (!m_IsFireproof)
+			{
+				TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0);
+			}
 			m_TicksSinceLastBurnDamage = 0;
 		}
 		m_TicksLeftBurning--;
@@ -884,7 +888,10 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastLavaDamage++;
 		if (m_TicksSinceLastLavaDamage >= LAVA_TICKS_PER_DAMAGE)
 		{
-			TakeDamage(dtLavaContact, NULL, LAVA_DAMAGE, 0);
+			if (!m_IsFireproof)
+			{
+				TakeDamage(dtLavaContact, NULL, LAVA_DAMAGE, 0);
+			}
 			m_TicksSinceLastLavaDamage = 0;
 		}
 	}
@@ -902,7 +909,10 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastFireDamage++;
 		if (m_TicksSinceLastFireDamage >= FIRE_TICKS_PER_DAMAGE)
 		{
-			TakeDamage(dtFireContact, NULL, FIRE_DAMAGE, 0);
+			if (!m_IsFireproof)
+			{
+				TakeDamage(dtFireContact, NULL, FIRE_DAMAGE, 0);
+			}
 			m_TicksSinceLastFireDamage = 0;
 		}
 	}
@@ -1055,6 +1065,16 @@ void cEntity::SetMaxHealth(int a_MaxHealth)
 	{
 		m_Health = a_MaxHealth;
 	}
+}
+
+
+
+
+
+/// Sets whether the entity is fireproof
+void cEntity::SetIsFireproof(bool a_IsFireproof)
+{
+	m_IsFireproof = a_IsFireproof;
 }
 
 

@@ -59,7 +59,7 @@ public:												// tolua_export
 
 	// Player counts:
 	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
-	int  GetNumPlayers(void);
+	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
 	// Hardcore mode or not:
@@ -168,7 +168,7 @@ private:
 	cClientHandleList m_Clients;          ///< Clients that are connected to the server and not yet assigned to a cWorld
 	cClientHandleList m_ClientsToRemove;  ///< Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick()
 	
-	cCriticalSection m_CSPlayerCount;      ///< Locks the m_PlayerCount
+	mutable cCriticalSection m_CSPlayerCount;      ///< Locks the m_PlayerCount
 	int              m_PlayerCount;        ///< Number of players currently playing in the server
 	cCriticalSection m_CSPlayerCountDiff;  ///< Locks the m_PlayerCountDiff
 	int              m_PlayerCountDiff;    ///< Adjustment to m_PlayerCount to be applied in the Tick thread

@@ -661,14 +661,16 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		ASSERT(itrS->x + a_OffsetX < a_GridWidth);
 		ASSERT(itrS->y + a_OffsetY < a_GridHeight);
 		int GridID = (itrS->x + a_OffsetX) + a_GridStride * (itrS->y + a_OffsetY);
+		
+		const cItem & Item = itrS->m_Item;
 		if (
 			(itrS->x >= a_GridWidth) || 
 			(itrS->y >= a_GridHeight) ||
-			(itrS->m_Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
-			(itrS->m_Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
+			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
+			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
 			(
-				(itrS->m_Item.m_ItemDamage > 0) &&  // should compare damage values?
-				(itrS->m_Item.m_ItemDamage != a_CraftingGrid[GridID].m_ItemDamage)
+				(Item.m_ItemDamage > 0) &&  // should compare damage values?
+				(Item.m_ItemDamage != a_CraftingGrid[GridID].m_ItemDamage)
 			)
 		)
 		{
@@ -824,7 +826,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_DYE:
 				{
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
+					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye((NIBBLETYPE)(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
 					break;
 				}
 				case E_ITEM_GUNPOWDER: break;

@@ -38,6 +38,10 @@ public:
 		int m_SizeY;
 		int m_SizeZ;
 		
+		/** The hitbox used for collision-checking between prefabs. Relative to the bounds. */
+		int m_HitboxMinX, m_HitboxMinY, m_HitboxMinZ;
+		int m_HitboxMaxX, m_HitboxMaxY, m_HitboxMaxZ;
+		
 		/** The mapping between characters in m_Image and the blocktype / blockmeta.
 		Format: "Char: BlockType: BlockMeta \n Char: BlockType : BlockMeta \n ..." */
 		const char * m_CharMap;
@@ -114,7 +118,7 @@ protected:
 	/** The size of the prefab */
 	Vector3i m_Size;
 	
-	/** The hitbox of the prefab. In first version is the same as the m_BlockArea dimensions */
+	/** The hitbox used for collision-checking between prefabs. */
 	cCuboid m_HitBox;
 	
 	/** The connectors through which the piece connects to other pieces */

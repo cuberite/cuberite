@@ -13,7 +13,7 @@ cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily,const std::set<cMonst
 	m_NewPack(true),
 	m_MobType(cMonster::mtInvalidType)
 {
-	for (std::set<cMonster::eType>::const_iterator itr = a_AllowedTypes.begin(); itr != a_AllowedTypes.end(); itr++)
+	for (std::set<cMonster::eType>::const_iterator itr = a_AllowedTypes.begin(); itr != a_AllowedTypes.end(); ++itr)
 	{
 		if (cMonster::FamilyFromType(*itr) == a_MonsterFamily)
 		{
@@ -112,7 +112,7 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 		for(int i = 0; i < iRandom; i++)
 		{
-			itr++;
+			++itr;
 		}
 
 		return *itr;

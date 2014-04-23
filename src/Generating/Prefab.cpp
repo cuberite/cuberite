@@ -23,6 +23,10 @@ static const cPrefab::sDef g_TestPrefabDef =
 	// Size:
 	7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
 
+	// Hitbox (relative to bounding box):
+	0, 0, 0,  // MinX, MinY, MinZ
+	6, 5, 6,  // MaxX, MaxY, MaxZ
+	
 	// Block definitions:
 	".:  0: 0\n"  /* 0 */
 	"a:112: 0\n"  /* netherbrick */
@@ -115,7 +119,10 @@ static cPrefab g_TestPrefab(g_TestPrefabDef);
 
 cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_Size(a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
-	m_HitBox(0, 0, 0, a_Def.m_SizeX - 1, a_Def.m_SizeY - 1, a_Def.m_SizeZ - 1),
+	m_HitBox(
+		a_Def.m_HitboxMinX, a_Def.m_HitboxMinY, a_Def.m_HitboxMinZ,
+		a_Def.m_HitboxMaxX, a_Def.m_HitboxMaxY, a_Def.m_HitboxMaxZ
+	),
 	m_AllowedRotations(a_Def.m_AllowedRotations),
 	m_MergeStrategy(a_Def.m_MergeStrategy),
 	m_ShouldExtendFloor(a_Def.m_ShouldExtendFloor),
