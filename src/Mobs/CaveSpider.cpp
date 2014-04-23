@@ -1,6 +1,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "Cavespider.h"
+#include "CaveSpider.h"
 #include "../World.h"
 
 
@@ -8,7 +8,7 @@
 
 
 cCavespider::cCavespider(void) :
-	super("Cavespider", mtCaveSpider, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
+	super("CaveSpider", mtCaveSpider, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
 {
 }
 
