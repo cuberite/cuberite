@@ -76,11 +76,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
-
-	m_TimeLastTeleportPacket = 0;
 	
 	m_PlayerName = a_PlayerName;
-	m_bDirtyPosition = true; // So chunks are streamed to player at spawn
 
 	if (!LoadFromDisk())
 	{
@@ -208,25 +205,22 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		m_BowCharge += 1;
 	}
 	
-	//handle updating experience
+	// Handle updating experience
 	if (m_bDirtyExperience)
 	{
 		SendExperience();
 	}
 
-	if (m_bDirtyPosition)
+	if ((GetPosition() - m_LastPos).SqrLength() != 0.0) // Change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
 		
 		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
-		BroadcastMovementUpdate(m_ClientHandle);
 		m_ClientHandle->StreamChunks();
 	}
-	else
-	{
-		BroadcastMovementUpdate(m_ClientHandle);
-	}
+
+	BroadcastMovementUpdate(m_ClientHandle);
 
 	if (m_Health > 0)  // make sure player is alive
 	{
@@ -1592,10 +1586,7 @@ bool cPlayer::LoadFromDisk()
 		SetPosX(JSON_PlayerPosition[(unsigned int)0].asDouble());
 		SetPosY(JSON_PlayerPosition[(unsigned int)1].asDouble());
 		SetPosZ(JSON_PlayerPosition[(unsigned int)2].asDouble());
-		m_LastPosX = GetPosX();
-		m_LastPosY = GetPosY();
-		m_LastPosZ = GetPosZ();
-		m_LastFoodPos = GetPosition();
+		m_LastPos = GetPosition();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
@@ -1858,9 +1849,8 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 	}
 	
 	// Calculate the distance travelled, update the last pos:
-	Vector3d Movement(GetPosition() - m_LastFoodPos);
+	Vector3d Movement(GetPosition() - m_LastPos);
 	Movement.y = 0;  // Only take XZ movement into account
-	m_LastFoodPos = GetPosition();
 	
 	// If riding anything, apply no food exhaustion
 	if (m_AttachedTo != NULL)

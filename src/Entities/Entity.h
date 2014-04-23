@@ -417,17 +417,14 @@ protected:
 	// Flags that signal that we haven't updated the clients with the latest.
 	bool     m_bDirtyHead;
 	bool     m_bDirtyOrientation;
-	bool     m_bDirtyPosition;
-	bool     m_bDirtySpeed;
+	bool     m_bHasSentNoSpeed;
 
 	bool     m_bOnGround;
 	float    m_Gravity;
 	
-	// Last Position.
-	double m_LastPosX, m_LastPosY, m_LastPosZ;
-
-	// This variables keep track of the last time a packet was sent
-	Int64 m_TimeLastTeleportPacket, m_TimeLastMoveReltPacket, m_TimeLastSpeedPacket;  // In ticks
+	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
+	Only updated if cEntity::BroadcastMovementUpdate() is called! */
+	Vector3d m_LastPos;
 
 	bool m_IsInitialized;  // Is set to true when it's initialized, until it's destroyed (Initialize() till Destroy() )
 
