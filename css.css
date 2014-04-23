@@ -42,7 +42,7 @@ nav { float: right; }
 	font-size: 20px;
 }
 .nav li :hover { background-color: lightgrey; }
-.navlink :link, .buildstatusanddonatelink :link { text-decoration: none; }
+.nav a :link, .buildstatusanddonatelink :link { text-decoration: none; }
 
 table .downloadbox
 {
