@@ -22,7 +22,7 @@ h2
 	font-weight: normal;	
 }
 
-img.logo
+.logo
 {
 	float: left;
 	margin-right: 20px;
@@ -44,7 +44,7 @@ nav { float: right; }
 .nav li :hover { background-color: lightgrey; }
 .nav a :link, .buildstatusanddonatelink :link { text-decoration: none; }
 
-table .downloadbox
+.downloadbox
 {
 	border: 2px solid lightblue;
 	background-color: lightblue;
@@ -56,7 +56,7 @@ table .downloadbox
 	max-height: 285px;
 	vertical-align: middle;
 }
-img .downloadosimage
+.downloadosimage
 {
 	width: 70px;
 	height: auto;
@@ -66,7 +66,7 @@ img .downloadosimage
 	padding-top: 5px;
 	padding-bottom: 5px;
 }
-img .downloadicon
+.downloadicon
 {
 	display: block;
 	margin-left: auto;
@@ -82,4 +82,4 @@ footer
 	bottom: -40px;
 }
 
-img.buildstatusanddonatebutton { display: inline; }
+.buildstatusanddonatebutton { display: inline; }
