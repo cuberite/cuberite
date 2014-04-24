@@ -7,7 +7,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 set(SOURCES
 	"EntropyContext.cpp"
 	"CtrDrbgContext.cpp"
-	"x509Cert.cpp"
+	"X509Cert.cpp"
 )
 
 add_library(PolarSSL++ ${SOURCES})
