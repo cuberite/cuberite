@@ -264,8 +264,10 @@ template class SizeChecker<UInt16, 2>;
 
 // Same as assert but in all Self test builds
 #ifdef SELF_TEST
-#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
+	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
+
+#define SharedPtr std::tr1::shared_ptr
 
 
 
@@ -296,7 +298,7 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 #ifndef TOLUA_TEMPLATE_BIND
-#define TOLUA_TEMPLATE_BIND(x)
+	#define TOLUA_TEMPLATE_BIND(x)
 #endif
 
 
