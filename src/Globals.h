@@ -267,7 +267,15 @@ template class SizeChecker<UInt16, 2>;
 	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
-#define SharedPtr std::tr1::shared_ptr
+// Allow both Older versions of MSVC and newer versions of everything use a shared_ptr:
+// Note that we cannot typedef, because C++ doesn't allow (partial) templates to be typedeffed.
+#if (defined(_MSC_VER) && (_MSC_VER < 1600))
+	// MSVC before 2010 doesn't have std::shared_ptr, but has std::tr1::shared_ptr
+	#define SharedPtr std::tr1::shared_ptr
+#else
+	// All others have std::shared ptr
+	#define SharedPtr std::shared_ptr
+#endif
 
 
 
