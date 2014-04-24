@@ -96,6 +96,7 @@ enum
 	PACKET_INVENTORY_WHOLE           = 0x68,
 	PACKET_WINDOW_PROPERTY           = 0x69,
 	PACKET_CREATIVE_INVENTORY_ACTION = 0x6B,
+	PACKET_ENCHANT_ITEM              = 0x6C,
 	PACKET_UPDATE_SIGN               = 0x82,
 	PACKET_ITEM_DATA                 = 0x83,
 	PACKET_PLAYER_LIST_ITEM          = 0xC9,
@@ -537,9 +538,10 @@ void cProtocol125::SendHealth(void)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_HEALTH);
-	WriteShort((short)m_Client->GetPlayer()->GetHealth());
-	WriteShort((short)m_Client->GetPlayer()->GetFoodLevel());
-	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
+	cPlayer * Player = m_Client->GetPlayer();
+	WriteShort((short)Player->GetHealth());
+	WriteShort((short)Player->GetFoodLevel());
+	WriteFloat((float)Player->GetFoodSaturationLevel());
 	Flush();
 }
 
@@ -667,13 +669,14 @@ void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_PICKUP_SPAWN);
 	WriteInt    (a_Pickup.GetUniqueID());
-	WriteShort  (a_Pickup.GetItem().m_ItemType);
-	WriteChar   (a_Pickup.GetItem().m_ItemCount);
-	WriteShort  (a_Pickup.GetItem().m_ItemDamage);
+	const cItem & Item = a_Pickup.GetItem();
+	WriteShort  (Item.m_ItemType);
+	WriteChar   (Item.m_ItemCount);
+	WriteShort  (Item.m_ItemDamage);
 	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
-	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
-	WriteByte   ((char)(a_Pickup.GetSpeed().y * 8));
-	WriteByte   ((char)(a_Pickup.GetSpeed().z * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeedX() * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeedY() * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeedZ() * 8));
 	Flush();
 }
 
@@ -830,10 +833,11 @@ void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 void cProtocol125::SendRespawn(void)
 {
 	cCSLock Lock(m_CSPacket);
+	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte  (PACKET_RESPAWN);
-	WriteInt   ((int)(m_Client->GetPlayer()->GetWorld()->GetDimension()));
+	WriteInt   ((int)(Player->GetWorld()->GetDimension()));
 	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
-	WriteChar  ((char)m_Client->GetPlayer()->GetGameMode());
+	WriteChar  ((char)Player->GetGameMode());
 	WriteShort (256);  // Current world height
 	WriteString("default");
 }
@@ -845,10 +849,11 @@ void cProtocol125::SendRespawn(void)
 void cProtocol125::SendExperience(void)
 {
 	cCSLock Lock(m_CSPacket);
+	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte  (PACKET_EXPERIENCE);
-	WriteFloat (m_Client->GetPlayer()->GetXpPercentage());
-	WriteShort (m_Client->GetPlayer()->GetXpLevel());
-	WriteShort (m_Client->GetPlayer()->GetCurrentXp());
+	WriteFloat (Player->GetXpPercentage());
+	WriteShort (Player->GetXpLevel());
+	WriteShort (Player->GetCurrentXp());
 	Flush();
 }
 
@@ -1278,6 +1283,7 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 		case PACKET_SLOT_SELECTED:             return ParseSlotSelected();
 		case PACKET_UPDATE_SIGN:               return ParseUpdateSign();
 		case PACKET_USE_ENTITY:                return ParseUseEntity();
+		case PACKET_ENCHANT_ITEM:              return ParseEnchantItem();
 		case PACKET_WINDOW_CLICK:              return ParseWindowClick();
 		case PACKET_WINDOW_CLOSE:              return ParseWindowClose();
 	}
@@ -1632,6 +1638,20 @@ int cProtocol125::ParseUseEntity(void)
 	HANDLE_PACKET_READ(ReadBEInt, int,  TargetEntityID);
 	HANDLE_PACKET_READ(ReadBool,  bool, IsLeftClick);
 	m_Client->HandleUseEntity(TargetEntityID, IsLeftClick);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParseEnchantItem(void)
+{
+	HANDLE_PACKET_READ(ReadByte, Byte, WindowID);
+	HANDLE_PACKET_READ(ReadByte, Byte, Enchantment);
+
+	m_Client->HandleEnchantItem(WindowID, Enchantment);
+
 	return PARSE_OK;
 }
 

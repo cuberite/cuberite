@@ -234,24 +234,27 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 		bool TrySuckPickupIn(cPickup * a_Pickup)
 		{
+			cItem & Item = a_Pickup->GetItem();
+
 			for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
 			{
 				if (m_Contents.IsSlotEmpty(i))
 				{
 					m_bFoundPickupsAbove = true;
-					m_Contents.SetSlot(i, a_Pickup->GetItem());
+					m_Contents.SetSlot(i, Item);
 					a_Pickup->Destroy(); // Kill pickup
 
 					return true;
 				}
-				else if (m_Contents.GetSlot(i).IsEqual(a_Pickup->GetItem()) && !m_Contents.GetSlot(i).IsFullStack())
+				else if (m_Contents.GetSlot(i).IsEqual(Item) && !m_Contents.GetSlot(i).IsFullStack())
 				{
 					m_bFoundPickupsAbove = true;
 
 					int PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
-					a_Pickup->GetItem().m_ItemCount -= m_Contents.ChangeSlotCount(i, a_Pickup->GetItem().m_ItemCount) - PreviousCount; // Set count to however many items were added
 					
-					if (a_Pickup->GetItem().IsEmpty())
+					Item.m_ItemCount -= m_Contents.ChangeSlotCount(i, Item.m_ItemCount) - PreviousCount; // Set count to however many items were added
+					
+					if (Item.IsEmpty())
 					{
 						a_Pickup->Destroy(); // Kill pickup if all items were added
 					}

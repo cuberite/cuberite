@@ -190,7 +190,7 @@ void cServer::PlayerDestroying(const cPlayer * a_Player)
 
 bool cServer::InitServer(cIniFile & a_SettingsIni)
 {
-	m_Description = a_SettingsIni.GetValueSet("Server", "Description", "MCServer - in C++!").c_str();
+	m_Description = a_SettingsIni.GetValueSet("Server", "Description", "MCServer - in C++!");
 	m_MaxPlayers  = a_SettingsIni.GetValueSetI("Server", "MaxPlayers", 100);
 	m_bIsHardcore = a_SettingsIni.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_PlayerCount = 0;
@@ -275,7 +275,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 
 
-int cServer::GetNumPlayers(void)
+int cServer::GetNumPlayers(void) const
 {
 	cCSLock Lock(m_CSPlayerCount);
 	return m_PlayerCount;

@@ -452,7 +452,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 		{
 			cMonster& Monster = (cMonster&)(**itr);
 			currentPosition = Monster.GetPosition();
-			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); itr2 ++)
+			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); ++itr2)
 			{
 				toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
 			}
@@ -600,7 +600,7 @@ void cChunk::Tick(float a_Dt)
 				delete ToDelete;
 				continue;
 			}
-			itr++;
+			++itr;
 	}  // for itr - m_Entitites[]
 	
 	// If any entity moved out of the chunk, move it to the neighbor:
@@ -1299,6 +1299,7 @@ void cChunk::CreateBlockEntities(void)
 				BLOCKTYPE BlockType = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
 				switch (BlockType)
 				{
+					case E_BLOCK_BEACON:
 					case E_BLOCK_CHEST:
 					case E_BLOCK_COMMAND_BLOCK:
 					case E_BLOCK_DISPENSER:
@@ -1429,6 +1430,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	// If the new block is a block entity, create the entity object:
 	switch (a_BlockType)
 	{
+		case E_BLOCK_BEACON:
 		case E_BLOCK_CHEST:
 		case E_BLOCK_COMMAND_BLOCK:
 		case E_BLOCK_DISPENSER:

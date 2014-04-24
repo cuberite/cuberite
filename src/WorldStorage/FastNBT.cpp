@@ -345,7 +345,7 @@ cFastNBTWriter::cFastNBTWriter(const AString & a_RootTagName) :
 
 void cFastNBTWriter::BeginCompound(const AString & a_Name)
 {
-	if (m_CurrentStack >= MAX_STACK)
+	if (m_CurrentStack >= MAX_STACK - 1)
 	{
 		ASSERT(!"Stack overflow");
 		return;
@@ -376,7 +376,7 @@ void cFastNBTWriter::EndCompound(void)
 
 void cFastNBTWriter::BeginList(const AString & a_Name, eTagType a_ChildrenType)
 {
-	if (m_CurrentStack >= MAX_STACK)
+	if (m_CurrentStack >= MAX_STACK - 1)
 	{
 		ASSERT(!"Stack overflow");
 		return;

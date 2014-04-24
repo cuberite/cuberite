@@ -18,6 +18,8 @@
 #include "ByteBuffer.h"
 #include "Scoreboard.h"
 #include "Map.h"
+#include "Enchantments.h"
+#include "UI/SlotArea.h"
 
 
 
@@ -243,6 +245,9 @@ public:
 	
 	/** Called when the player moves into a different world; queues sreaming the new chunks */
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
+	
+	/** Called when the player will enchant a Item */
+	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
 	
 private:
 

@@ -860,7 +860,7 @@ void cWorld::TickMobs(float a_Dt)
 			{
 				m_ChunkMap->SpawnMobs(Spawner);
 				// do the spawn
-				for (cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); itr2++)
+				for (cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); ++itr2)
 				{
 					SpawnMobFinalize(*itr2);
 				}
@@ -870,14 +870,14 @@ void cWorld::TickMobs(float a_Dt)
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; itr++)
+	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; ++itr)
 	{
 		itr->second.m_Monster.Tick(a_Dt, itr->second.m_Chunk);
 	}
 
 	// remove too far mobs
 	cMobProximityCounter::sIterablePair allTooFarMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(128 * 16, -1);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; itr++)
+	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; ++itr)
 	{
 		itr->second.m_Monster.Destroy(true);
 	}
@@ -2894,7 +2894,7 @@ void cWorld::TickQueuedBlocks(void)
 	m_BlockTickQueueCopy.clear();
 	m_BlockTickQueue.swap(m_BlockTickQueueCopy);
 
-	for (std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); itr++)
+	for (std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); ++itr)
 	{
 		BlockTickQueueItem * Block = (*itr);
 		Block->TicksToWait -= 1;
@@ -2985,7 +2985,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 
 
-int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem a_Item, const Vector3d * a_Speed)
+int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem & a_Item, const Vector3d * a_Speed)
 {
 	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
 	if (Projectile == NULL)

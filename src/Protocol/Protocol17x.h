@@ -280,6 +280,7 @@ protected:
 	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
+	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 	

@@ -839,7 +839,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 
 
-bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWorld * a_World)
+bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_UncompressedSize, const AString & a_Data, cWorld * a_World)
 {
 	// Crude data integrity check:
 	if (a_UncompressedSize < cChunkDef::BlockDataSize)

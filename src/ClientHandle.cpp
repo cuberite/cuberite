@@ -453,14 +453,16 @@ void cClientHandle::HandlePing(void)
 {
 	// Somebody tries to retrieve information about the server
 	AString Reply;
+	const cServer & Server = *cRoot::Get()->GetServer();
+
 	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetServer()->GetDescription().c_str(),
+		Server.GetDescription().c_str(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetNumPlayers(),
+		Server.GetNumPlayers(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetMaxPlayers()
+		Server.GetMaxPlayers()
 	);
-	Kick(Reply.c_str());
+	Kick(Reply);
 }
 
 
@@ -1216,8 +1218,8 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		Color = AString("@") + Color[2];
 	}
 	else
-	{
-		Color.empty();
+	{ 
+		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
 	Msg.ParseText(a_Message);
@@ -2726,6 +2728,29 @@ void cClientHandle::SocketClosed(void)
 }
 
 
+
+
+
+void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
+{
+	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
+	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
+	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
+
+	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
+	{
+		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
+		{
+			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
+			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
+			Window->BroadcastWholeWindow();
+
+			Window->SetProperty(0, 0, *m_Player);
+			Window->SetProperty(1, 0, *m_Player);
+			Window->SetProperty(2, 0, *m_Player);
+		}
+	}
+}
 
 
 

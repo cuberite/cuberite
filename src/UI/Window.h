@@ -136,11 +136,11 @@ public:
 	void SetWindowTitle(const AString & a_WindowTitle ) { m_WindowTitle = a_WindowTitle; }
 	
 	/// Sends the UpdateWindowProperty (0x69) packet to all clients of the window
-	void SetProperty(int a_Property, int a_Value);
+	virtual void SetProperty(int a_Property, int a_Value);
 	
 	/// Sends the UpdateWindowPropert(0x69) packet to the specified player
-	void SetProperty(int a_Property, int a_Value, cPlayer & a_Player);
-	
+	virtual void SetProperty(int a_Property, int a_Value, cPlayer & a_Player);
+
 	// tolua_end
 
 	void OwnerDestroyed(void);
@@ -165,7 +165,7 @@ public:
 	
 	/// Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea
 	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum);
-	
+
 protected:
 	cSlotAreas m_SlotAreas;
 	
@@ -226,6 +226,32 @@ class cCraftingWindow :
 public:
 	cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
 } ;
+
+
+
+
+
+class cEnchantingWindow :
+	public cWindow
+{
+	typedef cWindow super;
+public:
+	cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void SetProperty(int a_Property, int a_Value, cPlayer & a_Player) override;
+	virtual void SetProperty(int a_Property, int a_Value) override;
+
+	/** Return the Value of a Property */
+	int GetPropertyValue(int a_Property);
+
+	/** Set the Position Values to the Position of the Enchantment Table */
+	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
+
+	cSlotArea * m_SlotArea;
+
+protected:
+	int m_PropertyValue[3];
+	int m_BlockX, m_BlockY, m_BlockZ;
+};
 
 
 

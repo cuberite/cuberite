@@ -200,13 +200,14 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 	for (int i = 0; i < 4; i++)
 	{
 		// For each already present point, insert a point in between it and its predecessor, shifted randomly.
-		int PrevX = m_Points.front().m_BlockX;
-		int PrevY = m_Points.front().m_BlockY;
-		int PrevZ = m_Points.front().m_BlockZ;
-		int PrevR = m_Points.front().m_Radius;
+		cCaveDefPoint & Point = m_Points.front();
+		int PrevX = Point.m_BlockX;
+		int PrevY = Point.m_BlockY;
+		int PrevZ = Point.m_BlockZ;
+		int PrevR = Point.m_Radius;
 		cCaveDefPoints Pts;
 		Pts.reserve(m_Points.size() * 2 + 1);
-		Pts.push_back(m_Points.front());
+		Pts.push_back(Point);
 		for (cCaveDefPoints::const_iterator itr = m_Points.begin() + 1, end = m_Points.end(); itr != end; ++itr)
 		{
 			int Random = a_Noise.IntNoise3DInt(PrevX, PrevY, PrevZ + i) / 11;
@@ -244,11 +245,12 @@ bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints &
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);
 	cCaveDefPoints::const_iterator itr = a_Src.begin() + 1;
-	a_Dst.push_back(a_Src.front());
-	int PrevX = a_Src.front().m_BlockX;
-	int PrevY = a_Src.front().m_BlockY;
-	int PrevZ = a_Src.front().m_BlockZ;
-	int PrevR = a_Src.front().m_Radius;
+	const cCaveDefPoint & Source = a_Src.front();
+	a_Dst.push_back(Source);
+	int PrevX = Source.m_BlockX;
+	int PrevY = Source.m_BlockY;
+	int PrevZ = Source.m_BlockZ;
+	int PrevR = Source.m_Radius;
 	for (int i = 0; i <= Num; ++i, ++itr)
 	{
 		int dx = itr->m_BlockX - PrevX;
@@ -310,9 +312,10 @@ void cCaveTunnel::FinishLinear(void)
 	std::swap(Pts, m_Points);
 
 	m_Points.reserve(Pts.size() * 3);
-	int PrevX = Pts.front().m_BlockX;
-	int PrevY = Pts.front().m_BlockY;
-	int PrevZ = Pts.front().m_BlockZ;
+	cCaveDefPoint & PrevPoint = Pts.front();
+	int PrevX = PrevPoint.m_BlockX;
+	int PrevY = PrevPoint.m_BlockY;
+	int PrevZ = PrevPoint.m_BlockZ;
 	for (cCaveDefPoints::const_iterator itr = Pts.begin() + 1, end = Pts.end(); itr != end; ++itr)
 	{
 		int x1 = itr->m_BlockX;
@@ -433,9 +436,10 @@ void cCaveTunnel::FinishLinear(void)
 
 void cCaveTunnel::CalcBoundingBox(void)
 {
-	m_MinBlockX = m_MaxBlockX = m_Points.front().m_BlockX;
-	m_MinBlockY = m_MaxBlockY = m_Points.front().m_BlockY;
-	m_MinBlockZ = m_MaxBlockZ = m_Points.front().m_BlockZ;
+	cCaveDefPoint & Point = m_Points.front();
+	m_MinBlockX = m_MaxBlockX = Point.m_BlockX;
+	m_MinBlockY = m_MaxBlockY = Point.m_BlockY;
+	m_MinBlockZ = m_MaxBlockZ = Point.m_BlockZ;
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin() + 1, end = m_Points.end(); itr != end; ++itr)
 	{
 		m_MinBlockX = std::min(m_MinBlockX, itr->m_BlockX - itr->m_Radius);

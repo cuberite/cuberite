@@ -269,7 +269,7 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 	int CenterZ = a_BlockZ + OffsetZ;
 	
 	// Get the base angle in which the ravine "axis" goes:
-	float Angle = (float)(((float)((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * 3.141592653);
+	float Angle = (float)(((float)((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * M_PI);
 	float xc = sin(Angle);
 	float zc = cos(Angle);
 	
@@ -311,12 +311,13 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cR
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);
 	cRavDefPoints::const_iterator itr = a_Src.begin() + 1;
-	a_Dst.push_back(a_Src.front());
-	int PrevX = a_Src.front().m_BlockX;
-	int PrevZ = a_Src.front().m_BlockZ;
-	int PrevR = a_Src.front().m_Radius;
-	int PrevT = a_Src.front().m_Top;
-	int PrevB = a_Src.front().m_Bottom;
+	const cRavDefPoint & Source = a_Src.front();
+	a_Dst.push_back(Source);
+	int PrevX = Source.m_BlockX;
+	int PrevZ = Source.m_BlockZ;
+	int PrevR = Source.m_Radius;
+	int PrevT = Source.m_Top;
+	int PrevB = Source.m_Bottom;
 	for (int i = 0; i <= Num; ++i, ++itr)
 	{
 		int dx = itr->m_BlockX - PrevX;

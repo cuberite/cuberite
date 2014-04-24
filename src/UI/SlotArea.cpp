@@ -13,6 +13,8 @@
 #include "Window.h"
 #include "../CraftingRecipes.h"
 #include "../Root.h"
+#include "../FastRandom.h"
+#include "../BlockArea.h"
 
 
 
@@ -145,6 +147,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 					FreeSlots = 0;
 				}
 				int Filling = (FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots;
+
 				Slot.m_ItemCount += (char)Filling;
 				DraggingItem.m_ItemCount -= (char)Filling;
 				if (DraggingItem.m_ItemCount <= 0)
@@ -167,7 +170,6 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 	{
 		m_ParentWindow.BroadcastWholeWindow();
 	}
-	
 }
 
 
@@ -483,6 +485,7 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 
 	// Get the current recipe:
 	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
+	const cItem & Result = Recipe.GetResult();
 
 	cItem * PlayerSlots = GetPlayerSlots(a_Player) + 1;
 	cCraftingGrid Grid(PlayerSlots, m_GridSize, m_GridSize);
@@ -490,16 +493,16 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 	// If possible, craft:
 	if (DraggingItem.IsEmpty())
 	{
-		DraggingItem = Recipe.GetResult();
+		DraggingItem = Result;
 		Recipe.ConsumeIngredients(Grid);
 		Grid.CopyToItems(PlayerSlots);
 	}
-	else if (DraggingItem.IsEqual(Recipe.GetResult()))
+	else if (DraggingItem.IsEqual(Result))
 	{
-		cItemHandler * Handler = ItemHandler(Recipe.GetResult().m_ItemType);
-		if (DraggingItem.m_ItemCount + Recipe.GetResult().m_ItemCount <= Handler->GetMaxStackSize())
+		cItemHandler * Handler = ItemHandler(Result.m_ItemType);
+		if (DraggingItem.m_ItemCount + Result.m_ItemCount <= Handler->GetMaxStackSize())
 		{
-			DraggingItem.m_ItemCount += Recipe.GetResult().m_ItemCount;
+			DraggingItem.m_ItemCount += Result.m_ItemCount;
 			Recipe.ConsumeIngredients(Grid);
 			Grid.CopyToItems(PlayerSlots);
 		}
@@ -586,6 +589,307 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaEnchanting:
+
+cSlotAreaEnchanting::cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow) :
+	cSlotAreaTemporary(1, a_ParentWindow)
+{
+	a_ParentWindow.m_SlotArea = this;
+}
+
+
+
+
+
+void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
+
+	bool bAsync = false;
+	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	{
+		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		return;
+	}
+	
+	switch (a_ClickAction)
+	{
+		case caShiftLeftClick:
+		case caShiftRightClick:
+		{
+			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			return;
+		}
+		
+		case caDblClick:
+		{
+			DblClicked(a_Player, a_SlotNum);
+			return;
+		}
+		default:
+		{
+			break;
+		}
+	}
+	
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	if (!Slot.IsSameType(a_ClickedItem))
+	{
+		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+		LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+		bAsync = true;
+	}
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+	switch (a_ClickAction)
+	{
+		case caRightClick:
+		{
+			// Right-clicked
+			if (DraggingItem.IsEmpty())
+			{
+				DraggingItem = Slot.CopyOne();
+				Slot.Empty();
+				break;
+			}
+			
+			if (Slot.IsEmpty())
+			{
+				Slot = DraggingItem.CopyOne();
+				DraggingItem.m_ItemCount -= 1;
+				if (DraggingItem.m_ItemCount <= 0)
+				{
+					DraggingItem.Empty();
+				}
+			}
+			else if ((!DraggingItem.IsEqual(Slot)) && (DraggingItem.m_ItemCount == 1))
+			{
+				// Swap contents
+				cItem tmp(DraggingItem);
+				DraggingItem = Slot;
+				Slot = tmp;
+			}
+			break;
+		}
+		
+		case caLeftClick:
+		{	
+			// Left-clicked
+			if (DraggingItem.IsEmpty())
+			{
+				DraggingItem = Slot.CopyOne();
+				Slot.Empty();
+				break;
+			}
+			
+			if (DraggingItem.IsEqual(Slot))
+			{
+				// Do nothing
+				break;
+			}
+			
+			if (!Slot.IsEmpty())
+			{
+				if (DraggingItem.m_ItemCount == 1)
+				{
+					// Swap contents
+					cItem tmp(DraggingItem);
+					DraggingItem = Slot;
+					Slot = tmp;
+				}
+			}
+			else
+			{
+				Slot = DraggingItem.CopyOne();
+				DraggingItem.m_ItemCount -= 1;
+				if (DraggingItem.m_ItemCount <= 0)
+				{
+					DraggingItem.Empty();
+				}
+			}
+			break;
+		}
+		default:
+		{
+			LOGWARNING("SlotArea: Unhandled click action: %d (%s)", a_ClickAction, ClickActionToString(a_ClickAction));
+			m_ParentWindow.BroadcastWholeWindow();
+			return;
+		}
+	}  // switch (a_ClickAction
+	
+	SetSlot(a_SlotNum, a_Player, Slot);
+	if (bAsync)
+	{
+		m_ParentWindow.BroadcastWholeWindow();
+	}
+	UpdateResult(a_Player);
+}
+
+
+
+
+
+void cSlotAreaEnchanting::DblClicked(cPlayer & a_Player, int a_SlotNum)
+{
+	cItem & Dragging = a_Player.GetDraggingItem();
+	if ((!Dragging.IsEmpty()) || (a_SlotNum != 0))
+	{
+		return;
+	}
+	
+	cItem Item = *GetSlot(0, a_Player);
+	if (!m_ParentWindow.CollectItemsToHand(Item, *this, a_Player, false))
+	{
+		m_ParentWindow.CollectItemsToHand(Item, *this, a_Player, true);
+	}
+}
+
+
+
+
+
+void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
+{
+	const cItem * Slot = GetSlot(0, a_Player);
+	if (!Slot->IsEmpty())
+	{
+		return;
+	}
+
+	if (a_Apply)
+	{
+		SetSlot(0, a_Player, a_ItemStack.CopyOne());
+	}
+	a_ItemStack.m_ItemCount -= 1;
+	if (a_ItemStack.m_ItemCount <= 0)
+	{
+		a_ItemStack.Empty();
+	}
+
+	UpdateResult(a_Player);
+}
+
+
+
+
+
+void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
+{
+	// Toss the item in the enchanting slot
+	TossItems(a_Player, 0, 1);
+
+	super::OnPlayerRemoved(a_Player);
+}
+
+
+
+
+
+void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
+{
+	cItem Item = *GetSlot(0, a_Player);
+
+	if (Item.IsEmpty() || !Item.m_Enchantments.IsEmpty())
+	{
+		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SetProperty(1, 0, a_Player);
+		m_ParentWindow.SetProperty(2, 0, a_Player);
+	}
+	else if (cItem::IsEnchantable(Item.m_ItemType) || Item.m_ItemType == E_ITEM_BOOK)
+	{
+		int Bookshelves = std::min(GetBookshelvesCount(a_Player.GetWorld()), 15);
+
+		cFastRandom Random;
+		int base = (Random.GenerateRandomInteger(1, 8) + (int)floor((float)Bookshelves / 2) + Random.GenerateRandomInteger(0, Bookshelves));
+		int topSlot = std::max(base / 3, 1);
+		int middleSlot = (base * 2) / 3 + 1;
+		int bottomSlot = std::max(base, Bookshelves * 2);
+
+		m_ParentWindow.SetProperty(0, topSlot, a_Player);
+		m_ParentWindow.SetProperty(1, middleSlot, a_Player);
+		m_ParentWindow.SetProperty(2, bottomSlot, a_Player);
+	}
+	else
+	{
+		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SetProperty(1, 0, a_Player);
+		m_ParentWindow.SetProperty(2, 0, a_Player);
+	}
+}
+
+
+
+
+
+int cSlotAreaEnchanting::GetBookshelvesCount(cWorld * a_World)
+{
+	int PosX, PosY, PosZ;
+	((cEnchantingWindow*)&m_ParentWindow)->GetBlockPos(PosX, PosY, PosZ);
+
+	int Bookshelves = 0;
+	cBlockArea Area;
+	Area.Read(a_World, PosX - 2, PosX + 2, PosY, PosY + 1, PosZ - 2, PosZ + 2);
+
+	static const struct
+	{
+		int m_BookX, m_BookY, m_BookZ;  // Coords to check for bookcases
+		int m_AirX, m_AirY, m_AirZ;  // Coords to check for air; if not air, the bookcase won't be counted
+	} CheckCoords[] =
+	{
+		{ 0, 0, 0, 1, 0, 1 },  // Bookcase at {0, 0, 0}, air at {1, 0, 1}
+		{ 0, 0, 1, 1, 0, 1 },  // Bookcase at {0, 0, 1}, air at {1, 0, 1}
+		{ 0, 0, 2, 1, 0, 2 },  // Bookcase at {0, 0, 2}, air at {1, 0, 2}
+		{ 0, 0, 3, 1, 0, 3 },  // Bookcase at {0, 0, 3}, air at {1, 0, 3}
+		{ 0, 0, 4, 1, 0, 3 },  // Bookcase at {0, 0, 4}, air at {1, 0, 3}
+		{ 1, 0, 4, 1, 0, 3 },  // Bookcase at {1, 0, 4}, air at {1, 0, 3}
+		{ 2, 0, 4, 2, 0, 3 },  // Bookcase at {2, 0, 4}, air at {2, 0, 3}
+		{ 3, 0, 4, 3, 0, 3 },  // Bookcase at {3, 0, 4}, air at {3, 0, 3}
+		{ 4, 0, 4, 3, 0, 3 },  // Bookcase at {4, 0, 4}, air at {3, 0, 3}
+		{ 4, 0, 3, 3, 0, 3 },  // Bookcase at {4, 0, 3}, air at {3, 0, 3}
+		{ 4, 0, 2, 3, 0, 2 },  // Bookcase at {4, 0, 2}, air at {3, 0, 2}
+		{ 4, 0, 1, 3, 0, 1 },  // Bookcase at {4, 0, 1}, air at {3, 0, 1}
+		{ 4, 0, 0, 3, 0, 1 },  // Bookcase at {4, 0, 0}, air at {3, 0, 1}
+		{ 3, 0, 0, 3, 0, 1 },  // Bookcase at {3, 0, 0}, air at {3, 0, 1}
+		{ 2, 0, 0, 2, 0, 1 },  // Bookcase at {2, 0, 0}, air at {2, 0, 1}
+		{ 1, 0, 0, 1, 0, 1 },  // Bookcase at {1, 0, 0}, air at {1, 0, 1}
+
+		{ 0, 1, 0, 1, 1, 1 },  // Bookcase at {0, 1, 0}, air at {1, 1, 1}
+		{ 0, 1, 1, 1, 1, 1 },  // Bookcase at {0, 1, 1}, air at {1, 1, 1}
+		{ 0, 1, 2, 1, 1, 2 },  // Bookcase at {0, 1, 2}, air at {1, 1, 2}
+		{ 0, 1, 3, 1, 1, 3 },  // Bookcase at {0, 1, 3}, air at {1, 1, 3}
+		{ 0, 1, 4, 1, 1, 3 },  // Bookcase at {0, 1, 4}, air at {1, 1, 3}
+		{ 1, 1, 4, 1, 1, 3 },  // Bookcase at {1, 1, 4}, air at {1, 1, 3}
+		{ 2, 1, 4, 2, 1, 3 },  // Bookcase at {2, 1, 4}, air at {2, 1, 3}
+		{ 3, 1, 4, 3, 1, 3 },  // Bookcase at {3, 1, 4}, air at {3, 1, 3}
+		{ 4, 1, 4, 3, 1, 3 },  // Bookcase at {4, 1, 4}, air at {3, 1, 3}
+		{ 4, 1, 3, 3, 1, 3 },  // Bookcase at {4, 1, 3}, air at {3, 1, 3}
+		{ 4, 1, 2, 3, 1, 2 },  // Bookcase at {4, 1, 2}, air at {3, 1, 2}
+		{ 4, 1, 1, 3, 1, 1 },  // Bookcase at {4, 1, 1}, air at {3, 1, 1}
+		{ 4, 1, 0, 3, 1, 1 },  // Bookcase at {4, 1, 0}, air at {3, 1, 1}
+		{ 3, 1, 0, 3, 1, 1 },  // Bookcase at {3, 1, 0}, air at {3, 1, 1}
+		{ 2, 1, 0, 2, 1, 1 },  // Bookcase at {2, 1, 0}, air at {2, 1, 1}
+		{ 1, 1, 0, 1, 1, 1 },  // Bookcase at {1, 1, 0}, air at {1, 1, 1}
+	};
+
+	for (size_t i = 0; i < ARRAYCOUNT(CheckCoords); i++)
+	{
+		if (
+			(Area.GetRelBlockType(CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ) == E_BLOCK_AIR) &&  // There's air in the checkspot
+			(Area.GetRelBlockType(CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ) == E_BLOCK_BOOKCASE)  // There's bookcase in the wanted place
+			)
+		{
+			Bookshelves++;
+		}
+	}  // for i - CheckCoords
+
+	return Bookshelves;
 }
 
 

@@ -82,9 +82,10 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	if (!LoadFromDisk())
 	{
 		m_Inventory.Clear();
-		SetPosX(cRoot::Get()->GetDefaultWorld()->GetSpawnX());
-		SetPosY(cRoot::Get()->GetDefaultWorld()->GetSpawnY());
-		SetPosZ(cRoot::Get()->GetDefaultWorld()->GetSpawnZ());
+		cWorld * DefaultWorld = cRoot::Get()->GetDefaultWorld();
+		SetPosX(DefaultWorld->GetSpawnX());
+		SetPosY(DefaultWorld->GetSpawnY());
+		SetPosZ(DefaultWorld->GetSpawnZ());
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
@@ -1159,9 +1160,9 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 
 
-void cPlayer::ForceSetSpeed(Vector3d a_Direction)
+void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 {
-	SetSpeed(a_Direction);
+	SetSpeed(a_Speed);
 	m_ClientHandle->SendEntityVelocity(*this);
 }
 
