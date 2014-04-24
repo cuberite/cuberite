@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Entity.h"
@@ -722,11 +723,9 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if (NextSpeed.SqrLength() > 0.f)
 	{
 		cTracer Tracer(GetWorld());
-		
-		bool HasHit = Tracer.Trace(NextPos, NextSpeed,
-			// Distance traced is an integer, so we round up from the distance we should go (Speed * Delta), else we will encounter collision detection failures
-			(int)(ceil((NextSpeed * a_Dt).SqrLength()) * 2)
-			);
+		// Distance traced is an integer, so we round up from the distance we should go (Speed * Delta), else we will encounter collision detection failurse
+		int DistanceToTrace = (int)(ceil((NextSpeed * a_Dt).SqrLength()) * 2);
+		bool HasHit = Tracer.Trace(NextPos, NextSpeed, DistanceToTrace);
 
 		if (HasHit)
 		{
@@ -736,7 +735,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			{
 				// Block hit was within our projected path
 				// Begin by stopping movement in the direction that we hit something. The Normal is the line perpendicular to a 2D face and in this case, stores what block face was hit through either -1 or 1.
-				// Por ejemplo: HitNormal.y = -1 : BLOCK_FACE_YM; HitNormal.y = 1 : BLOCK_FACE_YP
+				// For example: HitNormal.y = -1 : BLOCK_FACE_YM; HitNormal.y = 1 : BLOCK_FACE_YP
 				if (Tracer.HitNormal.x != 0.f) NextSpeed.x = 0.f;
 				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
 				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
@@ -954,7 +953,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 		// Ref.: http://forum.mc-server.org/showthread.php?tid=1244
 		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, RelY, GetPosX(), GetPosZ()
-			);
+		);
 		m_IsSwimming = false;
 		m_IsSubmerged = false;
 		return;
