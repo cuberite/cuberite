@@ -8,6 +8,7 @@
 #include "../BlockInServerPluginInterface.h"
 
 // Handlers:
+#include "ItemArmor.h"
 #include "ItemBed.h"
 #include "ItemBoat.h"
 #include "ItemBow.h"
@@ -90,6 +91,12 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 
 cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 {
+	// Armor
+	if (ItemCategory::IsArmor(a_ItemType))
+	{
+		return new cItemArmorHandler(a_ItemType);
+	}
+
 	switch(a_ItemType)
 	{
 		default:                       return new cItemHandler(a_ItemType);
