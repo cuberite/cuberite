@@ -171,7 +171,7 @@ cByteBuffer::~cByteBuffer()
 
 
 
-bool cByteBuffer::Write(const char * a_Bytes, size_t a_Count)
+bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 {
 	CHECK_THREAD;
 	CheckValid();
@@ -187,13 +187,14 @@ bool cByteBuffer::Write(const char * a_Bytes, size_t a_Count)
 	}
 	ASSERT(m_BufferSize >= m_WritePos);
 	size_t TillEnd = m_BufferSize - m_WritePos;
+	const char * Bytes = (const char *)a_Bytes;
 	if (TillEnd <= a_Count)
 	{
 		// Need to wrap around the ringbuffer end
 		if (TillEnd > 0)
 		{
-			memcpy(m_Buffer + m_WritePos, a_Bytes, TillEnd);
-			a_Bytes += TillEnd;
+			memcpy(m_Buffer + m_WritePos, Bytes, TillEnd);
+			Bytes += TillEnd;
 			a_Count -= TillEnd;
 			WrittenBytes = TillEnd;
 		}
@@ -203,7 +204,7 @@ bool cByteBuffer::Write(const char * a_Bytes, size_t a_Count)
 	// We're guaranteed that we'll fit in a single write op
 	if (a_Count > 0)
 	{
-		memcpy(m_Buffer + m_WritePos, a_Bytes, a_Count);
+		memcpy(m_Buffer + m_WritePos, Bytes, a_Count);
 		m_WritePos += a_Count;
 		WrittenBytes += a_Count;
 	}
