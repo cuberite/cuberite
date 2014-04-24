@@ -1108,7 +1108,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		return;
 	}
 
-	//Armors haven't a dbl click
+	// Armors haven't a dbl click
 	if (a_ClickAction == caDblClick)
 	{
 		return;
