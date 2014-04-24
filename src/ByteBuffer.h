@@ -27,7 +27,7 @@ their own synchronization.
 class cByteBuffer
 {
 public:
-	cByteBuffer(int a_BufferSize);
+	cByteBuffer(size_t a_BufferSize);
 	~cByteBuffer();
 	
 	/// Writes the bytes specified to the ringbuffer. Returns true if successful, false if not
