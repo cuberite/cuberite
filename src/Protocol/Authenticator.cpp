@@ -13,10 +13,12 @@
 #include "polarssl/config.h"
 #include "polarssl/net.h"
 #include "polarssl/ssl.h"
-#include "polarssl/entropy.h"
 #include "polarssl/ctr_drbg.h"
 #include "polarssl/error.h"
-#include "polarssl/certs.h"
+
+#include "PolarSSL++/EntropyContext.h"
+#include "PolarSSL++/CtrDrbgContext.h"
+#include "PolarSSL++/X509Cert.h"
 
 #include <sstream>
 #include <iomanip>
@@ -150,31 +152,52 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	
 	int ret, server_fd = -1;
 	unsigned char buf[1024];
-	const char *pers = "cAuthenticator";
+	const char pers[] = "cAuthenticator";
 
-	entropy_context entropy;
-	ctr_drbg_context ctr_drbg;
+	cCtrDrbgContext CtrDrbg;
 	ssl_context ssl;
-	x509_crt cacert;
+	cX509Cert CACert;
 
 	/* Initialize the RNG and the session data */
 	memset(&ssl, 0, sizeof(ssl_context));
-	x509_crt_init(&cacert);
 
-	entropy_init(&entropy);
-	if ((ret = ctr_drbg_init(&ctr_drbg, entropy_func, &entropy, (const unsigned char *)pers, strlen(pers))) != 0)
+	if ((ret = CtrDrbg.Initialize(pers, sizeof(pers))) != 0)
 	{
-		LOGWARNING("cAuthenticator: ctr_drbg_init returned %d", ret);
+		LOGWARNING("cAuthenticator: CtrDrbg.Initialize() returned %d", ret);
 		return false;
 	}
 
 	/* Initialize certificates */
-	// TODO: Grab the sessionserver's root CA and any intermediates and hard-code them here, instead of test_ca_list
-	ret = x509_crt_parse(&cacert, (const unsigned char *)test_ca_list, strlen(test_ca_list));
-
+	// This is the root cert for Starfield Technologies, the CA that signed sessionserver.mojang.com's cert:
+	static const char StarfieldCACert[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIID3TCCAsWgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBjzELMAkGA1UEBhMCVVMx\n"
+	"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoT\n"
+	"HFN0YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAMTKVN0YXJmaWVs\n"
+	"ZCBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5MDkwMTAwMDAw\n"
+	"MFoXDTM3MTIzMTIzNTk1OVowgY8xCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6\n"
+	"b25hMRMwEQYDVQQHEwpTY290dHNkYWxlMSUwIwYDVQQKExxTdGFyZmllbGQgVGVj\n"
+	"aG5vbG9naWVzLCBJbmMuMTIwMAYDVQQDEylTdGFyZmllbGQgUm9vdCBDZXJ0aWZp\n"
+	"Y2F0ZSBBdXRob3JpdHkgLSBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\n"
+	"ggEBAL3twQP89o/8ArFvW59I2Z154qK3A2FWGMNHttfKPTUuiUP3oWmb3ooa/RMg\n"
+	"nLRJdzIpVv257IzdIvpy3Cdhl+72WoTsbhm5iSzchFvVdPtrX8WJpRBSiUZV9Lh1\n"
+	"HOZ/5FSuS/hVclcCGfgXcVnrHigHdMWdSL5stPSksPNkN3mSwOxGXn/hbVNMYq/N\n"
+	"Hwtjuzqd+/x5AJhhdM8mgkBj87JyahkNmcrUDnXMN/uLicFZ8WJ/X7NfZTD4p7dN\n"
+	"dloedl40wOiWVpmKs/B/pM293DIxfJHP4F8R+GuqSVzRmZTRouNjWwl2tVZi4Ut0\n"
+	"HZbUJtQIBFnQmA4O5t78w+wfkPECAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAO\n"
+	"BgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFHwMMh+n2TB/xH1oo2Kooc6rB1snMA0G\n"
+	"CSqGSIb3DQEBCwUAA4IBAQARWfolTwNvlJk7mh+ChTnUdgWUXuEok21iXQnCoKjU\n"
+	"sHU48TRqneSfioYmUeYs0cYtbpUgSpIB7LiKZ3sx4mcujJUDJi5DnUox9g61DLu3\n"
+	"4jd/IroAow57UvtruzvE03lRTs2Q9GcHGcg8RnoNAX3FWOdt5oUwF5okxBDgBPfg\n"
+	"8n/Uqgr/Qh037ZTlZFkSIHc40zI+OIF1lnP6aI+xy84fxez6nH7PfrHxBy22/L/K\n"
+	"pL/QlwVKvOoYKAKQvVR4CSFx09F9HdkWsKlhPdAKACL8x3vLCWRFCztAgfd9fDL1\n"
+	"mMpYjn0q7pBZc2T5NnReJaH1ZgUufzkVqSr7UIuOhWn0\n"
+	"-----END CERTIFICATE-----";
+	// Parse the Starfield CA and add it to "trusted root certs"
+	ret = CACert.Parse(StarfieldCACert, sizeof(StarfieldCACert) - 1);
 	if (ret < 0)
 	{
-		LOGWARNING("cAuthenticator: x509_crt_parse returned -0x%x", -ret);
+		LOGWARNING("cAuthenticator: CACert.Parse returned -0x%x", -ret);
 		return false;
 	}
 
@@ -193,8 +216,8 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	}
 	ssl_set_endpoint(&ssl, SSL_IS_CLIENT);
 	ssl_set_authmode(&ssl, SSL_VERIFY_OPTIONAL);
-	ssl_set_ca_chain(&ssl, &cacert, NULL, "PolarSSL Server 1");
-	ssl_set_rng(&ssl, ctr_drbg_random, &ctr_drbg);
+	ssl_set_ca_chain(&ssl, CACert.Get(), NULL, "PolarSSL Server 1");
+	ssl_set_rng(&ssl, ctr_drbg_random, CtrDrbg.Get());
 	ssl_set_bio(&ssl, net_recv, &server_fd, net_send, &server_fd);
 
 	/* Handshake */
@@ -253,13 +276,11 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 		}
 
 		Response.append((const char *)buf, ret);
-	} 
+	}
 
 	ssl_close_notify(&ssl);
-	x509_crt_free(&cacert);
 	net_close(server_fd);
 	ssl_free(&ssl);
-	entropy_free(&entropy);
 	memset(&ssl, 0, sizeof(ssl));
 
 	// Check the HTTP status line:
