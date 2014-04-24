@@ -19,7 +19,7 @@ public:
 
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
-		int SlotNum = -1;
+		int SlotNum;
 		if (ItemCategory::IsHelmet(a_Item.m_ItemType))
 		{
 			SlotNum = 0;
@@ -36,6 +36,11 @@ public:
 		{
 			SlotNum = 3;
 		}
+		else
+		{
+			LOGWARNING("Used unknown armor: %i", a_Item.m_ItemType);
+			return false;
+		}
 		
 		if (!a_Player->GetInventory().GetArmorSlot(SlotNum).IsEmpty())
 		{
@@ -43,7 +48,14 @@ public:
 		}
 		
 		a_Player->GetInventory().SetArmorSlot(SlotNum, a_Item.CopyOne());
-		a_Player->GetInventory().SetHotbarSlot(a_Player->GetInventory().GetEquippedSlotNum(), cItem());
+		
+		cItem Item(a_Item);
+		Item.m_ItemCount--;
+		if (Item.m_ItemCount <= 0)
+		{
+			Item.Empty();
+		}
+		a_Player->GetInventory().SetHotbarSlot(a_Player->GetInventory().GetEquippedSlotNum(), Item);
 		return true;
 	}
 
