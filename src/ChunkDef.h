@@ -219,24 +219,13 @@ public:
 		ASSERT((a_Z >= 0) && (a_Z <= Width));
 		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
 	}
-	
-	
-	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int a_BlockIdx)
-	{
-		if ((a_BlockIdx > -1) && (a_BlockIdx < NumBlocks))
-		{
-			return (a_Buffer[a_BlockIdx / 2] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
-		}
-		ASSERT(!"cChunkDef::GetNibble(): index out of chunk range!");
-		return 0;
-	}
 
 
 	static NIBBLETYPE GetNibble(const std::vector<NIBBLETYPE> & a_Buffer, int a_BlockIdx, bool a_IsSkyLightNibble = false)
 	{
 		if ((a_BlockIdx > -1) && (a_BlockIdx < NumBlocks))
 		{
-			if (a_Buffer.empty() || ((size_t)(a_BlockIdx / 2) > a_Buffer.size() - 1))
+			if (a_Buffer.empty() || ((size_t)(a_BlockIdx / 2) >= a_Buffer.size()))
 			{
 				return (a_IsSkyLightNibble ? 0xff : 0);
 			}
@@ -245,8 +234,24 @@ public:
 		ASSERT(!"cChunkDef::GetNibble(): index out of chunk range!");
 		return 0;
 	}
-	
-	
+
+
+	static NIBBLETYPE GetNibble(const std::vector<NIBBLETYPE> & a_Buffer, int x, int y, int z, bool a_IsSkyLightNibble = false)
+	{
+		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
+		{
+			int Index = MakeIndexNoCheck(x, y, z);
+			if (a_Buffer.empty() || ((size_t)(Index / 2) >= a_Buffer.size()))
+			{
+				return (a_IsSkyLightNibble ? 0xff : 0);
+			}
+			return (a_Buffer[(size_t)(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
+		}
+		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
+		return 0;
+	}
+
+
 	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int x, int y, int z)
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
@@ -259,36 +264,6 @@ public:
 	}
 
 
-	static NIBBLETYPE GetNibble(const std::vector<NIBBLETYPE> & a_Buffer, int x, int y, int z, bool a_IsSkyLightNibble = false)
-	{
-		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
-		{
-			int Index = MakeIndexNoCheck(x, y, z);
-			if (a_Buffer.empty() || ((size_t)(Index / 2) > a_Buffer.size() - 1))
-			{
-				return (a_IsSkyLightNibble ? 0xff : 0);
-			}
-			return (a_Buffer[(size_t)(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
-		}
-		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
-		return 0;
-	}
-
-
-	static void SetNibble(NIBBLETYPE * a_Buffer, int a_BlockIdx, NIBBLETYPE a_Nibble)
-	{
-		if ((a_BlockIdx < 0) || (a_BlockIdx >= NumBlocks))
-		{
-			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
-			return;
-		}
-		a_Buffer[a_BlockIdx / 2] = static_cast<NIBBLETYPE>(
-			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
-			((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
-		);
-	}
-
-
 	static void SetNibble(std::vector<NIBBLETYPE> & a_Buffer, int a_BlockIdx, NIBBLETYPE a_Nibble)
 	{
 		if ((a_BlockIdx < 0) || (a_BlockIdx >= NumBlocks))
@@ -296,7 +271,7 @@ public:
 			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
 			return;
 		}
-		if (a_Buffer.empty() || ((size_t)(a_BlockIdx / 2) > a_Buffer.size() - 1))
+		if (a_Buffer.empty() || ((size_t)(a_BlockIdx / 2) >= a_Buffer.size()))
 		{
 			a_Buffer.resize((size_t)((a_BlockIdx / 2) + 1));
 		}
@@ -304,26 +279,6 @@ public:
 			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
 			);
-	}
-	
-	
-	static void SetNibble(NIBBLETYPE * a_Buffer, int x, int y, int z, NIBBLETYPE a_Nibble)
-	{
-		if (
-			(x >= Width)  || (x < 0) ||
-			(y >= Height) || (y < 0) ||
-			(z >= Width)  || (z < 0)
-		)
-		{
-			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
-			return;
-		}
-
-		int Index = MakeIndexNoCheck(x, y, z);
-		a_Buffer[Index / 2] = static_cast<NIBBLETYPE>(
-			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
-			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
-		);
 	}
 
 
@@ -340,7 +295,7 @@ public:
 		}
 
 		int Index = MakeIndexNoCheck(x, y, z);
-		if (a_Buffer.empty() || ((size_t)(Index / 2) > a_Buffer.size() - 1))
+		if (a_Buffer.empty() || ((size_t)(Index / 2) >= a_Buffer.size()))
 		{
 			a_Buffer.resize((size_t)((Index / 2) + 1));
 		}
@@ -348,18 +303,6 @@ public:
 			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 			);
-	}
-
-
-	inline static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos)
-	{
-		return GetNibble(a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
-	}
-	
-	
-	inline static void SetNibble(NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos, NIBBLETYPE a_Value)
-	{
-		SetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Value );
 	}
 
 } ;

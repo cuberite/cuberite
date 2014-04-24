@@ -378,16 +378,14 @@ void cChunk::SetLight(
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
 
+	int IdxWhereNonEmptyStarts = 0;
 	{ // Compress blocklight
-		bool FoundNonEmpty = false;
-		int IdxWhereNonEmptyStarts = 0;
 		m_BlockLight.clear();
 
 		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
 		{
 			if (a_BlockLight[Idx] != 0)
 			{
-				FoundNonEmpty = true;
 				IdxWhereNonEmptyStarts = Idx;
 				break;
 			}
@@ -396,19 +394,7 @@ void cChunk::SetLight(
 	}
 
 	{ // Compress skylight
-		bool FoundNonEmpty = false;
-		int IdxWhereNonEmptyStarts = 0;
 		m_BlockSkyLight.clear();
-
-		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
-		{
-			if (a_SkyLight[Idx] != 0xff)
-			{
-				FoundNonEmpty = true;
-				IdxWhereNonEmptyStarts = Idx;
-				break;
-			}
-		}
 		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[IdxWhereNonEmptyStarts + 1]);
 	}
 
@@ -421,10 +407,8 @@ void cChunk::SetLight(
 
 void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 {
-	std::vector<BLOCKTYPE> Blocks = m_BlockTypes;
-	Blocks.resize(NumBlocks);
-
-	memcpy(a_BlockTypes, &Blocks[0], NumBlocks);
+	std::copy(m_BlockTypes.begin(), m_BlockTypes.end(), a_BlockTypes);
+	std::fill_n(&a_BlockTypes[m_BlockTypes.size()], NumBlocks - m_BlockTypes.size(), E_BLOCK_AIR);
 }
 
 
@@ -832,7 +816,7 @@ void cChunk::BroadcastPendingBlockChanges(void)
 
 void cChunk::CheckBlocks()
 {
-	if (m_ToTickBlocks.size() == 0)
+	if (m_ToTickBlocks.empty())
 	{
 		return;
 	}
@@ -1605,7 +1589,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	MarkDirty();
 
-	if (m_BlockTypes.empty() || ((size_t)index > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
+	if (m_BlockTypes.empty() || ((size_t)index >= m_BlockTypes.size()))
 	{
 		m_BlockTypes.resize(index + 1);
 	}
@@ -2550,7 +2534,7 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 		return 0;
 	}
 
-	if (m_BlockTypes.empty() || ((size_t)a_BlockIdx > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
+	if (m_BlockTypes.empty() || ((size_t)a_BlockIdx >= m_BlockTypes.size()))
 	{
 		return E_BLOCK_AIR;
 	}
