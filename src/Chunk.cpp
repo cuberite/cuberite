@@ -282,7 +282,7 @@ void cChunk::SetAllData(
 	const HeightMap *  a_HeightMap,
 	const BiomeMap &   a_BiomeMap,
 	cBlockEntityList & a_BlockEntities
-	)
+)
 {
 	memcpy(m_BiomeMap, a_BiomeMap, sizeof(m_BiomeMap));
 
