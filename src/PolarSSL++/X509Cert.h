@@ -26,7 +26,7 @@ public:
 	int Parse(const void * a_CertContents, size_t a_Size);
 	
 	/** Returns the internal cert ptr. Only use in PolarSSL API calls. */
-	__declspec(deprecated) x509_crt * Get(void) { return &m_Cert; }
+	OBSOLETE x509_crt * Get(void) { return &m_Cert; }
 
 protected:
 	x509_crt m_Cert;

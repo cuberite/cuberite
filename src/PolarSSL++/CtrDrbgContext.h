@@ -42,7 +42,7 @@ public:
 	bool IsValid(void) const { return m_IsValid; }
 	
 	/** Returns the internal context ptr. Only use in PolarSSL API calls. */
-	__declspec(deprecated) ctr_drbg_context * Get(void) { return &m_CtrDrbg; }
+	OBSOLETE ctr_drbg_context * Get(void) { return &m_CtrDrbg; }
 	
 protected:
 	/** The entropy source used for generating the random */
