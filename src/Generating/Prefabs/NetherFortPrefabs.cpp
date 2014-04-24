@@ -439,11 +439,11 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 	// The data has been exported from the gallery Nether, area index 20, ID 162, created by STR_Warrior
 	{
 		// Size:
-		14, 9, 7,  // SizeX = 14, SizeY = 9, SizeZ = 7
+		14, 11, 7,  // SizeX = 14, SizeY = 11, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		13, 18, 6,  // MaxX, MaxY, MaxZ
+		13, 20, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -552,11 +552,33 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/*    *   01234567890123 */
 		/*  0 */ "mmmmmmmmhhhhhm"
 		/*  1 */ "mmmmmmhhh...hh"
-		/*  2 */ ".............h"
-		/*  3 */ ".............h"
-		/*  4 */ ".............h"
+		/*  2 */ "mm...........h"
+		/*  3 */ "mm...........h"
+		/*  4 */ "mm...........h"
 		/*  5 */ "mmmmmmhhh...hh"
-		/*  6 */ "mmmmmmmmhhhhhm",
+		/*  6 */ "mmmmmmmmhhhhhm"
+
+		// Level 9
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmmmm.....m"
+		/*  1 */ "mmmmmm........"
+		/*  2 */ "mmmm.........."
+		/*  3 */ "mmmm.........."
+		/*  4 */ "mmmm.........."
+		/*  5 */ "mmmmmm........"
+		/*  6 */ "mmmmmmmm.....m"
+
+		// Level 10
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmmmm.....m"
+		/*  1 */ "mmmmmm........"
+		/*  2 */ "mmmmmm........"
+		/*  3 */ "mmmmmm........"
+		/*  4 */ "mmmmmm........"
+		/*  5 */ "mmmmmm........"
+		/*  6 */ "mmmmmmmm.....m",
 
 		// Connectors:
 		"0: 0, 5, 3: 4\n"  /* Type 0, direction X- */,
@@ -3030,7 +3052,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		250,
+		1000,
 
 		// DepthWeight:
 		"0:0|2:0|4:0|6:0|8:0|10:0|12:0|14:0|16:0|18:0",
