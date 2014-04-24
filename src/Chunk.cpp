@@ -378,24 +378,14 @@ void cChunk::SetLight(
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
 
-	int IdxWhereNonEmptyStarts = 0;
 	{ // Compress blocklight
 		m_BlockLight.clear();
-
-		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
-		{
-			if (a_BlockLight[Idx] != 0)
-			{
-				IdxWhereNonEmptyStarts = Idx;
-				break;
-			}
-		}
-		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[IdxWhereNonEmptyStarts + 1]);
+		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[m_BlockTypes.size()]);
 	}
 
 	{ // Compress skylight
 		m_BlockSkyLight.clear();
-		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[IdxWhereNonEmptyStarts + 1]);
+		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[m_BlockTypes.size()]);
 	}
 
 	m_IsLightValid = true;
