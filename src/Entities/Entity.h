@@ -505,7 +505,7 @@ private:
 	// Height of the entity (Y axis)
 	double m_Height;
 
-	// If a player hit a entity, the entity become a invulnerable of 20 ticks
+	// If a player hit a entity, the entity become a invulnerable of 10 ticks
 	int m_InvulnerableTicks;
 } ;  // tolua_export
 
