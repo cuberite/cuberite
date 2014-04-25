@@ -574,12 +574,6 @@ void cWorld::Start(void)
 		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
 		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
 		case dimEnd:       DefaultMonsters = "enderman"; break;
-		default:
-		{
-			ASSERT(!"Unhandled world dimension");
-			DefaultMonsters = "wither";
-			break;
-		}
 	}
 	m_bAnimals = IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
 	AString AllMonsters = IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
