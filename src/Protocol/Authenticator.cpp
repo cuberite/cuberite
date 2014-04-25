@@ -165,6 +165,10 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	if ((ret = ctr_drbg_init(&ctr_drbg, entropy_func, &entropy, (const unsigned char *)pers, strlen(pers))) != 0)
 	{
 		LOGWARNING("cAuthenticator: ctr_drbg_init returned %d", ret);
+
+		// Free all resources which have been initialized up to this line
+		x509_crt_free(&cacert);
+		entropy_free(&entropy);
 		return false;
 	}
 
@@ -175,6 +179,10 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	if (ret < 0)
 	{
 		LOGWARNING("cAuthenticator: x509_crt_parse returned -0x%x", -ret);
+
+		// Free all resources which have been initialized up to this line
+		x509_crt_free(&cacert);
+		entropy_free(&entropy);
 		return false;
 	}
 
@@ -182,6 +190,10 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	if ((ret = net_connect(&server_fd, m_Server.c_str(), 443)) != 0)
 	{
 		LOGWARNING("cAuthenticator: Can't connect to %s: %d", m_Server.c_str(), ret);
+
+		// Free all resources which have been initialized up to this line
+		x509_crt_free(&cacert);
+		entropy_free(&entropy);
 		return false;
 	}
 
@@ -189,6 +201,13 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	if ((ret = ssl_init(&ssl)) != 0)
 	{
 		LOGWARNING("cAuthenticator: ssl_init returned %d", ret);
+
+		// Free all resources which have been initialized up to this line
+		x509_crt_free(&cacert);
+		net_close(server_fd);
+		ssl_free(&ssl);
+		entropy_free(&entropy);
+		memset(&ssl, 0, sizeof(ssl));
 		return false;
 	}
 	ssl_set_endpoint(&ssl, SSL_IS_CLIENT);
@@ -203,6 +222,13 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 		if ((ret != POLARSSL_ERR_NET_WANT_READ) && (ret != POLARSSL_ERR_NET_WANT_WRITE))
 		{
 			LOGWARNING("cAuthenticator: ssl_handshake returned -0x%x", -ret);
+
+			// Free all resources which have been initialized up to this line
+			x509_crt_free(&cacert);
+			net_close(server_fd);
+			ssl_free(&ssl);
+			entropy_free(&entropy);
+			memset(&ssl, 0, sizeof(ssl));
 			return false;
 		}
 	}
@@ -223,6 +249,13 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	if (ret <= 0)
 	{
 		LOGWARNING("cAuthenticator: ssl_write returned %d", ret);
+		
+		// Free all resources which have been initialized up to this line
+		x509_crt_free(&cacert);
+		net_close(server_fd);
+		ssl_free(&ssl);
+		entropy_free(&entropy);
+		memset(&ssl, 0, sizeof(ssl));
 		return false;
 	}
 
