@@ -1924,6 +1924,8 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
+	bool ShouldAppendChatPrefixes = true;
+	
 	if (GetPlayer()->GetWorld() == NULL)
 	{
 		cWorld * World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
