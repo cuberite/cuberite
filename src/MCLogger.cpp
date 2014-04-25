@@ -9,7 +9,6 @@
 
 
 cMCLogger * cMCLogger::s_MCLogger = NULL;
-bool g_ShouldColorOutput = false;
 
 #ifdef _WIN32
 	#include <io.h>  // Needed for _isatty(), not available on Linux
@@ -33,7 +32,8 @@ cMCLogger * cMCLogger::GetInstance(void)
 
 
 
-cMCLogger::cMCLogger(void)
+cMCLogger::cMCLogger(void):
+	g_ShouldColorOutput(false)
 {
 	AString FileName;
 	Printf(FileName, "LOG_%d.txt", (int)time(NULL));

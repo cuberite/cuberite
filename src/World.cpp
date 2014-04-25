@@ -316,12 +316,9 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 		{
 			return 2400 + (m_TickRand.randInt() % 4800);   // 2 - 6 minutes
 		}
-		default:
-		{
-			LOGWARNING("%s: Missing default weather interval for weather %d.", __FUNCTION__, a_Weather);
-			return -1;
-		}
-	}  // switch (Weather)
+	}
+	LOGWARNING("%s: Missing default weather interval for weather %d.", __FUNCTION__, a_Weather);
+	return -1;
 }
 
 
