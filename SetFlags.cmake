@@ -188,6 +188,9 @@ macro(set_exe_flags)
 		add_flags_cxx("-ffast-math")
 		
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			if (APPLE)
+				add_flags_cxx("-stdlib=libc++")
+			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")
 			add_flags_cxx("-Werror -Weverything -Wno-c++98-compat-pedantic -Wno-string-conversion")
