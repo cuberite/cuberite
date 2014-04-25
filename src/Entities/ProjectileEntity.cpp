@@ -440,6 +440,7 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	m_IsCritical((a_Force >= 1)),
 	m_Timer(0),
 	m_HitGroundTimer(0),
+	m_HasTeleported(false),
 	m_bIsCollected(false),
 	m_HitBlockPos(0, 0, 0)
 {
@@ -611,7 +612,7 @@ cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, 
 
 void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
-	TryForChicken(a_HitPos);
+	TrySpawnChicken(a_HitPos);
 	
 	Destroy();
 }
@@ -625,7 +626,7 @@ void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hit
 	int TotalDamage = 0;
 	// TODO: If entity is Ender Crystal, destroy it
 	
-	TryForChicken(a_HitPos);
+	TrySpawnChicken(a_HitPos);
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
 	
 	Destroy(true);
@@ -635,7 +636,7 @@ void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hit
 
 
 
-void cThrownEggEntity::TryForChicken(const Vector3d & a_HitPos)
+void cThrownEggEntity::TrySpawnChicken(const Vector3d & a_HitPos)
 {
 	if (m_World->GetTickRandomNumber(7) == 1)
 	{
