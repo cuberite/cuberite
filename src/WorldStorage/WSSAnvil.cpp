@@ -1757,7 +1757,7 @@ void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cCavespider> Monster(new cCavespider());
+	std::auto_ptr<cCaveSpider> Monster(new cCaveSpider());
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;

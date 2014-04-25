@@ -143,7 +143,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cByteBuffer:
 
-cByteBuffer::cByteBuffer(int a_BufferSize) :
+cByteBuffer::cByteBuffer(size_t a_BufferSize) :
 	m_Buffer(new char[a_BufferSize + 1]),
 	m_BufferSize(a_BufferSize + 1),
 	#ifdef _DEBUG

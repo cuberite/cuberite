@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "AggressiveMonster.h"
@@ -7,13 +6,13 @@
 
 
 
-class cCavespider :
+class cCaveSpider :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
 	
 public:
-	cCavespider(void);
+	cCaveSpider(void);
 
 	CLASS_PROTODEF(cCaveSpider);
 

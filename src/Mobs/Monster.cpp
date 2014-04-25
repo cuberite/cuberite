@@ -859,7 +859,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 
 		case mtBat:           toReturn = new cBat();                      break;
 		case mtBlaze:         toReturn = new cBlaze();                    break;
-		case mtCaveSpider:    toReturn = new cCavespider();               break;
+		case mtCaveSpider:    toReturn = new cCaveSpider();               break;
 		case mtChicken:       toReturn = new cChicken();                  break;
 		case mtCow:           toReturn = new cCow();                      break;
 		case mtCreeper:       toReturn = new cCreeper();                  break;
