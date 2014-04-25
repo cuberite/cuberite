@@ -123,6 +123,7 @@ if (NOT MSVC)
 
 	file(GLOB SOURCE
 		"*.cpp"
+		"*.h"
 	)
 
 	list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")
