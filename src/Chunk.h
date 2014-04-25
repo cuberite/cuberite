@@ -421,10 +421,10 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	// TODO: Make these pointers and don't allocate what isn't needed
-	std::vector<BLOCKTYPE> m_BlockTypes;
-	std::vector<NIBBLETYPE> m_BlockMeta;
-	std::vector<NIBBLETYPE> m_BlockLight;
-	std::vector<NIBBLETYPE> m_BlockSkyLight;
+	COMPRESSED_BLOCKTYPE m_BlockTypes;
+	COMPRESSED_NIBBLETYPE m_BlockMeta;
+	COMPRESSED_NIBBLETYPE m_BlockLight;
+	COMPRESSED_NIBBLETYPE m_BlockSkyLight;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;

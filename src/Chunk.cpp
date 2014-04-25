@@ -241,21 +241,21 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 	a_Callback.HeightMap    (&m_HeightMap);
 	a_Callback.BiomeData    (&m_BiomeMap);
 
-	std::vector<BLOCKTYPE> Blocks = m_BlockTypes;
+	COMPRESSED_BLOCKTYPE Blocks = m_BlockTypes;
 	Blocks.resize(NumBlocks);
 	a_Callback.BlockTypes   (&Blocks[0]);
 
-	std::vector<NIBBLETYPE> Metas = m_BlockMeta;
+	COMPRESSED_NIBBLETYPE Metas = m_BlockMeta;
 	Metas.resize(NumBlocks / 2);
 	a_Callback.BlockMeta    (&Metas[0]);
 
 	a_Callback.LightIsValid (m_IsLightValid);
 
-	std::vector<NIBBLETYPE> BlockLights = m_BlockLight;
+	COMPRESSED_NIBBLETYPE BlockLights = m_BlockLight;
 	BlockLights.resize(NumBlocks / 2);
 	a_Callback.BlockLight   (&BlockLights[0]);
 
-	std::vector<NIBBLETYPE> BlockSkyLights = m_BlockSkyLight;
+	COMPRESSED_NIBBLETYPE BlockSkyLights = m_BlockSkyLight;
 	BlockSkyLights.resize(NumBlocks / 2, 0xff);
 	a_Callback.BlockSkyLight(&BlockSkyLights[0]);
 	
@@ -1579,7 +1579,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	MarkDirty();
 
-	if (m_BlockTypes.empty() || ((size_t)index >= m_BlockTypes.size()))
+	if ((size_t)index >= m_BlockTypes.size())
 	{
 		m_BlockTypes.resize(index + 1);
 	}
@@ -2524,7 +2524,7 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 		return 0;
 	}
 
-	if (m_BlockTypes.empty() || ((size_t)a_BlockIdx >= m_BlockTypes.size()))
+	if ((size_t)a_BlockIdx >= m_BlockTypes.size())
 	{
 		return E_BLOCK_AIR;
 	}
