@@ -6,6 +6,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../../src/")
 
 file(GLOB SOURCE
     "*.cpp"
+    "*.h"
 )
 
 add_library(md5 ${SOURCE})
