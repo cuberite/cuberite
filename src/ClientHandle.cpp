@@ -1113,7 +1113,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
-	else if (ItemHandler->IsFood())
+	else if (ItemHandler->IsFood() && !m_Player->IsGameModeCreative())
 	{
 		if (m_Player->IsSatiated())
 		{
