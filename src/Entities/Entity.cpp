@@ -341,15 +341,21 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		Vector3d additionalSpeed(0, 0, 0);
 		switch (KnockbackLevel)
 		{
-		case 1:
-			additionalSpeed.Set(5, .3, 5);
-			break;
-		case 2:
-			additionalSpeed.Set(8, .3, 8);
-			break;
-		default:
-			additionalSpeed.Set(2, .3, 2);
-			break;
+			case 1:
+			{
+				additionalSpeed.Set(5, .3, 5);
+				break;
+			}
+			case 2:
+			{
+				additionalSpeed.Set(8, .3, 8);
+				break;
+			}
+			default:
+			{
+				additionalSpeed.Set(2, .3, 2);
+				break;
+			}
 		}
 		AddSpeed(a_TDI.Knockback * additionalSpeed);
 	}
