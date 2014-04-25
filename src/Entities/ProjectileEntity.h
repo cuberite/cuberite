@@ -166,6 +166,9 @@ protected:
 
 	/// Timer for client arrow position confirmation via TeleportEntity
 	float m_HitGroundTimer;
+	
+	// Whether the arrow has already been teleported into the proper position in the ground.
+	bool m_HasTeleported;
 
 	/// If true, the arrow is in the process of being collected - don't go to anyone else
 	bool m_bIsCollected;
@@ -205,7 +208,10 @@ protected:
 	
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
-
+	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	
+	void TryForChicken(const Vector3d & a_HitPos);
+	
 	// tolua_begin
 	
 } ;
@@ -233,6 +239,9 @@ protected:
 	
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
+	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	
+	void TeleportUser(const Vector3d & a_HitPos);
 
 	// tolua_begin
 	

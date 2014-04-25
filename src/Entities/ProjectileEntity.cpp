@@ -562,12 +562,12 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		// We can afford to do this because xoft's algorithm for trajectory is near perfect, so things are pretty close anyway without sync
 		// Besides, this seems to be what the vanilla server does, note how arrows teleport half a second after they hit to the server position
 
-		if (m_HitGroundTimer != -1) // Sent a teleport already, don't do again
+		if (!m_HasTeleported) // Sent a teleport already, don't do again
 		{
 			if (m_HitGroundTimer > 1000.f) // Send after a second, could be less, but just in case
 			{
 				m_World->BroadcastTeleportEntity(*this);
-				m_HitGroundTimer = -1;
+				m_HasTeleported = true;
 			}
 			else
 			{
@@ -611,6 +611,32 @@ cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, 
 
 void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
+	TryForChicken(a_HitPos);
+	
+	Destroy();
+}
+
+
+
+
+
+void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+{
+	int TotalDamage = 0;
+	// TODO: If entity is Ender Crystal, destroy it
+	
+	TryForChicken(a_HitPos);
+	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
+	
+	Destroy(true);
+}
+
+
+
+
+
+void cThrownEggEntity::TryForChicken(const Vector3d & a_HitPos)
+{
 	if (m_World->GetTickRandomNumber(7) == 1)
 	{
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
@@ -622,7 +648,6 @@ void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_H
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, cMonster::mtChicken);
 	}
-	Destroy();
 }
 
 
@@ -644,15 +669,39 @@ cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X
 
 void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
+	// TODO: Tweak a_HitPos based on block face.
+	TeleportUser(a_HitPos);
+	
+	Destroy();
+}
+
+
+
+
+
+void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+{
+	int TotalDamage = 0;
+	// TODO: If entity is Ender Crystal, destroy it
+	
+	TeleportUser(a_HitPos);
+	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
+	
+	Destroy(true);
+}
+
+
+
+
+
+void cThrownEnderPearlEntity::TeleportUser(const Vector3d & a_HitPos)
+{
 	// Teleport the creator here, make them take 5 damage:
 	if (m_Creator != NULL)
 	{
-		// TODO: The coords might need some tweaking based on the block face
 		m_Creator->TeleportToCoords(a_HitPos.x + 0.5, a_HitPos.y + 1.7, a_HitPos.z + 0.5);
 		m_Creator->TakeDamage(dtEnderPearl, this, 5, 0);
 	}
-	
-	Destroy();
 }
 
 
@@ -696,6 +745,7 @@ void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & 
 			TotalDamage = 1;
 		}
 	}
+	// TODO: If entity is Ender Crystal, destroy it
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
 
 	Destroy(true);
