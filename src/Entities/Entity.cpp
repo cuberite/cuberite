@@ -342,13 +342,13 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		switch (KnockbackLevel)
 		{
 		case 1:
-			additionalSpeed.Set(5, .2, 5);
+			additionalSpeed.Set(5, .3, 5);
 			break;
 		case 2:
-			additionalSpeed.Set(8, .2, 8);
+			additionalSpeed.Set(8, .3, 8);
 			break;
 		default:
-			additionalSpeed.Set(2, .2, 2);
+			additionalSpeed.Set(2, .3, 2);
 			break;
 		}
 		AddSpeed(a_TDI.Knockback * additionalSpeed);
@@ -802,12 +802,9 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		int PosY = POSY_TOINT;
 		int PosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 
-		if((POSY_TOINT - 1) == m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
+		if (PosY > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
-			if (a_Chunk.GetSkyLight(PosX, PosY, PosZ) == 15)
-			{ 
-				m_TicksLeftBurning = 0;
-			}
+			m_TicksLeftBurning = 0;
 		}		
 	}
 	
