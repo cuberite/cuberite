@@ -27,7 +27,7 @@ public:
 	// cEntity overrides
 	virtual bool Initialize(cWorld * a_World) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
 private:

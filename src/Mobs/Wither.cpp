@@ -40,24 +40,24 @@ bool cWither::Initialize(cWorld * a_World)
 
 
 
-void cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType == dtDrowning)
 	{
-		return;
+		return false;
 	}
 
 	if (m_InvulnerableTicks > 0)
 	{
-		return;
+		return false;
 	}
 
 	if (IsArmored() && (a_TDI.DamageType == dtRangedAttack))
 	{
-		return;
+		return false;
 	}
 
-	super::DoTakeDamage(a_TDI);
+	return super::DoTakeDamage(a_TDI);
 }
 
 

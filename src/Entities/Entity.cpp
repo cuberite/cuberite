@@ -60,6 +60,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Mass (0.001)  // Default 1g
 	, m_Width(a_Width)
 	, m_Height(a_Height)
+	, m_InvulnerableTicks(20)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
@@ -294,17 +295,23 @@ void cEntity::SetPitchFromSpeed(void)
 
 
 
-void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))
 	{
-		return;
+		return false;
 	}
 
 	if (m_Health <= 0)
 	{
 		// Can't take damage if already dead
-		return;
+		return false;
+	}
+
+	if (m_InvulnerableTicks > 0)
+	{
+		// Entity is invulnerable
+		return false;
 	}
 
 	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
@@ -333,10 +340,13 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
 
+	m_InvulnerableTicks = 10;
+
 	if (m_Health <= 0)
 	{
 		KilledBy(a_TDI.Attacker);
 	}
+	return true;
 }
 
 
@@ -511,6 +521,11 @@ void cEntity::SetHealth(int a_Health)
 
 void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	if (m_InvulnerableTicks > 0)
+	{
+		m_InvulnerableTicks--;
+	}
+
 	if (m_AttachedTo != NULL)
 	{
 		if ((m_Pos - m_AttachedTo->GetPosition()).Length() > 0.5)

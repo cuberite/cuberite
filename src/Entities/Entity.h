@@ -262,8 +262,8 @@ public:
 	
 	// tolua_end
 	
-	/// Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI);
+	/** Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied. If it returns false, the entity hasn't become any damage. */
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI);
 	
 	// tolua_begin
 
@@ -391,6 +391,12 @@ public:
 	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
+
+	/** Gets the invulnerable ticks from the entity */
+	int GetInvulnerableTicks(void) const { return m_InvulnerableTicks; }
+
+	/** Set the invulnerable ticks from the entity */
+	void SetInvulnerableTicks(int a_InvulnerableTicks) { m_InvulnerableTicks = a_InvulnerableTicks; }
 	
 	// tolua_end
 	
@@ -493,11 +499,14 @@ private:
 	// Measured in Kilograms (Kg)
 	double m_Mass;
 	
-	/// Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
+	// Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
 	double m_Width;
 	
-	/// Height of the entity (Y axis)
+	// Height of the entity (Y axis)
 	double m_Height;
+
+	// If a player hunt a entity, the entity become a invulnerable of 20 ticks
+	int m_InvulnerableTicks;
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;
