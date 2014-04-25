@@ -663,6 +663,30 @@ void cWorld::GenerateRandomSpawn(void)
 
 
 
+eWeather cWorld::ChooseNewWeather()
+{
+	// Pick a new weather. Only reasonable transitions allowed:
+	switch (m_Weather)
+	{
+		case eWeather_Sunny:
+		case eWeather_ThunderStorm: return eWeather_Rain;
+			
+		case eWeather_Rain:
+		{
+			// 1/8 chance of turning into a thunderstorm
+			return ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
+		}
+	}
+	
+	LOGWARNING("Unknown current weather: %d. Setting sunny.", m_Weather);
+	ASSERT(!"Unknown weather");
+	return eWeather_Sunny;
+}
+
+
+
+
+
 void cWorld::Stop(void)
 {
 	// Delete the clients that have been in this world:
@@ -762,30 +786,8 @@ void cWorld::TickWeather(float a_Dt)
 	else
 	{
 		// Change weather:
-	
-		// Pick a new weather. Only reasonable transitions allowed:
-		eWeather NewWeather = m_Weather;
-		switch (m_Weather)
-		{
-			case eWeather_Sunny:        NewWeather = eWeather_Rain; break;
-			case eWeather_ThunderStorm: NewWeather = eWeather_Rain; break;
-			case eWeather_Rain:
-			{
-				// 1/8 chance of turning into a thunderstorm
-				NewWeather = ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
-				break;
-			}
-			
-			default:
-			{
-				LOGWARNING("Unknown current weather: %d. Setting sunny.", m_Weather);
-				ASSERT(!"Unknown weather");
-				NewWeather = eWeather_Sunny;
-			}
-		}
-		
-		SetWeather(NewWeather);
-	}  // else (m_WeatherInterval > 0)
+		SetWeather(ChooseNewWeather());
+	}
 
 	if (m_Weather == eWeather_ThunderStorm)
 	{
