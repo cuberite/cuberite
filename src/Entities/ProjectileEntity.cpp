@@ -671,7 +671,7 @@ cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X
 void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	// TODO: Tweak a_HitPos based on block face.
-	TeleportUser(a_HitPos);
+	TeleportCreator(a_HitPos);
 	
 	Destroy();
 }
@@ -685,7 +685,7 @@ void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d 
 	int TotalDamage = 0;
 	// TODO: If entity is Ender Crystal, destroy it
 	
-	TeleportUser(a_HitPos);
+	TeleportCreator(a_HitPos);
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
 	
 	Destroy(true);
@@ -695,7 +695,7 @@ void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d 
 
 
 
-void cThrownEnderPearlEntity::TeleportUser(const Vector3d & a_HitPos)
+void cThrownEnderPearlEntity::TeleportCreator(const Vector3d & a_HitPos)
 {
 	// Teleport the creator here, make them take 5 damage:
 	if (m_Creator != NULL)
