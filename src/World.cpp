@@ -518,21 +518,6 @@ void cWorld::Start(void)
 	}
 	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
 	m_Dimension = StringToDimension(Dimension);
-	switch (m_Dimension)
-	{
-		case dimNether:
-		case dimOverworld:
-		case dimEnd:
-		{
-			break;
-		}
-		default:
-		{
-			LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", Dimension.c_str());
-			m_Dimension = dimOverworld;
-			break;
-		}
-	}  // switch (m_Dimension)
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");

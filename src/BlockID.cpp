@@ -324,7 +324,7 @@ eDimension StringToDimension(const AString & a_DimensionString)
 		{ dimOverworld, "Normal"},
 		{ dimOverworld, "World"},
 		{ dimNether,    "Nether"},
-		{ dimNether,    "Hell"},  // Alternate name for End
+		{ dimNether,    "Hell"},  // Alternate name for Nether
 		{ dimEnd,       "End"},
 		{ dimEnd,       "Sky"},  // Old name for End
 	} ;
@@ -337,7 +337,8 @@ eDimension StringToDimension(const AString & a_DimensionString)
 	}  // for i - DimensionMap[]
 	
 	// Not found
-	return (eDimension)-1000;
+	LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", a_DimensionString.c_str());
+	return dimOverworld;
 }
 
 
