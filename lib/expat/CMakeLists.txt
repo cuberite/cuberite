@@ -4,6 +4,7 @@ project (expat)
 
 file(GLOB SOURCE
     "*.c"
+    "*.h"
 )
 
 # add headers to MSVC project files:

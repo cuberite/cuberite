@@ -4,4 +4,9 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-add_library(Items ItemHandler)
+file(GLOB SOURCE
+    "*.cpp"
+    "*.h"
+)
+
+add_library(Items ${SOURCE})
