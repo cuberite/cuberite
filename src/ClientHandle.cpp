@@ -186,6 +186,82 @@ void cClientHandle::GenerateOfflineUUID(void)
 
 
 
+AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString &a_AdditionalData)
+{
+	switch (a_ChatPrefix)
+	{
+		case mtCustom: return AString();
+		case mtFailure:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			else
+				return Printf("%s", cChatColor::Rose.c_str());
+		}
+		case mtInformation:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				return Printf("%s", cChatColor::Yellow.c_str());
+		}
+		case mtSuccess:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str());
+			else
+				return Printf("%s", cChatColor::Green.c_str());
+		}
+		case mtWarning:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
+			else
+				return Printf("%s", cChatColor::Rose.c_str());
+		}
+		case mtFatal:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str());
+			else
+				return Printf("%s", cChatColor::Red.c_str());
+		}
+		case mtDeath:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str());
+			else
+				return Printf("%s", cChatColor::Gray.c_str());
+		}
+		case mtPrivateMessage:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+			else
+				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
+		}
+		case mtJoin:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[JOIN] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				return Printf("%s", cChatColor::Yellow.c_str());
+		}
+		case mtLeave:
+		{
+			if (ShouldAppendChatPrefixes)
+				return Printf("%s[LEAVE] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
+			else
+				return Printf("%s", cChatColor::Yellow.c_str());
+		}
+	}
+	ASSERT(!"Unhandled chat prefix type!");
+}
+
+
+
+
+
 AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 {
 	// Proper format for a version 3 UUID is:
@@ -1848,8 +1924,6 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
-	bool ShouldAppendChatPrefixes = true;
-
 	if (GetPlayer()->GetWorld() == NULL)
 	{
 		cWorld * World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
@@ -1868,89 +1942,9 @@ void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefi
 		ShouldAppendChatPrefixes = false;
 	}
 
-	AString Message;
+	AString Message = FormatMessageType(ShouldAppendChatPrefixes, a_ChatPrefix, a_AdditionalData);
 
-	switch (a_ChatPrefix)
-	{
-		case mtCustom: break;
-		case mtFailure:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Rose.c_str());
-			break;
-		}
-		case mtInformation:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Yellow.c_str());
-			break;
-		}
-		case mtSuccess:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Green.c_str());
-			break;
-		}
-		case mtWarning:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Rose.c_str());
-			break;
-		}
-		case mtFatal:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Red.c_str());
-			break;
-		}
-		case mtDeath:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Gray.c_str());
-			break;
-		}
-		case mtPrivateMessage:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
-			else
-				Message = Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
-			break;
-		}
-		case mtJoin:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[JOIN] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Yellow.c_str());
-			break;
-		}
-		case mtLeave:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[LEAVE] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Yellow.c_str());
-			break;
-		}
-		default: ASSERT(!"Unhandled chat prefix type!"); return;
-	}
-
-	Message.append(a_Message);
-
-	m_Protocol->SendChat(Message);
+	m_Protocol->SendChat(Message.append(a_Message));
 }
 
 
