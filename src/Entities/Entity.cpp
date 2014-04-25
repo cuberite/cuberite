@@ -798,11 +798,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 
 	if (m_World->IsWeatherWet())
 	{
-		int PosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
-		int PosY = POSY_TOINT;
-		int PosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
-
-		if (PosY > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
+		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
 			m_TicksLeftBurning = 0;
 		}		
