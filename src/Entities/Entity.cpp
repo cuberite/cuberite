@@ -326,9 +326,38 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_Health = 0;
 	}
 
-	if (IsMob() || IsPlayer()) // Knockback for only players and mobs
+	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL)) // Knockback for only players and mobs
 	{
-		AddSpeed(a_TDI.Knockback * 2);
+		int KnockbackLevel = 0;
+		if (a_TDI.Attacker->GetEquippedWeapon().m_ItemType == E_ITEM_BOW)
+		{
+			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch);
+		}
+		else
+		{
+			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
+		}
+
+		Vector3d additionalSpeed(0, 0, 0);
+		switch (KnockbackLevel)
+		{
+			case 1:
+			{
+				additionalSpeed.Set(5, .3, 5);
+				break;
+			}
+			case 2:
+			{
+				additionalSpeed.Set(8, .3, 8);
+				break;
+			}
+			default:
+			{
+				additionalSpeed.Set(2, .3, 2);
+				break;
+			}
+		}
+		AddSpeed(a_TDI.Knockback * additionalSpeed);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -773,14 +802,12 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
-	if (GetWorld()->GetWeather() == eWeather_Rain)
+	if (m_World->IsWeatherWet())
 	{
-		if (HasBeenBurning)
+		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
 			m_TicksLeftBurning = 0;
-			OnFinishedBurning();
-		}
-		return;
+		}		
 	}
 	
 	// Do the burning damage:
