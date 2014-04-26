@@ -171,7 +171,6 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 		double CoeffZ = (DestZ - m_StartZ) / m_DiffZ;
 		if (CoeffZ < Coeff)
 		{
-			Coeff = CoeffZ;
 			Direction = dirZ;
 		}
 	}
