@@ -19,6 +19,9 @@ public:
 
 	/** Returns whether the wither is invulnerable to arrows. */
 	bool IsArmored(void) const;
+
+	/** Use the wither the invulnerable from the spawn? */
+	bool IsSpawnInvulnerable(void) const { return m_IsSpawnInvulnerable; }
 	
 	// cEntity overrides
 	virtual bool Initialize(cWorld * a_World) override;
