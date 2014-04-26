@@ -262,7 +262,9 @@ public:
 	
 	// tolua_end
 	
-	/** Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied. If it returns false, the entity hasn't become any damage. */
+	/** Makes this entity take damage specified in the a_TDI.
+	The TDI is sent through plugins first, then applied.
+	If it returns false, the entity hasn't receive any damage. */
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI);
 	
 	// tolua_begin
@@ -481,31 +483,32 @@ protected:
 	int m_AirTickTimer;
 	
 private:
-	// Measured in degrees, [-180, +180)
+	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
 	
-	// Measured in meter/second (m/s)
+	/** Measured in meter/second (m/s) */
 	Vector3d m_Speed;
 	
-	// Measured in degrees, [-180, +180)
+	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;
 	
-	/// Position of the entity's XZ center and Y bottom
+	/** Position of the entity's XZ center and Y bottom */
 	Vector3d m_Pos;
 	
-	// Measured in meter / second
+	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;
 	
-	// Measured in Kilograms (Kg)
+	/** Measured in Kilograms (Kg) */
 	double m_Mass;
 	
-	// Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
+	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
 	double m_Width;
 	
-	// Height of the entity (Y axis)
+	/** Height of the entity (Y axis) */
 	double m_Height;
 
-	// If a player hit a entity, the entity become a invulnerable of 10 ticks. While this ticks, a player can't hit this entity.
+	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
+	While this ticks, a player can't hit this entity. */
 	int m_InvulnerableTicks;
 } ;  // tolua_export
 

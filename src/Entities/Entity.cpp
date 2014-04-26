@@ -60,7 +60,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Mass (0.001)  // Default 1g
 	, m_Width(a_Width)
 	, m_Height(a_Height)
-	, m_InvulnerableTicks(20)
+	, m_InvulnerableTicks(0)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;

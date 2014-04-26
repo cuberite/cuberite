@@ -17,9 +17,9 @@ public:
 
 	CLASS_PROTODEF(cWither);
 
-	unsigned int GetNumInvulnerableTicks(void) const { return m_InvulnerableTicks; }
+	unsigned int GetWitherInvulnerableTicks(void) const { return m_WitherInvulnerableTicks; }
 
-	void SetNumInvulnerableTicks(unsigned int a_Ticks) { m_InvulnerableTicks = a_Ticks; }
+	void SetWitherInvulnerableTicks(unsigned int a_Ticks) { m_WitherInvulnerableTicks = a_Ticks; }
 
 	/** Returns whether the wither is invulnerable to arrows. */
 	bool IsArmored(void) const;
@@ -33,7 +33,7 @@ public:
 private:
 
 	/** The number of ticks of invulnerability left after being initially created. Zero once invulnerability has expired. */
-	unsigned int m_InvulnerableTicks;
+	unsigned int m_WitherInvulnerableTicks;
 
 } ;
 
