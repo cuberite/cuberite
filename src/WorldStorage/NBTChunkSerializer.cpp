@@ -621,10 +621,10 @@ void cNBTChunkSerializer::AddHangingEntity(cHangingEntity * a_Hanging)
 	m_Writer.AddInt("TileZ", a_Hanging->GetTileZ());
 	switch (a_Hanging->GetDirection())
 	{
-		case BLOCK_FACE_YM:    m_Writer.AddByte("Dir", (unsigned char)2); break;
-		case BLOCK_FACE_YP:    m_Writer.AddByte("Dir", (unsigned char)1); break;
-		case BLOCK_FACE_ZM:    m_Writer.AddByte("Dir", (unsigned char)0); break;
-		case BLOCK_FACE_ZP:    m_Writer.AddByte("Dir", (unsigned char)3); break;
+		case BLOCK_FACE_YM: m_Writer.AddByte("Dir", (unsigned char)2); break;
+		case BLOCK_FACE_YP: m_Writer.AddByte("Dir", (unsigned char)1); break;
+		case BLOCK_FACE_ZM: m_Writer.AddByte("Dir", (unsigned char)0); break;
+		case BLOCK_FACE_ZP: m_Writer.AddByte("Dir", (unsigned char)3); break;
 	}
 }
 

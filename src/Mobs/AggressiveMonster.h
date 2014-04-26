@@ -23,7 +23,7 @@ public:
 	virtual void Attack(float a_Dt);
 
 protected:
-	/* Whether this mob's destination is the same as its target's position. */
+	/** Whether this mob's destination is the same as its target's position. */
 	bool IsMovingToTargetPosition();
 
 } ;

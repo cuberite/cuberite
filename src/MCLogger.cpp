@@ -33,7 +33,7 @@ cMCLogger * cMCLogger::GetInstance(void)
 
 
 cMCLogger::cMCLogger(void):
-	g_ShouldColorOutput(false)
+	m_ShouldColorOutput(false)
 {
 	AString FileName;
 	Printf(FileName, "LOG_%d.txt", (int)time(NULL));
@@ -76,15 +76,15 @@ void cMCLogger::InitLog(const AString & a_FileName)
 
 	#ifdef _WIN32
 		// See whether we are writing to a console the default console attrib:
-		g_ShouldColorOutput = (_isatty(_fileno(stdin)) != 0);
-		if (g_ShouldColorOutput)
+		m_ShouldColorOutput = (_isatty(_fileno(stdin)) != 0);
+		if (m_ShouldColorOutput)
 		{
 			CONSOLE_SCREEN_BUFFER_INFO sbi;
 			GetConsoleScreenBufferInfo(g_Console, &sbi);
-			g_DefaultConsoleAttrib = sbi.wAttributes;
+			m_DefaultConsoleAttrib = sbi.wAttributes;
 		}
 	#elif defined (__linux) && !defined(ANDROID_NDK)
-		g_ShouldColorOutput = isatty(fileno(stdout));
+		m_ShouldColorOutput = isatty(fileno(stdout));
 		// TODO: Check if the terminal supports colors, somehow?
 	#endif
 }
@@ -178,7 +178,7 @@ void cMCLogger::Error(const char * a_Format, va_list a_ArgList)
 
 void cMCLogger::SetColor(eColorScheme a_Scheme)
 {
-	if (!g_ShouldColorOutput)
+	if (!m_ShouldColorOutput)
 	{
 		return;
 	}
@@ -211,7 +211,7 @@ void cMCLogger::SetColor(eColorScheme a_Scheme)
 
 void cMCLogger::ResetColor(void)
 {
-	if (!g_ShouldColorOutput)
+	if (!m_ShouldColorOutput)
 	{
 		return;
 	}
