@@ -81,7 +81,7 @@ void cMCLogger::InitLog(const AString & a_FileName)
 		{
 			CONSOLE_SCREEN_BUFFER_INFO sbi;
 			GetConsoleScreenBufferInfo(g_Console, &sbi);
-			m_DefaultConsoleAttrib = sbi.wAttributes;
+			g_DefaultConsoleAttrib = sbi.wAttributes;
 		}
 	#elif defined (__linux) && !defined(ANDROID_NDK)
 		m_ShouldColorOutput = isatty(fileno(stdout));

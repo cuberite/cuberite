@@ -189,7 +189,7 @@ void cClientHandle::GenerateOfflineUUID(void)
 AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2)
 {
 	if (ShouldAppendChatPrefixes)
-		return Printf("%s%s %s", m_Color1.c_str(), a_ChatPrefixS.c_str(), m_Color2.c_str());
+		return Printf("%s[%s] %s", m_Color1.c_str(), a_ChatPrefixS.c_str(), m_Color2.c_str());
 	else
 		return Printf("%s", m_Color1.c_str());
 }
@@ -203,14 +203,14 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 	switch (a_ChatPrefix)
 	{
 		case mtCustom:      return AString();
-		case mtFailure:     return FormatChatPrefix(ShouldAppendChatPrefixes, "[INFO]",  cChatColor::Rose,   cChatColor::White);
-		case mtInformation: return FormatChatPrefix(ShouldAppendChatPrefixes, "[INFO]",  cChatColor::Yellow, cChatColor::White);
-		case mtSuccess:     return FormatChatPrefix(ShouldAppendChatPrefixes, "[INFO]",  cChatColor::Green,  cChatColor::White);
-		case mtWarning:     return FormatChatPrefix(ShouldAppendChatPrefixes, "[WARN]",  cChatColor::Rose,   cChatColor::White);
-		case mtFatal:       return FormatChatPrefix(ShouldAppendChatPrefixes, "[FATAL]", cChatColor::Red,    cChatColor::White);
-		case mtDeath:       return FormatChatPrefix(ShouldAppendChatPrefixes, "[DEATH]", cChatColor::Gray,   cChatColor::White);
-		case mtJoin:        return FormatChatPrefix(ShouldAppendChatPrefixes, "[JOIN]",  cChatColor::Yellow, cChatColor::White);
-		case mtLeave:       return FormatChatPrefix(ShouldAppendChatPrefixes, "[LEAVE]", cChatColor::Yellow, cChatColor::White);
+		case mtFailure:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Rose,   cChatColor::White);
+		case mtInformation: return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Yellow, cChatColor::White);
+		case mtSuccess:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Green,  cChatColor::White);
+		case mtWarning:     return FormatChatPrefix(ShouldAppendChatPrefixes, "WARN",  cChatColor::Rose,   cChatColor::White);
+		case mtFatal:       return FormatChatPrefix(ShouldAppendChatPrefixes, "FATAL", cChatColor::Red,    cChatColor::White);
+		case mtDeath:       return FormatChatPrefix(ShouldAppendChatPrefixes, "DEATH", cChatColor::Gray,   cChatColor::White);
+		case mtJoin:        return FormatChatPrefix(ShouldAppendChatPrefixes, "JOIN",  cChatColor::Yellow, cChatColor::White);
+		case mtLeave:       return FormatChatPrefix(ShouldAppendChatPrefixes, "LEAVE", cChatColor::Yellow, cChatColor::White);
 		case mtPrivateMessage:
 		{
 			if (ShouldAppendChatPrefixes)
