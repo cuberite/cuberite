@@ -66,6 +66,7 @@ public:
 		mfAmbient  = 2, // Bats
 		mfWater    = 3, // Squid
 
+		mfNoSpawn,
 		mfUnhandled, // Nothing. Be sure this is the last and the others are in order
 	} ;
 	

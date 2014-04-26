@@ -761,9 +761,10 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtChicken:      return mfPassive;
 		case mtCow:          return mfPassive;
 		case mtCreeper:      return mfHostile;
+		case mtEnderDragon:  return mfNoSpawn;
 		case mtEnderman:     return mfHostile;
 		case mtGhast:        return mfHostile;
-		case mtGiant:        return mfHostile;
+		case mtGiant:        return mfNoSpawn;
 		case mtHorse:        return mfPassive;
 		case mtIronGolem:    return mfPassive;
 		case mtMagmaCube:    return mfHostile;
@@ -774,11 +775,12 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtSilverfish:   return mfHostile;
 		case mtSkeleton:     return mfHostile;
 		case mtSlime:        return mfHostile;
+		case mtSnowGolem:    return mfNoSpawn;
 		case mtSpider:       return mfHostile;
 		case mtSquid:        return mfWater;
 		case mtVillager:     return mfPassive;
 		case mtWitch:        return mfHostile;
-		case mtWither:       return mfHostile;
+		case mtWither:       return mfNoSpawn;
 		case mtWolf:         return mfHostile;
 		case mtZombie:       return mfHostile;
 		case mtZombiePigman: return mfHostile;
@@ -801,6 +803,7 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 		case mfPassive:   return 40;
 		case mfAmbient:   return 40;
 		case mfWater:     return 400;
+		case mfNoSpawn:   return -1;
 		case mfUnhandled: break;
 	}
 	ASSERT(!"Unhandled mob family");

@@ -67,11 +67,11 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		case fmRead:      Mode = "rb";  break;
 		case fmWrite:     Mode = "wb";  break;
 		case fmReadWrite: Mode = "rb+"; break;
-		default:
-		{
-			ASSERT(!"Unhandled file mode");
-			return false;
-		}
+	}
+	if (Mode == NULL)
+	{
+		ASSERT(!"Unhandled file mode");
+		return false;
 	}
 
 #ifdef _WIN32
