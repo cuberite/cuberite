@@ -108,7 +108,7 @@ void cAggressiveMonster::Attack(float a_Dt)
 
 bool cAggressiveMonster::IsMovingToTargetPosition()
 {
-	float epsilon = 0.000000000001;
+	static const float epsilon = 0.000000000001;
 	// Difference between destination x and target x is negligible (to 10^-12 precision)
 	if (fabsf((float)m_FinalDestination.x - (float)m_Target->GetPosX()) < epsilon)
 	{

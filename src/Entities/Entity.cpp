@@ -53,6 +53,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_TicksSinceLastVoidDamage(0)
 	, m_IsSwimming(false)
 	, m_IsSubmerged(false)
+	, m_AirLevel(0)
+	, m_AirTickTimer(0)
 	, m_HeadYaw( 0.0 )
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
