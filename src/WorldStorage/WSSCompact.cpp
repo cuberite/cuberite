@@ -107,15 +107,13 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 
 
 
-bool cJsonChunkSerializer::LightIsValid(bool a_IsLightValid)
+void cJsonChunkSerializer::LightIsValid(bool a_IsLightValid)
 {
-	if (!a_IsLightValid)
+	if (a_IsLightValid)
 	{
-		return false;
+		m_Root["IsLightValid"] = true;
+		m_HasJsonData = true;
 	}
-	m_Root["IsLightValid"] = true;
-	m_HasJsonData = true;
-	return true;
 }
 
 

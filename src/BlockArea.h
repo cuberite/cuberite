@@ -317,10 +317,7 @@ protected:
 		
 		// cChunkDataCallback overrides:
 		virtual bool Coords       (int a_ChunkX, int a_ChunkZ) override;
-		virtual void BlockTypes   (const BLOCKTYPE *  a_BlockTypes)    override;
-		virtual void BlockMeta    (const NIBBLETYPE * a_BlockMetas)    override;
-		virtual void BlockLight   (const NIBBLETYPE * a_BlockLight)    override;
-		virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override;
+		virtual void ChunkBuffer   (const cChunkBuffer &  a_BlockTypes)    override;
 	} ;
 	
 	typedef NIBBLETYPE * NIBBLEARRAY;

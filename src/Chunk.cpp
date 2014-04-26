@@ -241,23 +241,9 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 	a_Callback.HeightMap    (&m_HeightMap);
 	a_Callback.BiomeData    (&m_BiomeMap);
 
-	std::vector<BLOCKTYPE> Blocks = m_BlockTypes;
-	Blocks.resize(NumBlocks);
-	a_Callback.BlockTypes   (&Blocks[0]);
-
-	std::vector<NIBBLETYPE> Metas = m_BlockMeta;
-	Metas.resize(NumBlocks / 2);
-	a_Callback.BlockMeta    (&Metas[0]);
-
 	a_Callback.LightIsValid (m_IsLightValid);
 
-	std::vector<NIBBLETYPE> BlockLights = m_BlockLight;
-	BlockLights.resize(NumBlocks / 2);
-	a_Callback.BlockLight   (&BlockLights[0]);
-
-	std::vector<NIBBLETYPE> BlockSkyLights = m_BlockSkyLight;
-	BlockSkyLights.resize(NumBlocks / 2, 0xff);
-	a_Callback.BlockSkyLight(&BlockSkyLights[0]);
+	a_Callback.ChunkBuffer  (m_ChunkBuffer);
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
@@ -296,48 +282,10 @@ void cChunk::SetAllData(
 		CalculateHeightmap(a_BlockTypes);
 	}
 
-	int IdxWhereNonEmptyStarts = 0;
-	{ // Blocktype compression
-		unsigned char Highest = 0;
-		int X = 0, Z = 0;
-		m_BlockTypes.clear();
-			
-		for (int x = 0; x < Width; x++)
-		{
-			for (int z = 0; z < Width; z++)
-			{
-				unsigned char Height = m_HeightMap[x + z * Width];
-				if (Height > Highest)
-				{
-					Highest = Height;
-					X = x; Z = z;
-				}
-			}
-		}
-
-		IdxWhereNonEmptyStarts = MakeIndexNoCheck(X, Highest + 1, Z);
-
-		m_BlockTypes.insert(m_BlockTypes.end(), &a_BlockTypes[0], &a_BlockTypes[IdxWhereNonEmptyStarts]);
-	}
-
-	{ // Blockmeta compression
-		m_BlockMeta.clear();
-		m_BlockMeta.insert(m_BlockMeta.end(), &a_BlockMeta[0], &a_BlockMeta[IdxWhereNonEmptyStarts / 2]);
-	}
-	
-	if (a_BlockLight != NULL)
-	{
-		// Compress blocklight
-		m_BlockLight.clear();
-		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[IdxWhereNonEmptyStarts / 2]);
-	}
-
-	if (a_BlockSkyLight != NULL)
-	{
-		 // Compress skylight
-		m_BlockSkyLight.clear();
-		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_BlockSkyLight[0], &a_BlockSkyLight[IdxWhereNonEmptyStarts / 2]);
-	}
+	m_ChunkBuffer.SetBlocks   (a_BlockTypes);
+	m_ChunkBuffer.SetMeta     (a_BlockMeta);
+	m_ChunkBuffer.SetLight    (a_BlockLight);
+	m_ChunkBuffer.SetSkyLight (a_BlockSkyLight);
 	
 	m_IsLightValid = (a_BlockLight != NULL) && (a_BlockSkyLight != NULL);
 
@@ -378,39 +326,9 @@ void cChunk::SetLight(
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
 
-	{ // Compress blocklight
-		bool FoundNonEmpty = false;
-		int IdxWhereNonEmptyStarts = 0;
-		m_BlockLight.clear();
+	m_ChunkBuffer.SetLight    (a_BlockLight);
 
-		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
-		{
-			if (a_BlockLight[Idx] != 0)
-			{
-				FoundNonEmpty = true;
-				IdxWhereNonEmptyStarts = Idx;
-				break;
-			}
-		}
-		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[IdxWhereNonEmptyStarts + 1]);
-	}
-
-	{ // Compress skylight
-		bool FoundNonEmpty = false;
-		int IdxWhereNonEmptyStarts = 0;
-		m_BlockSkyLight.clear();
-
-		for (int Idx = (NumBlocks / 2) - 1; Idx >= 0; Idx--)
-		{
-			if (a_SkyLight[Idx] != 0xff)
-			{
-				FoundNonEmpty = true;
-				IdxWhereNonEmptyStarts = Idx;
-				break;
-			}
-		}
-		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[IdxWhereNonEmptyStarts + 1]);
-	}
+	m_ChunkBuffer.SetSkyLight (a_SkyLight);
 
 	m_IsLightValid = true;
 }
@@ -421,10 +339,7 @@ void cChunk::SetLight(
 
 void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 {
-	std::vector<BLOCKTYPE> Blocks = m_BlockTypes;
-	Blocks.resize(NumBlocks);
-
-	memcpy(a_BlockTypes, &Blocks[0], NumBlocks);
+	m_ChunkBuffer.CopyBlocks(a_BlockTypes);
 }
 
 
@@ -710,8 +625,7 @@ void cChunk::Tick(float a_Dt)
 
 void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
-	unsigned Index = MakeIndex(a_RelX, a_RelY, a_RelZ);
-	cBlockHandler * Handler = BlockHandler(GetBlock(Index));
+	cBlockHandler * Handler = BlockHandler(GetBlock(a_RelX, a_RelY, a_RelZ));
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
@@ -836,19 +750,18 @@ void cChunk::CheckBlocks()
 	{
 		return;
 	}
-	std::vector<unsigned int> ToTickBlocks;
+	std::vector<Vector3i> ToTickBlocks;
 	std::swap(m_ToTickBlocks, ToTickBlocks);
 	
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*m_World);
 	
-	for (std::vector<unsigned int>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
+	for (std::vector<Vector3i>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
 	{
-		unsigned int index = (*itr);
-		Vector3i BlockPos = IndexToCoordinate(index);
+		Vector3i Pos = (*itr);
 
-		cBlockHandler * Handler = BlockHandler(GetBlock(index));
-		Handler->Check(ChunkInterface, PluginInterface, BlockPos.x, BlockPos.y, BlockPos.z, *this);
+		cBlockHandler * Handler = BlockHandler(GetBlock(Pos));
+		Handler->Check(ChunkInterface, PluginInterface, Pos.x, Pos.y, Pos.z, *this);
 	}  // for itr - ToTickBlocks[]
 }
 
@@ -891,8 +804,7 @@ void cChunk::TickBlocks(void)
 			continue; // It's all air up here
 		}
 
-		unsigned int Index = MakeIndexNoCheck(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
-		cBlockHandler * Handler = BlockHandler(GetBlock(Index));
+		cBlockHandler * Handler = BlockHandler(GetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ));
 		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 	}  // for i - tickblocks
@@ -1284,9 +1196,8 @@ bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBB
 		// The chunk is not available, bail out
 		return false;
 	}
-	int idx = Chunk->MakeIndex(a_RelX, a_RelY, a_RelZ);
-	a_BlockLight = Chunk->GetBlockLight(idx);
-	a_SkyLight = Chunk->GetSkyLight(idx);
+	a_BlockLight = Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
+	a_SkyLight = Chunk->GetSkyLight(a_RelX, a_RelY, a_RelZ);
 	return true;
 }
 
@@ -1490,11 +1401,9 @@ void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
-
-	const int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 	
 	// Tick this block and its neighbors:
-	m_ToTickBlocks.push_back(index);
+	m_ToTickBlocks.push_back(Vector3i(a_RelX, a_RelY, a_RelZ));
 	QueueTickBlockNeighbors(a_RelX, a_RelY, a_RelZ);
 
 	// If there was a block entity, remove it:
@@ -1557,7 +1466,7 @@ void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 		return;
 	}
 	
-	m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ));
+	m_ToTickBlocks.push_back(Vector3i(a_RelX, a_RelY, a_RelZ));
 }
 
 
@@ -1595,9 +1504,8 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	ASSERT(IsValid());
 	
-	const int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	const BLOCKTYPE OldBlockType = GetBlock(index);
-	const BLOCKTYPE OldBlockMeta = GetNibble(m_BlockMeta, index);
+	const BLOCKTYPE OldBlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
+	const BLOCKTYPE OldBlockMeta = m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
 	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
 		return;
@@ -1605,11 +1513,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	MarkDirty();
 
-	if (m_BlockTypes.empty() || ((size_t)index > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
-	{
-		m_BlockTypes.resize(index + 1);
-	}
-	m_BlockTypes[index] = a_BlockType;
+	m_ChunkBuffer.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
 	// The client doesn't need to distinguish between stationary and nonstationary fluids:
 	if (
@@ -1625,7 +1529,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 	
-	SetNibble(m_BlockMeta, index, a_BlockMeta);
+	m_ChunkBuffer.SetMeta(a_RelX, a_RelY, a_RelZ, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
 	if (
@@ -1648,7 +1552,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		{
 			for (int y = a_RelY - 1; y > 0; --y)
 			{
-				if (GetBlock(MakeIndexNoCheck(a_RelX, y, a_RelZ)) != E_BLOCK_AIR)
+				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
 				{
 					m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)y;
 					break;
@@ -1665,18 +1569,16 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
 	// The coords must be valid, because the upper level already does chunk lookup. No need to check them again.
-	// There's an debug-time assert in MakeIndexNoCheck anyway
-	unsigned int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 
 	if (a_Client == NULL)
 	{
 		// Queue the block for all clients in the chunk (will be sent in Tick())
-		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(index), GetMeta(index)));
+		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ)));
 		return;
 	}
 
 	Vector3i wp = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(index), GetMeta(index));
+	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
 	
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
@@ -2535,27 +2437,7 @@ BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 		return 0; // Clip
 	}
 
-	return GetBlock(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ));
-}
-
-
-
-
-
-BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
-{
-	if ((a_BlockIdx < 0) || (a_BlockIdx >= NumBlocks))
-	{
-		ASSERT(!"GetBlock(idx) out of bounds!");
-		return 0;
-	}
-
-	if (m_BlockTypes.empty() || ((size_t)a_BlockIdx > m_BlockTypes.size() - 1) /* Vector starts from zero, .size() starts from 1 */)
-	{
-		return E_BLOCK_AIR;
-	}
-
-	return m_BlockTypes[a_BlockIdx];
+	return m_ChunkBuffer.GetBlock(a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -2564,9 +2446,8 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 
 void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	a_BlockType = GetBlock(Idx);
-	a_BlockMeta = cChunkDef::GetNibble(m_BlockMeta,  Idx);
+	a_BlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
+	a_BlockMeta = m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -2575,11 +2456,10 @@ void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_
 
 void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
-	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	a_BlockType = GetBlock(Idx);
-	a_Meta       = cChunkDef::GetNibble(m_BlockMeta,     Idx);
-	a_SkyLight   = cChunkDef::GetNibble(m_BlockSkyLight, Idx);
-	a_BlockLight = cChunkDef::GetNibble(m_BlockLight,    Idx);
+	a_BlockType  = GetBlock(a_RelX, a_RelY, a_RelZ);
+	a_Meta       = m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
+	a_SkyLight   = m_ChunkBuffer.GetSkyLight(a_RelX, a_RelY, a_RelZ);
+	a_BlockLight = m_ChunkBuffer.GetBlockLight(a_RelX, a_RelY, a_RelZ);
 }
 
 

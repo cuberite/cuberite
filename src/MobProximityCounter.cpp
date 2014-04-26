@@ -24,7 +24,8 @@ void cMobProximityCounter::CollectMob(cEntity& a_Monster, cChunk& a_Chunk, doubl
 		if (a_Distance < it->second.m_Distance)
 		{
 			it->second.m_Distance = a_Distance;
-			it->second.m_Chunk = a_Chunk;
+			ASSERT(false);
+			//it->second.m_Chunk = a_Chunk;
 		}
 	}
 

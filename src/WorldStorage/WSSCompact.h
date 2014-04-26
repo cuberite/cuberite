@@ -14,6 +14,7 @@
 #include "WorldStorage.h"
 #include "../Vector3.h"
 #include "json/json.h"
+#include "ChunkBuffer.h"
 
 
 
@@ -42,7 +43,7 @@ protected:
 	// cChunkDataCollector overrides:
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
-	virtual bool LightIsValid (bool a_IsLightValid) override;
+	virtual void LightIsValid (bool a_IsLightValid) override;
 } ;
 
 

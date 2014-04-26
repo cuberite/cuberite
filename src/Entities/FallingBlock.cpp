@@ -55,9 +55,8 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	
-	int idx = a_Chunk.MakeIndexNoCheck(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
-	BLOCKTYPE BlockBelow = a_Chunk.GetBlock(idx);
-	NIBBLETYPE BelowMeta = a_Chunk.GetMeta(idx);
+	BLOCKTYPE BlockBelow = a_Chunk.GetBlock(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
+	NIBBLETYPE BelowMeta = a_Chunk.GetMeta(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
 	if (cSandSimulator::DoesBreakFallingThrough(BlockBelow, BelowMeta))
 	{
 		// Fallen onto a block that breaks this into pickups (e. g. half-slab)

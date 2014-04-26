@@ -366,6 +366,7 @@ public:
 
 
 
+class cChunkBuffer;
 
 
 /** Interface class used for getting data out of a chunk using the GetAllData() function.
@@ -390,108 +391,17 @@ public:
 	/// Called once to provide biome data
 	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) {UNUSED(a_BiomeMap); };
 	
-	/// Called once to export block types
-	virtual void BlockTypes   (const BLOCKTYPE * a_Type) {UNUSED(a_Type); };
+	/// Called once to let know if the chunk lighting is valid. Return value is ignored
+	virtual void LightIsValid(bool a_IsLightValid) {UNUSED(a_IsLightValid); };
 	
-	/// Called once to export block meta
-	virtual void BlockMeta    (const NIBBLETYPE * a_Meta) {UNUSED(a_Meta); };
-	
-	/// Called once to let know if the chunk lighting is valid. Return value is used to control if BlockLight() and BlockSkyLight() are called next (if true)
-	virtual bool LightIsValid(bool a_IsLightValid) {UNUSED(a_IsLightValid); return true; };
-
-	/// Called once to export block light
-	virtual void BlockLight   (const NIBBLETYPE * a_BlockLight) {UNUSED(a_BlockLight); };
-	
-	/// Called once to export sky light
-	virtual void BlockSkyLight(const NIBBLETYPE * a_SkyLight) {UNUSED(a_SkyLight); };
+	/// Called once to export block info
+	virtual void ChunkBuffer   (const cChunkBuffer & a_Buffer) {UNUSED(a_Buffer); };
 	
 	/// Called for each entity in the chunk
 	virtual void Entity(cEntity * a_Entity) {UNUSED(a_Entity); };
 	
 	/// Called for each blockentity in the chunk
 	virtual void BlockEntity(cBlockEntity * a_Entity) {UNUSED(a_Entity); };
-} ;
-
-
-
-
-
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer
-*/
-class cChunkDataCollector :
-	public cChunkDataCallback
-{
-public:
-
-	// Must be unsigned char instead of BLOCKTYPE or NIBBLETYPE, because it houses both.
-	unsigned char m_BlockData[cChunkDef::BlockDataSize];
-
-protected:
-
-	virtual void BlockTypes(const BLOCKTYPE * a_BlockTypes) override
-	{
-		memcpy(m_BlockData, a_BlockTypes, sizeof(cChunkDef::BlockTypes));
-	}
-
-
-	virtual void BlockMeta(const NIBBLETYPE * a_BlockMeta) override
-	{
-		memcpy(m_BlockData + cChunkDef::NumBlocks, a_BlockMeta, cChunkDef::NumBlocks / 2);
-	}
-
-
-	virtual void BlockLight(const NIBBLETYPE * a_BlockLight) override
-	{
-		memcpy(m_BlockData + 3 * cChunkDef::NumBlocks / 2, a_BlockLight, cChunkDef::NumBlocks / 2);
-	}
-
-
-	virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override
-	{
-		memcpy(m_BlockData + 2 * cChunkDef::NumBlocks, a_BlockSkyLight, cChunkDef::NumBlocks / 2);
-	}
-} ;
-
-
-
-
-
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a separate buffers
-*/
-class cChunkDataSeparateCollector :
-	public cChunkDataCallback
-{
-public:
-
-	cChunkDef::BlockTypes   m_BlockTypes;
-	cChunkDef::BlockNibbles m_BlockMetas;
-	cChunkDef::BlockNibbles m_BlockLight;
-	cChunkDef::BlockNibbles m_BlockSkyLight;
-
-protected:
-
-	virtual void BlockTypes(const BLOCKTYPE * a_BlockTypes) override
-	{
-		memcpy(m_BlockTypes, a_BlockTypes, sizeof(m_BlockTypes));
-	}
-
-
-	virtual void BlockMeta(const NIBBLETYPE * a_BlockMeta) override
-	{
-		memcpy(m_BlockMetas, a_BlockMeta, sizeof(m_BlockMetas));
-	}
-
-
-	virtual void BlockLight(const NIBBLETYPE * a_BlockLight) override
-	{
-		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
-	}
-
-
-	virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override
-	{
-		memcpy(m_BlockSkyLight, a_BlockSkyLight, sizeof(m_BlockSkyLight));
-	}
 } ;
 
 

@@ -219,9 +219,8 @@ bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 		return false;
 	}
 	
-	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockType = Chunk->GetBlock(Index);
-	a_BlockMeta = Chunk->GetMeta(Index);
+	a_BlockType = Chunk->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	a_BlockMeta = Chunk->GetMeta(a_BlockX, a_BlockY, a_BlockZ);
 	return true;
 }
 
@@ -242,8 +241,7 @@ bool cChunkMap::LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 		return false;
 	}
 	
-	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockType = Chunk->GetBlock(Index);
+	a_BlockType = Chunk->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	return true;
 }
 
@@ -264,8 +262,7 @@ bool cChunkMap::LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIB
 		return false;
 	}
 	
-	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockMeta = Chunk->GetMeta(Index);
+	a_BlockMeta = Chunk->GetMeta(a_BlockX, a_BlockY, a_BlockZ);
 	return true;
 }
 
@@ -1486,9 +1483,8 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 			res = false;
 			continue;
 		}
-		int idx = cChunkDef::MakeIndexNoCheck(itr->x, itr->y, itr->z);
-		itr->BlockType = Chunk->GetBlock(idx);
-		itr->BlockMeta = Chunk->GetMeta(idx);
+		itr->BlockType = Chunk->GetBlock(itr->x, itr->y, itr->z);
+		itr->BlockMeta = Chunk->GetMeta(itr->x, itr->y, itr->z);
 	}
 	return res;
 }
