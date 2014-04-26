@@ -36,7 +36,7 @@
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
-#include "../Entities/ProjectileEntity.h"
+#include "../Entities/ProjectileArrow.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
