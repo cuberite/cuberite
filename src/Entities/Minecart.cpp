@@ -234,18 +234,15 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
 			if (EntCol || BlckCol) return;
 			
-			if (GetSpeedZ() != 0) // Don't do anything if cart is stationary
+			if (GetSpeedZ() > 0)
 			{
-				if (GetSpeedZ() > 0)
-				{
-					// Going SOUTH, slow down
-					AddSpeedZ(-0.1);
-				}
-				else
-				{
-					// Going NORTH, slow down
-					AddSpeedZ(0.1);
-				}
+				// Going SOUTH, slow down
+				AddSpeedZ(-0.1);
+			}
+			else if (GetSpeedZ() < 0)
+			{
+				// Going NORTH, slow down
+				AddSpeedZ(0.1);
 			}
 			break;
 		}
@@ -259,16 +256,13 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
 			if (EntCol || BlckCol) return;
 
-			if (GetSpeedX() != 0)
+			if (GetSpeedX() > 0)
 			{
-				if (GetSpeedX() > 0)
-				{
-					AddSpeedX(-0.1);
-				}
-				else
-				{
-					AddSpeedX(0.1);
-				}
+				AddSpeedX(-0.1);
+			}
+			else if (GetSpeedX() < 0)
+			{
+				AddSpeedX(0.1);
 			}
 			break;
 		}
