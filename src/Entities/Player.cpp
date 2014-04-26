@@ -1848,16 +1848,16 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 	{
 		return;
 	}
-	
-	// Calculate the distance travelled, update the last pos:
-	Vector3d Movement(GetPosition() - m_LastPos);
-	Movement.y = 0;  // Only take XZ movement into account
-	
+
 	// If riding anything, apply no food exhaustion
 	if (m_AttachedTo != NULL)
 	{
 		return;
 	}
+	
+	// Calculate the distance travelled, update the last pos:
+	Vector3d Movement(GetPosition() - m_LastPos);
+	Movement.y = 0;  // Only take XZ movement into account
 
 	// Apply the exhaustion based on distance travelled:
 	double BaseExhaustion = Movement.Length();
