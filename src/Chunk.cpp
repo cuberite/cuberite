@@ -240,11 +240,24 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 {
 	a_Callback.HeightMap    (&m_HeightMap);
 	a_Callback.BiomeData    (&m_BiomeMap);
-	a_Callback.BlockTypes   (m_BlockTypes);
-	a_Callback.BlockMeta    (m_BlockMeta);
+
+	COMPRESSED_BLOCKTYPE Blocks = m_BlockTypes;
+	Blocks.resize(NumBlocks);
+	a_Callback.BlockTypes   (&Blocks[0]);
+
+	COMPRESSED_NIBBLETYPE Metas = m_BlockMeta;
+	Metas.resize(NumBlocks / 2);
+	a_Callback.BlockMeta    (&Metas[0]);
+
 	a_Callback.LightIsValid (m_IsLightValid);
-	a_Callback.BlockLight   (m_BlockLight);
-	a_Callback.BlockSkyLight(m_BlockSkyLight);
+
+	COMPRESSED_NIBBLETYPE BlockLights = m_BlockLight;
+	BlockLights.resize(NumBlocks / 2);
+	a_Callback.BlockLight   (&BlockLights[0]);
+
+	COMPRESSED_NIBBLETYPE BlockSkyLights = m_BlockSkyLight;
+	BlockSkyLights.resize(NumBlocks / 2, 0xff);
+	a_Callback.BlockSkyLight(&BlockSkyLights[0]);
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
@@ -262,7 +275,7 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 
 void cChunk::SetAllData(
-	const BLOCKTYPE *  a_BlockTypes, 
+	const BLOCKTYPE *  a_BlockTypes,
 	const NIBBLETYPE * a_BlockMeta,
 	const NIBBLETYPE * a_BlockLight,
 	const NIBBLETYPE * a_BlockSkyLight,
@@ -272,29 +285,61 @@ void cChunk::SetAllData(
 )
 {
 	memcpy(m_BiomeMap, a_BiomeMap, sizeof(m_BiomeMap));
-	
+
 	if (a_HeightMap != NULL)
 	{
 		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
 	}
+
+	if (a_HeightMap == NULL)
+	{
+		CalculateHeightmap(a_BlockTypes);
+	}
+
+	int IdxWhereNonEmptyStarts = 0;
+	{ // Blocktype compression
+		unsigned char Highest = 0;
+		int X = 0, Z = 0;
+		m_BlockTypes.clear();
+			
+		for (int x = 0; x < Width; x++)
+		{
+			for (int z = 0; z < Width; z++)
+			{
+				unsigned char Height = m_HeightMap[x + z * Width];
+				if (Height > Highest)
+				{
+					Highest = Height;
+					X = x; Z = z;
+				}
+			}
+		}
+
+		IdxWhereNonEmptyStarts = MakeIndexNoCheck(X, Highest + 1, Z);
+
+		m_BlockTypes.insert(m_BlockTypes.end(), &a_BlockTypes[0], &a_BlockTypes[IdxWhereNonEmptyStarts]);
+	}
+
+	{ // Blockmeta compression
+		m_BlockMeta.clear();
+		m_BlockMeta.insert(m_BlockMeta.end(), &a_BlockMeta[0], &a_BlockMeta[IdxWhereNonEmptyStarts / 2]);
+	}
 	
-	memcpy(m_BlockTypes, a_BlockTypes, sizeof(m_BlockTypes));
-	memcpy(m_BlockMeta,  a_BlockMeta,  sizeof(m_BlockMeta));
 	if (a_BlockLight != NULL)
 	{
-		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
+		// Compress blocklight
+		m_BlockLight.clear();
+		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[IdxWhereNonEmptyStarts / 2]);
 	}
+
 	if (a_BlockSkyLight != NULL)
 	{
-		memcpy(m_BlockSkyLight, a_BlockSkyLight, sizeof(m_BlockSkyLight));
+		 // Compress skylight
+		m_BlockSkyLight.clear();
+		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_BlockSkyLight[0], &a_BlockSkyLight[IdxWhereNonEmptyStarts / 2]);
 	}
 	
 	m_IsLightValid = (a_BlockLight != NULL) && (a_BlockSkyLight != NULL);
-	
-	if (a_HeightMap == NULL)
-	{
-		CalculateHeightmap();
-	}
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
@@ -332,8 +377,17 @@ void cChunk::SetLight(
 {
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
-	memcpy(m_BlockLight,    a_BlockLight, sizeof(m_BlockLight));
-	memcpy(m_BlockSkyLight, a_SkyLight,   sizeof(m_BlockSkyLight));
+
+	{ // Compress blocklight
+		m_BlockLight.clear();
+		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[m_BlockTypes.size()]);
+	}
+
+	{ // Compress skylight
+		m_BlockSkyLight.clear();
+		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[m_BlockTypes.size()]);
+	}
+
 	m_IsLightValid = true;
 }
 
@@ -343,7 +397,8 @@ void cChunk::SetLight(
 
 void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 {
-	memcpy(a_BlockTypes, m_BlockTypes, NumBlocks);
+	std::copy(m_BlockTypes.begin(), m_BlockTypes.end(), a_BlockTypes);
+	std::fill_n(&a_BlockTypes[m_BlockTypes.size()], NumBlocks - m_BlockTypes.size(), E_BLOCK_AIR);
 }
 
 
@@ -630,7 +685,7 @@ void cChunk::Tick(float a_Dt)
 void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
 	unsigned Index = MakeIndex(a_RelX, a_RelY, a_RelZ);
-	cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
+	cBlockHandler * Handler = BlockHandler(GetBlock(Index));
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
@@ -751,7 +806,7 @@ void cChunk::BroadcastPendingBlockChanges(void)
 
 void cChunk::CheckBlocks()
 {
-	if (m_ToTickBlocks.size() == 0)
+	if (m_ToTickBlocks.empty())
 	{
 		return;
 	}
@@ -811,7 +866,7 @@ void cChunk::TickBlocks(void)
 		}
 
 		unsigned int Index = MakeIndexNoCheck(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
-		cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
+		cBlockHandler * Handler = BlockHandler(GetBlock(Index));
 		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 	}  // for i - tickblocks
@@ -1296,7 +1351,7 @@ void cChunk::CreateBlockEntities(void)
 		{
 			for (int y = 0; y < Height; y++)
 			{
-				BLOCKTYPE BlockType = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
+				BLOCKTYPE BlockType = GetBlock(x, y, z);
 				switch (BlockType)
 				{
 					case E_BLOCK_BEACON:
@@ -1349,7 +1404,7 @@ void cChunk::WakeUpSimulators(void)
 			int BlockZ = z + BaseZ;
 			for (int y = GetHeight(x, z); y >= 0; y--)
 			{
-				BLOCKTYPE Block = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
+				BLOCKTYPE Block = GetBlock(x, y, z);
 
 				// The redstone sim takes multiple blocks, use the inbuilt checker
 				if (RedstoneSimulator->IsAllowedBlock(Block))
@@ -1384,7 +1439,7 @@ void cChunk::WakeUpSimulators(void)
 
 
 
-void cChunk::CalculateHeightmap()
+void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 {
 	for (int x = 0; x < Width; x++)
 	{
@@ -1393,7 +1448,7 @@ void cChunk::CalculateHeightmap()
 			for (int y = Height - 1; y > -1; y--)
 			{
 				int index = MakeIndex( x, y, z );
-				if (m_BlockTypes[index] != E_BLOCK_AIR)
+				if (a_BlockTypes[index] != E_BLOCK_AIR)
 				{
 					m_HeightMap[x + z * Width] = (unsigned char)y;
 					break;
@@ -1517,7 +1572,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	ASSERT(IsValid());
 	
 	const int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	const BLOCKTYPE OldBlockType = cChunkDef::GetBlock(m_BlockTypes, index);
+	const BLOCKTYPE OldBlockType = GetBlock(index);
 	const BLOCKTYPE OldBlockMeta = GetNibble(m_BlockMeta, index);
 	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
@@ -1525,7 +1580,11 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	}
 
 	MarkDirty();
-	
+
+	if ((size_t)index >= m_BlockTypes.size())
+	{
+		m_BlockTypes.resize(index + 1);
+	}
 	m_BlockTypes[index] = a_BlockType;
 
 	// The client doesn't need to distinguish between stationary and nonstationary fluids:
@@ -1565,7 +1624,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		{
 			for (int y = a_RelY - 1; y > 0; --y)
 			{
-				if (m_BlockTypes[MakeIndexNoCheck(a_RelX, y, a_RelZ)] != E_BLOCK_AIR)
+				if (GetBlock(MakeIndexNoCheck(a_RelX, y, a_RelZ)) != E_BLOCK_AIR)
 				{
 					m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)y;
 					break;
@@ -2452,7 +2511,7 @@ BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 		return 0; // Clip
 	}
 
-	return m_BlockTypes[MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ)];
+	return GetBlock(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ));
 }
 
 
@@ -2466,8 +2525,13 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 		ASSERT(!"GetBlock(idx) out of bounds!");
 		return 0;
 	}
-	
-	return m_BlockTypes[ a_BlockIdx ];
+
+	if ((size_t)a_BlockIdx >= m_BlockTypes.size())
+	{
+		return E_BLOCK_AIR;
+	}
+
+	return m_BlockTypes[a_BlockIdx];
 }
 
 
@@ -2477,7 +2541,7 @@ BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
 	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	a_BlockType = cChunkDef::GetBlock (m_BlockTypes, Idx);
+	a_BlockType = GetBlock(Idx);
 	a_BlockMeta = cChunkDef::GetNibble(m_BlockMeta,  Idx);
 }
 
@@ -2488,7 +2552,7 @@ void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_
 void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
 	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	a_BlockType  = cChunkDef::GetBlock (m_BlockTypes,    Idx);
+	a_BlockType = GetBlock(Idx);
 	a_Meta       = cChunkDef::GetNibble(m_BlockMeta,     Idx);
 	a_SkyLight   = cChunkDef::GetNibble(m_BlockSkyLight, Idx);
 	a_BlockLight = cChunkDef::GetNibble(m_BlockLight,    Idx);
