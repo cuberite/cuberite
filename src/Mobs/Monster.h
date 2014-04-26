@@ -66,7 +66,8 @@ public:
 		mfAmbient  = 2, // Bats
 		mfWater    = 3, // Squid
 
-		mfMaxplusone, // Nothing. Be sure this is the last and the others are in order
+		mfNoSpawn,
+		mfUnhandled, // Nothing. Be sure this is the last and the others are in order
 	} ;
 	
 	// tolua_end

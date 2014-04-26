@@ -797,7 +797,6 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 			++index2;
 		}
 		InChunkOffset += index2 / 2;
-		index2 = 0;
 
 		AString Converted(ConvertedData, ExpectedSize);
 

@@ -410,11 +410,8 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 
 
 
-int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
-	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
-	
-	// Filter out damage types that are not protected by armor:
 	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Effects as of 2012_12_20
 	switch (a_DamageType)
 	{
@@ -429,9 +426,33 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case dtLightning:
 		case dtPlugin:
 		{
-			return 0;
+			return false;
+		}
+			
+		case dtAttack:
+		case dtArrowAttack:
+		case dtCactusContact:
+		case dtLavaContact:
+		case dtFireContact:
+		case dtEnderPearl:
+		case dtExplosion:
+		{
+			return true;
 		}
 	}
+	ASSERT(!"Invalid damage type!");
+}
+
+
+
+
+
+int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+{
+	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
+	
+	// Filter out damage types that are not protected by armor:
+	if (!ArmorCoversAgainst(a_DamageType)) return 0;
 	
 	// Add up all armor points:
 	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Defense_points as of 2012_12_20

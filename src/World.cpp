@@ -316,12 +316,9 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 		{
 			return 2400 + (m_TickRand.randInt() % 4800);   // 2 - 6 minutes
 		}
-		default:
-		{
-			LOGWARNING("%s: Missing default weather interval for weather %d.", __FUNCTION__, a_Weather);
-			return -1;
-		}
-	}  // switch (Weather)
+	}
+	LOGWARNING("%s: Missing default weather interval for weather %d.", __FUNCTION__, a_Weather);
+	return -1;
 }
 
 
@@ -521,21 +518,6 @@ void cWorld::Start(void)
 	}
 	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
 	m_Dimension = StringToDimension(Dimension);
-	switch (m_Dimension)
-	{
-		case dimNether:
-		case dimOverworld:
-		case dimEnd:
-		{
-			break;
-		}
-		default:
-		{
-			LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", Dimension.c_str());
-			m_Dimension = dimOverworld;
-			break;
-		}
-	}  // switch (m_Dimension)
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
@@ -592,12 +574,6 @@ void cWorld::Start(void)
 		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
 		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
 		case dimEnd:       DefaultMonsters = "enderman"; break;
-		default:
-		{
-			ASSERT(!"Unhandled world dimension");
-			DefaultMonsters = "wither";
-			break;
-		}
 	}
 	m_bAnimals = IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
 	AString AllMonsters = IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
@@ -681,6 +657,30 @@ void cWorld::GenerateRandomSpawn(void)
 	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f; // 1.6f to accomodate player height
 
 	LOGD("Generated random spawnpoint %i %i %i", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
+}
+
+
+
+
+
+eWeather cWorld::ChooseNewWeather()
+{
+	// Pick a new weather. Only reasonable transitions allowed:
+	switch (m_Weather)
+	{
+		case eWeather_Sunny:
+		case eWeather_ThunderStorm: return eWeather_Rain;
+			
+		case eWeather_Rain:
+		{
+			// 1/8 chance of turning into a thunderstorm
+			return ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
+		}
+	}
+	
+	LOGWARNING("Unknown current weather: %d. Setting sunny.", m_Weather);
+	ASSERT(!"Unknown weather");
+	return eWeather_Sunny;
 }
 
 
@@ -786,30 +786,8 @@ void cWorld::TickWeather(float a_Dt)
 	else
 	{
 		// Change weather:
-	
-		// Pick a new weather. Only reasonable transitions allowed:
-		eWeather NewWeather = m_Weather;
-		switch (m_Weather)
-		{
-			case eWeather_Sunny:        NewWeather = eWeather_Rain; break;
-			case eWeather_ThunderStorm: NewWeather = eWeather_Rain; break;
-			case eWeather_Rain:
-			{
-				// 1/8 chance of turning into a thunderstorm
-				NewWeather = ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
-				break;
-			}
-			
-			default:
-			{
-				LOGWARNING("Unknown current weather: %d. Setting sunny.", m_Weather);
-				ASSERT(!"Unknown weather");
-				NewWeather = eWeather_Sunny;
-			}
-		}
-		
-		SetWeather(NewWeather);
-	}  // else (m_WeatherInterval > 0)
+		SetWeather(ChooseNewWeather());
+	}
 
 	if (m_Weather == eWeather_ThunderStorm)
 	{
