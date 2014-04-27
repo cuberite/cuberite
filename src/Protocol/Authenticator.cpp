@@ -16,9 +16,7 @@
 #include "polarssl/ctr_drbg.h"
 #include "polarssl/error.h"
 
-#include "PolarSSL++/EntropyContext.h"
-#include "PolarSSL++/CtrDrbgContext.h"
-#include "PolarSSL++/X509Cert.h"
+#include "PolarSSL++/BlockingSslClientSocket.h"
 
 #include <sstream>
 #include <iomanip>
@@ -150,87 +148,47 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 {
 	LOGD("Trying to auth user %s", a_UserName.c_str());
 	
-	int ret, server_fd = -1;
+	int ret;
 	unsigned char buf[1024];
-	const char pers[] = "cAuthenticator";
-
-	cCtrDrbgContext CtrDrbg;
-	ssl_context ssl;
-	cX509Cert CACert;
-
-	/* Initialize the RNG and the session data */
-	memset(&ssl, 0, sizeof(ssl_context));
-
-	if ((ret = CtrDrbg.Initialize(pers, sizeof(pers))) != 0)
-	{
-		LOGWARNING("cAuthenticator: CtrDrbg.Initialize() returned %d", ret);
-		return false;
-	}
 
 	/* Initialize certificates */
 	// This is the root cert for Starfield Technologies, the CA that signed sessionserver.mojang.com's cert:
-	static const char StarfieldCACert[] =
-	"-----BEGIN CERTIFICATE-----\n"
-	"MIID3TCCAsWgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBjzELMAkGA1UEBhMCVVMx\n"
-	"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoT\n"
-	"HFN0YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAMTKVN0YXJmaWVs\n"
-	"ZCBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5MDkwMTAwMDAw\n"
-	"MFoXDTM3MTIzMTIzNTk1OVowgY8xCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6\n"
-	"b25hMRMwEQYDVQQHEwpTY290dHNkYWxlMSUwIwYDVQQKExxTdGFyZmllbGQgVGVj\n"
-	"aG5vbG9naWVzLCBJbmMuMTIwMAYDVQQDEylTdGFyZmllbGQgUm9vdCBDZXJ0aWZp\n"
-	"Y2F0ZSBBdXRob3JpdHkgLSBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\n"
-	"ggEBAL3twQP89o/8ArFvW59I2Z154qK3A2FWGMNHttfKPTUuiUP3oWmb3ooa/RMg\n"
-	"nLRJdzIpVv257IzdIvpy3Cdhl+72WoTsbhm5iSzchFvVdPtrX8WJpRBSiUZV9Lh1\n"
-	"HOZ/5FSuS/hVclcCGfgXcVnrHigHdMWdSL5stPSksPNkN3mSwOxGXn/hbVNMYq/N\n"
-	"Hwtjuzqd+/x5AJhhdM8mgkBj87JyahkNmcrUDnXMN/uLicFZ8WJ/X7NfZTD4p7dN\n"
-	"dloedl40wOiWVpmKs/B/pM293DIxfJHP4F8R+GuqSVzRmZTRouNjWwl2tVZi4Ut0\n"
-	"HZbUJtQIBFnQmA4O5t78w+wfkPECAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAO\n"
-	"BgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFHwMMh+n2TB/xH1oo2Kooc6rB1snMA0G\n"
-	"CSqGSIb3DQEBCwUAA4IBAQARWfolTwNvlJk7mh+ChTnUdgWUXuEok21iXQnCoKjU\n"
-	"sHU48TRqneSfioYmUeYs0cYtbpUgSpIB7LiKZ3sx4mcujJUDJi5DnUox9g61DLu3\n"
-	"4jd/IroAow57UvtruzvE03lRTs2Q9GcHGcg8RnoNAX3FWOdt5oUwF5okxBDgBPfg\n"
-	"8n/Uqgr/Qh037ZTlZFkSIHc40zI+OIF1lnP6aI+xy84fxez6nH7PfrHxBy22/L/K\n"
-	"pL/QlwVKvOoYKAKQvVR4CSFx09F9HdkWsKlhPdAKACL8x3vLCWRFCztAgfd9fDL1\n"
-	"mMpYjn0q7pBZc2T5NnReJaH1ZgUufzkVqSr7UIuOhWn0\n"
-	"-----END CERTIFICATE-----";
-	// Parse the Starfield CA and add it to "trusted root certs"
-	ret = CACert.Parse(StarfieldCACert, sizeof(StarfieldCACert) - 1);
-	if (ret < 0)
+	static const AString StarfieldCACert(
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIID3TCCAsWgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBjzELMAkGA1UEBhMCVVMx\n"
+		"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoT\n"
+		"HFN0YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAMTKVN0YXJmaWVs\n"
+		"ZCBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5MDkwMTAwMDAw\n"
+		"MFoXDTM3MTIzMTIzNTk1OVowgY8xCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6\n"
+		"b25hMRMwEQYDVQQHEwpTY290dHNkYWxlMSUwIwYDVQQKExxTdGFyZmllbGQgVGVj\n"
+		"aG5vbG9naWVzLCBJbmMuMTIwMAYDVQQDEylTdGFyZmllbGQgUm9vdCBDZXJ0aWZp\n"
+		"Y2F0ZSBBdXRob3JpdHkgLSBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\n"
+		"ggEBAL3twQP89o/8ArFvW59I2Z154qK3A2FWGMNHttfKPTUuiUP3oWmb3ooa/RMg\n"
+		"nLRJdzIpVv257IzdIvpy3Cdhl+72WoTsbhm5iSzchFvVdPtrX8WJpRBSiUZV9Lh1\n"
+		"HOZ/5FSuS/hVclcCGfgXcVnrHigHdMWdSL5stPSksPNkN3mSwOxGXn/hbVNMYq/N\n"
+		"Hwtjuzqd+/x5AJhhdM8mgkBj87JyahkNmcrUDnXMN/uLicFZ8WJ/X7NfZTD4p7dN\n"
+		"dloedl40wOiWVpmKs/B/pM293DIxfJHP4F8R+GuqSVzRmZTRouNjWwl2tVZi4Ut0\n"
+		"HZbUJtQIBFnQmA4O5t78w+wfkPECAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAO\n"
+		"BgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFHwMMh+n2TB/xH1oo2Kooc6rB1snMA0G\n"
+		"CSqGSIb3DQEBCwUAA4IBAQARWfolTwNvlJk7mh+ChTnUdgWUXuEok21iXQnCoKjU\n"
+		"sHU48TRqneSfioYmUeYs0cYtbpUgSpIB7LiKZ3sx4mcujJUDJi5DnUox9g61DLu3\n"
+		"4jd/IroAow57UvtruzvE03lRTs2Q9GcHGcg8RnoNAX3FWOdt5oUwF5okxBDgBPfg\n"
+		"8n/Uqgr/Qh037ZTlZFkSIHc40zI+OIF1lnP6aI+xy84fxez6nH7PfrHxBy22/L/K\n"
+		"pL/QlwVKvOoYKAKQvVR4CSFx09F9HdkWsKlhPdAKACL8x3vLCWRFCztAgfd9fDL1\n"
+		"mMpYjn0q7pBZc2T5NnReJaH1ZgUufzkVqSr7UIuOhWn0\n"
+		"-----END CERTIFICATE-----"
+	);
+
+	// Connect the socket:
+	cBlockingSslClientSocket Socket;
+	Socket.SetTrustedRootCertsFromString(StarfieldCACert, m_Server);
+	if (!Socket.Connect(m_Server, 443))
 	{
-		LOGWARNING("cAuthenticator: CACert.Parse returned -0x%x", -ret);
+		LOGWARNING("cAuthenticator: Can't connect to %s: %s", m_Server.c_str(), Socket.GetLastErrorText().c_str());
 		return false;
 	}
 
-	/* Connect */
-	if ((ret = net_connect(&server_fd, m_Server.c_str(), 443)) != 0)
-	{
-		LOGWARNING("cAuthenticator: Can't connect to %s: %d", m_Server.c_str(), ret);
-		return false;
-	}
-
-	/* Setup */
-	if ((ret = ssl_init(&ssl)) != 0)
-	{
-		LOGWARNING("cAuthenticator: ssl_init returned %d", ret);
-		return false;
-	}
-	ssl_set_endpoint(&ssl, SSL_IS_CLIENT);
-	ssl_set_authmode(&ssl, SSL_VERIFY_OPTIONAL);
-	ssl_set_ca_chain(&ssl, CACert.Get(), NULL, "PolarSSL Server 1");
-	ssl_set_rng(&ssl, ctr_drbg_random, CtrDrbg.Get());
-	ssl_set_bio(&ssl, net_recv, &server_fd, net_send, &server_fd);
-
-	/* Handshake */
-	while ((ret = ssl_handshake(&ssl)) != 0)
-	{
-		if ((ret != POLARSSL_ERR_NET_WANT_READ) && (ret != POLARSSL_ERR_NET_WANT_WRITE))
-		{
-			LOGWARNING("cAuthenticator: ssl_handshake returned -0x%x", -ret);
-			return false;
-		}
-	}
-
-	/* Write the GET request */
+	// Create the GET request:
 	AString ActualAddress = m_Address;
 	ReplaceString(ActualAddress, "%USERNAME%", a_UserName);
 	ReplaceString(ActualAddress, "%SERVERID%", a_ServerId);
@@ -242,23 +200,23 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	Request += "Connection: close\r\n";
 	Request += "\r\n";
 
-	ret = ssl_write(&ssl, (const unsigned char *)Request.c_str(), Request.size());
-	if (ret <= 0)
+	if (!Socket.Send(Request.c_str(), Request.size()))
 	{
-		LOGWARNING("cAuthenticator: ssl_write returned %d", ret);
+		LOGWARNING("cAuthenticator: Writing SSL data failed: %s", Socket.GetLastErrorText().c_str());
 		return false;
 	}
 
-	/* Read the HTTP response */
+	// Read the HTTP response:
 	std::string Response;
 	for (;;)
 	{
-		memset(buf, 0, sizeof(buf));
-		ret = ssl_read(&ssl, buf, sizeof(buf));
+		ret = Socket.Receive(buf, sizeof(buf));
 
 		if ((ret == POLARSSL_ERR_NET_WANT_READ) || (ret == POLARSSL_ERR_NET_WANT_WRITE))
 		{
-			continue;
+			// This value should never be returned, it is handled internally by cBlockingSslClientSocket
+			LOGWARNING("cAuthenticator: SSL reading failed internally.");
+			return false;
 		}
 		if (ret == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY)
 		{
@@ -266,22 +224,18 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 		}
 		if (ret < 0)
 		{
-			LOGWARNING("cAuthenticator: ssl_read returned %d", ret);
-			break;
+			LOGWARNING("cAuthenticator: SSL reading failed: -0x%x", -ret);
+			return false;
 		}
 		if (ret == 0)
 		{
-			LOGWARNING("cAuthenticator: EOF");
 			break;
 		}
 
-		Response.append((const char *)buf, ret);
+		Response.append((const char *)buf, (size_t)ret);
 	}
 
-	ssl_close_notify(&ssl);
-	net_close(server_fd);
-	ssl_free(&ssl);
-	memset(&ssl, 0, sizeof(ssl));
+	Socket.Disconnect();
 
 	// Check the HTTP status line:
 	AString prefix("HTTP/1.1 200 OK");
