@@ -160,6 +160,11 @@ void cChunkBuffer::SetBlocks(const BLOCKTYPE * a_src)
 					sizeof(BLOCKTYPE) * segment_length
 					);
 			}
+			else
+			{
+				Free(m_Sections[i]);
+				m_Sections[i] = 0;
+			}
 		}
 	} 
 }
@@ -185,10 +190,15 @@ void cChunkBuffer::SetMeta(const NIBBLETYPE * a_src)
 			{
 				m_Sections[i] = Allocate();
 				memcpy(
-					&m_Sections[i]->m_BlockTypes, 
+					&m_Sections[i]->m_BlockMeta, 
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
+			}
+			else
+			{
+				Free(m_Sections[i]);
+				m_Sections[i] = 0;
 			}
 		}
 	} 
@@ -199,6 +209,7 @@ void cChunkBuffer::SetMeta(const NIBBLETYPE * a_src)
 
 void cChunkBuffer::SetLight(const NIBBLETYPE * a_src)
 {
+	if (!a_src) return;
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
@@ -215,10 +226,15 @@ void cChunkBuffer::SetLight(const NIBBLETYPE * a_src)
 			{
 				m_Sections[i] = Allocate();
 				memcpy(
-					&m_Sections[i]->m_BlockTypes, 
+					&m_Sections[i]->m_BlockLight, 
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
+			}
+			else
+			{
+				Free(m_Sections[i]);
+				m_Sections[i] = 0;
 			}
 		}
 	}
@@ -229,6 +245,7 @@ void cChunkBuffer::SetLight(const NIBBLETYPE * a_src)
 
 void cChunkBuffer::SetSkyLight  (const NIBBLETYPE * a_src)
 {
+	if (!a_src) return;
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
@@ -245,10 +262,15 @@ void cChunkBuffer::SetSkyLight  (const NIBBLETYPE * a_src)
 			{
 				m_Sections[i] = Allocate();
 				memcpy(
-					&m_Sections[i]->m_BlockTypes, 
+					&m_Sections[i]->m_BlockSkyLight, 
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
+			}
+			else
+			{
+				Free(m_Sections[i]);
+				m_Sections[i] = 0;
 			}
 		}
 	}
@@ -263,3 +285,13 @@ cChunkBuffer::sChunkSection * cChunkBuffer::Allocate() const
 	// TODO: use a allocation pool
 	return new cChunkBuffer::sChunkSection;
 }
+
+
+
+void cChunkBuffer::Free(cChunkBuffer::sChunkSection * ptr) const
+{
+	delete ptr;
+}
+
+
+

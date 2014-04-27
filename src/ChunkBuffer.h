@@ -30,7 +30,7 @@ public:
 		#endif
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
-			if(m_Sections[i]) delete m_Sections[i];
+			if(m_Sections[i]) Free(m_Sections[i]);;
 		}
 	}
 	
@@ -52,7 +52,7 @@ public:
 		{
 			for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 			{
-				if(m_Sections[i]) delete m_Sections[i];
+				if(m_Sections[i]) Free(m_Sections[i]);;
 			}
 		}
 		IsOwner = true;
@@ -76,7 +76,7 @@ public:
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
-			if(m_Sections[i]) delete m_Sections[i];
+			if(m_Sections[i]) Free(m_Sections[i]);;
 			m_Sections[i] = other.m_Sections[i];
 		}
 	}
@@ -239,6 +239,7 @@ private:
 	sChunkSection *m_Sections[CHUNK_SECTION_NUM];
 	
 	sChunkSection * Allocate() const;
+	void Free(sChunkSection * ptr) const;
 };
 
 
