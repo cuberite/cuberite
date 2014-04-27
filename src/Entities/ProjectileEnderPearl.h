@@ -34,4 +34,4 @@ protected:
 	// Teleports the creator where the ender pearl lands.
 	void TeleportCreator(const Vector3d & a_HitPos);
 	
-} ;
+} ; // tolua_export

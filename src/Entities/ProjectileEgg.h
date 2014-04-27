@@ -34,4 +34,4 @@ protected:
 	// Randomly decides whether to spawn a chicken where the egg lands.
 	void TrySpawnChicken(const Vector3d & a_HitPos);
 	
-} ;
+} ; // tolua_export
