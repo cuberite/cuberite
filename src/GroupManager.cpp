@@ -7,7 +7,9 @@
 #include "Root.h"
 
 
-
+// Adds checks to make sure initialization goes well.
+bool loadGroups = false;
+bool checkUsers = false;
 
 
 typedef std::map< AString, cGroup* > GroupMap;
@@ -47,8 +49,17 @@ cGroupManager::cGroupManager()
 	
 	LoadGroups();
 	CheckUsers();
+	if(loadGroups){
+	        LOGD("-- Groups Successfully Loaded --");
+	} else {
+	        LOGD("ERROR: Groups could not load!");
+	}
 	
-	LOGD("-- Groups Successfully Loaded --");
+	if(checkUsers){
+	        LOGD("-- User file found and checked successfully --");
+	} else {
+	        LOGD("ERROR: User file could not be found!");
+	}
 }
 
 
@@ -96,6 +107,7 @@ void cGroupManager::CheckUsers(void)
 			}
 		}
 	}
+	checkUsers = true;
 }
 
 
@@ -179,6 +191,8 @@ void cGroupManager::LoadGroups()
 			}
 		}
 	}
+	loadGroups = true;
+
 }
 
 
