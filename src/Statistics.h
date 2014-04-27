@@ -11,7 +11,7 @@
 
 enum eStatistic
 {
-	// Do NOT change the order
+	// The order must match the order of cStatInfo::ms_Info
 
 	statInvalid = -1,
 
