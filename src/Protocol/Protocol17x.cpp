@@ -637,9 +637,11 @@ void cProtocol172::SendLoginSuccess(void)
 {
 	ASSERT(m_State == 2);  // State: login?
 	
-	cPacketizer Pkt(*this, 0x02);  // Login success packet
-	Pkt.WriteString(m_Client->GetUUID());
-	Pkt.WriteString(m_Client->GetUsername());
+	{
+		cPacketizer Pkt(*this, 0x02);  // Login success packet
+		Pkt.WriteString(m_Client->GetUUID());
+		Pkt.WriteString(m_Client->GetUsername());
+	}
 
 	m_State = 3;  // State = Game
 }
