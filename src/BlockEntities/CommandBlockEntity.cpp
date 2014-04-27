@@ -21,7 +21,8 @@
 cCommandBlockEntity::cCommandBlockEntity(int a_X, int a_Y, int a_Z, cWorld * a_World) :
 	super(E_BLOCK_COMMAND_BLOCK, a_X, a_Y, a_Z, a_World),
 	m_ShouldExecute(false),
-	m_IsPowered(false)
+	m_IsPowered(false),
+	m_Result(0)
 {}
 
 

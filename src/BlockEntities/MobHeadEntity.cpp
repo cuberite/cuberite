@@ -14,6 +14,8 @@
 
 cMobHeadEntity::cMobHeadEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(E_BLOCK_HEAD, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	m_Type(SKULL_TYPE_SKELETON),
+	m_Rotation(SKULL_ROTATION_NORTH),
 	m_Owner("")
 {
 }
