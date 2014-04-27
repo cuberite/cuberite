@@ -663,8 +663,12 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 	
 	if (IsDummyMetas)
 	{
-		SrcMetas = new NIBBLETYPE[a_Src.GetBlockCount()];
-		DstMetas = new NIBBLETYPE[GetBlockCount()];
+		size_t SrcCount = a_Src.GetBlockCount();
+		size_t DestCount = GetBlockCount();
+		SrcMetas = new NIBBLETYPE[SrcCount];
+		DstMetas = new NIBBLETYPE[DestCount];
+		memset(SrcMetas, 0, SrcCount);
+		memset(DstMetas, 0, DestCount);
 	}
 	
 	switch (a_Strategy)
