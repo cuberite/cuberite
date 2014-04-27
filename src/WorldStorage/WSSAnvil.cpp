@@ -39,6 +39,7 @@
 #include "../Entities/ProjectileEgg.h"
 #include "../Entities/ProjectileEnderPearl.h"
 #include "../Entities/ProjectileSnowball.h"
+#include "../Entities/ProjectileFireCharge.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
