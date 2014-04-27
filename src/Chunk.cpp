@@ -1468,7 +1468,7 @@ void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 		return;
 	}
 	
-	m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ));
+	m_ToTickBlocks.push_back(Vector3i(a_RelX, a_RelY, a_RelZ));
 }
 
 
@@ -1531,7 +1531,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 	
-	SetNibble(m_BlockMeta, index, a_BlockMeta);
+	m_ChunkBuffer.SetMeta(a_RelX, a_RelY, a_RelZ, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
 	if (
@@ -1554,7 +1554,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		{
 			for (int y = a_RelY - 1; y > 0; --y)
 			{
-				if (GetBlock(MakeIndexNoCheck(a_RelX, y, a_RelZ)) != E_BLOCK_AIR)
+				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
 				{
 					m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)y;
 					break;
@@ -1570,19 +1570,16 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
-	// The coords must be valid, because the upper level already does chunk lookup. No need to check them again.
-	// There's an debug-time assert in MakeIndexNoCheck anyway
-	unsigned int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 
 	if (a_Client == NULL)
 	{
 		// Queue the block for all clients in the chunk (will be sent in Tick())
-		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(index), GetMeta(index)));
+		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ)));
 		return;
 	}
 
 	Vector3i wp = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(index), GetMeta(index));
+	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
 	
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
@@ -2460,11 +2457,10 @@ void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_
 
 void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
-	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	a_BlockType = GetBlock(Idx);
-	a_Meta       = cChunkDef::GetNibble(m_BlockMeta,     Idx);
-	a_SkyLight   = cChunkDef::GetNibble(m_BlockSkyLight, Idx);
-	a_BlockLight = cChunkDef::GetNibble(m_BlockLight,    Idx);
+	a_BlockType  = GetBlock(a_RelX, a_RelY, a_RelZ);
+	a_Meta       = m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
+	a_SkyLight   = m_ChunkBuffer.GetSkyLight(a_RelX, a_RelY, a_RelZ);
+	a_BlockLight = m_ChunkBuffer.GetBlockLight(a_RelX, a_RelY, a_RelZ);
 }
 
 
