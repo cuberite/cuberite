@@ -295,7 +295,7 @@ bool cSocket::ConnectToLocalhostIPv4(unsigned short a_Port)
 
 bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Port)
 {
-	// First try IP Address string to hostent conversion, because it's faster
+	// First try IP Address string to hostent conversion, because it's faster and local:
 	unsigned long addr = inet_addr(a_HostNameOrAddr.c_str());
 	if (addr == INADDR_NONE)
 	{
@@ -307,10 +307,16 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 			CloseSocket();
 			return false;
 		}
-		// Should be optimised to a single word copy
 		memcpy(&addr, hp->h_addr, hp->h_length);
 	}
 
+	// If the socket is not created yet, create one:
+	if (!IsValid())
+	{
+		m_Socket = socket((int)IPv4, SOCK_STREAM, 0);
+	}
+	
+	// Connect the socket:
 	sockaddr_in server;
 	server.sin_addr.s_addr = addr;
 	server.sin_family = AF_INET;
