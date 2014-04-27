@@ -443,6 +443,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		}
 	}
 	ASSERT(!"Invalid damage type!");
+	return false;
 }
 
 
