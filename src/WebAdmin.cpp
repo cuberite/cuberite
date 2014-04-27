@@ -285,11 +285,6 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		Content = GetDefaultPage();
 	}
 
-	if (ShouldWrapInTemplate && (URL.size() > 1))
-	{
-		Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
-	}
-
 	int MemUsageKiB = cRoot::GetPhysicalRAMUsage();
 	if (MemUsageKiB > 0)
 	{
