@@ -1750,7 +1750,6 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cLuaChunkStay * ChunkStay = new cLuaChunkStay(*Plugin);
 	
 	// Read the params:
 	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 1, NULL);
@@ -1760,8 +1759,12 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 		L.LogStackTrace();
 		return 0;
 	}
+
+	cLuaChunkStay * ChunkStay = new cLuaChunkStay(*Plugin);
+
 	if (!ChunkStay->AddChunks(2))
 	{
+		delete ChunkStay;
 		return 0;
 	}
 

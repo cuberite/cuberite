@@ -744,6 +744,8 @@ void cCubicNoise::CalcFloorFrac(
 	int * a_Same, int & a_NumSame
 ) const
 {
+	ASSERT(a_Size > 0);
+
 	NOISE_DATATYPE val = a_Start;
 	NOISE_DATATYPE dif = (a_End - a_Start) / (a_Size - 1);
 	for (int i = 0; i < a_Size; i++)
