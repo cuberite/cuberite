@@ -36,8 +36,8 @@ public:
 	
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	cChunkBuffer(cChunkBuffer& other) :
-	IsOwner(true);
+	cChunkBuffer(const cChunkBuffer& other) :
+	IsOwner(true)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
@@ -45,7 +45,8 @@ public:
 		}
 		other.IsOwner = false;
 	}
-	void operator=(cChunkBuffer& other)
+
+	void operator=(const cChunkBuffer& other)
 	{
 		if(IsOwner)
 		{
@@ -63,7 +64,7 @@ public:
 	}
 	#else
 	// unique_ptr style interface for memory management
-	cChunkBuffer(cChunkBuffer&& other)
+	cChunkBuffer(const cChunkBuffer&& other)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
@@ -71,7 +72,7 @@ public:
 		}
 	}
 	
-	void operator=(cChunkBuffer&& other)
+	void operator=(const cChunkBuffer&& other)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
@@ -225,7 +226,7 @@ private:
 
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	bool IsOwner;
+	mutable bool IsOwner;
 	#endif
 	
 	struct sChunkSection {
