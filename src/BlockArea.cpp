@@ -665,9 +665,10 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 	{
 		size_t SrcCount = a_Src.GetBlockCount();
 		size_t DestCount = GetBlockCount();
-		SrcMetas = new NIBBLETYPE[SrcCount];
+		NIBBLETYPE * tempSrcMetas = new NIBBLETYPE[SrcCount];
+		memset(tempSrcMetas, 0, SrcCount);
+		SrcMetas = tempSrcMetas;
 		DstMetas = new NIBBLETYPE[DestCount];
-		memset(SrcMetas, 0, SrcCount);
 		memset(DstMetas, 0, DestCount);
 	}
 	
