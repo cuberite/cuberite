@@ -268,7 +268,7 @@ void cChunk::SetAllData(
 	const HeightMap *  a_HeightMap,
 	const BiomeMap &   a_BiomeMap,
 	cBlockEntityList & a_BlockEntities
-	)
+)
 {
 	memcpy(m_BiomeMap, a_BiomeMap, sizeof(m_BiomeMap));
 
@@ -448,7 +448,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 		{
 			cMonster& Monster = (cMonster&)(**itr);
 			currentPosition = Monster.GetPosition();
-			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); itr2 ++)
+			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); ++itr2)
 			{
 				toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
 			}
@@ -596,7 +596,7 @@ void cChunk::Tick(float a_Dt)
 				delete ToDelete;
 				continue;
 			}
-			itr++;
+			++itr;
 	}  // for itr - m_Entitites[]
 	
 	// If any entity moved out of the chunk, move it to the neighbor:
@@ -746,7 +746,7 @@ void cChunk::BroadcastPendingBlockChanges(void)
 
 void cChunk::CheckBlocks()
 {
-	if (m_ToTickBlocks.size() == 0)
+	if (m_ToTickBlocks.empty())
 	{
 		return;
 	}
@@ -1291,6 +1291,7 @@ void cChunk::CreateBlockEntities(void)
 				BLOCKTYPE BlockType = GetBlock(x, y, z);
 				switch (BlockType)
 				{
+					case E_BLOCK_BEACON:
 					case E_BLOCK_CHEST:
 					case E_BLOCK_COMMAND_BLOCK:
 					case E_BLOCK_DISPENSER:
@@ -1419,6 +1420,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	// If the new block is a block entity, create the entity object:
 	switch (a_BlockType)
 	{
+		case E_BLOCK_BEACON:
 		case E_BLOCK_CHEST:
 		case E_BLOCK_COMMAND_BLOCK:
 		case E_BLOCK_DISPENSER:
@@ -1466,7 +1468,7 @@ void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 		return;
 	}
 	
-	m_ToTickBlocks.push_back(Vector3i(a_RelX, a_RelY, a_RelZ));
+	m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ));
 }
 
 
@@ -1529,7 +1531,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 	
-	m_ChunkBuffer.SetMeta(a_RelX, a_RelY, a_RelZ, a_BlockMeta);
+	SetNibble(m_BlockMeta, index, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
 	if (
@@ -1552,7 +1554,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		{
 			for (int y = a_RelY - 1; y > 0; --y)
 			{
-				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
+				if (GetBlock(MakeIndexNoCheck(a_RelX, y, a_RelZ)) != E_BLOCK_AIR)
 				{
 					m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)y;
 					break;
@@ -1569,16 +1571,18 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
 	// The coords must be valid, because the upper level already does chunk lookup. No need to check them again.
+	// There's an debug-time assert in MakeIndexNoCheck anyway
+	unsigned int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 
 	if (a_Client == NULL)
 	{
 		// Queue the block for all clients in the chunk (will be sent in Tick())
-		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ)));
+		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(index), GetMeta(index)));
 		return;
 	}
 
 	Vector3i wp = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
+	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(index), GetMeta(index));
 	
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
@@ -2456,10 +2460,11 @@ void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_
 
 void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
-	a_BlockType  = GetBlock(a_RelX, a_RelY, a_RelZ);
-	a_Meta       = m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
-	a_SkyLight   = m_ChunkBuffer.GetSkyLight(a_RelX, a_RelY, a_RelZ);
-	a_BlockLight = m_ChunkBuffer.GetBlockLight(a_RelX, a_RelY, a_RelZ);
+	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
+	a_BlockType = GetBlock(Idx);
+	a_Meta       = cChunkDef::GetNibble(m_BlockMeta,     Idx);
+	a_SkyLight   = cChunkDef::GetNibble(m_BlockSkyLight, Idx);
+	a_BlockLight = cChunkDef::GetNibble(m_BlockLight,    Idx);
 }
 
 
@@ -2481,7 +2486,7 @@ cChunk * cChunk::GetNeighborChunk(int a_BlockX, int a_BlockZ)
 cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 {
 	// If the relative coords are too far away, use the parent's chunk lookup instead:
-	if ((a_RelX < 128) || (a_RelX > 128) || (a_RelZ < -128) || (a_RelZ > 128))
+	if ((a_RelX < -128) || (a_RelX > 128) || (a_RelZ < -128) || (a_RelZ > 128))
 	{
 		int BlockX = m_PosX * cChunkDef::Width + a_RelX;
 		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;

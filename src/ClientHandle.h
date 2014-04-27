@@ -18,6 +18,8 @@
 #include "ByteBuffer.h"
 #include "Scoreboard.h"
 #include "Map.h"
+#include "Enchantments.h"
+#include "UI/SlotArea.h"
 
 
 
@@ -62,8 +64,22 @@ public:
 	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 
+	const AString & GetUUID(void) const { return m_UUID; } // tolua_export
+	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
+	
+	/** Generates an UUID based on the username stored for this client, and stores it in the m_UUID member.
+	This is used for the offline (non-auth) mode, when there's no UUID source.
+	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same.
+	Internally calls the GenerateOfflineUUID static function. */
+	void GenerateOfflineUUID(void);
+	
+	/** Generates an UUID based on the player name provided.
+	This is used for the offline (non-auth) mode, when there's no UUID source.
+	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. */
+	static AString GenerateOfflineUUID(const AString & a_Username);  // tolua_export
+
 	void Kick(const AString & a_Reason);		// tolua_export
-	void Authenticate(void);  // Called by cAuthenticator when the user passes authentication
+	void Authenticate(const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator when the user passes authentication
 
 	void StreamChunks(void);
 	
@@ -225,10 +241,13 @@ public:
 	*/
 	bool HandleLogin(int a_ProtocolVersion, const AString & a_Username);
 	
-	void SendData(const char * a_Data, int a_Size);
+	void SendData(const char * a_Data, size_t a_Size);
 	
 	/** Called when the player moves into a different world; queues sreaming the new chunks */
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
+	
+	/** Called when the player will enchant a Item */
+	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
 	
 private:
 
@@ -326,6 +345,7 @@ private:
 	
 	static int s_ClientCount;
 	int m_UniqueID;
+	AString m_UUID;
 	
 	/** Set to true when the chunk where the player is is sent to the client. Used for spawning the player */
 	bool m_HasSentPlayerChunk;
@@ -362,7 +382,7 @@ private:
 	void HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length);
 	
 	// cSocketThreads::cCallback overrides:
-	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client
+	virtual void DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
 };										// tolua_export

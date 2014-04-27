@@ -551,7 +551,22 @@ end
 				{{cPlayer}}:SendMessage(), {{cWorld}}:BroadcastChat() and {{cRoot}}:BroadcastChat().</p>
 				<p>
 				Note that most of the functions in this class are so-called modifiers - they modify the object and
-				then return the object itself, so that they can be chained one after another.
+				then return the object itself, so that they can be chained one after another. See the Chaining
+				example below for details.</p>
+				<p>
+				Each part of the composite chat message takes a "Style" parameter, this is a string that describes
+				the formatting. It uses the following strings, concatenated together:
+				<table>
+				<tr><th>String</th><th>Style</th></tr>
+				<tr><td>b</td><td>Bold text</td></tr>
+				<tr><td>i</td><td>Italic text</td></tr>
+				<tr><td>u</td><td>Underlined text</td></tr>
+				<tr><td>s</td><td>Strikethrough text</td></tr>
+				<tr><td>o</td><td>Obfuscated text</td></tr>
+				<tr><td>@X</td><td>color X (X is 0 - 9 or a - f, same as dye meta</td></tr>
+				</table>
+				The following picture, taken from MineCraft Wiki, illustrates the color codes:</p>
+				<img src="http://hydra-media.cursecdn.com/minecraft.gamepedia.com/4/4c/Colors.png?version=34a0f56789a95326e1f7d82047b12232" />
 			]],
 			Functions =
 			{
@@ -565,6 +580,7 @@ end
 				AddTextPart = { Params = "Text, [Style]", Return = "self", Notes = "Adds a regular text. Chaining." },
 				AddUrlPart = { Params = "Text, Url, [Style]", Return = "self", Notes = "Adds a text which, when clicked, opens up a browser at the specified URL. Chaining." },
 				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
+				ExtractText = { Params = "", Return = "string", Notes = "Returns the text from the parts that comprises the human-readable data. Used for older protocols that don't support composite chat and for console-logging." },
 				GetMessageType = { Params = "", Return = "MessageType", Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)" },
 				ParseText = { Params = "Text", Return = "self", Notes = "Adds text, while recognizing http and https URLs and old-style formatting codes (\"@2\"). Chaining." },
 				SetMessageType = { Params = "MessageType", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.) Chaining." },
@@ -683,7 +699,7 @@ end</pre>
 				GetLevel = { Params = "EnchantmentNumID", Return = "number", Notes = "Returns the level of the specified enchantment stored in this object; 0 if not stored" },
 				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if the object stores no enchantments" },
 				SetLevel = { Params = "EnchantmentNumID, Level", Return = "", Notes = "Sets the level for the specified enchantment, adding it if not stored before or removing it if level < = 0" },
-				StringToEnchantmentID = { Params = "EnchantmentTextID", Return = "number", Notes = "(static) Returns the enchantment numerical ID, -1 if not understood. Case insensitive" },
+				StringToEnchantmentID = { Params = "EnchantmentTextID", Return = "number", Notes = "(static) Returns the enchantment numerical ID, -1 if not understood. Case insensitive. Also understands plain numbers." },
 				ToString = { Params = "", Return = "string", Notes = "Returns the string description of all the enchantments stored in this object, in numerical-ID form" },
 			},
 			Constants =
@@ -777,14 +793,14 @@ end</pre>
 				GetMass = { Params = "", Return = "number", Notes = "Returns the mass of the entity. Currently unused." },
 				GetMaxHealth = { Params = "", Return = "number", Notes = "Returns the maximum number of hitpoints this entity is allowed to have." },
 				GetParentClass = { Params = "", Return = "string", Notes = "Returns the name of the direct parent class for this entity" },
-				GetPitch = { Params = "", Return = "number", Notes = "Returns the pitch (nose-down rotation) of the entity" },
+				GetPitch = { Params = "", Return = "number", Notes = "Returns the pitch (nose-down rotation) of the entity. Measured in degrees, normal values range from -90 to +90. +90 means looking down, 0 means looking straight ahead, -90 means looking up." },
 				GetPosition = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the entity's pivot position as a 3D vector" },
 				GetPosX = { Params = "", Return = "number", Notes = "Returns the X-coord of the entity's pivot" },
 				GetPosY = { Params = "", Return = "number", Notes = "Returns the Y-coord of the entity's pivot" },
 				GetPosZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the entity's pivot" },
 				GetRawDamageAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the raw damage that this entity's equipment would cause when attacking the ReceiverEntity. This includes this entity's weapon {{cEnchantments|enchantments}}, but excludes the receiver's armor or potion effects. See {{TakeDamageInfo}} for more information on attack damage." },
 				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity. Currently unused." },
-				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the entire rotation vector (Yaw, Pitch, Roll)" },
+				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "(OBSOLETE) Returns the entire rotation vector (Yaw, Pitch, Roll)" },
 				GetSpeed = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the complete speed vector of the entity" },
 				GetSpeedX = { Params = "", Return = "number", Notes = "Returns the X-part of the speed vector" },
 				GetSpeedY = { Params = "", Return = "number", Notes = "Returns the Y-part of the speed vector" },
@@ -792,7 +808,7 @@ end</pre>
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity within the running server. Note that this ID is not persisted to the data files." },
 				GetWidth = { Params = "", Return = "number", Notes = "Returns the width (X and Z size) of the entity." },
 				GetWorld = { Params = "", Return = "{{cWorld}}", Notes = "Returns the world where the entity resides" },
-				GetYaw = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity." },
+				GetYaw = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. Measured in degrees, values range from -180 to +180. 0 means ZP, 90 means XM, -180 means ZM, -90 means XP." },
 				Heal = { Params = "Hitpoints", Return = "", Notes = "Heals the specified number of hitpoints. Hitpoints is expected to be a positive number." },
 				IsA = { Params = "ClassName", Return = "bool", Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself" },
 				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
@@ -2200,7 +2216,7 @@ end
 				CastThunderbolt = { Params = "X, Y, Z", Return = "", Notes = "Creates a thunderbolt at the specified coords" },
 				ChangeWeather = { Params = "", Return = "", Notes = "Forces the weather to change in the next game tick. Weather is changed according to the normal rules: wSunny <-> wRain <-> wStorm" },
 				ChunkStay = { Params = "ChunkCoordTable, OnChunkAvailable, OnAllChunksAvailable", Return = "", Notes = "Queues the specified chunks to be loaded or generated and calls the specified callbacks once they are loaded. ChunkCoordTable is an arra-table of chunk coords, each coord being a table of 2 numbers: { {Chunk1x, Chunk1z}, {Chunk2x, Chunk2z}, ...}. When any of those chunks are made available (including being available at the start of this call), the OnChunkAvailable() callback is called. When all the chunks are available, the OnAllChunksAvailable() callback is called. The function signatures are: <pre class=\"prettyprint lang-lua\">function OnChunkAvailable(ChunkX, ChunkZ)\nfunction OnAllChunksAvailable()</pre> All return values from the callbacks are ignored." },
-				CreateProjectile = { Params = "X, Y, Z, {{cProjectileEntity|ProjectileKind}}, {{cEntity|Creator}}, [{{Vector3d|Speed}}]", Return = "", Notes = "Creates a new projectile of the specified kind at the specified coords. The projectile's creator is set to Creator (may be nil). Optional speed indicates the initial speed for the projectile." },
+				CreateProjectile = { Params = "X, Y, Z, {{cProjectileEntity|ProjectileKind}}, {{cEntity|Creator}}, {{cItem|Originating Item}}, [{{Vector3d|Speed}}]", Return = "", Notes = "Creates a new projectile of the specified kind at the specified coords. The projectile's creator is set to Creator (may be nil). The item that created the projectile entity, commonly the {{cPlayer|player}}'s currently equipped item, is used at present for fireworks to correctly set their entity metadata. It is not used for any other projectile. Optional speed indicates the initial speed for the projectile." },
 				DigBlock = { Params = "X, Y, Z", Return = "", Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors." },
 				DoExplosionAt = { Params = "Force, X, Y, Z, CanCauseFire, Source, SourceData", Return = "", Notes = "Creates an explosion of the specified relative force in the specified position. If CanCauseFire is set, the explosion will set blocks on fire, too. The Source parameter specifies the source of the explosion, one of the esXXX constants. The SourceData parameter is specific to each source type, usually it provides more info about the source." },
 				DoWithBlockEntityAt = { Params = "X, Y, Z, CallbackFunction, [CallbackData]", Return = "bool", Notes = "If there is a block entity at the specified coords, calls the CallbackFunction with the {{cBlockEntity}} parameter representing the block entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}}, [CallbackData])</pre> The function returns false if there is no block entity, or if there is, it returns the bool value that the callback has returned. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant." },
@@ -2913,9 +2929,10 @@ end
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
 		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
-		{ FileName = "SettingUpDecoda.html", Title = "Setting up the Decoda Lua IDE" },
-		{ FileName = "SettingUpZeroBrane.html", Title = "Setting up the ZeroBrane Studio Lua IDE" },
-		{ FileName = "WebWorldThreads.html", Title = "Webserver vs World threads" },
+		{ FileName = "SettingUpDecoda.html",           Title = "Setting up the Decoda Lua IDE" },
+		{ FileName = "SettingUpZeroBrane.html",        Title = "Setting up the ZeroBrane Studio Lua IDE" },
+		{ FileName = "UsingChunkStays.html",           Title = "Using ChunkStays" },
+		{ FileName = "WebWorldThreads.html",           Title = "Webserver vs World threads" },
 	}
 } ;
 

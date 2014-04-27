@@ -16,16 +16,18 @@ class cItemLilypadHandler :
 	typedef cItemHandler super;
 
 public:
-	cItemLilypadHandler(BLOCKTYPE a_BlockType)
-		: cItemHandler(a_BlockType)
+	cItemLilypadHandler(int a_ItemType):
+		super(a_ItemType)
 	{
 
 	}
+
 
 	virtual bool IsPlaceable(void) override
 	{
 		return false; // Set as not placeable so OnItemUse is called
 	}
+
 
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
 	{
@@ -45,23 +47,22 @@ public:
 			public cBlockTracer::cCallbacks
 		{
 		public:
-			cCallbacks(cWorld * a_World) :
+			cCallbacks(cWorld * a_CBWorld) :
 				m_HasHitFluid(false),
-				m_World(a_World)
+				m_World(a_CBWorld)
 			{
 			}
 
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, char a_CBEntryFace) override
 			{
-				if (IsBlockWater(a_BlockType))
+				if (IsBlockWater(a_CBBlockType))
 				{
-					if ((a_BlockMeta != 0) || (a_EntryFace == BLOCK_FACE_NONE)) // The hit block should be a source. The FACE_NONE check is clicking whilst submerged
+					if ((a_CBBlockMeta != 0) || (a_CBEntryFace == BLOCK_FACE_NONE)) // The hit block should be a source. The FACE_NONE check is clicking whilst submerged
 					{
 						return false;
 					}
-					a_EntryFace = BLOCK_FACE_YP; // Always place pad at top of water block
-					AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, (eBlockFace)a_EntryFace);
-					BLOCKTYPE Block = m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+					AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, BLOCK_FACE_YP);  // Always place pad at top of water block
+					BLOCKTYPE Block = m_World->GetBlock(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
 					if (
 						!IsBlockWater(Block) &&
 						cBlockInfo::FullyOccupiesVoxel(Block)
@@ -71,7 +72,7 @@ public:
 						return true;
 					}
 					m_HasHitFluid = true;
-					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
+					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
 					return true;
 				}
 				return false;

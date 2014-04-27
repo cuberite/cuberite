@@ -17,6 +17,7 @@ struct cMonsterConfig::sAttributesStruct
 	int     m_AttackRange;
 	double  m_AttackRate;
 	int     m_MaxHealth;
+	bool    m_IsFireproof;
 };
 
 
@@ -72,6 +73,7 @@ void cMonsterConfig::Initialize()
 		Attributes.m_SightDistance = MonstersIniFile.GetValueI(Name, "SightDistance", 0);
 		Attributes.m_AttackRate    = MonstersIniFile.GetValueF(Name, "AttackRate",    0);
 		Attributes.m_MaxHealth     = MonstersIniFile.GetValueI(Name, "MaxHealth",     1);
+		Attributes.m_IsFireproof   = MonstersIniFile.GetValueB(Name, "IsFireproof",   false);
 		m_pState->AttributesList.push_front(Attributes);
 	}  // for i - SplitList[]
 }
@@ -92,6 +94,7 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 			a_Monster->SetSightDistance(itr->m_SightDistance);
 			a_Monster->SetAttackRate   ((float)itr->m_AttackRate);
 			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
+			a_Monster->SetIsFireproof  (itr->m_IsFireproof);
 			return;
 		}
 	}  // for itr - m_pState->AttributesList[]

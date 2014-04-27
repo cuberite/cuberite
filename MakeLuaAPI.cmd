@@ -30,7 +30,7 @@ if "a%ftpsite%" == "a" (
 
 cd MCServer
 copy /Y settings_apidump.ini settings.ini
-echo stop | MCServer
+echo api | MCServer
 cd ..
 
 

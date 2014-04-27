@@ -8,6 +8,7 @@
 #include "../Chunk.h"
 #include "BlockAnvil.h"
 #include "BlockBed.h"
+#include "BlockBigFlower.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
 #include "BlockCactus.h"
@@ -24,6 +25,7 @@
 #include "BlockDirt.h"
 #include "BlockDoor.h"
 #include "BlockDropSpenser.h"
+#include "BlockEnchantmentTable.h"
 #include "BlockEnderchest.h"
 #include "BlockEntity.h"
 #include "BlockFarmland.h"
@@ -90,6 +92,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
 		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
+		case E_BLOCK_BIG_FLOWER:            return new cBlockBigFlowerHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:     return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BREWING_STAND:         return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
@@ -117,6 +120,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DOUBLE_WOODEN_SLAB:    return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DROPPER:               return new cBlockDropSpenserHandler     (a_BlockType);
 		case E_BLOCK_EMERALD_ORE:           return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_ENCHANTMENT_TABLE:     return new cBlockEnchantmentTableHandler(a_BlockType);
 		case E_BLOCK_ENDER_CHEST:           return new cBlockEnderchestHandler      (a_BlockType);
 		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler        (           );
 		case E_BLOCK_FENCE_GATE:            return new cBlockFenceGateHandler       (a_BlockType);

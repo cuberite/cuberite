@@ -49,9 +49,6 @@ public:
 	bool IsPlayerCreated(void) const { return m_bIsPlayerCreated; } // tolua_export
 
 private:
-	Vector3d   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
-
-	Vector3d   m_WaterSpeed;
 
 	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
 	float m_Timer;

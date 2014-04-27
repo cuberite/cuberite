@@ -288,7 +288,7 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 		Coeff = c;
 	}
 	c = a_Line1.LineCoeffToXZPlane(a_Line2, a_Max.y);
-	if ((c >= 0) && (c >= 0) && (c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
+	if ((c >= 0) && (c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
 	{
 		Face = (a_Line1.y > a_Line2.y) ? BLOCK_FACE_YP : BLOCK_FACE_YM;
 		Coeff = c;

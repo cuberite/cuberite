@@ -59,6 +59,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_6_3: return "1.6.3";
 		case PROTO_VERSION_1_6_4: return "1.6.4";
 		case PROTO_VERSION_1_7_2: return "1.7.2";
+		case PROTO_VERSION_1_7_6: return "1.7.6";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -390,6 +391,16 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendLogin(a_Player, a_World);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendLoginSuccess(void)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendLoginSuccess();
 }
 
 
@@ -794,7 +805,7 @@ AString cProtocolRecognizer::GetAuthServerID(void)
 
 
 
-void cProtocolRecognizer::SendData(const char * a_Data, int a_Size)
+void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 {
 	// This is used only when handling the server ping
 	m_Client->SendData(a_Data, a_Size);
@@ -854,7 +865,7 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	// This must be a lengthed protocol, try if it has the entire initial handshake packet:
 	m_Buffer.ResetRead();
 	UInt32 PacketLen;
-	UInt32 ReadSoFar = m_Buffer.GetReadableSpace();
+	UInt32 ReadSoFar = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketLen))
 	{
 		// Not enough bytes for the packet length, keep waiting
@@ -931,7 +942,7 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
 {
 	UInt32 PacketType;
-	UInt32 NumBytesRead = m_Buffer.GetReadableSpace();
+	UInt32 NumBytesRead = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketType))
 	{
 		return false;
@@ -962,7 +973,19 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			m_Buffer.ReadBEShort(ServerPort);
 			m_Buffer.ReadVarInt(NextState);
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_7_6:
+		{
+			AString ServerAddress;
+			short ServerPort;
+			UInt32 NextState;
+			m_Buffer.ReadVarUTF8String(ServerAddress);
+			m_Buffer.ReadBEShort(ServerPort);
+			m_Buffer.ReadVarInt(NextState);
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
 		}
 	}
@@ -980,6 +1003,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 void cProtocolRecognizer::SendLengthlessServerPing(void)
 {
 	AString Reply;
+	cServer * Server = cRoot::Get()->GetServer();
 	switch (cRoot::Get()->GetPrimaryServerVersion())
 	{
 		case PROTO_VERSION_1_2_5:
@@ -987,11 +1011,11 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 		{
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
 			Printf(Reply, "%s%s%i%s%i", 
-				cRoot::Get()->GetServer()->GetDescription().c_str(),
+				Server->GetDescription().c_str(),
 				cChatColor::Delimiter.c_str(),
-				cRoot::Get()->GetServer()->GetNumPlayers(),
+				Server->GetNumPlayers(),
 				cChatColor::Delimiter.c_str(),
-				cRoot::Get()->GetServer()->GetMaxPlayers()
+				Server->GetMaxPlayers()
 			);
 			break;
 		}
@@ -1021,9 +1045,9 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			
 			// http://wiki.vg/wiki/index.php?title=Server_List_Ping&oldid=3100
 			AString NumPlayers;
-			Printf(NumPlayers, "%d", cRoot::Get()->GetServer()->GetNumPlayers());
+			Printf(NumPlayers, "%d", Server->GetNumPlayers());
 			AString MaxPlayers;
-			Printf(MaxPlayers, "%d", cRoot::Get()->GetServer()->GetMaxPlayers());
+			Printf(MaxPlayers, "%d", Server->GetMaxPlayers());
 			
 			AString ProtocolVersionNum;
 			Printf(ProtocolVersionNum, "%d", cRoot::Get()->GetPrimaryServerVersion());
@@ -1037,7 +1061,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			Reply.push_back(0);
 			Reply.append(ProtocolVersionTxt);
 			Reply.push_back(0);
-			Reply.append(cRoot::Get()->GetServer()->GetDescription());
+			Reply.append(Server->GetDescription());
 			Reply.push_back(0);
 			Reply.append(NumPlayers);
 			Reply.push_back(0);

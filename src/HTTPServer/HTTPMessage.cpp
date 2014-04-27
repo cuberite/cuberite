@@ -25,7 +25,7 @@
 
 cHTTPMessage::cHTTPMessage(eKind a_Kind) :
 	m_Kind(a_Kind),
-	m_ContentLength(-1)
+	m_ContentLength(AString::npos)
 {
 }
 
@@ -81,23 +81,23 @@ cHTTPRequest::cHTTPRequest(void) :
 
 
 
-int cHTTPRequest::ParseHeaders(const char * a_Data, int a_Size)
+size_t cHTTPRequest::ParseHeaders(const char * a_Data, size_t a_Size)
 {
 	if (!m_IsValid)
 	{
-		return -1;
+		return AString::npos;
 	}
 	
 	if (m_Method.empty())
 	{
 		// The first line hasn't been processed yet
-		int res = ParseRequestLine(a_Data, a_Size);
-		if ((res < 0) || (res == a_Size))
+		size_t res = ParseRequestLine(a_Data, a_Size);
+		if ((res == AString::npos) || (res == a_Size))
 		{
 			return res;
 		}
-		int res2 = m_EnvelopeParser.Parse(a_Data + res, a_Size - res);
-		if (res2 < 0)
+		size_t res2 = m_EnvelopeParser.Parse(a_Data + res, a_Size - res);
+		if (res2 == AString::npos)
 		{
 			m_IsValid = false;
 			return res2;
@@ -107,8 +107,8 @@ int cHTTPRequest::ParseHeaders(const char * a_Data, int a_Size)
 	
 	if (m_EnvelopeParser.IsInHeaders())
 	{
-		int res = m_EnvelopeParser.Parse(a_Data, a_Size);
-		if (res < 0)
+		size_t res = m_EnvelopeParser.Parse(a_Data, a_Size);
+		if (res == AString::npos)
 		{
 			m_IsValid = false;
 		}
@@ -138,7 +138,7 @@ AString cHTTPRequest::GetBareURL(void) const
 
 
 
-int cHTTPRequest::ParseRequestLine(const char * a_Data, int a_Size)
+size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
 {	
 	m_IncomingHeaderData.append(a_Data, a_Size);
 	size_t IdxEnd = m_IncomingHeaderData.size();
@@ -158,7 +158,7 @@ int cHTTPRequest::ParseRequestLine(const char * a_Data, int a_Size)
 	if (LineStart >= IdxEnd)
 	{
 		m_IsValid = false;
-		return -1;
+		return AString::npos;
 	}
 	
 	int NumSpaces = 0;
@@ -186,7 +186,7 @@ int cHTTPRequest::ParseRequestLine(const char * a_Data, int a_Size)
 					{
 						// Too many spaces in the request
 						m_IsValid = false;
-						return -1;
+						return AString::npos;
 					}
 				}
 				NumSpaces += 1;
@@ -198,13 +198,13 @@ int cHTTPRequest::ParseRequestLine(const char * a_Data, int a_Size)
 				{
 					// LF too early, without a CR, without two preceeding spaces or too soon after the second space
 					m_IsValid = false;
-					return -1;
+					return AString::npos;
 				}
 				// Check that there's HTTP/version at the end
 				if (strncmp(a_Data + URLEnd + 1, "HTTP/1.", 7) != 0)
 				{
 					m_IsValid = false;
-					return -1;
+					return AString::npos;
 				}
 				m_Method = m_IncomingHeaderData.substr(LineStart, MethodEnd - LineStart);
 				m_URL = m_IncomingHeaderData.substr(MethodEnd + 1, URLEnd - MethodEnd - 1);

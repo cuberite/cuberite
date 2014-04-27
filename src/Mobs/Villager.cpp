@@ -30,7 +30,7 @@ void cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		if (m_World->GetTickRandomNumber(5) == 3)
 		{
-			m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_VILLAGER_ANGRY);
+			m_World->BroadcastEntityStatus(*this, esVillagerAngry);
 		}
 	}
 }

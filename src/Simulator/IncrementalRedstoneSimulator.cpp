@@ -13,7 +13,7 @@
 
 
 
-
+	
 
 cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulator(cWorld & a_World)
 	: super(a_World)
@@ -69,18 +69,19 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	// Checking only when a block is changed, as opposed to every tick, also improves performance
 
 	PoweredBlocksList * PoweredBlocks = a_Chunk->GetRedstoneSimulatorPoweredBlocksList();
-	for (PoweredBlocksList::iterator itr = PoweredBlocks->begin(); itr != PoweredBlocks->end(); ++itr)
+	for (PoweredBlocksList::iterator itr = PoweredBlocks->begin(); itr != PoweredBlocks->end();)
 	{
 		if (!itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
+			++itr;
 			continue;
 		}
 
 		if (!IsPotentialSource(Block))
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list as it no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			PoweredBlocks->erase(itr);
-			break;
+			itr = PoweredBlocks->erase(itr);
+			continue;
 		}
 		else if (
 			// Changeable sources
@@ -93,29 +94,10 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			)
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			PoweredBlocks->erase(itr);
-			break;
+			itr = PoweredBlocks->erase(itr);
+			continue;
 		}
-		else if (Block == E_BLOCK_DAYLIGHT_SENSOR)
-		{
-			if (!a_Chunk->IsLightValid())
-			{
-				m_World.QueueLightChunk(a_Chunk->GetPosX(), a_Chunk->GetPosZ());
-				break;
-			}
-			else
-			{
-				NIBBLETYPE SkyLight;
-				a_Chunk->UnboundedRelGetBlockSkyLight(RelX, itr->a_SourcePos.y + 1, RelZ, SkyLight);
-
-				if (a_Chunk->GetTimeAlteredLight(SkyLight) <= 8) // Could use SkyLight - m_World.GetSkyDarkness();
-				{
-					LOGD("cIncrementalRedstoneSimulator: Erased daylight sensor from powered blocks list due to insufficient light level");
-					PoweredBlocks->erase(itr);
-					break;
-				}
-			}
-		}
+		++itr;
 	}
 
 	LinkedBlocksList * LinkedPoweredBlocks = a_Chunk->GetRedstoneSimulatorLinkedBlocksList();
@@ -552,128 +534,96 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 	};
 
 	// Check to see if directly beside a power source
-	if (IsWirePowered(a_BlockX, a_BlockY, a_BlockZ))
+	unsigned char MyPower;
+	if (!IsWirePowered(a_BlockX, a_BlockY, a_BlockZ, MyPower))
 	{
-		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 15); // Maximum power
+		m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
+		m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+		return;
 	}
-	else
+	
+	m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MyPower);
+
+	if (MyPower < 1)
 	{
-		NIBBLETYPE MetaToSet = 0;
-		NIBBLETYPE MyMeta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		int TimesMetaSmaller = 0, TimesFoundAWire = 0;
+		return;
+	}
 
-		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through all directions to transfer or receive power
+	MyPower--;
+
+	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through all directions to transfer or receive power
+	{
+		if ((i >= 4) && (i <= 7)) // If we are currently checking for wire surrounding ourself one block above...
 		{
-			if ((i >= 4) && (i <= 7)) // If we are currently checking for wire surrounding ourself one block above...
+			if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))) // If there is something solid above us (wire cut off)...
 			{
-				if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))) // If there is something solid above us (wire cut off)...
-				{
-					continue; // We don't receive power from that wire
-				}
+				continue; // We don't receive power from that wire
 			}
-			else if ((i >= 8) && (i <= 11)) // See above, but this is for wire below us
+		}
+		else if ((i >= 8) && (i <= 11)) // See above, but this is for wire below us
+		{
+			if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
 			{
-				if (cBlockInfo::IsSolid(m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y + 1, a_BlockZ + gCrossCoords[i].z)))
-				{
-					continue;
-				}
+				continue;
 			}
-
-			BLOCKTYPE SurroundType;
-			NIBBLETYPE SurroundMeta;
-			m_World.GetBlockTypeMeta(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, SurroundType, SurroundMeta);
-
-			if (SurroundType == E_BLOCK_REDSTONE_WIRE)
-			{
-				TimesFoundAWire++;
-
-				if (SurroundMeta > 1) // Wires of power 1 or 0 cannot transfer power TO ME, don't bother checking
-				{
-					// Does surrounding wire have a higher power level than self?
-					// >= to fix a bug where wires bordering each other with the same power level will appear (in terms of meta) to power each other, when they aren't actually in the powered list
-					if (SurroundMeta >= MyMeta)
-					{
-						MetaToSet = SurroundMeta - 1; // To improve performance
-					}
-				}
-				
-				if (SurroundMeta < MyMeta) // Go through all surroundings to see if self power is larger than everyone else's
-				{
-					TimesMetaSmaller++;
-				}
-			}			
 		}
 
-		if ((TimesMetaSmaller == TimesFoundAWire) && (MyMeta != 0))
+		if (m_World.GetBlock(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z) == E_BLOCK_REDSTONE_WIRE)
 		{
-			// All surrounding metas were smaller - self must have been a wire that was
-			// transferring power to other wires around.
-			// However, self not directly powered anymore, so source must have been removed,
-			// therefore, self must be set to meta zero
-			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, 0); // SetMeta & WakeUpSims doesn't seem to work here, so SetBlock
-			return; // No need to process block power sets because self not powered
-		}
-		else if (MyMeta != MetaToSet)
-		{
-			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, MetaToSet);
+			SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
 		}
 	}
 
-	if (m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) != 0) // A powered wire
+	for (size_t i = 0; i < ARRAYCOUNT(gSideCoords); i++) // Look for repeaters immediately surrounding self and try to power them
 	{
-		for (size_t i = 0; i < ARRAYCOUNT(gSideCoords); i++) // Look for repeaters immediately surrounding self and try to power them
+		if (m_World.GetBlock(a_BlockX + gSideCoords[i].x, a_BlockY + gSideCoords[i].y, a_BlockZ + gSideCoords[i].z) == E_BLOCK_REDSTONE_REPEATER_OFF)
 		{
-			if (m_World.GetBlock(a_BlockX + gSideCoords[i].x, a_BlockY + gSideCoords[i].y, a_BlockZ + gSideCoords[i].z) == E_BLOCK_REDSTONE_REPEATER_OFF)
-			{
-				SetBlockPowered(a_BlockX + gSideCoords[i].x, a_BlockY + gSideCoords[i].y, a_BlockZ + gSideCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-			}
+			SetBlockPowered(a_BlockX + gSideCoords[i].x, a_BlockY + gSideCoords[i].y, a_BlockZ + gSideCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
 		}
+	}
 
-		// Wire still powered, power blocks beneath
-		SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-		SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YM, E_BLOCK_REDSTONE_WIRE);
+	// Wire still powered, power blocks beneath
+	SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
+	SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YM, E_BLOCK_REDSTONE_WIRE, MyPower);
 
-		switch (GetWireDirection(a_BlockX, a_BlockY, a_BlockZ))
+	switch (GetWireDirection(a_BlockX, a_BlockY, a_BlockZ))
+	{
+		case REDSTONE_NONE:
 		{
-			case REDSTONE_NONE:
-			{
-				SetBlockPowered(a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
+			SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
 
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XM, E_BLOCK_REDSTONE_WIRE);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XP, E_BLOCK_REDSTONE_WIRE);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_YM, E_BLOCK_REDSTONE_WIRE);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_REDSTONE_WIRE);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_REDSTONE_WIRE);
-				break;
-			}
-			case REDSTONE_X_POS:
-			{
-				SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XP, E_BLOCK_REDSTONE_WIRE);
-				break;
-			}
-			case REDSTONE_X_NEG:
-			{
-				SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XM, E_BLOCK_REDSTONE_WIRE);
-				break;
-			}
-			case REDSTONE_Z_POS:
-			{
-				SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_REDSTONE_WIRE);
-				break;
-			}
-			case REDSTONE_Z_NEG:
-			{
-				SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE);
-				SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_REDSTONE_WIRE);
-				break;
-			}
+			SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XM, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XP, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_REDSTONE_WIRE, MyPower);
+			break;
+		}
+		case REDSTONE_X_POS:
+		{
+			SetBlockPowered(a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XP, E_BLOCK_REDSTONE_WIRE, MyPower);
+			break;
+		}
+		case REDSTONE_X_NEG:
+		{
+			SetBlockPowered(a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_XM, E_BLOCK_REDSTONE_WIRE, MyPower);
+			break;
+		}
+		case REDSTONE_Z_POS:
+		{
+			SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZP, E_BLOCK_REDSTONE_WIRE, MyPower);
+			break;
+		}
+		case REDSTONE_Z_NEG:
+		{
+			SetBlockPowered(a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_REDSTONE_WIRE, MyPower);
+			SetDirectionLinkedPowered(a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_ZM, E_BLOCK_REDSTONE_WIRE, MyPower);
+			break;
 		}
 	}
 }
@@ -684,18 +634,42 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_BlockX, int a_Block
 
 void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState)
 {
+	/* Repeater Orientation Mini Guide:
+	===================================
+
+	|
+	| Z Axis
+	V
+
+	X Axis ---->
+
+	Repeater directions, values from a cWorld::GetBlockMeta(a_BlockX , a_BlockY, a_BlockZ) lookup:
+
+	East (Right) (X+): 0x1
+	West (Left) (X-): 0x3
+	North (Up) (Z-): 0x2
+	South (Down) (Z+): 0x0
+	// TODO: Add E_META_XXX enum entries for all meta values and update project with them
+
+	Sun rises from East (X+)
+
+	*/
+
+	// Create a variable holding my meta to avoid multiple lookups.
 	NIBBLETYPE a_Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-
-	bool IsOn = ((a_MyState == E_BLOCK_REDSTONE_REPEATER_ON) ? true : false); // Cache if repeater is on
-	bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta & 0x3); // Cache if repeater is pwoered
-
-	if (IsSelfPowered && !IsOn) // Queue a power change if I am receiving power but not on
+	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
+    	
+	if (!IsRepeaterLocked(a_BlockX, a_BlockY, a_BlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
 	{
-		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
-	}
-	else if (!IsSelfPowered && IsOn) // Queue a power change if I am not receiving power but on
-	{
-		QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
+		bool IsSelfPowered = IsRepeaterPowered(a_BlockX, a_BlockY, a_BlockZ, a_Meta);
+		if (IsSelfPowered && !IsOn) // Queue a power change if powered, but not on and not locked.
+		{
+			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, true);
+		}
+		else if (!IsSelfPowered && IsOn) // Queue a power change if unpowered, on, and not locked.
+		{
+			QueueRepeaterPowerChange(a_BlockX, a_BlockY, a_BlockZ, a_Meta, false);
+		}
 	}
 
 	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
@@ -1042,16 +1016,13 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 			break;
 		}
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		{
 			class cPressurePlateCallback :
 				public cEntityCallback
 			{
 			public:
-				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-					m_Entity(NULL),
-					m_World(a_World),
+				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+					m_NumberOfEntities(0),
 					m_X(a_BlockX),
 					m_Y(a_BlockY),
 					m_Z(a_BlockZ)
@@ -1066,7 +1037,140 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 
 					if (Distance <= 0.7)
 					{
-						m_Entity = a_Entity;
+						m_NumberOfEntities++;
+					}
+					return false;
+				}
+
+				bool GetPowerLevel(unsigned char & a_PowerLevel) const
+				{
+					a_PowerLevel = std::min(m_NumberOfEntities, MAX_POWER_LEVEL);
+					return (a_PowerLevel > 0);
+				}
+
+			protected:
+				int m_NumberOfEntities;
+
+				int m_X;
+				int m_Y;
+				int m_Z;
+			};
+
+			cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ);
+			m_World.ForEachEntity(PressurePlateCallback);
+
+			unsigned char Power;
+			NIBBLETYPE Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+			if (PressurePlateCallback.GetPowerLevel(Power))
+			{
+				if (Meta == E_META_PRESSURE_PLATE_RAISED)
+				{
+					m_World.BroadcastSoundEffect("random.click", (int)((a_BlockX + 0.5) * 8.0), (int)((a_BlockY + 0.1) * 8.0), (int)((a_BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
+				}
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
+				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, a_MyType, Power);
+			}
+			else
+			{
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+				{
+					m_World.BroadcastSoundEffect("random.click", (int)((a_BlockX + 0.5) * 8.0), (int)((a_BlockY + 0.1) * 8.0), (int)((a_BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
+				}
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_RAISED);
+				m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+			}
+
+			break;
+		}
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+		{class cPressurePlateCallback :
+			public cEntityCallback
+		{
+		public:
+			cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+				m_NumberOfEntities(0),
+				m_X(a_BlockX),
+				m_Y(a_BlockY),
+				m_Z(a_BlockZ)
+			{
+			}
+
+			virtual bool Item(cEntity * a_Entity) override
+			{
+				Vector3f EntityPos = a_Entity->GetPosition();
+				Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+				double Distance = (EntityPos - BlockPos).Length();
+
+				if (Distance <= 0.7)
+				{
+					m_NumberOfEntities++;
+				}
+				return false;
+			}
+
+			bool GetPowerLevel(unsigned char & a_PowerLevel) const
+			{
+				a_PowerLevel = std::min((int)ceil(m_NumberOfEntities / (float)10), MAX_POWER_LEVEL);
+				return (a_PowerLevel > 0);
+			}
+
+		protected:
+			int m_NumberOfEntities;
+
+			int m_X;
+			int m_Y;
+			int m_Z;
+		};
+
+		cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ);
+		m_World.ForEachEntity(PressurePlateCallback);
+
+		unsigned char Power;
+		NIBBLETYPE Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		if (PressurePlateCallback.GetPowerLevel(Power))
+		{
+			if (Meta == E_META_PRESSURE_PLATE_RAISED)
+			{
+				m_World.BroadcastSoundEffect("random.click", (int)((a_BlockX + 0.5) * 8.0), (int)((a_BlockY + 0.1) * 8.0), (int)((a_BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
+			}
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
+			SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, a_MyType, Power);
+		}
+		else
+		{
+			if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+			{
+				m_World.BroadcastSoundEffect("random.click", (int)((a_BlockX + 0.5) * 8.0), (int)((a_BlockY + 0.1) * 8.0), (int)((a_BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
+			}
+			m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_RAISED);
+			m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+		}
+
+			break;
+		}
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		{
+			class cPressurePlateCallback :
+				public cEntityCallback
+			{
+			public:
+				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+					m_FoundEntity(false),
+					m_X(a_BlockX),
+					m_Y(a_BlockY),
+					m_Z(a_BlockZ)
+				{
+				}
+
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					Vector3f EntityPos = a_Entity->GetPosition();
+					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+					double Distance = (EntityPos - BlockPos).Length();
+
+					if (Distance <= 0.7)
+					{
+						m_FoundEntity = true;
 						return true; // Break out, we only need to know for plates that at least one entity is on top
 					}
 					return false;
@@ -1074,45 +1178,46 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_BlockX, int a_Bloc
 
 				bool FoundEntity(void) const
 				{
-					return m_Entity != NULL;
+					return m_FoundEntity;
 				}
 
 			protected:
-				cEntity * m_Entity;
-				cWorld * m_World;
+				bool m_FoundEntity;
 
 				int m_X;
 				int m_Y;
 				int m_Z;
 			} ;
 
-			cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ, &m_World);
+			cPressurePlateCallback PressurePlateCallback(a_BlockX, a_BlockY, a_BlockZ);
 			m_World.ForEachEntity(PressurePlateCallback);
 
 			NIBBLETYPE Meta = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 			if (PressurePlateCallback.FoundEntity())
 			{
-				if (Meta == 0x0)
+				if (Meta == E_META_PRESSURE_PLATE_RAISED)
 				{
 					m_World.BroadcastSoundEffect("random.click", (int) ((a_BlockX + 0.5) * 8.0), (int) ((a_BlockY + 0.1) * 8.0), (int) ((a_BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
 				}
-				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x1);
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
 				SetAllDirsAsPowered(a_BlockX, a_BlockY, a_BlockZ, a_MyType);
 			}
 			else
 			{
-				if (Meta == 0x1)
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
 				{
 					m_World.BroadcastSoundEffect("random.click", (int) ((a_BlockX + 0.5) * 8.0), (int) ((a_BlockY + 0.1) * 8.0), (int) ((a_BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
 				}
-				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0x0);
+				m_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, E_META_PRESSURE_PLATE_RAISED);
 				m_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 			}
 			break;
 		}
 		default:
+		{
 			LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(a_MyType).c_str());
 			break;
+		}
 	}
 }
 
@@ -1151,7 +1256,8 @@ bool cIncrementalRedstoneSimulator::AreCoordsLinkedPowered(int a_BlockX, int a_B
 
 
 
-
+// IsRepeaterPowered tests if a repeater should be powered by testing for power sources behind the repeater.
+// It takes the coordinates of the repeater the the meta value.
 bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
 {
 	// Repeaters cannot be powered by any face except their back; verify that this is true for a source
@@ -1160,7 +1266,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		switch (a_Meta)
+		switch (a_Meta & 0x3)
 		{
 			case 0x0:
 			{
@@ -1190,7 +1296,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
 
-		switch (a_Meta)
+		switch (a_Meta & 0x3)
 		{
 			case 0x0:
 			{
@@ -1215,6 +1321,60 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_BlockX, int a_BlockY
 		}
 	}
 	return false; // Couldn't find power source behind repeater
+}
+
+
+
+
+
+bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+{	
+	switch (a_Meta & 0x3) // We only want the 'direction' part of our metadata
+	{
+		// If the repeater is looking up or down (If parallel to the Z axis)
+		case 0x0:
+		case 0x2:
+		{
+			// Check if eastern(right) neighbor is a powered on repeater who is facing us.
+			if (m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) // Is right neighbor a powered repeater?
+			{
+				NIBBLETYPE OtherRepeaterDir = m_World.GetBlockMeta(a_BlockX + 1, a_BlockY, a_BlockZ) & 0x3;
+				if (OtherRepeaterDir == 0x3) { return true; } // If so, I am latched/locked.
+			}
+
+			// Check if western(left) neighbor is a powered on repeater who is facing us.
+	  		if (m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{
+				NIBBLETYPE OtherRepeaterDir = m_World.GetBlockMeta(a_BlockX -1, a_BlockY, a_BlockZ) & 0x3;
+				if (OtherRepeaterDir == 0x1) { return true; } // If so, I am latched/locked.
+			}
+
+			break;
+		}
+
+		// If the repeater is looking left or right (If parallel to the x axis)
+		case 0x1:
+		case 0x3:
+		{
+			// Check if southern(down) neighbor is a powered on repeater who is facing us.
+			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{ 
+				NIBBLETYPE OtherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ + 1) & 0x3;
+				if (OtherRepeaterDir == 0x0) { return true; } // If so,  am latched/locked.
+			}
+			
+			// Check if northern(up) neighbor is a powered on repeater who is facing us.
+			if (m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ -1) == E_BLOCK_REDSTONE_REPEATER_ON) 
+			{ 
+				NIBBLETYPE OtherRepeaterDir = m_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ - 1) & 0x3;
+				if (OtherRepeaterDir == 0x2) { return true; } // If so, I am latched/locked.
+			}
+
+			break;
+		}
+	}
+
+	return false; //  None of the checks succeeded, I am not a locked repeater.
 }
 
 
@@ -1264,28 +1424,29 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_BlockX, int a_BlockY, 
 
 
 
-bool cIncrementalRedstoneSimulator::IsWirePowered(int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cIncrementalRedstoneSimulator::IsWirePowered(int a_BlockX, int a_BlockY, int a_BlockZ, unsigned char & a_PowerLevel)
 {
-	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
-	{
-		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
+	a_PowerLevel = 0;
 
-		if (m_World.GetBlock(itr->a_SourcePos) != E_BLOCK_REDSTONE_WIRE)
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr) // Check powered list
+	{
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			return true;
+			continue;
 		}
+		a_PowerLevel = std::max(a_PowerLevel, itr->a_PowerLevel);
 	}
 
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr) // Check linked powered list
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))) { continue; }
-
-		if (m_World.GetBlock(itr->a_SourcePos) != E_BLOCK_REDSTONE_WIRE)
+		if (!itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 		{
-			return true;
+			continue;
 		}
+		a_PowerLevel = std::max(a_PowerLevel, itr->a_PowerLevel);
 	}
-	return false; // Source was in front of the piston's front face
+
+	return (a_PowerLevel != 0); // Source was in front of the piston's front face
 }
 
 
@@ -1315,7 +1476,7 @@ bool cIncrementalRedstoneSimulator::AreCoordsSimulated(int a_BlockX, int a_Block
 
 
 
-void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceType)
+void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceType, unsigned char a_PowerLevel)
 {
 	switch (a_Direction)
 	{
@@ -1323,11 +1484,11 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int 
 		{
 			BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ);
 
-			SetBlockLinkedPowered(a_BlockX - 2, a_BlockY, a_BlockZ, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY + 1, a_BlockZ, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY - 1, a_BlockZ, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY, a_BlockZ + 1, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY, a_BlockZ - 1, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
+			SetBlockLinkedPowered(a_BlockX - 2, a_BlockY, a_BlockZ, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY + 1, a_BlockZ, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY - 1, a_BlockZ, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY, a_BlockZ + 1, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY, a_BlockZ - 1, a_BlockX - 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
 
 			break;
 		}
@@ -1335,11 +1496,11 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int 
 		{
 			BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ);
 
-			SetBlockLinkedPowered(a_BlockX + 2, a_BlockY, a_BlockZ, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY + 1, a_BlockZ, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY - 1, a_BlockZ, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY, a_BlockZ + 1, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY, a_BlockZ - 1, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
+			SetBlockLinkedPowered(a_BlockX + 2, a_BlockY, a_BlockZ, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY + 1, a_BlockZ, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY - 1, a_BlockZ, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY, a_BlockZ + 1, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY, a_BlockZ - 1, a_BlockX + 1, a_BlockY, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
 
 			break;
 		}
@@ -1347,11 +1508,11 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int 
 		{
 			BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
 
-			SetBlockLinkedPowered(a_BlockX, a_BlockY - 2, a_BlockZ, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX, a_BlockY - 1, a_BlockZ + 1, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX, a_BlockY - 1, a_BlockZ - 1, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY - 2, a_BlockZ, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY - 1, a_BlockZ + 1, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY - 1, a_BlockZ - 1, a_BlockX, a_BlockY - 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
 
 			break;
 		}
@@ -1359,11 +1520,11 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int 
 		{
 			BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
 
-			SetBlockLinkedPowered(a_BlockX, a_BlockY + 2, a_BlockZ, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX, a_BlockY + 1, a_BlockZ + 1, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX, a_BlockY + 1, a_BlockZ - 1, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY + 2, a_BlockZ, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY + 1, a_BlockZ + 1, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY + 1, a_BlockZ - 1, a_BlockX, a_BlockY + 1, a_BlockZ, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
 
 			break;
 		}
@@ -1371,11 +1532,11 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int 
 		{
 			BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ - 1);
 						
-			SetBlockLinkedPowered(a_BlockX, a_BlockY, a_BlockZ - 2, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX, a_BlockY + 1, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX, a_BlockY - 1, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY, a_BlockZ - 2, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY + 1, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY - 1, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ - 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
 
 			break;
 		}
@@ -1383,11 +1544,11 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int 
 		{
 			BLOCKTYPE MiddleBlock = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1);
 			
-			SetBlockLinkedPowered(a_BlockX, a_BlockY, a_BlockZ + 2, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX, a_BlockY + 1, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
-			SetBlockLinkedPowered(a_BlockX, a_BlockY - 1, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY, a_BlockZ + 2, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX + 1, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX - 1, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY + 1, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_BlockX, a_BlockY - 1, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ + 1, a_BlockX, a_BlockY, a_BlockZ, a_SourceType, MiddleBlock, a_PowerLevel);
 
 			break;
 		}
@@ -1403,7 +1564,7 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_BlockX, int 
 
 
 
-void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock)
+void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel)
 {
 	static const struct
 	{
@@ -1420,7 +1581,7 @@ void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_Bloc
 
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through struct to power all directions
 	{
-		SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, a_SourceBlock);
+		SetBlockPowered(a_BlockX + gCrossCoords[i].x, a_BlockY + gCrossCoords[i].y, a_BlockZ + gCrossCoords[i].z, a_BlockX, a_BlockY, a_BlockZ, a_SourceBlock, a_PowerLevel);
 	}
 }
 
@@ -1428,7 +1589,7 @@ void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_BlockX, int a_Bloc
 
 
 
-void cIncrementalRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock)
+void cIncrementalRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel)
 {
 	BLOCKTYPE Block = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	if (Block == E_BLOCK_AIR)
@@ -1438,15 +1599,31 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, 
 	}
 
 	PoweredBlocksList * Powered = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorPoweredBlocksList();
-
-	for (PoweredBlocksList::const_iterator itr = Powered->begin(); itr != Powered->end(); ++itr) // Check powered list
+	for (PoweredBlocksList::iterator itr = Powered->begin(); itr != Powered->end(); ++itr)  // Check powered list
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
 			itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
-			)
+		)
 		{
-			// Check for duplicates
+			// Check for duplicates, update power level if everything else the same but either way, don't add a new listing
+			if (itr->a_PowerLevel != a_PowerLevel)
+			{
+				itr->a_PowerLevel = a_PowerLevel;
+			}
+			return;
+		}
+	}
+
+	PoweredBlocksList * OtherPowered = m_Chunk->GetNeighborChunk(a_SourceX, a_SourceZ)->GetRedstoneSimulatorPoweredBlocksList();
+	for (PoweredBlocksList::const_iterator itr = OtherPowered->begin(); itr != OtherPowered->end(); ++itr)  // Check powered list
+	{
+		if (
+			itr->a_BlockPos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ)) &&
+			itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ))
+		)
+		{
+			// Powered wires try to power their source - don't let them!
 			return;
 		}
 	}
@@ -1454,6 +1631,7 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_BlockX, int a_BlockY, 
 	sPoweredBlocks RC;
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 	RC.a_SourcePos = Vector3i(a_SourceX, a_SourceY, a_SourceZ);
+	RC.a_PowerLevel = a_PowerLevel;
 	Powered->push_back(RC);
 }
 
@@ -1465,7 +1643,7 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 	int a_BlockX,  int a_BlockY,  int a_BlockZ,
 	int a_MiddleX, int a_MiddleY, int a_MiddleZ,
 	int a_SourceX, int a_SourceY, int a_SourceZ,
-	BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddleBlock
+	BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddleBlock, unsigned char a_PowerLevel
 )
 {
 	BLOCKTYPE DestBlock = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
@@ -1480,16 +1658,19 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 	}
 
 	LinkedBlocksList * Linked = m_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ)->GetRedstoneSimulatorLinkedBlocksList();
-
-	for (LinkedBlocksList::const_iterator itr = Linked->begin(); itr != Linked->end(); ++itr) // Check linked powered list
+	for (LinkedBlocksList::iterator itr = Linked->begin(); itr != Linked->end(); ++itr)  // Check linked powered list
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)) &&
 			itr->a_MiddlePos.Equals(Vector3i(a_MiddleX, a_MiddleY, a_MiddleZ)) &&
 			itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ))
-			)
+		)
 		{
-			// Check for duplicates
+			// Check for duplicates, update power level if everything else the same but either way, don't add a new listing
+			if (itr->a_PowerLevel != a_PowerLevel)
+			{
+				itr->a_PowerLevel = a_PowerLevel;
+			}
 			return;
 		}
 	}
@@ -1498,6 +1679,7 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 	RC.a_MiddlePos = Vector3i(a_MiddleX, a_MiddleY, a_MiddleZ);
 	RC.a_SourcePos = Vector3i(a_SourceX, a_SourceY, a_SourceZ);
+	RC.a_PowerLevel = a_PowerLevel;
 	Linked->push_back(RC);
 }
 
@@ -1562,7 +1744,7 @@ void cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_BlockX, int a
 	RC.a_BlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
 	
 	// Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
-	// * 2 because apparently, MCS ticks are way faster than vanilla ticks, so repeater aren't noticeably delayed
+	// * 2 because in MCS, 1 redstone tick = 1 world tick, but in Vanilla, 1 redstone tick = 2 world ticks, and we need to maintain compatibility
 	RC.a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2;
 
 	RC.a_ElapsedTicks = 0;
@@ -1633,15 +1815,6 @@ bool cIncrementalRedstoneSimulator::IsLeverOn(NIBBLETYPE a_BlockMeta)
 {
 	// Extract the ON bit from metadata and return if true if it is set:
 	return ((a_BlockMeta & 0x8) == 0x8);
-}
-
-
-
-
-
-bool cIncrementalRedstoneSimulator::IsButtonOn(NIBBLETYPE a_BlockMeta)
-{
-	return IsLeverOn(a_BlockMeta);
 }
 
 

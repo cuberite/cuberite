@@ -185,14 +185,14 @@ protected:
 	inline bool IsNextYPosReachable(int a_PosY)
 	{
 		return (
-			(a_PosY <= (int)floor(GetPosY())) ||
+			(a_PosY <= POSY_TOINT) ||
 			DoesPosYRequireJump(a_PosY)
 			);
 	}
 	/** Returns if a monster can reach a given height by jumping */
 	inline bool DoesPosYRequireJump(int a_PosY)
 	{
-		return ((a_PosY > (int)floor(GetPosY())) && (a_PosY == (int)floor(GetPosY()) + 1));
+		return ((a_PosY > POSY_TOINT) && (a_PosY == POSY_TOINT + 1));
 	}
 
 	/** A semi-temporary list to store the traversed coordinates during active pathfinding so we don't visit them again */

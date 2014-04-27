@@ -392,14 +392,17 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 	Connections.reserve(AvailablePieces.size());
 	Vector3i ConnPos = a_Connector.m_Pos;  // The position at which the new connector should be placed - 1 block away from the connector
 	AddFaceDirection(ConnPos.x, ConnPos.y, ConnPos.z, a_Connector.m_Direction);
-	
-	/*
-	// DEBUG:
-	printf("Placing piece at connector pos {%d, %d, %d}, direction %s\n", ConnPos.x, ConnPos.y, ConnPos.z, BlockFaceToString(a_Connector.m_Direction).c_str());
-	//*/
-	
+	int WeightTotal = 0;
 	for (cPieces::iterator itrP = AvailablePieces.begin(), endP = AvailablePieces.end(); itrP != endP; ++itrP)
 	{
+		// Get the relative chance of this piece being generated in this path:
+		int Weight = m_PiecePool.GetPieceWeight(a_ParentPiece, a_Connector, **itrP);
+		if (Weight <= 0)
+		{
+			continue;
+		}
+		
+		// Try fitting each of the piece's connector:
 		cPiece::cConnectors Connectors = (*itrP)->GetConnectors();
 		for (cPiece::cConnectors::iterator itrC = Connectors.begin(), endC = Connectors.end(); itrC != endC; ++itrC)
 		{
@@ -419,7 +422,9 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 				// Doesn't fit in this rotation
 				continue;
 			}
-			Connections.push_back(cConnection(**itrP, *itrC, NumCCWRotations));
+			// Fits, add it to list of possibile connections:
+			Connections.push_back(cConnection(**itrP, *itrC, NumCCWRotations, Weight));
+			WeightTotal += Weight;
 		}  // for itrC - Connectors[]
 	}  // for itrP - AvailablePieces[]
 	if (Connections.empty())
@@ -427,21 +432,23 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		// No available connections, bail out
 		return false;
 	}
+	ASSERT(WeightTotal > 0);
 	
-	// Choose a random connection from the list:
-	int rnd = m_Noise.IntNoise3DInt(a_Connector.m_Pos.x, a_Connector.m_Pos.y, a_Connector.m_Pos.z) / 7;
-	cConnection & Conn = Connections[rnd % Connections.size()];
+	// Choose a random connection from the list, based on the weights:
+	int rnd = (m_Noise.IntNoise3DInt(a_Connector.m_Pos.x, a_Connector.m_Pos.y, a_Connector.m_Pos.z) / 7) % WeightTotal;
+	size_t ChosenIndex = 0;
+	for (cConnections::const_iterator itr = Connections.begin(), end = Connections.end(); itr != end; ++itr, ++ChosenIndex)
+	{
+		rnd -= itr->m_Weight;
+		if (rnd <= 0)
+		{
+			// This is the piece to choose
+			break;
+		}
+	}
+	cConnection & Conn = Connections[ChosenIndex];
 	
 	// Place the piece:
-	/*
-	// DEBUG
-	printf("Chosen connector at {%d, %d, %d}, direction %s, needs %d rotations\n",
-		Conn.m_Connector.m_Pos.x, Conn.m_Connector.m_Pos.y, Conn.m_Connector.m_Pos.z,
-		BlockFaceToString(Conn.m_Connector.m_Direction).c_str(),
-		Conn.m_NumCCWRotations
-	);
-	//*/
-	
 	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
 	ConnPos -= NewPos;
 	cPlacedPiece * PlacedPiece = new cPlacedPiece(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
@@ -449,12 +456,6 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 	
 	// Add the new piece's connectors to the list of free connectors:
 	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();
-	
-	/*
-	// DEBUG:
-	printf("Adding %u connectors to the pool\n", Connectors.size() - 1);
-	//*/
-	
 	for (cPiece::cConnectors::const_iterator itr = Connectors.begin(), end = Connectors.end(); itr != end; ++itr)
 	{
 		if (itr->m_Pos.Equals(Conn.m_Connector.m_Pos))
@@ -524,10 +525,11 @@ void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cPieceGenerator::cConnection:
 
-cPieceGenerator::cConnection::cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations) :
+cPieceGenerator::cConnection::cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations, int a_Weight) :
 	m_Piece(&a_Piece),
 	m_Connector(a_Connector),
-	m_NumCCWRotations(a_NumCCWRotations)
+	m_NumCCWRotations(a_NumCCWRotations),
+	m_Weight(a_Weight)
 {
 }
 

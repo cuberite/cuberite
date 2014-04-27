@@ -352,7 +352,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 		{
 			continue;
 		}
-		BlockType = Neighbour->GetBlock(X, a_RelY + gCrossCoords[i].y, Z);
+		BlockType = Neighbour->GetBlock(X, a_RelY + gNeighborCoords[i].y, Z);
 
 		if (!IsFuel(BlockType))
 		{

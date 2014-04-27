@@ -24,7 +24,7 @@ public:
 
 		// Now try parsing char-by-char, to debug transitions across datachunk boundaries:
 		cNameValueParser Parser2;
-		for (int i = 0; i < sizeof(Data) - 1; i++)
+		for (size_t i = 0; i < sizeof(Data) - 1; i++)
 		{
 			Parser2.Parse(Data + i, 1);
 		}
@@ -82,7 +82,7 @@ cNameValueParser::cNameValueParser(bool a_AllowsKeyOnly) :
 
 
 
-cNameValueParser::cNameValueParser(const char * a_Data, int a_Size, bool a_AllowsKeyOnly) :
+cNameValueParser::cNameValueParser(const char * a_Data, size_t a_Size, bool a_AllowsKeyOnly) :
 	m_State(psKeySpace),
 	m_AllowsKeyOnly(a_AllowsKeyOnly)
 {
@@ -93,12 +93,12 @@ cNameValueParser::cNameValueParser(const char * a_Data, int a_Size, bool a_Allow
 
 
 
-void cNameValueParser::Parse(const char * a_Data, int a_Size)
+void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 {
 	ASSERT(m_State != psFinished);  // Calling Parse() after Finish() is wrong!
 	
 	int Last = 0;
-	for (int i = 0; i < a_Size;)
+	for (size_t i = 0; i < a_Size;)
 	{
 		switch (m_State)
 		{

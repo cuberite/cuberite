@@ -7,7 +7,7 @@
 
 
 
-void cGroup::AddCommand( AString a_Command )
+void cGroup::AddCommand( const AString & a_Command )
 {
 	m_Commands[ a_Command ] = true;
 }
@@ -16,7 +16,7 @@ void cGroup::AddCommand( AString a_Command )
 
 
 
-void cGroup::AddPermission( AString a_Permission )
+void cGroup::AddPermission( const AString & a_Permission )
 {
 	m_Permissions[ a_Permission ] = true;
 }

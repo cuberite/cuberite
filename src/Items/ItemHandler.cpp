@@ -8,6 +8,7 @@
 #include "../BlockInServerPluginInterface.h"
 
 // Handlers:
+#include "ItemArmor.h"
 #include "ItemBed.h"
 #include "ItemBoat.h"
 #include "ItemBow.h"
@@ -222,6 +223,31 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemFoodHandler(a_ItemType);
 		}
+
+		// Armor:
+		case E_ITEM_LEATHER_CAP:
+		case E_ITEM_GOLD_HELMET:
+		case E_ITEM_CHAIN_HELMET:
+		case E_ITEM_IRON_HELMET:
+		case E_ITEM_DIAMOND_HELMET:
+		case E_ITEM_LEATHER_TUNIC:
+		case E_ITEM_GOLD_CHESTPLATE:
+		case E_ITEM_CHAIN_CHESTPLATE:
+		case E_ITEM_IRON_CHESTPLATE:
+		case E_ITEM_DIAMOND_CHESTPLATE:
+		case E_ITEM_LEATHER_PANTS:
+		case E_ITEM_GOLD_LEGGINGS:
+		case E_ITEM_CHAIN_LEGGINGS:
+		case E_ITEM_IRON_LEGGINGS:
+		case E_ITEM_DIAMOND_LEGGINGS:
+		case E_ITEM_LEATHER_BOOTS:
+		case E_ITEM_GOLD_BOOTS:
+		case E_ITEM_CHAIN_BOOTS:
+		case E_ITEM_IRON_BOOTS:
+		case E_ITEM_DIAMOND_BOOTS:
+		{
+			return new cItemArmorHandler(a_ItemType);
+		}
 	}
 }
 
@@ -431,7 +457,6 @@ bool cItemHandler::IsTool()
 		|| (m_ItemType >= 267 && m_ItemType <= 279)
 		|| (m_ItemType >= 283 && m_ItemType <= 286)
 		|| (m_ItemType >= 290 && m_ItemType <= 294)
-		|| (m_ItemType >= 256 && m_ItemType <= 259)
 		|| (m_ItemType == 325)
 		|| (m_ItemType == 346);
 }
@@ -506,13 +531,13 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 {
 	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers
 	
-	if (m_ItemType > 256)
+	if (m_ItemType >= 256)
 	{
-		LOGERROR("%s: Item %d has no valid block!", __FUNCTION__, m_ItemType);
+		LOGERROR("%s: Item %d is not eligible for direct block placement!", __FUNCTION__, m_ItemType);
 		return false;
 	}
 	
-	cBlockHandler * BlockH = BlockHandler(m_ItemType);
+	cBlockHandler * BlockH = BlockHandler((BLOCKTYPE)m_ItemType);
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
 		ChunkInterface, a_Player,

@@ -32,6 +32,8 @@
 #define POSZ_TOINT (int)floor(GetPosZ())
 #define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
 
+#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == NULL) || !ChunkVarName->IsValid()) { return; }
+
 
 
 
@@ -88,23 +90,42 @@ public:
 	} ;
 	
 	// tolua_end
-
-	enum
+	
+	enum eEntityStatus
 	{
-		ENTITY_STATUS_HURT            = 2,
-		ENTITY_STATUS_DEAD            = 3,
-		ENTITY_STATUS_WOLF_TAMING     = 6,
-		ENTITY_STATUS_WOLF_TAMED      = 7,
-		ENTITY_STATUS_WOLF_SHAKING    = 8,
-		ENTITY_STATUS_EATING_ACCEPTED = 9,
-		ENTITY_STATUS_SHEEP_EATING    = 10,
-		ENTITY_STATUS_GOLEM_ROSING    = 11,
-		ENTITY_STATUS_VILLAGER_HEARTS = 12,
-		ENTITY_STATUS_VILLAGER_ANGRY  = 13,
-		ENTITY_STATUS_VILLAGER_HAPPY  = 14,
-		ENTITY_STATUS_WITCH_MAGICKING = 15,
+		// TODO: Investiagate 0, 1, and 5 as Wiki.vg is not certain
+
+		// Entity becomes coloured red
+		esGenericHurt            = 2,
+		// Entity plays death animation (entity falls to ground)
+		esGenericDead            = 3,
+		// Iron Golem plays attack animation (arms lift and fall)
+		esIronGolemAttacking     = 4,
+		// Wolf taming particles spawn (smoke)
+		esWolfTaming             = 6,
+		// Wolf tamed particles spawn (hearts)
+		esWolfTamed              = 7,
+		// Wolf plays water removal animation (shaking and water particles)
+		esWolfDryingWater        = 8,
+		// Informs client that eating was accepted
+		esPlayerEatingAccepted   = 9,
+		// Sheep plays eating animation (head lowers to ground)
+		esSheepEating            = 10,
+		// Iron Golem holds gift to villager children
+		esIronGolemGivingPlant   = 11,
+		// Villager spawns heart particles
+		esVillagerBreeding       = 12,
+		// Villager spawns thunderclound particles
+		esVillagerAngry          = 13,
+		// Villager spawns green crosses
+		esVillagerHappy          = 14,
+		// Witch spawns magic particle (TODO: investigation into what this is)
+		esWitchMagicking         = 15,
+
 		// It seems 16 (zombie conversion) is now done with metadata
-		ENTITY_STATUS_FIREWORK_EXPLODE= 17,
+
+		// Informs client to explode a firework based on its metadata
+		esFireworkExploding      = 17,
 	} ;
 	
 	enum
@@ -118,7 +139,8 @@ public:
 		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
 		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
 		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
-		VOID_BOUNDARY = -46          ///< At what position Y to begin applying void damage
+		VOID_BOUNDARY = -46,         ///< At what position Y to begin applying void damage
+		FALL_DAMAGE_HEIGHT = 4       ///< At what position Y fall damage is applied
 	} ;
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
@@ -159,7 +181,7 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	double           GetHeadYaw   (void) const { return m_HeadYaw; }
+	double           GetHeadYaw   (void) const { return m_HeadYaw; }  // In degrees
 	double           GetHeight    (void) const { return m_Height;  }
 	double           GetMass      (void) const { return m_Mass;    }
 	const Vector3d & GetPosition  (void) const { return m_Pos;     }
@@ -167,9 +189,9 @@ public:
 	double           GetPosY      (void) const { return m_Pos.y;   }
 	double           GetPosZ      (void) const { return m_Pos.z;   }
 	const Vector3d & GetRot       (void) const { return m_Rot;     }  // OBSOLETE, use individual GetYaw(), GetPitch, GetRoll() components
-	double           GetYaw       (void) const { return m_Rot.x;   }
-	double           GetPitch     (void) const { return m_Rot.y;   }
-	double           GetRoll      (void) const { return m_Rot.z;   }
+	double           GetYaw       (void) const { return m_Rot.x;   }  // In degrees, [-180, +180)
+	double           GetPitch     (void) const { return m_Rot.y;   }  // In degrees, [-180, +180), but normal client clips to [-90, +90]
+	double           GetRoll      (void) const { return m_Rot.z;   }  // In degrees, unused in current client
 	Vector3d         GetLookVector(void) const;
 	const Vector3d & GetSpeed     (void) const { return m_Speed;   }
 	double           GetSpeedX    (void) const { return m_Speed.x; }
@@ -189,9 +211,9 @@ public:
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
 	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
 	void SetRot     (const Vector3f & a_Rot);  // OBSOLETE, use individual SetYaw(), SetPitch(), SetRoll() components
-	void SetYaw     (double a_Yaw);
-	void SetPitch   (double a_Pitch);
-	void SetRoll    (double a_Roll);
+	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
+	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
+	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
 	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
 	void SetSpeedX  (double a_SpeedX);
@@ -307,6 +329,11 @@ public:
 
 	int GetMaxHealth(void) const { return m_MaxHealth; }
 	
+	/// Sets whether the entity is fireproof
+	void SetIsFireproof(bool a_IsFireproof);
+	
+	bool IsFireproof(void) const { return m_IsFireproof; }
+	
 	/// Puts the entity on fire for the specified amount of ticks
 	void StartBurning(int a_TicksLeftBurning);
 	
@@ -413,6 +440,9 @@ protected:
 	
 	cWorld * m_World;
 	
+	/// Whether the entity is capable of taking fire or lava damage.
+	bool m_IsFireproof;
+    
 	/// Time, in ticks, since the last damage dealt by being on fire. Valid only if on fire (IsOnFire())
 	int m_TicksSinceLastBurnDamage;
 	

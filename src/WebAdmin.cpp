@@ -229,10 +229,11 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		}  // for itr - Data->m_Form[]
 
 		// Parse the URL into individual params:
-		size_t idxQM = a_Request.GetURL().find('?');
+		const AString & URL = a_Request.GetURL();
+		size_t idxQM = URL.find('?');
 		if (idxQM != AString::npos)
 		{
-			cHTTPFormParser URLParams(cHTTPFormParser::fpkURL, a_Request.GetURL().c_str() + idxQM + 1, a_Request.GetURL().length() - idxQM - 1, *Data);
+			cHTTPFormParser URLParams(cHTTPFormParser::fpkURL, URL.c_str() + idxQM + 1, URL.length() - idxQM - 1, *Data);
 			URLParams.Finish();
 			for (cHTTPFormParser::const_iterator itr = URLParams.begin(), end = URLParams.end(); itr != end; ++itr)
 			{
@@ -388,7 +389,6 @@ AString cWebAdmin::GetDefaultPage(void)
 		{
 			continue;
 		}
-		AString VersionNum;
 		AppendPrintf(Content, "<li>%s V.%i</li>", itr->second->GetName().c_str(), itr->second->GetVersion());
 	}
 	Content += "</ul>";
@@ -490,7 +490,7 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 
 
 
-void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, int a_Size)
+void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	UNUSED(a_Connection);
 	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
@@ -537,7 +537,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWebAdmin::cWebadminRequestData
 
-void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, int a_Size)
+void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, size_t a_Size)
 {
 	m_Form.Parse(a_Data, a_Size);
 }

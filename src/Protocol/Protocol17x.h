@@ -87,6 +87,7 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendLoginSuccess        (void) override;
 	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) override;
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
 	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
@@ -196,7 +197,7 @@ protected:
 			m_Out.WriteVarUTF8String(a_Value);
 		}
 		
-		void WriteBuf(const char * a_Data, int a_Size)
+		void WriteBuf(const char * a_Data, size_t a_Size)
 		{
 			m_Out.Write(a_Data, a_Size);
 		}
@@ -243,7 +244,7 @@ protected:
 	
 	
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	void AddReceivedData(const char * a_Data, int a_Size);
+	void AddReceivedData(const char * a_Data, size_t a_Size);
 	
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
@@ -252,7 +253,7 @@ protected:
 	
 	// Packet handlers while in the Status state (m_State == 1):
 	void HandlePacketStatusPing   (cByteBuffer & a_ByteBuffer);
-	void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
 	
 	// Packet handlers while in the Login state (m_State == 2):
 	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
@@ -279,6 +280,7 @@ protected:
 	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
+	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 	
@@ -287,7 +289,7 @@ protected:
 	void WritePacket(cByteBuffer & a_Packet);
 
 	/** Sends the data to the client, encrypting them if needed. */
-	virtual void SendData(const char * a_Data, int a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 	void SendCompass(const cWorld & a_World);
 	
@@ -301,6 +303,25 @@ protected:
 	
 	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle);
+} ;
+
+
+
+
+
+/** The version 5 lengthed protocol, used by 1.7.6 through 1.7.9. */
+class cProtocol176 :
+	public cProtocol172
+{
+	typedef cProtocol172 super;
+	
+public:
+	cProtocol176(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	
+	// cProtocol172 overrides:
+	virtual void SendPlayerSpawn(const cPlayer & a_Player) override;
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+
 } ;
 
 

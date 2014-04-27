@@ -11,11 +11,11 @@ public:			// tolua_export
 	cGroup() {}
 	~cGroup() {}
 
-	void SetName( AString a_Name ) { m_Name = a_Name; }				// tolua_export
+	void SetName( const AString & a_Name ) { m_Name = a_Name; }				// tolua_export
 	const AString & GetName() const { return m_Name; }				// tolua_export
-	void SetColor( AString a_Color ) { m_Color = a_Color; }			// tolua_export
-	void AddCommand( AString a_Command );							// tolua_export
-	void AddPermission( AString a_Permission );						// tolua_export
+	void SetColor( const AString & a_Color ) { m_Color = a_Color; }			// tolua_export
+	void AddCommand( const AString & a_Command );							// tolua_export
+	void AddPermission( const AString & a_Permission );						// tolua_export
 	void InheritFrom( cGroup* a_Group );							// tolua_export
 
 	typedef std::map< AString, bool > PermissionMap;

@@ -39,7 +39,7 @@
 #include "../Mobs/Creeper.h"
 #include "../Mobs/Enderman.h"
 #include "../Mobs/Horse.h"
-#include "../Mobs/Magmacube.h"
+#include "../Mobs/MagmaCube.h"
 #include "../Mobs/Sheep.h"
 #include "../Mobs/Slime.h"
 #include "../Mobs/Skeleton.h"

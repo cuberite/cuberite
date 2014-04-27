@@ -31,7 +31,7 @@ public:
 	}
 
 
-	static char RotationToMetaData(double a_Rotation)
+	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
 		a_Rotation += 180 + (180 / 16);  // So it's not aligned with axis
 		if (a_Rotation > 360)
@@ -45,7 +45,7 @@ public:
 	}
 	
 	
-	static char DirectionToMetaData(eBlockFace a_Direction)
+	static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)
 	{
 		switch (a_Direction)
 		{

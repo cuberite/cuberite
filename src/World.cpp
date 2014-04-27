@@ -574,7 +574,7 @@ void cWorld::Start(void)
 	m_IsSugarcaneBonemealable     = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",     false);
 	m_IsDeepSnowEnabled           = IniFile.GetValueSetB("Physics",       "DeepSnow",                    true);
 	m_ShouldLavaSpawnFire         = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",         true);
-	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            (int)slNone);
+	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            (int)slAll);
 	m_bCommandBlocksEnabled       = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",        false);
 	m_bEnabledPVP                 = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                  true);
 	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
@@ -860,7 +860,7 @@ void cWorld::TickMobs(float a_Dt)
 			{
 				m_ChunkMap->SpawnMobs(Spawner);
 				// do the spawn
-				for (cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); itr2++)
+				for (cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); ++itr2)
 				{
 					SpawnMobFinalize(*itr2);
 				}
@@ -870,14 +870,14 @@ void cWorld::TickMobs(float a_Dt)
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; itr++)
+	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; ++itr)
 	{
 		itr->second.m_Monster.Tick(a_Dt, itr->second.m_Chunk);
 	}
 
 	// remove too far mobs
 	cMobProximityCounter::sIterablePair allTooFarMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(128 * 16, -1);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; itr++)
+	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; ++itr)
 	{
 		itr->second.m_Monster.Destroy(true);
 	}
@@ -1632,7 +1632,6 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool IsPlayerCreated)
 {
-	MTRand r1;
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
@@ -1642,9 +1641,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			continue;
 		}
 
-		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(10) - 5));
-		float SpeedY = (float)(a_FlyAwaySpeed * r1.randInt(50));
-		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(10) - 5));
+		float SpeedX = (float)(a_FlyAwaySpeed * (GetTickRandomNumber(10) - 5));
+		float SpeedY = (float)(a_FlyAwaySpeed * GetTickRandomNumber(50));
+		float SpeedZ = (float)(a_FlyAwaySpeed * (GetTickRandomNumber(10) - 5));
 		
 		cPickup * Pickup = new cPickup(
 			a_BlockX, a_BlockY, a_BlockZ,
@@ -1692,6 +1691,11 @@ int cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NI
 
 int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 {
+	if (a_Reward < 1)
+	{
+		return -1;
+	}
+
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
 	ExpOrb->Initialize(this);
 	return ExpOrb->GetUniqueID();
@@ -2890,7 +2894,7 @@ void cWorld::TickQueuedBlocks(void)
 	m_BlockTickQueueCopy.clear();
 	m_BlockTickQueue.swap(m_BlockTickQueueCopy);
 
-	for (std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); itr++)
+	for (std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); ++itr)
 	{
 		BlockTickQueueItem * Block = (*itr);
 		Block->TicksToWait -= 1;
@@ -2981,7 +2985,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 
 
-int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem a_Item, const Vector3d * a_Speed)
+int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem & a_Item, const Vector3d * a_Speed)
 {
 	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
 	if (Projectile == NULL)
@@ -2993,7 +2997,6 @@ int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProje
 		delete Projectile;
 		return -1;
 	}
-	BroadcastSpawnEntity(*Projectile);
 	return Projectile->GetUniqueID();
 }
 

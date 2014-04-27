@@ -4,12 +4,11 @@ project (expat)
 
 file(GLOB SOURCE
     "*.c"
+    "*.h"
 )
 
-# add headers to MSVC project files:
-if (WIN32)
-	file(GLOB HEADERS "*.h")
-	set(SOURCE ${SOURCE} ${HEADERS})
+# Set files to go to a "Sources" folder in MSVC project files:
+if (MSVC)
 	source_group("Sources" FILES ${SOURCE})
 endif()
 

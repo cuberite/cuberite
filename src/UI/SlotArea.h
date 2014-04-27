@@ -19,6 +19,8 @@ class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cCraftingRecipe;
+class cEnchantingWindow;
+class cWorld;
 
 
 
@@ -66,7 +68,7 @@ public:
 	/// If a_CollectFullStacks is false, slots with full stacks are skipped while collecting.
 	/// Returns true if full stack has been collected in a_Dragging, false if there's space remaining to fill.
 	virtual bool CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool a_CollectFullStacks);
-	
+
 protected:
 	int       m_NumSlots;
 	cWindow & m_ParentWindow;
@@ -143,8 +145,13 @@ public:
 	{
 	}
 
-	// Distributing the stack is allowed only for compatible items (helmets into helmet slot etc.)
+	/** Distributing the stack is allowed only for compatible items (helmets into helmet slot etc.) */
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+
+	/** Called when a player clicks in the window. Parameters taken from the click packet. */
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+
+	bool CanPlaceInSlot(int a_SlotNum, const cItem & a_Item);
 } ;
 
 
@@ -247,6 +254,34 @@ protected:
 	/// Retrieves the recipe for the specified player from the map, or creates one if not found
 	cCraftingRecipe & GetRecipeForPlayer(cPlayer & a_Player);
 } ;
+
+
+
+
+
+class cSlotAreaEnchanting :
+	public cSlotAreaTemporary
+{
+	typedef cSlotAreaTemporary super;
+
+public:
+	cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow);
+
+	// cSlotArea overrides:
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum) override;
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+
+	// cSlotAreaTemporary overrides:
+	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+
+	/* Get the count of bookshelves who stand in the near of the enchanting table */
+	int GetBookshelvesCount(cWorld * a_World);
+
+protected:
+	/** Handles a click in the item slot. */
+	void UpdateResult(cPlayer & a_Player);
+};
 
 
 

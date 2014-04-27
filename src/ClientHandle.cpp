@@ -24,12 +24,14 @@
 
 #include "Root.h"
 
-#include "Authenticator.h"
+#include "Protocol/Authenticator.h"
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
+
+#include "md5/md5.h"
 
 
 
@@ -175,6 +177,39 @@ void cClientHandle::Destroy(void)
 
 
 
+void cClientHandle::GenerateOfflineUUID(void)
+{
+	m_UUID = GenerateOfflineUUID(m_Username);
+}
+
+
+
+
+
+AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
+{
+	// Proper format for a version 3 UUID is:
+	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
+	
+	// Generate an md5 checksum, and use it as base for the ID:
+	MD5 Checksum(a_Username);
+	AString UUID = Checksum.hexdigest();
+	UUID[12] = '3';  // Version 3 UUID
+	UUID[16] = '8';  // Variant 1 UUID
+	
+	// Now the digest doesn't have the UUID slashes, but the client requires them, so add them into the appropriate positions:
+	UUID.insert(8, "-");
+	UUID.insert(13, "-");
+	UUID.insert(18, "-");
+	UUID.insert(23, "-");
+	
+	return UUID;
+}
+
+
+
+
+
 void cClientHandle::Kick(const AString & a_Reason)
 {
 	if (m_State >= csAuthenticating)  // Don't log pings
@@ -188,7 +223,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(void)
+void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 {
 	if (m_State != csAuthenticating)
 	{
@@ -196,6 +231,12 @@ void cClientHandle::Authenticate(void)
 	}
 	
 	ASSERT( m_Player == NULL );
+
+	m_Username = a_Name;
+	m_UUID = a_UUID;
+	
+	// Send login success (if the protocol supports it):
+	m_Protocol->SendLoginSuccess();
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());
@@ -412,14 +453,16 @@ void cClientHandle::HandlePing(void)
 {
 	// Somebody tries to retrieve information about the server
 	AString Reply;
+	const cServer & Server = *cRoot::Get()->GetServer();
+
 	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetServer()->GetDescription().c_str(),
+		Server.GetDescription().c_str(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetNumPlayers(),
+		Server.GetNumPlayers(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetMaxPlayers()
+		Server.GetMaxPlayers()
 	);
-	Kick(Reply.c_str());
+	Kick(Reply);
 }
 
 
@@ -994,7 +1037,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
-	else if (ItemHandler->IsFood())
+	else if (ItemHandler->IsFood() && !m_Player->IsGameModeCreative())
 	{
 		if (m_Player->IsSatiated())
 		{
@@ -1175,8 +1218,8 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		Color = AString("@") + Color[2];
 	}
 	else
-	{
-		Color.empty();
+	{ 
+		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
 	Msg.ParseText(a_Message);
@@ -1532,7 +1575,7 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 
 
-void cClientHandle::SendData(const char * a_Data, int a_Size)
+void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_HasSentDC)
 	{
@@ -1547,7 +1590,7 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 		if (m_OutgoingDataOverflow.empty())
 		{
 			// No queued overflow data; if this packet fits into the ringbuffer, put it in, otherwise put it in the overflow buffer:
-			int CanFit = m_OutgoingData.GetFreeSpace();
+			size_t CanFit = m_OutgoingData.GetFreeSpace();
 			if (CanFit > a_Size)
 			{
 				CanFit = a_Size;
@@ -1677,13 +1720,16 @@ void cClientHandle::Tick(float a_Dt)
 	}
 
 	// Send a ping packet:
-	cTimer t1;
-	if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+	if (m_State == csPlaying)
 	{
-		m_PingID++;
-		m_PingStartTime = t1.GetNowTime();
-		m_Protocol->SendKeepAlive(m_PingID);
-		m_LastPingTime = m_PingStartTime;
+		cTimer t1;
+		if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+		{
+			m_PingID++;
+			m_PingStartTime = t1.GetNowTime();
+			m_Protocol->SendKeepAlive(m_PingID);
+			m_LastPingTime = m_PingStartTime;
+		}
 	}
 
 	// Handle block break animation:
@@ -2101,7 +2147,7 @@ void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_Blo
 	}
 	
 	// Update the statistics:
-	m_NumExplosionsThisTick += 1;
+	m_NumExplosionsThisTick++;
 	
 	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
@@ -2633,7 +2679,7 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 
 
 
-void cClientHandle::DataReceived(const char * a_Data, int a_Size)
+void cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
 	m_TimeSinceLastPacket = 0;
@@ -2682,6 +2728,29 @@ void cClientHandle::SocketClosed(void)
 }
 
 
+
+
+
+void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
+{
+	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
+	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
+	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
+
+	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
+	{
+		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
+		{
+			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
+			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
+			Window->BroadcastWholeWindow();
+
+			Window->SetProperty(0, 0, *m_Player);
+			Window->SetProperty(1, 0, *m_Player);
+			Window->SetProperty(2, 0, *m_Player);
+		}
+	}
+}
 
 
 

@@ -83,6 +83,7 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive           (int a_PingID) = 0;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) = 0;
+	virtual void SendLoginSuccess        (void) = 0;
 	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) = 0;
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) = 0;
 	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) = 0;
@@ -132,7 +133,7 @@ protected:
 	cCriticalSection m_CSPacket;  //< Each SendXYZ() function must acquire this CS in order to send the whole packet at once
 	
 	/// A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it
-	virtual void SendData(const char * a_Data, int a_Size) = 0;
+	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
 	
 	/// Called after writing each packet, enables descendants to flush their buffers
 	virtual void Flush(void) {};
@@ -143,10 +144,15 @@ protected:
 		SendData((const char *)&a_Value, 1);
 	}
 	
+	void WriteChar(char a_Value)
+	{
+		SendData(&a_Value, 1);
+	}
+	
 	void WriteShort(short a_Value)
 	{
-		a_Value = htons(a_Value);
-		SendData((const char *)&a_Value, 2);
+		u_short Value = htons((u_short)a_Value);
+		SendData((const char *)&Value, 2);
 	}
 	
 	/*
@@ -159,8 +165,8 @@ protected:
 	
 	void WriteInt(int a_Value)
 	{
-		a_Value = htonl(a_Value);
-		SendData((const char *)&a_Value, 4);
+		u_long Value = htonl((u_long)a_Value);
+		SendData((const char *)&Value, 4);
 	}
 	
 	void WriteUInt(unsigned int a_Value)
@@ -171,19 +177,19 @@ protected:
 	
 	void WriteInt64 (Int64 a_Value)
 	{
-		a_Value = HostToNetwork8(&a_Value);
-		SendData((const char *)&a_Value, 8);
+		UInt64 Value = HostToNetwork8(&a_Value);
+		SendData((const char *)&Value, 8);
 	}
 	
 	void WriteFloat (float a_Value)
 	{
-		unsigned int val = HostToNetwork4(&a_Value);
+		UInt32 val = HostToNetwork4(&a_Value);
 		SendData((const char *)&val, 4);
 	}
 	
 	void WriteDouble(double a_Value)
 	{
-		unsigned long long val = HostToNetwork8(&a_Value);
+		UInt64 val = HostToNetwork8(&a_Value);
 		SendData((const char *)&val, 8);
 	}
 	
@@ -191,7 +197,7 @@ protected:
 	{
 		AString UTF16;
 		UTF8ToRawBEUTF16(a_Value.c_str(), a_Value.length(), UTF16);
-		WriteShort((unsigned short)(UTF16.size() / 2));
+		WriteShort((short)(UTF16.size() / 2));
 		SendData(UTF16.data(), UTF16.size());
 	}
 	
@@ -211,7 +217,7 @@ protected:
 	{
 		// A 32-bit integer can be encoded by at most 5 bytes:
 		unsigned char b[5];
-		int idx = 0;
+		size_t idx = 0;
 		do
 		{
 			b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
@@ -224,7 +230,7 @@ protected:
 	
 	void WriteVarUTF8String(const AString & a_String)
 	{
-		WriteVarInt(a_String.size());
+		WriteVarInt((UInt32)a_String.size());
 		SendData(a_String.data(), a_String.size());
 	}
 } ;

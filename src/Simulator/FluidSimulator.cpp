@@ -155,7 +155,7 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	Points.push_back(new Vector3i(a_X, a_Y, a_Z + 1));
 	Points.push_back(new Vector3i(a_X, a_Y, a_Z - 1));
 
-	for (std::vector<Vector3i *>::iterator it = Points.begin(); it < Points.end(); it++)
+	for (std::vector<Vector3i *>::iterator it = Points.begin(); it < Points.end(); ++it)
 	{
 		Vector3i *Pos = (*it);
 		char BlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);

@@ -23,6 +23,10 @@ static const cPrefab::sDef g_TestPrefabDef =
 	// Size:
 	7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
 
+	// Hitbox (relative to bounding box):
+	0, 0, 0,  // MinX, MinY, MinZ
+	6, 5, 6,  // MaxX, MaxY, MaxZ
+	
 	// Block definitions:
 	".:  0: 0\n"  /* 0 */
 	"a:112: 0\n"  /* netherbrick */
@@ -91,7 +95,19 @@ static const cPrefab::sDef g_TestPrefabDef =
 	7,  /* 1, 2, 3 CCW rotations */
 	
 	// Merge strategy:
-	cBlockArea::msImprint
+	cBlockArea::msImprint,
+	
+	// ShouldExtendFloor:
+	false,
+
+	// DefaultWeight:
+	10,
+
+	// DepthWeight:
+	"",
+
+	// AddWeightIfSame:
+	1000,
 };
 
 static cPrefab g_TestPrefab(g_TestPrefabDef);
@@ -103,15 +119,22 @@ static cPrefab g_TestPrefab(g_TestPrefabDef);
 
 cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_Size(a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
-	m_HitBox(0, 0, 0, a_Def.m_SizeX - 1, a_Def.m_SizeY - 1, a_Def.m_SizeZ - 1),
+	m_HitBox(
+		a_Def.m_HitboxMinX, a_Def.m_HitboxMinY, a_Def.m_HitboxMinZ,
+		a_Def.m_HitboxMaxX, a_Def.m_HitboxMaxY, a_Def.m_HitboxMaxZ
+	),
 	m_AllowedRotations(a_Def.m_AllowedRotations),
-	m_MergeStrategy(a_Def.m_MergeStrategy)
+	m_MergeStrategy(a_Def.m_MergeStrategy),
+	m_ShouldExtendFloor(a_Def.m_ShouldExtendFloor),
+	m_DefaultWeight(a_Def.m_DefaultWeight),
+	m_AddWeightIfSame(a_Def.m_AddWeightIfSame)
 {
 	m_BlockArea[0].Create(m_Size);
 	CharMap cm;
 	ParseCharMap(cm, a_Def.m_CharMap);
 	ParseBlockImage(cm, a_Def.m_Image);
 	ParseConnectors(a_Def.m_Connectors);
+	ParseDepthWeight(a_Def.m_DepthWeight);
 	
 	// 1 CCW rotation:
 	if ((m_AllowedRotations & 0x01) != 0)
@@ -142,12 +165,53 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 
 void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 {
+	// Draw the basic image:
 	Vector3i Placement = a_Placement->GetCoords();
 	int ChunkStartX = a_Dest.GetChunkX() * cChunkDef::Width;
 	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
 	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
-	a_Dest.WriteBlockArea(m_BlockArea[a_Placement->GetNumCCWRotations()], Placement.x, Placement.y, Placement.z, m_MergeStrategy);
+	const cBlockArea & Image = m_BlockArea[a_Placement->GetNumCCWRotations()];
+	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
+	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
+	int MaxX = Image.GetSizeX();
+	int MaxZ = Image.GetSizeZ();
+	for (int z = 0; z < MaxZ; z++)
+	{
+		int RelZ = Placement.z + z;
+		if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
+		{
+			// Z coord outside the chunk
+			continue;
+		}
+		for (int x = 0; x < MaxX; x++)
+		{
+			int RelX = Placement.x + x;
+			if ((RelX < 0) || (RelX >= cChunkDef::Width))
+			{
+				// X coord outside the chunk
+				continue;
+			}
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+			Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
+			if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+			{
+				// Do not expand air nor sponge blocks
+				continue;
+			}
+			for (int y = Placement.y - 1; y >= 0; y--)
+			{
+				BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
+				if (ExistingBlock != E_BLOCK_AIR)
+				{
+					// End the expansion for this column, reached the end
+					break;
+				}
+				a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
+			}  // for y
+		}  // for x
+	}  // for z
 }
 
 
@@ -164,6 +228,26 @@ bool cPrefab::HasConnectorType(int a_ConnectorType) const
 		}
 	}  // for itr - m_Connectors[]
 	return false;
+}
+
+
+
+
+
+int cPrefab::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector) const
+{
+	// Use the default or per-depth weight:
+	cDepthWeight::const_iterator itr = m_DepthWeight.find(a_PlacedPiece.GetDepth() + 1);
+	int res = (itr == m_DepthWeight.end()) ? m_DefaultWeight : itr->second;
+	
+	// If the piece is the same as the parent, apply the m_AddWeightIfSame modifier:
+	const cPiece * ParentPiece = &a_PlacedPiece.GetPiece();
+	const cPiece * ThisPiece = this;
+	if (ThisPiece == ParentPiece)
+	{
+		res += m_AddWeightIfSame;
+	}
+	return res;
 }
 
 
@@ -271,6 +355,54 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 			(eBlockFace)BlockFace
 		));
 	}  // for itr - Lines[]
+}
+
+
+
+
+
+void cPrefab::ParseDepthWeight(const char * a_DepthWeightDef)
+{
+	// The member needn't be defined at all, if so, skip:
+	if (a_DepthWeightDef == NULL)
+	{
+		return;
+	}
+	
+	// Split into individual records: "Record | Record | Record"
+	AStringVector Defs = StringSplitAndTrim(a_DepthWeightDef, "|");
+	
+	// Add each record's contents:
+	for (AStringVector::const_iterator itr = Defs.begin(), end = Defs.end(); itr != end; ++itr)
+	{
+		// Split into components: "Depth : Weight"
+		AStringVector Components = StringSplitAndTrim(*itr, ":");
+		if (Components.size() != 2)
+		{
+			LOGWARNING("Bad prefab DepthWeight record: \"%s\", skipping.", itr->c_str());
+			continue;
+		}
+		
+		// Parse depth:
+		int Depth = atoi(Components[0].c_str());
+		if ((Depth == 0) && (Components[0] != "0"))
+		{
+			LOGWARNING("Bad prefab DepthWeight record, cannot parse depth \"%s\", skipping.", Components[0].c_str());
+			continue;
+		}
+		
+		// Parse weight:
+		int Weight = atoi(Components[1].c_str());
+		if ((Weight == 0) && (Components[1] != "0"))
+		{
+			LOGWARNING("Bad prefab DepthWeight record, cannot parse weight \"%s\", skipping.", Components[1].c_str());
+			continue;
+		}
+		
+		// Save to map:
+		ASSERT(m_DepthWeight.find(Depth) == m_DepthWeight.end());  // Not a duplicate
+		m_DepthWeight[Depth] = Weight;
+	}  // for itr - Defs[]
 }
 
 

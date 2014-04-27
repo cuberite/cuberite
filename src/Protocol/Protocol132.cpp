@@ -115,7 +115,7 @@ void cProtocol132::DataReceived(const char * a_Data, size_t a_Size)
 		Byte Decrypted[512];
 		while (a_Size > 0)
 		{
-			int NumBytes = (a_Size > (int)sizeof(Decrypted)) ? (int)sizeof(Decrypted) : a_Size;
+			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
 			m_Decryptor.ProcessData(Decrypted, (Byte *)a_Data, NumBytes);
 			super::DataReceived((const char *)Decrypted, NumBytes);
 			a_Size -= NumBytes;
@@ -139,8 +139,8 @@ void cProtocol132::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 	WriteInt  (a_BlockX);
 	WriteShort((short)a_BlockY);
 	WriteInt  (a_BlockZ);
-	WriteByte (a_Byte1);
-	WriteByte (a_Byte2);
+	WriteChar (a_Byte1);
+	WriteChar (a_Byte2);
 	WriteShort(a_BlockType);
 	Flush();
 }
@@ -157,7 +157,7 @@ void cProtocol132::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY
 	WriteInt    (a_BlockX);
 	WriteInt    (a_BlockY);
 	WriteInt    (a_BlockZ);
-	WriteByte   (stage);
+	WriteChar   (stage);
 	Flush();
 }
 
@@ -259,7 +259,7 @@ void cProtocol132::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	WriteByte  (PACKET_LOGIN);
 	WriteInt   (a_Player.GetUniqueID());  // EntityID of the player
 	WriteString("default");  // Level type
-	WriteByte  ((int)a_Player.GetGameMode());
+	WriteByte  ((Byte)a_Player.GetGameMode());
 	WriteByte  ((Byte)(a_World.GetDimension()));
 	WriteByte  (2);  // TODO: Difficulty
 	WriteByte  (0);  // Unused, used to be world height
@@ -283,8 +283,8 @@ void cProtocol132::SendPlayerSpawn(const cPlayer & a_Player)
 	WriteInt   ((int)(a_Player.GetPosX() * 32));
 	WriteInt   ((int)(a_Player.GetPosY() * 32));
 	WriteInt   ((int)(a_Player.GetPosZ() * 32));
-	WriteByte  ((char)((a_Player.GetYaw()   / 360.f) * 256));
-	WriteByte  ((char)((a_Player.GetPitch() / 360.f) * 256));
+	WriteChar  ((char)((a_Player.GetYaw()   / 360.f) * 256));
+	WriteChar  ((char)((a_Player.GetPitch() / 360.f) * 256));
 	WriteShort (HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType);
 	// Player metadata: just use a default metadata value, since the client doesn't like starting without any metadata:
 	WriteByte  (0);  // Index 0, byte (flags)
@@ -306,7 +306,7 @@ void cProtocol132::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int 
 	WriteInt    (a_SrcY);
 	WriteInt    (a_SrcZ);
 	WriteFloat  (a_Volume);
-	WriteByte   ((char)(a_Pitch * 63.0f));
+	WriteChar   ((char)(a_Pitch * 63.0f));
 	Flush();
 }
 
@@ -320,7 +320,7 @@ void cProtocol132::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 	WriteByte(PACKET_SOUND_PARTICLE_EFFECT);
 	WriteInt (a_EffectID);
 	WriteInt (a_SrcX);
-	WriteByte(a_SrcY);
+	WriteByte((Byte)a_SrcY);
 	WriteInt (a_SrcZ);
 	WriteInt (a_Data);
 	Flush();
@@ -335,7 +335,7 @@ void cProtocol132::SendSpawnMob(const cMonster & a_Mob)
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_SPAWN_MOB);
 	WriteInt    (a_Mob.GetUniqueID());
-	WriteByte   (a_Mob.GetMobType());
+	WriteByte   ((Byte)a_Mob.GetMobType());
 	WriteVectorI((Vector3i)(a_Mob.GetPosition() * 32));
 	WriteByte   ((Byte)((a_Mob.GetYaw()     / 360.f) * 256));
 	WriteByte   ((Byte)((a_Mob.GetPitch()   / 360.f) * 256));
@@ -408,21 +408,22 @@ void cProtocol132::SendWholeInventory(const cWindow & a_Window)
 	super::SendWholeInventory(a_Window);
 	
 	// Send the player inventory and hotbar:
-	const cInventory & Inventory = m_Client->GetPlayer()->GetInventory();
+	cPlayer * Player = m_Client->GetPlayer();
+	const cInventory & Inventory = Player->GetInventory();
 	int BaseOffset = a_Window.GetNumSlots() - (cInventory::invNumSlots - cInventory::invInventoryOffset);  // Number of non-inventory slots
 	char WindowID = a_Window.GetWindowID();
-	for (int i = 0; i < cInventory::invInventoryCount; i++)
+	for (short i = 0; i < cInventory::invInventoryCount; i++)
 	{
 		SendInventorySlot(WindowID, BaseOffset + i, Inventory.GetInventorySlot(i));
 	}  // for i - Inventory[]
 	BaseOffset += cInventory::invInventoryCount;
-	for (int i = 0; i < cInventory::invHotbarCount; i++)
+	for (short i = 0; i < cInventory::invHotbarCount; i++)
 	{
 		SendInventorySlot(WindowID, BaseOffset + i, Inventory.GetHotbarSlot(i));
 	}  // for i - Hotbar[]
 	
 	// Send even the item being dragged:
-	SendInventorySlot(-1, -1, m_Client->GetPlayer()->GetDraggingItem());
+	SendInventorySlot(-1, -1, Player->GetDraggingItem());
 }
 
 
@@ -527,21 +528,30 @@ int cProtocol132::ParseClientStatuses(void)
 
 int cProtocol132::ParseEncryptionKeyResponse(void)
 {
+	// Read the encryption key:
 	HANDLE_PACKET_READ(ReadBEShort, short, EncKeyLength);
+	if (EncKeyLength > MAX_ENC_LEN)
+	{
+		LOGD("Too long encryption key");
+		m_Client->Kick("Hacked client");
+		return PARSE_OK;
+	}
 	AString EncKey;
-	if (!m_ReceivedData.ReadString(EncKey, EncKeyLength))
+	if (!m_ReceivedData.ReadString(EncKey, (size_t)EncKeyLength))
 	{
 		return PARSE_INCOMPLETE;
 	}
+	
+	// Read the encryption nonce:
 	HANDLE_PACKET_READ(ReadBEShort, short, EncNonceLength);
 	AString EncNonce;
-	if (!m_ReceivedData.ReadString(EncNonce, EncNonceLength))
+	if (!m_ReceivedData.ReadString(EncNonce, (size_t)EncNonceLength))
 	{
 		return PARSE_INCOMPLETE;
 	}
-	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
+	if (EncNonceLength > MAX_ENC_LEN)
 	{
-		LOGD("Too long encryption");
+		LOGD("Too long encryption nonce");
 		m_Client->Kick("Hacked client");
 		return PARSE_OK;
 	}
@@ -605,7 +615,7 @@ int cProtocol132::ParseTabCompletion(void)
 
 
 
-void cProtocol132::SendData(const char * a_Data, int a_Size)
+void cProtocol132::SendData(const char * a_Data, size_t a_Size)
 {
 	m_DataToSend.append(a_Data, a_Size);
 }
@@ -623,23 +633,23 @@ void cProtocol132::Flush(void)
 		LOGD("Flushing empty");
 		return;
 	}
-	const char * a_Data = m_DataToSend.data();
-	int a_Size = m_DataToSend.size();
+	const char * Data = m_DataToSend.data();
+	size_t Size = m_DataToSend.size();
 	if (m_IsEncrypted)
 	{
 		Byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
-		while (a_Size > 0)
+		while (Size > 0)
 		{
-			int NumBytes = (a_Size > (int)sizeof(Encrypted)) ? (int)sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
+			size_t NumBytes = (Size > sizeof(Encrypted)) ? sizeof(Encrypted) : Size;
+			m_Encryptor.ProcessData(Encrypted, (Byte *)Data, NumBytes);
 			super::SendData((const char *)Encrypted, NumBytes);
-			a_Size -= NumBytes;
-			a_Data += NumBytes;
+			Size -= NumBytes;
+			Data += NumBytes;
 		}
 	}
 	else
 	{
-		super::SendData(a_Data, a_Size);
+		super::SendData(Data, Size);
 	}
 	m_DataToSend.clear();
 }
@@ -665,7 +675,7 @@ void cProtocol132::WriteItem(const cItem & a_Item)
 	}
 	
 	WriteShort(ItemType);
-	WriteByte (a_Item.m_ItemCount);
+	WriteChar (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
 	if (a_Item.m_Enchantments.IsEmpty())
@@ -681,7 +691,7 @@ void cProtocol132::WriteItem(const cItem & a_Item)
 	Writer.Finish();
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
-	WriteShort(Compressed.size());
+	WriteShort((short)Compressed.size());
 	SendData(Compressed.data(), Compressed.size());
 }
 
@@ -717,8 +727,8 @@ int cProtocol132::ParseItem(cItem & a_Item)
 		
 	// Read the metadata
 	AString Metadata;
-	Metadata.resize(MetadataLength);
-	if (!m_ReceivedData.ReadBuf((void *)Metadata.data(), MetadataLength))
+	Metadata.resize((size_t)MetadataLength);
+	if (!m_ReceivedData.ReadBuf((void *)Metadata.data(), (size_t)MetadataLength))
 	{
 		return PARSE_INCOMPLETE;
 	}
@@ -791,10 +801,12 @@ void cProtocol132::SendCompass(const cWorld & a_World)
 void cProtocol132::SendEncryptionKeyRequest(void)
 {
 	cCSLock Lock(m_CSPacket);
+	cServer * Server = cRoot::Get()->GetServer();
 	WriteByte(0xfd);
-	WriteString(cRoot::Get()->GetServer()->GetServerID());
-	WriteShort((short)(cRoot::Get()->GetServer()->GetPublicKeyDER().size()));
-	SendData(cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	WriteString(Server->GetServerID());
+	const AString & PublicKeyDER = Server->GetPublicKeyDER();
+	WriteShort((short)(PublicKeyDER.size()));
+	SendData(PublicKeyDER.data(), PublicKeyDER.size());
 	WriteShort(4);
 	WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 	Flush();
@@ -865,10 +877,11 @@ void cProtocol132::StartEncryption(const Byte * a_Key)
 	
 	// Prepare the m_AuthServerID:
 	cSHA1Checksum Checksum;
-	AString ServerID = cRoot::Get()->GetServer()->GetServerID();
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerID = Server->GetServerID();
 	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update((const Byte *)cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);

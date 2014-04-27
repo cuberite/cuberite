@@ -132,7 +132,7 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	int PosY = (int)floor(GetPosY());
+	int PosY = POSY_TOINT;
 	if ((PosY <= 0) || (PosY >= cChunkDef::Height))
 	{
 		// Outside the world, just process normal falling physics
@@ -141,8 +141,8 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	
-	int RelPosX = (int)floor(GetPosX()) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelPosZ = (int)floor(GetPosZ()) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int RelPosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelPosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
 	if (Chunk == NULL)
 	{
@@ -195,7 +195,7 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		super::HandlePhysics(a_Dt, *Chunk);
 	}
 
-	if (m_bIsOnDetectorRail && !Vector3i((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ())).Equals(m_DetectorRailPosition))
+	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
 	{
 		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
 		m_bIsOnDetectorRail = false;
@@ -203,7 +203,7 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	else if (WasDetectorRail)
 	{
 		m_bIsOnDetectorRail = true;
-		m_DetectorRailPosition = Vector3i((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
+		m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 	}
 	
 	// Broadcast positioning changes to client
@@ -719,11 +719,11 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		{
 			if (GetSpeedZ() > 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)ceil(GetPosZ()));
+				BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT, POSY_TOINT, (int)ceil(GetPosZ()));
 				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
 					// We could try to detect a block in front based purely on coordinates, but xoft made a bounding box system - why not use? :P
-					cBoundingBox bbBlock(Vector3d((int)floor(GetPosX()), (int)floor(GetPosY()), (int)ceil(GetPosZ())), 0.5, 1);
+					cBoundingBox bbBlock(Vector3d(POSX_TOINT, POSY_TOINT, (int)ceil(GetPosZ())), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
 
 					if (bbBlock.DoesIntersect(bbMinecart))
@@ -736,10 +736,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			}
 			else if (GetSpeedZ() < 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) - 1);
+				BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
 				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
-					cBoundingBox bbBlock(Vector3d((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) - 1), 0.5, 1);
+					cBoundingBox bbBlock(Vector3d(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ() - 1), GetWidth() / 2, GetHeight());
 
 					if (bbBlock.DoesIntersect(bbMinecart))
@@ -756,10 +756,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		{
 			if (GetSpeedX() > 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock((int)ceil(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
+				BLOCKTYPE Block = m_World->GetBlock((int)ceil(GetPosX()), POSY_TOINT, POSZ_TOINT);
 				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
-					cBoundingBox bbBlock(Vector3d((int)ceil(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ())), 0.5, 1);
+					cBoundingBox bbBlock(Vector3d((int)ceil(GetPosX()), POSY_TOINT, POSZ_TOINT), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
 
 					if (bbBlock.DoesIntersect(bbMinecart))
@@ -772,10 +772,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			}
 			else if (GetSpeedX() < 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock((int)floor(GetPosX()) - 1, (int)floor(GetPosY()), (int)floor(GetPosZ()));
+				BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
 				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
-					cBoundingBox bbBlock(Vector3d((int)floor(GetPosX()) - 1, (int)floor(GetPosY()), (int)floor(GetPosZ())), 0.5, 1);
+					cBoundingBox bbBlock(Vector3d(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX() - 1, floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
 
 					if (bbBlock.DoesIntersect(bbMinecart))
@@ -793,10 +793,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		case E_META_RAIL_CURVED_ZP_XM:
 		case E_META_RAIL_CURVED_ZP_XP:
 		{
-			BLOCKTYPE BlockXM = m_World->GetBlock((int)floor(GetPosX()) - 1, (int)floor(GetPosY()), (int)floor(GetPosZ()));
-			BLOCKTYPE BlockXP = m_World->GetBlock((int)floor(GetPosX()) + 1, (int)floor(GetPosY()), (int)floor(GetPosZ()));
-			BLOCKTYPE BlockZM = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) + 1);
-			BLOCKTYPE BlockZP = m_World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()) + 1);
+			BLOCKTYPE BlockXM = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
+			BLOCKTYPE BlockXP = m_World->GetBlock(POSX_TOINT + 1, POSY_TOINT, POSZ_TOINT);
+			BLOCKTYPE BlockZM = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
+			BLOCKTYPE BlockZP = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT + 1);
 			if (
 				(!IsBlockRail(BlockXM) && cBlockInfo::IsSolid(BlockXM)) ||
 				(!IsBlockRail(BlockXP) && cBlockInfo::IsSolid(BlockXP)) ||
@@ -805,7 +805,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 				)
 			{
 				SetSpeed(0, 0, 0);
-				SetPosition((int)floor(GetPosX()) + 0.5, GetPosY(), (int)floor(GetPosZ()) + 0.5);
+				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
 				return true;
 			}
 			break;
@@ -822,7 +822,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 {
 	cMinecartCollisionCallback MinecartCollisionCallback(GetPosition(), GetHeight(), GetWidth(), GetUniqueID(), ((m_Attachee == NULL) ? -1 : m_Attachee->GetUniqueID()));
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk((int)floor(GetPosX()), (int)floor(GetPosZ()), ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
 	m_World->ForEachEntityInChunk(ChunkX, ChunkZ, MinecartCollisionCallback);
 
 	if (!MinecartCollisionCallback.FoundIntersection())
