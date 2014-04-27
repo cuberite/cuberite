@@ -1042,7 +1042,7 @@ bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Cha
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLUGIN_MESSAGE];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Client, a_Channel, a_Message);
+		m_LuaState.Call((int)(**itr), &a_Client, a_Channel, a_Message, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
