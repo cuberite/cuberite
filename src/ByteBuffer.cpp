@@ -887,9 +887,7 @@ void cByteBuffer::AdvanceReadPos(size_t a_Count)
 
 void cByteBuffer::CheckValid(void) const
 {
-	ASSERT(m_ReadPos >= 0);
 	ASSERT(m_ReadPos < m_BufferSize);
-	ASSERT(m_WritePos >= 0);
 	ASSERT(m_WritePos < m_BufferSize);
 }
 
