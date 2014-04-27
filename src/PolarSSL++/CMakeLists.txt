@@ -5,12 +5,26 @@ project (MCServer)
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 set(SOURCES
-	"EntropyContext.cpp"
+	"BlockingSslClientSocket.cpp"
+	"BufferedSslSocket.cpp"
+	"CallbackSslContext.cpp"
 	"CtrDrbgContext.cpp"
+	"EntropyContext.cpp"
+	"SslContext.cpp"
 	"X509Cert.cpp"
 )
 
-add_library(PolarSSL++ ${SOURCES})
+set(HEADERS
+	"BlockingSslClientSocket.h"
+	"BufferedSslSocket.h"
+	"CallbackSslContext.h"
+	"CtrDrbgContext.h"
+	"EntropyContext.h"
+	"SslContext.h"
+	"X509Cert.h"
+)
+
+add_library(PolarSSL++ ${SOURCES} ${HEADERS})
 
 if (UNIX)
 	target_link_libraries(PolarSSL++ polarssl)
