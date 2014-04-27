@@ -1911,7 +1911,7 @@ bool cBlockArea::cChunkReader::Coords(int a_ChunkX, int a_ChunkZ)
 
 void cBlockArea::cChunkReader::ChunkBuffer(const cChunkBuffer &  a_BlockBuffer)
 {
-	{ // BlockTypes
+	{
 		if (!(m_Area.m_BlockTypes == NULL))
 		{
 			int SizeY = m_Area.m_Size.y;
