@@ -6,7 +6,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 set(SOURCES
 	"BlockingSslClientSocket.cpp"
-	"BufferedSslSocket.cpp"
+	"BufferedSslContext.cpp"
 	"CallbackSslContext.cpp"
 	"CtrDrbgContext.cpp"
 	"EntropyContext.cpp"
@@ -16,7 +16,7 @@ set(SOURCES
 
 set(HEADERS
 	"BlockingSslClientSocket.h"
-	"BufferedSslSocket.h"
+	"BufferedSslContext.h"
 	"CallbackSslContext.h"
 	"CtrDrbgContext.h"
 	"EntropyContext.h"
