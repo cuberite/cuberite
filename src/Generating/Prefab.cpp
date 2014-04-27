@@ -283,7 +283,7 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 		if ((NumElements >= 3) && !CharDef[2].empty())
 		{
 			BlockMeta = (NIBBLETYPE)atoi(CharDef[2].c_str());
-			ASSERT((BlockMeta >= 0) && (BlockMeta <= 15));
+			ASSERT((BlockMeta <= 15));
 		}
 		a_CharMapOut[Src].m_BlockMeta = BlockMeta;
 	}  // for itr - Lines[]
