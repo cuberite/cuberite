@@ -11,8 +11,8 @@
 
 
 cBlockingSslClientSocket::cBlockingSslClientSocket(void) :
-	m_IsConnected(false),
-	m_Ssl(*this)
+	m_Ssl(*this),
+	m_IsConnected(false)
 {
 	// Nothing needed yet
 }
