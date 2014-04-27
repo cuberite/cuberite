@@ -1248,8 +1248,6 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		Chunk->SetMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
-		Chunk->MarkDirty();
-		Chunk->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, NULL);
 	}
 }
 

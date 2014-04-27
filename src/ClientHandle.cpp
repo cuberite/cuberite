@@ -202,7 +202,7 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 {
 	switch (a_ChatPrefix)
 	{
-		case mtCustom:      return AString();
+		case mtCustom:      return "";
 		case mtFailure:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Rose,   cChatColor::White);
 		case mtInformation: return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Yellow, cChatColor::White);
 		case mtSuccess:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Green,  cChatColor::White);
@@ -220,6 +220,7 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		}
 	}
 	ASSERT(!"Unhandled chat prefix type!");
+	return "";
 }
 
 
