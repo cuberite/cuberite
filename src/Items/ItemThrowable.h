@@ -89,22 +89,6 @@ public:
 		super(E_ITEM_ENDER_PEARL, cProjectileEntity::pkEnderPearl, 30)
 	{
 	}
-	
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
-	{
-		// Creative players cannot throw ender pearls.
-		if (a_Player->IsGameModeCreative())
-		{
-			return false;
-		}
-		
-		a_Player->GetInventory().RemoveOneEquippedItem();
-		Vector3d Pos = a_Player->GetThrowStartPos();
-		Vector3d Speed = a_Player->GetLookVector() * m_SpeedCoeff;
-		a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, a_Player->GetEquippedItem(), &Speed);
-		
-		return true;
-	}
 } ;
 
 
