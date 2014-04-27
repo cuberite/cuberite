@@ -10,6 +10,8 @@
 
 
 
+// tolua_begin
+
 class cGhastFireballEntity :
 public cProjectileEntity
 {
@@ -32,7 +34,5 @@ protected:
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
 	
 	// TODO: Deflecting the fireballs by arrow- or sword- hits
-	
-	// tolua_begin
 	
 } ;

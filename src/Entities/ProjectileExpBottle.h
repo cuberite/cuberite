@@ -10,6 +10,8 @@
 
 
 
+// tolua_begin
+
 class cExpBottleEntity :
 public cProjectileEntity
 {
@@ -27,7 +29,5 @@ protected:
 	
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
-	
-	// tolua_begin
 	
 };

@@ -57,6 +57,14 @@ if (NOT MSVC)
 		Entities/Pickup.h
 		Entities/Player.h
 		Entities/ProjectileEntity.h
+		Entities/ProjectileArrow.h
+		Entities/ProjectileEgg.h
+		Entities/ProjectileEnderPearl.h
+		Entities/ProjectileExpBottle.h
+		Entities/ProjectileSnowball.h
+		Entities/ProjectileFireCharge.h
+		Entities/ProjectileFirework.h
+		Entities/ProjectileGhastFireball.h
 		Entities/TNTEntity.h
 		Entities/ExpOrb.h
 		Entities/HangingEntity.h

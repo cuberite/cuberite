@@ -10,6 +10,8 @@
 
 
 
+// tolua_begin
+
 class cThrownEnderPearlEntity :
 public cProjectileEntity
 {
@@ -25,15 +27,11 @@ public:
 	
 protected:
 	
-	// tolua_end
-	
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
 	
 	// Teleports the creator where the ender pearl lands.
 	void TeleportCreator(const Vector3d & a_HitPos);
-	
-	// tolua_begin
 	
 } ;
