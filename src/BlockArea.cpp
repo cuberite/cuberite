@@ -66,7 +66,10 @@ template<bool MetaValid>
 static void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	a_DstType = a_SrcType;
-	if (MetaValid) a_DstMeta = a_SrcMeta;
+	if (MetaValid)
+	{
+		a_DstMeta = a_SrcMeta;
+	}
 }
 
 
@@ -80,7 +83,10 @@ static void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, N
 	if (a_DstType == E_BLOCK_AIR)
 	{
 		a_DstType = a_SrcType;
-		if (MetaValid) a_DstMeta = a_SrcMeta;
+		if (MetaValid)
+		{
+			a_DstMeta = a_SrcMeta;
+		}
 	}
 	// "else" is the default, already in place
 }
@@ -96,7 +102,10 @@ static void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, N
 	if (a_SrcType != E_BLOCK_AIR)
 	{
 		a_DstType = a_SrcType;
-		if (MetaValid) a_DstMeta = a_SrcMeta;
+		if (MetaValid)
+		{
+			a_DstMeta = a_SrcMeta;
+		}
 	}
 	// "else" is the default, already in place
 }
@@ -119,7 +128,10 @@ static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 	if (a_SrcType == E_BLOCK_AIR)
 	{
 		a_DstType = E_BLOCK_AIR;
-		if (MetaValid) a_DstMeta = 0;
+		if (MetaValid)
+		{
+			a_DstMeta = 0;
+		}
 		return;
 	}
 	
@@ -144,7 +156,10 @@ static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 		case E_BLOCK_STATIONARY_LAVA:
 		{
 			a_DstType = a_SrcType;
-			if (MetaValid) a_DstMeta = a_SrcMeta;
+			if (MetaValid)
+			{
+				a_DstMeta = a_SrcMeta;
+			}
 			return;
 		}
 	}
@@ -158,7 +173,10 @@ static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 			case E_BLOCK_MYCELIUM:
 			{
 				a_DstType = E_BLOCK_STONE;
-				if (MetaValid) a_DstMeta = 0;
+				if (MetaValid)
+				{
+					a_DstMeta = 0;
+				}
 				return;
 			}
 		}
@@ -178,7 +196,10 @@ static void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcTyp
 	if (a_SrcType != E_BLOCK_SPONGE)
 	{
 		a_DstType = a_SrcType;
-		if (MetaValid) a_DstMeta = a_SrcMeta;
+		if (MetaValid)
+		{
+			a_DstMeta = a_SrcMeta;
+		}
 	}
 }
 
@@ -193,12 +214,18 @@ static void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType
 	if ((a_DstType == a_SrcType) && (!MetaValid || (a_DstMeta == a_SrcMeta)))
 	{
 		a_DstType = E_BLOCK_AIR;
-		if (MetaValid) a_DstMeta = 0;
+		if (MetaValid)
+		{
+			a_DstMeta = 0;
+		}
 	}
 	else
 	{
 		a_DstType = a_SrcType;
-		if (MetaValid) a_DstMeta = a_SrcMeta;
+		if (MetaValid)
+		{
+			a_DstMeta = a_SrcMeta;
+		}
 	}
 }
 
@@ -214,7 +241,10 @@ static void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 	if ((a_SrcType != a_DstType) || !MetaValid || (a_SrcMeta != a_DstMeta))
 	{
 		a_DstType = E_BLOCK_AIR;
-		if (MetaValid) a_DstMeta = 0;
+		if (MetaValid)
+		{
+			a_DstMeta = 0;
+		}
 	}
 }
 
