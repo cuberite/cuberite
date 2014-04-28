@@ -294,7 +294,7 @@ public:
 	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas; }     // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight; }     // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight; }  // NOTE: one byte per block!
-	int          GetBlockCount(void) const { return m_Size.x * m_Size.y * m_Size.z; }
+	size_t       GetBlockCount(void) const { return m_Size.x * m_Size.y * m_Size.z; }
 	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
 
 protected:
@@ -363,6 +363,9 @@ protected:
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
 		NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
 	);
+	
+	template<bool MetasValid>
+	void MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas);
 	// tolua_begin
 } ;
 // tolua_end

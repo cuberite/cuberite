@@ -608,6 +608,8 @@ void cCubicNoise::Generate2D(
 	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
 ) const
 {
+	ASSERT(a_SizeX > 0);
+	ASSERT(a_SizeY > 0);
 	ASSERT(a_SizeX < MAX_SIZE);
 	ASSERT(a_SizeY < MAX_SIZE);
 	ASSERT(a_StartX < a_EndX);

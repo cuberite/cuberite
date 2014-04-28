@@ -91,7 +91,8 @@ int cFastRandom::m_SeedCounter = 0;
 
 
 cFastRandom::cFastRandom(void) :
-	m_Seed(m_SeedCounter++)
+	m_Seed(m_SeedCounter++),
+	m_Counter(0)
 {
 }
 
