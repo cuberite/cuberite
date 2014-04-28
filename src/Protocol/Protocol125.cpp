@@ -2013,14 +2013,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtWither:
 		{
 			WriteByte(0x54); // Int at index 20
-			if (((const cWither &)a_Mob).IsSpawnInvulnerable())
-			{
-				WriteInt((Int32)((const cWither &)a_Mob).GetInvulnerableTicks());
-			}
-			else
-			{
-				WriteInt((Int32)0);
-			}
+			WriteInt((Int32)((const cWither &)a_Mob).GetWitherInvulnerableTicks());
 			WriteByte(0x66); // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;

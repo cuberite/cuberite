@@ -516,14 +516,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case cMonster::mtWither:
 			{
-				if (((const cWither *)a_Monster)->IsSpawnInvulnerable())
-				{
-					m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetInvulnerableTicks());
-				}
-				else
-				{
-					m_Writer.AddInt("Invul", 0);
-				}
+				m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetWitherInvulnerableTicks());
 				break;
 			}
 			case cMonster::mtWolf:
