@@ -10,10 +10,9 @@
 
 cWither::cWither(void) :
 	super("Wither", mtWither, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0),
-	m_IsSpawnInvulnerable(true)
+	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
-	SetInvulnerableTicks(220);
 }
 
 
@@ -48,6 +47,11 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+	if (m_WitherInvulnerableTicks > 0)
+	{
+		return false;
+	}
+
 	if (IsArmored() && (a_TDI.DamageType == dtRangedAttack))
 	{
 		return false;
@@ -64,14 +68,21 @@ void cWither::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if (GetInvulnerableTicks() <= 0 && m_IsSpawnInvulnerable)
+	if (m_WitherInvulnerableTicks > 0)
 	{
-		m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
-		m_IsSpawnInvulnerable = false;
-	}
-	else if (((GetInvulnerableTicks() % 10) == 0) && (GetInvulnerableTicks() > 10))
-	{
-		Heal(10);
+		unsigned int NewTicks = m_WitherInvulnerableTicks - 1;
+
+		if (NewTicks == 0)
+		{
+			m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
+		}
+
+		m_WitherInvulnerableTicks = NewTicks;
+
+		if ((NewTicks % 10) == 0)
+		{
+			Heal(10);
+		}
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
