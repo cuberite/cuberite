@@ -25,14 +25,19 @@ cWolf::cWolf(void) :
 
 
 
-void cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
 	if (!m_IsTame)
 	{
 		m_IsAngry = true;
 	}
 	m_World->BroadcastEntityMetadata(*this); // Broadcast health and possibly angry face
+	return true;
 }
 
 

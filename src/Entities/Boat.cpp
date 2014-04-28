@@ -33,9 +33,12 @@ void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cBoat::DoTakeDamage(TakeDamageInfo & TDI)
+bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 {
-	super::DoTakeDamage(TDI);
+	if (!super::DoTakeDamage(TDI))
+	{
+		return false;
+	}
 
 	if (GetHealth() == 0)
 	{
@@ -50,6 +53,7 @@ void cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 		}
 		Destroy(true);
 	}
+	return true;
 }
 
 
