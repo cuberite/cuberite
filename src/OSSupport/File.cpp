@@ -143,7 +143,7 @@ bool cFile::IsEOF(void) const
 
 
 
-int cFile::Read (void * iBuffer, int iNumBytes)
+int cFile::Read (void * iBuffer, size_t iNumBytes)
 {
 	ASSERT(IsOpen());
 	
@@ -159,7 +159,7 @@ int cFile::Read (void * iBuffer, int iNumBytes)
 
 
 
-int cFile::Write(const void * iBuffer, int iNumBytes)
+int cFile::Write(const void * iBuffer, size_t iNumBytes)
 {
 	ASSERT(IsOpen());
 	
