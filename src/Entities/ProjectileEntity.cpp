@@ -13,14 +13,14 @@
 #include "../ChunkMap.h"
 #include "../Chunk.h"
 
-#include "ProjectileArrow.h"
-#include "ProjectileEgg.h"
-#include "ProjectileEnderPearl.h"
-#include "ProjectileExpBottle.h"
-#include "ProjectileSnowball.h"
-#include "ProjectileFireCharge.h"
-#include "ProjectileFirework.h"
-#include "ProjectileGhastFireball.h"
+#include "ArrowEntity.h"
+#include "ThrownEggEntity.h"
+#include "ThrownEnderPearlEntity.h"
+#include "ExpBottleEntity.h"
+#include "ThrownSnowballEntity.h"
+#include "FireChargeEntity.h"
+#include "FireworkEntity.h"
+#include "GhastFireballEntity.h"
 
 
 

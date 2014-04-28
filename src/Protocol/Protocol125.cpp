@@ -26,7 +26,7 @@ Documentation:
 #include "../Root.h"
 #include "../Server.h"
 
-#include "../Entities/ProjectileArrow.h"
+#include "../Entities/ArrowEntity.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
 

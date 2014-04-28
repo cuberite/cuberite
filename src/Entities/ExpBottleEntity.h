@@ -1,5 +1,5 @@
 //
-//  ProjectileExpBottle.h
+//  ExpBottleEntity.h
 //
 
 #pragma once
@@ -13,7 +13,7 @@
 // tolua_begin
 
 class cExpBottleEntity :
-public cProjectileEntity
+	public cProjectileEntity
 {
 	typedef cProjectileEntity super;
 	

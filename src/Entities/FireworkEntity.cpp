@@ -1,6 +1,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "ProjectileFirework.h"
+#include "FireworkEntity.h"
 #include "../World.h"
 #include "../Chunk.h"
 
@@ -9,9 +9,9 @@
 
 
 cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item) :
-super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
-m_ExplodeTimer(0),
-m_FireworkItem(a_Item)
+	super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+	m_ExplodeTimer(0),
+	m_FireworkItem(a_Item)
 {
 }
 

@@ -57,14 +57,14 @@ if (NOT MSVC)
 		Entities/Pickup.h
 		Entities/Player.h
 		Entities/ProjectileEntity.h
-		Entities/ProjectileArrow.h
-		Entities/ProjectileEgg.h
-		Entities/ProjectileEnderPearl.h
-		Entities/ProjectileExpBottle.h
-		Entities/ProjectileSnowball.h
-		Entities/ProjectileFireCharge.h
-		Entities/ProjectileFirework.h
-		Entities/ProjectileGhastFireball.h
+		Entities/ArrowEntity.h
+		Entities/ThrownEggEntity.h
+		Entities/ThrownEnderPearlEntity.h
+		Entities/ExpBottleEntity.h
+		Entities/ThrownSnowballEntity.h
+		Entities/FireChargeEntity.h
+		Entities/FireworkEntity.h
+		Entities/GhastFireballEntity.h
 		Entities/TNTEntity.h
 		Entities/ExpOrb.h
 		Entities/HangingEntity.h

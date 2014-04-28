@@ -3,7 +3,7 @@
 
 #include "Blaze.h"
 #include "../World.h"
-#include "../Entities/ProjectileFireCharge.h"
+#include "../Entities/FireChargeEntity.h"
 
 
 

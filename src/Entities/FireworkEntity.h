@@ -1,5 +1,5 @@
 //
-//  ProjectileFirework.h
+//  FireworkEntity.h
 //
 
 #pragma once
@@ -13,7 +13,7 @@
 // tolua_begin
 
 class cFireworkEntity :
-public cProjectileEntity
+	public cProjectileEntity
 {
 	typedef cProjectileEntity super;
 	

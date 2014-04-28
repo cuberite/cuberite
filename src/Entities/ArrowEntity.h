@@ -1,5 +1,5 @@
 //
-//  ProjectileArrow.h
+//  ArrowEntity.h
 //
 
 #pragma once
@@ -13,7 +13,7 @@
 // tolua_begin
 
 class cArrowEntity :
-public cProjectileEntity
+	public cProjectileEntity
 {
 	typedef cProjectileEntity super;
 	

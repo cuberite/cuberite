@@ -1,7 +1,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
-#include "ProjectileArrow.h"
+#include "ArrowEntity.h"
 #include "../Chunk.h"
 
 
@@ -9,14 +9,14 @@
 
 
 cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5),
-m_PickupState(psNoPickup),
-m_DamageCoeff(2),
-m_IsCritical(false),
-m_Timer(0),
-m_HitGroundTimer(0),
-m_bIsCollected(false),
-m_HitBlockPos(Vector3i(0, 0, 0))
+	super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5),
+	m_PickupState(psNoPickup),
+	m_DamageCoeff(2),
+	m_IsCritical(false),
+	m_Timer(0),
+	m_HitGroundTimer(0),
+	m_bIsCollected(false),
+	m_HitBlockPos(Vector3i(0, 0, 0))
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
@@ -33,15 +33,15 @@ m_HitBlockPos(Vector3i(0, 0, 0))
 
 
 cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
-super(pkArrow, &a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), 0.5, 0.5),
-m_PickupState(psInSurvivalOrCreative),
-m_DamageCoeff(2),
-m_IsCritical((a_Force >= 1)),
-m_Timer(0),
-m_HitGroundTimer(0),
-m_HasTeleported(false),
-m_bIsCollected(false),
-m_HitBlockPos(0, 0, 0)
+	super(pkArrow, &a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), 0.5, 0.5),
+	m_PickupState(psInSurvivalOrCreative),
+	m_DamageCoeff(2),
+	m_IsCritical((a_Force >= 1)),
+	m_Timer(0),
+	m_HitGroundTimer(0),
+	m_HasTeleported(false),
+	m_bIsCollected(false),
+	m_HitBlockPos(0, 0, 0)
 {
 }
 

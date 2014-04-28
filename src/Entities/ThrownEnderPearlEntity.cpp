@@ -1,13 +1,13 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "ProjectileEnderPearl.h"
+#include "ThrownEnderPearlEntity.h"
 
 
 
 
 
 cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-super(pkEnderPearl, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+	super(pkEnderPearl, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 {
 	SetSpeed(a_Speed);
 }
