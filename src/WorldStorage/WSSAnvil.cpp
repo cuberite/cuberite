@@ -27,7 +27,6 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 
-
 #include "../Mobs/Monster.h"
 #include "../Mobs/IncludeAllMonsters.h"
 
@@ -36,7 +35,12 @@
 #include "../Entities/FallingBlock.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
-#include "../Entities/ProjectileEntity.h"
+#include "../Entities/ArrowEntity.h"
+#include "../Entities/ThrownEggEntity.h"
+#include "../Entities/ThrownEnderPearlEntity.h"
+#include "../Entities/ThrownSnowballEntity.h"
+#include "../Entities/FireChargeEntity.h"
+#include "../Entities/GhastFireballEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
