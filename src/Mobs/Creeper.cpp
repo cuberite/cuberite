@@ -75,9 +75,12 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
 
 	if (a_TDI.DamageType == dtLightning)
 	{
@@ -85,6 +88,7 @@ void cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
+	return true;
 }
 
 

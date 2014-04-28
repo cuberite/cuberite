@@ -1,15 +1,14 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "Cavespider.h"
+#include "CaveSpider.h"
 #include "../World.h"
 
 
 
 
 
-cCavespider::cCavespider(void) :
-	super("Cavespider", mtCaveSpider, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
+cCaveSpider::cCaveSpider(void) :
+	super("CaveSpider", mtCaveSpider, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
 {
 }
 
@@ -17,7 +16,7 @@ cCavespider::cCavespider(void) :
 
 
 
-void cCavespider::Tick(float a_Dt, cChunk & a_Chunk)
+void cCaveSpider::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
@@ -29,7 +28,7 @@ void cCavespider::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cCavespider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+void cCaveSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	int LootingLevel = 0;
 	if (a_Killer != NULL)

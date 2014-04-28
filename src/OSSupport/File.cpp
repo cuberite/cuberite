@@ -67,11 +67,11 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		case fmRead:      Mode = "rb";  break;
 		case fmWrite:     Mode = "wb";  break;
 		case fmReadWrite: Mode = "rb+"; break;
-		default:
-		{
-			ASSERT(!"Unhandled file mode");
-			return false;
-		}
+	}
+	if (Mode == NULL)
+	{
+		ASSERT(!"Unhandled file mode");
+		return false;
 	}
 
 #ifdef _WIN32
@@ -143,7 +143,7 @@ bool cFile::IsEOF(void) const
 
 
 
-int cFile::Read (void * iBuffer, int iNumBytes)
+int cFile::Read (void * iBuffer, size_t iNumBytes)
 {
 	ASSERT(IsOpen());
 	
@@ -159,7 +159,7 @@ int cFile::Read (void * iBuffer, int iNumBytes)
 
 
 
-int cFile::Write(const void * iBuffer, int iNumBytes)
+int cFile::Write(const void * iBuffer, size_t iNumBytes)
 {
 	ASSERT(IsOpen());
 	

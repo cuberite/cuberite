@@ -262,13 +262,18 @@ public:
 	
 	// tolua_end
 	
-	/// Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI);
+	/** Makes this entity take damage specified in the a_TDI.
+	The TDI is sent through plugins first, then applied.
+	If it returns false, the entity hasn't receive any damage. */
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI);
 	
 	// tolua_begin
 
 	/// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
 	virtual int GetRawDamageAgainst(const cEntity & a_Receiver);
+	
+	/** Returns whether armor will protect against the passed damage type **/
+	virtual bool ArmorCoversAgainst(eDamageType a_DamageType);
 	
 	/// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
 	virtual int GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_RawDamage);
@@ -391,6 +396,12 @@ public:
 	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
+
+	/** Gets the invulnerable ticks from the entity */
+	int GetInvulnerableTicks(void) const { return m_InvulnerableTicks; }
+
+	/** Set the invulnerable ticks from the entity */
+	void SetInvulnerableTicks(int a_InvulnerableTicks) { m_InvulnerableTicks = a_InvulnerableTicks; }
 	
 	// tolua_end
 	
@@ -475,29 +486,33 @@ protected:
 	int m_AirTickTimer;
 	
 private:
-	// Measured in degrees, [-180, +180)
+	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
 	
-	// Measured in meter/second (m/s)
+	/** Measured in meter/second (m/s) */
 	Vector3d m_Speed;
 	
-	// Measured in degrees, [-180, +180)
+	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;
 	
-	/// Position of the entity's XZ center and Y bottom
+	/** Position of the entity's XZ center and Y bottom */
 	Vector3d m_Pos;
 	
-	// Measured in meter / second
+	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;
 	
-	// Measured in Kilograms (Kg)
+	/** Measured in Kilograms (Kg) */
 	double m_Mass;
 	
-	/// Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
+	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
 	double m_Width;
 	
-	/// Height of the entity (Y axis)
+	/** Height of the entity (Y axis) */
 	double m_Height;
+
+	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
+	While this ticks, a player can't hit this entity. */
+	int m_InvulnerableTicks;
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;

@@ -1091,6 +1091,80 @@ void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 
 
 
+void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
+
+	bool bAsync = false;
+	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	{
+		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		return;
+	}
+
+	if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+	{
+		ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+		return;
+	}
+
+	// Armors haven't a dbl click
+	if (a_ClickAction == caDblClick)
+	{
+		return;
+	}
+
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	if (!Slot.IsSameType(a_ClickedItem))
+	{
+		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+		LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+		bAsync = true;
+	}
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+	if ((a_ClickAction != caRightClick) && (a_ClickAction != caLeftClick))
+	{
+		LOGWARNING("SlotArea: Unhandled click action: %d (%s)", a_ClickAction, ClickActionToString(a_ClickAction));
+		m_ParentWindow.BroadcastWholeWindow();
+		return;
+	}
+
+	if (DraggingItem.IsEmpty() || CanPlaceInSlot(a_SlotNum, DraggingItem))
+	{
+		// Swap contents
+		cItem tmp(DraggingItem);
+		DraggingItem = Slot;
+		Slot = tmp;
+	}
+
+	SetSlot(a_SlotNum, a_Player, Slot);
+	if (bAsync)
+	{
+		m_ParentWindow.BroadcastWholeWindow();
+	}
+}
+
+
+
+
+
+bool cSlotAreaArmor::CanPlaceInSlot(int a_SlotNum, const cItem & a_Item)
+{
+	switch (a_SlotNum)
+	{
+		case 0:  return ItemCategory::IsHelmet    (a_Item.m_ItemType);
+		case 1:  return ItemCategory::IsChestPlate(a_Item.m_ItemType);
+		case 2:  return ItemCategory::IsLeggings  (a_Item.m_ItemType);
+		case 3:  return ItemCategory::IsBoots     (a_Item.m_ItemType);
+	}
+	return false;
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaItemGrid:
 

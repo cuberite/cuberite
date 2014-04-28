@@ -57,6 +57,14 @@ if (NOT MSVC)
 		Entities/Pickup.h
 		Entities/Player.h
 		Entities/ProjectileEntity.h
+		Entities/ArrowEntity.h
+		Entities/ThrownEggEntity.h
+		Entities/ThrownEnderPearlEntity.h
+		Entities/ExpBottleEntity.h
+		Entities/ThrownSnowballEntity.h
+		Entities/FireChargeEntity.h
+		Entities/FireworkEntity.h
+		Entities/GhastFireballEntity.h
 		Entities/TNTEntity.h
 		Entities/ExpOrb.h
 		Entities/HangingEntity.h
@@ -123,6 +131,7 @@ if (NOT MSVC)
 
 	file(GLOB SOURCE
 		"*.cpp"
+		"*.h"
 	)
 
 	list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")

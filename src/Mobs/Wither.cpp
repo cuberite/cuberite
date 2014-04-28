@@ -10,7 +10,7 @@
 
 cWither::cWither(void) :
 	super("Wither", mtWither, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0),
-	m_InvulnerableTicks(220)
+	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
 }
@@ -40,24 +40,24 @@ bool cWither::Initialize(cWorld * a_World)
 
 
 
-void cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType == dtDrowning)
 	{
-		return;
+		return false;
 	}
 
-	if (m_InvulnerableTicks > 0)
+	if (m_WitherInvulnerableTicks > 0)
 	{
-		return;
+		return false;
 	}
 
 	if (IsArmored() && (a_TDI.DamageType == dtRangedAttack))
 	{
-		return;
+		return false;
 	}
 
-	super::DoTakeDamage(a_TDI);
+	return super::DoTakeDamage(a_TDI);
 }
 
 
@@ -68,16 +68,16 @@ void cWither::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if (m_InvulnerableTicks > 0)
+	if (m_WitherInvulnerableTicks > 0)
 	{
-		unsigned int NewTicks = m_InvulnerableTicks - 1;
+		unsigned int NewTicks = m_WitherInvulnerableTicks - 1;
 
 		if (NewTicks == 0)
 		{
 			m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
 		}
 
-		m_InvulnerableTicks = NewTicks;
+		m_WitherInvulnerableTicks = NewTicks;
 
 		if ((NewTicks % 10) == 0)
 		{

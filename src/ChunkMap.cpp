@@ -346,9 +346,8 @@ void cChunkMap::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * 
 void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
-	int x, y, z, ChunkX, ChunkZ;
+	int x, z, ChunkX, ChunkZ;
 	x = a_BlockX;
-	y = a_BlockY;
 	z = a_BlockZ;
 	cChunkDef::BlockToChunk(x, z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
@@ -1146,9 +1145,8 @@ BLOCKTYPE cChunkMap::GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 	// First check if it isn't queued in the m_FastSetBlockQueue:
 	{
 		int X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
-		int ChunkX, ChunkY, ChunkZ;
+		int ChunkX, ChunkZ;
 		cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
-		ChunkY = 0;
 		cCSLock Lock(m_CSFastSetBlock);
 		for (sSetBlockList::iterator itr = m_FastSetBlockQueue.begin(); itr != m_FastSetBlockQueue.end(); ++itr)
 		{
@@ -1656,7 +1654,10 @@ void cChunkMap::AddEntity(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if (
+		(Chunk == NULL) ||  // Chunk not present at all
+		(!Chunk->IsValid() && !a_Entity->IsPlayer())  // Chunk present, but no valid data; players need to spawn in such chunks (#953)
+	)
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
 			a_Entity, a_Entity->GetClass(), a_Entity->GetUniqueID()

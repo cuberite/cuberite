@@ -31,6 +31,8 @@ Implements the 1.7.x protocol classes:
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../CompositeChat.h"
+#include "../Entities/ArrowEntity.h"
+#include "../Entities/FireworkEntity.h"
 
 
 
@@ -637,9 +639,11 @@ void cProtocol172::SendLoginSuccess(void)
 {
 	ASSERT(m_State == 2);  // State: login?
 	
-	cPacketizer Pkt(*this, 0x02);  // Login success packet
-	Pkt.WriteString(m_Client->GetUUID());
-	Pkt.WriteString(m_Client->GetUsername());
+	{
+		cPacketizer Pkt(*this, 0x02);  // Login success packet
+		Pkt.WriteString(m_Client->GetUUID());
+		Pkt.WriteString(m_Client->GetUsername());
+	}
 
 	m_State = 3;  // State = Game
 }
@@ -2820,7 +2824,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtWither:
 		{
 			WriteByte(0x54); // Int at index 20
-			WriteInt(((const cWither &)a_Mob).GetNumInvulnerableTicks());
+			WriteInt(((const cWither &)a_Mob).GetWitherInvulnerableTicks());
 			WriteByte(0x66); // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;

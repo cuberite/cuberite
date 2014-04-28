@@ -938,7 +938,10 @@ private:
 
 	/** <summary>Generates a random spawnpoint on solid land by walking chunks and finding their biomes</summary> */
 	void GenerateRandomSpawn(void);
-	
+
+	/** Chooses a reasonable transition from the current weather to a new weather **/
+	eWeather ChooseNewWeather(void);
+
 	/** Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section) */
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
 

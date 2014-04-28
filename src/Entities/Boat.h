@@ -26,7 +26,7 @@ public:
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 	

@@ -53,6 +53,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_TicksSinceLastVoidDamage(0)
 	, m_IsSwimming(false)
 	, m_IsSubmerged(false)
+	, m_AirLevel(0)
+	, m_AirTickTimer(0)
 	, m_HeadYaw( 0.0 )
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
@@ -60,6 +62,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Mass (0.001)  // Default 1g
 	, m_Width(a_Width)
 	, m_Height(a_Height)
+	, m_InvulnerableTicks(0)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
@@ -294,17 +297,23 @@ void cEntity::SetPitchFromSpeed(void)
 
 
 
-void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))
 	{
-		return;
+		return false;
 	}
 
 	if (m_Health <= 0)
 	{
 		// Can't take damage if already dead
-		return;
+		return false;
+	}
+
+	if (m_InvulnerableTicks > 0)
+	{
+		// Entity is invulnerable
+		return false;
 	}
 
 	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
@@ -326,17 +335,49 @@ void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_Health = 0;
 	}
 
-	if (IsMob() || IsPlayer()) // Knockback for only players and mobs
+	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL)) // Knockback for only players and mobs
 	{
-		AddSpeed(a_TDI.Knockback * 2);
+		int KnockbackLevel = 0;
+		if (a_TDI.Attacker->GetEquippedWeapon().m_ItemType == E_ITEM_BOW)
+		{
+			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch);
+		}
+		else
+		{
+			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
+		}
+
+		Vector3d additionalSpeed(0, 0, 0);
+		switch (KnockbackLevel)
+		{
+			case 1:
+			{
+				additionalSpeed.Set(5, .3, 5);
+				break;
+			}
+			case 2:
+			{
+				additionalSpeed.Set(8, .3, 8);
+				break;
+			}
+			default:
+			{
+				additionalSpeed.Set(2, .3, 2);
+				break;
+			}
+		}
+		AddSpeed(a_TDI.Knockback * additionalSpeed);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
+
+	m_InvulnerableTicks = 10;
 
 	if (m_Health <= 0)
 	{
 		KilledBy(a_TDI.Attacker);
 	}
+	return true;
 }
 
 
@@ -381,11 +422,8 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 
 
 
-int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
-	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
-	
-	// Filter out damage types that are not protected by armor:
 	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Effects as of 2012_12_20
 	switch (a_DamageType)
 	{
@@ -400,9 +438,34 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case dtLightning:
 		case dtPlugin:
 		{
-			return 0;
+			return false;
+		}
+			
+		case dtAttack:
+		case dtArrowAttack:
+		case dtCactusContact:
+		case dtLavaContact:
+		case dtFireContact:
+		case dtEnderPearl:
+		case dtExplosion:
+		{
+			return true;
 		}
 	}
+	ASSERT(!"Invalid damage type!");
+	return false;
+}
+
+
+
+
+
+int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+{
+	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
+	
+	// Filter out damage types that are not protected by armor:
+	if (!ArmorCoversAgainst(a_DamageType)) return 0;
 	
 	// Add up all armor points:
 	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Defense_points as of 2012_12_20
@@ -511,6 +574,11 @@ void cEntity::SetHealth(int a_Health)
 
 void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	if (m_InvulnerableTicks > 0)
+	{
+		m_InvulnerableTicks--;
+	}
+
 	if (m_AttachedTo != NULL)
 	{
 		if ((m_Pos - m_AttachedTo->GetPosition()).Length() > 0.5)
@@ -773,14 +841,12 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
-	if (GetWorld()->GetWeather() == eWeather_Rain)
+	if (m_World->IsWeatherWet())
 	{
-		if (HasBeenBurning)
+		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
 			m_TicksLeftBurning = 0;
-			OnFinishedBurning();
-		}
-		return;
+		}		
 	}
 	
 	// Do the burning damage:
