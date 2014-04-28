@@ -214,13 +214,17 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		case mtPrivateMessage:
 		{
 			if (ShouldAppendChatPrefixes)
+			{
 				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+			}
 			else
+			{
 				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
+			}
 		}
 	}
 	ASSERT(!"Unhandled chat prefix type!");
-	return "";
+	return AString();
 }
 
 
