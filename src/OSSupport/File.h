@@ -80,10 +80,10 @@ public:
 	bool IsEOF(void) const;
 	
 	/** Reads  up to iNumBytes bytes into iBuffer, returns the number of bytes actually read,    or -1 on failure; asserts if not open */
-	int Read (void * iBuffer,       int iNumBytes);
+	int Read (void * iBuffer,       size_t iNumBytes);
 	
 	/** Writes up to iNumBytes bytes from iBuffer, returns the number of bytes actually written, or -1 on failure; asserts if not open */
-	int Write(const void * iBuffer, int iNumBytes);
+	int Write(const void * iBuffer, size_t iNumBytes);
 	
 	/** Seeks to iPosition bytes from file start, returns old position or -1 for failure; asserts if not open */
 	int Seek (int iPosition);
