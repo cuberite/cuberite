@@ -120,6 +120,9 @@ protected:
 	#ifdef _DEBUG
 		/** The callback used by PolarSSL to output debug messages */
 		static void SSLDebugMessage(void * a_UserParam, int a_Level, const char * a_Text);
+		
+		/** The callback used by PolarSSL to log information on the cert chain */
+		static int SSLVerifyCert(void * a_This, x509_crt * a_Crt, int a_Depth, int * a_Flags);
 	#endif  // _DEBUG
 
 	/** Called when PolarSSL wants to read encrypted data. */

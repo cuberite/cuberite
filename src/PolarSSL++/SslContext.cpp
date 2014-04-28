@@ -64,7 +64,12 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 	ssl_set_bio(&m_Ssl, ReceiveEncrypted, this, SendEncrypted, this);
 	
 	#ifdef _DEBUG
+		/*
+		// These functions allow us to debug SSL and certificate problems, but produce way too much output,
+		// so they're disabled until someone needs them
 		ssl_set_dbg(&m_Ssl, &SSLDebugMessage, this);
+		ssl_set_verify(&m_Ssl, &SSLVerifyCert, this);
+		*/
 	#endif
 	
 	m_IsValid = true;
@@ -173,6 +178,63 @@ int cSslContext::NotifyClose(void)
 		AString Text(a_Text, len + 1);
 		
 		LOGD("SSL (%d): %s", a_Level, Text.c_str());
+	}
+
+
+
+
+
+	int cSslContext::SSLVerifyCert(void * a_This, x509_crt * a_Crt, int a_Depth, int * a_Flags)
+	{
+		char buf[1024];
+		UNUSED(a_This);
+
+		LOG("Verify requested for (Depth %d):", a_Depth);
+		x509_crt_info(buf, sizeof(buf) - 1, "", a_Crt);
+		LOG("%s", buf);
+
+		int Flags = *a_Flags;
+		if ((Flags & BADCERT_EXPIRED) != 0)
+		{
+			LOG(" ! server certificate has expired");
+		}
+
+		if ((Flags & BADCERT_REVOKED) != 0)
+		{
+			LOG(" ! server certificate has been revoked");
+		}
+
+		if ((Flags & BADCERT_CN_MISMATCH) != 0)
+		{
+			LOG(" ! CN mismatch");
+		}
+
+		if ((Flags & BADCERT_NOT_TRUSTED) != 0)
+		{
+			LOG(" ! self-signed or not signed by a trusted CA");
+		}
+
+		if ((Flags & BADCRL_NOT_TRUSTED) != 0)
+		{
+			LOG(" ! CRL not trusted");
+		}
+
+		if ((Flags & BADCRL_EXPIRED) != 0)
+		{
+			LOG(" ! CRL expired");
+		}
+
+		if ((Flags & BADCERT_OTHER) != 0)
+		{
+			LOG(" ! other (unknown) flag");
+		}
+
+		if (Flags == 0)
+		{
+			LOG(" This certificate has no flags");
+		}
+
+		return 0;
 	}
 #endif  // _DEBUG
 
