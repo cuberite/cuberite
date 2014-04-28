@@ -63,7 +63,7 @@ void InternalMergeBlocks(
 
 /// Combinator used for cBlockArea::msOverwrite merging
 template<bool MetaValid>
-static inline void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	a_DstType = a_SrcType;
 	if (MetaValid) a_DstMeta = a_SrcMeta;
@@ -75,7 +75,7 @@ static inline void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_S
 
 /// Combinator used for cBlockArea::msFillAir merging
 template<bool MetaValid>
-static inline void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if (a_DstType == E_BLOCK_AIR)
 	{
@@ -91,7 +91,7 @@ static inline void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_Src
 
 /// Combinator used for cBlockArea::msImprint merging
 template<bool MetaValid>
-static inline void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if (a_SrcType != E_BLOCK_AIR)
 	{
@@ -107,7 +107,7 @@ static inline void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_Src
 
 /// Combinator used for cBlockArea::msLake merging
 template<bool MetaValid>
-static inline void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// Sponge is the NOP block
 	if (a_SrcType == E_BLOCK_SPONGE)
@@ -172,7 +172,7 @@ static inline void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcTyp
 
 /** Combinator used for cBlockArea::msSpongePrint merging */
 template<bool MetaValid>
-static inline void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// Sponge overwrites nothing, everything else overwrites anything
 	if (a_SrcType != E_BLOCK_SPONGE)
@@ -188,7 +188,7 @@ static inline void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a
 
 /** Combinator used for cBlockArea::msDifference merging */
 template<bool MetaValid>
-static inline void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if ((a_DstType == a_SrcType) && (!MetaValid || (a_DstMeta == a_SrcMeta)))
 	{
@@ -208,7 +208,7 @@ static inline void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_
 
 /** Combinator used for cBlockArea::msMask merging */
 template<bool MetaValid>
-static inline void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+static void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// If the blocks are the same, keep the dest; otherwise replace with air
 	if ((a_SrcType != a_DstType) || !MetaValid || (a_SrcMeta != a_DstMeta))
