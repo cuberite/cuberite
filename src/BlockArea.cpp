@@ -13,11 +13,21 @@
 
 
 
-// This wild construct allows us to pass a function argument and still have it inlined by the compiler :)
-/// Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
+
+// Disable MSVC warnings: "conditional expression is constant"
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+#endif
+
+
+
+
 
 typedef void (CombinatorFunc)(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta);
 
+// This wild construct allows us to pass a function argument and still have it inlined by the compiler :)
+/// Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
 template<bool MetasValid, CombinatorFunc Combinator> 
 void InternalMergeBlocks(
 	BLOCKTYPE * a_DstTypes, const BLOCKTYPE * a_SrcTypes,
@@ -58,6 +68,8 @@ void InternalMergeBlocks(
 		}  // for z
 	}  // for y
 }
+
+
 
 
 
@@ -247,6 +259,11 @@ void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 		}
 	}
 }
+
+// Re-enable previously disabled MSVC warnings
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 
 
