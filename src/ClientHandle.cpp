@@ -220,6 +220,7 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		}
 	}
 	ASSERT(!"Unhandled chat prefix type!");
+	return "";
 }
 
 
