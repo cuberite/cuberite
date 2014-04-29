@@ -26,6 +26,7 @@ class cCtrDrbgContext
 {
 	friend class cSslContext;
 	friend class cRsaPrivateKey;
+	friend class cPublicKey;
 	
 public:
 	/** Constructs the context with a new entropy context. */

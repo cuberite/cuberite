@@ -7,6 +7,7 @@
 #include "Connection.h"
 #include "Server.h"
 #include <iostream>
+#include "PolarSSL++/PublicKey.h"
 
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
