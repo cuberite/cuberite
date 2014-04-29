@@ -10,6 +10,7 @@ set(SOURCES
 	"CallbackSslContext.cpp"
 	"CtrDrbgContext.cpp"
 	"EntropyContext.cpp"
+	"RsaPrivateKey.cpp"
 	"SslContext.cpp"
 	"X509Cert.cpp"
 )
@@ -20,6 +21,7 @@ set(HEADERS
 	"CallbackSslContext.h"
 	"CtrDrbgContext.h"
 	"EntropyContext.h"
+	"RsaPrivateKey.h"
 	"SslContext.h"
 	"X509Cert.h"
 )

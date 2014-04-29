@@ -25,6 +25,7 @@ class cEntropyContext;
 class cCtrDrbgContext
 {
 	friend class cSslContext;
+	friend class cRsaPrivateKey;
 	
 public:
 	/** Constructs the context with a new entropy context. */
@@ -41,9 +42,6 @@ public:
 	/** Returns true if the object is valid (has been initialized properly) */
 	bool IsValid(void) const { return m_IsValid; }
 	
-	/** Returns the internal context ptr. Only use in PolarSSL API calls. */
-	OBSOLETE ctr_drbg_context * Get(void) { return &m_CtrDrbg; }
-	
 protected:
 	/** The entropy source used for generating the random */
 	SharedPtr<cEntropyContext> m_EntropyContext;
@@ -53,6 +51,10 @@ protected:
 	
 	/** Set to true if the object is valid (has been initialized properly) */
 	bool m_IsValid;
+
+
+	/** Returns the internal context ptr. Only use in PolarSSL API calls. */
+	ctr_drbg_context * GetInternal(void) { return &m_CtrDrbg; }
 } ;
 
 

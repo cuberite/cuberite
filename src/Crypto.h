@@ -20,49 +20,6 @@
 
 
 
-/** Encapsulates an RSA private key used in PKI cryptography */
-class cRSAPrivateKey
-{
-public:
-	/** Creates a new empty object, the key is not assigned */
-	cRSAPrivateKey(void);
-	
-	/** Deep-copies the key from a_Other */
-	cRSAPrivateKey(const cRSAPrivateKey & a_Other);
-	
-	~cRSAPrivateKey();
-	
-	/** Generates a new key within this object, with the specified size in bits.
-	Returns true on success, false on failure. */
-	bool Generate(unsigned a_KeySizeBits = 1024);
-	
-	/** Returns the public key part encoded in ASN1 DER encoding */
-	AString GetPubKeyDER(void);
-	
-	/** Decrypts the data using RSAES-PKCS#1 algorithm.
-	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
-	Returns the number of bytes decrypted, or negative number for error. */
-	int Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength);
-	
-	/** Encrypts the data using RSAES-PKCS#1 algorithm.
-	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
-	Returns the number of bytes decrypted, or negative number for error. */
-	int Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength);
-	
-protected:
-	rsa_context m_Rsa;
-	entropy_context m_Entropy;
-	ctr_drbg_context m_Ctr_drbg;
-	
-	/** Initializes the m_Entropy and m_Ctr_drbg contexts
-	Common part of this object's construction, called from all constructors. */
-	void InitRnd(void);
-} ;
-
-
-
-
-
 class cPublicKey
 {
 public:
