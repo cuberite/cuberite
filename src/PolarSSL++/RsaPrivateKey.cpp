@@ -14,6 +14,7 @@
 cRsaPrivateKey::cRsaPrivateKey(void)
 {
 	rsa_init(&m_Rsa, RSA_PKCS_V15, 0);
+	m_CtrDrbg.Initialize("RSA", 3);
 }
 
 
@@ -24,6 +25,7 @@ cRsaPrivateKey::cRsaPrivateKey(const cRsaPrivateKey & a_Other)
 {
 	rsa_init(&m_Rsa, RSA_PKCS_V15, 0);
 	rsa_copy(&m_Rsa, &a_Other.m_Rsa);
+	m_CtrDrbg.Initialize("RSA", 3);
 }
 
 
@@ -41,9 +43,10 @@ cRsaPrivateKey::~cRsaPrivateKey()
 
 bool cRsaPrivateKey::Generate(unsigned a_KeySizeBits)
 {
-	if (rsa_gen_key(&m_Rsa, ctr_drbg_random, m_CtrDrbg.GetInternal(), a_KeySizeBits, 65537) != 0)
+	int res = rsa_gen_key(&m_Rsa, ctr_drbg_random, m_CtrDrbg.GetInternal(), a_KeySizeBits, 65537);
+	if (res != 0)
 	{
-		// Key generation failed
+		LOG("RSA key generation failed: -0x%x", -res);
 		return false;
 	}
 
