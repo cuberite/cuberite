@@ -10,12 +10,6 @@
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
-#include "polarssl/config.h"
-#include "polarssl/net.h"
-#include "polarssl/ssl.h"
-#include "polarssl/ctr_drbg.h"
-#include "polarssl/error.h"
-
 #include "PolarSSL++/BlockingSslClientSocket.h"
 
 #include <sstream>
