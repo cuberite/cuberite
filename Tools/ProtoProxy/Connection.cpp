@@ -472,7 +472,7 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer)
 {
 	DataLog(a_Data, a_Size, "Encrypting %d bytes to %s", a_Size, a_Peer);
 	const Byte * Data = (const Byte *)a_Data;
@@ -496,7 +496,7 @@ bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryp
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
 {
 	AString All;
 	a_Data.ReadAll(All);

@@ -36,7 +36,8 @@ set(SHARED_SRC
 	../../src/StringUtils.cpp
 	../../src/Log.cpp
 	../../src/MCLogger.cpp
-	../../src/Crypto.cpp
+	../../src/PolarSSL++/AesCfb128Decryptor.cpp
+	../../src/PolarSSL++/AesCfb128Encryptor.cpp
 	../../src/PolarSSL++/CtrDrbgContext.cpp
 	../../src/PolarSSL++/EntropyContext.cpp
 	../../src/PolarSSL++/PublicKey.cpp
@@ -47,7 +48,8 @@ set(SHARED_HDR
 	../../src/StringUtils.h
 	../../src/Log.h
 	../../src/MCLogger.h
-	../../src/Crypto.h
+	../../src/PolarSSL++/AesCfb128Decryptor.h
+	../../src/PolarSSL++/AesCfb128Encryptor.h
 	../../src/PolarSSL++/CtrDrbgContext.h
 	../../src/PolarSSL++/EntropyContext.h
 	../../src/PolarSSL++/PublicKey.h
