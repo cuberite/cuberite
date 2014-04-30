@@ -280,8 +280,6 @@ protected:
 
 	/** The maximum cost of repairing/renaming in the anvil. */
 	int m_MaximumCost;
-
-	AString m_RepairedItemName;
 } ;
 
 

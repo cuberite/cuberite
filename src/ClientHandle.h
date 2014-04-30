@@ -385,6 +385,9 @@ private:
 	
 	/** Handles the "MC|AdvCdm" plugin message */
 	void HandleCommandBlockMessage(const char * a_Data, size_t a_Length);
+
+	/** Handles the "MC|ItemName" plugin message */
+	void HandleAnvilItemName(const char * a_Data, size_t a_Length);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client

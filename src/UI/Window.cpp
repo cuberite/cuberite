@@ -808,7 +808,8 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 // cAnvilWindow:
 
 cAnvilWindow::cAnvilWindow() :
-	cWindow(wtAnvil, "Repair")
+	cWindow(wtAnvil, "Repair"),
+	m_RepairedItemName("")
 {
 	m_SlotAreas.push_back(new cSlotAreaAnvil(*this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));

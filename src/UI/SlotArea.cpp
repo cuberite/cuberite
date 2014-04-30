@@ -600,8 +600,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
 	cSlotAreaTemporary(3, a_ParentWindow),
-	m_MaximumCost(0),
-	m_RepairedItemName("")
+	m_MaximumCost(0)
 {
 }
 
@@ -705,7 +704,8 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 
 	int NameChangeExp = 0;
-	if (m_RepairedItemName.empty())
+	const AString & RepairedItemName = ((cAnvilWindow*)&m_ParentWindow)->GetRepairedItemName();
+	if (RepairedItemName.empty())
 	{
 		// Remove custom name
 		if (!Input.m_CustomName.empty())
@@ -715,7 +715,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			Input.m_CustomName = "";
 		}
 	}
-	else if (m_RepairedItemName != Input.m_CustomName)
+	else if (RepairedItemName != Input.m_CustomName)
 	{
 		// Change custom name
 		NameChangeExp = (Input.IsDamageable()) ? 4 : (Input.m_ItemCount * 5);
@@ -726,7 +726,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			RepairCost += NameChangeExp / 2;
 		}
 
-		Input.m_CustomName = m_RepairedItemName;
+		Input.m_CustomName = RepairedItemName;
 	}
 
 	// TODO: Add enchantment exp cost.

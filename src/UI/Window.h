@@ -237,6 +237,15 @@ class cAnvilWindow :
 	typedef cWindow super;
 public:
 	cAnvilWindow();
+
+	/** Gets the repaired item name. */
+	AString GetRepairedItemName(void) const { return m_RepairedItemName; }
+
+	/** Set the repaired item name. */
+	void SetRepairedItemName(const AString & a_Name) { m_RepairedItemName = a_Name; }
+
+protected:
+	AString m_RepairedItemName;
 } ;
 
 
