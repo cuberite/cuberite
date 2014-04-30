@@ -633,6 +633,10 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
 	}
+	else if (a_Channel == "MC|ItemName")
+	{
+		HandleAnvilItemName(a_Message.c_str(), a_Message.size());
+	}
 	else if (a_Channel == "REGISTER")
 	{
 		if (HasPluginChannel(a_Channel))
@@ -767,6 +771,34 @@ void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Leng
 	else
 	{
 		SendChat("Command blocks are not enabled on this server", mtFailure);
+	}
+}
+
+
+
+
+
+void cClientHandle::HandleAnvilItemName(const char * a_Data, unsigned int a_Length)
+{
+	if (a_Length < 1)
+	{
+		return;
+	}
+
+	if ((m_Player->GetWindow() == NULL) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
+	{
+		return;
+	}
+
+	cByteBuffer Buffer(a_Length);
+	Buffer.Write(a_Data, a_Length);
+
+	AString Name;
+	Buffer.ReadAll(Name);
+
+	if (Name.length() <= 30)
+	{
+		((cAnvilWindow&)*m_Player->GetWindow()).SetRepairedItemName(Name);
 	}
 }
 
