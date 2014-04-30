@@ -10,15 +10,44 @@
 
 
 
-cPublicKey::cPublicKey(const AString & a_PublicKeyDER)
+cPublicKey::cPublicKey(void)
 {
 	pk_init(&m_Pk);
-	if (pk_parse_public_key(&m_Pk, (const Byte *)a_PublicKeyDER.data(), a_PublicKeyDER.size()) != 0)
+	m_CtrDrbg.Initialize("rsa_pubkey", 10);
+}
+
+
+
+
+
+cPublicKey::cPublicKey(const AString & a_PublicKeyData)
+{
+	pk_init(&m_Pk);
+	m_CtrDrbg.Initialize("rsa_pubkey", 10);
+	int res = ParsePublic(a_PublicKeyData.data(), a_PublicKeyData.size());
+	if (res != 0)
 	{
+		LOGWARNING("Failed to parse public key: -0x%x", res);
 		ASSERT(!"Cannot parse PubKey");
 		return;
 	}
-	m_CtrDrbg.Initialize("rsa_pubkey", 10);
+}
+
+
+
+
+
+cPublicKey::cPublicKey(const AString & a_PrivateKeyData, const AString & a_Password)
+{
+	pk_init(&m_Pk);
+	m_CtrDrbg.Initialize("rsa_privkey", 11);
+	int res = ParsePrivate(a_PrivateKeyData.data(), a_PrivateKeyData.size(), a_Password);
+	if (res != 0)
+	{
+		LOGWARNING("Failed to parse private key: -0x%x", res);
+		ASSERT(!"Cannot parse PubKey");
+		return;
+	}
 }
 
 
@@ -36,6 +65,8 @@ cPublicKey::~cPublicKey()
 
 int cPublicKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength)
 {
+	ASSERT(IsValid());
+	
 	size_t DecryptedLen = a_DecryptedMaxLength;
 	int res = pk_decrypt(&m_Pk,
 		a_EncryptedData, a_EncryptedLength,
@@ -55,6 +86,8 @@ int cPublicKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, 
 
 int cPublicKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength)
 {
+	ASSERT(IsValid());
+	
 	size_t EncryptedLength = a_EncryptedMaxLength;
 	int res = pk_encrypt(&m_Pk,
 		a_PlainData, a_PlainLength, a_EncryptedData, &EncryptedLength, a_EncryptedMaxLength,
@@ -67,6 +100,49 @@ int cPublicKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a
 	return (int)EncryptedLength;
 }
 
+
+
+
+
+
+int cPublicKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
+{
+	ASSERT(!IsValid());  // Cannot parse a second key
+	
+	return pk_parse_public_key(&m_Pk, (const unsigned char *)a_Data, a_NumBytes);
+}
+
+
+
+
+
+
+int cPublicKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AString & a_Password)
+{
+	ASSERT(!IsValid());  // Cannot parse a second key
+	
+	if (a_Password.empty())
+	{
+		return pk_parse_key(&m_Pk, (const unsigned char *)a_Data, a_NumBytes, NULL, 0);
+	}
+	else
+	{
+		return pk_parse_key(
+			&m_Pk,
+			(const unsigned char *)a_Data, a_NumBytes,
+			(const unsigned char *)a_Password.c_str(), a_Password.size()
+		);
+	}
+}
+
+
+
+
+
+bool cPublicKey::IsValid(void) const
+{
+	return (pk_get_type(&m_Pk) != POLARSSL_PK_NONE);
+}
 
 
 

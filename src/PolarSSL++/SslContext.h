@@ -11,6 +11,8 @@
 
 #include "polarssl/ssl.h"
 #include "../ByteBuffer.h"
+#include "PublicKey.h"
+#include "RsaPrivateKey.h"
 #include "X509Cert.h"
 
 
@@ -47,7 +49,16 @@ public:
 	/** Returns true if the object has been initialized properly. */
 	bool IsValid(void) const { return m_IsValid; }
 	
-	/** Sets a cert chain as the trusted cert store for this context.
+	/** Sets the certificate to use as our own. Must be used when representing a server, optional when client.
+	Must be called after Initialize(). */
+	void SetOwnCert(const cX509CertPtr & a_OwnCert, const cRsaPrivateKeyPtr & a_OwnCertPrivKey);
+	
+	/** Sets the certificate to use as our own. Must be used when representing a server, optional when client.
+	Must be called after Initialize().
+	Despite the class name, a_OwnCertPrivKey is a PRIVATE key. */
+	void SetOwnCert(const cX509CertPtr & a_OwnCert, const cPublicKeyPtr & a_OwnCertPrivKey);
+	
+	/** Sets a cert chain as the trusted cert store for this context. Must be called after Initialize().
 	Calling this will switch the context into strict cert verification mode.
 	a_ExpectedPeerName is the CommonName that we expect the SSL peer to have in its cert,
 	if it is different, the verification will fail. An empty string will disable the CN check. */
@@ -92,6 +103,15 @@ protected:
 	
 	/** The SSL context that PolarSSL uses. */
 	ssl_context m_Ssl;
+	
+	/** The certificate that we present to the peer. */
+	cX509CertPtr m_OwnCert;
+	
+	/** Private key for m_OwnCert, if initialized from a cRsaPrivateKey */
+	cRsaPrivateKeyPtr m_OwnCertPrivKey;
+	
+	/** Private key for m_OwnCert, if initialized from a cPublicKey. Despite the class name, this is a PRIVATE key. */
+	cPublicKeyPtr m_OwnCertPrivKey2;
 	
 	/** True if the SSL handshake has been completed. */
 	bool m_HasHandshaken;

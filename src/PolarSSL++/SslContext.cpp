@@ -40,7 +40,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 	if (m_IsValid)
 	{
 		LOGWARNING("SSL: Double initialization is not supported.");
-		return POLARSSL_ERR_SSL_MALLOC_FAILED;  // There is no return value well-suited for this, reuse this one.
+		return POLARSSL_ERR_SSL_BAD_INPUT_DATA;  // There is no return value well-suited for this, reuse this one.
 	}
 	
 	// Set the CtrDrbg context, create a new one if needed:
@@ -80,8 +80,56 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 
 
 
+void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cRsaPrivateKeyPtr & a_OwnCertPrivKey)
+{
+	ASSERT(m_IsValid);  // Call Initialize() first
+	
+	// Check that both the cert and the key is valid:
+	if ((a_OwnCert.get() == NULL) || (a_OwnCertPrivKey.get() == NULL))
+	{
+		LOGWARNING("SSL: Own certificate is not valid, skipping the set.");
+		return;
+	}
+	
+	// Make sure we have the cert stored for later, PolarSSL only uses the cert later on
+	m_OwnCert = a_OwnCert;
+	m_OwnCertPrivKey = a_OwnCertPrivKey;
+	
+	// Set into the context:
+	ssl_set_own_cert_rsa(&m_Ssl, m_OwnCert->GetInternal(), m_OwnCertPrivKey->GetInternal());
+}
+
+
+
+
+
+void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cPublicKeyPtr & a_OwnCertPrivKey)
+{
+	ASSERT(m_IsValid);  // Call Initialize() first
+	
+	// Check that both the cert and the key is valid:
+	if ((a_OwnCert.get() == NULL) || (a_OwnCertPrivKey.get() == NULL))
+	{
+		LOGWARNING("SSL: Own certificate is not valid, skipping the set.");
+		return;
+	}
+	
+	// Make sure we have the cert stored for later, PolarSSL only uses the cert later on
+	m_OwnCert = a_OwnCert;
+	m_OwnCertPrivKey2 = a_OwnCertPrivKey;
+	
+	// Set into the context:
+	ssl_set_own_cert(&m_Ssl, m_OwnCert->GetInternal(), m_OwnCertPrivKey2->GetInternal());
+}
+
+
+
+
+
 void cSslContext::SetCACerts(const cX509CertPtr & a_CACert, const AString & a_ExpectedPeerName)
 {
+	ASSERT(m_IsValid);  // Call Initialize() first
+	
 	// Store the data in our internal buffers, to avoid losing the pointers later on
 	// PolarSSL will need these after this call returns, and the caller may move / delete the data before that:
 	m_ExpectedPeerName = a_ExpectedPeerName;
