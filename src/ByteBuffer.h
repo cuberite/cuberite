@@ -31,7 +31,7 @@ public:
 	~cByteBuffer();
 	
 	/// Writes the bytes specified to the ringbuffer. Returns true if successful, false if not
-	bool Write(const char * a_Bytes, size_t a_Count);
+	bool Write(const void * a_Bytes, size_t a_Count);
 	
 	/// Returns the number of bytes that can be successfully written to the ringbuffer
 	size_t GetFreeSpace(void) const;

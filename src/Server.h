@@ -23,7 +23,7 @@
 	#pragma warning(disable:4702)
 #endif
 
-#include "Crypto.h"
+#include "PolarSSL++/RsaPrivateKey.h"
 
 #ifdef _MSC_VER
 	#pragma warning(pop)
@@ -109,7 +109,7 @@ public:												// tolua_export
 	/** Returns base64 encoded favicon data (obtained from favicon.png) */
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
 	
-	cRSAPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
+	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 	
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }
@@ -182,7 +182,7 @@ private:
 	bool m_bRestarting;
 	
 	/** The private key used for the assymetric encryption start in the protocols */
-	cRSAPrivateKey m_PrivateKey;
+	cRsaPrivateKey m_PrivateKey;
 	
 	/** Public key for m_PrivateKey, ASN1-DER-encoded */
 	AString m_PublicKeyDER;

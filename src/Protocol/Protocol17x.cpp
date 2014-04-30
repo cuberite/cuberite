@@ -33,6 +33,7 @@ Implements the 1.7.x protocol classes:
 #include "../CompositeChat.h"
 #include "../Entities/ArrowEntity.h"
 #include "../Entities/FireworkEntity.h"
+#include "PolarSSL++/Sha1Checksum.h"
 
 
 
@@ -1690,7 +1691,7 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	}
 
 	// Decrypt EncNonce using privkey
-	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
 	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
 	int res = rsaDecryptor.Decrypt((const Byte *)EncNonce.data(), EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
 	if (res != 4)
@@ -2293,7 +2294,7 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 	m_IsEncrypted = true;
 	
 	// Prepare the m_AuthServerID:
-	cSHA1Checksum Checksum;
+	cSha1Checksum Checksum;
 	cServer * Server = cRoot::Get()->GetServer();
 	const AString & ServerID = Server->GetServerID();
 	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
@@ -2301,7 +2302,7 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
-	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
+	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
 
 
