@@ -511,6 +511,25 @@ bool cItemHandler::IsPlaceable(void)
 
 
 
+
+bool cItemHandler::CanRepairWithItem(const cItem & a_Item)
+{
+	return false;
+}
+
+
+
+
+
+int cItemHandler::GetRepairCost(void)
+{
+	return 0;
+}
+
+
+
+
+
 bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 {
 	UNUSED(a_BlockType);

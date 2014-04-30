@@ -85,6 +85,12 @@ public:
 	/** Blocks simply get placed */
 	virtual bool IsPlaceable(void);
 
+	/** Can the anvil repair this item, when a_Item is the second input? */
+	virtual bool CanRepairWithItem(const cItem & a_Item);
+
+	/** Get the repair cost from the item, or 0 if the item hasn't repair cost. */
+	virtual int GetRepairCost(void);
+
 	/** Called before a block is placed	into a world.
 	The handler should return true to allow placement, false to refuse.
 	Also, the handler should set a_BlockType and a_BlockMeta to correct values for the newly placed block.

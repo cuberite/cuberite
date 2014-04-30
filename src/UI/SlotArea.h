@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../Inventory.h"
+#include "Window.h"
 
 
 
@@ -253,6 +254,34 @@ protected:
 	
 	/// Retrieves the recipe for the specified player from the map, or creates one if not found
 	cCraftingRecipe & GetRecipeForPlayer(cPlayer & a_Player);
+} ;
+
+
+
+
+
+class cSlotAreaAnvil :
+	public cSlotAreaTemporary
+{
+	typedef cSlotAreaTemporary super;
+
+public:
+	cSlotAreaAnvil(cAnvilWindow & a_ParentWindow);
+
+	// cSlotArea overrides:
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+
+	// cSlotAreaTemporary overrides:
+	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+
+protected:
+	/** Handles a click in the item slot. */
+	void UpdateResult(cPlayer & a_Player);
+
+	/** The maximum cost of repairing/renaming in the anvil. */
+	int m_MaximumCost;
+
+	AString m_RepairedItemName;
 } ;
 
 
