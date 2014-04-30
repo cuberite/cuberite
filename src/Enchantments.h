@@ -84,6 +84,9 @@ public:
 	/** Adds enchantments in the stringspec; if a specified enchantment already exists, overwrites it */
 	void AddFromString(const AString & a_StringSpec);
 	
+	/** Get the count of enchantments */
+	int Size(void);
+	
 	/** Serializes all the enchantments into a string */
 	AString ToString(void) const;
 	

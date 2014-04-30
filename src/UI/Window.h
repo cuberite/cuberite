@@ -231,6 +231,18 @@ public:
 
 
 
+class cAnvilWindow :
+	public cWindow
+{
+	typedef cWindow super;
+public:
+	cAnvilWindow();
+} ;
+
+
+
+
+
 class cEnchantingWindow :
 	public cWindow
 {

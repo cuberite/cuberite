@@ -83,6 +83,15 @@ void cEnchantments::AddFromString(const AString & a_StringSpec)
 
 
 
+int cEnchantments::Size(void)
+{
+	return (int)m_Enchantments.size();
+}
+
+
+
+
+
 AString cEnchantments::ToString(void) const
 {
 	// Serialize all the enchantments into a string
