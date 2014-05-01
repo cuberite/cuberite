@@ -123,7 +123,7 @@ public:
 	virtual void SendWholeInventory      (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose         (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen          (const cWindow & a_Window) = 0;
-	virtual void SendWindowProperty      (const cWindow & a_Window, short a_Property, short a_Value) = 0;
+	virtual void SendWindowProperty      (const cWindow & a_Window, int a_Property, int a_Value) = 0;
 
 	/// Returns the ServerID used for authentication through session.minecraft.net
 	virtual AString GetAuthServerID(void) = 0;

@@ -1658,7 +1658,7 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 		{
 			// There is a queued overflow. Append to it, then send as much from its front as possible
 			m_OutgoingDataOverflow.append(a_Data, a_Size);
-			int CanFit = m_OutgoingData.GetFreeSpace();
+			size_t CanFit = m_OutgoingData.GetFreeSpace();
 			if (CanFit > 128)
 			{
 				// No point in moving the data over if it's not large enough - too much effort for too little an effect
@@ -2522,7 +2522,7 @@ void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cClientHandle::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
+void cClientHandle::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }
