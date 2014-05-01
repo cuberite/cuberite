@@ -327,7 +327,7 @@ bool cByteBuffer::ReadBEShort(short & a_Value)
 	CheckValid();
 	NEEDBYTES(2);
 	ReadBuf(&a_Value, 2);
-	a_Value = ntohs(a_Value);
+	a_Value = (short)ntohs((u_short)a_Value);
 	return true;
 }
 
@@ -341,7 +341,7 @@ bool cByteBuffer::ReadBEInt(int & a_Value)
 	CheckValid();
 	NEEDBYTES(4);
 	ReadBuf(&a_Value, 4);
-	a_Value = ntohl(a_Value);
+	a_Value = (int)ntohl((u_long)a_Value);
 	return true;
 }
 
@@ -420,7 +420,7 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 		ASSERT(!"Negative string length? Are you sure?");
 		return true;
 	}
-	return ReadUTF16String(a_Value, Length);
+	return ReadUTF16String(a_Value, (size_t)Length);
 }
 
 
@@ -438,7 +438,7 @@ bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
 	{
 		NEEDBYTES(1);
 		ReadBuf(&b, 1);
-		Value = Value | (((Int64)(b & 0x7f)) << Shift);
+		Value = Value | (((UInt32)(b & 0x7f)) << Shift);
 		Shift += 7;
 	} while ((b & 0x80) != 0);
 	a_Value = Value;
@@ -462,7 +462,7 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 	{
 		LOGWARNING("%s: String too large: %u (%u KiB)", __FUNCTION__, Size, Size / 1024);
 	}
-	return ReadString(a_Value, (int)Size);
+	return ReadString(a_Value, (size_t)Size);
 }
 
 
@@ -517,7 +517,7 @@ bool cByteBuffer::WriteBEShort(short a_Value)
 	CHECK_THREAD;
 	CheckValid();
 	PUTBYTES(2);
-	short Converted = htons(a_Value);
+	u_short Converted = htons((u_short)a_Value);
 	return WriteBuf(&Converted, 2);
 }
 
@@ -530,7 +530,7 @@ bool cByteBuffer::WriteBEInt(int a_Value)
 	CHECK_THREAD;
 	CheckValid();
 	PUTBYTES(4);
-	int Converted = HostToNetwork4(&a_Value);
+	UInt32 Converted = HostToNetwork4(&a_Value);
 	return WriteBuf(&Converted, 4);
 }
 
@@ -543,7 +543,7 @@ bool cByteBuffer::WriteBEInt64(Int64 a_Value)
 	CHECK_THREAD;
 	CheckValid();
 	PUTBYTES(8);
-	Int64 Converted = HostToNetwork8(&a_Value);
+	UInt64 Converted = HostToNetwork8(&a_Value);
 	return WriteBuf(&Converted, 8);
 }
 
@@ -556,7 +556,7 @@ bool cByteBuffer::WriteBEFloat(float a_Value)
 	CHECK_THREAD;
 	CheckValid();
 	PUTBYTES(4);
-	int Converted = HostToNetwork4(&a_Value);
+	UInt32 Converted = HostToNetwork4(&a_Value);
 	return WriteBuf(&Converted, 4);
 }
 
@@ -569,7 +569,7 @@ bool cByteBuffer::WriteBEDouble(double a_Value)
 	CHECK_THREAD;
 	CheckValid();
 	PUTBYTES(8);
-	Int64 Converted = HostToNetwork8(&a_Value);
+	UInt64 Converted = HostToNetwork8(&a_Value);
 	return WriteBuf(&Converted, 8);
 }
 
@@ -613,7 +613,7 @@ bool cByteBuffer::WriteVarInt(UInt32 a_Value)
 	
 	// A 32-bit integer can be encoded by at most 5 bytes:
 	unsigned char b[5];
-	int idx = 0;
+	size_t idx = 0;
 	do
 	{
 		b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
@@ -632,7 +632,7 @@ bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 	CHECK_THREAD;
 	CheckValid();
 	PUTBYTES(a_Value.size() + 1);  // This is a lower-bound on the bytes that will be actually written. Fail early.
-	bool res = WriteVarInt(a_Value.size());
+	bool res = WriteVarInt((UInt32)(a_Value.size()));
 	if (!res)
 	{
 		return false;
@@ -757,7 +757,7 @@ bool cByteBuffer::ReadString(AString & a_String, size_t a_Count)
 
 
 
-bool cByteBuffer::ReadUTF16String(AString & a_String, int a_NumChars)
+bool cByteBuffer::ReadUTF16String(AString & a_String, size_t a_NumChars)
 {
 	// Reads 2 * a_NumChars bytes and interprets it as a UTF16 string, converting it into UTF8 string a_String
 	CHECK_THREAD;
