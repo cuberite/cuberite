@@ -2,7 +2,7 @@
 if(NOT TARGET polarssl)
 	message("including polarssl")
 	if (SELF_TEST)
-		set(ENABLE_TESTING 0)
+		set(ENABLE_TESTING OFF CACHE BOOL)
 		add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/polarssl/ ${CMAKE_CURRENT_BINARY_DIR}/lib/polarssl)
 	else()
 		add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/polarssl/ ${CMAKE_CURRENT_BINARY_DIR}/lib/polarssl EXCLUDE_FROM_ALL)
