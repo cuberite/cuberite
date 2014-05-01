@@ -8,6 +8,7 @@
 #include "HTTPMessage.h"
 #include "HTTPConnection.h"
 #include "HTTPFormParser.h"
+#include "SslHTTPConnection.h"
 
 
 
@@ -123,8 +124,30 @@ class cDebugCallbacks :
 cHTTPServer::cHTTPServer(void) :
 	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer IPv4"),
 	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer IPv6"),
-	m_Callbacks(NULL)
+	m_Callbacks(NULL),
+	m_Cert(new cX509Cert),
+	m_CertPrivKey(new cPublicKey)
 {
+	AString CertFile = cFile::ReadWholeFile("webadmin/httpscert.crt");
+	AString KeyFile  = cFile::ReadWholeFile("webadmin/httpskey.pem");
+	if (!CertFile.empty() && !KeyFile.empty())
+	{
+		int res = m_Cert->Parse(CertFile.data(), CertFile.size());
+		if (res  == 0)
+		{
+			int res2 = m_CertPrivKey->ParsePrivate(KeyFile.data(), KeyFile.size(), "");
+			if (res2 != 0)
+			{
+				// Reading the private key failed, reset the cert:
+				LOGWARNING("WebAdmin: Cannot read HTTPS certificate private key: -0x%x", -res2);
+				m_Cert.reset();
+			}
+		}
+		else
+		{
+			LOGWARNING("WebAdmin: Cannot read HTTPS certificate: -0x%x", -res);
+		}
+	}
 }
 
 
@@ -195,7 +218,15 @@ void cHTTPServer::Stop(void)
 
 void cHTTPServer::OnConnectionAccepted(cSocket & a_Socket)
 {
-	cHTTPConnection * Connection = new cHTTPConnection(*this);
+	cHTTPConnection * Connection;
+	if (m_Cert.get() != NULL)
+	{
+		Connection = new cSslHTTPConnection(*this, m_Cert, m_CertPrivKey);
+	}
+	else
+	{
+		Connection = new cHTTPConnection(*this);
+	}
 	m_SocketThreads.AddClient(a_Socket, Connection);
 	cCSLock Lock(m_CSConnections);
 	m_Connections.push_back(Connection);
