@@ -716,7 +716,7 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length)
+void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Length)
 {
 	if (a_Length < 14)
 	{
@@ -2522,7 +2522,7 @@ void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cClientHandle::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cClientHandle::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
 {
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }
