@@ -26,7 +26,7 @@ size_t cBufferedSslContext::WriteIncoming(const void * a_Data, size_t a_NumBytes
 	if (NumBytes > 0)
 	{
 		m_IncomingData.Write(a_Data, NumBytes);
-		return a_NumBytes - NumBytes;
+		return NumBytes;
 	}
 	return 0;
 }
@@ -42,7 +42,7 @@ size_t cBufferedSslContext::ReadOutgoing(void * a_Data, size_t a_DataMaxSize)
 	{
 		m_OutgoingData.ReadBuf(a_Data, NumBytes);
 		m_OutgoingData.CommitRead();
-		return a_DataMaxSize - NumBytes;
+		return NumBytes;
 	}
 	return 0;
 }
