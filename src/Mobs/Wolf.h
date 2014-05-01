@@ -18,7 +18,7 @@ public:
 
 	CLASS_PROTODEF(cWolf);
 
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();

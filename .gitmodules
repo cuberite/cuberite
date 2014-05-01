@@ -9,4 +9,4 @@
 	url = https://github.com/bearbin/transapi.git
 [submodule "lib/polarssl"]
 	path = lib/polarssl
-	url = https://github.com/polarssl/polarssl
+	url = https://github.com/mc-server/polarssl

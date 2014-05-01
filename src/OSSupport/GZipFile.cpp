@@ -11,7 +11,7 @@
 
 
 cGZipFile::cGZipFile(void) :
-	m_File(NULL)
+	m_File(NULL), m_Mode(fmRead)
 {
 }
 

@@ -808,14 +808,14 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 
 
-void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
 		if (IsGameModeCreative())
 		{
 			// No damage / health in creative mode if not void or plugin damage
-			return;
+			return false;
 		}
 	}
 
@@ -828,17 +828,19 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 			if (!m_Team->AllowsFriendlyFire())
 			{
 				// Friendly fire is disabled
-				return;
+				return false;
 			}
 		}
 	}
 	
-	super::DoTakeDamage(a_TDI);
-	
-	// Any kind of damage adds food exhaustion
-	AddFoodExhaustion(0.3f);
-	
-	SendHealth();
+	if (super::DoTakeDamage(a_TDI))
+	{
+		// Any kind of damage adds food exhaustion
+		AddFoodExhaustion(0.3f);
+		SendHealth();
+		return true;
+	}
+	return false;
 }
 
 
@@ -897,6 +899,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 void cPlayer::Respawn(void)
 {
 	m_Health = GetMaxHealth();
+	SetInvulnerableTicks(20);
 	
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;

@@ -30,7 +30,8 @@ Declares the 1.7.x protocol classes:
 	#pragma warning(pop)
 #endif
 
-#include "../Crypto.h"
+#include "PolarSSL++/AesCfb128Decryptor.h"
+#include "PolarSSL++/AesCfb128Encryptor.h"
 
 
 
@@ -236,8 +237,8 @@ protected:
 	
 	bool m_IsEncrypted;
 	
-	cAESCFBDecryptor m_Decryptor;
-	cAESCFBEncryptor m_Encryptor;
+	cAesCfb128Decryptor m_Decryptor;
+	cAesCfb128Decryptor m_Encryptor;
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;

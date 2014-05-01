@@ -28,7 +28,7 @@
 #include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
-#include "../Entities/ProjectileEntity.h"
+#include "../Entities/ArrowEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
@@ -516,7 +516,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case cMonster::mtWither:
 			{
-				m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetNumInvulnerableTicks());
+				m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetWitherInvulnerableTicks());
 				break;
 			}
 			case cMonster::mtWolf:
@@ -621,10 +621,10 @@ void cNBTChunkSerializer::AddHangingEntity(cHangingEntity * a_Hanging)
 	m_Writer.AddInt("TileZ", a_Hanging->GetTileZ());
 	switch (a_Hanging->GetDirection())
 	{
-		case 0:    m_Writer.AddByte("Dir", (unsigned char)2); break;
-		case 1:    m_Writer.AddByte("Dir", (unsigned char)1); break;
-		case 2:    m_Writer.AddByte("Dir", (unsigned char)0); break;
-		case 3:    m_Writer.AddByte("Dir", (unsigned char)3); break;
+		case BLOCK_FACE_YM: m_Writer.AddByte("Dir", (unsigned char)2); break;
+		case BLOCK_FACE_YP: m_Writer.AddByte("Dir", (unsigned char)1); break;
+		case BLOCK_FACE_ZM: m_Writer.AddByte("Dir", (unsigned char)0); break;
+		case BLOCK_FACE_ZP: m_Writer.AddByte("Dir", (unsigned char)3); break;
 	}
 }
 

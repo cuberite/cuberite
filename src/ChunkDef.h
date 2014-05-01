@@ -246,8 +246,8 @@ public:
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			int Index = MakeIndexNoCheck(x, y, z);
-			if ((size_t)(Index / 2) >= a_Buffer.size())
+			size_t Index = (size_t)MakeIndexNoCheck(x, y, z);
+			if ((Index / 2) >= a_Buffer.size())
 			{
 				return (a_IsSkyLightNibble ? 0xff : 0);
 			}
@@ -281,7 +281,7 @@ public:
 		{
 			a_Buffer.resize((size_t)((a_BlockIdx / 2) + 1));
 		}
-		a_Buffer[(size_t)(a_BlockIdx / 2)] = PackNibble(a_Buffer, a_BlockIdx, a_Nibble);
+		a_Buffer[(size_t)(a_BlockIdx / 2)] = PackNibble(a_Buffer, (size_t)a_BlockIdx, a_Nibble);
 	}
 
 
@@ -297,19 +297,19 @@ public:
 			return;
 		}
 
-		int Index = MakeIndexNoCheck(x, y, z);
-		if ((size_t)(Index / 2) >= a_Buffer.size())
+		size_t Index = (size_t)MakeIndexNoCheck(x, y, z);
+		if ((Index / 2) >= a_Buffer.size())
 		{
-			a_Buffer.resize((size_t)((Index / 2) + 1));
+			a_Buffer.resize(((Index / 2) + 1));
 		}
-		a_Buffer[(size_t)(Index / 2)] = PackNibble(a_Buffer, Index, a_Nibble);
+		a_Buffer[(Index / 2)] = PackNibble(a_Buffer, Index, a_Nibble);
 	}
 
 
 private:
 
 
-	inline static NIBBLETYPE PackNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, int a_Index, NIBBLETYPE a_Nibble)
+	inline static NIBBLETYPE PackNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, size_t a_Index, NIBBLETYPE a_Nibble)
 	{
 		return static_cast<NIBBLETYPE>(
 			(a_Buffer[a_Index / 2] & (0xf0 >> ((a_Index & 1) * 4))) |  // The untouched nibble
@@ -318,7 +318,7 @@ private:
 	}
 
 
-	inline static NIBBLETYPE ExpandNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, int a_Index)
+	inline static NIBBLETYPE ExpandNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, size_t a_Index)
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}

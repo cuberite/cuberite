@@ -457,9 +457,12 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 
 
 
-void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
 
 	if((m_SoundHurt != "") && (m_Health > 0))
 		m_World->BroadcastSoundEffect(m_SoundHurt, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
@@ -468,6 +471,7 @@ void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		m_Target = a_TDI.Attacker;
 	}
+	return true;
 }
 
 
@@ -761,8 +765,10 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtChicken:      return mfPassive;
 		case mtCow:          return mfPassive;
 		case mtCreeper:      return mfHostile;
+		case mtEnderDragon:  return mfNoSpawn;
 		case mtEnderman:     return mfHostile;
 		case mtGhast:        return mfHostile;
+		case mtGiant:        return mfNoSpawn;
 		case mtHorse:        return mfPassive;
 		case mtIronGolem:    return mfPassive;
 		case mtMagmaCube:    return mfHostile;
@@ -773,17 +779,20 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtSilverfish:   return mfHostile;
 		case mtSkeleton:     return mfHostile;
 		case mtSlime:        return mfHostile;
+		case mtSnowGolem:    return mfNoSpawn;
 		case mtSpider:       return mfHostile;
 		case mtSquid:        return mfWater;
 		case mtVillager:     return mfPassive;
 		case mtWitch:        return mfHostile;
-		case mtWither:       return mfHostile;
+		case mtWither:       return mfNoSpawn;
 		case mtWolf:         return mfHostile;
 		case mtZombie:       return mfHostile;
 		case mtZombiePigman: return mfHostile;
-	} ;
+			
+		case mtInvalidType:  break;
+	}
 	ASSERT(!"Unhandled mob type");
-	return mfMaxplusone;
+	return mfUnhandled;
 }
 
 
@@ -794,10 +803,12 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{
-		case mfHostile: return 40;
-		case mfPassive: return 40;
-		case mfAmbient: return 40;
-		case mfWater:   return 400;
+		case mfHostile:   return 40;
+		case mfPassive:   return 40;
+		case mfAmbient:   return 40;
+		case mfWater:     return 400;
+		case mfNoSpawn:   return -1;
+		case mfUnhandled: break;
 	}
 	ASSERT(!"Unhandled mob family");
 	return -1;
@@ -866,6 +877,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtEnderDragon:   toReturn = new cEnderDragon();              break;
 		case mtEnderman:      toReturn = new cEnderman();                 break;
 		case mtGhast:         toReturn = new cGhast();                    break;
+		case mtGiant:         toReturn = new cGiant();                    break;
 		case mtIronGolem:     toReturn = new cIronGolem();                break;
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
 		case mtOcelot:        toReturn = new cOcelot();                   break;
