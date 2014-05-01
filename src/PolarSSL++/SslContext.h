@@ -40,7 +40,7 @@ public:
 	/** Creates a new uninitialized context */
 	cSslContext(void);
 	
-	~cSslContext();
+	virtual ~cSslContext();
 	
 	/** Initializes the context for use as a server or client.
 	Returns 0 on success, PolarSSL error on failure. */
