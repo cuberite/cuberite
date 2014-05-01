@@ -716,7 +716,7 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length)
+void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Length)
 {
 	if (a_Length < 14)
 	{
@@ -1658,7 +1658,7 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 		{
 			// There is a queued overflow. Append to it, then send as much from its front as possible
 			m_OutgoingDataOverflow.append(a_Data, a_Size);
-			int CanFit = m_OutgoingData.GetFreeSpace();
+			size_t CanFit = m_OutgoingData.GetFreeSpace();
 			if (CanFit > 128)
 			{
 				// No point in moving the data over if it's not large enough - too much effort for too little an effect

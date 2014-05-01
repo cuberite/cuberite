@@ -23,6 +23,9 @@ public:
 	class cDataCallbacks
 	{
 	public:
+		// Force a virtual destructor in descendants:
+		virtual ~cDataCallbacks() {}
+		
 		/** Called when PolarSSL wants to read encrypted data from the SSL peer.
 		The returned value is the number of bytes received, or a PolarSSL error on failure.
 		The implementation can return POLARSSL_ERR_NET_WANT_READ or POLARSSL_ERR_NET_WANT_WRITE to indicate

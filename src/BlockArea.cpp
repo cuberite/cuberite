@@ -2005,7 +2005,7 @@ void cBlockArea::ExpandBlockTypes(int a_SubMinX, int a_AddMaxX, int a_SubMinY, i
 	int NewSizeX = m_Size.x + a_SubMinX + a_AddMaxX;
 	int NewSizeY = m_Size.y + a_SubMinY + a_AddMaxY;
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
-	size_t BlockCount = (size_t)NewSizeX * NewSizeY * NewSizeZ;
+	size_t BlockCount = (size_t)(NewSizeX * NewSizeY * NewSizeZ);
 	BLOCKTYPE * NewBlockTypes = new BLOCKTYPE[BlockCount];
 	memset(NewBlockTypes, 0, BlockCount * sizeof(BLOCKTYPE));
 	int OldIndex = 0;
@@ -2035,7 +2035,7 @@ void cBlockArea::ExpandNibbles(NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMa
 	int NewSizeX = m_Size.x + a_SubMinX + a_AddMaxX;
 	int NewSizeY = m_Size.y + a_SubMinY + a_AddMaxY;
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
-	size_t BlockCount = (size_t)NewSizeX * NewSizeY * NewSizeZ;
+	size_t BlockCount = (size_t)(NewSizeX * NewSizeY * NewSizeZ);
 	NIBBLETYPE * NewNibbles = new NIBBLETYPE[BlockCount];
 	memset(NewNibbles, 0, BlockCount * sizeof(NIBBLETYPE));
 	int OldIndex = 0;
