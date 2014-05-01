@@ -1,16 +1,16 @@
 
-// PublicKey.cpp
+// CryptoKey.cpp
 
-// Implements the cPublicKey class representing a RSA public key in PolarSSL
+// Implements the cCryptoKey class representing a RSA public key in PolarSSL
 
 #include "Globals.h"
-#include "PublicKey.h"
+#include "CryptoKey.h"
 
 
 
 
 
-cPublicKey::cPublicKey(void)
+cCryptoKey::cCryptoKey(void)
 {
 	pk_init(&m_Pk);
 	m_CtrDrbg.Initialize("rsa_pubkey", 10);
@@ -20,7 +20,7 @@ cPublicKey::cPublicKey(void)
 
 
 
-cPublicKey::cPublicKey(const AString & a_PublicKeyData)
+cCryptoKey::cCryptoKey(const AString & a_PublicKeyData)
 {
 	pk_init(&m_Pk);
 	m_CtrDrbg.Initialize("rsa_pubkey", 10);
@@ -37,7 +37,7 @@ cPublicKey::cPublicKey(const AString & a_PublicKeyData)
 
 
 
-cPublicKey::cPublicKey(const AString & a_PrivateKeyData, const AString & a_Password)
+cCryptoKey::cCryptoKey(const AString & a_PrivateKeyData, const AString & a_Password)
 {
 	pk_init(&m_Pk);
 	m_CtrDrbg.Initialize("rsa_privkey", 11);
@@ -54,7 +54,7 @@ cPublicKey::cPublicKey(const AString & a_PrivateKeyData, const AString & a_Passw
 
 
 
-cPublicKey::~cPublicKey()
+cCryptoKey::~cCryptoKey()
 {
 	pk_free(&m_Pk);
 }
@@ -63,7 +63,7 @@ cPublicKey::~cPublicKey()
 
 
 
-int cPublicKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength)
+int cCryptoKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength)
 {
 	ASSERT(IsValid());
 	
@@ -84,7 +84,7 @@ int cPublicKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, 
 
 
 
-int cPublicKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength)
+int cCryptoKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength)
 {
 	ASSERT(IsValid());
 	
@@ -105,7 +105,7 @@ int cPublicKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a
 
 
 
-int cPublicKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
+int cCryptoKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
 {
 	ASSERT(!IsValid());  // Cannot parse a second key
 	
@@ -117,7 +117,7 @@ int cPublicKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
 
 
 
-int cPublicKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AString & a_Password)
+int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AString & a_Password)
 {
 	ASSERT(!IsValid());  // Cannot parse a second key
 	
@@ -139,7 +139,7 @@ int cPublicKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AStri
 
 
 
-bool cPublicKey::IsValid(void) const
+bool cCryptoKey::IsValid(void) const
 {
 	return (pk_get_type(&m_Pk) != POLARSSL_PK_NONE);
 }

@@ -11,7 +11,7 @@
 
 
 
-cSslHTTPConnection::cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cPublicKeyPtr & a_PrivateKey) :
+cSslHTTPConnection::cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cCryptoKeyPtr & a_PrivateKey) :
 	super(a_HTTPServer),
 	m_Ssl(64000),
 	m_Cert(a_Cert),

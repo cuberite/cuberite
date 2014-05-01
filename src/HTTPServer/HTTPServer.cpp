@@ -124,17 +124,17 @@ class cDebugCallbacks :
 cHTTPServer::cHTTPServer(void) :
 	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer IPv4"),
 	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer IPv6"),
-	m_Callbacks(NULL),
-	m_Cert(new cX509Cert),
-	m_CertPrivKey(new cPublicKey)
+	m_Callbacks(NULL)
 {
 	AString CertFile = cFile::ReadWholeFile("webadmin/httpscert.crt");
 	AString KeyFile  = cFile::ReadWholeFile("webadmin/httpskey.pem");
 	if (!CertFile.empty() && !KeyFile.empty())
 	{
+		m_Cert.reset(new cX509Cert);
 		int res = m_Cert->Parse(CertFile.data(), CertFile.size());
 		if (res  == 0)
 		{
+			m_CertPrivKey.reset(new cCryptoKey);
 			int res2 = m_CertPrivKey->ParsePrivate(KeyFile.data(), KeyFile.size(), "");
 			if (res2 != 0)
 			{

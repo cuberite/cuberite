@@ -11,7 +11,7 @@
 
 #include "polarssl/ssl.h"
 #include "../ByteBuffer.h"
-#include "PublicKey.h"
+#include "CryptoKey.h"
 #include "RsaPrivateKey.h"
 #include "X509Cert.h"
 
@@ -54,9 +54,8 @@ public:
 	void SetOwnCert(const cX509CertPtr & a_OwnCert, const cRsaPrivateKeyPtr & a_OwnCertPrivKey);
 	
 	/** Sets the certificate to use as our own. Must be used when representing a server, optional when client.
-	Must be called after Initialize().
-	Despite the class name, a_OwnCertPrivKey is a PRIVATE key. */
-	void SetOwnCert(const cX509CertPtr & a_OwnCert, const cPublicKeyPtr & a_OwnCertPrivKey);
+	Must be called after Initialize(). */
+	void SetOwnCert(const cX509CertPtr & a_OwnCert, const cCryptoKeyPtr & a_OwnCertPrivKey);
 	
 	/** Sets a cert chain as the trusted cert store for this context. Must be called after Initialize().
 	Calling this will switch the context into strict cert verification mode.
@@ -107,11 +106,11 @@ protected:
 	/** The certificate that we present to the peer. */
 	cX509CertPtr m_OwnCert;
 	
-	/** Private key for m_OwnCert, if initialized from a cRsaPrivateKey */
+	/** Private key for m_OwnCert, if initialized from a cRsaPrivateKey. */
 	cRsaPrivateKeyPtr m_OwnCertPrivKey;
 	
-	/** Private key for m_OwnCert, if initialized from a cPublicKey. Despite the class name, this is a PRIVATE key. */
-	cPublicKeyPtr m_OwnCertPrivKey2;
+	/** Private key for m_OwnCert, if initialized from a cCryptoKey. */
+	cCryptoKeyPtr m_OwnCertPrivKey2;
 	
 	/** True if the SSL handshake has been completed. */
 	bool m_HasHandshaken;

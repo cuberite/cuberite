@@ -22,9 +22,9 @@ class cSslHTTPConnection :
 	typedef cHTTPConnection super;
 	
 public:
-	/** Creates a new connection on the specified server; sends the specified cert as the server certificate,
-	uses the private key for decryption. a_Private key is, despite the class name, a PRIVATE key for the cert. */
-	cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cPublicKeyPtr & a_PrivateKey);
+	/** Creates a new connection on the specified server.
+	Sends the specified cert as the server certificate, uses the private key for decryption. */
+	cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cCryptoKeyPtr & a_PrivateKey);
 	
 protected:
 	cBufferedSslContext m_Ssl;
@@ -33,7 +33,7 @@ protected:
 	cX509CertPtr m_Cert;
 	
 	/** The private key used for the certificate */
-	cPublicKeyPtr m_PrivateKey;
+	cCryptoKeyPtr m_PrivateKey;
 	
 	// cHTTPConnection overrides:
 	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client

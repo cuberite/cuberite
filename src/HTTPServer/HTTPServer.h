@@ -13,7 +13,7 @@
 #include "../OSSupport/SocketThreads.h"
 #include "inifile/iniFile.h"
 #include "PolarSSL++/RsaPrivateKey.h"
-#include "PolarSSL++/PublicKey.h"
+#include "PolarSSL++/CryptoKey.h"
 #include "PolarSSL++/X509Cert.h"
 
 
@@ -85,8 +85,8 @@ protected:
 	/** The server certificate to use for the SSL connections */
 	cX509CertPtr m_Cert;
 	
-	/** The private key for m_Cert. Despite the class name, this is the PRIVATE key. */
-	cPublicKeyPtr m_CertPrivKey;
+	/** The private key for m_Cert. */
+	cCryptoKeyPtr m_CertPrivKey;
 	
 
 	// cListenThread::cCallback overrides:

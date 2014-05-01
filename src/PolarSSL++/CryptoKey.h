@@ -1,7 +1,7 @@
 
-// PublicKey.h
+// CryptoKey.h
 
-// Declares the cPublicKey class representing a RSA public key in PolarSSL
+// Declares the cCryptoKey class representing a RSA public key in PolarSSL
 
 
 
@@ -16,22 +16,22 @@
 
 
 
-class cPublicKey
+class cCryptoKey
 {
 	friend class cSslContext;
 	
 public:
 	/** Constructs an empty key instance. Before use, it needs to be filled by ParsePublic() or ParsePrivate() */
-	cPublicKey(void);
+	cCryptoKey(void);
 	
 	/** Constructs the public key out of the DER- or PEM-encoded pubkey data */
-	cPublicKey(const AString & a_PublicKeyData);
+	cCryptoKey(const AString & a_PublicKeyData);
 	
 	/** Constructs the private key out of the DER- or PEM-encoded privkey data, with the specified password.
 	If a_Password is empty, no password is assumed. */
-	cPublicKey(const AString & a_PrivateKeyData, const AString & a_Password);
+	cCryptoKey(const AString & a_PrivateKeyData, const AString & a_Password);
 	
-	~cPublicKey();
+	~cCryptoKey();
 	
 	/** Decrypts the data using the stored public key
 	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
@@ -58,7 +58,7 @@ public:
 	bool IsValid(void) const;
 
 protected:
-	/** The public key PolarSSL representation */
+	/** The PolarSSL representation of the key data */
 	pk_context m_Pk;
 	
 	/** The random generator used in encryption and decryption */
@@ -69,7 +69,7 @@ protected:
 	pk_context * GetInternal(void) { return &m_Pk; }
 } ;
 
-typedef SharedPtr<cPublicKey> cPublicKeyPtr;
+typedef SharedPtr<cCryptoKey> cCryptoKeyPtr;
 
 
 

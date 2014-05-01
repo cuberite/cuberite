@@ -115,7 +115,7 @@ void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cRsaPrivateKe
 
 
 
-void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cPublicKeyPtr & a_OwnCertPrivKey)
+void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cCryptoKeyPtr & a_OwnCertPrivKey)
 {
 	ASSERT(m_IsValid);  // Call Initialize() first
 	
