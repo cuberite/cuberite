@@ -2649,12 +2649,13 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 
 
 
-void cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
+bool cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
 	m_TimeSinceLastPacket = 0;
 	cCSLock Lock(m_CSIncomingData);
 	m_IncomingData.append(a_Data, a_Size);
+	return false;
 }
 
 

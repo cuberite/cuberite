@@ -25,7 +25,7 @@ cSslHTTPConnection::cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509Ce
 
 
 
-void cSslHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
+bool cSslHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// If there is outgoing data in the queue, notify the server that it should write it out:
 	if (!m_OutgoingData.empty())
@@ -52,13 +52,17 @@ void cSslHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 		int NumRead = m_Ssl.ReadPlain(Buffer, sizeof(Buffer));
 		if (NumRead > 0)
 		{
-			super::DataReceived(Buffer, (size_t)NumRead);
+			if (super::DataReceived(Buffer, (size_t)NumRead))
+			{
+				// The socket has been closed, and the object is already deleted. Bail out.
+				return true;
+			}
 		}
 		
 		// If both failed, bail out:
 		if ((BytesWritten == 0) && (NumRead <= 0))
 		{
-			return;
+			return false;
 		}
 	}
 }
