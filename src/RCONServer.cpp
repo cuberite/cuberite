@@ -206,6 +206,7 @@ bool cRCONServer::cConnection::DataReceived(const char * a_Data, size_t a_Size)
 		}
 		m_Buffer.erase(0, Length + 4);
 	}  // while (m_Buffer.size() >= 14)
+	return false;
 }
 
 
