@@ -70,6 +70,18 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 		ssl_set_dbg(&m_Ssl, &SSLDebugMessage, this);
 		ssl_set_verify(&m_Ssl, &SSLVerifyCert, this);
 		*/
+		
+		/*
+		// Set ciphersuite to the easiest one to decode, so that the connection can be wireshark-decoded:
+		static const int CipherSuites[] =
+		{
+			TLS_RSA_WITH_RC4_128_MD5,
+			TLS_RSA_WITH_RC4_128_SHA,
+			TLS_RSA_WITH_AES_128_CBC_SHA,
+			0,  // Must be 0-terminated!
+		};
+		ssl_set_ciphersuites(&m_Ssl, CipherSuites);
+		*/
 	#endif
 	
 	m_IsValid = true;
