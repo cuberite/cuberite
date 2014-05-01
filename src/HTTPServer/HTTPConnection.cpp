@@ -26,6 +26,7 @@ cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
 
 cHTTPConnection::~cHTTPConnection()
 {
+	// LOGD("HTTP: Connection deleting: %p", this);
 	delete m_CurrentRequest;
 }
 
@@ -183,11 +184,11 @@ void cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 			// Process the rest of the incoming data into the request body:
 			if (a_Size > BytesConsumed)
 			{
-				DataReceived(a_Data + BytesConsumed, a_Size - BytesConsumed);
+				cHTTPConnection::DataReceived(a_Data + BytesConsumed, a_Size - BytesConsumed);
 			}
 			else
 			{
-				DataReceived("", 0);  // If the request has zero body length, let it be processed right-away
+				cHTTPConnection::DataReceived("", 0);  // If the request has zero body length, let it be processed right-away
 			}
 			break;
 		}

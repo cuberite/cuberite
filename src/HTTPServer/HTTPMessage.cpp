@@ -201,7 +201,7 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
 					return AString::npos;
 				}
 				// Check that there's HTTP/version at the end
-				if (strncmp(a_Data + URLEnd + 1, "HTTP/1.", 7) != 0)
+				if (strncmp(m_IncomingHeaderData.c_str() + URLEnd + 1, "HTTP/1.", 7) != 0)
 				{
 					m_IsValid = false;
 					return AString::npos;
