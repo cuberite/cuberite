@@ -56,7 +56,7 @@ public:
 	virtual bool OnChunkUnloading           (cWorld * a_World, int a_ChunkX, int a_ChunkZ) = 0;
 	virtual bool OnCollectingPickup         (cPlayer * a_Player, cPickup * a_Pickup) = 0;
 	virtual bool OnCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) = 0;
-	virtual bool OnDisconnect               (cPlayer * a_Player, const AString & a_Reason) = 0;
+	virtual bool OnDisconnect               (cClientHandle & a_Client, const AString & a_Reason) = 0;
 	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split) = 0;
 	virtual bool OnExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) = 0;
 	virtual bool OnExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) = 0;

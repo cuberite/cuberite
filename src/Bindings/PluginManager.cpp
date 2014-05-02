@@ -442,7 +442,7 @@ bool cPluginManager::CallHookCraftingNoRecipe(const cPlayer * a_Player, const cC
 
 
 
-bool cPluginManager::CallHookDisconnect(cPlayer * a_Player, const AString & a_Reason)
+bool cPluginManager::CallHookDisconnect(cClientHandle & a_Client, const AString & a_Reason)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_DISCONNECT);
 	if (Plugins == m_Hooks.end())
@@ -451,7 +451,7 @@ bool cPluginManager::CallHookDisconnect(cPlayer * a_Player, const AString & a_Re
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnDisconnect(a_Player, a_Reason))
+		if ((*itr)->OnDisconnect(a_Client, a_Reason))
 		{
 			return true;
 		}

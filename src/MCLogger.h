@@ -52,6 +52,7 @@ private:
 	cCriticalSection m_CriticalSection;
 	cLog * m_Log;
 	static cMCLogger * s_MCLogger;
+	bool m_ShouldColorOutput;
 
 
 	/// Sets the specified color scheme in the terminal (TODO: if coloring available)

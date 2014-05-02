@@ -145,8 +145,13 @@ public:
 	{
 	}
 
-	// Distributing the stack is allowed only for compatible items (helmets into helmet slot etc.)
+	/** Distributing the stack is allowed only for compatible items (helmets into helmet slot etc.) */
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+
+	/** Called when a player clicks in the window. Parameters taken from the click packet. */
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+
+	bool CanPlaceInSlot(int a_SlotNum, const cItem & a_Item);
 } ;
 
 

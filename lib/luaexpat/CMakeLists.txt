@@ -7,6 +7,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 file(GLOB SOURCE
     "*.c"
+    "*.h"
 )
 
 add_library(luaexpat ${SOURCE})

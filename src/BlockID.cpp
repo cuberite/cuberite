@@ -102,7 +102,7 @@ public:
 			return true;
 		}
 		
-		a_Item.m_ItemDamage = atoi(Split[1].c_str());
+		a_Item.m_ItemDamage = (short)atoi(Split[1].c_str());
 		if ((a_Item.m_ItemDamage == 0) && (Split[1] != "0"))
 		{
 			// Parsing the number failed
@@ -324,7 +324,7 @@ eDimension StringToDimension(const AString & a_DimensionString)
 		{ dimOverworld, "Normal"},
 		{ dimOverworld, "World"},
 		{ dimNether,    "Nether"},
-		{ dimNether,    "Hell"},  // Alternate name for End
+		{ dimNether,    "Hell"},  // Alternate name for Nether
 		{ dimEnd,       "End"},
 		{ dimEnd,       "Sky"},  // Old name for End
 	} ;
@@ -337,7 +337,8 @@ eDimension StringToDimension(const AString & a_DimensionString)
 	}  // for i - DimensionMap[]
 	
 	// Not found
-	return (eDimension)-1000;
+	LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", a_DimensionString.c_str());
+	return dimOverworld;
 }
 
 

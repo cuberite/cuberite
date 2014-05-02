@@ -8,6 +8,7 @@
 #include "../BlockInServerPluginInterface.h"
 
 // Handlers:
+#include "ItemArmor.h"
 #include "ItemBed.h"
 #include "ItemBoat.h"
 #include "ItemBow.h"
@@ -221,6 +222,31 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_STEAK:
 		{
 			return new cItemFoodHandler(a_ItemType);
+		}
+
+		// Armor:
+		case E_ITEM_LEATHER_CAP:
+		case E_ITEM_GOLD_HELMET:
+		case E_ITEM_CHAIN_HELMET:
+		case E_ITEM_IRON_HELMET:
+		case E_ITEM_DIAMOND_HELMET:
+		case E_ITEM_LEATHER_TUNIC:
+		case E_ITEM_GOLD_CHESTPLATE:
+		case E_ITEM_CHAIN_CHESTPLATE:
+		case E_ITEM_IRON_CHESTPLATE:
+		case E_ITEM_DIAMOND_CHESTPLATE:
+		case E_ITEM_LEATHER_PANTS:
+		case E_ITEM_GOLD_LEGGINGS:
+		case E_ITEM_CHAIN_LEGGINGS:
+		case E_ITEM_IRON_LEGGINGS:
+		case E_ITEM_DIAMOND_LEGGINGS:
+		case E_ITEM_LEATHER_BOOTS:
+		case E_ITEM_GOLD_BOOTS:
+		case E_ITEM_CHAIN_BOOTS:
+		case E_ITEM_IRON_BOOTS:
+		case E_ITEM_DIAMOND_BOOTS:
+		{
+			return new cItemArmorHandler(a_ItemType);
 		}
 	}
 }

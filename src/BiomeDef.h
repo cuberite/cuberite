@@ -104,10 +104,13 @@ enum EMCSBiome
 	biMaxVariantBiome = biNumVariantBiomes - 1,  // The maximum biome value
 } ;
 
-/// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns biInvalidBiome on failure.
+/** Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns biInvalidBiome on failure. */
 extern EMCSBiome StringToBiome(const AString & a_BiomeString);
 
-/// Returns true if the biome has no downfall - deserts and savannas
+/** Translates biome enum into biome string. Returns empty string on failure (unknown biome). */
+extern AString BiomeToString(int a_Biome);
+
+/** Returns true if the biome has no downfall - deserts and savannas */
 extern bool IsBiomeNoDownfall(EMCSBiome a_Biome);
 
 

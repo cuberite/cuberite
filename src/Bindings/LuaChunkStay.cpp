@@ -42,7 +42,7 @@ bool cLuaChunkStay::AddChunks(int a_ChunkCoordTableStackPos)
 	
 	// Add each set of coords:
 	int NumChunks = luaL_getn(L, a_ChunkCoordTableStackPos);
-	m_Chunks.reserve(NumChunks);
+	m_Chunks.reserve((size_t)NumChunks);
 	for (int idx = 1; idx <= NumChunks; idx++)
 	{
 		// Push the idx-th element of the array onto stack top, check that it's a table:

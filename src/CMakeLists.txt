@@ -5,7 +5,7 @@ include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
 
-set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating) 
+set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++)
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs)
 
 
@@ -57,6 +57,14 @@ if (NOT MSVC)
 		Entities/Pickup.h
 		Entities/Player.h
 		Entities/ProjectileEntity.h
+		Entities/ArrowEntity.h
+		Entities/ThrownEggEntity.h
+		Entities/ThrownEnderPearlEntity.h
+		Entities/ExpBottleEntity.h
+		Entities/ThrownSnowballEntity.h
+		Entities/FireChargeEntity.h
+		Entities/FireworkEntity.h
+		Entities/GhastFireballEntity.h
 		Entities/TNTEntity.h
 		Entities/ExpOrb.h
 		Entities/HangingEntity.h
@@ -123,6 +131,7 @@ if (NOT MSVC)
 
 	file(GLOB SOURCE
 		"*.cpp"
+		"*.h"
 	)
 
 	list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")
@@ -233,7 +242,7 @@ endif ()
 if (NOT MSVC)
 	target_link_libraries(${EXECUTABLE} OSSupport HTTPServer Bindings Items Blocks)
 	target_link_libraries(${EXECUTABLE} Protocol Generating Generating_Prefabs WorldStorage)
-	target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI BlockEntities)
+	target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI BlockEntities PolarSSL++)
 endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)

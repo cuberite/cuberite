@@ -357,7 +357,7 @@ void cProtocolRecognizer::SendHealth(void)
 
 
 
-void cProtocolRecognizer::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocolRecognizer::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);

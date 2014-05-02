@@ -21,13 +21,13 @@ class cItemHandler
 public:
 	cItemHandler(int a_ItemType);
 	
-	// Force virtual destructor
+	/** Force virtual destructor */
 	virtual ~cItemHandler() {}
 	
-	/// Called when the player tries to use the item (right mouse button). Return false to make the item unusable. DEFAULT: False
+	/** Called when the player tries to use the item (right mouse button). Return false to make the item unusable. DEFAULT: False */
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir);
 	
-	/// Called when the client sends the SHOOT status in the lclk packet
+	/** Called when the client sends the SHOOT status in the lclk packet */
 	virtual void OnItemShoot(cPlayer *, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) 
 	{
 		UNUSED(a_BlockX);
@@ -36,7 +36,7 @@ public:
 		UNUSED(a_BlockFace);
 	}
 
-	/// Called every tick while the item is on the player's inventory (Used by maps) - For now, called only for equipped items
+	/** Called every tick while the item is on the player's inventory (Used by maps) - For now, called only for equipped items */
 	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item)
 	{
 		UNUSED(a_World);
@@ -44,16 +44,16 @@ public:
 		UNUSED(a_Item);
 	}
 	
-	/// Called while the player diggs a block using this item
+	/** Called while the player diggs a block using this item */
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
 	
-	/// Called when the player destroys a block using this item. This also calls the drop function for the destroyed block
+	/** Called when the player destroys a block using this item. This also calls the drop function for the destroyed block */
 	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_X, int a_Y, int a_Z);
 	
-	/// Called after the player has eaten this item.
+	/** Called after the player has eaten this item. */
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);
 	
-	/// Returns the maximum stack size for a given item
+	/** Returns the maximum stack size for a given item */
 	virtual char GetMaxStackSize(void);
 
 	struct FoodInfo
@@ -70,22 +70,22 @@ public:
 		}
 	} ;
 
-	/// Returns the FoodInfo for this item. (FoodRecovery, Saturation and PoisionChance)
+	/** Returns the FoodInfo for this item. (FoodRecovery, Saturation and PoisionChance) */
 	virtual FoodInfo GetFoodInfo();
 	
-	/// Lets the player eat a selected item. Returns true if the player ate the item
+	/** Lets the player eat a selected item. Returns true if the player ate the item */
 	virtual bool EatItem(cPlayer *a_Player, cItem *a_Item);
 
-	/// Indicates if this item is a tool
+	/** Indicates if this item is a tool */
 	virtual bool IsTool(void);
 	
-	/// Indicates if this item is food
+	/** Indicates if this item is food */
 	virtual bool IsFood(void);
 	
-	/// Blocks simply get placed
+	/** Blocks simply get placed */
 	virtual bool IsPlaceable(void);
 
-	/** Called before a block is placed	into a world. 
+	/** Called before a block is placed	into a world.
 	The handler should return true to allow placement, false to refuse.
 	Also, the handler should set a_BlockType and a_BlockMeta to correct values for the newly placed block.
 	*/
@@ -96,7 +96,7 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	);
 	
-	/// Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood can´t) DEFAULT: False
+	/** Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood canï¿½t) DEFAULT: False */
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
 	static cItemHandler * GetItemHandler(int a_ItemType);
