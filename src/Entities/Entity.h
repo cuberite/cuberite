@@ -431,18 +431,21 @@ protected:
 	cEntity * m_Attachee;
 
 	/** Stores whether head yaw has been set manually */
-	bool     m_bDirtyHead;
+	bool m_bDirtyHead;
+	
 	/** Stores whether our yaw/pitch/roll (body orientation) has been set manually */
-	bool     m_bDirtyOrientation;
+	bool m_bDirtyOrientation;
+	
 	/** Stores whether we have sent a Velocity packet with a speed of zero (no speed) to the client
 	Ensures that said packet is sent only once */
-	bool     m_bHasSentNoSpeed;
+	bool m_bHasSentNoSpeed;
 
 	/** Stores if the entity is on the ground */
-	bool     m_bOnGround;
+	bool m_bOnGround;
+	
 	/** Stores gravity that is applied to an entity every tick
 	For realistic effects, this should be negative. For spaaaaaaace, this can be zero or even positive */
-	float    m_Gravity;
+	float m_Gravity;
 	
 	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
 	Only updated if cEntity::BroadcastMovementUpdate() is called! */
@@ -473,12 +476,14 @@ protected:
 	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
 	int m_TicksSinceLastVoidDamage;
 
+
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir();
+	
 	/** Called once per tick to set IsSwimming and IsSubmerged */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
