@@ -34,9 +34,9 @@ public:
 		return true;
 	}
 
-	virtual const char * GetStepSound(void) override
+	virtual cStepSound GetSound(void) override
 	{
-		return "step.stone";
+		return cStepSound("stone", 1.0F, 1.5F);
 	}
 	
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)

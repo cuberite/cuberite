@@ -88,9 +88,9 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
+	virtual cStepSound GetSound(void) override
 	{
-		return "step.gravel";
+		return cStepSound("gravel");
 	}
 } ;
 

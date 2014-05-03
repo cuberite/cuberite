@@ -24,9 +24,9 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
+	virtual cStepSound GetSound(void) override
 	{
-		return "step.cloth";
+		return cStepSound("cloth");
 	}
 	
 	

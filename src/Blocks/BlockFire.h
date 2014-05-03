@@ -55,9 +55,9 @@ public:
 		return true;
 	}
 
-	virtual const char * GetStepSound(void) override
+	virtual cStepSound GetSound(void) override
 	{
-		return "step.wood";
+		return cStepSound("wood");
 	}
 
 	/// Traces along YP until it finds an obsidian block, returns Y difference or 0 if no portal, and -1 for border

@@ -17,8 +17,14 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
-	
+
+
+	virtual cStepSound GetSound(void) override
+	{
+		return cStepSound("random.anvil_land", "dig.stone", "step.anvil", 0.3F, 1.0F);
+	}
+
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta >> 2));
@@ -30,8 +36,8 @@ public:
 		cWindow * Window = new cAnvilWindow(a_BlockX, a_BlockY, a_BlockZ);
 		a_Player->OpenWindow(Window);
 	}
-	
-	
+
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 

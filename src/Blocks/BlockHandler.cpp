@@ -382,9 +382,9 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 
 
-const char * cBlockHandler::GetStepSound()
+cStepSound cBlockHandler::GetSound()
 {
-	return "step.stone";
+	return cStepSound("stone");
 }
 
 

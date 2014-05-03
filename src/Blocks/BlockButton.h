@@ -56,9 +56,16 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
+	virtual cStepSound GetSound(void) override
 	{
-		return m_BlockType == E_BLOCK_WOODEN_BUTTON ? "step.wood" : "step.stone";
+		if (m_BlockType == E_BLOCK_WOODEN_BUTTON)
+		{
+			return cStepSound("wood");
+		}
+		else
+		{
+			return cStepSound("stone");
+		}
 	}
 
 

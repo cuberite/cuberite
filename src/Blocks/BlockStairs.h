@@ -55,7 +55,7 @@ public:
 	}
 	
 	
-	virtual const char * GetStepSound(void) override
+	virtual cStepSound GetSound(void) override
 	{
 		if (
 			(m_BlockType == E_BLOCK_WOODEN_STAIRS) ||
@@ -66,10 +66,10 @@ public:
 			(m_BlockType == E_BLOCK_DARK_OAK_WOOD_STAIRS)
 			)
 		{
-			return "step.wood";
+			return cStepSound("wood");
 		}
 
-		return "step.stone";
+		return cStepSound("stone");
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override

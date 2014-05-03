@@ -20,6 +20,12 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_REDSTONE_LAMP_OFF, 1, 0));
 	}
+
+
+	virtual cStepSound GetSound(void) override
+	{
+		return cStepSound("step.stone", "dig.glass", "tile.stone");
+	}
 };
 
 
