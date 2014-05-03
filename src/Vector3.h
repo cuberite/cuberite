@@ -163,7 +163,15 @@ public:
 		z *= a_v;
 	}
 
-	template <typename T2> inline Vector3<T> & operator =(const Vector3<T2> & a_Rhs)
+	inline Vector3<T> & operator = (const Vector3<T> & a_Rhs)
+	{
+		x = a_Rhs.x;
+		y = a_Rhs.y;
+		z = a_Rhs.z;
+		return *this;
+	}
+
+	template <typename T2> inline Vector3<T> & operator = (const Vector3<T2> & a_Rhs)
 	{
 		x = (T)a_Rhs.x;
 		y = (T)a_Rhs.y;
