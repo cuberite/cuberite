@@ -123,12 +123,6 @@ public:
 		return Equals(a_Rhs);
 	}
 
-	inline bool operator < (const Vector3<T> & a_Rhs)
-	{
-		// return (x < a_Rhs.x) && (y < a_Rhs.y) && (z < a_Rhs.z); ?
-		return (x < a_Rhs.x) || (x == a_Rhs.x && y < a_Rhs.y) || (x == a_Rhs.x && y == a_Rhs.y && z < a_Rhs.z);
-	}
-
 	inline void Move(T a_X, T a_Y, T a_Z)
 	{
 		x += a_X;
