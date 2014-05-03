@@ -37,7 +37,7 @@
 /****************************
  * Better error reporting for Lua
  **/
-int tolua_do_error(lua_State* L, const char * a_pMsg, tolua_Error * a_pToLuaError)
+static int tolua_do_error(lua_State* L, const char * a_pMsg, tolua_Error * a_pToLuaError)
 {
 	// Retrieve current function name
 	lua_Debug entry;
@@ -57,7 +57,7 @@ int tolua_do_error(lua_State* L, const char * a_pMsg, tolua_Error * a_pToLuaErro
 
 
 
-int lua_do_error(lua_State* L, const char * a_pFormat, ...)
+static int lua_do_error(lua_State* L, const char * a_pFormat, ...)
 {
 	// Retrieve current function name
 	lua_Debug entry;
@@ -235,7 +235,7 @@ static int tolua_Base64Decode(lua_State * tolua_S)
 
 
 
-cPluginLua * GetLuaPlugin(lua_State * L)
+static cPluginLua * GetLuaPlugin(lua_State * L)
 {
 	// Get the plugin identification out of LuaState:
 	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
@@ -1776,20 +1776,20 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 
 
 
-static int tolua_cPlayer_GetGroups(lua_State* tolua_S)
+static int tolua_cPlayer_GetGroups(lua_State * tolua_S)
 {
-	cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S, 1, NULL);
+	cPlayer * self = (cPlayer *)tolua_tousertype(tolua_S, 1, NULL);
 
 	const cPlayer::GroupList & AllGroups = self->GetGroups();
 
-	lua_createtable(tolua_S, AllGroups.size(), 0);
+	lua_createtable(tolua_S, (int)AllGroups.size(), 0);
 	int newTable = lua_gettop(tolua_S);
 	int index = 1;
 	cPlayer::GroupList::const_iterator iter = AllGroups.begin();
-	while(iter != AllGroups.end())
+	while (iter != AllGroups.end())
 	{
-		const cGroup* Group = *iter;
-		tolua_pushusertype( tolua_S, (void*)Group, "const cGroup" );
+		const cGroup * Group = *iter;
+		tolua_pushusertype(tolua_S, (void *)Group, "const cGroup");
 		lua_rawseti(tolua_S, newTable, index);
 		++iter;
 		++index;
@@ -1801,20 +1801,20 @@ static int tolua_cPlayer_GetGroups(lua_State* tolua_S)
 
 
 
-static int tolua_cPlayer_GetResolvedPermissions(lua_State* tolua_S)
+static int tolua_cPlayer_GetResolvedPermissions(lua_State * tolua_S)
 {
-	cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S, 1, NULL);
+	cPlayer * self = (cPlayer*)  tolua_tousertype(tolua_S, 1, NULL);
 
 	cPlayer::StringList AllPermissions = self->GetResolvedPermissions();
 
-	lua_createtable(tolua_S, AllPermissions.size(), 0);
+	lua_createtable(tolua_S, (int)AllPermissions.size(), 0);
 	int newTable = lua_gettop(tolua_S);
 	int index = 1;
 	cPlayer::StringList::iterator iter = AllPermissions.begin();
-	while(iter != AllPermissions.end())
+	while (iter != AllPermissions.end())
 	{
-		std::string& Permission = *iter;
-		tolua_pushstring( tolua_S, Permission.c_str() );
+		std::string & Permission = *iter;
+		lua_pushlstring(tolua_S, Permission.c_str(), Permission.length());
 		lua_rawseti(tolua_S, newTable, index);
 		++iter;
 		++index;
@@ -2076,18 +2076,18 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 
 static int tolua_cWebAdmin_GetPlugins(lua_State * tolua_S)
 {
-	cWebAdmin* self = (cWebAdmin*)  tolua_tousertype(tolua_S, 1, NULL);
+	cWebAdmin * self = (cWebAdmin *)tolua_tousertype(tolua_S, 1, NULL);
 
 	const cWebAdmin::PluginList & AllPlugins = self->GetPlugins();
 
-	lua_createtable(tolua_S, AllPlugins.size(), 0);
+	lua_createtable(tolua_S, (int)AllPlugins.size(), 0);
 	int newTable = lua_gettop(tolua_S);
 	int index = 1;
 	cWebAdmin::PluginList::const_iterator iter = AllPlugins.begin();
-	while(iter != AllPlugins.end())
+	while (iter != AllPlugins.end())
 	{
-		const cWebPlugin* Plugin = *iter;
-		tolua_pushusertype( tolua_S, (void*)Plugin, "const cWebPlugin" );
+		const cWebPlugin * Plugin = *iter;
+		tolua_pushusertype(tolua_S, (void *)Plugin, "const cWebPlugin");
 		lua_rawseti(tolua_S, newTable, index);
 		++iter;
 		++index;

@@ -172,7 +172,7 @@ public:																	// tolua_export
 	bool CallHookChunkUnloading           (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookCollectingPickup         (cPlayer * a_Player, cPickup & a_Pickup);
 	bool CallHookCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	bool CallHookDisconnect               (cPlayer * a_Player, const AString & a_Reason);
+	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == NULL, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);

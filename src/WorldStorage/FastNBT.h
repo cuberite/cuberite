@@ -237,7 +237,7 @@ public:
 	{
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_String);
 		AString res;
-		res.assign(m_Data + m_Tags[(size_t)a_Tag].m_DataStart, m_Tags[(size_t)a_Tag].m_DataLength);
+		res.assign(m_Data + m_Tags[(size_t)a_Tag].m_DataStart, (size_t)m_Tags[(size_t)a_Tag].m_DataLength);
 		return res;
 	}
 	
@@ -245,7 +245,7 @@ public:
 	inline AString GetName(int a_Tag) const
 	{
 		AString res;
-		res.assign(m_Data + m_Tags[(size_t)a_Tag].m_NameStart, m_Tags[(size_t)a_Tag].m_NameLength);
+		res.assign(m_Data + m_Tags[(size_t)a_Tag].m_NameStart, (size_t)m_Tags[(size_t)a_Tag].m_NameLength);
 		return res;
 	}
 	

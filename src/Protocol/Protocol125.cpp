@@ -1175,7 +1175,7 @@ void cProtocol125::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol125::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocol125::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_WINDOW_PROPERTY);

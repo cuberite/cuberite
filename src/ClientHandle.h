@@ -384,7 +384,7 @@ private:
 	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
 	
 	/** Handles the "MC|AdvCdm" plugin message */
-	void HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length);
+	void HandleCommandBlockMessage(const char * a_Data, size_t a_Length);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client

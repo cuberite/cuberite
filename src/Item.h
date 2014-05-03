@@ -73,6 +73,10 @@ public:
 	}
 	
 	
+	// The constructor is disabled in code, because the compiler generates it anyway,
+	// but it needs to stay because ToLua needs to generate the binding for it
+	#if 0
+	
 	/** Creates an exact copy of the item */
 	cItem(const cItem & a_CopyFrom) :
 		m_ItemType    (a_CopyFrom.m_ItemType),
@@ -84,6 +88,8 @@ public:
 		m_FireworkItem(a_CopyFrom.m_FireworkItem)
 	{
 	}
+	
+	#endif
 	
 	
 	void Empty(void)

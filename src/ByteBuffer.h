@@ -101,7 +101,7 @@ public:
 	bool ReadString(AString & a_String, size_t a_Count);
 	
 	/// Reads 2 * a_NumChars bytes and interprets it as a UTF16-BE string, converting it into UTF8 string a_String
-	bool ReadUTF16String(AString & a_String, int a_NumChars);
+	bool ReadUTF16String(AString & a_String, size_t a_NumChars);
 	
 	/// Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer
 	bool SkipRead(size_t a_Count);
