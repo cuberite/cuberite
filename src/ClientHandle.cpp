@@ -798,7 +798,7 @@ void cClientHandle::HandleAnvilItemName(const char * a_Data, unsigned int a_Leng
 
 	if (Name.length() <= 30)
 	{
-		((cAnvilWindow&)*m_Player->GetWindow()).SetRepairedItemName(Name);
+		((cAnvilWindow&)*m_Player->GetWindow()).SetRepairedItemName(Name, m_Player);
 	}
 }
 

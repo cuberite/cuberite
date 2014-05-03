@@ -274,12 +274,19 @@ public:
 	// cSlotAreaTemporary overrides:
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
-protected:
+	bool CanTakeResultItem(cPlayer & a_Player);
+
+	void OnTakeResult(cPlayer & a_Player, cItem a_ResultItem);
+
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
 
+protected:
 	/** The maximum cost of repairing/renaming in the anvil. */
 	int m_MaximumCost;
+
+	/** The stack size of the second item where was used for repair */
+	char m_StackSizeToBeUsedInRepair;
 } ;
 
 
