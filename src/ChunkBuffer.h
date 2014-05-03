@@ -1,6 +1,13 @@
 
 #pragma once
 
+
+#include <cstring>
+
+
+#include "ChunkDef.h"
+
+
 #define CHUNK_SECTION_HEIGHT 16
 #define CHUNK_SECTION_NUM (256 / CHUNK_SECTION_HEIGHT)
 

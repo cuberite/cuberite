@@ -1,4 +1,9 @@
+
+#include "TestGlobals.h"
+#include "ChunkBuffer.h"
+
 int main(int argc, char** argv)
 {
-return 0;
+	cChunkBuffer buffer;
+	return 0;
 }
