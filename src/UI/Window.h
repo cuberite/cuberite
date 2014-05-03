@@ -245,7 +245,7 @@ public:
 	/** Set the repaired item name. */
 	void SetRepairedItemName(const AString & a_Name, cPlayer * a_Player);
 
-	/** Get the Position from the Enchantment Table */
+	/** Gets the Position from the Anvil */
 	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
 
 protected:
