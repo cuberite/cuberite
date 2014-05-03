@@ -40,7 +40,6 @@ public:
 	Vector3(const Vector3<_T> * a_Rhs) : x(a_Rhs->x), y(a_Rhs->y), z(a_Rhs->z) {}
 	// tolua_begin
 
-
 	inline void Set(T a_x, T a_y, T a_z)
 	{
 		x = a_x;
@@ -105,7 +104,18 @@ public:
 
 	inline bool Equals(const Vector3<T> & a_Rhs) const
 	{
-		return x == a_Rhs.x && y == a_Rhs.y && z == a_Rhs.z;
+		// Perform a bitwise comparison of the contents - we want to know whether this object is exactly equal
+		// To perform EPS-based comparison, use the EqualsEps() function
+		return (
+			(memcmp(&x, &a_Rhs.x, sizeof(x)) == 0) &&
+			(memcmp(&y, &a_Rhs.y, sizeof(y)) == 0) &&
+			(memcmp(&z, &a_Rhs.z, sizeof(z)) == 0)
+		);
+	}
+	
+	inline bool EqualsEps(const Vector3<T> & a_Rhs, T a_Eps) const
+	{
+		return (Abs(x - a_Rhs.x) < a_Eps) && (Abs(y - a_Rhs.y) < a_Eps) && (Abs(z - a_Rhs.z) < a_Eps);
 	}
 
 	inline bool operator == (const Vector3<T> & a_Rhs) const
@@ -233,7 +243,7 @@ public:
 	*/
 	inline double LineCoeffToXYPlane(const Vector3<T> & a_OtherEnd, T a_Z) const
 	{
-		if (abs(z - a_OtherEnd.z) < EPS)
+		if (Abs(z - a_OtherEnd.z) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -248,7 +258,7 @@ public:
 	*/
 	inline double LineCoeffToXZPlane(const Vector3<T> & a_OtherEnd, T a_Y) const
 	{
-		if (abs(y - a_OtherEnd.y) < EPS)
+		if (Abs(y - a_OtherEnd.y) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -263,7 +273,7 @@ public:
 	*/
 	inline double LineCoeffToYZPlane(const Vector3<T> & a_OtherEnd, T a_X) const
 	{
-		if (abs(x - a_OtherEnd.x) < EPS)
+		if (Abs(x - a_OtherEnd.x) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -276,7 +286,15 @@ public:
 
 	/** Return value of LineCoeffToPlane() if the line is parallel to the plane. */
 	static const double NO_INTERSECTION;
+	
+protected:
 
+	/** Returns the absolute value of the given argument.
+	Templatized because the standard library differentiates between abs() and fabs(). */
+	static T Abs(T a_Value)
+	{
+		return (a_Value < 0) ? -a_Value : a_Value;
+	}
 };
 // tolua_end
 
