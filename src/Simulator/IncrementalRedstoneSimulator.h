@@ -55,13 +55,13 @@ private:
 
 	struct sSimulatedPlayerToggleableList // Define structure of the list containing simulate-on-update blocks (such as trapdoors that respond once to a block update, and can be toggled by a player)
 	{
-		Vector3i a_BlockPos;
+		Vector3i a_RelBlockPos;
 		bool WasLastStatePowered; // Was the last state powered or not? Determines whether a source update has happened and if I should resimulate
 	};
 
 	struct sRepeatersDelayList // Define structure of list containing repeaters' delay states
 	{
-		Vector3i a_BlockPos;
+		Vector3i a_RelBlockPos;
 		unsigned char a_DelayTicks; // For how many ticks should the repeater delay
 		unsigned char a_ElapsedTicks; // How much of the previous has been elapsed?
 		bool ShouldPowerOn; // What happens when the delay time is fulfilled?
@@ -91,80 +91,80 @@ private:
 
 	/* ====== SOURCES ====== */
 	/** Handles the redstone torch */
-	void HandleRedstoneTorch(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
+	void HandleRedstoneTorch(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState);
 	/** Handles the redstone block */
-	void HandleRedstoneBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleRedstoneBlock(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles levers */
-	void HandleRedstoneLever(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleRedstoneLever(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles buttons */
-	void HandleRedstoneButton(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
+	void HandleRedstoneButton(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles daylight sensors */
-	void HandleDaylightSensor(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleDaylightSensor(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles pressure plates */
-	void HandlePressurePlate(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
+	void HandlePressurePlate(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyType);
 	/* ==================== */
 
 	/* ====== CARRIERS ====== */
 	/** Handles redstone wire */
-	void HandleRedstoneWire(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleRedstoneWire(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles repeaters */
-	void HandleRedstoneRepeater(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
+	void HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState);
 	/* ====================== */
 
 	/* ====== DEVICES ====== */
 	/** Handles pistons */
-	void HandlePiston(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandlePiston(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles dispensers and droppers */
-	void HandleDropSpenser(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleDropSpenser(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles TNT (exploding) */
-	void HandleTNT(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleTNT(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles redstone lamps */
-	void HandleRedstoneLamp(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyState);
+	void HandleRedstoneLamp(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState);
 	/** Handles doords */
-	void HandleDoor(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleDoor(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles command blocks */
-	void HandleCommandBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleCommandBlock(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles activator, detector, and powered rails */
-	void HandleRail(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_MyType);
+	void HandleRail(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyType);
 	/** Handles trapdoors */
-	void HandleTrapdoor(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleTrapdoor(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles fence gates */
-	void HandleFenceGate(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleFenceGate(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles noteblocks */
-	void HandleNoteBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void HandleNoteBlock(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/* ===================== */
 
 	/* ====== Helper functions ====== */
 	/** Marks a block as powered */
-	void SetBlockPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
+	void SetBlockPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Marks a block as being powered through another block */
-	void SetBlockLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MiddleX, int a_MiddleY, int a_MiddleZ, int a_SourceX, int a_SourceY, int a_SourceZ, BLOCKTYPE a_SourceBlock, BLOCKTYPE a_MiddeBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
+	void SetBlockLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, BLOCKTYPE a_MiddeBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Marks a block as simulated, who should not be simulated further unless their power state changes, to accomodate a player manually toggling the block without triggering the simulator toggling it back */
-	void SetPlayerToggleableBlockAsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool WasLastStatePowered);
+	void SetPlayerToggleableBlockAsSimulated(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, bool WasLastStatePowered);
 	/** Marks the second block in a direction as linked powered */
-	void SetDirectionLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Direction, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
+	void SetDirectionLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, char a_Direction, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Marks all blocks immediately surrounding a coordinate as powered */
-	void SetAllDirsAsPowered(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SourceBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
+	void SetAllDirsAsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Queues a repeater to be powered or unpowered */
-	void QueueRepeaterPowerChange(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
+	void QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
 
 	/** Returns if a coordinate is powered or linked powered */
-	bool AreCoordsPowered(int a_BlockX, int a_BlockY, int a_BlockZ) { return AreCoordsDirectlyPowered(a_BlockX, a_BlockY, a_BlockZ) || AreCoordsLinkedPowered(a_BlockX, a_BlockY, a_BlockZ); }
+	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }
 	/** Returns if a coordinate is in the directly powered blocks list */
-	bool AreCoordsDirectlyPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
+	bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Returns if a coordinate is in the indirectly powered blocks list */
-	bool AreCoordsLinkedPowered(int a_BlockX, int a_BlockY, int a_BlockZ);
+	bool AreCoordsLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Returns if a coordinate was marked as simulated (for blocks toggleable by players) */
-	bool AreCoordsSimulated(int a_BlockX, int a_BlockY, int a_BlockZ, bool IsCurrentStatePowered);
+	bool AreCoordsSimulated(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, bool IsCurrentStatePowered);
 	/** Returns if a repeater is powered */
-	bool IsRepeaterPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
+	bool IsRepeaterPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta);
 	/** Returns if a repeater is locked */
-	bool IsRepeaterLocked(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
+	bool IsRepeaterLocked(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta);
 	/** Returns if a piston is powered */
-	bool IsPistonPowered(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta);
+	bool IsPistonPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta);
 	/** Returns if a wire is powered
 	The only diffence between this and a normal AreCoordsPowered is that this function checks for a wire powering another wire */
-	bool IsWirePowered(int a_BlockX, int a_BlockY, int a_BlockZ, unsigned char & a_PowerLevel);
+	bool IsWirePowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char & a_PowerLevel);
 
 
 	/** Returns if lever metadata marks it as emitting power */
