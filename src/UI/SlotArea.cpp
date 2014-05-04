@@ -244,7 +244,7 @@ void cSlotArea::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
+void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
 {
 	for (int i = 0; i < m_NumSlots; i++)
 	{
@@ -264,7 +264,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 		{
 			NumFit = a_ItemStack.m_ItemCount;
 		}
-		if (a_Apply)
+		if (a_ShouldApply)
 		{
 			cItem NewSlot(a_ItemStack);
 			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
@@ -630,6 +630,12 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		return;
 	}
 
+	if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+	{
+		ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+		return;
+	}
+
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
 	if (!Slot.IsSameType(a_ClickedItem))
 	{
@@ -665,7 +671,7 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	SetSlot(a_SlotNum, a_Player, Slot);
 
 	DraggingItem = NewItem;
-	OnTakeResult(a_Player, NewItem);
+	OnTakeResult(a_Player);
 
 	if (bAsync)
 	{
@@ -677,7 +683,80 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 
 
 
-void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player, cItem a_ResultItem)
+void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem)
+{
+	if (a_SlotNum != 2)
+	{
+		super::ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+		UpdateResult(a_Player);
+		return;
+	}
+
+	// Make a copy of the slot, distribute it among the other areas, then update the slot to contain the leftover:
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+
+	if (Slot.IsEmpty() || !CanTakeResultItem(a_Player))
+	{
+		return;
+	}
+
+	m_ParentWindow.DistributeStack(Slot, a_Player, this, true);
+	if (Slot.IsEmpty())
+	{
+		Slot.Empty();
+		OnTakeResult(a_Player);
+	}
+	SetSlot(a_SlotNum, a_Player, Slot);
+	
+	// Some clients try to guess our actions and not always right (armor slots in 1.2.5), so we fix them:
+	m_ParentWindow.BroadcastWholeWindow();
+}
+
+
+
+
+
+void cSlotAreaAnvil::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		const cItem * Slot = GetSlot(i, a_Player);
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		{
+			// Different items
+			continue;
+		}
+		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			continue;
+		}
+		if (NumFit > a_ItemStack.m_ItemCount)
+		{
+			NumFit = a_ItemStack.m_ItemCount;
+		}
+		if (a_ShouldApply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(i, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		if (a_ItemStack.IsEmpty())
+		{
+			UpdateResult(a_Player);
+			return;
+		}
+	}  // for i - Slots
+	UpdateResult(a_Player);
+}
+
+
+
+
+
+void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 {
 	if (!a_Player.IsGameModeCreative())
 	{

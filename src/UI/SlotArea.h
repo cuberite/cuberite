@@ -270,13 +270,15 @@ public:
 
 	// cSlotArea overrides:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem) override;
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
 
 	// cSlotAreaTemporary overrides:
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
 	bool CanTakeResultItem(cPlayer & a_Player);
 
-	void OnTakeResult(cPlayer & a_Player, cItem a_ResultItem);
+	void OnTakeResult(cPlayer & a_Player);
 
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
