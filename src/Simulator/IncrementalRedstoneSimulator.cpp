@@ -442,7 +442,31 @@ void cIncrementalRedstoneSimulator::HandleRedstoneLever(int a_RelBlockX, int a_R
 	if (IsLeverOn(Meta))
 	{
 		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, cBlockLeverHandler::BlockMetaDataToBlockFace(Meta));
+
+		NIBBLETYPE Dir = cBlockLeverHandler::BlockMetaDataToBlockFace(Meta);
+		switch (Dir)
+		{
+			case BLOCK_FACE_YP:
+			case BLOCK_FACE_XP:
+			case BLOCK_FACE_ZP:
+			{
+				Dir--;
+				break;
+			}
+			case BLOCK_FACE_XM:
+			case BLOCK_FACE_ZM:
+			case BLOCK_FACE_YM:
+			{
+				Dir++;
+				break;
+			}
+			default:
+			{
+				ASSERT(!"Unhandled lever metadata!");
+				return;
+			}
+		}
+		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Dir);
 	}
 }
 
@@ -486,8 +510,29 @@ void cIncrementalRedstoneSimulator::HandleRedstoneButton(int a_RelBlockX, int a_
 	NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	if (IsButtonOn(Meta))
 	{
-		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, cBlockButtonHandler::BlockMetaDataToBlockFace(Meta));
+		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);NIBBLETYPE Dir = cBlockButtonHandler::BlockMetaDataToBlockFace(Meta);
+
+		switch (Dir)
+		{
+			case BLOCK_FACE_XP:
+			case BLOCK_FACE_ZP:
+			{
+				Dir--;
+				break;
+			}
+			case BLOCK_FACE_XM:
+			case BLOCK_FACE_ZM:
+			{
+				Dir++;
+				break;
+			}
+			default:
+			{
+				ASSERT(!"Unhandled button metadata!");
+				return;
+			}
+		}
+		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Dir);
 	}
 }
 
@@ -1207,6 +1252,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			{
 			public:
 				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+					m_FoundEntity(false),
 					m_X(a_BlockX),
 					m_Y(a_BlockY),
 					m_Z(a_BlockZ)
