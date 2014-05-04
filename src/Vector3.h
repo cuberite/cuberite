@@ -175,14 +175,6 @@ public:
 		return *this;
 	}
 
-	template <typename T2> inline Vector3<T> & operator = (const Vector3<T2> & a_Rhs)
-	{
-		x = (T)a_Rhs.x;
-		y = (T)a_Rhs.y;
-		z = (T)a_Rhs.z;
-		return *this;
-	}
-
 	// tolua_begin
 	
 	inline Vector3<T> operator + (const Vector3<T>& a_Rhs) const
