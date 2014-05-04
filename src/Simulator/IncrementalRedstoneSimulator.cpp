@@ -9,6 +9,8 @@
 #include "../Entities/Pickup.h"
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
+#include "../Blocks/BlockButton.h"
+#include "../Blocks/BlockLever.h"
 #include "../Piston.h"
 
 
@@ -434,16 +436,11 @@ void cIncrementalRedstoneSimulator::HandleRedstoneBlock(int a_RelBlockX, int a_R
 
 void cIncrementalRedstoneSimulator::HandleRedstoneLever(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
-	if (IsLeverOn(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+	NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+	if (IsLeverOn(Meta))
 	{
 		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YP);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP);
+		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, cBlockLeverHandler::BlockMetaDataToBlockFace(Meta));
 	}
 }
 
@@ -484,16 +481,11 @@ void cIncrementalRedstoneSimulator::HandleFenceGate(int a_RelBlockX, int a_RelBl
 
 void cIncrementalRedstoneSimulator::HandleRedstoneButton(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
-	if (IsButtonOn(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+	NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+	if (IsButtonOn(Meta))
 	{
 		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YP);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP);
+		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, cBlockButtonHandler::BlockMetaDataToBlockFace(Meta));
 	}
 }
 
