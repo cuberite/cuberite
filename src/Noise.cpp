@@ -608,6 +608,8 @@ void cCubicNoise::Generate2D(
 	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
 ) const
 {
+	ASSERT(a_SizeX > 0);
+	ASSERT(a_SizeY > 0);
 	ASSERT(a_SizeX < MAX_SIZE);
 	ASSERT(a_SizeY < MAX_SIZE);
 	ASSERT(a_StartX < a_EndX);
@@ -744,6 +746,8 @@ void cCubicNoise::CalcFloorFrac(
 	int * a_Same, int & a_NumSame
 ) const
 {
+	ASSERT(a_Size > 0);
+
 	NOISE_DATATYPE val = a_Start;
 	NOISE_DATATYPE dif = (a_End - a_Start) / (a_Size - 1);
 	for (int i = 0; i < a_Size; i++)

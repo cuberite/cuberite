@@ -26,7 +26,7 @@ Documentation:
 #include "../Root.h"
 #include "../Server.h"
 
-#include "../Entities/ProjectileEntity.h"
+#include "../Entities/ArrowEntity.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
 
@@ -1175,7 +1175,7 @@ void cProtocol125::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol125::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocol125::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_WINDOW_PROPERTY);
@@ -2013,7 +2013,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtWither:
 		{
 			WriteByte(0x54); // Int at index 20
-			WriteInt((Int32)((const cWither &)a_Mob).GetNumInvulnerableTicks());
+			WriteInt((Int32)((const cWither &)a_Mob).GetWitherInvulnerableTicks());
 			WriteByte(0x66); // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;

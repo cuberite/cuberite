@@ -457,9 +457,12 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 
 
 
-void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
 
 	if((m_SoundHurt != "") && (m_Health > 0))
 		m_World->BroadcastSoundEffect(m_SoundHurt, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
@@ -468,6 +471,7 @@ void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		m_Target = a_TDI.Attacker;
 	}
+	return true;
 }
 
 
@@ -823,6 +827,10 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 	switch (a_MobType)
 	{
 		case mtMagmaCube:
+		{
+			toReturn = new cMagmaCube(Random.NextInt(2) + 1);
+			break;
+		}
 		case mtSlime:
 		{
 			toReturn = new cSlime(Random.NextInt(2) + 1);

@@ -216,6 +216,20 @@ typedef unsigned char Byte;
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
 
+// Allow both Older versions of MSVC and newer versions of everything use a shared_ptr:
+// Note that we cannot typedef, because C++ doesn't allow (partial) templates to be typedeffed.
+#if (defined(_MSC_VER) && (_MSC_VER < 1600))
+	// MSVC before 2010 doesn't have std::shared_ptr, but has std::tr1::shared_ptr, defined in <memory> included earlier
+	#define SharedPtr std::tr1::shared_ptr
+#elif (__cplusplus >= 201103L)
+	// C++11 has std::shared_ptr in <memory>, included earlier
+	#define SharedPtr std::shared_ptr
+#else
+	// C++03 has std::tr1::shared_ptr in <tr1/memory>
+	#include <tr1/memory>
+	#define SharedPtr std::tr1::shared_ptr
+#endif
+
 
 
 
@@ -227,12 +241,6 @@ public:
 	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating
 	virtual bool Item(Type * a_Type) = 0;
 } ;
-
-
-
-
-
-#include "../../src/Crypto.h"
 
 
 

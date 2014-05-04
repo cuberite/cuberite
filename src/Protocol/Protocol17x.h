@@ -30,7 +30,8 @@ Declares the 1.7.x protocol classes:
 	#pragma warning(pop)
 #endif
 
-#include "../Crypto.h"
+#include "PolarSSL++/AesCfb128Decryptor.h"
+#include "PolarSSL++/AesCfb128Encryptor.h"
 
 
 
@@ -127,7 +128,7 @@ public:
 	virtual void SendWholeInventory      (const cWindow & a_Window) override;
 	virtual void SendWindowClose         (const cWindow & a_Window) override;
 	virtual void SendWindowOpen          (const cWindow & a_Window) override;
-	virtual void SendWindowProperty      (const cWindow & a_Window, short a_Property, short a_Value) override;
+	virtual void SendWindowProperty      (const cWindow & a_Window, int a_Property, int a_Value) override;
 
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
@@ -236,8 +237,8 @@ protected:
 	
 	bool m_IsEncrypted;
 	
-	cAESCFBDecryptor m_Decryptor;
-	cAESCFBEncryptor m_Encryptor;
+	cAesCfb128Decryptor m_Decryptor;
+	cAesCfb128Encryptor m_Encryptor;
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;

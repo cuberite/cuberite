@@ -902,18 +902,21 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 
 
 
-void cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
+bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 {
 	if ((TDI.Attacker != NULL) && TDI.Attacker->IsPlayer() && ((cPlayer *)TDI.Attacker)->IsGameModeCreative())
 	{
 		Destroy();
 		TDI.FinalDamage = GetMaxHealth(); // Instant hit for creative
-		super::DoTakeDamage(TDI);
-		return; // No drops for creative
+		SetInvulnerableTicks(0);
+		return super::DoTakeDamage(TDI);  // No drops for creative
 	}
 
 	m_LastDamage = TDI.FinalDamage;
-	super::DoTakeDamage(TDI);
+	if (!super::DoTakeDamage(TDI))
+	{
+		return false;
+	}
 
 	m_World->BroadcastEntityMetadata(*this);
 
@@ -952,12 +955,13 @@ void cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 			default:
 			{
 				ASSERT(!"Unhandled minecart type when spawning pickup!");
-				return;
+				return true;
 			}
 		}
 		
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
+	return true;
 }
 
 

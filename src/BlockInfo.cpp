@@ -129,6 +129,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_Transparent = true;
 	ms_Info[E_BLOCK_ICE                 ].m_Transparent = true;
 	ms_Info[E_BLOCK_IRON_DOOR           ].m_Transparent = true;
+	ms_Info[E_BLOCK_LADDER              ].m_Transparent = true;
 	ms_Info[E_BLOCK_LAVA                ].m_Transparent = true;
 	ms_Info[E_BLOCK_LEAVES              ].m_Transparent = true;
 	ms_Info[E_BLOCK_LEVER               ].m_Transparent = true;

@@ -280,7 +280,7 @@ NOISE_DATATYPE cNoise::CubicInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, 
 NOISE_DATATYPE cNoise::CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct)
 {
 	const NOISE_DATATYPE ft = a_Pct * (NOISE_DATATYPE)3.1415927;
-	const NOISE_DATATYPE f = (1 - cos(ft)) * (NOISE_DATATYPE)0.5;
+	const NOISE_DATATYPE f = (NOISE_DATATYPE)((NOISE_DATATYPE)(1 - cos(ft)) * (NOISE_DATATYPE)0.5);
 	return  a_A * (1 - f) + a_B * f;
 }
 

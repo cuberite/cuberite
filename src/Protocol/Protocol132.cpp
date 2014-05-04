@@ -18,19 +18,7 @@
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
 #include "../StringCompression.h"
-
-#ifdef _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	#pragma warning(disable:4244)
-	#pragma warning(disable:4231)
-	#pragma warning(disable:4189)
-	#pragma warning(disable:4702)
-#endif
-
-#ifdef _MSC_VER
-	#pragma warning(pop)
-#endif
+#include "PolarSSL++/Sha1Checksum.h"
 
 
 
@@ -819,7 +807,7 @@ void cProtocol132::SendEncryptionKeyRequest(void)
 void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const AString & a_EncNonce)
 {
 	// Decrypt EncNonce using privkey
-	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
 
 	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
 	int res = rsaDecryptor.Decrypt((const Byte *)a_EncNonce.data(), a_EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
@@ -876,7 +864,7 @@ void cProtocol132::StartEncryption(const Byte * a_Key)
 	m_IsEncrypted = true;
 	
 	// Prepare the m_AuthServerID:
-	cSHA1Checksum Checksum;
+	cSha1Checksum Checksum;
 	cServer * Server = cRoot::Get()->GetServer();
 	AString ServerID = Server->GetServerID();
 	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
@@ -884,7 +872,7 @@ void cProtocol132::StartEncryption(const Byte * a_Key)
 	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
-	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
+	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
 
 

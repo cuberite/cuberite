@@ -28,7 +28,7 @@
 #include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
-#include "../Entities/ProjectileEntity.h"
+#include "../Entities/ArrowEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
@@ -516,7 +516,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case cMonster::mtWither:
 			{
-				m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetNumInvulnerableTicks());
+				m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetWitherInvulnerableTicks());
 				break;
 			}
 			case cMonster::mtWolf:

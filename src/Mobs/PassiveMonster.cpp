@@ -18,13 +18,17 @@ cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eType a_MobType, 
 
 
 
-void cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
 	if ((a_TDI.Attacker != this) && (a_TDI.Attacker != NULL))
 	{
 		m_EMState = ESCAPING;
 	}
+	return true;
 }
 
 

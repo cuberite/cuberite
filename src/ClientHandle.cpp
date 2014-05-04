@@ -214,9 +214,13 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		case mtPrivateMessage:
 		{
 			if (ShouldAppendChatPrefixes)
+			{
 				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+			}
 			else
+			{
 				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
+			}
 		}
 	}
 	ASSERT(!"Unhandled chat prefix type!");
@@ -332,6 +336,11 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 
 	// Send scoreboard data
 	World->GetScoreBoard().SendTo(*this);
+	
+	// Delay the first ping until the client "settles down"
+	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
+	cTimer t1;
+	m_LastPingTime = t1.GetNowTime() + 3000;  // Send the first KeepAlive packet in 3 seconds
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -707,7 +716,7 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length)
+void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Length)
 {
 	if (a_Length < 14)
 	{
@@ -1501,7 +1510,7 @@ void cClientHandle::HandleDisconnect(const AString & a_Reason)
 {
 	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
 
-	cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason);
+	cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, a_Reason);
 
 	m_HasSentDC = true;
 	Destroy();
@@ -1649,7 +1658,7 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 		{
 			// There is a queued overflow. Append to it, then send as much from its front as possible
 			m_OutgoingDataOverflow.append(a_Data, a_Size);
-			int CanFit = m_OutgoingData.GetFreeSpace();
+			size_t CanFit = m_OutgoingData.GetFreeSpace();
 			if (CanFit > 128)
 			{
 				// No point in moving the data over if it's not large enough - too much effort for too little an effect
@@ -2680,9 +2689,9 @@ void cClientHandle::SocketClosed(void)
 	
 	LOGD("Player %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 
-	if (m_Username != "") // Ignore client pings
+	if (!m_Username.empty())  // Ignore client pings
 	{
-		cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected");
+		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
 
 	Destroy();

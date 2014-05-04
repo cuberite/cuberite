@@ -380,12 +380,12 @@ void cChunk::SetLight(
 
 	{ // Compress blocklight
 		m_BlockLight.clear();
-		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[m_BlockTypes.size()]);
+		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[m_BlockTypes.size() / 2]);
 	}
 
 	{ // Compress skylight
 		m_BlockSkyLight.clear();
-		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[m_BlockTypes.size()]);
+		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[m_BlockTypes.size() / 2]);
 	}
 
 	m_IsLightValid = true;

@@ -102,7 +102,7 @@ public:
 			return true;
 		}
 		
-		a_Item.m_ItemDamage = atoi(Split[1].c_str());
+		a_Item.m_ItemDamage = (short)atoi(Split[1].c_str());
 		if ((a_Item.m_ItemDamage == 0) && (Split[1] != "0"))
 		{
 			// Parsing the number failed

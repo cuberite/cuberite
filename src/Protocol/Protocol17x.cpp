@@ -31,6 +31,9 @@ Implements the 1.7.x protocol classes:
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../CompositeChat.h"
+#include "../Entities/ArrowEntity.h"
+#include "../Entities/FireworkEntity.h"
+#include "PolarSSL++/Sha1Checksum.h"
 
 
 
@@ -637,9 +640,11 @@ void cProtocol172::SendLoginSuccess(void)
 {
 	ASSERT(m_State == 2);  // State: login?
 	
-	cPacketizer Pkt(*this, 0x02);  // Login success packet
-	Pkt.WriteString(m_Client->GetUUID());
-	Pkt.WriteString(m_Client->GetUsername());
+	{
+		cPacketizer Pkt(*this, 0x02);  // Login success packet
+		Pkt.WriteString(m_Client->GetUUID());
+		Pkt.WriteString(m_Client->GetUsername());
+	}
 
 	m_State = 3;  // State = Game
 }
@@ -1378,7 +1383,7 @@ void cProtocol172::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocol172::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -1686,7 +1691,7 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	}
 
 	// Decrypt EncNonce using privkey
-	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
 	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
 	int res = rsaDecryptor.Decrypt((const Byte *)EncNonce.data(), EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
 	if (res != 4)
@@ -2289,7 +2294,7 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 	m_IsEncrypted = true;
 	
 	// Prepare the m_AuthServerID:
-	cSHA1Checksum Checksum;
+	cSha1Checksum Checksum;
 	cServer * Server = cRoot::Get()->GetServer();
 	const AString & ServerID = Server->GetServerID();
 	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
@@ -2297,7 +2302,7 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
-	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
+	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
 
 
@@ -2820,7 +2825,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtWither:
 		{
 			WriteByte(0x54); // Int at index 20
-			WriteInt(((const cWither &)a_Mob).GetNumInvulnerableTicks());
+			WriteInt(((const cWither &)a_Mob).GetWitherInvulnerableTicks());
 			WriteByte(0x66); // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;

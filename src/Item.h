@@ -64,7 +64,7 @@ public:
 	{
 		if (!IsValidItem(m_ItemType))
 		{
-			if (m_ItemType != E_BLOCK_AIR)
+			if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
 			{
 				LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
 			}
@@ -72,6 +72,10 @@ public:
 		}
 	}
 	
+	
+	// The constructor is disabled in code, because the compiler generates it anyway,
+	// but it needs to stay because ToLua needs to generate the binding for it
+	#if 0
 	
 	/** Creates an exact copy of the item */
 	cItem(const cItem & a_CopyFrom) :
@@ -84,6 +88,8 @@ public:
 		m_FireworkItem(a_CopyFrom.m_FireworkItem)
 	{
 	}
+	
+	#endif
 	
 	
 	void Empty(void)

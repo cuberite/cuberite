@@ -24,7 +24,8 @@
 	#pragma warning(pop)
 #endif
 
-#include "../Crypto.h"
+#include "PolarSSL++/AesCfb128Decryptor.h"
+#include "PolarSSL++/AesCfb128Encryptor.h"
 
 
 
@@ -79,8 +80,8 @@ public:
 protected:
 	bool m_IsEncrypted;
 	
-	cAESCFBDecryptor m_Decryptor;
-	cAESCFBEncryptor m_Encryptor;
+	cAesCfb128Decryptor m_Decryptor;
+	cAesCfb128Encryptor m_Encryptor;
 	
 	AString m_DataToSend;
 	

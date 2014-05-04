@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Authenticator.h"
-#include "../OSSupport/BlockingTCPLink.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
@@ -10,13 +9,7 @@
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
-#include "polarssl/config.h"
-#include "polarssl/net.h"
-#include "polarssl/ssl.h"
-#include "polarssl/entropy.h"
-#include "polarssl/ctr_drbg.h"
-#include "polarssl/error.h"
-#include "polarssl/certs.h"
+#include "PolarSSL++/BlockingSslClientSocket.h"
 
 #include <sstream>
 #include <iomanip>
@@ -148,94 +141,102 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 {
 	LOGD("Trying to auth user %s", a_UserName.c_str());
 	
-	int ret, server_fd = -1;
+	int ret;
 	unsigned char buf[1024];
-	const char *pers = "cAuthenticator";
-
-	entropy_context entropy;
-	ctr_drbg_context ctr_drbg;
-	ssl_context ssl;
-	x509_crt cacert;
-
-	/* Initialize the RNG and the session data */
-	memset(&ssl, 0, sizeof(ssl_context));
-	x509_crt_init(&cacert);
-
-	entropy_init(&entropy);
-	if ((ret = ctr_drbg_init(&ctr_drbg, entropy_func, &entropy, (const unsigned char *)pers, strlen(pers))) != 0)
-	{
-		LOGWARNING("cAuthenticator: ctr_drbg_init returned %d", ret);
-		return false;
-	}
 
 	/* Initialize certificates */
-	// TODO: Grab the sessionserver's root CA and any intermediates and hard-code them here, instead of test_ca_list
-	ret = x509_crt_parse(&cacert, (const unsigned char *)test_ca_list, strlen(test_ca_list));
+	// This is the data of the root certs for Starfield Technologies, the CA that signed sessionserver.mojang.com's cert:
+	// Downloaded from http://certs.starfieldtech.com/repository/
+	static const AString StarfieldCACert(
+		// G2 cert
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIID3TCCAsWgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBjzELMAkGA1UEBhMCVVMx\n"
+		"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoT\n"
+		"HFN0YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAMTKVN0YXJmaWVs\n"
+		"ZCBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5MDkwMTAwMDAw\n"
+		"MFoXDTM3MTIzMTIzNTk1OVowgY8xCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6\n"
+		"b25hMRMwEQYDVQQHEwpTY290dHNkYWxlMSUwIwYDVQQKExxTdGFyZmllbGQgVGVj\n"
+		"aG5vbG9naWVzLCBJbmMuMTIwMAYDVQQDEylTdGFyZmllbGQgUm9vdCBDZXJ0aWZp\n"
+		"Y2F0ZSBBdXRob3JpdHkgLSBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\n"
+		"ggEBAL3twQP89o/8ArFvW59I2Z154qK3A2FWGMNHttfKPTUuiUP3oWmb3ooa/RMg\n"
+		"nLRJdzIpVv257IzdIvpy3Cdhl+72WoTsbhm5iSzchFvVdPtrX8WJpRBSiUZV9Lh1\n"
+		"HOZ/5FSuS/hVclcCGfgXcVnrHigHdMWdSL5stPSksPNkN3mSwOxGXn/hbVNMYq/N\n"
+		"Hwtjuzqd+/x5AJhhdM8mgkBj87JyahkNmcrUDnXMN/uLicFZ8WJ/X7NfZTD4p7dN\n"
+		"dloedl40wOiWVpmKs/B/pM293DIxfJHP4F8R+GuqSVzRmZTRouNjWwl2tVZi4Ut0\n"
+		"HZbUJtQIBFnQmA4O5t78w+wfkPECAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAO\n"
+		"BgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFHwMMh+n2TB/xH1oo2Kooc6rB1snMA0G\n"
+		"CSqGSIb3DQEBCwUAA4IBAQARWfolTwNvlJk7mh+ChTnUdgWUXuEok21iXQnCoKjU\n"
+		"sHU48TRqneSfioYmUeYs0cYtbpUgSpIB7LiKZ3sx4mcujJUDJi5DnUox9g61DLu3\n"
+		"4jd/IroAow57UvtruzvE03lRTs2Q9GcHGcg8RnoNAX3FWOdt5oUwF5okxBDgBPfg\n"
+		"8n/Uqgr/Qh037ZTlZFkSIHc40zI+OIF1lnP6aI+xy84fxez6nH7PfrHxBy22/L/K\n"
+		"pL/QlwVKvOoYKAKQvVR4CSFx09F9HdkWsKlhPdAKACL8x3vLCWRFCztAgfd9fDL1\n"
+		"mMpYjn0q7pBZc2T5NnReJaH1ZgUufzkVqSr7UIuOhWn0\n"
+		"-----END CERTIFICATE-----\n\n"
+		// Original (G1) cert:
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl\n"
+		"MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp\n"
+		"U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw\n"
+		"NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE\n"
+		"ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp\n"
+		"ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3\n"
+		"DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf\n"
+		"8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN\n"
+		"+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0\n"
+		"X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa\n"
+		"K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA\n"
+		"1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G\n"
+		"A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR\n"
+		"zt0fhvRbVazc1xDCDqmI56FspGowaDELMAkGA1UEBhMCVVMxJTAjBgNVBAoTHFN0\n"
+		"YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD\n"
+		"bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w\n"
+		"DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3\n"
+		"L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D\n"
+		"eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl\n"
+		"xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp\n"
+		"VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY\n"
+		"WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=\n"
+		"-----END CERTIFICATE-----\n"
+	);
 
-	if (ret < 0)
+	// Connect the socket:
+	cBlockingSslClientSocket Socket;
+	Socket.SetTrustedRootCertsFromString(StarfieldCACert, m_Server);
+	if (!Socket.Connect(m_Server, 443))
 	{
-		LOGWARNING("cAuthenticator: x509_crt_parse returned -0x%x", -ret);
+		LOGWARNING("cAuthenticator: Can't connect to %s: %s", m_Server.c_str(), Socket.GetLastErrorText().c_str());
 		return false;
 	}
 
-	/* Connect */
-	if ((ret = net_connect(&server_fd, m_Server.c_str(), 443)) != 0)
-	{
-		LOGWARNING("cAuthenticator: Can't connect to %s: %d", m_Server.c_str(), ret);
-		return false;
-	}
-
-	/* Setup */
-	if ((ret = ssl_init(&ssl)) != 0)
-	{
-		LOGWARNING("cAuthenticator: ssl_init returned %d", ret);
-		return false;
-	}
-	ssl_set_endpoint(&ssl, SSL_IS_CLIENT);
-	ssl_set_authmode(&ssl, SSL_VERIFY_OPTIONAL);
-	ssl_set_ca_chain(&ssl, &cacert, NULL, "PolarSSL Server 1");
-	ssl_set_rng(&ssl, ctr_drbg_random, &ctr_drbg);
-	ssl_set_bio(&ssl, net_recv, &server_fd, net_send, &server_fd);
-
-	/* Handshake */
-	while ((ret = ssl_handshake(&ssl)) != 0)
-	{
-		if ((ret != POLARSSL_ERR_NET_WANT_READ) && (ret != POLARSSL_ERR_NET_WANT_WRITE))
-		{
-			LOGWARNING("cAuthenticator: ssl_handshake returned -0x%x", -ret);
-			return false;
-		}
-	}
-
-	/* Write the GET request */
+	// Create the GET request:
 	AString ActualAddress = m_Address;
 	ReplaceString(ActualAddress, "%USERNAME%", a_UserName);
 	ReplaceString(ActualAddress, "%SERVERID%", a_ServerId);
 
 	AString Request;
-	Request += "GET " + ActualAddress + " HTTP/1.1\r\n";
+	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
 	Request += "Host: " + m_Server + "\r\n";
 	Request += "User-Agent: MCServer\r\n";
 	Request += "Connection: close\r\n";
 	Request += "\r\n";
 
-	ret = ssl_write(&ssl, (const unsigned char *)Request.c_str(), Request.size());
-	if (ret <= 0)
+	if (!Socket.Send(Request.c_str(), Request.size()))
 	{
-		LOGWARNING("cAuthenticator: ssl_write returned %d", ret);
+		LOGWARNING("cAuthenticator: Writing SSL data failed: %s", Socket.GetLastErrorText().c_str());
 		return false;
 	}
 
-	/* Read the HTTP response */
+	// Read the HTTP response:
 	std::string Response;
 	for (;;)
 	{
-		memset(buf, 0, sizeof(buf));
-		ret = ssl_read(&ssl, buf, sizeof(buf));
+		ret = Socket.Receive(buf, sizeof(buf));
 
 		if ((ret == POLARSSL_ERR_NET_WANT_READ) || (ret == POLARSSL_ERR_NET_WANT_WRITE))
 		{
-			continue;
+			// This value should never be returned, it is handled internally by cBlockingSslClientSocket
+			LOGWARNING("cAuthenticator: SSL reading failed internally.");
+			return false;
 		}
 		if (ret == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY)
 		{
@@ -243,24 +244,18 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 		}
 		if (ret < 0)
 		{
-			LOGWARNING("cAuthenticator: ssl_read returned %d", ret);
-			break;
+			LOGWARNING("cAuthenticator: SSL reading failed: -0x%x", -ret);
+			return false;
 		}
 		if (ret == 0)
 		{
-			LOGWARNING("cAuthenticator: EOF");
 			break;
 		}
 
-		Response.append((const char *)buf, ret);
-	} 
+		Response.append((const char *)buf, (size_t)ret);
+	}
 
-	ssl_close_notify(&ssl);
-	x509_crt_free(&cacert);
-	net_close(server_fd);
-	ssl_free(&ssl);
-	entropy_free(&entropy);
-	memset(&ssl, 0, sizeof(ssl));
+	Socket.Disconnect();
 
 	// Check the HTTP status line:
 	AString prefix("HTTP/1.1 200 OK");
