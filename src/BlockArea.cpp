@@ -707,11 +707,11 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 	
 	if (IsDummyMetas)
 	{
-		MergeByStrategy<true>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
+		MergeByStrategy<false>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
 	}
 	else
 	{
-		MergeByStrategy<false>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
+		MergeByStrategy<true>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
 	}
 }
 
