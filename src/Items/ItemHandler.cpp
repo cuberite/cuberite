@@ -321,7 +321,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 
 	if (a_Player->IsGameModeSurvival())
 	{
-		if (!BlockRequiresSpecialTool(Block) || CanHarvestBlock(Block))
+		if (!cBlockInfo::RequiresSpecialTool(Block) || CanHarvestBlock(Block))
 		{
 			cChunkInterface ChunkInterface(a_World->GetChunkMap());
 			cBlockInServerPluginInterface PluginInterface(*a_World);
@@ -505,6 +505,25 @@ bool cItemHandler::IsPlaceable(void)
 {
 	// We can place any block that has a corresponding E_BLOCK_TYPE:
 	return (m_ItemType >= 1) && (m_ItemType <= E_BLOCK_MAX_TYPE_ID);
+}
+
+
+
+
+
+
+bool cItemHandler::CanRepairWithItem(const cItem & a_Item)
+{
+	return false;
+}
+
+
+
+
+
+int cItemHandler::GetRepairCost(void)
+{
+	return 0;
 }
 
 

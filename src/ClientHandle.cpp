@@ -633,6 +633,10 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
 	}
+	else if (a_Channel == "MC|ItemName")
+	{
+		HandleAnvilItemName(a_Message.c_str(), a_Message.size());
+	}
 	else if (a_Channel == "REGISTER")
 	{
 		if (HasPluginChannel(a_Channel))
@@ -767,6 +771,34 @@ void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Leng
 	else
 	{
 		SendChat("Command blocks are not enabled on this server", mtFailure);
+	}
+}
+
+
+
+
+
+void cClientHandle::HandleAnvilItemName(const char * a_Data, size_t a_Length)
+{
+	if (a_Length < 1)
+	{
+		return;
+	}
+
+	if ((m_Player->GetWindow() == NULL) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
+	{
+		return;
+	}
+
+	cByteBuffer Buffer(a_Length);
+	Buffer.Write(a_Data, a_Length);
+
+	AString Name;
+	Buffer.ReadAll(Name);
+
+	if (Name.length() <= 30)
+	{
+		((cAnvilWindow&)*m_Player->GetWindow()).SetRepairedItemName(Name, m_Player);
 	}
 }
 
@@ -1240,8 +1272,9 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	NewBlock->OnPlacedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
-	// Step sound with 0.8f pitch is used as block placement sound
-	World->BroadcastSoundEffect(NewBlock->GetStepSound(), a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
+	// Play sound
+	cBlockSounds Sounds = cBlockInfo::GetBlockSounds(BlockType);
+	World->BroadcastSoundEffect(Sounds.m_PlaceSound, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, (Sounds.m_Volume1 + 1.0F) / 2.0F, Sounds.m_Volume2 * 0.8F);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 

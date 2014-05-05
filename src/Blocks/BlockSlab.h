@@ -84,18 +84,6 @@ public:
 
 		return true;
 	}
-	
-	
-	virtual const char * GetStepSound(void) override
-	{
-		switch (m_BlockType)
-		{
-			case E_BLOCK_WOODEN_SLAB: return "step.wood";
-			case E_BLOCK_STONE_SLAB:  return "step.stone";
-		}
-		ASSERT(!"Unhandled slab type!");
-		return "";
-	}
 
 	
 	/// Returns true if the specified blocktype is one of the slabs handled by this handler
@@ -148,17 +136,6 @@ public:
 		}
 		ASSERT(!"Unhandled double slab type!");
 		return a_BlockType;
-	}
-	
-	virtual const char * GetStepSound(void) override
-	{
-		switch (m_BlockType)
-		{
-			case E_BLOCK_DOUBLE_STONE_SLAB:  return "step.stone";
-			case E_BLOCK_DOUBLE_WOODEN_SLAB: return "step.wood";
-		}
-		ASSERT(!"Unhandled double slab type!");
-		return "";
 	}
 
 

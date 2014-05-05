@@ -86,12 +86,6 @@ public:
 			}
 		}  // for i - repeat twice
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.gravel";
-	}
 } ;
 
 

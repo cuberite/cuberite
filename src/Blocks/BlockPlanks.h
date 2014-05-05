@@ -28,12 +28,6 @@ public:
 		a_BlockMeta = Meta;
 		return true;
 	}
-
-	
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
 } ;
 
 

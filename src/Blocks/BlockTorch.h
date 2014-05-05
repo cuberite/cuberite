@@ -179,12 +179,6 @@ public:
 		// Always drop meta = 0
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
 } ;
 
 

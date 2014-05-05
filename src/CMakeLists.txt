@@ -41,6 +41,8 @@ if (NOT MSVC)
 		BlockEntities/MobHeadEntity.h
 		BlockEntities/FlowerPotEntity.h
 		BlockID.h
+		BlockInfo.h
+		BlockSounds.h
 		BoundingBox.h
 		ChatColor.h
 		ChunkDef.h

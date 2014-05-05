@@ -430,6 +430,85 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_WOOL                ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_STONE               ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_STONE_BRICKS        ].m_FullyOccupiesVoxel = true;
+
+	// Block sounds
+	ms_Info[E_BLOCK_BIG_FLOWER          ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_WOODEN_BUTTON       ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_CACTUS              ].m_Sounds.SetBySoundName("cloth");
+	ms_Info[E_BLOCK_CAKE                ].m_Sounds.SetBySoundName("cloth");
+	ms_Info[E_BLOCK_CARPET              ].m_Sounds.SetBySoundName("cloth");
+	ms_Info[E_BLOCK_CHEST               ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_WOOL                ].m_Sounds.SetBySoundName("cloth");
+	ms_Info[E_BLOCK_ACTIVE_COMPARATOR   ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_INACTIVE_COMPARATOR ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_CROPS               ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_DIRT                ].m_Sounds.SetBySoundName("gravel");
+	ms_Info[E_BLOCK_GRASS               ].m_Sounds.SetBySoundName("gravel");
+	ms_Info[E_BLOCK_WOODEN_DOOR         ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_FARMLAND            ].m_Sounds.SetBySoundName("gravel");
+	ms_Info[E_BLOCK_FENCE               ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_FENCE_GATE          ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_FIRE                ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_RED_ROSE            ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_YELLOW_FLOWER       ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_TALL_GRASS          ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_BIG_FLOWER          ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_GRAVEL              ].m_Sounds.SetBySoundName("gravel");
+	ms_Info[E_BLOCK_LADDER              ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_LEAVES              ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_NEW_LEAVES          ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_LEVER               ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_LILY_PAD            ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_MELON               ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_BROWN_MUSHROOM      ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_RED_MUSHROOM        ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_MYCELIUM            ].m_Sounds.SetBySoundName("gravel");
+	ms_Info[E_BLOCK_PLANKS              ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_REDSTONE_REPEATER_OFF].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_REDSTONE_REPEATER_ON].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_REDSTONE_TORCH_OFF  ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_REDSTONE_TORCH_ON   ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_SAND                ].m_Sounds.SetBySoundName("sand");
+	ms_Info[E_BLOCK_SAPLING             ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_LOG                 ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_NEW_LOG             ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_HAY_BALE            ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_SIGN_POST           ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_WALLSIGN            ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_WOODEN_SLAB         ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_DOUBLE_WOODEN_SLAB  ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_SNOW                ].m_Sounds.SetBySoundName("snow");
+	ms_Info[E_BLOCK_SNOW_BLOCK          ].m_Sounds.SetBySoundName("snow");
+	ms_Info[E_BLOCK_WOODEN_STAIRS       ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_SPRUCE_WOOD_STAIRS  ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_JUNGLE_WOOD_STAIRS  ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_ACACIA_WOOD_STAIRS  ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_BIRCH_WOOD_STAIRS   ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_DARK_OAK_WOOD_STAIRS].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_MELON_STEM          ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_PUMPKIN_STEM        ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_PUMPKIN             ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_SUGARCANE           ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_TNT                 ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_TORCH               ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_TRAPDOOR            ].m_Sounds.SetBySoundName("wood");
+	ms_Info[E_BLOCK_VINES               ].m_Sounds.SetBySoundName("grass");
+	ms_Info[E_BLOCK_WORKBENCH           ].m_Sounds.SetBySoundName("wood");
+
+	// Extra block sounds
+	ms_Info[E_BLOCK_ANVIL               ].m_Sounds.m_PlaceSound = "random.anvil_land";
+	ms_Info[E_BLOCK_ANVIL               ].m_Sounds.m_StepSound  = "step.anvil";
+	ms_Info[E_BLOCK_ANVIL               ].m_Sounds.m_Volume1    = 0.3F;
+	ms_Info[E_BLOCK_IRON_DOOR           ].m_Sounds.m_Volume2    = 1.5F;
+	ms_Info[E_BLOCK_REDSTONE_LAMP_OFF   ].m_Sounds.m_PlaceSound = "step.stone";
+	ms_Info[E_BLOCK_REDSTONE_LAMP_OFF   ].m_Sounds.m_BreakSound = "dig.glass";
+	ms_Info[E_BLOCK_REDSTONE_LAMP_ON    ].m_Sounds.m_PlaceSound = "step.stone";
+	ms_Info[E_BLOCK_REDSTONE_LAMP_ON    ].m_Sounds.m_BreakSound = "dig.glass";
+	ms_Info[E_BLOCK_RAIL                ].m_Sounds.m_Volume2    = 1.5F;
+	ms_Info[E_BLOCK_DETECTOR_RAIL       ].m_Sounds.m_Volume2    = 1.5F;
+	ms_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_Sounds.m_Volume2    = 1.5F;
+	ms_Info[E_BLOCK_POWERED_RAIL        ].m_Sounds.m_Volume2    = 1.5F;
+	
 }
 
 

@@ -102,15 +102,6 @@ void cBlockDoorHandler::OnPlacedByPlayer(
 
 
 
-const char * cBlockDoorHandler::GetStepSound(void)
-{
-	return (m_BlockType == E_BLOCK_WOODEN_DOOR) ? "step.wood" : "step.stone";
-}
-
-
-
-
-
 NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 {
 	if (a_Meta & 0x08)

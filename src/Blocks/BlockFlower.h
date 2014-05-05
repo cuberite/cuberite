@@ -28,12 +28,6 @@ public:
 	{
 		return (a_RelY > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ));
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.grass";
-	}
 } ;
 
 

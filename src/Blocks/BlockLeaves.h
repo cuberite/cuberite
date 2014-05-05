@@ -40,6 +40,16 @@ public:
 	{
 		cFastRandom rand;
 
+		if (m_BlockType == E_BLOCK_NEW_LEAVES)
+		{
+			// Only the first 2 bits contain the display information, the others are for growing
+			if (rand.NextInt(6) == 0)
+			{
+				a_Pickups.push_back(cItem(E_BLOCK_SAPLING, 1, (a_BlockMeta & 3) + 4));
+			}
+			return;
+		}
+
 		// Only the first 2 bits contain the display information, the others are for growing
 		if (rand.NextInt(6) == 0)
 		{
@@ -60,7 +70,12 @@ public:
 	void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		cBlockHandler::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
-		
+
+		if (m_BlockType == E_BLOCK_NEW_LEAVES)
+		{
+			return;
+		}
+
 		// 0.5% chance of dropping an apple, if the leaves' type is Apple Leaves:
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		cFastRandom rand;
@@ -121,12 +136,6 @@ public:
 		// Decay the leaves:
 		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
 		a_ChunkInterface.DigBlock(a_WorldInterface, BlockX, a_RelY, BlockZ);
-	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.grass";
 	}
 } ;
 

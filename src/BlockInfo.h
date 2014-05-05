@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "BlockSounds.h"
+
 
 
 
@@ -58,6 +60,9 @@ public:
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	bool m_FullyOccupiesVoxel;
 
+	/** Get the sounds from the block */
+	cBlockSounds m_Sounds;
+
 	// tolua_end
 
 	/** Associated block handler. */
@@ -74,6 +79,7 @@ public:
 	inline static bool RequiresSpecialTool        (BLOCKTYPE a_Type) { return Get(a_Type).m_RequiresSpecialTool; }
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
+	inline static cBlockSounds GetBlockSounds     (BLOCKTYPE a_Type) { return Get(a_Type).m_Sounds;              }
 
 	// tolua_end
 

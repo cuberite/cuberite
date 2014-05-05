@@ -22,12 +22,6 @@ public:
 		cBlockHandler(a_BlockType)
 	{
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.cloth";
-	}
 	
 	
 	virtual bool GetPlacementBlockTypeMeta(

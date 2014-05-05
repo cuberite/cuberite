@@ -23,12 +23,6 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
 	}
-	
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
 
 
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)

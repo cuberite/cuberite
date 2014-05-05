@@ -53,24 +53,7 @@ public:
 		}
 		return true;
 	}
-	
-	
-	virtual const char * GetStepSound(void) override
-	{
-		if (
-			(m_BlockType == E_BLOCK_WOODEN_STAIRS) ||
-			(m_BlockType == E_BLOCK_SPRUCE_WOOD_STAIRS) ||
-			(m_BlockType == E_BLOCK_JUNGLE_WOOD_STAIRS) ||
-			(m_BlockType == E_BLOCK_ACACIA_WOOD_STAIRS) ||
-			(m_BlockType == E_BLOCK_BIRCH_WOOD_STAIRS) ||
-			(m_BlockType == E_BLOCK_DARK_OAK_WOOD_STAIRS)
-			)
-		{
-			return "step.wood";
-		}
 
-		return "step.stone";
-	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
