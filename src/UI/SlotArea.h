@@ -276,8 +276,10 @@ public:
 	// cSlotAreaTemporary overrides:
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
+	/** Can the player take the item from the slot? */
 	bool CanTakeResultItem(cPlayer & a_Player);
 
+	/** This function will call, when the player take the item from the slot. */
 	void OnTakeResult(cPlayer & a_Player);
 
 	/** Handles a click in the item slot. */
