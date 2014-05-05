@@ -38,7 +38,8 @@ public:
 		/** Position relative to the piece */
 		Vector3i m_Pos;
 		
-		/** Type of the connector. Any arbitrary number; the generator connects only connectors of the same type. */
+		/** Type of the connector. Any arbitrary number; the generator connects only connectors of opposite
+		(negative) types. */
 		int m_Type;
 		
 		/** Direction in which the connector is facing.

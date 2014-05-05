@@ -388,7 +388,8 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 	// Get a list of available connections:
 	const int * RotTable = DirectionRotationTable[a_Connector.m_Direction];
 	cConnections Connections;
-	cPieces AvailablePieces = m_PiecePool.GetPiecesWithConnector(a_Connector.m_Type);
+	int WantedConnectorType = -a_Connector.m_Type;
+	cPieces AvailablePieces = m_PiecePool.GetPiecesWithConnector(WantedConnectorType);
 	Connections.reserve(AvailablePieces.size());
 	Vector3i ConnPos = a_Connector.m_Pos;  // The position at which the new connector should be placed - 1 block away from the connector
 	AddFaceDirection(ConnPos.x, ConnPos.y, ConnPos.z, a_Connector.m_Direction);
@@ -406,7 +407,7 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		cPiece::cConnectors Connectors = (*itrP)->GetConnectors();
 		for (cPiece::cConnectors::iterator itrC = Connectors.begin(), endC = Connectors.end(); itrC != endC; ++itrC)
 		{
-			if (itrC->m_Type != a_Connector.m_Type)
+			if (itrC->m_Type != WantedConnectorType)
 			{
 				continue;
 			}
