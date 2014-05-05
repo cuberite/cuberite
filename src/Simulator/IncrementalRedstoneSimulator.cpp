@@ -444,7 +444,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneLever(int a_RelBlockX, int a_R
 		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 
 		NIBBLETYPE Dir = cBlockLeverHandler::BlockMetaDataToBlockFace(Meta);
-		switch (Dir)
+		switch (Dir) // Now, flip the direction into the type used by SetBlockLinkedPowered()
 		{
 			case BLOCK_FACE_YP:
 			case BLOCK_FACE_XP:
@@ -510,9 +510,10 @@ void cIncrementalRedstoneSimulator::HandleRedstoneButton(int a_RelBlockX, int a_
 	NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	if (IsButtonOn(Meta))
 	{
-		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);NIBBLETYPE Dir = cBlockButtonHandler::BlockMetaDataToBlockFace(Meta);
-
-		switch (Dir)
+		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+		
+		NIBBLETYPE Dir = cBlockButtonHandler::BlockMetaDataToBlockFace(Meta);
+		switch (Dir) // Now, flip the direction into the type used by SetBlockLinkedPowered()
 		{
 			case BLOCK_FACE_XP:
 			case BLOCK_FACE_ZP:
