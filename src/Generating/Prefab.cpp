@@ -174,44 +174,47 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
-	int MaxX = Image.GetSizeX();
-	int MaxZ = Image.GetSizeZ();
-	for (int z = 0; z < MaxZ; z++)
+	if (m_ShouldExtendFloor)
 	{
-		int RelZ = Placement.z + z;
-		if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
+		int MaxX = Image.GetSizeX();
+		int MaxZ = Image.GetSizeZ();
+		for (int z = 0; z < MaxZ; z++)
 		{
-			// Z coord outside the chunk
-			continue;
-		}
-		for (int x = 0; x < MaxX; x++)
-		{
-			int RelX = Placement.x + x;
-			if ((RelX < 0) || (RelX >= cChunkDef::Width))
+			int RelZ = Placement.z + z;
+			if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
 			{
-				// X coord outside the chunk
+				// Z coord outside the chunk
 				continue;
 			}
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
-			Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
-			if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+			for (int x = 0; x < MaxX; x++)
 			{
-				// Do not expand air nor sponge blocks
-				continue;
-			}
-			for (int y = Placement.y - 1; y >= 0; y--)
-			{
-				BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
-				if (ExistingBlock != E_BLOCK_AIR)
+				int RelX = Placement.x + x;
+				if ((RelX < 0) || (RelX >= cChunkDef::Width))
 				{
-					// End the expansion for this column, reached the end
-					break;
+					// X coord outside the chunk
+					continue;
 				}
-				a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
-			}  // for y
-		}  // for x
-	}  // for z
+				BLOCKTYPE BlockType;
+				NIBBLETYPE BlockMeta;
+				Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
+				if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+				{
+					// Do not expand air nor sponge blocks
+					continue;
+				}
+				for (int y = Placement.y - 1; y >= 0; y--)
+				{
+					BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
+					if (ExistingBlock != E_BLOCK_AIR)
+					{
+						// End the expansion for this column, reached the end
+						break;
+					}
+					a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
+				}  // for y
+			}  // for x
+		}  // for z
+	}
 }
 
 
