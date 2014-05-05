@@ -56,19 +56,6 @@ public:
 	}
 
 
-	virtual cStepSound GetSound(void) override
-	{
-		if (m_BlockType == E_BLOCK_WOODEN_BUTTON)
-		{
-			return cStepSound("wood");
-		}
-		else
-		{
-			return cStepSound("stone");
-		}
-	}
-
-
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
 		switch (a_BlockFace)

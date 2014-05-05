@@ -321,7 +321,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 
 	if (a_Player->IsGameModeSurvival())
 	{
-		if (!BlockRequiresSpecialTool(Block) || CanHarvestBlock(Block))
+		if (!cBlockInfo::RequiresSpecialTool(Block) || CanHarvestBlock(Block))
 		{
 			cChunkInterface ChunkInterface(a_World->GetChunkMap());
 			cBlockInServerPluginInterface PluginInterface(*a_World);

@@ -43,11 +43,6 @@ public:
 	{
 		return true;
 	}
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("cloth");
-	}
 } ;
 
 

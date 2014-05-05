@@ -16,11 +16,6 @@ public:
 	{
 	}
 
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("wood");
-	}
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to 0

@@ -63,12 +63,6 @@ public:
 	}
 
 
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("wood");
-	}
-
-
 	inline static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation)
 	{
 		a_Rotation += 90 + 45; // So its not aligned with axis

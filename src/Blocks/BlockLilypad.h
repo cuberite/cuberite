@@ -21,12 +21,6 @@ public:
 		// Reset meta to zero
 		a_Pickups.push_back(cItem(E_BLOCK_LILY_PAD, 1, 0));
 	}
-
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("grass");
-	}
 };
 
 

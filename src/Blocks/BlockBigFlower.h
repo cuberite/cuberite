@@ -118,12 +118,6 @@ public:
 			}
 		}
 	}
-
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("grass");
-	}
 } ;
 
 

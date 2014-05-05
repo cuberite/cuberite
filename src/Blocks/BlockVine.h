@@ -152,12 +152,6 @@ public:
 	{
 		return true;
 	}
-	
-	
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("grass");
-	}
 
 
 	virtual bool DoesDropOnUnsuitable(void) override

@@ -103,12 +103,6 @@ public:
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 		return LadderCanBePlacedAt(a_ChunkInterface, BlockX, a_RelY, BlockZ, BlockFace);
 	}
-
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("wood");
-	}
 } ;
 
 

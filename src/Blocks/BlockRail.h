@@ -42,12 +42,6 @@ public:
 	}
 
 
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("stone", 1.0F, 1.5F);
-	}
-
-
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
 		super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);

@@ -1272,9 +1272,9 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	NewBlock->OnPlacedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
-	// Step sound with 0.8f pitch is used as block placement sound
-	cStepSound Sound = NewBlock->GetSound();
-	World->BroadcastSoundEffect(Sound.GetPlaceSound(), a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, (Sound.GetVolume1() + 1.0F) / 2.0F, Sound.GetVolume2() * 0.8F);
+	// Play sound
+	cBlockSounds Sounds = cBlockInfo::GetBlockSounds(BlockType);
+	World->BroadcastSoundEffect(Sounds.m_PlaceSound, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, (Sounds.m_Volume1 + 1.0F) / 2.0F, Sounds.m_Volume2 * 0.8F);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 

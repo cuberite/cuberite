@@ -91,12 +91,6 @@ public:
 	}
 
 
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("wood");
-	}
-
-
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
 		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));

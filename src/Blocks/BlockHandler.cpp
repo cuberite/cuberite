@@ -37,20 +37,17 @@
 #include "BlockFurnace.h"
 #include "BlockGlass.h"
 #include "BlockGlowstone.h"
-#include "BlockGravel.h"
 #include "BlockMobHead.h"
 #include "BlockHopper.h"
 #include "BlockIce.h"
 #include "BlockLadder.h"
 #include "BlockLeaves.h"
 #include "BlockLilypad.h"
-#include "BlockNewLeaves.h"
 #include "BlockLever.h"
 #include "BlockMelon.h"
 #include "BlockMushroom.h"
 #include "BlockMycelium.h"
 #include "BlockNetherWart.h"
-#include "BlockNote.h"
 #include "BlockOre.h"
 #include "BlockPiston.h"
 #include "BlockPlanks.h"
@@ -63,7 +60,6 @@
 #include "BlockRedstoneRepeater.h"
 #include "BlockRedstoneTorch.h"
 #include "BlockTNT.h"
-#include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSideways.h"
 #include "BlockSign.h"
@@ -131,7 +127,6 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GOLD_ORE:              return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_GLASS:                 return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
-		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
 		case E_BLOCK_HAY_BALE:              return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_HEAD:                  return new cBlockMobHeadHandler         (a_BlockType);
 		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);
@@ -157,9 +152,9 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NETHER_PORTAL:         return new cBlockPortalHandler          (a_BlockType);
 		case E_BLOCK_NETHER_WART:           return new cBlockNetherWartHandler      (a_BlockType);
 		case E_BLOCK_NETHER_QUARTZ_ORE:     return new cBlockOreHandler             (a_BlockType);
-		case E_BLOCK_NEW_LEAVES:            return new cBlockNewLeavesHandler       (a_BlockType);
+		case E_BLOCK_NEW_LEAVES:            return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_NEW_LOG:               return new cBlockSidewaysHandler        (a_BlockType);
-		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
+		case E_BLOCK_NOTE_BLOCK:            return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      (           );
 		case E_BLOCK_PLANKS:                return new cBlockPlanksHandler          (a_BlockType);
@@ -180,7 +175,6 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_REDSTONE_WIRE:         return new cBlockRedstoneHandler        (a_BlockType);
 		case E_BLOCK_RED_MUSHROOM:          return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_RED_ROSE:              return new cBlockFlowerHandler          (a_BlockType);
-		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
 		case E_BLOCK_SANDSTONE_STAIRS:      return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_SAPLING:               return new cBlockSaplingHandler         (a_BlockType);
 		case E_BLOCK_SIGN_POST:             return new cBlockSignHandler            (a_BlockType);
@@ -208,7 +202,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_WOOL:                  return new cBlockClothHandler           (a_BlockType);
 		case E_BLOCK_WORKBENCH:             return new cBlockWorkbenchHandler       (a_BlockType);
 		case E_BLOCK_YELLOW_FLOWER:         return new cBlockFlowerHandler          (a_BlockType);
-			
+
 		default: return new cBlockHandler(a_BlockType);
 	}
 }
@@ -376,15 +370,6 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}
-}
-
-
-
-
-
-cStepSound cBlockHandler::GetSound()
-{
-	return cStepSound("stone");
 }
 
 

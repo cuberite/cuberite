@@ -19,12 +19,6 @@ public:
 	}
 
 
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("random.anvil_land", "dig.stone", "step.anvil", 0.3F, 1.0F);
-	}
-
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta >> 2));

@@ -105,13 +105,8 @@ public:
 		
 		// Single chest, no further processing needed
 	}
-	
-	
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("wood");
-	}
-	
+
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;

@@ -87,12 +87,6 @@ public:
 	{
 		return false;
 	}
-	
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("snow");
-	}
 } ;
 
 

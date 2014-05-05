@@ -21,12 +21,6 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_WOOL, 1, a_BlockMeta));
 	}
-
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("cloth");
-	}
 } ;
 
 

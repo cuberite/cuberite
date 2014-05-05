@@ -86,12 +86,6 @@ public:
 			}
 		}  // for i - repeat twice
 	}
-
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("gravel");
-	}
 } ;
 
 

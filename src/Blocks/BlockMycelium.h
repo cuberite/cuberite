@@ -22,11 +22,6 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_DIRT, 1, 0));
 	}
-	
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("gravel");
-	}
 } ;
 
 

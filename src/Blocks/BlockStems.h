@@ -47,12 +47,6 @@ public:
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) == E_BLOCK_FARMLAND));
 	}
-
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("wood");
-	}
 } ;
 
 

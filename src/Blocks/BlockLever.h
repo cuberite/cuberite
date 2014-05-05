@@ -68,12 +68,6 @@ public:
 	}
 
 
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("wood");
-	}
-
-
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)

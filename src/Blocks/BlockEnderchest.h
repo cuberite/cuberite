@@ -33,11 +33,6 @@ public:
 		a_BlockMeta = RotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
-
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("stone", 1.0F, 1.5F);
-	}
 	
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{

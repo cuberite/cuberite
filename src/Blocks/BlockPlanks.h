@@ -28,12 +28,6 @@ public:
 		a_BlockMeta = Meta;
 		return true;
 	}
-
-	
-	virtual cStepSound GetSound(void) override
-	{
-		return cStepSound("wood");
-	}
 } ;
 
 
