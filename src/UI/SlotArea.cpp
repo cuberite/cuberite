@@ -785,7 +785,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
 
 	m_MaximumCost = 0;
-	((cAnvilWindow*)&m_ParentWindow)->SetRepairedItemName("", false);
+	((cAnvilWindow*)&m_ParentWindow)->SetRepairedItemName("", NULL);
 
 	int PosX, PosY, PosZ;
 	((cAnvilWindow*)&m_ParentWindow)->GetBlockPos(PosX, PosY, PosZ);
