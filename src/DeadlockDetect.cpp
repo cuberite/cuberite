@@ -109,7 +109,7 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 	WorldAges::iterator itr = m_WorldAges.find(a_WorldName);
 	if (itr == m_WorldAges.end())
 	{
-		ASSERT(!"Unknown world in cDeadlockDetect");
+		SetWorldAge(a_WorldName, a_Age);
 		return;
 	}
 
