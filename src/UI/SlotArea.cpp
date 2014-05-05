@@ -828,11 +828,11 @@ bool cSlotAreaAnvil::CanTakeResultItem(cPlayer & a_Player)
 {
 	return (
 			(
-				a_Player.IsGameModeCreative()
-				|| a_Player.GetXpLevel() >= m_MaximumCost
-			)
-			&& !GetSlot(2, a_Player)->IsEmpty()
-			&& m_MaximumCost > 0
+				a_Player.IsGameModeCreative() ||              // Is the player in gamemode?
+				(a_Player.GetXpLevel() >= m_MaximumCost)      // or the player have enough exp?
+			) &&
+			(!GetSlot(2, a_Player)->IsEmpty()) &&             // Is a item in the result slot?
+			(m_MaximumCost > 0)                               // And: Is m_MaximumCost higher than 0?
 	);
 }
 
