@@ -83,9 +83,9 @@ void cEnchantments::AddFromString(const AString & a_StringSpec)
 
 
 
-int cEnchantments::Size(void)
+size_t cEnchantments::Size(void)
 {
-	return (int)m_Enchantments.size();
+	return m_Enchantments.size();
 }
 
 
