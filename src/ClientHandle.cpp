@@ -778,7 +778,7 @@ void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Leng
 
 
 
-void cClientHandle::HandleAnvilItemName(const char * a_Data, unsigned int a_Length)
+void cClientHandle::HandleAnvilItemName(const char * a_Data, size_t a_Length)
 {
 	if (a_Length < 1)
 	{
