@@ -1211,7 +1211,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		int DiffY = (int)(floor(GetPosY() * 32.0) - floor(m_LastPos.y * 32.0));
 		int DiffZ = (int)(floor(GetPosZ() * 32.0) - floor(m_LastPos.z * 32.0));
 
-		if ((abs(DiffX) != 0) || (abs(DiffY) != 0) || (abs(DiffZ) != 0)) // Have we moved?
+		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0)) // Have we moved?
 		{
 			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127)) // Limitations of a Byte
 			{
