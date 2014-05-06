@@ -23,6 +23,13 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta >> 2));
 	}
+
+
+	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	{
+		cWindow * Window = new cAnvilWindow(a_BlockX, a_BlockY, a_BlockZ);
+		a_Player->OpenWindow(Window);
+	}
 	
 	
 	virtual bool GetPlacementBlockTypeMeta(

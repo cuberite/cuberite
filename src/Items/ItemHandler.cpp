@@ -511,6 +511,25 @@ bool cItemHandler::IsPlaceable(void)
 
 
 
+
+bool cItemHandler::CanRepairWithRawMaterial(short a_ItemType)
+{
+	return false;
+}
+
+
+
+
+
+int cItemHandler::GetRepairCost(void)
+{
+	return 0;
+}
+
+
+
+
+
 bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 {
 	UNUSED(a_BlockType);

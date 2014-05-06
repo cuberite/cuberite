@@ -244,7 +244,7 @@ void cSlotArea::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
+void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
 {
 	for (int i = 0; i < m_NumSlots; i++)
 	{
@@ -264,7 +264,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 		{
 			NumFit = a_ItemStack.m_ItemCount;
 		}
-		if (a_Apply)
+		if (a_ShouldApply)
 		{
 			cItem NewSlot(a_ItemStack);
 			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
@@ -590,6 +590,403 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
 }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaAnvil:
+
+cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
+	cSlotAreaTemporary(3, a_ParentWindow),
+	m_MaximumCost(0)
+{
+}
+
+
+
+
+
+void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
+	if (a_SlotNum != 2)
+	{
+		super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+		UpdateResult(a_Player);
+		return;
+	}
+
+	bool bAsync = false;
+	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	{
+		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		return;
+	}
+
+	if (a_ClickAction == caDblClick)
+	{
+		return;
+	}
+
+	if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+	{
+		ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+		return;
+	}
+
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	if (!Slot.IsSameType(a_ClickedItem))
+	{
+		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+		LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+		bAsync = true;
+	}
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+
+	if (Slot.IsEmpty())
+	{
+		return;
+	}
+	if (!DraggingItem.IsEmpty())
+	{
+		if (!(DraggingItem.IsEqual(Slot) && ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= cItemHandler::GetItemHandler(Slot)->GetMaxStackSize())))
+		{
+			return;
+		}
+	}
+
+	if (!CanTakeResultItem(a_Player))
+	{
+		return;
+	}
+
+	cItem NewItem = cItem(Slot);
+	NewItem.m_ItemCount += DraggingItem.m_ItemCount;
+
+	Slot.Empty();
+	DraggingItem.Empty();
+	SetSlot(a_SlotNum, a_Player, Slot);
+
+	DraggingItem = NewItem;
+	OnTakeResult(a_Player);
+
+	if (bAsync)
+	{
+		m_ParentWindow.BroadcastWholeWindow();
+	}
+}
+
+
+
+
+
+void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem)
+{
+	if (a_SlotNum != 2)
+	{
+		super::ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+		UpdateResult(a_Player);
+		return;
+	}
+
+	// Make a copy of the slot, distribute it among the other areas, then update the slot to contain the leftover:
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+
+	if (Slot.IsEmpty() || !CanTakeResultItem(a_Player))
+	{
+		return;
+	}
+
+	m_ParentWindow.DistributeStack(Slot, a_Player, this, true);
+	if (Slot.IsEmpty())
+	{
+		Slot.Empty();
+		OnTakeResult(a_Player);
+	}
+	SetSlot(a_SlotNum, a_Player, Slot);
+	
+	// Some clients try to guess our actions and not always right (armor slots in 1.2.5), so we fix them:
+	m_ParentWindow.BroadcastWholeWindow();
+}
+
+
+
+
+
+void cSlotAreaAnvil::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		const cItem * Slot = GetSlot(i, a_Player);
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		{
+			// Different items
+			continue;
+		}
+		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			continue;
+		}
+		if (NumFit > a_ItemStack.m_ItemCount)
+		{
+			NumFit = a_ItemStack.m_ItemCount;
+		}
+		if (a_ShouldApply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(i, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		if (a_ItemStack.IsEmpty())
+		{
+			UpdateResult(a_Player);
+			return;
+		}
+	}  // for i - Slots
+	UpdateResult(a_Player);
+}
+
+
+
+
+
+void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
+{
+	if (!a_Player.IsGameModeCreative())
+	{
+		a_Player.DeltaExperience(cPlayer::XpForLevel(m_MaximumCost));
+	}
+	SetSlot(0, a_Player, cItem());
+
+	if (m_StackSizeToBeUsedInRepair > 0)
+	{
+		const cItem * Item = GetSlot(1, a_Player);
+		if (!Item->IsEmpty() && (Item->m_ItemCount > m_StackSizeToBeUsedInRepair))
+		{
+			cItem NewSecondItem(*Item);
+			NewSecondItem.m_ItemCount -= m_StackSizeToBeUsedInRepair;
+			SetSlot(1, a_Player, NewSecondItem);
+		}
+		else
+		{
+			SetSlot(1, a_Player, cItem());
+		}
+	}
+	else
+	{
+		SetSlot(1, a_Player, cItem());
+	}
+	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
+
+	m_MaximumCost = 0;
+	((cAnvilWindow*)&m_ParentWindow)->SetRepairedItemName("", NULL);
+
+	int PosX, PosY, PosZ;
+	((cAnvilWindow*)&m_ParentWindow)->GetBlockPos(PosX, PosY, PosZ);
+
+	BLOCKTYPE Block;
+	NIBBLETYPE BlockMeta;
+	a_Player.GetWorld()->GetBlockTypeMeta(PosX, PosY, PosZ, Block, BlockMeta);
+
+	cFastRandom Random;
+	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && (Random.NextFloat(1.0F) < 0.12F))
+	{
+		NIBBLETYPE Orientation = BlockMeta & 0x3;
+		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
+		++AnvilDamage;
+
+		if (AnvilDamage > 2)
+		{
+			// Anvil will break
+			a_Player.GetWorld()->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, (NIBBLETYPE)0);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(1020, PosX, PosY, PosZ, 0);
+			a_Player.CloseWindow(false);
+		}
+		else
+		{
+			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, Orientation | (AnvilDamage << 2));
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(1021, PosX, PosY, PosZ, 0);
+		}
+	}
+	else
+	{
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(1021, PosX, PosY, PosZ, 0);
+	}
+}
+
+
+
+
+
+bool cSlotAreaAnvil::CanTakeResultItem(cPlayer & a_Player)
+{
+	return (
+			(
+				a_Player.IsGameModeCreative() ||              // Is the player in gamemode?
+				(a_Player.GetXpLevel() >= m_MaximumCost)      // or the player have enough exp?
+			) &&
+			(!GetSlot(2, a_Player)->IsEmpty()) &&             // Is a item in the result slot?
+			(m_MaximumCost > 0)                               // When no maximum cost is set, the item isn't set from the UpdateResult() method and can't be a valid enchanting result.
+	);
+}
+
+
+
+
+
+void cSlotAreaAnvil::OnPlayerRemoved(cPlayer & a_Player)
+{
+	TossItems(a_Player, 0, 2);
+	super::OnPlayerRemoved(a_Player);
+}
+
+
+
+
+
+void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
+{
+	cItem Input(*GetSlot(0, a_Player));
+	cItem SecondInput(*GetSlot(1, a_Player));
+	cItem Output(*GetSlot(2, a_Player));
+	
+	if (Input.IsEmpty() && !Output.IsEmpty())
+	{
+		Output.Empty();
+		SetSlot(2, a_Player, Output);
+		m_ParentWindow.SetProperty(0, 0, a_Player);
+		return;
+	}
+
+	m_MaximumCost = 0;
+	m_StackSizeToBeUsedInRepair = 0;
+	int RepairCost = cItemHandler::GetItemHandler(Input)->GetRepairCost();
+	int NeedExp = 0;
+	if (!SecondInput.IsEmpty())
+	{
+		RepairCost += cItemHandler::GetItemHandler(SecondInput)->GetRepairCost();
+		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
+		{
+			// Tool and armor repair with special item (iron / gold / diamond / ...)
+			int DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
+			if (DamageDiff < 0)
+			{
+				// No enchantment
+				Output.Empty();
+				SetSlot(2, a_Player, Output);
+				m_ParentWindow.SetProperty(0, 0, a_Player);
+				return;
+			}
+
+			int x = 0;
+			while ((DamageDiff > 0) && (x < SecondInput.m_ItemCount))
+			{
+				Input.m_ItemDamage -= DamageDiff;
+				NeedExp += std::max(1, DamageDiff / 100) + Input.m_Enchantments.Count();
+				DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
+
+				++x;
+			}
+			m_StackSizeToBeUsedInRepair = x;
+		}
+		else
+		{
+			// Tool and armor repair with two tools / armors
+			if (!Input.IsSameType(SecondInput) || !Input.IsDamageable())
+			{
+				// No enchantment
+				Output.Empty();
+				SetSlot(2, a_Player, Output);
+				m_ParentWindow.SetProperty(0, 0, a_Player);
+				return;
+			}
+
+			int FirstDamageDiff = Input.GetMaxDamage() - Input.m_ItemDamage;
+			int SecondDamageDiff = SecondInput.GetMaxDamage() - SecondInput.m_ItemDamage;
+			int Damage = SecondDamageDiff + Input.GetMaxDamage() * 12 / 100;
+			
+			int NewItemDamage = Input.GetMaxDamage() - (FirstDamageDiff + Damage);
+			if (NewItemDamage > 0)
+			{
+				NewItemDamage = 0;
+			}
+
+			if (NewItemDamage < Input.m_ItemDamage)
+			{
+				Input.m_ItemDamage = NewItemDamage;
+				NeedExp += std::max(1, Damage / 100);
+			}
+
+			// TODO: Add enchantments.
+		}
+	}
+
+	int NameChangeExp = 0;
+	const AString & RepairedItemName = ((cAnvilWindow*)&m_ParentWindow)->GetRepairedItemName();
+	if (RepairedItemName.empty())
+	{
+		// Remove custom name
+		if (!Input.m_CustomName.empty())
+		{
+			NameChangeExp = (Input.IsDamageable()) ? 4 : (Input.m_ItemCount * 5);
+			NeedExp += NameChangeExp;
+			Input.m_CustomName = "";
+		}
+	}
+	else if (RepairedItemName != Input.m_CustomName)
+	{
+		// Change custom name
+		NameChangeExp = (Input.IsDamageable()) ? 4 : (Input.m_ItemCount * 5);
+		NeedExp += NameChangeExp;
+
+		if (!Input.m_CustomName.empty())
+		{
+			RepairCost += NameChangeExp / 2;
+		}
+
+		Input.m_CustomName = RepairedItemName;
+	}
+
+	// TODO: Add enchantment exp cost.
+
+	m_MaximumCost = RepairCost + NeedExp;
+
+	if (NeedExp < 0)
+	{
+		Input.Empty();
+	}
+
+	if (NameChangeExp == NeedExp && NameChangeExp > 0 && m_MaximumCost >= 40)
+	{
+		m_MaximumCost = 39;
+	}
+	if (m_MaximumCost >= 40 && !a_Player.IsGameModeCreative())
+	{
+		Input.Empty();
+	}
+
+	/* TODO: Add repair cost to cItem and not ItemHandler. This is required for this function!
+	if (!Input.IsEmpty())
+	{
+		RepairCost = max(cItemHandler::GetItemHandler(Input)->GetRepairCost(), cItemHandler::GetItemHandler(SecondInput)->GetRepairCost());
+		if (!Input.m_CustomName.empty())
+		{
+			RepairCost -= 9;
+		}
+		RepairCost = max(RepairCost, 0);
+		RepairCost += 2;
+	}*/
+
+	SetSlot(2, a_Player, Input);
+	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
+}
+
 
 
 
