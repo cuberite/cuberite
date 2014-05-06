@@ -212,7 +212,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	if (!(GetPosition() - m_LastPos).Equals(Vector3d(0, 0, 0))) // Change in position from last tick?
+	if (GetPosition() != m_LastPos) // Change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();

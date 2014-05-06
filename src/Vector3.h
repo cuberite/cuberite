@@ -113,6 +113,11 @@ public:
 		return Equals(a_Rhs);
 	}
 
+	inline bool operator != (const Vector3<T> & a_Rhs) const
+	{
+		return !Equals(a_Rhs);
+	}
+
 	inline bool operator < (const Vector3<T> & a_Rhs)
 	{
 		// return (x < a_Rhs.x) && (y < a_Rhs.y) && (z < a_Rhs.z); ?
