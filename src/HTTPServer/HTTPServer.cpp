@@ -150,7 +150,7 @@ bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_Port
 	{
 		m_Cert.reset(new cX509Cert);
 		int res = m_Cert->Parse(CertFile.data(), CertFile.size());
-		if (res  == 0)
+		if (res == 0)
 		{
 			m_CertPrivKey.reset(new cCryptoKey);
 			int res2 = m_CertPrivKey->ParsePrivate(KeyFile.data(), KeyFile.size(), "");
