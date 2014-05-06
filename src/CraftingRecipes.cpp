@@ -802,7 +802,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 					break;
 				}
 				case E_ITEM_PAPER: break;
-				default: LOG("Unexpected item in firework rocket a_Recipe, was the crafting file fireworks section changed?"); break;
+				default: LOG("Unexpected item in firework rocket recipe, was the crafting file's fireworks section changed?"); break;
 			}
 		}
 	}
@@ -837,7 +837,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_GOLD_NUGGET: a_Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
 				case E_ITEM_FEATHER: a_Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
 				case E_ITEM_HEAD: a_Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
-				default: LOG("Unexpected item in firework star a_Recipe, was the crafting file fireworks section changed?"); break; // ermahgerd BARD ardmins
+				default: LOG("Unexpected item in firework star recipe, was the crafting file's fireworks section changed?"); break; // ermahgerd BARD ardmins
 			}
 		}
 

@@ -118,11 +118,6 @@ public:
 		return (Abs(x - a_Rhs.x) < a_Eps) && (Abs(y - a_Rhs.y) < a_Eps) && (Abs(z - a_Rhs.z) < a_Eps);
 	}
 
-	inline bool operator == (const Vector3<T> & a_Rhs) const
-	{
-		return Equals(a_Rhs);
-	}
-
 	inline void Move(T a_X, T a_Y, T a_Z)
 	{
 		x += a_X;
@@ -138,6 +133,16 @@ public:
 	}
 
 	// tolua_end
+
+	inline bool operator != (const Vector3<T> & a_Rhs) const
+	{
+		return !Equals(a_Rhs);
+	}
+
+	inline bool operator == (const Vector3<T> & a_Rhs) const
+	{
+		return Equals(a_Rhs);
+	}
 
 	inline void operator += (const Vector3<T> & a_Rhs)
 	{

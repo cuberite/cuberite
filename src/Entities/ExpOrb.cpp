@@ -34,8 +34,6 @@ cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
 void cExpOrb::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendExperienceOrb(*this);
-	m_bDirtyPosition = false;
-	m_bDirtySpeed = false;
 	m_bDirtyOrientation = false;
 	m_bDirtyHead = false;
 }
