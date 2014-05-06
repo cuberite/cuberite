@@ -790,15 +790,10 @@ void cClientHandle::HandleAnvilItemName(const char * a_Data, size_t a_Length)
 		return;
 	}
 
-	cByteBuffer Buffer(a_Length);
-	Buffer.Write(a_Data, a_Length);
-
-	AString Name;
-	Buffer.ReadAll(Name);
-
+	AString Name(a_Data, a_Length);
 	if (Name.length() <= 30)
 	{
-		((cAnvilWindow&)*m_Player->GetWindow()).SetRepairedItemName(Name, m_Player);
+		((cAnvilWindow *)m_Player->GetWindow())->SetRepairedItemName(Name, m_Player);
 	}
 }
 
