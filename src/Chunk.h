@@ -320,10 +320,10 @@ public:
 		m_BlockTickZ = a_RelZ;
 	}
 	
-	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const              {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetMeta(int a_BlockIdx) const                                  {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
-	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
-	inline void       SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta)                     {       cChunkDef::SetNibble(m_BlockMeta, a_BlockIdx, a_Meta); }
+	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const              { return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetMeta(int a_BlockIdx) const                                  { return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
+	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) { SetMeta(MakeIndex(a_RelX, a_RelY, a_RelZ), a_Meta); }
+	void SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta);
 
 	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
 	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ, true); }
@@ -420,7 +420,6 @@ private:
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
-	// TODO: Make these pointers and don't allocate what isn't needed
 	COMPRESSED_BLOCKTYPE m_BlockTypes;
 	COMPRESSED_NIBBLETYPE m_BlockMeta;
 	COMPRESSED_NIBBLETYPE m_BlockLight;

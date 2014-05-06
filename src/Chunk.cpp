@@ -380,12 +380,12 @@ void cChunk::SetLight(
 
 	{ // Compress blocklight
 		m_BlockLight.clear();
-		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[m_BlockTypes.size()]);
+		m_BlockLight.insert(m_BlockLight.end(), &a_BlockLight[0], &a_BlockLight[m_BlockTypes.size() / 2]);
 	}
 
 	{ // Compress skylight
 		m_BlockSkyLight.clear();
-		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[m_BlockTypes.size()]);
+		m_BlockSkyLight.insert(m_BlockSkyLight.end(), &a_SkyLight[0], &a_SkyLight[m_BlockTypes.size() / 2]);
 	}
 
 	m_IsLightValid = true;
@@ -749,7 +749,7 @@ void cChunk::ProcessQueuedSetBlocks(void)
 	{
 		if (itr->m_Tick <= CurrTick)
 		{
-			if (itr->m_PreviousType != E_BLOCK_AIR) // PreviousType defaults to -1 if not specified
+			if (itr->m_PreviousType != E_BLOCK_AIR) // PreviousType defaults to 0 if not specified
 			{
 				if (GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == itr->m_PreviousType)
 				{
@@ -1632,6 +1632,24 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 			}  // for y - column in m_BlockData
 		}
 	}
+}
+
+
+
+
+
+void cChunk::SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta)
+{
+	if (GetNibble(m_BlockMeta, a_BlockIdx) == a_Meta)
+	{
+		return;
+	}
+
+	MarkDirty();
+	SetNibble(m_BlockMeta, a_BlockIdx, a_Meta);
+	Vector3i Coords(IndexToCoordinate(a_BlockIdx));
+
+	m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, Coords.x, Coords.y, Coords.z, GetBlock(a_BlockIdx), a_Meta));
 }
 
 

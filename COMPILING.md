@@ -45,7 +45,30 @@ It is possible to use an external profiler to learn more about how the code perf
 
 There's a script file, `MCServer/profile_run.cmd` that encapsulates most of the profiling work, have a look at the comments at the top of that script for details on how to get it to work. You'll need to change to a profiled configuration (both debug and release can be profiled).
 
-## Linux, MacOS, FreeBSD etc. ##
+## OSX ##
+Install git from its [website](http://git-scm.com) or homebrew: `brew install git`.
+
+Install Xcode (commandline tools are recommended) from the App Store or https://developer.apple.com/downloads.
+
+Install CMake from its [website](http://cmake.org) or homebrew: `brew install cmake`.
+
+### Getting the sources ###
+```
+mkdir MCServer
+cd MCServer
+git clone https://github.com/mc-server/MCServer.git .
+git submodule init
+git submodule update
+```
+
+### Building ###
+
+Follow the instructions at [CMake on Unix-based platforms](#cmake-on-unix-based-platforms), using Xcode as cmake's generator. If no generator is specified, CMake will use the Makefile generator, in which case you must build with the `make` command.
+
+After doing so, run the command `xcodebuild lib/polarssl/POLARSSL.xcodeproj` in the build directory, in order to build polarssl, a library that is required by MCServer. Lastly, run the command `xcodebuild` to build MCServer. Optionally, you may open the project files for polarssl and then MCServer in Xcode and build there.
+
+
+## Linux, FreeBSD etc. ##
 
 Install git, cmake and gcc or clang, using your platform's package manager:
 ```
@@ -61,6 +84,14 @@ git submodule init
 git submodule update
 ```
 
+### Building ###
+
+Follow the instructions at [CMake on Unix-based platforms](#cmake-on-unix-based-platforms).
+
+After doing so, run the command `make` in the build directory, and MCServer will build. 
+
+## CMake on Unix-based platforms ###
+
 ### Release Mode ###
 
 Release mode is preferred for almost all cases, it has much better speed and less console spam. However, if you are developing MCServer actively, debug mode might be better.
@@ -69,8 +100,10 @@ Assuming you are in the MCServer folder created in the initial setup step, you n
 ```
 mkdir Release
 cd Release
-cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make
+cmake -DCMAKE_BUILD_TYPE=RELEASE ..
 ```
+NOTE: CMake can generate project files for many different programs, such as Xcode, eclipse, and ninja. To use a different generator, first type `cmake --help`, and at the end, cmake will output the different generators that are available. To specify one, add `-G` followed by the name of the generator, in the `cmake` command. Note that the name is case-sensitive. 
+
 The executable will be built in the `MCServer/MCServer` folder and will be named `MCServer`.
 
 ### Debug Mode ###
@@ -81,8 +114,10 @@ Assuming you are in the MCServer folder created in the Getting the sources step,
 ```
 mkdir Debug
 cd Debug
-cmake -DCMAKE_BUILD_TYPE=DEBUG .. && make
+cmake -DCMAKE_BUILD_TYPE=DEBUG ..
 ```
+NOTE: CMake can generate project files for many different programs, such as Xcode, eclipse, and ninja. To use a different generator, first type `cmake --help`, and at the end, cmake will output the different generators that are available. To specify one, add `-G` followed by the name of the generator, in the `cmake` command. Note that the name is case-sensitive. 
+
 The executable will be built in the `MCServer/MCServer` folder and will be named `MCServer_debug`.
     
 ### 32 Bit Mode switch ###

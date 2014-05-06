@@ -214,7 +214,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	ReplaceString(ActualAddress, "%SERVERID%", a_ServerId);
 
 	AString Request;
-	Request += "GET " + ActualAddress + " HTTP/1.1\r\n";
+	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
 	Request += "Host: " + m_Server + "\r\n";
 	Request += "User-Agent: MCServer\r\n";
 	Request += "Connection: close\r\n";
