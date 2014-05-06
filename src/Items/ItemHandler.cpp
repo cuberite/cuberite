@@ -512,7 +512,7 @@ bool cItemHandler::IsPlaceable(void)
 
 
 
-bool cItemHandler::CanRepairWithItem(const cItem & a_Item)
+bool cItemHandler::CanRepairWithRawMaterial(short a_ItemType)
 {
 	return false;
 }

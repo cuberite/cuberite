@@ -83,7 +83,7 @@ void cEnchantments::AddFromString(const AString & a_StringSpec)
 
 
 
-size_t cEnchantments::Size(void)
+size_t cEnchantments::Count(void)
 {
 	return m_Enchantments.size();
 }

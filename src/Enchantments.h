@@ -85,7 +85,7 @@ public:
 	void AddFromString(const AString & a_StringSpec);
 	
 	/** Get the count of enchantments */
-	size_t Size(void);
+	size_t Count(void);
 	
 	/** Serializes all the enchantments into a string */
 	AString ToString(void) const;

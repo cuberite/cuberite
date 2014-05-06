@@ -797,7 +797,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	cFastRandom Random;
 	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && (Random.NextFloat(1.0F) < 0.12F))
 	{
-		NIBBLETYPE var4 = BlockMeta & 0x3;
+		NIBBLETYPE Orientation = BlockMeta & 0x3;
 		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
 		++AnvilDamage;
 
@@ -810,7 +810,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 		}
 		else
 		{
-			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, var4 | AnvilDamage << 2);
+			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, Orientation | (AnvilDamage << 2));
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(1021, PosX, PosY, PosZ, 0);
 		}
 	}
@@ -832,7 +832,7 @@ bool cSlotAreaAnvil::CanTakeResultItem(cPlayer & a_Player)
 				(a_Player.GetXpLevel() >= m_MaximumCost)      // or the player have enough exp?
 			) &&
 			(!GetSlot(2, a_Player)->IsEmpty()) &&             // Is a item in the result slot?
-			(m_MaximumCost > 0)                               // And: Is m_MaximumCost higher than 0?
+			(m_MaximumCost > 0)                               // When no maximum cost is set, the item isn't set from the UpdateResult() method and can't be a valid enchanting result.
 	);
 }
 
@@ -871,8 +871,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	if (!SecondInput.IsEmpty())
 	{
 		RepairCost += cItemHandler::GetItemHandler(SecondInput)->GetRepairCost();
-		
-		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithItem(SecondInput))
+		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
 			int DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
@@ -889,7 +888,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			while ((DamageDiff > 0) && (x < SecondInput.m_ItemCount))
 			{
 				Input.m_ItemDamage -= DamageDiff;
-				NeedExp += std::max(1, DamageDiff / 100) + Input.m_Enchantments.Size();
+				NeedExp += std::max(1, DamageDiff / 100) + Input.m_Enchantments.Count();
 				DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
 
 				++x;

@@ -86,7 +86,7 @@ public:
 	virtual bool IsPlaceable(void);
 
 	/** Can the anvil repair this item, when a_Item is the second input? */
-	virtual bool CanRepairWithItem(const cItem & a_Item);
+	virtual bool CanRepairWithRawMaterial(short a_ItemType);
 
 	/** Get the repair cost from the item, or 0 if the item hasn't repair cost. */
 	virtual int GetRepairCost(void);

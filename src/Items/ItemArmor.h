@@ -60,7 +60,7 @@ public:
 		return true;
 	}
 
-	virtual bool CanRepairWithItem(const cItem & a_Item) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
 	{
 		switch (m_ItemType)
 		{
@@ -69,35 +69,35 @@ public:
 			case E_ITEM_CHAIN_HELMET:
 			case E_ITEM_CHAIN_LEGGINGS:
 			{
-				return (a_Item.m_ItemType == E_ITEM_IRON);
+				return (a_ItemType == E_ITEM_IRON);
 			}
 			case E_ITEM_DIAMOND_BOOTS:
 			case E_ITEM_DIAMOND_CHESTPLATE:
 			case E_ITEM_DIAMOND_HELMET:
 			case E_ITEM_DIAMOND_LEGGINGS:
 			{
-				return (a_Item.m_ItemType == E_ITEM_DIAMOND);
+				return (a_ItemType == E_ITEM_DIAMOND);
 			}
 			case E_ITEM_IRON_BOOTS:
 			case E_ITEM_IRON_CHESTPLATE:
 			case E_ITEM_IRON_HELMET:
 			case E_ITEM_IRON_LEGGINGS:
 			{
-				return (a_Item.m_ItemType == E_ITEM_IRON);
+				return (a_ItemType == E_ITEM_IRON);
 			}
 			case E_ITEM_GOLD_BOOTS:
 			case E_ITEM_GOLD_CHESTPLATE:
 			case E_ITEM_GOLD_HELMET:
 			case E_ITEM_GOLD_LEGGINGS:
 			{
-				return (a_Item.m_ItemType == E_ITEM_GOLD);
+				return (a_ItemType == E_ITEM_GOLD);
 			}
 			case E_ITEM_LEATHER_BOOTS:
 			case E_ITEM_LEATHER_CAP:
 			case E_ITEM_LEATHER_PANTS:
 			case E_ITEM_LEATHER_TUNIC:
 			{
-				return (a_Item.m_ItemType == E_ITEM_LEATHER);
+				return (a_ItemType == E_ITEM_LEATHER);
 			}
 		}
 		return false;
