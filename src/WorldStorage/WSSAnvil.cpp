@@ -1974,7 +1974,10 @@ void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT 
 {
 	int SizeIdx = a_NBT.FindChildByName(a_TagIdx, "Size");
 
-	if (SizeIdx < 0) { return; }
+	if (SizeIdx < 0)
+	{
+		return;
+	}
 
 	int Size = a_NBT.GetInt(SizeIdx);
 
@@ -2132,7 +2135,10 @@ void cWSSAnvil::LoadSlimeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 {
 	int SizeIdx = a_NBT.FindChildByName(a_TagIdx, "Size");
 
-	if (SizeIdx < 0) { return; }
+	if (SizeIdx < 0)
+	{
+		return;
+	}
 
 	int Size = a_NBT.GetInt(SizeIdx);
 
