@@ -110,10 +110,13 @@ void cBlockInfo::Initialize(void)
 	// Transparent blocks
 	ms_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_Transparent = true;
 	ms_Info[E_BLOCK_AIR                 ].m_Transparent = true;
+	ms_Info[E_BLOCK_ANVIL               ].m_Transparent = true;
 	ms_Info[E_BLOCK_BIG_FLOWER          ].m_Transparent = true;
 	ms_Info[E_BLOCK_BROWN_MUSHROOM      ].m_Transparent = true;
+	ms_Info[E_BLOCK_CAKE                ].m_Transparent = true;
 	ms_Info[E_BLOCK_CARROTS             ].m_Transparent = true;
 	ms_Info[E_BLOCK_CHEST               ].m_Transparent = true;
+	ms_Info[E_BLOCK_COBBLESTONE_WALL    ].m_Transparent = true;
 	ms_Info[E_BLOCK_COBWEB              ].m_Transparent = true;
 	ms_Info[E_BLOCK_CROPS               ].m_Transparent = true;
 	ms_Info[E_BLOCK_DANDELION           ].m_Transparent = true;
@@ -126,6 +129,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_FLOWER_POT          ].m_Transparent = true;
 	ms_Info[E_BLOCK_GLASS               ].m_Transparent = true;
 	ms_Info[E_BLOCK_GLASS_PANE          ].m_Transparent = true;
+	ms_Info[E_BLOCK_HEAD                ].m_Transparent = true;
 	ms_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_Transparent = true;
 	ms_Info[E_BLOCK_ICE                 ].m_Transparent = true;
 	ms_Info[E_BLOCK_IRON_DOOR           ].m_Transparent = true;
@@ -196,12 +200,14 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_BED                 ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_BIG_FLOWER          ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_BROWN_MUSHROOM      ].m_PistonBreakable = true;
+	ms_Info[E_BLOCK_CAKE                ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_COBWEB              ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_CROPS               ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_DANDELION           ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_DEAD_BUSH           ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_FIRE                ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_FLOWER              ].m_PistonBreakable = true;
+	ms_Info[E_BLOCK_HEAD                ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_INACTIVE_COMPARATOR ].m_PistonBreakable = true;
 	ms_Info[E_BLOCK_IRON_DOOR           ].m_PistonBreakable = true;
@@ -243,6 +249,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_CACTUS              ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_CHEST               ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_CROPS               ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_COBBLESTONE_WALL    ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_DANDELION           ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_FIRE                ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_FLOWER              ].m_IsSnowable = false;
@@ -276,6 +283,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_POWERED_RAIL        ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_DETECTOR_RAIL       ].m_IsSnowable = false;
 	ms_Info[E_BLOCK_COBWEB              ].m_IsSnowable = false;
+	ms_Info[E_BLOCK_HEAD                ].m_IsSnowable = false;
 
 
 	// Blocks that don't drop without a special tool:
@@ -283,6 +291,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_CAULDRON            ].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_COAL_ORE            ].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_COBBLESTONE         ].m_RequiresSpecialTool = true;
+	ms_Info[E_BLOCK_COBBLESTONE_WALL    ].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_COBBLESTONE_STAIRS  ].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_COBWEB              ].m_RequiresSpecialTool = true;
 	ms_Info[E_BLOCK_DIAMOND_BLOCK       ].m_RequiresSpecialTool = true;
@@ -325,6 +334,7 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_AIR                 ].m_IsSolid = false;
 	ms_Info[E_BLOCK_BIG_FLOWER          ].m_IsSolid = false;
 	ms_Info[E_BLOCK_BROWN_MUSHROOM      ].m_IsSolid = false;
+	ms_Info[E_BLOCK_CAKE                ].m_IsSolid = false;
 	ms_Info[E_BLOCK_CARROTS             ].m_IsSolid = false;
 	ms_Info[E_BLOCK_COBWEB              ].m_IsSolid = false;
 	ms_Info[E_BLOCK_CROPS               ].m_IsSolid = false;

@@ -39,6 +39,13 @@ public:
 	}
 
 
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	{
+		return true;
+	}
+
+
+
 	// Bed specific helper functions
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
