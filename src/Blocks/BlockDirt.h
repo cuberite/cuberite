@@ -38,7 +38,7 @@ public:
 			BLOCKTYPE Above;
 			NIBBLETYPE AboveMeta;
 			a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY + 1, a_RelZ, Above, AboveMeta);
-			if ((IsBlockWater(Above)) || !cBlockInfo::GetHandler(Above)->CanChangeDirtToGrass(Above, AboveMeta))
+			if ((IsBlockWater(Above)) || !cBlockInfo::GetHandler(Above)->CanDirtGrowGrass(AboveMeta))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
@@ -79,7 +79,7 @@ public:
 			BLOCKTYPE AboveDest;
 			NIBBLETYPE AboveMeta;
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
-			if ((!IsBlockWater(AboveDest)) && (cBlockInfo::GetHandler(AboveDest)->CanChangeDirtToGrass(AboveDest, AboveMeta)))
+			if ((!IsBlockWater(AboveDest)) && (cBlockInfo::GetHandler(AboveDest)->CanDirtGrowGrass(AboveMeta)))
 			{
 				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, BlockX * cChunkDef::Width, BlockY, BlockZ * cChunkDef::Width, ssGrassSpread))
 				{

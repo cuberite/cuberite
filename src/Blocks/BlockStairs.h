@@ -78,7 +78,7 @@ public:
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
-	virtual bool CanChangeDirtToGrass(BLOCKTYPE a_Block, NIBBLETYPE a_Meta) override
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
 	{
 		return true;
 	}

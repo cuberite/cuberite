@@ -98,7 +98,7 @@ public:
 	}
 
 
-	virtual bool CanChangeDirtToGrass(BLOCKTYPE a_Block, NIBBLETYPE a_Meta) override
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
 	{
 		return (a_Meta & 0x8);
 	}
