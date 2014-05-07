@@ -645,18 +645,16 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	}
 	
 	int Damage = a_NBT.FindChildByName(a_TagIdx, "Damage");
-	if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
+	if ((Damage > 0) && (a_NBT.GetType(Damage) == TAG_Short))
 	{
-		return false;
+		a_Item.m_ItemDamage = a_NBT.GetShort(Damage);
 	}
-	a_Item.m_ItemDamage = a_NBT.GetShort(Damage);
 	
 	int Count = a_NBT.FindChildByName(a_TagIdx, "Count");
-	if ((Count < 0) || (a_NBT.GetType(Count) != TAG_Byte))
+	if ((Count > 0) && (a_NBT.GetType(Count) == TAG_Byte))
 	{
-		return false;
+		a_Item.m_ItemCount = a_NBT.GetByte(Count);
 	}
-	a_Item.m_ItemCount = a_NBT.GetByte(Count);
 	
 	// Find the "tag" tag, used for enchantments and other extra data
 	int TagTag = a_NBT.FindChildByName(a_TagIdx, "tag");
@@ -664,6 +662,29 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	{
 		// No extra data
 		return true;
+	}
+
+	// Load repair cost:
+	int RepairCost = a_NBT.FindChildByName(TagTag, "RepairCost");
+	if ((RepairCost > 0) && (a_NBT.GetType(RepairCost) == TAG_Int))
+	{
+		a_Item.m_RepairCost = (UInt16)a_NBT.GetInt(RepairCost);
+	}
+
+	// Load display name:
+	int DisplayTag = a_NBT.FindChildByName(TagTag, "display");
+	if (DisplayTag > 0)
+	{
+		int DisplayName = a_NBT.FindChildByName(DisplayTag, "Name");
+		if ((DisplayName > 0) && (a_NBT.GetType(DisplayName) == TAG_String))
+		{
+			a_Item.m_CustomName = a_NBT.GetString(DisplayName);
+		}
+		int Lore = a_NBT.FindChildByName(DisplayTag, "Lore");
+		if ((Lore > 0) && (a_NBT.GetType(Lore) == TAG_String))
+		{
+			a_Item.m_Lore = a_NBT.GetString(Lore);
+		}
 	}
 
 	// Load enchantments:
@@ -674,6 +695,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 		EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, a_NBT, EnchTag);
 	}
 
+	// Load firework data:
 	int FireworksTag = a_NBT.FindChildByName(TagTag, ((a_Item.m_ItemType == E_ITEM_FIREWORK_STAR) ? "Fireworks" : "Explosion"));
 	if (EnchTag > 0)
 	{

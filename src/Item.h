@@ -40,6 +40,7 @@ public:
 		m_ItemDamage(0),
 		m_CustomName(""),
 		m_Lore(""),
+		m_RepairCost(0),
 		m_FireworkItem()
 	{
 	}
@@ -60,6 +61,7 @@ public:
 		m_Enchantments(a_Enchantments),
 		m_CustomName  (a_CustomName),
 		m_Lore        (a_Lore),
+		m_RepairCost  (0),
 		m_FireworkItem()
 	{
 		if (!IsValidItem(m_ItemType))
@@ -85,7 +87,8 @@ public:
 		m_Enchantments(a_CopyFrom.m_Enchantments),
 		m_CustomName  (a_CopyFrom.m_CustomName),
 		m_Lore        (a_CopyFrom.m_Lore),
-		m_FireworkItem(a_CopyFrom.m_FireworkItem)
+		m_FireworkItem(a_CopyFrom.m_FireworkItem),
+		m_RepairCost  (a_CopyFrom.m_RepairCost)
 	{
 	}
 	
@@ -100,6 +103,7 @@ public:
 		m_Enchantments.Clear();
 		m_CustomName = "";
 		m_Lore = "";
+		m_RepairCost = 0;
 		m_FireworkItem.EmptyData();
 	}
 	
@@ -109,6 +113,7 @@ public:
 		m_ItemType = E_ITEM_EMPTY;
 		m_ItemCount = 0;
 		m_ItemDamage = 0;
+		m_RepairCost = 0;
 	}
 	
 	
@@ -190,14 +195,15 @@ public:
 
 	// tolua_begin
 	
-	short         m_ItemType;
-	char          m_ItemCount;
-	short         m_ItemDamage;
-	cEnchantments m_Enchantments;
-	AString       m_CustomName;
-	AString       m_Lore;
+	short          m_ItemType;
+	char           m_ItemCount;
+	short          m_ItemDamage;
+	cEnchantments  m_Enchantments;
+	AString        m_CustomName;
+	AString        m_Lore;
 
-	cFireworkItem m_FireworkItem;
+	cFireworkItem  m_FireworkItem;
+	UInt16         m_RepairCost;
 };
 // tolua_end
 

@@ -2278,6 +2278,13 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 				}
 				break;
 			}
+			case TAG_Int:
+			{
+				if (TagName == "RepairCost")
+				{
+					a_Item.m_RepairCost = (UInt16)NBT.GetInt(tag);
+				}
+			}
 			default: LOGD("Unimplemented NBT data when parsing!"); break;
 		}
 	}
@@ -2451,6 +2458,10 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 
 	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
+	if (a_Item.m_RepairCost != 0)
+	{
+		Writer.AddInt("RepairCost", (Int32)a_Item.m_RepairCost);
+	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";

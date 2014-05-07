@@ -866,16 +866,19 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
-	int RepairCost = cItemHandler::GetItemHandler(Input)->GetRepairCost();
+	UInt16 RepairCost = Input.m_RepairCost;
 	int NeedExp = 0;
+	bool IsEnchantBook = false;
 	if (!SecondInput.IsEmpty())
 	{
-		RepairCost += cItemHandler::GetItemHandler(SecondInput)->GetRepairCost();
+		IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+		
+		RepairCost += SecondInput.m_RepairCost;
 		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
 			int DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
-			if (DamageDiff < 0)
+			if (DamageDiff <= 0)
 			{
 				// No enchantment
 				Output.Empty();
@@ -898,7 +901,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		else
 		{
 			// Tool and armor repair with two tools / armors
-			if (!Input.IsSameType(SecondInput) || !Input.IsDamageable())
+			if (!IsEnchantBook && (!Input.IsSameType(SecondInput) || !Input.IsDamageable()))
 			{
 				// No enchantment
 				Output.Empty();
@@ -907,20 +910,23 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				return;
 			}
 
-			int FirstDamageDiff = Input.GetMaxDamage() - Input.m_ItemDamage;
-			int SecondDamageDiff = SecondInput.GetMaxDamage() - SecondInput.m_ItemDamage;
-			int Damage = SecondDamageDiff + Input.GetMaxDamage() * 12 / 100;
-			
-			int NewItemDamage = Input.GetMaxDamage() - (FirstDamageDiff + Damage);
-			if (NewItemDamage > 0)
+			if ((Input.GetMaxDamage() > 0) && !IsEnchantBook)
 			{
-				NewItemDamage = 0;
-			}
+				int FirstDamageDiff = Input.GetMaxDamage() - Input.m_ItemDamage;
+				int SecondDamageDiff = SecondInput.GetMaxDamage() - SecondInput.m_ItemDamage;
+				int Damage = SecondDamageDiff + Input.GetMaxDamage() * 12 / 100;
 
-			if (NewItemDamage < Input.m_ItemDamage)
-			{
-				Input.m_ItemDamage = NewItemDamage;
-				NeedExp += std::max(1, Damage / 100);
+				int NewItemDamage = Input.GetMaxDamage() - (FirstDamageDiff + Damage);
+				if (NewItemDamage > 0)
+				{
+					NewItemDamage = 0;
+				}
+
+				if (NewItemDamage < Input.m_ItemDamage)
+				{
+					Input.m_ItemDamage = NewItemDamage;
+					NeedExp += std::max(1, Damage / 100);
+				}
 			}
 
 			// TODO: Add enchantments.
@@ -934,7 +940,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		// Remove custom name
 		if (!Input.m_CustomName.empty())
 		{
-			NameChangeExp = (Input.IsDamageable()) ? 4 : (Input.m_ItemCount * 5);
+			NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
 			NeedExp += NameChangeExp;
 			Input.m_CustomName = "";
 		}
@@ -942,7 +948,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	else if (RepairedItemName != Input.m_CustomName)
 	{
 		// Change custom name
-		NameChangeExp = (Input.IsDamageable()) ? 4 : (Input.m_ItemCount * 5);
+		NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
 		NeedExp += NameChangeExp;
 
 		if (!Input.m_CustomName.empty())
@@ -962,7 +968,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		Input.Empty();
 	}
 
-	if (NameChangeExp == NeedExp && NameChangeExp > 0 && m_MaximumCost >= 40)
+	if ((NameChangeExp == NeedExp) && (NameChangeExp > 0) && (m_MaximumCost >= 40))
 	{
 		m_MaximumCost = 39;
 	}
@@ -971,17 +977,23 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		Input.Empty();
 	}
 
-	/* TODO: Add repair cost to cItem and not ItemHandler. This is required for this function!
 	if (!Input.IsEmpty())
 	{
-		RepairCost = max(cItemHandler::GetItemHandler(Input)->GetRepairCost(), cItemHandler::GetItemHandler(SecondInput)->GetRepairCost());
+		RepairCost = std::max(Input.m_RepairCost, SecondInput.m_RepairCost);
 		if (!Input.m_CustomName.empty())
 		{
-			RepairCost -= 9;
+			if (RepairCost < 9)
+			{
+				RepairCost = 0;
+			}
+			else
+			{
+				RepairCost -= 9;
+			}
 		}
-		RepairCost = max(RepairCost, 0);
 		RepairCost += 2;
-	}*/
+		Input.m_RepairCost = RepairCost;
+	}
 
 	SetSlot(2, a_Player, Input);
 	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
