@@ -202,8 +202,8 @@ public:
 	AString        m_CustomName;
 	AString        m_Lore;
 
-	cFireworkItem  m_FireworkItem;
 	UInt16         m_RepairCost;
+	cFireworkItem  m_FireworkItem;
 };
 // tolua_end
 
