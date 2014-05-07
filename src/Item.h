@@ -87,8 +87,8 @@ public:
 		m_Enchantments(a_CopyFrom.m_Enchantments),
 		m_CustomName  (a_CopyFrom.m_CustomName),
 		m_Lore        (a_CopyFrom.m_Lore),
-		m_FireworkItem(a_CopyFrom.m_FireworkItem),
 		m_RepairCost  (a_CopyFrom.m_RepairCost)
+		m_FireworkItem(a_CopyFrom.m_FireworkItem),
 	{
 	}
 	
@@ -202,7 +202,7 @@ public:
 	AString        m_CustomName;
 	AString        m_Lore;
 
-	UInt16         m_RepairCost;
+	int            m_RepairCost;
 	cFireworkItem  m_FireworkItem;
 };
 // tolua_end

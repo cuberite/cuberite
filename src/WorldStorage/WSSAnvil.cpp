@@ -668,7 +668,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	int RepairCost = a_NBT.FindChildByName(TagTag, "RepairCost");
 	if ((RepairCost > 0) && (a_NBT.GetType(RepairCost) == TAG_Int))
 	{
-		a_Item.m_RepairCost = (UInt16)a_NBT.GetInt(RepairCost);
+		a_Item.m_RepairCost = a_NBT.GetInt(RepairCost);
 	}
 
 	// Load display name:

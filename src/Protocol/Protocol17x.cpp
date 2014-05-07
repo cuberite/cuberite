@@ -2282,7 +2282,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			{
 				if (TagName == "RepairCost")
 				{
-					a_Item.m_RepairCost = (UInt16)NBT.GetInt(tag);
+					a_Item.m_RepairCost = NBT.GetInt(tag);
 				}
 			}
 			default: LOGD("Unimplemented NBT data when parsing!"); break;
@@ -2460,7 +2460,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	cFastNBTWriter Writer;
 	if (a_Item.m_RepairCost != 0)
 	{
-		Writer.AddInt("RepairCost", (Int32)a_Item.m_RepairCost);
+		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{

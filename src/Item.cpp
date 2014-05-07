@@ -182,7 +182,7 @@ void cItem::FromJson(const Json::Value & a_Value)
 			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
 		}
 
-		m_RepairCost = (unsigned short)a_Value.get("RepairCost", 0).asInt();
+		m_RepairCost = a_Value.get("RepairCost", 0).asInt();
 	}
 }
 

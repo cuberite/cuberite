@@ -866,7 +866,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
-	UInt16 RepairCost = Input.m_RepairCost;
+	int RepairCost = Input.m_RepairCost;
 	int NeedExp = 0;
 	bool IsEnchantBook = false;
 	if (!SecondInput.IsEmpty())
@@ -982,15 +982,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		RepairCost = std::max(Input.m_RepairCost, SecondInput.m_RepairCost);
 		if (!Input.m_CustomName.empty())
 		{
-			if (RepairCost < 9)
-			{
-				RepairCost = 0;
-			}
-			else
-			{
-				RepairCost -= 9;
-			}
+			RepairCost -= 9;
 		}
+		RepairCost = std::max(RepairCost, 0);
 		RepairCost += 2;
 		Input.m_RepairCost = RepairCost;
 	}

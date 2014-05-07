@@ -108,7 +108,7 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 		m_Writer.BeginCompound("tag");
 			if (a_Item.m_RepairCost > 0)
 			{
-				m_Writer.AddInt("RepairCost", (Int32)a_Item.m_RepairCost);
+				m_Writer.AddInt("RepairCost", a_Item.m_RepairCost);
 			}
 
 			if ((a_Item.m_CustomName != "") || (a_Item.m_Lore != ""))
