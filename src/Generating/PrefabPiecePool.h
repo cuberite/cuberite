@@ -20,11 +20,15 @@ class cPrefabPiecePool :
 	public cPiecePool
 {
 public:
+	/** Creates an empty instance. Prefabs can be added by calling AddPieceDefs() and AddStartingPieceDefs(). */
+	cPrefabPiecePool(void);
+	
 	/** Creates a piece pool with prefabs from the specified definitions.
 	If both a_PieceDefs and a_StartingPieceDefs are given, only the a_StartingPieceDefs are used as starting
 	pieces for the pool, and they do not participate in the generation any further.
 	If only a_PieceDefs is given, any such piece can be chosen as a starting piece, and all the pieces are used
-	for generating. */
+	for generating.
+	More pieces can be added to the instance afterwards by calling AddPieceDefs() and AddStartingPieceDefs(). */
 	cPrefabPiecePool(
 		const cPrefab::sDef * a_PieceDefs,         size_t a_NumPieceDefs,
 		const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs
@@ -35,7 +39,7 @@ public:
 	May be called multiple times with different PieceDefs, will add all such pieces. */
 	void AddPieceDefs(const cPrefab::sDef * a_PieceDefs, size_t a_NumPieceDefs);
 	
-	/** Adds pieces from the specified definitions into m_StartingPieces. Doesn't add to
+	/** Adds pieces from the specified definitions into m_StartingPieces. Doesn't add them to
 	the m_PiecesByConnector map.
 	May be called multiple times with different PieceDefs, will add all such pieces. */
 	void AddStartingPieceDefs(const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs);

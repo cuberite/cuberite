@@ -37,21 +37,21 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 	int MaxBlockZ = a_ChunkZ * cChunkDef::Width + m_MaxStructureSizeZ + cChunkDef::Width - 1;
 	int MinGridX = MinBlockX / m_GridSizeX;
 	int MinGridZ = MinBlockZ / m_GridSizeZ;
-	int MaxGridX = MaxBlockX / m_GridSizeX;
-	int MaxGridZ = MaxBlockX / m_GridSizeZ;
-	if (MinGridX < 0)
+	int MaxGridX = (MaxBlockX + m_GridSizeX - 1) / m_GridSizeX;
+	int MaxGridZ = (MaxBlockZ + m_GridSizeZ - 1) / m_GridSizeZ;
+	if (MinBlockX < 0)
 	{
 		--MinGridX;
 	}
-	if (MinGridZ < 0)
+	if (MinBlockZ < 0)
 	{
 		--MinGridZ;
 	}
-	if (MaxGridX < 0)
+	if (MaxBlockX < 0)
 	{
 		--MaxGridX;
 	}
-	if (MaxGridZ < 0)
+	if (MaxBlockZ < 0)
 	{
 		--MaxGridZ;
 	}

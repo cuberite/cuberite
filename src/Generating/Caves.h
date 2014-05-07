@@ -93,7 +93,7 @@ protected:
 	/// Returns all caves that *may* intersect the given chunk. All the caves are valid until the next call to this function.
 	void GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cCaveSystems & a_Caves);
 	
-	// cStructGen override:
+	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
