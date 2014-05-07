@@ -18,19 +18,7 @@
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
 #include "../StringCompression.h"
-
-#ifdef _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	#pragma warning(disable:4244)
-	#pragma warning(disable:4231)
-	#pragma warning(disable:4189)
-	#pragma warning(disable:4702)
-#endif
-
-#ifdef _MSC_VER
-	#pragma warning(pop)
-#endif
+#include "PolarSSL++/Sha1Checksum.h"
 
 
 
@@ -408,7 +396,8 @@ void cProtocol132::SendWholeInventory(const cWindow & a_Window)
 	super::SendWholeInventory(a_Window);
 	
 	// Send the player inventory and hotbar:
-	const cInventory & Inventory = m_Client->GetPlayer()->GetInventory();
+	cPlayer * Player = m_Client->GetPlayer();
+	const cInventory & Inventory = Player->GetInventory();
 	int BaseOffset = a_Window.GetNumSlots() - (cInventory::invNumSlots - cInventory::invInventoryOffset);  // Number of non-inventory slots
 	char WindowID = a_Window.GetWindowID();
 	for (short i = 0; i < cInventory::invInventoryCount; i++)
@@ -422,7 +411,7 @@ void cProtocol132::SendWholeInventory(const cWindow & a_Window)
 	}  // for i - Hotbar[]
 	
 	// Send even the item being dragged:
-	SendInventorySlot(-1, -1, m_Client->GetPlayer()->GetDraggingItem());
+	SendInventorySlot(-1, -1, Player->GetDraggingItem());
 }
 
 
@@ -800,10 +789,12 @@ void cProtocol132::SendCompass(const cWorld & a_World)
 void cProtocol132::SendEncryptionKeyRequest(void)
 {
 	cCSLock Lock(m_CSPacket);
+	cServer * Server = cRoot::Get()->GetServer();
 	WriteByte(0xfd);
-	WriteString(cRoot::Get()->GetServer()->GetServerID());
-	WriteShort((short)(cRoot::Get()->GetServer()->GetPublicKeyDER().size()));
-	SendData(cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	WriteString(Server->GetServerID());
+	const AString & PublicKeyDER = Server->GetPublicKeyDER();
+	WriteShort((short)(PublicKeyDER.size()));
+	SendData(PublicKeyDER.data(), PublicKeyDER.size());
 	WriteShort(4);
 	WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 	Flush();
@@ -816,7 +807,7 @@ void cProtocol132::SendEncryptionKeyRequest(void)
 void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const AString & a_EncNonce)
 {
 	// Decrypt EncNonce using privkey
-	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
 
 	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
 	int res = rsaDecryptor.Decrypt((const Byte *)a_EncNonce.data(), a_EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
@@ -873,14 +864,15 @@ void cProtocol132::StartEncryption(const Byte * a_Key)
 	m_IsEncrypted = true;
 	
 	// Prepare the m_AuthServerID:
-	cSHA1Checksum Checksum;
-	AString ServerID = cRoot::Get()->GetServer()->GetServerID();
+	cSha1Checksum Checksum;
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerID = Server->GetServerID();
 	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update((const Byte *)cRoot::Get()->GetServer()->GetPublicKeyDER().data(), cRoot::Get()->GetServer()->GetPublicKeyDER().size());
+	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
-	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
+	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
 
 

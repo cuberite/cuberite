@@ -468,7 +468,15 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 	for (int i = 0; i < NumChunks; i++)
 	{
 		sChunkHeader * Header = new sChunkHeader;
-		READ(*Header);
+		
+		// Here we do not use the READ macro, as it does not free the resources
+		// allocated with new in case of error.
+		if (f.Read(Header, sizeof(*Header)) != sizeof(*Header))
+		{
+			LOGERROR("ERROR READING %s FROM FILE %s (line %d); file offset %d", "Header", m_FileName.c_str(), __LINE__, f.Tell());
+			delete Header;
+			return;
+		}
 		m_ChunkHeaders.push_back(Header);
 	}  // for i - chunk headers
 
@@ -797,7 +805,6 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 			++index2;
 		}
 		InChunkOffset += index2 / 2;
-		index2 = 0;
 
 		AString Converted(ConvertedData, ExpectedSize);
 
@@ -839,7 +846,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 
 
-bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWorld * a_World)
+bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_UncompressedSize, const AString & a_Data, cWorld * a_World)
 {
 	// Crude data integrity check:
 	if (a_UncompressedSize < cChunkDef::BlockDataSize)

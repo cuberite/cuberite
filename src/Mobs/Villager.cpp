@@ -23,16 +23,21 @@ cVillager::cVillager(eVillagerType VillagerType) :
 
 
 
-void cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
 	if ((a_TDI.Attacker != NULL) && a_TDI.Attacker->IsPlayer())
 	{
 		if (m_World->GetTickRandomNumber(5) == 3)
 		{
-			m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_VILLAGER_ANGRY);
+			m_World->BroadcastEntityStatus(*this, esVillagerAngry);
 		}
 	}
+	return true;
 }
 
 

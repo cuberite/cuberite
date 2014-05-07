@@ -3,6 +3,7 @@
 
 #include "Ghast.h"
 #include "../World.h"
+#include "../Entities/GhastFireballEntity.h"
 
 
 

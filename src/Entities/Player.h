@@ -181,7 +181,7 @@ public:
 	void LoginSetGameMode(eGameMode a_GameMode);
 
 	/** Forces the player to move in the given direction. */
-	void ForceSetSpeed(Vector3d a_Direction); // tolua_export
+	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
 
 	/** Tries to move to a new position, with attachment-related checks (y == -999) */
 	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
@@ -423,9 +423,6 @@ protected:
 	/** Number of ticks remaining for the foodpoisoning effect; zero if not foodpoisoned */
 	int m_FoodPoisonedTicksRemaining;
 	
-	/** Last position that has been recorded for food-related processing: */
-	Vector3d m_LastFoodPos;
-	
 	float m_LastJumpHeight;
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
@@ -498,7 +495,7 @@ protected:
 	virtual void Destroyed(void);
 
 	/** Filters out damage for creative mode/friendly fire */
-	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 
 	/** Stops players from burning in creative mode */
 	virtual void TickBurning(cChunk & a_Chunk) override;

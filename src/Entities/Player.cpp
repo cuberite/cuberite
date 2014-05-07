@@ -76,18 +76,16 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
-
-	m_TimeLastTeleportPacket = 0;
 	
 	m_PlayerName = a_PlayerName;
-	m_bDirtyPosition = true; // So chunks are streamed to player at spawn
 
 	if (!LoadFromDisk())
 	{
 		m_Inventory.Clear();
-		SetPosX(cRoot::Get()->GetDefaultWorld()->GetSpawnX());
-		SetPosY(cRoot::Get()->GetDefaultWorld()->GetSpawnY());
-		SetPosZ(cRoot::Get()->GetDefaultWorld()->GetSpawnZ());
+		cWorld * DefaultWorld = cRoot::Get()->GetDefaultWorld();
+		SetPosX(DefaultWorld->GetSpawnX());
+		SetPosY(DefaultWorld->GetSpawnY());
+		SetPosZ(DefaultWorld->GetSpawnZ());
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
@@ -208,25 +206,22 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		m_BowCharge += 1;
 	}
 	
-	//handle updating experience
+	// Handle updating experience
 	if (m_bDirtyExperience)
 	{
 		SendExperience();
 	}
 
-	if (m_bDirtyPosition)
+	if (GetPosition() != m_LastPos) // Change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
 		
 		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
-		BroadcastMovementUpdate(m_ClientHandle);
 		m_ClientHandle->StreamChunks();
 	}
-	else
-	{
-		BroadcastMovementUpdate(m_ClientHandle);
-	}
+
+	BroadcastMovementUpdate(m_ClientHandle);
 
 	if (m_Health > 0)  // make sure player is alive
 	{
@@ -437,7 +432,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		cWorld * World = GetWorld();
 		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
 		{
-			BLOCKTYPE BlockType = World->GetBlock((int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
+			BLOCKTYPE BlockType = World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 			if (BlockType != E_BLOCK_AIR)
 			{
 				m_bTouchGround = true;
@@ -466,7 +461,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 			
 			// Fall particles
-			GetWorld()->BroadcastSoundParticleEffect(2006, (int)floor(GetPosX()), (int)GetPosY() - 1, (int)floor(GetPosZ()), Damage /* Used as particle effect speed modifier */);
+			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, (int)GetPosY() - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
 		}		
 
 		m_LastGroundHeight = (float)GetPosY();
@@ -590,7 +585,7 @@ void cPlayer::FinishEating(void)
 	m_EatingFinishTick = -1;
 	
 	// Send the packets:
-	m_ClientHandle->SendEntityStatus(*this, ENTITY_STATUS_EATING_ACCEPTED);
+	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
 	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
@@ -807,14 +802,14 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 
 
-void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
 		if (IsGameModeCreative())
 		{
 			// No damage / health in creative mode if not void or plugin damage
-			return;
+			return false;
 		}
 	}
 
@@ -827,17 +822,19 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 			if (!m_Team->AllowsFriendlyFire())
 			{
 				// Friendly fire is disabled
-				return;
+				return false;
 			}
 		}
 	}
 	
-	super::DoTakeDamage(a_TDI);
-	
-	// Any kind of damage adds food exhaustion
-	AddFoodExhaustion(0.3f);
-	
-	SendHealth();
+	if (super::DoTakeDamage(a_TDI))
+	{
+		// Any kind of damage adds food exhaustion
+		AddFoodExhaustion(0.3f);
+		SendHealth();
+		return true;
+	}
+	return false;
 }
 
 
@@ -896,6 +893,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 void cPlayer::Respawn(void)
 {
 	m_Health = GetMaxHealth();
+	SetInvulnerableTicks(20);
 	
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;
@@ -1165,9 +1163,9 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 
 
-void cPlayer::ForceSetSpeed(Vector3d a_Direction)
+void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 {
-	SetSpeed(a_Direction);
+	SetSpeed(a_Speed);
 	m_ClientHandle->SendEntityVelocity(*this);
 }
 
@@ -1519,22 +1517,16 @@ void cPlayer::LoadPermissionsFromDisk()
 	cIniFile IniFile;
 	if (IniFile.ReadFile("users.ini"))
 	{
-		std::string Groups = IniFile.GetValue(m_PlayerName, "Groups", "");
-		if (!Groups.empty())
+		AString Groups = IniFile.GetValueSet(m_PlayerName, "Groups", "Default");
+		AStringVector Split = StringSplitAndTrim(Groups, ",");
+
+		for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
 		{
-			AStringVector Split = StringSplitAndTrim(Groups, ",");
-			for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
+			if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
 			{
-				if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
-				{
-					LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
-				}
-				AddToGroup(*itr);
+				LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
 			}
-		}
-		else
-		{
-			AddToGroup("Default");
+			AddToGroup(*itr);
 		}
 
 		AString Color = IniFile.GetValue(m_PlayerName, "Color", "-");
@@ -1546,8 +1538,10 @@ void cPlayer::LoadPermissionsFromDisk()
 	else
 	{
 		cGroupManager::GenerateDefaultUsersIni(IniFile);
+		IniFile.AddValue("Groups", m_PlayerName, "Default");
 		AddToGroup("Default");
 	}
+	IniFile.WriteFile("users.ini");
 	ResolvePermissions();
 }
 
@@ -1596,10 +1590,7 @@ bool cPlayer::LoadFromDisk()
 		SetPosX(JSON_PlayerPosition[(unsigned int)0].asDouble());
 		SetPosY(JSON_PlayerPosition[(unsigned int)1].asDouble());
 		SetPosZ(JSON_PlayerPosition[(unsigned int)2].asDouble());
-		m_LastPosX = GetPosX();
-		m_LastPosY = GetPosY();
-		m_LastPosZ = GetPosZ();
-		m_LastFoodPos = GetPosition();
+		m_LastPos = GetPosition();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
@@ -1860,17 +1851,16 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 	{
 		return;
 	}
-	
-	// Calculate the distance travelled, update the last pos:
-	Vector3d Movement(GetPosition() - m_LastFoodPos);
-	Movement.y = 0;  // Only take XZ movement into account
-	m_LastFoodPos = GetPosition();
-	
+
 	// If riding anything, apply no food exhaustion
 	if (m_AttachedTo != NULL)
 	{
 		return;
 	}
+	
+	// Calculate the distance travelled, update the last pos:
+	Vector3d Movement(GetPosition() - m_LastPos);
+	Movement.y = 0;  // Only take XZ movement into account
 
 	// Apply the exhaustion based on distance travelled:
 	double BaseExhaustion = Movement.Length();
@@ -1899,9 +1889,9 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 void cPlayer::Detach()
 {
 	super::Detach();
-	int PosX = (int)floor(GetPosX());
-	int PosY = (int)floor(GetPosY());
-	int PosZ = (int)floor(GetPosZ());
+	int PosX = POSX_TOINT;
+	int PosY = POSY_TOINT;
+	int PosZ = POSZ_TOINT;
 
 	// Search for a position within an area to teleport player after detachment
 	// Position must be solid land, and occupied by a nonsolid block

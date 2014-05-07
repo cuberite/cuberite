@@ -26,7 +26,7 @@ Documentation:
 #include "../Root.h"
 #include "../Server.h"
 
-#include "../Entities/ProjectileEntity.h"
+#include "../Entities/ArrowEntity.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
 
@@ -96,6 +96,7 @@ enum
 	PACKET_INVENTORY_WHOLE           = 0x68,
 	PACKET_WINDOW_PROPERTY           = 0x69,
 	PACKET_CREATIVE_INVENTORY_ACTION = 0x6B,
+	PACKET_ENCHANT_ITEM              = 0x6C,
 	PACKET_UPDATE_SIGN               = 0x82,
 	PACKET_ITEM_DATA                 = 0x83,
 	PACKET_PLAYER_LIST_ITEM          = 0xC9,
@@ -537,9 +538,10 @@ void cProtocol125::SendHealth(void)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_HEALTH);
-	WriteShort((short)m_Client->GetPlayer()->GetHealth());
-	WriteShort((short)m_Client->GetPlayer()->GetFoodLevel());
-	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
+	cPlayer * Player = m_Client->GetPlayer();
+	WriteShort((short)Player->GetHealth());
+	WriteShort((short)Player->GetFoodLevel());
+	WriteFloat((float)Player->GetFoodSaturationLevel());
 	Flush();
 }
 
@@ -594,6 +596,15 @@ void cProtocol125::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 
 
+void cProtocol125::SendLoginSuccess(void)
+{
+	// Not supported in this protocol version
+}
+
+
+
+
+
 void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
 {
 	cCSLock Lock(m_CSPacket);
@@ -642,18 +653,30 @@ void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decor
 
 
 
+void cProtocol125::SendMapInfo(int a_ID, unsigned int a_Scale)
+{
+	// This protocol doesn't support such message
+	UNUSED(a_ID);
+	UNUSED(a_Scale);
+}
+
+
+
+
+
 void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_PICKUP_SPAWN);
 	WriteInt    (a_Pickup.GetUniqueID());
-	WriteShort  (a_Pickup.GetItem().m_ItemType);
-	WriteChar   (a_Pickup.GetItem().m_ItemCount);
-	WriteShort  (a_Pickup.GetItem().m_ItemDamage);
+	const cItem & Item = a_Pickup.GetItem();
+	WriteShort  (Item.m_ItemType);
+	WriteChar   (Item.m_ItemCount);
+	WriteShort  (Item.m_ItemDamage);
 	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
-	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
-	WriteByte   ((char)(a_Pickup.GetSpeed().y * 8));
-	WriteByte   ((char)(a_Pickup.GetSpeed().z * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeedX() * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeedY() * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeedZ() * 8));
 	Flush();
 }
 
@@ -677,6 +700,16 @@ void cProtocol125::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 void cProtocol125::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
 {
 	// Not supported by this protocol version
+}
+
+
+
+
+
+void cProtocol125::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Painting);
 }
 
 
@@ -800,10 +833,11 @@ void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 void cProtocol125::SendRespawn(void)
 {
 	cCSLock Lock(m_CSPacket);
+	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte  (PACKET_RESPAWN);
-	WriteInt   ((int)(m_Client->GetPlayer()->GetWorld()->GetDimension()));
+	WriteInt   ((int)(Player->GetWorld()->GetDimension()));
 	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
-	WriteChar  ((char)m_Client->GetPlayer()->GetGameMode());
+	WriteChar  ((char)Player->GetGameMode());
 	WriteShort (256);  // Current world height
 	WriteString("default");
 }
@@ -815,10 +849,11 @@ void cProtocol125::SendRespawn(void)
 void cProtocol125::SendExperience(void)
 {
 	cCSLock Lock(m_CSPacket);
+	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte  (PACKET_EXPERIENCE);
-	WriteFloat (m_Client->GetPlayer()->GetXpPercentage());
-	WriteShort (m_Client->GetPlayer()->GetXpLevel());
-	WriteShort (m_Client->GetPlayer()->GetCurrentXp());
+	WriteFloat (Player->GetXpPercentage());
+	WriteShort (Player->GetXpLevel());
+	WriteShort (Player->GetCurrentXp());
 	Flush();
 }
 
@@ -836,6 +871,18 @@ void cProtocol125::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	WriteInt((int) a_ExpOrb.GetPosZ());
 	WriteShort((short)a_ExpOrb.GetReward());
 	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	// This protocol version doesn't support such message
+	UNUSED(a_Name);
+	UNUSED(a_DisplayName);
+	UNUSED(a_Mode);
 }
 
 
@@ -1128,7 +1175,7 @@ void cProtocol125::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol125::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocol125::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_WINDOW_PROPERTY);
@@ -1236,6 +1283,7 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 		case PACKET_SLOT_SELECTED:             return ParseSlotSelected();
 		case PACKET_UPDATE_SIGN:               return ParseUpdateSign();
 		case PACKET_USE_ENTITY:                return ParseUseEntity();
+		case PACKET_ENCHANT_ITEM:              return ParseEnchantItem();
 		case PACKET_WINDOW_CLICK:              return ParseWindowClick();
 		case PACKET_WINDOW_CLOSE:              return ParseWindowClose();
 	}
@@ -1597,6 +1645,20 @@ int cProtocol125::ParseUseEntity(void)
 
 
 
+int cProtocol125::ParseEnchantItem(void)
+{
+	HANDLE_PACKET_READ(ReadByte, Byte, WindowID);
+	HANDLE_PACKET_READ(ReadByte, Byte, Enchantment);
+
+	m_Client->HandleEnchantItem(WindowID, Enchantment);
+
+	return PARSE_OK;
+}
+
+
+
+
+
 int cProtocol125::ParseWindowClick(void)
 {
 	HANDLE_PACKET_READ(ReadChar,    char,  WindowID);
@@ -1951,7 +2013,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtWither:
 		{
 			WriteByte(0x54); // Int at index 20
-			WriteInt((Int32)((const cWither &)a_Mob).GetNumInvulnerableTicks());
+			WriteInt((Int32)((const cWither &)a_Mob).GetWitherInvulnerableTicks());
 			WriteByte(0x66); // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;

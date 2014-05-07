@@ -805,6 +805,111 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cAnvilWindow:
+
+cAnvilWindow::cAnvilWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	cWindow(wtAnvil, "Repair"),
+	m_RepairedItemName(""),
+	m_BlockX(a_BlockX),
+	m_BlockY(a_BlockY),
+	m_BlockZ(a_BlockZ)
+{
+	m_AnvilSlotArea = new cSlotAreaAnvil(*this);
+	m_SlotAreas.push_back(m_AnvilSlotArea);
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+void cAnvilWindow::SetRepairedItemName(const AString & a_Name, cPlayer * a_Player)
+{
+	m_RepairedItemName = a_Name;
+
+	if (a_Player != NULL)
+	{
+		m_AnvilSlotArea->UpdateResult(*a_Player);
+	}
+}
+
+
+
+
+
+void cAnvilWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
+{
+	a_PosX = m_BlockX;
+	a_PosY = m_BlockY;
+	a_PosZ = m_BlockZ;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cEnchantingWindow:
+
+cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	cWindow(wtEnchantment, "Enchant"),
+	m_BlockX(a_BlockX),
+	m_BlockY(a_BlockY),
+	m_BlockZ(a_BlockZ)
+{
+	m_SlotAreas.push_back(new cSlotAreaEnchanting(*this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
+{
+	m_PropertyValue[a_Property] = a_Value;
+
+	super::SetProperty(a_Property, a_Value);
+}
+
+
+
+
+
+void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
+{
+	m_PropertyValue[a_Property] = a_Value;
+
+	super::SetProperty(a_Property, a_Value, a_Player);
+}
+
+
+
+
+
+int cEnchantingWindow::GetPropertyValue(int a_Property)
+{
+	return m_PropertyValue[a_Property];
+}
+
+
+
+
+
+void cEnchantingWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
+{
+	a_PosX = m_BlockX;
+	a_PosY = m_BlockY;
+	a_PosZ = m_BlockZ;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cChestWindow:
 
 cChestWindow::cChestWindow(cChestEntity * a_Chest) :

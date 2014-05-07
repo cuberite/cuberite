@@ -23,7 +23,7 @@
 	#pragma warning(disable:4702)
 #endif
 
-#include "Crypto.h"
+#include "PolarSSL++/RsaPrivateKey.h"
 
 #ifdef _MSC_VER
 	#pragma warning(pop)
@@ -59,7 +59,7 @@ public:												// tolua_export
 
 	// Player counts:
 	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
-	int  GetNumPlayers(void);
+	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
 	// Hardcore mode or not:
@@ -83,7 +83,7 @@ public:												// tolua_export
 	void Shutdown(void);
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
-	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator to auth the specified user
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 	
@@ -109,7 +109,7 @@ public:												// tolua_export
 	/** Returns base64 encoded favicon data (obtained from favicon.png) */
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
 	
-	cRSAPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
+	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 	
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }
@@ -168,7 +168,7 @@ private:
 	cClientHandleList m_Clients;          ///< Clients that are connected to the server and not yet assigned to a cWorld
 	cClientHandleList m_ClientsToRemove;  ///< Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick()
 	
-	cCriticalSection m_CSPlayerCount;      ///< Locks the m_PlayerCount
+	mutable cCriticalSection m_CSPlayerCount;      ///< Locks the m_PlayerCount
 	int              m_PlayerCount;        ///< Number of players currently playing in the server
 	cCriticalSection m_CSPlayerCountDiff;  ///< Locks the m_PlayerCountDiff
 	int              m_PlayerCountDiff;    ///< Adjustment to m_PlayerCount to be applied in the Tick thread
@@ -182,7 +182,7 @@ private:
 	bool m_bRestarting;
 	
 	/** The private key used for the assymetric encryption start in the protocols */
-	cRSAPrivateKey m_PrivateKey;
+	cRsaPrivateKey m_PrivateKey;
 	
 	/** Public key for m_PrivateKey, ASN1-DER-encoded */
 	AString m_PublicKeyDER;

@@ -18,6 +18,7 @@ Implements the 1.6.x protocol classes:
 #include "../Entities/Entity.h"
 #include "../Entities/Player.h"
 #include "../UI/Window.h"
+#include "../CompositeChat.h"
 
 
 
@@ -89,6 +90,18 @@ void cProtocol161::SendChat(const AString & a_Message)
 
 
 
+void cProtocol161::SendChat(const cCompositeChat & a_Message)
+{
+	// This protocol version doesn't support composite messages to the full
+	// Just extract each part's text and use it:
+	
+	super::SendChat(Printf("{\"text\":\"%s\"}", EscapeString(a_Message.ExtractText()).c_str()));
+}
+
+
+
+
+
 void cProtocol161::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cCSLock Lock(m_CSPacket);
@@ -118,9 +131,10 @@ void cProtocol161::SendHealth(void)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_HEALTH);
-	WriteFloat((float)m_Client->GetPlayer()->GetHealth());
-	WriteShort((short)m_Client->GetPlayer()->GetFoodLevel());
-	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
+	cPlayer * Player = m_Client->GetPlayer();
+	WriteFloat((float)Player->GetHealth());
+	WriteShort((short)Player->GetFoodLevel());
+	WriteFloat((float)Player->GetFoodSaturationLevel());
 	Flush();
 }
 
@@ -131,11 +145,12 @@ void cProtocol161::SendHealth(void)
 void cProtocol161::SendPlayerMaxSpeed(void)
 {
 	cCSLock Lock(m_CSPacket);
+	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte(PACKET_ENTITY_PROPERTIES);
-	WriteInt(m_Client->GetPlayer()->GetUniqueID());
+	WriteInt(Player->GetUniqueID());
 	WriteInt(1);
 	WriteString("generic.movementSpeed");
-	WriteDouble(0.1 * m_Client->GetPlayer()->GetMaxSpeed());
+	WriteDouble(0.1 * Player->GetMaxSpeed());
 	Flush();
 }
 
@@ -194,6 +209,25 @@ int cProtocol161::ParseEntityAction(void)
 		case 5: m_Client->HandleEntitySprinting(EntityID, false); break; // Stop sprinting
 	}
 
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol161::ParseLogin(void)
+{
+	// The login packet is sent by Forge clients only
+	// Only parse the packet, do no extra processing
+	// Note that the types and the names have been only guessed and are not verified at all!
+	HANDLE_PACKET_READ(ReadBEInt, int, Int1);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, String1);
+	HANDLE_PACKET_READ(ReadChar, char, Char1);
+	HANDLE_PACKET_READ(ReadChar, char, Char2);
+	HANDLE_PACKET_READ(ReadChar, char, Char3);
+	HANDLE_PACKET_READ(ReadByte, Byte, Byte1);
+	HANDLE_PACKET_READ(ReadByte, Byte, Byte2);
 	return PARSE_OK;
 }
 
@@ -263,11 +297,12 @@ cProtocol162::cProtocol162(cClientHandle * a_Client) :
 void cProtocol162::SendPlayerMaxSpeed(void)
 {
 	cCSLock Lock(m_CSPacket);
+	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte(PACKET_ENTITY_PROPERTIES);
-	WriteInt(m_Client->GetPlayer()->GetUniqueID());
+	WriteInt(Player->GetUniqueID());
 	WriteInt(1);
 	WriteString("generic.movementSpeed");
-	WriteDouble(0.1 * m_Client->GetPlayer()->GetMaxSpeed());
+	WriteDouble(0.1 * Player->GetMaxSpeed());
 	WriteShort(0);
 	Flush();
 }

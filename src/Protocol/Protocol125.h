@@ -56,19 +56,12 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendLoginSuccess        (void) override;
 	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) override;
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
-	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override 
-	{
-		// This protocol doesn't support such message
-		UNUSED(a_ID);
-		UNUSED(a_Scale);
-	} 
+	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
 	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
-	virtual void SendPaintingSpawn       (const cPainting & a_Painting) override 
-	{
-		UNUSED(a_Painting);
-	};
+	virtual void SendPaintingSpawn       (const cPainting & a_Painting) override;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override {}  // This protocol doesn't support such message
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
@@ -82,12 +75,7 @@ public:
 	virtual void SendRespawn             (void) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb &  a_ExpOrb) override;
-	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)                            override 
-	{
-		UNUSED(a_Name);
-		UNUSED(a_DisplayName);
-		UNUSED(a_Mode);
-	} // This protocol doesn't support such message
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override {} // This protocol doesn't support such message
 	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)                              override {} // This protocol doesn't support such message
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
@@ -108,7 +96,7 @@ public:
 	virtual void SendWholeInventory      (const cWindow & a_Window) override;
 	virtual void SendWindowClose         (const cWindow & a_Window) override;
 	virtual void SendWindowOpen          (const cWindow & a_Window) override;
-	virtual void SendWindowProperty      (const cWindow & a_Window, short a_Property, short a_Value) override;
+	virtual void SendWindowProperty      (const cWindow & a_Window, int a_Property, int a_Value) override;
 	
 	virtual AString GetAuthServerID(void) override;
 	
@@ -155,6 +143,7 @@ protected:
 	virtual int ParseSlotSelected           (void);
 	virtual int ParseUpdateSign             (void);
 	virtual int ParseUseEntity              (void);
+	virtual int ParseEnchantItem            (void);
 	virtual int ParseWindowClick            (void);
 	virtual int ParseWindowClose            (void);
 	

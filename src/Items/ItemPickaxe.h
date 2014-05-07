@@ -86,6 +86,19 @@ public:
 		}
 		return false;
 	}
+
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	{
+		switch (m_ItemType)
+		{
+			case E_ITEM_WOODEN_PICKAXE:  return (a_ItemType == E_BLOCK_PLANKS);
+			case E_ITEM_STONE_PICKAXE:   return (a_ItemType == E_BLOCK_COBBLESTONE);
+			case E_ITEM_IRON_PICKAXE:    return (a_ItemType == E_ITEM_IRON);
+			case E_ITEM_GOLD_PICKAXE:    return (a_ItemType == E_ITEM_GOLD);
+			case E_ITEM_DIAMOND_PICKAXE: return (a_ItemType == E_ITEM_DIAMOND);
+		}
+		return false;
+	}
 } ;
 
 

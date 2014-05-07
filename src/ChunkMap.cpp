@@ -346,9 +346,8 @@ void cChunkMap::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * 
 void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
-	int x, y, z, ChunkX, ChunkZ;
+	int x, z, ChunkX, ChunkZ;
 	x = a_BlockX;
-	y = a_BlockY;
 	z = a_BlockZ;
 	cChunkDef::BlockToChunk(x, z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
@@ -916,19 +915,21 @@ void cChunkMap::SetChunkData(
 		}
 		
 		// Notify relevant ChunkStays:
-		for (cChunkStays::iterator itr = m_ChunkStays.begin(); itr != m_ChunkStays.end(); )
+		cChunkStays ToBeDisabled;
+		for (cChunkStays::iterator itr = m_ChunkStays.begin(), end = m_ChunkStays.end(); itr != end; ++itr)
 		{
 			if ((*itr)->ChunkAvailable(a_ChunkX, a_ChunkZ))
 			{
-				cChunkStays::iterator cur = itr;
-				++itr;
-				m_ChunkStays.erase(cur);
-			}
-			else
-			{
-				++itr;
+				// The chunkstay wants to be disabled, add it to a list of to-be-disabled chunkstays for later processing:
+				ToBeDisabled.push_back(*itr);
 			}
 		}  // for itr - m_ChunkStays[]
+		
+		// Disable (and possibly remove) the chunkstays that chose to get disabled:
+		for (cChunkStays::iterator itr = ToBeDisabled.begin(), end = ToBeDisabled.end(); itr != end; ++itr)
+		{
+			(*itr)->Disable();
+		}
 	}
 
 	// Notify plugins of the chunk becoming available
@@ -1144,9 +1145,8 @@ BLOCKTYPE cChunkMap::GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 	// First check if it isn't queued in the m_FastSetBlockQueue:
 	{
 		int X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
-		int ChunkX, ChunkY, ChunkZ;
+		int ChunkX, ChunkZ;
 		cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
-		ChunkY = 0;
 		cCSLock Lock(m_CSFastSetBlock);
 		for (sSetBlockList::iterator itr = m_FastSetBlockQueue.begin(); itr != m_FastSetBlockQueue.end(); ++itr)
 		{
@@ -1248,8 +1248,6 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		Chunk->SetMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
-		Chunk->MarkDirty();
-		Chunk->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, NULL);
 	}
 }
 
@@ -1654,7 +1652,10 @@ void cChunkMap::AddEntity(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if (
+		(Chunk == NULL) ||  // Chunk not present at all
+		(!Chunk->IsValid() && !a_Entity->IsPlayer())  // Chunk present, but no valid data; players need to spawn in such chunks (#953)
+	)
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
 			a_Entity, a_Entity->GetClass(), a_Entity->GetUniqueID()
@@ -1689,7 +1690,7 @@ void cChunkMap::RemoveEntity(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return;
 	}
@@ -1721,7 +1722,7 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -1971,7 +1972,7 @@ bool cChunkMap::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEnti
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -1986,7 +1987,7 @@ bool cChunkMap::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback &
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2001,7 +2002,7 @@ bool cChunkMap::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCa
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2016,7 +2017,7 @@ bool cChunkMap::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallba
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2031,7 +2032,7 @@ bool cChunkMap::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpens
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2046,7 +2047,7 @@ bool cChunkMap::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallba
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2064,7 +2065,7 @@ bool cChunkMap::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cB
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2082,7 +2083,7 @@ bool cChunkMap::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCa
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2100,7 +2101,7 @@ bool cChunkMap::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDis
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2118,7 +2119,7 @@ bool cChunkMap::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropp
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2136,7 +2137,7 @@ bool cChunkMap::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cD
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2154,7 +2155,7 @@ bool cChunkMap::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurna
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2171,7 +2172,7 @@ bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNot
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2188,7 +2189,7 @@ bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2206,7 +2207,7 @@ bool cChunkMap::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHe
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2224,7 +2225,7 @@ bool cChunkMap::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlo
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2242,7 +2243,7 @@ bool cChunkMap::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString &
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
+	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
 	}
@@ -2974,7 +2975,12 @@ void cChunkMap::AddChunkStay(cChunkStay & a_ChunkStay)
 		Chunk->Stay(true);
 		if (Chunk->IsValid())
 		{
-			a_ChunkStay.ChunkAvailable(itr->m_ChunkX, itr->m_ChunkZ);
+			if (a_ChunkStay.ChunkAvailable(itr->m_ChunkX, itr->m_ChunkZ))
+			{
+				// The chunkstay wants to be deactivated, disable it and bail out:
+				a_ChunkStay.Disable();
+				return;
+			}
 		}
 	}  // for itr - WantedChunks[]
 }
@@ -3017,6 +3023,7 @@ void cChunkMap::DelChunkStay(cChunkStay & a_ChunkStay)
 		}
 		Chunk->Stay(false);
 	}  // for itr - Chunks[]
+	a_ChunkStay.OnDisabled();
 }
 
 

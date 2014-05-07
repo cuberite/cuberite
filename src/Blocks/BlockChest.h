@@ -56,6 +56,7 @@ public:
 			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
 		)
 		{
+			// FIXME: This is unreachable, as the condition is the same as the above one
 			a_BlockMeta = (yaw < 0) ? 4 : 5;
 			return true;
 		}

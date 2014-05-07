@@ -18,6 +18,8 @@
 #include "ByteBuffer.h"
 #include "Scoreboard.h"
 #include "Map.h"
+#include "Enchantments.h"
+#include "UI/SlotArea.h"
 
 
 
@@ -62,8 +64,27 @@ public:
 	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 
+	const AString & GetUUID(void) const { return m_UUID; } // tolua_export
+	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
+	
+	/** Generates an UUID based on the username stored for this client, and stores it in the m_UUID member.
+	This is used for the offline (non-auth) mode, when there's no UUID source.
+	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same.
+	Internally calls the GenerateOfflineUUID static function. */
+	void GenerateOfflineUUID(void);
+	
+	/** Generates an UUID based on the player name provided.
+	This is used for the offline (non-auth) mode, when there's no UUID source.
+	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. */
+	static AString GenerateOfflineUUID(const AString & a_Username);  // tolua_export
+	
+	/** Formats the type of message with the proper color and prefix for sending to the client. **/
+	AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
+	
+	AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
+
 	void Kick(const AString & a_Reason);		// tolua_export
-	void Authenticate(void);  // Called by cAuthenticator when the user passes authentication
+	void Authenticate(const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator when the user passes authentication
 
 	void StreamChunks(void);
 	
@@ -230,6 +251,9 @@ public:
 	/** Called when the player moves into a different world; queues sreaming the new chunks */
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
+	/** Called when the player will enchant a Item */
+	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
+	
 private:
 
 	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
@@ -326,6 +350,7 @@ private:
 	
 	static int s_ClientCount;
 	int m_UniqueID;
+	AString m_UUID;
 	
 	/** Set to true when the chunk where the player is is sent to the client. Used for spawning the player */
 	bool m_HasSentPlayerChunk;
@@ -359,7 +384,10 @@ private:
 	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
 	
 	/** Handles the "MC|AdvCdm" plugin message */
-	void HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length);
+	void HandleCommandBlockMessage(const char * a_Data, size_t a_Length);
+
+	/** Handles the "MC|ItemName" plugin message */
+	void HandleAnvilItemName(const char * a_Data, size_t a_Length);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client

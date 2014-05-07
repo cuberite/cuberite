@@ -608,6 +608,8 @@ void cCubicNoise::Generate2D(
 	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
 ) const
 {
+	ASSERT(a_SizeX > 0);
+	ASSERT(a_SizeY > 0);
 	ASSERT(a_SizeX < MAX_SIZE);
 	ASSERT(a_SizeY < MAX_SIZE);
 	ASSERT(a_StartX < a_EndX);
@@ -744,6 +746,8 @@ void cCubicNoise::CalcFloorFrac(
 	int * a_Same, int & a_NumSame
 ) const
 {
+	ASSERT(a_Size > 0);
+
 	NOISE_DATATYPE val = a_Start;
 	NOISE_DATATYPE dif = (a_End - a_Start) / (a_Size - 1);
 	for (int i = 0; i < a_Size; i++)
@@ -840,12 +844,14 @@ void cPerlinNoise::Generate2D(
 	}
 	
 	// Generate the first octave directly into array:
-	m_Octaves.front().m_Noise.Generate2D(
+	const cOctave & FirstOctave = m_Octaves.front();
+	
+	FirstOctave.m_Noise.Generate2D(
 		a_Workspace, a_SizeX, a_SizeY,
-		a_StartX * m_Octaves.front().m_Frequency, a_EndX * m_Octaves.front().m_Frequency,
-		a_StartY * m_Octaves.front().m_Frequency, a_EndY * m_Octaves.front().m_Frequency
+		a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
+		a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency
 	);
-	NOISE_DATATYPE Amplitude = m_Octaves.front().m_Amplitude;
+	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
 	for (int i = 0; i < ArrayCount; i++)
 	{
 		a_Array[i] *= Amplitude;
@@ -902,13 +908,15 @@ void cPerlinNoise::Generate3D(
 	}
 	
 	// Generate the first octave directly into array:
-	m_Octaves.front().m_Noise.Generate3D(
+	const cOctave & FirstOctave = m_Octaves.front();
+
+	FirstOctave.m_Noise.Generate3D(
 		a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
-		a_StartX * m_Octaves.front().m_Frequency, a_EndX * m_Octaves.front().m_Frequency,
-		a_StartY * m_Octaves.front().m_Frequency, a_EndY * m_Octaves.front().m_Frequency,
-		a_StartZ * m_Octaves.front().m_Frequency, a_EndZ * m_Octaves.front().m_Frequency
+		a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
+		a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency,
+		a_StartZ * FirstOctave.m_Frequency, a_EndZ * FirstOctave.m_Frequency
 	);
-	NOISE_DATATYPE Amplitude = m_Octaves.front().m_Amplitude;
+	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
 	for (int i = 0; i < ArrayCount; i++)
 	{
 		a_Array[i] = a_Workspace[i] * Amplitude;

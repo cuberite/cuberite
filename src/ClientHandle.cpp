@@ -24,12 +24,14 @@
 
 #include "Root.h"
 
-#include "Authenticator.h"
+#include "Protocol/Authenticator.h"
 #include "MersenneTwister.h"
 
 #include "Protocol/ProtocolRecognizer.h"
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
+
+#include "md5/md5.h"
 
 
 
@@ -175,6 +177,84 @@ void cClientHandle::Destroy(void)
 
 
 
+void cClientHandle::GenerateOfflineUUID(void)
+{
+	m_UUID = GenerateOfflineUUID(m_Username);
+}
+
+
+
+
+
+AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2)
+{
+	if (ShouldAppendChatPrefixes)
+		return Printf("%s[%s] %s", m_Color1.c_str(), a_ChatPrefixS.c_str(), m_Color2.c_str());
+	else
+		return Printf("%s", m_Color1.c_str());
+}
+
+
+
+
+
+AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString &a_AdditionalData)
+{
+	switch (a_ChatPrefix)
+	{
+		case mtCustom:      return "";
+		case mtFailure:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Rose,   cChatColor::White);
+		case mtInformation: return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Yellow, cChatColor::White);
+		case mtSuccess:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Green,  cChatColor::White);
+		case mtWarning:     return FormatChatPrefix(ShouldAppendChatPrefixes, "WARN",  cChatColor::Rose,   cChatColor::White);
+		case mtFatal:       return FormatChatPrefix(ShouldAppendChatPrefixes, "FATAL", cChatColor::Red,    cChatColor::White);
+		case mtDeath:       return FormatChatPrefix(ShouldAppendChatPrefixes, "DEATH", cChatColor::Gray,   cChatColor::White);
+		case mtJoin:        return FormatChatPrefix(ShouldAppendChatPrefixes, "JOIN",  cChatColor::Yellow, cChatColor::White);
+		case mtLeave:       return FormatChatPrefix(ShouldAppendChatPrefixes, "LEAVE", cChatColor::Yellow, cChatColor::White);
+		case mtPrivateMessage:
+		{
+			if (ShouldAppendChatPrefixes)
+			{
+				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+			}
+			else
+			{
+				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
+			}
+		}
+	}
+	ASSERT(!"Unhandled chat prefix type!");
+	return "";
+}
+
+
+
+
+
+AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
+{
+	// Proper format for a version 3 UUID is:
+	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
+	
+	// Generate an md5 checksum, and use it as base for the ID:
+	MD5 Checksum(a_Username);
+	AString UUID = Checksum.hexdigest();
+	UUID[12] = '3';  // Version 3 UUID
+	UUID[16] = '8';  // Variant 1 UUID
+	
+	// Now the digest doesn't have the UUID slashes, but the client requires them, so add them into the appropriate positions:
+	UUID.insert(8, "-");
+	UUID.insert(13, "-");
+	UUID.insert(18, "-");
+	UUID.insert(23, "-");
+	
+	return UUID;
+}
+
+
+
+
+
 void cClientHandle::Kick(const AString & a_Reason)
 {
 	if (m_State >= csAuthenticating)  // Don't log pings
@@ -188,7 +268,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(void)
+void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 {
 	if (m_State != csAuthenticating)
 	{
@@ -196,6 +276,12 @@ void cClientHandle::Authenticate(void)
 	}
 	
 	ASSERT( m_Player == NULL );
+
+	m_Username = a_Name;
+	m_UUID = a_UUID;
+	
+	// Send login success (if the protocol supports it):
+	m_Protocol->SendLoginSuccess();
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());
@@ -250,6 +336,11 @@ void cClientHandle::Authenticate(void)
 
 	// Send scoreboard data
 	World->GetScoreBoard().SendTo(*this);
+	
+	// Delay the first ping until the client "settles down"
+	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
+	cTimer t1;
+	m_LastPingTime = t1.GetNowTime() + 3000;  // Send the first KeepAlive packet in 3 seconds
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -412,14 +503,16 @@ void cClientHandle::HandlePing(void)
 {
 	// Somebody tries to retrieve information about the server
 	AString Reply;
+	const cServer & Server = *cRoot::Get()->GetServer();
+
 	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetServer()->GetDescription().c_str(),
+		Server.GetDescription().c_str(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetNumPlayers(),
+		Server.GetNumPlayers(),
 		cChatColor::Delimiter.c_str(),
-		cRoot::Get()->GetServer()->GetMaxPlayers()
+		Server.GetMaxPlayers()
 	);
-	Kick(Reply.c_str());
+	Kick(Reply);
 }
 
 
@@ -540,6 +633,10 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
 	}
+	else if (a_Channel == "MC|ItemName")
+	{
+		HandleAnvilItemName(a_Message.c_str(), a_Message.size());
+	}
 	else if (a_Channel == "REGISTER")
 	{
 		if (HasPluginChannel(a_Channel))
@@ -623,7 +720,7 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char * a_Data, unsigned int a_Length)
+void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Length)
 {
 	if (a_Length < 14)
 	{
@@ -674,6 +771,29 @@ void cClientHandle::HandleCommandBlockMessage(const char * a_Data, unsigned int 
 	else
 	{
 		SendChat("Command blocks are not enabled on this server", mtFailure);
+	}
+}
+
+
+
+
+
+void cClientHandle::HandleAnvilItemName(const char * a_Data, size_t a_Length)
+{
+	if (a_Length < 1)
+	{
+		return;
+	}
+
+	if ((m_Player->GetWindow() == NULL) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
+	{
+		return;
+	}
+
+	AString Name(a_Data, a_Length);
+	if (Name.length() <= 30)
+	{
+		((cAnvilWindow *)m_Player->GetWindow())->SetRepairedItemName(Name, m_Player);
 	}
 }
 
@@ -994,7 +1114,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
-	else if (ItemHandler->IsFood())
+	else if (ItemHandler->IsFood() && !m_Player->IsGameModeCreative())
 	{
 		if (m_Player->IsSatiated())
 		{
@@ -1175,8 +1295,8 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		Color = AString("@") + Color[2];
 	}
 	else
-	{
-		Color.empty();
+	{ 
+		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
 	Msg.ParseText(a_Message);
@@ -1417,7 +1537,7 @@ void cClientHandle::HandleDisconnect(const AString & a_Reason)
 {
 	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
 
-	cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason);
+	cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, a_Reason);
 
 	m_HasSentDC = true;
 	Destroy();
@@ -1565,7 +1685,7 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 		{
 			// There is a queued overflow. Append to it, then send as much from its front as possible
 			m_OutgoingDataOverflow.append(a_Data, a_Size);
-			int CanFit = m_OutgoingData.GetFreeSpace();
+			size_t CanFit = m_OutgoingData.GetFreeSpace();
 			if (CanFit > 128)
 			{
 				// No point in moving the data over if it's not large enough - too much effort for too little an effect
@@ -1677,13 +1797,16 @@ void cClientHandle::Tick(float a_Dt)
 	}
 
 	// Send a ping packet:
-	cTimer t1;
-	if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+	if (m_State == csPlaying)
 	{
-		m_PingID++;
-		m_PingStartTime = t1.GetNowTime();
-		m_Protocol->SendKeepAlive(m_PingID);
-		m_LastPingTime = m_PingStartTime;
+		cTimer t1;
+		if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+		{
+			m_PingID++;
+			m_PingStartTime = t1.GetNowTime();
+			m_Protocol->SendKeepAlive(m_PingID);
+			m_LastPingTime = m_PingStartTime;
+		}
 	}
 
 	// Handle block break animation:
@@ -1803,7 +1926,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	bool ShouldAppendChatPrefixes = true;
-
+	
 	if (GetPlayer()->GetWorld() == NULL)
 	{
 		cWorld * World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
@@ -1822,89 +1945,9 @@ void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefi
 		ShouldAppendChatPrefixes = false;
 	}
 
-	AString Message;
+	AString Message = FormatMessageType(ShouldAppendChatPrefixes, a_ChatPrefix, a_AdditionalData);
 
-	switch (a_ChatPrefix)
-	{
-		case mtCustom: break;
-		case mtFailure:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[INFO] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Rose.c_str());
-			break;
-		}
-		case mtInformation:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[INFO] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Yellow.c_str());
-			break;
-		}
-		case mtSuccess:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[INFO] %s", cChatColor::Green.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Green.c_str());
-			break;
-		}
-		case mtWarning:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[WARN] %s", cChatColor::Rose.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Rose.c_str());
-			break;
-		}
-		case mtFatal:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[FATAL] %s", cChatColor::Red.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Red.c_str());
-			break;
-		}
-		case mtDeath:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[DEATH] %s", cChatColor::Gray.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Gray.c_str());
-			break;
-		}
-		case mtPrivateMessage:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
-			else
-				Message = Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
-			break;
-		}
-		case mtJoin:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[JOIN] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Yellow.c_str());
-			break;
-		}
-		case mtLeave:
-		{
-			if (ShouldAppendChatPrefixes)
-				Message = Printf("%s[LEAVE] %s", cChatColor::Yellow.c_str(), cChatColor::White.c_str());
-			else
-				Message = Printf("%s", cChatColor::Yellow.c_str());
-			break;
-		}
-		default: ASSERT(!"Unhandled chat prefix type!"); return;
-	}
-
-	Message.append(a_Message);
-
-	m_Protocol->SendChat(Message);
+	m_Protocol->SendChat(Message.append(a_Message));
 }
 
 
@@ -2101,7 +2144,7 @@ void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_Blo
 	}
 	
 	// Update the statistics:
-	m_NumExplosionsThisTick += 1;
+	m_NumExplosionsThisTick++;
 	
 	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
@@ -2673,15 +2716,38 @@ void cClientHandle::SocketClosed(void)
 	
 	LOGD("Player %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 
-	if (m_Username != "") // Ignore client pings
+	if (!m_Username.empty())  // Ignore client pings
 	{
-		cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected");
+		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
 
 	Destroy();
 }
 
 
+
+
+
+void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
+{
+	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
+	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
+	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
+
+	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
+	{
+		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
+		{
+			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
+			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
+			Window->BroadcastWholeWindow();
+
+			Window->SetProperty(0, 0, *m_Player);
+			Window->SetProperty(1, 0, *m_Player);
+			Window->SetProperty(2, 0, *m_Player);
+		}
+	}
+}
 
 
 

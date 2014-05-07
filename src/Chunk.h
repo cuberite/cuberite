@@ -267,7 +267,7 @@ public:
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
 	void CalculateLighting(); // Recalculate right now
-	void CalculateHeightmap();
+	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 
 	// Broadcast various packets to all clients of this chunk:
 	// (Please keep these alpha-sorted)
@@ -320,15 +320,15 @@ public:
 		m_BlockTickZ = a_RelZ;
 	}
 	
-	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const              {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetMeta(int a_BlockIdx) const                                  {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
-	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
-	inline void       SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta)                     {       cChunkDef::SetNibble(m_BlockMeta, a_BlockIdx, a_Meta); }
+	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const              { return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetMeta(int a_BlockIdx) const                                  { return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
+	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) { SetMeta(MakeIndex(a_RelX, a_RelY, a_RelZ), a_Meta); }
+	void SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta);
 
 	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ, true); }
 	inline NIBBLETYPE GetBlockLight(int a_Idx) const {return cChunkDef::GetNibble(m_BlockLight, a_Idx); }
-	inline NIBBLETYPE GetSkyLight  (int a_Idx) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_Idx); }
+	inline NIBBLETYPE GetSkyLight  (int a_Idx) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_Idx, true); }
 	
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
@@ -382,14 +382,14 @@ private:
 	
 	struct sSetBlockQueueItem
 	{
+		Int64 m_Tick;
 		int m_RelX, m_RelY, m_RelZ;
 		BLOCKTYPE m_BlockType;
 		NIBBLETYPE m_BlockMeta;
-		Int64 m_Tick;
 		BLOCKTYPE m_PreviousType;
 		
 		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType) :
-			m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta), m_Tick(a_Tick), m_PreviousType(a_PreviousBlockType)
+			m_Tick(a_Tick), m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta), m_PreviousType(a_PreviousBlockType)
 		{
 		}
 	} ;
@@ -420,11 +420,10 @@ private:
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
-	// TODO: Make these pointers and don't allocate what isn't needed
-	BLOCKTYPE  m_BlockTypes   [cChunkDef::NumBlocks];
-	NIBBLETYPE m_BlockMeta    [cChunkDef::NumBlocks / 2];
-	NIBBLETYPE m_BlockLight   [cChunkDef::NumBlocks / 2];
-	NIBBLETYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
+	COMPRESSED_BLOCKTYPE m_BlockTypes;
+	COMPRESSED_NIBBLETYPE m_BlockMeta;
+	COMPRESSED_NIBBLETYPE m_BlockLight;
+	COMPRESSED_NIBBLETYPE m_BlockSkyLight;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;

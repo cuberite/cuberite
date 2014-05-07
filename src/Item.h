@@ -64,7 +64,7 @@ public:
 	{
 		if (!IsValidItem(m_ItemType))
 		{
-			if (m_ItemType != E_BLOCK_AIR)
+			if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
 			{
 				LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
 			}
@@ -72,6 +72,10 @@ public:
 		}
 	}
 	
+	
+	// The constructor is disabled in code, because the compiler generates it anyway,
+	// but it needs to stay because ToLua needs to generate the binding for it
+	#if 0
 	
 	/** Creates an exact copy of the item */
 	cItem(const cItem & a_CopyFrom) :
@@ -84,6 +88,8 @@ public:
 		m_FireworkItem(a_CopyFrom.m_FireworkItem)
 	{
 	}
+	
+	#endif
 	
 	
 	void Empty(void)
@@ -174,6 +180,13 @@ public:
 	
 	/** Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements) */
 	static bool IsEnchantable(short a_ItemType); // tolua_export
+
+	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
+	int GetEnchantability(); // tolua_export
+
+	/** Enchants the item using the specified number of XP levels.
+	Returns true if item enchanted, false if not. */
+	bool EnchantByXPLevels(int a_NumXPLevels); // tolua_export
 
 	// tolua_begin
 	

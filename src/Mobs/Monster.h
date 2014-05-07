@@ -66,7 +66,8 @@ public:
 		mfAmbient  = 2, // Bats
 		mfWater    = 3, // Squid
 
-		mfMaxplusone, // Nothing. Be sure this is the last and the others are in order
+		mfNoSpawn,
+		mfUnhandled, // Nothing. Be sure this is the last and the others are in order
 	} ;
 	
 	// tolua_end
@@ -87,7 +88,7 @@ public:
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	
 	virtual void KilledBy(cEntity * a_Killer) override;
 
@@ -185,14 +186,14 @@ protected:
 	inline bool IsNextYPosReachable(int a_PosY)
 	{
 		return (
-			(a_PosY <= (int)floor(GetPosY())) ||
+			(a_PosY <= POSY_TOINT) ||
 			DoesPosYRequireJump(a_PosY)
 			);
 	}
 	/** Returns if a monster can reach a given height by jumping */
 	inline bool DoesPosYRequireJump(int a_PosY)
 	{
-		return ((a_PosY > (int)floor(GetPosY())) && (a_PosY == (int)floor(GetPosY()) + 1));
+		return ((a_PosY > POSY_TOINT) && (a_PosY == POSY_TOINT + 1));
 	}
 
 	/** A semi-temporary list to store the traversed coordinates during active pathfinding so we don't visit them again */

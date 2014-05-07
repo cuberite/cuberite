@@ -661,14 +661,16 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		ASSERT(itrS->x + a_OffsetX < a_GridWidth);
 		ASSERT(itrS->y + a_OffsetY < a_GridHeight);
 		int GridID = (itrS->x + a_OffsetX) + a_GridStride * (itrS->y + a_OffsetY);
+		
+		const cItem & Item = itrS->m_Item;
 		if (
 			(itrS->x >= a_GridWidth) || 
 			(itrS->y >= a_GridHeight) ||
-			(itrS->m_Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
-			(itrS->m_Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
+			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
+			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
 			(
-				(itrS->m_Item.m_ItemDamage > 0) &&  // should compare damage values?
-				(itrS->m_Item.m_ItemDamage != a_CraftingGrid[GridID].m_ItemDamage)
+				(Item.m_ItemDamage > 0) &&  // should compare damage values?
+				(Item.m_ItemDamage != a_CraftingGrid[GridID].m_ItemDamage)
 			)
 		)
 		{
@@ -800,7 +802,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 					break;
 				}
 				case E_ITEM_PAPER: break;
-				default: LOG("Unexpected item in firework rocket a_Recipe, was the crafting file fireworks section changed?"); break;
+				default: LOG("Unexpected item in firework rocket recipe, was the crafting file's fireworks section changed?"); break;
 			}
 		}
 	}
@@ -824,7 +826,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_DYE:
 				{
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(a_CraftingGrid[GridID].m_ItemDamage));
+					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye((NIBBLETYPE)(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
 					break;
 				}
 				case E_ITEM_GUNPOWDER: break;
@@ -835,7 +837,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_GOLD_NUGGET: a_Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
 				case E_ITEM_FEATHER: a_Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
 				case E_ITEM_HEAD: a_Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
-				default: LOG("Unexpected item in firework star a_Recipe, was the crafting file fireworks section changed?"); break; // ermahgerd BARD ardmins
+				default: LOG("Unexpected item in firework star recipe, was the crafting file's fireworks section changed?"); break; // ermahgerd BARD ardmins
 			}
 		}
 

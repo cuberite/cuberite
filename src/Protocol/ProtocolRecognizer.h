@@ -18,8 +18,8 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2, 1.6.1, 1.6.2, 1.6.3, 1.6.4, 1.7.2, 1.7.4"
-#define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49, 51, 60, 61, 73, 74, 77, 78, 4"
+#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2, 1.6.1, 1.6.2, 1.6.3, 1.6.4, 1.7.2, 1.7.4, 1.7.5, 1.7.6, 1.7.7, 1.7.8, 1.7.9"
+#define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49, 51, 60, 61, 73, 74, 77, 78, 4, 5"
 
 
 
@@ -50,6 +50,7 @@ public:
 
 		// These will be kept "under" the next / latest, because the next and latest are only needed for previous protocols
 		PROTO_VERSION_1_7_2 = 4,
+		PROTO_VERSION_1_7_6 = 5,
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
@@ -90,6 +91,7 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive           (int a_PingID) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendLoginSuccess        (void) override;
 	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) override;
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
 	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
@@ -129,7 +131,7 @@ public:
 	virtual void SendWholeInventory      (const cWindow & a_Window) override;
 	virtual void SendWindowClose         (const cWindow & a_Window) override;
 	virtual void SendWindowOpen          (const cWindow & a_Window) override;
-	virtual void SendWindowProperty      (const cWindow & a_Window, short a_Property, short a_Value) override;
+	virtual void SendWindowProperty      (const cWindow & a_Window, int a_Property, int a_Value) override;
 	
 	virtual AString GetAuthServerID(void) override;
 

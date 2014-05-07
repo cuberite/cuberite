@@ -83,6 +83,7 @@ public:
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive           (int a_PingID) = 0;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) = 0;
+	virtual void SendLoginSuccess        (void) = 0;
 	virtual void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length) = 0;
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) = 0;
 	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) = 0;
@@ -122,7 +123,7 @@ public:
 	virtual void SendWholeInventory      (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose         (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen          (const cWindow & a_Window) = 0;
-	virtual void SendWindowProperty      (const cWindow & a_Window, short a_Property, short a_Value) = 0;
+	virtual void SendWindowProperty      (const cWindow & a_Window, int a_Property, int a_Value) = 0;
 
 	/// Returns the ServerID used for authentication through session.minecraft.net
 	virtual AString GetAuthServerID(void) = 0;
@@ -177,7 +178,7 @@ protected:
 	void WriteInt64 (Int64 a_Value)
 	{
 		UInt64 Value = HostToNetwork8(&a_Value);
-		SendData((const char *)Value, 8);
+		SendData((const char *)&Value, 8);
 	}
 	
 	void WriteFloat (float a_Value)

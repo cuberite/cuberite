@@ -111,9 +111,9 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 void cMonster::TickPathFinding()
 {
-	const int PosX = (int)floor(GetPosX());
-	const int PosY = (int)floor(GetPosY());
-	const int PosZ = (int)floor(GetPosZ());
+	const int PosX = POSX_TOINT;
+	const int PosY = POSY_TOINT;
+	const int PosZ = POSZ_TOINT;
 
 	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
 
@@ -148,13 +148,27 @@ void cMonster::TickPathFinding()
 		BLOCKTYPE BlockAtY = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 1, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
-		BLOCKTYPE BlockAtYM = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY - 1, gCrossCoords[i].z + PosZ);
+		int LowestY = FindFirstNonAirBlockPosition(gCrossCoords[i].x + PosX, gCrossCoords[i].z + PosZ);
+		BLOCKTYPE BlockAtLowestY = m_World->GetBlock(gCrossCoords[i].x + PosX, LowestY, gCrossCoords[i].z + PosZ);
 
-		if ((!cBlockInfo::IsSolid(BlockAtY)) && (!cBlockInfo::IsSolid(BlockAtYP)) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
+		if (
+			(!cBlockInfo::IsSolid(BlockAtY)) &&
+			(!cBlockInfo::IsSolid(BlockAtYP)) &&
+			(!IsBlockLava(BlockAtLowestY)) &&
+			(BlockAtLowestY != E_BLOCK_CACTUS) &&
+			(PosY - LowestY < FALL_DAMAGE_HEIGHT)
+			)
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY, gCrossCoords[i].z + PosZ));
 		}
-		else if ((cBlockInfo::IsSolid(BlockAtY)) && (!cBlockInfo::IsSolid(BlockAtYP)) && (!cBlockInfo::IsSolid(BlockAtYPP)) && (!IsBlockLava(BlockAtYM)) && (BlockAtY != E_BLOCK_FENCE) && (BlockAtY != E_BLOCK_FENCE_GATE))
+		else if (
+			(cBlockInfo::IsSolid(BlockAtY)) &&
+			(BlockAtY != E_BLOCK_CACTUS) &&
+			(!cBlockInfo::IsSolid(BlockAtYP)) &&
+			(!cBlockInfo::IsSolid(BlockAtYPP)) &&
+			(BlockAtY != E_BLOCK_FENCE) &&
+			(BlockAtY != E_BLOCK_FENCE_GATE)
+			)
 		{
 			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY + 1, gCrossCoords[i].z + PosZ));
 		}
@@ -402,7 +416,7 @@ void cMonster::HandleFalling()
 			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
 		}
 
-		m_LastGroundHeight = (int)floor(GetPosY());
+		m_LastGroundHeight = POSY_TOINT;
 	}
 }
 
@@ -411,7 +425,7 @@ void cMonster::HandleFalling()
 
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
-	int PosY = (int)floor(GetPosY());
+	int PosY = POSY_TOINT;
 
 	if (PosY < 0)
 		PosY = 0;
@@ -443,9 +457,12 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 
 
 
-void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
 
 	if((m_SoundHurt != "") && (m_Health > 0))
 		m_World->BroadcastSoundEffect(m_SoundHurt, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
@@ -454,6 +471,7 @@ void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		m_Target = a_TDI.Attacker;
 	}
+	return true;
 }
 
 
@@ -526,7 +544,10 @@ void cMonster::KilledBy(cEntity * a_Killer)
 			break;
 		}
 	}
-	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
+	if ((a_Killer != NULL) && (!IsBaby()))
+	{
+		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
+	}
 	m_DestroyTimer = 0;
 }
 
@@ -744,8 +765,10 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtChicken:      return mfPassive;
 		case mtCow:          return mfPassive;
 		case mtCreeper:      return mfHostile;
+		case mtEnderDragon:  return mfNoSpawn;
 		case mtEnderman:     return mfHostile;
 		case mtGhast:        return mfHostile;
+		case mtGiant:        return mfNoSpawn;
 		case mtHorse:        return mfPassive;
 		case mtIronGolem:    return mfPassive;
 		case mtMagmaCube:    return mfHostile;
@@ -756,17 +779,20 @@ cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
 		case mtSilverfish:   return mfHostile;
 		case mtSkeleton:     return mfHostile;
 		case mtSlime:        return mfHostile;
+		case mtSnowGolem:    return mfNoSpawn;
 		case mtSpider:       return mfHostile;
 		case mtSquid:        return mfWater;
 		case mtVillager:     return mfPassive;
 		case mtWitch:        return mfHostile;
-		case mtWither:       return mfHostile;
+		case mtWither:       return mfNoSpawn;
 		case mtWolf:         return mfHostile;
 		case mtZombie:       return mfHostile;
 		case mtZombiePigman: return mfHostile;
-	} ;
+			
+		case mtInvalidType:  break;
+	}
 	ASSERT(!"Unhandled mob type");
-	return mfMaxplusone;
+	return mfUnhandled;
 }
 
 
@@ -777,10 +803,12 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{
-		case mfHostile: return 40;
-		case mfPassive: return 40;
-		case mfAmbient: return 40;
-		case mfWater:   return 400;
+		case mfHostile:   return 40;
+		case mfPassive:   return 40;
+		case mfAmbient:   return 40;
+		case mfWater:     return 400;
+		case mfNoSpawn:   return -1;
+		case mfUnhandled: break;
 	}
 	ASSERT(!"Unhandled mob family");
 	return -1;
@@ -799,6 +827,10 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 	switch (a_MobType)
 	{
 		case mtMagmaCube:
+		{
+			toReturn = new cMagmaCube(Random.NextInt(2) + 1);
+			break;
+		}
 		case mtSlime:
 		{
 			toReturn = new cSlime(Random.NextInt(2) + 1);
@@ -842,13 +874,14 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 
 		case mtBat:           toReturn = new cBat();                      break;
 		case mtBlaze:         toReturn = new cBlaze();                    break;
-		case mtCaveSpider:    toReturn = new cCavespider();               break;
+		case mtCaveSpider:    toReturn = new cCaveSpider();               break;
 		case mtChicken:       toReturn = new cChicken();                  break;
 		case mtCow:           toReturn = new cCow();                      break;
 		case mtCreeper:       toReturn = new cCreeper();                  break;
 		case mtEnderDragon:   toReturn = new cEnderDragon();              break;
 		case mtEnderman:      toReturn = new cEnderman();                 break;
 		case mtGhast:         toReturn = new cGhast();                    break;
+		case mtGiant:         toReturn = new cGiant();                    break;
 		case mtIronGolem:     toReturn = new cIronGolem();                break;
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
 		case mtOcelot:        toReturn = new cOcelot();                   break;
@@ -966,15 +999,15 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		return;
 	}
 	
-	int RelY = (int)floor(GetPosY());
+	int RelY = POSY_TOINT;
 	if ((RelY < 0) || (RelY >= cChunkDef::Height))
 	{
 		// Outside the world
 		return;
 	}
 	
-	int RelX = (int)floor(GetPosX()) - GetChunkX() * cChunkDef::Width;
-	int RelZ = (int)floor(GetPosZ()) - GetChunkZ() * cChunkDef::Width;
+	int RelX = POSX_TOINT - GetChunkX() * cChunkDef::Width;
+	int RelZ = POSZ_TOINT - GetChunkZ() * cChunkDef::Width;
 
 	if (!a_Chunk.IsLightValid())
 	{
@@ -986,7 +1019,8 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		(a_Chunk.GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
 		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
-		!IsOnFire()                                                  // Not already burning
+		!IsOnFire() &&                                               // Not already burning
+		(GetWorld()->GetWeather() != eWeather_Rain)                  // Not raining
 	)
 	{
 		// Burn for 100 ticks, then decide again

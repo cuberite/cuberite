@@ -19,9 +19,12 @@ cPassiveAggressiveMonster::cPassiveAggressiveMonster(const AString & a_ConfigNam
 
 
 
-void cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
 	
 	if ((m_Target != NULL) && (m_Target->IsPlayer()))
 	{
@@ -30,6 +33,7 @@ void cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 			m_EMState = CHASING;
 		}
 	}
+	return true;
 }
 
 

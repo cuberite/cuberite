@@ -18,7 +18,7 @@ public:
 
 	CLASS_PROTODEF(cWolf);
 
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();
@@ -37,7 +37,7 @@ public:
 	void SetIsTame     (bool a_IsTame)      { m_IsTame = a_IsTame; }
 	void SetIsBegging  (bool a_IsBegging)   { m_IsBegging = a_IsBegging; }
 	void SetIsAngry    (bool a_IsAngry)     { m_IsAngry = a_IsAngry; }
-	void SetOwner      (AString a_NewOwner) { m_OwnerName = a_NewOwner; }
+	void SetOwner      (const AString & a_NewOwner) { m_OwnerName = a_NewOwner; }
 	void SetCollarColor(int a_CollarColor)  { m_CollarColor = a_CollarColor; }
 
 protected:

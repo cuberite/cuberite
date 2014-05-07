@@ -37,7 +37,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt)
 			}
 		}
 
-		if (((float)m_FinalDestination.x != (float)m_Target->GetPosX()) || ((float)m_FinalDestination.z != (float)m_Target->GetPosZ()))
+		if (!IsMovingToTargetPosition())
 		{
 			MoveToPosition(m_Target->GetPosition());
 		}
@@ -106,3 +106,17 @@ void cAggressiveMonster::Attack(float a_Dt)
 
 
 
+bool cAggressiveMonster::IsMovingToTargetPosition()
+{
+	// Difference between destination x and target x is negligible (to 10^-12 precision)
+	if (fabsf((float)m_FinalDestination.x - (float)m_Target->GetPosX()) < std::numeric_limits<float>::epsilon())
+	{
+		return false;
+	}
+	// Difference between destination z and target z is negligible (to 10^-12 precision)
+	else if (fabsf((float)m_FinalDestination.z - (float)m_Target->GetPosZ()) > std::numeric_limits<float>::epsilon())
+	{
+		return false;
+	}
+	return true;
+}

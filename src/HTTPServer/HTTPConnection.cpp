@@ -70,7 +70,7 @@ void cHTTPConnection::Send(const cHTTPResponse & a_Response)
 void cHTTPConnection::Send(const void * a_Data, size_t a_Size)
 {
 	ASSERT(m_State == wcsSendingResp);
-	AppendPrintf(m_OutgoingData, SIZE_T_FMT "\r\n", a_Size);
+	AppendPrintf(m_OutgoingData, SIZE_T_FMT_HEX "\r\n", a_Size);
 	m_OutgoingData.append((const char *)a_Data, a_Size);
 	m_OutgoingData.append("\r\n");
 	m_HTTPServer.NotifyConnectionWrite(*this);

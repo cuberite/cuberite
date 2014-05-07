@@ -91,7 +91,8 @@ int cFastRandom::m_SeedCounter = 0;
 
 
 cFastRandom::cFastRandom(void) :
-	m_Seed(m_SeedCounter++)
+	m_Seed(m_SeedCounter++),
+	m_Counter(0)
 {
 }
 
@@ -167,6 +168,16 @@ float cFastRandom::NextFloat(float a_Range, int a_Salt)
 	
 	// Convert the integer into float with the specified range:
 	return (((float)n / (float)0x7fffffff) * a_Range);
+}
+
+
+
+
+
+int cFastRandom::GenerateRandomInteger(int a_Begin, int a_End)
+{
+	cFastRandom Random;
+	return Random.NextInt(a_End - a_Begin + 1) + a_Begin;
 }
 
 

@@ -458,9 +458,8 @@ end
 -- Internal constructor
 function _Function (t)
  setmetatable(t,classFunction)
-
  if t.const ~= 'const' and t.const ~= '' then
-  error("#invalid 'const' specification")
+  error("#invalid 'const' specification: " .. t.const)
  end
 
  append(t)
@@ -489,7 +488,6 @@ end
 function Function (d,a,c)
  --local t = split(strsub(a,2,-2),',') -- eliminate braces
  --local t = split_params(strsub(a,2,-2))
-
 	if not flags['W'] and string.find(a, "%.%.%.%s*%)") then
 
 		warning("Functions with variable arguments (`...') are not supported. Ignoring "..d..a..c)

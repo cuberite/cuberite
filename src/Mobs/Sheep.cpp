@@ -36,7 +36,8 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
-	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_SHEARS) && (!m_IsSheared))
+	const cItem & EquippedItem = a_Player.GetEquippedItem();
+	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && (!m_IsSheared))
 	{
 		m_IsSheared = true;
 		m_World->BroadcastEntityMetadata(*this);
@@ -51,9 +52,9 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
-	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_DYE) && (m_WoolColor != 15 - a_Player.GetEquippedItem().m_ItemDamage))
+	else if ((EquippedItem.m_ItemType == E_ITEM_DYE) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
 	{
-		m_WoolColor = 15 - a_Player.GetEquippedItem().m_ItemDamage;
+		m_WoolColor = 15 - EquippedItem.m_ItemDamage;
 		if (!a_Player.IsGameModeCreative())
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
@@ -101,7 +102,7 @@ void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)
 			{
-				m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_SHEEP_EATING);
+				m_World->BroadcastEntityStatus(*this, esSheepEating);
 				m_TimeToStopEating = 40;
 			}
 		}

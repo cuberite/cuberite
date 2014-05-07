@@ -254,6 +254,10 @@ void cSandSimulator::FinishFalling(
 	{
 		// Rematerialize the material here:
 		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FallingBlockType, a_FallingBlockMeta);
+		if (a_FallingBlockType == E_BLOCK_ANVIL)
+		{
+			a_World->BroadcastSoundParticleEffect(1022, a_BlockX, a_BlockY, a_BlockZ, 0);
+		}
 		return;
 	}
 	

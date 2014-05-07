@@ -36,8 +36,12 @@ class cChunkStay
 {
 public:
 	cChunkStay(void);
+	
+	/** Deletes the object. Note that this calls Clear(), which means that the ChunkStay needs to be disabled. */
 	virtual ~cChunkStay();
 	
+	/** Clears all the chunks that have been added.
+	To be used only while the ChunkStay object is not enabled. */
 	void Clear(void);
 	
 	/** Adds a chunk to be locked from unloading.

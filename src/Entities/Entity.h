@@ -32,6 +32,8 @@
 #define POSZ_TOINT (int)floor(GetPosZ())
 #define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
 
+#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == NULL) || !ChunkVarName->IsValid()) { return; }
+
 
 
 
@@ -88,23 +90,42 @@ public:
 	} ;
 	
 	// tolua_end
-
-	enum
+	
+	enum eEntityStatus
 	{
-		ENTITY_STATUS_HURT            = 2,
-		ENTITY_STATUS_DEAD            = 3,
-		ENTITY_STATUS_WOLF_TAMING     = 6,
-		ENTITY_STATUS_WOLF_TAMED      = 7,
-		ENTITY_STATUS_WOLF_SHAKING    = 8,
-		ENTITY_STATUS_EATING_ACCEPTED = 9,
-		ENTITY_STATUS_SHEEP_EATING    = 10,
-		ENTITY_STATUS_GOLEM_ROSING    = 11,
-		ENTITY_STATUS_VILLAGER_HEARTS = 12,
-		ENTITY_STATUS_VILLAGER_ANGRY  = 13,
-		ENTITY_STATUS_VILLAGER_HAPPY  = 14,
-		ENTITY_STATUS_WITCH_MAGICKING = 15,
+		// TODO: Investiagate 0, 1, and 5 as Wiki.vg is not certain
+
+		// Entity becomes coloured red
+		esGenericHurt            = 2,
+		// Entity plays death animation (entity falls to ground)
+		esGenericDead            = 3,
+		// Iron Golem plays attack animation (arms lift and fall)
+		esIronGolemAttacking     = 4,
+		// Wolf taming particles spawn (smoke)
+		esWolfTaming             = 6,
+		// Wolf tamed particles spawn (hearts)
+		esWolfTamed              = 7,
+		// Wolf plays water removal animation (shaking and water particles)
+		esWolfDryingWater        = 8,
+		// Informs client that eating was accepted
+		esPlayerEatingAccepted   = 9,
+		// Sheep plays eating animation (head lowers to ground)
+		esSheepEating            = 10,
+		// Iron Golem holds gift to villager children
+		esIronGolemGivingPlant   = 11,
+		// Villager spawns heart particles
+		esVillagerBreeding       = 12,
+		// Villager spawns thunderclound particles
+		esVillagerAngry          = 13,
+		// Villager spawns green crosses
+		esVillagerHappy          = 14,
+		// Witch spawns magic particle (TODO: investigation into what this is)
+		esWitchMagicking         = 15,
+
 		// It seems 16 (zombie conversion) is now done with metadata
-		ENTITY_STATUS_FIREWORK_EXPLODE= 17,
+
+		// Informs client to explode a firework based on its metadata
+		esFireworkExploding      = 17,
 	} ;
 	
 	enum
@@ -118,7 +139,8 @@ public:
 		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
 		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
 		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
-		VOID_BOUNDARY = -46          ///< At what position Y to begin applying void damage
+		VOID_BOUNDARY = -46,         ///< At what position Y to begin applying void damage
+		FALL_DAMAGE_HEIGHT = 4       ///< At what position Y fall damage is applied
 	} ;
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
@@ -240,13 +262,18 @@ public:
 	
 	// tolua_end
 	
-	/// Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI);
+	/** Makes this entity take damage specified in the a_TDI.
+	The TDI is sent through plugins first, then applied.
+	If it returns false, the entity hasn't receive any damage. */
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI);
 	
 	// tolua_begin
 
 	/// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
 	virtual int GetRawDamageAgainst(const cEntity & a_Receiver);
+	
+	/** Returns whether armor will protect against the passed damage type **/
+	virtual bool ArmorCoversAgainst(eDamageType a_DamageType);
 	
 	/// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
 	virtual int GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_RawDamage);
@@ -307,6 +334,11 @@ public:
 
 	int GetMaxHealth(void) const { return m_MaxHealth; }
 	
+	/// Sets whether the entity is fireproof
+	void SetIsFireproof(bool a_IsFireproof);
+	
+	bool IsFireproof(void) const { return m_IsFireproof; }
+	
 	/// Puts the entity on fire for the specified amount of ticks
 	void StartBurning(int a_TicksLeftBurning);
 	
@@ -364,6 +396,12 @@ public:
 	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
+
+	/** Gets the invulnerable ticks from the entity */
+	int GetInvulnerableTicks(void) const { return m_InvulnerableTicks; }
+
+	/** Set the invulnerable ticks from the entity */
+	void SetInvulnerableTicks(int a_InvulnerableTicks) { m_InvulnerableTicks = a_InvulnerableTicks; }
 	
 	// tolua_end
 	
@@ -392,27 +430,37 @@ protected:
 	/// The entity which is attached to this entity (rider), NULL if none
 	cEntity * m_Attachee;
 
-	// Flags that signal that we haven't updated the clients with the latest.
-	bool     m_bDirtyHead;
-	bool     m_bDirtyOrientation;
-	bool     m_bDirtyPosition;
-	bool     m_bDirtySpeed;
-
-	bool     m_bOnGround;
-	float    m_Gravity;
+	/** Stores whether head yaw has been set manually */
+	bool m_bDirtyHead;
 	
-	// Last Position.
-	double m_LastPosX, m_LastPosY, m_LastPosZ;
+	/** Stores whether our yaw/pitch/roll (body orientation) has been set manually */
+	bool m_bDirtyOrientation;
+	
+	/** Stores whether we have sent a Velocity packet with a speed of zero (no speed) to the client
+	Ensures that said packet is sent only once */
+	bool m_bHasSentNoSpeed;
 
-	// This variables keep track of the last time a packet was sent
-	Int64 m_TimeLastTeleportPacket, m_TimeLastMoveReltPacket, m_TimeLastSpeedPacket;  // In ticks
+	/** Stores if the entity is on the ground */
+	bool m_bOnGround;
+	
+	/** Stores gravity that is applied to an entity every tick
+	For realistic effects, this should be negative. For spaaaaaaace, this can be zero or even positive */
+	float m_Gravity;
+	
+	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
+	Only updated if cEntity::BroadcastMovementUpdate() is called! */
+	Vector3d m_LastPos;
 
-	bool m_IsInitialized;  // Is set to true when it's initialized, until it's destroyed (Initialize() till Destroy() )
+	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
+	bool m_IsInitialized;
 
 	eEntityType m_EntityType;
 	
 	cWorld * m_World;
 	
+	/// Whether the entity is capable of taking fire or lava damage.
+	bool m_IsFireproof;
+    
 	/// Time, in ticks, since the last damage dealt by being on fire. Valid only if on fire (IsOnFire())
 	int m_TicksSinceLastBurnDamage;
 	
@@ -428,12 +476,14 @@ protected:
 	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
 	int m_TicksSinceLastVoidDamage;
 
+
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir();
+	
 	/** Called once per tick to set IsSwimming and IsSubmerged */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
@@ -445,29 +495,33 @@ protected:
 	int m_AirTickTimer;
 	
 private:
-	// Measured in degrees, [-180, +180)
+	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
 	
-	// Measured in meter/second (m/s)
+	/** Measured in meter/second (m/s) */
 	Vector3d m_Speed;
 	
-	// Measured in degrees, [-180, +180)
+	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;
 	
-	/// Position of the entity's XZ center and Y bottom
+	/** Position of the entity's XZ center and Y bottom */
 	Vector3d m_Pos;
 	
-	// Measured in meter / second
+	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;
 	
-	// Measured in Kilograms (Kg)
+	/** Measured in Kilograms (Kg) */
 	double m_Mass;
 	
-	/// Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
+	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
 	double m_Width;
 	
-	/// Height of the entity (Y axis)
+	/** Height of the entity (Y axis) */
 	double m_Height;
+
+	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
+	While this ticks, a player can't hit this entity. */
+	int m_InvulnerableTicks;
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;
