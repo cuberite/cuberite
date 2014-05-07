@@ -7,4 +7,4 @@ echo ""
 echo "When OpenSSL asks you for Common Name, you need to enter the fully qualified domain name of the server, that is, e. g. gallery.xoft.cz"
 echo ""
 
-openssl req -x509 -newkey rsa:2048 -keyout httpskey.pem -out httpscert.pem -days 3650 -nodes
+openssl req -x509 -newkey rsa:2048 -keyout httpskey.pem -out httpscert.crt -days 3650 -nodes
