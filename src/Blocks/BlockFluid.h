@@ -138,12 +138,6 @@ public:
 		}  // for i - CrossCoords[]
 		return false;
 	}
-
-
-	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
-	{
-		return false;
-	}
 } ;
 
 
