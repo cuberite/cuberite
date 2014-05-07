@@ -49,6 +49,12 @@ public:
 		}
 		super::Check(a_ChunkInterface, a_PluginInterface, a_RelX, a_RelY, a_RelZ, a_Chunk);
 	}
+
+
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	{
+		return false;
+	}
 } ;
 
 
@@ -130,6 +136,12 @@ public:
 				return true;
 			}
 		}  // for i - CrossCoords[]
+		return false;
+	}
+
+
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	{
 		return false;
 	}
 } ;
