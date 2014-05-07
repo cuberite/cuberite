@@ -376,6 +376,7 @@ bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 	if (!Grid->DamageItem(GridSlotNum, a_Amount))
 	{
 		// The item has been damaged, but did not break yet
+		SendSlot(a_SlotNum);
 		return false;
 	}
 	
