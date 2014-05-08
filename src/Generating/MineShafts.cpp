@@ -543,7 +543,7 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 {
 	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
 	BoundingBox.p2.y += 3;
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
 	int NumSegments = 2 + (rnd) % (MAX_SEGMENTS - 1);  // 2 .. MAX_SEGMENTS
 	switch (a_Direction)
 	{
@@ -985,7 +985,7 @@ cMineShaft * cMineShaftCrossing::CreateAndFit(
 )
 {
 	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
 	BoundingBox.p2.y += 3;
 	if ((rnd % 4) < 2)
 	{
@@ -1127,7 +1127,7 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 	cNoise & a_Noise
 )
 {
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
 	cCuboid Box;
 	switch (a_Direction)
 	{

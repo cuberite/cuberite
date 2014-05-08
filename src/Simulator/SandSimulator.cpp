@@ -64,7 +64,7 @@ void cSandSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
 		}
 	}
-	m_TotalBlocks -= ChunkData.size();
+	m_TotalBlocks -= (int)ChunkData.size();
 	ChunkData.clear();
 }
 
@@ -254,6 +254,10 @@ void cSandSimulator::FinishFalling(
 	{
 		// Rematerialize the material here:
 		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FallingBlockType, a_FallingBlockMeta);
+		if (a_FallingBlockType == E_BLOCK_ANVIL)
+		{
+			a_World->BroadcastSoundParticleEffect(1022, a_BlockX, a_BlockY, a_BlockZ, 0);
+		}
 		return;
 	}
 	

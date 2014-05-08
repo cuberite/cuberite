@@ -11,15 +11,15 @@
 
 
 /// Compresses a_Data into a_Compressed; returns Z_XXX error constants same as zlib's compress2()
-int CompressString(const char * a_Data, int a_Length, AString & a_Compressed, int a_Factor)
+int CompressString(const char * a_Data, size_t a_Length, AString & a_Compressed, int a_Factor)
 {
-	uLongf CompressedSize = compressBound(a_Length);
+	uLongf CompressedSize = compressBound((uLong)a_Length);
 	
 	// HACK: We're assuming that AString returns its internal buffer in its data() call and we're overwriting that buffer!
 	// It saves us one allocation and one memcpy of the entire compressed data
 	// It may not work on some STL implementations! (Confirmed working on MSVC 2008 & 2010)
 	a_Compressed.resize(CompressedSize);
-	int errorcode = compress2( (Bytef*)a_Compressed.data(), &CompressedSize, (const Bytef*)a_Data, a_Length, a_Factor);
+	int errorcode = compress2((Bytef*)a_Compressed.data(), &CompressedSize, (const Bytef *)a_Data, (uLong)a_Length, a_Factor);
 	if (errorcode != Z_OK)
 	{
 		return errorcode;
@@ -33,14 +33,14 @@ int CompressString(const char * a_Data, int a_Length, AString & a_Compressed, in
 
 
 /// Uncompresses a_Data into a_Decompressed; returns Z_XXX error constants same as zlib's uncompress()
-int UncompressString(const char * a_Data, int a_Length, AString & a_Uncompressed, int a_UncompressedSize)
+int UncompressString(const char * a_Data, size_t a_Length, AString & a_Uncompressed, size_t a_UncompressedSize)
 {
 	// HACK: We're assuming that AString returns its internal buffer in its data() call and we're overwriting that buffer!
 	// It saves us one allocation and one memcpy of the entire compressed data
 	// It may not work on some STL implementations! (Confirmed working on MSVC 2008 & 2010)
 	a_Uncompressed.resize(a_UncompressedSize);
 	uLongf UncompressedSize = (uLongf)a_UncompressedSize;  // On some architectures the uLongf is different in size to int, that may be the cause of the -5 error
-	int errorcode = uncompress((Bytef*)a_Uncompressed.data(), &UncompressedSize, (const Bytef*)a_Data, a_Length);
+	int errorcode = uncompress((Bytef*)a_Uncompressed.data(), &UncompressedSize, (const Bytef*)a_Data, (uLong)a_Length);
 	if (errorcode != Z_OK)
 	{
 		return errorcode;
@@ -63,7 +63,7 @@ int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Compres
 	z_stream strm;
 	memset(&strm, 0, sizeof(strm));
 	strm.next_in = (Bytef *)a_Data;
-	strm.avail_in = a_Length;
+	strm.avail_in = (uInt)a_Length;
 	strm.next_out = (Bytef *)Buffer;
 	strm.avail_out = sizeof(Buffer);
 	
@@ -127,7 +127,7 @@ extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & 
 	z_stream strm;
 	memset(&strm, 0, sizeof(strm));
 	strm.next_in = (Bytef *)a_Data;
-	strm.avail_in = a_Length;
+	strm.avail_in = (uInt)a_Length;
 	strm.next_out = (Bytef *)Buffer;
 	strm.avail_out = sizeof(Buffer);
 	

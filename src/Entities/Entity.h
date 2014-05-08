@@ -430,22 +430,29 @@ protected:
 	/// The entity which is attached to this entity (rider), NULL if none
 	cEntity * m_Attachee;
 
-	// Flags that signal that we haven't updated the clients with the latest.
-	bool     m_bDirtyHead;
-	bool     m_bDirtyOrientation;
-	bool     m_bDirtyPosition;
-	bool     m_bDirtySpeed;
-
-	bool     m_bOnGround;
-	float    m_Gravity;
+	/** Stores whether head yaw has been set manually */
+	bool m_bDirtyHead;
 	
-	// Last Position.
-	double m_LastPosX, m_LastPosY, m_LastPosZ;
+	/** Stores whether our yaw/pitch/roll (body orientation) has been set manually */
+	bool m_bDirtyOrientation;
+	
+	/** Stores whether we have sent a Velocity packet with a speed of zero (no speed) to the client
+	Ensures that said packet is sent only once */
+	bool m_bHasSentNoSpeed;
 
-	// This variables keep track of the last time a packet was sent
-	Int64 m_TimeLastTeleportPacket, m_TimeLastMoveReltPacket, m_TimeLastSpeedPacket;  // In ticks
+	/** Stores if the entity is on the ground */
+	bool m_bOnGround;
+	
+	/** Stores gravity that is applied to an entity every tick
+	For realistic effects, this should be negative. For spaaaaaaace, this can be zero or even positive */
+	float m_Gravity;
+	
+	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
+	Only updated if cEntity::BroadcastMovementUpdate() is called! */
+	Vector3d m_LastPos;
 
-	bool m_IsInitialized;  // Is set to true when it's initialized, until it's destroyed (Initialize() till Destroy() )
+	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
+	bool m_IsInitialized;
 
 	eEntityType m_EntityType;
 	
@@ -469,12 +476,14 @@ protected:
 	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
 	int m_TicksSinceLastVoidDamage;
 
+
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir();
+	
 	/** Called once per tick to set IsSwimming and IsSubmerged */
 	virtual void SetSwimState(cChunk & a_Chunk);
 

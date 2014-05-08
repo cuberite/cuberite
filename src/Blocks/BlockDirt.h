@@ -35,8 +35,10 @@ public:
 		// Grass becomes dirt if there is something on top of it:
 		if (a_RelY < cChunkDef::Height - 1)
 		{
-			BLOCKTYPE Above = a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
-			if ((!cBlockInfo::IsTransparent(Above) && !cBlockInfo::IsOneHitDig(Above)) || IsBlockWater(Above))
+			BLOCKTYPE Above;
+			NIBBLETYPE AboveMeta;
+			a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY + 1, a_RelZ, Above, AboveMeta);
+			if (!cBlockInfo::GetHandler(Above)->CanDirtGrowGrass(AboveMeta))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
@@ -77,7 +79,7 @@ public:
 			BLOCKTYPE AboveDest;
 			NIBBLETYPE AboveMeta;
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
-			if ((cBlockInfo::IsOneHitDig(AboveDest) || cBlockInfo::IsTransparent(AboveDest)) && !IsBlockWater(AboveDest))
+			if (cBlockInfo::GetHandler(AboveDest)->CanDirtGrowGrass(AboveMeta))
 			{
 				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, BlockX * cChunkDef::Width, BlockY, BlockZ * cChunkDef::Width, ssGrassSpread))
 				{

@@ -615,11 +615,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 		else if ((i >= 8) && (i <= 11)) // See above, but this is for wire below us
 		{
 			BLOCKTYPE Type = 0;
-			if (a_RelBlockY - 1 < 0)
-			{
-				continue;
-			}
-			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, Type))
+			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX + gCrossCoords[i].x, a_RelBlockY, a_RelBlockZ + gCrossCoords[i].z, Type))
 			{
 				continue;
 			}

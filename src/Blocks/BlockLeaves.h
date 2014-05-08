@@ -138,14 +138,14 @@ bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Filter the blocks into a {leaves, log, other (air)} set:
 	BLOCKTYPE * Types = a_Area.GetBlockTypes();
-	for (int i = a_Area.GetBlockCount() - 1; i > 0; i--)
+	for (size_t i = a_Area.GetBlockCount() - 1; i > 0; i--)
 	{
 		switch (Types[i])
 		{
-			case E_BLOCK_NEW_LEAVES:
-			case E_BLOCK_NEW_LOG:
 			case E_BLOCK_LEAVES:
 			case E_BLOCK_LOG:
+			case E_BLOCK_NEW_LEAVES:
+			case E_BLOCK_NEW_LOG:
 			{
 				break;
 			}

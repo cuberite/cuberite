@@ -64,7 +64,7 @@ void cMobCensus::CollectSpawnableChunk(cChunk & a_Chunk)
 
 int cMobCensus::GetNumChunks(void)
 {
-	return m_EligibleForSpawnChunks.size();
+	return (int)m_EligibleForSpawnChunks.size();
 }
 
 

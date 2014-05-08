@@ -52,9 +52,9 @@ public:
 				return;
 			}
 
-			int NumBlocks = Area.GetBlockCount();
+			size_t NumBlocks = Area.GetBlockCount();
 			BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
-			for (int i = 0; i < NumBlocks; i++)
+			for (size_t i = 0; i < NumBlocks; i++)
 			{
 				if (
 					(BlockTypes[i] == E_BLOCK_WATER) ||

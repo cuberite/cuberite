@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Entity.h"
@@ -10,7 +11,6 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../Bindings/PluginManager.h"
 #include "../Tracer.h"
-#include "Minecart.h"
 #include "Player.h"
 
 
@@ -32,16 +32,10 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Attachee(NULL)
 	, m_bDirtyHead(true)
 	, m_bDirtyOrientation(true)
-	, m_bDirtyPosition(true)
-	, m_bDirtySpeed(true)
-	, m_bOnGround( false )
-	, m_Gravity( -9.81f )
-	, m_LastPosX( 0.0 )
-	, m_LastPosY( 0.0 )
-	, m_LastPosZ( 0.0 )
-	, m_TimeLastTeleportPacket(0)
-	, m_TimeLastMoveReltPacket(0)
-	, m_TimeLastSpeedPacket(0)
+	, m_bHasSentNoSpeed(true)
+	, m_bOnGround(false)
+	, m_Gravity(-9.81f)
+	, m_LastPos(a_X, a_Y, a_Z)
 	, m_IsInitialized(false)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
@@ -55,7 +49,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_IsSubmerged(false)
 	, m_AirLevel(0)
 	, m_AirTickTimer(0)
-	, m_HeadYaw( 0.0 )
+	, m_HeadYaw(0.0)
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
 	, m_WaterSpeed(0, 0, 0)
@@ -794,30 +788,43 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 	NextSpeed += m_WaterSpeed;
 
-	if( NextSpeed.SqrLength() > 0.f )
+	if (NextSpeed.SqrLength() > 0.f)
 	{
-		cTracer Tracer( GetWorld() );
-		bool HasHit = Tracer.Trace( NextPos, NextSpeed, 2 );
-		if (HasHit) // Oh noez! we hit something
+		cTracer Tracer(GetWorld());
+		// Distance traced is an integer, so we round up from the distance we should go (Speed * Delta), else we will encounter collision detection failurse
+		int DistanceToTrace = (int)(ceil((NextSpeed * a_Dt).SqrLength()) * 2);
+		bool HasHit = Tracer.Trace(NextPos, NextSpeed, DistanceToTrace);
+
+		if (HasHit)
 		{
-			// Set to hit position
+			// Oh noez! We hit something: verify that the (hit position - current) was smaller or equal to the (position that we should travel without obstacles - current)
+			// This is because previously, we traced with a length that was rounded up (due to integer limitations), and in the case that something was hit, we don't want to overshoot our projected movement
 			if ((Tracer.RealHit - NextPos).SqrLength() <= (NextSpeed * a_Dt).SqrLength())
 			{
+				// Block hit was within our projected path
+				// Begin by stopping movement in the direction that we hit something. The Normal is the line perpendicular to a 2D face and in this case, stores what block face was hit through either -1 or 1.
+				// For example: HitNormal.y = -1 : BLOCK_FACE_YM; HitNormal.y = 1 : BLOCK_FACE_YP
 				if (Tracer.HitNormal.x != 0.f) NextSpeed.x = 0.f;
 				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
 				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
 
-				if (Tracer.HitNormal.y > 0) // means on ground
+				if (Tracer.HitNormal.y == 1) // Hit BLOCK_FACE_YP, we are on the ground
 				{
 					m_bOnGround = true;
 				}
-				NextPos.Set(Tracer.RealHit.x,Tracer.RealHit.y,Tracer.RealHit.z);
-				NextPos.x += Tracer.HitNormal.x * 0.3f;
-				NextPos.y += Tracer.HitNormal.y * 0.05f; // Any larger produces entity vibration-upon-the-spot
-				NextPos.z += Tracer.HitNormal.z * 0.3f;
+
+				// Now, set our position to the hit block (i.e. move part way along our intended trajectory)
+				NextPos.Set(Tracer.RealHit.x, Tracer.RealHit.y, Tracer.RealHit.z);
+				NextPos.x += Tracer.HitNormal.x * 0.1;
+				NextPos.y += Tracer.HitNormal.y * 0.05;
+				NextPos.z += Tracer.HitNormal.z * 0.1;
 			}
 			else
 			{
+				// We have hit a block but overshot our intended trajectory, move normally, safe in the warm cocoon of knowledge that we won't appear to teleport forwards on clients,
+				// and that this piece of software will come to be hailed as the epitome of performance and functionality in C++, never before seen, and of such a like that will never
+				// be henceforth seen again in the time of programmers and man alike
+				// </&sensationalist>
 				NextPos += (NextSpeed * a_Dt);
 			}
 		}
@@ -1010,9 +1017,9 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	{
 		// This sometimes happens on Linux machines
 		// Ref.: http://forum.mc-server.org/showthread.php?tid=1244
-		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, LastPos = {%.02f, %.02f}, Pos = %.02f, %.02f}",
-			RelX, RelY, m_LastPosX, m_LastPosZ, GetPosX(), GetPosZ()
-			);
+		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, Pos = %.02f, %.02f}",
+			RelX, RelY, GetPosX(), GetPosZ()
+		);
 		m_IsSwimming = false;
 		m_IsSubmerged = false;
 		return;
@@ -1178,71 +1185,69 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
-	// Send velocity packet every two ticks if: speed is not negligible or speed was set (as indicated by the DirtySpeed flag)
-	if (((m_Speed.SqrLength() > 0.0004f) || m_bDirtySpeed) && ((m_World->GetWorldAge() - m_TimeLastSpeedPacket) >= 2))
+	// Process packet sending every two ticks
+	if (GetWorld()->GetWorldAge() % 2 == 0)
 	{
-		m_World->BroadcastEntityVelocity(*this,a_Exclude);
-		m_bDirtySpeed = false;
-		m_TimeLastSpeedPacket = m_World->GetWorldAge();
-	}
-
-	// Have to process position related packets this every two ticks
-	if (m_World->GetWorldAge() % 2 == 0)
-	{
-		int DiffX = (int) (floor(GetPosX() * 32.0) - floor(m_LastPosX * 32.0));
-		int DiffY = (int) (floor(GetPosY() * 32.0) - floor(m_LastPosY * 32.0));
-		int DiffZ = (int) (floor(GetPosZ() * 32.0) - floor(m_LastPosZ * 32.0));
-		Int64 DiffTeleportPacket = m_World->GetWorldAge() - m_TimeLastTeleportPacket;
-		// 4 blocks is max Relative So if the Diff is greater than 127 or. Send an absolute position every 20 seconds
-		if (DiffTeleportPacket >= 400 || 
-			((DiffX > 127) || (DiffX < -128) ||
-			(DiffY > 127) || (DiffY < -128) ||
-			(DiffZ > 127) || (DiffZ < -128)))
+		double SpeedSqr = GetSpeed().SqrLength();
+		if (SpeedSqr == 0.0)
 		{
-			//
-			m_World->BroadcastTeleportEntity(*this,a_Exclude);
-			m_TimeLastTeleportPacket = m_World->GetWorldAge();
-			m_TimeLastMoveReltPacket = m_TimeLastTeleportPacket; //Must synchronize.
-			m_LastPosX = GetPosX();
-			m_LastPosY = GetPosY();
-			m_LastPosZ = GetPosZ();
-			m_bDirtyPosition = false;
-			m_bDirtyOrientation = false;
+			// Speed is zero, send this to clients once only as well as an absolute position
+			if (!m_bHasSentNoSpeed)
+			{
+				m_World->BroadcastEntityVelocity(*this, a_Exclude);
+				m_World->BroadcastTeleportEntity(*this, a_Exclude);
+				m_bHasSentNoSpeed = true;
+			}
 		}
 		else
 		{
-			Int64 DiffMoveRelPacket = m_World->GetWorldAge() - m_TimeLastMoveReltPacket;
-			//if the change is big enough.
-			if ((abs(DiffX) >= 4 || abs(DiffY) >= 4 || abs(DiffZ) >= 4 || DiffMoveRelPacket >= 60) && m_bDirtyPosition)
+			// Movin'
+			m_World->BroadcastEntityVelocity(*this, a_Exclude);
+			m_bHasSentNoSpeed = false;
+		}
+		
+		// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
+		int DiffX = (int)(floor(GetPosX() * 32.0) - floor(m_LastPos.x * 32.0));
+		int DiffY = (int)(floor(GetPosY() * 32.0) - floor(m_LastPos.y * 32.0));
+		int DiffZ = (int)(floor(GetPosZ() * 32.0) - floor(m_LastPos.z * 32.0));
+
+		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0)) // Have we moved?
+		{
+			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127)) // Limitations of a Byte
 			{
+				// Difference within Byte limitations, use a relative move packet
 				if (m_bDirtyOrientation)
 				{
-					m_World->BroadcastEntityRelMoveLook(*this, (char)DiffX, (char)DiffY, (char)DiffZ,a_Exclude);
+					m_World->BroadcastEntityRelMoveLook(*this, (char)DiffX, (char)DiffY, (char)DiffZ, a_Exclude);
 					m_bDirtyOrientation = false;
 				}
 				else
 				{
-					m_World->BroadcastEntityRelMove(*this, (char)DiffX, (char)DiffY, (char)DiffZ,a_Exclude);
+					m_World->BroadcastEntityRelMove(*this, (char)DiffX, (char)DiffY, (char)DiffZ, a_Exclude);
 				}
-				m_LastPosX = GetPosX();
-				m_LastPosY = GetPosY();
-				m_LastPosZ = GetPosZ();
-				m_bDirtyPosition = false;
-				m_TimeLastMoveReltPacket = m_World->GetWorldAge();
+				// Clients seem to store two positions, one for the velocity packet and one for the teleport/relmove packet
+				// The latter is only changed with a relmove/teleport, and m_LastPos stores this position
+				m_LastPos = GetPosition();
 			}
 			else
 			{
-				if (m_bDirtyOrientation)
-				{
-					m_World->BroadcastEntityLook(*this,a_Exclude);
-					m_bDirtyOrientation = false;
-				}
-			}		
+				// Too big a movement, do a teleport
+				m_World->BroadcastTeleportEntity(*this, a_Exclude);
+				m_LastPos = GetPosition(); // See above
+				m_bDirtyOrientation = false;
+			}
 		}
+
 		if (m_bDirtyHead)
 		{
-			m_World->BroadcastEntityHeadLook(*this,a_Exclude);
+			m_World->BroadcastEntityHeadLook(*this, a_Exclude);
 			m_bDirtyHead = false;
+		}
+		if (m_bDirtyOrientation)
+		{
+			// Send individual update in case above (sending with rel-move packet) wasn't done
+			GetWorld()->BroadcastEntityLook(*this, a_Exclude);
+			m_bDirtyOrientation = false;
 		}
 	}
 }
@@ -1383,7 +1388,7 @@ void cEntity::SetRoll(double a_Roll)
 void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
 	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
-	m_bDirtySpeed = true;
+	
 	WrapSpeed();
 }
 
@@ -1393,7 +1398,7 @@ void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 void cEntity::SetSpeedX(double a_SpeedX)
 {
 	m_Speed.x = a_SpeedX;
-	m_bDirtySpeed = true;
+	
 	WrapSpeed();
 }
 
@@ -1403,7 +1408,7 @@ void cEntity::SetSpeedX(double a_SpeedX)
 void cEntity::SetSpeedY(double a_SpeedY)
 {
 	m_Speed.y = a_SpeedY;
-	m_bDirtySpeed = true;
+	
 	WrapSpeed();
 }
 
@@ -1413,7 +1418,7 @@ void cEntity::SetSpeedY(double a_SpeedY)
 void cEntity::SetSpeedZ(double a_SpeedZ)
 {
 	m_Speed.z = a_SpeedZ;
-	m_bDirtySpeed = true;
+	
 	WrapSpeed();
 }
 
@@ -1433,7 +1438,7 @@ void cEntity::SetWidth(double a_Width)
 void cEntity::AddPosX(double a_AddPosX)
 {
 	m_Pos.x += a_AddPosX;
-	m_bDirtyPosition = true;
+	
 }
 
 
@@ -1442,7 +1447,7 @@ void cEntity::AddPosX(double a_AddPosX)
 void cEntity::AddPosY(double a_AddPosY)
 {
 	m_Pos.y += a_AddPosY;
-	m_bDirtyPosition = true;
+	
 }
 
 
@@ -1451,7 +1456,7 @@ void cEntity::AddPosY(double a_AddPosY)
 void cEntity::AddPosZ(double a_AddPosZ)
 {
 	m_Pos.z += a_AddPosZ;
-	m_bDirtyPosition = true;
+	
 }
 
 
@@ -1462,7 +1467,7 @@ void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
 	m_Pos.x += a_AddPosX;
 	m_Pos.y += a_AddPosY;
 	m_Pos.z += a_AddPosZ;
-	m_bDirtyPosition = true;
+	
 }
 
 
@@ -1472,8 +1477,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 {
 	m_Speed.x += a_AddSpeedX;
 	m_Speed.y += a_AddSpeedY;
-	m_Speed.z += a_AddSpeedZ;
-	m_bDirtySpeed = true;
+	m_Speed.z += a_AddSpeedZ;	
 	WrapSpeed();
 }
 
@@ -1483,8 +1487,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 
 void cEntity::AddSpeedX(double a_AddSpeedX)
 {
-	m_Speed.x += a_AddSpeedX;
-	m_bDirtySpeed = true;
+	m_Speed.x += a_AddSpeedX;	
 	WrapSpeed();
 }
 
@@ -1494,8 +1497,7 @@ void cEntity::AddSpeedX(double a_AddSpeedX)
 
 void cEntity::AddSpeedY(double a_AddSpeedY)
 {
-	m_Speed.y += a_AddSpeedY;
-	m_bDirtySpeed = true;
+	m_Speed.y += a_AddSpeedY;	
 	WrapSpeed();
 }
 
@@ -1505,8 +1507,7 @@ void cEntity::AddSpeedY(double a_AddSpeedY)
 
 void cEntity::AddSpeedZ(double a_AddSpeedZ)
 {
-	m_Speed.z += a_AddSpeedZ;
-	m_bDirtySpeed = true;
+	m_Speed.z += a_AddSpeedZ;	
 	WrapSpeed();
 }
 
@@ -1561,8 +1562,7 @@ Vector3d cEntity::GetLookVector(void) const
 // Set position
 void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 {
-	m_Pos.Set(a_PosX, a_PosY, a_PosZ);
-	m_bDirtyPosition = true;
+	m_Pos.Set(a_PosX, a_PosY, a_PosZ);	
 }
 
 
@@ -1571,8 +1571,7 @@ void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::SetPosX(double a_PosX)
 {
-	m_Pos.x = a_PosX;
-	m_bDirtyPosition = true;
+	m_Pos.x = a_PosX;	
 }
 
 
@@ -1581,8 +1580,7 @@ void cEntity::SetPosX(double a_PosX)
 
 void cEntity::SetPosY(double a_PosY)
 {
-	m_Pos.y = a_PosY;
-	m_bDirtyPosition = true;
+	m_Pos.y = a_PosY;	
 }
 
 
@@ -1592,7 +1590,6 @@ void cEntity::SetPosY(double a_PosY)
 void cEntity::SetPosZ(double a_PosZ)
 {
 	m_Pos.z = a_PosZ;
-	m_bDirtyPosition = true;
 }
 
 

@@ -96,7 +96,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		gzFile gz = gzopen((FILE_IO_PREFIX + fnam).c_str(), "wb");
 		if (gz != NULL)
 		{
-			gzwrite(gz, Writer.GetResult().data(), Writer.GetResult().size());
+			gzwrite(gz, Writer.GetResult().data(), (unsigned)Writer.GetResult().size());
 		}
 		gzclose(gz);
 	}
@@ -252,7 +252,7 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	strm.next_out  = (Bytef *)Uncompressed;
 	strm.avail_out = sizeof(Uncompressed);
 	strm.next_in   = (Bytef *)a_Data.data();
-	strm.avail_in  = a_Data.size();
+	strm.avail_in  = (uInt)a_Data.size();
 	int res = inflate(&strm, Z_FINISH);
 	inflateEnd(&strm);
 	if (res != Z_STREAM_END)
@@ -645,18 +645,16 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	}
 	
 	int Damage = a_NBT.FindChildByName(a_TagIdx, "Damage");
-	if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
+	if ((Damage > 0) && (a_NBT.GetType(Damage) == TAG_Short))
 	{
-		return false;
+		a_Item.m_ItemDamage = a_NBT.GetShort(Damage);
 	}
-	a_Item.m_ItemDamage = a_NBT.GetShort(Damage);
 	
 	int Count = a_NBT.FindChildByName(a_TagIdx, "Count");
-	if ((Count < 0) || (a_NBT.GetType(Count) != TAG_Byte))
+	if ((Count > 0) && (a_NBT.GetType(Count) == TAG_Byte))
 	{
-		return false;
+		a_Item.m_ItemCount = a_NBT.GetByte(Count);
 	}
-	a_Item.m_ItemCount = a_NBT.GetByte(Count);
 	
 	// Find the "tag" tag, used for enchantments and other extra data
 	int TagTag = a_NBT.FindChildByName(a_TagIdx, "tag");
@@ -664,6 +662,29 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	{
 		// No extra data
 		return true;
+	}
+
+	// Load repair cost:
+	int RepairCost = a_NBT.FindChildByName(TagTag, "RepairCost");
+	if ((RepairCost > 0) && (a_NBT.GetType(RepairCost) == TAG_Int))
+	{
+		a_Item.m_RepairCost = a_NBT.GetInt(RepairCost);
+	}
+
+	// Load display name:
+	int DisplayTag = a_NBT.FindChildByName(TagTag, "display");
+	if (DisplayTag > 0)
+	{
+		int DisplayName = a_NBT.FindChildByName(DisplayTag, "Name");
+		if ((DisplayName > 0) && (a_NBT.GetType(DisplayName) == TAG_String))
+		{
+			a_Item.m_CustomName = a_NBT.GetString(DisplayName);
+		}
+		int Lore = a_NBT.FindChildByName(DisplayTag, "Lore");
+		if ((Lore > 0) && (a_NBT.GetType(Lore) == TAG_String))
+		{
+			a_Item.m_Lore = a_NBT.GetString(Lore);
+		}
 	}
 
 	// Load enchantments:
@@ -674,6 +695,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 		EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, a_NBT, EnchTag);
 	}
 
+	// Load firework data:
 	int FireworksTag = a_NBT.FindChildByName(TagTag, ((a_Item.m_ItemType == E_ITEM_FIREWORK_STAR) ? "Fireworks" : "Explosion"));
 	if (EnchTag > 0)
 	{
@@ -1974,7 +1996,10 @@ void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT 
 {
 	int SizeIdx = a_NBT.FindChildByName(a_TagIdx, "Size");
 
-	if (SizeIdx < 0) { return; }
+	if (SizeIdx < 0)
+	{
+		return;
+	}
 
 	int Size = a_NBT.GetInt(SizeIdx);
 
@@ -2132,7 +2157,10 @@ void cWSSAnvil::LoadSlimeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 {
 	int SizeIdx = a_NBT.FindChildByName(a_TagIdx, "Size");
 
-	if (SizeIdx < 0) { return; }
+	if (SizeIdx < 0)
+	{
+		return;
+	}
 
 	int Size = a_NBT.GetInt(SizeIdx);
 
@@ -2654,7 +2682,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 
 	// Store the chunk data:
 	m_File.Seek(ChunkSector * 4096);
-	unsigned ChunkSize = htonl(a_Data.size() + 1);
+	u_long ChunkSize = htonl((u_long)a_Data.size() + 1);
 	if (m_File.Write(&ChunkSize, 4) != 4)
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], writing(1) data to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
@@ -2678,7 +2706,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	m_File.Write(Padding, 4096 - (BytesWritten % 4096));
 	
 	// Store the header:
-	ChunkSize = (a_Data.size() + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size *up* to nearest 4KB sector, make it a sector number
+	ChunkSize = ((u_long)a_Data.size() + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size *up* to nearest 4KB sector, make it a sector number
 	ASSERT(ChunkSize < 256);
 	m_Header[LocalX + 32 * LocalZ] = htonl((ChunkSector << 8) | ChunkSize);
 	if (m_File.Seek(0) < 0)

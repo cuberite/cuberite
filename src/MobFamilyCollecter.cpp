@@ -18,7 +18,7 @@ void cMobFamilyCollecter::CollectMob(cMonster & a_Monster)
 
 int cMobFamilyCollecter::GetNumberOfCollectedMobs(cMonster::eFamily a_Family)
 {
-	return m_Mobs[a_Family].size();
+	return (int)m_Mobs[a_Family].size();
 }
 
 

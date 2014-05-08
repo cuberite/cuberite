@@ -47,9 +47,9 @@ public:
 			public cBlockTracer::cCallbacks
 		{
 		public:
-			cCallbacks(cWorld * a_CBWorld) :
-				m_HasHitFluid(false),
-				m_World(a_CBWorld)
+
+			cCallbacks(void) :
+				m_HasHitFluid(false)
 			{
 			}
 
@@ -62,10 +62,9 @@ public:
 						return false;
 					}
 					AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, BLOCK_FACE_YP);  // Always place pad at top of water block
-					BLOCKTYPE Block = m_World->GetBlock(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
 					if (
-						!IsBlockWater(Block) &&
-						cBlockInfo::FullyOccupiesVoxel(Block)
+						!IsBlockWater(a_CBBlockType) &&
+						cBlockInfo::FullyOccupiesVoxel(a_CBBlockType)
 						)
 					{
 						// Can't place lilypad on air/in another block!
@@ -80,11 +79,10 @@ public:
 
 			Vector3i m_Pos;
 			bool m_HasHitFluid;
-			cWorld * m_World;
 
 		};
 
-		cCallbacks Callbacks(a_World);
+		cCallbacks Callbacks;
 		cLineBlockTracer Tracer(*a_Player->GetWorld(), Callbacks);
 		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
