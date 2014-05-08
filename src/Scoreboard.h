@@ -153,7 +153,7 @@ public:
 	// tolua_begin
 
 	/** Returns the number of registered players */
-	unsigned int GetNumPlayers(void) const;
+	size_t GetNumPlayers(void) const;
 
 	bool AllowsFriendlyFire(void)      const { return m_AllowsFriendlyFire; }
 	bool CanSeeFriendlyInvisible(void) const { return m_CanSeeFriendlyInvisible; }
@@ -248,9 +248,9 @@ public:
 
 	cObjective * GetObjectiveIn(eDisplaySlot a_Slot);
 
-	unsigned int GetNumObjectives(void) const;
+	size_t GetNumObjectives(void) const;
 
-	unsigned int GetNumTeams(void) const;
+	size_t GetNumTeams(void) const;
 
 	void AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value = 1);
 

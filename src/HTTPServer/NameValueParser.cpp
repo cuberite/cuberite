@@ -97,7 +97,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 {
 	ASSERT(m_State != psFinished);  // Calling Parse() after Finish() is wrong!
 	
-	int Last = 0;
+	size_t Last = 0;
 	for (size_t i = 0; i < a_Size;)
 	{
 		switch (m_State)

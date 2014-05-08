@@ -891,7 +891,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			while ((DamageDiff > 0) && (x < SecondInput.m_ItemCount))
 			{
 				Input.m_ItemDamage -= DamageDiff;
-				NeedExp += std::max(1, DamageDiff / 100) + Input.m_Enchantments.Count();
+				NeedExp += std::max(1, DamageDiff / 100) + (int)Input.m_Enchantments.Count();
 				DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
 
 				++x;

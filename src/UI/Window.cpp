@@ -591,7 +591,7 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 	
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	int ToEachSlot = (int)ToDistribute.m_ItemCount / SlotNums.size();
+	int ToEachSlot = (int)ToDistribute.m_ItemCount / (int)SlotNums.size();
 	
 	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
 	

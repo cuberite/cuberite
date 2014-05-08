@@ -197,7 +197,7 @@ void cProtocol172::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	Pkt.WriteInt(a_ChunkX);
 	Pkt.WriteInt(a_ChunkZ);
 	Pkt.WriteShort((short)a_Changes.size());
-	Pkt.WriteInt(a_Changes.size() * 4);
+	Pkt.WriteInt((int)a_Changes.size() * 4);
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
 		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
@@ -532,7 +532,7 @@ void cProtocol172::SendExplosion(double a_BlockX, double a_BlockY, double a_Bloc
 	Pkt.WriteFloat((float)a_BlockY);
 	Pkt.WriteFloat((float)a_BlockZ);
 	Pkt.WriteFloat((float)a_Radius);
-	Pkt.WriteInt(a_BlocksAffected.size());
+	Pkt.WriteInt((int)a_BlocksAffected.size());
 	for (cVector3iArray::const_iterator itr = a_BlocksAffected.begin(), end = a_BlocksAffected.end(); itr != end; ++itr)
 	{
 		Pkt.WriteChar((char)itr->x);
@@ -698,7 +698,7 @@ void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decor
 	
 	cPacketizer Pkt(*this, 0x34);
 	Pkt.WriteVarInt(a_ID);
-	Pkt.WriteShort (1 + (3 * a_Decorators.size()));
+	Pkt.WriteShort ((short)(1 + (3 * a_Decorators.size())));
 
 	Pkt.WriteByte(1);
 	
@@ -1174,7 +1174,7 @@ void cProtocol172::SendTabCompletionResults(const AStringVector & a_Results)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x3a);  // Tab-Complete packet
-	Pkt.WriteVarInt(a_Results.size());
+	Pkt.WriteVarInt((int)a_Results.size());
 
 	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
 	{
@@ -1743,7 +1743,7 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		cPacketizer Pkt(*this, 0x01);
 		Pkt.WriteString(Server->GetServerID());
 		const AString & PubKeyDer = Server->GetPublicKeyDER();
-		Pkt.WriteShort(PubKeyDer.size());
+		Pkt.WriteShort((short)PubKeyDer.size());
 		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
 		Pkt.WriteShort(4);
 		Pkt.WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
@@ -2138,7 +2138,7 @@ void cProtocol172::WritePacket(cByteBuffer & a_Packet)
 	cCSLock Lock(m_CSPacket);
 	AString Pkt;
 	a_Packet.ReadAll(Pkt);
-	WriteVarInt(Pkt.size());
+	WriteVarInt((UInt32)Pkt.size());
 	SendData(Pkt.data(), Pkt.size());
 	Flush();
 }
@@ -2403,7 +2403,7 @@ cProtocol172::cPacketizer::~cPacketizer()
 	AString DataToSend;
 
 	// Send the packet length
-	UInt32 PacketLen = m_Out.GetUsedSpace();
+	UInt32 PacketLen = (UInt32)m_Out.GetUsedSpace();
 	m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
 	m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
@@ -2500,7 +2500,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	Writer.Finish();
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
-	WriteShort(Compressed.size());
+	WriteShort((short)Compressed.size());
 	WriteBuf(Compressed.data(), Compressed.size());
 }
 
@@ -2570,7 +2570,7 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
-	WriteShort(Compressed.size());
+	WriteShort((short)Compressed.size());
 	WriteBuf(Compressed.data(), Compressed.size());
 }
 

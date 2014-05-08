@@ -100,7 +100,7 @@ public:
 
 	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
 	{
-		return (a_Meta & 0x8);
+		return ((a_Meta & 0x8) != 0);
 	}
 
 	

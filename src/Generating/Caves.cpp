@@ -239,9 +239,15 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 
 bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints & a_Dst)
 {
+	if (a_Src.size() < 2)
+	{
+		// There are no midpoints, nothing to smooth
+		return true;
+	}
+
 	// Smoothing: for each line segment, add points on its 1/4 lengths
 	bool res = false;
-	int Num = a_Src.size() - 2;  // this many intermediary points
+	size_t Num = a_Src.size() - 2;  // this many intermediary points
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);
 	cCaveDefPoints::const_iterator itr = a_Src.begin() + 1;
@@ -251,7 +257,7 @@ bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints &
 	int PrevY = Source.m_BlockY;
 	int PrevZ = Source.m_BlockZ;
 	int PrevR = Source.m_Radius;
-	for (int i = 0; i <= Num; ++i, ++itr)
+	for (size_t i = 0; i <= Num; ++i, ++itr)
 	{
 		int dx = itr->m_BlockX - PrevX;
 		int dy = itr->m_BlockY - PrevY;
