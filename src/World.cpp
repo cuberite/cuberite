@@ -2402,13 +2402,13 @@ bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_
 bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback)
 {
 	cPlayer * BestMatch = NULL;
-	unsigned int BestRating = 0;
-	unsigned int NameLength = a_PlayerNameHint.length();
+	size_t BestRating = 0;
+	size_t NameLength = a_PlayerNameHint.length();
 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		unsigned int Rating = RateCompareString (a_PlayerNameHint, (*itr)->GetName());
+		size_t Rating = RateCompareString (a_PlayerNameHint, (*itr)->GetName());
 		if (Rating >= BestRating)
 		{
 			BestMatch = *itr;
@@ -2422,7 +2422,6 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 	if (BestMatch != NULL)
 	{
-		LOG("Compared %s and %s with rating %i", a_PlayerNameHint.c_str(), BestMatch->GetName().c_str(), BestRating);
 		return a_Callback.Item (BestMatch);
 	}
 	return false;

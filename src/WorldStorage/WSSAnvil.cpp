@@ -96,7 +96,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		gzFile gz = gzopen((FILE_IO_PREFIX + fnam).c_str(), "wb");
 		if (gz != NULL)
 		{
-			gzwrite(gz, Writer.GetResult().data(), Writer.GetResult().size());
+			gzwrite(gz, Writer.GetResult().data(), (unsigned)Writer.GetResult().size());
 		}
 		gzclose(gz);
 	}
@@ -252,7 +252,7 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	strm.next_out  = (Bytef *)Uncompressed;
 	strm.avail_out = sizeof(Uncompressed);
 	strm.next_in   = (Bytef *)a_Data.data();
-	strm.avail_in  = a_Data.size();
+	strm.avail_in  = (uInt)a_Data.size();
 	int res = inflate(&strm, Z_FINISH);
 	inflateEnd(&strm);
 	if (res != Z_STREAM_END)
@@ -2682,7 +2682,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 
 	// Store the chunk data:
 	m_File.Seek(ChunkSector * 4096);
-	unsigned ChunkSize = htonl(a_Data.size() + 1);
+	u_long ChunkSize = htonl((u_long)a_Data.size() + 1);
 	if (m_File.Write(&ChunkSize, 4) != 4)
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], writing(1) data to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
@@ -2706,7 +2706,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	m_File.Write(Padding, 4096 - (BytesWritten % 4096));
 	
 	// Store the header:
-	ChunkSize = (a_Data.size() + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size *up* to nearest 4KB sector, make it a sector number
+	ChunkSize = ((u_long)a_Data.size() + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size *up* to nearest 4KB sector, make it a sector number
 	ASSERT(ChunkSize < 256);
 	m_Header[LocalX + 32 * LocalZ] = htonl((ChunkSector << 8) | ChunkSize);
 	if (m_File.Seek(0) < 0)

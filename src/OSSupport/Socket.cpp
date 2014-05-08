@@ -328,18 +328,18 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 
 
 
-int cSocket::Receive(char * a_Buffer, unsigned int a_Length, unsigned int a_Flags)
+int cSocket::Receive(char * a_Buffer, size_t a_Length, unsigned int a_Flags)
 {
-	return recv(m_Socket, a_Buffer, a_Length, a_Flags);
+	return recv(m_Socket, a_Buffer, (int)a_Length, a_Flags);
 }
 
 
 
 
 
-int cSocket::Send(const char * a_Buffer, unsigned int a_Length)
+int cSocket::Send(const char * a_Buffer, size_t a_Length)
 {
-	return send(m_Socket, a_Buffer, a_Length, MSG_NOSIGNAL);
+	return send(m_Socket, a_Buffer, (int)a_Length, MSG_NOSIGNAL);
 }
 
 

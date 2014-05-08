@@ -114,7 +114,7 @@ Each primitive tag also stores the length of the contained data, in bytes.
 class cParsedNBT
 {
 public:
-	cParsedNBT(const char * a_Data, int a_Length);
+	cParsedNBT(const char * a_Data, size_t a_Length);
 	
 	bool IsValid(void) const {return m_IsValid; }
 	
@@ -251,7 +251,7 @@ public:
 	
 protected:
 	const char *             m_Data;
-	int                      m_Length;
+	size_t                   m_Length;
 	std::vector<cFastNBTTag> m_Tags;
 	bool                     m_IsValid;  // True if parsing succeeded
 
@@ -319,7 +319,7 @@ protected:
 	
 	bool IsStackTopCompound(void) const { return (m_Stack[m_CurrentStack].m_Type == TAG_Compound); }
 	
-	void WriteString(const char * a_Data, short a_Length);
+	void WriteString(const char * a_Data, UInt16 a_Length);
 	
 	inline void TagCommon(const AString & a_Name, eTagType a_Type)
 	{
@@ -330,7 +330,7 @@ protected:
 		{
 			// Compound: add the type and name:
 			m_Result.push_back((char)a_Type);
-			WriteString(a_Name.c_str(), (short)a_Name.length());
+			WriteString(a_Name.c_str(), (UInt16)a_Name.length());
 		}
 		else
 		{

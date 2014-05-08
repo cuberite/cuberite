@@ -871,7 +871,7 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 		// Not enough bytes for the packet length, keep waiting
 		return false;
 	}
-	ReadSoFar -= m_Buffer.GetReadableSpace();
+	ReadSoFar -= (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.CanReadBytes(PacketLen))
 	{
 		// Not enough bytes for the packet, keep waiting
@@ -961,7 +961,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 	{
 		return false;
 	}
-	NumBytesRead -= m_Buffer.GetReadableSpace();
+	NumBytesRead -= (UInt32)m_Buffer.GetReadableSpace();
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:

@@ -814,7 +814,7 @@ void cPerlinNoise::SetSeed(int a_Seed)
 
 void cPerlinNoise::AddOctave(float a_Frequency, float a_Amplitude)
 {
-	m_Octaves.push_back(cOctave(m_Seed * (m_Octaves.size() + 4) * 4 + 1024, a_Frequency, a_Amplitude));
+	m_Octaves.push_back(cOctave(m_Seed * ((int)m_Octaves.size() + 4) * 4 + 1024, a_Frequency, a_Amplitude));
 }
 
 

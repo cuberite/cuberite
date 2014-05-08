@@ -406,7 +406,7 @@ void cSocketThreads::cSocketThread::Execute(void)
 		timeval Timeout;
 		Timeout.tv_sec = 5;
 		Timeout.tv_usec = 0;
-		if (select(Highest + 1, &fdRead, &fdWrite, NULL, &Timeout) == -1)
+		if (select((int)Highest + 1, &fdRead, &fdWrite, NULL, &Timeout) == -1)
 		{
 			LOG("select() call failed in cSocketThread: \"%s\"", cSocket::GetLastErrorString().c_str());
 			continue;

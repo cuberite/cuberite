@@ -247,18 +247,22 @@ int NoCaseCompare(const AString & s1, const AString & s2)
 
 
 
-unsigned int RateCompareString(const AString & s1, const AString & s2 )
+size_t RateCompareString(const AString & s1, const AString & s2)
 {
-	unsigned int MatchedLetters = 0;
-	unsigned int s1Length = s1.length();
+	size_t MatchedLetters = 0;
+	size_t s1Length = s1.length();
 
-	if( s1Length > s2.length() ) return 0; // Definitely not a match
-
-	for (unsigned int i = 0; i < s1Length; i++)
+	if (s1Length > s2.length())
 	{
-		char c1 = (char)toupper( s1[i] );
-		char c2 = (char)toupper( s2[i] );
-		if( c1 == c2 )
+		// Definitely not a match
+		return 0;
+	}
+
+	for (size_t i = 0; i < s1Length; i++)
+	{
+		char c1 = (char)toupper(s1[i]);
+		char c2 = (char)toupper(s2[i]);
+		if (c1 == c2)
 		{
 			++MatchedLetters;
 		}
@@ -288,11 +292,11 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 // Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
-AString & RawBEToUTF8(const char * a_RawData, int a_NumShorts, AString & a_UTF8)
+AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
 	a_UTF8.reserve(3 * a_NumShorts / 2);  // a quick guess of the resulting size
-	for (int i = 0; i < a_NumShorts; i++)
+	for (size_t i = 0; i < a_NumShorts; i++)
 	{
 		int c = GetBEShort(&a_RawData[i * 2]);
 		if (c < 0x80)

@@ -306,8 +306,14 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 
 void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cRavDefPoints & a_Dst)
 {
+	if (a_Src.size() < 2)
+	{
+		// No midpoints, nothing to refine
+		return;
+	}
+
 	// Smoothing: for each line segment, add points on its 1/4 lengths
-	int Num = a_Src.size() - 2;  // this many intermediary points
+	size_t Num = a_Src.size() - 2;  // this many intermediary points
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);
 	cRavDefPoints::const_iterator itr = a_Src.begin() + 1;
@@ -318,7 +324,7 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cR
 	int PrevR = Source.m_Radius;
 	int PrevT = Source.m_Top;
 	int PrevB = Source.m_Bottom;
-	for (int i = 0; i <= Num; ++i, ++itr)
+	for (size_t i = 0; i <= Num; ++i, ++itr)
 	{
 		int dx = itr->m_BlockX - PrevX;
 		int dz = itr->m_BlockZ - PrevZ;

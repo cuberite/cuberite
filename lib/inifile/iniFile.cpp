@@ -243,7 +243,7 @@ int cIniFile::FindKey(const AString & a_KeyName) const
 	{
 		if (CheckCase(names[keyID]) == CaseKeyName)
 		{
-			return keyID;
+			return (int)keyID;
 		}
 	}
 	return noID;
@@ -279,7 +279,7 @@ int cIniFile::AddKeyName(const AString & keyname)
 {
 	names.resize(names.size() + 1, keyname);
 	keys.resize(keys.size() + 1);
-	return names.size() - 1;
+	return (int)names.size() - 1;
 }
 
 
@@ -683,7 +683,7 @@ int cIniFile::GetNumKeyComments(const int keyID) const
 {
 	if (keyID < (int)keys.size())
 	{
-		return keys[keyID].comments.size();
+		return (int)keys[keyID].comments.size();
 	}
 	return 0;
 }

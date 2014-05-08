@@ -53,7 +53,7 @@ public:
 	 */
 	bool ForEachMap(cMapCallback & a_Callback);
 
-	unsigned int GetNumMaps(void) const; // tolua_export
+	size_t GetNumMaps(void) const; // tolua_export
 
 	/** Loads the map data from the disk */
 	void LoadMapData(void);

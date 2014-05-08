@@ -143,13 +143,14 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 		}
 	}
 
-	if (GetNumPlugins() == 0)
+	size_t NumLoadedPlugins = GetNumPlugins();
+	if (NumLoadedPlugins)
 	{
 		LOG("-- No Plugins Loaded --");
 	}
-	else if (GetNumPlugins() > 1)
+	else if (NumLoadedPlugins > 1)
 	{
-		LOG("-- Loaded %i Plugins --", GetNumPlugins());
+		LOG("-- Loaded %i Plugins --", (int)NumLoadedPlugins);
 	}
 	else
 	{
@@ -1869,7 +1870,7 @@ void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
 
 
 
-unsigned int cPluginManager::GetNumPlugins() const
+size_t cPluginManager::GetNumPlugins() const
 {
 	return m_Plugins.size();
 }

@@ -590,13 +590,13 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 {
 	class cCallback : public cPlayerListCallback
 	{
-		unsigned      m_BestRating;
-		unsigned      m_NameLength;
+		size_t        m_BestRating;
+		size_t        m_NameLength;
 		const AString m_PlayerName;
 
 		virtual bool Item (cPlayer * a_pPlayer)
 		{
-			unsigned int Rating = RateCompareString (m_PlayerName, a_pPlayer->GetName());
+			size_t Rating = RateCompareString (m_PlayerName, a_pPlayer->GetName());
 			if ((Rating > 0) && (Rating >= m_BestRating))
 			{
 				m_BestMatch = a_pPlayer;
@@ -626,7 +626,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 		cPlayer * m_BestMatch;
 		unsigned  m_NumMatches;
 	} Callback (a_PlayerName);
-	ForEachPlayer( Callback );
+	ForEachPlayer(Callback);
 
 	if (Callback.m_NumMatches == 1)
 	{
@@ -763,8 +763,8 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	{
 		cWorld * World = itr->second;
 		int NumInGenerator = World->GetGeneratorQueueLength();
-		int NumInSaveQueue = World->GetStorageSaveQueueLength();
-		int NumInLoadQueue = World->GetStorageLoadQueueLength();
+		int NumInSaveQueue = (int)World->GetStorageSaveQueueLength();
+		int NumInLoadQueue = (int)World->GetStorageLoadQueueLength();
 		int NumValid = 0;
 		int NumDirty = 0;
 		int NumInLighting = 0;
@@ -784,8 +784,6 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		a_Output.Out("    block lighting: " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
 		a_Output.Out("    heightmap:      " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
 		a_Output.Out("    biomemap:       " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
-		int Rest = sizeof(cChunk) - sizeof(cChunkDef::BlockTypes) - 3 * sizeof(cChunkDef::BlockNibbles) - sizeof(cChunkDef::HeightMap) - sizeof(cChunkDef::BiomeMap);
-		a_Output.Out("    other:          %6d bytes (%3d KiB)", Rest, (Rest + 1023) / 1024);
 		SumNumValid += NumValid;
 		SumNumDirty += NumDirty;
 		SumNumInLighting += NumInLighting;
