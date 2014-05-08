@@ -39,29 +39,17 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 	int MinGridZ = MinBlockZ / m_GridSizeZ;
 	int MaxGridX = (MaxBlockX + m_GridSizeX - 1) / m_GridSizeX;
 	int MaxGridZ = (MaxBlockZ + m_GridSizeZ - 1) / m_GridSizeZ;
-	if (MinBlockX < 0)
-	{
-		--MinGridX;
-	}
-	if (MinBlockZ < 0)
-	{
-		--MinGridZ;
-	}
-	if (MaxBlockX < 0)
-	{
-		--MaxGridX;
-	}
-	if (MaxBlockZ < 0)
-	{
-		--MaxGridZ;
-	}
+	int MinX = MinGridX * m_GridSizeX;
+	int MaxX = MaxGridX * m_GridSizeX;
+	int MinZ = MinGridZ * m_GridSizeZ;
+	int MaxZ = MaxGridZ * m_GridSizeZ;
 
 	// Walk the cache, move each structure that we want into a_Structures:
 	for (cStructurePtrs::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
 	{
 		if (
-			((*itr)->m_OriginX >= MinBlockX) && ((*itr)->m_OriginX < MaxBlockX) &&
-			((*itr)->m_OriginZ >= MinBlockZ) && ((*itr)->m_OriginZ < MaxBlockZ)
+			((*itr)->m_OriginX >= MinX) && ((*itr)->m_OriginX < MaxX) &&
+			((*itr)->m_OriginZ >= MinZ) && ((*itr)->m_OriginZ < MaxZ)
 		)
 		{
 			// want
