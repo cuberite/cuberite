@@ -1016,6 +1016,17 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	
 	cWorld * World = m_Player->GetWorld();
+
+	if (
+		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+	)
+	{
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -1189,6 +1200,16 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 	{
 		// The block is being placed outside the world, ignore this packet altogether (#128)
+		return;
+	}
+
+	if (
+		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+	)
+	{
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
 	}
 	
