@@ -79,11 +79,11 @@ bool cParsedNBT::Parse(void)
 
 
 
-bool cParsedNBT::ReadString(int & a_StringStart, int & a_StringLen)
+bool cParsedNBT::ReadString(size_t & a_StringStart, size_t & a_StringLen)
 {
 	NEEDBYTES(2);
 	a_StringStart = m_Pos + 2;
-	a_StringLen = GetBEShort(m_Data + m_Pos);
+	a_StringLen = (size_t)GetBEShort(m_Data + m_Pos);
 	if (a_StringLen < 0)
 	{
 		// Invalid string length

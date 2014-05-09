@@ -1078,7 +1078,7 @@ void cWSSAnvil::LoadCommandBlockFromNBT(cBlockEntityList & a_BlockEntities, cons
 
 
 
-void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength)
+void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, size_t a_IDTagLength)
 {
 	if (strncmp(a_IDTag, "Boat", a_IDTagLength) == 0)
 	{

@@ -96,7 +96,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 					if (ExplosionName == "Colors")
 					{
 						// Divide by four as data length returned in bytes
-						int DataLength = a_NBT.GetDataLength(explosiontag);
+						size_t DataLength = a_NBT.GetDataLength(explosiontag);
 						// round to the next highest multiple of four
 						DataLength -= DataLength % 4; 
 						if (DataLength == 0)
@@ -112,7 +112,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 					}
 					else if (ExplosionName == "FadeColors")
 					{
-						int DataLength = a_NBT.GetDataLength(explosiontag) / 4;
+						size_t DataLength = a_NBT.GetDataLength(explosiontag) / 4;
 						// round to the next highest multiple of four
 						DataLength -= DataLength % 4; 
 						if (DataLength == 0)
