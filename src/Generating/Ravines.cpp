@@ -9,9 +9,6 @@
 
 
 
-/// How many ravines in each direction are generated for a given chunk. Must be an even number
-static const int NEIGHBORHOOD_SIZE = 8;
-
 static const int NUM_RAVINE_POINTS = 4;
 
 
