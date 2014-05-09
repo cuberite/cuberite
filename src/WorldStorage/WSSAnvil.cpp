@@ -405,7 +405,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 
 
-void cWSSAnvil::CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, int a_Length)
+void cWSSAnvil::CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, size_t a_Length)
 {
 	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
 	if ((Child >= 0) && (a_NBT.GetType(Child) == TAG_ByteArray) && (a_NBT.GetDataLength(Child) == a_Length))
@@ -440,8 +440,8 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	
 	// Save blockdata:
 	a_Writer.BeginList("Sections", TAG_Compound);
-	int SliceSizeBlock  = cChunkDef::Width * cChunkDef::Width * 16;
-	int SliceSizeNibble = SliceSizeBlock / 2;
+	size_t SliceSizeBlock  = cChunkDef::Width * cChunkDef::Width * 16;
+	size_t SliceSizeNibble = SliceSizeBlock / 2;
 	const char * BlockTypes    = (const char *)(Serializer.m_BlockTypes);
 	const char * BlockMetas    = (const char *)(Serializer.m_BlockMetas);
 	#ifdef DEBUG_SKYLIGHT
@@ -1078,7 +1078,7 @@ void cWSSAnvil::LoadCommandBlockFromNBT(cBlockEntityList & a_BlockEntities, cons
 
 
 
-void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength)
+void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, size_t a_IDTagLength)
 {
 	if (strncmp(a_IDTag, "Boat", a_IDTagLength) == 0)
 	{
@@ -2630,14 +2630,14 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	unsigned ChunkLocation = ntohl(m_Header[LocalX + 32 * LocalZ]);
 	unsigned ChunkOffset = ChunkLocation >> 8;
 	
-	m_File.Seek(ChunkOffset * 4096);
+	m_File.Seek((int)ChunkOffset * 4096);
 	
 	int ChunkSize = 0;
 	if (m_File.Read(&ChunkSize, 4) != 4)
 	{
 		return false;
 	}
-	ChunkSize = ntohl(ChunkSize);
+	ChunkSize = ntohl((u_long)ChunkSize);
 	char CompressionType = 0;
 	if (m_File.Read(&CompressionType, 1) != 1)
 	{

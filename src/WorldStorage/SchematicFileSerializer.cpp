@@ -230,11 +230,11 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	}
 
 	// Copy the block types and metas:
-	int NumBytes = (int)a_BlockArea.GetBlockCount();
+	size_t NumBytes = a_BlockArea.GetBlockCount();
 	if (a_NBT.GetDataLength(TBlockTypes) < NumBytes)
 	{
 		LOG("BlockTypes truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
-			NumBytes, a_NBT.GetDataLength(TBlockTypes)
+			(int)NumBytes, (int)a_NBT.GetDataLength(TBlockTypes)
 		);
 		NumBytes = a_NBT.GetDataLength(TBlockTypes);
 	}
@@ -242,11 +242,11 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	
 	if (AreMetasPresent)
 	{
-		int NumBytes = (int)a_BlockArea.GetBlockCount();
+		size_t NumBytes = a_BlockArea.GetBlockCount();
 		if (a_NBT.GetDataLength(TBlockMetas) < NumBytes)
 		{
 			LOG("BlockMetas truncated in the schematic file (exp %d, got %d bytes). Loading partial.",
-				NumBytes, a_NBT.GetDataLength(TBlockMetas)
+				(int)NumBytes, (int)a_NBT.GetDataLength(TBlockMetas)
 			);
 			NumBytes = a_NBT.GetDataLength(TBlockMetas);
 		}

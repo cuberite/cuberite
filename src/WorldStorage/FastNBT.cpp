@@ -29,7 +29,7 @@
 // cParsedNBT:
 
 #define NEEDBYTES(N) \
-	if (m_Length - m_Pos < N) \
+	if (m_Length - m_Pos < (size_t)N) \
 	{ \
 		return false; \
 	}
@@ -79,14 +79,14 @@ bool cParsedNBT::Parse(void)
 
 
 
-bool cParsedNBT::ReadString(int & a_StringStart, int & a_StringLen)
+bool cParsedNBT::ReadString(size_t & a_StringStart, size_t & a_StringLen)
 {
 	NEEDBYTES(2);
 	a_StringStart = m_Pos + 2;
-	a_StringLen = GetBEShort(m_Data + m_Pos);
-	if (a_StringLen < 0)
+	a_StringLen = (size_t)GetBEShort(m_Data + m_Pos);
+	if (a_StringLen > 0xffff)
 	{
-		// Invalid string length
+		// Suspicious string length
 		return false;
 	}
 	m_Pos += 2 + a_StringLen;
@@ -281,7 +281,7 @@ int cParsedNBT::FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLen
 	for (int Child = m_Tags[a_Tag].m_FirstChild; Child != -1; Child = m_Tags[Child].m_NextSibling)
 	{
 		if (
-			(m_Tags[Child].m_NameLength == (int)a_NameLength) &&
+			(m_Tags[Child].m_NameLength == a_NameLength) &&
 			(memcmp(m_Data + m_Tags[Child].m_NameStart, a_Name, a_NameLength) == 0)
 		)
 		{

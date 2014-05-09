@@ -394,10 +394,14 @@ void cWorld::InitializeSpawn(void)
 	
 	// For the debugging builds, don't make the server build too much world upon start:
 	#if defined(_DEBUG) || defined(ANDROID_NDK)
-	int ViewDist = 9;
+		const int DefaultViewDist = 9;
 	#else
-	int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
+		const int DefaultViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
 	#endif  // _DEBUG
+	cIniFile IniFile;
+	IniFile.ReadFile(m_IniFileName);
+	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
+	IniFile.WriteFile(m_IniFileName);
 	
 	LOG("Preparing spawn area in world \"%s\"...", m_WorldName.c_str());
 	for (int x = 0; x < ViewDist; x++)

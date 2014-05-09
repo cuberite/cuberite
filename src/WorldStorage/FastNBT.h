@@ -61,10 +61,10 @@ public:
 	
 	// The following members are indices into the data stream. m_DataLength == 0 if no data available
 	// They must not be pointers, because the datastream may be copied into another AString object in the meantime.
-	int m_NameStart;
-	int m_NameLength;
-	int m_DataStart;
-	int m_DataLength;
+	size_t m_NameStart;
+	size_t m_NameLength;
+	size_t m_DataStart;
+	size_t m_DataLength;
 	
 	// The following members are indices into the array returned; -1 if not valid
 	// They must not be pointers, because pointers would not survive std::vector reallocation
@@ -135,7 +135,7 @@ public:
 	
 	/** Returns the length of the tag's data, in bytes.
 	Not valid for Compound or List tags! */
-	int GetDataLength (int a_Tag) const
+	size_t GetDataLength (int a_Tag) const
 	{
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_List);
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_Compound);
@@ -256,10 +256,10 @@ protected:
 	bool                     m_IsValid;  // True if parsing succeeded
 
 	// Used while parsing:
-	int m_Pos;
+	size_t m_Pos;
 
 	bool Parse(void);
-	bool ReadString(int & a_StringStart, int & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
+	bool ReadString(size_t & a_StringStart, size_t & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
 	bool ReadCompound(void);  // Reads the latest tag as a compound
 	bool ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
 	bool ReadTag(void);       // Reads the latest tag, depending on its m_Type setting
