@@ -878,6 +878,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		case DIG_STATUS_CANCELLED:
 		{
 			// Block breaking cancelled by player
+			HandleBlockDigCancel();
 			return;
 		}
 
@@ -916,7 +917,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		// It is a duplicate packet, drop it right away
 		return;
 	}
-	
+
 	if (
 		m_Player->IsGameModeCreative() &&
 		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType)
@@ -925,14 +926,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		// Players can't destroy blocks with a Sword in the hand.
 		return;
 	}
-	
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
-	{
-		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
-	}
-	
+
 	// Set the last digging coords to the block being dug, so that they can be checked in DIG_FINISHED to avoid dig/aim bug in the client:
 	m_HasStartedDigging = true;
 	m_LastDigBlockX = a_BlockX;
@@ -1004,16 +998,16 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	m_HasStartedDigging = false;
-	if (m_BlockDigAnimStage != -1)
-	{
-		// End dig animation
-		m_BlockDigAnimStage = -1;
-		// It seems that 10 ends block animation
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
-	}
+	HandleBlockDigCancel();
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	{
+		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
 	
 	if (a_OldBlock == E_BLOCK_AIR)
 	{
@@ -1030,6 +1024,36 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+}
+
+
+
+
+
+void cClientHandle::HandleBlockDigCancel()
+{
+	if (
+		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
+		(m_LastDigBlockX == -1) ||
+		(m_LastDigBlockY == -1) ||
+		(m_LastDigBlockZ == -1)
+	)
+	{
+		return;
+	}
+
+	m_HasStartedDigging = false;
+	if (m_BlockDigAnimStage != -1)
+	{
+		// End dig animation
+		m_BlockDigAnimStage = -1;
+		// It seems that 10 ends block animation
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ, 10, this);
+	}
+
+	m_BlockDigAnimX = -1;
+	m_BlockDigAnimY = -1;
+	m_BlockDigAnimZ = -1;
 }
 
 
@@ -1058,6 +1082,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player); //2 block high things
+			m_Player->GetInventory().SendEquippedSlot();
 		}
 		return;
 	}
@@ -1246,6 +1271,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Handler refused the placement, send that information back to the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		m_Player->GetInventory().SendEquippedSlot();
 		return;
 	}
 	
@@ -1255,6 +1281,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// A plugin doesn't agree with placing the block, revert the block on the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		m_Player->GetInventory().SendEquippedSlot();
 		return;
 	}
 	

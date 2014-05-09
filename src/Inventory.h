@@ -56,13 +56,13 @@ public:
 	
 	// tolua_begin
 
-	/// Removes all items from the entire inventory
+	/** Removes all items from the entire inventory */
 	void Clear(void);
 
-	/// Returns number of items out of a_ItemStack that can fit in the storage
+	/** Returns number of items out of a_ItemStack that can fit in the storage */
 	int HowManyCanFit(const cItem & a_ItemStack, bool a_ConsiderEmptySlots);
 
-	/// Returns how many items of the specified type would fit into the slot range specified
+	/** Returns how many items of the specified type would fit into the slot range specified */
 	int HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int a_EndSlotNum, bool a_ConsiderEmptySlots);
 	
 	/** Adds as many items out of a_ItemStack as can fit.
@@ -86,33 +86,36 @@ public:
 	*/
 	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a_tryToFillEquippedFirst);
 
-	/// Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed
+	/** Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed */
 	bool RemoveOneEquippedItem(void);
 	
-	/// Returns the number of items of type a_Item that are stored
+	/** Returns the number of items of type a_Item that are stored */
 	int HowManyItems(const cItem & a_Item);
 	
-	/// Returns true if there are at least as many items of type a_ItemStack as in a_ItemStack
+	/** Returns true if there are at least as many items of type a_ItemStack as in a_ItemStack */
 	bool HasItems(const cItem & a_ItemStack);
+
+	/** Sends the equipped item slot to the client */
+	void SendEquippedSlot();
 	
-	/// Returns the cItemGrid object representing the armor slots
+	/** Returns the cItemGrid object representing the armor slots */
 	cItemGrid & GetArmorGrid(void) { return m_ArmorSlots; }
 	
-	/// Returns the cItemGrid object representing the main inventory slots
+	/** Returns the cItemGrid object representing the main inventory slots */
 	cItemGrid & GetInventoryGrid(void) { return m_InventorySlots; }
 	
-	/// Returns the cItemGrid object representing the hotbar slots
+	/** Returns the cItemGrid object representing the hotbar slots */
 	cItemGrid & GetHotbarGrid(void) { return m_HotbarSlots; }
 	
-	/// Returns the player associated with this inventory
+	/** Returns the player associated with this inventory */
 	cPlayer & GetOwner(void) { return m_Owner; }
 	
-	/// Copies the non-empty slots into a_ItemStacks; preserves the original a_Items contents
+	/** Copies the non-empty slots into a_ItemStacks; preserves the original a_Items contents */
 	void CopyToItems(cItems & a_Items);
 	
 	// tolua_end
 
-	/// Returns the player associated with this inventory (const version)
+	/** Returns the player associated with this inventory (const version) */
 	const cPlayer & GetOwner(void) const { return m_Owner; }
 	
 	// tolua_begin
@@ -136,10 +139,10 @@ public:
 	*/
 	int ChangeSlotCount(int a_SlotNum, int a_AddToCount);
 	
-	/// Adds the specified damage to the specified item; deletes the item and returns true if the item broke.
+	/** Adds the specified damage to the specified item; deletes the item and returns true if the item broke. */
 	bool DamageItem(int a_SlotNum, short a_Amount);
 
-	/// Adds the specified damage to the currently held item; deletes the item and returns true if the item broke.
+	/** Adds the specified damage to the currently held item; deletes the item and returns true if the item broke. */
 	bool DamageEquippedItem(short a_Amount = 1);
 	
 	const cItem & GetEquippedHelmet    (void) const { return m_ArmorSlots.GetSlot(0); }
@@ -149,13 +152,13 @@ public:
 
 	// tolua_end
 	
-	/// Sends the slot contents to the owner
+	/** Sends the slot contents to the owner */
 	void SendSlot(int a_SlotNum);
 
-	/// Update items (e.g. Maps)
+	/** Update items (e.g. Maps) */
 	void UpdateItems(void);
 
-	/// Converts an armor slot number into the ID for the EntityEquipment packet
+	/** Converts an armor slot number into the ID for the EntityEquipment packet */
 	static int ArmorSlotNumToEntityEquipmentID(short a_ArmorSlotNum);
 
 	void SaveToJson(Json::Value & a_Value);
@@ -172,10 +175,10 @@ protected:
 
 	cPlayer & m_Owner;
 	
-	/// Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return NULL for invalid SlotNum
+	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return NULL for invalid SlotNum */
 	const cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum) const;
 	
-	/// Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return NULL for invalid SlotNum
+	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return NULL for invalid SlotNum */
 	cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum);
 	
 	// cItemGrid::cListener override:
