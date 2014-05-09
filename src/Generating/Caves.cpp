@@ -35,13 +35,6 @@ reduced in complexity in order for this generator to be useful, so the caves' sh
 
 
 
-/// How many nests in each direction are generated for a given chunk. Must be an even number
-#define NEIGHBORHOOD_SIZE 8
-
-
-
-
-
 const int MIN_RADIUS = 3;
 const int MAX_RADIUS = 8;
 
