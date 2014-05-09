@@ -221,7 +221,7 @@ protected:
 	cMCAFile * LoadMCAFile(const cChunkCoords & a_Chunk);
 	
 	/// Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer
-	void CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, int a_Length);
+	void CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, size_t a_Length);
 		
 	// cWSSchema overrides:
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;
