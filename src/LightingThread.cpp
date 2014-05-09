@@ -106,11 +106,13 @@ void cLightingThread::Stop(void)
 		cCSLock Lock(m_CS);
 		for (cChunkStays::iterator itr = m_PendingQueue.begin(), end = m_PendingQueue.end(); itr != end; ++itr)
 		{
+			(*itr)->Disable();
 			delete *itr;
 		}
 		m_PendingQueue.clear();
 		for (cChunkStays::iterator itr = m_Queue.begin(), end = m_Queue.end(); itr != end; ++itr)
 		{
+			(*itr)->Disable();
 			delete *itr;
 		}
 		m_Queue.clear();
