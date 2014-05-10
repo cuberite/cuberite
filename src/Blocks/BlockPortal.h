@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "../Mobs/Monster.h"
 
 
 
@@ -38,6 +39,19 @@ public:
 		return; // No pickups
 	}
 
+	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	{
+		cFastRandom Random;
+		if (Random.NextInt(2000) != 0)
+		{
+			return;
+		}
+
+		int PosX = a_Chunk.GetPosX() * 16 + a_RelX;
+		int PosZ = a_Chunk.GetPosZ() * 16 + a_RelZ;
+
+		a_WorldInterface.SpawnMob(PosX, a_RelY, PosZ, cMonster::mtZombiePigman);
+	}
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{

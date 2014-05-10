@@ -144,7 +144,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	}
 
 	size_t NumLoadedPlugins = GetNumPlugins();
-	if (NumLoadedPlugins)
+	if (NumLoadedPlugins == 0)
 	{
 		LOG("-- No Plugins Loaded --");
 	}
