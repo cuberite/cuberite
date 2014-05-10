@@ -1,11 +1,17 @@
+html { height: 100%; }
+
 body
 {
 	padding: 0px 20px 20px 20px;
 	font-family: Calibri, Helvetica;
-	min-width: 1250px;
+	height: 100%;
+}
+.wrapper
+{
+	min-height: 100%;
 }
 
-hr { margin-top: -8px; }
+.navhr { margin-top: -8px; }
 
 h1
 {
@@ -29,8 +35,12 @@ h2
 }
 
 nav { float: right; }
-.nav { margin-top: -32.5px; list-style: none; }
-.nav li
+.nav
+{
+	margin-top: -32.5px;
+	list-style: none;
+}
+.nav > li
 {
 	padding-left: 10px;
 	padding-right: 10px;
@@ -40,27 +50,43 @@ nav { float: right; }
 	border-top-right-radius: 5px;
 	display: inline;
 	font-size: 20px;
+	transition: all 300ms;
 	margin-left: 1.5px;
+	vertical-align: 6px;
 }
-.nav li :hover { background-color: lightgrey; }
-.nav a { text-decoration: none; }
-.nav a :link, .buildstatusanddonatelink :link { text-decoration: none; }
+.nav li:hover { background-color: lightgrey; }
+.nav a:link, .buildstatusanddonatelink:link { text-decoration: none; }
 
 .downloadbox
 {
 	border: 2px solid lightblue;
 	background-color: lightblue;
 	border-radius: 5px;
+	width: 500px;
+	height: 300px;
+	margin-left: auto;
+	margin-right: auto;
+	clear: left;
 	display: inline-table;
-	min-width: 480px;
-	max-width: 480px;
-	min-height: 285px;
-	max-height: 285px;
-	vertical-align: middle;
+}
+@media screen and (max-width: 1360px)
+{
+	.downloadbox { display: table; }
+	.nav
+	{
+		margin-top: -15.5px;
+	}
+	.nav li
+	{
+		border-bottom: 1px solid black;
+		border-radius: 5px;
+	}
+	nav { float: none; }
+	.navhr { margin-top: 0; }
 }
 .downloadosimage
 {
-	width: 70px;
+	width: 90px;
 	height: auto;
 	display: block;
 	margin-left: auto;
@@ -73,15 +99,13 @@ nav { float: right; }
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
-	width: 30px;
+	width: 40px;
 	height: auto;
 }
 
 footer
 {
 	border-top: 1px dotted black;
-	position: relative;
-	bottom: -40px;
 }
 
 .buildstatusanddonatebutton { display: inline; }

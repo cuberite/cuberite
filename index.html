@@ -6,6 +6,7 @@
 
 		<meta charset="UTF-8">
 		<meta name="description" content="A high performance custom Minecraft server written entirely in C++.">
+		<meta name="viewport" content="width=device-width" />
 
 		<link type="text/css" href="css.css" rel="stylesheet">
 
@@ -23,16 +24,16 @@
 		
 		<nav>
 			<ul class="nav">
-				<li ><a href="/" >Home</a></li>
-				<li ><a href="https://github.com/mc-server/MCServer" >GitHub</a></li>
-				<li ><a href="http://forum.mc-server.org" >Forums</a></li>
-				<li ><a href="http://mc-server.xoft.cz/LuaAPI/" >API Documentation</a></li>
+				<li class="nav"><a href="/">Home</a></li>
+				<li class="nav"><a href="https://github.com/mc-server/MCServer">GitHub</a></li>
+				<li class="nav"><a href="http://forum.mc-server.org">Forums</a></li>
+				<li class="nav"><a href="http://mc-server.xoft.cz/LuaAPI/">API&nbsp;Documentation</a></li>
 			</ul>
 		</nav>
 
-		<hr>
+		<hr class="navhr">
 		
-		<div>
+		<div class="wrapper">
 		
 			<p>
 				MCServer is a custom Minecraft server, written completely in C++.
@@ -45,52 +46,53 @@
 				If your platform is not listed, then there is probably a bug to add compatibility or your operating system is too obscure.
 			</p>
 			
-			<hr><br/>
+			<hr>
 			
 			<table class="downloadbox">
+				<tr><td style="margin: 0 auto;"><h3>Download Executables</h3></td></tr>
 				<tr>
 					<td>					
 						<div style="text-align: center;"><b>Linux 32-bit</b></div>
-						<img src="images/linux.png" alt="Linux" class="downloadosimage"/>
 						<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86/lastSuccessfulBuild/artifact/MCServer.tar">
-							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/linux.svg" alt="Linux" class="downloadosimage"/>
+							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>
 					</td>
 					<td>
 						<div style="text-align: center;"><b>Linux 64-bit</b></div>
-						<img src="images/linux.png" alt="Linux" class="downloadosimage"/>
 						<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86-64/lastSuccessfulBuild/artifact/MCServer.tar">
-							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/linux.svg" alt="Linux" class="downloadosimage"/>
+							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>
 					</td>
 					<td>
 						<div style="text-align: center;"><b>Windows 32-bit</b></div>
-						<img src="https://www.snelserver.com/media/images/windows.png" alt="Windows" class="downloadosimage"/>
 						<a href="http://mc-server.xoft.cz">
-							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/windows.svg" alt="Windows" class="downloadosimage"/>
+							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>
 					</td>
 				</tr>
 				<tr>
 					<td>
 						<div style="text-align: center;"><b>Macintosh 64-bit</b></div>
-						<img src="images/mac.png" alt="Macintosh" class="downloadosimage"/>
 						<a href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&amp;id=EAC2A6E3A23C4250%21109">
-							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/mac.svg" alt="Macintosh" class="downloadosimage"/>
+							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>
 					</td>
 					<td>
 						<div style="text-align: center;"><b>Raspbian Hard Float</b></div>
-						<img src="images/raspi.png" alt="Raspbian" class="downloadosimage"/>
 						<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20HardFloat/lastSuccessfulBuild/artifact/MCServer.tar">
-							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/raspi.svg" alt="Raspbian" class="downloadosimage"/>
+							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>
 					</td>
 					<td>
 						<div style="text-align: center;"><b>Raspbian Soft Float</b></div>
-						<img src="images/raspi.png" alt="Raspbian" class="downloadosimage"/>
 						<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20SoftFloat/lastSuccessfulBuild/artifact/MCServer.tar">
-							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/raspi.svg" alt="Raspbian" class="downloadosimage"/>
+							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>
 					</td>			
 				</tr>
@@ -107,31 +109,33 @@
 						<a href="https://github.com/mc-server/MCServer">our GitHub repository</a> and compile the binaries yourself.<br/>
 						See GitHub repository for compiling instructions
 						</div>
-						<img src="http://cssnerd.com/wp-content/plugins/better-github-widget/octocat.png" alt="Source Code" class="downloadosimage"/>
+						<img src="images/github.svg" alt="Source Code" class="downloadosimage"/>
 						<a href="http://github.com/mc-server/MCServer/archive/master.zip">
-							<img src="http://www.abtmm.in/images/download.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>
 					</td>
 					<td>
 						<div style="text-align: center;"><b>GitHub for Windows Clone</b><br/>
 						Use this link if you have <a href="https://windows.github.com">GitHub for Windows</a> installed.
 						</div>
-						<img src="images/github.png" alt="Github for Windows" class="downloadosimage"/>
 						<a href="github-windows://github.com/mc-server/MCServer.git">
-							<img src="http://simpleicon.com/wp-content/uploads/cloud-download-2.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/githubforwindows.svg" alt="Github for Windows" class="downloadosimage"/>
+							<img src="images/gitdownloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>						
 					</td>
 					<td>
 						<div style="text-align: center;"><b>GitHub for Command Line Clone Address</b><br/>
 						Use this link if you have hate all things colourful and chiefly use command line Git.
 						</div>
-						<img src="http://d3e07c52qqws8e.cloudfront.net/wp-content/uploads/2009/11/Terminalicon2.png" alt="Github for Haters of Art (HoF - as in Astrid HoFferson)" class="downloadosimage"/>
 						<a href="github-windows://github.com/mc-server/MCServer.git">
-							<img src="http://simpleicon.com/wp-content/uploads/cloud-download-2.png" alt="Download Icon" class="downloadicon"/>
+							<img src="images/terminal.svg" alt="Github for Haters of Art (HoF - as in Astrid HoFferson)" class="downloadosimage"/>
+							<img src="images/gitdownloadicon.svg" alt="Download Icon" class="downloadicon"/>
 						</a>						
 					</td>
 				</tr>
 			</table>
+			
+			&nbsp;
 		
 		</div>
     
