@@ -328,7 +328,7 @@ public:
 	}
 	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
-			if (!GetMeta(a_RelX, a_RelY, a_RelZ) == a_Meta)
+			if (!(GetMeta(a_RelX, a_RelY, a_RelZ) == a_Meta))
 			{
 				MarkDirty();
 				m_ChunkBuffer.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
