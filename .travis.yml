@@ -4,7 +4,7 @@ compiler:
   - clang
 
 before_install:
-  - if [ $TRAVIS_MCSERVER_BUILD_TYPE == "COVERAGE" ]; then sudo pip install cpp_coveralls; fi
+  - if [ "$TRAVIS_MCSERVER_BUILD_TYPE" == "COVERAGE" ]; then sudo pip install cpp_coveralls; fi
 
 # Build MCServer
 script: ./CIbuild.sh
