@@ -7,10 +7,10 @@ before_install:
   - if [TRAVIS_MCSERVER_BUILD_TYPE == "COVERAGE"]; then sudo pip install cpp_coveralls; fi
 
 # Build MCServer
-script: CIbuild.sh
+script: ./CIbuild.sh
 
 after_success:
-  - uploadCoverage.sh
+  - ./uploadCoverage.sh
 
 env:
   - TRAVIS_MCSERVER_BUILD_TYPE=RELEASE MCSERVER_PATH=./MCServer
