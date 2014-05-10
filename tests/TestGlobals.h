@@ -1,8 +1,8 @@
 
 
-#include <cassert>
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 
 
 // Compiler-dependent stuff:
@@ -110,10 +110,13 @@ typedef unsigned short     UInt16;
 
 typedef unsigned char Byte;
 
+class cAssertFailure
+{
+};
 
-
-#define ASSERT(x) assert(x)
-
+#define ASSERT(x) do { if (!(x)) { throw cAssertFailure();} } while (0)
+#define testassert(x) do { if(!(x)) { exit(1); } } while (0)
+#define CheckAsserts(x) do { try {x} catch (cAssertFailure) { break; }  exit(1); } while (0)
 
 #ifndef TOLUA_TEMPLATE_BIND
 #define TOLUA_TEMPLATE_BIND(x)
