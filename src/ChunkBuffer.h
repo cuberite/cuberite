@@ -124,7 +124,7 @@ public:
 			m_Sections[Section] = Allocate();
 			if(!m_Sections[Section])
 			{
-				ASSERT("Failed to allocate a new section in Chunkbuffer");
+				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 				return;
 			}
 		}
@@ -169,7 +169,7 @@ public:
 			m_Sections[Section] = Allocate();
 			if(!m_Sections[Section])
 			{
-				ASSERT("Failed to allocate a new section in Chunkbuffer");
+				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 				return;
 			}
 		}

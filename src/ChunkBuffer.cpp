@@ -35,7 +35,7 @@ void cChunkBuffer::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length
 				memcpy(
 					&a_dest[i * segment_length],
 					&m_Sections[i]->m_BlockTypes, 
-					sizeof(BLOCKTYPE) * length
+					sizeof(BLOCKTYPE) * tocopy
 				);
 			}
 			else
@@ -43,7 +43,7 @@ void cChunkBuffer::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length
 				memset(
 					&a_dest[i * segment_length],
 					0,
-					sizeof(BLOCKTYPE) * length
+					sizeof(BLOCKTYPE) * tocopy
 				);
 			}
 		}
@@ -141,7 +141,7 @@ void cChunkBuffer::SetBlocks(const BLOCKTYPE * a_src)
 {
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
-		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
+		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16;
 		if (m_Sections[i])
 		{
 			memcpy(&m_Sections[i]->m_BlockTypes, &a_src[i * segment_length], sizeof(BLOCKTYPE) * segment_length);

@@ -15,8 +15,8 @@ int main(int argc, char** argv)
 	testassert(copy.GetBlock(3,1,4) == 0xDE);
 	testassert(copy.GetMeta(3,1,4) == 0xA);
 	
-	BLOCKTYPE * SrcBlockBuffer = new BLOCKTYPE[256 * 256 * 256];
-	for (int i = 0; i < 256* 256 * 256; i += 4)
+	BLOCKTYPE * SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
+	for (int i = 0; i < 16 * 16 * 256; i += 4)
 	{
 		SrcBlockBuffer[i+0] = 0xDE;
 		SrcBlockBuffer[i+1] = 0xAD;
@@ -25,16 +25,16 @@ int main(int argc, char** argv)
 	}
 	
 	buffer.SetBlocks(SrcBlockBuffer);
-	BLOCKTYPE * DstBlockBuffer = new BLOCKTYPE[256 * 256 * 256];
+	BLOCKTYPE * DstBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 	buffer.CopyBlocks(DstBlockBuffer);
-	testassert(memcmp(SrcBlockBuffer, DstBlockBuffer, (256 * 256 * 256) -1) == 0);
+	testassert(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) -1) == 0);
 	delete SrcBlockBuffer;
 	delete DstBlockBuffer;
 	SrcBlockBuffer = NULL;
 	DstBlockBuffer = NULL;
 	
-	NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[256 * 256 * 256/2];
-	for (int i = 0; i < 256* 256 * 256 / 2; i += 4)
+	NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
+	for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
 	{
 		SrcNibbleBuffer[i+0] = 0xEF;
 		SrcNibbleBuffer[i+1] = 0xDE;
@@ -43,9 +43,9 @@ int main(int argc, char** argv)
 	}
 	
 	buffer.SetMeta(SrcNibbleBuffer);
-	NIBBLETYPE * DstNibbleBuffer = new NIBBLETYPE[256 * 256 * 256/ 2];
+	NIBBLETYPE * DstNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/ 2];
 	buffer.CopyMeta(DstNibbleBuffer);
-	testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (256 * 256 * 256 /2) -1) == 0);
+	testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 /2) -1) == 0);
 	delete SrcNibbleBuffer;
 	delete DstNibbleBuffer;
 	SrcNibbleBuffer = NULL;
