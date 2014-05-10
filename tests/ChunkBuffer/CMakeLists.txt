@@ -14,3 +14,7 @@ add_test(NAME creatable-test COMMAND creatable-exe)
 add_executable(coordinates-exe Coordinates.cpp)
 target_link_libraries(coordinates-exe ChunkBuffer)
 add_test(NAME coordinates-test COMMAND coordinates-exe)
+
+add_executable(copies-exe Copies.cpp)
+target_link_libraries(copies-exe ChunkBuffer)
+add_test(NAME copies-test COMMAND copies-exe)
