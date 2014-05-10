@@ -2,14 +2,26 @@ language: cpp
 compiler:
   - gcc
   - clang
+
+before_install:
+  - if [TRAVIS_MCSERVER_BUILD_TYPE == "COVERAGE"] then sudo pip install cpp_coveralls fi
+
 # Build MCServer
-script: cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1 && make -j 2 && cd MCServer/ && (echo stop | $MCSERVER_PATH)
+script: CIbuild.sh
+
+after_success:
+  - uploadCoverage.sh
 
 env:
   - TRAVIS_MCSERVER_BUILD_TYPE=RELEASE MCSERVER_PATH=./MCServer
   - TRAVIS_MCSERVER_BUILD_TYPE=DEBUG   MCSERVER_PATH=./MCServer_debug
   - TRAVIS_MCSERVER_BUILD_TYPE=RELEASE TRAVIS_MCSERVER_FORCE32=1 MCSERVER_PATH=./MCServer
   - TRAVIS_MCSERVER_BUILD_TYPE=DEBUG   TRAVIS_MCSERVER_FORCE32=1 MCSERVER_PATH=./MCServer_debug
+
+matrix:
+  include:
+    - compiler: gcc
+      env: TRAVIS_MCSERVER_BUILD_TYPE=COVERAGE   MCSERVER_PATH=./MCServer_debug
 
 # Notification Settings
 notifications:
